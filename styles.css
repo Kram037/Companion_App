@@ -578,8 +578,6 @@ body {
     background: var(--background);
     border-radius: var(--radius-sm);
     color: var(--text);
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
 }
 
 /* Theme Selector */
@@ -904,26 +902,10 @@ body {
         height: 80px;
     }
     
-    /* Theme buttons on mobile */
-    .theme-selector {
-        flex-wrap: wrap;
-        gap: var(--spacing-xs);
-    }
-    
-    .theme-btn {
-        min-width: 60px;
-        padding: var(--spacing-xs);
-        flex: 1;
-        max-width: calc(50% - var(--spacing-xs));
-    }
-    
+    /* Theme preview 25% smaller on mobile */
     .theme-preview {
-        width: 45px;
-        height: 30px;
-    }
-    
-    .theme-btn span {
-        font-size: 0.75rem;
+        width: 45px; /* 60px * 0.75 = 45px */
+        height: 30px; /* 40px * 0.75 = 30px */
     }
 }
 
