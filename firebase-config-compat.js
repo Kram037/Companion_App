@@ -14,8 +14,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-// Make auth and googleProvider globally available
+// Make auth, firestore and googleProvider globally available
 window.auth = firebase.auth();
+window.firestore = firebase.firestore();
 window.analytics = firebase.analytics();
 
 // Google Auth Provider
@@ -26,8 +27,10 @@ window.googleProvider.setCustomParameters({
 
 // Also declare as const for compatibility
 const auth = window.auth;
+const firestore = window.firestore;
 const googleProvider = window.googleProvider;
 const analytics = window.analytics;
 
 console.log('✅ Firebase (Compat) inizializzato correttamente');
+console.log('Firestore disponibile:', !!firestore);
 

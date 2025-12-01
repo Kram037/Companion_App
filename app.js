@@ -101,7 +101,15 @@ async function init() {
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         themeLight: document.getElementById('themeLight'),
-        themeDark: document.getElementById('themeDark')
+        themeDark: document.getElementById('themeDark'),
+        campagneList: document.getElementById('campagneList'),
+        addCampagnaBtn: document.getElementById('addCampagnaBtn'),
+        campagnaModal: document.getElementById('campagnaModal'),
+        closeCampagnaModal: document.getElementById('closeCampagnaModal'),
+        campagnaForm: document.getElementById('campagnaForm'),
+        campagnaModalTitle: document.getElementById('campagnaModalTitle'),
+        cancelCampagnaBtn: document.getElementById('cancelCampagnaBtn'),
+        saveCampagnaBtn: document.getElementById('saveCampagnaBtn')
     };
 
     // Check if all required elements exist
@@ -139,6 +147,8 @@ async function init() {
         if (success) {
             console.log('✅ Firebase pronto, setup auth...');
             setupFirebaseAuth();
+            // Setup Firestore after auth is ready
+            setupFirestore();
         } else {
             console.warn('⚠️ Firebase non disponibile, app continua senza autenticazione');
         }
@@ -554,6 +564,294 @@ function setTheme(theme, save = true) {
         console.log('✅ Tema salvato:', theme);
     }
 }
+
+// Firestore - Campagne Management
+let campagneUnsubscribe = null;
+let editingCampagnaId = null;
+
+function setupFirestore() {
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentAuth || !currentFirestore) {
+        console.warn('⚠️ Firestore non disponibile');
+        return;
+    }
+
+    // Listen for auth state changes to load campagne
+    currentAuth.onAuthStateChanged((user) => {
+        if (user) {
+            loadCampagne(user.uid);
+        } else {
+            // Clear campagne when logged out
+            if (campagneUnsubscribe) {
+                campagneUnsubscribe();
+                campagneUnsubscribe = null;
+            }
+            renderCampagne([]);
+        }
+    });
+}
+
+function loadCampagne(userId) {
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore) {
+        console.error('❌ Firestore non disponibile');
+        return;
+    }
+
+    console.log('📚 Caricamento campagne per utente:', userId);
+    
+    // Unsubscribe from previous listener if exists
+    if (campagneUnsubscribe) {
+        campagneUnsubscribe();
+    }
+
+    // Listen to real-time updates
+    // Note: We filter by userId in the query, but document ID is nome_campagna
+    campagneUnsubscribe = currentFirestore
+        .collection('Campagne')
+        .where('userId', '==', userId)
+        .onSnapshot(
+            (snapshot) => {
+                const campagne = [];
+                snapshot.forEach((doc) => {
+                    campagne.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                console.log('✅ Campagne caricate:', campagne.length);
+                renderCampagne(campagne);
+            },
+            (error) => {
+                console.error('❌ Errore nel caricamento campagne:', error);
+                showNotification('Errore nel caricamento delle campagne');
+            }
+        );
+}
+
+function renderCampagne(campagne) {
+    if (!elements.campagneList) return;
+
+    if (campagne.length === 0) {
+        elements.campagneList.innerHTML = `
+            <div class="content-placeholder">
+                <p>Nessuna campagna ancora. Clicca su "Nuova Campagna" per crearne una!</p>
+            </div>
+        `;
+        return;
+    }
+
+    elements.campagneList.innerHTML = campagne.map(campagna => {
+        const dataCreazione = campagna.data_creazione?.toDate ? 
+            new Date(campagna.data_creazione.toDate()).toLocaleDateString('it-IT') : 
+            'N/A';
+        const tempoGioco = campagna.tempo_di_gioco ? 
+            formatTempoGioco(campagna.tempo_di_gioco) : 
+            '0 min';
+        const note = campagna.note && campagna.note.length > 0 ? 
+            campagna.note.join(', ') : 
+            'Nessuna nota';
+
+        return `
+            <div class="campagna-card" data-campagna-id="${campagna.id}">
+                <div class="campagna-header">
+                    <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
+                    <div class="campagna-actions">
+                        <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="campagna-info">
+                    <div class="info-item">
+                        <span class="info-label">DM:</span>
+                        <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giocatori:</span>
+                        <span class="info-value">${campagna.numero_giocatori || 0}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Sessioni:</span>
+                        <span class="info-value">${campagna.numero_sessioni || 0}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tempo di gioco:</span>
+                        <span class="info-value">${tempoGioco}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Creata il:</span>
+                        <span class="info-value">${dataCreazione}</span>
+                    </div>
+                </div>
+                ${note !== 'Nessuna nota' ? `<div class="campagna-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function formatTempoGioco(minuti) {
+    if (minuti < 60) {
+        return `${minuti} min`;
+    }
+    const ore = Math.floor(minuti / 60);
+    const min = minuti % 60;
+    if (min === 0) {
+        return `${ore}h`;
+    }
+    return `${ore}h ${min}min`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function openCampagnaModal(campagnaId = null) {
+    editingCampagnaId = campagnaId;
+    
+    if (!elements.campagnaModal || !elements.campagnaForm) return;
+
+    // Reset form
+    elements.campagnaForm.reset();
+    
+    if (campagnaId) {
+        // Load campagna data for editing
+        const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+        if (currentFirestore) {
+            currentFirestore.collection('Campagne').doc(campagnaId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('nomeCampagna').value = data.nome_campagna || '';
+                        document.getElementById('nomeDM').value = data.nome_dm || '';
+                        document.getElementById('numeroGiocatori').value = data.numero_giocatori || '';
+                        document.getElementById('numeroSessioni').value = data.numero_sessioni || 0;
+                        document.getElementById('tempoDiGioco').value = data.tempo_di_gioco || 0;
+                        document.getElementById('note').value = data.note ? data.note.join('\n') : '';
+                        if (elements.campagnaModalTitle) {
+                            elements.campagnaModalTitle.textContent = 'Modifica Campagna';
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error('Errore nel caricamento campagna:', error);
+                    showNotification('Errore nel caricamento della campagna');
+                });
+        }
+    } else {
+        if (elements.campagnaModalTitle) {
+            elements.campagnaModalTitle.textContent = 'Nuova Campagna';
+        }
+    }
+
+    elements.campagnaModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCampagnaModal() {
+    if (!elements.campagnaModal) return;
+    elements.campagnaModal.classList.remove('active');
+    document.body.style.overflow = '';
+    editingCampagnaId = null;
+    if (elements.campagnaForm) {
+        elements.campagnaForm.reset();
+    }
+}
+
+async function handleCampagnaSubmit(e) {
+    e.preventDefault();
+    
+    if (!AppState.isLoggedIn) {
+        showNotification('Devi essere loggato per creare una campagna');
+        return;
+    }
+
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentAuth || !currentFirestore) {
+        showNotification('Errore: Firestore non disponibile');
+        return;
+    }
+
+    const user = currentAuth.currentUser;
+    if (!user) {
+        showNotification('Errore: utente non autenticato');
+        return;
+    }
+
+    const formData = {
+        nome_campagna: document.getElementById('nomeCampagna').value.trim(),
+        nome_dm: document.getElementById('nomeDM').value.trim(),
+        numero_giocatori: parseInt(document.getElementById('numeroGiocatori').value) || 0,
+        numero_sessioni: parseInt(document.getElementById('numeroSessioni').value) || 0,
+        tempo_di_gioco: parseInt(document.getElementById('tempoDiGioco').value) || 0,
+        note: document.getElementById('note').value.split('\n').filter(n => n.trim()).map(n => n.trim()),
+        userId: user.uid
+    };
+
+    // Add data_creazione only for new campaigns
+    if (!editingCampagnaId) {
+        formData.data_creazione = firebase.firestore.FieldValue.serverTimestamp();
+    }
+
+    try {
+        if (editingCampagnaId) {
+            // Update existing campagna - keep same document ID
+            await currentFirestore.collection('Campagne').doc(editingCampagnaId).update(formData);
+            showNotification('Campagna aggiornata con successo!');
+        } else {
+            // Create new campagna - use nome_campagna as document ID (as specified)
+            const docId = formData.nome_campagna;
+            await currentFirestore.collection('Campagne').doc(docId).set(formData);
+            showNotification('Campagna creata con successo!');
+        }
+        closeCampagnaModal();
+    } catch (error) {
+        console.error('Errore nel salvataggio campagna:', error);
+        showNotification('Errore nel salvataggio della campagna: ' + error.message);
+    }
+}
+
+// Global functions for inline onclick handlers
+window.editCampagna = function(campagnaId) {
+    openCampagnaModal(campagnaId);
+};
+
+window.deleteCampagna = async function(campagnaId) {
+    if (!confirm('Sei sicuro di voler eliminare questa campagna?')) {
+        return;
+    }
+
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore) {
+        showNotification('Errore: Firestore non disponibile');
+        return;
+    }
+
+    try {
+        await currentFirestore.collection('Campagne').doc(campagnaId).delete();
+        showNotification('Campagna eliminata con successo!');
+    } catch (error) {
+        console.error('Errore nell\'eliminazione campagna:', error);
+        showNotification('Errore nell\'eliminazione della campagna: ' + error.message);
+    }
+};
 
 // Toggle between login and register mode
 function toggleLoginRegisterMode(isRegister) {

@@ -61,10 +61,14 @@
         <!-- Campagne Page (Landing) -->
         <section class="page active" id="campagnePage">
             <div class="page-content">
-                <h1>Le Mie Campagne</h1>
-                <p class="welcome-text">Benvenuto nella Companion App!</p>
-                <div class="content-placeholder">
-                    <p>Le tue campagne appariranno qui</p>
+                <div class="page-header">
+                    <h1>Le Mie Campagne</h1>
+                    <button class="btn-primary" id="addCampagnaBtn">+ Nuova Campagna</button>
+                </div>
+                <div id="campagneList" class="campagne-list">
+                    <div class="content-placeholder">
+                        <p>Le tue campagne appariranno qui</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -238,6 +242,7 @@
     <!-- Firebase SDK - Compat version (no ES modules needed) -->
     <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics-compat.js"></script>
     <script src="firebase-config-compat.js?v=1.0"></script>
     <script src="app.js?v=1.0"></script>
