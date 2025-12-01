@@ -136,7 +136,7 @@
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" id="closeLoginModal">&times;</button>
-            <h2>Accedi</h2>
+            <h2 id="loginModalTitle">Accedi</h2>
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -146,9 +146,14 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn-primary">Accedi</button>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn-primary" id="submitBtn">Accedi</button>
             </form>
-            <p class="modal-footer-text">Non hai un account? <a href="#" id="registerLink">Registrati</a></p>
+            <p class="modal-footer-text">
+                <span id="modalFooterText">Non hai un account? </span>
+                <a href="#" id="registerLink">Registrati</a>
+                <a href="#" id="loginLink" style="display: none;">Accedi</a>
+            </p>
         </div>
     </div>
 
@@ -177,7 +182,9 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
 

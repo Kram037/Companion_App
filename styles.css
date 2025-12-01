@@ -325,6 +325,16 @@ body {
     background: var(--surface);
 }
 
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+    border-left: 3px solid #c62828;
+}
+
 .btn-primary {
     width: 100%;
     padding: var(--spacing-sm);

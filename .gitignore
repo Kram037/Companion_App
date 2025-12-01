@@ -1,0 +1,21 @@
+# Firebase config (contiene credenziali sensibili)
+firebase-config.js
+
+# File di esempio (questo può essere committato)
+# firebase-config.example.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+

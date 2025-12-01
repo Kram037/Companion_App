@@ -1,8 +1,13 @@
+// Import Firebase Auth
+import { auth } from './firebase-config.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 // State Management
 const AppState = {
     currentUser: null,
     currentPage: 'campagne',
-    isLoggedIn: false
+    isLoggedIn: false,
+    isRegisterMode: false
 };
 
 // DOM Elements
@@ -17,27 +22,47 @@ const elements = {
     logoutBtn: document.getElementById('logoutBtn'),
     toolbarBtns: document.querySelectorAll('.toolbar-btn'),
     pages: document.querySelectorAll('.page'),
-    mainContent: document.getElementById('mainContent')
+    mainContent: document.getElementById('mainContent'),
+    loginModalTitle: document.getElementById('loginModalTitle'),
+    submitBtn: document.getElementById('submitBtn'),
+    registerLink: document.getElementById('registerLink'),
+    loginLink: document.getElementById('loginLink'),
+    errorMessage: document.getElementById('errorMessage'),
+    modalFooterText: document.getElementById('modalFooterText')
 };
 
 // Initialize App
 function init() {
-    checkLoginStatus();
+    setupFirebaseAuth();
     setupEventListeners();
     navigateToPage('campagne');
 }
 
-// Check if user is logged in (from localStorage)
-function checkLoginStatus() {
-    const savedUser = localStorage.getItem('companionApp_user');
-    if (savedUser) {
-        AppState.currentUser = JSON.parse(savedUser);
-        AppState.isLoggedIn = true;
-        updateUIForLoggedIn();
-    } else {
-        AppState.isLoggedIn = false;
-        updateUIForLoggedOut();
+// Setup Firebase Auth listeners
+function setupFirebaseAuth() {
+    if (!auth) {
+        console.error('Firebase Auth non inizializzato. Controlla firebase-config.js');
+        return;
     }
+
+    // Listen for auth state changes
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in
+            AppState.currentUser = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || user.email.split('@')[0]
+            };
+            AppState.isLoggedIn = true;
+            updateUIForLoggedIn();
+        } else {
+            // User is signed out
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            updateUIForLoggedOut();
+        }
+    });
 }
 
 // Update UI when user is logged in
@@ -105,10 +130,15 @@ function setupEventListeners() {
         });
     });
 
-    // Register link (placeholder)
-    document.getElementById('registerLink')?.addEventListener('click', (e) => {
+    // Register/Login link toggle
+    elements.registerLink?.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Registrazione (da implementare)');
+        toggleLoginRegisterMode(true);
+    });
+
+    elements.loginLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleLoginRegisterMode(false);
     });
 }
 
@@ -145,6 +175,8 @@ function closeLoginModal() {
     elements.loginModal.classList.remove('active');
     document.body.style.overflow = '';
     elements.loginForm.reset();
+    hideError();
+    toggleLoginRegisterMode(false);
 }
 
 function openSettingsModal() {
@@ -157,49 +189,115 @@ function closeSettingsModal() {
     document.body.style.overflow = '';
 }
 
+// Toggle between login and register mode
+function toggleLoginRegisterMode(isRegister) {
+    AppState.isRegisterMode = isRegister;
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    if (isRegister) {
+        elements.loginModalTitle.textContent = 'Registrati';
+        elements.submitBtn.textContent = 'Registrati';
+        elements.registerLink.style.display = 'none';
+        elements.loginLink.style.display = 'inline';
+        elements.modalFooterText.textContent = 'Hai già un account? ';
+    } else {
+        elements.loginModalTitle.textContent = 'Accedi';
+        elements.submitBtn.textContent = 'Accedi';
+        elements.registerLink.style.display = 'inline';
+        elements.loginLink.style.display = 'none';
+        elements.modalFooterText.textContent = 'Non hai un account? ';
+    }
+    
+    hideError();
+    emailInput.value = '';
+    passwordInput.value = '';
+}
+
+// Show error message
+function showError(message) {
+    elements.errorMessage.textContent = message;
+    elements.errorMessage.style.display = 'block';
+}
+
+// Hide error message
+function hideError() {
+    elements.errorMessage.style.display = 'none';
+}
+
 // Login Handler
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
+    hideError();
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // TODO: Implementare chiamata API reale
-    // Per ora simuliamo un login
-    if (email && password) {
-        // Simulazione login (in produzione qui ci sarebbe una chiamata API)
-        const userData = {
-            email: email,
-            name: email.split('@')[0],
-            loginTime: new Date().toISOString()
-        };
+    if (!email || !password) {
+        showError('Inserisci email e password');
+        return;
+    }
 
-        // Salva nello stato e localStorage
-        AppState.currentUser = userData;
-        AppState.isLoggedIn = true;
-        localStorage.setItem('companionApp_user', JSON.stringify(userData));
+    try {
+        elements.submitBtn.disabled = true;
+        elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrazione...' : 'Accesso...';
 
-        // Aggiorna UI
-        updateUIForLoggedIn();
+        if (AppState.isRegisterMode) {
+            // Register new user
+            await createUserWithEmailAndPassword(auth, email, password);
+            showNotification('Registrazione completata! Benvenuto!');
+        } else {
+            // Sign in existing user
+            await signInWithEmailAndPassword(auth, email, password);
+            showNotification('Accesso effettuato!');
+        }
+
         closeLoginModal();
-
-        // Mostra messaggio di benvenuto
-        showNotification(`Benvenuto, ${userData.name}!`);
-    } else {
-        alert('Inserisci email e password');
+    } catch (error) {
+        console.error('Auth error:', error);
+        let errorMessage = 'Si è verificato un errore';
+        
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = 'Questa email è già registrata';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'Email non valida';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'Password troppo debole (minimo 6 caratteri)';
+                break;
+            case 'auth/user-not-found':
+                errorMessage = 'Utente non trovato';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = 'Password errata';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = 'Troppi tentativi. Riprova più tardi';
+                break;
+            default:
+                errorMessage = error.message || 'Errore durante l\'autenticazione';
+        }
+        
+        showError(errorMessage);
+    } finally {
+        elements.submitBtn.disabled = false;
+        elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrati' : 'Accedi';
     }
 }
 
 // Logout Handler
-function handleLogout() {
+async function handleLogout() {
     if (confirm('Sei sicuro di voler uscire?')) {
-        AppState.currentUser = null;
-        AppState.isLoggedIn = false;
-        localStorage.removeItem('companionApp_user');
-        
-        updateUIForLoggedOut();
-        closeSettingsModal();
-        showNotification('Logout effettuato');
+        try {
+            await signOut(auth);
+            closeSettingsModal();
+            showNotification('Logout effettuato');
+        } catch (error) {
+            console.error('Logout error:', error);
+            showNotification('Errore durante il logout');
+        }
     }
 }
 
