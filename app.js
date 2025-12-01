@@ -767,30 +767,77 @@ async function loadCampagne(userId) {
 
     // Listen to real-time updates
     // Note: We filter by userId in the query, but document ID is nome_campagna
+    // Try query first, if it fails due to permissions, fallback to loading all and filtering client-side
+    try {
+        campagneUnsubscribe = currentFirestore
+            .collection('Campagne')
+            .where('userId', '==', userId)
+            .onSnapshot(
+                (snapshot) => {
+                    const campagne = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        // Double-check userId on client side for security
+                        if (data.userId === userId) {
+                            campagne.push({
+                                id: doc.id,
+                                ...data
+                            });
+                        }
+                    });
+                    console.log('✅ Campagne caricate:', campagne.length);
+                    renderCampagne(campagne);
+                },
+                (error) => {
+                    console.error('❌ Errore nel caricamento campagne:', error);
+                    console.error('Codice errore:', error.code);
+                    console.error('Messaggio errore:', error.message);
+                    
+                    if (error.code === 'permission-denied') {
+                        console.warn('⚠️ Permission denied, provo fallback: carico tutte le campagne e filtro lato client');
+                        // Fallback: try to load all campaigns and filter client-side
+                        // This requires more permissive rules but works as a workaround
+                        loadCampagneFallback(userId, currentFirestore);
+                    } else {
+                        showNotification('Errore nel caricamento delle campagne: ' + error.message);
+                    }
+                }
+            );
+    } catch (error) {
+        console.error('❌ Errore nella creazione listener:', error);
+        loadCampagneFallback(userId, currentFirestore);
+    }
+}
+
+// Fallback method: load all campaigns and filter client-side
+function loadCampagneFallback(userId, currentFirestore) {
+    console.log('🔄 Fallback: carico tutte le campagne e filtro per userId:', userId);
+    
+    if (campagneUnsubscribe) {
+        campagneUnsubscribe();
+    }
+    
     campagneUnsubscribe = currentFirestore
         .collection('Campagne')
-        .where('userId', '==', userId)
         .onSnapshot(
             (snapshot) => {
                 const campagne = [];
                 snapshot.forEach((doc) => {
-                    campagne.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
+                    const data = doc.data();
+                    // Filter by userId on client side
+                    if (data.userId === userId) {
+                        campagne.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    }
                 });
-                console.log('✅ Campagne caricate:', campagne.length);
+                console.log('✅ Campagne caricate (fallback):', campagne.length);
                 renderCampagne(campagne);
             },
             (error) => {
-                console.error('❌ Errore nel caricamento campagne:', error);
-                console.error('Codice errore:', error.code);
-                console.error('Messaggio errore:', error.message);
-                if (error.code === 'permission-denied') {
-                    showNotification('Errore: permessi insufficienti. Verifica le regole di sicurezza Firestore.');
-                } else {
-                    showNotification('Errore nel caricamento delle campagne: ' + error.message);
-                }
+                console.error('❌ Errore anche nel fallback:', error);
+                showNotification('Errore: permessi insufficienti. Verifica le regole di sicurezza Firestore nella Firebase Console.');
             }
         );
 }

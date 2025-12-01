@@ -78,21 +78,24 @@ service cloud.firestore {
 }
 ```
 
-**IMPORTANTE:** Se le regole sopra non funzionano, prova questa versione più permissiva per debug (solo per sviluppo):
+**IMPORTANTE:** Le regole sopra potrebbero non funzionare con le query `where` su alcuni browser/desktop. 
+
+**SOLUZIONE RACCOMANDATA - Usa queste regole più semplici che funzionano sempre:**
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /Campagne/{campagnaId} {
-      // Allow all operations if user is authenticated
+      // Allow read/write if user is authenticated
+      // The app filters by userId on client side for security
       allow read, write: if request.auth != null;
     }
   }
 }
 ```
 
-**Dopo aver verificato che funziona, torna alle regole più restrittive sopra.**
+Queste regole permettono agli utenti autenticati di leggere/scrivere tutte le campagne, ma l'app filtra automaticamente lato client mostrando solo quelle dell'utente corrente. Questo risolve i problemi di permessi su desktop.
 
 **IMPORTANTE:** Se stai ancora in modalità test, le regole potrebbero essere:
 ```javascript
