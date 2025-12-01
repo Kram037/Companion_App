@@ -413,6 +413,60 @@ function setupEventListeners() {
             handleGoogleLogin();
         });
         console.log('✅ Event listener aggiunto a googleLoginBtn');
+    }
+
+    // Campagne buttons
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('➕ Click su Nuova Campagna');
+            openCampagnaModal();
+        };
+        elements.addCampagnaBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('➕ Click su Nuova Campagna (addEventListener)');
+            openCampagnaModal();
+        });
+        console.log('✅ Event listener aggiunto a addCampagnaBtn');
+    } else {
+        console.error('❌ addCampagnaBtn non trovato');
+    }
+    
+    if (elements.closeCampagnaModal) {
+        elements.closeCampagnaModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCampagnaModal();
+        };
+    }
+    if (elements.cancelCampagnaBtn) {
+        elements.cancelCampagnaBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeCampagnaModal();
+        };
+    }
+    if (elements.campagnaForm) {
+        elements.campagnaForm.addEventListener('submit', handleCampagnaSubmit);
+    }
+    if (elements.campagnaModal) {
+        elements.campagnaModal.addEventListener('click', (e) => {
+            if (e.target === elements.campagnaModal) {
+                closeCampagnaModal();
+            }
+        });
+    }
+    
+    // Icon preview update
+    const iconaInput = document.getElementById('iconaCampagna');
+    const iconPreview = document.getElementById('iconDisplay');
+    if (iconaInput && iconPreview) {
+        iconaInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            iconPreview.textContent = value || '🎲';
+        });
     } else {
         console.error('❌ googleLoginBtn non trovato');
     }
@@ -723,43 +777,32 @@ function escapeHtml(text) {
 function openCampagnaModal(campagnaId = null) {
     editingCampagnaId = campagnaId;
     
-    if (!elements.campagnaModal || !elements.campagnaForm) return;
+    if (!elements.campagnaModal || !elements.campagnaForm) {
+        console.error('❌ campagnaModal o campagnaForm non trovati');
+        return;
+    }
+
+    console.log('📝 Apertura modal campagna, editingCampagnaId:', editingCampagnaId);
 
     // Reset form
     elements.campagnaForm.reset();
     
-    if (campagnaId) {
-        // Load campagna data for editing
-        const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-        if (currentFirestore) {
-            currentFirestore.collection('Campagne').doc(campagnaId).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        document.getElementById('nomeCampagna').value = data.nome_campagna || '';
-                        document.getElementById('nomeDM').value = data.nome_dm || '';
-                        document.getElementById('numeroGiocatori').value = data.numero_giocatori || '';
-                        document.getElementById('numeroSessioni').value = data.numero_sessioni || 0;
-                        document.getElementById('tempoDiGioco').value = data.tempo_di_gioco || 0;
-                        document.getElementById('note').value = data.note ? data.note.join('\n') : '';
-                        if (elements.campagnaModalTitle) {
-                            elements.campagnaModalTitle.textContent = 'Modifica Campagna';
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error('Errore nel caricamento campagna:', error);
-                    showNotification('Errore nel caricamento della campagna');
-                });
-        }
-    } else {
-        if (elements.campagnaModalTitle) {
-            elements.campagnaModalTitle.textContent = 'Nuova Campagna';
-        }
+    // Reset icon preview
+    const iconPreview = document.getElementById('iconDisplay');
+    if (iconPreview) {
+        iconPreview.textContent = '🎲';
+    }
+    
+    // For now, we only support creating new campaigns (simple form)
+    // Editing will be handled separately if needed
+    const modalTitle = document.querySelector('#campagnaModal h2');
+    if (modalTitle) {
+        modalTitle.textContent = 'Nuova Campagna';
     }
 
     elements.campagnaModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    console.log('✅ Modal campagna aperta');
 }
 
 function closeCampagnaModal() {

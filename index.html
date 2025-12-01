@@ -239,6 +239,34 @@
         </div>
     </div>
 
+    <!-- Nuova Campagna Modal -->
+    <div class="modal" id="campagnaModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCampagnaModal">&times;</button>
+            <h2>Nuova Campagna</h2>
+            <form id="campagnaForm">
+                <div class="form-group">
+                    <label for="nomeCampagna">Nome Campagna *</label>
+                    <input type="text" id="nomeCampagna" name="nomeCampagna" required placeholder="Inserisci il nome della campagna">
+                </div>
+                <div class="form-group">
+                    <label for="iconaCampagna">Icona (opzionale)</label>
+                    <div class="icon-picker">
+                        <input type="text" id="iconaCampagna" name="iconaCampagna" placeholder="Emoji o testo (es: 🎲, ⚔️, 🏰)">
+                        <div class="icon-preview" id="iconPreview">
+                            <span id="iconDisplay">🎲</span>
+                        </div>
+                    </div>
+                    <small class="form-hint">Puoi usare un'emoji o un testo breve</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelCampagnaBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="saveCampagnaBtn">Crea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase SDK - Compat version (no ES modules needed) -->
     <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
