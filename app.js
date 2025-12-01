@@ -660,9 +660,15 @@ function setupFirestore() {
 
     // Listen for auth state changes to load campagne
     currentAuth.onAuthStateChanged((user) => {
+        console.log('🔄 Auth state changed:', user ? user.uid : 'null');
         if (user) {
-            loadCampagne(user.uid);
+            console.log('✅ Utente autenticato, carico campagne per:', user.uid);
+            // Wait a bit to ensure auth is fully propagated (especially on desktop)
+            setTimeout(() => {
+                loadCampagne(user.uid);
+            }, 100);
         } else {
+            console.log('👤 Utente non autenticato, pulisco campagne');
             // Clear campagne when logged out
             if (campagneUnsubscribe) {
                 campagneUnsubscribe();
@@ -688,15 +694,26 @@ function loadCampagne(userId) {
     }
 
     // Verify user is authenticated
-    if (currentAuth && currentAuth.currentUser) {
-        if (currentAuth.currentUser.uid !== userId) {
-            console.error('❌ userId non corrisponde all\'utente autenticato');
-            return;
-        }
-    } else {
-        console.error('❌ Utente non autenticato');
+    if (!currentAuth) {
+        console.error('❌ Auth non disponibile');
         return;
     }
+    
+    const currentUser = currentAuth.currentUser;
+    if (!currentUser) {
+        console.error('❌ Utente non autenticato');
+        console.log('Stato auth:', currentAuth);
+        return;
+    }
+    
+    if (currentUser.uid !== userId) {
+        console.error('❌ userId non corrisponde all\'utente autenticato');
+        console.log('userId fornito:', userId);
+        console.log('uid utente:', currentUser.uid);
+        return;
+    }
+    
+    console.log('✅ Utente autenticato verificato:', currentUser.uid);
 
     console.log('📚 Caricamento campagne per utente:', userId);
     

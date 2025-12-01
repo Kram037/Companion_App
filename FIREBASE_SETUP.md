@@ -66,14 +66,47 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Campagne collection
     match /Campagne/{campagnaId} {
-      // Allow read/write only if user is authenticated and owns the document
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      // Allow create if user is authenticated
+      // Allow read if user is authenticated and owns the document
+      // Note: For queries, Firestore checks each document individually
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Allow create if user is authenticated and sets userId to their uid
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Allow update/delete if user is authenticated and owns the document
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
   }
 }
 ```
+
+**IMPORTANTE:** Se le regole sopra non funzionano, prova questa versione più permissiva per debug (solo per sviluppo):
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /Campagne/{campagnaId} {
+      // Allow all operations if user is authenticated
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+```
+
+**Dopo aver verificato che funziona, torna alle regole più restrittive sopra.**
+
+**IMPORTANTE:** Se stai ancora in modalità test, le regole potrebbero essere:
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2025, 12, 31);
+    }
+  }
+}
+```
+
+**Per produzione, usa le regole sopra che limitano l'accesso ai documenti dell'utente.**
 
 3. Clicca su **Pubblica**
 
