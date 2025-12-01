@@ -3,26 +3,47 @@ let auth = null;
 let signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged;
 let signInWithPopup;
 let googleProvider = null;
+let firebaseReady = false;
+let firebaseLoadPromise = null;
 
-// Try to load Firebase, but don't block if it fails
-(async function loadFirebase() {
-    try {
-        const firebaseModule = await import('./firebase-config.js');
-        auth = firebaseModule.auth;
-        googleProvider = firebaseModule.googleProvider;
-        
-        const firebaseAuth = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js");
-        signInWithEmailAndPassword = firebaseAuth.signInWithEmailAndPassword;
-        createUserWithEmailAndPassword = firebaseAuth.createUserWithEmailAndPassword;
-        signOut = firebaseAuth.signOut;
-        onAuthStateChanged = firebaseAuth.onAuthStateChanged;
-        signInWithPopup = firebaseAuth.signInWithPopup;
-        console.log('✅ Firebase caricato correttamente');
-    } catch (error) {
-        console.warn('⚠️ Firebase non disponibile:', error.message);
-        console.log('L\'app continuerà a funzionare senza autenticazione');
+// Load Firebase and return a promise
+function loadFirebase() {
+    if (firebaseLoadPromise) {
+        return firebaseLoadPromise;
     }
-})();
+    
+    firebaseLoadPromise = (async function() {
+        try {
+            console.log('🔄 Caricamento Firebase...');
+            const firebaseModule = await import('./firebase-config.js');
+            auth = firebaseModule.auth;
+            googleProvider = firebaseModule.googleProvider;
+            
+            const firebaseAuth = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js");
+            signInWithEmailAndPassword = firebaseAuth.signInWithEmailAndPassword;
+            createUserWithEmailAndPassword = firebaseAuth.createUserWithEmailAndPassword;
+            signOut = firebaseAuth.signOut;
+            onAuthStateChanged = firebaseAuth.onAuthStateChanged;
+            signInWithPopup = firebaseAuth.signInWithPopup;
+            
+            firebaseReady = true;
+            console.log('✅ Firebase caricato correttamente');
+            console.log('Auth disponibile:', !!auth);
+            return true;
+        } catch (error) {
+            console.error('❌ Errore nel caricamento Firebase:', error);
+            console.warn('⚠️ Firebase non disponibile:', error.message);
+            console.log('L\'app continuerà a funzionare senza autenticazione');
+            firebaseReady = false;
+            return false;
+        }
+    })();
+    
+    return firebaseLoadPromise;
+}
+
+// Start loading Firebase immediately
+loadFirebase();
 
 console.log('📦 app.js caricato');
 
@@ -38,7 +59,7 @@ const AppState = {
 let elements = {};
 
 // Initialize App
-function init() {
+async function init() {
     // Initialize DOM elements
     elements = {
         userBtn: document.getElementById('userBtn'),
@@ -78,6 +99,20 @@ function init() {
         // Non return, continua comunque per vedere cosa funziona
     } else {
         console.log('✅ Tutti gli elementi DOM trovati');
+    }
+
+    // Wait for Firebase to be ready (with timeout)
+    try {
+        console.log('⏳ Attesa caricamento Firebase...');
+        await Promise.race([
+            loadFirebase(),
+            new Promise(resolve => setTimeout(() => {
+                console.warn('⏱️ Timeout caricamento Firebase, continuo comunque...');
+                resolve(false);
+            }, 5000))
+        ]);
+    } catch (error) {
+        console.error('❌ Errore nell\'attesa Firebase:', error);
     }
 
     setupFirebaseAuth();
@@ -398,15 +433,25 @@ async function handleLogin(e) {
     }
 
     // Verifica che Firebase sia disponibile
-    if (!auth) {
-        showError('Autenticazione non disponibile. Ricarica la pagina.');
-        console.error('Auth non disponibile');
-        return;
+    if (!firebaseReady || !auth) {
+        showError('Autenticazione non disponibile. Attendo il caricamento...');
+        console.warn('Auth non disponibile, provo a ricaricare Firebase...');
+        
+        // Try to reload Firebase
+        const loaded = await loadFirebase();
+        if (!loaded || !auth) {
+            showError('Autenticazione non disponibile. Ricarica la pagina.');
+            console.error('Auth non disponibile dopo tentativo di ricaricamento');
+            return;
+        }
     }
 
     if (!createUserWithEmailAndPassword || !signInWithEmailAndPassword) {
         showError('Funzioni di autenticazione non disponibili. Ricarica la pagina.');
-        console.error('Funzioni Firebase non disponibili');
+        console.error('Funzioni Firebase non disponibili:', {
+            createUser: !!createUserWithEmailAndPassword,
+            signIn: !!signInWithEmailAndPassword
+        });
         return;
     }
 
