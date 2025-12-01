@@ -563,6 +563,11 @@ body {
 }
 
 /* Settings */
+#settingsModal .modal-content {
+    background: var(--surface);
+    color: var(--text);
+}
+
 .settings-content {
     display: flex;
     flex-direction: column;
@@ -574,6 +579,9 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-sm);
+    background: var(--background);
+    border-radius: var(--radius-sm);
+    color: var(--text);
 }
 
 /* Theme Selector */
@@ -696,6 +704,11 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-md);
     margin-top: var(--spacing-md);
+}
+
+.campagne-list .content-placeholder {
+    grid-column: 1 / -1;
+    width: 100%;
 }
 
 .campagna-card {
