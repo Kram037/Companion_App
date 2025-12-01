@@ -265,12 +265,36 @@ function setupEventListeners() {
 
     // Close modals
     if (elements.closeLoginModal) {
+        elements.closeLoginModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeLoginModal();
+        };
         elements.closeLoginModal.addEventListener('click', closeLoginModal);
     }
     if (elements.closeUserModal) {
-        elements.closeUserModal.addEventListener('click', closeUserModal);
+        console.log('✅ Trovato closeUserModal, aggiungo listener');
+        elements.closeUserModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('❌ Click su closeUserModal');
+            closeUserModal();
+        };
+        elements.closeUserModal.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('❌ Click su closeUserModal (addEventListener)');
+            closeUserModal();
+        });
+    } else {
+        console.error('❌ closeUserModal non trovato!');
     }
     if (elements.closeSettingsModal) {
+        elements.closeSettingsModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeSettingsModal();
+        };
         elements.closeSettingsModal.addEventListener('click', closeSettingsModal);
     }
 
@@ -447,8 +471,14 @@ function openUserModal() {
 }
 
 function closeUserModal() {
+    console.log('🔒 Chiusura User Modal...');
+    if (!elements.userModal) {
+        console.error('❌ userModal non trovato in closeUserModal!');
+        return;
+    }
     elements.userModal.classList.remove('active');
     document.body.style.overflow = '';
+    console.log('✅ User Modal chiuso');
 }
 
 function openSettingsModal() {
