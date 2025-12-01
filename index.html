@@ -212,10 +212,24 @@
                 </div>
                 <div class="settings-item">
                     <span>Tema</span>
-                    <select class="settings-select">
-                        <option>Chiaro</option>
-                        <option>Scuro</option>
-                    </select>
+                    <div class="theme-selector">
+                        <button class="theme-btn" data-theme="light" id="themeLight">
+                            <div class="theme-preview theme-preview-light">
+                                <div class="preview-header"></div>
+                                <div class="preview-content"></div>
+                                <div class="preview-toolbar"></div>
+                            </div>
+                            <span>Chiaro</span>
+                        </button>
+                        <button class="theme-btn" data-theme="dark" id="themeDark">
+                            <div class="theme-preview theme-preview-dark">
+                                <div class="preview-header"></div>
+                                <div class="preview-content"></div>
+                                <div class="preview-toolbar"></div>
+                            </div>
+                            <span>Scuro</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

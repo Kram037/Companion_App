@@ -99,7 +99,9 @@ async function init() {
         modalFooterText: document.getElementById('modalFooterText'),
         googleLoginBtn: document.getElementById('googleLoginBtn'),
         userName: document.getElementById('userName'),
-        userEmail: document.getElementById('userEmail')
+        userEmail: document.getElementById('userEmail'),
+        themeLight: document.getElementById('themeLight'),
+        themeDark: document.getElementById('themeDark')
     };
 
     // Check if all required elements exist
@@ -123,6 +125,9 @@ async function init() {
         console.log('✅ Tutti gli elementi DOM trovati');
     }
 
+    // Load saved theme
+    loadTheme();
+    
     // Setup event listeners immediately (don't wait for Firebase)
     console.log('🔧 Setup event listeners...');
     setupEventListeners();
@@ -323,6 +328,22 @@ function setupEventListeners() {
         });
     }
 
+    // Theme buttons
+    if (elements.themeLight) {
+        elements.themeLight.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setTheme('light');
+        };
+    }
+    if (elements.themeDark) {
+        elements.themeDark.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setTheme('dark');
+        };
+    }
+
     // Login form submission
     if (elements.loginForm) {
         elements.loginForm.addEventListener('submit', handleLogin);
@@ -489,6 +510,49 @@ function openSettingsModal() {
 function closeSettingsModal() {
     elements.settingsModal.classList.remove('active');
     document.body.style.overflow = '';
+}
+
+// Theme Management
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme, false); // false = don't save again
+}
+
+function setTheme(theme, save = true) {
+    console.log('🎨 Cambio tema a:', theme);
+    
+    // Remove existing theme attribute
+    document.documentElement.removeAttribute('data-theme');
+    
+    // Apply new theme
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        // Light theme is default, no attribute needed
+        document.documentElement.removeAttribute('data-theme');
+    }
+    
+    // Update button states
+    if (elements.themeLight) {
+        if (theme === 'light') {
+            elements.themeLight.classList.add('active');
+        } else {
+            elements.themeLight.classList.remove('active');
+        }
+    }
+    if (elements.themeDark) {
+        if (theme === 'dark') {
+            elements.themeDark.classList.add('active');
+        } else {
+            elements.themeDark.classList.remove('active');
+        }
+    }
+    
+    // Save to localStorage
+    if (save) {
+        localStorage.setItem('theme', theme);
+        console.log('✅ Tema salvato:', theme);
+    }
 }
 
 // Toggle between login and register mode
