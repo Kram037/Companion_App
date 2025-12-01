@@ -107,14 +107,16 @@ async function init() {
     console.log('userBtn:', elements.userBtn);
     console.log('settingsBtn:', elements.settingsBtn);
     console.log('loginModal:', elements.loginModal);
+    console.log('userModal:', elements.userModal);
     console.log('toolbarBtns:', elements.toolbarBtns?.length || 0);
     
-    if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal) {
+    if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal || !elements.userModal) {
         console.error('❌ Alcuni elementi DOM non sono stati trovati');
         console.error('Elementi mancanti:', {
             userBtn: !elements.userBtn,
             settingsBtn: !elements.settingsBtn,
-            loginModal: !elements.loginModal
+            loginModal: !elements.loginModal,
+            userModal: !elements.userModal
         });
         // Non return, continua comunque per vedere cosa funziona
     } else {
@@ -211,9 +213,13 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             console.log('👤 Click su user button');
+            console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
+            console.log('AppState.currentUser:', AppState.currentUser);
             if (!AppState.isLoggedIn) {
+                console.log('→ Apertura login modal');
                 openLoginModal();
             } else {
+                console.log('→ Apertura user modal');
                 openUserModal();
             }
         };
@@ -222,9 +228,12 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             console.log('👤 Click su user button (addEventListener)');
+            console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
             if (!AppState.isLoggedIn) {
+                console.log('→ Apertura login modal (addEventListener)');
                 openLoginModal();
             } else {
+                console.log('→ Apertura user modal (addEventListener)');
                 openUserModal();
             }
         });
@@ -257,6 +266,9 @@ function setupEventListeners() {
     // Close modals
     if (elements.closeLoginModal) {
         elements.closeLoginModal.addEventListener('click', closeLoginModal);
+    }
+    if (elements.closeUserModal) {
+        elements.closeUserModal.addEventListener('click', closeUserModal);
     }
     if (elements.closeSettingsModal) {
         elements.closeSettingsModal.addEventListener('click', closeSettingsModal);
@@ -409,13 +421,29 @@ function closeLoginModal() {
 }
 
 function openUserModal() {
-    // Update user info in modal
-    if (AppState.currentUser && elements.userName && elements.userEmail) {
-        elements.userName.textContent = AppState.currentUser.displayName || 'Utente';
-        elements.userEmail.textContent = AppState.currentUser.email || '';
+    console.log('🔓 Apertura User Modal...');
+    console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
+    console.log('AppState.currentUser:', AppState.currentUser);
+    console.log('elements.userModal:', elements.userModal);
+    
+    if (!elements.userModal) {
+        console.error('❌ userModal non trovato!');
+        return;
     }
+    
+    // Update user info in modal
+    if (AppState.currentUser) {
+        if (elements.userName) {
+            elements.userName.textContent = AppState.currentUser.displayName || 'Utente';
+        }
+        if (elements.userEmail) {
+            elements.userEmail.textContent = AppState.currentUser.email || '';
+        }
+    }
+    
     elements.userModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    console.log('✅ User Modal aperto');
 }
 
 function closeUserModal() {
