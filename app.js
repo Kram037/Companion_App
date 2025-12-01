@@ -675,9 +675,26 @@ function setupFirestore() {
 
 function loadCampagne(userId) {
     const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
     
     if (!currentFirestore) {
         console.error('❌ Firestore non disponibile');
+        return;
+    }
+
+    if (!userId) {
+        console.error('❌ userId non fornito');
+        return;
+    }
+
+    // Verify user is authenticated
+    if (currentAuth && currentAuth.currentUser) {
+        if (currentAuth.currentUser.uid !== userId) {
+            console.error('❌ userId non corrisponde all\'utente autenticato');
+            return;
+        }
+    } else {
+        console.error('❌ Utente non autenticato');
         return;
     }
 
@@ -707,7 +724,13 @@ function loadCampagne(userId) {
             },
             (error) => {
                 console.error('❌ Errore nel caricamento campagne:', error);
-                showNotification('Errore nel caricamento delle campagne');
+                console.error('Codice errore:', error.code);
+                console.error('Messaggio errore:', error.message);
+                if (error.code === 'permission-denied') {
+                    showNotification('Errore: permessi insufficienti. Verifica le regole di sicurezza Firestore.');
+                } else {
+                    showNotification('Errore nel caricamento delle campagne: ' + error.message);
+                }
             }
         );
 }
