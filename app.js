@@ -1,49 +1,58 @@
-// Import Firebase Auth with error handling
+// Firebase Auth - Compat version (no ES modules)
+// Firebase is loaded via script tags, so it's available globally as 'firebase'
 let auth = null;
-let signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged;
-let signInWithPopup;
 let googleProvider = null;
 let firebaseReady = false;
-let firebaseLoadPromise = null;
 
-// Load Firebase and return a promise
-function loadFirebase() {
-    if (firebaseLoadPromise) {
-        return firebaseLoadPromise;
-    }
-    
-    firebaseLoadPromise = (async function() {
-        try {
-            console.log('🔄 Caricamento Firebase...');
-            const firebaseModule = await import('./firebase-config.js');
-            auth = firebaseModule.auth;
-            googleProvider = firebaseModule.googleProvider;
-            
-            const firebaseAuth = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js");
-            signInWithEmailAndPassword = firebaseAuth.signInWithEmailAndPassword;
-            createUserWithEmailAndPassword = firebaseAuth.createUserWithEmailAndPassword;
-            signOut = firebaseAuth.signOut;
-            onAuthStateChanged = firebaseAuth.onAuthStateChanged;
-            signInWithPopup = firebaseAuth.signInWithPopup;
-            
-            firebaseReady = true;
-            console.log('✅ Firebase caricato correttamente');
-            console.log('Auth disponibile:', !!auth);
-            return true;
-        } catch (error) {
-            console.error('❌ Errore nel caricamento Firebase:', error);
-            console.warn('⚠️ Firebase non disponibile:', error.message);
-            console.log('L\'app continuerà a funzionare senza autenticazione');
-            firebaseReady = false;
+// Initialize Firebase (runs after firebase-config-compat.js loads)
+function initFirebase() {
+    try {
+        if (typeof firebase === 'undefined') {
+            console.error('❌ Firebase non disponibile. Assicurati che gli script siano caricati.');
             return false;
         }
-    })();
-    
-    return firebaseLoadPromise;
+
+        // Get auth and provider from global firebase object
+        auth = firebase.auth();
+        googleProvider = new firebase.auth.GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+
+        firebaseReady = true;
+        console.log('✅ Firebase (Compat) inizializzato correttamente');
+        console.log('Auth disponibile:', !!auth);
+        return true;
+    } catch (error) {
+        console.error('❌ Errore nell\'inizializzazione Firebase:', error);
+        firebaseReady = false;
+        return false;
+    }
 }
 
-// Start loading Firebase immediately
-loadFirebase();
+// Wait for DOM and Firebase to be ready
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            resolve(initFirebase());
+        } else {
+            // Wait a bit and retry
+            let attempts = 0;
+            const maxAttempts = 10;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (typeof firebase !== 'undefined' && firebase.auth) {
+                    clearInterval(checkInterval);
+                    resolve(initFirebase());
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('❌ Timeout attesa Firebase');
+                    resolve(false);
+                }
+            }, 100);
+        }
+    });
+}
 
 console.log('📦 app.js caricato');
 
@@ -101,16 +110,10 @@ async function init() {
         console.log('✅ Tutti gli elementi DOM trovati');
     }
 
-    // Wait for Firebase to be ready (with timeout)
+    // Wait for Firebase to be ready
     try {
         console.log('⏳ Attesa caricamento Firebase...');
-        await Promise.race([
-            loadFirebase(),
-            new Promise(resolve => setTimeout(() => {
-                console.warn('⏱️ Timeout caricamento Firebase, continuo comunque...');
-                resolve(false);
-            }, 5000))
-        ]);
+        await waitForFirebase();
     } catch (error) {
         console.error('❌ Errore nell\'attesa Firebase:', error);
     }
@@ -122,14 +125,14 @@ async function init() {
 
 // Setup Firebase Auth listeners
 function setupFirebaseAuth() {
-    if (!auth || !onAuthStateChanged) {
+    if (!auth || !firebase.auth) {
         console.warn('⚠️ Firebase Auth non disponibile. L\'app funzionerà senza autenticazione.');
         return;
     }
 
     try {
-        // Listen for auth state changes
-        onAuthStateChanged(auth, (user) => {
+        // Listen for auth state changes (compat version)
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 // User is signed in
                 AppState.currentUser = {
@@ -433,24 +436,12 @@ async function handleLogin(e) {
     }
 
     // Verifica che Firebase sia disponibile
-    if (!firebaseReady || !auth) {
-        showError('Autenticazione non disponibile. Attendo il caricamento...');
-        console.warn('Auth non disponibile, provo a ricaricare Firebase...');
-        
-        // Try to reload Firebase
-        const loaded = await loadFirebase();
-        if (!loaded || !auth) {
-            showError('Autenticazione non disponibile. Ricarica la pagina.');
-            console.error('Auth non disponibile dopo tentativo di ricaricamento');
-            return;
-        }
-    }
-
-    if (!createUserWithEmailAndPassword || !signInWithEmailAndPassword) {
-        showError('Funzioni di autenticazione non disponibili. Ricarica la pagina.');
-        console.error('Funzioni Firebase non disponibili:', {
-            createUser: !!createUserWithEmailAndPassword,
-            signIn: !!signInWithEmailAndPassword
+    if (!firebaseReady || !auth || typeof firebase === 'undefined') {
+        showError('Autenticazione non disponibile. Ricarica la pagina.');
+        console.error('Auth non disponibile:', {
+            firebaseReady,
+            auth: !!auth,
+            firebase: typeof firebase
         });
         return;
     }
@@ -463,14 +454,14 @@ async function handleLogin(e) {
         console.log(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
 
         if (AppState.isRegisterMode) {
-            // Register new user
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // Register new user (compat version)
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             console.log('✅ Utente registrato con successo:', user.uid, user.email);
             showNotification('Registrazione completata! Benvenuto!');
         } else {
-            // Sign in existing user
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            // Sign in existing user (compat version)
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             console.log('✅ Utente autenticato con successo:', user.uid, user.email);
             showNotification('Accesso effettuato!');
@@ -528,7 +519,7 @@ async function handleLogin(e) {
 
 // Google Login Handler
 async function handleGoogleLogin() {
-    if (!auth || !googleProvider || !signInWithPopup) {
+    if (!auth || !googleProvider || typeof firebase === 'undefined') {
         showError('Autenticazione Google non disponibile. Controlla la configurazione Firebase.');
         return;
     }
@@ -538,7 +529,8 @@ async function handleGoogleLogin() {
         elements.googleLoginBtn.disabled = true;
         elements.googleLoginBtn.textContent = 'Accesso in corso...';
         
-        const result = await signInWithPopup(auth, googleProvider);
+        // Compat version
+        const result = await auth.signInWithPopup(googleProvider);
         const user = result.user;
         
         console.log('✅ Login Google completato:', user.email);
@@ -585,7 +577,7 @@ async function handleGoogleLogin() {
 async function handleLogout() {
     if (confirm('Sei sicuro di voler uscire?')) {
         try {
-            await signOut(auth);
+            await auth.signOut();
             closeSettingsModal();
             showNotification('Logout effettuato');
         } catch (error) {

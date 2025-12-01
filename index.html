@@ -199,9 +199,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module" src="firebase-config.js?v=1.0"></script>
-    <script type="module" src="app.js?v=1.0"></script>
+    <!-- Firebase SDK - Compat version (no ES modules needed) -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics-compat.js"></script>
+    <script src="firebase-config-compat.js?v=1.0"></script>
+    <script src="app.js?v=1.0"></script>
     
     <!-- Cache busting script for development -->
     <script>
