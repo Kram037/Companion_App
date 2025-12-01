@@ -908,9 +908,10 @@ body {
         height: 30px; /* 40px * 0.75 = 30px */
     }
     
-    /* Reduce gap between theme buttons on mobile */
+    /* Reduce gap between theme buttons and move right on mobile */
     .theme-selector {
-        gap: var(--spacing-xs);
+        gap: 4px; /* Much smaller gap to bring previews closer */
+        margin-left: var(--spacing-sm); /* Move to the right */
     }
 }
 
