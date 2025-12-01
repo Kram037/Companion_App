@@ -118,18 +118,23 @@ async function init() {
     }
 
     // Setup event listeners immediately (don't wait for Firebase)
+    console.log('🔧 Setup event listeners...');
     setupEventListeners();
+    console.log('📄 Navigazione alla pagina iniziale...');
     navigateToPage('campagne');
     
-    // Wait for Firebase to be ready (in background)
-    try {
-        console.log('⏳ Attesa caricamento Firebase...');
-        await waitForFirebase();
-        setupFirebaseAuth();
-    } catch (error) {
+    // Wait for Firebase to be ready (in background, non-blocking)
+    waitForFirebase().then((success) => {
+        if (success) {
+            console.log('✅ Firebase pronto, setup auth...');
+            setupFirebaseAuth();
+        } else {
+            console.warn('⚠️ Firebase non disponibile, app continua senza autenticazione');
+        }
+    }).catch((error) => {
         console.error('❌ Errore nell\'attesa Firebase:', error);
         // Continue anyway - app works without Firebase
-    }
+    });
 }
 
 // Setup Firebase Auth listeners
@@ -336,6 +341,23 @@ function setupEventListeners() {
     
     console.log('✅ Setup event listeners completato');
     
+    // Test diretto: verifica che i bottoni siano cliccabili
+    setTimeout(() => {
+        console.log('🧪 Test bottoni...');
+        if (elements.userBtn) {
+            console.log('userBtn presente, verifico click handler...');
+            console.log('userBtn.onclick:', typeof elements.userBtn.onclick);
+        }
+        if (elements.settingsBtn) {
+            console.log('settingsBtn presente');
+        }
+        if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
+            console.log(`${elements.toolbarBtns.length} toolbar buttons presenti`);
+            elements.toolbarBtns.forEach((btn, i) => {
+                console.log(`Toolbar button ${i}:`, btn.getAttribute('data-page'), 'onclick:', typeof btn.onclick);
+            });
+        }
+    }, 300);
 }
 
 // Navigation
@@ -670,15 +692,20 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Initialize app when DOM is ready
-// With ES modules, scripts are deferred, so DOM should be ready
-async function startApp() {
+function startApp() {
     try {
         console.log('🚀 Inizializzazione app...');
         console.log('Document readyState:', document.readyState);
-        await init();
-        console.log('✅ Inizializzazione completata');
+        
+        // Call init synchronously first to set up event listeners
+        init().catch(error => {
+            console.error('❌ Errore durante l\'inizializzazione:', error);
+            console.error('Stack:', error.stack);
+        });
+        
+        console.log('✅ Inizializzazione avviata');
     } catch (error) {
-        console.error('❌ Errore durante l\'inizializzazione:', error);
+        console.error('❌ Errore critico durante l\'inizializzazione:', error);
         console.error('Stack:', error.stack);
     }
 }
@@ -694,6 +721,6 @@ if (document.readyState === 'loading') {
     console.log('📄 DOM già caricato, attendo script...');
     setTimeout(() => {
         startApp();
-    }, 200);
+    }, 100);
 }
 
