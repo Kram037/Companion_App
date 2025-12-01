@@ -1,0 +1,20 @@
+[33m2fe2b11[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix: correggi problema dialog settings rossa - forza applicazione tema e aggiungi !important ai colori modal
+[33m1323878[m Fix: correggi dialog settings (background rosso) e larghezza content-placeholder campagne
+[33mcff1b41[m Fix bottone Nuova Campagna: aggiungi dialog semplificata con nome e icona opzionale
+[33m85d00ff[m Implementa Firestore per Campagne: aggiungi CRUD completo, interfaccia utente e stili CSS
+[33mb777d46[m Implementa sistema temi: sostituisci select con bottoni affiancati e miniature, aggiungi tema scuro funzionante
+[33m3ef6e62[m Fix: aggiungi onclick diretto per closeUserModal e logging
+[33mfbe5f9d[m Fix user modal: aggiungi listener closeUserModal e logging per debug
+[33mbe4ce4d[m Aggiungi User Modal con logout: sposta logout da settings a user modal
+[33me689277[m Semplifica inizializzazione: Firebase in background, test debug bottoni
+[33m89da8c9[m Fix conflitto variabili: rimuovi dichiarazioni duplicate auth/googleProvider
+[33mb7e1692[m Aggiungi doppio binding eventi (onclick + addEventListener) per maggiore affidabilità
+[33md62f205[m Fix event listeners: rimuovi clonazione bottoni, aggiungi pulizia onclick
+[33mc6a0950[m Fix inizializzazione: event listeners aggiunti subito, Firebase in background
+[33mb5ef564[m Fix errori: rimuovi getEventListeners e migliora timeout Firebase
+[33maf1f6b9[m Converti Firebase a versione compat (funziona senza server locale)
+[33m80b8c0e[m Fix caricamento Firebase: aggiungi attesa asincrona e retry automatico
+[33m0186bce[m Migliora registrazione con validazioni e fix layout modal desktop (bottone Google)
+[33me32272c[m Aggiungi autenticazione Google e migliora registrazione utenti
+[33m39d4590[m Migliora gestione event listeners: Firebase opzionale, clonazione bottoni, preventDefault
+[33m71c6fdf[m Fix errore sintassi: sposta Register/Login link dentro setupEventListeners

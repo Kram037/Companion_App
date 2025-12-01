@@ -583,20 +583,18 @@ function closeUserModal() {
 }
 
 function openSettingsModal() {
+    if (!elements.settingsModal) {
+        console.error('❌ settingsModal non trovato');
+        return;
+    }
+    
     console.log('⚙️ Apertura Settings Modal');
-    console.log('Tema corrente:', localStorage.getItem('theme') || 'light');
-    console.log('data-theme attribute:', document.documentElement.getAttribute('data-theme'));
-    
-    // Ensure theme is applied correctly
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    setTheme(currentTheme, false); // Don't save, just apply
-    
     elements.settingsModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    console.log('✅ Settings Modal aperto');
 }
 
 function closeSettingsModal() {
+    if (!elements.settingsModal) return;
     elements.settingsModal.classList.remove('active');
     document.body.style.overflow = '';
 }
