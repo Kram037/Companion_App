@@ -17,6 +17,11 @@
    - Clicca su "Email/Password"
    - Attiva "Enable"
    - Salva
+5. Abilita **Google**:
+   - Clicca su "Google"
+   - Attiva "Enable"
+   - Seleziona un email di supporto (puoi usare la tua email)
+   - Salva
 
 ### 3. Aggiungi una Web App
 
@@ -69,6 +74,7 @@ const firebaseConfig = {
 
 ✅ Login con email/password  
 ✅ Registrazione nuovi utenti  
+✅ Login con Google  
 ✅ Logout  
 ✅ Persistenza sessione (l'utente rimane loggato anche dopo il refresh)  
 ✅ Gestione errori con messaggi chiari  

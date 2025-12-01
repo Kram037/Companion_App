@@ -1,18 +1,22 @@
 // Import Firebase Auth with error handling
 let auth = null;
 let signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged;
+let signInWithPopup;
+let googleProvider = null;
 
 // Try to load Firebase, but don't block if it fails
 (async function loadFirebase() {
     try {
         const firebaseModule = await import('./firebase-config.js');
         auth = firebaseModule.auth;
+        googleProvider = firebaseModule.googleProvider;
         
         const firebaseAuth = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js");
         signInWithEmailAndPassword = firebaseAuth.signInWithEmailAndPassword;
         createUserWithEmailAndPassword = firebaseAuth.createUserWithEmailAndPassword;
         signOut = firebaseAuth.signOut;
         onAuthStateChanged = firebaseAuth.onAuthStateChanged;
+        signInWithPopup = firebaseAuth.signInWithPopup;
         console.log('✅ Firebase caricato correttamente');
     } catch (error) {
         console.warn('⚠️ Firebase non disponibile:', error.message);
@@ -53,7 +57,8 @@ function init() {
         registerLink: document.getElementById('registerLink'),
         loginLink: document.getElementById('loginLink'),
         errorMessage: document.getElementById('errorMessage'),
-        modalFooterText: document.getElementById('modalFooterText')
+        modalFooterText: document.getElementById('modalFooterText'),
+        googleLoginBtn: document.getElementById('googleLoginBtn')
     };
 
     // Check if all required elements exist
@@ -249,6 +254,18 @@ function setupEventListeners() {
         });
         console.log('✅ Event listener aggiunto a loginLink');
     }
+
+    // Google Login button
+    if (elements.googleLoginBtn) {
+        elements.googleLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleGoogleLogin();
+        });
+        console.log('✅ Event listener aggiunto a googleLoginBtn');
+    } else {
+        console.error('❌ googleLoginBtn non trovato');
+    }
     
     console.log('✅ Setup event listeners completato');
     
@@ -412,6 +429,61 @@ async function handleLogin(e) {
     } finally {
         elements.submitBtn.disabled = false;
         elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrati' : 'Accedi';
+    }
+}
+
+// Google Login Handler
+async function handleGoogleLogin() {
+    if (!auth || !googleProvider || !signInWithPopup) {
+        showError('Autenticazione Google non disponibile. Controlla la configurazione Firebase.');
+        return;
+    }
+
+    try {
+        hideError();
+        elements.googleLoginBtn.disabled = true;
+        elements.googleLoginBtn.textContent = 'Accesso in corso...';
+        
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        console.log('✅ Login Google completato:', user.email);
+        showNotification(`Benvenuto, ${user.displayName || user.email}!`);
+        closeLoginModal();
+    } catch (error) {
+        console.error('Google Auth error:', error);
+        let errorMessage = 'Errore durante l\'accesso con Google';
+        
+        switch (error.code) {
+            case 'auth/popup-closed-by-user':
+                errorMessage = 'Popup chiusa. Riprova.';
+                break;
+            case 'auth/cancelled-popup-request':
+                errorMessage = 'Richiesta annullata. Riprova.';
+                break;
+            case 'auth/account-exists-with-different-credential':
+                errorMessage = 'Esiste già un account con questa email. Usa email/password.';
+                break;
+            default:
+                errorMessage = error.message || 'Errore durante l\'accesso con Google';
+        }
+        
+        showError(errorMessage);
+    } finally {
+        if (elements.googleLoginBtn) {
+            elements.googleLoginBtn.disabled = false;
+            elements.googleLoginBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#000" fill-rule="evenodd">
+                        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9 18c2.43 0 4.467-.806 5.96-2.184l-2.908-2.258c-.806.54-1.837.86-3.052.86-2.347 0-4.335-1.585-5.043-3.716H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+                        <path d="M3.957 10.702c-.18-.54-.282-1.117-.282-1.702s.102-1.162.282-1.702V4.966H.957C.348 6.175 0 7.55 0 9s.348 2.825.957 4.034l3-2.332z" fill="#FBBC05"/>
+                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.966L3.957 7.3C4.665 5.168 6.653 3.58 9 3.58z" fill="#EA4335"/>
+                    </g>
+                </svg>
+                Accedi con Google
+            `;
+        }
     }
 }
 

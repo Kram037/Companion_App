@@ -351,10 +351,6 @@ body {
 
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-}
-
-
-.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px var(--shadow);
 }
@@ -396,6 +392,67 @@ body {
 
 .modal-footer-text a:hover {
     text-decoration: underline;
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.divider span {
+    padding: 0 var(--spacing-sm);
+}
+
+/* Google Login Button */
+.btn-google {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: white;
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.btn-google:hover {
+    background: #f8f8f8;
+    border-color: var(--text-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.btn-google:active {
+    transform: translateY(0);
+}
+
+.btn-google:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-google svg {
+    flex-shrink: 0;
 }
 
 /* Settings */
