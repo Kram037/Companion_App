@@ -260,10 +260,56 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// D20 Logo Interactive
+function initD20Logo() {
+    const die = document.getElementById('d20LogoDie');
+    if (!die) return;
+    
+    const sides = 20;
+    let lastFace = null;
+    let timeoutId = null;
+    const transitionDuration = 500;
+    const animationDuration = 3000;
+    
+    function randomFace() {
+        let face = Math.floor((Math.random() * sides)) + 1;
+        lastFace = face === lastFace ? randomFace() : face;
+        return face;
+    }
+    
+    function rollTo(face) {
+        clearTimeout(timeoutId);
+        die.setAttribute('data-face', face);
+    }
+    
+    function reset() {
+        die.removeAttribute('data-face');
+        die.classList.remove('rolling');
+    }
+    
+    // Click handler per il dado
+    die.addEventListener('click', function() {
+        die.classList.add('rolling');
+        clearTimeout(timeoutId);
+        
+        timeoutId = setTimeout(function() {
+            die.classList.remove('rolling');
+            rollTo(randomFace());
+        }, animationDuration);
+    });
+    
+    // Inizializza mostrando la faccia 20 (con la C)
+    rollTo(20);
+}
+
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+        initD20Logo();
+    });
 } else {
     init();
+    initD20Logo();
 }
 

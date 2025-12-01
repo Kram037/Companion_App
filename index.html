@@ -17,66 +17,29 @@
         </button>
         
         <div class="logo-container">
-            <div class="d20-logo">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="d20Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#C85A5A;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#A84A4A;stop-opacity:1" />
-                        </linearGradient>
-                        <filter id="shadow">
-                            <feDropShadow dx="1.5" dy="2" stdDeviation="2" flood-opacity="0.35"/>
-                        </filter>
-                    </defs>
-
-                    <!-- D20 stilizzato: poliedro con facce triangolari -->
-                    <!-- Contorno esterno del dado -->
-                    <polygon
-                        points="50,6 86,28 95,50 86,72 50,94 14,72 5,50 14,28"
-                        fill="url(#d20Gradient)"
-                        stroke="#7A3333"
-                        stroke-width="1.8"
-                        filter="url(#shadow)"
-                    />
-
-                    <!-- Suddivisione in facce triangolari principali -->
-                    <!-- Linee interne che ricordano le facce del d20 -->
-                    <!-- Dall'apice superiore verso il centro -->
-                    <line x1="50" y1="6" x2="50" y2="50" stroke="#7A3333" stroke-width="1.3"/>
-                    <line x1="50" y1="6" x2="20" y2="30" stroke="#7A3333" stroke-width="1.3"/>
-                    <line x1="50" y1="6" x2="80" y2="30" stroke="#7A3333" stroke-width="1.3"/>
-
-                    <!-- Fascia centrale -->
-                    <line x1="14" y1="28" x2="86" y2="28" stroke="#7A3333" stroke-width="1.2" opacity="0.9"/>
-                    <line x1="14" y1="72" x2="86" y2="72" stroke="#7A3333" stroke-width="1.2" opacity="0.9"/>
-
-                    <!-- Linee diagonali verso il basso -->
-                    <line x1="20" y1="30" x2="50" y2="50" stroke="#7A3333" stroke-width="1.2"/>
-                    <line x1="80" y1="30" x2="50" y2="50" stroke="#7A3333" stroke-width="1.2"/>
-                    <line x1="20" y1="70" x2="50" y2="50" stroke="#7A3333" stroke-width="1.2"/>
-                    <line x1="80" y1="70" x2="50" y2="50" stroke="#7A3333" stroke-width="1.2"/>
-
-                    <!-- Linee verso il vertice inferiore -->
-                    <line x1="50" y1="50" x2="50" y2="94" stroke="#7A3333" stroke-width="1.3"/>
-
-                    <!-- Cerchio leggero per dare volume -->
-                    <circle cx="50" cy="50" r="24" fill="rgba(255,255,255,0.05)"/>
-
-                    <!-- Lettera C al centro del dado -->
-                    <text
-                        x="50"
-                        y="52"
-                        font-family="Arial, sans-serif"
-                        font-size="26"
-                        font-weight="700"
-                        fill="white"
-                        text-anchor="middle"
-                        dominant-baseline="middle"
-                        filter="url(#shadow)"
-                    >
-                        C
-                    </text>
-                </svg>
+            <div class="d20-logo-wrapper">
+                <div class="d20-logo-die" id="d20LogoDie">
+                    <figure class="d20-face d20-face-1"></figure>
+                    <figure class="d20-face d20-face-2"></figure>
+                    <figure class="d20-face d20-face-3"></figure>
+                    <figure class="d20-face d20-face-4"></figure>
+                    <figure class="d20-face d20-face-5"></figure>
+                    <figure class="d20-face d20-face-6"></figure>
+                    <figure class="d20-face d20-face-7"></figure>
+                    <figure class="d20-face d20-face-8"></figure>
+                    <figure class="d20-face d20-face-9"></figure>
+                    <figure class="d20-face d20-face-10"></figure>
+                    <figure class="d20-face d20-face-11"></figure>
+                    <figure class="d20-face d20-face-12"></figure>
+                    <figure class="d20-face d20-face-13"></figure>
+                    <figure class="d20-face d20-face-14"></figure>
+                    <figure class="d20-face d20-face-15"></figure>
+                    <figure class="d20-face d20-face-16"></figure>
+                    <figure class="d20-face d20-face-17"></figure>
+                    <figure class="d20-face d20-face-18"></figure>
+                    <figure class="d20-face d20-face-19"></figure>
+                    <figure class="d20-face d20-face-20"></figure>
+                </div>
             </div>
             <span class="app-title">Companion App</span>
         </div>
