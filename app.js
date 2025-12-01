@@ -2,6 +2,8 @@
 import { auth } from './firebase-config.js';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
+console.log('📦 app.js caricato');
+
 // State Management
 const AppState = {
     currentUser: null,
@@ -37,9 +39,22 @@ function init() {
     };
 
     // Check if all required elements exist
+    console.log('🔍 Verifica elementi DOM...');
+    console.log('userBtn:', elements.userBtn);
+    console.log('settingsBtn:', elements.settingsBtn);
+    console.log('loginModal:', elements.loginModal);
+    console.log('toolbarBtns:', elements.toolbarBtns?.length || 0);
+    
     if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal) {
-        console.error('Alcuni elementi DOM non sono stati trovati');
-        return;
+        console.error('❌ Alcuni elementi DOM non sono stati trovati');
+        console.error('Elementi mancanti:', {
+            userBtn: !elements.userBtn,
+            settingsBtn: !elements.settingsBtn,
+            loginModal: !elements.loginModal
+        });
+        // Non return, continua comunque per vedere cosa funziona
+    } else {
+        console.log('✅ Tutti gli elementi DOM trovati');
     }
 
     setupFirebaseAuth();
@@ -49,29 +64,35 @@ function init() {
 
 // Setup Firebase Auth listeners
 function setupFirebaseAuth() {
-    if (!auth) {
-        console.error('Firebase Auth non inizializzato. Controlla firebase-config.js');
+    if (!auth || !onAuthStateChanged) {
+        console.warn('⚠️ Firebase Auth non disponibile. L\'app funzionerà senza autenticazione.');
         return;
     }
 
-    // Listen for auth state changes
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // User is signed in
-            AppState.currentUser = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || user.email.split('@')[0]
-            };
-            AppState.isLoggedIn = true;
-            updateUIForLoggedIn();
-        } else {
-            // User is signed out
-            AppState.currentUser = null;
-            AppState.isLoggedIn = false;
-            updateUIForLoggedOut();
-        }
-    });
+    try {
+        // Listen for auth state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                AppState.currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || user.email.split('@')[0]
+                };
+                AppState.isLoggedIn = true;
+                updateUIForLoggedIn();
+                console.log('✅ Utente autenticato:', user.email);
+            } else {
+                // User is signed out
+                AppState.currentUser = null;
+                AppState.isLoggedIn = false;
+                updateUIForLoggedOut();
+                console.log('👤 Utente non autenticato');
+            }
+        });
+    } catch (error) {
+        console.error('❌ Errore nel setup Firebase Auth:', error);
+    }
 }
 
 // Update UI when user is logged in
@@ -93,9 +114,12 @@ function updateUIForLoggedOut() {
 
 // Setup Event Listeners
 function setupEventListeners() {
+    console.log('🔧 Setup event listeners...');
+    
     // User button - opens login if not logged in, or user menu if logged in
     if (elements.userBtn) {
         elements.userBtn.addEventListener('click', () => {
+            console.log('👤 Click su user button');
             if (!AppState.isLoggedIn) {
                 openLoginModal();
             } else {
@@ -103,13 +127,20 @@ function setupEventListeners() {
                 console.log('User menu (to be implemented)');
             }
         });
+        console.log('✅ Event listener aggiunto a userBtn');
+    } else {
+        console.error('❌ userBtn non trovato');
     }
 
     // Settings button
     if (elements.settingsBtn) {
         elements.settingsBtn.addEventListener('click', () => {
+            console.log('⚙️ Click su settings button');
             openSettingsModal();
         });
+        console.log('✅ Event listener aggiunto a settingsBtn');
+    } else {
+        console.error('❌ settingsBtn non trovato');
     }
 
     // Close modals
@@ -149,13 +180,20 @@ function setupEventListeners() {
 
     // Toolbar navigation
     if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
-        elements.toolbarBtns.forEach(btn => {
+        elements.toolbarBtns.forEach((btn, index) => {
             btn.addEventListener('click', () => {
                 const page = btn.getAttribute('data-page');
+                console.log('📄 Click su toolbar button:', page);
                 navigateToPage(page);
             });
         });
+        console.log(`✅ Event listeners aggiunti a ${elements.toolbarBtns.length} toolbar buttons`);
+    } else {
+        console.error('❌ toolbarBtns non trovati');
     }
+    
+    console.log('✅ Setup event listeners completato');
+}
 
     // Register/Login link toggle
     if (elements.registerLink) {
@@ -391,10 +429,26 @@ document.head.appendChild(style);
 
 // Initialize app when DOM is ready
 // With ES modules, scripts are deferred, so DOM should be ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    // DOM already loaded
-    init();
-}
+// Wrap in async function to handle Firebase imports
+(async function() {
+    try {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('🚀 Inizializzazione app...');
+                init();
+            });
+        } else {
+            // DOM already loaded
+            console.log('🚀 Inizializzazione app...');
+            init();
+        }
+    } catch (error) {
+        console.error('❌ Errore durante l\'inizializzazione:', error);
+        // Try to initialize anyway for basic functionality
+        setTimeout(() => {
+            console.log('🔄 Tentativo di inizializzazione senza Firebase...');
+            init();
+        }, 1000);
+    }
+})();
 
