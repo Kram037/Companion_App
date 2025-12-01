@@ -260,62 +260,10 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// D20 Logo functionality
-function initD20Logo() {
-    const die = document.getElementById('logoDie');
-    if (!die) return;
-    
-    const sides = 20;
-    const initialSide = 1;
-    let lastFace = null;
-    let timeoutId = null;
-    const transitionDuration = 500;
-    const animationDuration = 3000;
-    
-    function randomFace() {
-        const face = Math.floor((Math.random() * sides)) + initialSide;
-        lastFace = face == lastFace ? randomFace() : face;
-        return face;
-    }
-    
-    function rollTo(face) {
-        clearTimeout(timeoutId);
-        die.setAttribute('data-face', face);
-    }
-    
-    function reset() {
-        die.removeAttribute('data-face');
-        die.classList.remove('rolling');
-    }
-    
-    function randomize() {
-        die.classList.add('rolling');
-        clearTimeout(timeoutId);
-        
-        timeoutId = setTimeout(function() {
-            die.classList.remove('rolling');
-            rollTo(randomFace());
-        }, animationDuration);
-    }
-    
-    // Click on die to randomize
-    die.addEventListener('click', function(e) {
-        e.preventDefault();
-        randomize();
-    });
-    
-    // Initialize with face 1 showing
-    rollTo(1);
-}
-
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        init();
-        initD20Logo();
-    });
+    document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
-    initD20Logo();
 }
 
