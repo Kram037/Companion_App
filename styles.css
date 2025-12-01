@@ -846,10 +846,14 @@ body {
 
 .form-actions .btn-secondary,
 .form-actions .btn-primary {
+    height: 44px;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 0;
+    padding: var(--spacing-sm);
+    box-sizing: border-box;
 }
 
 /* Icon Selector */
