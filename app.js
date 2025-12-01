@@ -110,17 +110,19 @@ async function init() {
         console.log('✅ Tutti gli elementi DOM trovati');
     }
 
-    // Wait for Firebase to be ready
+    // Setup event listeners immediately (don't wait for Firebase)
+    setupEventListeners();
+    navigateToPage('campagne');
+    
+    // Wait for Firebase to be ready (in background)
     try {
         console.log('⏳ Attesa caricamento Firebase...');
         await waitForFirebase();
+        setupFirebaseAuth();
     } catch (error) {
         console.error('❌ Errore nell\'attesa Firebase:', error);
+        // Continue anyway - app works without Firebase
     }
-
-    setupFirebaseAuth();
-    setupEventListeners();
-    navigateToPage('campagne');
 }
 
 // Setup Firebase Auth listeners
@@ -630,11 +632,11 @@ document.head.appendChild(style);
 
 // Initialize app when DOM is ready
 // With ES modules, scripts are deferred, so DOM should be ready
-function startApp() {
+async function startApp() {
     try {
         console.log('🚀 Inizializzazione app...');
         console.log('Document readyState:', document.readyState);
-        init();
+        await init();
         console.log('✅ Inizializzazione completata');
     } catch (error) {
         console.error('❌ Errore durante l\'inizializzazione:', error);

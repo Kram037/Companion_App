@@ -1,2 +1,0 @@
-Questo è un file di prova per il primo commit dalla companion app.
-
