@@ -191,9 +191,6 @@ function setupEventListeners() {
     } else {
         console.error('❌ toolbarBtns non trovati');
     }
-    
-    console.log('✅ Setup event listeners completato');
-}
 
     // Register/Login link toggle
     if (elements.registerLink) {
@@ -201,6 +198,7 @@ function setupEventListeners() {
             e.preventDefault();
             toggleLoginRegisterMode(true);
         });
+        console.log('✅ Event listener aggiunto a registerLink');
     }
 
     if (elements.loginLink) {
@@ -208,7 +206,10 @@ function setupEventListeners() {
             e.preventDefault();
             toggleLoginRegisterMode(false);
         });
+        console.log('✅ Event listener aggiunto a loginLink');
     }
+    
+    console.log('✅ Setup event listeners completato');
 }
 
 // Navigation
