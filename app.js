@@ -1,6 +1,24 @@
-// Import Firebase Auth
-import { auth } from './firebase-config.js';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+// Import Firebase Auth with error handling
+let auth = null;
+let signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged;
+
+// Try to load Firebase, but don't block if it fails
+(async function loadFirebase() {
+    try {
+        const firebaseModule = await import('./firebase-config.js');
+        auth = firebaseModule.auth;
+        
+        const firebaseAuth = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js");
+        signInWithEmailAndPassword = firebaseAuth.signInWithEmailAndPassword;
+        createUserWithEmailAndPassword = firebaseAuth.createUserWithEmailAndPassword;
+        signOut = firebaseAuth.signOut;
+        onAuthStateChanged = firebaseAuth.onAuthStateChanged;
+        console.log('✅ Firebase caricato correttamente');
+    } catch (error) {
+        console.warn('⚠️ Firebase non disponibile:', error.message);
+        console.log('L\'app continuerà a funzionare senza autenticazione');
+    }
+})();
 
 console.log('📦 app.js caricato');
 
@@ -115,10 +133,18 @@ function updateUIForLoggedOut() {
 // Setup Event Listeners
 function setupEventListeners() {
     console.log('🔧 Setup event listeners...');
+    console.log('Elementi disponibili:', Object.keys(elements).filter(key => elements[key] !== null));
     
     // User button - opens login if not logged in, or user menu if logged in
     if (elements.userBtn) {
-        elements.userBtn.addEventListener('click', () => {
+        // Remove any existing listeners first
+        const newUserBtn = elements.userBtn.cloneNode(true);
+        elements.userBtn.parentNode.replaceChild(newUserBtn, elements.userBtn);
+        elements.userBtn = newUserBtn;
+        
+        elements.userBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('👤 Click su user button');
             if (!AppState.isLoggedIn) {
                 openLoginModal();
@@ -134,7 +160,14 @@ function setupEventListeners() {
 
     // Settings button
     if (elements.settingsBtn) {
-        elements.settingsBtn.addEventListener('click', () => {
+        // Remove any existing listeners first
+        const newSettingsBtn = elements.settingsBtn.cloneNode(true);
+        elements.settingsBtn.parentNode.replaceChild(newSettingsBtn, elements.settingsBtn);
+        elements.settingsBtn = newSettingsBtn;
+        
+        elements.settingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('⚙️ Click su settings button');
             openSettingsModal();
         });
@@ -181,12 +214,20 @@ function setupEventListeners() {
     // Toolbar navigation
     if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
         elements.toolbarBtns.forEach((btn, index) => {
-            btn.addEventListener('click', () => {
-                const page = btn.getAttribute('data-page');
+            // Remove any existing listeners first
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const page = newBtn.getAttribute('data-page');
                 console.log('📄 Click su toolbar button:', page);
                 navigateToPage(page);
             });
         });
+        // Re-query after cloning
+        elements.toolbarBtns = document.querySelectorAll('.toolbar-btn');
         console.log(`✅ Event listeners aggiunti a ${elements.toolbarBtns.length} toolbar buttons`);
     } else {
         console.error('❌ toolbarBtns non trovati');
@@ -210,6 +251,23 @@ function setupEventListeners() {
     }
     
     console.log('✅ Setup event listeners completato');
+    
+    // Test diretto: verifica che i bottoni siano cliccabili
+    setTimeout(() => {
+        console.log('🧪 Test bottoni...');
+        if (elements.userBtn) {
+            console.log('userBtn presente, test click...');
+            // Non fare click automatico, solo verifica
+            console.log('userBtn onclick:', elements.userBtn.onclick);
+            console.log('userBtn event listeners:', getEventListeners ? getEventListeners(elements.userBtn) : 'N/A');
+        }
+        if (elements.settingsBtn) {
+            console.log('settingsBtn presente');
+        }
+        if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
+            console.log(`${elements.toolbarBtns.length} toolbar buttons presenti`);
+        }
+    }, 500);
 }
 
 // Navigation
@@ -430,26 +488,23 @@ document.head.appendChild(style);
 
 // Initialize app when DOM is ready
 // With ES modules, scripts are deferred, so DOM should be ready
-// Wrap in async function to handle Firebase imports
-(async function() {
+function startApp() {
     try {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                console.log('🚀 Inizializzazione app...');
-                init();
-            });
-        } else {
-            // DOM already loaded
-            console.log('🚀 Inizializzazione app...');
-            init();
-        }
+        console.log('🚀 Inizializzazione app...');
+        console.log('Document readyState:', document.readyState);
+        init();
+        console.log('✅ Inizializzazione completata');
     } catch (error) {
         console.error('❌ Errore durante l\'inizializzazione:', error);
-        // Try to initialize anyway for basic functionality
-        setTimeout(() => {
-            console.log('🔄 Tentativo di inizializzazione senza Firebase...');
-            init();
-        }, 1000);
+        console.error('Stack:', error.stack);
     }
-})();
+}
+
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+} else {
+    // DOM already loaded, but wait a bit for all scripts
+    setTimeout(startApp, 100);
+}
 
