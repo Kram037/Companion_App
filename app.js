@@ -659,14 +659,32 @@ function setupFirestore() {
     }
 
     // Listen for auth state changes to load campagne
-    currentAuth.onAuthStateChanged((user) => {
+    currentAuth.onAuthStateChanged(async (user) => {
         console.log('🔄 Auth state changed:', user ? user.uid : 'null');
         if (user) {
             console.log('✅ Utente autenticato, carico campagne per:', user.uid);
-            // Wait a bit to ensure auth is fully propagated (especially on desktop)
-            setTimeout(() => {
-                loadCampagne(user.uid);
-            }, 100);
+            
+            // Wait for auth token to be ready (especially important on desktop)
+            try {
+                // Force token refresh to ensure it's valid
+                const token = await user.getIdToken(true);
+                console.log('🔑 Token ottenuto, lunghezza:', token ? token.length : 0);
+                
+                // Additional delay for desktop to ensure everything is synced
+                const isDesktop = window.innerWidth > 768;
+                const delay = isDesktop ? 300 : 100;
+                
+                setTimeout(() => {
+                    console.log('📚 Chiamata loadCampagne dopo delay di', delay, 'ms');
+                    loadCampagne(user.uid);
+                }, delay);
+            } catch (error) {
+                console.error('❌ Errore nel recupero token:', error);
+                // Retry after a longer delay
+                setTimeout(() => {
+                    loadCampagne(user.uid);
+                }, 500);
+            }
         } else {
             console.log('👤 Utente non autenticato, pulisco campagne');
             // Clear campagne when logged out
@@ -679,7 +697,7 @@ function setupFirestore() {
     });
 }
 
-function loadCampagne(userId) {
+async function loadCampagne(userId) {
     const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
     const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
     
@@ -701,19 +719,44 @@ function loadCampagne(userId) {
     
     const currentUser = currentAuth.currentUser;
     if (!currentUser) {
-        console.error('❌ Utente non autenticato');
+        console.error('❌ Utente non autenticato al momento della query');
+        console.log('userId richiesto:', userId);
         console.log('Stato auth:', currentAuth);
-        return;
+        // Try to get the user again
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const retryUser = currentAuth.currentUser;
+        if (!retryUser) {
+            console.error('❌ Utente ancora non disponibile dopo retry');
+            return;
+        }
+        console.log('✅ Utente recuperato dopo retry:', retryUser.uid);
     }
     
-    if (currentUser.uid !== userId) {
+    const finalUser = currentAuth.currentUser;
+    if (finalUser.uid !== userId) {
         console.error('❌ userId non corrisponde all\'utente autenticato');
         console.log('userId fornito:', userId);
-        console.log('uid utente:', currentUser.uid);
+        console.log('uid utente:', finalUser.uid);
         return;
     }
     
-    console.log('✅ Utente autenticato verificato:', currentUser.uid);
+    // Verify token is valid
+    try {
+        const token = await finalUser.getIdToken();
+        console.log('✅ Token valido verificato, lunghezza:', token ? token.length : 0);
+    } catch (error) {
+        console.error('❌ Errore nel recupero token:', error);
+        // Try to refresh
+        try {
+            await finalUser.getIdToken(true);
+            console.log('✅ Token aggiornato');
+        } catch (refreshError) {
+            console.error('❌ Errore nell\'aggiornamento token:', refreshError);
+            return;
+        }
+    }
+    
+    console.log('✅ Utente autenticato verificato:', finalUser.uid);
 
     console.log('📚 Caricamento campagne per utente:', userId);
     
@@ -1278,4 +1321,5 @@ if (document.readyState === 'loading') {
         startApp();
     }, 100);
 }
+
 
