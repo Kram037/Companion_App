@@ -120,12 +120,15 @@ body {
     filter: drop-shadow(0 4px 8px var(--shadow));
 }
 
+.d20-logo img,
 .d20-logo svg {
     width: 100%;
     height: 100%;
+    object-fit: contain;
     transition: var(--transition);
 }
 
+.d20-logo:hover img,
 .d20-logo:hover svg {
     transform: rotate(15deg) scale(1.1);
 }
