@@ -477,17 +477,8 @@ function setupEventListeners() {
         });
     }
     
-    // Icon preview update
-    const iconaInput = document.getElementById('iconaCampagna');
-    const iconPreview = document.getElementById('iconDisplay');
-    if (iconaInput && iconPreview) {
-        iconaInput.addEventListener('input', function(e) {
-            const value = e.target.value.trim();
-            iconPreview.textContent = value || '🎲';
-        });
-    } else {
-        console.error('❌ googleLoginBtn non trovato');
-    }
+    // Icon selector setup
+    setupIconSelector();
     
     console.log('✅ Setup event listeners completato');
     
@@ -977,10 +968,7 @@ function openCampagnaModal(campagnaId = null) {
     elements.campagnaForm.reset();
     
     // Reset icon preview
-    const iconPreview = document.getElementById('iconDisplay');
-    if (iconPreview) {
-        iconPreview.textContent = '🎲';
-    }
+    resetIconPreview();
     
     // For now, we only support creating new campaigns (simple form)
     // Editing will be handled separately if needed
@@ -1002,6 +990,137 @@ function closeCampagnaModal() {
     if (elements.campagnaForm) {
         elements.campagnaForm.reset();
     }
+    resetIconPreview();
+}
+
+// Icon Selector Functions
+const predefinedIcons = [
+    { name: 'dice', svg: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="9" r="1"></circle><circle cx="15" cy="9" r="1"></circle><circle cx="9" cy="15" r="1"></circle><circle cx="15" cy="15" r="1"></circle><circle cx="12" cy="12" r="1"></circle>' },
+    { name: 'sword', svg: '<path d="M6 18L18 6M6 6l12 12"></path>' },
+    { name: 'castle', svg: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><line x1="9" y1="8" x2="15" y2="8"></line><line x1="9" y1="12" x2="15" y2="12"></line><line x1="9" y1="16" x2="15" y2="16"></line>' },
+    { name: 'shield', svg: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' },
+    { name: 'book', svg: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>' },
+    { name: 'star', svg: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>' },
+    { name: 'fire', svg: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>' },
+    { name: 'moon', svg: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>' },
+    { name: 'sun', svg: '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>' },
+    { name: 'treasure', svg: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>' },
+    { name: 'skull', svg: '<circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2"></path><path d="M12 20v2"></path><path d="M8 18v-2a4 4 0 0 1 8 0v2"></path>' },
+    { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' }
+];
+
+let selectedIconType = 'predefined';
+let selectedIconName = 'dice';
+let uploadedImageData = null;
+
+function setupIconSelector() {
+    const iconGrid = document.getElementById('iconGrid');
+    const iconUpload = document.getElementById('iconUpload');
+    const iconPreview = document.getElementById('iconPreview');
+    const iconDisplay = document.getElementById('iconDisplay');
+    const iconImageDisplay = document.getElementById('iconImageDisplay');
+    
+    if (!iconGrid) {
+        console.error('❌ iconGrid non trovato');
+        return;
+    }
+    
+    // Populate icon grid
+    predefinedIcons.forEach((icon, index) => {
+        const iconOption = document.createElement('div');
+        iconOption.className = 'icon-option';
+        if (index === 0) iconOption.classList.add('selected');
+        iconOption.dataset.iconName = icon.name;
+        iconOption.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
+        iconOption.addEventListener('click', () => selectPredefinedIcon(icon.name));
+        iconGrid.appendChild(iconOption);
+    });
+    
+    // Handle image upload
+    if (iconUpload) {
+        iconUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                    showNotification('L\'immagine è troppo grande. Massimo 2MB.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    uploadedImageData = event.target.result;
+                    selectedIconType = 'uploaded';
+                    updateIconPreview();
+                    
+                    // Deselect all predefined icons
+                    document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Set default icon
+    selectPredefinedIcon('dice');
+}
+
+function selectPredefinedIcon(iconName) {
+    selectedIconType = 'predefined';
+    selectedIconName = iconName;
+    uploadedImageData = null;
+    
+    // Update selected state
+    document.querySelectorAll('.icon-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.iconName === iconName);
+    });
+    
+    updateIconPreview();
+}
+
+function updateIconPreview() {
+    const iconDisplay = document.getElementById('iconDisplay');
+    const iconImageDisplay = document.getElementById('iconImageDisplay');
+    const iconaCampagna = document.getElementById('iconaCampagna');
+    
+    if (!iconDisplay || !iconImageDisplay) return;
+    
+    if (selectedIconType === 'uploaded' && uploadedImageData) {
+        iconDisplay.style.display = 'none';
+        iconImageDisplay.style.display = 'block';
+        iconImageDisplay.src = uploadedImageData;
+        if (iconaCampagna) {
+            iconaCampagna.value = uploadedImageData; // Store as data URL
+        }
+    } else {
+        iconDisplay.style.display = 'block';
+        iconImageDisplay.style.display = 'none';
+        const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
+        if (selectedIcon) {
+            iconDisplay.innerHTML = selectedIcon.svg;
+        }
+        if (iconaCampagna) {
+            iconaCampagna.value = selectedIconName; // Store icon name
+        }
+    }
+}
+
+function resetIconPreview() {
+    selectedIconType = 'predefined';
+    selectedIconName = 'dice';
+    uploadedImageData = null;
+    
+    // Reset file input
+    const iconUpload = document.getElementById('iconUpload');
+    if (iconUpload) {
+        iconUpload.value = '';
+    }
+    
+    // Select first icon
+    document.querySelectorAll('.icon-option').forEach((opt, index) => {
+        opt.classList.toggle('selected', index === 0);
+    });
+    
+    updateIconPreview();
 }
 
 async function handleCampagnaSubmit(e) {
@@ -1026,13 +1145,28 @@ async function handleCampagnaSubmit(e) {
         return;
     }
 
+    // Get icon data
+    let iconaData = null;
+    if (selectedIconType === 'uploaded' && uploadedImageData) {
+        iconaData = {
+            type: 'image',
+            data: uploadedImageData
+        };
+    } else if (selectedIconName) {
+        iconaData = {
+            type: 'predefined',
+            name: selectedIconName
+        };
+    }
+
     const formData = {
         nome_campagna: document.getElementById('nomeCampagna').value.trim(),
-        nome_dm: document.getElementById('nomeDM').value.trim(),
-        numero_giocatori: parseInt(document.getElementById('numeroGiocatori').value) || 0,
-        numero_sessioni: parseInt(document.getElementById('numeroSessioni').value) || 0,
-        tempo_di_gioco: parseInt(document.getElementById('tempoDiGioco').value) || 0,
-        note: document.getElementById('note').value.split('\n').filter(n => n.trim()).map(n => n.trim()),
+        icona: iconaData,
+        nome_dm: '',
+        numero_giocatori: 0,
+        numero_sessioni: 0,
+        tempo_di_gioco: 0,
+        note: [],
         userId: user.uid
     };
 
