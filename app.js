@@ -10,29 +10,38 @@ const AppState = {
     isRegisterMode: false
 };
 
-// DOM Elements
-const elements = {
-    userBtn: document.getElementById('userBtn'),
-    settingsBtn: document.getElementById('settingsBtn'),
-    loginModal: document.getElementById('loginModal'),
-    settingsModal: document.getElementById('settingsModal'),
-    closeLoginModal: document.getElementById('closeLoginModal'),
-    closeSettingsModal: document.getElementById('closeSettingsModal'),
-    loginForm: document.getElementById('loginForm'),
-    logoutBtn: document.getElementById('logoutBtn'),
-    toolbarBtns: document.querySelectorAll('.toolbar-btn'),
-    pages: document.querySelectorAll('.page'),
-    mainContent: document.getElementById('mainContent'),
-    loginModalTitle: document.getElementById('loginModalTitle'),
-    submitBtn: document.getElementById('submitBtn'),
-    registerLink: document.getElementById('registerLink'),
-    loginLink: document.getElementById('loginLink'),
-    errorMessage: document.getElementById('errorMessage'),
-    modalFooterText: document.getElementById('modalFooterText')
-};
+// DOM Elements - will be initialized in init()
+let elements = {};
 
 // Initialize App
 function init() {
+    // Initialize DOM elements
+    elements = {
+        userBtn: document.getElementById('userBtn'),
+        settingsBtn: document.getElementById('settingsBtn'),
+        loginModal: document.getElementById('loginModal'),
+        settingsModal: document.getElementById('settingsModal'),
+        closeLoginModal: document.getElementById('closeLoginModal'),
+        closeSettingsModal: document.getElementById('closeSettingsModal'),
+        loginForm: document.getElementById('loginForm'),
+        logoutBtn: document.getElementById('logoutBtn'),
+        toolbarBtns: document.querySelectorAll('.toolbar-btn'),
+        pages: document.querySelectorAll('.page'),
+        mainContent: document.getElementById('mainContent'),
+        loginModalTitle: document.getElementById('loginModalTitle'),
+        submitBtn: document.getElementById('submitBtn'),
+        registerLink: document.getElementById('registerLink'),
+        loginLink: document.getElementById('loginLink'),
+        errorMessage: document.getElementById('errorMessage'),
+        modalFooterText: document.getElementById('modalFooterText')
+    };
+
+    // Check if all required elements exist
+    if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal) {
+        console.error('Alcuni elementi DOM non sono stati trovati');
+        return;
+    }
+
     setupFirebaseAuth();
     setupEventListeners();
     navigateToPage('campagne');
@@ -85,61 +94,83 @@ function updateUIForLoggedOut() {
 // Setup Event Listeners
 function setupEventListeners() {
     // User button - opens login if not logged in, or user menu if logged in
-    elements.userBtn.addEventListener('click', () => {
-        if (!AppState.isLoggedIn) {
-            openLoginModal();
-        } else {
-            // TODO: Open user menu/profile
-            console.log('User menu (to be implemented)');
-        }
-    });
+    if (elements.userBtn) {
+        elements.userBtn.addEventListener('click', () => {
+            if (!AppState.isLoggedIn) {
+                openLoginModal();
+            } else {
+                // TODO: Open user menu/profile
+                console.log('User menu (to be implemented)');
+            }
+        });
+    }
 
     // Settings button
-    elements.settingsBtn.addEventListener('click', () => {
-        openSettingsModal();
-    });
+    if (elements.settingsBtn) {
+        elements.settingsBtn.addEventListener('click', () => {
+            openSettingsModal();
+        });
+    }
 
     // Close modals
-    elements.closeLoginModal.addEventListener('click', closeLoginModal);
-    elements.closeSettingsModal.addEventListener('click', closeSettingsModal);
+    if (elements.closeLoginModal) {
+        elements.closeLoginModal.addEventListener('click', closeLoginModal);
+    }
+    if (elements.closeSettingsModal) {
+        elements.closeSettingsModal.addEventListener('click', closeSettingsModal);
+    }
 
     // Close modal on background click
-    elements.loginModal.addEventListener('click', (e) => {
-        if (e.target === elements.loginModal) {
-            closeLoginModal();
-        }
-    });
+    if (elements.loginModal) {
+        elements.loginModal.addEventListener('click', (e) => {
+            if (e.target === elements.loginModal) {
+                closeLoginModal();
+            }
+        });
+    }
 
-    elements.settingsModal.addEventListener('click', (e) => {
-        if (e.target === elements.settingsModal) {
-            closeSettingsModal();
-        }
-    });
+    if (elements.settingsModal) {
+        elements.settingsModal.addEventListener('click', (e) => {
+            if (e.target === elements.settingsModal) {
+                closeSettingsModal();
+            }
+        });
+    }
 
     // Login form submission
-    elements.loginForm.addEventListener('submit', handleLogin);
+    if (elements.loginForm) {
+        elements.loginForm.addEventListener('submit', handleLogin);
+    }
 
     // Logout button
-    elements.logoutBtn.addEventListener('click', handleLogout);
+    if (elements.logoutBtn) {
+        elements.logoutBtn.addEventListener('click', handleLogout);
+    }
 
     // Toolbar navigation
-    elements.toolbarBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const page = btn.getAttribute('data-page');
-            navigateToPage(page);
+    if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
+        elements.toolbarBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const page = btn.getAttribute('data-page');
+                navigateToPage(page);
+            });
         });
-    });
+    }
 
     // Register/Login link toggle
-    elements.registerLink?.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleLoginRegisterMode(true);
-    });
+    if (elements.registerLink) {
+        elements.registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleLoginRegisterMode(true);
+        });
+    }
 
-    elements.loginLink?.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleLoginRegisterMode(false);
-    });
+    if (elements.loginLink) {
+        elements.loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleLoginRegisterMode(false);
+        });
+    }
 }
 
 // Navigation
@@ -359,9 +390,11 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Initialize app when DOM is ready
+// With ES modules, scripts are deferred, so DOM should be ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
+    // DOM already loaded
     init();
 }
 
