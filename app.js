@@ -209,6 +209,8 @@ function updateUIForLoggedIn() {
 // Update UI when user is logged out
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
+    // Show login message in campagne list
+    renderCampagne([], false);
 }
 
 // Setup Event Listeners
@@ -686,13 +688,13 @@ function setupFirestore() {
                 }, 500);
             }
         } else {
-            console.log('👤 Utente non autenticato, pulisco campagne');
+            console.log('👤 Utente non autenticato, mostro messaggio login');
             // Clear campagne when logged out
             if (campagneUnsubscribe) {
                 campagneUnsubscribe();
                 campagneUnsubscribe = null;
             }
-            renderCampagne([]);
+            renderCampagne([], false); // false = utente non loggato
         }
     });
 }
@@ -786,7 +788,7 @@ async function loadCampagne(userId) {
                         }
                     });
                     console.log('✅ Campagne caricate:', campagne.length);
-                    renderCampagne(campagne);
+                    renderCampagne(campagne, true);
                 },
                 (error) => {
                     console.error('❌ Errore nel caricamento campagne:', error);
@@ -833,7 +835,7 @@ function loadCampagneFallback(userId, currentFirestore) {
                     }
                 });
                 console.log('✅ Campagne caricate (fallback):', campagne.length);
-                renderCampagne(campagne);
+                renderCampagne(campagne, true);
             },
             (error) => {
                 console.error('❌ Errore anche nel fallback:', error);
@@ -842,9 +844,20 @@ function loadCampagneFallback(userId, currentFirestore) {
         );
 }
 
-function renderCampagne(campagne) {
+function renderCampagne(campagne, isLoggedIn = true) {
     if (!elements.campagneList) return;
 
+    // If user is not logged in, show login message
+    if (!isLoggedIn) {
+        elements.campagneList.innerHTML = `
+            <div class="content-placeholder">
+                <p>Accedi per vedere le tue campagne</p>
+            </div>
+        `;
+        return;
+    }
+
+    // If logged in but no campaigns
     if (campagne.length === 0) {
         elements.campagneList.innerHTML = `
             <div class="content-placeholder">
