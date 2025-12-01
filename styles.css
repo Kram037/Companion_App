@@ -899,7 +899,7 @@ body {
     background: var(--background);
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: auto;
 }
 

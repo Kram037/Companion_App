@@ -1006,29 +1006,7 @@ const predefinedIcons = [
     { name: 'sun', svg: '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>' },
     { name: 'treasure', svg: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>' },
     { name: 'skull', svg: '<circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2"></path><path d="M12 20v2"></path><path d="M8 18v-2a4 4 0 0 1 8 0v2"></path>' },
-    { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' },
-    { name: 'dragon', svg: '<path d="M12 2c-2 0-4 2-4 4v4c0 2 2 4 4 4s4-2 4-4V6c0-2-2-4-4-4z"></path><path d="M8 10l-2 2 2 2"></path><path d="M16 10l2 2-2 2"></path><path d="M10 14l2 4 2-4"></path><path d="M12 18v4"></path>' },
-    { name: 'bow', svg: '<path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path><line x1="12" y1="2" x2="12" y2="22"></line><path d="M8 2l4 4 4-4"></path>' },
-    { name: 'crown', svg: '<path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"></path><path d="M12 18v4"></path><path d="M8 22h8"></path>' },
-    { name: 'gem', svg: '<path d="M6 3h12l4 6-10 12L2 9l4-6z"></path><path d="M11 3l1 12"></path><path d="M13 3l-1 12"></path>' },
-    { name: 'key', svg: '<circle cx="8" cy="15" r="3"></circle><path d="M14 8l-4 4"></path><path d="M19 2l-2 2"></path><path d="M19 6l-2-2"></path><path d="M19 10l-2-2"></path>' },
-    { name: 'door', svg: '<path d="M6 2h12v20H6z"></path><path d="M6 2v20"></path><path d="M18 2v20"></path><circle cx="15" cy="12" r="2"></circle>' },
-    { name: 'scroll', svg: '<path d="M4 4h16v16H4z"></path><path d="M4 4v16"></path><path d="M8 8h8"></path><path d="M8 12h8"></path><path d="M8 16h6"></path><path d="M18 4v16"></path>' },
-    { name: 'potion', svg: '<path d="M9 2v6"></path><path d="M15 2v6"></path><path d="M12 2v20"></path><path d="M8 8h8v12a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V8z"></path>' },
-    { name: 'map', svg: '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line>' },
-    { name: 'bag', svg: '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>' },
-    { name: 'lantern', svg: '<path d="M12 2v4"></path><path d="M6 6h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6z"></path><line x1="6" y1="6" x2="6" y2="16"></line><line x1="18" y1="6" x2="18" y2="16"></line><circle cx="12" cy="11" r="2"></circle>' },
-    { name: 'hammer', svg: '<path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0-.83-.83-.83-2.17 0-3L12 9"></path><path d="M17.64 15L22 10.64a2.5 2.5 0 0 0 0-3.54l-2.82-2.82a2.5 2.5 0 0 0-3.54 0L12.36 6.36"></path>' },
-    { name: 'axe', svg: '<path d="M14 7l-5 5"></path><path d="M9 2L2 9l5 5 7-7 5-5-5-5z"></path><path d="M14 2l7 7"></path><path d="M21 2l-7 7"></path>' },
-    { name: 'spear', svg: '<line x1="12" y1="2" x2="12" y2="22"></line><path d="M8 2l4 4 4-4"></path><path d="M8 22l4-4 4 4"></path>' },
-    { name: 'helmet', svg: '<path d="M12 2C8 2 6 4 6 8v6c0 4 2 6 6 6s6-2 6-6V8c0-4-2-6-6-6z"></path><path d="M12 2v4"></path><path d="M8 6h8"></path><ellipse cx="12" cy="14" rx="4" ry="2"></ellipse>' },
-    { name: 'ring', svg: '<circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="4"></circle>' },
-    { name: 'wand', svg: '<line x1="12" y1="2" x2="12" y2="22"></line><path d="M8 2l4 4 4-4"></path><circle cx="12" cy="18" r="2"></circle>' },
-    { name: 'dagger', svg: '<path d="M12 2L8 6l4 4 4-4-4-4z"></path><line x1="12" y1="6" x2="12" y2="22"></line><path d="M10 20l2 2 2-2"></path>' },
-    { name: 'tower', svg: '<rect x="8" y="6" width="8" height="16" rx="1"></rect><rect x="10" y="2" width="4" height="4"></rect><line x1="9" y1="10" x2="15" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line><line x1="9" y1="18" x2="15" y2="18"></line>' },
-    { name: 'tree', svg: '<path d="M12 2v6"></path><path d="M8 8c0-4 4-4 4-4s4 0 4 4"></path><path d="M6 8h12v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8z"></path>' },
-    { name: 'mountain', svg: '<path d="M3 20l9-9 9 9H3z"></path><path d="M8 20l4-4 4 4"></path>' },
-    { name: 'compass', svg: '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><path d="M12 6l-4 4 4 4 4-4-4-4z"></path>' }
+    { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' }
 ];
 
 let selectedIconType = 'predefined';
