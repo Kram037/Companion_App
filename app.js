@@ -38,7 +38,7 @@ function waitForFirebase() {
         } else {
             // Wait a bit and retry
             let attempts = 0;
-            const maxAttempts = 10;
+            const maxAttempts = 50; // 5 secondi totali (50 * 100ms)
             const checkInterval = setInterval(() => {
                 attempts++;
                 if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -46,7 +46,7 @@ function waitForFirebase() {
                     resolve(initFirebase());
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    console.error('❌ Timeout attesa Firebase');
+                    console.warn('⏱️ Timeout attesa Firebase, continuo comunque...');
                     resolve(false);
                 }
             }, 100);
@@ -307,22 +307,6 @@ function setupEventListeners() {
     
     console.log('✅ Setup event listeners completato');
     
-    // Test diretto: verifica che i bottoni siano cliccabili
-    setTimeout(() => {
-        console.log('🧪 Test bottoni...');
-        if (elements.userBtn) {
-            console.log('userBtn presente, test click...');
-            // Non fare click automatico, solo verifica
-            console.log('userBtn onclick:', elements.userBtn.onclick);
-            console.log('userBtn event listeners:', getEventListeners ? getEventListeners(elements.userBtn) : 'N/A');
-        }
-        if (elements.settingsBtn) {
-            console.log('settingsBtn presente');
-        }
-        if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
-            console.log(`${elements.toolbarBtns.length} toolbar buttons presenti`);
-        }
-    }, 500);
 }
 
 // Navigation
