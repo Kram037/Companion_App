@@ -375,36 +375,75 @@ async function handleLogin(e) {
     e.preventDefault();
     hideError();
     
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
+    // Validazione input
     if (!email || !password) {
         showError('Inserisci email e password');
         return;
     }
 
+    // Validazione email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showError('Inserisci un indirizzo email valido');
+        return;
+    }
+
+    // Validazione password per registrazione
+    if (AppState.isRegisterMode && password.length < 6) {
+        showError('La password deve contenere almeno 6 caratteri');
+        return;
+    }
+
+    // Verifica che Firebase sia disponibile
+    if (!auth) {
+        showError('Autenticazione non disponibile. Ricarica la pagina.');
+        console.error('Auth non disponibile');
+        return;
+    }
+
+    if (!createUserWithEmailAndPassword || !signInWithEmailAndPassword) {
+        showError('Funzioni di autenticazione non disponibili. Ricarica la pagina.');
+        console.error('Funzioni Firebase non disponibili');
+        return;
+    }
+
     try {
         elements.submitBtn.disabled = true;
+        const originalText = elements.submitBtn.textContent;
         elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrazione...' : 'Accesso...';
+
+        console.log(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
 
         if (AppState.isRegisterMode) {
             // Register new user
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log('✅ Utente registrato con successo:', user.uid, user.email);
             showNotification('Registrazione completata! Benvenuto!');
         } else {
             // Sign in existing user
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log('✅ Utente autenticato con successo:', user.uid, user.email);
             showNotification('Accesso effettuato!');
         }
 
         closeLoginModal();
     } catch (error) {
-        console.error('Auth error:', error);
+        console.error('❌ Auth error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        
         let errorMessage = 'Si è verificato un errore';
         
         switch (error.code) {
             case 'auth/email-already-in-use':
-                errorMessage = 'Questa email è già registrata';
+                errorMessage = AppState.isRegisterMode 
+                    ? 'Questa email è già registrata. Usa "Accedi" per entrare.' 
+                    : 'Email già in uso';
                 break;
             case 'auth/invalid-email':
                 errorMessage = 'Email non valida';
@@ -413,16 +452,26 @@ async function handleLogin(e) {
                 errorMessage = 'Password troppo debole (minimo 6 caratteri)';
                 break;
             case 'auth/user-not-found':
-                errorMessage = 'Utente non trovato';
+                errorMessage = 'Utente non trovato. Verifica l\'email o registrati.';
                 break;
             case 'auth/wrong-password':
                 errorMessage = 'Password errata';
                 break;
+            case 'auth/invalid-credential':
+                errorMessage = 'Credenziali non valide. Verifica email e password.';
+                break;
             case 'auth/too-many-requests':
                 errorMessage = 'Troppi tentativi. Riprova più tardi';
                 break;
+            case 'auth/network-request-failed':
+                errorMessage = 'Errore di connessione. Verifica la tua connessione internet.';
+                break;
+            case 'auth/operation-not-allowed':
+                errorMessage = 'Operazione non consentita. Controlla le impostazioni Firebase.';
+                break;
             default:
                 errorMessage = error.message || 'Errore durante l\'autenticazione';
+                console.error('Errore sconosciuto:', error);
         }
         
         showError(errorMessage);
