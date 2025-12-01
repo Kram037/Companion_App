@@ -179,11 +179,16 @@ function updateUIForLoggedOut() {
 function setupEventListeners() {
     console.log('🔧 Setup event listeners...');
     console.log('Elementi disponibili:', Object.keys(elements).filter(key => elements[key] !== null));
+    console.log('Verifica elementi critici:', {
+        userBtn: !!elements.userBtn,
+        settingsBtn: !!elements.settingsBtn,
+        toolbarBtns: elements.toolbarBtns?.length || 0
+    });
     
     // User button - opens login if not logged in, or user menu if logged in
     if (elements.userBtn) {
-        elements.userBtn.onclick = null; // Clear any existing handlers
-        elements.userBtn.addEventListener('click', (e) => {
+        // Use onclick for more reliable binding
+        elements.userBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
             console.log('👤 Click su user button');
@@ -191,6 +196,17 @@ function setupEventListeners() {
                 openLoginModal();
             } else {
                 // TODO: Open user menu/profile
+                console.log('User menu (to be implemented)');
+            }
+        };
+        // Also add event listener as backup
+        elements.userBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('👤 Click su user button (addEventListener)');
+            if (!AppState.isLoggedIn) {
+                openLoginModal();
+            } else {
                 console.log('User menu (to be implemented)');
             }
         });
@@ -201,11 +217,18 @@ function setupEventListeners() {
 
     // Settings button
     if (elements.settingsBtn) {
-        elements.settingsBtn.onclick = null; // Clear any existing handlers
-        elements.settingsBtn.addEventListener('click', (e) => {
+        // Use onclick for more reliable binding
+        elements.settingsBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
             console.log('⚙️ Click su settings button');
+            openSettingsModal();
+        };
+        // Also add event listener as backup
+        elements.settingsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('⚙️ Click su settings button (addEventListener)');
             openSettingsModal();
         });
         console.log('✅ Event listener aggiunto a settingsBtn');
@@ -251,12 +274,19 @@ function setupEventListeners() {
     // Toolbar navigation
     if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
         elements.toolbarBtns.forEach((btn, index) => {
-            btn.onclick = null; // Clear any existing handlers
-            btn.addEventListener('click', (e) => {
+            const page = btn.getAttribute('data-page');
+            // Use onclick for more reliable binding
+            btn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                const page = btn.getAttribute('data-page');
                 console.log('📄 Click su toolbar button:', page);
+                navigateToPage(page);
+            };
+            // Also add event listener as backup
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📄 Click su toolbar button (addEventListener):', page);
                 navigateToPage(page);
             });
         });
