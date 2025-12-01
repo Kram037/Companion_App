@@ -907,6 +907,11 @@ body {
         width: 45px; /* 60px * 0.75 = 45px */
         height: 30px; /* 40px * 0.75 = 30px */
     }
+    
+    /* Reduce gap between theme buttons on mobile */
+    .theme-selector {
+        gap: var(--spacing-xs);
+    }
 }
 
 .toggle-switch {
