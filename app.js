@@ -182,11 +182,7 @@ function setupEventListeners() {
     
     // User button - opens login if not logged in, or user menu if logged in
     if (elements.userBtn) {
-        // Remove any existing listeners first
-        const newUserBtn = elements.userBtn.cloneNode(true);
-        elements.userBtn.parentNode.replaceChild(newUserBtn, elements.userBtn);
-        elements.userBtn = newUserBtn;
-        
+        elements.userBtn.onclick = null; // Clear any existing handlers
         elements.userBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -205,11 +201,7 @@ function setupEventListeners() {
 
     // Settings button
     if (elements.settingsBtn) {
-        // Remove any existing listeners first
-        const newSettingsBtn = elements.settingsBtn.cloneNode(true);
-        elements.settingsBtn.parentNode.replaceChild(newSettingsBtn, elements.settingsBtn);
-        elements.settingsBtn = newSettingsBtn;
-        
+        elements.settingsBtn.onclick = null; // Clear any existing handlers
         elements.settingsBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -259,20 +251,15 @@ function setupEventListeners() {
     // Toolbar navigation
     if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
         elements.toolbarBtns.forEach((btn, index) => {
-            // Remove any existing listeners first
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            
-            newBtn.addEventListener('click', (e) => {
+            btn.onclick = null; // Clear any existing handlers
+            btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const page = newBtn.getAttribute('data-page');
+                const page = btn.getAttribute('data-page');
                 console.log('📄 Click su toolbar button:', page);
                 navigateToPage(page);
             });
         });
-        // Re-query after cloning
-        elements.toolbarBtns = document.querySelectorAll('.toolbar-btn');
         console.log(`✅ Event listeners aggiunti a ${elements.toolbarBtns.length} toolbar buttons`);
     } else {
         console.error('❌ toolbarBtns non trovati');
@@ -646,9 +633,15 @@ async function startApp() {
 
 // Wait for DOM to be ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startApp);
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOMContentLoaded fired');
+        startApp();
+    });
 } else {
-    // DOM already loaded, but wait a bit for all scripts
-    setTimeout(startApp, 100);
+    // DOM already loaded, but wait a bit for all scripts to load
+    console.log('📄 DOM già caricato, attendo script...');
+    setTimeout(() => {
+        startApp();
+    }, 200);
 }
 
