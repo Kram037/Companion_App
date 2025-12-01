@@ -3,19 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Companion App - D&D Helper</title>
-    <link rel="stylesheet" href="styles.css" id="mainStylesheet">
-    <script>
-        // Cache busting per CSS: aggiorna automaticamente
-        (function() {
-            const version = new Date().getTime();
-            const link = document.getElementById('mainStylesheet');
-            link.href = `styles.css?v=${version}`;
-        })();
-    </script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Header -->
@@ -28,28 +17,28 @@
         </button>
         
         <div class="logo-container">
-            <div class="d20-logo-wrapper">
-                <div class="d20-logo-die" id="d20LogoDie">
-                    <figure class="d20-face d20-face-1"></figure>
-                    <figure class="d20-face d20-face-2"></figure>
-                    <figure class="d20-face d20-face-3"></figure>
-                    <figure class="d20-face d20-face-4"></figure>
-                    <figure class="d20-face d20-face-5"></figure>
-                    <figure class="d20-face d20-face-6"></figure>
-                    <figure class="d20-face d20-face-7"></figure>
-                    <figure class="d20-face d20-face-8"></figure>
-                    <figure class="d20-face d20-face-9"></figure>
-                    <figure class="d20-face d20-face-10"></figure>
-                    <figure class="d20-face d20-face-11"></figure>
-                    <figure class="d20-face d20-face-12"></figure>
-                    <figure class="d20-face d20-face-13"></figure>
-                    <figure class="d20-face d20-face-14"></figure>
-                    <figure class="d20-face d20-face-15"></figure>
-                    <figure class="d20-face d20-face-16"></figure>
-                    <figure class="d20-face d20-face-17"></figure>
-                    <figure class="d20-face d20-face-18"></figure>
-                    <figure class="d20-face d20-face-19"></figure>
-                    <figure class="d20-face d20-face-20"></figure>
+            <div class="logo-d20-wrapper">
+                <div class="die" id="logoDie">
+                    <figure class="face face-1"></figure>
+                    <figure class="face face-2"></figure>
+                    <figure class="face face-3"></figure>
+                    <figure class="face face-4"></figure>
+                    <figure class="face face-5"></figure>
+                    <figure class="face face-6"></figure>
+                    <figure class="face face-7"></figure>
+                    <figure class="face face-8"></figure>
+                    <figure class="face face-9"></figure>
+                    <figure class="face face-10"></figure>
+                    <figure class="face face-11"></figure>
+                    <figure class="face face-12"></figure>
+                    <figure class="face face-13"></figure>
+                    <figure class="face face-14"></figure>
+                    <figure class="face face-15"></figure>
+                    <figure class="face face-16"></figure>
+                    <figure class="face face-17"></figure>
+                    <figure class="face face-18"></figure>
+                    <figure class="face face-19"></figure>
+                    <figure class="face face-20"></figure>
                 </div>
             </div>
             <span class="app-title">Companion App</span>
@@ -187,13 +176,7 @@
         </div>
     </div>
 
-    <script>
-        // Cache busting: aggiorna automaticamente la versione dei file
-        const version = new Date().getTime();
-        const script = document.createElement('script');
-        script.src = `app.js?v=${version}`;
-        document.body.appendChild(script);
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
 
