@@ -1,7 +1,6 @@
 // Firebase Auth - Compat version (no ES modules)
 // Firebase is loaded via script tags, so it's available globally as 'firebase'
-let auth = null;
-let googleProvider = null;
+// auth and googleProvider are declared in firebase-config-compat.js
 let firebaseReady = false;
 
 // Initialize Firebase (runs after firebase-config-compat.js loads)
@@ -12,16 +11,24 @@ function initFirebase() {
             return false;
         }
 
-        // Get auth and provider from global firebase object
-        auth = firebase.auth();
-        googleProvider = new firebase.auth.GoogleAuthProvider();
-        googleProvider.setCustomParameters({
-            prompt: 'select_account'
-        });
+        // Check if auth and googleProvider are available from firebase-config-compat.js
+        if (typeof auth === 'undefined' || typeof googleProvider === 'undefined') {
+            console.warn('⚠️ auth o googleProvider non disponibili da firebase-config-compat.js');
+            // Try to get them directly from firebase
+            if (typeof window.auth === 'undefined') {
+                window.auth = firebase.auth();
+            }
+            if (typeof window.googleProvider === 'undefined') {
+                window.googleProvider = new firebase.auth.GoogleAuthProvider();
+                window.googleProvider.setCustomParameters({
+                    prompt: 'select_account'
+                });
+            }
+        }
 
         firebaseReady = true;
         console.log('✅ Firebase (Compat) inizializzato correttamente');
-        console.log('Auth disponibile:', !!auth);
+        console.log('Auth disponibile:', !!(typeof auth !== 'undefined' ? auth : window.auth));
         return true;
     } catch (error) {
         console.error('❌ Errore nell\'inizializzazione Firebase:', error);
@@ -33,7 +40,7 @@ function initFirebase() {
 // Wait for DOM and Firebase to be ready
 function waitForFirebase() {
     return new Promise((resolve) => {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
+        if (typeof firebase !== 'undefined' && firebase.auth && (typeof auth !== 'undefined' || typeof window.auth !== 'undefined')) {
             resolve(initFirebase());
         } else {
             // Wait a bit and retry
@@ -41,7 +48,7 @@ function waitForFirebase() {
             const maxAttempts = 50; // 5 secondi totali (50 * 100ms)
             const checkInterval = setInterval(() => {
                 attempts++;
-                if (typeof firebase !== 'undefined' && firebase.auth) {
+                if (typeof firebase !== 'undefined' && firebase.auth && (typeof auth !== 'undefined' || typeof window.auth !== 'undefined')) {
                     clearInterval(checkInterval);
                     resolve(initFirebase());
                 } else if (attempts >= maxAttempts) {
@@ -127,14 +134,17 @@ async function init() {
 
 // Setup Firebase Auth listeners
 function setupFirebaseAuth() {
-    if (!auth || !firebase.auth) {
+    // Get auth from global scope (from firebase-config-compat.js)
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    
+    if (!currentAuth || !firebase.auth) {
         console.warn('⚠️ Firebase Auth non disponibile. L\'app funzionerà senza autenticazione.');
         return;
     }
 
     try {
         // Listen for auth state changes (compat version)
-        auth.onAuthStateChanged((user) => {
+        currentAuth.onAuthStateChanged((user) => {
             if (user) {
                 // User is signed in
                 AppState.currentUser = {
@@ -439,11 +449,13 @@ async function handleLogin(e) {
     }
 
     // Verifica che Firebase sia disponibile
-    if (!firebaseReady || !auth || typeof firebase === 'undefined') {
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    
+    if (!firebaseReady || !currentAuth || typeof firebase === 'undefined') {
         showError('Autenticazione non disponibile. Ricarica la pagina.');
         console.error('Auth non disponibile:', {
             firebaseReady,
-            auth: !!auth,
+            auth: !!currentAuth,
             firebase: typeof firebase
         });
         return;
@@ -456,15 +468,17 @@ async function handleLogin(e) {
 
         console.log(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
 
+        const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+        
         if (AppState.isRegisterMode) {
             // Register new user (compat version)
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const userCredential = await currentAuth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             console.log('✅ Utente registrato con successo:', user.uid, user.email);
             showNotification('Registrazione completata! Benvenuto!');
         } else {
             // Sign in existing user (compat version)
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const userCredential = await currentAuth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             console.log('✅ Utente autenticato con successo:', user.uid, user.email);
             showNotification('Accesso effettuato!');
@@ -522,7 +536,10 @@ async function handleLogin(e) {
 
 // Google Login Handler
 async function handleGoogleLogin() {
-    if (!auth || !googleProvider || typeof firebase === 'undefined') {
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    const currentGoogleProvider = typeof googleProvider !== 'undefined' ? googleProvider : (typeof window.googleProvider !== 'undefined' ? window.googleProvider : null);
+    
+    if (!currentAuth || !currentGoogleProvider || typeof firebase === 'undefined') {
         showError('Autenticazione Google non disponibile. Controlla la configurazione Firebase.');
         return;
     }
@@ -533,7 +550,7 @@ async function handleGoogleLogin() {
         elements.googleLoginBtn.textContent = 'Accesso in corso...';
         
         // Compat version
-        const result = await auth.signInWithPopup(googleProvider);
+        const result = await currentAuth.signInWithPopup(currentGoogleProvider);
         const user = result.user;
         
         console.log('✅ Login Google completato:', user.email);
@@ -580,9 +597,14 @@ async function handleGoogleLogin() {
 async function handleLogout() {
     if (confirm('Sei sicuro di voler uscire?')) {
         try {
-            await auth.signOut();
-            closeSettingsModal();
-            showNotification('Logout effettuato');
+            const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+            if (currentAuth) {
+                await currentAuth.signOut();
+                closeSettingsModal();
+                showNotification('Logout effettuato');
+            } else {
+                showNotification('Errore: autenticazione non disponibile');
+            }
         } catch (error) {
             console.error('Logout error:', error);
             showNotification('Errore durante il logout');

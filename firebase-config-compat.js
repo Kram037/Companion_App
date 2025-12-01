@@ -14,14 +14,20 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const analytics = firebase.analytics();
+// Make auth and googleProvider globally available
+window.auth = firebase.auth();
+window.analytics = firebase.analytics();
 
 // Google Auth Provider
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-googleProvider.setCustomParameters({
+window.googleProvider = new firebase.auth.GoogleAuthProvider();
+window.googleProvider.setCustomParameters({
     prompt: 'select_account'
 });
+
+// Also declare as const for compatibility
+const auth = window.auth;
+const googleProvider = window.googleProvider;
+const analytics = window.analytics;
 
 console.log('✅ Firebase (Compat) inizializzato correttamente');
 
