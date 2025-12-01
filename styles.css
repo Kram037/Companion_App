@@ -616,6 +616,20 @@ body {
     box-shadow: 0 2px 4px var(--shadow);
 }
 
+/* Ensure modal inherits theme correctly */
+.modal {
+    color: var(--text);
+}
+
+.modal-content {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+}
+
+.modal-content h2 {
+    color: var(--text) !important;
+}
+
 .theme-btn span {
     font-size: 0.85rem;
     color: var(--text);

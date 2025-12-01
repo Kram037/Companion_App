@@ -343,15 +343,31 @@ function setupEventListeners() {
         elements.themeLight.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('🎨 Click su tema light');
             setTheme('light');
         };
+        // Also addEventListener as backup
+        elements.themeLight.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🎨 Click su tema light (addEventListener)');
+            setTheme('light');
+        });
     }
     if (elements.themeDark) {
         elements.themeDark.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('🎨 Click su tema dark');
             setTheme('dark');
         };
+        // Also addEventListener as backup
+        elements.themeDark.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🎨 Click su tema dark (addEventListener)');
+            setTheme('dark');
+        });
     }
 
     // Login form submission
@@ -567,8 +583,17 @@ function closeUserModal() {
 }
 
 function openSettingsModal() {
+    console.log('⚙️ Apertura Settings Modal');
+    console.log('Tema corrente:', localStorage.getItem('theme') || 'light');
+    console.log('data-theme attribute:', document.documentElement.getAttribute('data-theme'));
+    
+    // Ensure theme is applied correctly
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    setTheme(currentTheme, false); // Don't save, just apply
+    
     elements.settingsModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    console.log('✅ Settings Modal aperto');
 }
 
 function closeSettingsModal() {
@@ -595,6 +620,9 @@ function setTheme(theme, save = true) {
         // Light theme is default, no attribute needed
         document.documentElement.removeAttribute('data-theme');
     }
+    
+    // Force reflow to ensure CSS variables are updated
+    void document.documentElement.offsetHeight;
     
     // Update button states
     if (elements.themeLight) {
