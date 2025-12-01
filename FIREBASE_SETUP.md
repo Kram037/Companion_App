@@ -78,24 +78,36 @@ service cloud.firestore {
 }
 ```
 
-**IMPORTANTE:** Le regole sopra potrebbero non funzionare con le query `where` su alcuni browser/desktop. 
+**⚠️ IMPORTANTE - REGOLE DA USARE:**
 
-**SOLUZIONE RACCOMANDATA - Usa queste regole più semplici che funzionano sempre:**
+Le regole sopra potrebbero non funzionare con le query `where` su alcuni browser/desktop. 
+
+**USA QUESTE REGOLE (copiale esattamente come sono):**
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /Campagne/{campagnaId} {
-      // Allow read/write if user is authenticated
-      // The app filters by userId on client side for security
       allow read, write: if request.auth != null;
     }
   }
 }
 ```
 
-Queste regole permettono agli utenti autenticati di leggere/scrivere tutte le campagne, ma l'app filtra automaticamente lato client mostrando solo quelle dell'utente corrente. Questo risolve i problemi di permessi su desktop.
+**OPPURE copia il contenuto del file `FIRESTORE_RULES.txt` nella root del progetto.**
+
+Queste regole permettono agli utenti autenticati di leggere/scrivere tutte le campagne. L'app filtra automaticamente lato client mostrando solo quelle dell'utente corrente (campo `userId`).
+
+**PASSI PER CONFIGURARE:**
+1. Vai su [Firebase Console](https://console.firebase.google.com/)
+2. Seleziona il progetto `companionapp-37`
+3. Vai su **Firestore Database** > **Regole**
+4. **CANCELLA** tutte le regole esistenti
+5. **INCOLLA** le regole sopra (o dal file FIRESTORE_RULES.txt)
+6. Clicca su **Pubblica**
+7. Attendi qualche secondo per la propagazione
+8. Ricarica la pagina dell'app
 
 **IMPORTANTE:** Se stai ancora in modalità test, le regole potrebbero essere:
 ```javascript

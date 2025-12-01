@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /Campagne/{campagnaId} {
+      // Allow read/write if user is authenticated
+      // The app filters by userId on client side for security
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+

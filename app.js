@@ -796,11 +796,13 @@ async function loadCampagne(userId) {
                     console.error('Messaggio errore:', error.message);
                     
                     if (error.code === 'permission-denied') {
-                        console.warn('⚠️ Permission denied, provo fallback: carico tutte le campagne e filtro lato client');
+                        console.warn('⚠️ Permission denied con query where, provo fallback');
+                        console.warn('⚠️ Verifica che le regole Firestore permettano read a utenti autenticati');
                         // Fallback: try to load all campaigns and filter client-side
                         // This requires more permissive rules but works as a workaround
                         loadCampagneFallback(userId, currentFirestore);
                     } else {
+                        console.error('❌ Errore diverso da permission-denied:', error);
                         showNotification('Errore nel caricamento delle campagne: ' + error.message);
                     }
                 }
@@ -818,6 +820,16 @@ function loadCampagneFallback(userId, currentFirestore) {
     if (campagneUnsubscribe) {
         campagneUnsubscribe();
     }
+    
+    // Verify user is still authenticated
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    if (!currentAuth || !currentAuth.currentUser) {
+        console.error('❌ Utente non autenticato durante fallback');
+        renderCampagne([], false);
+        return;
+    }
+    
+    console.log('✅ Utente autenticato, procedo con fallback');
     
     campagneUnsubscribe = currentFirestore
         .collection('Campagne')
@@ -839,7 +851,15 @@ function loadCampagneFallback(userId, currentFirestore) {
             },
             (error) => {
                 console.error('❌ Errore anche nel fallback:', error);
-                showNotification('Errore: permessi insufficienti. Verifica le regole di sicurezza Firestore nella Firebase Console.');
+                console.error('Codice errore fallback:', error.code);
+                console.error('Messaggio errore fallback:', error.message);
+                
+                if (error.code === 'permission-denied') {
+                    console.error('❌ Le regole Firestore non permettono la lettura. Configura le regole come da FIREBASE_SETUP.md');
+                    showNotification('Errore: configura le regole Firestore nella Firebase Console. Vedi FIREBASE_SETUP.md per le istruzioni.');
+                } else {
+                    showNotification('Errore nel caricamento delle campagne: ' + error.message);
+                }
             }
         );
 }
