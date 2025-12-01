@@ -81,8 +81,10 @@ async function init() {
         userBtn: document.getElementById('userBtn'),
         settingsBtn: document.getElementById('settingsBtn'),
         loginModal: document.getElementById('loginModal'),
+        userModal: document.getElementById('userModal'),
         settingsModal: document.getElementById('settingsModal'),
         closeLoginModal: document.getElementById('closeLoginModal'),
+        closeUserModal: document.getElementById('closeUserModal'),
         closeSettingsModal: document.getElementById('closeSettingsModal'),
         loginForm: document.getElementById('loginForm'),
         logoutBtn: document.getElementById('logoutBtn'),
@@ -95,7 +97,9 @@ async function init() {
         loginLink: document.getElementById('loginLink'),
         errorMessage: document.getElementById('errorMessage'),
         modalFooterText: document.getElementById('modalFooterText'),
-        googleLoginBtn: document.getElementById('googleLoginBtn')
+        googleLoginBtn: document.getElementById('googleLoginBtn'),
+        userName: document.getElementById('userName'),
+        userEmail: document.getElementById('userEmail')
     };
 
     // Check if all required elements exist
@@ -210,8 +214,7 @@ function setupEventListeners() {
             if (!AppState.isLoggedIn) {
                 openLoginModal();
             } else {
-                // TODO: Open user menu/profile
-                console.log('User menu (to be implemented)');
+                openUserModal();
             }
         };
         // Also add event listener as backup
@@ -222,7 +225,7 @@ function setupEventListeners() {
             if (!AppState.isLoggedIn) {
                 openLoginModal();
             } else {
-                console.log('User menu (to be implemented)');
+                openUserModal();
             }
         });
         console.log('✅ Event listener aggiunto a userBtn');
@@ -264,6 +267,14 @@ function setupEventListeners() {
         elements.loginModal.addEventListener('click', (e) => {
             if (e.target === elements.loginModal) {
                 closeLoginModal();
+            }
+        });
+    }
+
+    if (elements.userModal) {
+        elements.userModal.addEventListener('click', (e) => {
+            if (e.target === elements.userModal) {
+                closeUserModal();
             }
         });
     }
@@ -395,6 +406,21 @@ function closeLoginModal() {
     elements.loginForm.reset();
     hideError();
     toggleLoginRegisterMode(false);
+}
+
+function openUserModal() {
+    // Update user info in modal
+    if (AppState.currentUser && elements.userName && elements.userEmail) {
+        elements.userName.textContent = AppState.currentUser.displayName || 'Utente';
+        elements.userEmail.textContent = AppState.currentUser.email || '';
+    }
+    elements.userModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeUserModal() {
+    elements.userModal.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 function openSettingsModal() {
@@ -622,7 +648,7 @@ async function handleLogout() {
             const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
             if (currentAuth) {
                 await currentAuth.signOut();
-                closeSettingsModal();
+                closeUserModal(); // Close user modal instead of settings
                 showNotification('Logout effettuato');
             } else {
                 showNotification('Errore: autenticazione non disponibile');
