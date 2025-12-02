@@ -598,7 +598,7 @@ function loadTheme() {
     setTheme(savedTheme, false); // false = don't save again
 }
 
-function setTheme(theme, save = true) {
+async function setTheme(theme, save = true) {
     console.log('🎨 Cambio tema a:', theme);
     
     // Remove existing theme attribute
@@ -634,7 +634,26 @@ function setTheme(theme, save = true) {
     // Save to localStorage
     if (save) {
         localStorage.setItem('theme', theme);
-        console.log('✅ Tema salvato:', theme);
+        console.log('✅ Tema salvato in localStorage:', theme);
+        
+        // Save to Firestore if user is logged in
+        if (AppState.isLoggedIn && AppState.currentUser) {
+            const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+            const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+            
+            if (currentFirestore && currentAuth && currentAuth.currentUser) {
+                try {
+                    const temaScuro = theme === 'dark';
+                    await currentFirestore
+                        .collection('Utenti')
+                        .doc(currentAuth.currentUser.uid)
+                        .update({ tema_scuro: temaScuro });
+                    console.log('✅ Tema salvato in Firestore:', temaScuro);
+                } catch (error) {
+                    console.error('❌ Errore nel salvataggio tema in Firestore:', error);
+                }
+            }
+        }
     }
 }
 
@@ -651,17 +670,20 @@ function setupFirestore() {
         return;
     }
 
-    // Listen for auth state changes to load campagne
+    // Listen for auth state changes to load campagne and initialize user
     currentAuth.onAuthStateChanged(async (user) => {
         console.log('🔄 Auth state changed:', user ? user.uid : 'null');
         if (user) {
-            console.log('✅ Utente autenticato, carico campagne per:', user.uid);
+            console.log('✅ Utente autenticato, inizializzo documento utente e carico campagne per:', user.uid);
             
             // Wait for auth token to be ready (especially important on desktop)
             try {
                 // Force token refresh to ensure it's valid
                 const token = await user.getIdToken(true);
                 console.log('🔑 Token ottenuto, lunghezza:', token ? token.length : 0);
+                
+                // Initialize or update user document in Firestore
+                await initializeUserDocument(user);
                 
                 // Additional delay for desktop to ensure everything is synced
                 const isDesktop = window.innerWidth > 768;
@@ -674,7 +696,8 @@ function setupFirestore() {
             } catch (error) {
                 console.error('❌ Errore nel recupero token:', error);
                 // Retry after a longer delay
-                setTimeout(() => {
+                setTimeout(async () => {
+                    await initializeUserDocument(user);
                     loadCampagne(user.uid);
                 }, 500);
             }
@@ -954,6 +977,188 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Firestore - Utenti Management
+/**
+ * Genera un CID univoco a 4 cifre (1000-9999)
+ */
+async function generateUniqueCid() {
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore) {
+        console.error('❌ Firestore non disponibile per generare CID');
+        // Fallback: genera un numero casuale
+        return Math.floor(1000 + Math.random() * 9000);
+    }
+    
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+        const cid = Math.floor(1000 + Math.random() * 9000);
+        
+        try {
+            // Verifica se il CID esiste già
+            const snapshot = await currentFirestore
+                .collection('Utenti')
+                .where('cid', '==', cid)
+                .limit(1)
+                .get();
+            
+            if (snapshot.empty) {
+                console.log('✅ CID generato:', cid);
+                return cid;
+            }
+            
+            attempts++;
+            console.log(`⚠️ CID ${cid} già esistente, tentativo ${attempts}/${maxAttempts}`);
+        } catch (error) {
+            console.error('❌ Errore nel controllo CID:', error);
+            // In caso di errore, usa comunque il CID generato
+            return cid;
+        }
+    }
+    
+    // Se dopo 10 tentativi non troviamo un CID univoco, usa l'ultimo generato
+    // (estremamente improbabile, ma meglio avere un fallback)
+    const fallbackCid = Math.floor(1000 + Math.random() * 9000);
+    console.warn('⚠️ Usando CID fallback dopo', maxAttempts, 'tentativi:', fallbackCid);
+    return fallbackCid;
+}
+
+/**
+ * Inizializza o aggiorna il documento utente in Firestore
+ */
+async function initializeUserDocument(user) {
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore || !user) {
+        console.warn('⚠️ Firestore o utente non disponibile per inizializzare documento utente');
+        return null;
+    }
+    
+    try {
+        const userRef = currentFirestore.collection('Utenti').doc(user.uid);
+        const userDoc = await userRef.get();
+        
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const temaScuro = currentTheme === 'dark';
+        
+        if (userDoc.exists) {
+            // Utente esistente: aggiorna solo i campi che potrebbero essere cambiati
+            const existingData = userDoc.data();
+            const updateData = {
+                email: user.email,
+                nome_utente: user.displayName || user.email.split('@')[0] || existingData.nome_utente,
+                tema_scuro: temaScuro
+            };
+            
+            // Aggiorna solo se necessario
+            await userRef.update(updateData);
+            console.log('✅ Documento utente aggiornato:', user.uid);
+            
+            // Carica i dati utente per applicare il tema
+            await loadUserData(user.uid);
+            
+            return userDoc.data();
+        } else {
+            // Nuovo utente: crea documento completo
+            const cid = await generateUniqueCid();
+            const userData = {
+                cid: cid,
+                nome_utente: user.displayName || user.email.split('@')[0] || 'Utente',
+                email: user.email,
+                campagne: 0,
+                personaggi: [],
+                mostri: [],
+                tema_scuro: temaScuro
+            };
+            
+            await userRef.set(userData);
+            console.log('✅ Nuovo documento utente creato:', user.uid, 'CID:', cid);
+            
+            // Applica il tema
+            if (temaScuro) {
+                setTheme('dark', false); // false = non salvare di nuovo in localStorage
+            } else {
+                setTheme('light', false);
+            }
+            
+            return userData;
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'inizializzazione documento utente:', error);
+        return null;
+    }
+}
+
+/**
+ * Carica i dati utente da Firestore e applica le preferenze (es. tema)
+ */
+async function loadUserData(userId) {
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore || !userId) {
+        console.warn('⚠️ Firestore o userId non disponibile per caricare dati utente');
+        return null;
+    }
+    
+    try {
+        const userDoc = await currentFirestore.collection('Utenti').doc(userId).get();
+        
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            console.log('✅ Dati utente caricati:', userData);
+            
+            // Applica il tema se presente
+            if (userData.tema_scuro !== undefined) {
+                const theme = userData.tema_scuro ? 'dark' : 'light';
+                setTheme(theme, false); // false = non salvare in localStorage (già salvato in Firestore)
+                // Aggiorna localStorage per coerenza
+                localStorage.setItem('theme', theme);
+            }
+            
+            return userData;
+        } else {
+            console.warn('⚠️ Documento utente non trovato per:', userId);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Errore nel caricamento dati utente:', error);
+        return null;
+    }
+}
+
+/**
+ * Aggiorna il campo campagne dell'utente
+ */
+async function updateUserCampagneCount(userId, increment = true) {
+    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    
+    if (!currentFirestore || !userId) {
+        console.warn('⚠️ Firestore o userId non disponibile per aggiornare conteggio campagne');
+        return;
+    }
+    
+    try {
+        const userRef = currentFirestore.collection('Utenti').doc(userId);
+        
+        if (increment) {
+            await userRef.update({
+                campagne: firebase.firestore.FieldValue.increment(1)
+            });
+            console.log('✅ Conteggio campagne incrementato per utente:', userId);
+        } else {
+            // Decrementa (quando si elimina una campagna)
+            await userRef.update({
+                campagne: firebase.firestore.FieldValue.increment(-1)
+            });
+            console.log('✅ Conteggio campagne decrementato per utente:', userId);
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiornamento conteggio campagne:', error);
+    }
+}
+
 function openCampagnaModal(campagnaId = null) {
     editingCampagnaId = campagnaId;
     
@@ -1185,6 +1390,9 @@ async function handleCampagnaSubmit(e) {
             const docId = formData.nome_campagna;
             await currentFirestore.collection('Campagne').doc(docId).set(formData);
             showNotification('Campagna creata con successo!');
+            
+            // Incrementa il conteggio campagne dell'utente
+            await updateUserCampagneCount(user.uid, true);
         }
         closeCampagnaModal();
     } catch (error) {
@@ -1204,15 +1412,23 @@ window.deleteCampagna = async function(campagnaId) {
     }
 
     const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
     
     if (!currentFirestore) {
         showNotification('Errore: Firestore non disponibile');
         return;
     }
 
+    const user = currentAuth ? currentAuth.currentUser : null;
+
     try {
         await currentFirestore.collection('Campagne').doc(campagnaId).delete();
         showNotification('Campagna eliminata con successo!');
+        
+        // Decrementa il conteggio campagne dell'utente se loggato
+        if (user) {
+            await updateUserCampagneCount(user.uid, false);
+        }
     } catch (error) {
         console.error('Errore nell\'eliminazione campagna:', error);
         showNotification('Errore nell\'eliminazione della campagna: ' + error.message);

@@ -125,7 +125,23 @@ service cloud.firestore {
 
 3. Clicca su **Pubblica**
 
-**Nota:** Le regole sopra permettono agli utenti autenticati di leggere e scrivere solo i documenti dove il campo `userId` corrisponde al loro `uid`.
+**Nota:** Le regole sopra permettono agli utenti autenticati di leggere e scrivere solo i documenti dove il campo `userId` corrisponde al loro `uid`. Per la collezione `Utenti`, ogni utente può leggere e scrivere solo il proprio documento (identificato dal suo `uid`).
+
+### 6.1. Struttura Collezione Utenti
+
+La collezione `Utenti` viene creata automaticamente quando un utente si registra o accede per la prima volta. Ogni documento ha la seguente struttura:
+
+- **Document ID**: `uid` dell'utente (da Firebase Auth)
+- **Campi**:
+  - `cid` (int): ID riconoscitivo univoco a 4 cifre (1000-9999), generato automaticamente
+  - `nome_utente` (string): Nome dell'utente (da displayName o email)
+  - `email` (string): Email dell'utente
+  - `campagne` (int): Numero di campagne in cui l'utente gioca (aggiornato automaticamente)
+  - `personaggi` (array): Array di personaggi dell'utente (vuoto di default)
+  - `mostri` (array): Array di nemici/mostri dell'utente (vuoto di default)
+  - `tema_scuro` (boolean): Preferenza tema scuro (sincronizzato con le impostazioni)
+
+**Nota:** Il documento utente viene inizializzato automaticamente al primo login/registrazione. Il campo `campagne` viene aggiornato automaticamente quando vengono create o eliminate campagne.
 
 ### 7. Configura il file firebase-config.js
 
@@ -167,10 +183,24 @@ const firebaseConfig = {
 - Aggiungi `firebase-config.js` al `.gitignore` se contiene credenziali reali
 - Per progetti pubblici, usa Firebase App Check per proteggere le API keys
 
+## Collezioni Firestore
+
+### Campagne
+- **Nome collezione**: `Campagne`
+- **Document ID**: `nome_campagna` (string)
+- **Campi**: `nome_campagna`, `nome_dm`, `numero_giocatori`, `numero_sessioni`, `data_creazione`, `tempo_di_gioco`, `note`, `userId`, `icona`
+
+### Utenti
+- **Nome collezione**: `Utenti`
+- **Document ID**: `uid` dell'utente (da Firebase Auth)
+- **Campi**: `cid`, `nome_utente`, `email`, `campagne`, `personaggi`, `mostri`, `tema_scuro`
+- **Creazione**: Automatica al primo login/registrazione
+- **Aggiornamento**: Automatico per `campagne` e `tema_scuro`
+
 ## Prossimi passi
 
 Dopo aver configurato l'autenticazione, puoi:
-- Integrare Firestore per salvare dati utente
+- Gestire personaggi e mostri nella collezione Utenti
 - Aggiungere autenticazione social (Google, Facebook, ecc.)
 - Implementare reset password
 - Aggiungere verifica email
