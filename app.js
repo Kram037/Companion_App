@@ -100,7 +100,6 @@ async function init() {
         googleLoginBtn: document.getElementById('googleLoginBtn'),
         nicknameGroup: document.getElementById('nicknameGroup'),
         nicknameInput: document.getElementById('nickname'),
-        clearNicknameBtn: document.getElementById('clearNicknameBtn'),
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         themeLight: document.getElementById('themeLight'),
@@ -434,19 +433,6 @@ function setupEventListeners() {
             handleGoogleLogin();
         });
         console.log('✅ Event listener aggiunto a googleLoginBtn');
-    }
-    
-    // Clear nickname button
-    if (elements.clearNicknameBtn) {
-        elements.clearNicknameBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (elements.nicknameInput) {
-                elements.nicknameInput.value = '';
-                elements.nicknameInput.focus();
-            }
-        });
-        console.log('✅ Event listener aggiunto a clearNicknameBtn');
     }
 
     // Campagne buttons

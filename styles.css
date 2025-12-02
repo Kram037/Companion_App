@@ -491,49 +491,58 @@ body {
 }
 
 /* Nickname Input */
+#nicknameGroup {
+    margin-top: var(--spacing-md);
+}
+
 .nickname-input-wrapper {
     position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--spacing-xs);
 }
 
-.nickname-clear-btn {
+.nickname-x-icon {
+    position: absolute;
+    right: var(--spacing-sm);
+    top: calc(var(--spacing-xs) + 1.5rem + var(--spacing-xs) + 0.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: transparent;
-    border: none;
+    width: 20px;
+    height: 20px;
     color: var(--text-light);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: var(--transition);
-    flex-shrink: 0;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.nickname-clear-btn:hover {
-    background: var(--surface);
-    color: var(--text);
-}
-
-.nickname-clear-btn svg {
+.nickname-x-icon svg {
     width: 18px;
     height: 18px;
 }
 
 .nickname-input-wrapper label {
-    margin-bottom: 0;
-    margin-right: var(--spacing-xs);
-    white-space: nowrap;
-    flex-shrink: 0;
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text);
+    font-weight: 500;
 }
 
 .nickname-input-wrapper input {
-    flex: 1;
-    margin: 0;
+    width: 100%;
+    padding: var(--spacing-sm);
+    padding-right: calc(var(--spacing-sm) + 20px + var(--spacing-xs));
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--background);
+}
+
+.nickname-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--accent-dark);
+    background: var(--surface);
 }
 
 /* Ensure form elements are properly sized */
