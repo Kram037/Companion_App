@@ -11,9 +11,8 @@ service cloud.firestore {
       // Users can only read/write their own document
       // Document ID format: utente_<cid>_<nome>
       // We check the uid field in the document data
-      allow read: if request.auth != null && 
-                     (resource.data.uid == request.auth.uid || 
-                      request.query.limit <= 1); // Allow queries with limit 1
+      // For queries, Firestore checks each document individually
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null && 
                        request.resource.data.uid == request.auth.uid;
       allow update, delete: if request.auth != null && 
