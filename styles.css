@@ -490,6 +490,52 @@ body {
     display: block;
 }
 
+/* Nickname Input */
+.nickname-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.nickname-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.nickname-clear-btn:hover {
+    background: var(--surface);
+    color: var(--text);
+}
+
+.nickname-clear-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.nickname-input-wrapper label {
+    margin-bottom: 0;
+    margin-right: var(--spacing-xs);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.nickname-input-wrapper input {
+    flex: 1;
+    margin: 0;
+}
+
 /* Ensure form elements are properly sized */
 #loginForm {
     width: 100%;

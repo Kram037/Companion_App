@@ -98,6 +98,9 @@ async function init() {
         errorMessage: document.getElementById('errorMessage'),
         modalFooterText: document.getElementById('modalFooterText'),
         googleLoginBtn: document.getElementById('googleLoginBtn'),
+        nicknameGroup: document.getElementById('nicknameGroup'),
+        nicknameInput: document.getElementById('nickname'),
+        clearNicknameBtn: document.getElementById('clearNicknameBtn'),
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         themeLight: document.getElementById('themeLight'),
@@ -431,6 +434,19 @@ function setupEventListeners() {
             handleGoogleLogin();
         });
         console.log('✅ Event listener aggiunto a googleLoginBtn');
+    }
+    
+    // Clear nickname button
+    if (elements.clearNicknameBtn) {
+        elements.clearNicknameBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (elements.nicknameInput) {
+                elements.nicknameInput.value = '';
+                elements.nicknameInput.focus();
+            }
+        });
+        console.log('✅ Event listener aggiunto a clearNicknameBtn');
     }
 
     // Campagne buttons
@@ -1598,6 +1614,10 @@ function toggleLoginRegisterMode(isRegister) {
         elements.registerLink.style.display = 'none';
         elements.loginLink.style.display = 'inline';
         elements.modalFooterText.textContent = 'Hai già un account? ';
+        // Mostra il campo nickname
+        if (elements.nicknameGroup) {
+            elements.nicknameGroup.style.display = 'block';
+        }
     } else {
         elements.loginModalTitle.textContent = 'Accedi';
         elements.submitBtn.textContent = 'Accedi';
