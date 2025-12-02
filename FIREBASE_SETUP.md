@@ -23,6 +23,29 @@
    - Seleziona un email di supporto (puoi usare la tua email)
    - Salva
 
+### 2.1. Aggiungi domini autorizzati per OAuth
+
+**IMPORTANTE**: Se ricevi l'errore `auth/unauthorized-domain`, devi aggiungere il tuo dominio alla lista dei domini autorizzati.
+
+1. Vai su [Firebase Console](https://console.firebase.google.com/)
+2. Seleziona il tuo progetto
+3. Vai su **Authentication** > **Settings** (icona ingranaggio in alto)
+4. Scorri fino a **Authorized domains**
+5. Clicca su **Add domain**
+6. Aggiungi i seguenti domini:
+   - `localhost` (per sviluppo locale)
+   - Il tuo dominio GitHub Pages (es. `kram037.github.io`)
+   - Il tuo dominio personalizzato (se ne hai uno)
+7. Clicca su **Add**
+8. Salva le modifiche
+
+**Nota**: I domini autorizzati includono automaticamente:
+- `localhost` (per sviluppo locale)
+- `*.firebaseapp.com` (domini Firebase)
+- `*.web.app` (domini Firebase)
+
+Se stai usando GitHub Pages, assicurati di aggiungere `kram037.github.io` o il tuo dominio GitHub Pages.
+
 ### 3. Aggiungi una Web App
 
 1. Vai su **Project Settings** (icona ingranaggio in alto a sinistra)
