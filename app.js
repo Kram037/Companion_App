@@ -1005,7 +1005,7 @@ async function generateUniqueCid() {
                 .get();
             
             if (snapshot.empty) {
-                console.log('✅ CID generato:', cid);
+                console.log('✅ CID generato e verificato come univoco:', cid);
                 return cid;
             }
             
@@ -1013,8 +1013,22 @@ async function generateUniqueCid() {
             console.log(`⚠️ CID ${cid} già esistente, tentativo ${attempts}/${maxAttempts}`);
         } catch (error) {
             console.error('❌ Errore nel controllo CID:', error);
-            // In caso di errore, usa comunque il CID generato
-            return cid;
+            console.error('Codice errore:', error.code);
+            console.error('Messaggio errore:', error.message);
+            
+            // Se è un errore di permessi, genera un CID senza verificare l'unicità
+            if (error.code === 'permission-denied') {
+                console.warn('⚠️ Permessi insufficienti per verificare CID, uso CID generato senza verifica:', cid);
+                return cid;
+            }
+            
+            // Per altri errori, riprova o usa fallback
+            if (attempts >= maxAttempts - 1) {
+                console.warn('⚠️ Troppi errori, uso CID generato senza verifica:', cid);
+                return cid;
+            }
+            
+            attempts++;
         }
     }
     
@@ -1029,14 +1043,19 @@ async function generateUniqueCid() {
  * Inizializza o aggiorna il documento utente in Firestore
  */
 async function initializeUserDocument(user) {
+    console.log('🔧 Inizializzazione documento utente per:', user ? user.uid : 'null');
+    
     const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
     
     if (!currentFirestore || !user) {
-        console.warn('⚠️ Firestore o utente non disponibile per inizializzare documento utente');
+        console.error('❌ Firestore o utente non disponibile per inizializzare documento utente');
+        console.log('Firestore disponibile:', !!currentFirestore);
+        console.log('User disponibile:', !!user);
         return null;
     }
     
     try {
+        console.log('📄 Controllo documento utente esistente...');
         const userRef = currentFirestore.collection('Utenti').doc(user.uid);
         const userDoc = await userRef.get();
         
@@ -1044,6 +1063,7 @@ async function initializeUserDocument(user) {
         const temaScuro = currentTheme === 'dark';
         
         if (userDoc.exists) {
+            console.log('✅ Documento utente già esistente, aggiorno...');
             // Utente esistente: aggiorna solo i campi che potrebbero essere cambiati
             const existingData = userDoc.data();
             const updateData = {
@@ -1061,8 +1081,20 @@ async function initializeUserDocument(user) {
             
             return userDoc.data();
         } else {
+            console.log('🆕 Nuovo utente, creo documento...');
             // Nuovo utente: crea documento completo
-            const cid = await generateUniqueCid();
+            console.log('🔢 Generazione CID...');
+            let cid;
+            try {
+                cid = await generateUniqueCid();
+                console.log('✅ CID generato:', cid);
+            } catch (cidError) {
+                console.error('❌ Errore nella generazione CID, uso fallback:', cidError);
+                // Fallback: genera un CID senza verificare l'unicità
+                cid = Math.floor(1000 + Math.random() * 9000);
+                console.log('⚠️ Usando CID fallback:', cid);
+            }
+            
             const userData = {
                 cid: cid,
                 nome_utente: user.displayName || user.email.split('@')[0] || 'Utente',
@@ -1073,8 +1105,17 @@ async function initializeUserDocument(user) {
                 tema_scuro: temaScuro
             };
             
+            console.log('💾 Salvataggio documento utente:', userData);
             await userRef.set(userData);
-            console.log('✅ Nuovo documento utente creato:', user.uid, 'CID:', cid);
+            console.log('✅ Nuovo documento utente creato con successo:', user.uid, 'CID:', cid);
+            
+            // Verifica che il documento sia stato creato
+            const verifyDoc = await userRef.get();
+            if (verifyDoc.exists) {
+                console.log('✅ Verifica: documento utente presente in Firestore');
+            } else {
+                console.error('❌ Verifica fallita: documento utente non presente dopo la creazione');
+            }
             
             // Applica il tema
             if (temaScuro) {
@@ -1087,6 +1128,9 @@ async function initializeUserDocument(user) {
         }
     } catch (error) {
         console.error('❌ Errore nell\'inizializzazione documento utente:', error);
+        console.error('Codice errore:', error.code);
+        console.error('Messaggio errore:', error.message);
+        console.error('Stack trace:', error.stack);
         return null;
     }
 }
@@ -1525,6 +1569,17 @@ async function handleLogin(e) {
             const userCredential = await currentAuth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             console.log('✅ Utente registrato con successo:', user.uid, user.email);
+            
+            // Inizializza documento utente immediatamente dopo la registrazione
+            console.log('🔧 Inizializzazione documento utente dopo registrazione...');
+            try {
+                await initializeUserDocument(user);
+                console.log('✅ Documento utente inizializzato dopo registrazione');
+            } catch (initError) {
+                console.error('❌ Errore nell\'inizializzazione documento utente dopo registrazione:', initError);
+                // Non bloccare il flusso, onAuthStateChanged lo riproverà
+            }
+            
             showNotification('Registrazione completata! Benvenuto!');
         } else {
             // Sign in existing user (compat version)
@@ -1604,6 +1659,17 @@ async function handleGoogleLogin() {
         const user = result.user;
         
         console.log('✅ Login Google completato:', user.email);
+        
+        // Inizializza documento utente immediatamente dopo il login Google
+        console.log('🔧 Inizializzazione documento utente dopo login Google...');
+        try {
+            await initializeUserDocument(user);
+            console.log('✅ Documento utente inizializzato dopo login Google');
+        } catch (initError) {
+            console.error('❌ Errore nell\'inizializzazione documento utente dopo login Google:', initError);
+            // Non bloccare il flusso, onAuthStateChanged lo riproverà
+        }
+        
         showNotification(`Benvenuto, ${user.displayName || user.email}!`);
         closeLoginModal();
     } catch (error) {
