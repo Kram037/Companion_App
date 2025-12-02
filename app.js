@@ -1046,13 +1046,40 @@ async function initializeUserDocument(user) {
     console.log('🔧 Inizializzazione documento utente per:', user ? user.uid : 'null');
     
     const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
     
-    if (!currentFirestore || !user) {
-        console.error('❌ Firestore o utente non disponibile per inizializzare documento utente');
+    if (!currentFirestore || !user || !currentAuth) {
+        console.error('❌ Firestore, utente o auth non disponibile per inizializzare documento utente');
         console.log('Firestore disponibile:', !!currentFirestore);
         console.log('User disponibile:', !!user);
+        console.log('Auth disponibile:', !!currentAuth);
         return null;
     }
+    
+    // Verifica che l'utente sia completamente autenticato e che il token sia valido
+    try {
+        console.log('🔑 Verifica token di autenticazione...');
+        const token = await user.getIdToken(true); // Force refresh
+        console.log('✅ Token valido, lunghezza:', token ? token.length : 0);
+        
+        // Verifica che currentUser corrisponda
+        const currentUser = currentAuth.currentUser;
+        if (!currentUser || currentUser.uid !== user.uid) {
+            console.warn('⚠️ currentUser non corrisponde, attendo...');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const retryUser = currentAuth.currentUser;
+            if (!retryUser || retryUser.uid !== user.uid) {
+                console.error('❌ currentUser ancora non corrisponde dopo retry');
+                return null;
+            }
+        }
+    } catch (tokenError) {
+        console.error('❌ Errore nel recupero token:', tokenError);
+        return null;
+    }
+    
+    // Piccolo delay per assicurarsi che tutto sia propagato
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     try {
         console.log('📄 Controllo documento utente esistente...');
@@ -1106,6 +1133,14 @@ async function initializeUserDocument(user) {
             };
             
             console.log('💾 Salvataggio documento utente:', userData);
+            console.log('🔐 Verifica autenticazione prima del salvataggio...');
+            
+            // Verifica nuovamente l'autenticazione prima di salvare
+            const verifyToken = await user.getIdToken();
+            if (!verifyToken) {
+                throw new Error('Token di autenticazione non disponibile');
+            }
+            
             await userRef.set(userData);
             console.log('✅ Nuovo documento utente creato con successo:', user.uid, 'CID:', cid);
             
@@ -1131,6 +1166,22 @@ async function initializeUserDocument(user) {
         console.error('Codice errore:', error.code);
         console.error('Messaggio errore:', error.message);
         console.error('Stack trace:', error.stack);
+        
+        // Se è un errore di permessi, mostra un messaggio più chiaro
+        if (error.code === 'permission-denied') {
+            console.error('⚠️ ERRORE DI PERMESSI FIRESTORE');
+            console.error('📋 Per risolvere:');
+            console.error('1. Vai su https://console.firebase.google.com/');
+            console.error('2. Seleziona il tuo progetto');
+            console.error('3. Vai su Firestore Database > Regole');
+            console.error('4. Copia le regole dal file FIRESTORE_RULES.txt');
+            console.error('5. Pubblica le regole');
+            console.error('6. Ricarica la pagina');
+            
+            // Mostra anche una notifica all'utente
+            showNotification('⚠️ Errore di permessi Firestore. Controlla la console per i dettagli.');
+        }
+        
         return null;
     }
 }
