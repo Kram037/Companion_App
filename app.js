@@ -1624,6 +1624,14 @@ function toggleLoginRegisterMode(isRegister) {
         elements.registerLink.style.display = 'inline';
         elements.loginLink.style.display = 'none';
         elements.modalFooterText.textContent = 'Non hai un account? ';
+        // Nascondi il campo nickname
+        if (elements.nicknameGroup) {
+            elements.nicknameGroup.style.display = 'none';
+        }
+        // Pulisci il campo nickname
+        if (elements.nicknameInput) {
+            elements.nicknameInput.value = '';
+        }
     }
     
     hideError();
