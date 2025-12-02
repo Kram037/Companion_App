@@ -644,11 +644,16 @@ async function setTheme(theme, save = true) {
             if (currentFirestore && currentAuth && currentAuth.currentUser) {
                 try {
                     const temaScuro = theme === 'dark';
-                    await currentFirestore
-                        .collection('Utenti')
-                        .doc(currentAuth.currentUser.uid)
-                        .update({ tema_scuro: temaScuro });
-                    console.log('✅ Tema salvato in Firestore:', temaScuro);
+                    // Cerca il documento per uid
+                    const userDoc = await findUserDocumentByUid(currentFirestore, currentAuth.currentUser.uid);
+                    
+                    if (userDoc) {
+                        const userRef = currentFirestore.collection('Utenti').doc(userDoc.docId);
+                        await userRef.update({ tema_scuro: temaScuro });
+                        console.log('✅ Tema salvato in Firestore:', temaScuro);
+                    } else {
+                        console.warn('⚠️ Documento utente non trovato per salvare tema');
+                    }
                 } catch (error) {
                     console.error('❌ Errore nel salvataggio tema in Firestore:', error);
                 }
@@ -1040,6 +1045,39 @@ async function generateUniqueCid() {
 }
 
 /**
+ * Normalizza il nome utente per usarlo nel document ID (rimuove caratteri speciali)
+ */
+function normalizeNomeUtente(nome) {
+    return nome
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '_') // Sostituisce caratteri speciali con underscore
+        .replace(/_+/g, '_') // Rimuove underscore multipli
+        .replace(/^_|_$/g, ''); // Rimuove underscore all'inizio e alla fine
+}
+
+/**
+ * Trova il documento utente per uid
+ */
+async function findUserDocumentByUid(firestore, uid) {
+    try {
+        const snapshot = await firestore
+            .collection('Utenti')
+            .where('uid', '==', uid)
+            .limit(1)
+            .get();
+        
+        if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            return { doc: doc, data: doc.data(), docId: doc.id };
+        }
+        return null;
+    } catch (error) {
+        console.error('❌ Errore nella ricerca documento utente per uid:', error);
+        return null;
+    }
+}
+
+/**
  * Inizializza o aggiorna il documento utente in Firestore
  */
 async function initializeUserDocument(user) {
@@ -1083,30 +1121,33 @@ async function initializeUserDocument(user) {
     
     try {
         console.log('📄 Controllo documento utente esistente...');
-        const userRef = currentFirestore.collection('Utenti').doc(user.uid);
-        const userDoc = await userRef.get();
+        // Cerca il documento per uid
+        const existingUser = await findUserDocumentByUid(currentFirestore, user.uid);
         
         const currentTheme = localStorage.getItem('theme') || 'light';
         const temaScuro = currentTheme === 'dark';
+        const nomeUtente = user.displayName || user.email.split('@')[0] || 'Utente';
         
-        if (userDoc.exists) {
+        if (existingUser) {
             console.log('✅ Documento utente già esistente, aggiorno...');
             // Utente esistente: aggiorna solo i campi che potrebbero essere cambiati
-            const existingData = userDoc.data();
+            const existingData = existingUser.data;
+            const userRef = currentFirestore.collection('Utenti').doc(existingUser.docId);
+            
             const updateData = {
                 email: user.email,
-                nome_utente: user.displayName || user.email.split('@')[0] || existingData.nome_utente,
+                nome_utente: nomeUtente,
                 tema_scuro: temaScuro
             };
             
             // Aggiorna solo se necessario
             await userRef.update(updateData);
-            console.log('✅ Documento utente aggiornato:', user.uid);
+            console.log('✅ Documento utente aggiornato:', existingUser.docId);
             
             // Carica i dati utente per applicare il tema
             await loadUserData(user.uid);
             
-            return userDoc.data();
+            return existingData;
         } else {
             console.log('🆕 Nuovo utente, creo documento...');
             // Nuovo utente: crea documento completo
@@ -1122,9 +1163,13 @@ async function initializeUserDocument(user) {
                 console.log('⚠️ Usando CID fallback:', cid);
             }
             
+            const nomeNormalizzato = normalizeNomeUtente(nomeUtente);
+            const docId = `utente_${cid}_${nomeNormalizzato}`;
+            
             const userData = {
+                uid: user.uid, // Aggiungiamo uid per poter cercare l'utente
                 cid: cid,
-                nome_utente: user.displayName || user.email.split('@')[0] || 'Utente',
+                nome_utente: nomeUtente,
                 email: user.email,
                 campagne: 0,
                 personaggi: [],
@@ -1132,7 +1177,8 @@ async function initializeUserDocument(user) {
                 tema_scuro: temaScuro
             };
             
-            console.log('💾 Salvataggio documento utente:', userData);
+            console.log('💾 Salvataggio documento utente con ID:', docId);
+            console.log('📋 Dati:', userData);
             console.log('🔐 Verifica autenticazione prima del salvataggio...');
             
             // Verifica nuovamente l'autenticazione prima di salvare
@@ -1141,8 +1187,9 @@ async function initializeUserDocument(user) {
                 throw new Error('Token di autenticazione non disponibile');
             }
             
+            const userRef = currentFirestore.collection('Utenti').doc(docId);
             await userRef.set(userData);
-            console.log('✅ Nuovo documento utente creato con successo:', user.uid, 'CID:', cid);
+            console.log('✅ Nuovo documento utente creato con successo:', docId, 'CID:', cid);
             
             // Verifica che il documento sia stato creato
             const verifyDoc = await userRef.get();
@@ -1198,10 +1245,11 @@ async function loadUserData(userId) {
     }
     
     try {
-        const userDoc = await currentFirestore.collection('Utenti').doc(userId).get();
+        // Cerca il documento per uid
+        const userDoc = await findUserDocumentByUid(currentFirestore, userId);
         
-        if (userDoc.exists) {
-            const userData = userDoc.data();
+        if (userDoc) {
+            const userData = userDoc.data;
             console.log('✅ Dati utente caricati:', userData);
             
             // Applica il tema se presente
@@ -1235,7 +1283,15 @@ async function updateUserCampagneCount(userId, increment = true) {
     }
     
     try {
-        const userRef = currentFirestore.collection('Utenti').doc(userId);
+        // Cerca il documento per uid
+        const userDoc = await findUserDocumentByUid(currentFirestore, userId);
+        
+        if (!userDoc) {
+            console.warn('⚠️ Documento utente non trovato per aggiornare conteggio campagne:', userId);
+            return;
+        }
+        
+        const userRef = currentFirestore.collection('Utenti').doc(userDoc.docId);
         
         if (increment) {
             await userRef.update({
