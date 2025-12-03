@@ -1268,15 +1268,20 @@ body {
     }
     
     .icon-preview-large {
-        width: 80px !important;
-        height: 80px !important;
+        width: 100px !important;
+        height: 100px !important;
         flex-shrink: 0 !important;
         margin: 0 !important;
     }
     
     .icon-preview-large svg {
-        width: 48px !important;
-        height: 48px !important;
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .icon-preview-large img {
+        width: 100% !important;
+        height: 100% !important;
     }
     
     .icon-options {
