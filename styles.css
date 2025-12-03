@@ -1091,6 +1091,7 @@ body {
     color: var(--text);
     font-size: 0.95rem;
     font-weight: 500;
+    overflow: hidden;
 }
 
 .btn-icon-selector svg {
@@ -1100,8 +1101,11 @@ body {
 }
 
 .btn-icon-selector span {
-    flex: 1;
-    text-align: right;
+    flex-shrink: 1;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .btn-icon-selector:hover {
