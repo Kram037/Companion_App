@@ -111,7 +111,10 @@ async function init() {
         campagnaForm: document.getElementById('campagnaForm'),
         campagnaModalTitle: document.getElementById('campagnaModalTitle'),
         cancelCampagnaBtn: document.getElementById('cancelCampagnaBtn'),
-        saveCampagnaBtn: document.getElementById('saveCampagnaBtn')
+        saveCampagnaBtn: document.getElementById('saveCampagnaBtn'),
+        openIconSelectorBtn: document.getElementById('openIconSelectorBtn'),
+        iconSelectorModal: document.getElementById('iconSelectorModal'),
+        closeIconSelectorModal: document.getElementById('closeIconSelectorModal')
     };
 
     // Check if all required elements exist
@@ -475,6 +478,29 @@ function setupEventListeners() {
         elements.campagnaModal.addEventListener('click', (e) => {
             if (e.target === elements.campagnaModal) {
                 closeCampagnaModal();
+            }
+        });
+    }
+    
+    // Icon selector popup
+    if (elements.openIconSelectorBtn) {
+        elements.openIconSelectorBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openIconSelectorModal();
+        };
+    }
+    if (elements.closeIconSelectorModal) {
+        elements.closeIconSelectorModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeIconSelectorModal();
+        };
+    }
+    if (elements.iconSelectorModal) {
+        elements.iconSelectorModal.addEventListener('click', (e) => {
+            if (e.target === elements.iconSelectorModal) {
+                closeIconSelectorModal();
             }
         });
     }
@@ -1340,6 +1366,22 @@ function openCampagnaModal(campagnaId = null) {
     console.log('✅ Modal campagna aperta');
 }
 
+function openIconSelectorModal() {
+    if (elements.iconSelectorModal) {
+        elements.iconSelectorModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        console.log('✅ Icon selector modal aperto');
+    }
+}
+
+function closeIconSelectorModal() {
+    if (elements.iconSelectorModal) {
+        elements.iconSelectorModal.classList.remove('active');
+        document.body.style.overflow = '';
+        console.log('✅ Icon selector modal chiuso');
+    }
+}
+
 function closeCampagnaModal() {
     if (!elements.campagnaModal) return;
     elements.campagnaModal.classList.remove('active');
@@ -1433,6 +1475,9 @@ function selectPredefinedIcon(iconName) {
     });
     
     updateIconPreview();
+    
+    // Close icon selector modal after selection
+    closeIconSelectorModal();
 }
 
 function updateIconPreview() {

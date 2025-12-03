@@ -1063,11 +1063,37 @@ body {
     gap: var(--spacing-sm);
 }
 
-.icon-options-header {
+.icon-buttons-row {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.btn-icon-selector {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--background);
+    color: var(--text);
     font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-light);
-    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.btn-icon-selector:hover {
+    border-color: var(--accent);
+    background: var(--primary);
+}
+
+.btn-icon-selector svg {
+    width: 18px;
+    height: 18px;
 }
 
 .icon-grid {
@@ -1113,33 +1139,22 @@ body {
     color: var(--text);
 }
 
-.icon-upload-section {
-    margin-top: var(--spacing-sm);
+.modal-content-small {
+    max-width: 500px;
+    max-height: 80vh;
 }
 
-.icon-upload-label {
+.modal-content-small .icon-grid {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#iconSelectorModal {
+    display: none;
+}
+
+#iconSelectorModal.active {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
-    border: 2px dashed var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: var(--transition);
-    background: var(--background);
-    color: var(--text);
-    font-size: 0.9rem;
-}
-
-.icon-upload-label:hover {
-    border-color: var(--accent);
-    background: var(--primary);
-}
-
-.icon-upload-label svg {
-    width: 18px;
-    height: 18px;
 }
 
 .form-hint {
@@ -1176,6 +1191,23 @@ body {
     .icon-preview-large {
         width: 80px;
         height: 80px;
+    }
+    
+    .icon-buttons-row {
+        flex-direction: column;
+    }
+    
+    .btn-icon-selector {
+        width: 100%;
+    }
+    
+    .modal-content-small {
+        max-width: 90vw;
+        max-height: 85vh;
+    }
+    
+    .modal-content-small .icon-grid {
+        max-height: 60vh;
     }
     
     .icon-preview {
