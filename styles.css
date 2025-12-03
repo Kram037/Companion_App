@@ -1261,31 +1261,28 @@ body {
         max-height: 150px;
     }
     
-    .icon-preview-large {
-        width: 80px;
-        height: 80px;
-    }
-    
     .icon-selector-container {
-        flex-direction: row;
-        align-items: center;
-        gap: var(--spacing-sm);
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: var(--spacing-sm) !important;
     }
     
     .icon-preview-large {
-        width: 80px;
-        height: 80px;
-        flex-shrink: 0;
+        width: 80px !important;
+        height: 80px !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
     }
     
     .icon-preview-large svg {
-        width: 48px;
-        height: 48px;
+        width: 48px !important;
+        height: 48px !important;
     }
     
     .icon-options {
-        flex: 1;
-        min-width: 0;
+        flex: 1 !important;
+        min-width: 0 !important;
+        width: auto !important;
     }
     
     .btn-icon-selector {
