@@ -1035,7 +1035,7 @@ body {
 .icon-selector-container {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--spacing-md);
 }
 
@@ -1070,14 +1070,16 @@ body {
     flex-direction: column;
     gap: var(--spacing-sm);
     flex: 1;
+    justify-content: center;
 }
 
 .icon-name-display {
     font-size: 0.9rem;
     color: var(--text-light);
     font-weight: 500;
-    padding: var(--spacing-xs) 0;
-    min-height: 24px;
+    padding: 0;
+    min-height: 20px;
+    line-height: 1.2;
 }
 
 .btn-icon-selector {
