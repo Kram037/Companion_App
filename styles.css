@@ -1268,10 +1268,17 @@ body {
     
     .icon-selector-container {
         flex-direction: column;
+        align-items: stretch;
     }
     
     .icon-preview-large {
         margin: 0 auto;
+        width: 100px;
+        height: 100px;
+    }
+    
+    .icon-options {
+        width: 100%;
     }
     
     .btn-icon-selector {
