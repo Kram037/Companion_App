@@ -1080,7 +1080,7 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    justify-content: space-between;
     padding: var(--spacing-md);
     height: 50px;
     border: 2px solid var(--text-light);
@@ -1101,10 +1101,11 @@ body {
 
 .btn-icon-selector span {
     flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     text-align: right;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1;
 }
 
 .btn-icon-selector:hover {
