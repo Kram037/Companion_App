@@ -88,6 +88,8 @@ async function init() {
         closeSettingsModal: document.getElementById('closeSettingsModal'),
         loginForm: document.getElementById('loginForm'),
         logoutBtn: document.getElementById('logoutBtn'),
+        d20Logo: document.getElementById('d20Logo'),
+        d20RollNumber: document.getElementById('d20RollNumber'),
         toolbarBtns: document.querySelectorAll('.toolbar-btn'),
         pages: document.querySelectorAll('.page'),
         mainContent: document.getElementById('mainContent'),
@@ -481,6 +483,24 @@ function setupEventListeners() {
             }
         });
     }
+    
+    // D20 Logo roll functionality
+    if (elements.d20Logo) {
+        elements.d20Logo.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            rollD20();
+        });
+    }
+    
+    // Hide roll number when clicking elsewhere
+    document.addEventListener('click', (e) => {
+        if (elements.d20RollNumber && elements.d20RollNumber.classList.contains('show')) {
+            if (!elements.d20Logo || !elements.d20Logo.contains(e.target)) {
+                hideRollNumber();
+            }
+        }
+    });
     
     // Icon selector popup
     if (elements.openIconSelectorBtn) {
@@ -1954,6 +1974,32 @@ async function handleGoogleLogin() {
                 Accedi con Google
             `;
         }
+    }
+}
+
+// D20 Roll Functions
+function rollD20() {
+    if (!elements.d20Logo || !elements.d20RollNumber) return;
+    
+    // Add spinning class
+    elements.d20Logo.classList.add('spinning');
+    
+    // Generate random number between 1 and 20
+    const roll = Math.floor(Math.random() * 20) + 1;
+    
+    // Remove spinning class after animation completes
+    setTimeout(() => {
+        elements.d20Logo.classList.remove('spinning');
+        
+        // Show the number
+        elements.d20RollNumber.textContent = roll;
+        elements.d20RollNumber.classList.add('show');
+    }, 600); // Match animation duration
+}
+
+function hideRollNumber() {
+    if (elements.d20RollNumber) {
+        elements.d20RollNumber.classList.remove('show');
     }
 }
 

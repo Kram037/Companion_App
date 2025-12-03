@@ -108,6 +108,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .d20-logo {
@@ -119,6 +120,8 @@ body {
     transition: var(--transition);
     filter: drop-shadow(0 4px 8px var(--shadow));
     margin-top: 8px;
+    position: relative;
+    cursor: pointer;
 }
 
 .d20-logo img,
@@ -131,7 +134,45 @@ body {
 
 .d20-logo:hover img,
 .d20-logo:hover svg {
-    transform: rotate(15deg) scale(1.1);
+    transform: scale(1.1);
+}
+
+.d20-logo:active img,
+.d20-logo:active svg {
+    transform: scale(0.95);
+}
+
+.d20-logo.spinning img,
+.d20-logo.spinning svg {
+    animation: spin3Times 0.6s ease-in-out;
+}
+
+@keyframes spin3Times {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    100% {
+        transform: rotate(1080deg) scale(1);
+    }
+}
+
+.d20-roll-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.d20-roll-number.show {
+    opacity: 1;
 }
 
 .app-title {
