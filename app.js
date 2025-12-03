@@ -1981,6 +1981,9 @@ async function handleGoogleLogin() {
 function rollD20() {
     if (!elements.d20Logo || !elements.d20RollNumber) return;
     
+    // Remove critical class if present
+    elements.d20RollNumber.classList.remove('critical');
+    
     // Add spinning class
     elements.d20Logo.classList.add('spinning');
     
@@ -1994,7 +1997,12 @@ function rollD20() {
         // Show the number
         elements.d20RollNumber.textContent = roll;
         elements.d20RollNumber.classList.add('show');
-    }, 600); // Match animation duration
+        
+        // If critical roll (1 or 20), add flash effect
+        if (roll === 1 || roll === 20) {
+            elements.d20RollNumber.classList.add('critical');
+        }
+    }, 1200); // Match animation duration (1.2s)
 }
 
 function hideRollNumber() {
