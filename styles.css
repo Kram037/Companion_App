@@ -1267,18 +1267,25 @@ body {
     }
     
     .icon-selector-container {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-sm);
     }
     
     .icon-preview-large {
-        margin: 0 auto;
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+    }
+    
+    .icon-preview-large svg {
+        width: 48px;
+        height: 48px;
     }
     
     .icon-options {
-        width: 100%;
+        flex: 1;
+        min-width: 0;
     }
     
     .btn-icon-selector {
