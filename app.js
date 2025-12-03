@@ -1409,16 +1409,10 @@ const predefinedIcons = [
     { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' }
 ];
 
-let selectedIconType = 'predefined';
 let selectedIconName = 'dice';
-let uploadedImageData = null;
 
 function setupIconSelector() {
     const iconGrid = document.getElementById('iconGrid');
-    const iconUpload = document.getElementById('iconUpload');
-    const iconPreview = document.getElementById('iconPreview');
-    const iconDisplay = document.getElementById('iconDisplay');
-    const iconImageDisplay = document.getElementById('iconImageDisplay');
     
     if (!iconGrid) {
         console.error('❌ iconGrid non trovato');
@@ -1436,38 +1430,12 @@ function setupIconSelector() {
         iconGrid.appendChild(iconOption);
     });
     
-    // Handle image upload
-    if (iconUpload) {
-        iconUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                    showNotification('L\'immagine è troppo grande. Massimo 2MB.');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    uploadedImageData = event.target.result;
-                    selectedIconType = 'uploaded';
-                    updateIconPreview();
-                    
-                    // Deselect all predefined icons
-                    document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-    
     // Set default icon
     selectPredefinedIcon('dice');
 }
 
 function selectPredefinedIcon(iconName) {
-    selectedIconType = 'predefined';
     selectedIconName = iconName;
-    uploadedImageData = null;
     
     // Update selected state
     document.querySelectorAll('.icon-option').forEach(opt => {
@@ -1480,27 +1448,43 @@ function selectPredefinedIcon(iconName) {
     closeIconSelectorModal();
 }
 
+// Icon name mapping for display
+const iconNameMap = {
+    'dice': 'Dado',
+    'sword': 'Spada',
+    'shield': 'Scudo',
+    'book': 'Libro',
+    'star': 'Stella',
+    'fire': 'Fuoco',
+    'moon': 'Luna',
+    'sun': 'Sole',
+    'treasure': 'Tesoro',
+    'skull': 'Teschio',
+    'cross': 'Croce'
+};
+
 function updateIconPreview() {
     const iconDisplay = document.getElementById('iconDisplay');
     const iconImageDisplay = document.getElementById('iconImageDisplay');
     const iconaCampagna = document.getElementById('iconaCampagna');
+    const iconNameDisplay = document.getElementById('iconNameDisplay');
     
     if (!iconDisplay || !iconImageDisplay) return;
     
-    if (selectedIconType === 'uploaded' && uploadedImageData) {
-        iconDisplay.style.display = 'none';
-        iconImageDisplay.style.display = 'block';
-        iconImageDisplay.src = uploadedImageData;
-        if (iconaCampagna) {
-            iconaCampagna.value = uploadedImageData; // Store as data URL
+    // Always show predefined icon (no more uploaded images)
+    iconDisplay.style.display = 'block';
+    iconImageDisplay.style.display = 'none';
+    
+    const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
+    if (selectedIcon) {
+        iconDisplay.innerHTML = selectedIcon.svg;
+        
+        // Update icon name display
+        if (iconNameDisplay) {
+            const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
+            iconNameDisplay.textContent = displayName;
         }
-    } else {
-        iconDisplay.style.display = 'block';
-        iconImageDisplay.style.display = 'none';
-        const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
-        if (selectedIcon) {
-            iconDisplay.innerHTML = selectedIcon.svg;
-        }
+        
         if (iconaCampagna) {
             iconaCampagna.value = selectedIconName; // Store icon name
         }
@@ -1508,15 +1492,7 @@ function updateIconPreview() {
 }
 
 function resetIconPreview() {
-    selectedIconType = 'predefined';
     selectedIconName = 'dice';
-    uploadedImageData = null;
-    
-    // Reset file input
-    const iconUpload = document.getElementById('iconUpload');
-    if (iconUpload) {
-        iconUpload.value = '';
-    }
     
     // Select first icon
     document.querySelectorAll('.icon-option').forEach((opt, index) => {
@@ -1550,12 +1526,7 @@ async function handleCampagnaSubmit(e) {
 
     // Get icon data
     let iconaData = null;
-    if (selectedIconType === 'uploaded' && uploadedImageData) {
-        iconaData = {
-            type: 'image',
-            data: uploadedImageData
-        };
-    } else if (selectedIconName) {
+    if (selectedIconName) {
         iconaData = {
             type: 'predefined',
             name: selectedIconName

@@ -1034,7 +1034,8 @@ body {
 /* Icon Selector */
 .icon-selector-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: flex-start;
     gap: var(--spacing-md);
 }
 
@@ -1054,7 +1055,7 @@ body {
     align-items: center;
     justify-content: center;
     background: var(--background);
-    margin: 0 auto;
+    flex-shrink: 0;
     overflow: hidden;
 }
 
@@ -1068,16 +1069,19 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    flex: 1;
 }
 
-.icon-buttons-row {
-    display: flex;
-    gap: var(--spacing-sm);
-    width: 100%;
+.icon-name-display {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
+    padding: var(--spacing-xs) 0;
+    min-height: 24px;
 }
 
 .btn-icon-selector {
-    flex: 1;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1212,8 +1216,12 @@ body {
         height: 80px;
     }
     
-    .icon-buttons-row {
+    .icon-selector-container {
         flex-direction: column;
+    }
+    
+    .icon-preview-large {
+        margin: 0 auto;
     }
     
     .btn-icon-selector {
