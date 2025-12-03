@@ -1080,10 +1080,9 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
+    justify-content: space-between;
     padding: var(--spacing-md);
-    min-height: 50px;
+    height: 50px;
     border: 2px solid var(--text-light);
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -1094,16 +1093,22 @@ body {
     font-weight: 500;
 }
 
+.btn-icon-selector svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.btn-icon-selector span {
+    flex: 1;
+    text-align: right;
+}
+
 .btn-icon-selector:hover {
     border-color: var(--accent);
     background: var(--primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px var(--shadow);
-}
-
-.btn-icon-selector svg {
-    width: 18px;
-    height: 18px;
 }
 
 .icon-grid {
