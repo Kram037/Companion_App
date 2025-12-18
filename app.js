@@ -135,6 +135,11 @@ async function init() {
     // Load saved theme
     loadTheme();
     
+    // Nascondi il pulsante "Nuova Campagna" di default (sarà mostrato quando l'utente fa login)
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = 'none';
+    }
+    
     // Setup event listeners immediately (don't wait for Supabase)
     console.log('🔧 Setup event listeners...');
     setupEventListeners();
