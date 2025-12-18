@@ -957,23 +957,33 @@ async function findUserByUid(uid) {
     if (!supabase) return null;
     
     try {
+        // Verifica che l'utente sia autenticato
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            console.warn('⚠️ Nessuna sessione attiva per la query utente');
+            return null;
+        }
+        
+        // Usa maybeSingle per evitare errori se non trovato
         const { data, error } = await supabase
             .from('utenti')
             .select('*')
             .eq('uid', uid)
-            .single();
+            .maybeSingle(); // maybeSingle ritorna null se non trova risultati invece di errore
         
         if (error) {
+            // PGRST116 significa "nessun risultato", non è un errore critico
             if (error.code === 'PGRST116') {
-                // Nessun risultato trovato
                 return null;
             }
+            console.error('❌ Errore nella ricerca utente per uid:', error);
             throw error;
         }
         
         return data;
     } catch (error) {
         console.error('❌ Errore nella ricerca utente per uid:', error);
+        // Non lanciare l'errore, ritorna null per evitare crash
         return null;
     }
 }
