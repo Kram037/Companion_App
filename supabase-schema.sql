@@ -220,3 +220,26 @@ FROM utenti u
 LEFT JOIN campagne c ON c.user_id = u.id
 GROUP BY u.id, u.uid;
 
+-- Funzione per pulire utenti orfani (utenti nella tabella utenti senza corrispondenza in auth.users)
+-- Utile dopo cancellazioni manuali o migrazioni
+CREATE OR REPLACE FUNCTION cleanup_orphan_users()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    -- Elimina utenti che non hanno più un corrispondente in auth.users
+    -- Nota: questa funzione richiede che auth.users sia accessibile
+    -- In produzione, potrebbe essere necessario usare una funzione edge o trigger
+    
+    -- Per ora, questa funzione è un placeholder
+    -- Per usarla, dovresti verificare manualmente gli utenti orfani
+    -- e eliminarli con: DELETE FROM utenti WHERE uid NOT IN (SELECT id::text FROM auth.users);
+    
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Commento: Per pulire manualmente gli utenti orfani, esegui:
+-- DELETE FROM utenti WHERE uid NOT IN (SELECT id::text FROM auth.users);
+-- ATTENZIONE: Questo eliminerà anche le campagne associate (per CASCADE)
+
