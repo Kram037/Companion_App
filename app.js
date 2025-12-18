@@ -842,7 +842,7 @@ function renderCampagne(campagne, isLoggedIn = true) {
     if (!isLoggedIn) {
         elements.campagneList.innerHTML = `
             <div class="content-placeholder">
-                <p>Accedi per vedere le tue campagne</p>
+                <p>Accedi per vedere e creare le tue campagne</p>
             </div>
         `;
         return;
