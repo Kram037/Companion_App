@@ -922,6 +922,8 @@ function escapeHtml(text) {
 }
 
 // Supabase - Utenti Management
+let initializingUsers = new Set(); // Traccia utenti in fase di inizializzazione per evitare chiamate multiple
+
 /**
  * Genera un CID univoco a 4 cifre (1000-9999) usando la funzione SQL
  */
@@ -1000,6 +1002,21 @@ async function initializeUserDocument(user) {
         console.error('❌ Supabase o utente non disponibile per inizializzare utente');
         return null;
     }
+    
+    // Evita inizializzazioni multiple simultanee per lo stesso utente
+    if (initializingUsers.has(user.id)) {
+        console.log('⚠️ Inizializzazione già in corso per questo utente, aspetto...');
+        // Aspetta che l'inizializzazione corrente finisca
+        let waitAttempts = 0;
+        while (initializingUsers.has(user.id) && waitAttempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitAttempts++;
+        }
+        // Prova a caricare l'utente che dovrebbe essere stato creato
+        return await findUserByUid(user.id);
+    }
+    
+    initializingUsers.add(user.id);
     
     try {
         console.log('📄 Controllo utente esistente...');
@@ -1140,6 +1157,9 @@ async function initializeUserDocument(user) {
         showNotification('⚠️ Errore nell\'inizializzazione profilo. Controlla la console per i dettagli.');
         
         return null;
+    } finally {
+        // Rimuovi l'utente dal set di inizializzazione
+        initializingUsers.delete(user.id);
     }
 }
 
