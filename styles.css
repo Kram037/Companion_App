@@ -927,10 +927,21 @@ body {
     margin-bottom: var(--spacing-lg);
     flex-wrap: wrap;
     gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px var(--shadow);
 }
 
 .page-header h1 {
     margin: 0;
+}
+
+/* Bottoni nella page-header sono più compatti */
+.page-header .btn-primary {
+    width: auto;
+    padding: var(--spacing-xs) var(--spacing-md);
+    white-space: nowrap;
 }
 
 .campagne-list {
@@ -1314,8 +1325,14 @@ body {
     }
     
     .page-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .page-header .btn-primary {
+        font-size: 0.9rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
     }
     
     .icon-picker {
