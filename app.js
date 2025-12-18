@@ -1060,40 +1060,62 @@ async function initializeUserDocument(user) {
             
             // Usa upsert che gestisce automaticamente insert/update
             // onConflict su uid (chiave primaria per identificare l'utente)
-            const { data, error } = await supabase
-                .from('utenti')
-                .upsert(userData, {
-                    onConflict: 'uid'
-                })
-                .select()
-                .single();
+            let attempts = 0;
+            let data = null;
+            let error = null;
             
-            if (error) {
-                // Se è un errore di chiave duplicata su email (utente esiste ma con uid diverso, molto raro)
+            while (attempts < 3) {
+                const result = await supabase
+                    .from('utenti')
+                    .upsert(userData, {
+                        onConflict: 'uid'
+                    })
+                    .select()
+                    .single();
+                
+                data = result.data;
+                error = result.error;
+                
+                if (!error) {
+                    break; // Successo
+                }
+                
+                // Se è un errore di chiave duplicata, aspetta un po' e riprova
                 if (error.code === '23505') {
-                    console.log('⚠️ Conflitto chiave duplicata, provo a cercare l\'utente esistente...');
-                    // Prova a cercare per uid
-                    const existingUser = await findUserByUid(user.id);
-                    if (existingUser) {
-                        // Aggiorna l'utente esistente
-                        const { data: updatedData, error: updateError } = await supabase
-                            .from('utenti')
-                            .update({
+                    attempts++;
+                    if (attempts < 3) {
+                        console.log(`⚠️ Conflitto chiave duplicata, tentativo ${attempts + 1}/3...`);
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        // Prova a caricare l'utente esistente
+                        const existingUser = await findUserByUid(user.id);
+                        if (existingUser) {
+                            // Usa i dati esistenti e aggiorna solo i campi necessari
+                            const updateData = {
                                 email: user.email,
                                 nome_utente: nomeUtente,
                                 tema_scuro: temaScuro
-                            })
-                            .eq('uid', user.id)
-                            .select()
-                            .single();
-                        
-                        if (!updateError && updatedData) {
-                            await loadUserData(user.id);
-                            return updatedData;
+                            };
+                            const updateResult = await supabase
+                                .from('utenti')
+                                .update(updateData)
+                                .eq('uid', user.id)
+                                .select()
+                                .single();
+                            
+                            if (!updateResult.error && updateResult.data) {
+                                data = updateResult.data;
+                                error = null;
+                                break;
+                            }
                         }
+                        continue;
                     }
                 }
-                console.error('❌ Errore nell\'upsert utente:', error);
+                break; // Errore diverso o troppi tentativi
+            }
+            
+            if (error) {
+                console.error('❌ Errore nell\'upsert utente dopo', attempts, 'tentativi:', error);
                 throw error;
             }
             
