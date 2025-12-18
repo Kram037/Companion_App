@@ -236,11 +236,19 @@ function updateUIForLoggedIn() {
             <circle cx="12" cy="7" r="4"></circle>
         </svg>
     `;
+    // Mostra il pulsante "Nuova Campagna"
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = 'block';
+    }
 }
 
 // Update UI when user is logged out
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
+    // Nascondi il pulsante "Nuova Campagna"
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = 'none';
+    }
     // Show login message in campagne list
     renderCampagne([], false);
 }
@@ -1200,6 +1208,14 @@ async function loadUserData(userId) {
 }
 
 function openCampagnaModal(campagnaId = null) {
+    // Verifica che l'utente sia loggato
+    if (!AppState.isLoggedIn) {
+        showNotification('Devi essere loggato per creare una campagna');
+        // Apri il modal di login invece
+        openLoginModal();
+        return;
+    }
+    
     editingCampagnaId = campagnaId;
     
     if (!elements.campagnaModal || !elements.campagnaForm) {
