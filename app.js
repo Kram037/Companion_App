@@ -1581,13 +1581,25 @@ async function handleLogin(e) {
     // Verifica che Supabase sia disponibile
     const supabase = getSupabaseClient();
     
-    if (!supabaseReady || !supabase) {
-        showError('Autenticazione non disponibile. Ricarica la pagina.');
-        console.error('Supabase non disponibile:', {
-            supabaseReady,
-            supabase: !!supabase
-        });
-        return;
+    if (!supabase) {
+        // Prova a ottenere il client direttamente se non è disponibile
+        if (typeof window.supabaseClient !== 'undefined') {
+            // Client disponibile, aggiorna supabaseReady
+            supabaseReady = true;
+        } else {
+            showError('Autenticazione non disponibile. Ricarica la pagina.');
+            console.error('Supabase non disponibile:', {
+                supabaseReady,
+                supabase: !!supabase,
+                windowSupabaseClient: typeof window.supabaseClient
+            });
+            return;
+        }
+    } else {
+        // Client disponibile, assicurati che supabaseReady sia true
+        if (!supabaseReady) {
+            supabaseReady = true;
+        }
     }
 
     try {
