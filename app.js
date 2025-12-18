@@ -100,9 +100,6 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
-        amiciList: document.getElementById('amiciList'),
-        nemiciList: document.getElementById('nemiciList'),
-        personaggiList: document.getElementById('personaggiList'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
@@ -248,6 +245,44 @@ function updateUIForLoggedIn() {
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'block';
     }
+    // Aggiorna i placeholder per amici, nemici e personaggi (nessun dato ancora)
+    updatePlaceholderMessages(true);
+}
+
+// Aggiorna i messaggi dei placeholder in base allo stato di login
+function updatePlaceholderMessages(isLoggedIn) {
+    const amiciPlaceholder = document.getElementById('amiciPlaceholder');
+    const nemiciPlaceholder = document.getElementById('nemiciPlaceholder');
+    const personaggiPlaceholder = document.getElementById('personaggiPlaceholder');
+    
+    if (isLoggedIn) {
+        // Utente loggato ma senza dati
+        if (amiciPlaceholder) {
+            amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
+        }
+        if (nemiciPlaceholder) {
+            nemiciPlaceholder.innerHTML = `
+                <p>Non ci sono nemici. Crea nuovi nemici!</p>
+                <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 0.5em;">
+                    Companion App non si assume responsabilità di eventuali conflitti al tavolo con i tuoi "amici".
+                </p>
+            `;
+        }
+        if (personaggiPlaceholder) {
+            personaggiPlaceholder.innerHTML = '<p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p>';
+        }
+    } else {
+        // Utente non loggato
+        if (amiciPlaceholder) {
+            amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
+        }
+        if (nemiciPlaceholder) {
+            nemiciPlaceholder.innerHTML = '<p>Accedi per vedere e creare i tuoi nemici</p>';
+        }
+        if (personaggiPlaceholder) {
+            personaggiPlaceholder.innerHTML = '<p>Accedi per vedere e creare i tuoi personaggi</p>';
+        }
+    }
 }
 
 // Update UI when user is logged out
@@ -257,11 +292,10 @@ function updateUIForLoggedOut() {
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
     }
-    // Show login message in all tabs
+    // Show login message in campagne list
     renderCampagne([], false);
-    renderAmici([], false);
-    renderNemici([], false);
-    renderPersonaggi([], false);
+    // Aggiorna i placeholder per amici, nemici e personaggi
+    updatePlaceholderMessages(false);
 }
 
 // Setup Event Listeners
@@ -614,16 +648,6 @@ function navigateToPage(pageName) {
     });
 
     AppState.currentPage = pageName;
-    
-    // Aggiorna il contenuto della pagina corrente in base allo stato di login
-    const isLoggedIn = AppState.isLoggedIn;
-    if (pageName === 'amici') {
-        renderAmici([], isLoggedIn);
-    } else if (pageName === 'nemici') {
-        renderNemici([], isLoggedIn);
-    } else if (pageName === 'personaggi') {
-        renderPersonaggi([], isLoggedIn);
-    }
 }
 
 // Modal Functions
@@ -930,85 +954,6 @@ function renderCampagne(campagne, isLoggedIn = true) {
             </div>
         `;
     }).join('');
-}
-
-// Rendering functions for other tabs
-function renderAmici(amici = [], isLoggedIn = true) {
-    if (!elements.amiciList) return;
-    
-    if (!isLoggedIn) {
-        elements.amiciList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Accedi per vedere i tuoi amici</p>
-            </div>
-        `;
-        return;
-    }
-    
-    if (amici.length === 0) {
-        elements.amiciList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // TODO: Implementare rendering lista amici quando ci saranno dati
-    elements.amiciList.innerHTML = '<p>Lista amici (da implementare)</p>';
-}
-
-function renderNemici(nemici = [], isLoggedIn = true) {
-    if (!elements.nemiciList) return;
-    
-    if (!isLoggedIn) {
-        elements.nemiciList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Accedi per vedere e creare i tuoi nemici</p>
-            </div>
-        `;
-        return;
-    }
-    
-    if (nemici.length === 0) {
-        elements.nemiciList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Non ci sono nemici. Crea nuovi nemici!</p>
-                <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 0.5em;">
-                    Companion App non si assume responsabilità di eventuali conflitti al tavolo con i tuoi "amici".
-                </p>
-            </div>
-        `;
-        return;
-    }
-    
-    // TODO: Implementare rendering lista nemici quando ci saranno dati
-    elements.nemiciList.innerHTML = '<p>Lista nemici (da implementare)</p>';
-}
-
-function renderPersonaggi(personaggi = [], isLoggedIn = true) {
-    if (!elements.personaggiList) return;
-    
-    if (!isLoggedIn) {
-        elements.personaggiList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Accedi per vedere e creare i tuoi personaggi</p>
-            </div>
-        `;
-        return;
-    }
-    
-    if (personaggi.length === 0) {
-        elements.personaggiList.innerHTML = `
-            <div class="content-placeholder">
-                <p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // TODO: Implementare rendering lista personaggi quando ci saranno dati
-    elements.personaggiList.innerHTML = '<p>Lista personaggi (da implementare)</p>';
 }
 
 function formatTempoGioco(minuti) {
