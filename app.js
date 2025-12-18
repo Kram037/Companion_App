@@ -1051,24 +1051,40 @@ async function initializeUserDocument(user) {
             console.log('💾 Salvataggio utente...');
             console.log('📋 Dati:', userData);
             
-            // Usa upsert per evitare errori se l'utente esiste già (race condition)
+            // Verifica nuovamente se l'utente esiste (potrebbe essere stato creato nel frattempo)
+            const checkAgain = await findUserByUid(user.id);
+            if (checkAgain) {
+                console.log('⚠️ Utente creato nel frattempo, aggiorno...');
+                // Aggiorna invece di inserire
+                const { data, error } = await supabase
+                    .from('utenti')
+                    .update({
+                        email: user.email,
+                        nome_utente: nomeUtente,
+                        tema_scuro: temaScuro
+                    })
+                    .eq('uid', user.id)
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                await loadUserData(user.id);
+                return data;
+            }
+            
+            // Inserisci nuovo utente
             const { data, error } = await supabase
                 .from('utenti')
-                .upsert(userData, {
-                    onConflict: 'uid',
-                    ignoreDuplicates: false
-                })
+                .insert(userData)
                 .select()
                 .single();
             
             if (error) {
-                // Se è un errore di chiave duplicata, significa che l'utente esiste già
-                // (potrebbe essere stato creato da un'altra chiamata simultanea)
-                if (error.code === '23505') {
+                // Se è un errore di chiave duplicata (race condition), prova a caricare l'utente esistente
+                if (error.code === '23505' || error.code === '23514') {
                     console.log('⚠️ Utente già esistente (race condition), carico i dati esistenti...');
                     const existingUser = await findUserByUid(user.id);
                     if (existingUser) {
-                        // Carica i dati esistenti
                         await loadUserData(user.id);
                         return existingUser;
                     }
