@@ -1119,7 +1119,10 @@ async function initializeUserDocument(user) {
                 throw error;
             }
             
-            console.log('✅ Nuovo utente creato con successo, CID:', cid);
+            console.log('✅ Utente creato/aggiornato con successo, CID:', data?.cid || cid);
+            
+            // Piccolo delay per assicurarsi che il database sia aggiornato
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Applica il tema
             if (temaScuro) {
