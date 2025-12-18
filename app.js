@@ -768,14 +768,11 @@ async function loadCampagne(userId) {
     // Carica inizialmente le campagne
     try {
         // Prima trova l'utente nella tabella utenti per ottenere l'ID
-        const { data: utente, error: utenteError } = await supabase
-            .from('utenti')
-            .select('id')
-            .eq('uid', userId)
-            .single();
-
-        if (utenteError || !utente) {
-            console.error('❌ Utente non trovato nella tabella utenti:', utenteError);
+        // Usa findUserByUid che già gestisce correttamente le RLS e gli errori
+        const utente = await findUserByUid(userId);
+        
+        if (!utente) {
+            console.error('❌ Utente non trovato nella tabella utenti');
             renderCampagne([], false);
             return;
         }
