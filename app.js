@@ -1051,13 +1051,30 @@ async function initializeUserDocument(user) {
             console.log('💾 Salvataggio utente...');
             console.log('📋 Dati:', userData);
             
+            // Usa upsert per evitare errori se l'utente esiste già (race condition)
             const { data, error } = await supabase
                 .from('utenti')
-                .insert(userData)
+                .upsert(userData, {
+                    onConflict: 'uid',
+                    ignoreDuplicates: false
+                })
                 .select()
                 .single();
             
-            if (error) throw error;
+            if (error) {
+                // Se è un errore di chiave duplicata, significa che l'utente esiste già
+                // (potrebbe essere stato creato da un'altra chiamata simultanea)
+                if (error.code === '23505') {
+                    console.log('⚠️ Utente già esistente (race condition), carico i dati esistenti...');
+                    const existingUser = await findUserByUid(user.id);
+                    if (existingUser) {
+                        // Carica i dati esistenti
+                        await loadUserData(user.id);
+                        return existingUser;
+                    }
+                }
+                throw error;
+            }
             
             console.log('✅ Nuovo utente creato con successo, CID:', cid);
             
@@ -1627,17 +1644,9 @@ async function handleLogin(e) {
             
             console.log('✅ Utente registrato con successo:', data.user?.id, data.user?.email);
             
-            // Inizializza utente immediatamente dopo la registrazione
-            if (data.user) {
-                console.log('🔧 Inizializzazione utente dopo registrazione...');
-                try {
-                    await initializeUserDocument(data.user);
-                    console.log('✅ Utente inizializzato dopo registrazione');
-                } catch (initError) {
-                    console.error('❌ Errore nell\'inizializzazione utente dopo registrazione:', initError);
-                }
-            }
-            
+            // Non inizializziamo qui perché onAuthStateChange lo farà automaticamente
+            // Questo evita doppie inizializzazioni e race conditions
+            console.log('✅ Registrazione completata, onAuthStateChange gestirà l\'inizializzazione');
             showNotification('Registrazione completata! Benvenuto!');
         } else {
             // Sign in existing user
