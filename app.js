@@ -553,18 +553,54 @@ function setupEventListeners() {
         elements.addCampagnaBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('➕ Click su Nuova Campagna');
+            console.log('➕ Click su Crea Campagna');
             openCampagnaModal();
         };
         elements.addCampagnaBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('➕ Click su Nuova Campagna (addEventListener)');
+            console.log('➕ Click su Crea Campagna (addEventListener)');
             openCampagnaModal();
         });
         console.log('✅ Event listener aggiunto a addCampagnaBtn');
     } else {
         console.error('❌ addCampagnaBtn non trovato');
+    }
+    
+    // Amici button
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('➕ Click su Aggiungi Amico');
+            // TODO: Implementare funzione per aggiungere amico
+            showNotification('Funzionalità in arrivo: Aggiungi Amico');
+        };
+        console.log('✅ Event listener aggiunto a addAmicoBtn');
+    }
+    
+    // Nemici button
+    if (elements.addNemicoBtn) {
+        elements.addNemicoBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('➕ Click su Crea Nemico');
+            // TODO: Implementare funzione per creare nemico
+            showNotification('Funzionalità in arrivo: Crea Nemico');
+        };
+        console.log('✅ Event listener aggiunto a addNemicoBtn');
+    }
+    
+    // Personaggi button
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('➕ Click su Crea Personaggio');
+            // TODO: Implementare funzione per creare personaggio
+            showNotification('Funzionalità in arrivo: Crea Personaggio');
+        };
+        console.log('✅ Event listener aggiunto a addPersonaggioBtn');
     }
     
     if (elements.closeCampagnaModal) {
