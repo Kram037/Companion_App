@@ -289,10 +289,22 @@
         </div>
     </div>
 
-    <!-- Supabase SDK - usando bundle browser diretto -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/index.min.js"></script>
-    <script src="supabase-config.js?v=1.5"></script>
-    <script src="app.js?v=1.5"></script>
+    <!-- Supabase SDK -->
+    <script type="module">
+        // Carica Supabase come ES module
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        // Configurazione
+        const SUPABASE_URL = 'https://tezlofuwlydbjitiymkk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlemxvZnV3bHlkYmppdGl5bWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNTg2NTMsImV4cCI6MjA4MTYzNDY1M30.RoerUrtO6Y9gagzutXDL6Yz0XBJce9bVnmAL4Lf1IDc';
+        
+        // Crea il client e rendilo disponibile globalmente
+        window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseCreateClient = createClient; // Per compatibilità
+        
+        console.log('✅ Supabase caricato e inizializzato (ES Module)');
+    </script>
+    <script src="app.js?v=1.6"></script>
     
     <!-- Cache busting script for development -->
     <script>
