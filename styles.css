@@ -956,6 +956,11 @@ body {
     font-weight: 300;
     border-radius: var(--radius-full);
     min-width: 44px;
+    background: #8B0000;
+}
+
+.page-header .btn-icon:hover {
+    background: #A00000;
 }
 
 .campagne-list {
