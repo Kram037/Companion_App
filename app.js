@@ -614,6 +614,16 @@ function navigateToPage(pageName) {
     });
 
     AppState.currentPage = pageName;
+    
+    // Aggiorna il contenuto della pagina corrente in base allo stato di login
+    const isLoggedIn = AppState.isLoggedIn;
+    if (pageName === 'amici') {
+        renderAmici([], isLoggedIn);
+    } else if (pageName === 'nemici') {
+        renderNemici([], isLoggedIn);
+    } else if (pageName === 'personaggi') {
+        renderPersonaggi([], isLoggedIn);
+    }
 }
 
 // Modal Functions
