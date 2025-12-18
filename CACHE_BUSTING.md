@@ -17,7 +17,7 @@ Aggiunti meta tag nell'`<head>` per disabilitare la cache durante lo sviluppo:
 Aggiunto parametro `?v=1.0` agli script e CSS:
 - `styles.css?v=1.0`
 - `app.js?v=1.0`
-- `firebase-config.js?v=1.0`
+- `supabase-config.js?v=1.0`
 
 **Per aggiornare dopo modifiche:**
 Cambia il numero di versione (es. `?v=1.1`) per forzare il reload.

@@ -1,64 +1,53 @@
-// Firebase Auth - Compat version (no ES modules)
-// Firebase is loaded via script tags, so it's available globally as 'firebase'
-// auth and googleProvider are declared in firebase-config-compat.js
-let firebaseReady = false;
+// Supabase - Database relazionale PostgreSQL
+// Supabase client è disponibile globalmente da supabase-config.js
+let supabaseReady = false;
 
-// Initialize Firebase (runs after firebase-config-compat.js loads)
-function initFirebase() {
+// Initialize Supabase (runs after supabase-config.js loads)
+function initSupabase() {
     try {
-        if (typeof firebase === 'undefined') {
-            console.error('❌ Firebase non disponibile. Assicurati che gli script siano caricati.');
+        if (typeof window.supabase === 'undefined' || typeof window.supabaseClient === 'undefined') {
+            console.error('❌ Supabase non disponibile. Assicurati che gli script siano caricati.');
             return false;
         }
 
-        // Check if auth and googleProvider are available from firebase-config-compat.js
-        if (typeof auth === 'undefined' || typeof googleProvider === 'undefined') {
-            console.warn('⚠️ auth o googleProvider non disponibili da firebase-config-compat.js');
-            // Try to get them directly from firebase
-            if (typeof window.auth === 'undefined') {
-                window.auth = firebase.auth();
-            }
-            if (typeof window.googleProvider === 'undefined') {
-                window.googleProvider = new firebase.auth.GoogleAuthProvider();
-                window.googleProvider.setCustomParameters({
-                    prompt: 'select_account'
-                });
-            }
-        }
-
-        firebaseReady = true;
-        console.log('✅ Firebase (Compat) inizializzato correttamente');
-        console.log('Auth disponibile:', !!(typeof auth !== 'undefined' ? auth : window.auth));
+        supabaseReady = true;
+        console.log('✅ Supabase inizializzato correttamente');
+        console.log('Supabase client disponibile:', !!window.supabaseClient);
         return true;
     } catch (error) {
-        console.error('❌ Errore nell\'inizializzazione Firebase:', error);
-        firebaseReady = false;
+        console.error('❌ Errore nell\'inizializzazione Supabase:', error);
+        supabaseReady = false;
         return false;
     }
 }
 
-// Wait for DOM and Firebase to be ready
-function waitForFirebase() {
+// Wait for DOM and Supabase to be ready
+function waitForSupabase() {
     return new Promise((resolve) => {
-        if (typeof firebase !== 'undefined' && firebase.auth && (typeof auth !== 'undefined' || typeof window.auth !== 'undefined')) {
-            resolve(initFirebase());
+        if (typeof window.supabase !== 'undefined' && typeof window.supabaseClient !== 'undefined') {
+            resolve(initSupabase());
         } else {
             // Wait a bit and retry
             let attempts = 0;
             const maxAttempts = 50; // 5 secondi totali (50 * 100ms)
             const checkInterval = setInterval(() => {
                 attempts++;
-                if (typeof firebase !== 'undefined' && firebase.auth && (typeof auth !== 'undefined' || typeof window.auth !== 'undefined')) {
+                if (typeof window.supabase !== 'undefined' && typeof window.supabaseClient !== 'undefined') {
                     clearInterval(checkInterval);
-                    resolve(initFirebase());
+                    resolve(initSupabase());
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
-                    console.warn('⏱️ Timeout attesa Firebase, continuo comunque...');
+                    console.warn('⏱️ Timeout attesa Supabase, continuo comunque...');
                     resolve(false);
                 }
             }, 100);
         }
     });
+}
+
+// Helper per ottenere il client Supabase
+function getSupabaseClient() {
+    return window.supabaseClient;
 }
 
 console.log('📦 app.js caricato');
@@ -143,51 +132,57 @@ async function init() {
     // Load saved theme
     loadTheme();
     
-    // Setup event listeners immediately (don't wait for Firebase)
+    // Setup event listeners immediately (don't wait for Supabase)
     console.log('🔧 Setup event listeners...');
     setupEventListeners();
     console.log('📄 Navigazione alla pagina iniziale...');
     navigateToPage('campagne');
     
-    // Wait for Firebase to be ready (in background, non-blocking)
-    waitForFirebase().then((success) => {
+    // Wait for Supabase to be ready (in background, non-blocking)
+    waitForSupabase().then((success) => {
         if (success) {
-            console.log('✅ Firebase pronto, setup auth...');
-            setupFirebaseAuth();
-            // Setup Firestore after auth is ready
-            setupFirestore();
+            console.log('✅ Supabase pronto, setup auth...');
+            setupSupabaseAuth();
+            // Load initial data after auth is ready
+            checkAuthState();
         } else {
-            console.warn('⚠️ Firebase non disponibile, app continua senza autenticazione');
+            console.warn('⚠️ Supabase non disponibile, app continua senza autenticazione');
         }
     }).catch((error) => {
-        console.error('❌ Errore nell\'attesa Firebase:', error);
-        // Continue anyway - app works without Firebase
+        console.error('❌ Errore nell\'attesa Supabase:', error);
+        // Continue anyway - app works without Supabase
     });
 }
 
-// Setup Firebase Auth listeners
-function setupFirebaseAuth() {
-    // Get auth from global scope (from firebase-config-compat.js)
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+// Setup Supabase Auth listeners
+function setupSupabaseAuth() {
+    const supabase = getSupabaseClient();
     
-    if (!currentAuth || !firebase.auth) {
-        console.warn('⚠️ Firebase Auth non disponibile. L\'app funzionerà senza autenticazione.');
+    if (!supabase) {
+        console.warn('⚠️ Supabase non disponibile. L\'app funzionerà senza autenticazione.');
         return;
     }
 
     try {
-        // Listen for auth state changes (compat version)
-        currentAuth.onAuthStateChanged((user) => {
-            if (user) {
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('🔄 Auth state changed:', event, session?.user?.email || 'null');
+            
+            if (session?.user) {
                 // User is signed in
                 AppState.currentUser = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName || user.email.split('@')[0]
+                    uid: session.user.id,
+                    email: session.user.email,
+                    displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Utente'
                 };
                 AppState.isLoggedIn = true;
                 updateUIForLoggedIn();
-                console.log('✅ Utente autenticato:', user.email);
+                console.log('✅ Utente autenticato:', session.user.email);
+                
+                // Initialize user document and load campagne
+                initializeUserDocument(session.user).then(() => {
+                    loadCampagne(session.user.id);
+                });
             } else {
                 // User is signed out
                 AppState.currentUser = null;
@@ -197,7 +192,34 @@ function setupFirebaseAuth() {
             }
         });
     } catch (error) {
-        console.error('❌ Errore nel setup Firebase Auth:', error);
+        console.error('❌ Errore nel setup Supabase Auth:', error);
+    }
+}
+
+// Check current auth state
+async function checkAuthState() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        if (session?.user) {
+            AppState.currentUser = {
+                uid: session.user.id,
+                email: session.user.email,
+                displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Utente'
+            };
+            AppState.isLoggedIn = true;
+            updateUIForLoggedIn();
+            await initializeUserDocument(session.user);
+            loadCampagne(session.user.id);
+        } else {
+            updateUIForLoggedOut();
+        }
+    } catch (error) {
+        console.error('❌ Errore nel controllo stato auth:', error);
     }
 }
 
@@ -684,94 +706,38 @@ async function setTheme(theme, save = true) {
         localStorage.setItem('theme', theme);
         console.log('✅ Tema salvato in localStorage:', theme);
         
-        // Save to Firestore if user is logged in
+        // Save to Supabase if user is logged in
         if (AppState.isLoggedIn && AppState.currentUser) {
-            const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-            const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+            const supabase = getSupabaseClient();
             
-            if (currentFirestore && currentAuth && currentAuth.currentUser) {
+            if (supabase) {
                 try {
                     const temaScuro = theme === 'dark';
-                    // Cerca il documento per uid
-                    const userDoc = await findUserDocumentByUid(currentFirestore, currentAuth.currentUser.uid);
+                    // Aggiorna il tema dell'utente
+                    const { error } = await supabase
+                        .from('utenti')
+                        .update({ tema_scuro: temaScuro })
+                        .eq('uid', AppState.currentUser.uid);
                     
-                    if (userDoc) {
-                        const userRef = currentFirestore.collection('Utenti').doc(userDoc.docId);
-                        await userRef.update({ tema_scuro: temaScuro });
-                        console.log('✅ Tema salvato in Firestore:', temaScuro);
-                    } else {
-                        console.warn('⚠️ Documento utente non trovato per salvare tema');
-                    }
+                    if (error) throw error;
+                    console.log('✅ Tema salvato in Supabase:', temaScuro);
                 } catch (error) {
-                    console.error('❌ Errore nel salvataggio tema in Firestore:', error);
+                    console.error('❌ Errore nel salvataggio tema in Supabase:', error);
                 }
             }
         }
     }
 }
 
-// Firestore - Campagne Management
-let campagneUnsubscribe = null;
+// Supabase - Campagne Management
+let campagneChannel = null;
 let editingCampagnaId = null;
 
-function setupFirestore() {
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-    
-    if (!currentAuth || !currentFirestore) {
-        console.warn('⚠️ Firestore non disponibile');
-        return;
-    }
-
-    // Listen for auth state changes to load campagne and initialize user
-    currentAuth.onAuthStateChanged(async (user) => {
-        console.log('🔄 Auth state changed:', user ? user.uid : 'null');
-        if (user) {
-            console.log('✅ Utente autenticato, inizializzo documento utente e carico campagne per:', user.uid);
-            
-            // Wait for auth token to be ready (especially important on desktop)
-            try {
-                // Force token refresh to ensure it's valid
-                const token = await user.getIdToken(true);
-                console.log('🔑 Token ottenuto, lunghezza:', token ? token.length : 0);
-                
-                // Initialize or update user document in Firestore
-                await initializeUserDocument(user);
-                
-                // Additional delay for desktop to ensure everything is synced
-                const isDesktop = window.innerWidth > 768;
-                const delay = isDesktop ? 300 : 100;
-                
-                setTimeout(() => {
-                    console.log('📚 Chiamata loadCampagne dopo delay di', delay, 'ms');
-                    loadCampagne(user.uid);
-                }, delay);
-            } catch (error) {
-                console.error('❌ Errore nel recupero token:', error);
-                // Retry after a longer delay
-                setTimeout(async () => {
-                    await initializeUserDocument(user);
-                    loadCampagne(user.uid);
-                }, 500);
-            }
-        } else {
-            console.log('👤 Utente non autenticato, mostro messaggio login');
-            // Clear campagne when logged out
-            if (campagneUnsubscribe) {
-                campagneUnsubscribe();
-                campagneUnsubscribe = null;
-            }
-            renderCampagne([], false); // false = utente non loggato
-        }
-    });
-}
-
 async function loadCampagne(userId) {
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentFirestore) {
-        console.error('❌ Firestore non disponibile');
+    if (!supabase) {
+        console.error('❌ Supabase non disponibile');
         return;
     }
 
@@ -780,155 +746,80 @@ async function loadCampagne(userId) {
         return;
     }
 
-    // Verify user is authenticated
-    if (!currentAuth) {
-        console.error('❌ Auth non disponibile');
-        return;
-    }
-    
-    const currentUser = currentAuth.currentUser;
-    if (!currentUser) {
-        console.error('❌ Utente non autenticato al momento della query');
-        console.log('userId richiesto:', userId);
-        console.log('Stato auth:', currentAuth);
-        // Try to get the user again
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const retryUser = currentAuth.currentUser;
-        if (!retryUser) {
-            console.error('❌ Utente ancora non disponibile dopo retry');
-            return;
-        }
-        console.log('✅ Utente recuperato dopo retry:', retryUser.uid);
-    }
-    
-    const finalUser = currentAuth.currentUser;
-    if (finalUser.uid !== userId) {
-        console.error('❌ userId non corrisponde all\'utente autenticato');
-        console.log('userId fornito:', userId);
-        console.log('uid utente:', finalUser.uid);
-        return;
-    }
-    
-    // Verify token is valid
-    try {
-        const token = await finalUser.getIdToken();
-        console.log('✅ Token valido verificato, lunghezza:', token ? token.length : 0);
-    } catch (error) {
-        console.error('❌ Errore nel recupero token:', error);
-        // Try to refresh
-        try {
-            await finalUser.getIdToken(true);
-            console.log('✅ Token aggiornato');
-        } catch (refreshError) {
-            console.error('❌ Errore nell\'aggiornamento token:', refreshError);
-            return;
-        }
-    }
-    
-    console.log('✅ Utente autenticato verificato:', finalUser.uid);
-
-    console.log('📚 Caricamento campagne per utente:', userId);
-    
-    // Unsubscribe from previous listener if exists
-    if (campagneUnsubscribe) {
-        campagneUnsubscribe();
-    }
-
-    // Listen to real-time updates
-    // Note: We filter by userId in the query, but document ID is nome_campagna
-    // Try query first, if it fails due to permissions, fallback to loading all and filtering client-side
-    try {
-        campagneUnsubscribe = currentFirestore
-            .collection('Campagne')
-            .where('userId', '==', userId)
-            .onSnapshot(
-                (snapshot) => {
-                    const campagne = [];
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        // Double-check userId on client side for security
-                        if (data.userId === userId) {
-                            campagne.push({
-                                id: doc.id,
-                                ...data
-                            });
-                        }
-                    });
-                    console.log('✅ Campagne caricate:', campagne.length);
-                    renderCampagne(campagne, true);
-                },
-                (error) => {
-                    console.error('❌ Errore nel caricamento campagne:', error);
-                    console.error('Codice errore:', error.code);
-                    console.error('Messaggio errore:', error.message);
-                    
-                    if (error.code === 'permission-denied') {
-                        console.warn('⚠️ Permission denied con query where, provo fallback');
-                        console.warn('⚠️ Verifica che le regole Firestore permettano read a utenti autenticati');
-                        // Fallback: try to load all campaigns and filter client-side
-                        // This requires more permissive rules but works as a workaround
-                        loadCampagneFallback(userId, currentFirestore);
-                    } else {
-                        console.error('❌ Errore diverso da permission-denied:', error);
-                        showNotification('Errore nel caricamento delle campagne: ' + error.message);
-                    }
-                }
-            );
-    } catch (error) {
-        console.error('❌ Errore nella creazione listener:', error);
-        loadCampagneFallback(userId, currentFirestore);
-    }
-}
-
-// Fallback method: load all campaigns and filter client-side
-function loadCampagneFallback(userId, currentFirestore) {
-    console.log('🔄 Fallback: carico tutte le campagne e filtro per userId:', userId);
-    
-    if (campagneUnsubscribe) {
-        campagneUnsubscribe();
-    }
-    
-    // Verify user is still authenticated
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-    if (!currentAuth || !currentAuth.currentUser) {
-        console.error('❌ Utente non autenticato durante fallback');
+    // Verifica che l'utente sia autenticato
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session || session.user.id !== userId) {
+        console.error('❌ Utente non autenticato o userId non corrisponde');
         renderCampagne([], false);
         return;
     }
+
+    console.log('📚 Caricamento campagne per utente:', userId);
     
-    console.log('✅ Utente autenticato, procedo con fallback');
-    
-    campagneUnsubscribe = currentFirestore
-        .collection('Campagne')
-        .onSnapshot(
-            (snapshot) => {
-                const campagne = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // Filter by userId on client side
-                    if (data.userId === userId) {
-                        campagne.push({
-                            id: doc.id,
-                            ...data
-                        });
+    // Disconnetti da eventuali subscription precedenti
+    if (campagneChannel) {
+        supabase.removeChannel(campagneChannel);
+        campagneChannel = null;
+    }
+
+    // Carica inizialmente le campagne
+    try {
+        // Prima trova l'utente nella tabella utenti per ottenere l'ID
+        const { data: utente, error: utenteError } = await supabase
+            .from('utenti')
+            .select('id')
+            .eq('uid', userId)
+            .single();
+
+        if (utenteError || !utente) {
+            console.error('❌ Utente non trovato nella tabella utenti:', utenteError);
+            renderCampagne([], false);
+            return;
+        }
+
+        // Carica le campagne
+        const { data: campagne, error } = await supabase
+            .from('campagne')
+            .select('*')
+            .eq('user_id', utente.id)
+            .order('data_creazione', { ascending: false });
+
+        if (error) throw error;
+
+        console.log('✅ Campagne caricate:', campagne?.length || 0);
+        renderCampagne(campagne || [], true);
+
+        // Setup real-time subscription
+        campagneChannel = supabase
+            .channel('campagne-changes')
+            .on('postgres_changes', 
+                { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: 'campagne',
+                    filter: `user_id=eq.${utente.id}`
+                }, 
+                async (payload) => {
+                    console.log('🔄 Cambio rilevato nelle campagne:', payload);
+                    // Ricarica le campagne
+                    const { data: updatedCampagne, error: reloadError } = await supabase
+                        .from('campagne')
+                        .select('*')
+                        .eq('user_id', utente.id)
+                        .order('data_creazione', { ascending: false });
+                    
+                    if (!reloadError && updatedCampagne) {
+                        renderCampagne(updatedCampagne, true);
                     }
-                });
-                console.log('✅ Campagne caricate (fallback):', campagne.length);
-                renderCampagne(campagne, true);
-            },
-            (error) => {
-                console.error('❌ Errore anche nel fallback:', error);
-                console.error('Codice errore fallback:', error.code);
-                console.error('Messaggio errore fallback:', error.message);
-                
-                if (error.code === 'permission-denied') {
-                    console.error('❌ Le regole Firestore non permettono la lettura. Configura le regole come da FIREBASE_SETUP.md');
-                    showNotification('Errore: configura le regole Firestore nella Firebase Console. Vedi FIREBASE_SETUP.md per le istruzioni.');
-                } else {
-                    showNotification('Errore nel caricamento delle campagne: ' + error.message);
                 }
-            }
-        );
+            )
+            .subscribe();
+
+    } catch (error) {
+        console.error('❌ Errore nel caricamento campagne:', error);
+        showNotification('Errore nel caricamento delle campagne: ' + error.message);
+        renderCampagne([], false);
+    }
 }
 
 function renderCampagne(campagne, isLoggedIn = true) {
@@ -955,13 +846,13 @@ function renderCampagne(campagne, isLoggedIn = true) {
     }
 
     elements.campagneList.innerHTML = campagne.map(campagna => {
-        const dataCreazione = campagna.data_creazione?.toDate ? 
-            new Date(campagna.data_creazione.toDate()).toLocaleDateString('it-IT') : 
+        const dataCreazione = campagna.data_creazione ? 
+            new Date(campagna.data_creazione).toLocaleDateString('it-IT') : 
             'N/A';
         const tempoGioco = campagna.tempo_di_gioco ? 
             formatTempoGioco(campagna.tempo_di_gioco) : 
             '0 min';
-        const note = campagna.note && campagna.note.length > 0 ? 
+        const note = campagna.note && Array.isArray(campagna.note) && campagna.note.length > 0 ? 
             campagna.note.join(', ') : 
             'Nessuna nota';
 
@@ -1030,175 +921,110 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Firestore - Utenti Management
+// Supabase - Utenti Management
 /**
- * Genera un CID univoco a 4 cifre (1000-9999)
+ * Genera un CID univoco a 4 cifre (1000-9999) usando la funzione SQL
  */
 async function generateUniqueCid() {
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentFirestore) {
-        console.error('❌ Firestore non disponibile per generare CID');
+    if (!supabase) {
+        console.error('❌ Supabase non disponibile per generare CID');
         // Fallback: genera un numero casuale
         return Math.floor(1000 + Math.random() * 9000);
     }
     
-    let attempts = 0;
-    const maxAttempts = 10;
-    
-    while (attempts < maxAttempts) {
-        const cid = Math.floor(1000 + Math.random() * 9000);
-        
-        try {
-            // Verifica se il CID esiste già
-            const snapshot = await currentFirestore
-                .collection('Utenti')
-                .where('cid', '==', cid)
-                .limit(1)
-                .get();
-            
-            if (snapshot.empty) {
-                console.log('✅ CID generato e verificato come univoco:', cid);
-                return cid;
-            }
-            
-            attempts++;
-            console.log(`⚠️ CID ${cid} già esistente, tentativo ${attempts}/${maxAttempts}`);
-        } catch (error) {
-            console.error('❌ Errore nel controllo CID:', error);
-            console.error('Codice errore:', error.code);
-            console.error('Messaggio errore:', error.message);
-            
-            // Se è un errore di permessi, genera un CID senza verificare l'unicità
-            if (error.code === 'permission-denied') {
-                console.warn('⚠️ Permessi insufficienti per verificare CID, uso CID generato senza verifica:', cid);
-                return cid;
-            }
-            
-            // Per altri errori, riprova o usa fallback
-            if (attempts >= maxAttempts - 1) {
-                console.warn('⚠️ Troppi errori, uso CID generato senza verifica:', cid);
-                return cid;
-            }
-            
-            attempts++;
-        }
-    }
-    
-    // Se dopo 10 tentativi non troviamo un CID univoco, usa l'ultimo generato
-    // (estremamente improbabile, ma meglio avere un fallback)
-    const fallbackCid = Math.floor(1000 + Math.random() * 9000);
-    console.warn('⚠️ Usando CID fallback dopo', maxAttempts, 'tentativi:', fallbackCid);
-    return fallbackCid;
-}
-
-/**
- * Normalizza il nome utente per usarlo nel document ID (rimuove caratteri speciali)
- */
-function normalizeNomeUtente(nome) {
-    return nome
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '_') // Sostituisce caratteri speciali con underscore
-        .replace(/_+/g, '_') // Rimuove underscore multipli
-        .replace(/^_|_$/g, ''); // Rimuove underscore all'inizio e alla fine
-}
-
-/**
- * Trova il documento utente per uid
- */
-async function findUserDocumentByUid(firestore, uid) {
     try {
-        const snapshot = await firestore
-            .collection('Utenti')
-            .where('uid', '==', uid)
-            .limit(1)
-            .get();
+        // Usa la funzione SQL per generare un CID univoco
+        const { data, error } = await supabase.rpc('generate_unique_cid');
         
-        if (!snapshot.empty) {
-            const doc = snapshot.docs[0];
-            return { doc: doc, data: doc.data(), docId: doc.id };
-        }
-        return null;
+        if (error) throw error;
+        
+        console.log('✅ CID generato dalla funzione SQL:', data);
+        return data;
     } catch (error) {
-        console.error('❌ Errore nella ricerca documento utente per uid:', error);
-        return null;
+        console.error('❌ Errore nella generazione CID, uso fallback:', error);
+        // Fallback: genera un numero casuale
+        return Math.floor(1000 + Math.random() * 9000);
     }
 }
 
 /**
- * Inizializza o aggiorna il documento utente in Firestore
+ * Trova l'utente per uid
  */
-async function initializeUserDocument(user) {
-    console.log('🔧 Inizializzazione documento utente per:', user ? user.uid : 'null');
+async function findUserByUid(uid) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
     
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-    
-    if (!currentFirestore || !user || !currentAuth) {
-        console.error('❌ Firestore, utente o auth non disponibile per inizializzare documento utente');
-        console.log('Firestore disponibile:', !!currentFirestore);
-        console.log('User disponibile:', !!user);
-        console.log('Auth disponibile:', !!currentAuth);
-        return null;
-    }
-    
-    // Verifica che l'utente sia completamente autenticato e che il token sia valido
     try {
-        console.log('🔑 Verifica token di autenticazione...');
-        const token = await user.getIdToken(true); // Force refresh
-        console.log('✅ Token valido, lunghezza:', token ? token.length : 0);
+        const { data, error } = await supabase
+            .from('utenti')
+            .select('*')
+            .eq('uid', uid)
+            .single();
         
-        // Verifica che currentUser corrisponda
-        const currentUser = currentAuth.currentUser;
-        if (!currentUser || currentUser.uid !== user.uid) {
-            console.warn('⚠️ currentUser non corrisponde, attendo...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const retryUser = currentAuth.currentUser;
-            if (!retryUser || retryUser.uid !== user.uid) {
-                console.error('❌ currentUser ancora non corrisponde dopo retry');
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // Nessun risultato trovato
                 return null;
             }
+            throw error;
         }
-    } catch (tokenError) {
-        console.error('❌ Errore nel recupero token:', tokenError);
+        
+        return data;
+    } catch (error) {
+        console.error('❌ Errore nella ricerca utente per uid:', error);
+        return null;
+    }
+}
+
+/**
+ * Inizializza o aggiorna l'utente in Supabase
+ */
+async function initializeUserDocument(user) {
+    console.log('🔧 Inizializzazione utente per:', user ? user.id : 'null');
+    
+    const supabase = getSupabaseClient();
+    
+    if (!supabase || !user) {
+        console.error('❌ Supabase o utente non disponibile per inizializzare utente');
         return null;
     }
     
-    // Piccolo delay per assicurarsi che tutto sia propagato
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
     try {
-        console.log('📄 Controllo documento utente esistente...');
-        // Cerca il documento per uid
-        const existingUser = await findUserDocumentByUid(currentFirestore, user.uid);
+        console.log('📄 Controllo utente esistente...');
+        // Cerca l'utente per uid (user.id è l'UUID di Supabase Auth)
+        const existingUser = await findUserByUid(user.id);
         
         const currentTheme = localStorage.getItem('theme') || 'light';
         const temaScuro = currentTheme === 'dark';
-        const nomeUtente = user.displayName || user.email.split('@')[0] || 'Utente';
+        const nomeUtente = user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Utente';
         
         if (existingUser) {
-            console.log('✅ Documento utente già esistente, aggiorno...');
+            console.log('✅ Utente già esistente, aggiorno...');
             // Utente esistente: aggiorna solo i campi che potrebbero essere cambiati
-            const existingData = existingUser.data;
-            const userRef = currentFirestore.collection('Utenti').doc(existingUser.docId);
+            const { data, error } = await supabase
+                .from('utenti')
+                .update({
+                    email: user.email,
+                    nome_utente: nomeUtente,
+                    tema_scuro: temaScuro
+                })
+                .eq('uid', user.id)
+                .select()
+                .single();
             
-            const updateData = {
-                email: user.email,
-                nome_utente: nomeUtente,
-                tema_scuro: temaScuro
-            };
+            if (error) throw error;
             
-            // Aggiorna solo se necessario
-            await userRef.update(updateData);
-            console.log('✅ Documento utente aggiornato:', existingUser.docId);
+            console.log('✅ Utente aggiornato');
             
             // Carica i dati utente per applicare il tema
-            await loadUserData(user.uid);
+            await loadUserData(user.id);
             
-            return existingData;
+            return data;
         } else {
-            console.log('🆕 Nuovo utente, creo documento...');
-            // Nuovo utente: crea documento completo
+            console.log('🆕 Nuovo utente, creo record...');
+            // Nuovo utente: crea record completo
             console.log('🔢 Generazione CID...');
             let cid;
             try {
@@ -1211,41 +1037,26 @@ async function initializeUserDocument(user) {
                 console.log('⚠️ Usando CID fallback:', cid);
             }
             
-            const nomeNormalizzato = normalizeNomeUtente(nomeUtente);
-            const docId = `utente_${cid}_${nomeNormalizzato}`;
-            
             const userData = {
-                uid: user.uid, // Aggiungiamo uid per poter cercare l'utente
+                uid: user.id, // UUID di Supabase Auth
                 cid: cid,
                 nome_utente: nomeUtente,
                 email: user.email,
-                campagne: 0,
-                personaggi: [],
-                mostri: [],
                 tema_scuro: temaScuro
             };
             
-            console.log('💾 Salvataggio documento utente con ID:', docId);
+            console.log('💾 Salvataggio utente...');
             console.log('📋 Dati:', userData);
-            console.log('🔐 Verifica autenticazione prima del salvataggio...');
             
-            // Verifica nuovamente l'autenticazione prima di salvare
-            const verifyToken = await user.getIdToken();
-            if (!verifyToken) {
-                throw new Error('Token di autenticazione non disponibile');
-            }
+            const { data, error } = await supabase
+                .from('utenti')
+                .insert(userData)
+                .select()
+                .single();
             
-            const userRef = currentFirestore.collection('Utenti').doc(docId);
-            await userRef.set(userData);
-            console.log('✅ Nuovo documento utente creato con successo:', docId, 'CID:', cid);
+            if (error) throw error;
             
-            // Verifica che il documento sia stato creato
-            const verifyDoc = await userRef.get();
-            if (verifyDoc.exists) {
-                console.log('✅ Verifica: documento utente presente in Firestore');
-            } else {
-                console.error('❌ Verifica fallita: documento utente non presente dopo la creazione');
-            }
+            console.log('✅ Nuovo utente creato con successo, CID:', cid);
             
             // Applica il tema
             if (temaScuro) {
@@ -1254,107 +1065,51 @@ async function initializeUserDocument(user) {
                 setTheme('light', false);
             }
             
-            return userData;
+            return data;
         }
     } catch (error) {
-        console.error('❌ Errore nell\'inizializzazione documento utente:', error);
-        console.error('Codice errore:', error.code);
+        console.error('❌ Errore nell\'inizializzazione utente:', error);
         console.error('Messaggio errore:', error.message);
-        console.error('Stack trace:', error.stack);
         
-        // Se è un errore di permessi, mostra un messaggio più chiaro
-        if (error.code === 'permission-denied') {
-            console.error('⚠️ ERRORE DI PERMESSI FIRESTORE');
-            console.error('📋 Per risolvere:');
-            console.error('1. Vai su https://console.firebase.google.com/');
-            console.error('2. Seleziona il tuo progetto');
-            console.error('3. Vai su Firestore Database > Regole');
-            console.error('4. Copia le regole dal file FIRESTORE_RULES.txt');
-            console.error('5. Pubblica le regole');
-            console.error('6. Ricarica la pagina');
-            
-            // Mostra anche una notifica all'utente
-            showNotification('⚠️ Errore di permessi Firestore. Controlla la console per i dettagli.');
-        }
+        showNotification('⚠️ Errore nell\'inizializzazione profilo. Controlla la console per i dettagli.');
         
         return null;
     }
 }
 
 /**
- * Carica i dati utente da Firestore e applica le preferenze (es. tema)
+ * Carica i dati utente da Supabase e applica le preferenze (es. tema)
  */
 async function loadUserData(userId) {
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentFirestore || !userId) {
-        console.warn('⚠️ Firestore o userId non disponibile per caricare dati utente');
+    if (!supabase || !userId) {
+        console.warn('⚠️ Supabase o userId non disponibile per caricare dati utente');
         return null;
     }
     
     try {
-        // Cerca il documento per uid
-        const userDoc = await findUserDocumentByUid(currentFirestore, userId);
+        const userData = await findUserByUid(userId);
         
-        if (userDoc) {
-            const userData = userDoc.data;
+        if (userData) {
             console.log('✅ Dati utente caricati:', userData);
             
             // Applica il tema se presente
             if (userData.tema_scuro !== undefined) {
                 const theme = userData.tema_scuro ? 'dark' : 'light';
-                setTheme(theme, false); // false = non salvare in localStorage (già salvato in Firestore)
+                setTheme(theme, false); // false = non salvare in localStorage (già salvato in Supabase)
                 // Aggiorna localStorage per coerenza
                 localStorage.setItem('theme', theme);
             }
             
             return userData;
         } else {
-            console.warn('⚠️ Documento utente non trovato per:', userId);
+            console.warn('⚠️ Utente non trovato per:', userId);
             return null;
         }
     } catch (error) {
         console.error('❌ Errore nel caricamento dati utente:', error);
         return null;
-    }
-}
-
-/**
- * Aggiorna il campo campagne dell'utente
- */
-async function updateUserCampagneCount(userId, increment = true) {
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-    
-    if (!currentFirestore || !userId) {
-        console.warn('⚠️ Firestore o userId non disponibile per aggiornare conteggio campagne');
-        return;
-    }
-    
-    try {
-        // Cerca il documento per uid
-        const userDoc = await findUserDocumentByUid(currentFirestore, userId);
-        
-        if (!userDoc) {
-            console.warn('⚠️ Documento utente non trovato per aggiornare conteggio campagne:', userId);
-            return;
-        }
-        
-        const userRef = currentFirestore.collection('Utenti').doc(userDoc.docId);
-        
-        if (increment) {
-            await userRef.update({
-                campagne: firebase.firestore.FieldValue.increment(1)
-            });
-            console.log('✅ Conteggio campagne incrementato per utente:', userId);
-        } else {
-            // Decrementa (quando si elimina una campagna)
-            await userRef.update({
-                campagne: firebase.firestore.FieldValue.increment(-1)
-            });
-            console.log('✅ Conteggio campagne decrementato per utente:', userId);
-        }
-    } catch (error) {
-        console.error('❌ Errore nell\'aggiornamento conteggio campagne:', error);
     }
 }
 
@@ -1636,68 +1391,80 @@ async function handleCampagnaSubmit(e) {
         return;
     }
 
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentAuth || !currentFirestore) {
-        showNotification('Errore: Firestore non disponibile');
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
         return;
     }
 
-    const user = currentAuth.currentUser;
-    if (!user) {
+    // Verifica che l'utente sia autenticato
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.user) {
         showNotification('Errore: utente non autenticato');
         return;
     }
 
-    // Get icon data
-    let iconaData = null;
-    if (uploadedImageData) {
-        iconaData = {
-            type: 'image',
-            data: uploadedImageData
-        };
-    } else if (selectedIconName) {
-        iconaData = {
-            type: 'predefined',
-            name: selectedIconName
-        };
+    // Trova l'utente nella tabella utenti per ottenere l'ID
+    const utente = await findUserByUid(session.user.id);
+    if (!utente) {
+        showNotification('Errore: profilo utente non trovato');
+        return;
     }
 
-    const formData = {
-        nome_campagna: document.getElementById('nomeCampagna').value.trim(),
-        icona: iconaData,
+    // Get icon data
+    const iconaType = uploadedImageData ? 'image' : 'predefined';
+    const iconaName = selectedIconName || null;
+    const iconaData = uploadedImageData || null;
+
+    const nomeCampagna = document.getElementById('nomeCampagna').value.trim();
+    if (!nomeCampagna) {
+        showNotification('Inserisci un nome per la campagna');
+        return;
+    }
+
+    const campagnaData = {
+        nome_campagna: nomeCampagna,
+        user_id: utente.id,
+        icona_type: iconaType,
+        icona_name: iconaName,
+        icona_data: iconaData,
         nome_dm: '',
         numero_giocatori: 0,
         numero_sessioni: 0,
         tempo_di_gioco: 0,
-        note: [],
-        userId: user.uid
+        note: []
     };
-
-    // Add data_creazione only for new campaigns
-    if (!editingCampagnaId) {
-        formData.data_creazione = firebase.firestore.FieldValue.serverTimestamp();
-    }
 
     try {
         if (editingCampagnaId) {
-            // Update existing campagna - keep same document ID
-            await currentFirestore.collection('Campagne').doc(editingCampagnaId).update(formData);
+            // Update existing campagna
+            const { error } = await supabase
+                .from('campagne')
+                .update(campagnaData)
+                .eq('id', editingCampagnaId);
+            
+            if (error) throw error;
             showNotification('Campagna aggiornata con successo!');
         } else {
-            // Create new campagna - use nome_campagna as document ID (as specified)
-            const docId = formData.nome_campagna;
-            await currentFirestore.collection('Campagne').doc(docId).set(formData);
-            showNotification('Campagna creata con successo!');
+            // Create new campagna
+            const { error } = await supabase
+                .from('campagne')
+                .insert(campagnaData);
             
-            // Incrementa il conteggio campagne dell'utente
-            await updateUserCampagneCount(user.uid, true);
+            if (error) {
+                // Se è un errore di unique constraint, significa che esiste già una campagna con questo nome
+                if (error.code === '23505') {
+                    throw new Error('Esiste già una campagna con questo nome');
+                }
+                throw error;
+            }
+            showNotification('Campagna creata con successo!');
         }
         closeCampagnaModal();
     } catch (error) {
         console.error('Errore nel salvataggio campagna:', error);
-        showNotification('Errore nel salvataggio della campagna: ' + error.message);
+        showNotification('Errore nel salvataggio della campagna: ' + (error.message || error));
     }
 }
 
@@ -1711,27 +1478,25 @@ window.deleteCampagna = async function(campagnaId) {
         return;
     }
 
-    const currentFirestore = typeof firestore !== 'undefined' ? firestore : (typeof window.firestore !== 'undefined' ? window.firestore : null);
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentFirestore) {
-        showNotification('Errore: Firestore non disponibile');
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
         return;
     }
 
-    const user = currentAuth ? currentAuth.currentUser : null;
-
     try {
-        await currentFirestore.collection('Campagne').doc(campagnaId).delete();
-        showNotification('Campagna eliminata con successo!');
+        const { error } = await supabase
+            .from('campagne')
+            .delete()
+            .eq('id', campagnaId);
         
-        // Decrementa il conteggio campagne dell'utente se loggato
-        if (user) {
-            await updateUserCampagneCount(user.uid, false);
-        }
+        if (error) throw error;
+        
+        showNotification('Campagna eliminata con successo!');
     } catch (error) {
         console.error('Errore nell\'eliminazione campagna:', error);
-        showNotification('Errore nell\'eliminazione della campagna: ' + error.message);
+        showNotification('Errore nell\'eliminazione della campagna: ' + (error.message || error));
     }
 };
 
@@ -1810,15 +1575,14 @@ async function handleLogin(e) {
         return;
     }
 
-    // Verifica che Firebase sia disponibile
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
+    // Verifica che Supabase sia disponibile
+    const supabase = getSupabaseClient();
     
-    if (!firebaseReady || !currentAuth || typeof firebase === 'undefined') {
+    if (!supabaseReady || !supabase) {
         showError('Autenticazione non disponibile. Ricarica la pagina.');
-        console.error('Auth non disponibile:', {
-            firebaseReady,
-            auth: !!currentAuth,
-            firebase: typeof firebase
+        console.error('Supabase non disponibile:', {
+            supabaseReady,
+            supabase: !!supabase
         });
         return;
     }
@@ -1829,75 +1593,74 @@ async function handleLogin(e) {
         elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrazione...' : 'Accesso...';
 
         console.log(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
-
-        const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
         
         if (AppState.isRegisterMode) {
-            // Register new user (compat version)
-            const userCredential = await currentAuth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            console.log('✅ Utente registrato con successo:', user.uid, user.email);
+            // Register new user
+            const nickname = document.getElementById('nickname')?.value.trim() || '';
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        display_name: nickname || email.split('@')[0],
+                        full_name: nickname || email.split('@')[0]
+                    }
+                }
+            });
             
-            // Inizializza documento utente immediatamente dopo la registrazione
-            console.log('🔧 Inizializzazione documento utente dopo registrazione...');
-            try {
-                await initializeUserDocument(user);
-                console.log('✅ Documento utente inizializzato dopo registrazione');
-            } catch (initError) {
-                console.error('❌ Errore nell\'inizializzazione documento utente dopo registrazione:', initError);
-                // Non bloccare il flusso, onAuthStateChanged lo riproverà
+            if (error) throw error;
+            
+            console.log('✅ Utente registrato con successo:', data.user?.id, data.user?.email);
+            
+            // Inizializza utente immediatamente dopo la registrazione
+            if (data.user) {
+                console.log('🔧 Inizializzazione utente dopo registrazione...');
+                try {
+                    await initializeUserDocument(data.user);
+                    console.log('✅ Utente inizializzato dopo registrazione');
+                } catch (initError) {
+                    console.error('❌ Errore nell\'inizializzazione utente dopo registrazione:', initError);
+                }
             }
             
             showNotification('Registrazione completata! Benvenuto!');
         } else {
-            // Sign in existing user (compat version)
-            const userCredential = await currentAuth.signInWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            console.log('✅ Utente autenticato con successo:', user.uid, user.email);
+            // Sign in existing user
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            console.log('✅ Utente autenticato con successo:', data.user?.id, data.user?.email);
             showNotification('Accesso effettuato!');
         }
 
         closeLoginModal();
     } catch (error) {
         console.error('❌ Auth error:', error);
-        console.error('Error code:', error.code);
         console.error('Error message:', error.message);
         
         let errorMessage = 'Si è verificato un errore';
         
-        switch (error.code) {
-            case 'auth/email-already-in-use':
+        // Supabase error codes
+        if (error.message) {
+            if (error.message.includes('already registered') || error.message.includes('already exists')) {
                 errorMessage = AppState.isRegisterMode 
                     ? 'Questa email è già registrata. Usa "Accedi" per entrare.' 
                     : 'Email già in uso';
-                break;
-            case 'auth/invalid-email':
+            } else if (error.message.includes('Invalid email')) {
                 errorMessage = 'Email non valida';
-                break;
-            case 'auth/weak-password':
+            } else if (error.message.includes('Password')) {
                 errorMessage = 'Password troppo debole (minimo 6 caratteri)';
-                break;
-            case 'auth/user-not-found':
-                errorMessage = 'Utente non trovato. Verifica l\'email o registrati.';
-                break;
-            case 'auth/wrong-password':
-                errorMessage = 'Password errata';
-                break;
-            case 'auth/invalid-credential':
+            } else if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
                 errorMessage = 'Credenziali non valide. Verifica email e password.';
-                break;
-            case 'auth/too-many-requests':
+            } else if (error.message.includes('Too many requests')) {
                 errorMessage = 'Troppi tentativi. Riprova più tardi';
-                break;
-            case 'auth/network-request-failed':
-                errorMessage = 'Errore di connessione. Verifica la tua connessione internet.';
-                break;
-            case 'auth/operation-not-allowed':
-                errorMessage = 'Operazione non consentita. Controlla le impostazioni Firebase.';
-                break;
-            default:
+            } else {
                 errorMessage = error.message || 'Errore durante l\'autenticazione';
-                console.error('Errore sconosciuto:', error);
+            }
         }
         
         showError(errorMessage);
@@ -1909,11 +1672,10 @@ async function handleLogin(e) {
 
 // Google Login Handler
 async function handleGoogleLogin() {
-    const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-    const currentGoogleProvider = typeof googleProvider !== 'undefined' ? googleProvider : (typeof window.googleProvider !== 'undefined' ? window.googleProvider : null);
+    const supabase = getSupabaseClient();
     
-    if (!currentAuth || !currentGoogleProvider || typeof firebase === 'undefined') {
-        showError('Autenticazione Google non disponibile. Controlla la configurazione Firebase.');
+    if (!supabase) {
+        showError('Autenticazione Google non disponibile. Controlla la configurazione Supabase.');
         return;
     }
 
@@ -1922,40 +1684,31 @@ async function handleGoogleLogin() {
         elements.googleLoginBtn.disabled = true;
         elements.googleLoginBtn.textContent = 'Accesso in corso...';
         
-        // Compat version
-        const result = await currentAuth.signInWithPopup(currentGoogleProvider);
-        const user = result.user;
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
         
-        console.log('✅ Login Google completato:', user.email);
+        if (error) throw error;
         
-        // Inizializza documento utente immediatamente dopo il login Google
-        console.log('🔧 Inizializzazione documento utente dopo login Google...');
-        try {
-            await initializeUserDocument(user);
-            console.log('✅ Documento utente inizializzato dopo login Google');
-        } catch (initError) {
-            console.error('❌ Errore nell\'inizializzazione documento utente dopo login Google:', initError);
-            // Non bloccare il flusso, onAuthStateChanged lo riproverà
-        }
+        // La redirect avverrà automaticamente, quindi non chiudiamo il modal qui
+        // Il callback verrà gestito da onAuthStateChange
+        console.log('✅ Redirect a Google per autenticazione...');
         
-        showNotification(`Benvenuto, ${user.displayName || user.email}!`);
-        closeLoginModal();
     } catch (error) {
         console.error('Google Auth error:', error);
         let errorMessage = 'Errore durante l\'accesso con Google';
         
-        switch (error.code) {
-            case 'auth/popup-closed-by-user':
+        if (error.message) {
+            if (error.message.includes('popup_closed')) {
                 errorMessage = 'Popup chiusa. Riprova.';
-                break;
-            case 'auth/cancelled-popup-request':
+            } else if (error.message.includes('cancelled')) {
                 errorMessage = 'Richiesta annullata. Riprova.';
-                break;
-            case 'auth/account-exists-with-different-credential':
-                errorMessage = 'Esiste già un account con questa email. Usa email/password.';
-                break;
-            default:
+            } else {
                 errorMessage = error.message || 'Errore durante l\'accesso con Google';
+            }
         }
         
         showError(errorMessage);
@@ -2015,10 +1768,18 @@ function hideRollNumber() {
 async function handleLogout() {
     if (confirm('Sei sicuro di voler uscire?')) {
         try {
-            const currentAuth = typeof auth !== 'undefined' ? auth : (typeof window.auth !== 'undefined' ? window.auth : null);
-            if (currentAuth) {
-                await currentAuth.signOut();
-                closeUserModal(); // Close user modal instead of settings
+            const supabase = getSupabaseClient();
+            if (supabase) {
+                // Disconnetti da eventuali subscription
+                if (campagneChannel) {
+                    supabase.removeChannel(campagneChannel);
+                    campagneChannel = null;
+                }
+                
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                closeUserModal();
                 showNotification('Logout effettuato');
             } else {
                 showNotification('Errore: autenticazione non disponibile');

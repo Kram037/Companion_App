@@ -1,8 +1,8 @@
-# Firebase config (contiene credenziali sensibili)
-firebase-config.js
+# Supabase config (contiene credenziali sensibili)
+supabase-config.js
 
 # File di esempio (questo può essere committato)
-# firebase-config.example.js
+# supabase-config.example.js
 
 # OS files
 .DS_Store
