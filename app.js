@@ -100,6 +100,9 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
+        addAmicoBtn: document.getElementById('addAmicoBtn'),
+        addNemicoBtn: document.getElementById('addNemicoBtn'),
+        addPersonaggioBtn: document.getElementById('addPersonaggioBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
@@ -135,9 +138,18 @@ async function init() {
     // Load saved theme
     loadTheme();
     
-    // Nascondi il pulsante "Nuova Campagna" di default (sarà mostrato quando l'utente fa login)
+    // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = 'none';
+    }
+    if (elements.addNemicoBtn) {
+        elements.addNemicoBtn.style.display = 'none';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = 'none';
     }
     
     // Setup event listeners immediately (don't wait for Supabase)
@@ -241,9 +253,18 @@ function updateUIForLoggedIn() {
             <circle cx="12" cy="7" r="4"></circle>
         </svg>
     `;
-    // Mostra il pulsante "Nuova Campagna"
+    // Mostra i pulsanti quando l'utente è loggato
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'block';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = 'block';
+    }
+    if (elements.addNemicoBtn) {
+        elements.addNemicoBtn.style.display = 'block';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = 'block';
     }
     // Aggiorna i placeholder per amici, nemici e personaggi (nessun dato ancora)
     updatePlaceholderMessages(true);
@@ -288,9 +309,18 @@ function updatePlaceholderMessages(isLoggedIn) {
 // Update UI when user is logged out
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
-    // Nascondi il pulsante "Nuova Campagna"
+    // Nascondi i pulsanti quando l'utente non è loggato
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = 'none';
+    }
+    if (elements.addNemicoBtn) {
+        elements.addNemicoBtn.style.display = 'none';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = 'none';
     }
     // Show login message in campagne list
     renderCampagne([], false);
