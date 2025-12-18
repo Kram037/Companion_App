@@ -100,6 +100,9 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
+        amiciList: document.getElementById('amiciList'),
+        nemiciList: document.getElementById('nemiciList'),
+        personaggiList: document.getElementById('personaggiList'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
@@ -254,8 +257,11 @@ function updateUIForLoggedOut() {
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
     }
-    // Show login message in campagne list
+    // Show login message in all tabs
     renderCampagne([], false);
+    renderAmici([], false);
+    renderNemici([], false);
+    renderPersonaggi([], false);
 }
 
 // Setup Event Listeners
@@ -852,7 +858,7 @@ function renderCampagne(campagne, isLoggedIn = true) {
     if (campagne.length === 0) {
         elements.campagneList.innerHTML = `
             <div class="content-placeholder">
-                <p>Nessuna campagna ancora. Clicca su "Nuova Campagna" per crearne una!</p>
+                <p>Non hai campagne. Crea o partecipa a una campagna!</p>
             </div>
         `;
         return;
