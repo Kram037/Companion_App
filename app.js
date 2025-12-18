@@ -262,7 +262,7 @@ function updatePlaceholderMessages(isLoggedIn) {
         }
         if (nemiciPlaceholder) {
             nemiciPlaceholder.innerHTML = `
-                <p>Non ci sono nemici. Crea nuovi nemici!</p>
+                <p>Non ci sono nemici. Crea la tua schiera!</p>
                 <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 0.5em;">
                     Companion App non si assume responsabilità di eventuali conflitti al tavolo con i tuoi "amici".
                 </p>
