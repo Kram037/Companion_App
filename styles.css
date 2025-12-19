@@ -1053,6 +1053,8 @@ body {
 .btn-small {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+    min-width: 80px; /* Assicura che i pulsanti abbiano la stessa larghezza minima */
+    text-align: center;
 }
 
 #richiesteInEntrataSection {

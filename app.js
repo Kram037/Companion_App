@@ -209,9 +209,15 @@ function setupSupabaseAuth() {
                 updateUIForLoggedIn();
                 console.log('✅ Utente autenticato:', session.user.email);
                 
-                // Initialize user document and load campagne
+                // Initialize user document and load data
                 initializeUserDocument(session.user).then(() => {
-                    loadCampagne(session.user.id);
+                    // Carica i dati in base alla pagina corrente
+                    if (AppState.currentPage === 'campagne') {
+                        loadCampagne(session.user.id);
+                    } else if (AppState.currentPage === 'amici') {
+                        loadAmici();
+                    }
+                    // Altre pagine possono essere aggiunte qui in futuro
                 });
             } else {
                 // User is signed out
@@ -219,6 +225,13 @@ function setupSupabaseAuth() {
                 AppState.isLoggedIn = false;
                 updateUIForLoggedOut();
                 console.log('👤 Utente non autenticato');
+                
+                // Pulisci i dati quando l'utente esce
+                if (AppState.currentPage === 'campagne') {
+                    renderCampagne([], false);
+                } else if (AppState.currentPage === 'amici') {
+                    renderAmici([], [], []);
+                }
             }
         });
     } catch (error) {
@@ -244,9 +257,22 @@ async function checkAuthState() {
             AppState.isLoggedIn = true;
             updateUIForLoggedIn();
             await initializeUserDocument(session.user);
-            loadCampagne(session.user.id);
+            
+            // Carica i dati in base alla pagina corrente
+            if (AppState.currentPage === 'campagne') {
+                loadCampagne(session.user.id);
+            } else if (AppState.currentPage === 'amici') {
+                loadAmici();
+            }
         } else {
             updateUIForLoggedOut();
+            
+            // Pulisci i dati quando l'utente esce
+            if (AppState.currentPage === 'campagne') {
+                renderCampagne([], false);
+            } else if (AppState.currentPage === 'amici') {
+                renderAmici([], [], []);
+            }
         }
     } catch (error) {
         console.error('❌ Errore nel controllo stato auth:', error);
