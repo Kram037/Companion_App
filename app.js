@@ -1406,17 +1406,18 @@ async function handleCercaUtente(e) {
     }
     
     try {
-        // Cerca l'utente per nome e CID
-        // Nota: questa query non è protetta da RLS perché vogliamo permettere agli utenti
-        // di cercare altri utenti (senza vedere dati sensibili, solo nome e CID)
+        // Cerca l'utente per nome e CID usando una funzione SQL che bypassa RLS
         const { data, error } = await supabase
-            .from('utenti')
-            .select('id, nome_utente, cid, email')
-            .eq('nome_utente', nome)
-            .eq('cid', cid)
+            .rpc('search_user_by_name_and_cid', {
+                search_nome: nome,
+                search_cid: cid
+            })
             .maybeSingle();
         
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Errore nella ricerca utente:', error);
+            throw error;
+        }
         
         if (!data) {
             showNotification('Utente non trovato. Verifica nome e CID.');

@@ -149,6 +149,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
+-- Funzione per cercare un utente per nome e CID (bypassa RLS per permettere la ricerca)
+CREATE OR REPLACE FUNCTION search_user_by_name_and_cid(
+    search_nome TEXT,
+    search_cid INTEGER
+)
+RETURNS TABLE (
+    id UUID,
+    nome_utente TEXT,
+    cid INTEGER,
+    email TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        u.id,
+        u.nome_utente,
+        u.cid,
+        u.email
+    FROM utenti u
+    WHERE u.nome_utente = search_nome
+    AND u.cid = search_cid
+    LIMIT 1;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
 -- Verifica che le funzioni siano state create
 SELECT 
     'Funzione get_richieste_in_entrata creata: ' || 
@@ -169,5 +194,12 @@ SELECT
     CASE WHEN EXISTS (
         SELECT 1 FROM pg_proc 
         WHERE proname = 'get_amici'
+    ) THEN 'SÌ' ELSE 'NO' END
+UNION ALL
+SELECT 
+    'Funzione search_user_by_name_and_cid creata: ' || 
+    CASE WHEN EXISTS (
+        SELECT 1 FROM pg_proc 
+        WHERE proname = 'search_user_by_name_and_cid'
     ) THEN 'SÌ' ELSE 'NO' END;
 
