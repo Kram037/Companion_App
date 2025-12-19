@@ -805,6 +805,13 @@ body {
     margin: 0;
 }
 
+.user-cid {
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin: 0.25rem 0 0 0;
+    font-weight: 600;
+}
+
 /* Settings */
 .settings-content {
     display: flex;

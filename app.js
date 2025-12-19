@@ -96,6 +96,7 @@ async function init() {
         nicknameInput: document.getElementById('nickname'),
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
+        userCID: document.getElementById('userCID'),
         themeLight: document.getElementById('themeLight'),
         themeDark: document.getElementById('themeDark'),
         campagneList: document.getElementById('campagneList'),
@@ -764,7 +765,7 @@ function closeLoginModal() {
     toggleLoginRegisterMode(false);
 }
 
-function openUserModal() {
+async function openUserModal() {
     console.log('🔓 Apertura User Modal...');
     console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
     console.log('AppState.currentUser:', AppState.currentUser);
@@ -782,6 +783,21 @@ function openUserModal() {
         }
         if (elements.userEmail) {
             elements.userEmail.textContent = AppState.currentUser.email || '';
+        }
+        
+        // Carica il CID dall'utente
+        if (elements.userCID) {
+            try {
+                const userData = await findUserByUid(AppState.currentUser.uid);
+                if (userData && userData.cid) {
+                    elements.userCID.textContent = `CID: ${userData.cid}`;
+                } else {
+                    elements.userCID.textContent = 'CID: ----';
+                }
+            } catch (error) {
+                console.error('❌ Errore nel caricamento CID:', error);
+                elements.userCID.textContent = 'CID: ----';
+            }
         }
     }
     
