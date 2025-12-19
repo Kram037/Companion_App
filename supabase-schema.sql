@@ -143,28 +143,12 @@ CREATE POLICY "Utenti possono vedere il proprio profilo"
     ON utenti FOR SELECT
     USING (auth.uid()::text = uid);
 
--- Policy per vedere dati pubblici di altri utenti con richieste di amicizia
--- Usa una funzione SECURITY DEFINER per evitare ricorsione
-CREATE OR REPLACE FUNCTION get_current_user_id()
-RETURNS UUID AS $$
-    SELECT id FROM utenti WHERE uid = auth.uid()::text LIMIT 1;
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
-
-CREATE POLICY "Utenti possono vedere dati pubblici di altri utenti con richieste di amicizia"
-    ON utenti FOR SELECT
-    USING (
-        -- Permetti se c'è una richiesta di amicizia (in qualsiasi direzione)
-        -- Usa la funzione per evitare ricorsione
-        EXISTS (
-            SELECT 1 FROM richieste_amicizia
-            WHERE (richieste_amicizia.richiedente_id = utenti.id 
-                   OR richieste_amicizia.destinatario_id = utenti.id)
-            AND (
-                richieste_amicizia.richiedente_id = get_current_user_id()
-                OR richieste_amicizia.destinatario_id = get_current_user_id()
-            )
-        )
-    );
+-- NOTA: La policy per vedere dati pubblici di altri utenti con richieste di amicizia
+-- è stata rimossa perché causava ricorsione infinita.
+-- Per ora, gli utenti possono vedere solo il proprio profilo.
+-- I dati degli altri utenti vengono caricati usando altre tecniche nell'applicazione.
+-- Se necessario, possiamo creare una funzione SQL SECURITY DEFINER che ritorna
+-- i dati pubblici degli utenti con richieste di amicizia senza usare RLS policies.
 
 CREATE POLICY "Utenti possono aggiornare il proprio profilo"
     ON utenti FOR UPDATE
