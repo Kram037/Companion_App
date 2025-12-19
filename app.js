@@ -1622,109 +1622,54 @@ async function loadAmici() {
         
         console.log('🔍 Caricamento richieste amicizia per utente:', currentUser.id);
         
-        // Carica tutte le richieste relative all'utente corrente (senza join per evitare problemi RLS)
-        const { data: richieste, error: richiesteError } = await supabase
-            .from('richieste_amicizia')
-            .select('*')
-            .or(`richiedente_id.eq.${currentUser.id},destinatario_id.eq.${currentUser.id}`);
+        // Usa le funzioni SQL per ottenere i dati (bypassano RLS)
+        const [amiciResult, richiesteEntrataResult, richiesteUscitaResult] = await Promise.all([
+            supabase.rpc('get_amici'),
+            supabase.rpc('get_richieste_in_entrata'),
+            supabase.rpc('get_richieste_in_uscita')
+        ]);
         
-        if (richiesteError) {
-            console.error('❌ Errore query richieste:', richiesteError);
-            throw richiesteError;
+        if (amiciResult.error) {
+            console.error('❌ Errore nel caricamento amici:', amiciResult.error);
+        }
+        if (richiesteEntrataResult.error) {
+            console.error('❌ Errore nel caricamento richieste in entrata:', richiesteEntrataResult.error);
+        }
+        if (richiesteUscitaResult.error) {
+            console.error('❌ Errore nel caricamento richieste in uscita:', richiesteUscitaResult.error);
         }
         
-        console.log('📋 Richieste trovate:', richieste?.length || 0);
+        // Formatta i dati degli amici
+        const amici = (amiciResult.data || []).map(row => ({
+            id: row.amico_id,
+            nome_utente: row.nome_utente,
+            cid: row.cid,
+            email: row.email
+        }));
         
-        // Se non ci sono richieste, mostra solo il placeholder
-        if (!richieste || richieste.length === 0) {
-            renderAmici([], [], []);
-            return;
-        }
-        
-        // Raccogli gli ID degli utenti da caricare
-        const userIds = new Set();
-        richieste.forEach(richiesta => {
-            if (richiesta.richiedente_id !== currentUser.id) {
-                userIds.add(richiesta.richiedente_id);
+        // Formatta le richieste in entrata
+        const richiesteInEntrata = (richiesteEntrataResult.data || []).map(row => ({
+            id: row.richiesta_id,
+            utente: {
+                id: row.richiedente_id,
+                nome_utente: row.nome_utente,
+                cid: row.cid,
+                email: row.email
             }
-            if (richiesta.destinatario_id !== currentUser.id) {
-                userIds.add(richiesta.destinatario_id);
+        }));
+        
+        // Formatta le richieste in uscita
+        const richiesteInUscita = (richiesteUscitaResult.data || []).map(row => ({
+            id: row.richiesta_id,
+            utente: {
+                id: row.destinatario_id,
+                nome_utente: row.nome_utente,
+                cid: row.cid,
+                email: row.email
             }
-        });
+        }));
         
-        // Carica i dati degli utenti usando una funzione SQL che bypassa RLS
-        // Questa è una soluzione temporanea finché non abbiamo una policy RLS corretta
-        const utentiMap = new Map();
-        
-        if (userIds.size > 0) {
-            try {
-                // Usa una chiamata RPC per ottenere i dati degli utenti
-                // Per ora, carichiamo solo gli ID necessari e li inseriamo manualmente
-                // Nota: Questo è un workaround - in futuro potremmo creare una funzione SQL
-                // che ritorna i dati pubblici degli utenti con richieste di amicizia
-                
-                // Per ogni ID, prova a caricare l'utente
-                // Se fallisce per RLS, useremo solo i dati che abbiamo dalle richieste
-                for (const userId of userIds) {
-                    try {
-                        const { data: utente, error: utenteError } = await supabase
-                            .from('utenti')
-                            .select('id, nome_utente, cid, email')
-                            .eq('id', userId)
-                            .maybeSingle();
-                        
-                        if (!utenteError && utente) {
-                            utentiMap.set(userId, utente);
-                        }
-                    } catch (err) {
-                        // Ignora errori di RLS - useremo solo i dati disponibili
-                        console.warn('⚠️ Impossibile caricare utente (RLS):', userId);
-                    }
-                }
-            } catch (err) {
-                console.warn('⚠️ Errore nel caricamento utenti:', err);
-            }
-        }
-        
-        // Separa amici, richieste in entrata e richieste in uscita
-        const amici = [];
-        const richiesteInEntrata = [];
-        const richiesteInUscita = [];
-        
-        richieste.forEach(richiesta => {
-            if (richiesta.stato === 'accepted') {
-                // Determina chi è l'amico (l'altro utente nella richiesta)
-                const amicoId = richiesta.richiedente_id === currentUser.id 
-                    ? richiesta.destinatario_id 
-                    : richiesta.richiedente_id;
-                const amico = utentiMap.get(amicoId);
-                if (amico) {
-                    amici.push(amico);
-                }
-            } else if (richiesta.stato === 'pending') {
-                if (richiesta.destinatario_id === currentUser.id) {
-                    // Richiesta in entrata
-                    const richiedente = utentiMap.get(richiesta.richiedente_id);
-                    if (richiedente) {
-                        richiesteInEntrata.push({
-                            id: richiesta.id,
-                            utente: richiedente
-                        });
-                    }
-                } else {
-                    // Richiesta in uscita
-                    const destinatario = utentiMap.get(richiesta.destinatario_id);
-                    if (destinatario) {
-                        richiesteInUscita.push({
-                            id: richiesta.id,
-                            utente: destinatario
-                        });
-                    }
-                }
-            }
-        });
-        
-        console.log('✅ Amici caricati:', amici.length, 'Richieste in entrata:', richiesteInEntrata.length);
+        console.log('✅ Amici caricati:', amici.length, 'Richieste in entrata:', richiesteInEntrata.length, 'Richieste in uscita:', richiesteInUscita.length);
         
         // Renderizza
         renderAmici(amici, richiesteInEntrata, richiesteInUscita);
