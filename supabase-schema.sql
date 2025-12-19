@@ -137,9 +137,30 @@ ALTER TABLE mostri ENABLE ROW LEVEL SECURITY;
 ALTER TABLE richieste_amicizia ENABLE ROW LEVEL SECURITY;
 
 -- Policy per Utenti: gli utenti possono leggere e modificare solo il proprio profilo
+-- Ma possono anche vedere i dati pubblici (nome_utente, cid, email) degli altri utenti
+-- se c'è una richiesta di amicizia tra loro
 CREATE POLICY "Utenti possono vedere il proprio profilo"
     ON utenti FOR SELECT
     USING (auth.uid()::text = uid);
+
+CREATE POLICY "Utenti possono vedere dati pubblici di altri utenti con richieste di amicizia"
+    ON utenti FOR SELECT
+    USING (
+        -- Permetti se c'è una richiesta di amicizia (in qualsiasi direzione)
+        EXISTS (
+            SELECT 1 FROM richieste_amicizia
+            WHERE (richieste_amicizia.richiedente_id = utenti.id 
+                   OR richieste_amicizia.destinatario_id = utenti.id)
+            AND (
+                richieste_amicizia.richiedente_id IN (
+                    SELECT id FROM utenti WHERE uid = auth.uid()::text
+                )
+                OR richieste_amicizia.destinatario_id IN (
+                    SELECT id FROM utenti WHERE uid = auth.uid()::text
+                )
+            )
+        )
+    );
 
 CREATE POLICY "Utenti possono aggiornare il proprio profilo"
     ON utenti FOR UPDATE

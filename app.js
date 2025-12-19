@@ -1620,17 +1620,63 @@ async function loadAmici() {
             return;
         }
         
-        // Carica tutte le richieste relative all'utente corrente
+        console.log('🔍 Caricamento richieste amicizia per utente:', currentUser.id);
+        
+        // Carica tutte le richieste relative all'utente corrente (senza join per evitare problemi RLS)
         const { data: richieste, error: richiesteError } = await supabase
             .from('richieste_amicizia')
-            .select(`
-                *,
-                richiedente:utenti!richieste_amicizia_richiedente_id_fkey(id, nome_utente, cid, email),
-                destinatario:utenti!richieste_amicizia_destinatario_id_fkey(id, nome_utente, cid, email)
-            `)
+            .select('*')
             .or(`richiedente_id.eq.${currentUser.id},destinatario_id.eq.${currentUser.id}`);
         
-        if (richiesteError) throw richiesteError;
+        if (richiesteError) {
+            console.error('❌ Errore query richieste:', richiesteError);
+            throw richiesteError;
+        }
+        
+        console.log('📋 Richieste trovate:', richieste?.length || 0);
+        
+        // Se non ci sono richieste, mostra solo il placeholder
+        if (!richieste || richieste.length === 0) {
+            renderAmici([], [], []);
+            return;
+        }
+        
+        // Raccogli gli ID degli utenti da caricare
+        const userIds = new Set();
+        richieste.forEach(richiesta => {
+            if (richiesta.richiedente_id !== currentUser.id) {
+                userIds.add(richiesta.richiedente_id);
+            }
+            if (richiesta.destinatario_id !== currentUser.id) {
+                userIds.add(richiesta.destinatario_id);
+            }
+        });
+        
+        // Carica i dati degli utenti (solo quelli che l'utente può vedere tramite RLS)
+        // Nota: le RLS policies permettono di vedere solo il proprio profilo, quindi
+        // dobbiamo usare un approccio diverso: caricare gli utenti uno per uno o
+        // creare una policy che permetta di vedere i dati degli utenti nelle richieste
+        // Per ora, proviamo a caricare gli utenti direttamente
+        const utentiMap = new Map();
+        
+        for (const userId of userIds) {
+            try {
+                // Prova a caricare l'utente - potrebbe fallire per RLS
+                const { data: utente, error: utenteError } = await supabase
+                    .from('utenti')
+                    .select('id, nome_utente, cid, email')
+                    .eq('id', userId)
+                    .maybeSingle();
+                
+                if (!utenteError && utente) {
+                    utentiMap.set(userId, utente);
+                } else {
+                    console.warn('⚠️ Impossibile caricare utente:', userId, utenteError);
+                }
+            } catch (err) {
+                console.warn('⚠️ Errore nel caricamento utente:', userId, err);
+            }
+        }
         
         // Separa amici, richieste in entrata e richieste in uscita
         const amici = [];
@@ -1640,34 +1686,46 @@ async function loadAmici() {
         richieste.forEach(richiesta => {
             if (richiesta.stato === 'accepted') {
                 // Determina chi è l'amico (l'altro utente nella richiesta)
-                const amico = richiesta.richiedente_id === currentUser.id 
-                    ? richiesta.destinatario 
-                    : richiesta.richiedente;
+                const amicoId = richiesta.richiedente_id === currentUser.id 
+                    ? richiesta.destinatario_id 
+                    : richiesta.richiedente_id;
+                const amico = utentiMap.get(amicoId);
                 if (amico) {
                     amici.push(amico);
                 }
             } else if (richiesta.stato === 'pending') {
                 if (richiesta.destinatario_id === currentUser.id) {
                     // Richiesta in entrata
-                    richiesteInEntrata.push({
-                        id: richiesta.id,
-                        utente: richiesta.richiedente
-                    });
+                    const richiedente = utentiMap.get(richiesta.richiedente_id);
+                    if (richiedente) {
+                        richiesteInEntrata.push({
+                            id: richiesta.id,
+                            utente: richiedente
+                        });
+                    }
                 } else {
                     // Richiesta in uscita
-                    richiesteInUscita.push({
-                        id: richiesta.id,
-                        utente: richiesta.destinatario
-                    });
+                    const destinatario = utentiMap.get(richiesta.destinatario_id);
+                    if (destinatario) {
+                        richiesteInUscita.push({
+                            id: richiesta.id,
+                            utente: destinatario
+                        });
+                    }
                 }
             }
         });
+        
+        console.log('✅ Amici caricati:', amici.length, 'Richieste in entrata:', richiesteInEntrata.length);
         
         // Renderizza
         renderAmici(amici, richiesteInEntrata, richiesteInUscita);
     } catch (error) {
         console.error('❌ Errore nel caricamento amici:', error);
+        console.error('Dettagli errore:', error.message, error.code);
         showNotification('Errore nel caricamento degli amici. Riprova.');
+        // Mostra comunque il placeholder
+        renderAmici([], [], []);
     }
 }
 
