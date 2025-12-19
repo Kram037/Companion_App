@@ -54,6 +54,20 @@ CREATE TABLE IF NOT EXISTS mostri (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Tabella Richieste Amicizia (Network)
+CREATE TABLE IF NOT EXISTS richieste_amicizia (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    richiedente_id UUID NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
+    destinatario_id UUID NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
+    stato TEXT NOT NULL DEFAULT 'pending' CHECK (stato IN ('pending', 'accepted', 'rejected', 'blocked')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    -- Un utente non può inviare richieste a se stesso
+    CHECK (richiedente_id != destinatario_id),
+    -- Evita duplicati: stessa coppia di utenti (in qualsiasi direzione)
+    UNIQUE(richiedente_id, destinatario_id)
+);
+
 -- Indici per performance
 CREATE INDEX IF NOT EXISTS idx_campagne_user_id ON campagne(user_id);
 CREATE INDEX IF NOT EXISTS idx_campagne_nome ON campagne(nome_campagna);
@@ -61,6 +75,9 @@ CREATE INDEX IF NOT EXISTS idx_utenti_uid ON utenti(uid);
 CREATE INDEX IF NOT EXISTS idx_utenti_cid ON utenti(cid);
 CREATE INDEX IF NOT EXISTS idx_personaggi_user_id ON personaggi(user_id);
 CREATE INDEX IF NOT EXISTS idx_mostri_user_id ON mostri(user_id);
+CREATE INDEX IF NOT EXISTS idx_richieste_amicizia_richiedente ON richieste_amicizia(richiedente_id);
+CREATE INDEX IF NOT EXISTS idx_richieste_amicizia_destinatario ON richieste_amicizia(destinatario_id);
+CREATE INDEX IF NOT EXISTS idx_richieste_amicizia_stato ON richieste_amicizia(stato);
 
 -- Funzione per aggiornare updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -82,6 +99,9 @@ CREATE TRIGGER update_personaggi_updated_at BEFORE UPDATE ON personaggi
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_mostri_updated_at BEFORE UPDATE ON mostri
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_richieste_amicizia_updated_at BEFORE UPDATE ON richieste_amicizia
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Funzione per generare CID univoco
@@ -114,6 +134,7 @@ ALTER TABLE utenti ENABLE ROW LEVEL SECURITY;
 ALTER TABLE campagne ENABLE ROW LEVEL SECURITY;
 ALTER TABLE personaggi ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mostri ENABLE ROW LEVEL SECURITY;
+ALTER TABLE richieste_amicizia ENABLE ROW LEVEL SECURITY;
 
 -- Policy per Utenti: gli utenti possono leggere e modificare solo il proprio profilo
 CREATE POLICY "Utenti possono vedere il proprio profilo"
@@ -206,6 +227,51 @@ CREATE POLICY "Utenti possono gestire i propri mostri"
         EXISTS (
             SELECT 1 FROM utenti
             WHERE utenti.id = mostri.user_id
+            AND utenti.uid = auth.uid()::text
+        )
+    );
+
+-- Policy per Richieste Amicizia
+-- Gli utenti possono vedere le richieste che hanno inviato o ricevuto
+CREATE POLICY "Utenti possono vedere le proprie richieste di amicizia"
+    ON richieste_amicizia FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM utenti
+            WHERE (utenti.id = richieste_amicizia.richiedente_id OR utenti.id = richieste_amicizia.destinatario_id)
+            AND utenti.uid = auth.uid()::text
+        )
+    );
+
+-- Gli utenti possono creare richieste solo come richiedente
+CREATE POLICY "Utenti possono creare richieste di amicizia"
+    ON richieste_amicizia FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM utenti
+            WHERE utenti.id = richieste_amicizia.richiedente_id
+            AND utenti.uid = auth.uid()::text
+        )
+    );
+
+-- Gli utenti possono aggiornare solo le richieste che hanno ricevuto (per accettare/rifiutare)
+CREATE POLICY "Utenti possono aggiornare richieste ricevute"
+    ON richieste_amicizia FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM utenti
+            WHERE utenti.id = richieste_amicizia.destinatario_id
+            AND utenti.uid = auth.uid()::text
+        )
+    );
+
+-- Gli utenti possono eliminare solo le richieste che hanno inviato o ricevuto
+CREATE POLICY "Utenti possono eliminare le proprie richieste"
+    ON richieste_amicizia FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM utenti
+            WHERE (utenti.id = richieste_amicizia.richiedente_id OR utenti.id = richieste_amicizia.destinatario_id)
             AND utenti.uid = auth.uid()::text
         )
     );

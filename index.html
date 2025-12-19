@@ -59,6 +59,15 @@
                     <h1>Amici</h1>
                     <button class="btn-primary btn-icon" id="addAmicoBtn" aria-label="Aggiungi Amico">+</button>
                 </div>
+                
+                <!-- Richieste in entrata -->
+                <div id="richiesteInEntrataSection" style="display: none;">
+                    <h3 style="margin: 1rem 0 0.5rem; font-size: 1rem; color: var(--text-secondary);">Richieste in entrata</h3>
+                    <div id="richiesteInEntrataList" class="amici-list"></div>
+                </div>
+                
+                <!-- Lista Amici -->
+                <div id="amiciList" class="amici-list" style="display: none;"></div>
                 <div id="amiciPlaceholder" class="content-placeholder">
                     <p>Accedi per vedere i tuoi amici</p>
                 </div>
@@ -282,6 +291,33 @@
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="cancelCampagnaBtn">Annulla</button>
                     <button type="submit" class="btn-primary" id="saveCampagnaBtn">Crea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Aggiungi Amico Modal -->
+    <div class="modal" id="addAmicoModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeAddAmicoModal">&times;</button>
+            <h2>Aggiungi Amico</h2>
+            <form id="addAmicoForm">
+                <div class="form-group">
+                    <label for="amicoNome">Nome Utente</label>
+                    <input type="text" id="amicoNome" name="amicoNome" required placeholder="Inserisci il nome utente">
+                </div>
+                <div class="form-group">
+                    <label for="amicoCID">CID</label>
+                    <input type="number" id="amicoCID" name="amicoCID" required placeholder="Inserisci il CID (4 cifre)" min="1000" max="9999">
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Il CID è il codice identificativo a 4 cifre dell'utente</small>
+                </div>
+                <div id="searchUserResult" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius-md);">
+                    <div id="searchUserInfo"></div>
+                    <button type="button" class="btn-primary" id="invitaAmicoBtn" style="margin-top: 0.5rem; width: 100%;">Invia Richiesta</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelAddAmicoBtn">Annulla</button>
+                    <button type="button" class="btn-primary" id="cercaUtenteBtn">Cerca</button>
                 </div>
             </form>
         </div>

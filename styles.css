@@ -975,6 +975,90 @@ body {
     width: 100%;
 }
 
+/* Amici List Styles */
+.amici-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.amico-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.amico-item:hover {
+    box-shadow: 0 4px 8px var(--shadow);
+    transform: translateY(-2px);
+}
+
+.amico-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.amico-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.amico-avatar svg {
+    width: 24px;
+    height: 24px;
+}
+
+.amico-nome {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.amico-cid {
+    margin: 0.25rem 0 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.amico-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+#richiesteInEntrataSection {
+    margin-top: var(--spacing-md);
+}
+
+#richiesteInEntrataSection h3 {
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
 .campagna-card {
     background: var(--surface);
     border: 1px solid var(--border);

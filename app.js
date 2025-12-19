@@ -106,6 +106,15 @@ async function init() {
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
+        addAmicoModal: document.getElementById('addAmicoModal'),
+        closeAddAmicoModal: document.getElementById('closeAddAmicoModal'),
+        addAmicoForm: document.getElementById('addAmicoForm'),
+        cercaUtenteBtn: document.getElementById('cercaUtenteBtn'),
+        invitaAmicoBtn: document.getElementById('invitaAmicoBtn'),
+        cancelAddAmicoBtn: document.getElementById('cancelAddAmicoBtn'),
+        amiciList: document.getElementById('amiciList'),
+        richiesteInEntrataList: document.getElementById('richiesteInEntrataList'),
+        richiesteInEntrataSection: document.getElementById('richiesteInEntrataSection'),
         campagnaModalTitle: document.getElementById('campagnaModalTitle'),
         cancelCampagnaBtn: document.getElementById('cancelCampagnaBtn'),
         saveCampagnaBtn: document.getElementById('saveCampagnaBtn'),
@@ -573,10 +582,30 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             console.log('➕ Click su Aggiungi Amico');
-            // TODO: Implementare funzione per aggiungere amico
-            showNotification('Funzionalità in arrivo: Aggiungi Amico');
+            openAddAmicoModal();
         };
         console.log('✅ Event listener aggiunto a addAmicoBtn');
+    }
+    
+    // Add Amico Modal listeners
+    if (elements.closeAddAmicoModal) {
+        elements.closeAddAmicoModal.addEventListener('click', closeAddAmicoModal);
+    }
+    if (elements.cancelAddAmicoBtn) {
+        elements.cancelAddAmicoBtn.addEventListener('click', closeAddAmicoModal);
+    }
+    if (elements.addAmicoModal) {
+        elements.addAmicoModal.addEventListener('click', (e) => {
+            if (e.target === elements.addAmicoModal) {
+                closeAddAmicoModal();
+            }
+        });
+    }
+    if (elements.cercaUtenteBtn) {
+        elements.cercaUtenteBtn.addEventListener('click', handleCercaUtente);
+    }
+    if (elements.invitaAmicoBtn) {
+        elements.invitaAmicoBtn.addEventListener('click', handleInvitaAmico);
     }
     
     // Nemici button
@@ -714,6 +743,11 @@ function navigateToPage(pageName) {
     });
 
     AppState.currentPage = pageName;
+    
+    // Carica dati specifici per la pagina
+    if (pageName === 'amici' && AppState.isLoggedIn) {
+        loadAmici();
+    }
 }
 
 // Modal Functions
@@ -1279,6 +1313,437 @@ async function initializeUserDocument(user) {
     } finally {
         // Rimuovi l'utente dal set di inizializzazione
         initializingUsers.delete(user.id);
+    }
+}
+
+// ============================================================================
+// AMICI MANAGEMENT (Network)
+// ============================================================================
+
+// Variabile per tenere traccia dell'utente cercato
+let searchedUser = null;
+
+/**
+ * Apre il modal per aggiungere un amico
+ */
+function openAddAmicoModal() {
+    if (!AppState.isLoggedIn) {
+        showNotification('Devi essere loggato per aggiungere amici');
+        openLoginModal();
+        return;
+    }
+    
+    if (!elements.addAmicoModal || !elements.addAmicoForm) {
+        console.error('❌ addAmicoModal o addAmicoForm non trovati');
+        return;
+    }
+    
+    // Reset form e risultato ricerca
+    elements.addAmicoForm.reset();
+    const searchResult = document.getElementById('searchUserResult');
+    if (searchResult) {
+        searchResult.style.display = 'none';
+    }
+    searchedUser = null;
+    
+    elements.addAmicoModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Chiude il modal per aggiungere un amico
+ */
+function closeAddAmicoModal() {
+    if (!elements.addAmicoModal) return;
+    elements.addAmicoModal.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    // Reset
+    if (elements.addAmicoForm) {
+        elements.addAmicoForm.reset();
+    }
+    const searchResult = document.getElementById('searchUserResult');
+    if (searchResult) {
+        searchResult.style.display = 'none';
+    }
+    searchedUser = null;
+}
+
+/**
+ * Cerca un utente per nome e CID
+ */
+async function handleCercaUtente(e) {
+    e.preventDefault();
+    
+    const nome = document.getElementById('amicoNome').value.trim();
+    const cid = parseInt(document.getElementById('amicoCID').value);
+    
+    if (!nome || !cid || cid < 1000 || cid > 9999) {
+        showNotification('Inserisci un nome valido e un CID compreso tra 1000 e 9999');
+        return;
+    }
+    
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+    
+    try {
+        // Cerca l'utente per nome e CID
+        // Nota: questa query non è protetta da RLS perché vogliamo permettere agli utenti
+        // di cercare altri utenti (senza vedere dati sensibili, solo nome e CID)
+        const { data, error } = await supabase
+            .from('utenti')
+            .select('id, nome_utente, cid, email')
+            .eq('nome_utente', nome)
+            .eq('cid', cid)
+            .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (!data) {
+            showNotification('Utente non trovato. Verifica nome e CID.');
+            const searchResult = document.getElementById('searchUserResult');
+            if (searchResult) {
+                searchResult.style.display = 'none';
+            }
+            searchedUser = null;
+            return;
+        }
+        
+        // Verifica che non sia se stesso
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (currentUser && currentUser.id === data.id) {
+            showNotification('Non puoi inviare richieste di amicizia a te stesso!');
+            const searchResult = document.getElementById('searchUserResult');
+            if (searchResult) {
+                searchResult.style.display = 'none';
+            }
+            searchedUser = null;
+            return;
+        }
+        
+        // Verifica se esiste già una richiesta (in entrambe le direzioni)
+        // Query 1: richiesta da currentUser a data.id
+        const { data: request1, error: error1 } = await supabase
+            .from('richieste_amicizia')
+            .select('*')
+            .eq('richiedente_id', currentUser.id)
+            .eq('destinatario_id', data.id)
+            .maybeSingle();
+        
+        if (error1) throw error1;
+        
+        // Query 2: richiesta da data.id a currentUser
+        const { data: request2, error: error2 } = await supabase
+            .from('richieste_amicizia')
+            .select('*')
+            .eq('richiedente_id', data.id)
+            .eq('destinatario_id', currentUser.id)
+            .maybeSingle();
+        
+        if (error2) throw error2;
+        
+        const existingRequest = request1 || request2;
+        
+        searchedUser = data;
+        const searchUserInfo = document.getElementById('searchUserInfo');
+        const searchResult = document.getElementById('searchUserResult');
+        
+        if (searchUserInfo && searchResult) {
+            let statusText = '';
+            if (existingRequest) {
+                if (existingRequest.stato === 'accepted') {
+                    statusText = '<p style="color: var(--accent); margin-top: 0.5rem;">Già amico!</p>';
+                } else if (existingRequest.stato === 'pending') {
+                    if (existingRequest.richiedente_id === currentUser.id) {
+                        statusText = '<p style="color: var(--text-secondary); margin-top: 0.5rem;">Richiesta già inviata</p>';
+                    } else {
+                        statusText = '<p style="color: var(--text-secondary); margin-top: 0.5rem;">Hai già una richiesta da questo utente</p>';
+                    }
+                } else if (existingRequest.stato === 'rejected') {
+                    statusText = '<p style="color: var(--text-secondary); margin-top: 0.5rem;">Richiesta precedentemente rifiutata</p>';
+                }
+            }
+            
+            searchUserInfo.innerHTML = `
+                <p><strong>${data.nome_utente}</strong> (CID: ${data.cid})</p>
+                ${statusText}
+            `;
+            
+            // Mostra/nascondi pulsante invita
+            const invitaBtn = document.getElementById('invitaAmicoBtn');
+            if (invitaBtn) {
+                if (existingRequest && (existingRequest.stato === 'accepted' || existingRequest.stato === 'pending')) {
+                    invitaBtn.style.display = 'none';
+                } else {
+                    invitaBtn.style.display = 'block';
+                    invitaBtn.textContent = existingRequest && existingRequest.stato === 'rejected' ? 'Invia nuovamente' : 'Invia Richiesta';
+                }
+            }
+            
+            searchResult.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('❌ Errore nella ricerca utente:', error);
+        showNotification('Errore nella ricerca utente. Riprova.');
+    }
+}
+
+/**
+ * Invia una richiesta di amicizia
+ */
+async function handleInvitaAmico(e) {
+    e.preventDefault();
+    
+    if (!searchedUser) {
+        showNotification('Cerca prima un utente');
+        return;
+    }
+    
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+    
+    try {
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            showNotification('Errore: utente corrente non trovato');
+            return;
+        }
+        
+        // Invia la richiesta (usando upsert per gestire anche il caso di richiesta rifiutata precedentemente)
+        const { data, error } = await supabase
+            .from('richieste_amicizia')
+            .upsert({
+                richiedente_id: currentUser.id,
+                destinatario_id: searchedUser.id,
+                stato: 'pending'
+            }, {
+                onConflict: 'richiedente_id,destinatario_id'
+            })
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        showNotification(`Richiesta di amicizia inviata a ${searchedUser.nome_utente}!`);
+        closeAddAmicoModal();
+        
+        // Ricarica gli amici per mostrare eventuali aggiornamenti
+        if (AppState.currentPage === 'amici') {
+            loadAmici();
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'invio richiesta amicizia:', error);
+        if (error.code === '23505') {
+            showNotification('Richiesta già esistente');
+        } else {
+            showNotification('Errore nell\'invio della richiesta. Riprova.');
+        }
+    }
+}
+
+/**
+ * Accetta una richiesta di amicizia (esposta globalmente per onclick)
+ */
+window.acceptFriendRequest = async function(requestId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('richieste_amicizia')
+            .update({ stato: 'accepted' })
+            .eq('id', requestId);
+        
+        if (error) throw error;
+        
+        showNotification('Richiesta di amicizia accettata!');
+        loadAmici();
+    } catch (error) {
+        console.error('❌ Errore nell\'accettazione richiesta:', error);
+        showNotification('Errore nell\'accettazione della richiesta. Riprova.');
+    }
+}
+
+/**
+ * Rifiuta una richiesta di amicizia (esposta globalmente per onclick)
+ */
+window.rejectFriendRequest = async function(requestId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('richieste_amicizia')
+            .update({ stato: 'rejected' })
+            .eq('id', requestId);
+        
+        if (error) throw error;
+        
+        showNotification('Richiesta di amicizia rifiutata');
+        loadAmici();
+    } catch (error) {
+        console.error('❌ Errore nel rifiuto richiesta:', error);
+        showNotification('Errore nel rifiuto della richiesta. Riprova.');
+    }
+}
+
+/**
+ * Carica e visualizza gli amici e le richieste
+ */
+async function loadAmici() {
+    if (!AppState.isLoggedIn || !AppState.currentUser) {
+        return;
+    }
+    
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        console.error('❌ Supabase non disponibile');
+        return;
+    }
+    
+    try {
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            console.error('❌ Utente corrente non trovato');
+            return;
+        }
+        
+        // Carica tutte le richieste relative all'utente corrente
+        const { data: richieste, error: richiesteError } = await supabase
+            .from('richieste_amicizia')
+            .select(`
+                *,
+                richiedente:utenti!richieste_amicizia_richiedente_id_fkey(id, nome_utente, cid, email),
+                destinatario:utenti!richieste_amicizia_destinatario_id_fkey(id, nome_utente, cid, email)
+            `)
+            .or(`richiedente_id.eq.${currentUser.id},destinatario_id.eq.${currentUser.id}`);
+        
+        if (richiesteError) throw richiesteError;
+        
+        // Separa amici, richieste in entrata e richieste in uscita
+        const amici = [];
+        const richiesteInEntrata = [];
+        const richiesteInUscita = [];
+        
+        richieste.forEach(richiesta => {
+            if (richiesta.stato === 'accepted') {
+                // Determina chi è l'amico (l'altro utente nella richiesta)
+                const amico = richiesta.richiedente_id === currentUser.id 
+                    ? richiesta.destinatario 
+                    : richiesta.richiedente;
+                if (amico) {
+                    amici.push(amico);
+                }
+            } else if (richiesta.stato === 'pending') {
+                if (richiesta.destinatario_id === currentUser.id) {
+                    // Richiesta in entrata
+                    richiesteInEntrata.push({
+                        id: richiesta.id,
+                        utente: richiesta.richiedente
+                    });
+                } else {
+                    // Richiesta in uscita
+                    richiesteInUscita.push({
+                        id: richiesta.id,
+                        utente: richiesta.destinatario
+                    });
+                }
+            }
+        });
+        
+        // Renderizza
+        renderAmici(amici, richiesteInEntrata, richiesteInUscita);
+    } catch (error) {
+        console.error('❌ Errore nel caricamento amici:', error);
+        showNotification('Errore nel caricamento degli amici. Riprova.');
+    }
+}
+
+/**
+ * Renderizza amici e richieste nella UI
+ */
+function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
+    const amiciPlaceholder = document.getElementById('amiciPlaceholder');
+    const amiciList = elements.amiciList;
+    const richiesteInEntrataList = elements.richiesteInEntrataList;
+    const richiesteInEntrataSection = elements.richiesteInEntrataSection;
+    
+    // Gestisci richieste in entrata
+    if (richiesteInEntrataSection) {
+        if (richiesteInEntrata.length > 0) {
+            richiesteInEntrataSection.style.display = 'block';
+            if (richiesteInEntrataList) {
+                richiesteInEntrataList.innerHTML = richiesteInEntrata.map(req => `
+                    <div class="amico-item">
+                        <div class="amico-info">
+                            <div class="amico-avatar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="amico-nome">${req.utente?.nome_utente || 'Utente'}</p>
+                                <p class="amico-cid">CID: ${req.utente?.cid || ''}</p>
+                            </div>
+                        </div>
+                        <div class="amico-actions">
+                            <button class="btn-primary btn-small" onclick="acceptFriendRequest('${req.id}')">Accetta</button>
+                            <button class="btn-secondary btn-small" onclick="rejectFriendRequest('${req.id}')">Rifiuta</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } else {
+            richiesteInEntrataSection.style.display = 'none';
+        }
+    }
+    
+    // Gestisci lista amici
+    if (amici.length === 0 && richiesteInEntrata.length === 0 && richiesteInUscita.length === 0) {
+        // Nessun amico e nessuna richiesta
+        if (amiciPlaceholder) {
+            amiciPlaceholder.style.display = 'block';
+            amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
+        }
+        if (amiciList) {
+            amiciList.style.display = 'none';
+        }
+    } else {
+        if (amiciPlaceholder) {
+            amiciPlaceholder.style.display = 'none';
+        }
+        if (amiciList) {
+            amiciList.style.display = 'block';
+            amiciList.innerHTML = amici.map(amico => `
+                <div class="amico-item">
+                    <div class="amico-info">
+                        <div class="amico-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="amico-nome">${amico.nome_utente || 'Utente'}</p>
+                            <p class="amico-cid">CID: ${amico.cid || ''}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
     }
 }
 
