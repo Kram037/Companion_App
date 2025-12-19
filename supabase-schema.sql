@@ -143,21 +143,25 @@ CREATE POLICY "Utenti possono vedere il proprio profilo"
     ON utenti FOR SELECT
     USING (auth.uid()::text = uid);
 
+-- Policy per vedere dati pubblici di altri utenti con richieste di amicizia
+-- Usa una funzione SECURITY DEFINER per evitare ricorsione
+CREATE OR REPLACE FUNCTION get_current_user_id()
+RETURNS UUID AS $$
+    SELECT id FROM utenti WHERE uid = auth.uid()::text LIMIT 1;
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+
 CREATE POLICY "Utenti possono vedere dati pubblici di altri utenti con richieste di amicizia"
     ON utenti FOR SELECT
     USING (
         -- Permetti se c'è una richiesta di amicizia (in qualsiasi direzione)
+        -- Usa la funzione per evitare ricorsione
         EXISTS (
             SELECT 1 FROM richieste_amicizia
             WHERE (richieste_amicizia.richiedente_id = utenti.id 
                    OR richieste_amicizia.destinatario_id = utenti.id)
             AND (
-                richieste_amicizia.richiedente_id IN (
-                    SELECT id FROM utenti WHERE uid = auth.uid()::text
-                )
-                OR richieste_amicizia.destinatario_id IN (
-                    SELECT id FROM utenti WHERE uid = auth.uid()::text
-                )
+                richieste_amicizia.richiedente_id = get_current_user_id()
+                OR richieste_amicizia.destinatario_id = get_current_user_id()
             )
         )
     );
