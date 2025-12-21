@@ -2944,6 +2944,63 @@ async function updateCampagnaField(campagnaId, field, value) {
     }
 }
 
+/**
+ * Invita un amico alla campagna
+ */
+window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            showNotification('Errore: utente corrente non trovato');
+            return;
+        }
+
+        // Verifica che la campagna appartenga all'utente corrente
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('*')
+            .eq('id', campagnaId)
+            .eq('user_id', currentUser.id)
+            .single();
+
+        if (campagnaError || !campagna) {
+            showNotification('Errore: campagna non trovata o non sei il proprietario');
+            return;
+        }
+
+        // Crea l'invito
+        const { error } = await supabase
+            .from('inviti_campagna')
+            .insert({
+                campagna_id: campagnaId,
+                inviante_id: currentUser.id,
+                invitato_id: amicoId,
+                stato: 'pending'
+            });
+
+        if (error) {
+            if (error.code === '23505') {
+                showNotification('Questo utente è già stato invitato a questa campagna');
+            } else {
+                throw error;
+            }
+        } else {
+            showNotification('Invito inviato con successo!');
+            // Ricarica il modal per aggiornare lo stato
+            await openInvitaGiocatoriModal(campagnaId);
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'invio invito:', error);
+        showNotification('Errore nell\'invio dell\'invito: ' + (error.message || error));
+    }
+};
+
 window.deleteCampagna = async function(campagnaId) {
     if (!confirm('Sei sicuro di voler eliminare questa campagna?')) {
         return;
