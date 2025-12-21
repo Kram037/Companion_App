@@ -1364,12 +1364,48 @@ window.accettaInvitoCampagna = async function(invitoId) {
     }
 
     try {
-        const { error } = await supabase
+        // Prima recupera i dati dell'invito per ottenere campagna_id
+        const { data: invito, error: invitoError } = await supabase
+            .from('inviti_campagna')
+            .select('campagna_id')
+            .eq('id', invitoId)
+            .single();
+
+        if (invitoError || !invito) {
+            throw invitoError || new Error('Invito non trovato');
+        }
+
+        // Aggiorna lo stato dell'invito
+        const { error: updateError } = await supabase
             .from('inviti_campagna')
             .update({ stato: 'accepted' })
             .eq('id', invitoId);
 
-        if (error) throw error;
+        if (updateError) throw updateError;
+
+        // Incrementa numero_giocatori nella campagna
+        const { error: incrementError } = await supabase.rpc('increment_campagna_giocatori', {
+            p_campagna_id: invito.campagna_id
+        });
+
+        // Se la funzione RPC non esiste, fallback a query manuale
+        if (incrementError) {
+            console.warn('⚠️ Funzione RPC non disponibile, uso fallback:', incrementError);
+            // Fallback: leggi, incrementa e aggiorna
+            const { data: campagna, error: readError } = await supabase
+                .from('campagne')
+                .select('numero_giocatori')
+                .eq('id', invito.campagna_id)
+                .single();
+
+            if (!readError && campagna) {
+                const nuovoNumero = (campagna.numero_giocatori || 0) + 1;
+                await supabase
+                    .from('campagne')
+                    .update({ numero_giocatori: nuovoNumero })
+                    .eq('id', invito.campagna_id);
+            }
+        }
 
         showNotification('Invito accettato!');
         
@@ -1379,7 +1415,7 @@ window.accettaInvitoCampagna = async function(invitoId) {
         }
     } catch (error) {
         console.error('❌ Errore nell\'accettazione invito:', error);
-        showNotification('Errore nell\'accettazione dell\'invito');
+        showNotification('Errore nell\'accettazione dell\'invito: ' + (error.message || error));
     }
 };
 
@@ -2721,6 +2757,37 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             </div>
             ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
+            ${giocatoriCampagna.length > 0 ? `
+                <div class="dettagli-giocatori-section">
+                    <h3>Giocatori Invitati</h3>
+                    <div class="giocatori-table">
+                        ${giocatoriCampagna.map(giocatore => `
+                            <div class="giocatore-row">
+                                <div class="giocatore-info">
+                                    <div class="giocatore-avatar-small">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="giocatore-nome">${escapeHtml(giocatore.nome_utente || 'Utente')}</p>
+                                        <p class="giocatore-cid">CID: ${giocatore.cid || ''}</p>
+                                    </div>
+                                </div>
+                                ${isCurrentUserDM ? `
+                                    <button class="btn-icon-small btn-remove" onclick="rimuoviGiocatoreDaCampagna('${campagna.id}', '${giocatore.invitoId || ''}', '${giocatore.id}')" aria-label="Rimuovi giocatore" title="Rimuovi dalla campagna">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
         `;
 
         // Salva i dati della campagna nello state per uso futuro
@@ -3026,6 +3093,67 @@ window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
     } catch (error) {
         console.error('❌ Errore nell\'invio invito:', error);
         showNotification('Errore nell\'invio dell\'invito: ' + (error.message || error));
+    }
+};
+
+/**
+ * Rimuove un giocatore dalla campagna
+ */
+window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocatoreId) {
+    if (!confirm('Sei sicuro di voler rimuovere questo giocatore dalla campagna?')) {
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Se abbiamo l'invitoId, aggiorna lo stato a 'rejected', altrimenti elimina
+        if (invitoId) {
+            const { error } = await supabase
+                .from('inviti_campagna')
+                .update({ stato: 'rejected' })
+                .eq('id', invitoId);
+
+            if (error) throw error;
+        } else {
+            // Fallback: elimina tutti gli inviti per questo giocatore e campagna
+            const { error } = await supabase
+                .from('inviti_campagna')
+                .delete()
+                .eq('campagna_id', campagnaId)
+                .eq('invitato_id', giocatoreId);
+
+            if (error) throw error;
+        }
+
+        // Decrementa numero_giocatori nella campagna
+        const { data: campagna, error: readError } = await supabase
+            .from('campagne')
+            .select('numero_giocatori')
+            .eq('id', campagnaId)
+            .single();
+
+        if (!readError && campagna) {
+            const nuovoNumero = Math.max(0, (campagna.numero_giocatori || 0) - 1);
+            await supabase
+                .from('campagne')
+                .update({ numero_giocatori: nuovoNumero })
+                .eq('id', campagnaId);
+        }
+
+        showNotification('Giocatore rimosso dalla campagna');
+
+        // Ricarica i dettagli della campagna
+        if (AppState.currentCampagnaId) {
+            await loadCampagnaDetails(AppState.currentCampagnaId);
+        }
+    } catch (error) {
+        console.error('❌ Errore nella rimozione giocatore:', error);
+        showNotification('Errore nella rimozione del giocatore: ' + (error.message || error));
     }
 };
 

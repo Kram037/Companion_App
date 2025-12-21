@@ -505,6 +505,82 @@ body {
     margin-top: var(--spacing-md);
 }
 
+.dettagli-giocatori-section {
+    margin-top: var(--spacing-md);
+}
+
+.dettagli-giocatori-section h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.giocatori-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.giocatore-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    gap: var(--spacing-md);
+}
+
+.giocatore-row:last-child {
+    border-bottom: none;
+}
+
+.giocatore-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.giocatore-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    flex-shrink: 0;
+}
+
+.giocatore-avatar-small svg {
+    width: 20px;
+    height: 20px;
+}
+
+.giocatore-nome {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.giocatore-cid {
+    margin: 0.25rem 0 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.btn-icon-small.btn-remove {
+    background: #dc3545;
+}
+
+.btn-icon-small.btn-remove:hover {
+    background: #c82333;
+}
+
 /* Inviti campagna */
 .invito-card {
     background: var(--surface);
