@@ -3419,6 +3419,13 @@ window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
  * Rimuove un giocatore dalla campagna
  */
 window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocatoreId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può rimuovere giocatori dalla campagna');
+        return;
+    }
+
     const confirmed = await showConfirm('Sei sicuro di voler rimuovere questo giocatore dalla campagna?', 'Rimuovi Giocatore');
     if (!confirmed) {
         return;
