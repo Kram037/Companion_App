@@ -1511,9 +1511,13 @@ body {
 }
 
 /* Assicura che le icone SVG siano visibili */
-.btn-icon-amico.btn-accept svg,
-.btn-icon-amico.btn-reject svg {
+.btn-icon-amico.btn-accept svg {
     stroke: white !important;
+    fill: none;
+}
+
+.btn-icon-amico.btn-reject svg {
+    stroke: var(--text) !important;
     fill: none;
 }
 
