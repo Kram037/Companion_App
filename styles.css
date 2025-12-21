@@ -617,31 +617,40 @@ body {
 .btn-icon-invito {
     width: 36px;
     height: 36px;
-    padding: 0;
-    display: inline-flex;
+    padding: 0 !important;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-full);
-    border: none;
+    border: none !important;
     cursor: pointer;
     transition: var(--transition);
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    /* Nascondi qualsiasi testo */
-    text-indent: -9999px;
-    overflow: hidden;
-    font-size: 0;
-    line-height: 0;
-    color: transparent;
+    /* Nascondi qualsiasi testo - FORZATO */
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    text-align: center;
+}
+
+/* Rimuovi qualsiasi testo dai bottoni invito */
+.btn-icon-invito::before,
+.btn-icon-invito::after {
+    display: none !important;
+    content: none !important;
 }
 
 .btn-icon-invito svg {
     width: 20px;
     height: 20px;
-    display: block;
+    display: block !important;
     text-indent: 0;
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
 }
 
 .btn-icon-invito.btn-accept {
