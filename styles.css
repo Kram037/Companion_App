@@ -614,67 +614,6 @@ body {
     align-items: center;
 }
 
-.btn-icon-invito {
-    width: 36px;
-    height: 36px;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    border: none !important;
-    cursor: pointer;
-    transition: var(--transition);
-    flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    /* Nascondi qualsiasi testo - FORZATO */
-    text-indent: -9999px !important;
-    overflow: hidden !important;
-    font-size: 0 !important;
-    line-height: 0 !important;
-    color: transparent !important;
-    text-align: center;
-}
-
-/* Rimuovi qualsiasi testo dai bottoni invito */
-.btn-icon-invito::before,
-.btn-icon-invito::after {
-    display: none !important;
-    content: none !important;
-}
-
-.btn-icon-invito svg {
-    width: 20px;
-    height: 20px;
-    display: block !important;
-    text-indent: 0;
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
-}
-
-.btn-icon-invito.btn-accept {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
-}
-
-.btn-icon-invito.btn-accept:hover {
-    background: #218838;
-    border-color: #218838;
-}
-
-.btn-icon-invito.btn-reject {
-    background: #dc3545;
-    color: white;
-    border-color: #dc3545;
-}
-
-.btn-icon-invito.btn-reject:hover {
-    background: #c82333;
-    border-color: #c82333;
-}
-
 .amici-invito-list {
     display: flex;
     flex-direction: column;
@@ -1515,6 +1454,69 @@ body {
     display: flex;
     gap: var(--spacing-sm);
     flex-shrink: 0;
+    align-items: center;
+}
+
+/* Bottoni icon-only per richieste di amicizia */
+.btn-icon-amico {
+    width: 36px;
+    height: 36px;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    border: none !important;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    /* Nascondi qualsiasi testo - FORZATO */
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    text-align: center;
+}
+
+/* Rimuovi qualsiasi testo dai bottoni amico */
+.btn-icon-amico::before,
+.btn-icon-amico::after {
+    display: none !important;
+    content: none !important;
+}
+
+.btn-icon-amico svg {
+    width: 20px;
+    height: 20px;
+    display: block !important;
+    text-indent: 0;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+.btn-icon-amico.btn-accept {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.btn-icon-amico.btn-accept:hover {
+    background: #218838;
+    border-color: #218838;
+}
+
+.btn-icon-amico.btn-reject {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-icon-amico.btn-reject:hover {
+    background: #c82333;
+    border-color: #c82333;
 }
 
 .btn-small {
