@@ -1158,8 +1158,6 @@ async function loadCampagne(userId) {
             campagne.push(...campagnePartecipate);
         }
 
-        if (error) throw error;
-
         console.log('✅ Campagne caricate:', campagne?.length || 0);
         renderCampagne(campagne || [], true, invitiRicevuti);
 
