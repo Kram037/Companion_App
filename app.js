@@ -1414,37 +1414,8 @@ window.accettaInvitoCampagna = async function(invitoId) {
 
         if (updateError) throw updateError;
 
-        // Incrementa numero_giocatori nella campagna
-        const { error: incrementError } = await supabase.rpc('increment_campagna_giocatori', {
-            p_campagna_id: invito.campagna_id
-        });
-
-        // Se la funzione RPC non esiste, fallback a query manuale
-        if (incrementError) {
-            console.warn('⚠️ Funzione RPC non disponibile, uso fallback:', incrementError);
-            // Fallback: leggi, incrementa e aggiorna
-            const { data: campagna, error: readError } = await supabase
-                .from('campagne')
-                .select('numero_giocatori')
-                .eq('id', invito.campagna_id)
-                .single();
-
-            if (!readError && campagna) {
-                const nuovoNumero = (campagna.numero_giocatori || 0) + 1;
-                const { error: updateError } = await supabase
-                    .from('campagne')
-                    .update({ numero_giocatori: nuovoNumero })
-                    .eq('id', invito.campagna_id);
-                
-                if (updateError) {
-                    console.error('❌ Errore nell\'aggiornamento numero_giocatori:', updateError);
-                } else {
-                    console.log('✅ numero_giocatori aggiornato a:', nuovoNumero);
-                }
-            } else {
-                console.error('❌ Errore nella lettura campagna per incremento:', readError);
-            }
-        }
+        // Il numero_giocatori viene calcolato dinamicamente contando gli inviti accettati
+        // Non è più necessario incrementarlo manualmente
 
         showNotification('Invito accettato!');
         
@@ -2614,7 +2585,7 @@ async function handleCampagnaSubmit(e) {
         icona_name: iconaName,
         icona_data: iconaData,
         nome_dm: utente.nome_utente || session.user.email?.split('@')[0] || 'N/A', // Imposta il DM al creatore
-        numero_giocatori: 0,
+        numero_giocatori: 0, // Mantenuto per retrocompatibilità, ma viene calcolato dinamicamente
         numero_sessioni: 0,
         tempo_di_gioco: 0,
         note: []
@@ -3190,20 +3161,8 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
             if (error) throw error;
         }
 
-        // Decrementa numero_giocatori nella campagna
-        const { data: campagna, error: readError } = await supabase
-            .from('campagne')
-            .select('numero_giocatori')
-            .eq('id', campagnaId)
-            .single();
-
-        if (!readError && campagna) {
-            const nuovoNumero = Math.max(0, (campagna.numero_giocatori || 0) - 1);
-            await supabase
-                .from('campagne')
-                .update({ numero_giocatori: nuovoNumero })
-                .eq('id', campagnaId);
-        }
+        // Il numero_giocatori viene calcolato dinamicamente contando gli inviti accettati
+        // Non è più necessario decrementarlo manualmente
 
         showNotification('Giocatore rimosso dalla campagna');
 
@@ -3523,6 +3482,15 @@ async function handleLogout() {
     if (confirm('Sei sicuro di voler uscire?')) {
         try {
             const supabase = getSupabaseClient();
+            
+            // Pulisci localStorage PRIMA del logout
+            localStorage.removeItem('currentCampagnaId');
+            AppState.currentCampagnaId = null;
+            
+            // Pulisci lo stato locale PRIMA
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            
             if (supabase) {
                 // Disconnetti da eventuali subscription
                 if (campagneChannel) {
@@ -3530,44 +3498,41 @@ async function handleLogout() {
                     campagneChannel = null;
                 }
                 
-                // Pulisci localStorage
-                localStorage.removeItem('currentCampagnaId');
-                AppState.currentCampagnaId = null;
-                
-                // Prova logout con scope local invece di global
-                const { error } = await supabase.auth.signOut({ scope: 'local' });
-                
-                // Anche se c'è un errore, procedi con la pulizia locale
-                if (error) {
-                    console.warn('Errore durante signOut:', error);
-                    // Pulisci lo stato locale comunque
-                    AppState.currentUser = null;
-                    AppState.isLoggedIn = false;
-                    updateUIForLoggedOut();
-                    closeUserModal();
-                    showNotification('Logout effettuato (locale)');
-                } else {
-                    closeUserModal();
-                    showNotification('Logout effettuato');
+                // Prova logout senza scope (default è 'local', ma proviamo anche senza)
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                        console.warn('Errore durante signOut:', error);
+                    }
+                } catch (signOutError) {
+                    console.warn('Errore nel signOut:', signOutError);
                 }
-            } else {
-                // Fallback: pulisci tutto localmente
-                AppState.currentUser = null;
-                AppState.isLoggedIn = false;
-                updateUIForLoggedOut();
-                localStorage.removeItem('currentCampagnaId');
-                closeUserModal();
-                showNotification('Logout effettuato (locale)');
             }
+            
+            // Aggiorna UI e chiudi modal
+            updateUIForLoggedOut();
+            closeUserModal();
+            showNotification('Logout effettuato');
+            
+            // Forza un refresh della pagina per assicurarsi che tutto sia pulito
+            // (opzionale, ma aiuta in caso di problemi con la sessione)
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+            
         } catch (error) {
             console.error('Logout error:', error);
-            // In caso di errore, pulisci comunque lo stato locale
+            // In caso di errore, pulisci comunque tutto
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
             localStorage.removeItem('currentCampagnaId');
             closeUserModal();
-            showNotification('Logout effettuato (locale)');
+            showNotification('Logout effettuato');
+            // Forza refresh anche in caso di errore
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         }
     }
 }
