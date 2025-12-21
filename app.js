@@ -101,6 +101,7 @@ async function init() {
         backToCampagneBtn: document.getElementById('backToCampagneBtn'),
         dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
         dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
+        dettagliIconContainer: document.getElementById('dettagliIconContainer'),
         editUserNameBtn: document.getElementById('editUserNameBtn'),
         editUserNameForm: document.getElementById('editUserNameForm'),
         editUserNameInput: document.getElementById('editUserNameInput'),
@@ -739,6 +740,8 @@ function setupEventListeners() {
         elements.backToCampagneBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
+            // Reset currentCampagnaId per tornare alla lista
+            AppState.currentCampagnaId = null;
             navigateToPage('campagne');
         };
         console.log('✅ Event listener aggiunto a backToCampagneBtn');
@@ -836,8 +839,19 @@ function navigateToPage(pageName) {
     // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
-    } else if (pageName === 'campagne' && AppState.isLoggedIn && AppState.currentUser) {
-        loadCampagne(AppState.currentUser.uid);
+    } else if (pageName === 'campagne') {
+        // Se si naviga verso campagne ma si era nella pagina dettagli, torna ai dettagli
+        if (AppState.currentCampagnaId) {
+            navigateToPage('dettagli');
+            return;
+        }
+        // Altrimenti carica la lista campagne
+        if (AppState.isLoggedIn && AppState.currentUser) {
+            loadCampagne(AppState.currentUser.uid);
+        }
+    } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
+        // Carica i dettagli della campagna
+        loadCampagnaDetails(AppState.currentCampagnaId);
     }
 }
 

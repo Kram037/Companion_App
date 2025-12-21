@@ -278,6 +278,93 @@ body {
     height: 80px;
 }
 
+/* Bottone indietro fluttuante nella pagina dettagli */
+.back-button-floating {
+    position: fixed;
+    bottom: 100px;
+    left: var(--spacing-md);
+    background: var(--primary);
+    color: var(--text);
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    box-shadow: 0 4px 12px var(--shadow);
+    z-index: 101;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.back-button-floating:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow);
+}
+
+.back-button-floating svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Pagina Dettagli */
+.dettagli-content {
+    padding-bottom: 120px; /* Spazio per il bottone fluttuante e la toolbar */
+}
+
+.dettagli-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg) 0;
+}
+
+.dettagli-icon-container {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: var(--background);
+    border: 2px solid var(--border);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.dettagli-icon-svg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.dettagli-icon-svg svg {
+    width: 80px;
+    height: 80px;
+    color: var(--accent);
+}
+
+.dettagli-icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.dettagli-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    margin: 0;
+}
+
 .toolbar-btn {
     background: none;
     border: none;
