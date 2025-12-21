@@ -1406,11 +1406,12 @@ window.accettaInvitoCampagna = async function(invitoId) {
             throw invitoError || new Error('Invito non trovato');
         }
 
-        // Aggiorna lo stato dell'invito
+        // Aggiorna lo stato dell'invito usando la funzione RPC
         const { error: updateError } = await supabase
-            .from('inviti_campagna')
-            .update({ stato: 'accepted' })
-            .eq('id', invitoId);
+            .rpc('update_invito_campagna_stato', {
+                p_invito_id: invitoId,
+                p_nuovo_stato: 'accepted'
+            });
 
         if (updateError) throw updateError;
 
@@ -1445,10 +1446,12 @@ window.rifiutaInvitoCampagna = async function(invitoId) {
     }
 
     try {
+        // Aggiorna lo stato dell'invito usando la funzione RPC
         const { error } = await supabase
-            .from('inviti_campagna')
-            .update({ stato: 'rejected' })
-            .eq('id', invitoId);
+            .rpc('update_invito_campagna_stato', {
+                p_invito_id: invitoId,
+                p_nuovo_stato: 'rejected'
+            });
 
         if (error) throw error;
 
@@ -3099,18 +3102,15 @@ window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
             return;
         }
 
-        // Crea l'invito
-        const { error } = await supabase
-            .from('inviti_campagna')
-            .insert({
-                campagna_id: campagnaId,
-                inviante_id: currentUser.id,
-                invitato_id: amicoId,
-                stato: 'pending'
+        // Crea l'invito usando la funzione RPC per evitare problemi RLS
+        const { data: invitoId, error } = await supabase
+            .rpc('create_invito_campagna', {
+                p_campagna_id: campagnaId,
+                p_invitato_id: amicoId
             });
 
         if (error) {
-            if (error.code === '23505') {
+            if (error.message && error.message.includes('già esistente')) {
                 showNotification('Questo utente è già stato invitato a questa campagna');
             } else {
                 throw error;
