@@ -1495,28 +1495,36 @@ body {
     position: relative;
     z-index: 1;
     flex-shrink: 0;
+    pointer-events: none;
+}
+
+/* Assicura che le icone SVG siano visibili */
+.btn-icon-amico.btn-accept svg,
+.btn-icon-amico.btn-reject svg {
+    stroke: white !important;
+    fill: none;
 }
 
 .btn-icon-amico.btn-accept {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
-}
-
-.btn-icon-amico.btn-accept:hover {
-    background: #218838;
-    border-color: #218838;
-}
-
-.btn-icon-amico.btn-reject {
     background: #dc3545;
     color: white;
     border-color: #dc3545;
 }
 
-.btn-icon-amico.btn-reject:hover {
+.btn-icon-amico.btn-accept:hover {
     background: #c82333;
     border-color: #c82333;
+}
+
+.btn-icon-amico.btn-reject {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-icon-amico.btn-reject:hover {
+    background: #5a6268;
+    border-color: #5a6268;
 }
 
 .btn-small {

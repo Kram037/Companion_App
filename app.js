@@ -2178,12 +2178,12 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
                         </div>
                         <div class="amico-actions">
                             <button class="btn-icon-amico btn-accept" onclick="acceptFriendRequest('${req.id}')" aria-label="Accetta richiesta" title="Accetta richiesta">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                             </button>
                             <button class="btn-icon-amico btn-reject" onclick="rejectFriendRequest('${req.id}')" aria-label="Rifiuta richiesta" title="Rifiuta richiesta">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
                                 </svg>
