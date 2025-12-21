@@ -148,7 +148,13 @@ async function init() {
         editDMModal: document.getElementById('editDMModal'),
         closeEditDMModal: document.getElementById('closeEditDMModal'),
         dmPlayersList: document.getElementById('dmPlayersList'),
-        cancelEditDMBtn: document.getElementById('cancelEditDMBtn')
+        cancelEditDMBtn: document.getElementById('cancelEditDMBtn'),
+        confirmDialogModal: document.getElementById('confirmDialogModal'),
+        closeConfirmDialogModal: document.getElementById('closeConfirmDialogModal'),
+        confirmDialogTitle: document.getElementById('confirmDialogTitle'),
+        confirmDialogMessage: document.getElementById('confirmDialogMessage'),
+        cancelConfirmDialogBtn: document.getElementById('cancelConfirmDialogBtn'),
+        confirmDialogBtn: document.getElementById('confirmDialogBtn')
     };
 
     // Check if all required elements exist
@@ -843,6 +849,71 @@ function setupEventListeners() {
 
     // Icon selector setup
     setupIconSelector();
+
+    // Confirm dialog modal setup
+    if (elements.confirmDialogBtn) {
+        elements.confirmDialogBtn.onclick = () => {
+            closeConfirmDialog(true);
+        };
+    }
+    if (elements.cancelConfirmDialogBtn) {
+        elements.cancelConfirmDialogBtn.onclick = () => {
+            closeConfirmDialog(false);
+        };
+    }
+    if (elements.closeConfirmDialogModal) {
+        elements.closeConfirmDialogModal.onclick = () => {
+            closeConfirmDialog(false);
+        };
+    }
+    if (elements.confirmDialogModal) {
+        elements.confirmDialogModal.addEventListener('click', (e) => {
+            if (e.target === elements.confirmDialogModal) {
+                closeConfirmDialog(false);
+            }
+        });
+    }
+
+    // Prompt dialog modal setup (editFieldModal riutilizzato)
+    // Nota: editFieldForm potrebbe essere usato anche per altri scopi,
+    // quindi controlliamo promptDialogResolve prima di usarlo
+    const originalEditFieldSubmit = elements.editFieldForm ? elements.editFieldForm.onsubmit : null;
+    if (elements.editFieldForm) {
+        elements.editFieldForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (promptDialogResolve && elements.editFieldInput) {
+                closePromptDialog(elements.editFieldInput.value.trim() || null);
+            }
+            // Se non è un prompt dialog, non fare nulla (altri handler lo gestiranno)
+        });
+    }
+    if (elements.cancelEditFieldBtn) {
+        const originalCancelHandler = elements.cancelEditFieldBtn.onclick;
+        elements.cancelEditFieldBtn.onclick = () => {
+            if (promptDialogResolve) {
+                closePromptDialog(null);
+            } else if (originalCancelHandler) {
+                originalCancelHandler();
+            }
+        };
+    }
+    if (elements.closeEditFieldModal) {
+        const originalCloseHandler = elements.closeEditFieldModal.onclick;
+        elements.closeEditFieldModal.onclick = () => {
+            if (promptDialogResolve) {
+                closePromptDialog(null);
+            } else if (originalCloseHandler) {
+                originalCloseHandler();
+            }
+        };
+    }
+    if (elements.editFieldModal) {
+        elements.editFieldModal.addEventListener('click', (e) => {
+            if (e.target === elements.editFieldModal && promptDialogResolve) {
+                closePromptDialog(null);
+            }
+        });
+    }
     
     console.log('✅ Setup event listeners completato');
     
@@ -1472,6 +1543,112 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Callback per i dialog personalizzati
+let confirmDialogResolve = null;
+let promptDialogResolve = null;
+
+/**
+ * Mostra un dialog di conferma personalizzato (sostituisce confirm())
+ * @param {string} message - Messaggio da mostrare
+ * @param {string} title - Titolo del dialog (default: "Conferma")
+ * @returns {Promise<boolean>} - true se confermato, false se annullato
+ */
+function showConfirm(message, title = 'Conferma') {
+    return new Promise((resolve) => {
+        if (!elements.confirmDialogModal) {
+            console.error('❌ confirmDialogModal non trovato');
+            resolve(false);
+            return;
+        }
+
+        // Imposta titolo e messaggio
+        if (elements.confirmDialogTitle) {
+            elements.confirmDialogTitle.textContent = title;
+        }
+        if (elements.confirmDialogMessage) {
+            elements.confirmDialogMessage.textContent = message;
+        }
+
+        // Memorizza il resolve
+        confirmDialogResolve = resolve;
+
+        // Mostra modal
+        elements.confirmDialogModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+}
+
+/**
+ * Chiude il dialog di conferma
+ */
+function closeConfirmDialog(result) {
+    if (elements.confirmDialogModal) {
+        elements.confirmDialogModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    if (confirmDialogResolve) {
+        confirmDialogResolve(result);
+        confirmDialogResolve = null;
+    }
+}
+
+/**
+ * Mostra un dialog di input personalizzato (sostituisce prompt())
+ * @param {string} message - Messaggio da mostrare
+ * @param {string} title - Titolo del dialog (default: "Input")
+ * @param {string} defaultValue - Valore di default (default: "")
+ * @returns {Promise<string|null>} - Valore inserito o null se annullato
+ */
+function showPrompt(message, title = 'Input', defaultValue = '') {
+    return new Promise((resolve) => {
+        if (!elements.editFieldModal) {
+            console.error('❌ editFieldModal non trovato');
+            resolve(null);
+            return;
+        }
+
+        // Imposta titolo e label
+        if (elements.editFieldModalTitle) {
+            elements.editFieldModalTitle.textContent = title;
+        }
+        if (elements.editFieldLabel) {
+            elements.editFieldLabel.textContent = message;
+        }
+        if (elements.editFieldInput) {
+            elements.editFieldInput.value = defaultValue;
+            elements.editFieldInput.type = 'text';
+        }
+
+        // Memorizza il resolve
+        promptDialogResolve = resolve;
+
+        // Mostra modal
+        elements.editFieldModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Focus sull'input
+        setTimeout(() => {
+            if (elements.editFieldInput) {
+                elements.editFieldInput.focus();
+                elements.editFieldInput.select();
+            }
+        }, 100);
+    });
+}
+
+/**
+ * Chiude il dialog di input
+ */
+function closePromptDialog(result) {
+    if (elements.editFieldModal) {
+        elements.editFieldModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    if (promptDialogResolve) {
+        promptDialogResolve(result);
+        promptDialogResolve = null;
+    }
+}
+
 // Supabase - Utenti Management
 let initializingUsers = new Set(); // Traccia utenti in fase di inizializzazione per evitare chiamate multiple
 
@@ -2065,7 +2242,8 @@ window.rimuoviAmico = async function(amicoId) {
         return;
     }
 
-    if (!confirm('Sei sicuro di voler rimuovere questo amico?')) {
+    const confirmed = await showConfirm('Sei sicuro di voler rimuovere questo amico?', 'Rimuovi Amico');
+    if (!confirmed) {
         return;
     }
 
@@ -3003,7 +3181,7 @@ function closeInvitaGiocatoriModal() {
  * Modifica il numero di giocatori
  */
 window.editNumeroGiocatori = async function(campagnaId) {
-    const nuovoNumero = prompt('Inserisci il nuovo numero di giocatori:');
+    const nuovoNumero = await showPrompt('Inserisci il nuovo numero di giocatori:', 'Modifica Numero Giocatori');
     if (nuovoNumero === null) return;
     
     const numero = parseInt(nuovoNumero);
@@ -3019,7 +3197,7 @@ window.editNumeroGiocatori = async function(campagnaId) {
  * Modifica il numero di sessioni
  */
 window.editNumeroSessioni = async function(campagnaId) {
-    const nuovoNumero = prompt('Inserisci il nuovo numero di sessioni:');
+    const nuovoNumero = await showPrompt('Inserisci il nuovo numero di sessioni:', 'Modifica Numero Sessioni');
     if (nuovoNumero === null) return;
     
     const numero = parseInt(nuovoNumero);
@@ -3035,7 +3213,7 @@ window.editNumeroSessioni = async function(campagnaId) {
  * Modifica il tempo di gioco (in minuti)
  */
 window.editTempoGioco = async function(campagnaId) {
-    const nuovoTempo = prompt('Inserisci il nuovo tempo di gioco in minuti:');
+    const nuovoTempo = await showPrompt('Inserisci il nuovo tempo di gioco in minuti:', 'Modifica Tempo di Gioco');
     if (nuovoTempo === null) return;
     
     const minuti = parseInt(nuovoTempo);
@@ -3167,7 +3345,8 @@ window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
  * Rimuove un giocatore dalla campagna
  */
 window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocatoreId) {
-    if (!confirm('Sei sicuro di voler rimuovere questo giocatore dalla campagna?')) {
+    const confirmed = await showConfirm('Sei sicuro di voler rimuovere questo giocatore dalla campagna?', 'Rimuovi Giocatore');
+    if (!confirmed) {
         return;
     }
 
@@ -3213,7 +3392,8 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
 };
 
 window.deleteCampagna = async function(campagnaId) {
-    if (!confirm('Sei sicuro di voler eliminare questa campagna?')) {
+    const confirmed = await showConfirm('Sei sicuro di voler eliminare questa campagna?', 'Elimina Campagna');
+    if (!confirmed) {
         return;
     }
 
@@ -3515,7 +3695,8 @@ function hideRollNumber() {
 
 // Logout Handler
 async function handleLogout() {
-    if (confirm('Sei sicuro di voler uscire?')) {
+    const confirmed = await showConfirm('Sei sicuro di voler uscire?', 'Logout');
+    if (confirmed) {
         try {
             const supabase = getSupabaseClient();
             

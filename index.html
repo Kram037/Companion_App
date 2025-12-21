@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Companion App - D&D Helper</title>
-    <link rel="stylesheet" href="styles.css?v=1766334914722">
+    <link rel="stylesheet" href="styles.css?v=1766336129544">
 </head>
 <body>
     <!-- Header -->
@@ -275,6 +275,19 @@
         </div>
     </div>
 
+    <!-- Confirm Dialog Modal -->
+    <div class="modal" id="confirmDialogModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeConfirmDialogModal">&times;</button>
+            <h2 id="confirmDialogTitle">Conferma</h2>
+            <p id="confirmDialogMessage">Sei sicuro di voler continuare?</p>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" id="cancelConfirmDialogBtn">Annulla</button>
+                <button type="button" class="btn-primary" id="confirmDialogBtn">Conferma</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Invita Giocatori Modal -->
     <div class="modal" id="invitaGiocatoriModal">
         <div class="modal-content">
@@ -431,7 +444,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766334914722"></script>
+    <script src="app.js?v=1766336129544"></script>
     
     <!-- Cache busting script for development -->
     <script>
