@@ -2683,7 +2683,7 @@ async function renderCampagnaDetailsContent(campagna) {
     if (supabase && AppState.currentUser) {
         try {
             const currentUser = await findUserByUid(AppState.currentUser.uid);
-            if (currentUser && currentUser.nome_utente === campagna.nome_dm) {
+            if (currentUser && currentUser.id === campagna.user_id) {
                 isCurrentUserDM = true;
             }
             
@@ -2692,13 +2692,18 @@ async function renderCampagnaDetailsContent(campagna) {
                 .from('inviti_campagna')
                 .select(`
                     *,
-                    utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
+                    giocatore:utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
                 `)
                 .eq('campagna_id', campagna.id)
                 .eq('stato', 'accepted');
             
             if (!error && inviti) {
-                giocatoriCampagna = inviti.map(inv => inv.utenti).filter(Boolean);
+                giocatoriCampagna = inviti
+                    .map(inv => ({
+                        ...(inv.giocatore || inv.utenti),
+                        invitoId: inv.id
+                    }))
+                    .filter(g => g.id); // Filtra solo quelli con id valido
             }
         } catch (error) {
             console.error('❌ Errore nel caricamento dati campagna:', error);
