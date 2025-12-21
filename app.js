@@ -2655,6 +2655,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">Creata il:</span>
                     <span class="info-value">${dataCreazione}</span>
+                    <span></span>
                 </div>
             </div>
             ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}

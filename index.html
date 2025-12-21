@@ -243,6 +243,38 @@
         </div>
     </div>
 
+    <!-- Edit Campagna Field Modal -->
+    <div class="modal" id="editFieldModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeEditFieldModal">&times;</button>
+            <h2 id="editFieldModalTitle">Modifica Campo</h2>
+            <form id="editFieldForm">
+                <div class="form-group">
+                    <label id="editFieldLabel" for="editFieldInput">Valore</label>
+                    <input type="text" id="editFieldInput" name="editFieldInput" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelEditFieldBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="saveEditFieldBtn">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit DM Modal -->
+    <div class="modal" id="editDMModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeEditDMModal">&times;</button>
+            <h2>Seleziona Nuovo DM</h2>
+            <div id="dmPlayersList" class="players-list">
+                <!-- Lista giocatori -->
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" id="cancelEditDMBtn">Annulla</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Invita Giocatori Modal -->
     <div class="modal" id="invitaGiocatoriModal">
         <div class="modal-content">
