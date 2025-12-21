@@ -1138,23 +1138,29 @@ async function loadCampagne(userId) {
             .from('inviti_campagna')
             .select(`
                 campagna_id,
-                campagne!inviti_campagna_campagna_id_fkey(*)
+                campagne:campagne!inviti_campagna_campagna_id_fkey(*)
             `)
             .eq('invitato_id', utente.id)
             .eq('stato', 'accepted');
 
         if (errorInviti) {
             console.error('❌ Errore nel caricamento inviti accettati:', errorInviti);
+        } else {
+            console.log('✅ Inviti accettati caricati:', invitiAccettati?.length || 0);
         }
 
         // Combina le campagne create e quelle a cui partecipa
         const campagne = campagneCreate || [];
         if (invitiAccettati && invitiAccettati.length > 0) {
             const campagnePartecipate = invitiAccettati
-                .map(inv => inv.campagne || inv.campagna)
+                .map(inv => {
+                    // Usa l'alias 'campagne' dalla query
+                    return inv.campagne;
+                })
                 .filter(Boolean)
                 .filter(camp => !campagne.some(c => c.id === camp.id)); // Evita duplicati
 
+            console.log('📋 Campagne a cui partecipa:', campagnePartecipate.length);
             campagne.push(...campagnePartecipate);
         }
 
@@ -1203,19 +1209,31 @@ async function loadInvitiRicevuti(userId) {
 
     try {
         const utente = await findUserByUid(userId);
-        if (!utente) return [];
+        if (!utente) {
+            console.warn('⚠️ Utente non trovato per caricamento inviti');
+            return [];
+        }
 
         const { data: inviti, error } = await supabase
             .from('inviti_campagna')
             .select(`
                 *,
                 campagne:campagne!inviti_campagna_campagna_id_fkey(*),
-                inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid)
+                inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid, email)
             `)
             .eq('invitato_id', utente.id)
             .eq('stato', 'pending');
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Errore query inviti ricevuti:', error);
+            throw error;
+        }
+
+        console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
+        if (inviti && inviti.length > 0) {
+            console.log('📋 Primo invito esempio:', JSON.stringify(inviti[0], null, 2));
+        }
+
         return inviti || [];
     } catch (error) {
         console.error('❌ Errore nel caricamento inviti ricevuti:', error);
@@ -1400,10 +1418,18 @@ window.accettaInvitoCampagna = async function(invitoId) {
 
             if (!readError && campagna) {
                 const nuovoNumero = (campagna.numero_giocatori || 0) + 1;
-                await supabase
+                const { error: updateError } = await supabase
                     .from('campagne')
                     .update({ numero_giocatori: nuovoNumero })
                     .eq('id', invito.campagna_id);
+                
+                if (updateError) {
+                    console.error('❌ Errore nell\'aggiornamento numero_giocatori:', updateError);
+                } else {
+                    console.log('✅ numero_giocatori aggiornato a:', nuovoNumero);
+                }
+            } else {
+                console.error('❌ Errore nella lettura campagna per incremento:', readError);
             }
         }
 
@@ -1411,7 +1437,12 @@ window.accettaInvitoCampagna = async function(invitoId) {
         
         // Ricarica le campagne
         if (AppState.currentUser) {
-            loadCampagne(AppState.currentUser.uid);
+            await loadCampagne(AppState.currentUser.uid);
+        }
+        
+        // Se siamo nella pagina dettagli di questa campagna, ricarica i dettagli
+        if (AppState.currentCampagnaId === invito.campagna_id) {
+            await loadCampagnaDetails(invito.campagna_id);
         }
     } catch (error) {
         console.error('❌ Errore nell\'accettazione invito:', error);
@@ -2704,6 +2735,17 @@ async function renderCampagnaDetailsContent(campagna) {
                         invitoId: inv.id
                     }))
                     .filter(g => g.id); // Filtra solo quelli con id valido
+            }
+            
+            // Ricarica la campagna per ottenere il numero_giocatori aggiornato
+            const { data: campagnaAggiornata, error: errorAggiornata } = await supabase
+                .from('campagne')
+                .select('numero_giocatori')
+                .eq('id', campagna.id)
+                .single();
+            
+            if (!errorAggiornata && campagnaAggiornata) {
+                campagna.numero_giocatori = campagnaAggiornata.numero_giocatori;
             }
         } catch (error) {
             console.error('❌ Errore nel caricamento dati campagna:', error);
