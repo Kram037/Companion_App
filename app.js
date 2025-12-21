@@ -1138,7 +1138,7 @@ async function loadCampagne(userId) {
             .from('inviti_campagna')
             .select(`
                 campagna_id,
-                campagne:campagne!inviti_campagna_campagna_id_fkey(*)
+                campagne!inviti_campagna_campagna_id_fkey(*)
             `)
             .eq('invitato_id', utente.id)
             .eq('stato', 'accepted');
