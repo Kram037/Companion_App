@@ -630,8 +630,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    max-height: 400px;
-    overflow-y: auto;
+    padding: var(--spacing-xs);
 }
 
 .amico-invito-item {
@@ -713,8 +712,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    max-height: 300px;
-    overflow-y: auto;
+    padding: var(--spacing-xs);
 }
 
 .giocatore-modal-item {
@@ -847,6 +845,15 @@ body {
     flex-direction: column;
 }
 
+/* Modal content con tab - dimensione fissa */
+#invitaGiocatoriModal .modal-content {
+    height: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 .modal.active .modal-content {
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -915,10 +922,31 @@ body {
 
 .modal-tab-content {
     display: none;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .modal-tab-content.active {
-    display: block;
+    display: flex;
+}
+
+/* Scrollable content dentro le tab */
+.modal-tab-content .giocatori-modal-list,
+.modal-tab-content .amici-invito-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.modal-tab-content .content-placeholder {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
 }
 
 /* Form */
