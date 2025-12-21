@@ -30,6 +30,12 @@ DROP FUNCTION IF EXISTS update_inviti_campagna_updated_at() CASCADE;
 DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 DROP FUNCTION IF EXISTS generate_unique_cid() CASCADE;
 DROP FUNCTION IF EXISTS get_numero_giocatori(UUID) CASCADE;
+DROP FUNCTION IF EXISTS get_current_user_id() CASCADE;
+DROP FUNCTION IF EXISTS get_richieste_in_entrata() CASCADE;
+DROP FUNCTION IF EXISTS get_richieste_in_uscita() CASCADE;
+DROP FUNCTION IF EXISTS get_amici() CASCADE;
+DROP FUNCTION IF EXISTS get_all_richieste_amicizia() CASCADE;
+DROP FUNCTION IF EXISTS search_user_by_name_and_cid(TEXT, INTEGER) CASCADE;
 
 -- ============================================
 -- PARTE 2: FUNZIONI DI SUPPORTO
