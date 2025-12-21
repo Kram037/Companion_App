@@ -387,44 +387,92 @@ body {
 }
 
 .dettagli-info .info-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
     align-items: center;
     padding: var(--spacing-sm) 0;
     border-bottom: 1px solid var(--border);
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
 }
 
 .dettagli-info .info-item:last-child {
     border-bottom: none;
 }
 
-.dettagli-info .info-item-content {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    gap: var(--spacing-xs);
+.dettagli-info .info-label {
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
 }
 
-.btn-edit-small {
-    background: none;
+.dettagli-info .info-value {
+    color: var(--text);
+    text-align: left;
+}
+
+.dettagli-info .info-item .btn-primary {
+    min-width: 100px;
+    justify-self: end;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.25rem;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.player-item:hover {
+    background: var(--primary);
+    border-color: var(--accent);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
-    width: 28px;
-    height: 28px;
+    color: var(--text-light);
 }
 
-.btn-edit-small:hover {
-    background: var(--primary);
-    border-color: var(--accent);
+.player-avatar svg {
+    width: 24px;
+    height: 24px;
+}
+
+.player-name {
+    margin: 0;
+    font-weight: 600;
     color: var(--text);
+}
+
+.player-cid {
+    margin: 0.25rem 0 0 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
 }
 
 .dettagli-notes {

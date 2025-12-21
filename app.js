@@ -136,7 +136,19 @@ async function init() {
         closeIconSelectorModal: document.getElementById('closeIconSelectorModal'),
         invitaGiocatoriModal: document.getElementById('invitaGiocatoriModal'),
         closeInvitaGiocatoriModal: document.getElementById('closeInvitaGiocatoriModal'),
-        invitaGiocatoriContent: document.getElementById('invitaGiocatoriContent')
+        invitaGiocatoriContent: document.getElementById('invitaGiocatoriContent'),
+        editFieldModal: document.getElementById('editFieldModal'),
+        closeEditFieldModal: document.getElementById('closeEditFieldModal'),
+        editFieldForm: document.getElementById('editFieldForm'),
+        editFieldInput: document.getElementById('editFieldInput'),
+        editFieldLabel: document.getElementById('editFieldLabel'),
+        editFieldModalTitle: document.getElementById('editFieldModalTitle'),
+        cancelEditFieldBtn: document.getElementById('cancelEditFieldBtn'),
+        saveEditFieldBtn: document.getElementById('saveEditFieldBtn'),
+        editDMModal: document.getElementById('editDMModal'),
+        closeEditDMModal: document.getElementById('closeEditDMModal'),
+        dmPlayersList: document.getElementById('dmPlayersList'),
+        cancelEditDMBtn: document.getElementById('cancelEditDMBtn')
     };
 
     // Check if all required elements exist
@@ -2613,60 +2625,31 @@ async function renderCampagnaDetailsContent(campagna) {
         elements.dettagliCampagnaContent.innerHTML = `
             <div class="dettagli-info">
                 <div class="info-item">
-                    <div class="info-item-content">
-                        <span class="info-label">DM:</span>
-                        <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
-                    </div>
-                    ${isCurrentUserDM ? `<button class="btn-edit-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
+                    <span class="info-label">DM:</span>
+                    <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                    ${isCurrentUserDM ? `<button class="btn-primary btn-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                        Modifica
                     </button>` : ''}
                 </div>
                 <div class="info-item">
-                    <div class="info-item-content">
-                        <span class="info-label">Giocatori:</span>
-                        <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
-                        <button class="btn-primary btn-small" id="invitaGiocatoriBtn" onclick="openInvitaGiocatoriModal('${campagna.id}')" style="margin-left: 0.5rem;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 0.25rem;">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="8.5" cy="7" r="4"></circle>
-                                <line x1="20" y1="8" x2="20" y2="14"></line>
-                                <line x1="23" y1="11" x2="17" y2="11"></line>
-                            </svg>
-                            Invita
-                        </button>
-                    </div>
-                    <button class="btn-edit-small" onclick="editNumeroGiocatori('${campagna.id}')" aria-label="Modifica numero giocatori">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
+                    <span class="info-label">Giocatori:</span>
+                    <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
+                    <button class="btn-primary btn-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Invita giocatori">
+                        Invita
                     </button>
                 </div>
                 <div class="info-item">
-                    <div class="info-item-content">
-                        <span class="info-label">Sessioni:</span>
-                        <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
-                    </div>
-                    <button class="btn-edit-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
+                    <span class="info-label">Sessioni:</span>
+                    <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
+                    <button class="btn-primary btn-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                        Modifica
                     </button>
                 </div>
                 <div class="info-item">
-                    <div class="info-item-content">
-                        <span class="info-label">Tempo di gioco:</span>
-                        <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
-                    </div>
-                    <button class="btn-edit-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
+                    <span class="info-label">Tempo di gioco:</span>
+                    <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
+                    <button class="btn-primary btn-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                        Modifica
                     </button>
                 </div>
                 <div class="info-item">
@@ -2735,18 +2718,17 @@ async function openInvitaGiocatoriModal(campagnaId) {
         }
 
         // Carica gli amici usando la stessa funzione di loadAmici
-        const { data: richieste, error } = await supabase
-            .rpc('get_all_friend_requests_for_user', { p_user_id: currentUser.id });
+        const { data: amiciData, error } = await supabase
+            .rpc('get_amici');
 
         if (error) throw error;
 
-        const amici = [];
-        richieste.forEach(req => {
-            if (req.stato === 'accepted') {
-                const amico = req.richiedente_id === currentUser.id ? req.destinatario_info : req.richiedente_info;
-                if (amico) amici.push(amico);
-            }
-        });
+        const amici = (amiciData || []).map(row => ({
+            id: row.amico_id,
+            nome_utente: row.nome_utente,
+            cid: row.cid,
+            email: row.email
+        }));
 
         // Carica gli inviti già inviati per questa campagna
         const { data: invitiEsistenti, error: invitiError } = await supabase
