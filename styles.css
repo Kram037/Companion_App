@@ -287,14 +287,15 @@ body {
     color: var(--text);
     border: none;
     border-radius: var(--radius-full);
-    padding: var(--spacing-sm) var(--spacing-md);
+    width: 48px;
+    height: 48px;
+    padding: 0;
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    justify-content: center;
     cursor: pointer;
     box-shadow: 0 4px 12px var(--shadow);
     z-index: 101;
-    font-weight: 600;
     transition: var(--transition);
 }
 
@@ -305,8 +306,8 @@ body {
 }
 
 .back-button-floating svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 /* Pagina Dettagli */
