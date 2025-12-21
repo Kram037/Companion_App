@@ -1259,11 +1259,24 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     // Mostra gli inviti ricevuti
     if (invitiRicevuti.length > 0) {
         htmlContent += invitiRicevuti.map(invito => {
-            const campagna = invito.campagne || invito.campagna;
+            // Usa l'alias 'campagne' e 'inviante' dalla query
+            const campagna = invito.campagne;
             const inviante = invito.inviante;
+            
+            // Debug logging
+            if (!campagna || !inviante) {
+                console.warn('⚠️ Dati invito incompleti:', {
+                    invitoId: invito.id,
+                    hasCampagna: !!campagna,
+                    hasInviante: !!inviante,
+                    invitoKeys: Object.keys(invito)
+                });
+            }
+            
             const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
             const nomeInviante = inviante?.nome_utente || 'Utente sconosciuto';
             const cidInviante = inviante?.cid || '';
+            
             return `
                 <div class="invito-card">
                     <div class="invito-header">
