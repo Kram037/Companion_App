@@ -627,12 +627,21 @@ body {
     transition: var(--transition);
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    /* Nascondi qualsiasi testo */
+    text-indent: -9999px;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+    color: transparent;
 }
 
 .btn-icon-invito svg {
     width: 20px;
     height: 20px;
     display: block;
+    text-indent: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-icon-invito.btn-accept {
