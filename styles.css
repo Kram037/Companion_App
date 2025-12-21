@@ -611,12 +611,48 @@ body {
     display: flex;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
-    flex-wrap: wrap; /* Permette ai bottoni di andare a capo se necessario */
+    align-items: center;
 }
 
-.invito-actions .btn-small {
-    flex: 1 1 auto; /* I bottoni si adattano allo spazio disponibile */
-    min-width: 0; /* Permette ai bottoni di rimpicciolirsi */
+.btn-icon-invito {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-icon-invito svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-icon-invito.btn-accept {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.btn-icon-invito.btn-accept:hover {
+    background: #218838;
+    border-color: #218838;
+}
+
+.btn-icon-invito.btn-reject {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-icon-invito.btn-reject:hover {
+    background: #c82333;
+    border-color: #c82333;
 }
 
 .amici-invito-list {
@@ -2078,16 +2114,19 @@ body {
     }
     
     .invito-actions {
-        flex-direction: column; /* Bottoni in colonna su mobile */
+        flex-direction: row; /* Bottoni affiancati anche su mobile */
         gap: var(--spacing-xs);
         margin-top: var(--spacing-sm);
     }
     
-    .invito-actions .btn-small {
-        width: 100%; /* Bottoni a larghezza piena su mobile */
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: 0.85rem;
-        min-width: 0; /* Rimuove il min-width su mobile */
+    .btn-icon-invito {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .btn-icon-invito svg {
+        width: 18px;
+        height: 18px;
     }
 }
 

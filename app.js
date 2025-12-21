@@ -1286,8 +1286,17 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
                         <p><strong>Campagna: ${escapeHtml(nomeCampagna)}</strong></p>
                         <p class="invito-from">DM: ${escapeHtml(nomeInviante)}${cidInviante ? ` (CID: ${cidInviante})` : ''}</p>
                         <div class="invito-actions">
-                            <button class="btn-primary btn-small" onclick="accettaInvitoCampagna('${invito.id}')">Accetta</button>
-                            <button class="btn-secondary btn-small" onclick="rifiutaInvitoCampagna('${invito.id}')">Rifiuta</button>
+                            <button class="btn-icon-invito btn-accept" onclick="accettaInvitoCampagna('${invito.id}')" aria-label="Accetta" title="Accetta">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                            <button class="btn-icon-invito btn-reject" onclick="rifiutaInvitoCampagna('${invito.id}')" aria-label="Rifiuta" title="Rifiuta">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
