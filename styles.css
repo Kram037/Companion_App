@@ -888,6 +888,11 @@ body {
     margin-top: var(--spacing-md);
 }
 
+/* Rimuovi margin-top per bottoni in invito-actions */
+.invito-actions .btn-secondary {
+    margin-top: 0;
+}
+
 .btn-secondary:hover {
     background: var(--primary-dark);
 }
