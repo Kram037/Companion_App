@@ -766,34 +766,6 @@ body {
     font-size: 0.85rem;
 }
 
-.btn-icon-remove {
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: 0 2px 4px var(--shadow);
-    flex-shrink: 0;
-}
-
-.btn-icon-remove:hover {
-    background: #c82333;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px var(--shadow);
-}
-
-.btn-icon-remove svg {
-    width: 20px;
-    height: 20px;
-    stroke: white;
-}
 
 .btn-disabled {
     opacity: 0.6;
