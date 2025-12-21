@@ -895,6 +895,7 @@ body {
     border-bottom: 2px solid var(--border);
     margin-bottom: var(--spacing-md);
     padding-bottom: 0;
+    flex-shrink: 0;
 }
 
 .modal-tab {
@@ -924,7 +925,6 @@ body {
     display: none;
     flex: 1;
     overflow: hidden;
-    display: flex;
     flex-direction: column;
     min-height: 0;
 }
@@ -939,6 +939,7 @@ body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    padding: var(--spacing-xs);
 }
 
 .modal-tab-content .content-placeholder {
