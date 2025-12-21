@@ -611,6 +611,12 @@ body {
     display: flex;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
+    flex-wrap: wrap; /* Permette ai bottoni di andare a capo se necessario */
+}
+
+.invito-actions .btn-small {
+    flex: 1 1 auto; /* I bottoni si adattano allo spazio disponibile */
+    min-width: 0; /* Permette ai bottoni di rimpicciolirsi */
 }
 
 .amici-invito-list {
