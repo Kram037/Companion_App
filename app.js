@@ -175,6 +175,12 @@ async function init() {
     // Load saved theme
     loadTheme();
     
+    // Ripristina currentCampagnaId dal localStorage se esiste
+    const savedCampagnaId = localStorage.getItem('currentCampagnaId');
+    if (savedCampagnaId) {
+        AppState.currentCampagnaId = savedCampagnaId;
+    }
+    
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
@@ -236,16 +242,21 @@ function setupSupabaseAuth() {
                 updateUIForLoggedIn();
                 console.log('✅ Utente autenticato:', session.user.email);
                 
-                // Initialize user document and load data
-                initializeUserDocument(session.user).then(() => {
+            // Initialize user document and load data
+            initializeUserDocument(session.user).then(() => {
+                // Se c'è una campagna salvata, vai ai dettagli
+                if (AppState.currentCampagnaId) {
+                    navigateToPage('dettagli');
+                } else {
                     // Carica i dati in base alla pagina corrente
                     if (AppState.currentPage === 'campagne') {
                         loadCampagne(session.user.id);
                     } else if (AppState.currentPage === 'amici') {
                         loadAmici();
                     }
-                    // Altre pagine possono essere aggiunte qui in futuro
-                });
+                }
+                // Altre pagine possono essere aggiunte qui in futuro
+            });
             } else {
                 // User is signed out
                 AppState.currentUser = null;
@@ -759,6 +770,7 @@ function setupEventListeners() {
             e.stopPropagation();
             // Reset currentCampagnaId per tornare alla lista
             AppState.currentCampagnaId = null;
+            localStorage.removeItem('currentCampagnaId');
             navigateToPage('campagne');
         };
         console.log('✅ Event listener aggiunto a backToCampagneBtn');
@@ -2539,6 +2551,8 @@ window.editCampagna = function(campagnaId) {
 window.openCampagnaDetails = function(campagnaId) {
     // Salva l'ID della campagna corrente
     AppState.currentCampagnaId = campagnaId;
+    // Salva nel localStorage per persistenza al refresh
+    localStorage.setItem('currentCampagnaId', campagnaId);
     navigateToPage('dettagli');
 };
 
