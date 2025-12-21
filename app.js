@@ -179,6 +179,7 @@ async function init() {
     const savedCampagnaId = localStorage.getItem('currentCampagnaId');
     if (savedCampagnaId) {
         AppState.currentCampagnaId = savedCampagnaId;
+        console.log('📌 Campagna salvata ripristinata:', savedCampagnaId);
     }
     
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
@@ -296,11 +297,16 @@ async function checkAuthState() {
             updateUIForLoggedIn();
             await initializeUserDocument(session.user);
             
-            // Carica i dati in base alla pagina corrente
-            if (AppState.currentPage === 'campagne') {
-                loadCampagne(session.user.id);
-            } else if (AppState.currentPage === 'amici') {
-                loadAmici();
+            // Se c'è una campagna salvata, vai ai dettagli
+            if (AppState.currentCampagnaId) {
+                navigateToPage('dettagli');
+            } else {
+                // Carica i dati in base alla pagina corrente
+                if (AppState.currentPage === 'campagne') {
+                    loadCampagne(session.user.id);
+                } else if (AppState.currentPage === 'amici') {
+                    loadAmici();
+                }
             }
         } else {
             updateUIForLoggedOut();
