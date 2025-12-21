@@ -2062,6 +2062,33 @@ body {
         width: 60px;
         height: 60px;
     }
+    
+    /* Invito card responsive */
+    .invito-card {
+        padding: var(--spacing-sm);
+    }
+    
+    .invito-content p {
+        font-size: 0.9rem;
+        margin: var(--spacing-xs) 0;
+    }
+    
+    .invito-from {
+        font-size: 0.85rem;
+    }
+    
+    .invito-actions {
+        flex-direction: column; /* Bottoni in colonna su mobile */
+        gap: var(--spacing-xs);
+        margin-top: var(--spacing-sm);
+    }
+    
+    .invito-actions .btn-small {
+        width: 100%; /* Bottoni a larghezza piena su mobile */
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.85rem;
+        min-width: 0; /* Rimuove il min-width su mobile */
+    }
 }
 
 /* User logged in state */
