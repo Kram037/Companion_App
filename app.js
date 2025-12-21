@@ -3081,6 +3081,13 @@ function renderCampagnaDetailsHeader(campagna) {
 async function openInvitaGiocatoriModal(campagnaId) {
     if (!elements.invitaGiocatoriModal) return;
 
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può invitare giocatori');
+        return;
+    }
+
     // Carica la lista degli amici
     try {
         const supabase = getSupabaseClient();
@@ -3181,6 +3188,13 @@ function closeInvitaGiocatoriModal() {
  * Modifica il numero di giocatori
  */
 window.editNumeroGiocatori = async function(campagnaId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
+
     const nuovoNumero = await showPrompt('Inserisci il nuovo numero di giocatori:', 'Modifica Numero Giocatori');
     if (nuovoNumero === null) return;
     
@@ -3197,6 +3211,13 @@ window.editNumeroGiocatori = async function(campagnaId) {
  * Modifica il numero di sessioni
  */
 window.editNumeroSessioni = async function(campagnaId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
+
     const nuovoNumero = await showPrompt('Inserisci il nuovo numero di sessioni:', 'Modifica Numero Sessioni');
     if (nuovoNumero === null) return;
     
@@ -3213,6 +3234,13 @@ window.editNumeroSessioni = async function(campagnaId) {
  * Modifica il tempo di gioco (in minuti)
  */
 window.editTempoGioco = async function(campagnaId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
+
     const nuovoTempo = await showPrompt('Inserisci il nuovo tempo di gioco in minuti:', 'Modifica Tempo di Gioco');
     if (nuovoTempo === null) return;
     
@@ -3229,6 +3257,13 @@ window.editTempoGioco = async function(campagnaId) {
  * Modifica il DM della campagna
  */
 window.editDMField = async function(campagnaId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
+
     if (!AppState.campagnaGiocatori || AppState.campagnaGiocatori.length === 0) {
         showNotification('Non ci sono giocatori nella campagna per cambiare il DM');
         return;
@@ -3258,9 +3293,48 @@ window.editDMField = async function(campagnaId) {
 };
 
 /**
+ * Verifica se l'utente corrente è il DM di una campagna
+ */
+async function isCurrentUserDM(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser) {
+        return false;
+    }
+
+    try {
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            return false;
+        }
+
+        // Carica la campagna per verificare user_id
+        const { data: campagna, error } = await supabase
+            .from('campagne')
+            .select('user_id')
+            .eq('id', campagnaId)
+            .single();
+
+        if (error || !campagna) {
+            return false;
+        }
+
+        return currentUser.id === campagna.user_id;
+    } catch (error) {
+        console.error('❌ Errore nel controllo DM:', error);
+        return false;
+    }
+}
+
+/**
  * Aggiorna un campo della campagna
  */
 async function updateCampagnaField(campagnaId, field, value) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
     const supabase = getSupabaseClient();
     if (!supabase) {
         showNotification('Errore: Supabase non disponibile');
