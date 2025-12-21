@@ -612,6 +612,18 @@ body {
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
     align-items: center;
+    justify-content: flex-start;
+}
+
+/* Allinea i bottoni inviti campagne */
+.invito-actions .btn-primary.btn-small,
+.invito-actions .btn-secondary.btn-small {
+    margin-top: 0;
+    height: auto;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .amici-invito-list {
@@ -1506,25 +1518,25 @@ body {
 }
 
 .btn-icon-amico.btn-accept {
-    background: #dc3545;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: white;
-    border-color: #dc3545;
+    border: none;
 }
 
 .btn-icon-amico.btn-accept:hover {
-    background: #c82333;
-    border-color: #c82333;
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow);
 }
 
 .btn-icon-amico.btn-reject {
-    background: #6c757d;
-    color: white;
-    border-color: #6c757d;
+    background: var(--secondary);
+    color: var(--text);
+    border: none;
 }
 
 .btn-icon-amico.btn-reject:hover {
-    background: #5a6268;
-    border-color: #5a6268;
+    background: var(--primary-dark);
 }
 
 .btn-small {
