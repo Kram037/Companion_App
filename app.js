@@ -2627,29 +2627,43 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">DM:</span>
                     <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
-                    ${isCurrentUserDM ? `<button class="btn-primary btn-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
-                        Modifica
-                    </button>` : ''}
+                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>` : '<span></span>'}
                 </div>
                 <div class="info-item">
                     <span class="info-label">Giocatori:</span>
                     <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
-                    <button class="btn-primary btn-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Invita giocatori">
-                        Invita
+                    <button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Invita giocatori">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                        </svg>
                     </button>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Sessioni:</span>
                     <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
-                    <button class="btn-primary btn-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
-                        Modifica
+                    <button class="btn-icon-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
                     </button>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Tempo di gioco:</span>
                     <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
-                    <button class="btn-primary btn-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
-                        Modifica
+                    <button class="btn-icon-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
                     </button>
                 </div>
                 <div class="info-item">
