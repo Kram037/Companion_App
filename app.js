@@ -2161,7 +2161,7 @@ async function handleCampagnaSubmit(e) {
         icona_type: iconaType,
         icona_name: iconaName,
         icona_data: iconaData,
-        nome_dm: '',
+        nome_dm: utente.nome_utente || session.user.email?.split('@')[0] || 'N/A', // Imposta il DM al creatore
         numero_giocatori: 0,
         numero_sessioni: 0,
         tempo_di_gioco: 0,
