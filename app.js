@@ -1051,10 +1051,29 @@ function renderCampagne(campagne, isLoggedIn = true) {
             campagna.note.join(', ') : 
             'Nessuna nota';
 
+        // Renderizza l'icona della campagna
+        let iconaHTML = '';
+        if (campagna.icona_type === 'image' && campagna.icona_data) {
+            iconaHTML = `<img src="${escapeHtml(campagna.icona_data)}" alt="Icona campagna" class="campagna-icon-image">`;
+        } else if (campagna.icona_type === 'predefined' && campagna.icona_name) {
+            const selectedIcon = predefinedIcons.find(i => i.name === campagna.icona_name);
+            if (selectedIcon) {
+                iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
+            }
+        }
+        // Se non c'è icona, usa quella di default
+        if (!iconaHTML) {
+            const defaultIcon = predefinedIcons.find(i => i.name === 'dice');
+            iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${defaultIcon.svg}</svg></div>`;
+        }
+
         return `
             <div class="campagna-card" data-campagna-id="${campagna.id}">
                 <div class="campagna-header">
-                    <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
+                    <div class="campagna-title-with-icon">
+                        <div class="campagna-icon">${iconaHTML}</div>
+                        <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
+                    </div>
                     <div class="campagna-actions">
                         <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
