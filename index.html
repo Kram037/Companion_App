@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Companion App - D&D Helper</title>
-    <link rel="stylesheet" href="styles.css?v=1766337157937">
+    <link rel="stylesheet" href="styles.css?v=1766338280812">
 </head>
 <body>
     <!-- Header -->
@@ -292,8 +292,14 @@
     <div class="modal" id="invitaGiocatoriModal">
         <div class="modal-content">
             <button class="modal-close" id="closeInvitaGiocatoriModal">&times;</button>
-            <h2>Gestisci Giocatori</h2>
-            <div id="invitaGiocatoriContent">
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="gestisci" id="gestisciGiocatoriTab">Gestisci Giocatori</button>
+                <button class="modal-tab" data-tab="invita" id="invitaGiocatoriTab">Invita Giocatori</button>
+            </div>
+            <div class="modal-tab-content active" id="gestisciGiocatoriContent">
+                <p>Caricamento giocatori...</p>
+            </div>
+            <div class="modal-tab-content" id="invitaGiocatoriContent">
                 <p>Caricamento amici...</p>
             </div>
         </div>
@@ -444,7 +450,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766337157937"></script>
+    <script src="app.js?v=1766338280812"></script>
     
     <!-- Cache busting script for development -->
     <script>

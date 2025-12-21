@@ -881,6 +881,46 @@ body {
     color: var(--text);
 }
 
+/* Modal Tabs */
+.modal-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    border-bottom: 2px solid var(--border);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: 0;
+}
+
+.modal-tab {
+    background: none;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    position: relative;
+}
+
+.modal-tab:hover {
+    color: var(--text);
+}
+
+.modal-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.modal-tab-content {
+    display: none;
+}
+
+.modal-tab-content.active {
+    display: block;
+}
+
 /* Form */
 #loginForm {
     width: 100%;

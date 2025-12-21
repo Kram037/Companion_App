@@ -136,6 +136,9 @@ async function init() {
         closeIconSelectorModal: document.getElementById('closeIconSelectorModal'),
         invitaGiocatoriModal: document.getElementById('invitaGiocatoriModal'),
         closeInvitaGiocatoriModal: document.getElementById('closeInvitaGiocatoriModal'),
+        gestisciGiocatoriTab: document.getElementById('gestisciGiocatoriTab'),
+        invitaGiocatoriTab: document.getElementById('invitaGiocatoriTab'),
+        gestisciGiocatoriContent: document.getElementById('gestisciGiocatoriContent'),
         invitaGiocatoriContent: document.getElementById('invitaGiocatoriContent'),
         editFieldModal: document.getElementById('editFieldModal'),
         closeEditFieldModal: document.getElementById('closeEditFieldModal'),
@@ -837,6 +840,28 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             closeInvitaGiocatoriModal();
+        };
+    }
+    
+    // Tab navigation per gestione giocatori modal
+    if (elements.gestisciGiocatoriTab) {
+        elements.gestisciGiocatoriTab.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                switchGiocatoriTab('gestisci', campagnaId);
+            }
+        };
+    }
+    if (elements.invitaGiocatoriTab) {
+        elements.invitaGiocatoriTab.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                switchGiocatoriTab('invita', campagnaId);
+            }
         };
     }
     if (elements.invitaGiocatoriModal) {
@@ -3012,6 +3037,207 @@ async function renderCampagnaDetailsContent(campagna) {
 }
 
 /**
+ * Cambia tab nella dialog gestione giocatori
+ */
+function switchGiocatoriTab(tabName, campagnaId) {
+    if (!elements.gestisciGiocatoriTab || !elements.invitaGiocatoriTab || 
+        !elements.gestisciGiocatoriContent || !elements.invitaGiocatoriContent) {
+        return;
+    }
+
+    // Rimuovi classe active da tutte le tab e contenuti
+    elements.gestisciGiocatoriTab.classList.remove('active');
+    elements.invitaGiocatoriTab.classList.remove('active');
+    elements.gestisciGiocatoriContent.classList.remove('active');
+    elements.invitaGiocatoriContent.classList.remove('active');
+
+    // Aggiungi classe active alla tab selezionata
+    if (tabName === 'gestisci') {
+        elements.gestisciGiocatoriTab.classList.add('active');
+        elements.gestisciGiocatoriContent.classList.add('active');
+        renderGestisciGiocatoriTab(campagnaId);
+    } else if (tabName === 'invita') {
+        elements.invitaGiocatoriTab.classList.add('active');
+        elements.invitaGiocatoriContent.classList.add('active');
+        renderInvitaGiocatoriTab(campagnaId);
+    }
+}
+
+/**
+ * Renderizza la tab "Gestisci Giocatori"
+ */
+async function renderGestisciGiocatoriTab(campagnaId) {
+    if (!elements.gestisciGiocatoriContent) return;
+
+    try {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+            return;
+        }
+
+        // Carica i giocatori attuali (utenti che hanno accettato l'invito)
+        const { data: invitiAccettati, error: invitiError } = await supabase
+            .from('inviti_campagna')
+            .select(`
+                *,
+                giocatore:utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
+            `)
+            .eq('campagna_id', campagnaId)
+            .eq('stato', 'accepted');
+        
+        if (invitiError) {
+            console.error('❌ Errore nel caricamento giocatori:', invitiError);
+            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+            return;
+        }
+
+        const giocatoriAttuali = (invitiAccettati || [])
+            .map(inv => ({
+                ...(inv.giocatore || inv.utenti),
+                invitoId: inv.id
+            }))
+            .filter(g => g.id); // Filtra solo quelli con id valido
+
+        if (giocatoriAttuali.length === 0) {
+            elements.gestisciGiocatoriContent.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Non ci sono giocatori. Invita amici nella tua campagna!</p>
+                </div>
+            `;
+        } else {
+            elements.gestisciGiocatoriContent.innerHTML = `
+                <div class="giocatori-modal-list">
+                    ${giocatoriAttuali.map(giocatore => `
+                        <div class="giocatore-modal-item">
+                            <div class="giocatore-info">
+                                <div class="giocatore-avatar">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="giocatore-nome">${escapeHtml(giocatore.nome_utente || 'Utente')}</p>
+                                    <p class="giocatore-cid">CID: ${giocatore.cid || ''}</p>
+                                </div>
+                            </div>
+                            <button class="btn-icon-remove" onclick="rimuoviGiocatoreDaCampagna('${campagnaId}', '${giocatore.invitoId || ''}', '${giocatore.id}')" aria-label="Rimuovi giocatore" title="Rimuovi dalla campagna">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Errore nel caricamento giocatori:', error);
+        elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+    }
+}
+
+/**
+ * Renderizza la tab "Invita Giocatori"
+ */
+async function renderInvitaGiocatoriTab(campagnaId) {
+    if (!elements.invitaGiocatoriContent) return;
+
+    try {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            elements.invitaGiocatoriContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+            return;
+        }
+
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            elements.invitaGiocatoriContent.innerHTML = '<p>Errore: utente corrente non trovato</p>';
+            return;
+        }
+
+        // Carica i giocatori attuali per escluderli dalla lista amici
+        const { data: invitiAccettati } = await supabase
+            .from('inviti_campagna')
+            .select('invitato_id')
+            .eq('campagna_id', campagnaId)
+            .eq('stato', 'accepted');
+        
+        const giocatoriAttualiIds = new Set((invitiAccettati || []).map(inv => inv.invitato_id));
+
+        // Carica gli amici
+        const { data: amiciData, error: amiciError } = await supabase
+            .rpc('get_amici');
+
+        if (amiciError) throw amiciError;
+
+        const amici = (amiciData || []).map(row => ({
+            id: row.amico_id,
+            nome_utente: row.nome_utente,
+            cid: row.cid,
+            email: row.email
+        }));
+
+        // Filtra gli amici escludendo quelli già nella campagna
+        const amiciDaInvitare = amici.filter(amico => !giocatoriAttualiIds.has(amico.id));
+
+        // Carica gli inviti già inviati per questa campagna
+        const { data: invitiEsistenti } = await supabase
+            .from('inviti_campagna')
+            .select('invitato_id')
+            .eq('campagna_id', campagnaId);
+
+        const invitatiIds = new Set((invitiEsistenti || []).map(inv => inv.invitato_id));
+
+        if (amiciDaInvitare.length === 0) {
+            elements.invitaGiocatoriContent.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Non hai amici da invitare. Aggiungi degli amici prima!</p>
+                </div>
+            `;
+        } else {
+            elements.invitaGiocatoriContent.innerHTML = `
+                <div class="amici-invito-list">
+                    ${amiciDaInvitare.map(amico => {
+                        const giaInvitato = invitatiIds.has(amico.id);
+                        return `
+                            <div class="amico-invito-item">
+                                <div class="amico-info">
+                                    <div class="amico-avatar">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="amico-nome">${escapeHtml(amico.nome_utente || 'Utente')}</p>
+                                        <p class="amico-cid">CID: ${amico.cid || ''}</p>
+                                    </div>
+                                </div>
+                                <button class="btn-icon-invita ${giaInvitato ? 'btn-disabled' : ''}" 
+                                        onclick="invitaAmicoAllaCampagna('${campagnaId}', '${amico.id}')" 
+                                        ${giaInvitato ? 'disabled' : ''}
+                                        title="${giaInvitato ? 'Già invitato' : 'Invita'}">
+                                    ${giaInvitato ? 
+                                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' :
+                                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+                                    }
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Errore nel caricamento amici per invito:', error);
+        elements.invitaGiocatoriContent.innerHTML = '<p>Errore nel caricamento degli amici</p>';
+    }
+}
+
+/**
  * Renderizza l'header dei dettagli campagna (icona e nome)
  */
 function renderCampagnaDetailsHeader(campagna) {
@@ -3043,7 +3269,7 @@ function renderCampagnaDetailsHeader(campagna) {
 }
 
 /**
- * Apre il modal per invitare giocatori
+ * Apre il modal per gestire i giocatori della campagna
  */
 async function openInvitaGiocatoriModal(campagnaId) {
     if (!elements.invitaGiocatoriModal) return;
@@ -3051,95 +3277,14 @@ async function openInvitaGiocatoriModal(campagnaId) {
     // Verifica che l'utente sia il DM
     const isDM = await isCurrentUserDM(campagnaId);
     if (!isDM) {
-        showNotification('Solo il DM può invitare giocatori');
+        showNotification('Solo il DM può gestire i giocatori');
         return;
     }
 
-    // Carica la lista degli amici
-    try {
-        const supabase = getSupabaseClient();
-        if (!supabase) {
-            showNotification('Errore: Supabase non disponibile');
-            return;
-        }
-
-        const currentUser = await findUserByUid(AppState.currentUser.uid);
-        if (!currentUser) {
-            showNotification('Errore: utente corrente non trovato');
-            return;
-        }
-
-        // Carica gli amici usando la stessa funzione di loadAmici
-        const { data: amiciData, error } = await supabase
-            .rpc('get_amici');
-
-        if (error) throw error;
-
-        const amici = (amiciData || []).map(row => ({
-            id: row.amico_id,
-            nome_utente: row.nome_utente,
-            cid: row.cid,
-            email: row.email
-        }));
-
-        // Carica gli inviti già inviati per questa campagna
-        const { data: invitiEsistenti, error: invitiError } = await supabase
-            .from('inviti_campagna')
-            .select('invitato_id')
-            .eq('campagna_id', campagnaId);
-
-        const invitatiIds = new Set((invitiEsistenti || []).map(inv => inv.invitato_id));
-
-        // Renderizza la lista degli amici
-        if (elements.invitaGiocatoriContent) {
-            if (amici.length === 0) {
-                elements.invitaGiocatoriContent.innerHTML = `
-                    <div class="content-placeholder">
-                        <p>Non hai amici da invitare. Aggiungi degli amici prima!</p>
-                    </div>
-                `;
-            } else {
-                elements.invitaGiocatoriContent.innerHTML = `
-                    <div class="amici-invito-list">
-                        ${amici.map(amico => {
-                            const giaInvitato = invitatiIds.has(amico.id);
-                            return `
-                                <div class="amico-invito-item">
-                                    <div class="amico-info">
-                                        <div class="amico-avatar">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                <circle cx="12" cy="7" r="4"></circle>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="amico-nome">${escapeHtml(amico.nome_utente || 'Utente')}</p>
-                                            <p class="amico-cid">CID: ${amico.cid || ''}</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn-icon-invita ${giaInvitato ? 'btn-disabled' : ''}" 
-                                            onclick="invitaAmicoAllaCampagna('${campagnaId}', '${amico.id}')" 
-                                            ${giaInvitato ? 'disabled' : ''}
-                                            title="${giaInvitato ? 'Già invitato' : 'Invita'}">
-                                        ${giaInvitato ? 
-                                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' :
-                                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
-                                        }
-                                    </button>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            }
-        }
-
-        elements.invitaGiocatoriModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    } catch (error) {
-        console.error('❌ Errore nel caricamento amici per invito:', error);
-        showNotification('Errore nel caricamento degli amici');
-    }
+    // Mostra la dialog e switch alla tab "Gestisci Giocatori" (tab predefinita)
+    elements.invitaGiocatoriModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    switchGiocatoriTab('gestisci', campagnaId);
 }
 
 /**
@@ -3429,9 +3574,9 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
 
         showNotification('Giocatore rimosso dalla campagna');
 
-        // Ricarica la dialog se è aperta, altrimenti ricarica i dettagli
+        // Ricarica la tab "Gestisci Giocatori" se la dialog è aperta
         if (elements.invitaGiocatoriModal && elements.invitaGiocatoriModal.classList.contains('active')) {
-            await openInvitaGiocatoriModal(campagnaId);
+            await renderGestisciGiocatoriTab(campagnaId);
         }
         
         // Ricarica i dettagli della campagna
