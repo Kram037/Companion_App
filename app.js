@@ -2766,10 +2766,14 @@ async function openInvitaGiocatoriModal(campagnaId) {
                                             <p class="amico-cid">CID: ${amico.cid || ''}</p>
                                         </div>
                                     </div>
-                                    <button class="btn-primary btn-small ${giaInvitato ? 'btn-disabled' : ''}" 
+                                    <button class="btn-icon-invita ${giaInvitato ? 'btn-disabled' : ''}" 
                                             onclick="invitaAmicoAllaCampagna('${campagnaId}', '${amico.id}')" 
-                                            ${giaInvitato ? 'disabled' : ''}>
-                                        ${giaInvitato ? 'Già invitato' : 'Invita'}
+                                            ${giaInvitato ? 'disabled' : ''}
+                                            title="${giaInvitato ? 'Già invitato' : 'Invita'}">
+                                        ${giaInvitato ? 
+                                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' :
+                                            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>'
+                                        }
                                     </button>
                                 </div>
                             `;
