@@ -131,7 +131,10 @@ async function init() {
         saveCampagnaBtn: document.getElementById('saveCampagnaBtn'),
         openIconSelectorBtn: document.getElementById('openIconSelectorBtn'),
         iconSelectorModal: document.getElementById('iconSelectorModal'),
-        closeIconSelectorModal: document.getElementById('closeIconSelectorModal')
+        closeIconSelectorModal: document.getElementById('closeIconSelectorModal'),
+        invitaGiocatoriModal: document.getElementById('invitaGiocatoriModal'),
+        closeInvitaGiocatoriModal: document.getElementById('closeInvitaGiocatoriModal'),
+        invitaGiocatoriContent: document.getElementById('invitaGiocatoriContent')
     };
 
     // Check if all required elements exist
@@ -790,6 +793,22 @@ function setupEventListeners() {
         console.log('✅ Event listener aggiunto a cancelEditUserNameBtn');
     }
 
+    // Close invita giocatori modal
+    if (elements.closeInvitaGiocatoriModal) {
+        elements.closeInvitaGiocatoriModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeInvitaGiocatoriModal();
+        };
+    }
+    if (elements.invitaGiocatoriModal) {
+        elements.invitaGiocatoriModal.addEventListener('click', (e) => {
+            if (e.target === elements.invitaGiocatoriModal) {
+                closeInvitaGiocatoriModal();
+            }
+        });
+    }
+
     // Icon selector setup
     setupIconSelector();
     
@@ -1052,6 +1071,9 @@ async function loadCampagne(userId) {
 
     console.log('📚 Caricamento campagne per utente:', userId);
     
+    // Carica anche gli inviti ricevuti
+    const invitiRicevuti = await loadInvitiRicevuti(userId);
+    
     // Disconnetti da eventuali subscription precedenti
     if (campagneChannel) {
         supabase.removeChannel(campagneChannel);
@@ -1080,7 +1102,7 @@ async function loadCampagne(userId) {
         if (error) throw error;
 
         console.log('✅ Campagne caricate:', campagne?.length || 0);
-        renderCampagne(campagne || [], true);
+        renderCampagne(campagne || [], true, invitiRicevuti);
 
         // Setup real-time subscription
         campagneChannel = supabase
@@ -1115,7 +1137,36 @@ async function loadCampagne(userId) {
     }
 }
 
-function renderCampagne(campagne, isLoggedIn = true) {
+/**
+ * Carica gli inviti ricevuti dall'utente
+ */
+async function loadInvitiRicevuti(userId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return [];
+
+    try {
+        const utente = await findUserByUid(userId);
+        if (!utente) return [];
+
+        const { data: inviti, error } = await supabase
+            .from('inviti_campagna')
+            .select(`
+                *,
+                campagna:campagne(*),
+                inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid)
+            `)
+            .eq('invitato_id', utente.id)
+            .eq('stato', 'pending');
+
+        if (error) throw error;
+        return inviti || [];
+    } catch (error) {
+        console.error('❌ Errore nel caricamento inviti ricevuti:', error);
+        return [];
+    }
+}
+
+function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     if (!elements.campagneList) return;
 
     // If user is not logged in, show login message
@@ -1128,8 +1179,33 @@ function renderCampagne(campagne, isLoggedIn = true) {
         return;
     }
 
-    // If logged in but no campaigns
-    if (campagne.length === 0) {
+    let htmlContent = '';
+
+    // Mostra gli inviti ricevuti
+    if (invitiRicevuti.length > 0) {
+        htmlContent += invitiRicevuti.map(invito => {
+            const campagna = invito.campagna;
+            const inviante = invito.inviante;
+            return `
+                <div class="invito-card">
+                    <div class="invito-header">
+                        <h4>🎲 Invito a Campagna</h4>
+                    </div>
+                    <div class="invito-content">
+                        <p><strong>${escapeHtml(campagna?.nome_campagna || 'Campagna')}</strong></p>
+                        <p class="invito-from">Da: ${escapeHtml(inviante?.nome_utente || 'Utente')} (CID: ${inviante?.cid || ''})</p>
+                        <div class="invito-actions">
+                            <button class="btn-primary btn-small" onclick="accettaInvitoCampagna('${invito.id}')">Accetta</button>
+                            <button class="btn-secondary btn-small" onclick="rifiutaInvitoCampagna('${invito.id}')">Rifiuta</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // If logged in but no campaigns and no invites
+    if (campagne.length === 0 && invitiRicevuti.length === 0) {
         elements.campagneList.innerHTML = `
             <div class="content-placeholder">
                 <p>Non hai campagne. Crea o partecipa a una campagna!</p>
@@ -1138,7 +1214,7 @@ function renderCampagne(campagne, isLoggedIn = true) {
         return;
     }
 
-    elements.campagneList.innerHTML = campagne.map(campagna => {
+    htmlContent += campagne.map(campagna => {
         const dataCreazione = campagna.data_creazione ? 
             new Date(campagna.data_creazione).toLocaleDateString('it-IT') : 
             'N/A';
@@ -1213,7 +1289,69 @@ function renderCampagne(campagne, isLoggedIn = true) {
             </div>
         `;
     }).join('');
+
+    elements.campagneList.innerHTML = htmlContent;
 }
+
+/**
+ * Accetta un invito a una campagna
+ */
+window.accettaInvitoCampagna = async function(invitoId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('inviti_campagna')
+            .update({ stato: 'accepted' })
+            .eq('id', invitoId);
+
+        if (error) throw error;
+
+        showNotification('Invito accettato!');
+        
+        // Ricarica le campagne
+        if (AppState.currentUser) {
+            loadCampagne(AppState.currentUser.uid);
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'accettazione invito:', error);
+        showNotification('Errore nell\'accettazione dell\'invito');
+    }
+};
+
+/**
+ * Rifiuta un invito a una campagna
+ */
+window.rifiutaInvitoCampagna = async function(invitoId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('inviti_campagna')
+            .update({ stato: 'rejected' })
+            .eq('id', invitoId);
+
+        if (error) throw error;
+
+        showNotification('Invito rifiutato');
+        
+        // Ricarica le campagne
+        if (AppState.currentUser) {
+            loadCampagne(AppState.currentUser.uid);
+        }
+    } catch (error) {
+        console.error('❌ Errore nel rifiuto invito:', error);
+        showNotification('Errore nel rifiuto dell\'invito');
+    }
+};
 
 function formatTempoGioco(minuti) {
     if (minuti < 60) {
@@ -2417,18 +2555,75 @@ async function loadCampagnaDetails(campagnaId) {
         // Mostra icona e nome
         renderCampagnaDetailsHeader(campagna);
 
-        // Mostra contenuto dettagli (placeholder per ora)
-        if (elements.dettagliCampagnaContent) {
-            elements.dettagliCampagnaContent.innerHTML = `
-                <div class="content-placeholder">
-                    <p>Dettagli della campagna</p>
-                    <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">I dettagli verranno implementati a breve.</p>
-                </div>
-            `;
-        }
+        // Mostra tutti i dettagli della campagna
+        renderCampagnaDetailsContent(campagna);
     } catch (error) {
         console.error('❌ Errore nel caricamento dettagli campagna:', error);
         showNotification('Errore nel caricamento dei dettagli della campagna');
+    }
+}
+
+/**
+ * Renderizza il contenuto dei dettagli campagna
+ */
+function renderCampagnaDetailsContent(campagna) {
+    const dataCreazione = campagna.data_creazione ? 
+        new Date(campagna.data_creazione).toLocaleDateString('it-IT') : 
+        'N/A';
+    const tempoGioco = campagna.tempo_di_gioco ? 
+        formatTempoGioco(campagna.tempo_di_gioco) : 
+        '0 min';
+    const note = campagna.note && Array.isArray(campagna.note) && campagna.note.length > 0 ? 
+        campagna.note.join(', ') : 
+        'Nessuna nota';
+
+    if (elements.dettagliCampagnaContent) {
+        elements.dettagliCampagnaContent.innerHTML = `
+            <div class="dettagli-actions">
+                <button class="btn-primary" id="invitaGiocatoriBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 0.5rem;">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Invita Giocatori
+                </button>
+            </div>
+            <div class="dettagli-info">
+                <div class="info-item">
+                    <span class="info-label">DM:</span>
+                    <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Giocatori:</span>
+                    <span class="info-value">${campagna.numero_giocatori || 0}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sessioni:</span>
+                    <span class="info-value">${campagna.numero_sessioni || 0}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tempo di gioco:</span>
+                    <span class="info-value">${tempoGioco}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Creata il:</span>
+                    <span class="info-value">${dataCreazione}</span>
+                </div>
+            </div>
+            ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
+        `;
+
+        // Aggiungi event listener al bottone
+        const invitaBtn = document.getElementById('invitaGiocatoriBtn');
+        if (invitaBtn) {
+            invitaBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openInvitaGiocatoriModal(campagna.id);
+            };
+        }
     }
 }
 
