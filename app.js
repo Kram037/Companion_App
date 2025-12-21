@@ -2813,6 +2813,116 @@ function closeInvitaGiocatoriModal() {
     document.body.style.overflow = '';
 }
 
+/**
+ * Modifica il numero di giocatori
+ */
+window.editNumeroGiocatori = async function(campagnaId) {
+    const nuovoNumero = prompt('Inserisci il nuovo numero di giocatori:');
+    if (nuovoNumero === null) return;
+    
+    const numero = parseInt(nuovoNumero);
+    if (isNaN(numero) || numero < 0) {
+        showNotification('Inserisci un numero valido');
+        return;
+    }
+
+    await updateCampagnaField(campagnaId, 'numero_giocatori', numero);
+};
+
+/**
+ * Modifica il numero di sessioni
+ */
+window.editNumeroSessioni = async function(campagnaId) {
+    const nuovoNumero = prompt('Inserisci il nuovo numero di sessioni:');
+    if (nuovoNumero === null) return;
+    
+    const numero = parseInt(nuovoNumero);
+    if (isNaN(numero) || numero < 0) {
+        showNotification('Inserisci un numero valido');
+        return;
+    }
+
+    await updateCampagnaField(campagnaId, 'numero_sessioni', numero);
+};
+
+/**
+ * Modifica il tempo di gioco (in minuti)
+ */
+window.editTempoGioco = async function(campagnaId) {
+    const nuovoTempo = prompt('Inserisci il nuovo tempo di gioco in minuti:');
+    if (nuovoTempo === null) return;
+    
+    const minuti = parseInt(nuovoTempo);
+    if (isNaN(minuti) || minuti < 0) {
+        showNotification('Inserisci un numero valido');
+        return;
+    }
+
+    await updateCampagnaField(campagnaId, 'tempo_di_gioco', minuti);
+};
+
+/**
+ * Modifica il DM della campagna
+ */
+window.editDMField = async function(campagnaId) {
+    if (!AppState.campagnaGiocatori || AppState.campagnaGiocatori.length === 0) {
+        showNotification('Non ci sono giocatori nella campagna per cambiare il DM');
+        return;
+    }
+
+    // Mostra un dialog per selezionare il nuovo DM
+    const options = AppState.campagnaGiocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join('\n');
+    const selected = prompt(`Seleziona il nuovo DM:\n\n${options}\n\nInserisci il nome utente o il CID:`);
+    if (!selected) return;
+
+    // Trova il giocatore selezionato
+    const giocatoreSelezionato = AppState.campagnaGiocatori.find(g => 
+        g.nome_utente.toLowerCase() === selected.toLowerCase() || 
+        g.cid.toString() === selected
+    );
+
+    if (!giocatoreSelezionato) {
+        showNotification('Giocatore non trovato');
+        return;
+    }
+
+    // Aggiorna il DM
+    await updateCampagnaField(campagnaId, 'nome_dm', giocatoreSelezionato.nome_utente);
+    
+    // Il vecchio DM diventa un giocatore normale (non serve fare nulla, solo cambiare nome_dm)
+    showNotification(`DM cambiato a ${giocatoreSelezionato.nome_utente}`);
+};
+
+/**
+ * Aggiorna un campo della campagna
+ */
+async function updateCampagnaField(campagnaId, field, value) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('campagne')
+            .update({ [field]: value })
+            .eq('id', campagnaId);
+
+        if (error) throw error;
+
+        showNotification('Campo aggiornato con successo!');
+        
+        // Ricarica i dettagli della campagna
+        if (AppState.currentCampagnaId) {
+            await loadCampagnaDetails(AppState.currentCampagnaId);
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiornamento campo:', error);
+        showNotification('Errore nell\'aggiornamento: ' + (error.message || error));
+    }
+}
+
 window.deleteCampagna = async function(campagnaId) {
     if (!confirm('Sei sicuro di voler eliminare questa campagna?')) {
         return;
