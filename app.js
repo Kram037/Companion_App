@@ -3234,9 +3234,9 @@ window.editDMField = async function(campagnaId) {
         return;
     }
 
-    // Mostra un dialog per selezionare il nuovo DM
-    const options = AppState.campagnaGiocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join('\n');
-    const selected = prompt(`Seleziona il nuovo DM:\n\n${options}\n\nInserisci il nome utente o il CID:`);
+    // Mostra un dialog per selezionare il nuovo DM usando showPrompt
+    const options = AppState.campagnaGiocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join(', ');
+    const selected = await showPrompt(`Seleziona il nuovo DM. Giocatori disponibili: ${options}\n\nInserisci il nome utente o il CID:`, 'Cambia DM');
     if (!selected) return;
 
     // Trova il giocatore selezionato
