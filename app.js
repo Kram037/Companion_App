@@ -2721,16 +2721,6 @@ async function renderCampagnaDetailsContent(campagna) {
                     .filter(g => g.id); // Filtra solo quelli con id valido
             }
             
-            // Ricarica la campagna per ottenere il numero_giocatori aggiornato
-            const { data: campagnaAggiornata, error: errorAggiornata } = await supabase
-                .from('campagne')
-                .select('numero_giocatori')
-                .eq('id', campagna.id)
-                .single();
-            
-            if (!errorAggiornata && campagnaAggiornata) {
-                campagna.numero_giocatori = campagnaAggiornata.numero_giocatori;
-            }
         } catch (error) {
             console.error('❌ Errore nel caricamento dati campagna:', error);
         }
