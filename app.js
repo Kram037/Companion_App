@@ -2390,6 +2390,79 @@ window.openCampagnaDetails = function(campagnaId) {
     navigateToPage('dettagli');
 };
 
+/**
+ * Carica e mostra i dettagli di una campagna
+ */
+async function loadCampagnaDetails(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Carica i dati della campagna
+        const { data: campagna, error } = await supabase
+            .from('campagne')
+            .select('*')
+            .eq('id', campagnaId)
+            .single();
+
+        if (error) throw error;
+        if (!campagna) {
+            showNotification('Campagna non trovata');
+            return;
+        }
+
+        // Mostra icona e nome
+        renderCampagnaDetailsHeader(campagna);
+
+        // Mostra contenuto dettagli (placeholder per ora)
+        if (elements.dettagliCampagnaContent) {
+            elements.dettagliCampagnaContent.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Dettagli della campagna</p>
+                    <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">I dettagli verranno implementati a breve.</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Errore nel caricamento dettagli campagna:', error);
+        showNotification('Errore nel caricamento dei dettagli della campagna');
+    }
+}
+
+/**
+ * Renderizza l'header dei dettagli campagna (icona e nome)
+ */
+function renderCampagnaDetailsHeader(campagna) {
+    // Renderizza l'icona
+    let iconaHTML = '';
+    if (campagna.icona_type === 'image' && campagna.icona_data) {
+        iconaHTML = `<img src="${escapeHtml(campagna.icona_data)}" alt="Icona campagna" class="dettagli-icon-image">`;
+    } else if (campagna.icona_type === 'predefined' && campagna.icona_name) {
+        const selectedIcon = predefinedIcons.find(i => i.name === campagna.icona_name);
+        if (selectedIcon) {
+            iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
+        }
+    }
+    // Se non c'è icona, usa quella di default
+    if (!iconaHTML) {
+        const defaultIcon = predefinedIcons.find(i => i.name === 'dice');
+        iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${defaultIcon.svg}</svg></div>`;
+    }
+
+    // Aggiorna icona container
+    if (elements.dettagliIconContainer) {
+        elements.dettagliIconContainer.innerHTML = iconaHTML;
+    }
+
+    // Aggiorna titolo
+    if (elements.dettagliCampagnaTitle) {
+        elements.dettagliCampagnaTitle.textContent = escapeHtml(campagna.nome_campagna || 'Senza nome');
+    }
+}
+
 window.deleteCampagna = async function(campagnaId) {
     if (!confirm('Sei sicuro di voler eliminare questa campagna?')) {
         return;
