@@ -61,7 +61,9 @@ const AppState = {
     currentPage: 'campagne',
     isLoggedIn: false,
     isRegisterMode: false,
-    currentCampagnaId: null
+    currentCampagnaId: null,
+    currentCampagnaDetails: null,
+    campagnaGiocatori: []
 };
 
 // DOM Elements - will be initialized in init()
@@ -2555,8 +2557,8 @@ async function loadCampagnaDetails(campagnaId) {
         // Mostra icona e nome
         renderCampagnaDetailsHeader(campagna);
 
-        // Mostra tutti i dettagli della campagna
-        renderCampagnaDetailsContent(campagna);
+        // Mostra tutti i dettagli della campagna (ora async)
+        await renderCampagnaDetailsContent(campagna);
     } catch (error) {
         console.error('❌ Errore nel caricamento dettagli campagna:', error);
         showNotification('Errore nel caricamento dei dettagli della campagna');
@@ -2566,7 +2568,7 @@ async function loadCampagnaDetails(campagnaId) {
 /**
  * Renderizza il contenuto dei dettagli campagna
  */
-function renderCampagnaDetailsContent(campagna) {
+async function renderCampagnaDetailsContent(campagna) {
     const dataCreazione = campagna.data_creazione ? 
         new Date(campagna.data_creazione).toLocaleDateString('it-IT') : 
         'N/A';
@@ -2577,35 +2579,95 @@ function renderCampagnaDetailsContent(campagna) {
         campagna.note.join(', ') : 
         'Nessuna nota';
 
+    // Verifica se l'utente corrente è il DM
+    const supabase = getSupabaseClient();
+    let isCurrentUserDM = false;
+    let giocatoriCampagna = [];
+    
+    if (supabase && AppState.currentUser) {
+        try {
+            const currentUser = await findUserByUid(AppState.currentUser.uid);
+            if (currentUser && currentUser.nome_utente === campagna.nome_dm) {
+                isCurrentUserDM = true;
+            }
+            
+            // Carica i giocatori della campagna (utenti che hanno accettato l'invito)
+            const { data: inviti, error } = await supabase
+                .from('inviti_campagna')
+                .select(`
+                    *,
+                    utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
+                `)
+                .eq('campagna_id', campagna.id)
+                .eq('stato', 'accepted');
+            
+            if (!error && inviti) {
+                giocatoriCampagna = inviti.map(inv => inv.utenti).filter(Boolean);
+            }
+        } catch (error) {
+            console.error('❌ Errore nel caricamento dati campagna:', error);
+        }
+    }
+
     if (elements.dettagliCampagnaContent) {
         elements.dettagliCampagnaContent.innerHTML = `
-            <div class="dettagli-actions">
-                <button class="btn-primary" id="invitaGiocatoriBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 0.5rem;">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="8.5" cy="7" r="4"></circle>
-                        <line x1="20" y1="8" x2="20" y2="14"></line>
-                        <line x1="23" y1="11" x2="17" y2="11"></line>
-                    </svg>
-                    Invita Giocatori
-                </button>
-            </div>
             <div class="dettagli-info">
                 <div class="info-item">
-                    <span class="info-label">DM:</span>
-                    <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                    <div class="info-item-content">
+                        <span class="info-label">DM:</span>
+                        <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                    </div>
+                    ${isCurrentUserDM ? `<button class="btn-edit-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>` : ''}
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Giocatori:</span>
-                    <span class="info-value">${campagna.numero_giocatori || 0}</span>
+                    <div class="info-item-content">
+                        <span class="info-label">Giocatori:</span>
+                        <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
+                        <button class="btn-primary btn-small" id="invitaGiocatoriBtn" onclick="openInvitaGiocatoriModal('${campagna.id}')" style="margin-left: 0.5rem;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 0.25rem;">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                            Invita
+                        </button>
+                    </div>
+                    <button class="btn-edit-small" onclick="editNumeroGiocatori('${campagna.id}')" aria-label="Modifica numero giocatori">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Sessioni:</span>
-                    <span class="info-value">${campagna.numero_sessioni || 0}</span>
+                    <div class="info-item-content">
+                        <span class="info-label">Sessioni:</span>
+                        <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
+                    </div>
+                    <button class="btn-edit-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Tempo di gioco:</span>
-                    <span class="info-value">${tempoGioco}</span>
+                    <div class="info-item-content">
+                        <span class="info-label">Tempo di gioco:</span>
+                        <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
+                    </div>
+                    <button class="btn-edit-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Creata il:</span>
@@ -2615,15 +2677,9 @@ function renderCampagnaDetailsContent(campagna) {
             ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
         `;
 
-        // Aggiungi event listener al bottone
-        const invitaBtn = document.getElementById('invitaGiocatoriBtn');
-        if (invitaBtn) {
-            invitaBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openInvitaGiocatoriModal(campagna.id);
-            };
-        }
+        // Salva i dati della campagna nello state per uso futuro
+        AppState.currentCampagnaDetails = campagna;
+        AppState.campagnaGiocatori = giocatoriCampagna;
     }
 }
 
@@ -2656,6 +2712,105 @@ function renderCampagnaDetailsHeader(campagna) {
     if (elements.dettagliCampagnaTitle) {
         elements.dettagliCampagnaTitle.textContent = escapeHtml(campagna.nome_campagna || 'Senza nome');
     }
+}
+
+/**
+ * Apre il modal per invitare giocatori
+ */
+async function openInvitaGiocatoriModal(campagnaId) {
+    if (!elements.invitaGiocatoriModal) return;
+
+    // Carica la lista degli amici
+    try {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            showNotification('Errore: Supabase non disponibile');
+            return;
+        }
+
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            showNotification('Errore: utente corrente non trovato');
+            return;
+        }
+
+        // Carica gli amici usando la stessa funzione di loadAmici
+        const { data: richieste, error } = await supabase
+            .rpc('get_all_friend_requests_for_user', { p_user_id: currentUser.id });
+
+        if (error) throw error;
+
+        const amici = [];
+        richieste.forEach(req => {
+            if (req.stato === 'accepted') {
+                const amico = req.richiedente_id === currentUser.id ? req.destinatario_info : req.richiedente_info;
+                if (amico) amici.push(amico);
+            }
+        });
+
+        // Carica gli inviti già inviati per questa campagna
+        const { data: invitiEsistenti, error: invitiError } = await supabase
+            .from('inviti_campagna')
+            .select('invitato_id')
+            .eq('campagna_id', campagnaId);
+
+        const invitatiIds = new Set((invitiEsistenti || []).map(inv => inv.invitato_id));
+
+        // Renderizza la lista degli amici
+        if (elements.invitaGiocatoriContent) {
+            if (amici.length === 0) {
+                elements.invitaGiocatoriContent.innerHTML = `
+                    <div class="content-placeholder">
+                        <p>Non hai amici da invitare. Aggiungi degli amici prima!</p>
+                    </div>
+                `;
+            } else {
+                elements.invitaGiocatoriContent.innerHTML = `
+                    <div class="amici-invito-list">
+                        ${amici.map(amico => {
+                            const giaInvitato = invitatiIds.has(amico.id);
+                            return `
+                                <div class="amico-invito-item">
+                                    <div class="amico-info">
+                                        <div class="amico-avatar">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="12" cy="7" r="4"></circle>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="amico-nome">${escapeHtml(amico.nome_utente || 'Utente')}</p>
+                                            <p class="amico-cid">CID: ${amico.cid || ''}</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-primary btn-small ${giaInvitato ? 'btn-disabled' : ''}" 
+                                            onclick="invitaAmicoAllaCampagna('${campagnaId}', '${amico.id}')" 
+                                            ${giaInvitato ? 'disabled' : ''}>
+                                        ${giaInvitato ? 'Già invitato' : 'Invita'}
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        elements.invitaGiocatoriModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('❌ Errore nel caricamento amici per invito:', error);
+        showNotification('Errore nel caricamento degli amici');
+    }
+}
+
+/**
+ * Chiude il modal per invitare giocatori
+ */
+function closeInvitaGiocatoriModal() {
+    if (!elements.invitaGiocatoriModal) return;
+    elements.invitaGiocatoriModal.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 window.deleteCampagna = async function(campagnaId) {

@@ -389,12 +389,42 @@ body {
 .dettagli-info .info-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: var(--spacing-sm) 0;
     border-bottom: 1px solid var(--border);
+    gap: var(--spacing-sm);
 }
 
 .dettagli-info .info-item:last-child {
     border-bottom: none;
+}
+
+.dettagli-info .info-item-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: var(--spacing-xs);
+}
+
+.btn-edit-small {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    width: 28px;
+    height: 28px;
+}
+
+.btn-edit-small:hover {
+    background: var(--primary);
+    border-color: var(--accent);
+    color: var(--text);
 }
 
 .dettagli-notes {
