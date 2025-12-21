@@ -2969,12 +2969,10 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">Giocatori:</span>
                     <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
-                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Invita giocatori">
+                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                     </button>` : '<span></span>'}
                 </div>
@@ -3005,37 +3003,6 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             </div>
             ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
-            ${giocatoriCampagna.length > 0 ? `
-                <div class="dettagli-giocatori-section">
-                    <h3>Giocatori Invitati</h3>
-                    <div class="giocatori-table">
-                        ${giocatoriCampagna.map(giocatore => `
-                            <div class="giocatore-row">
-                                <div class="giocatore-info">
-                                    <div class="giocatore-avatar-small">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p class="giocatore-nome">${escapeHtml(giocatore.nome_utente || 'Utente')}</p>
-                                        <p class="giocatore-cid">CID: ${giocatore.cid || ''}</p>
-                                    </div>
-                                </div>
-                                ${isCurrentUserDM ? `
-                                    <button class="btn-icon-small btn-remove" onclick="rimuoviGiocatoreDaCampagna('${campagna.id}', '${giocatore.invitoId || ''}', '${giocatore.id}')" aria-label="Rimuovi giocatore" title="Rimuovi dalla campagna">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                ` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
         `;
 
         // Salva i dati della campagna nello state per uso futuro
@@ -3462,6 +3429,11 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
 
         showNotification('Giocatore rimosso dalla campagna');
 
+        // Ricarica la dialog se è aperta, altrimenti ricarica i dettagli
+        if (elements.invitaGiocatoriModal && elements.invitaGiocatoriModal.classList.contains('active')) {
+            await openInvitaGiocatoriModal(campagnaId);
+        }
+        
         // Ricarica i dettagli della campagna
         if (AppState.currentCampagnaId) {
             await loadCampagnaDetails(AppState.currentCampagnaId);
