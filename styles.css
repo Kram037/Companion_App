@@ -553,6 +553,53 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+    gap: var(--spacing-md);
+}
+
+.amico-invito-item .amico-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.amico-invito-item .amico-nome,
+.amico-invito-item .amico-cid {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.btn-icon-invita {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 4px var(--shadow);
+    flex-shrink: 0;
+}
+
+.btn-icon-invita:hover:not(.btn-disabled) {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.btn-icon-invita.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--text-light);
+}
+
+.btn-icon-invita svg {
+    width: 20px;
+    height: 20px;
 }
 
 .btn-disabled {
