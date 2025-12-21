@@ -433,8 +433,8 @@ BEGIN
     
     RETURN QUERY
     SELECT 
-        ra.id::VARCHAR(10) as richiesta_id,
-        u.id::VARCHAR(10) as richiedente_id,
+        ra.id as richiesta_id,
+        u.id as richiedente_id,
         u.nome_utente,
         u.cid,
         u.email,
@@ -466,8 +466,8 @@ BEGIN
     
     RETURN QUERY
     SELECT 
-        ra.id::VARCHAR(10) as richiesta_id,
-        u.id::VARCHAR(10) as destinatario_id,
+        ra.id as richiesta_id,
+        u.id as destinatario_id,
         u.nome_utente,
         u.cid,
         u.email,
@@ -498,11 +498,11 @@ BEGIN
     
     RETURN QUERY
     SELECT 
-        u.id::VARCHAR(10) as amico_id,
+        u.id as amico_id,
         u.nome_utente,
         u.cid,
         u.email,
-        ra.id::VARCHAR(10) as richiesta_id,
+        ra.id as richiesta_id,
         ra.created_at
     FROM richieste_amicizia ra
     INNER JOIN utenti u ON (
@@ -531,7 +531,7 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT 
-        u.id::VARCHAR(10),
+        u.id,
         u.nome_utente,
         u.cid,
         u.email
