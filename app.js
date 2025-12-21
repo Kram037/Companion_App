@@ -1241,7 +1241,7 @@ async function loadInvitiRicevuti(userId) {
     }
 }
 
-function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
+async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     if (!elements.campagneList) return;
 
     // If user is not logged in, show login message
@@ -1252,6 +1252,15 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
             </div>
         `;
         return;
+    }
+
+    // Ottieni l'ID dell'utente corrente per verificare se è DM
+    let currentUserId = null;
+    if (AppState.currentUser && AppState.currentUser.uid) {
+        const currentUserData = await findUserByUid(AppState.currentUser.uid);
+        if (currentUserData) {
+            currentUserId = currentUserData.id;
+        }
     }
 
     let htmlContent = '';
@@ -1306,15 +1315,8 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     }
 
     htmlContent += campagne.map(campagna => {
-        const dataCreazione = campagna.data_creazione ? 
-            new Date(campagna.data_creazione).toLocaleDateString('it-IT') : 
-            'N/A';
-        const tempoGioco = campagna.tempo_di_gioco ? 
-            formatTempoGioco(campagna.tempo_di_gioco) : 
-            '0 min';
-        const note = campagna.note && Array.isArray(campagna.note) && campagna.note.length > 0 ? 
-            campagna.note.join(', ') : 
-            'Nessuna nota';
+        // Verifica se l'utente corrente è il DM di questa campagna
+        const isDM = currentUserId && campagna.user_id === currentUserId;
 
         // Renderizza l'icona della campagna
         let iconaHTML = '';
@@ -1339,6 +1341,7 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
                         <div class="campagna-icon">${iconaHTML}</div>
                         <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
                     </div>
+                    ${isDM ? `
                     <div class="campagna-actions" onclick="event.stopPropagation();">
                         <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1353,30 +1356,14 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
                             </svg>
                         </button>
                     </div>
+                    ` : ''}
                 </div>
                 <div class="campagna-info">
                     <div class="info-item">
                         <span class="info-label">DM:</span>
                         <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Giocatori:</span>
-                        <span class="info-value">${campagna.numero_giocatori || 0}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Sessioni:</span>
-                        <span class="info-value">${campagna.numero_sessioni || 0}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Tempo di gioco:</span>
-                        <span class="info-value">${tempoGioco}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Creata il:</span>
-                        <span class="info-value">${dataCreazione}</span>
-                    </div>
                 </div>
-                ${note !== 'Nessuna nota' ? `<div class="campagna-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
             </div>
         `;
     }).join('');
