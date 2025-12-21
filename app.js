@@ -2385,18 +2385,9 @@ window.editCampagna = function(campagnaId) {
 };
 
 window.openCampagnaDetails = function(campagnaId) {
-    navigateToPage('dettagli');
-    // Per ora mostriamo solo un placeholder, le specifiche verranno implementate dopo
-    if (elements.dettagliCampagnaContent) {
-        elements.dettagliCampagnaContent.innerHTML = `
-            <div class="content-placeholder">
-                <p>Dettagli della campagna ${campagnaId}</p>
-                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">I dettagli verranno implementati a breve.</p>
-            </div>
-        `;
-    }
-    // Salva l'ID della campagna corrente per uso futuro
+    // Salva l'ID della campagna corrente
     AppState.currentCampagnaId = campagnaId;
+    navigateToPage('dettagli');
 };
 
 window.deleteCampagna = async function(campagnaId) {
