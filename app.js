@@ -60,7 +60,8 @@ const AppState = {
     currentUser: null,
     currentPage: 'campagne',
     isLoggedIn: false,
-    isRegisterMode: false
+    isRegisterMode: false,
+    currentCampagnaId: null
 };
 
 // DOM Elements - will be initialized in init()
@@ -97,6 +98,14 @@ async function init() {
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         userCID: document.getElementById('userCID'),
+        backToCampagneBtn: document.getElementById('backToCampagneBtn'),
+        dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
+        dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
+        editUserNameBtn: document.getElementById('editUserNameBtn'),
+        editUserNameForm: document.getElementById('editUserNameForm'),
+        editUserNameInput: document.getElementById('editUserNameInput'),
+        saveUserNameBtn: document.getElementById('saveUserNameBtn'),
+        cancelEditUserNameBtn: document.getElementById('cancelEditUserNameBtn'),
         themeLight: document.getElementById('themeLight'),
         themeDark: document.getElementById('themeDark'),
         campagneList: document.getElementById('campagneList'),
@@ -725,6 +734,16 @@ function setupEventListeners() {
         });
     }
     
+    // Back to campagne button
+    if (elements.backToCampagneBtn) {
+        elements.backToCampagneBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navigateToPage('campagne');
+        };
+        console.log('✅ Event listener aggiunto a backToCampagneBtn');
+    }
+
     // Icon selector setup
     setupIconSelector();
     
@@ -774,6 +793,8 @@ function navigateToPage(pageName) {
     // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
+    } else if (pageName === 'campagne' && AppState.isLoggedIn && AppState.currentUser) {
+        loadCampagne(AppState.currentUser.uid);
     }
 }
 
@@ -837,6 +858,13 @@ function closeUserModal() {
     if (!elements.userModal) {
         console.error('❌ userModal non trovato in closeUserModal!');
         return;
+    }
+    // Nascondi il form di modifica nome quando chiudi il modal
+    if (elements.editUserNameForm) {
+        elements.editUserNameForm.style.display = 'none';
+    }
+    if (elements.editUserNameInput) {
+        elements.editUserNameInput.value = '';
     }
     elements.userModal.classList.remove('active');
     document.body.style.overflow = '';
@@ -1068,13 +1096,13 @@ function renderCampagne(campagne, isLoggedIn = true) {
         }
 
         return `
-            <div class="campagna-card" data-campagna-id="${campagna.id}">
+            <div class="campagna-card" data-campagna-id="${campagna.id}" onclick="openCampagnaDetails('${campagna.id}')" style="cursor: pointer;">
                 <div class="campagna-header">
                     <div class="campagna-title-with-icon">
                         <div class="campagna-icon">${iconaHTML}</div>
                         <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
                     </div>
-                    <div class="campagna-actions">
+                    <div class="campagna-actions" onclick="event.stopPropagation();">
                         <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1162,6 +1190,63 @@ async function generateUniqueCid() {
         console.error('❌ Errore nella generazione CID, uso fallback:', error);
         // Fallback: genera un numero casuale
         return Math.floor(1000 + Math.random() * 9000);
+    }
+}
+
+/**
+ * Salva il nuovo nome utente
+ */
+async function handleSaveUserName() {
+    if (!elements.editUserNameInput) return;
+    
+    const newName = elements.editUserNameInput.value.trim();
+    if (!newName) {
+        showNotification('Il nome utente non può essere vuoto');
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    if (!AppState.currentUser) {
+        showNotification('Errore: utente non autenticato');
+        return;
+    }
+
+    try {
+        // Trova l'utente nella tabella utenti
+        const utente = await findUserByUid(AppState.currentUser.uid);
+        if (!utente) {
+            showNotification('Errore: profilo utente non trovato');
+            return;
+        }
+
+        // Aggiorna il nome utente
+        const { error } = await supabase
+            .from('utenti')
+            .update({ nome_utente: newName })
+            .eq('id', utente.id);
+
+        if (error) throw error;
+
+        // Aggiorna l'UI
+        if (elements.userName) {
+            elements.userName.textContent = newName;
+        }
+        if (elements.editUserNameForm) {
+            elements.editUserNameForm.style.display = 'none';
+        }
+        if (elements.editUserNameInput) {
+            elements.editUserNameInput.value = '';
+        }
+
+        showNotification('Nome utente aggiornato con successo!');
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiornamento nome utente:', error);
+        showNotification('Errore nell\'aggiornamento del nome utente: ' + (error.message || error));
     }
 }
 
@@ -2213,6 +2298,11 @@ async function handleCampagnaSubmit(e) {
             showNotification('Campagna creata con successo!');
         }
         closeCampagnaModal();
+        
+        // Ricarica le campagne dopo creazione/modifica
+        if (session?.user) {
+            loadCampagne(session.user.id);
+        }
     } catch (error) {
         console.error('Errore nel salvataggio campagna:', error);
         showNotification('Errore nel salvataggio della campagna: ' + (error.message || error));
@@ -2222,6 +2312,21 @@ async function handleCampagnaSubmit(e) {
 // Global functions for inline onclick handlers
 window.editCampagna = function(campagnaId) {
     openCampagnaModal(campagnaId);
+};
+
+window.openCampagnaDetails = function(campagnaId) {
+    navigateToPage('dettagli');
+    // Per ora mostriamo solo un placeholder, le specifiche verranno implementate dopo
+    if (elements.dettagliCampagnaContent) {
+        elements.dettagliCampagnaContent.innerHTML = `
+            <div class="content-placeholder">
+                <p>Dettagli della campagna ${campagnaId}</p>
+                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">I dettagli verranno implementati a breve.</p>
+            </div>
+        `;
+    }
+    // Salva l'ID della campagna corrente per uso futuro
+    AppState.currentCampagnaId = campagnaId;
 };
 
 window.deleteCampagna = async function(campagnaId) {
@@ -2245,6 +2350,12 @@ window.deleteCampagna = async function(campagnaId) {
         if (error) throw error;
         
         showNotification('Campagna eliminata con successo!');
+        
+        // Ricarica le campagne dopo eliminazione
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            loadCampagne(session.user.id);
+        }
     } catch (error) {
         console.error('Errore nell\'eliminazione campagna:', error);
         showNotification('Errore nell\'eliminazione della campagna: ' + (error.message || error));
