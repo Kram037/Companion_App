@@ -213,9 +213,26 @@
                         </svg>
                     </div>
                     <div class="user-details">
-                        <p class="user-name" id="userName">Nome Utente</p>
+                        <div class="user-name-container" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <p class="user-name" id="userName">Nome Utente</p>
+                            <button class="btn-icon-small" id="editUserNameBtn" aria-label="Modifica nome utente" style="background: none; border: none; cursor: pointer; padding: 0.25rem; color: var(--text-light);">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                        </div>
                         <p class="user-email" id="userEmail">email@example.com</p>
                         <p class="user-cid" id="userCID">CID: ----</p>
+                    </div>
+                </div>
+                <div id="editUserNameForm" style="display: none; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="editUserNameInput" placeholder="Nuovo nome utente" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn-primary" id="saveUserNameBtn" style="flex: 1; padding: 0.5rem;">Salva</button>
+                        <button class="btn-secondary" id="cancelEditUserNameBtn" style="flex: 1; padding: 0.5rem; margin-top: 0;">Annulla</button>
                     </div>
                 </div>
                 <button class="btn-secondary" id="logoutBtn">Esci</button>

@@ -744,6 +744,49 @@ function setupEventListeners() {
         console.log('✅ Event listener aggiunto a backToCampagneBtn');
     }
 
+    // Edit user name button
+    if (elements.editUserNameBtn) {
+        elements.editUserNameBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (elements.editUserNameForm) {
+                elements.editUserNameForm.style.display = 'block';
+                if (elements.editUserNameInput) {
+                    // Pre-compila con il nome corrente
+                    const currentName = elements.userName ? elements.userName.textContent : '';
+                    elements.editUserNameInput.value = currentName;
+                    elements.editUserNameInput.focus();
+                }
+            }
+        };
+        console.log('✅ Event listener aggiunto a editUserNameBtn');
+    }
+
+    // Save user name button
+    if (elements.saveUserNameBtn) {
+        elements.saveUserNameBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            await handleSaveUserName();
+        };
+        console.log('✅ Event listener aggiunto a saveUserNameBtn');
+    }
+
+    // Cancel edit user name button
+    if (elements.cancelEditUserNameBtn) {
+        elements.cancelEditUserNameBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (elements.editUserNameForm) {
+                elements.editUserNameForm.style.display = 'none';
+            }
+            if (elements.editUserNameInput) {
+                elements.editUserNameInput.value = '';
+            }
+        };
+        console.log('✅ Event listener aggiunto a cancelEditUserNameBtn');
+    }
+
     // Icon selector setup
     setupIconSelector();
     
@@ -832,19 +875,32 @@ async function openUserModal() {
             elements.userEmail.textContent = AppState.currentUser.email || '';
         }
         
-        // Carica il CID dall'utente
+        // Carica il CID e nome utente dall'utente
         if (elements.userCID) {
             try {
                 const userData = await findUserByUid(AppState.currentUser.uid);
-                if (userData && userData.cid) {
-                    elements.userCID.textContent = `CID: ${userData.cid}`;
+                if (userData) {
+                    if (userData.cid) {
+                        elements.userCID.textContent = `CID: ${userData.cid}`;
+                    } else {
+                        elements.userCID.textContent = 'CID: ----';
+                    }
+                    // Aggiorna anche il nome utente se disponibile
+                    if (userData.nome_utente && elements.userName) {
+                        elements.userName.textContent = userData.nome_utente;
+                    }
                 } else {
                     elements.userCID.textContent = 'CID: ----';
                 }
             } catch (error) {
-                console.error('❌ Errore nel caricamento CID:', error);
+                console.error('❌ Errore nel caricamento dati utente:', error);
                 elements.userCID.textContent = 'CID: ----';
             }
+        }
+        
+        // Nascondi il form di modifica nome quando apri il modal
+        if (elements.editUserNameForm) {
+            elements.editUserNameForm.style.display = 'none';
         }
     }
     
