@@ -2139,6 +2139,21 @@ body {
         width: 18px;
         height: 18px;
     }
+    
+    /* Assicura che i bottoni invito non abbiano testo su mobile */
+    .invito-actions button {
+        text-indent: -9999px !important;
+        overflow: hidden !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+        color: transparent !important;
+    }
+    
+    .invito-actions button svg {
+        text-indent: 0;
+        position: relative;
+        z-index: 1;
+    }
 }
 
 /* User logged in state */
