@@ -1124,12 +1124,39 @@ async function loadCampagne(userId) {
             return;
         }
 
-        // Carica le campagne
-        const { data: campagne, error } = await supabase
+        // Carica le campagne: sia quelle create dall'utente che quelle a cui partecipa (invito accettato)
+        const { data: campagneCreate, error: errorCreate } = await supabase
             .from('campagne')
             .select('*')
             .eq('user_id', utente.id)
             .order('data_creazione', { ascending: false });
+
+        if (errorCreate) throw errorCreate;
+
+        // Carica anche le campagne dove l'utente ha accettato un invito
+        const { data: invitiAccettati, error: errorInviti } = await supabase
+            .from('inviti_campagna')
+            .select(`
+                campagna_id,
+                campagne:campagne!inviti_campagna_campagna_id_fkey(*)
+            `)
+            .eq('invitato_id', utente.id)
+            .eq('stato', 'accepted');
+
+        if (errorInviti) {
+            console.error('❌ Errore nel caricamento inviti accettati:', errorInviti);
+        }
+
+        // Combina le campagne create e quelle a cui partecipa
+        const campagne = campagneCreate || [];
+        if (invitiAccettati && invitiAccettati.length > 0) {
+            const campagnePartecipate = invitiAccettati
+                .map(inv => inv.campagne || inv.campagna)
+                .filter(Boolean)
+                .filter(camp => !campagne.some(c => c.id === camp.id)); // Evita duplicati
+
+            campagne.push(...campagnePartecipate);
+        }
 
         if (error) throw error;
 
@@ -1216,16 +1243,19 @@ function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     // Mostra gli inviti ricevuti
     if (invitiRicevuti.length > 0) {
         htmlContent += invitiRicevuti.map(invito => {
-            const campagna = invito.campagna;
+            const campagna = invito.campagne || invito.campagna;
             const inviante = invito.inviante;
+            const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
+            const nomeInviante = inviante?.nome_utente || 'Utente sconosciuto';
+            const cidInviante = inviante?.cid || '';
             return `
                 <div class="invito-card">
                     <div class="invito-header">
                         <h4>🎲 Invito a Campagna</h4>
                     </div>
                     <div class="invito-content">
-                        <p><strong>${escapeHtml(campagna?.nome_campagna || 'Campagna')}</strong></p>
-                        <p class="invito-from">Da: ${escapeHtml(inviante?.nome_utente || 'Utente')} (CID: ${inviante?.cid || ''})</p>
+                        <p><strong>Campagna: ${escapeHtml(nomeCampagna)}</strong></p>
+                        <p class="invito-from">DM: ${escapeHtml(nomeInviante)}${cidInviante ? ` (CID: ${cidInviante})` : ''}</p>
                         <div class="invito-actions">
                             <button class="btn-primary btn-small" onclick="accettaInvitoCampagna('${invito.id}')">Accetta</button>
                             <button class="btn-secondary btn-small" onclick="rifiutaInvitoCampagna('${invito.id}')">Rifiuta</button>
@@ -3314,17 +3344,44 @@ async function handleLogout() {
                     campagneChannel = null;
                 }
                 
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
+                // Pulisci localStorage
+                localStorage.removeItem('currentCampagnaId');
+                AppState.currentCampagnaId = null;
                 
-                closeUserModal();
-                showNotification('Logout effettuato');
+                // Prova logout con scope local invece di global
+                const { error } = await supabase.auth.signOut({ scope: 'local' });
+                
+                // Anche se c'è un errore, procedi con la pulizia locale
+                if (error) {
+                    console.warn('Errore durante signOut:', error);
+                    // Pulisci lo stato locale comunque
+                    AppState.currentUser = null;
+                    AppState.isLoggedIn = false;
+                    updateUIForLoggedOut();
+                    closeUserModal();
+                    showNotification('Logout effettuato (locale)');
+                } else {
+                    closeUserModal();
+                    showNotification('Logout effettuato');
+                }
             } else {
-                showNotification('Errore: autenticazione non disponibile');
+                // Fallback: pulisci tutto localmente
+                AppState.currentUser = null;
+                AppState.isLoggedIn = false;
+                updateUIForLoggedOut();
+                localStorage.removeItem('currentCampagnaId');
+                closeUserModal();
+                showNotification('Logout effettuato (locale)');
             }
         } catch (error) {
             console.error('Logout error:', error);
-            showNotification('Errore durante il logout');
+            // In caso di errore, pulisci comunque lo stato locale
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            updateUIForLoggedOut();
+            localStorage.removeItem('currentCampagnaId');
+            closeUserModal();
+            showNotification('Logout effettuato (locale)');
         }
     }
 }
