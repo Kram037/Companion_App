@@ -2136,23 +2136,27 @@ body {
     }
     
     .invito-actions {
-        flex-direction: row; /* Bottoni affiancati anche su mobile */
+        flex-direction: row;
         gap: var(--spacing-xs);
         margin-top: var(--spacing-sm);
     }
     
-    .btn-icon-invito {
+    .amico-actions {
+        gap: var(--spacing-xs);
+    }
+    
+    .btn-icon-amico {
         width: 32px;
         height: 32px;
     }
     
-    .btn-icon-invito svg {
+    .btn-icon-amico svg {
         width: 18px;
         height: 18px;
     }
     
-    /* Assicura che i bottoni invito non abbiano testo su mobile */
-    .invito-actions button {
+    /* Assicura che i bottoni amico non abbiano testo su mobile */
+    .amico-actions .btn-icon-amico {
         text-indent: -9999px !important;
         overflow: hidden !important;
         font-size: 0 !important;
@@ -2160,7 +2164,7 @@ body {
         color: transparent !important;
     }
     
-    .invito-actions button svg {
+    .amico-actions .btn-icon-amico svg {
         text-indent: 0;
         position: relative;
         z-index: 1;
