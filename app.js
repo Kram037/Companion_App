@@ -1211,8 +1211,8 @@ async function loadInvitiRicevuti(userId) {
             .from('inviti_campagna')
             .select(`
                 *,
-                campagne!inviti_campagna_campagna_id_fkey(*),
-                utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid)
+                campagne:campagne!inviti_campagna_campagna_id_fkey(*),
+                inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid)
             `)
             .eq('invitato_id', utente.id)
             .eq('stato', 'pending');
