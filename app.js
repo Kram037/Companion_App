@@ -2056,6 +2056,48 @@ window.rejectFriendRequest = async function(requestId) {
 }
 
 /**
+ * Rimuove un amico dalla lista (esposta globalmente per onclick)
+ */
+window.rimuoviAmico = async function(amicoId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    if (!confirm('Sei sicuro di voler rimuovere questo amico?')) {
+        return;
+    }
+
+    try {
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) {
+            showNotification('Errore: utente corrente non trovato');
+            return;
+        }
+
+        // Elimina la richiesta di amicizia accettata (in entrambe le direzioni possibili)
+        const { error } = await supabase
+            .from('richieste_amicizia')
+            .delete()
+            .eq('stato', 'accepted')
+            .or(`and(richiedente_id.eq.${currentUser.id},destinatario_id.eq.${amicoId}),and(richiedente_id.eq.${amicoId},destinatario_id.eq.${currentUser.id})`);
+
+        if (error) throw error;
+
+        showNotification('Amico rimosso');
+        
+        // Ricarica gli amici
+        if (AppState.currentUser) {
+            await loadAmici();
+        }
+    } catch (error) {
+        console.error('❌ Errore nella rimozione amico:', error);
+        showNotification('Errore nella rimozione dell\'amico');
+    }
+};
+
+/**
  * Carica e visualizza gli amici e le richieste
  */
 async function loadAmici() {
