@@ -3101,18 +3101,12 @@ async function renderGestisciGiocatoriTab(campagnaId) {
         // 3. Carica gli utenti dalla tabella utenti usando gli ID
         let giocatoriAttuali = [];
         if (giocatoriIds.length > 0) {
-            // Prima verifichiamo se gli ID esistono nella tabella utenti
-            console.log('🔍 Verifico esistenza ID nella tabella utenti...');
-            const { data: allUtenti, error: allUtentiError } = await supabase
-                .from('utenti')
-                .select('id, nome_utente, cid')
-                .limit(100);
+            // Carica gli utenti usando una RPC function o direttamente
+            // Potrebbe essere un problema di RLS, quindi proviamo diverse strategie
+            console.log('🔍 Carico utenti con ID:', giocatoriIds);
             
-            console.log('👥 Tutti gli utenti (primi 100):', allUtenti);
-            console.log('🆔 ID presenti nella tabella utenti:', allUtenti?.map(u => ({ id: u.id, type: typeof u.id })));
-            
-            // Ora carichiamo gli utenti specifici
-            const { data: utenti, error: utentiError } = await supabase
+            // Strategia 1: Query diretta con .in()
+            let { data: utenti, error: utentiError } = await supabase
                 .from('utenti')
                 .select('id, nome_utente, cid')
                 .in('id', giocatoriIds);
@@ -3120,30 +3114,60 @@ async function renderGestisciGiocatoriTab(campagnaId) {
             console.log('👥 Utenti caricati con .in():', utenti);
             console.log('❌ Errore caricamento utenti:', utentiError);
             
-            // Se non troviamo utenti, proviamo a cercare uno per uno
+            // Se non troviamo utenti e non c'è errore, potrebbe essere RLS
+            // Proviamo a usare una query più permissiva o una RPC function
             if ((!utenti || utenti.length === 0) && !utentiError) {
-                console.log('⚠️ Nessun utente trovato con .in(), provo a cercare uno per uno...');
+                console.log('⚠️ Nessun utente trovato, potrebbe essere RLS. Provo query alternativa...');
+                
+                // Strategia 2: Cerca uno per uno (potrebbe bypassare alcuni problemi RLS)
                 const utentiTrovati = [];
                 for (const id of giocatoriIds) {
+                    // Rimuovi eventuali spazi o caratteri nascosti
+                    const idPulito = String(id).trim();
+                    console.log(`🔍 Cerca ID "${idPulito}" (tipo: ${typeof idPulito}, lunghezza: ${idPulito.length})...`);
+                    
                     const { data: utente, error: err } = await supabase
                         .from('utenti')
                         .select('id, nome_utente, cid')
-                        .eq('id', id)
-                        .single();
-                    console.log(`🔍 Cerca ID "${id}" (tipo: ${typeof id}):`, utente, err);
+                        .eq('id', idPulito)
+                        .maybeSingle(); // Usa maybeSingle invece di single per evitare errori
+                    
+                    console.log(`   Risultato:`, utente, err);
                     if (utente && !err) {
                         utentiTrovati.push(utente);
+                    } else if (err) {
+                        console.log(`   ⚠️ Errore specifico per ID ${idPulito}:`, err);
                     }
                 }
+                
                 console.log('👥 Utenti trovati uno per uno:', utentiTrovati);
                 if (utentiTrovati.length > 0) {
-                    giocatoriAttuali = utentiTrovati.map(utente => ({
-                        id: utente.id,
-                        nome_utente: utente.nome_utente,
-                        cid: utente.cid,
-                        invitoId: null // Lo troveremo dopo
-                    }));
+                    utenti = utentiTrovati;
+                } else {
+                    // Strategia 3: Prova a usare una query senza filtri per vedere se RLS blocca tutto
+                    console.log('⚠️ Nessun utente trovato, verifico se RLS blocca tutte le query...');
+                    const { data: testUtenti, error: testError } = await supabase
+                        .from('utenti')
+                        .select('id')
+                        .limit(1);
+                    console.log('🔍 Test query utenti (senza filtri):', testUtenti, testError);
+                    
+                    // Se anche questa query fallisce, è sicuramente RLS
+                    if (testError || !testUtenti || testUtenti.length === 0) {
+                        console.error('❌ RLS probabilmente blocca le query sulla tabella utenti');
+                        elements.gestisciGiocatoriContent.innerHTML = `
+                            <div class="content-placeholder">
+                                <p>Errore: Impossibile caricare i giocatori. Verifica le policy RLS sulla tabella utenti.</p>
+                            </div>
+                        `;
+                        return;
+                    }
                 }
+            }
+            
+            // Se abbiamo trovato utenti, aggiorniamo la variabile
+            if (utenti && utenti.length > 0) {
+                console.log('✅ Utenti trovati:', utenti);
             }
             
             if (utentiError) {
