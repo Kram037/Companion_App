@@ -6,8 +6,7 @@
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION update_dm_campagna(
     p_campagna_id VARCHAR(10),
-    p_nuovo_dm_id VARCHAR(10),
-    p_nuovo_dm_nome TEXT
+    p_nuovo_dm_id VARCHAR(10)
 )
 RETURNS VOID
 LANGUAGE plpgsql
@@ -37,9 +36,7 @@ BEGIN
     
     -- STEP 2: Aggiorna id_dm al nuovo DM
     UPDATE campagne
-    SET 
-        id_dm = p_nuovo_dm_id,
-        nome_dm = p_nuovo_dm_nome
+    SET id_dm = p_nuovo_dm_id
     WHERE id = p_campagna_id;
     
     -- STEP 3: Rimuovi il nuovo DM dall'array giocatori (se presente)
@@ -58,5 +55,5 @@ END;
 $$;
 
 -- Grant execute alla funzione per gli utenti autenticati
-GRANT EXECUTE ON FUNCTION update_dm_campagna(VARCHAR(10), VARCHAR(10), TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION update_dm_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;
 

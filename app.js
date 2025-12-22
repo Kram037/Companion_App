@@ -1335,6 +1335,7 @@ async function loadInvitiRicevuti(userId) {
             return [];
         }
 
+        // Carica gli inviti con i dati della campagna
         const { data: inviti, error } = await supabase
             .from('inviti_campagna')
             .select(`
@@ -1342,11 +1343,8 @@ async function loadInvitiRicevuti(userId) {
                 campagne:campagne!inviti_campagna_campagna_id_fkey(
                     id,
                     nome_campagna,
-                    nome_dm,
-                    id_dm,
-                    dm:utenti!campagne_id_dm_fkey(id, nome_utente, cid, email)
-                ),
-                inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid, email)
+                    id_dm
+                )
             `)
             .eq('invitato_id', utente.id)
             .eq('stato', 'pending');
@@ -1354,6 +1352,46 @@ async function loadInvitiRicevuti(userId) {
         if (error) {
             console.error('❌ Errore query inviti ricevuti:', error);
             throw error;
+        }
+
+        // Per ogni invito, carica i dati del DM separatamente
+        if (inviti && inviti.length > 0) {
+            // Raccogli tutti gli id_dm univoci
+            const dmIds = [...new Set(inviti.map(inv => inv.campagne?.id_dm).filter(Boolean))];
+            
+            if (dmIds.length > 0) {
+                // Carica tutti i DM in una sola query
+                const { data: dms, error: dmError } = await supabase
+                    .from('utenti')
+                    .select('id, nome_utente, cid, email')
+                    .in('id', dmIds);
+                
+                // Se la query fallisce, prova a caricare individualmente
+                let dmMap = new Map();
+                if (!dmError && dms) {
+                    dms.forEach(dm => dmMap.set(dm.id, dm));
+                } else {
+                    // Fallback: carica ogni DM individualmente
+                    for (const dmId of dmIds) {
+                        const { data: dm, error: singleError } = await supabase
+                            .from('utenti')
+                            .select('id, nome_utente, cid, email')
+                            .eq('id', dmId)
+                            .single();
+                        
+                        if (!singleError && dm) {
+                            dmMap.set(dm.id, dm);
+                        }
+                    }
+                }
+                
+                // Aggiungi i dati del DM a ogni invito
+                inviti.forEach(invito => {
+                    if (invito.campagne?.id_dm) {
+                        invito.campagne.dm = dmMap.get(invito.campagne.id_dm);
+                    }
+                });
+            }
         }
 
         console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
@@ -1410,8 +1448,8 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                 });
             }
             
-            const nomeCampagna = campagna?.nome_campagna || campagna?.nome_campagna || 'Campagna sconosciuta';
-            const nomeDM = dm?.nome_utente || campagna?.nome_dm || 'DM sconosciuto';
+            const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
+            const nomeDM = dm?.nome_utente || 'DM sconosciuto';
             const cidDM = dm?.cid || '';
             
             return `
@@ -1442,9 +1480,33 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         return;
     }
 
+    // Carica i nomi dei DM per tutte le campagne
+    const dmIds = [...new Set(campagne.map(c => c.id_dm).filter(Boolean))];
+    let dmMap = new Map();
+    if (dmIds.length > 0) {
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            const { data: dms } = await supabase
+                .from('utenti')
+                .select('id, nome_utente, cid')
+                .in('id', dmIds);
+            
+            if (dms) {
+                dms.forEach(dm => dmMap.set(dm.id, dm));
+            }
+        }
+    }
+
     htmlContent += campagne.map(campagna => {
         // Verifica se l'utente corrente è il DM di questa campagna
         const isDM = currentUserId && campagna.id_dm === currentUserId;
+        
+        // Recupera il nome del DM
+        const dm = dmMap.get(campagna.id_dm);
+        const nomeDM = dm?.nome_utente || 'DM sconosciuto';
+        
+        // Calcola il numero di giocatori dall'array
+        const numeroGiocatori = Array.isArray(campagna.giocatori) ? campagna.giocatori.length : 0;
 
         // Renderizza l'icona della campagna
         let iconaHTML = '';
@@ -1489,7 +1551,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                 <div class="campagna-info">
                     <div class="info-item">
                         <span class="info-label">DM:</span>
-                        <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                        <span class="info-value">${escapeHtml(nomeDM)}</span>
                     </div>
                     </div>
             </div>
@@ -2867,10 +2929,8 @@ async function handleCampagnaSubmit(e) {
         icona_type: iconaType,
         icona_name: iconaName,
         icona_data: iconaData,
-        nome_dm: utente.nome_utente || session.user.email?.split('@')[0] || 'N/A', // Imposta il DM al creatore
         id_dm: utente.id, // Imposta l'ID del DM (foreign key verso utenti)
         giocatori: [], // Array vuoto: il creatore è il DM, quindi non è nella lista giocatori
-        numero_giocatori: 0, // Mantenuto per retrocompatibilità, ma viene calcolato dinamicamente
         numero_sessioni: 0,
         tempo_di_gioco: 0,
         note: []
@@ -2979,6 +3039,8 @@ async function renderCampagnaDetailsContent(campagna) {
     const supabase = getSupabaseClient();
     let isDM = false;
     let giocatoriCampagna = [];
+    let nomeDM = 'DM sconosciuto';
+    let numeroGiocatori = 0;
     
     if (supabase && AppState.currentUser) {
         try {
@@ -2986,23 +3048,48 @@ async function renderCampagnaDetailsContent(campagna) {
             isDM = await isCurrentUserDM(campagna.id);
             console.log('🔍 Verifica DM per campagna', campagna.id, '- isDM:', isDM);
             
-            // Carica i giocatori della campagna (utenti che hanno accettato l'invito)
-            const { data: inviti, error } = await supabase
-                .from('inviti_campagna')
-                .select(`
-                    *,
-                    giocatore:utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
-                `)
-                .eq('campagna_id', campagna.id)
-                .eq('stato', 'accepted');
+            // Carica i giocatori della campagna dall'array giocatori
+            if (campagna.id_dm) {
+                const { data: dmData } = await supabase
+                    .from('utenti')
+                    .select('nome_utente, cid')
+                    .eq('id', campagna.id_dm)
+                    .single();
+                
+                if (dmData) {
+                    nomeDM = dmData.nome_utente || 'DM sconosciuto';
+                }
+            }
             
-            if (!error && inviti) {
-                giocatoriCampagna = inviti
-                    .map(inv => ({
-                        ...(inv.giocatore || inv.utenti),
-                        invitoId: inv.id
-                    }))
-                    .filter(g => g.id); // Filtra solo quelli con id valido
+            // Calcola il numero di giocatori dall'array
+            numeroGiocatori = Array.isArray(campagna.giocatori) ? campagna.giocatori.length : 0;
+            
+            // Carica i dettagli dei giocatori se l'array non è vuoto
+            if (campagna.giocatori && campagna.giocatori.length > 0) {
+                const { data: giocatoriData } = await supabase
+                    .from('utenti')
+                    .select('id, nome_utente, cid')
+                    .in('id', campagna.giocatori);
+                
+                if (giocatoriData) {
+                    // Mappa i giocatori con i loro inviti per poterli rimuovere
+                    const { data: inviti } = await supabase
+                        .from('inviti_campagna')
+                        .select('id, invitato_id')
+                        .eq('campagna_id', campagna.id)
+                        .in('invitato_id', campagna.giocatori)
+                        .eq('stato', 'accepted');
+                    
+                    const invitiMap = new Map();
+                    if (inviti) {
+                        inviti.forEach(inv => invitiMap.set(inv.invitato_id, inv.id));
+                    }
+                    
+                    giocatoriCampagna = giocatoriData.map(giocatore => ({
+                        ...giocatore,
+                        invitoId: invitiMap.get(giocatore.id)
+                    }));
+                }
             }
             
         } catch (error) {
@@ -3015,7 +3102,7 @@ async function renderCampagnaDetailsContent(campagna) {
             <div class="dettagli-info">
                 <div class="info-item">
                     <span class="info-label">DM:</span>
-                    <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
+                    <span class="info-value" id="dmValue">${escapeHtml(nomeDM)}</span>
                     ${isDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -3025,7 +3112,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
                 <div class="info-item">
                     <span class="info-label">Giocatori:</span>
-                    <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
+                    <span class="info-value" id="giocatoriValue">${numeroGiocatori}</span>
                     ${isDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -3413,7 +3500,8 @@ window.editNumeroGiocatori = async function(campagnaId) {
         return;
     }
 
-    await updateCampagnaField(campagnaId, 'numero_giocatori', numero);
+    // Non aggiorniamo più numero_giocatori, viene calcolato dinamicamente dall'array giocatori
+    showNotification('Il numero di giocatori viene calcolato automaticamente dal numero di giocatori nella campagna');
 };
 
 /**
@@ -3572,13 +3660,12 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         const currentUser = await findUserByUid(AppState.currentUser.uid);
         console.log('🔄 selectNewDM: currentUser.id =', currentUser?.id);
         
-        // Aggiorna sia nome_dm che user_id per trasferire completamente i permessi
+        // Aggiorna id_dm per trasferire i permessi
         // Usa la funzione RPC per bypassare RLS
         console.log('🔄 selectNewDM: uso funzione RPC per aggiornare DM');
         const { error: rpcError } = await supabase.rpc('update_dm_campagna', {
             p_campagna_id: campagnaId,
-            p_nuovo_dm_id: giocatoreId,
-            p_nuovo_dm_nome: giocatoreNome
+            p_nuovo_dm_id: giocatoreId
         });
         
         if (rpcError) {
@@ -3588,7 +3675,6 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
             const { data, error } = await supabase
                 .from('campagne')
                 .update({ 
-                    nome_dm: giocatoreNome,
                     id_dm: giocatoreId
                 })
                 .eq('id', campagnaId)
@@ -3606,14 +3692,14 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         // Per la verifica, usa una query normale
         const { data: campagnaVerifica, error: errorVerifica } = await supabase
             .from('campagne')
-            .select('id_dm, nome_dm')
+            .select('id_dm')
             .eq('id', campagnaId)
             .single();
         
         if (errorVerifica) {
             console.error('❌ selectNewDM: errore nella verifica:', errorVerifica);
         } else if (campagnaVerifica) {
-            console.log('✅ selectNewDM: verifica dopo update - id_dm =', campagnaVerifica.id_dm, 'nome_dm =', campagnaVerifica.nome_dm);
+            console.log('✅ selectNewDM: verifica dopo update - id_dm =', campagnaVerifica.id_dm);
             console.log('🔍 selectNewDM: confronto id_dm - atteso:', giocatoreId, 'trovato:', campagnaVerifica.id_dm, 'match:', campagnaVerifica.id_dm === giocatoreId);
         }
         
@@ -3710,12 +3796,12 @@ async function isCurrentUserDM(campagnaId) {
         // Aggiungi anche una query diretta per confrontare
         const { data: campagnaDirect, error: directError } = await supabase
             .from('campagne')
-            .select('id_dm, nome_dm')
+            .select('id_dm')
             .eq('id', campagnaId)
             .single();
         
         if (!directError && campagnaDirect) {
-            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagnaDirect.id_dm, 'nome_dm =', campagnaDirect.nome_dm);
+            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagnaDirect.id_dm);
             console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagnaDirect.id_dm, '=', currentUser.id === campagnaDirect.id_dm);
         }
         
@@ -4190,7 +4276,7 @@ async function handleLogout() {
                 if (error) {
                     console.warn('⚠️ Errore durante signOut:', error);
                     // Continua comunque con il logout locale
-                } else {
+            } else {
                     console.log('✅ SignOut completato con successo');
                 }
                 
