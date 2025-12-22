@@ -1,4 +1,5 @@
 -- Funzione RPC per ottenere i giocatori di una campagna
+-- Recupera i giocatori che hanno accettato un invito (non dall'array giocatori)
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION get_giocatori_campagna(campagna_id_param VARCHAR(10))
 RETURNS TABLE (
@@ -12,16 +13,14 @@ SET search_path = public
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT DISTINCT
         u.id,
         u.nome_utente,
         u.cid
     FROM utenti u
-    WHERE u.id = ANY(
-        SELECT unnest(c.giocatori)
-        FROM campagne c
-        WHERE c.id = campagna_id_param
-    );
+    INNER JOIN inviti_campagna ic ON u.id = ic.invitato_id
+    WHERE ic.campagna_id = campagna_id_param
+    AND ic.stato = 'accepted';
 END;
 $$;
 
