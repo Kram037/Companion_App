@@ -3586,30 +3586,17 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         }
         
         // Per la verifica, usa una query normale
-        const { data, error } = await supabase
-            .from('campagne')
-            .select('user_id, nome_dm')
-            .eq('id', campagnaId)
-            .single();
-
-        if (error) {
-            console.error('❌ selectNewDM: errore nell\'update:', error);
-            throw error;
-        }
-        
-        console.log('✅ selectNewDM: campagna aggiornata:', data);
-        
-        // Verifica immediatamente che l'update sia andato a buon fine
         const { data: campagnaVerifica, error: errorVerifica } = await supabase
             .from('campagne')
-            .select('user_id, nome_dm')
+            .select('id_dm, nome_dm')
             .eq('id', campagnaId)
             .single();
         
         if (errorVerifica) {
             console.error('❌ selectNewDM: errore nella verifica:', errorVerifica);
-        } else {
-            console.log('✅ selectNewDM: verifica dopo update - user_id =', campagnaVerifica.user_id, 'nome_dm =', campagnaVerifica.nome_dm);
+        } else if (campagnaVerifica) {
+            console.log('✅ selectNewDM: verifica dopo update - id_dm =', campagnaVerifica.id_dm, 'nome_dm =', campagnaVerifica.nome_dm);
+            console.log('🔍 selectNewDM: confronto id_dm - atteso:', giocatoreId, 'trovato:', campagnaVerifica.id_dm, 'match:', campagnaVerifica.id_dm === giocatoreId);
         }
         
         // Chiudi il modal
