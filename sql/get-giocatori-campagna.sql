@@ -1,5 +1,5 @@
 -- Funzione RPC per ottenere i giocatori di una campagna
--- Recupera i giocatori che hanno accettato un invito (non dall'array giocatori)
+-- Recupera i giocatori dall'array giocatori della campagna
 -- Esclude il DM corrente dalla lista
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION get_giocatori_campagna(campagna_id_param VARCHAR(10))
@@ -14,42 +14,25 @@ SET search_path = public
 AS $$
 DECLARE
     v_id_dm VARCHAR(10);
-    v_user_id VARCHAR(10);
 BEGIN
-    -- Ottieni l'ID del DM corrente e del creatore
-    SELECT id_dm, user_id INTO v_id_dm, v_user_id
+    -- Ottieni l'ID del DM corrente
+    SELECT id_dm INTO v_id_dm
     FROM campagne
     WHERE id = campagna_id_param;
     
     RETURN QUERY
-    SELECT DISTINCT
-        u.id,
-        u.nome_utente,
-        u.cid
-    FROM utenti u
-    INNER JOIN inviti_campagna ic ON u.id = ic.invitato_id
-    WHERE ic.campagna_id = campagna_id_param
-    AND ic.stato = 'accepted'
-    AND u.id != COALESCE(v_id_dm, '') -- Escludi il DM corrente
-    
-    UNION
-    
-    -- Include anche il creatore se non è il DM e non è già nella lista degli inviti
     SELECT 
         u.id,
         u.nome_utente,
         u.cid
     FROM utenti u
-    WHERE u.id = v_user_id
-    AND v_user_id IS NOT NULL
-    AND (v_user_id != COALESCE(v_id_dm, ''))
-    AND NOT EXISTS (
-        SELECT 1 
-        FROM inviti_campagna ic2 
-        WHERE ic2.invitato_id = u.id 
-        AND ic2.campagna_id = campagna_id_param 
-        AND ic2.stato = 'accepted'
-    );
+    WHERE u.id = ANY(
+        SELECT unnest(c.giocatori)
+        FROM campagne c
+        WHERE c.id = campagna_id_param
+        AND c.giocatori IS NOT NULL
+    )
+    AND u.id != COALESCE(v_id_dm, ''); -- Escludi il DM corrente
 END;
 $$;
 
