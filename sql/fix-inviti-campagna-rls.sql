@@ -20,13 +20,13 @@ BEGIN
         RAISE EXCEPTION 'Utente non trovato';
     END IF;
     
-    -- Verifica che la campagna appartenga all'utente corrente
+    -- Verifica che l'utente corrente sia il DM della campagna
     IF NOT EXISTS (
         SELECT 1 FROM campagne
         WHERE id = p_campagna_id
-        AND user_id = v_current_user_id
+        AND id_dm = v_current_user_id
     ) THEN
-        RAISE EXCEPTION 'La campagna non appartiene all''utente corrente';
+        RAISE EXCEPTION 'Solo il DM può invitare giocatori alla campagna';
     END IF;
     
     -- Verifica che non esista già un invito per questa campagna e questo invitato
