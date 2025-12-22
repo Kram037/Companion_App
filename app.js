@@ -2967,17 +2967,15 @@ async function renderCampagnaDetailsContent(campagna) {
         campagna.note.join(', ') : 
         'Nessuna nota';
 
-    // Verifica se l'utente corrente è il DM
+    // Verifica se l'utente corrente è il DM (usa la funzione che fa una query fresca al DB)
     const supabase = getSupabaseClient();
-    let isCurrentUserDM = false;
+    let isDM = false;
     let giocatoriCampagna = [];
     
     if (supabase && AppState.currentUser) {
         try {
-            const currentUser = await findUserByUid(AppState.currentUser.uid);
-            if (currentUser && currentUser.id === campagna.user_id) {
-                isCurrentUserDM = true;
-            }
+            // Usa la funzione isCurrentUserDM che fa una query fresca al database
+            isDM = await isCurrentUserDM(campagna.id);
             
             // Carica i giocatori della campagna (utenti che hanno accettato l'invito)
             const { data: inviti, error } = await supabase
@@ -3009,7 +3007,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">DM:</span>
                     <span class="info-value" id="dmValue">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
-                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                    ${isDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -3019,7 +3017,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">Giocatori:</span>
                     <span class="info-value" id="giocatoriValue">${campagna.numero_giocatori || 0}</span>
-                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
+                    ${isDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -3029,7 +3027,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">Sessioni:</span>
                     <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
-                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                    ${isDM ? `<button class="btn-icon-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -3039,7 +3037,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 <div class="info-item">
                     <span class="info-label">Tempo di gioco:</span>
                     <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
-                    ${isCurrentUserDM ? `<button class="btn-icon-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                    ${isDM ? `<button class="btn-icon-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
