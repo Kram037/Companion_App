@@ -4190,14 +4190,27 @@ async function handleLogout() {
                     campagneChannel = null;
                 }
                 
-                // Esegui logout da Supabase
-                const { error } = await supabase.auth.signOut({ scope: 'local' });
+                // Esegui logout da Supabase (senza scope per pulire tutto)
+                const { error } = await supabase.auth.signOut();
                 if (error) {
                     console.warn('⚠️ Errore durante signOut:', error);
                     // Continua comunque con il logout locale
                 } else {
                     console.log('✅ SignOut completato con successo');
                 }
+                
+                // Pulisci manualmente anche localStorage e sessionStorage per sicurezza
+                // Rimuovi tutte le chiavi di Supabase
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('sb-')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                Object.keys(sessionStorage).forEach(key => {
+                    if (key.startsWith('sb-')) {
+                        sessionStorage.removeItem(key);
+                    }
+                });
             }
             
             // Aggiorna UI e chiudi modal
@@ -4205,11 +4218,17 @@ async function handleLogout() {
             closeUserModal();
             showNotification('Logout effettuato');
             
-            // Forza un refresh della pagina per assicurarsi che tutto sia pulito
-            // (opzionale, ma aiuta in caso di problemi con la sessione)
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            // Aspetta un po' per assicurarsi che il signOut sia completato
+            // e poi forza un refresh della pagina per assicurarsi che tutto sia pulito
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Pulisci anche AppState prima del reload
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            AppState.currentCampagnaId = null;
+            
+            // Ricarica la pagina
+            window.location.reload();
             
         } catch (error) {
             console.error('Logout error:', error);
