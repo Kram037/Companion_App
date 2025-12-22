@@ -3077,64 +3077,63 @@ async function renderGestisciGiocatoriTab(campagnaId) {
         }
 
         // Carica i giocatori attuali (utenti che hanno accettato l'invito)
+        // Carichiamo prima solo gli inviti, poi carichiamo manualmente gli utenti
         const { data: invitiAccettati, error: invitiError } = await supabase
             .from('inviti_campagna')
-            .select(`
-                *,
-                giocatore:utenti!inviti_campagna_invitato_id_fkey(id, nome_utente, cid)
-            `)
+            .select('id, invitato_id, campagna_id, stato')
             .eq('campagna_id', campagnaId)
             .eq('stato', 'accepted');
         
         if (invitiError) {
-            console.error('❌ Errore nel caricamento giocatori:', invitiError);
+            console.error('❌ Errore nel caricamento inviti:', invitiError);
             elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
             return;
         }
 
         console.log('📋 Inviti accettati caricati:', invitiAccettati);
+        console.log('📋 Numero inviti:', invitiAccettati?.length || 0);
         
-        // Se la foreign key non funziona, carica manualmente gli utenti
+        // Carica manualmente gli utenti dagli ID degli invitati
         let giocatoriAttuali = [];
         if (invitiAccettati && invitiAccettati.length > 0) {
-            // Prova prima con la foreign key
-            giocatoriAttuali = invitiAccettati
-                .map(inv => {
-                    const giocatore = inv.giocatore || inv.utenti;
-                    if (giocatore && giocatore.id) {
-                        return {
-                            ...giocatore,
-                            invitoId: inv.id
-                        };
-                    }
-                    return null;
-                })
-                .filter(g => g !== null);
+            const invitatiIds = invitiAccettati.map(inv => inv.invitato_id).filter(id => id);
+            console.log('🆔 ID invitati da caricare:', invitatiIds);
             
-            // Se non abbiamo giocatori dalla foreign key, carica manualmente
-            if (giocatoriAttuali.length === 0) {
-                console.log('⚠️ Foreign key non ha restituito dati, carico manualmente...');
-                const invitatiIds = invitiAccettati.map(inv => inv.invitato_id).filter(id => id);
+            if (invitatiIds.length > 0) {
+                const { data: utenti, error: utentiError } = await supabase
+                    .from('utenti')
+                    .select('id, nome_utente, cid')
+                    .in('id', invitatiIds);
                 
-                if (invitatiIds.length > 0) {
-                    const { data: utenti, error: utentiError } = await supabase
-                        .from('utenti')
-                        .select('id, nome_utente, cid')
-                        .in('id', invitatiIds);
-                    
-                    if (!utentiError && utenti) {
-                        // Crea una mappa per trovare l'invitoId
-                        const invitiMap = new Map(invitiAccettati.map(inv => [inv.invitato_id, inv.id]));
-                        giocatoriAttuali = utenti.map(utente => ({
-                            ...utente,
-                            invitoId: invitiMap.get(utente.id)
-                        }));
-                    }
+                console.log('👥 Utenti caricati:', utenti);
+                console.log('❌ Errore caricamento utenti:', utentiError);
+                
+                if (utentiError) {
+                    console.error('❌ Errore nel caricamento utenti:', utentiError);
+                    elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+                    return;
+                }
+                
+                if (utenti && utenti.length > 0) {
+                    // Crea una mappa per trovare l'invitoId
+                    const invitiMap = new Map(invitiAccettati.map(inv => [inv.invitato_id, inv.id]));
+                    giocatoriAttuali = utenti.map(utente => {
+                        const invitoId = invitiMap.get(utente.id);
+                        console.log('👤 Mappo utente:', utente, 'con invitoId:', invitoId);
+                        return {
+                            id: utente.id,
+                            nome_utente: utente.nome_utente,
+                            cid: utente.cid,
+                            invitoId: invitoId
+                        };
+                    });
+                    console.log('✅ Giocatori mappati:', giocatoriAttuali);
                 }
             }
         }
 
         console.log('✅ Giocatori attuali finali:', giocatoriAttuali);
+        console.log('✅ Numero giocatori finali:', giocatoriAttuali.length);
 
         if (giocatoriAttuali.length === 0) {
             elements.gestisciGiocatoriContent.innerHTML = `
