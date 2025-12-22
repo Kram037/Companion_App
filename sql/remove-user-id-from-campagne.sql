@@ -56,37 +56,26 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP INDEX IF EXISTS idx_campagne_user_id;
 
 -- Rimuoviamo il vincolo UNIQUE su (nome_campagna, user_id) se esiste
--- Nota: in PostgreSQL, dobbiamo prima trovare il nome del constraint
+-- Usiamo un approccio più semplice: cerchiamo tutti i constraint unique e li droppiamo se contengono user_id
 DO $$
 DECLARE
-    constraint_name TEXT;
-    nome_campagna_attnum SMALLINT;
-    user_id_attnum SMALLINT;
+    constraint_record RECORD;
 BEGIN
-    -- Ottieni gli attnum per nome_campagna e user_id
-    SELECT attnum INTO nome_campagna_attnum
-    FROM pg_attribute
-    WHERE attrelid = 'campagne'::regclass
-    AND attname = 'nome_campagna';
-    
-    SELECT attnum INTO user_id_attnum
-    FROM pg_attribute
-    WHERE attrelid = 'campagne'::regclass
-    AND attname = 'user_id';
-    
-    -- Trova il nome del constraint unique su (nome_campagna, user_id)
-    IF nome_campagna_attnum IS NOT NULL AND user_id_attnum IS NOT NULL THEN
-        SELECT conname INTO constraint_name
+    -- Trova tutti i constraint unique che coinvolgono user_id
+    FOR constraint_record IN
+        SELECT conname
         FROM pg_constraint
         WHERE conrelid = 'campagne'::regclass
         AND contype = 'u'
-        AND array_length(conkey, 1) = 2
-        AND conkey @> ARRAY[nome_campagna_attnum, user_id_attnum]::smallint[];
-        
-        IF constraint_name IS NOT NULL THEN
-            EXECUTE 'ALTER TABLE campagne DROP CONSTRAINT ' || quote_ident(constraint_name);
-        END IF;
-    END IF;
+        AND EXISTS (
+            SELECT 1
+            FROM unnest(conkey) AS attnum
+            JOIN pg_attribute ON pg_attribute.attrelid = conrelid AND pg_attribute.attnum = unnest.attnum
+            WHERE pg_attribute.attname = 'user_id'
+        )
+    LOOP
+        EXECUTE 'ALTER TABLE campagne DROP CONSTRAINT IF EXISTS ' || quote_ident(constraint_record.conname);
+    END LOOP;
 END $$;
 
 -- Ora possiamo rimuovere la colonna user_id

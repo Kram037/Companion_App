@@ -111,13 +111,17 @@ BEGIN
         v_giocatori := ARRAY[]::VARCHAR(10)[];
     END IF;
     
-    -- Se l'invito viene accettato, aggiungi l'invitato all'array giocatori (se non già presente e non è il DM)
-    IF p_nuovo_stato = 'accepted' AND v_invitato_id != COALESCE(v_id_dm, '') THEN
-        IF NOT (v_invitato_id = ANY(v_giocatori)) THEN
-            v_giocatori := array_append(v_giocatori, v_invitato_id);
-            UPDATE campagne
-            SET giocatori = v_giocatori
-            WHERE id = v_campagna_id;
+    -- Se l'invito viene accettato, aggiungi l'invitato all'array giocatori (se non già presente)
+    -- Nota: non aggiungiamo se è il DM, ma questo non dovrebbe mai succedere perché il DM non può invitare se stesso
+    IF p_nuovo_stato = 'accepted' THEN
+        -- Verifica che non sia il DM
+        IF v_invitato_id != COALESCE(v_id_dm, '') THEN
+            IF NOT (v_invitato_id = ANY(v_giocatori)) THEN
+                v_giocatori := array_append(v_giocatori, v_invitato_id);
+                UPDATE campagne
+                SET giocatori = v_giocatori
+                WHERE id = v_campagna_id;
+            END IF;
         END IF;
     END IF;
     

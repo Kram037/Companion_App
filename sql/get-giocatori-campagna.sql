@@ -1,6 +1,6 @@
 -- Funzione RPC per ottenere i giocatori di una campagna
 -- Recupera i giocatori dall'array giocatori della campagna
--- Esclude il DM corrente dalla lista
+-- L'array giocatori contiene solo i giocatori (non il DM)
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION get_giocatori_campagna(campagna_id_param VARCHAR(10))
 RETURNS TABLE (
@@ -13,11 +13,10 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-    v_id_dm VARCHAR(10);
     v_giocatori VARCHAR(10)[];
 BEGIN
-    -- Ottieni l'ID del DM corrente e l'array giocatori
-    SELECT c.id_dm, c.giocatori INTO v_id_dm, v_giocatori
+    -- Ottieni l'array giocatori dalla campagna
+    SELECT c.giocatori INTO v_giocatori
     FROM campagne c
     WHERE c.id = campagna_id_param;
     
@@ -26,14 +25,14 @@ BEGIN
         RETURN;
     END IF;
     
+    -- Ritorna i dettagli degli utenti nell'array giocatori
     RETURN QUERY
     SELECT 
         u.id,
         u.nome_utente,
         u.cid
     FROM utenti u
-    WHERE u.id = ANY(v_giocatori)
-    AND u.id != COALESCE(v_id_dm, ''); -- Escludi il DM corrente
+    WHERE u.id = ANY(v_giocatori);
 END;
 $$;
 

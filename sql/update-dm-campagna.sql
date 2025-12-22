@@ -1,7 +1,8 @@
 -- Funzione RPC per aggiornare il DM di una campagna
--- Gestisce anche l'aggiornamento dell'array giocatori:
--- - Rimuove il nuovo DM dall'array giocatori
--- - Aggiunge il vecchio DM all'array giocatori
+-- Logica:
+-- 1. Aggiunge il vecchio DM all'array giocatori
+-- 2. Aggiorna id_dm al nuovo DM
+-- 3. Rimuove il nuovo DM dall'array giocatori
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION update_dm_campagna(
     p_campagna_id VARCHAR(10),
@@ -22,31 +23,37 @@ BEGIN
     FROM campagne
     WHERE id = p_campagna_id;
     
-    -- Se il vecchio DM esiste e non è NULL, aggiungilo all'array giocatori (se non già presente)
+    -- Inizializza l'array se NULL
+    IF v_giocatori IS NULL THEN
+        v_giocatori := ARRAY[]::VARCHAR(10)[];
+    END IF;
+    
+    -- STEP 1: Aggiungi il vecchio DM all'array giocatori (se esiste e non è già presente)
     IF v_vecchio_dm_id IS NOT NULL AND v_vecchio_dm_id != p_nuovo_dm_id THEN
-        -- Inizializza l'array se NULL
-        IF v_giocatori IS NULL THEN
-            v_giocatori := ARRAY[]::VARCHAR(10)[];
-        END IF;
-        
-        -- Aggiungi il vecchio DM all'array se non è già presente
         IF NOT (v_vecchio_dm_id = ANY(v_giocatori)) THEN
             v_giocatori := array_append(v_giocatori, v_vecchio_dm_id);
         END IF;
     END IF;
     
-    -- Rimuovi il nuovo DM dall'array giocatori (se presente)
-    IF v_giocatori IS NOT NULL THEN
-        v_giocatori := array_remove(v_giocatori, p_nuovo_dm_id);
-    END IF;
-    
-    -- Aggiorna la campagna
+    -- STEP 2: Aggiorna id_dm al nuovo DM
     UPDATE campagne
     SET 
         id_dm = p_nuovo_dm_id,
-        nome_dm = p_nuovo_dm_nome,
-        giocatori = v_giocatori
+        nome_dm = p_nuovo_dm_nome
     WHERE id = p_campagna_id;
+    
+    -- STEP 3: Rimuovi il nuovo DM dall'array giocatori (se presente)
+    IF p_nuovo_dm_id = ANY(v_giocatori) THEN
+        v_giocatori := array_remove(v_giocatori, p_nuovo_dm_id);
+        UPDATE campagne
+        SET giocatori = v_giocatori
+        WHERE id = p_campagna_id;
+    ELSE
+        -- Aggiorna comunque l'array se abbiamo aggiunto il vecchio DM
+        UPDATE campagne
+        SET giocatori = v_giocatori
+        WHERE id = p_campagna_id;
+    END IF;
 END;
 $$;
 

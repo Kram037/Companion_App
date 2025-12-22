@@ -896,7 +896,7 @@ function setupEventListeners() {
             }
         });
     }
-
+    
     // Icon selector setup
     setupIconSelector();
 
@@ -1221,7 +1221,7 @@ async function loadCampagne(userId) {
         renderCampagne([], false);
         return;
     }
-
+    
     console.log('📚 Caricamento campagne per utente:', userId);
     
     // Carica anche gli inviti ricevuti
@@ -1460,7 +1460,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                 <div class="campagna-header">
                     <div class="campagna-title-with-icon">
                         <div class="campagna-icon">${iconaHTML}</div>
-                        <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
+                    <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
                     </div>
                     ${isDM ? `
                     <div class="campagna-actions" onclick="event.stopPropagation();">
@@ -1484,7 +1484,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                         <span class="info-label">DM:</span>
                         <span class="info-value">${escapeHtml(campagna.nome_dm || 'N/A')}</span>
                     </div>
-                </div>
+                    </div>
             </div>
         `;
     }).join('');
@@ -1722,7 +1722,7 @@ async function generateUniqueCid() {
         
         console.log('✅ CID generato dalla funzione SQL:', data);
         return data;
-    } catch (error) {
+        } catch (error) {
         console.error('❌ Errore nella generazione CID, uso fallback:', error);
         // Fallback: genera un numero casuale
         return Math.floor(1000 + Math.random() * 9000);
@@ -1811,7 +1811,7 @@ async function findUserByUid(uid) {
         if (error) {
             // PGRST116 significa "nessun risultato", non è un errore critico
             if (error.code === 'PGRST116') {
-                return null;
+        return null;
             }
             console.error('❌ Errore nella ricerca utente per uid:', error);
             throw error;
@@ -1868,9 +1868,9 @@ async function initializeUserDocument(user) {
             const { data, error } = await supabase
                 .from('utenti')
                 .update({
-                    email: user.email,
-                    nome_utente: nomeUtente,
-                    tema_scuro: temaScuro
+                email: user.email,
+                nome_utente: nomeUtente,
+                tema_scuro: temaScuro
                 })
                 .eq('uid', user.id)
                 .select()
@@ -2142,7 +2142,7 @@ async function handleCercaUtente(e) {
                 } else if (existingRequest.stato === 'pending') {
                     if (existingRequest.richiedente_id === currentUser.id) {
                         statusText = '<p style="color: var(--text-secondary); margin-top: 0.5rem;">Richiesta già inviata</p>';
-                    } else {
+        } else {
                         statusText = '<p style="color: var(--text-secondary); margin-top: 0.5rem;">Hai già una richiesta da questo utente</p>';
                     }
                 } else if (existingRequest.stato === 'rejected') {
@@ -2237,9 +2237,9 @@ window.acceptFriendRequest = async function(requestId) {
     const supabase = getSupabaseClient();
     if (!supabase) {
         showNotification('Errore: Supabase non disponibile');
-        return;
-    }
-    
+            return;
+        }
+        
     try {
         const { error } = await supabase
             .from('richieste_amicizia')
@@ -2940,8 +2940,8 @@ async function loadCampagnaDetails(campagnaId) {
         if (error) throw error;
         if (!campagna) {
             showNotification('Campagna non trovata');
-            return;
-        }
+        return;
+    }
 
         // Mostra icona e nome
         renderCampagnaDetailsHeader(campagna);
@@ -3238,14 +3238,24 @@ async function renderInvitaGiocatoriTab(campagnaId) {
             return;
         }
 
-        // Carica i giocatori attuali per escluderli dalla lista amici
-        const { data: invitiAccettati } = await supabase
-            .from('inviti_campagna')
-            .select('invitato_id')
-            .eq('campagna_id', campagnaId)
-            .eq('stato', 'accepted');
+        // Carica i giocatori attuali dall'array giocatori della campagna
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('giocatori, id_dm')
+            .eq('id', campagnaId)
+            .single();
         
-        const giocatoriAttualiIds = new Set((invitiAccettati || []).map(inv => inv.invitato_id));
+        if (campagnaError) throw campagnaError;
+        
+        // Crea un Set con gli ID dei giocatori attuali (incluso il DM per escluderlo)
+        const giocatoriAttualiIds = new Set();
+        if (campagna.giocatori && Array.isArray(campagna.giocatori)) {
+            campagna.giocatori.forEach(id => giocatoriAttualiIds.add(id));
+        }
+        // Aggiungi anche il DM per escluderlo dalla lista
+        if (campagna.id_dm) {
+            giocatoriAttualiIds.add(campagna.id_dm);
+        }
 
         // Carica gli amici
         const { data: amiciData, error: amiciError } = await supabase
@@ -3968,13 +3978,13 @@ async function handleLogin(e) {
             // Client disponibile, aggiorna supabaseReady
             supabaseReady = true;
         } else {
-            showError('Autenticazione non disponibile. Ricarica la pagina.');
+        showError('Autenticazione non disponibile. Ricarica la pagina.');
             console.error('Supabase non disponibile:', {
                 supabaseReady,
                 supabase: !!supabase,
                 windowSupabaseClient: typeof window.supabaseClient
-            });
-            return;
+        });
+        return;
         }
     } else {
         // Client disponibile, assicurati che supabaseReady sia true
