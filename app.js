@@ -3816,27 +3816,16 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
     }
 
     try {
-        // Se abbiamo l'invitoId, aggiorna lo stato a 'rejected', altrimenti elimina
-        if (invitoId) {
-            const { error } = await supabase
-                .from('inviti_campagna')
-                .update({ stato: 'rejected' })
-                .eq('id', invitoId);
+        // Usa la funzione RPC dedicata per il DM per rimuovere il giocatore
+        // Questa funzione aggiorna lo stato dell'invito e rimuove il giocatore dall'array giocatori
+        const { error } = await supabase
+            .rpc('dm_rimuovi_giocatore', {
+                p_campagna_id: campagnaId,
+                p_giocatore_id: giocatoreId,
+                p_invito_id: invitoId || null
+            });
 
-            if (error) throw error;
-        } else {
-            // Fallback: elimina tutti gli inviti per questo giocatore e campagna
-            const { error } = await supabase
-                .from('inviti_campagna')
-                .delete()
-                .eq('campagna_id', campagnaId)
-                .eq('invitato_id', giocatoreId);
-
-            if (error) throw error;
-        }
-
-        // Il numero_giocatori viene calcolato dinamicamente contando gli inviti accettati
-        // Non è più necessario decrementarlo manualmente
+        if (error) throw error;
 
         showNotification('Giocatore rimosso dalla campagna');
 
