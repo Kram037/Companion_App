@@ -2976,6 +2976,7 @@ async function renderCampagnaDetailsContent(campagna) {
         try {
             // Usa la funzione isCurrentUserDM che fa una query fresca al database
             isDM = await isCurrentUserDM(campagna.id);
+            console.log('🔍 Verifica DM per campagna', campagna.id, '- isDM:', isDM);
             
             // Carica i giocatori della campagna (utenti che hanno accettato l'invito)
             const { data: inviti, error } = await supabase
@@ -3575,14 +3576,17 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
 async function isCurrentUserDM(campagnaId) {
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.currentUser) {
+        console.log('❌ isCurrentUserDM: supabase o currentUser non disponibili');
         return false;
     }
 
     try {
         const currentUser = await findUserByUid(AppState.currentUser.uid);
         if (!currentUser) {
+            console.log('❌ isCurrentUserDM: currentUser non trovato');
             return false;
         }
+        console.log('👤 isCurrentUserDM: currentUser.id =', currentUser.id, 'tipo:', typeof currentUser.id);
 
         // Carica la campagna per verificare user_id
         const { data: campagna, error } = await supabase
@@ -3591,11 +3595,19 @@ async function isCurrentUserDM(campagnaId) {
             .eq('id', campagnaId)
             .single();
 
-        if (error || !campagna) {
+        if (error) {
+            console.error('❌ isCurrentUserDM: errore nel caricamento campagna:', error);
             return false;
         }
+        if (!campagna) {
+            console.log('❌ isCurrentUserDM: campagna non trovata');
+            return false;
+        }
+        console.log('📋 isCurrentUserDM: campagna.user_id =', campagna.user_id, 'tipo:', typeof campagna.user_id);
 
-        return currentUser.id === campagna.user_id;
+        const isMatch = currentUser.id === campagna.user_id;
+        console.log('✅ isCurrentUserDM: confronto', currentUser.id, '===', campagna.user_id, '=', isMatch);
+        return isMatch;
     } catch (error) {
         console.error('❌ Errore nel controllo DM:', error);
         return false;
