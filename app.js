@@ -3571,7 +3571,7 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
                 .from('campagne')
                 .update({ 
                     nome_dm: giocatoreNome,
-                    user_id: giocatoreId
+                    id_dm: giocatoreId
                 })
                 .eq('id', campagnaId)
                 .select();
