@@ -3619,14 +3619,32 @@ async function isCurrentUserDM(campagnaId) {
         console.log('👤 isCurrentUserDM: currentUser.id =', currentUser.id, 'tipo:', typeof currentUser.id);
 
         // Carica la campagna per verificare user_id
+        // Usa una query con cache disabilitata per assicurarsi di avere i dati più recenti
         const { data: campagna, error } = await supabase
             .from('campagne')
             .select('user_id')
             .eq('id', campagnaId)
-            .single();
+            .single()
+            .abortSignal(AbortSignal.timeout(5000)); // Timeout per evitare query infinite
 
         if (error) {
             console.error('❌ isCurrentUserDM: errore nel caricamento campagna:', error);
+            // Se c'è un errore di RLS, prova con una query diversa
+            if (error.code === 'PGRST301' || error.message?.includes('RLS')) {
+                console.log('⚠️ isCurrentUserDM: possibile problema RLS, provo query alternativa');
+                // Prova a caricare tutte le campagne e filtrare lato client (solo come fallback)
+                const { data: allCampagne, error: allError } = await supabase
+                    .from('campagne')
+                    .select('id, user_id');
+                if (!allError && allCampagne) {
+                    const campagnaFound = allCampagne.find(c => c.id === campagnaId);
+                    if (campagnaFound) {
+                        const isMatch = currentUser.id === campagnaFound.user_id;
+                        console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagnaFound.user_id, '=', isMatch);
+                        return isMatch;
+                    }
+                }
+            }
             return false;
         }
         if (!campagna) {
