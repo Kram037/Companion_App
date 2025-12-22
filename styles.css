@@ -1577,6 +1577,11 @@ body {
     align-items: center;
     transition: var(--transition);
     box-shadow: 0 2px 4px var(--shadow);
+    margin-bottom: var(--spacing-md);
+}
+
+.amico-item:last-child {
+    margin-bottom: 0;
 }
 
 .amico-item:hover {
