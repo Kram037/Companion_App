@@ -4184,14 +4184,13 @@ async function handleLogout() {
                     campagneChannel = null;
                 }
                 
-                // Prova logout senza scope (default è 'local', ma proviamo anche senza)
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) {
-                        console.warn('Errore durante signOut:', error);
-                    }
-                } catch (signOutError) {
-                    console.warn('Errore nel signOut:', signOutError);
+                // Esegui logout da Supabase
+                const { error } = await supabase.auth.signOut({ scope: 'local' });
+                if (error) {
+                    console.warn('⚠️ Errore durante signOut:', error);
+                    // Continua comunque con il logout locale
+                } else {
+                    console.log('✅ SignOut completato con successo');
                 }
             }
             
