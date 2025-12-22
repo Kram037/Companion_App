@@ -1437,7 +1437,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
 
     htmlContent += campagne.map(campagna => {
         // Verifica se l'utente corrente è il DM di questa campagna
-        const isDM = currentUserId && campagna.user_id === currentUserId;
+        const isDM = currentUserId && campagna.id_dm === currentUserId;
 
         // Renderizza l'icona della campagna
         let iconaHTML = '';
@@ -3688,9 +3688,9 @@ async function isCurrentUserDM(campagnaId) {
                 console.log('❌ isCurrentUserDM: campagna non trovata');
                 return false;
             }
-            console.log('📋 isCurrentUserDM (fallback): campagna.user_id =', campagna.user_id, 'tipo:', typeof campagna.user_id);
-            const isMatch = currentUser.id === campagna.user_id;
-            console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagna.user_id, '=', isMatch);
+            console.log('📋 isCurrentUserDM (fallback): campagna.id_dm =', campagna.id_dm, 'tipo:', typeof campagna.id_dm);
+            const isMatch = currentUser.id === campagna.id_dm;
+            console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagna.id_dm, '=', isMatch);
             return isMatch;
         }
 
@@ -3699,13 +3699,13 @@ async function isCurrentUserDM(campagnaId) {
         // Aggiungi anche una query diretta per confrontare
         const { data: campagnaDirect, error: directError } = await supabase
             .from('campagne')
-            .select('user_id, nome_dm')
+            .select('id_dm, nome_dm')
             .eq('id', campagnaId)
             .single();
         
         if (!directError && campagnaDirect) {
-            console.log('🔍 isCurrentUserDM: query diretta - user_id =', campagnaDirect.user_id, 'nome_dm =', campagnaDirect.nome_dm);
-            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagnaDirect.user_id, '=', currentUser.id === campagnaDirect.user_id);
+            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagnaDirect.id_dm, 'nome_dm =', campagnaDirect.nome_dm);
+            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagnaDirect.id_dm, '=', currentUser.id === campagnaDirect.id_dm);
         }
         
         return isDM === true;
