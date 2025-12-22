@@ -203,6 +203,8 @@ GRANT EXECUTE ON FUNCTION dm_rimuovi_giocatore(VARCHAR(10), VARCHAR(10), VARCHAR
 -- Rimuovi le policy problematiche e sostituiscile con policy più semplici
 DROP POLICY IF EXISTS "Utenti possono creare inviti per le proprie campagne" ON inviti_campagna;
 DROP POLICY IF EXISTS "Utenti possono aggiornare inviti ricevuti" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono creare inviti tramite funzione" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono aggiornare inviti tramite funzione" ON inviti_campagna;
 
 -- Policy semplificate che usano le funzioni SECURITY DEFINER
 -- La policy INSERT ora permette solo se viene chiamata tramite la funzione
