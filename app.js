@@ -1335,15 +1335,20 @@ async function loadInvitiRicevuti(userId) {
             return [];
         }
 
-        // Carica gli inviti con i dati della campagna
+        // Carica gli inviti con i dati della campagna e dell'inviante (DM che ha inviato l'invito)
         const { data: inviti, error } = await supabase
             .from('inviti_campagna')
             .select(`
                 *,
                 campagne:campagne!inviti_campagna_campagna_id_fkey(
                     id,
-                    nome_campagna,
-                    id_dm
+                    nome_campagna
+                ),
+                inviante:utenti!inviti_campagna_inviante_id_fkey(
+                    id,
+                    nome_utente,
+                    cid,
+                    email
                 )
             `)
             .eq('invitato_id', utente.id)
@@ -1352,46 +1357,6 @@ async function loadInvitiRicevuti(userId) {
         if (error) {
             console.error('❌ Errore query inviti ricevuti:', error);
             throw error;
-        }
-
-        // Per ogni invito, carica i dati del DM separatamente
-        if (inviti && inviti.length > 0) {
-            // Raccogli tutti gli id_dm univoci
-            const dmIds = [...new Set(inviti.map(inv => inv.campagne?.id_dm).filter(Boolean))];
-            
-            if (dmIds.length > 0) {
-                // Carica tutti i DM in una sola query
-                const { data: dms, error: dmError } = await supabase
-                    .from('utenti')
-                    .select('id, nome_utente, cid, email')
-                    .in('id', dmIds);
-                
-                // Se la query fallisce, prova a caricare individualmente
-                let dmMap = new Map();
-                if (!dmError && dms) {
-                    dms.forEach(dm => dmMap.set(dm.id, dm));
-                } else {
-                    // Fallback: carica ogni DM individualmente
-                    for (const dmId of dmIds) {
-                        const { data: dm, error: singleError } = await supabase
-                            .from('utenti')
-                            .select('id, nome_utente, cid, email')
-                            .eq('id', dmId)
-                            .single();
-                        
-                        if (!singleError && dm) {
-                            dmMap.set(dm.id, dm);
-                        }
-                    }
-                }
-                
-                // Aggiungi i dati del DM a ogni invito
-                inviti.forEach(invito => {
-                    if (invito.campagne?.id_dm) {
-                        invito.campagne.dm = dmMap.get(invito.campagne.id_dm);
-                    }
-                });
-            }
         }
 
         console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
@@ -1433,24 +1398,23 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
     // Mostra gli inviti ricevuti
     if (invitiRicevuti.length > 0) {
         htmlContent += invitiRicevuti.map(invito => {
-            // Usa l'alias 'campagne' e 'dm' dalla query
+            // Usa l'alias 'campagne' e 'inviante' dalla query
             const campagna = invito.campagne;
-            const dm = campagna?.dm; // Il DM della campagna (non chi ha inviato l'invito)
+            const inviante = invito.inviante; // Chi ha inviato l'invito (il DM)
             
             // Debug logging
-            if (!campagna) {
+            if (!campagna || !inviante) {
                 console.warn('⚠️ Dati invito incompleti:', {
                     invitoId: invito.id,
                     hasCampagna: !!campagna,
-                    hasDm: !!dm,
-                    invitoKeys: Object.keys(invito),
-                    campagnaKeys: campagna ? Object.keys(campagna) : []
+                    hasInviante: !!inviante,
+                    invitoKeys: Object.keys(invito)
                 });
             }
             
             const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
-            const nomeDM = dm?.nome_utente || 'DM sconosciuto';
-            const cidDM = dm?.cid || '';
+            const nomeDM = inviante?.nome_utente || 'DM sconosciuto';
+            const cidDM = inviante?.cid || '';
             
             return `
                 <div class="invito-card">
