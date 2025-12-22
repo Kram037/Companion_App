@@ -3630,44 +3630,38 @@ async function isCurrentUserDM(campagnaId) {
         }
         console.log('👤 isCurrentUserDM: currentUser.id =', currentUser.id, 'tipo:', typeof currentUser.id);
 
-        // Carica la campagna per verificare user_id
-        // Usa una query con cache disabilitata per assicurarsi di avere i dati più recenti
-        const { data: campagna, error } = await supabase
-            .from('campagne')
-            .select('user_id')
-            .eq('id', campagnaId)
-            .single()
-            .abortSignal(AbortSignal.timeout(5000)); // Timeout per evitare query infinite
+        // Usa la funzione RPC per bypassare RLS e ottenere il vero valore dal database
+        const { data: isDM, error: rpcError } = await supabase.rpc('check_dm_campagna', {
+            p_campagna_id: campagnaId,
+            p_user_id: currentUser.id
+        });
 
-        if (error) {
-            console.error('❌ isCurrentUserDM: errore nel caricamento campagna:', error);
-            // Se c'è un errore di RLS, prova con una query diversa
-            if (error.code === 'PGRST301' || error.message?.includes('RLS')) {
-                console.log('⚠️ isCurrentUserDM: possibile problema RLS, provo query alternativa');
-                // Prova a caricare tutte le campagne e filtrare lato client (solo come fallback)
-                const { data: allCampagne, error: allError } = await supabase
-                    .from('campagne')
-                    .select('id, user_id');
-                if (!allError && allCampagne) {
-                    const campagnaFound = allCampagne.find(c => c.id === campagnaId);
-                    if (campagnaFound) {
-                        const isMatch = currentUser.id === campagnaFound.user_id;
-                        console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagnaFound.user_id, '=', isMatch);
-                        return isMatch;
-                    }
-                }
+        if (rpcError) {
+            console.error('❌ isCurrentUserDM: errore nella funzione RPC:', rpcError);
+            // Fallback: usa la query normale se la RPC non è disponibile
+            console.log('⚠️ isCurrentUserDM: fallback alla query normale');
+            const { data: campagna, error } = await supabase
+                .from('campagne')
+                .select('user_id')
+                .eq('id', campagnaId)
+                .single();
+
+            if (error) {
+                console.error('❌ isCurrentUserDM: errore nel caricamento campagna:', error);
+                return false;
             }
-            return false;
+            if (!campagna) {
+                console.log('❌ isCurrentUserDM: campagna non trovata');
+                return false;
+            }
+            console.log('📋 isCurrentUserDM (fallback): campagna.user_id =', campagna.user_id, 'tipo:', typeof campagna.user_id);
+            const isMatch = currentUser.id === campagna.user_id;
+            console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagna.user_id, '=', isMatch);
+            return isMatch;
         }
-        if (!campagna) {
-            console.log('❌ isCurrentUserDM: campagna non trovata');
-            return false;
-        }
-        console.log('📋 isCurrentUserDM: campagna.user_id =', campagna.user_id, 'tipo:', typeof campagna.user_id);
 
-        const isMatch = currentUser.id === campagna.user_id;
-        console.log('✅ isCurrentUserDM: confronto', currentUser.id, '===', campagna.user_id, '=', isMatch);
-        return isMatch;
+        console.log('✅ isCurrentUserDM (RPC): risultato =', isDM);
+        return isDM === true;
     } catch (error) {
         console.error('❌ Errore nel controllo DM:', error);
         return false;
