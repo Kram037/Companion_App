@@ -1335,28 +1335,55 @@ async function loadInvitiRicevuti(userId) {
             return [];
         }
 
-        // Carica gli inviti con i dati della campagna e dell'inviante (DM che ha inviato l'invito)
+        // Carica gli inviti
         const { data: inviti, error } = await supabase
             .from('inviti_campagna')
-            .select(`
-                *,
-                campagne:campagne!inviti_campagna_campagna_id_fkey(
-                    id,
-                    nome_campagna
-                ),
-                inviante:utenti!inviti_campagna_inviante_id_fkey(
-                    id,
-                    nome_utente,
-                    cid,
-                    email
-                )
-            `)
+            .select('*')
             .eq('invitato_id', utente.id)
             .eq('stato', 'pending');
 
         if (error) {
             console.error('❌ Errore query inviti ricevuti:', error);
             throw error;
+        }
+
+        // Carica manualmente i dati della campagna e dell'inviante per ogni invito
+        if (inviti && inviti.length > 0) {
+            // Raccogli tutti gli ID univoci
+            const campagnaIds = [...new Set(inviti.map(inv => inv.campagna_id).filter(Boolean))];
+            const invianteIds = [...new Set(inviti.map(inv => inv.inviante_id).filter(Boolean))];
+            
+            // Carica le campagne
+            let campagneMap = new Map();
+            if (campagnaIds.length > 0) {
+                const { data: campagne } = await supabase
+                    .from('campagne')
+                    .select('id, nome_campagna')
+                    .in('id', campagnaIds);
+                
+                if (campagne) {
+                    campagne.forEach(c => campagneMap.set(c.id, c));
+                }
+            }
+            
+            // Carica gli invianti (DM)
+            let inviantiMap = new Map();
+            if (invianteIds.length > 0) {
+                const { data: invianti } = await supabase
+                    .from('utenti')
+                    .select('id, nome_utente, cid, email')
+                    .in('id', invianteIds);
+                
+                if (invianti) {
+                    invianti.forEach(i => inviantiMap.set(i.id, i));
+                }
+            }
+            
+            // Aggiungi i dati a ogni invito
+            inviti.forEach(invito => {
+                invito.campagne = campagneMap.get(invito.campagna_id) || null;
+                invito.inviante = inviantiMap.get(invito.inviante_id) || null;
+            });
         }
 
         console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
