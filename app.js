@@ -1455,18 +1455,20 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         return;
     }
 
-    // Carica i nomi dei DM per tutte le campagne
+    // Carica i nomi dei DM per tutte le campagne usando la funzione RPC (bypassa RLS)
     const dmIds = [...new Set(campagne.map(c => c.id_dm).filter(Boolean))];
     let dmMap = new Map();
     if (dmIds.length > 0) {
         const supabase = getSupabaseClient();
         if (supabase) {
-            const { data: dms } = await supabase
-                .from('utenti')
-                .select('id, nome_utente, cid')
-                .in('id', dmIds);
+            const { data: dms, error: dmsError } = await supabase
+                .rpc('get_dms_campagne', {
+                    p_dm_ids: dmIds
+                });
             
-            if (dms) {
+            if (dmsError) {
+                console.error('❌ Errore nel caricamento DM:', dmsError);
+            } else if (dms) {
                 dms.forEach(dm => dmMap.set(dm.id, dm));
             }
         }
@@ -3023,16 +3025,17 @@ async function renderCampagnaDetailsContent(campagna) {
             isDM = await isCurrentUserDM(campagna.id);
             console.log('🔍 Verifica DM per campagna', campagna.id, '- isDM:', isDM);
             
-            // Carica i giocatori della campagna dall'array giocatori
+            // Carica i dati del DM usando la funzione RPC (bypassa RLS)
             if (campagna.id_dm) {
-                const { data: dmData } = await supabase
-                    .from('utenti')
-                    .select('nome_utente, cid')
-                    .eq('id', campagna.id_dm)
-                    .single();
+                const { data: dmData, error: dmError } = await supabase
+                    .rpc('get_dm_campagna', {
+                        p_campagna_id: campagna.id
+                    });
                 
-                if (dmData) {
-                    nomeDM = dmData.nome_utente || 'DM sconosciuto';
+                if (dmError) {
+                    console.error('❌ Errore nel caricamento DM:', dmError);
+                } else if (dmData && dmData.length > 0) {
+                    nomeDM = dmData[0].nome_utente || 'DM sconosciuto';
                 }
             }
             
