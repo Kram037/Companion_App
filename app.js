@@ -3431,32 +3431,56 @@ window.editDMField = async function(campagnaId) {
         return;
     }
 
-    if (!AppState.campagnaGiocatori || AppState.campagnaGiocatori.length === 0) {
-        showNotification('Non ci sono giocatori nella campagna per cambiare il DM');
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
         return;
     }
 
-    // Mostra un dialog per selezionare il nuovo DM usando showPrompt
-    const options = AppState.campagnaGiocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join(', ');
-    const selected = await showPrompt(`Seleziona il nuovo DM. Giocatori disponibili: ${options}\n\nInserisci il nome utente o il CID:`, 'Cambia DM');
-    if (!selected) return;
+    try {
+        // Carica i giocatori usando la funzione RPC (stessa logica di renderGestisciGiocatoriTab)
+        const { data: giocatori, error } = await supabase
+            .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
+        
+        if (error) {
+            console.error('❌ Errore nel caricamento giocatori:', error);
+            showNotification('Errore nel caricamento dei giocatori');
+            return;
+        }
 
-    // Trova il giocatore selezionato
-    const giocatoreSelezionato = AppState.campagnaGiocatori.find(g => 
-        g.nome_utente.toLowerCase() === selected.toLowerCase() || 
-        g.cid.toString() === selected
-    );
+        if (!giocatori || giocatori.length === 0) {
+            showNotification('Non ci sono giocatori nella campagna per cambiare il DM');
+            return;
+        }
 
-    if (!giocatoreSelezionato) {
-        showNotification('Giocatore non trovato');
-        return;
+        // Mostra un dialog per selezionare il nuovo DM usando showPrompt
+        const options = giocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join(', ');
+        const selected = await showPrompt(`Seleziona il nuovo DM. Giocatori disponibili: ${options}\n\nInserisci il nome utente o il CID:`, 'Cambia DM');
+        if (!selected) return;
+
+        // Trova il giocatore selezionato
+        const giocatoreSelezionato = giocatori.find(g => 
+            g.nome_utente.toLowerCase() === selected.toLowerCase() || 
+            g.cid.toString() === selected
+        );
+
+        if (!giocatoreSelezionato) {
+            showNotification('Giocatore non trovato');
+            return;
+        }
+
+        // Aggiorna il DM
+        await updateCampagnaField(campagnaId, 'nome_dm', giocatoreSelezionato.nome_utente);
+        
+        // Il vecchio DM diventa un giocatore normale (non serve fare nulla, solo cambiare nome_dm)
+        showNotification(`DM cambiato a ${giocatoreSelezionato.nome_utente}`);
+        
+        // Ricarica i dettagli della campagna per aggiornare la UI
+        await loadCampagnaDetails(campagnaId);
+    } catch (error) {
+        console.error('❌ Errore nel cambio DM:', error);
+        showNotification('Errore nel cambio del DM: ' + (error.message || error));
     }
-
-    // Aggiorna il DM
-    await updateCampagnaField(campagnaId, 'nome_dm', giocatoreSelezionato.nome_utente);
-    
-    // Il vecchio DM diventa un giocatore normale (non serve fare nulla, solo cambiare nome_dm)
-    showNotification(`DM cambiato a ${giocatoreSelezionato.nome_utente}`);
 };
 
 /**
