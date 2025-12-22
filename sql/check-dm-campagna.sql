@@ -13,6 +13,12 @@ BEGIN
     FROM campagne
     WHERE id = p_campagna_id;
     
+    -- Se la campagna non esiste o user_id è NULL, ritorna false
+    IF v_user_id IS NULL THEN
+        RETURN FALSE;
+    END IF;
+    
+    -- Confronta i valori (entrambi sono VARCHAR(10))
     RETURN v_user_id = p_user_id;
 END;
 $$;
