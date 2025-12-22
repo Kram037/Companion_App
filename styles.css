@@ -492,6 +492,36 @@ body {
     gap: var(--spacing-md);
 }
 
+.dm-player-card .giocatore-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.dm-player-card .giocatore-avatar svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text);
+}
+
+.dm-player-card .giocatore-nome {
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.dm-player-card .giocatore-cid {
+    color: var(--text-light);
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+}
+
 .player-info {
     display: flex;
     align-items: center;
