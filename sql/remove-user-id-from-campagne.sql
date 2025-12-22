@@ -63,15 +63,15 @@ DECLARE
 BEGIN
     -- Trova tutti i constraint unique che coinvolgono user_id
     FOR constraint_record IN
-        SELECT conname
-        FROM pg_constraint
-        WHERE conrelid = 'campagne'::regclass
-        AND contype = 'u'
+        SELECT c.conname
+        FROM pg_constraint c
+        WHERE c.conrelid = 'campagne'::regclass
+        AND c.contype = 'u'
         AND EXISTS (
             SELECT 1
-            FROM unnest(conkey) AS attnum
-            JOIN pg_attribute ON pg_attribute.attrelid = conrelid AND pg_attribute.attnum = unnest.attnum
-            WHERE pg_attribute.attname = 'user_id'
+            FROM unnest(c.conkey) AS attnum
+            JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = unnest.attnum
+            WHERE a.attname = 'user_id'
         )
     LOOP
         EXECUTE 'ALTER TABLE campagne DROP CONSTRAINT IF EXISTS ' || quote_ident(constraint_record.conname);
