@@ -3589,11 +3589,23 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         
         showNotification(`DM cambiato a ${giocatoreNome}`);
         
-        // Aspetta un po' per assicurarsi che l'update sia propagato
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Aspetta un po' per assicurarsi che l'update sia propagato nel database
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Ricarica i dettagli della campagna per aggiornare la UI
+        // Usa un approccio più diretto: ricarica la campagna e verifica i permessi
         await loadCampagnaDetails(campagnaId);
+        
+        // Verifica che il DM sia stato cambiato correttamente
+        const isNowDM = await isCurrentUserDM(campagnaId);
+        console.log('🔍 selectNewDM: verifica finale - isNowDM =', isNowDM);
+        if (!isNowDM && giocatoreId === currentUser?.id) {
+            console.warn('⚠️ selectNewDM: il DM non corrisponde dopo l\'update, potrebbe essere un problema di cache o RLS');
+            // Forza un refresh completo ricaricando la pagina delle campagne
+            if (AppState.currentUser) {
+                await loadCampagne(AppState.currentUser.uid);
+            }
+        }
     } catch (error) {
         console.error('❌ Errore nel cambio DM:', error);
         showNotification('Errore nel cambio del DM: ' + (error.message || error));
