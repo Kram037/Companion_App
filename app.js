@@ -3772,20 +3772,8 @@ window.invitaAmicoAllaCampagna = async function(campagnaId, amicoId) {
             return;
         }
 
-        // Verifica che la campagna appartenga all'utente corrente
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('*')
-            .eq('id', campagnaId)
-            .eq('user_id', currentUser.id)
-            .single();
-
-        if (campagnaError || !campagna) {
-            showNotification('Errore: campagna non trovata o non sei il proprietario');
-            return;
-        }
-
-        // Crea l'invito usando la funzione RPC per evitare problemi RLS
+        // Crea l'invito usando la funzione RPC
+        // La funzione RPC verifica automaticamente che l'utente sia il DM della campagna
         const { data: invitoId, error } = await supabase
             .rpc('create_invito_campagna', {
                 p_campagna_id: campagnaId,

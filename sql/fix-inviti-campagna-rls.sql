@@ -10,6 +10,7 @@ RETURNS VARCHAR(10) AS $$
 DECLARE
     v_current_user_id VARCHAR(10);
     v_invito_id VARCHAR(10);
+    v_id_dm VARCHAR(10);
 BEGIN
     -- Ottieni l'ID dell'utente corrente
     SELECT id INTO v_current_user_id
@@ -20,12 +21,16 @@ BEGIN
         RAISE EXCEPTION 'Utente non trovato';
     END IF;
     
-    -- Verifica che l'utente corrente sia il DM della campagna
-    IF NOT EXISTS (
-        SELECT 1 FROM campagne
-        WHERE id = p_campagna_id
-        AND id_dm = v_current_user_id
-    ) THEN
+    -- Verifica che la campagna esista e che l'utente corrente sia il DM
+    SELECT id_dm INTO v_id_dm
+    FROM campagne
+    WHERE id = p_campagna_id;
+    
+    IF v_id_dm IS NULL THEN
+        RAISE EXCEPTION 'Campagna non trovata';
+    END IF;
+    
+    IF v_id_dm != v_current_user_id THEN
         RAISE EXCEPTION 'Solo il DM può invitare giocatori alla campagna';
     END IF;
     
