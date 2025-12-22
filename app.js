@@ -1339,7 +1339,13 @@ async function loadInvitiRicevuti(userId) {
             .from('inviti_campagna')
             .select(`
                 *,
-                campagne:campagne!inviti_campagna_campagna_id_fkey(*),
+                campagne:campagne!inviti_campagna_campagna_id_fkey(
+                    id,
+                    nome_campagna,
+                    nome_dm,
+                    id_dm,
+                    dm:utenti!campagne_id_dm_fkey(id, nome_utente, cid, email)
+                ),
                 inviante:utenti!inviti_campagna_inviante_id_fkey(id, nome_utente, cid, email)
             `)
             .eq('invitato_id', utente.id)
@@ -1389,23 +1395,24 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
     // Mostra gli inviti ricevuti
     if (invitiRicevuti.length > 0) {
         htmlContent += invitiRicevuti.map(invito => {
-            // Usa l'alias 'campagne' e 'inviante' dalla query
+            // Usa l'alias 'campagne' e 'dm' dalla query
             const campagna = invito.campagne;
-            const inviante = invito.inviante;
+            const dm = campagna?.dm; // Il DM della campagna (non chi ha inviato l'invito)
             
             // Debug logging
-            if (!campagna || !inviante) {
+            if (!campagna) {
                 console.warn('⚠️ Dati invito incompleti:', {
                     invitoId: invito.id,
                     hasCampagna: !!campagna,
-                    hasInviante: !!inviante,
-                    invitoKeys: Object.keys(invito)
+                    hasDm: !!dm,
+                    invitoKeys: Object.keys(invito),
+                    campagnaKeys: campagna ? Object.keys(campagna) : []
                 });
             }
             
-            const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
-            const nomeInviante = inviante?.nome_utente || 'Utente sconosciuto';
-            const cidInviante = inviante?.cid || '';
+            const nomeCampagna = campagna?.nome_campagna || campagna?.nome_campagna || 'Campagna sconosciuta';
+            const nomeDM = dm?.nome_utente || campagna?.nome_dm || 'DM sconosciuto';
+            const cidDM = dm?.cid || '';
             
             return `
                 <div class="invito-card">
@@ -1414,7 +1421,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                     </div>
                     <div class="invito-content">
                         <p><strong>Campagna: ${escapeHtml(nomeCampagna)}</strong></p>
-                        <p class="invito-from">DM: ${escapeHtml(nomeInviante)}${cidInviante ? ` (CID: ${cidInviante})` : ''}</p>
+                        <p class="invito-from">DM: ${escapeHtml(nomeDM)}${cidDM ? ` (CID: ${cidDM})` : ''}</p>
                         <div class="invito-actions">
                             <button class="btn-primary btn-small" onclick="accettaInvitoCampagna('${invito.id}')">Accetta</button>
                             <button class="btn-secondary btn-small" onclick="rifiutaInvitoCampagna('${invito.id}')">Rifiuta</button>
