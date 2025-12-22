@@ -3782,7 +3782,7 @@ async function isCurrentUserDM(campagnaId) {
             
             // Confronta id_dm invece di user_id
             const isDM = campagna.id_dm === currentUser.id;
-            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagna.id_dm, 'nome_dm =', campagna.nome_dm);
+            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagna.id_dm);
             console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagna.id_dm, '=', isDM);
             return isDM;
             console.log('📋 isCurrentUserDM (fallback): campagna.id_dm =', campagna.id_dm, 'tipo:', typeof campagna.id_dm);
