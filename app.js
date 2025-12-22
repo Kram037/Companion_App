@@ -1249,7 +1249,7 @@ async function loadCampagne(userId) {
         const { data: campagneCreate, error: errorCreate } = await supabase
             .from('campagne')
             .select('*')
-            .eq('user_id', utente.id)
+            .eq('id_dm', utente.id)
             .order('data_creazione', { ascending: false });
 
         if (errorCreate) throw errorCreate;
@@ -1296,7 +1296,7 @@ async function loadCampagne(userId) {
                     event: '*', 
                     schema: 'public', 
                     table: 'campagne',
-                    filter: `user_id=eq.${utente.id}`
+                    filter: `id_dm=eq.${utente.id}`
                 }, 
                 async (payload) => {
                     console.log('🔄 Cambio rilevato nelle campagne:', payload);
@@ -1304,7 +1304,7 @@ async function loadCampagne(userId) {
                     const { data: updatedCampagne, error: reloadError } = await supabase
                         .from('campagne')
                         .select('*')
-                        .eq('user_id', utente.id)
+                        .eq('id_dm', utente.id)
                         .order('data_creazione', { ascending: false });
                     
                     if (!reloadError && updatedCampagne) {
@@ -2857,7 +2857,6 @@ async function handleCampagnaSubmit(e) {
 
     const campagnaData = {
         nome_campagna: nomeCampagna,
-        user_id: utente.id,
         icona_type: iconaType,
         icona_name: iconaName,
         icona_data: iconaData,
@@ -3665,7 +3664,7 @@ async function isCurrentUserDM(campagnaId) {
             console.log('⚠️ isCurrentUserDM: fallback alla query normale');
             const { data: campagna, error } = await supabase
                 .from('campagne')
-                .select('user_id')
+                .select('id_dm')
                 .eq('id', campagnaId)
                 .single();
 
@@ -3677,6 +3676,12 @@ async function isCurrentUserDM(campagnaId) {
                 console.log('❌ isCurrentUserDM: campagna non trovata');
                 return false;
             }
+            
+            // Confronta id_dm invece di user_id
+            const isDM = campagna.id_dm === currentUser.id;
+            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagna.id_dm, 'nome_dm =', campagna.nome_dm);
+            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagna.id_dm, '=', isDM);
+            return isDM;
             console.log('📋 isCurrentUserDM (fallback): campagna.id_dm =', campagna.id_dm, 'tipo:', typeof campagna.id_dm);
             const isMatch = currentUser.id === campagna.id_dm;
             console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagna.id_dm, '=', isMatch);
