@@ -842,6 +842,31 @@ function setupEventListeners() {
             closeInvitaGiocatoriModal();
         };
     }
+
+    // Close edit DM modal
+    if (elements.closeEditDMModal) {
+        elements.closeEditDMModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeEditDMModal();
+        };
+    }
+
+    if (elements.cancelEditDMBtn) {
+        elements.cancelEditDMBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeEditDMModal();
+        };
+    }
+
+    if (elements.editDMModal) {
+        elements.editDMModal.addEventListener('click', (e) => {
+            if (e.target === elements.editDMModal) {
+                closeEditDMModal();
+            }
+        });
+    }
     
     // Tab navigation per gestione giocatori modal
     if (elements.gestisciGiocatoriTab) {
@@ -3431,49 +3456,99 @@ window.editDMField = async function(campagnaId) {
         return;
     }
 
+    await openEditDMModal(campagnaId);
+};
+
+/**
+ * Apre il modal per selezionare il nuovo DM
+ */
+async function openEditDMModal(campagnaId) {
     const supabase = getSupabaseClient();
-    if (!supabase) {
-        showNotification('Errore: Supabase non disponibile');
+    if (!supabase || !elements.editDMModal || !elements.dmPlayersList) {
+        showNotification('Errore: Elementi non disponibili');
         return;
     }
 
     try {
+        // Mostra il modal con stato di caricamento
+        elements.dmPlayersList.innerHTML = '<p>Caricamento giocatori...</p>';
+        elements.editDMModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
         // Carica i giocatori usando la funzione RPC (stessa logica di renderGestisciGiocatoriTab)
         const { data: giocatori, error } = await supabase
             .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
         
         if (error) {
             console.error('❌ Errore nel caricamento giocatori:', error);
-            showNotification('Errore nel caricamento dei giocatori');
+            elements.dmPlayersList.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
             return;
         }
 
         if (!giocatori || giocatori.length === 0) {
-            showNotification('Non ci sono giocatori nella campagna per cambiare il DM');
+            elements.dmPlayersList.innerHTML = '<p>Non ci sono giocatori nella campagna per cambiare il DM</p>';
             return;
         }
 
-        // Mostra un dialog per selezionare il nuovo DM usando showPrompt
-        const options = giocatori.map(g => `${g.nome_utente} (CID: ${g.cid})`).join(', ');
-        const selected = await showPrompt(`Seleziona il nuovo DM. Giocatori disponibili: ${options}\n\nInserisci il nome utente o il CID:`, 'Cambia DM');
-        if (!selected) return;
+        // Popola la lista con le card dei giocatori
+        elements.dmPlayersList.innerHTML = giocatori.map(giocatore => `
+            <div class="dm-player-card" data-giocatore-id="${giocatore.id}" data-giocatore-nome="${escapeHtml(giocatore.nome_utente)}">
+                <div class="giocatore-info">
+                    <div class="giocatore-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="giocatore-nome">${escapeHtml(giocatore.nome_utente || 'Utente')}</p>
+                        <p class="giocatore-cid">CID: ${giocatore.cid || ''}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
 
-        // Trova il giocatore selezionato
-        const giocatoreSelezionato = giocatori.find(g => 
-            g.nome_utente.toLowerCase() === selected.toLowerCase() || 
-            g.cid.toString() === selected
-        );
+        // Aggiungi event listener a tutte le card
+        const playerCards = elements.dmPlayersList.querySelectorAll('.dm-player-card');
+        playerCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const giocatoreId = card.getAttribute('data-giocatore-id');
+                const giocatoreNome = card.getAttribute('data-giocatore-nome');
+                selectNewDM(campagnaId, giocatoreId, giocatoreNome);
+            });
+        });
 
-        if (!giocatoreSelezionato) {
-            showNotification('Giocatore non trovato');
-            return;
+    } catch (error) {
+        console.error('❌ Errore nell\'apertura modal DM:', error);
+        if (elements.dmPlayersList) {
+            elements.dmPlayersList.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
         }
+    }
+}
 
+/**
+ * Chiude il modal di selezione DM
+ */
+function closeEditDMModal() {
+    if (elements.editDMModal) {
+        elements.editDMModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Seleziona un giocatore come nuovo DM
+ */
+async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
+    try {
         // Aggiorna il DM
-        await updateCampagnaField(campagnaId, 'nome_dm', giocatoreSelezionato.nome_utente);
+        await updateCampagnaField(campagnaId, 'nome_dm', giocatoreNome);
+        
+        // Chiudi il modal
+        closeEditDMModal();
         
         // Il vecchio DM diventa un giocatore normale (non serve fare nulla, solo cambiare nome_dm)
-        showNotification(`DM cambiato a ${giocatoreSelezionato.nome_utente}`);
+        showNotification(`DM cambiato a ${giocatoreNome}`);
         
         // Ricarica i dettagli della campagna per aggiornare la UI
         await loadCampagnaDetails(campagnaId);
@@ -3481,7 +3556,7 @@ window.editDMField = async function(campagnaId) {
         console.error('❌ Errore nel cambio DM:', error);
         showNotification('Errore nel cambio del DM: ' + (error.message || error));
     }
-};
+}
 
 /**
  * Verifica se l'utente corrente è il DM di una campagna

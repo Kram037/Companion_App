@@ -462,6 +462,36 @@ body {
     border-color: var(--accent);
 }
 
+.dm-player-card {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.dm-player-card:last-child {
+    margin-bottom: 0;
+}
+
+.dm-player-card:hover {
+    background: var(--primary);
+    border-color: var(--accent);
+    box-shadow: 0 4px 8px var(--shadow);
+    transform: translateY(-2px);
+}
+
+.dm-player-card .giocatore-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
 .player-info {
     display: flex;
     align-items: center;
