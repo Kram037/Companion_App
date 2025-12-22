@@ -60,8 +60,8 @@ DROP INDEX IF EXISTS idx_campagne_user_id;
 DO $$
 DECLARE
     constraint_name TEXT;
-    nome_campagna_attnum INTEGER;
-    user_id_attnum INTEGER;
+    nome_campagna_attnum SMALLINT;
+    user_id_attnum SMALLINT;
 BEGIN
     -- Ottieni gli attnum per nome_campagna e user_id
     SELECT attnum INTO nome_campagna_attnum
@@ -81,7 +81,7 @@ BEGIN
         WHERE conrelid = 'campagne'::regclass
         AND contype = 'u'
         AND array_length(conkey, 1) = 2
-        AND conkey @> ARRAY[nome_campagna_attnum, user_id_attnum];
+        AND conkey @> ARRAY[nome_campagna_attnum, user_id_attnum]::smallint[];
         
         IF constraint_name IS NOT NULL THEN
             EXECUTE 'ALTER TABLE campagne DROP CONSTRAINT ' || quote_ident(constraint_name);
