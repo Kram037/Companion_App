@@ -4164,8 +4164,14 @@ function hideRollNumber() {
 
 // Logout Handler
 async function handleLogout() {
-    const confirmed = await showConfirm('Sei sicuro di voler uscire?', 'Logout');
-    if (confirmed) {
+    console.log('🚪 handleLogout chiamato');
+    try {
+        const confirmed = await showConfirm('Sei sicuro di voler uscire?', 'Logout');
+        console.log('🚪 Conferma logout:', confirmed);
+        if (!confirmed) {
+            console.log('🚪 Logout annullato dall\'utente');
+            return;
+        }
         try {
             const supabase = getSupabaseClient();
             
@@ -4218,6 +4224,27 @@ async function handleLogout() {
             setTimeout(() => {
                 window.location.reload();
             }, 500);
+        }
+    } catch (error) {
+        console.error('❌ Errore in handleLogout:', error);
+        // In caso di errore nella conferma, procedi comunque con il logout
+        try {
+            const supabase = getSupabaseClient();
+            if (supabase) {
+                await supabase.auth.signOut({ scope: 'local' });
+            }
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            updateUIForLoggedOut();
+            localStorage.removeItem('currentCampagnaId');
+            closeUserModal();
+            showNotification('Logout effettuato');
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } catch (logoutError) {
+            console.error('❌ Errore critico nel logout:', logoutError);
+            showNotification('Errore durante il logout. Ricarica la pagina.');
         }
     }
 }
