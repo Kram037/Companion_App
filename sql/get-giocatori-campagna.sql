@@ -14,11 +14,17 @@ SET search_path = public
 AS $$
 DECLARE
     v_id_dm VARCHAR(10);
+    v_giocatori VARCHAR(10)[];
 BEGIN
-    -- Ottieni l'ID del DM corrente
-    SELECT id_dm INTO v_id_dm
-    FROM campagne
-    WHERE id = campagna_id_param;
+    -- Ottieni l'ID del DM corrente e l'array giocatori
+    SELECT c.id_dm, c.giocatori INTO v_id_dm, v_giocatori
+    FROM campagne c
+    WHERE c.id = campagna_id_param;
+    
+    -- Se non ci sono giocatori, ritorna vuoto
+    IF v_giocatori IS NULL OR array_length(v_giocatori, 1) IS NULL THEN
+        RETURN;
+    END IF;
     
     RETURN QUERY
     SELECT 
@@ -26,12 +32,7 @@ BEGIN
         u.nome_utente,
         u.cid
     FROM utenti u
-    WHERE u.id = ANY(
-        SELECT unnest(c.giocatori)
-        FROM campagne c
-        WHERE c.id = campagna_id_param
-        AND c.giocatori IS NOT NULL
-    )
+    WHERE u.id = ANY(v_giocatori)
     AND u.id != COALESCE(v_id_dm, ''); -- Escludi il DM corrente
 END;
 $$;
