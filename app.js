@@ -1323,6 +1323,7 @@ async function loadCampagne(userId) {
 
 /**
  * Carica gli inviti ricevuti dall'utente
+ * Usa una funzione RPC per bypassare le RLS e recuperare i dati completi
  */
 async function loadInvitiRicevuti(userId) {
     const supabase = getSupabaseClient();
@@ -1335,56 +1336,39 @@ async function loadInvitiRicevuti(userId) {
             return [];
         }
 
-        // Carica gli inviti
-        const { data: inviti, error } = await supabase
-            .from('inviti_campagna')
-            .select('*')
-            .eq('invitato_id', utente.id)
-            .eq('stato', 'pending');
+        // Usa la funzione RPC per recuperare gli inviti con dati completi
+        // La funzione bypassa le RLS e restituisce i dati di campagna e inviante
+        const { data, error } = await supabase
+            .rpc('get_inviti_ricevuti', {
+                p_invitato_id: utente.id
+            });
 
         if (error) {
-            console.error('❌ Errore query inviti ricevuti:', error);
+            console.error('❌ Errore RPC get_inviti_ricevuti:', error);
             throw error;
         }
 
-        // Carica manualmente i dati della campagna e dell'inviante per ogni invito
-        if (inviti && inviti.length > 0) {
-            // Raccogli tutti gli ID univoci
-            const campagnaIds = [...new Set(inviti.map(inv => inv.campagna_id).filter(Boolean))];
-            const invianteIds = [...new Set(inviti.map(inv => inv.inviante_id).filter(Boolean))];
-            
-            // Carica le campagne
-            let campagneMap = new Map();
-            if (campagnaIds.length > 0) {
-                const { data: campagne } = await supabase
-                    .from('campagne')
-                    .select('id, nome_campagna')
-                    .in('id', campagnaIds);
-                
-                if (campagne) {
-                    campagne.forEach(c => campagneMap.set(c.id, c));
-                }
-            }
-            
-            // Carica gli invianti (DM)
-            let inviantiMap = new Map();
-            if (invianteIds.length > 0) {
-                const { data: invianti } = await supabase
-                    .from('utenti')
-                    .select('id, nome_utente, cid, email')
-                    .in('id', invianteIds);
-                
-                if (invianti) {
-                    invianti.forEach(i => inviantiMap.set(i.id, i));
-                }
-            }
-            
-            // Aggiungi i dati a ogni invito
-            inviti.forEach(invito => {
-                invito.campagne = campagneMap.get(invito.campagna_id) || null;
-                invito.inviante = inviantiMap.get(invito.inviante_id) || null;
-            });
-        }
+        // Trasforma i risultati della tabella nella struttura attesa dal codice
+        // (con oggetti annidati 'campagne' e 'inviante')
+        const inviti = (data || []).map(row => ({
+            id: row.id,
+            campagna_id: row.campagna_id,
+            inviante_id: row.inviante_id,
+            invitato_id: row.invitato_id,
+            stato: row.stato,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            campagne: row.campagna_nome_campagna ? {
+                id: row.campagna_id,
+                nome_campagna: row.campagna_nome_campagna
+            } : null,
+            inviante: row.inviante_nome_utente ? {
+                id: row.inviante_id,
+                nome_utente: row.inviante_nome_utente,
+                cid: row.inviante_cid,
+                email: row.inviante_email
+            } : null
+        }));
 
         console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
         if (inviti && inviti.length > 0) {
