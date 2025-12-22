@@ -3555,14 +3555,42 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         console.log('🔄 selectNewDM: currentUser.id =', currentUser?.id);
         
         // Aggiorna sia nome_dm che user_id per trasferire completamente i permessi
+        // Usa la funzione RPC per bypassare RLS
+        console.log('🔄 selectNewDM: uso funzione RPC per aggiornare DM');
+        const { error: rpcError } = await supabase.rpc('update_dm_campagna', {
+            p_campagna_id: campagnaId,
+            p_nuovo_dm_id: giocatoreId,
+            p_nuovo_dm_nome: giocatoreNome
+        });
+        
+        if (rpcError) {
+            console.error('❌ selectNewDM: errore nella funzione RPC update_dm_campagna:', rpcError);
+            // Fallback: prova con update normale
+            console.log('⚠️ selectNewDM: fallback all\'update normale');
+            const { data, error } = await supabase
+                .from('campagne')
+                .update({ 
+                    nome_dm: giocatoreNome,
+                    user_id: giocatoreId
+                })
+                .eq('id', campagnaId)
+                .select();
+            
+            if (error) {
+                console.error('❌ selectNewDM: errore nell\'update normale:', error);
+                throw error;
+            }
+            console.log('✅ selectNewDM: campagna aggiornata (fallback):', data);
+        } else {
+            console.log('✅ selectNewDM: campagna aggiornata tramite RPC');
+        }
+        
+        // Per la verifica, usa una query normale
         const { data, error } = await supabase
             .from('campagne')
-            .update({ 
-                nome_dm: giocatoreNome,
-                user_id: giocatoreId
-            })
+            .select('user_id, nome_dm')
             .eq('id', campagnaId)
-            .select();
+            .single();
 
         if (error) {
             console.error('❌ selectNewDM: errore nell\'update:', error);
