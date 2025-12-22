@@ -1,5 +1,6 @@
 -- Funzione RPC per ottenere i giocatori di una campagna
 -- Recupera i giocatori che hanno accettato un invito (non dall'array giocatori)
+-- Esclude il DM corrente dalla lista
 -- Bypassa RLS usando SECURITY DEFINER
 CREATE OR REPLACE FUNCTION get_giocatori_campagna(campagna_id_param VARCHAR(10))
 RETURNS TABLE (
@@ -11,7 +12,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+    v_id_dm VARCHAR(10);
 BEGIN
+    -- Ottieni l'ID del DM corrente
+    SELECT id_dm INTO v_id_dm
+    FROM campagne
+    WHERE id = campagna_id_param;
+    
     RETURN QUERY
     SELECT DISTINCT
         u.id,
@@ -20,7 +28,8 @@ BEGIN
     FROM utenti u
     INNER JOIN inviti_campagna ic ON u.id = ic.invitato_id
     WHERE ic.campagna_id = campagna_id_param
-    AND ic.stato = 'accepted';
+    AND ic.stato = 'accepted'
+    AND u.id != v_id_dm; -- Escludi il DM corrente
 END;
 $$;
 
