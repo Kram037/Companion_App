@@ -3629,8 +3629,14 @@ async function isCurrentUserDM(campagnaId) {
             return false;
         }
         console.log('👤 isCurrentUserDM: currentUser.id =', currentUser.id, 'tipo:', typeof currentUser.id);
+        console.log('📋 isCurrentUserDM: campagnaId =', campagnaId, 'tipo:', typeof campagnaId);
 
         // Usa la funzione RPC per bypassare RLS e ottenere il vero valore dal database
+        console.log('🔍 isCurrentUserDM: chiamata RPC con parametri:', {
+            p_campagna_id: campagnaId,
+            p_user_id: currentUser.id
+        });
+        
         const { data: isDM, error: rpcError } = await supabase.rpc('check_dm_campagna', {
             p_campagna_id: campagnaId,
             p_user_id: currentUser.id
@@ -3660,7 +3666,20 @@ async function isCurrentUserDM(campagnaId) {
             return isMatch;
         }
 
-        console.log('✅ isCurrentUserDM (RPC): risultato =', isDM);
+        console.log('✅ isCurrentUserDM (RPC): risultato =', isDM, 'tipo:', typeof isDM);
+        
+        // Aggiungi anche una query diretta per confrontare
+        const { data: campagnaDirect, error: directError } = await supabase
+            .from('campagne')
+            .select('user_id, nome_dm')
+            .eq('id', campagnaId)
+            .single();
+        
+        if (!directError && campagnaDirect) {
+            console.log('🔍 isCurrentUserDM: query diretta - user_id =', campagnaDirect.user_id, 'nome_dm =', campagnaDirect.nome_dm);
+            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagnaDirect.user_id, '=', currentUser.id === campagnaDirect.user_id);
+        }
+        
         return isDM === true;
     } catch (error) {
         console.error('❌ Errore nel controllo DM:', error);
