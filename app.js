@@ -3076,59 +3076,71 @@ async function renderGestisciGiocatoriTab(campagnaId) {
             return;
         }
 
-        // Carica i giocatori attuali (utenti che hanno accettato l'invito)
-        // Carichiamo prima solo gli inviti, poi carichiamo manualmente gli utenti
-        const { data: invitiAccettati, error: invitiError } = await supabase
-            .from('inviti_campagna')
-            .select('id, invitato_id, campagna_id, stato')
-            .eq('campagna_id', campagnaId)
-            .eq('stato', 'accepted');
+        // 1. Carica la campagna per ottenere l'array giocatori
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('id, giocatori')
+            .eq('id', campagnaId)
+            .single();
         
-        if (invitiError) {
-            console.error('❌ Errore nel caricamento inviti:', invitiError);
-            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+        if (campagnaError) {
+            console.error('❌ Errore nel caricamento campagna:', campagnaError);
+            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento della campagna</p>';
             return;
         }
 
-        console.log('📋 Inviti accettati caricati:', invitiAccettati);
-        console.log('📋 Numero inviti:', invitiAccettati?.length || 0);
+        console.log('📋 Campagna caricata:', campagna);
+        console.log('📋 Array giocatori:', campagna.giocatori);
         
-        // Carica manualmente gli utenti dagli ID degli invitati
+        // 2. Estrai gli ID dall'array giocatori
+        const giocatoriIds = Array.isArray(campagna.giocatori) ? campagna.giocatori.filter(id => id) : [];
+        console.log('🆔 ID giocatori da caricare:', giocatoriIds);
+        
+        // 3. Carica gli utenti dalla tabella utenti usando gli ID
         let giocatoriAttuali = [];
-        if (invitiAccettati && invitiAccettati.length > 0) {
-            const invitatiIds = invitiAccettati.map(inv => inv.invitato_id).filter(id => id);
-            console.log('🆔 ID invitati da caricare:', invitatiIds);
+        if (giocatoriIds.length > 0) {
+            const { data: utenti, error: utentiError } = await supabase
+                .from('utenti')
+                .select('id, nome_utente, cid')
+                .in('id', giocatoriIds);
             
-            if (invitatiIds.length > 0) {
-                const { data: utenti, error: utentiError } = await supabase
-                    .from('utenti')
-                    .select('id, nome_utente, cid')
-                    .in('id', invitatiIds);
+            console.log('👥 Utenti caricati:', utenti);
+            console.log('❌ Errore caricamento utenti:', utentiError);
+            
+            if (utentiError) {
+                console.error('❌ Errore nel caricamento utenti:', utentiError);
+                elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+                return;
+            }
+            
+            if (utenti && utenti.length > 0) {
+                // Per ogni giocatore, dobbiamo trovare l'invitoId corrispondente per poterlo rimuovere
+                // Carichiamo gli inviti per mappare gli ID
+                const { data: inviti, error: invitiError } = await supabase
+                    .from('inviti_campagna')
+                    .select('id, invitato_id')
+                    .eq('campagna_id', campagnaId)
+                    .eq('stato', 'accepted')
+                    .in('invitato_id', giocatoriIds);
                 
-                console.log('👥 Utenti caricati:', utenti);
-                console.log('❌ Errore caricamento utenti:', utentiError);
-                
-                if (utentiError) {
-                    console.error('❌ Errore nel caricamento utenti:', utentiError);
-                    elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
-                    return;
-                }
-                
-                if (utenti && utenti.length > 0) {
-                    // Crea una mappa per trovare l'invitoId
-                    const invitiMap = new Map(invitiAccettati.map(inv => [inv.invitato_id, inv.id]));
-                    giocatoriAttuali = utenti.map(utente => {
-                        const invitoId = invitiMap.get(utente.id);
-                        console.log('👤 Mappo utente:', utente, 'con invitoId:', invitoId);
-                        return {
-                            id: utente.id,
-                            nome_utente: utente.nome_utente,
-                            cid: utente.cid,
-                            invitoId: invitoId
-                        };
+                const invitiMap = new Map();
+                if (!invitiError && inviti) {
+                    inviti.forEach(inv => {
+                        invitiMap.set(inv.invitato_id, inv.id);
                     });
-                    console.log('✅ Giocatori mappati:', giocatoriAttuali);
                 }
+                
+                giocatoriAttuali = utenti.map(utente => {
+                    const invitoId = invitiMap.get(utente.id);
+                    console.log('👤 Mappo utente:', utente, 'con invitoId:', invitoId);
+                    return {
+                        id: utente.id,
+                        nome_utente: utente.nome_utente,
+                        cid: utente.cid,
+                        invitoId: invitoId || null // Se non c'è invito, sarà null (non dovrebbe succedere)
+                    };
+                });
+                console.log('✅ Giocatori mappati:', giocatoriAttuali);
             }
         }
 
