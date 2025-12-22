@@ -3091,21 +3091,60 @@ async function renderGestisciGiocatoriTab(campagnaId) {
 
         console.log('📋 Campagna caricata:', campagna);
         console.log('📋 Array giocatori:', campagna.giocatori);
+        console.log('📋 Tipo array giocatori:', typeof campagna.giocatori, Array.isArray(campagna.giocatori));
         
         // 2. Estrai gli ID dall'array giocatori
         const giocatoriIds = Array.isArray(campagna.giocatori) ? campagna.giocatori.filter(id => id) : [];
         console.log('🆔 ID giocatori da caricare:', giocatoriIds);
+        console.log('🆔 Tipo ID:', giocatoriIds.map(id => ({ id, type: typeof id })));
         
         // 3. Carica gli utenti dalla tabella utenti usando gli ID
         let giocatoriAttuali = [];
         if (giocatoriIds.length > 0) {
+            // Prima verifichiamo se gli ID esistono nella tabella utenti
+            console.log('🔍 Verifico esistenza ID nella tabella utenti...');
+            const { data: allUtenti, error: allUtentiError } = await supabase
+                .from('utenti')
+                .select('id, nome_utente, cid')
+                .limit(100);
+            
+            console.log('👥 Tutti gli utenti (primi 100):', allUtenti);
+            console.log('🆔 ID presenti nella tabella utenti:', allUtenti?.map(u => ({ id: u.id, type: typeof u.id })));
+            
+            // Ora carichiamo gli utenti specifici
             const { data: utenti, error: utentiError } = await supabase
                 .from('utenti')
                 .select('id, nome_utente, cid')
                 .in('id', giocatoriIds);
             
-            console.log('👥 Utenti caricati:', utenti);
+            console.log('👥 Utenti caricati con .in():', utenti);
             console.log('❌ Errore caricamento utenti:', utentiError);
+            
+            // Se non troviamo utenti, proviamo a cercare uno per uno
+            if ((!utenti || utenti.length === 0) && !utentiError) {
+                console.log('⚠️ Nessun utente trovato con .in(), provo a cercare uno per uno...');
+                const utentiTrovati = [];
+                for (const id of giocatoriIds) {
+                    const { data: utente, error: err } = await supabase
+                        .from('utenti')
+                        .select('id, nome_utente, cid')
+                        .eq('id', id)
+                        .single();
+                    console.log(`🔍 Cerca ID "${id}" (tipo: ${typeof id}):`, utente, err);
+                    if (utente && !err) {
+                        utentiTrovati.push(utente);
+                    }
+                }
+                console.log('👥 Utenti trovati uno per uno:', utentiTrovati);
+                if (utentiTrovati.length > 0) {
+                    giocatoriAttuali = utentiTrovati.map(utente => ({
+                        id: utente.id,
+                        nome_utente: utente.nome_utente,
+                        cid: utente.cid,
+                        invitoId: null // Lo troveremo dopo
+                    }));
+                }
+            }
             
             if (utentiError) {
                 console.error('❌ Errore nel caricamento utenti:', utentiError);
