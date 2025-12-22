@@ -3540,14 +3540,27 @@ function closeEditDMModal() {
  * Seleziona un giocatore come nuovo DM
  */
 async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
     try {
-        // Aggiorna il DM
-        await updateCampagnaField(campagnaId, 'nome_dm', giocatoreNome);
+        // Aggiorna sia nome_dm che user_id per trasferire completamente i permessi
+        const { error } = await supabase
+            .from('campagne')
+            .update({ 
+                nome_dm: giocatoreNome,
+                user_id: giocatoreId
+            })
+            .eq('id', campagnaId);
+
+        if (error) throw error;
         
         // Chiudi il modal
         closeEditDMModal();
         
-        // Il vecchio DM diventa un giocatore normale (non serve fare nulla, solo cambiare nome_dm)
         showNotification(`DM cambiato a ${giocatoreNome}`);
         
         // Ricarica i dettagli della campagna per aggiornare la UI
