@@ -824,6 +824,11 @@ body {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* Dialog di conferma deve essere sopra altre dialog */
+#confirmDialogModal {
+    z-index: 2000;
+}
+
 .modal.active {
     opacity: 1;
     visibility: visible;
