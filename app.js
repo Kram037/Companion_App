@@ -2863,6 +2863,7 @@ async function handleCampagnaSubmit(e) {
         icona_data: iconaData,
         nome_dm: utente.nome_utente || session.user.email?.split('@')[0] || 'N/A', // Imposta il DM al creatore
         id_dm: utente.id, // Imposta l'ID del DM (foreign key verso utenti)
+        giocatori: [], // Array vuoto: il creatore è il DM, quindi non è nella lista giocatori
         numero_giocatori: 0, // Mantenuto per retrocompatibilità, ma viene calcolato dinamicamente
         numero_sessioni: 0,
         tempo_di_gioco: 0,
