@@ -3546,21 +3546,51 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
     }
 
     try {
+        console.log('🔄 selectNewDM: campagnaId =', campagnaId);
+        console.log('🔄 selectNewDM: giocatoreId =', giocatoreId, 'tipo:', typeof giocatoreId);
+        console.log('🔄 selectNewDM: giocatoreNome =', giocatoreNome);
+        
+        // Verifica che il giocatoreId esista prima di aggiornare
+        const currentUser = await findUserByUid(AppState.currentUser.uid);
+        console.log('🔄 selectNewDM: currentUser.id =', currentUser?.id);
+        
         // Aggiorna sia nome_dm che user_id per trasferire completamente i permessi
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('campagne')
             .update({ 
                 nome_dm: giocatoreNome,
                 user_id: giocatoreId
             })
-            .eq('id', campagnaId);
+            .eq('id', campagnaId)
+            .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ selectNewDM: errore nell\'update:', error);
+            throw error;
+        }
+        
+        console.log('✅ selectNewDM: campagna aggiornata:', data);
+        
+        // Verifica immediatamente che l'update sia andato a buon fine
+        const { data: campagnaVerifica, error: errorVerifica } = await supabase
+            .from('campagne')
+            .select('user_id, nome_dm')
+            .eq('id', campagnaId)
+            .single();
+        
+        if (errorVerifica) {
+            console.error('❌ selectNewDM: errore nella verifica:', errorVerifica);
+        } else {
+            console.log('✅ selectNewDM: verifica dopo update - user_id =', campagnaVerifica.user_id, 'nome_dm =', campagnaVerifica.nome_dm);
+        }
         
         // Chiudi il modal
         closeEditDMModal();
         
         showNotification(`DM cambiato a ${giocatoreNome}`);
+        
+        // Aspetta un po' per assicurarsi che l'update sia propagato
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Ricarica i dettagli della campagna per aggiornare la UI
         await loadCampagnaDetails(campagnaId);
