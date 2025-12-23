@@ -1524,7 +1524,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                  ondragover="handleDragOver(event)"
                  ondrop="handleDrop(event, '${campagna.id}')"
                  ondragend="handleDragEnd(event)"
-                 onclick="openCampagnaDetails('${campagna.id}')" 
+                 onclick="handleCampagnaCardClick('${campagna.id}')"
                  style="cursor: pointer;">
                 <div class="campagna-header">
                     <div class="campagna-title-with-icon">
@@ -4420,6 +4420,7 @@ document.head.appendChild(style);
 // ============================================
 
 let draggedCampagnaId = null;
+let isDragging = false;
 
 /**
  * Toggle preferito per una campagna
@@ -4468,9 +4469,17 @@ window.togglePreferito = async function(campagnaId) {
  */
 window.handleDragStart = function(event, campagnaId) {
     draggedCampagnaId = campagnaId;
+    isDragging = false; // Reset drag state
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/html', event.target.outerHTML);
     event.currentTarget.classList.add('dragging');
+    
+    // Set dragging flag dopo un piccolo delay per permettere al drag di iniziare
+    setTimeout(() => {
+        if (draggedCampagnaId === campagnaId) {
+            isDragging = true;
+        }
+    }, 10);
 };
 
 /**
@@ -4501,7 +4510,10 @@ window.handleDrop = async function(event, targetCampagnaId) {
     event.preventDefault();
     event.stopPropagation();
 
+    console.log('🎯 handleDrop chiamato:', { draggedCampagnaId, targetCampagnaId });
+
     if (!draggedCampagnaId || draggedCampagnaId === targetCampagnaId) {
+        console.log('⚠️ handleDrop: condizioni non soddisfatte, esco');
         return;
     }
 
@@ -4546,11 +4558,25 @@ window.handleDrop = async function(event, targetCampagnaId) {
         const preferiti = tutteCampagne.filter(c => c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
         const nonPreferiti = tutteCampagne.filter(c => !c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
 
+        console.log('📊 Campagne trovate:', { 
+            totali: tutteCampagne.length, 
+            preferiti: preferiti.length, 
+            nonPreferiti: nonPreferiti.length 
+        });
+
         // Trova la campagna trascinata e quella target
         const draggedCampagna = tutteCampagne.find(c => c.id === draggedCampagnaId);
         const targetCampagna = tutteCampagne.find(c => c.id === targetCampagnaId);
 
-        if (!draggedCampagna || !targetCampagna) return;
+        console.log('🎯 Campagne:', { 
+            dragged: draggedCampagna ? draggedCampagna.id : 'non trovata',
+            target: targetCampagna ? targetCampagna.id : 'non trovata'
+        });
+
+        if (!draggedCampagna || !targetCampagna) {
+            console.error('❌ Campagne non trovate');
+            return;
+        }
 
         // Determina se inserire prima o dopo
         const card = event.currentTarget;
@@ -4646,13 +4672,15 @@ window.handleDrop = async function(event, targetCampagnaId) {
             await Promise.all(updatePromises);
         }
 
+        console.log('✅ Riordinamento completato con successo');
+
         // Ricarica le campagne
         if (AppState.currentUser) {
             await loadCampagne(AppState.currentUser.uid);
         }
     } catch (error) {
         console.error('❌ Errore nel riordinamento:', error);
-        showNotification('Errore nel riordinamento delle campagne');
+        showNotification('Errore nel riordinamento delle campagne: ' + (error.message || error));
     }
 };
 
@@ -4667,7 +4695,22 @@ window.handleDragEnd = function(event) {
         card.classList.remove('drag-over-top', 'drag-over-bottom');
     });
     
-    draggedCampagnaId = null;
+    // Reset dopo un piccolo delay per permettere al click di non essere eseguito
+    setTimeout(() => {
+        isDragging = false;
+        draggedCampagnaId = null;
+    }, 100);
+};
+
+/**
+ * Gestisce il click sulla card (solo se non c'è stato un drag)
+ */
+window.handleCampagnaCardClick = function(campagnaId) {
+    if (isDragging || draggedCampagnaId) {
+        console.log('🖱️ Click ignorato perché c\'è un drag in corso');
+        return;
+    }
+    openCampagnaDetails(campagnaId);
 };
 
 // Initialize app when DOM is ready
