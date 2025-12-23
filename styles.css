@@ -1929,7 +1929,7 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: var(--spacing-sm);
+    padding: 0;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
     position: relative;
@@ -1992,7 +1992,7 @@ body {
     gap: var(--spacing-sm);
     flex: 1;
     min-height: 0;
-    padding: var(--spacing-xs) 0 0 var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs);
 }
 
 .btn-star {
@@ -2091,7 +2091,7 @@ body {
     gap: var(--spacing-xs);
     flex-shrink: 0;
     align-items: center;
-    padding: var(--spacing-xs) var(--spacing-xs) 0 0;
+    padding: var(--spacing-xs);
     margin-left: auto;
 }
 
