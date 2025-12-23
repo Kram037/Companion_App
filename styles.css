@@ -2096,8 +2096,12 @@ body {
     position: absolute;
     top: var(--spacing-xs);
     right: var(--spacing-xs);
-    height: calc(100% - 2 * var(--spacing-xs));
+    bottom: var(--spacing-xs);
     justify-content: flex-start;
+}
+
+.campagna-actions .btn-icon:last-child {
+    margin-top: auto;
 }
 
 .btn-icon {
