@@ -2518,7 +2518,7 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
             amiciPlaceholder.style.display = 'none';
         }
         if (amiciList) {
-            amiciList.style.display = 'block';
+            amiciList.style.display = 'grid';
             amiciList.innerHTML = amici.map(amico => `
                 <div class="amico-item">
                     <div class="amico-info">

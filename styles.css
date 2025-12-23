@@ -1693,8 +1693,8 @@ body {
 
 /* Amici List Styles */
 .amici-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
     gap: var(--spacing-md);
     margin-top: var(--spacing-md);
 }
@@ -2364,7 +2364,7 @@ body {
     }
     
     .amici-list {
-        display: flex;
+        display: flex !important;
         flex-direction: column;
         gap: var(--spacing-md);
     }
