@@ -1285,6 +1285,19 @@ async function loadCampagne(userId) {
             campagne.push(...campagnePartecipate);
         }
 
+        // Ordina le campagne: prima i preferiti, poi per ordine, poi per data di creazione
+        campagne.sort((a, b) => {
+            // Preferiti in cima
+            if (a.preferito && !b.preferito) return -1;
+            if (!a.preferito && b.preferito) return 1;
+            // Tra preferiti o tra non preferiti, ordina per campo ordine
+            if (a.ordine !== b.ordine) {
+                return (a.ordine || 0) - (b.ordine || 0);
+            }
+            // Se stesso ordine, ordina per data di creazione (più recenti prima)
+            return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
+        });
+
         console.log('✅ Campagne caricate:', campagne?.length || 0);
         renderCampagne(campagne || [], true, invitiRicevuti);
 
@@ -1501,10 +1514,28 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
             iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${defaultIcon.svg}</svg></div>`;
         }
 
+        const isPreferito = campagna.preferito === true;
         return `
-            <div class="campagna-card" data-campagna-id="${campagna.id}" onclick="openCampagnaDetails('${campagna.id}')" style="cursor: pointer;">
+            <div class="campagna-card" 
+                 data-campagna-id="${campagna.id}" 
+                 data-ordine="${campagna.ordine || 0}"
+                 draggable="true"
+                 ondragstart="handleDragStart(event, '${campagna.id}')"
+                 ondragover="handleDragOver(event)"
+                 ondrop="handleDrop(event, '${campagna.id}')"
+                 ondragend="handleDragEnd(event)"
+                 onclick="openCampagnaDetails('${campagna.id}')" 
+                 style="cursor: pointer;">
                 <div class="campagna-header">
                     <div class="campagna-title-with-icon">
+                        <button class="btn-star ${isPreferito ? 'starred' : ''}" 
+                                onclick="event.stopPropagation(); togglePreferito('${campagna.id}')" 
+                                aria-label="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
+                                title="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">
+                            <svg viewBox="0 0 24 24" fill="${isPreferito ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </button>
                         <div class="campagna-icon">${iconaHTML}</div>
                     <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
                     </div>
@@ -4383,6 +4414,239 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ============================================
+// GESTIONE PREFERITI E DRAG & DROP CAMPAGNE
+// ============================================
+
+let draggedCampagnaId = null;
+
+/**
+ * Toggle preferito per una campagna
+ */
+window.togglePreferito = async function(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Recupera lo stato attuale
+        const { data: campagna, error: fetchError } = await supabase
+            .from('campagne')
+            .select('preferito')
+            .eq('id', campagnaId)
+            .single();
+
+        if (fetchError) throw fetchError;
+
+        const nuovoStato = !campagna.preferito;
+
+        // Aggiorna il preferito
+        const { error: updateError } = await supabase
+            .from('campagne')
+            .update({ preferito: nuovoStato })
+            .eq('id', campagnaId);
+
+        if (updateError) throw updateError;
+
+        showNotification(nuovoStato ? 'Campagna aggiunta ai preferiti' : 'Campagna rimossa dai preferiti');
+
+        // Ricarica le campagne
+        if (AppState.currentUser) {
+            await loadCampagne(AppState.currentUser.uid);
+        }
+    } catch (error) {
+        console.error('❌ Errore nel toggle preferito:', error);
+        showNotification('Errore nell\'aggiornamento del preferito');
+    }
+};
+
+/**
+ * Gestisce l'inizio del drag
+ */
+window.handleDragStart = function(event, campagnaId) {
+    draggedCampagnaId = campagnaId;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.outerHTML);
+    event.currentTarget.classList.add('dragging');
+};
+
+/**
+ * Gestisce il drag over
+ */
+window.handleDragOver = function(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    
+    // Determina se inserire sopra o sotto
+    if (y < rect.height / 2) {
+        card.classList.add('drag-over-top');
+        card.classList.remove('drag-over-bottom');
+    } else {
+        card.classList.add('drag-over-bottom');
+        card.classList.remove('drag-over-top');
+    }
+};
+
+/**
+ * Gestisce il drop
+ */
+window.handleDrop = async function(event, targetCampagnaId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!draggedCampagnaId || draggedCampagnaId === targetCampagnaId) {
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Recupera tutte le campagne dell'utente (create + partecipate)
+        const utente = await findUserByUid(AppState.currentUser.uid);
+        if (!utente) throw new Error('Utente non trovato');
+
+        // Campagne create
+        const { data: campagneCreate, error: errorCreate } = await supabase
+            .from('campagne')
+            .select('id, ordine, preferito')
+            .eq('id_dm', utente.id);
+
+        if (errorCreate) throw errorCreate;
+
+        // Campagne partecipate
+        const { data: invitiAccettati, error: errorInviti } = await supabase
+            .from('inviti_campagna')
+            .select('campagne:campagne!inviti_campagna_campagna_id_fkey(id, ordine, preferito)')
+            .eq('invitato_id', utente.id)
+            .eq('stato', 'accepted');
+
+        if (errorInviti) throw errorInviti;
+
+        let tutteCampagne = campagneCreate || [];
+        if (invitiAccettati && invitiAccettati.length > 0) {
+            const campagnePartecipate = invitiAccettati
+                .map(inv => inv.campagne)
+                .filter(Boolean)
+                .filter(camp => !tutteCampagne.some(c => c.id === camp.id));
+            tutteCampagne.push(...campagnePartecipate);
+        }
+
+        if (fetchError) throw fetchError;
+
+        // Separa preferiti e non preferiti
+        const preferiti = tutteCampagne.filter(c => c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
+        const nonPreferiti = tutteCampagne.filter(c => !c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
+
+        // Trova la campagna trascinata e quella target
+        const draggedCampagna = tutteCampagne.find(c => c.id === draggedCampagnaId);
+        const targetCampagna = tutteCampagne.find(c => c.id === targetCampagnaId);
+
+        if (!draggedCampagna || !targetCampagna) return;
+
+        // Determina se inserire prima o dopo
+        const card = event.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const y = event.clientY - rect.top;
+        const insertAfter = y > rect.height / 2;
+
+        // Se entrambe sono preferiti o entrambe non lo sono, mantieni il gruppo
+        const stessoGruppo = draggedCampagna.preferito === targetCampagna.preferito;
+
+        if (stessoGruppo) {
+            // Reordina nello stesso gruppo
+            const lista = draggedCampagna.preferito ? preferiti : nonPreferiti;
+            const draggedIndex = lista.findIndex(c => c.id === draggedCampagnaId);
+            const targetIndex = lista.findIndex(c => c.id === targetCampagnaId);
+
+            lista.splice(draggedIndex, 1);
+            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            lista.splice(newIndex, 0, draggedCampagna);
+
+            // Aggiorna gli ordini
+            const updatePromises = lista.map((camp, index) => 
+                supabase
+                    .from('campagne')
+                    .update({ ordine: index })
+                    .eq('id', camp.id)
+            );
+
+            await Promise.all(updatePromises);
+        } else {
+            // Sposta da un gruppo all'altro (cambia preferito)
+            const listaDestino = targetCampagna.preferito ? preferiti : nonPreferiti;
+            const targetIndex = listaDestino.findIndex(c => c.id === targetCampagnaId);
+            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+
+            // Rimuovi dalla lista origine
+            if (draggedCampagna.preferito) {
+                preferiti.splice(preferiti.findIndex(c => c.id === draggedCampagnaId), 1);
+                nonPreferiti.push(draggedCampagna);
+            } else {
+                nonPreferiti.splice(nonPreferiti.findIndex(c => c.id === draggedCampagnaId), 1);
+                preferiti.push(draggedCampagna);
+            }
+
+            // Reordina entrambe le liste
+            preferiti.forEach((camp, index) => {
+                camp.ordine = index;
+            });
+            nonPreferiti.forEach((camp, index) => {
+                camp.ordine = index;
+            });
+
+            // Aggiorna preferito e ordine della campagna trascinata
+            draggedCampagna.preferito = targetCampagna.preferito;
+            draggedCampagna.ordine = newIndex;
+
+            // Aggiorna tutte le campagne
+            const allCampagne = [...preferiti, ...nonPreferiti];
+            const updatePromises = allCampagne.map(camp => 
+                supabase
+                    .from('campagne')
+                    .update({ 
+                        preferito: camp.preferito,
+                        ordine: camp.ordine 
+                    })
+                    .eq('id', camp.id)
+            );
+
+            await Promise.all(updatePromises);
+        }
+
+        // Ricarica le campagne
+        if (AppState.currentUser) {
+            await loadCampagne(AppState.currentUser.uid);
+        }
+    } catch (error) {
+        console.error('❌ Errore nel riordinamento:', error);
+        showNotification('Errore nel riordinamento delle campagne');
+    }
+};
+
+/**
+ * Gestisce la fine del drag
+ */
+window.handleDragEnd = function(event) {
+    event.currentTarget.classList.remove('dragging');
+    
+    // Rimuovi le classi drag-over da tutte le card
+    document.querySelectorAll('.campagna-card').forEach(card => {
+        card.classList.remove('drag-over-top', 'drag-over-bottom');
+    });
+    
+    draggedCampagnaId = null;
+};
 
 // Initialize app when DOM is ready
 function startApp() {

@@ -1959,6 +1959,30 @@ body {
     opacity: 1;
 }
 
+/* Drag & Drop Styles */
+.campagna-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.campagna-card.drag-over-top {
+    border-top: 3px solid var(--accent);
+    margin-top: var(--spacing-xs);
+}
+
+.campagna-card.drag-over-bottom {
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: var(--spacing-xs);
+}
+
+.campagna-card[draggable="true"] {
+    cursor: grab;
+}
+
+.campagna-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
 .campagna-header {
     display: flex;
     justify-content: space-between;
@@ -1971,6 +1995,41 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     flex: 1;
+}
+
+.btn-star {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    transition: var(--transition);
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.btn-star:hover {
+    color: var(--accent);
+    background-color: var(--primary);
+    transform: scale(1.1);
+}
+
+.btn-star.starred {
+    color: #FFC107;
+}
+
+.btn-star.starred:hover {
+    color: #FFB300;
+}
+
+.btn-star svg {
+    width: 18px;
+    height: 18px;
 }
 
 .campagna-icon {
