@@ -2091,8 +2091,9 @@ body {
     gap: var(--spacing-xs);
     flex-shrink: 0;
     align-items: center;
-    padding: var(--spacing-xs);
-    margin-left: auto;
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
 }
 
 .btn-icon {
