@@ -1527,20 +1527,18 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                  onclick="handleCampagnaCardClick('${campagna.id}')"
                  style="cursor: pointer;">
                 <div class="campagna-header">
-                    <div class="campagna-title-with-icon">
+                    <div class="campagna-icon">${iconaHTML}</div>
+                    <h3 class="campagna-title">${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
+                    <div class="campagna-actions" onclick="event.stopPropagation();">
                         <button class="btn-star ${isPreferito ? 'starred' : ''}" 
-                                onclick="event.stopPropagation(); togglePreferito('${campagna.id}')" 
+                                onclick="togglePreferito('${campagna.id}')" 
                                 aria-label="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
                                 title="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">
                             <svg viewBox="0 0 24 24" fill="${isPreferito ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </button>
-                        <div class="campagna-icon">${iconaHTML}</div>
-                    <h3>${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
-                    </div>
-                    ${isDM ? `
-                    <div class="campagna-actions" onclick="event.stopPropagation();">
+                        ${isDM ? `
                         <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -1553,8 +1551,8 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
                         </button>
+                        ` : ''}
                     </div>
-                    ` : ''}
                 </div>
                 <div class="campagna-info">
                     <div class="info-item">
