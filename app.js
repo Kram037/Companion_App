@@ -4542,8 +4542,6 @@ window.handleDrop = async function(event, targetCampagnaId) {
             tutteCampagne.push(...campagnePartecipate);
         }
 
-        if (fetchError) throw fetchError;
-
         // Separa preferiti e non preferiti
         const preferiti = tutteCampagne.filter(c => c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
         const nonPreferiti = tutteCampagne.filter(c => !c.preferito).sort((a, b) => (a.ordine || 0) - (b.ordine || 0));
@@ -4569,8 +4567,25 @@ window.handleDrop = async function(event, targetCampagnaId) {
             const draggedIndex = lista.findIndex(c => c.id === draggedCampagnaId);
             const targetIndex = lista.findIndex(c => c.id === targetCampagnaId);
 
+            if (draggedIndex === -1 || targetIndex === -1) {
+                console.error('❌ Indici non validi per il riordinamento');
+                return;
+            }
+
+            // Rimuovi l'elemento trascinato
             lista.splice(draggedIndex, 1);
-            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            
+            // Calcola il nuovo indice (dopo la rimozione, gli indici sono cambiati)
+            let newIndex;
+            if (draggedIndex < targetIndex) {
+                // Se abbiamo rimosso un elemento prima del target, il target si è spostato di -1
+                newIndex = insertAfter ? targetIndex : targetIndex - 1;
+            } else {
+                // Se abbiamo rimosso un elemento dopo il target, il target è rimasto uguale
+                newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            }
+            
+            // Inserisci nel nuovo posto
             lista.splice(newIndex, 0, draggedCampagna);
 
             // Aggiorna gli ordini
@@ -4584,18 +4599,29 @@ window.handleDrop = async function(event, targetCampagnaId) {
             await Promise.all(updatePromises);
         } else {
             // Sposta da un gruppo all'altro (cambia preferito)
+            const listaOrigine = draggedCampagna.preferito ? preferiti : nonPreferiti;
             const listaDestino = targetCampagna.preferito ? preferiti : nonPreferiti;
-            const targetIndex = listaDestino.findIndex(c => c.id === targetCampagnaId);
-            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
-
+            
             // Rimuovi dalla lista origine
-            if (draggedCampagna.preferito) {
-                preferiti.splice(preferiti.findIndex(c => c.id === draggedCampagnaId), 1);
-                nonPreferiti.push(draggedCampagna);
-            } else {
-                nonPreferiti.splice(nonPreferiti.findIndex(c => c.id === draggedCampagnaId), 1);
-                preferiti.push(draggedCampagna);
+            const origineIndex = listaOrigine.findIndex(c => c.id === draggedCampagnaId);
+            if (origineIndex === -1) {
+                console.error('❌ Campagna trascinata non trovata nella lista origine');
+                return;
             }
+            listaOrigine.splice(origineIndex, 1);
+            
+            // Trova la posizione nella lista destinazione
+            const targetIndex = listaDestino.findIndex(c => c.id === targetCampagnaId);
+            if (targetIndex === -1) {
+                console.error('❌ Campagna target non trovata nella lista destinazione');
+                return;
+            }
+            
+            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            
+            // Aggiorna preferito e inserisci nella nuova posizione
+            draggedCampagna.preferito = targetCampagna.preferito;
+            listaDestino.splice(newIndex, 0, draggedCampagna);
 
             // Reordina entrambe le liste
             preferiti.forEach((camp, index) => {
@@ -4604,10 +4630,6 @@ window.handleDrop = async function(event, targetCampagnaId) {
             nonPreferiti.forEach((camp, index) => {
                 camp.ordine = index;
             });
-
-            // Aggiorna preferito e ordine della campagna trascinata
-            draggedCampagna.preferito = targetCampagna.preferito;
-            draggedCampagna.ordine = newIndex;
 
             // Aggiorna tutte le campagne
             const allCampagne = [...preferiti, ...nonPreferiti];
