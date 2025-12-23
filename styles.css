@@ -1716,7 +1716,7 @@ body {
     margin-bottom: var(--spacing-md);
     position: relative;
     overflow: hidden;
-    outline: 1px solid rgba(0, 0, 0, 0.05);
+    outline: 1px solid rgba(200, 90, 90, 0.15);
 }
 
 .amico-item::before {
@@ -1931,7 +1931,7 @@ body {
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
-    outline: 1px solid rgba(0, 0, 0, 0.05);
+    outline: 1px solid rgba(200, 90, 90, 0.15);
 }
 
 .campagna-card::before {
