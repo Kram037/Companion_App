@@ -14,9 +14,9 @@ CREATE INDEX IF NOT EXISTS idx_campagne_preferito ON campagne(preferito);
 -- Le campagne più recenti avranno un ordine maggiore
 UPDATE campagne
 SET ordine = (
-    SELECT COUNT(*) - ROW_NUMBER() OVER (ORDER BY created_at ASC)
+    SELECT COUNT(*) - ROW_NUMBER() OVER (ORDER BY data_creazione ASC)
     FROM campagne c2
-    WHERE c2.created_at <= campagne.created_at
+    WHERE c2.data_creazione <= campagne.data_creazione
 )
 WHERE ordine = 0 OR ordine IS NULL;
 
