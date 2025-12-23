@@ -1735,6 +1735,7 @@ body {
     transition: var(--transition);
 }
 
+
 .amico-item:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-3px);
@@ -2356,10 +2357,7 @@ body {
 }
 
 @media (max-width: 768px) {
-    .campagne-list {
-        grid-template-columns: 1fr;
-    }
-    
+    .campagne-list,
     .amici-list {
         grid-template-columns: 1fr;
     }
