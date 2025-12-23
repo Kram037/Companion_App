@@ -1992,7 +1992,9 @@ body {
     gap: var(--spacing-sm);
     flex: 1;
     min-height: 0;
-    padding: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    padding-left: var(--spacing-xs);
+    padding-right: 60px; /* Spazio per le azioni assolute */
 }
 
 .btn-star {
