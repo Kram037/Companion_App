@@ -1717,6 +1717,7 @@ body {
     margin-bottom: var(--spacing-md);
     position: relative;
     overflow: hidden;
+    outline: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .amico-item::before {
@@ -1931,6 +1932,7 @@ body {
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    outline: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .campagna-card::before {
@@ -1984,7 +1986,6 @@ body {
 }
 
 .campagna-card:hover .campagna-icon {
-    transform: scale(1.05) rotate(5deg);
     box-shadow: var(--shadow-md);
 }
 
@@ -2059,7 +2060,15 @@ body {
 .info-label {
     font-weight: 600;
     color: var(--text-light);
-    min-width: 100px;
+}
+
+/* Per le card delle campagne, il label non ha min-width per rimanere attaccato al valore */
+.campagna-card .info-item {
+    gap: 0.25rem;
+}
+
+.campagna-card .info-label {
+    min-width: auto;
 }
 
 .info-value {
