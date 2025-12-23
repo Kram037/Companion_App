@@ -1693,10 +1693,15 @@ body {
 
 /* Amici List Styles */
 .amici-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
     margin-top: var(--spacing-md);
+}
+
+.amici-list .content-placeholder {
+    grid-column: 1 / -1;
+    width: 100%;
 }
 
 .campagne-list {
@@ -1713,7 +1718,6 @@ body {
     align-items: center;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
-    margin-bottom: var(--spacing-md);
     position: relative;
     overflow: hidden;
     outline: 1px solid rgba(200, 90, 90, 0.15);
@@ -1729,10 +1733,6 @@ body {
     background: linear-gradient(180deg, var(--accent), var(--accent-light));
     opacity: 0;
     transition: var(--transition);
-}
-
-.amico-item:last-child {
-    margin-bottom: 0;
 }
 
 .amico-item:hover {
@@ -2357,6 +2357,10 @@ body {
 
 @media (max-width: 768px) {
     .campagne-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .amici-list {
         grid-template-columns: 1fr;
     }
     
