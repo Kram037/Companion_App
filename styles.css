@@ -2090,12 +2090,14 @@ body {
 .campagna-actions {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
     flex-shrink: 0;
     align-items: center;
     position: absolute;
     top: var(--spacing-xs);
     right: var(--spacing-xs);
+    bottom: var(--spacing-xs);
+    justify-content: space-between;
 }
 
 .btn-icon {
@@ -2130,7 +2132,8 @@ body {
     gap: var(--spacing-xs);
     margin: 0;
     margin-top: auto;
-    padding: 0 0 var(--spacing-xs) var(--spacing-xs);
+    padding-left: var(--spacing-xs);
+    padding-bottom: var(--spacing-xs);
 }
 
 .info-item {
