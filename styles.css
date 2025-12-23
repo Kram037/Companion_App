@@ -1929,7 +1929,7 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
     position: relative;
@@ -1992,6 +1992,7 @@ body {
     gap: var(--spacing-sm);
     flex: 1;
     min-height: 0;
+    padding: var(--spacing-xs) 0 0 var(--spacing-xs);
 }
 
 .btn-star {
@@ -2090,6 +2091,8 @@ body {
     gap: var(--spacing-xs);
     flex-shrink: 0;
     align-items: center;
+    padding: var(--spacing-xs) var(--spacing-xs) 0 0;
+    margin-left: auto;
 }
 
 .btn-icon {
@@ -2124,7 +2127,7 @@ body {
     gap: var(--spacing-xs);
     margin: 0;
     margin-top: auto;
-    padding-top: var(--spacing-sm);
+    padding: 0 0 var(--spacing-xs) var(--spacing-xs);
 }
 
 .info-item {
