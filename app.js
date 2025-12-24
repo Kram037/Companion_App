@@ -1315,13 +1315,18 @@ async function loadCampagne(userId) {
                                 }
                             });
                         }
-                    } else if (userError && userError.code !== '42703') {
+                    } else if (userError && userError.code === '42703') {
+                        // Colonna non esiste, disabilita preferiti
+                        preferitiEnabled = false;
+                        console.info('ℹ️ Colonna campagne_preferite non esiste - preferiti disabilitati');
+                    } else if (userError) {
                         // Solo log se non è "colonna non definita"
                         console.warn('⚠️ Errore nel caricamento campo campagne_preferite:', userError);
                     }
                 } catch (fallbackError) {
                     console.warn('⚠️ Errore nel fallback preferiti:', fallbackError);
                     // Continua senza preferiti
+                    preferitiEnabled = false;
                 }
             } else if (preferitiData) {
                 preferitiData.forEach(p => {
@@ -1335,25 +1340,36 @@ async function loadCampagne(userId) {
             // Continua senza preferiti se c'è un errore - non bloccare l'app
         }
 
-        // Aggiungi informazioni sui preferiti alle campagne
-        campagne.forEach(campagna => {
-            const preferito = preferitiMap.get(campagna.id);
-            campagna.isPreferito = !!preferito;
-            campagna.preferitoOrdine = preferito ? preferito.ordine : null;
-        });
+        // Aggiungi informazioni sui preferiti alle campagne (solo se preferiti sono abilitati)
+        if (preferitiEnabled) {
+            campagne.forEach(campagna => {
+                const preferito = preferitiMap.get(campagna.id);
+                campagna.isPreferito = !!preferito;
+                campagna.preferitoOrdine = preferito ? preferito.ordine : null;
+            });
 
-        // Ordina le campagne: prima i preferiti, poi per ordine preferito, poi per data di creazione
-        campagne.sort((a, b) => {
-            // Preferiti in cima
-            if (a.isPreferito && !b.isPreferito) return -1;
-            if (!a.isPreferito && b.isPreferito) return 1;
-            // Tra preferiti, ordina per preferitoOrdine
-            if (a.isPreferito && b.isPreferito) {
-                return (a.preferitoOrdine || 0) - (b.preferitoOrdine || 0);
-            }
-            // Tra non preferiti, ordina per data di creazione (più recenti prima)
-            return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
-        });
+            // Ordina le campagne: prima i preferiti, poi per ordine preferito, poi per data di creazione
+            campagne.sort((a, b) => {
+                // Preferiti in cima
+                if (a.isPreferito && !b.isPreferito) return -1;
+                if (!a.isPreferito && b.isPreferito) return 1;
+                // Tra preferiti, ordina per preferitoOrdine
+                if (a.isPreferito && b.isPreferito) {
+                    return (a.preferitoOrdine || 0) - (b.preferitoOrdine || 0);
+                }
+                // Tra non preferiti, ordina per data di creazione (più recenti prima)
+                return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
+            });
+        } else {
+            // Se preferiti non disponibili, ordina solo per data di creazione
+            campagne.forEach(campagna => {
+                campagna.isPreferito = false;
+                campagna.preferitoOrdine = null;
+            });
+            campagne.sort((a, b) => {
+                return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
+            });
+        }
 
         console.log('✅ Campagne caricate:', campagne?.length || 0);
         renderCampagne(campagne || [], true, invitiRicevuti);
