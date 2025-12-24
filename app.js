@@ -4557,16 +4557,159 @@ window.handleDragOver = function(event) {
 };
 
 /**
- * Gestisce il drop
- * Nota: Il riordinamento manuale è temporaneamente disabilitato come richiesto dall'utente
+ * Gestisce il drop e riordina le campagne usando l'array campagne_preferite
  */
 window.handleDrop = async function(event, targetCampagnaId) {
     event.preventDefault();
     event.stopPropagation();
 
-    // Per ora non facciamo nulla, il riordinamento manuale è disabilitato
-    // Il drag & drop serve solo per il feedback visivo
-    console.log('🎯 handleDrop chiamato (riordinamento disabilitato):', { draggedCampagnaId, targetCampagnaId });
+    console.log('🎯 handleDrop chiamato:', { draggedCampagnaId, targetCampagnaId });
+
+    if (!draggedCampagnaId || draggedCampagnaId === targetCampagnaId) {
+        console.log('⚠️ handleDrop: condizioni non soddisfatte, esco');
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Recupera l'utente corrente
+        const utente = await findUserByUid(AppState.currentUser.uid);
+        if (!utente) throw new Error('Utente non trovato');
+
+        // Recupera l'array preferiti dell'utente
+        const { data: utenteData, error: utenteError } = await supabase
+            .from('utenti')
+            .select('campagne_preferite')
+            .eq('id', utente.id)
+            .single();
+
+        if (utenteError) throw utenteError;
+
+        const campagnePreferite = utenteData.campagne_preferite || [];
+
+        // Recupera tutte le campagne dell'utente (create + partecipate)
+        const { data: campagneCreate, error: errorCreate } = await supabase
+            .from('campagne')
+            .select('id')
+            .eq('id_dm', utente.id);
+
+        if (errorCreate) throw errorCreate;
+
+        const { data: invitiAccettati, error: errorInviti } = await supabase
+            .from('inviti_campagna')
+            .select('campagne:campagne!inviti_campagna_campagna_id_fkey(id)')
+            .eq('invitato_id', utente.id)
+            .eq('stato', 'accepted');
+
+        if (errorInviti) throw errorInviti;
+
+        // Costruisci lista di tutte le campagne dell'utente
+        const tutteCampagneIds = new Set((campagneCreate || []).map(c => c.id));
+        if (invitiAccettati && invitiAccettati.length > 0) {
+            invitiAccettati.forEach(inv => {
+                if (inv.campagne && inv.campagne.id) {
+                    tutteCampagneIds.add(inv.campagne.id);
+                }
+            });
+        }
+
+        // Verifica che entrambe le campagne appartengano all'utente
+        if (!tutteCampagneIds.has(draggedCampagnaId) || !tutteCampagneIds.has(targetCampagnaId)) {
+            console.error('❌ Una delle campagne non appartiene all\'utente');
+            return;
+        }
+
+        const isDraggedPreferito = campagnePreferite.includes(draggedCampagnaId);
+        const isTargetPreferito = campagnePreferite.includes(targetCampagnaId);
+
+        // Determina la direzione del drop basandosi sulle classi CSS applicate
+        const card = event.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        // Determina se inserire prima o dopo
+        let insertAfter = false;
+        if (card.classList.contains('drag-over-bottom') || card.classList.contains('drag-over-right')) {
+            insertAfter = true;
+        } else if (card.classList.contains('drag-over-top') || card.classList.contains('drag-over-left')) {
+            insertAfter = false;
+        } else {
+            // Fallback: usa la posizione del mouse
+            insertAfter = (window.innerWidth >= 768) ? (x >= rect.width / 2) : (y >= rect.height / 2);
+        }
+
+        let nuovoArrayPreferiti = [...campagnePreferite];
+
+        if (isDraggedPreferito && isTargetPreferito) {
+            // Entrambe sono preferiti: riordina all'interno dell'array preferiti
+            const draggedIndex = nuovoArrayPreferiti.indexOf(draggedCampagnaId);
+            const targetIndex = nuovoArrayPreferiti.indexOf(targetCampagnaId);
+
+            if (draggedIndex === -1 || targetIndex === -1) {
+                console.error('❌ Indici non validi per il riordinamento');
+                return;
+            }
+
+            // Rimuovi l'elemento trascinato
+            nuovoArrayPreferiti.splice(draggedIndex, 1);
+
+            // Calcola il nuovo indice
+            let newIndex;
+            if (draggedIndex < targetIndex) {
+                newIndex = insertAfter ? targetIndex : targetIndex - 1;
+            } else {
+                newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            }
+
+            // Inserisci nel nuovo posto
+            nuovoArrayPreferiti.splice(newIndex, 0, draggedCampagnaId);
+
+        } else if (!isDraggedPreferito && isTargetPreferito) {
+            // Sposta da non preferito a preferito: aggiungi all'array nella posizione corretta
+            const targetIndex = nuovoArrayPreferiti.indexOf(targetCampagnaId);
+            if (targetIndex === -1) {
+                console.error('❌ Target non trovato nei preferiti');
+                return;
+            }
+
+            const newIndex = insertAfter ? targetIndex + 1 : targetIndex;
+            nuovoArrayPreferiti.splice(newIndex, 0, draggedCampagnaId);
+
+        } else if (isDraggedPreferito && !isTargetPreferito) {
+            // Sposta da preferito a non preferito: rimuovi dall'array
+            const draggedIndex = nuovoArrayPreferiti.indexOf(draggedCampagnaId);
+            if (draggedIndex === -1) {
+                console.error('❌ Dragged non trovato nei preferiti');
+                return;
+            }
+            nuovoArrayPreferiti.splice(draggedIndex, 1);
+        }
+        // Se entrambe non sono preferiti, non facciamo nulla (non cambia l'ordine)
+
+        // Aggiorna l'array preferiti nella tabella utenti
+        const { error: updateError } = await supabase
+            .from('utenti')
+            .update({ campagne_preferite: nuovoArrayPreferiti })
+            .eq('id', utente.id);
+
+        if (updateError) throw updateError;
+
+        console.log('✅ Riordinamento completato con successo');
+
+        // Ricarica le campagne per riflettere il nuovo ordine
+        if (AppState.currentUser) {
+            await loadCampagne(AppState.currentUser.uid);
+        }
+    } catch (error) {
+        console.error('❌ Errore nel riordinamento:', error);
+        showNotification('Errore nel riordinamento delle campagne: ' + (error.message || error));
+    }
 };
 
 /**
