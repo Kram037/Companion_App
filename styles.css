@@ -1962,39 +1962,6 @@ body {
     opacity: 1;
 }
 
-/* Drag & Drop Styles */
-.campagna-card.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-}
-
-.campagna-card.drag-over-top {
-    border-top: 3px solid var(--accent);
-    margin-top: var(--spacing-xs);
-}
-
-.campagna-card.drag-over-bottom {
-    border-bottom: 3px solid var(--accent);
-    margin-bottom: var(--spacing-xs);
-}
-
-.campagna-card.drag-over-left {
-    border-left: 3px solid var(--accent);
-    margin-left: var(--spacing-xs);
-}
-
-.campagna-card.drag-over-right {
-    border-right: 3px solid var(--accent);
-    margin-right: var(--spacing-xs);
-}
-
-.campagna-card[draggable="true"] {
-    cursor: grab;
-}
-
-.campagna-card[draggable="true"]:active {
-    cursor: grabbing;
-}
 
 .campagna-header {
     display: flex;
