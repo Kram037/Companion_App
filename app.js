@@ -63,7 +63,13 @@ const AppState = {
     isRegisterMode: false,
     currentCampagnaId: null,
     currentCampagnaDetails: null,
-    campagnaGiocatori: []
+    campagnaGiocatori: [],
+    campagneFilters: {
+        searchText: '',
+        role: 'all',
+        soloPreferiti: false,
+        dateSort: 'all'
+    }
 };
 
 // DOM Elements - will be initialized in init()
@@ -655,6 +661,9 @@ function setupEventListeners() {
     } else {
         console.error('❌ addCampagnaBtn non trovato');
     }
+
+    // Filtri campagne
+    setupCampagneFilters();
     
     // Amici button
     if (elements.addAmicoBtn) {
@@ -1301,15 +1310,20 @@ async function loadCampagne(userId) {
 
         // Ordina le campagne: prima i preferiti, poi per data di creazione (più recenti prima)
         campagne.sort((a, b) => {
-            // Preferiti in cima
-            if (a.isPreferito && !b.isPreferito) return -1;
-            if (!a.isPreferito && b.isPreferito) return 1;
+            // Preferiti in cima (solo se non c'è un filtro data specifico)
+            if (AppState.campagneFilters.dateSort === 'all') {
+                if (a.isPreferito && !b.isPreferito) return -1;
+                if (!a.isPreferito && b.isPreferito) return 1;
+            }
             // Tra preferiti o tra non preferiti, ordina per data di creazione (più recenti prima)
             return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
         });
 
         console.log('✅ Campagne caricate:', campagne?.length || 0);
-        renderCampagne(campagne || [], true, invitiRicevuti);
+        
+        // Applica i filtri prima di renderizzare (passa l'ID utente per filtri ruolo)
+        const campagneFiltrate = applyCampagneFilters(campagne || [], AppState.campagneFilters, utente.id);
+        renderCampagne(campagneFiltrate, true, invitiRicevuti);
 
         // Setup real-time subscription
         campagneChannel = supabase
@@ -1403,6 +1417,136 @@ async function loadInvitiRicevuti(userId) {
         console.error('❌ Errore nel caricamento inviti ricevuti:', error);
         return [];
     }
+}
+
+/**
+ * Applica i filtri all'array di campagne
+ */
+function applyCampagneFilters(campagne, filters, currentUserId) {
+    let filtered = [...campagne];
+
+    // Filtro per testo (nome campagna)
+    if (filters.searchText && filters.searchText.trim() !== '') {
+        const searchLower = filters.searchText.toLowerCase().trim();
+        filtered = filtered.filter(c => 
+            c.nome_campagna && c.nome_campagna.toLowerCase().includes(searchLower)
+        );
+    }
+
+    // Filtro per ruolo (DM o giocatore)
+    if (filters.role === 'dm') {
+        filtered = filtered.filter(c => c.id_dm === currentUserId);
+    } else if (filters.role === 'player') {
+        filtered = filtered.filter(c => 
+            c.id_dm !== currentUserId && 
+            Array.isArray(c.giocatori) && 
+            c.giocatori.includes(currentUserId)
+        );
+    }
+
+    // Filtro per preferiti
+    if (filters.soloPreferiti) {
+        filtered = filtered.filter(c => c.isPreferito === true);
+    }
+
+    // Ordinamento per data (se non è 'all')
+    if (filters.dateSort === 'recent') {
+        filtered.sort((a, b) => {
+            // Mantieni preferiti in cima anche con ordinamento data
+            if (a.isPreferito && !b.isPreferito) return -1;
+            if (!a.isPreferito && b.isPreferito) return 1;
+            const dateA = new Date(a.data_creazione || 0);
+            const dateB = new Date(b.data_creazione || 0);
+            return dateB - dateA; // Più recenti prima
+        });
+    } else if (filters.dateSort === 'oldest') {
+        filtered.sort((a, b) => {
+            // Mantieni preferiti in cima anche con ordinamento data
+            if (a.isPreferito && !b.isPreferito) return -1;
+            if (!a.isPreferito && b.isPreferito) return 1;
+            const dateA = new Date(a.data_creazione || 0);
+            const dateB = new Date(b.data_creazione || 0);
+            return dateA - dateB; // Più vecchie prima
+        });
+    }
+
+    return filtered;
+}
+
+/**
+ * Setup event listeners per i filtri campagne
+ */
+function setupCampagneFilters() {
+    const searchInput = document.getElementById('campagneSearchInput');
+    const roleFilter = document.getElementById('campagneRoleFilter');
+    const preferitiFilter = document.getElementById('togglePreferitiFilter');
+    const dateFilter = document.getElementById('campagneDateFilter');
+
+    // Debounce per ricerca testuale
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                AppState.campagneFilters.searchText = e.target.value;
+                applyFiltersAndRerender();
+            }, 300);
+        });
+    }
+
+    if (roleFilter) {
+        roleFilter.addEventListener('change', (e) => {
+            AppState.campagneFilters.role = e.target.value;
+            applyFiltersAndRerender();
+        });
+    }
+
+    if (preferitiFilter) {
+        preferitiFilter.addEventListener('click', (e) => {
+            e.preventDefault();
+            AppState.campagneFilters.soloPreferiti = !AppState.campagneFilters.soloPreferiti;
+            preferitiFilter.classList.toggle('active', AppState.campagneFilters.soloPreferiti);
+            applyFiltersAndRerender();
+        });
+    }
+
+    if (dateFilter) {
+        dateFilter.addEventListener('change', (e) => {
+            AppState.campagneFilters.dateSort = e.target.value;
+            applyFiltersAndRerender();
+        });
+    }
+
+    // Carica preferenze salvate dal localStorage (opzionale)
+    const savedFilters = localStorage.getItem('campagneFilters');
+    if (savedFilters) {
+        try {
+            const parsed = JSON.parse(savedFilters);
+            AppState.campagneFilters = { ...AppState.campagneFilters, ...parsed };
+            // Applica i valori salvati agli input
+            if (searchInput) searchInput.value = AppState.campagneFilters.searchText || '';
+            if (roleFilter) roleFilter.value = AppState.campagneFilters.role || 'all';
+            if (preferitiFilter) {
+                preferitiFilter.classList.toggle('active', AppState.campagneFilters.soloPreferiti);
+            }
+            if (dateFilter) dateFilter.value = AppState.campagneFilters.dateSort || 'all';
+        } catch (e) {
+            console.warn('Errore nel caricamento filtri salvati:', e);
+        }
+    }
+}
+
+/**
+ * Applica i filtri e ricarica le campagne
+ */
+async function applyFiltersAndRerender() {
+    if (!AppState.currentUser || !AppState.isLoggedIn) return;
+    
+    // Salva preferenze in localStorage
+    localStorage.setItem('campagneFilters', JSON.stringify(AppState.campagneFilters));
+    
+    // Ricarica le campagne (che applicheranno automaticamente i filtri)
+    await loadCampagne(AppState.currentUser.uid);
 }
 
 async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
@@ -3108,56 +3252,126 @@ async function renderCampagnaDetailsContent(campagna) {
         }
     }
 
+    // Renderizza azioni rapide nell'header (solo se DM)
+    const dettagliActionsElement = document.getElementById('dettagliActions');
+    if (dettagliActionsElement) {
+        if (isDM) {
+            // Verifica se c'è una sessione attiva
+            const sessioneAttiva = await checkSessioneAttiva(campagna.id);
+            
+            dettagliActionsElement.innerHTML = `
+                ${sessioneAttiva ? `
+                <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Sessione Attiva
+                </button>
+                ` : `
+                <button class="btn-primary btn-small" onclick="iniziaSessione('${campagna.id}')" aria-label="Inizia sessione">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Inizia Sessione
+                </button>
+                `}
+                <button class="btn-secondary btn-small" onclick="editCampagna('${campagna.id}')" aria-label="Modifica campagna">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Modifica
+                </button>
+                <button class="btn-danger btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Elimina
+                </button>
+            `;
+        } else {
+            dettagliActionsElement.innerHTML = '';
+        }
+    }
+
     if (elements.dettagliCampagnaContent) {
         elements.dettagliCampagnaContent.innerHTML = `
-            <div class="dettagli-info">
-                <div class="info-item">
-                    <span class="info-label">DM:</span>
-                    <span class="info-value" id="dmValue">${escapeHtml(nomeDM)}</span>
-                    ${isDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </button>` : '<span></span>'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Giocatori:</span>
-                    <span class="info-value" id="giocatoriValue">${numeroGiocatori}</span>
-                    ${isDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </button>` : '<span></span>'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Sessioni:</span>
-                    <span class="info-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
-                    ${isDM ? `<button class="btn-icon-small" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </button>` : '<span></span>'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Tempo di gioco:</span>
-                    <span class="info-value" id="tempoGiocoValue">${tempoGioco}</span>
-                    ${isDM ? `<button class="btn-icon-small" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </button>` : '<span></span>'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Creata il:</span>
-                    <span class="info-value">${dataCreazione}</span>
-                    <span></span>
+            <!-- Sezione Informazioni Principali -->
+            <div class="dettagli-section dettagli-main-info">
+                <h2 class="dettagli-section-title">Informazioni</h2>
+                <div class="dettagli-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">DM:</span>
+                        <span class="info-value" id="dmValue">${escapeHtml(nomeDM)}</span>
+                        ${isDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>` : '<span></span>'}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giocatori:</span>
+                        <span class="info-value" id="giocatoriValue">${numeroGiocatori}</span>
+                        ${isDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>` : '<span></span>'}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Creata il:</span>
+                        <span class="info-value">${dataCreazione}</span>
+                        <span></span>
+                    </div>
                 </div>
             </div>
-            ${note !== 'Nessuna nota' ? `<div class="dettagli-notes"><strong>Note:</strong> ${escapeHtml(note)}</div>` : ''}
+
+            <!-- Sezione Statistiche -->
+            <div class="dettagli-section dettagli-stats">
+                <h2 class="dettagli-section-title">Statistiche</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Sessioni</span>
+                            <span class="stat-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
+                        </div>
+                        ${isDM ? `<button class="btn-icon-small stat-edit" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>` : ''}
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Tempo di gioco</span>
+                            <span class="stat-value" id="tempoGiocoValue">${tempoGioco}</span>
+                        </div>
+                        ${isDM ? `<button class="btn-icon-small stat-edit" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione Note -->
+            ${note !== 'Nessuna nota' ? `
+            <div class="dettagli-section dettagli-notes-section">
+                <h2 class="dettagli-section-title">Note</h2>
+                <div class="dettagli-notes-content">
+                    ${escapeHtml(note)}
+                </div>
+            </div>
+            ` : ''}
         `;
 
         // Salva i dati della campagna nello state per uso futuro
@@ -4480,6 +4694,379 @@ window.togglePreferito = async function(campagnaId) {
     }
 };
 
+
+// ============================================
+// GESTIONE SESSIONI
+// ============================================
+
+/**
+ * Verifica se c'è una sessione attiva per una campagna
+ */
+async function checkSessioneAttiva(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return false;
+
+    try {
+        const { data, error } = await supabase
+            .from('sessioni')
+            .select('id')
+            .eq('campagna_id', campagnaId)
+            .is('data_fine', null)
+            .limit(1)
+            .single();
+
+        return !error && data !== null;
+    } catch (error) {
+        console.error('❌ Errore nel controllo sessione attiva:', error);
+        return false;
+    }
+}
+
+/**
+ * Ottiene la sessione attiva per una campagna
+ */
+async function getSessioneAttiva(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
+
+    try {
+        const { data, error } = await supabase
+            .from('sessioni')
+            .select('*')
+            .eq('campagna_id', campagnaId)
+            .is('data_fine', null)
+            .limit(1)
+            .single();
+
+        if (error) return null;
+        return data;
+    } catch (error) {
+        console.error('❌ Errore nel recupero sessione attiva:', error);
+        return null;
+    }
+}
+
+/**
+ * Inizia una nuova sessione per una campagna
+ */
+window.iniziaSessione = async function(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che non ci sia già una sessione attiva
+        const sessioneAttiva = await checkSessioneAttiva(campagnaId);
+        if (sessioneAttiva) {
+            showNotification('C\'è già una sessione attiva per questa campagna');
+            openSessionePage(campagnaId);
+            return;
+        }
+
+        // Verifica che l'utente sia il DM
+        const isDM = await isCurrentUserDM(campagnaId);
+        if (!isDM) {
+            showNotification('Solo il DM può iniziare una sessione');
+            return;
+        }
+
+        // Crea la nuova sessione
+        const { data, error } = await supabase
+            .from('sessioni')
+            .insert({
+                campagna_id: campagnaId,
+                data_inizio: new Date().toISOString()
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        showNotification('Sessione iniziata!');
+        
+        // Apri la pagina sessione
+        openSessionePage(campagnaId);
+    } catch (error) {
+        console.error('❌ Errore nell\'inizio sessione:', error);
+        showNotification('Errore nell\'inizio della sessione: ' + (error.message || error));
+    }
+};
+
+/**
+ * Apre la pagina sessione
+ */
+window.openSessionePage = async function(campagnaId) {
+    AppState.currentCampagnaId = campagnaId;
+    localStorage.setItem('currentCampagnaId', campagnaId);
+    navigateToPage('sessione');
+    await renderSessioneContent(campagnaId);
+};
+
+/**
+ * Renderizza il contenuto della pagina sessione
+ */
+async function renderSessioneContent(campagnaId) {
+    const sessioneContent = document.getElementById('sessioneContent');
+    const sessioneTitle = document.getElementById('sessioneCampagnaTitle');
+    if (!sessioneContent) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        sessioneContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+        return;
+    }
+
+    try {
+        // Carica la campagna
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('nome_campagna')
+            .eq('id', campagnaId)
+            .single();
+
+        if (campagnaError) throw campagnaError;
+
+        if (sessioneTitle) {
+            sessioneTitle.textContent = `Sessione: ${escapeHtml(campagna.nome_campagna)}`;
+        }
+
+        // Carica la sessione attiva
+        const sessione = await getSessioneAttiva(campagnaId);
+        
+        if (!sessione) {
+            sessioneContent.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Nessuna sessione attiva</p>
+                    <button class="btn-primary" onclick="iniziaSessione('${campagnaId}')">Inizia Sessione</button>
+                </div>
+            `;
+            return;
+        }
+
+        // Calcola durata corrente
+        const dataInizio = new Date(sessione.data_inizio);
+        const durataMs = Date.now() - dataInizio.getTime();
+        const durataMinuti = Math.floor(durataMs / 60000);
+        const durataOre = Math.floor(durataMinuti / 60);
+        const durataMinutiResto = durataMinuti % 60;
+
+        // Carica iniziativa
+        const { data: iniziativa, error: iniziativaError } = await supabase
+            .from('iniziativa')
+            .select('*')
+            .eq('sessione_id', sessione.id)
+            .order('ordine', { ascending: true });
+
+        if (iniziativaError) {
+            console.error('❌ Errore nel caricamento iniziativa:', iniziativaError);
+        }
+
+        sessioneContent.innerHTML = `
+            <div class="sessione-timer">
+                <div class="timer-display">
+                    <span class="timer-value">${durataOre.toString().padStart(2, '0')}:${durataMinutiResto.toString().padStart(2, '0')}</span>
+                    <span class="timer-label">Durata</span>
+                </div>
+                <button class="btn-danger btn-small" onclick="finisciSessione('${sessione.id}', '${campagnaId}')">
+                    Fine Sessione
+                </button>
+            </div>
+
+            <div class="sessione-iniziativa">
+                <h2 class="sessione-section-title">Iniziativa</h2>
+                <button class="btn-primary btn-small" onclick="aggiungiIniziativa('${sessione.id}')">
+                    + Aggiungi
+                </button>
+                <div id="iniziativaList" class="iniziativa-list">
+                    ${iniziativa && iniziativa.length > 0 ? iniziativa.map((item, index) => `
+                        <div class="iniziativa-item" data-iniziativa-id="${item.id}">
+                            <span class="iniziativa-ordine">${item.ordine}</span>
+                            <span class="iniziativa-nome">${escapeHtml(item.personaggio_nome)}</span>
+                            <span class="iniziativa-valore">${item.valore_iniziativa}</span>
+                            <button class="btn-icon-small" onclick="rimuoviIniziativa('${item.id}', '${sessione.id}')" aria-label="Rimuovi">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('') : '<p class="no-iniziativa">Nessuna iniziativa registrata</p>'}
+                </div>
+            </div>
+        `;
+
+        // Avvia timer se non già avviato
+        if (!window.sessioneTimerInterval) {
+            startSessioneTimer(campagnaId);
+        }
+    } catch (error) {
+        console.error('❌ Errore nel rendering sessione:', error);
+        sessioneContent.innerHTML = '<p>Errore nel caricamento della sessione</p>';
+    }
+}
+
+/**
+ * Avvia il timer per la sessione
+ */
+function startSessioneTimer(campagnaId) {
+    // Rimuovi timer esistente se presente
+    if (window.sessioneTimerInterval) {
+        clearInterval(window.sessioneTimerInterval);
+    }
+
+    window.sessioneTimerInterval = setInterval(async () => {
+        await renderSessioneContent(campagnaId);
+    }, 60000); // Aggiorna ogni minuto
+}
+
+/**
+ * Ferma il timer della sessione
+ */
+function stopSessioneTimer() {
+    if (window.sessioneTimerInterval) {
+        clearInterval(window.sessioneTimerInterval);
+        window.sessioneTimerInterval = null;
+    }
+}
+
+/**
+ * Finisce una sessione
+ */
+window.finisciSessione = async function(sessioneId, campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che l'utente sia il DM
+        const isDM = await isCurrentUserDM(campagnaId);
+        if (!isDM) {
+            showNotification('Solo il DM può finire una sessione');
+            return;
+        }
+
+        const dataFine = new Date().toISOString();
+
+        const { error } = await supabase
+            .from('sessioni')
+            .update({ data_fine: dataFine })
+            .eq('id', sessioneId);
+
+        if (error) throw error;
+
+        stopSessioneTimer();
+        showNotification('Sessione terminata!');
+        
+        // Torna ai dettagli campagna
+        navigateToPage('dettagli');
+        await loadCampagnaDetails(campagnaId);
+    } catch (error) {
+        console.error('❌ Errore nella fine sessione:', error);
+        showNotification('Errore nella fine della sessione: ' + (error.message || error));
+    }
+};
+
+/**
+ * Aggiunge una voce all'iniziativa
+ */
+window.aggiungiIniziativa = async function(sessioneId) {
+    const nome = await showPrompt('Nome personaggio:', 'Aggiungi Iniziativa');
+    if (!nome || nome.trim() === '') return;
+
+    const valoreStr = await showPrompt('Valore iniziativa (d20 + modificatori):', 'Aggiungi Iniziativa');
+    if (!valoreStr) return;
+
+    const valore = parseInt(valoreStr);
+    if (isNaN(valore)) {
+        showNotification('Inserisci un numero valido');
+        return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Trova l'ordine massimo
+        const { data: existing, error: existingError } = await supabase
+            .from('iniziativa')
+            .select('ordine')
+            .eq('sessione_id', sessioneId)
+            .order('ordine', { ascending: false })
+            .limit(1);
+
+        const nuovoOrdine = existing && existing.length > 0 ? existing[0].ordine + 1 : 1;
+
+        const { error } = await supabase
+            .from('iniziativa')
+            .insert({
+                sessione_id: sessioneId,
+                personaggio_nome: nome.trim(),
+                valore_iniziativa: valore,
+                ordine: nuovoOrdine
+            });
+
+        if (error) throw error;
+
+        showNotification('Iniziativa aggiunta!');
+        
+        // Ricarica la sessione
+        const { data: sessione } = await supabase
+            .from('sessioni')
+            .select('campagna_id')
+            .eq('id', sessioneId)
+            .single();
+
+        if (sessione) {
+            await renderSessioneContent(sessione.campagna_id);
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiunta iniziativa:', error);
+        showNotification('Errore nell\'aggiunta dell\'iniziativa: ' + (error.message || error));
+    }
+};
+
+/**
+ * Rimuove una voce dall'iniziativa
+ */
+window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('iniziativa')
+            .delete()
+            .eq('id', iniziativaId);
+
+        if (error) throw error;
+
+        showNotification('Iniziativa rimossa!');
+        
+        // Ricarica la sessione
+        const { data: sessione } = await supabase
+            .from('sessioni')
+            .select('campagna_id')
+            .eq('id', sessioneId)
+            .single();
+
+        if (sessione) {
+            await renderSessioneContent(sessione.campagna_id);
+        }
+    } catch (error) {
+        console.error('❌ Errore nella rimozione iniziativa:', error);
+        showNotification('Errore nella rimozione dell\'iniziativa: ' + (error.message || error));
+    }
+};
 
 // Initialize app when DOM is ready
 function startApp() {
