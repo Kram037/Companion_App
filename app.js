@@ -1297,26 +1297,42 @@ async function loadCampagne(userId) {
             if (preferitiError) {
                 console.warn('⚠️ Errore nel caricamento preferiti (funzione RPC potrebbe non esistere):', preferitiError);
                 // Fallback: prova a leggere direttamente dall'array nella tabella utenti
-                const { data: userData, error: userError } = await supabase
-                    .from('utenti')
-                    .select('campagne_preferite')
-                    .eq('id', utente.id)
-                    .single();
-                
-                if (!userError && userData && userData.campagne_preferite) {
-                    // Costruisci la mappa dall'array
-                    userData.campagne_preferite.forEach((campagnaId, index) => {
-                        preferitiMap.set(campagnaId, { ordine: index });
-                    });
+                try {
+                    const { data: userData, error: userError } = await supabase
+                        .from('utenti')
+                        .select('campagne_preferite')
+                        .eq('id', utente.id)
+                        .single();
+                    
+                    // Se la colonna non esiste, userError.code sarà '42703' (undefined_column)
+                    // In questo caso, semplicemente ignora e continua senza preferiti
+                    if (!userError && userData) {
+                        if (userData.campagne_preferite && Array.isArray(userData.campagne_preferite)) {
+                            // Costruisci la mappa dall'array
+                            userData.campagne_preferite.forEach((campagnaId, index) => {
+                                if (campagnaId) {
+                                    preferitiMap.set(campagnaId, { ordine: index });
+                                }
+                            });
+                        }
+                    } else if (userError && userError.code !== '42703') {
+                        // Solo log se non è "colonna non definita"
+                        console.warn('⚠️ Errore nel caricamento campo campagne_preferite:', userError);
+                    }
+                } catch (fallbackError) {
+                    console.warn('⚠️ Errore nel fallback preferiti:', fallbackError);
+                    // Continua senza preferiti
                 }
             } else if (preferitiData) {
                 preferitiData.forEach(p => {
-                    preferitiMap.set(p.campagna_id, { ordine: p.ordine });
+                    if (p && p.campagna_id) {
+                        preferitiMap.set(p.campagna_id, { ordine: p.ordine || 0 });
+                    }
                 });
             }
         } catch (error) {
             console.warn('⚠️ Errore nel caricamento preferiti:', error);
-            // Continua senza preferiti se c'è un errore
+            // Continua senza preferiti se c'è un errore - non bloccare l'app
         }
 
         // Aggiungi informazioni sui preferiti alle campagne
@@ -4487,40 +4503,62 @@ window.togglePreferito = async function(campagnaId) {
                     p_campagna_id: campagnaId
                 });
 
-            if (toggleError) {
-                console.warn('⚠️ Errore RPC toggle preferito, uso fallback:', toggleError);
-                // Fallback: gestisci manualmente l'array
-                const { data: userData, error: userError } = await supabase
-                    .from('utenti')
-                    .select('campagne_preferite')
-                    .eq('id', utente.id)
-                    .single();
+                if (toggleError) {
+                    // Se l'errore è "colonna non definita", semplicemente ignora
+                    if (toggleError.code === '42883' || toggleError.message?.includes('does not exist')) {
+                        console.warn('⚠️ Funzione RPC toggle_campagna_preferito non esiste, ignorando preferito');
+                        showNotification('La funzione preferiti non è ancora configurata. Esegui gli script SQL.');
+                        return;
+                    }
+                    
+                    console.warn('⚠️ Errore RPC toggle preferito, uso fallback:', toggleError);
+                    // Fallback: gestisci manualmente l'array
+                    try {
+                        const { data: userData, error: userError } = await supabase
+                            .from('utenti')
+                            .select('campagne_preferite')
+                            .eq('id', utente.id)
+                            .single();
 
-                if (userError) throw userError;
+                        // Se la colonna non esiste, ignora
+                        if (userError && (userError.code === '42703' || userError.message?.includes('does not exist'))) {
+                            console.warn('⚠️ Colonna campagne_preferite non esiste, ignorando');
+                            showNotification('La colonna preferiti non è ancora configurata. Esegui gli script SQL.');
+                            return;
+                        }
 
-                let preferiti = userData.campagne_preferite || [];
-                const exists = preferiti.includes(campagnaId);
+                        if (userError) throw userError;
 
-                if (exists) {
-                    preferiti = preferiti.filter(id => id !== campagnaId);
-                    nuovoStato = false;
+                        let preferiti = userData.campagne_preferite || [];
+                        const exists = preferiti.includes(campagnaId);
+
+                        if (exists) {
+                            preferiti = preferiti.filter(id => id !== campagnaId);
+                            nuovoStato = false;
+                        } else {
+                            preferiti.push(campagnaId);
+                            nuovoStato = true;
+                        }
+
+                        const { error: updateError } = await supabase
+                            .from('utenti')
+                            .update({ campagne_preferite: preferiti })
+                            .eq('id', utente.id);
+
+                        if (updateError) throw updateError;
+                    } catch (fallbackError) {
+                        console.warn('⚠️ Errore nel fallback toggle preferito:', fallbackError);
+                        showNotification('Errore nell\'aggiornamento del preferito');
+                        return;
+                    }
                 } else {
-                    preferiti.push(campagnaId);
-                    nuovoStato = true;
+                    nuovoStato = toggleResult;
                 }
-
-                const { error: updateError } = await supabase
-                    .from('utenti')
-                    .update({ campagne_preferite: preferiti })
-                    .eq('id', utente.id);
-
-                if (updateError) throw updateError;
-            } else {
-                nuovoStato = toggleResult;
+            } catch (error) {
+                console.error('❌ Errore nel toggle preferito:', error);
+                showNotification('Errore nell\'aggiornamento del preferito');
+                return;
             }
-        } catch (error) {
-            throw error;
-        }
 
         showNotification(nuovoStato ? 'Campagna aggiunta ai preferiti' : 'Campagna rimossa dai preferiti');
 
