@@ -4527,7 +4527,12 @@ window.togglePreferito = async function(campagnaId) {
                             return;
                         }
 
-                        if (userError) throw userError;
+                        // Se la colonna non esiste, ignora silenziosamente
+                    if (userError && (userError.code === '42703' || userError.message?.includes('does not exist'))) {
+                        console.warn('⚠️ Colonna campagne_preferite non esiste, ignorando drag&drop preferiti');
+                        return;
+                    }
+                    if (userError) throw userError;
 
                         let preferiti = userData.campagne_preferite || [];
                         const exists = preferiti.includes(campagnaId);
@@ -4873,6 +4878,11 @@ window.handleDrop = async function(event, targetCampagnaId) {
                         .eq('id', utente.id)
                         .single();
 
+                    // Se la colonna non esiste, ignora silenziosamente
+                    if (userError && (userError.code === '42703' || userError.message?.includes('does not exist'))) {
+                        console.warn('⚠️ Colonna campagne_preferite non esiste, ignorando drag&drop preferiti');
+                        return;
+                    }
                     if (userError) throw userError;
 
                     let preferiti = userData.campagne_preferite || [];
