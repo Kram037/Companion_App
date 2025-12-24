@@ -1286,21 +1286,37 @@ async function loadCampagne(userId) {
         }
 
         // Carica i preferiti dell'utente corrente
-        const { data: preferitiData, error: preferitiError } = await supabase
-            .rpc('get_campagne_preferiti', {
-                p_utente_id: utente.id
-            });
+        // Gestisce il caso in cui la funzione RPC non esista ancora (fallback)
+        let preferitiMap = new Map();
+        try {
+            const { data: preferitiData, error: preferitiError } = await supabase
+                .rpc('get_campagne_preferiti', {
+                    p_utente_id: utente.id
+                });
 
-        if (preferitiError) {
-            console.error('❌ Errore nel caricamento preferiti:', preferitiError);
-        }
-
-        // Crea una mappa dei preferiti: campagna_id -> { ordine }
-        const preferitiMap = new Map();
-        if (preferitiData) {
-            preferitiData.forEach(p => {
-                preferitiMap.set(p.campagna_id, { ordine: p.ordine });
-            });
+            if (preferitiError) {
+                console.warn('⚠️ Errore nel caricamento preferiti (funzione RPC potrebbe non esistere):', preferitiError);
+                // Fallback: prova a leggere direttamente dall'array nella tabella utenti
+                const { data: userData, error: userError } = await supabase
+                    .from('utenti')
+                    .select('campagne_preferite')
+                    .eq('id', utente.id)
+                    .single();
+                
+                if (!userError && userData && userData.campagne_preferite) {
+                    // Costruisci la mappa dall'array
+                    userData.campagne_preferite.forEach((campagnaId, index) => {
+                        preferitiMap.set(campagnaId, { ordine: index });
+                    });
+                }
+            } else if (preferitiData) {
+                preferitiData.forEach(p => {
+                    preferitiMap.set(p.campagna_id, { ordine: p.ordine });
+                });
+            }
+        } catch (error) {
+            console.warn('⚠️ Errore nel caricamento preferiti:', error);
+            // Continua senza preferiti se c'è un errore
         }
 
         // Aggiungi informazioni sui preferiti alle campagne
@@ -4462,14 +4478,49 @@ window.togglePreferito = async function(campagnaId) {
             throw new Error('Utente non trovato');
         }
 
-        // Usa la funzione RPC per toggle preferito
-        const { data: nuovoStato, error: toggleError } = await supabase
-            .rpc('toggle_campagna_preferito', {
-                p_utente_id: utente.id,
-                p_campagna_id: campagnaId
-            });
+        // Usa la funzione RPC per toggle preferito (con fallback)
+        let nuovoStato = false;
+        try {
+            const { data: toggleResult, error: toggleError } = await supabase
+                .rpc('toggle_campagna_preferito', {
+                    p_utente_id: utente.id,
+                    p_campagna_id: campagnaId
+                });
 
-        if (toggleError) throw toggleError;
+            if (toggleError) {
+                console.warn('⚠️ Errore RPC toggle preferito, uso fallback:', toggleError);
+                // Fallback: gestisci manualmente l'array
+                const { data: userData, error: userError } = await supabase
+                    .from('utenti')
+                    .select('campagne_preferite')
+                    .eq('id', utente.id)
+                    .single();
+
+                if (userError) throw userError;
+
+                let preferiti = userData.campagne_preferite || [];
+                const exists = preferiti.includes(campagnaId);
+
+                if (exists) {
+                    preferiti = preferiti.filter(id => id !== campagnaId);
+                    nuovoStato = false;
+                } else {
+                    preferiti.push(campagnaId);
+                    nuovoStato = true;
+                }
+
+                const { error: updateError } = await supabase
+                    .from('utenti')
+                    .update({ campagne_preferite: preferiti })
+                    .eq('id', utente.id);
+
+                if (updateError) throw updateError;
+            } else {
+                nuovoStato = toggleResult;
+            }
+        } catch (error) {
+            throw error;
+        }
 
         showNotification(nuovoStato ? 'Campagna aggiunta ai preferiti' : 'Campagna rimossa dai preferiti');
 
@@ -4628,18 +4679,38 @@ window.handleDrop = async function(event, targetCampagnaId) {
 
 
         // Carica i preferiti dell'utente corrente
-        const { data: preferitiData, error: preferitiError } = await supabase
-            .rpc('get_campagne_preferiti', {
-                p_utente_id: utente.id
-            });
+        // Gestisce il caso in cui la funzione RPC non esista ancora (fallback)
+        let preferitiMap = new Map();
+        try {
+            const { data: preferitiData, error: preferitiError } = await supabase
+                .rpc('get_campagne_preferiti', {
+                    p_utente_id: utente.id
+                });
 
-        if (preferitiError) throw preferitiError;
-
-        // Crea mappa preferiti: campagna_id -> ordine
-        const preferitiMap = new Map();
-        preferitiData?.forEach(p => {
-            preferitiMap.set(p.campagna_id, p.ordine);
-        });
+            if (preferitiError) {
+                console.warn('⚠️ Errore nel caricamento preferiti (funzione RPC potrebbe non esistere):', preferitiError);
+                // Fallback: prova a leggere direttamente dall'array nella tabella utenti
+                const { data: userData, error: userError } = await supabase
+                    .from('utenti')
+                    .select('campagne_preferite')
+                    .eq('id', utente.id)
+                    .single();
+                
+                if (!userError && userData && userData.campagne_preferite) {
+                    // Costruisci la mappa dall'array
+                    userData.campagne_preferite.forEach((campagnaId, index) => {
+                        preferitiMap.set(campagnaId, index);
+                    });
+                }
+            } else if (preferitiData) {
+                preferitiData.forEach(p => {
+                    preferitiMap.set(p.campagna_id, p.ordine);
+                });
+            }
+        } catch (error) {
+            console.warn('⚠️ Errore nel caricamento preferiti:', error);
+            // Continua senza preferiti se c'è un errore
+        }
 
         // Aggiungi informazioni sui preferiti alle campagne
         tutteCampagne.forEach(campagna => {
@@ -4700,13 +4771,27 @@ window.handleDrop = async function(event, targetCampagnaId) {
                 // Crea array di ID nell'ordine corretto
                 const preferitiIds = lista.map(camp => camp.id);
 
-                const { error: updateError } = await supabase
-                    .rpc('update_preferiti_ordine', {
-                        p_utente_id: utente.id,
-                        p_campagne_ids: preferitiIds
-                    });
+                try {
+                    const { error: updateError } = await supabase
+                        .rpc('update_preferiti_ordine', {
+                            p_utente_id: utente.id,
+                            p_campagne_ids: preferitiIds
+                        });
 
-                if (updateError) throw updateError;
+                    if (updateError) {
+                        console.warn('⚠️ Errore RPC update ordine, uso fallback:', updateError);
+                        // Fallback: aggiorna direttamente l'array
+                        const { error: directUpdateError } = await supabase
+                            .from('utenti')
+                            .update({ campagne_preferite: preferitiIds })
+                            .eq('id', utente.id);
+
+                        if (directUpdateError) throw directUpdateError;
+                    }
+                } catch (error) {
+                    console.error('❌ Errore nell\'aggiornamento ordine preferiti:', error);
+                    throw error;
+                }
             }
         } else {
             // Sposta da un gruppo all'altro: aggiungi/rimuovi preferito
@@ -4733,14 +4818,45 @@ window.handleDrop = async function(event, targetCampagnaId) {
             // Inserisci nella nuova posizione
             listaDestino.splice(newIndex, 0, draggedCampagna);
 
-            // Toggle preferito per la campagna trascinata
-            const { error: toggleError } = await supabase
-                .rpc('toggle_campagna_preferito', {
-                    p_utente_id: utente.id,
-                    p_campagna_id: draggedCampagnaId
-                });
+            // Toggle preferito per la campagna trascinata (con fallback)
+            try {
+                const { error: toggleError } = await supabase
+                    .rpc('toggle_campagna_preferito', {
+                        p_utente_id: utente.id,
+                        p_campagna_id: draggedCampagnaId
+                    });
 
-            if (toggleError) throw toggleError;
+                if (toggleError) {
+                    console.warn('⚠️ Errore RPC toggle preferito, uso fallback:', toggleError);
+                    // Fallback: gestisci manualmente l'array
+                    const { data: userData, error: userError } = await supabase
+                        .from('utenti')
+                        .select('campagne_preferite')
+                        .eq('id', utente.id)
+                        .single();
+
+                    if (userError) throw userError;
+
+                    let preferiti = userData.campagne_preferite || [];
+                    const exists = preferiti.includes(draggedCampagnaId);
+
+                    if (exists) {
+                        preferiti = preferiti.filter(id => id !== draggedCampagnaId);
+                    } else {
+                        preferiti.push(draggedCampagnaId);
+                    }
+
+                    const { error: updateError } = await supabase
+                        .from('utenti')
+                        .update({ campagne_preferite: preferiti })
+                        .eq('id', utente.id);
+
+                    if (updateError) throw updateError;
+                }
+            } catch (error) {
+                console.error('❌ Errore nel toggle preferito durante drag:', error);
+                throw error;
+            }
 
             // Se stiamo aggiungendo ai preferiti, aggiorna gli ordini
             // Se stiamo rimuovendo dai preferiti, non serve aggiornare gli ordini (vengono rimossi automaticamente dal toggle)
@@ -4748,13 +4864,27 @@ window.handleDrop = async function(event, targetCampagnaId) {
                 // Crea array di ID nell'ordine corretto (listaDestino include già la campagna trascinata nell'ordine corretto)
                 const preferitiIds = listaDestino.map(camp => camp.id);
 
-                const { error: updateError } = await supabase
-                    .rpc('update_preferiti_ordine', {
-                        p_utente_id: utente.id,
-                        p_campagne_ids: preferitiIds
-                    });
+                try {
+                    const { error: updateError } = await supabase
+                        .rpc('update_preferiti_ordine', {
+                            p_utente_id: utente.id,
+                            p_campagne_ids: preferitiIds
+                        });
 
-                if (updateError) throw updateError;
+                    if (updateError) {
+                        console.warn('⚠️ Errore RPC update ordine, uso fallback:', updateError);
+                        // Fallback: aggiorna direttamente l'array
+                        const { error: directUpdateError } = await supabase
+                            .from('utenti')
+                            .update({ campagne_preferite: preferitiIds })
+                            .eq('id', utente.id);
+
+                        if (directUpdateError) throw directUpdateError;
+                    }
+                } catch (error) {
+                    console.error('❌ Errore nell\'aggiornamento ordine preferiti:', error);
+                    throw error;
+                }
             }
         }
 
