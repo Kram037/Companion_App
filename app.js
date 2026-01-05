@@ -961,20 +961,8 @@ function setupEventListeners() {
     setupIconSelector();
 
     // Roll request modal setup
-    if (elements.closeRollRequestModal) {
-        elements.closeRollRequestModal.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeRollRequestModal();
-        };
-    }
-    if (elements.cancelRollRequestBtn) {
-        elements.cancelRollRequestBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeRollRequestModal();
-        };
-    }
+    // Il modal di richiesta tiro non può essere chiuso (il giocatore deve fornire un tiro)
+    // closeRollRequestModal e cancelRollRequestBtn sono stati rimossi dall'HTML
     if (elements.rollRequestForm) {
         elements.rollRequestForm.addEventListener('submit', async function(e) {
             e.preventDefault();
