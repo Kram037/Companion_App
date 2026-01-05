@@ -3169,3 +3169,107 @@ body {
     color: var(--accent);
 }
 
+/* In-App Notifications */
+.in-app-notifications {
+    position: fixed;
+    top: 80px;
+    right: var(--spacing-md);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.in-app-notification {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    pointer-events: auto;
+    animation: slideInNotification 0.3s ease-out;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.in-app-notification:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.in-app-notification.closing {
+    animation: slideOutNotification 0.3s ease-out forwards;
+}
+
+.in-app-notification-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: var(--accent);
+}
+
+.in-app-notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.in-app-notification-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.in-app-notification-message {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.4;
+}
+
+.in-app-notification-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.in-app-notification-close:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+}
+
+@keyframes slideInNotification {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutNotification {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+

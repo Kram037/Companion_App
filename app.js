@@ -292,6 +292,7 @@ function setupSupabaseAuth() {
                 
                 // Ferma polling
                 stopPollingRollRequests();
+                stopSessionPolling();
                 
                 // Pulisci i dati quando l'utente esce
                 if (AppState.currentPage === 'campagne') {
@@ -1095,6 +1096,22 @@ function navigateToPage(pageName) {
     });
 
     AppState.currentPage = pageName;
+    
+    // Salva la pagina corrente nel localStorage
+    localStorage.setItem('currentPage', pageName);
+    
+    // Salva currentCampagnaId solo per pagine che lo richiedono
+    if (pageName === 'dettagli' || pageName === 'sessione' || pageName === 'combattimento') {
+        if (AppState.currentCampagnaId) {
+            localStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
+        }
+    } else {
+        // Per altre pagine, rimuovi currentCampagnaId se presente
+        if (pageName === 'campagne' || pageName === 'amici') {
+            localStorage.removeItem('currentCampagnaId');
+            AppState.currentCampagnaId = null;
+        }
+    }
     
     // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
@@ -3347,13 +3364,13 @@ async function renderCampagnaDetailsContent(campagna) {
         }
     }
 
-    // Renderizza azioni rapide nell'header (solo se DM)
+    // Renderizza azioni rapide nell'header
     const dettagliActionsElement = document.getElementById('dettagliActions');
     if (dettagliActionsElement) {
+        // Verifica se c'è una sessione attiva (sia per DM che giocatori)
+        const sessioneAttiva = await checkSessioneAttiva(campagna.id);
+        
         if (isDM) {
-            // Verifica se c'è una sessione attiva
-            const sessioneAttiva = await checkSessioneAttiva(campagna.id);
-            
             dettagliActionsElement.innerHTML = `
                 <div class="dettagli-actions-top">
                     <button class="btn-secondary btn-small" onclick="editCampagna('${campagna.id}')" aria-label="Modifica campagna">
@@ -3391,7 +3408,22 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             `;
         } else {
-            dettagliActionsElement.innerHTML = '';
+            // Per i giocatori, mostra solo il bottone "Sessione Attiva" se c'è una sessione attiva
+            if (sessioneAttiva) {
+                dettagliActionsElement.innerHTML = `
+                    <div class="dettagli-actions-start">
+                        <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Sessione Attiva
+                        </button>
+                    </div>
+                `;
+            } else {
+                dettagliActionsElement.innerHTML = '';
+            }
         }
     }
 
@@ -5345,7 +5377,12 @@ async function checkPendingRollRequests(userId) {
 
     try {
         const userData = await findUserByUid(userId);
-        if (!userData) return null;
+        if (!userData) {
+            console.log('⚠️ UserData non trovato per userId:', userId);
+            return null;
+        }
+
+        console.log('🔍 Controllo richieste tiro per giocatore:', userData.id);
 
         // Controlla richieste iniziativa pending
         const { data: iniziativaRequests, error: iniziativaError } = await supabase
@@ -5358,9 +5395,12 @@ async function checkPendingRollRequests(userId) {
 
         if (iniziativaError) {
             console.error('❌ Errore nel controllo richieste iniziativa:', iniziativaError);
+        } else {
+            console.log('📊 Richieste iniziativa trovate:', iniziativaRequests?.length || 0);
         }
 
         if (iniziativaRequests && iniziativaRequests.length > 0) {
+            console.log('✅ Trovata richiesta iniziativa:', iniziativaRequests[0].id);
             return {
                 id: iniziativaRequests[0].id,
                 tipo: 'iniziativa',
@@ -5379,9 +5419,12 @@ async function checkPendingRollRequests(userId) {
 
         if (genericoError) {
             console.error('❌ Errore nel controllo richieste generico:', genericoError);
+        } else {
+            console.log('📊 Richieste generico trovate:', genericoRequests?.length || 0);
         }
 
         if (genericoRequests && genericoRequests.length > 0) {
+            console.log('✅ Trovata richiesta generico:', genericoRequests[0].id);
             return {
                 id: genericoRequests[0].id,
                 tipo: 'generico',
@@ -5417,6 +5460,188 @@ function startPollingRollRequests() {
             showRollRequestModal(request);
         }
     }, 2500); // 2.5 secondi
+}
+
+/**
+ * Verifica se ci sono nuove sessioni attive per campagne dell'utente
+ */
+async function checkNewSessions(userId) {
+    if (!AppState.isLoggedIn || !userId) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const userData = await findUserByUid(userId);
+        if (!userData) return;
+
+        // Carica tutte le campagne dove l'utente è DM o giocatore
+        const { data: campagneDM, error: errorDM } = await supabase
+            .from('campagne')
+            .select('id')
+            .eq('id_dm', userData.id);
+
+        // Per le campagne dove l'utente è giocatore, carica tutte le campagne e filtra lato client
+        // (Supabase non supporta direttamente "array contains" nelle query)
+        const { data: tutteCampagne, error: errorTutte } = await supabase
+            .from('campagne')
+            .select('id, giocatori');
+        
+        let campagnePlayer = [];
+        if (!errorTutte && tutteCampagne) {
+            campagnePlayer = tutteCampagne
+                .filter(c => Array.isArray(c.giocatori) && c.giocatori.includes(userData.id))
+                .map(c => ({ id: c.id }));
+        }
+
+        if (errorDM || errorPlayer) {
+            console.error('❌ Errore nel caricamento campagne per sessioni:', errorDM || errorPlayer);
+            return;
+        }
+
+        const campagnaIds = [
+            ...(campagneDM || []).map(c => c.id),
+            ...(campagnePlayer || []).map(c => c.id)
+        ].filter((id, index, self) => self.indexOf(id) === index); // Rimuovi duplicati
+
+        if (campagnaIds.length === 0) return;
+
+        // Carica sessioni attive per queste campagne
+        const { data: sessioniAttive, error: errorSessioni } = await supabase
+            .from('sessioni')
+            .select('id, campagna_id, data_inizio')
+            .in('campagna_id', campagnaIds)
+            .is('data_fine', null)
+            .order('data_inizio', { ascending: false });
+
+        if (errorSessioni) {
+            console.error('❌ Errore nel caricamento sessioni attive:', errorSessioni);
+            return;
+        }
+
+        if (!sessioniAttive || sessioniAttive.length === 0) return;
+
+        // Controlla se ci sono sessioni nuove (non ancora notificate)
+        const lastCheckKey = 'lastSessionCheck';
+        const lastCheck = localStorage.getItem(lastCheckKey);
+        const lastCheckTime = lastCheck ? parseInt(lastCheck) : 0;
+
+        for (const sessione of sessioniAttive) {
+            const sessioneTime = new Date(sessione.data_inizio).getTime();
+            
+            // Se la sessione è più recente dell'ultimo check, notifica
+            if (sessioneTime > lastCheckTime) {
+                // Carica i dettagli della campagna
+                const { data: campagna, error: errorCampagna } = await supabase
+                    .from('campagne')
+                    .select('nome_campagna')
+                    .eq('id', sessione.campagna_id)
+                    .single();
+
+                if (!errorCampagna && campagna) {
+                    showInAppNotification({
+                        title: 'Sessione Attiva',
+                        message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
+                        campagnaId: sessione.campagna_id,
+                        sessioneId: sessione.id
+                    });
+                }
+            }
+        }
+
+        // Aggiorna il timestamp dell'ultimo check
+        localStorage.setItem(lastCheckKey, Date.now().toString());
+    } catch (error) {
+        console.error('❌ Errore nel controllo nuove sessioni:', error);
+    }
+}
+
+/**
+ * Avvia il polling per le nuove sessioni
+ */
+function startSessionPolling() {
+    // Rimuovi polling esistente se presente
+    if (window.sessionPollingInterval) {
+        clearInterval(window.sessionPollingInterval);
+    }
+
+    // Controlla ogni 5 secondi
+    window.sessionPollingInterval = setInterval(async () => {
+        if (!AppState.isLoggedIn || !AppState.currentUser) {
+            return;
+        }
+
+        await checkNewSessions(AppState.currentUser.uid);
+    }, 5000); // 5 secondi
+}
+
+/**
+ * Ferma il polling per le nuove sessioni
+ */
+function stopSessionPolling() {
+    if (window.sessionPollingInterval) {
+        clearInterval(window.sessionPollingInterval);
+        window.sessionPollingInterval = null;
+    }
+}
+
+/**
+ * Mostra una notifica in-app
+ */
+function showInAppNotification({ title, message, campagnaId, sessioneId }) {
+    const container = document.getElementById('inAppNotifications');
+    if (!container) return;
+
+    const notificationId = `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const notification = document.createElement('div');
+    notification.id = notificationId;
+    notification.className = 'in-app-notification';
+    
+    notification.innerHTML = `
+        <svg class="in-app-notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <div class="in-app-notification-content">
+            <div class="in-app-notification-title">${escapeHtml(title)}</div>
+            <div class="in-app-notification-message">${escapeHtml(message)}</div>
+        </div>
+        <button class="in-app-notification-close" onclick="closeInAppNotification('${notificationId}')" aria-label="Chiudi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    `;
+
+    // Click sulla notifica per aprire la sessione
+    if (campagnaId && sessioneId) {
+        notification.onclick = function(e) {
+            if (e.target.closest('.in-app-notification-close')) return;
+            closeInAppNotification(notificationId);
+            openSessionePage(campagnaId);
+        };
+    }
+
+    container.appendChild(notification);
+
+    // Auto-rimuovi dopo 10 secondi
+    setTimeout(() => {
+        closeInAppNotification(notificationId);
+    }, 10000);
+}
+
+/**
+ * Chiude una notifica in-app
+ */
+window.closeInAppNotification = function(notificationId) {
+    const notification = document.getElementById(notificationId);
+    if (!notification) return;
+
+    notification.classList.add('closing');
+    setTimeout(() => {
+        notification.remove();
+    }, 300);
 }
 
 /**
