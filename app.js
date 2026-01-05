@@ -107,6 +107,7 @@ async function init() {
         userEmail: document.getElementById('userEmail'),
         userCID: document.getElementById('userCID'),
         backToCampagneBtn: document.getElementById('backToCampagneBtn'),
+        backToDettagliBtn: document.getElementById('backToDettagliBtn'),
         dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
         dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
         dettagliIconContainer: document.getElementById('dettagliIconContainer'),
@@ -798,6 +799,34 @@ function setupEventListeners() {
             navigateToPage('campagne');
         };
         console.log('✅ Event listener aggiunto a backToCampagneBtn');
+    }
+
+    // Back to dettagli button (from sessione page)
+    if (elements.backToDettagliBtn) {
+        elements.backToDettagliBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                navigateToPage('dettagli');
+                await loadCampagnaDetails(campagnaId);
+            }
+        };
+        console.log('✅ Event listener aggiunto a backToDettagliBtn');
+    }
+
+    // Back to sessione button (from combattimento page)
+    if (elements.backToSessioneBtn) {
+        elements.backToSessioneBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                navigateToPage('sessione');
+                await renderSessioneContent(campagnaId);
+            }
+        };
+        console.log('✅ Event listener aggiunto a backToSessioneBtn');
     }
 
     // Edit user name button
@@ -1625,19 +1654,36 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
     // Carica i nomi dei DM per tutte le campagne usando la funzione RPC (bypassa RLS)
     const dmIds = [...new Set(campagne.map(c => c.id_dm).filter(Boolean))];
     let dmMap = new Map();
-    if (dmIds.length > 0) {
-        const supabase = getSupabaseClient();
-        if (supabase) {
-            const { data: dms, error: dmsError } = await supabase
-                .rpc('get_dms_campagne', {
-                    p_dm_ids: dmIds
-                });
+    const supabase = getSupabaseClient();
+    if (dmIds.length > 0 && supabase) {
+        const { data: dms, error: dmsError } = await supabase
+            .rpc('get_dms_campagne', {
+                p_dm_ids: dmIds
+            });
+        
+        if (dmsError) {
+            console.error('❌ Errore nel caricamento DM:', dmsError);
+        } else if (dms) {
+            dms.forEach(dm => dmMap.set(dm.id, dm));
+        }
+    }
+
+    // Carica tutte le sessioni attive per le campagne in batch
+    const campagnaIds = campagne.map(c => c.id);
+    const sessioniAttiveMap = new Map();
+    if (campagnaIds.length > 0 && supabase) {
+        try {
+            const { data: sessioniAttive, error: sessioniError } = await supabase
+                .from('sessioni')
+                .select('campagna_id')
+                .in('campagna_id', campagnaIds)
+                .is('data_fine', null);
             
-            if (dmsError) {
-                console.error('❌ Errore nel caricamento DM:', dmsError);
-            } else if (dms) {
-                dms.forEach(dm => dmMap.set(dm.id, dm));
+            if (!sessioniError && sessioniAttive) {
+                sessioniAttive.forEach(s => sessioniAttiveMap.set(s.campagna_id, true));
             }
+        } catch (error) {
+            console.error('❌ Errore nel caricamento sessioni attive:', error);
         }
     }
 
@@ -1800,14 +1846,13 @@ window.rifiutaInvitoCampagna = async function(invitoId) {
 
 function formatTempoGioco(minuti) {
     if (minuti < 60) {
-        return `${minuti} min`;
+        return `00:${minuti.toString().padStart(2, '0')}`;
     }
     const ore = Math.floor(minuti / 60);
     const min = minuti % 60;
-    if (min === 0) {
-        return `${ore}h`;
-    }
-    return `${ore}h ${min}min`;
+    // Se ore <= 99, usa formato hh:mm, altrimenti hhh:mm
+    const oreStr = ore.toString().padStart(ore > 99 ? 3 : 2, '0');
+    return `${oreStr}:${min.toString().padStart(2, '0')}`;
 }
 
 function escapeHtml(text) {
@@ -3260,36 +3305,40 @@ async function renderCampagnaDetailsContent(campagna) {
             const sessioneAttiva = await checkSessioneAttiva(campagna.id);
             
             dettagliActionsElement.innerHTML = `
-                ${sessioneAttiva ? `
-                <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    Sessione Attiva
-                </button>
-                ` : `
-                <button class="btn-primary btn-small" onclick="iniziaSessione('${campagna.id}')" aria-label="Inizia sessione">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    Inizia Sessione
-                </button>
-                `}
-                <button class="btn-secondary btn-small" onclick="editCampagna('${campagna.id}')" aria-label="Modifica campagna">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                    Modifica
-                </button>
-                <button class="btn-danger btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                    Elimina
-                </button>
+                <div class="dettagli-actions-top">
+                    <button class="btn-secondary btn-small" onclick="editCampagna('${campagna.id}')" aria-label="Modifica campagna">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Modifica
+                    </button>
+                    <button class="btn-danger btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Elimina
+                    </button>
+                </div>
+                <div class="dettagli-actions-start">
+                    ${sessioneAttiva ? `
+                    <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Sessione Attiva
+                    </button>
+                    ` : `
+                    <button class="btn-primary btn-small btn-start-session" onclick="iniziaSessione('${campagna.id}')" aria-label="Inizia sessione">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Inizia Sessione
+                    </button>
+                    `}
+                </div>
             `;
         } else {
             dettagliActionsElement.innerHTML = '';
@@ -3325,7 +3374,12 @@ async function renderCampagnaDetailsContent(campagna) {
                     <div class="info-item">
                         <span class="info-label">Creata il:</span>
                         <span class="info-value">${dataCreazione}</span>
-                        <span></span>
+                        ${isDM ? `<button class="btn-icon-small" onclick="editDataCreazione('${campagna.id}')" aria-label="Modifica data creazione">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>` : '<span></span>'}
                     </div>
                 </div>
             </div>
@@ -3787,6 +3841,45 @@ window.editDMField = async function(campagnaId) {
     }
 
     await openEditDMModal(campagnaId);
+};
+
+/**
+ * Modifica la data di creazione della campagna
+ */
+window.editDataCreazione = async function(campagnaId) {
+    // Verifica che l'utente sia il DM
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può modificare i dettagli della campagna');
+        return;
+    }
+
+    const nuovaData = await showPrompt('Inserisci la nuova data di creazione (formato: GG/MM/AAAA):', 'Modifica Data Creazione');
+    if (nuovaData === null) return;
+    
+    // Valida e converti la data
+    const dateParts = nuovaData.split('/');
+    if (dateParts.length !== 3) {
+        showNotification('Formato data non valido. Usa GG/MM/AAAA');
+        return;
+    }
+    
+    const giorno = parseInt(dateParts[0]);
+    const mese = parseInt(dateParts[1]) - 1; // I mesi sono 0-indexed in JavaScript
+    const anno = parseInt(dateParts[2]);
+    
+    if (isNaN(giorno) || isNaN(mese) || isNaN(anno)) {
+        showNotification('Inserisci una data valida');
+        return;
+    }
+    
+    const dataObj = new Date(anno, mese, giorno);
+    if (dataObj.getDate() !== giorno || dataObj.getMonth() !== mese || dataObj.getFullYear() !== anno) {
+        showNotification('Data non valida');
+        return;
+    }
+    
+    await updateCampagnaField(campagnaId, 'data_creazione', dataObj.toISOString());
 };
 
 /**
@@ -4805,6 +4898,32 @@ window.openSessionePage = async function(campagnaId) {
 };
 
 /**
+ * Calcola il numero della sessione (sessioni concluse + 1)
+ */
+async function getNumeroSessione(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return 1;
+
+    try {
+        const { count, error } = await supabase
+            .from('sessioni')
+            .select('*', { count: 'exact', head: true })
+            .eq('campagna_id', campagnaId)
+            .not('data_fine', 'is', null);
+
+        if (error) {
+            console.error('❌ Errore nel conteggio sessioni:', error);
+            return 1;
+        }
+
+        return (count || 0) + 1;
+    } catch (error) {
+        console.error('❌ Errore nel conteggio sessioni:', error);
+        return 1;
+    }
+}
+
+/**
  * Renderizza il contenuto della pagina sessione
  */
 async function renderSessioneContent(campagnaId) {
@@ -4819,6 +4938,9 @@ async function renderSessioneContent(campagnaId) {
     }
 
     try {
+        // Verifica se l'utente è DM
+        const isDM = await isCurrentUserDM(campagnaId);
+
         // Carica la campagna
         const { data: campagna, error: campagnaError } = await supabase
             .from('campagne')
@@ -4828,10 +4950,6 @@ async function renderSessioneContent(campagnaId) {
 
         if (campagnaError) throw campagnaError;
 
-        if (sessioneTitle) {
-            sessioneTitle.textContent = `Sessione: ${escapeHtml(campagna.nome_campagna)}`;
-        }
-
         // Carica la sessione attiva
         const sessione = await getSessioneAttiva(campagnaId);
         
@@ -4839,10 +4957,21 @@ async function renderSessioneContent(campagnaId) {
             sessioneContent.innerHTML = `
                 <div class="content-placeholder">
                     <p>Nessuna sessione attiva</p>
-                    <button class="btn-primary" onclick="iniziaSessione('${campagnaId}')">Inizia Sessione</button>
+                    ${isDM ? `<button class="btn-primary" onclick="iniziaSessione('${campagnaId}')">Inizia Sessione</button>` : ''}
                 </div>
             `;
+            if (sessioneTitle) {
+                sessioneTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Sessione</div>`;
+            }
             return;
+        }
+
+        // Calcola numero sessione
+        const numeroSessione = await getNumeroSessione(campagnaId);
+
+        // Aggiorna titolo
+        if (sessioneTitle) {
+            sessioneTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Sessione ${numeroSessione}</div>`;
         }
 
         // Calcola durata corrente
@@ -4852,16 +4981,8 @@ async function renderSessioneContent(campagnaId) {
         const durataOre = Math.floor(durataMinuti / 60);
         const durataMinutiResto = durataMinuti % 60;
 
-        // Carica iniziativa
-        const { data: iniziativa, error: iniziativaError } = await supabase
-            .from('iniziativa')
-            .select('*')
-            .eq('sessione_id', sessione.id)
-            .order('ordine', { ascending: true });
-
-        if (iniziativaError) {
-            console.error('❌ Errore nel caricamento iniziativa:', iniziativaError);
-        }
+        // Verifica se c'è combattimento attivo (per ora placeholder, sarà implementato dopo)
+        const inCombattimento = false; // TODO: implementare controllo combattimento
 
         sessioneContent.innerHTML = `
             <div class="sessione-timer">
@@ -4869,32 +4990,38 @@ async function renderSessioneContent(campagnaId) {
                     <span class="timer-value">${durataOre.toString().padStart(2, '0')}:${durataMinutiResto.toString().padStart(2, '0')}</span>
                     <span class="timer-label">Durata</span>
                 </div>
-                <button class="btn-danger btn-small" onclick="finisciSessione('${sessione.id}', '${campagnaId}')">
+                ${isDM ? `
+                <button class="btn-secondary btn-small" onclick="finisciSessione('${sessione.id}', '${campagnaId}')">
                     Fine Sessione
                 </button>
+                ` : ''}
             </div>
 
-            <div class="sessione-iniziativa">
-                <h2 class="sessione-section-title">Iniziativa</h2>
-                <button class="btn-primary btn-small" onclick="aggiungiIniziativa('${sessione.id}')">
-                    + Aggiungi
+            ${isDM ? `
+            <div class="sessione-actions">
+                ${inCombattimento ? `
+                <button class="btn-primary btn-small" onclick="openCombattimentoPage('${campagnaId}', '${sessione.id}')">
+                    Ritorna al combattimento
                 </button>
-                <div id="iniziativaList" class="iniziativa-list">
-                    ${iniziativa && iniziativa.length > 0 ? iniziativa.map((item, index) => `
-                        <div class="iniziativa-item" data-iniziativa-id="${item.id}">
-                            <span class="iniziativa-ordine">${item.ordine}</span>
-                            <span class="iniziativa-nome">${escapeHtml(item.personaggio_nome)}</span>
-                            <span class="iniziativa-valore">${item.valore_iniziativa}</span>
-                            <button class="btn-icon-small" onclick="rimuoviIniziativa('${item.id}', '${sessione.id}')" aria-label="Rimuovi">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    `).join('') : '<p class="no-iniziativa">Nessuna iniziativa registrata</p>'}
-                </div>
+                ` : `
+                <button class="btn-primary btn-small" onclick="richiediTiroIniziativa('${sessione.id}', '${campagnaId}')">
+                    Tirate iniziativa
+                </button>
+                `}
+                <button class="btn-secondary btn-small" onclick="richiediTiroGenerico('${sessione.id}', '${campagnaId}')">
+                    Richiedi tiro
+                </button>
             </div>
+            <div id="tiroGenericoTable" class="tiro-generico-table" style="display: none;"></div>
+            ` : `
+            ${inCombattimento ? `
+            <div class="sessione-actions">
+                <button class="btn-primary btn-small" onclick="openCombattimentoPage('${campagnaId}', '${sessione.id}')">
+                    Ritorna al combattimento
+                </button>
+            </div>
+            ` : ''}
+            `}
         `;
 
         // Avvia timer se non già avviato
@@ -5030,6 +5157,80 @@ window.aggiungiIniziativa = async function(sessioneId) {
         console.error('❌ Errore nell\'aggiunta iniziativa:', error);
         showNotification('Errore nell\'aggiunta dell\'iniziativa: ' + (error.message || error));
     }
+};
+
+/**
+ * Apre la pagina combattimento
+ */
+window.openCombattimentoPage = async function(campagnaId, sessioneId) {
+    AppState.currentCampagnaId = campagnaId;
+    AppState.currentSessioneId = sessioneId;
+    localStorage.setItem('currentCampagnaId', campagnaId);
+    localStorage.setItem('currentSessioneId', sessioneId);
+    navigateToPage('combattimento');
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+/**
+ * Renderizza il contenuto della pagina combattimento
+ */
+async function renderCombattimentoContent(campagnaId, sessioneId) {
+    const combattimentoContent = document.getElementById('combattimentoContent');
+    const combattimentoTitle = document.getElementById('combattimentoCampagnaTitle');
+    if (!combattimentoContent) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        combattimentoContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+        return;
+    }
+
+    try {
+        // Carica la campagna
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('nome_campagna')
+            .eq('id', campagnaId)
+            .single();
+
+        if (campagnaError) throw campagnaError;
+
+        // Calcola numero sessione
+        const numeroSessione = await getNumeroSessione(campagnaId);
+
+        // Aggiorna titolo
+        if (combattimentoTitle) {
+            combattimentoTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Combattimento - Sessione ${numeroSessione}</div>`;
+        }
+
+        // TODO: Caricare i tiri di iniziativa dalla tabella richieste_tiro_iniziativa
+        // Per ora mostra placeholder
+        combattimentoContent.innerHTML = `
+            <div class="content-placeholder">
+                <p>Combattimento in corso...</p>
+                <p style="margin-top: 1rem; color: var(--text-light);">I giocatori stanno tirando l'iniziativa</p>
+            </div>
+        `;
+    } catch (error) {
+        console.error('❌ Errore nel rendering combattimento:', error);
+        combattimentoContent.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
+    }
+}
+
+/**
+ * Richiede tiro iniziativa a tutti i giocatori
+ */
+window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
+    // TODO: Implementare creazione richieste tiro iniziativa
+    showNotification('Funzionalità in arrivo: Tirate iniziativa');
+};
+
+/**
+ * Richiede tiro generico a tutti i giocatori
+ */
+window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
+    // TODO: Implementare creazione richieste tiro generico
+    showNotification('Funzionalità in arrivo: Richiedi tiro');
 };
 
 /**
