@@ -108,6 +108,7 @@ async function init() {
         userCID: document.getElementById('userCID'),
         backToCampagneBtn: document.getElementById('backToCampagneBtn'),
         backToDettagliBtn: document.getElementById('backToDettagliBtn'),
+        backToSessioneBtn: document.getElementById('backToSessioneBtn'),
         dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
         dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
         dettagliIconContainer: document.getElementById('dettagliIconContainer'),
@@ -282,6 +283,10 @@ function setupSupabaseAuth() {
                     }
                 }
                 // Altre pagine possono essere aggiunte qui in futuro
+                
+                // Avvia polling per richieste tiro e sessioni
+                startPollingRollRequests();
+                startSessionPolling();
             });
             } else {
                 // User is signed out
@@ -337,6 +342,10 @@ async function checkAuthState() {
                     loadAmici();
                 }
             }
+            
+            // Avvia polling per richieste tiro e sessioni
+            startPollingRollRequests();
+            startSessionPolling();
         } else {
             updateUIForLoggedOut();
             
@@ -5344,7 +5353,20 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                 </div>
             `).join('');
 
-            combattimentoContent.innerHTML = cardsHTML;
+            // Verifica se l'utente è il DM
+            const isDM = await isCurrentUserDM(campagnaId);
+            
+            combattimentoContent.innerHTML = cardsHTML + (isDM ? `
+                <div style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
+                    <button class="btn-danger" onclick="terminaCombattimento('${campagnaId}', '${sessioneId}')" aria-label="Termina combattimento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Termina Combattimento
+                    </button>
+                </div>
+            ` : '');
         }
     } catch (error) {
         console.error('❌ Errore nel rendering combattimento:', error);
