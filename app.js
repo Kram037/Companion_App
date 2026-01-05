@@ -5773,8 +5773,8 @@ async function checkAllIniziativaCompleted(sessioneId) {
 
         if (!campagna) return;
 
-        // Lista tutti i partecipanti (DM + giocatori)
-        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
+        // Lista solo i giocatori (DM esonerato)
+        const partecipanti = (campagna.giocatori || []).filter(Boolean);
 
         // Controlla se tutte le richieste sono completed
         const { data: richieste, error } = await supabase
@@ -5788,8 +5788,8 @@ async function checkAllIniziativaCompleted(sessioneId) {
             (richieste || []).filter(r => r.stato === 'completed').map(r => r.giocatore_id)
         );
 
-        // Se tutti i partecipanti hanno completato, porta i giocatori alla pagina combattimento
-        const allCompleted = partecipanti.every(id => completedGiocatori.has(id));
+        // Se tutti i giocatori hanno completato, porta i giocatori alla pagina combattimento
+        const allCompleted = partecipanti.length > 0 && partecipanti.every(id => completedGiocatori.has(id));
 
         if (allCompleted && partecipanti.length > 0) {
             // Se l'utente corrente è nella sessione, portalo al combattimento
