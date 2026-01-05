@@ -339,6 +339,25 @@
         </div>
     </div>
 
+    <!-- Roll Request Modal -->
+    <div class="modal" id="rollRequestModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeRollRequestModal">&times;</button>
+            <h2 id="rollRequestTitle">Tiro Richiesto</h2>
+            <p id="rollRequestMessage">Il DM ti ha richiesto di fare un tiro</p>
+            <form id="rollRequestForm">
+                <div class="form-group">
+                    <label id="rollRequestLabel" for="rollRequestInput">Risultato del tiro:</label>
+                    <input type="number" id="rollRequestInput" name="rollRequestInput" required min="1" max="999" placeholder="Inserisci il risultato">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelRollRequestBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="submitRollRequestBtn">Invia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Invita Giocatori Modal -->
     <div class="modal" id="invitaGiocatoriModal">
         <div class="modal-content">

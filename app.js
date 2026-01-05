@@ -164,7 +164,16 @@ async function init() {
         confirmDialogTitle: document.getElementById('confirmDialogTitle'),
         confirmDialogMessage: document.getElementById('confirmDialogMessage'),
         cancelConfirmDialogBtn: document.getElementById('cancelConfirmDialogBtn'),
-        confirmDialogBtn: document.getElementById('confirmDialogBtn')
+        confirmDialogBtn: document.getElementById('confirmDialogBtn'),
+        rollRequestModal: document.getElementById('rollRequestModal'),
+        closeRollRequestModal: document.getElementById('closeRollRequestModal'),
+        rollRequestTitle: document.getElementById('rollRequestTitle'),
+        rollRequestMessage: document.getElementById('rollRequestMessage'),
+        rollRequestLabel: document.getElementById('rollRequestLabel'),
+        rollRequestInput: document.getElementById('rollRequestInput'),
+        rollRequestForm: document.getElementById('rollRequestForm'),
+        cancelRollRequestBtn: document.getElementById('cancelRollRequestBtn'),
+        submitRollRequestBtn: document.getElementById('submitRollRequestBtn')
     };
 
     // Check if all required elements exist
@@ -280,6 +289,9 @@ function setupSupabaseAuth() {
                 AppState.isLoggedIn = false;
                 updateUIForLoggedOut();
                 console.log('👤 Utente non autenticato');
+                
+                // Ferma polling
+                stopPollingRollRequests();
                 
                 // Pulisci i dati quando l'utente esce
                 if (AppState.currentPage === 'campagne') {
@@ -937,6 +949,44 @@ function setupEventListeners() {
     
     // Icon selector setup
     setupIconSelector();
+
+    // Roll request modal setup
+    if (elements.closeRollRequestModal) {
+        elements.closeRollRequestModal.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeRollRequestModal();
+        };
+    }
+    if (elements.cancelRollRequestBtn) {
+        elements.cancelRollRequestBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeRollRequestModal();
+        };
+    }
+    if (elements.rollRequestForm) {
+        elements.rollRequestForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.currentRollRequest) {
+                const valore = parseInt(elements.rollRequestInput.value);
+                if (isNaN(valore) || valore < 1) {
+                    showNotification('Inserisci un numero valido (minimo 1)');
+                    return;
+                }
+                await submitRollRequest(window.currentRollRequest.id, window.currentRollRequest.tipo, valore);
+                closeRollRequestModal();
+            }
+        });
+    }
+    if (elements.rollRequestModal) {
+        elements.rollRequestModal.addEventListener('click', (e) => {
+            if (e.target === elements.rollRequestModal) {
+                closeRollRequestModal();
+            }
+        });
+    }
 
     // Confirm dialog modal setup
     if (elements.confirmDialogBtn) {
@@ -5203,14 +5253,49 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             combattimentoTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Combattimento - Sessione ${numeroSessione}</div>`;
         }
 
-        // TODO: Caricare i tiri di iniziativa dalla tabella richieste_tiro_iniziativa
-        // Per ora mostra placeholder
-        combattimentoContent.innerHTML = `
-            <div class="content-placeholder">
-                <p>Combattimento in corso...</p>
-                <p style="margin-top: 1rem; color: var(--text-light);">I giocatori stanno tirando l'iniziativa</p>
-            </div>
-        `;
+        // Carica i tiri di iniziativa dalla tabella richieste_tiro_iniziativa
+        const { data: tiriIniziativa, error: tiriError } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .select(`
+                *,
+                utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)
+            `)
+            .eq('sessione_id', sessioneId)
+            .order('valore', { ascending: false });
+
+        if (tiriError) {
+            console.error('❌ Errore nel caricamento tiri iniziativa:', tiriError);
+        }
+
+        const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
+        
+        if (tiriCompleted.length === 0) {
+            combattimentoContent.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Combattimento in corso...</p>
+                    <p style="margin-top: 1rem; color: var(--text-light);">I giocatori stanno tirando l'iniziativa</p>
+                </div>
+            `;
+        } else {
+            const cardsHTML = tiriCompleted.map((tiro, index) => `
+                <div class="combattimento-card" style="padding: var(--spacing-md); background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-md); margin-bottom: var(--spacing-md);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">#${index + 1}</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: var(--spacing-xs);">
+                                ${escapeHtml(tiro.utenti?.nome_utente || 'Sconosciuto')}
+                                ${tiro.utenti?.cid ? ` <span style="color: var(--text-light); font-size: 0.9rem;">(CID: ${tiro.utenti.cid})</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--text-primary);">
+                            ${tiro.valore}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            combattimentoContent.innerHTML = cardsHTML;
+        }
     } catch (error) {
         console.error('❌ Errore nel rendering combattimento:', error);
         combattimentoContent.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
@@ -5218,19 +5303,518 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 }
 
 /**
+ * Chiude il modal di richiesta tiro
+ */
+function closeRollRequestModal() {
+    if (elements.rollRequestModal) {
+        elements.rollRequestModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    if (elements.rollRequestInput) {
+        elements.rollRequestInput.value = '';
+    }
+    window.currentRollRequest = null;
+}
+
+/**
+ * Verifica se ci sono richieste tiro pending per l'utente corrente
+ */
+async function checkPendingRollRequests(userId) {
+    if (!AppState.isLoggedIn || !userId) return null;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return null;
+
+    try {
+        const userData = await findUserByUid(userId);
+        if (!userData) return null;
+
+        // Controlla richieste iniziativa pending
+        const { data: iniziativaRequests, error: iniziativaError } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .select('*')
+            .eq('giocatore_id', userData.id)
+            .eq('stato', 'pending')
+            .order('timestamp', { ascending: false })
+            .limit(1);
+
+        if (iniziativaError) {
+            console.error('❌ Errore nel controllo richieste iniziativa:', iniziativaError);
+        }
+
+        if (iniziativaRequests && iniziativaRequests.length > 0) {
+            return {
+                id: iniziativaRequests[0].id,
+                tipo: 'iniziativa',
+                sessione_id: iniziativaRequests[0].sessione_id
+            };
+        }
+
+        // Controlla richieste tiro generico pending
+        const { data: genericoRequests, error: genericoError } = await supabase
+            .from('richieste_tiro_generico')
+            .select('*')
+            .eq('giocatore_id', userData.id)
+            .eq('stato', 'pending')
+            .order('timestamp', { ascending: false })
+            .limit(1);
+
+        if (genericoError) {
+            console.error('❌ Errore nel controllo richieste generico:', genericoError);
+        }
+
+        if (genericoRequests && genericoRequests.length > 0) {
+            return {
+                id: genericoRequests[0].id,
+                tipo: 'generico',
+                sessione_id: genericoRequests[0].sessione_id,
+                richiesta_id: genericoRequests[0].richiesta_id
+            };
+        }
+
+        return null;
+    } catch (error) {
+        console.error('❌ Errore nel controllo richieste tiro:', error);
+        return null;
+    }
+}
+
+/**
+ * Avvia il polling per le richieste tiro
+ */
+function startPollingRollRequests() {
+    // Rimuovi polling esistente se presente
+    if (window.rollRequestPollingInterval) {
+        clearInterval(window.rollRequestPollingInterval);
+    }
+
+    // Controlla ogni 2-3 secondi
+    window.rollRequestPollingInterval = setInterval(async () => {
+        if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
+            return; // Non controllare se non loggato o se c'è già un popup aperto
+        }
+
+        const request = await checkPendingRollRequests(AppState.currentUser.uid);
+        if (request) {
+            showRollRequestModal(request);
+        }
+    }, 2500); // 2.5 secondi
+}
+
+/**
+ * Ferma il polling per le richieste tiro
+ */
+function stopPollingRollRequests() {
+    if (window.rollRequestPollingInterval) {
+        clearInterval(window.rollRequestPollingInterval);
+        window.rollRequestPollingInterval = null;
+    }
+}
+
+/**
+ * Mostra il modal per la richiesta tiro
+ */
+function showRollRequestModal(request) {
+    if (!elements.rollRequestModal) return;
+
+    window.currentRollRequest = request;
+
+    if (elements.rollRequestTitle) {
+        elements.rollRequestTitle.textContent = request.tipo === 'iniziativa' 
+            ? 'Tiro di Iniziativa' 
+            : 'Tiro Richiesto';
+    }
+    if (elements.rollRequestMessage) {
+        elements.rollRequestMessage.textContent = request.tipo === 'iniziativa'
+            ? 'Il DM ti ha richiesto di fare un tiro di iniziativa (d20 + modificatori)'
+            : 'Il DM ti ha richiesto di fare un tiro (d20)';
+    }
+    if (elements.rollRequestLabel) {
+        elements.rollRequestLabel.textContent = request.tipo === 'iniziativa'
+            ? 'Risultato del tiro (d20 + modificatori):'
+            : 'Risultato del tiro (d20):';
+    }
+    if (elements.rollRequestInput) {
+        elements.rollRequestInput.value = '';
+        elements.rollRequestInput.min = '1';
+        elements.rollRequestInput.max = request.tipo === 'iniziativa' ? '999' : '20';
+    }
+
+    elements.rollRequestModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        if (elements.rollRequestInput) {
+            elements.rollRequestInput.focus();
+        }
+    }, 100);
+}
+
+/**
+ * Invia il risultato di un tiro (globale per essere chiamata dal form)
+ */
+window.submitRollRequest = async function(requestId, tipo, valore) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        const tableName = tipo === 'iniziativa' 
+            ? 'richieste_tiro_iniziativa' 
+            : 'richieste_tiro_generico';
+
+        const { error } = await supabase
+            .from(tableName)
+            .update({ 
+                valore: valore,
+                stato: 'completed',
+                timestamp: new Date().toISOString()
+            })
+            .eq('id', requestId);
+
+        if (error) throw error;
+
+        showNotification('Tiro inviato!');
+
+        // Se è un tiro iniziativa, verifica se tutti hanno completato
+        if (tipo === 'iniziativa') {
+            const { data: richiesta } = await supabase
+                .from('richieste_tiro_iniziativa')
+                .select('sessione_id')
+                .eq('id', requestId)
+                .single();
+
+            if (richiesta) {
+                await checkAllIniziativaCompleted(richiesta.sessione_id);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Errore nell\'invio tiro:', error);
+        showNotification('Errore nell\'invio del tiro: ' + (error.message || error));
+    }
+}
+
+/**
+ * Verifica se tutti i giocatori hanno completato il tiro iniziativa
+ */
+async function checkAllIniziativaCompleted(sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const { data: sessione } = await supabase
+            .from('sessioni')
+            .select('campagna_id')
+            .eq('id', sessioneId)
+            .single();
+
+        if (!sessione) return;
+
+        const { data: campagna } = await supabase
+            .from('campagne')
+            .select('giocatori, id_dm')
+            .eq('id', sessione.campagna_id)
+            .single();
+
+        if (!campagna) return;
+
+        // Lista tutti i partecipanti (DM + giocatori)
+        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
+
+        // Controlla se tutte le richieste sono completed
+        const { data: richieste, error } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .select('giocatore_id, stato')
+            .eq('sessione_id', sessioneId);
+
+        if (error) throw error;
+
+        const completedGiocatori = new Set(
+            (richieste || []).filter(r => r.stato === 'completed').map(r => r.giocatore_id)
+        );
+
+        // Se tutti i partecipanti hanno completato, porta i giocatori alla pagina combattimento
+        const allCompleted = partecipanti.every(id => completedGiocatori.has(id));
+
+        if (allCompleted && partecipanti.length > 0) {
+            // Se l'utente corrente è nella sessione, portalo al combattimento
+            const userData = await findUserByUid(AppState.currentUser.uid);
+            if (userData && partecipanti.includes(userData.id)) {
+                navigateToPage('combattimento');
+                await renderCombattimentoContent(sessione.campagna_id, sessioneId);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Errore nel controllo completamento iniziativa:', error);
+    }
+}
+
+/**
  * Richiede tiro iniziativa a tutti i giocatori
  */
 window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
-    // TODO: Implementare creazione richieste tiro iniziativa
-    showNotification('Funzionalità in arrivo: Tirate iniziativa');
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che l'utente sia il DM
+        const isDM = await isCurrentUserDM(campagnaId);
+        if (!isDM) {
+            showNotification('Solo il DM può richiedere tiri');
+            return;
+        }
+
+        // Carica la campagna per ottenere i giocatori
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('giocatori, id_dm')
+            .eq('id', campagnaId)
+            .single();
+
+        if (campagnaError) throw campagnaError;
+
+        // Rimuovi eventuali richieste pending per questa sessione
+        await supabase
+            .from('richieste_tiro_iniziativa')
+            .delete()
+            .eq('sessione_id', sessioneId);
+
+        // Crea richieste per tutti i partecipanti (DM + giocatori)
+        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
+        
+        const richieste = partecipanti.map(giocatoreId => ({
+            sessione_id: sessioneId,
+            giocatore_id: giocatoreId,
+            stato: 'pending'
+        }));
+
+        const { error: insertError } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .insert(richieste);
+
+        if (insertError) throw insertError;
+
+        showNotification('Richieste tiro iniziativa inviate!');
+        
+        // Apri pagina combattimento per il DM
+        navigateToPage('combattimento');
+        await renderCombattimentoContent(campagnaId, sessioneId);
+    } catch (error) {
+        console.error('❌ Errore nella richiesta tiro iniziativa:', error);
+        showNotification('Errore nella richiesta tiro iniziativa: ' + (error.message || error));
+    }
 };
 
 /**
  * Richiede tiro generico a tutti i giocatori
  */
 window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
-    // TODO: Implementare creazione richieste tiro generico
-    showNotification('Funzionalità in arrivo: Richiedi tiro');
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che l'utente sia il DM
+        const isDM = await isCurrentUserDM(campagnaId);
+        if (!isDM) {
+            showNotification('Solo il DM può richiedere tiri');
+            return;
+        }
+
+        // Carica la campagna per ottenere i giocatori
+        const { data: campagna, error: campagnaError } = await supabase
+            .from('campagne')
+            .select('giocatori, id_dm')
+            .eq('id', campagnaId)
+            .single();
+
+        if (campagnaError) throw campagnaError;
+
+        // Genera un ID univoco per questa richiesta (round)
+        const richiestaId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // Crea richieste per tutti i partecipanti (DM + giocatori)
+        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
+        
+        const richieste = partecipanti.map(giocatoreId => ({
+            sessione_id: sessioneId,
+            richiesta_id: richiestaId,
+            giocatore_id: giocatoreId,
+            stato: 'pending'
+        }));
+
+        const { error: insertError } = await supabase
+            .from('richieste_tiro_generico')
+            .insert(richieste);
+
+        if (insertError) throw insertError;
+
+        showNotification('Richieste tiro inviate!');
+        
+        // Salva richiesta_id corrente
+        window.currentTiroGenericoRichiestaId = richiestaId;
+        
+        // Aggiorna la tabella tiri generici
+        await updateTiroGenericoTable(sessioneId, richiestaId);
+    } catch (error) {
+        console.error('❌ Errore nella richiesta tiro generico:', error);
+        showNotification('Errore nella richiesta tiro generico: ' + (error.message || error));
+    }
+};
+
+/**
+ * Avvia polling per aggiornare la tabella tiri generici
+ */
+function startTiroGenericoPolling(sessioneId) {
+    if (window.tiroGenericoPollingInterval) {
+        clearInterval(window.tiroGenericoPollingInterval);
+    }
+
+    window.tiroGenericoPollingInterval = setInterval(async () => {
+        if (window.currentTiroGenericoRichiestaId) {
+            await updateTiroGenericoTable(sessioneId, window.currentTiroGenericoRichiestaId);
+        }
+    }, 2000); // Aggiorna ogni 2 secondi
+}
+
+/**
+ * Ferma il polling per la tabella tiri generici
+ */
+function stopTiroGenericoPolling() {
+    if (window.tiroGenericoPollingInterval) {
+        clearInterval(window.tiroGenericoPollingInterval);
+        window.tiroGenericoPollingInterval = null;
+    }
+}
+
+/**
+ * Aggiorna la tabella tiri generici nella pagina sessione
+ */
+async function updateTiroGenericoTable(sessioneId, richiestaId) {
+    const tableElement = document.getElementById('tiroGenericoTable');
+    if (!tableElement) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        // Carica tutti i tiri per questa richiesta
+        const { data: tiri, error } = await supabase
+            .from('richieste_tiro_generico')
+            .select(`
+                *,
+                utenti!richieste_tiro_generico_giocatore_id_fkey(nome_utente, cid)
+            `)
+            .eq('sessione_id', sessioneId)
+            .eq('richiesta_id', richiestaId)
+            .order('timestamp', { ascending: false });
+
+        if (error) throw error;
+
+        if (!tiri || tiri.length === 0) {
+            tableElement.style.display = 'none';
+            return;
+        }
+
+        tableElement.style.display = 'block';
+
+        const tableHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
+                <h3 style="margin: 0;">Tiri Richiesti</h3>
+                <button class="btn-secondary btn-small" onclick="chiudiTabellaTiri('${sessioneId}', '${richiestaId}')" style="width: auto; padding: var(--spacing-xs) var(--spacing-sm);">
+                    Chiudi
+                </button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Giocatore</th>
+                        <th style="text-align: right; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Risultato</th>
+                        <th style="text-align: center; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Stato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tiri.map(tiro => `
+                        <tr>
+                            <td style="padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
+                                ${escapeHtml(tiro.utenti?.nome_utente || 'Sconosciuto')}
+                                ${tiro.utenti?.cid ? ` (CID: ${tiro.utenti.cid})` : ''}
+                            </td>
+                            <td style="text-align: right; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
+                                ${tiro.valore !== null ? tiro.valore : '-'}
+                            </td>
+                            <td style="text-align: center; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
+                                ${tiro.stato === 'completed' ? '✓' : '⏳'}
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        tableElement.innerHTML = tableHTML;
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiornamento tabella tiri:', error);
+    }
+}
+
+/**
+ * Chiude e cancella la tabella tiri generici
+ */
+window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che l'utente sia il DM
+        const { data: sessione } = await supabase
+            .from('sessioni')
+            .select('campagna_id')
+            .eq('id', sessioneId)
+            .single();
+
+        if (!sessione) return;
+
+        const isDM = await isCurrentUserDM(sessione.campagna_id);
+        if (!isDM) {
+            showNotification('Solo il DM può chiudere la tabella');
+            return;
+        }
+
+        // Cancella tutte le richieste per questa richiesta_id
+        const { error } = await supabase
+            .from('richieste_tiro_generico')
+            .delete()
+            .eq('sessione_id', sessioneId)
+            .eq('richiesta_id', richiestaId);
+
+        if (error) throw error;
+
+        // Nascondi la tabella
+        const tableElement = document.getElementById('tiroGenericoTable');
+        if (tableElement) {
+            tableElement.style.display = 'none';
+        }
+
+        // Reset richiesta_id corrente
+        if (window.currentTiroGenericoRichiestaId === richiestaId) {
+            window.currentTiroGenericoRichiestaId = null;
+        }
+
+        showNotification('Tabella tiri chiusa');
+    } catch (error) {
+        console.error('❌ Errore nella chiusura tabella tiri:', error);
+        showNotification('Errore nella chiusura tabella: ' + (error.message || error));
+    }
 };
 
 /**
