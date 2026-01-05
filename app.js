@@ -5031,8 +5031,14 @@ async function renderSessioneContent(campagnaId) {
         const durataOre = Math.floor(durataMinuti / 60);
         const durataMinutiResto = durataMinuti % 60;
 
-        // Verifica se c'è combattimento attivo (per ora placeholder, sarà implementato dopo)
-        const inCombattimento = false; // TODO: implementare controllo combattimento
+        // Verifica se c'è combattimento attivo (ci sono richieste tiro iniziativa per questa sessione)
+        const { data: richiesteIniziativa } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .select('id, stato')
+            .eq('sessione_id', sessione.id)
+            .limit(1);
+        
+        const inCombattimento = richiesteIniziativa && richiesteIniziativa.length > 0;
 
         sessioneContent.innerHTML = `
             <div class="sessione-timer">
