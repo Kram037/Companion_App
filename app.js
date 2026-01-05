@@ -5084,6 +5084,18 @@ async function renderSessioneContent(campagnaId) {
         if (!window.sessioneTimerInterval) {
             startSessioneTimer(campagnaId);
         }
+
+        // Se c'è una tabella tiri generici da mostrare, aggiornala
+        if (isDM && window.currentTiroGenericoRichiestaId) {
+            await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
+        }
+
+        // Avvia polling per aggiornare la tabella tiri generici
+        if (isDM && !window.tiroGenericoPollingInterval) {
+            startTiroGenericoPolling(sessione.id);
+        } else if (!isDM && window.tiroGenericoPollingInterval) {
+            stopTiroGenericoPolling();
+        }
     } catch (error) {
         console.error('❌ Errore nel rendering sessione:', error);
         sessioneContent.innerHTML = '<p>Errore nel caricamento della sessione</p>';
