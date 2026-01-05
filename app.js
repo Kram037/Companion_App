@@ -990,13 +990,14 @@ function setupEventListeners() {
             }
         });
     }
-    if (elements.rollRequestModal) {
-        elements.rollRequestModal.addEventListener('click', (e) => {
-            if (e.target === elements.rollRequestModal) {
-                closeRollRequestModal();
-            }
-        });
-    }
+    // Il modal di richiesta tiro non può essere chiuso cliccando fuori (il giocatore deve fornire un tiro)
+    // if (elements.rollRequestModal) {
+    //     elements.rollRequestModal.addEventListener('click', (e) => {
+    //         if (e.target === elements.rollRequestModal) {
+    //             closeRollRequestModal();
+    //         }
+    //     });
+    // }
 
     // Confirm dialog modal setup
     if (elements.confirmDialogBtn) {
@@ -5848,8 +5849,8 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
             .delete()
             .eq('sessione_id', sessioneId);
 
-        // Crea richieste per tutti i partecipanti (DM + giocatori)
-        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
+        // Crea richieste solo per i giocatori (escludi il DM)
+        const partecipanti = (campagna.giocatori || []).filter(Boolean);
         
         const richieste = partecipanti.map(giocatoreId => ({
             sessione_id: sessioneId,
