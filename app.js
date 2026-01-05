@@ -6083,6 +6083,43 @@ window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
 };
 
 /**
+ * Termina il combattimento eliminando tutte le richieste di iniziativa
+ */
+window.terminaCombattimento = async function(campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+        showNotification('Errore: Supabase non disponibile');
+        return;
+    }
+
+    try {
+        // Verifica che l'utente sia il DM
+        const isDM = await isCurrentUserDM(campagnaId);
+        if (!isDM) {
+            showNotification('Solo il DM può terminare il combattimento');
+            return;
+        }
+
+        // Elimina tutte le richieste di iniziativa per questa sessione
+        const { error: deleteError } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .delete()
+            .eq('sessione_id', sessioneId);
+
+        if (deleteError) throw deleteError;
+
+        showNotification('Combattimento terminato');
+        
+        // Torna alla pagina sessione
+        navigateToPage('sessione');
+        await renderSessioneContent(campagnaId);
+    } catch (error) {
+        console.error('❌ Errore nella terminazione combattimento:', error);
+        showNotification('Errore nella terminazione del combattimento: ' + (error.message || error));
+    }
+};
+
+/**
  * Rimuove una voce dall'iniziativa
  */
 window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
