@@ -4561,10 +4561,13 @@ async function handleGoogleLogin() {
         elements.googleLoginBtn.disabled = true;
         elements.googleLoginBtn.textContent = 'Accesso in corso...';
         
+        // Usa l'URL completo corrente come redirect
+        const redirectUrl = window.location.origin + window.location.pathname;
+        
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin
+                redirectTo: redirectUrl
             }
         });
         
