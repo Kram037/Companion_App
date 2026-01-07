@@ -66,9 +66,9 @@ const AppState = {
     campagnaGiocatori: [],
     campagneFilters: {
         searchText: '',
-        role: 'all',
-        soloPreferiti: false,
-        dateSort: 'all'
+        tipologia: 'all',
+        dm: 'all',
+        soloPreferiti: false
     }
 };
 
@@ -1404,11 +1404,9 @@ async function loadCampagne(userId) {
 
         // Ordina le campagne: prima i preferiti, poi per data di creazione (più recenti prima)
         campagne.sort((a, b) => {
-            // Preferiti in cima (solo se non c'è un filtro data specifico)
-            if (AppState.campagneFilters.dateSort === 'all') {
-                if (a.isPreferito && !b.isPreferito) return -1;
-                if (!a.isPreferito && b.isPreferito) return 1;
-            }
+            // Preferiti in cima
+            if (a.isPreferito && !b.isPreferito) return -1;
+            if (!a.isPreferito && b.isPreferito) return 1;
             // Tra preferiti o tra non preferiti, ordina per data di creazione (più recenti prima)
             return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
         });
@@ -1527,15 +1525,20 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
         );
     }
 
-    // Filtro per ruolo (DM o giocatore)
-    if (filters.role === 'dm') {
+    // Filtro per tipologia (se il campo esiste nel database)
+    if (filters.tipologia && filters.tipologia !== 'all') {
+        filtered = filtered.filter(c => {
+            // Se il campo tipologia non esiste, ignora il filtro
+            if (!c.tipologia) return true;
+            return c.tipologia === filters.tipologia;
+        });
+    }
+
+    // Filtro per DM
+    if (filters.dm === 'yes') {
         filtered = filtered.filter(c => c.id_dm === currentUserId);
-    } else if (filters.role === 'player') {
-        filtered = filtered.filter(c => 
-            c.id_dm !== currentUserId && 
-            Array.isArray(c.giocatori) && 
-            c.giocatori.includes(currentUserId)
-        );
+    } else if (filters.dm === 'no') {
+        filtered = filtered.filter(c => c.id_dm !== currentUserId);
     }
 
     // Filtro per preferiti
@@ -1543,26 +1546,16 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
         filtered = filtered.filter(c => c.isPreferito === true);
     }
 
-    // Ordinamento per data (se non è 'all')
-    if (filters.dateSort === 'recent') {
-        filtered.sort((a, b) => {
-            // Mantieni preferiti in cima anche con ordinamento data
-            if (a.isPreferito && !b.isPreferito) return -1;
-            if (!a.isPreferito && b.isPreferito) return 1;
-            const dateA = new Date(a.data_creazione || 0);
-            const dateB = new Date(b.data_creazione || 0);
-            return dateB - dateA; // Più recenti prima
-        });
-    } else if (filters.dateSort === 'oldest') {
-        filtered.sort((a, b) => {
-            // Mantieni preferiti in cima anche con ordinamento data
-            if (a.isPreferito && !b.isPreferito) return -1;
-            if (!a.isPreferito && b.isPreferito) return 1;
-            const dateA = new Date(a.data_creazione || 0);
-            const dateB = new Date(b.data_creazione || 0);
-            return dateA - dateB; // Più vecchie prima
-        });
-    }
+    // Ordinamento: prima i preferiti, poi per data di creazione (più recenti prima)
+    filtered.sort((a, b) => {
+        // Preferiti in cima
+        if (a.isPreferito && !b.isPreferito) return -1;
+        if (!a.isPreferito && b.isPreferito) return 1;
+        // Tra preferiti o tra non preferiti, ordina per data di creazione (più recenti prima)
+        const dateA = new Date(a.data_creazione || 0);
+        const dateB = new Date(b.data_creazione || 0);
+        return dateB - dateA;
+    });
 
     return filtered;
 }
@@ -1571,10 +1564,37 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
  * Setup event listeners per i filtri campagne
  */
 function setupCampagneFilters() {
+    const openFiltersBtn = document.getElementById('openFiltersBtn');
+    const filtersDropdown = document.getElementById('filtersDropdown');
     const searchInput = document.getElementById('campagneSearchInput');
-    const roleFilter = document.getElementById('campagneRoleFilter');
+    const tipologiaFilter = document.getElementById('campagneTipologiaFilter');
+    const dmFilter = document.getElementById('campagneDMFilter');
     const preferitiFilter = document.getElementById('togglePreferitiFilter');
-    const dateFilter = document.getElementById('campagneDateFilter');
+
+    // Apri/chiudi tendina filtri
+    if (openFiltersBtn && filtersDropdown) {
+        openFiltersBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = filtersDropdown.classList.contains('active');
+            if (isActive) {
+                filtersDropdown.classList.remove('active');
+                openFiltersBtn.classList.remove('active');
+            } else {
+                filtersDropdown.classList.add('active');
+                openFiltersBtn.classList.add('active');
+            }
+        });
+
+        // Chiudi tendina quando si clicca fuori
+        document.addEventListener('click', (e) => {
+            if (filtersDropdown && filtersDropdown.classList.contains('active')) {
+                if (!filtersDropdown.contains(e.target) && !openFiltersBtn.contains(e.target)) {
+                    filtersDropdown.classList.remove('active');
+                    openFiltersBtn.classList.remove('active');
+                }
+            }
+        });
+    }
 
     // Debounce per ricerca testuale
     let searchTimeout;
@@ -1588,25 +1608,23 @@ function setupCampagneFilters() {
         });
     }
 
-    if (roleFilter) {
-        roleFilter.addEventListener('change', (e) => {
-            AppState.campagneFilters.role = e.target.value;
+    if (tipologiaFilter) {
+        tipologiaFilter.addEventListener('change', (e) => {
+            AppState.campagneFilters.tipologia = e.target.value;
+            applyFiltersAndRerender();
+        });
+    }
+
+    if (dmFilter) {
+        dmFilter.addEventListener('change', (e) => {
+            AppState.campagneFilters.dm = e.target.value;
             applyFiltersAndRerender();
         });
     }
 
     if (preferitiFilter) {
-        preferitiFilter.addEventListener('click', (e) => {
-            e.preventDefault();
-            AppState.campagneFilters.soloPreferiti = !AppState.campagneFilters.soloPreferiti;
-            preferitiFilter.classList.toggle('active', AppState.campagneFilters.soloPreferiti);
-            applyFiltersAndRerender();
-        });
-    }
-
-    if (dateFilter) {
-        dateFilter.addEventListener('change', (e) => {
-            AppState.campagneFilters.dateSort = e.target.value;
+        preferitiFilter.addEventListener('change', (e) => {
+            AppState.campagneFilters.soloPreferiti = e.target.checked;
             applyFiltersAndRerender();
         });
     }
@@ -1619,11 +1637,9 @@ function setupCampagneFilters() {
             AppState.campagneFilters = { ...AppState.campagneFilters, ...parsed };
             // Applica i valori salvati agli input
             if (searchInput) searchInput.value = AppState.campagneFilters.searchText || '';
-            if (roleFilter) roleFilter.value = AppState.campagneFilters.role || 'all';
-            if (preferitiFilter) {
-                preferitiFilter.classList.toggle('active', AppState.campagneFilters.soloPreferiti);
-            }
-            if (dateFilter) dateFilter.value = AppState.campagneFilters.dateSort || 'all';
+            if (tipologiaFilter) tipologiaFilter.value = AppState.campagneFilters.tipologia || 'all';
+            if (dmFilter) dmFilter.value = AppState.campagneFilters.dm || 'all';
+            if (preferitiFilter) preferitiFilter.checked = AppState.campagneFilters.soloPreferiti || false;
         } catch (e) {
             console.warn('Errore nel caricamento filtri salvati:', e);
         }

@@ -47,19 +47,43 @@
                     <h1>Campagne</h1>
                     <button class="btn-primary btn-icon" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
                 </div>
-                <div class="filters-bar" id="filtersBar">
-                    <input type="text" id="campagneSearchInput" class="filter-input" placeholder="Cerca per nome...">
-                    <select id="campagneRoleFilter" class="filter-select">
-                        <option value="all">Tutte</option>
-                        <option value="dm">Solo dove sono DM</option>
-                        <option value="player">Solo dove sono giocatore</option>
-                    </select>
-                    <button id="togglePreferitiFilter" class="filter-btn">Solo Preferiti</button>
-                    <select id="campagneDateFilter" class="filter-select">
-                        <option value="all">Tutte le date</option>
-                        <option value="recent">Più recenti</option>
-                        <option value="oldest">Più vecchie</option>
-                    </select>
+                <div class="filters-container">
+                    <button class="btn-filters" id="openFiltersBtn" aria-label="Filtri">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span>Filtri</span>
+                    </button>
+                    <div class="filters-dropdown" id="filtersDropdown">
+                        <div class="filters-dropdown-content">
+                            <div class="filter-group">
+                                <label for="campagneSearchInput">Ricerca per nome</label>
+                                <input type="text" id="campagneSearchInput" class="filter-input" placeholder="Cerca per nome...">
+                            </div>
+                            <div class="filter-group">
+                                <label for="campagneTipologiaFilter">Tipologia</label>
+                                <select id="campagneTipologiaFilter" class="filter-select">
+                                    <option value="all">Tutte</option>
+                                    <option value="lunghe">Campagne lunghe</option>
+                                    <option value="one-shot">One-shot</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="campagneDMFilter">DM</label>
+                                <select id="campagneDMFilter" class="filter-select">
+                                    <option value="all">Tutte</option>
+                                    <option value="yes">Solo dove sono DM</option>
+                                    <option value="no">Solo dove non sono DM</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" id="togglePreferitiFilter" class="filter-checkbox">
+                                    <span>Preferiti</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="campagneList" class="campagne-list">
                     <div class="content-placeholder">
@@ -73,7 +97,7 @@
         <section class="page" id="amiciPage">
             <div class="page-content">
                 <div class="page-header">
-                    <h1>Amici</h1>
+                <h1>Amici</h1>
                     <button class="btn-primary btn-icon" id="addAmicoBtn" aria-label="Aggiungi Amico">+</button>
                 </div>
                 
@@ -95,7 +119,7 @@
         <section class="page" id="nemiciPage">
             <div class="page-content">
                 <div class="page-header">
-                    <h1>Nemici</h1>
+                <h1>Nemici</h1>
                     <button class="btn-primary btn-icon" id="addNemicoBtn" aria-label="Crea Nemico">+</button>
                 </div>
                 <div id="nemiciPlaceholder" class="content-placeholder">
@@ -108,7 +132,7 @@
         <section class="page" id="personaggiPage">
             <div class="page-content">
                 <div class="page-header">
-                    <h1>Personaggi</h1>
+                <h1>Personaggi</h1>
                     <button class="btn-primary btn-icon" id="addPersonaggioBtn" aria-label="Crea Personaggio">+</button>
                 </div>
                 <div id="personaggiPlaceholder" class="content-placeholder">
@@ -271,7 +295,7 @@
                     </div>
                     <div class="user-details">
                         <div class="user-name-container" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <p class="user-name" id="userName">Nome Utente</p>
+                        <p class="user-name" id="userName">Nome Utente</p>
                             <button class="btn-icon-small" id="editUserNameBtn" aria-label="Modifica nome utente" style="background: none; border: none; cursor: pointer; padding: 0.25rem; color: var(--text-light);">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
