@@ -1111,6 +1111,11 @@ function navigateToPage(pageName) {
         }
     }
     
+    // Ferma il polling combattimento se si esce dalla pagina
+    if (pageName !== 'combattimento') {
+        stopCombattimentoPolling();
+    }
+    
     // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
@@ -1127,6 +1132,11 @@ function navigateToPage(pageName) {
     } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
         // Carica i dettagli della campagna
         loadCampagnaDetails(AppState.currentCampagnaId);
+    } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+        // Se si naviga verso combattimento, avvia il polling se non già attivo
+        if (!window.combattimentoPollingInterval) {
+            startCombattimentoPolling(AppState.currentCampagnaId, AppState.currentSessioneId);
+        }
     }
 }
 
@@ -5286,6 +5296,7 @@ window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     localStorage.setItem('currentSessioneId', sessioneId);
     navigateToPage('combattimento');
     await renderCombattimentoContent(campagnaId, sessioneId);
+    startCombattimentoPolling(campagnaId, sessioneId);
 };
 
 /**
@@ -5329,6 +5340,12 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `)
             .eq('sessione_id', sessioneId)
             .order('valore', { ascending: false });
+        
+        // Debug: log per capire la struttura dei dati
+        if (tiriIniziativa && tiriIniziativa.length > 0) {
+            console.log('📊 Tiri iniziativa caricati:', tiriIniziativa.length);
+            console.log('📊 Primo tiro (struttura):', JSON.stringify(tiriIniziativa[0], null, 2));
+        }
 
         if (tiriError) {
             console.error('❌ Errore nel caricamento tiri iniziativa:', tiriError);
@@ -5344,22 +5361,28 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                 </div>
             `;
         } else {
-            const cardsHTML = tiriCompleted.map((tiro, index) => `
-                <div class="combattimento-card" style="padding: var(--spacing-md); background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-md); margin-bottom: var(--spacing-md);">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">#${index + 1}</div>
-                            <div style="font-size: 1.1rem; font-weight: 600; margin-top: var(--spacing-xs);">
-                                ${escapeHtml(tiro.utenti?.nome_utente || 'Sconosciuto')}
-                                ${tiro.utenti?.cid ? ` <span style="color: var(--text-light); font-size: 0.9rem;">(CID: ${tiro.utenti.cid})</span>` : ''}
-                            </div>
-                        </div>
-                        <div style="font-size: 2rem; font-weight: bold; color: var(--text-primary);">
-                            ${tiro.valore}
-                        </div>
+            const cardsHTML = tiriCompleted.map((tiro, index) => {
+                // Debug: log per capire la struttura dei dati
+                if (!tiro.utenti) {
+                    console.warn('⚠️ Tiro senza utenti:', tiro);
+                }
+                
+                const nomeUtente = tiro.utenti?.nome_utente || 'Sconosciuto';
+                const cid = tiro.utenti?.cid;
+                
+                return `
+                <div class="combattimento-card">
+                    <div class="combattimento-card-content">
+                        <span class="combattimento-card-position">#${index + 1}</span>
+                        <span class="combattimento-card-name">
+                            ${escapeHtml(nomeUtente)}
+                            ${cid ? `<span class="combattimento-card-cid">(CID: ${escapeHtml(cid)})</span>` : ''}
+                        </span>
                     </div>
+                    <span class="combattimento-card-value">${tiro.valore}</span>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             // Verifica se l'utente è il DM
             const isDM = await isCurrentUserDM(campagnaId);
@@ -5612,6 +5635,45 @@ function stopSessionPolling() {
     if (window.sessionPollingInterval) {
         clearInterval(window.sessionPollingInterval);
         window.sessionPollingInterval = null;
+    }
+}
+
+/**
+ * Avvia il polling per la pagina combattimento
+ */
+function startCombattimentoPolling(campagnaId, sessioneId) {
+    // Rimuovi polling esistente se presente
+    if (window.combattimentoPollingInterval) {
+        clearInterval(window.combattimentoPollingInterval);
+    }
+
+    // Controlla ogni 2 secondi
+    window.combattimentoPollingInterval = setInterval(async () => {
+        // Verifica che siamo ancora nella pagina combattimento
+        const combattimentoPage = document.getElementById('combattimentoPage');
+        if (!combattimentoPage || !combattimentoPage.classList.contains('active')) {
+            stopCombattimentoPolling();
+            return;
+        }
+
+        // Verifica che la sessione sia ancora quella corrente
+        if (AppState.currentSessioneId !== sessioneId || AppState.currentCampagnaId !== campagnaId) {
+            stopCombattimentoPolling();
+            return;
+        }
+
+        // Ricarica il contenuto del combattimento
+        await renderCombattimentoContent(campagnaId, sessioneId);
+    }, 2000); // 2 secondi
+}
+
+/**
+ * Ferma il polling per la pagina combattimento
+ */
+function stopCombattimentoPolling() {
+    if (window.combattimentoPollingInterval) {
+        clearInterval(window.combattimentoPollingInterval);
+        window.combattimentoPollingInterval = null;
     }
 }
 
