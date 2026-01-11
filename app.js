@@ -5334,24 +5334,32 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         // Carica i tiri di iniziativa dalla tabella richieste_tiro_iniziativa
         const { data: tiriIniziativa, error: tiriError } = await supabase
             .from('richieste_tiro_iniziativa')
-            .select(`
-                *,
-                utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)
-            `)
+            .select('*')
             .eq('sessione_id', sessioneId)
             .order('valore', { ascending: false });
-        
-        // Debug: log per capire la struttura dei dati
-        if (tiriIniziativa && tiriIniziativa.length > 0) {
-            console.log('📊 Tiri iniziativa caricati:', tiriIniziativa.length);
-            console.log('📊 Primo tiro (struttura):', JSON.stringify(tiriIniziativa[0], null, 2));
-        }
 
         if (tiriError) {
             console.error('❌ Errore nel caricamento tiri iniziativa:', tiriError);
         }
 
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
+        
+        // Recupera i nomi degli utenti con una query separata (fallback)
+        const giocatoriIds = [...new Set(tiriCompleted.map(t => t.giocatore_id).filter(Boolean))];
+        const nomiUtenti = new Map();
+        
+        if (giocatoriIds.length > 0) {
+            const { data: utenti, error: utentiError } = await supabase
+                .from('utenti')
+                .select('id, nome_utente, cid')
+                .in('id', giocatoriIds);
+            
+            if (!utentiError && utenti) {
+                utenti.forEach(u => {
+                    nomiUtenti.set(u.id, { nome_utente: u.nome_utente, cid: u.cid });
+                });
+            }
+        }
         
         if (tiriCompleted.length === 0) {
             combattimentoContent.innerHTML = `
@@ -5362,13 +5370,9 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `;
         } else {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
-                // Debug: log per capire la struttura dei dati
-                if (!tiro.utenti) {
-                    console.warn('⚠️ Tiro senza utenti:', tiro);
-                }
-                
-                const nomeUtente = tiro.utenti?.nome_utente || 'Sconosciuto';
-                const cid = tiro.utenti?.cid;
+                const utenteData = nomiUtenti.get(tiro.giocatore_id);
+                const nomeUtente = utenteData?.nome_utente || 'Sconosciuto';
+                const cid = utenteData?.cid;
                 
                 return `
                 <div class="combattimento-card">
@@ -5876,8 +5880,8 @@ async function checkAllIniziativaCompleted(sessioneId) {
             // Se l'utente corrente è nella sessione, portalo al combattimento
             const userData = await findUserByUid(AppState.currentUser.uid);
             if (userData && partecipanti.includes(userData.id)) {
-                navigateToPage('combattimento');
-                await renderCombattimentoContent(sessione.campagna_id, sessioneId);
+                // Usa openCombattimentoPage per impostare correttamente lo stato e avviare il polling
+                await openCombattimentoPage(sessione.campagna_id, sessioneId);
             }
         }
     } catch (error) {
