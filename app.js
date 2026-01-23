@@ -5935,8 +5935,21 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
             console.log('📡 [REALTIME] Stato subscription combattimento:', status);
             if (status === 'SUBSCRIBED') {
                 console.log('✅ [REALTIME] Subscription combattimento attiva');
-            } else if (status === 'CHANNEL_ERROR') {
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 console.error('❌ [REALTIME] Errore subscription combattimento');
+                // Fallback polling se Realtime non funziona
+                if (!window.combattimentoPollingFallback) {
+                    window.combattimentoPollingFallback = setInterval(async () => {
+                        const combattimentoPage = document.getElementById('combattimentoPage');
+                        if (!combattimentoPage || !combattimentoPage.classList.contains('active')) {
+                            return;
+                        }
+                        if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                            await renderCombattimentoContent(campagnaId, sessioneId);
+                        }
+                    }, 3000); // 3 secondi
+                    console.log('🔄 [FALLBACK] Polling di backup avviato per combattimento');
+                }
             }
         });
 
@@ -5955,6 +5968,12 @@ function stopCombattimentoRealtime() {
         supabase.removeChannel(window.combattimentoChannel);
         window.combattimentoChannel = null;
         console.log('✅ Realtime subscription per combattimento fermata');
+    }
+
+    if (window.combattimentoPollingFallback) {
+        clearInterval(window.combattimentoPollingFallback);
+        window.combattimentoPollingFallback = null;
+        console.log('🔄 [FALLBACK] Polling di backup fermato per combattimento');
     }
 }
 
@@ -6219,6 +6238,17 @@ window.submitRollRequest = async function(requestId, tipo, valore) {
                 .single();
 
             if (richiesta) {
+                // Porta subito il giocatore alla pagina combattimento
+                const { data: sessione } = await supabase
+                    .from('sessioni')
+                    .select('campagna_id')
+                    .eq('id', richiesta.sessione_id)
+                    .single();
+
+                if (sessione?.campagna_id) {
+                    await openCombattimentoPage(sessione.campagna_id, richiesta.sessione_id);
+                }
+
                 await checkAllIniziativaCompleted(richiesta.sessione_id);
             }
         }
@@ -6333,9 +6363,8 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
 
         showNotification('Richieste tiro iniziativa inviate!');
         
-        // Apri pagina combattimento per il DM
-        navigateToPage('combattimento');
-        await renderCombattimentoContent(campagnaId, sessioneId);
+        // Apri pagina combattimento per il DM (imposta anche stato e realtime)
+        await openCombattimentoPage(campagnaId, sessioneId);
     } catch (error) {
         console.error('❌ Errore nella richiesta tiro iniziativa:', error);
         showNotification('Errore nella richiesta tiro iniziativa: ' + (error.message || error));
