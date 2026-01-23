@@ -62,6 +62,7 @@ const AppState = {
     isLoggedIn: false,
     isRegisterMode: false,
     currentCampagnaId: null,
+    currentSessioneId: null,
     currentCampagnaDetails: null,
     campagnaGiocatori: [],
     campagneFilters: {
@@ -201,11 +202,25 @@ async function init() {
     // Load saved theme
     loadTheme();
     
-    // Ripristina currentCampagnaId dal localStorage se esiste
-    const savedCampagnaId = localStorage.getItem('currentCampagnaId');
+    // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');
     if (savedCampagnaId) {
         AppState.currentCampagnaId = savedCampagnaId;
-        console.log('📌 Campagna salvata ripristinata:', savedCampagnaId);
+        console.log('📌 Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
+    }
+    
+    // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedSessioneId = sessionStorage.getItem('currentSessioneId');
+    if (savedSessioneId) {
+        AppState.currentSessioneId = savedSessioneId;
+        console.log('📌 Sessione salvata ripristinata dalla sessione:', savedSessioneId);
+    }
+    
+    // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedPage = sessionStorage.getItem('currentPage');
+    if (savedPage) {
+        AppState.currentPage = savedPage;
+        console.log('📌 Pagina salvata ripristinata dalla sessione:', savedPage);
     }
     
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
@@ -226,7 +241,8 @@ async function init() {
     console.log('🔧 Setup event listeners...');
     setupEventListeners();
     console.log('📄 Navigazione alla pagina iniziale...');
-    navigateToPage('campagne');
+    // Naviga alla pagina salvata o alla home
+    navigateToPage(AppState.currentPage || 'campagne');
     
     // Wait for Supabase to be ready (in background, non-blocking)
     waitForSupabase().then((success) => {
@@ -271,8 +287,12 @@ function setupSupabaseAuth() {
                 
             // Initialize user document and load data
             initializeUserDocument(session.user).then(() => {
-                // Se c'è una campagna salvata, vai ai dettagli
-                if (AppState.currentCampagnaId) {
+                // Naviga alla pagina salvata o carica i dati
+                if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+                    // Se siamo nella pagina combattimento, carica il contenuto e avvia Realtime
+                    navigateToPage('combattimento');
+                } else if (AppState.currentCampagnaId) {
+                    // Se c'è una campagna salvata, vai ai dettagli
                     navigateToPage('dettagli');
                 } else {
                     // Carica i dati in base alla pagina corrente
@@ -280,13 +300,15 @@ function setupSupabaseAuth() {
                         loadCampagne(session.user.id);
                     } else if (AppState.currentPage === 'amici') {
                         loadAmici();
+                    } else {
+                        // Naviga alla pagina salvata
+                        navigateToPage(AppState.currentPage || 'campagne');
                     }
                 }
-                // Altre pagine possono essere aggiunte qui in futuro
                 
-                // Avvia polling per richieste tiro e sessioni
-                startPollingRollRequests();
-                startSessionPolling();
+                // Avvia Realtime subscriptions per richieste tiro e sessioni
+                startRollRequestsRealtime();
+                startSessionRealtime();
             });
             } else {
                 // User is signed out
@@ -295,9 +317,9 @@ function setupSupabaseAuth() {
                 updateUIForLoggedOut();
                 console.log('👤 Utente non autenticato');
                 
-                // Ferma polling
-                stopPollingRollRequests();
-                stopSessionPolling();
+                // Ferma Realtime subscriptions
+                stopRollRequestsRealtime();
+                stopSessionRealtime();
                 
                 // Pulisci i dati quando l'utente esce
                 if (AppState.currentPage === 'campagne') {
@@ -331,8 +353,12 @@ async function checkAuthState() {
             updateUIForLoggedIn();
             await initializeUserDocument(session.user);
             
-            // Se c'è una campagna salvata, vai ai dettagli
-            if (AppState.currentCampagnaId) {
+            // Naviga alla pagina salvata o carica i dati
+            if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+                // Se siamo nella pagina combattimento, carica il contenuto e avvia Realtime
+                navigateToPage('combattimento');
+            } else if (AppState.currentCampagnaId) {
+                // Se c'è una campagna salvata, vai ai dettagli
                 navigateToPage('dettagli');
             } else {
                 // Carica i dati in base alla pagina corrente
@@ -340,12 +366,15 @@ async function checkAuthState() {
                     loadCampagne(session.user.id);
                 } else if (AppState.currentPage === 'amici') {
                     loadAmici();
+                } else {
+                    // Naviga alla pagina salvata
+                    navigateToPage(AppState.currentPage || 'campagne');
                 }
             }
             
-            // Avvia polling per richieste tiro e sessioni
-            startPollingRollRequests();
-            startSessionPolling();
+            // Avvia Realtime subscriptions per richieste tiro e sessioni
+            startRollRequestsRealtime();
+            startSessionRealtime();
         } else {
             updateUIForLoggedOut();
             
@@ -817,7 +846,7 @@ function setupEventListeners() {
             e.stopPropagation();
             // Reset currentCampagnaId per tornare alla lista
             AppState.currentCampagnaId = null;
-            localStorage.removeItem('currentCampagnaId');
+            sessionStorage.removeItem('currentCampagnaId');
             navigateToPage('campagne');
         };
         console.log('✅ Event listener aggiunto a backToCampagneBtn');
@@ -1095,25 +1124,34 @@ function navigateToPage(pageName) {
 
     AppState.currentPage = pageName;
     
-    // Salva la pagina corrente nel localStorage
-    localStorage.setItem('currentPage', pageName);
+    // Salva la pagina corrente nel sessionStorage (si cancella quando si chiude il browser)
+    sessionStorage.setItem('currentPage', pageName);
     
-    // Salva currentCampagnaId solo per pagine che lo richiedono
+    // Salva currentCampagnaId e currentSessioneId solo per pagine che lo richiedono
     if (pageName === 'dettagli' || pageName === 'sessione' || pageName === 'combattimento') {
         if (AppState.currentCampagnaId) {
-            localStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
+            sessionStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
+        }
+        if (pageName === 'combattimento' && AppState.currentSessioneId) {
+            sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
+        } else {
+            // Rimuovi currentSessioneId se non siamo nella pagina combattimento
+            sessionStorage.removeItem('currentSessioneId');
+            AppState.currentSessioneId = null;
         }
     } else {
-        // Per altre pagine, rimuovi currentCampagnaId se presente
+        // Per altre pagine, rimuovi currentCampagnaId e currentSessioneId se presenti
         if (pageName === 'campagne' || pageName === 'amici') {
-            localStorage.removeItem('currentCampagnaId');
+            sessionStorage.removeItem('currentCampagnaId');
+            sessionStorage.removeItem('currentSessioneId');
             AppState.currentCampagnaId = null;
+            AppState.currentSessioneId = null;
         }
     }
     
-    // Ferma il polling combattimento se si esce dalla pagina
+    // Ferma Realtime subscription combattimento se si esce dalla pagina
     if (pageName !== 'combattimento') {
-        stopCombattimentoPolling();
+        stopCombattimentoRealtime();
     }
     
     // Carica dati specifici per la pagina
@@ -1133,10 +1171,12 @@ function navigateToPage(pageName) {
         // Carica i dettagli della campagna
         loadCampagnaDetails(AppState.currentCampagnaId);
     } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-        // Se si naviga verso combattimento, avvia il polling se non già attivo
-        if (!window.combattimentoPollingInterval) {
-            startCombattimentoPolling(AppState.currentCampagnaId, AppState.currentSessioneId);
-        }
+        // Se si naviga verso combattimento, carica il contenuto e avvia Realtime subscription
+        renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId).then(() => {
+            if (!window.combattimentoChannel) {
+                startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
+            }
+        });
     }
 }
 
@@ -3271,8 +3311,8 @@ window.editCampagna = function(campagnaId) {
 window.openCampagnaDetails = function(campagnaId) {
     // Salva l'ID della campagna corrente
     AppState.currentCampagnaId = campagnaId;
-    // Salva nel localStorage per persistenza al refresh
-    localStorage.setItem('currentCampagnaId', campagnaId);
+    // Salva nel sessionStorage per persistenza al refresh (si cancella alla chiusura del browser)
+    sessionStorage.setItem('currentCampagnaId', campagnaId);
     navigateToPage('dettagli');
 };
 
@@ -4683,8 +4723,8 @@ async function handleLogout() {
         try {
             const supabase = getSupabaseClient();
             
-            // Pulisci localStorage PRIMA del logout
-            localStorage.removeItem('currentCampagnaId');
+            // Pulisci sessionStorage PRIMA del logout
+            sessionStorage.removeItem('currentCampagnaId');
             AppState.currentCampagnaId = null;
             
             // Pulisci lo stato locale PRIMA
@@ -4744,7 +4784,7 @@ async function handleLogout() {
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
-            localStorage.removeItem('currentCampagnaId');
+            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             // Forza refresh anche in caso di errore
@@ -4763,7 +4803,7 @@ async function handleLogout() {
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
-            localStorage.removeItem('currentCampagnaId');
+            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             setTimeout(() => {
@@ -5001,7 +5041,7 @@ window.iniziaSessione = async function(campagnaId) {
  */
 window.openSessionePage = async function(campagnaId) {
     AppState.currentCampagnaId = campagnaId;
-    localStorage.setItem('currentCampagnaId', campagnaId);
+    sessionStorage.setItem('currentCampagnaId', campagnaId);
     navigateToPage('sessione');
     await renderSessioneContent(campagnaId);
 };
@@ -5292,11 +5332,11 @@ window.aggiungiIniziativa = async function(sessioneId) {
 window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     AppState.currentCampagnaId = campagnaId;
     AppState.currentSessioneId = sessioneId;
-    localStorage.setItem('currentCampagnaId', campagnaId);
-    localStorage.setItem('currentSessioneId', sessioneId);
+    sessionStorage.setItem('currentCampagnaId', campagnaId);
+    sessionStorage.setItem('currentSessioneId', sessioneId);
     navigateToPage('combattimento');
     await renderCombattimentoContent(campagnaId, sessioneId);
-    startCombattimentoPolling(campagnaId, sessioneId);
+    startCombattimentoRealtime(campagnaId, sessioneId);
 };
 
 /**
@@ -5498,25 +5538,85 @@ async function checkPendingRollRequests(userId) {
 }
 
 /**
- * Avvia il polling per le richieste tiro
+ * Avvia Realtime subscription per le richieste tiro
  */
-function startPollingRollRequests() {
-    // Rimuovi polling esistente se presente
-    if (window.rollRequestPollingInterval) {
-        clearInterval(window.rollRequestPollingInterval);
-    }
+function startRollRequestsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn || !AppState.currentUser) return;
 
-    // Controlla ogni 2-3 secondi
-    window.rollRequestPollingInterval = setInterval(async () => {
-        if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
-            return; // Non controllare se non loggato o se c'è già un popup aperto
+    // Ferma subscription esistente se presente
+    stopRollRequestsRealtime();
+
+    // Ottieni l'ID utente dal database
+    findUserByUid(AppState.currentUser.uid).then(async (userData) => {
+        if (!userData) {
+            console.warn('⚠️ UserData non trovato per Realtime roll requests');
+            return;
         }
 
-        const request = await checkPendingRollRequests(AppState.currentUser.uid);
-        if (request) {
-            showRollRequestModal(request);
-        }
-    }, 2500); // 2.5 secondi
+        const giocatoreId = userData.id;
+
+        // Subscription per richieste tiro iniziativa
+        const iniziativaChannel = supabase
+            .channel('roll-requests-iniziativa')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'richieste_tiro_iniziativa',
+                    filter: `giocatore_id=eq.${giocatoreId}`
+                },
+                async (payload) => {
+                    console.log('🔔 Nuova richiesta tiro iniziativa:', payload.new);
+                    if (payload.new.stato === 'pending' && !window.currentRollRequest) {
+                        const request = {
+                            id: payload.new.id,
+                            tipo: 'iniziativa',
+                            sessione_id: payload.new.sessione_id
+                        };
+                        showRollRequestModal(request);
+                    }
+                }
+            )
+            .subscribe();
+
+        // Subscription per richieste tiro generico
+        const genericoChannel = supabase
+            .channel('roll-requests-generico')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'richieste_tiro_generico',
+                    filter: `giocatore_id=eq.${giocatoreId}`
+                },
+                async (payload) => {
+                    console.log('🔔 Nuova richiesta tiro generico:', payload.new);
+                    if (payload.new.stato === 'pending' && !window.currentRollRequest) {
+                        const request = {
+                            id: payload.new.id,
+                            tipo: 'generico',
+                            sessione_id: payload.new.sessione_id,
+                            richiesta_id: payload.new.richiesta_id
+                        };
+                        showRollRequestModal(request);
+                    }
+                }
+            )
+            .subscribe();
+
+        // Salva i canali per poterli rimuovere in seguito
+        window.rollRequestsChannels = {
+            iniziativa: iniziativaChannel,
+            generico: genericoChannel
+        };
+
+        console.log('✅ Realtime subscriptions per roll requests avviate');
+    }).catch(error => {
+        console.error('❌ Errore nell\'avvio Realtime roll requests:', error);
+    });
 }
 
 /**
@@ -5614,70 +5714,154 @@ async function checkNewSessions(userId) {
 }
 
 /**
- * Avvia il polling per le nuove sessioni
+ * Avvia Realtime subscription per le nuove sessioni
  */
-function startSessionPolling() {
-    // Rimuovi polling esistente se presente
-    if (window.sessionPollingInterval) {
-        clearInterval(window.sessionPollingInterval);
-    }
+function startSessionRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn || !AppState.currentUser) return;
 
-    // Controlla ogni 5 secondi
-    window.sessionPollingInterval = setInterval(async () => {
-        if (!AppState.isLoggedIn || !AppState.currentUser) {
+    // Ferma subscription esistente se presente
+    stopSessionRealtime();
+
+    // Ottieni l'ID utente dal database e carica le campagne
+    findUserByUid(AppState.currentUser.uid).then(async (userData) => {
+        if (!userData) {
+            console.warn('⚠️ UserData non trovato per Realtime sessioni');
             return;
         }
 
-        await checkNewSessions(AppState.currentUser.uid);
-    }, 5000); // 5 secondi
+        // Carica tutte le campagne dove l'utente è DM o giocatore
+        const { data: campagneDM } = await supabase
+            .from('campagne')
+            .select('id')
+            .eq('id_dm', userData.id);
+
+        const { data: tutteCampagne } = await supabase
+            .from('campagne')
+            .select('id, giocatori');
+
+        let campagnePlayer = [];
+        if (tutteCampagne) {
+            campagnePlayer = tutteCampagne
+                .filter(c => Array.isArray(c.giocatori) && c.giocatori.includes(userData.id))
+                .map(c => ({ id: c.id }));
+        }
+
+        const campagnaIds = [
+            ...(campagneDM || []).map(c => c.id),
+            ...(campagnePlayer || []).map(c => c.id)
+        ].filter((id, index, self) => self.indexOf(id) === index);
+
+        if (campagnaIds.length === 0) return;
+
+        // Subscription per nuove sessioni
+        // Nota: Supabase Realtime non supporta filtri complessi con OR, quindi
+        // ascoltiamo tutte le nuove sessioni e filtriamo lato client
+        const sessionChannel = supabase
+            .channel('new-sessions')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'sessioni'
+                },
+                async (payload) => {
+                    console.log('🔔 Nuova sessione:', payload.new);
+                    // Filtra lato client: verifica che la sessione appartenga a una delle campagne dell'utente
+                    if (campagnaIds.includes(payload.new.campagna_id) && !payload.new.data_fine) {
+                        // Carica i dettagli della campagna
+                        const { data: campagna } = await supabase
+                            .from('campagne')
+                            .select('nome_campagna')
+                            .eq('id', payload.new.campagna_id)
+                            .single();
+
+                        if (campagna) {
+                            showInAppNotification({
+                                title: 'Sessione Attiva',
+                                message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
+                                campagnaId: payload.new.campagna_id,
+                                sessioneId: payload.new.id
+                            });
+                        }
+                    }
+                }
+            )
+            .subscribe();
+
+        window.sessionChannel = sessionChannel;
+        console.log('✅ Realtime subscription per sessioni avviata');
+    }).catch(error => {
+        console.error('❌ Errore nell\'avvio Realtime sessioni:', error);
+    });
 }
 
 /**
- * Ferma il polling per le nuove sessioni
+ * Ferma Realtime subscription per le nuove sessioni
  */
-function stopSessionPolling() {
-    if (window.sessionPollingInterval) {
-        clearInterval(window.sessionPollingInterval);
-        window.sessionPollingInterval = null;
+function stopSessionRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.sessionChannel) {
+        supabase.removeChannel(window.sessionChannel);
+        window.sessionChannel = null;
+        console.log('✅ Realtime subscription per sessioni fermata');
     }
 }
 
 /**
- * Avvia il polling per la pagina combattimento
+ * Avvia Realtime subscription per la pagina combattimento
  */
-function startCombattimentoPolling(campagnaId, sessioneId) {
-    // Rimuovi polling esistente se presente
-    if (window.combattimentoPollingInterval) {
-        clearInterval(window.combattimentoPollingInterval);
-    }
+function startCombattimentoRealtime(campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
 
-    // Controlla ogni 2 secondi
-    window.combattimentoPollingInterval = setInterval(async () => {
-        // Verifica che siamo ancora nella pagina combattimento
-        const combattimentoPage = document.getElementById('combattimentoPage');
-        if (!combattimentoPage || !combattimentoPage.classList.contains('active')) {
-            stopCombattimentoPolling();
-            return;
-        }
+    // Ferma subscription esistente se presente
+    stopCombattimentoRealtime();
 
-        // Verifica che la sessione sia ancora quella corrente
-        if (AppState.currentSessioneId !== sessioneId || AppState.currentCampagnaId !== campagnaId) {
-            stopCombattimentoPolling();
-            return;
-        }
+    // Subscription per aggiornamenti ai tiri iniziativa
+    const combattimentoChannel = supabase
+        .channel(`combattimento-${sessioneId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: '*', // INSERT, UPDATE, DELETE
+                schema: 'public',
+                table: 'richieste_tiro_iniziativa',
+                filter: `sessione_id=eq.${sessioneId}`
+            },
+            async (payload) => {
+                console.log('🔔 Aggiornamento tiro iniziativa:', payload);
+                // Verifica che siamo ancora nella pagina combattimento
+                const combattimentoPage = document.getElementById('combattimentoPage');
+                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
+                    // Verifica che la sessione sia ancora quella corrente
+                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        // Ricarica il contenuto del combattimento
+                        await renderCombattimentoContent(campagnaId, sessioneId);
+                    }
+                }
+            }
+        )
+        .subscribe();
 
-        // Ricarica il contenuto del combattimento
-        await renderCombattimentoContent(campagnaId, sessioneId);
-    }, 2000); // 2 secondi
+    window.combattimentoChannel = combattimentoChannel;
+    console.log('✅ Realtime subscription per combattimento avviata');
 }
 
 /**
- * Ferma il polling per la pagina combattimento
+ * Ferma Realtime subscription per la pagina combattimento
  */
-function stopCombattimentoPolling() {
-    if (window.combattimentoPollingInterval) {
-        clearInterval(window.combattimentoPollingInterval);
-        window.combattimentoPollingInterval = null;
+function stopCombattimentoRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.combattimentoChannel) {
+        supabase.removeChannel(window.combattimentoChannel);
+        window.combattimentoChannel = null;
+        console.log('✅ Realtime subscription per combattimento fermata');
     }
 }
 
@@ -5741,12 +5925,21 @@ window.closeInAppNotification = function(notificationId) {
 }
 
 /**
- * Ferma il polling per le richieste tiro
+ * Ferma Realtime subscriptions per le richieste tiro
  */
-function stopPollingRollRequests() {
-    if (window.rollRequestPollingInterval) {
-        clearInterval(window.rollRequestPollingInterval);
-        window.rollRequestPollingInterval = null;
+function stopRollRequestsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.rollRequestsChannels) {
+        if (window.rollRequestsChannels.iniziativa) {
+            supabase.removeChannel(window.rollRequestsChannels.iniziativa);
+        }
+        if (window.rollRequestsChannels.generico) {
+            supabase.removeChannel(window.rollRequestsChannels.generico);
+        }
+        window.rollRequestsChannels = null;
+        console.log('✅ Realtime subscriptions per roll requests fermate');
     }
 }
 
