@@ -5910,6 +5910,19 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
     const combattimentoChannel = supabase
         .channel(`combattimento-${sessioneId}`)
         .on(
+            'broadcast',
+            { event: 'iniziativa_update' },
+            async (payload) => {
+                console.log('🔔 [REALTIME] Broadcast iniziativa:', payload);
+                const combattimentoPage = document.getElementById('combattimentoPage');
+                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
+                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        await renderCombattimentoContent(campagnaId, sessioneId);
+                    }
+                }
+            }
+        )
+        .on(
             'postgres_changes',
             {
                 event: '*', // INSERT, UPDATE, DELETE
@@ -5955,6 +5968,48 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
 
     window.combattimentoChannel = combattimentoChannel;
     console.log('✅ Realtime subscription per combattimento avviata');
+}
+
+/**
+ * Invia un broadcast per aggiornare il combattimento in tempo reale
+ */
+async function sendCombattimentoUpdateBroadcast(sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !sessioneId) return;
+
+    // Se siamo già in combattimento, usa il canale esistente
+    if (window.combattimentoChannel && AppState.currentSessioneId === sessioneId) {
+        try {
+            await window.combattimentoChannel.send({
+                type: 'broadcast',
+                event: 'iniziativa_update',
+                payload: { sessioneId, ts: Date.now() }
+            });
+        } catch (error) {
+            console.warn('⚠️ Errore invio broadcast combattimento:', error);
+        }
+        return;
+    }
+
+    // Altrimenti crea un canale temporaneo per il broadcast
+    const tempChannel = supabase.channel(`combattimento-${sessioneId}`);
+    tempChannel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+            tempChannel.send({
+                type: 'broadcast',
+                event: 'iniziativa_update',
+                payload: { sessioneId, ts: Date.now() }
+            }).catch((error) => {
+                console.warn('⚠️ Errore invio broadcast combattimento:', error);
+            }).finally(() => {
+                setTimeout(() => {
+                    supabase.removeChannel(tempChannel);
+                }, 300);
+            });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            supabase.removeChannel(tempChannel);
+        }
+    });
 }
 
 /**
@@ -6248,6 +6303,9 @@ window.submitRollRequest = async function(requestId, tipo, valore) {
                 if (sessione?.campagna_id) {
                     await openCombattimentoPage(sessione.campagna_id, richiesta.sessione_id);
                 }
+
+                // Notifica subito il DM tramite broadcast realtime
+                await sendCombattimentoUpdateBroadcast(richiesta.sessione_id);
 
                 await checkAllIniziativaCompleted(richiesta.sessione_id);
             }
