@@ -5569,7 +5569,7 @@ function startRollRequestsRealtime() {
 
         // Subscription per richieste tiro iniziativa
         const iniziativaChannel = supabase
-            .channel('roll-requests-iniziativa')
+            .channel(`roll-requests-iniziativa-${giocatoreId}`)
             .on(
                 'postgres_changes',
                 {
@@ -5579,22 +5579,30 @@ function startRollRequestsRealtime() {
                     filter: `giocatore_id=eq.${giocatoreId}`
                 },
                 async (payload) => {
-                    console.log('🔔 Nuova richiesta tiro iniziativa:', payload.new);
+                    console.log('🔔 [REALTIME] Nuova richiesta tiro iniziativa ricevuta:', payload.new);
                     if (payload.new.stato === 'pending' && !window.currentRollRequest) {
                         const request = {
                             id: payload.new.id,
                             tipo: 'iniziativa',
                             sessione_id: payload.new.sessione_id
                         };
+                        console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('📡 [REALTIME] Stato subscription iniziativa:', status);
+                if (status === 'SUBSCRIBED') {
+                    console.log('✅ [REALTIME] Subscription iniziativa attiva');
+                } else if (status === 'CHANNEL_ERROR') {
+                    console.error('❌ [REALTIME] Errore subscription iniziativa');
+                }
+            });
 
         // Subscription per richieste tiro generico
         const genericoChannel = supabase
-            .channel('roll-requests-generico')
+            .channel(`roll-requests-generico-${giocatoreId}`)
             .on(
                 'postgres_changes',
                 {
@@ -5604,7 +5612,7 @@ function startRollRequestsRealtime() {
                     filter: `giocatore_id=eq.${giocatoreId}`
                 },
                 async (payload) => {
-                    console.log('🔔 Nuova richiesta tiro generico:', payload.new);
+                    console.log('🔔 [REALTIME] Nuova richiesta tiro generico ricevuta:', payload.new);
                     if (payload.new.stato === 'pending' && !window.currentRollRequest) {
                         const request = {
                             id: payload.new.id,
@@ -5612,11 +5620,19 @@ function startRollRequestsRealtime() {
                             sessione_id: payload.new.sessione_id,
                             richiesta_id: payload.new.richiesta_id
                         };
+                        console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('📡 [REALTIME] Stato subscription generico:', status);
+                if (status === 'SUBSCRIBED') {
+                    console.log('✅ [REALTIME] Subscription generico attiva');
+                } else if (status === 'CHANNEL_ERROR') {
+                    console.error('❌ [REALTIME] Errore subscription generico');
+                }
+            });
 
         // Salva i canali per poterli rimuovere in seguito
         window.rollRequestsChannels = {
@@ -5625,8 +5641,38 @@ function startRollRequestsRealtime() {
         };
 
         console.log('✅ Realtime subscriptions per roll requests avviate');
+        
+        // Fallback: avvia anche polling come backup se Realtime non funziona
+        // Il polling controllerà ogni 3 secondi se ci sono richieste pending
+        if (!window.rollRequestPollingFallback) {
+            window.rollRequestPollingFallback = setInterval(async () => {
+                if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
+                    return;
+                }
+                const request = await checkPendingRollRequests(AppState.currentUser.uid);
+                if (request) {
+                    console.log('🔄 [FALLBACK POLLING] Trovata richiesta pending:', request);
+                    showRollRequestModal(request);
+                }
+            }, 3000); // 3 secondi
+            console.log('🔄 [FALLBACK] Polling di backup avviato per roll requests');
+        }
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime roll requests:', error);
+        // Se Realtime fallisce, avvia comunque il polling
+        if (!window.rollRequestPollingFallback) {
+            window.rollRequestPollingFallback = setInterval(async () => {
+                if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
+                    return;
+                }
+                const request = await checkPendingRollRequests(AppState.currentUser.uid);
+                if (request) {
+                    console.log('🔄 [FALLBACK POLLING] Trovata richiesta pending:', request);
+                    showRollRequestModal(request);
+                }
+            }, 3000);
+            console.log('🔄 [FALLBACK] Polling di backup avviato (Realtime fallito)');
+        }
     });
 }
 
@@ -5803,8 +5849,29 @@ function startSessionRealtime() {
 
         window.sessionChannel = sessionChannel;
         console.log('✅ Realtime subscription per sessioni avviata');
+        
+        // Fallback: avvia anche polling come backup
+        if (!window.sessionPollingFallback) {
+            window.sessionPollingFallback = setInterval(async () => {
+                if (!AppState.isLoggedIn || !AppState.currentUser) {
+                    return;
+                }
+                await checkNewSessions(AppState.currentUser.uid);
+            }, 5000); // 5 secondi
+            console.log('🔄 [FALLBACK] Polling di backup avviato per sessioni');
+        }
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime sessioni:', error);
+        // Se Realtime fallisce, avvia comunque il polling
+        if (!window.sessionPollingFallback) {
+            window.sessionPollingFallback = setInterval(async () => {
+                if (!AppState.isLoggedIn || !AppState.currentUser) {
+                    return;
+                }
+                await checkNewSessions(AppState.currentUser.uid);
+            }, 5000);
+            console.log('🔄 [FALLBACK] Polling di backup avviato (Realtime fallito)');
+        }
     });
 }
 
@@ -5819,6 +5886,13 @@ function stopSessionRealtime() {
         supabase.removeChannel(window.sessionChannel);
         window.sessionChannel = null;
         console.log('✅ Realtime subscription per sessioni fermata');
+    }
+    
+    // Ferma anche il polling di fallback
+    if (window.sessionPollingFallback) {
+        clearInterval(window.sessionPollingFallback);
+        window.sessionPollingFallback = null;
+        console.log('🔄 [FALLBACK] Polling di backup fermato');
     }
 }
 
@@ -5844,19 +5918,27 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                 filter: `sessione_id=eq.${sessioneId}`
             },
             async (payload) => {
-                console.log('🔔 Aggiornamento tiro iniziativa:', payload);
+                console.log('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
                 // Verifica che siamo ancora nella pagina combattimento
                 const combattimentoPage = document.getElementById('combattimentoPage');
                 if (combattimentoPage && combattimentoPage.classList.contains('active')) {
                     // Verifica che la sessione sia ancora quella corrente
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        console.log('✅ [REALTIME] Ricarico contenuto combattimento');
                         // Ricarica il contenuto del combattimento
                         await renderCombattimentoContent(campagnaId, sessioneId);
                     }
                 }
             }
         )
-        .subscribe();
+        .subscribe((status) => {
+            console.log('📡 [REALTIME] Stato subscription combattimento:', status);
+            if (status === 'SUBSCRIBED') {
+                console.log('✅ [REALTIME] Subscription combattimento attiva');
+            } else if (status === 'CHANNEL_ERROR') {
+                console.error('❌ [REALTIME] Errore subscription combattimento');
+            }
+        });
 
     window.combattimentoChannel = combattimentoChannel;
     console.log('✅ Realtime subscription per combattimento avviata');
@@ -5909,7 +5991,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 filter: `campagna_id=eq.${campagnaId}`
             },
             async (payload) => {
-                console.log('🔔 Nuova sessione avviata per campagna:', payload.new);
+                console.log('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
                 // Verifica che la sessione non abbia data_fine (sia attiva)
                 if (!payload.new.data_fine) {
                     // Verifica che siamo ancora nella pagina dettagli
@@ -5917,6 +5999,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                     if (dettagliPage && dettagliPage.classList.contains('active')) {
                         // Verifica che la campagna sia ancora quella corrente
                         if (AppState.currentCampagnaId === campagnaId) {
+                            console.log('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
                             await loadCampagnaDetails(campagnaId);
                         }
@@ -5933,7 +6016,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 filter: `campagna_id=eq.${campagnaId}`
             },
             async (payload) => {
-                console.log('🔔 Sessione aggiornata per campagna:', payload.new);
+                console.log('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
                 // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
                 if (payload.new.data_fine) {
                     // Verifica che siamo ancora nella pagina dettagli
@@ -5941,6 +6024,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                     if (dettagliPage && dettagliPage.classList.contains('active')) {
                         // Verifica che la campagna sia ancora quella corrente
                         if (AppState.currentCampagnaId === campagnaId) {
+                            console.log('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
                             await loadCampagnaDetails(campagnaId);
                         }
@@ -5948,7 +6032,14 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 }
             }
         )
-        .subscribe();
+        .subscribe((status) => {
+            console.log('📡 [REALTIME] Stato subscription dettagli campagna:', status);
+            if (status === 'SUBSCRIBED') {
+                console.log('✅ [REALTIME] Subscription dettagli campagna attiva');
+            } else if (status === 'CHANNEL_ERROR') {
+                console.error('❌ [REALTIME] Errore subscription dettagli campagna');
+            }
+        });
 
     window.campagnaDetailsChannel = campagnaDetailsChannel;
     console.log('✅ Realtime subscription per dettagli campagna avviata');
@@ -6043,6 +6134,13 @@ function stopRollRequestsRealtime() {
         }
         window.rollRequestsChannels = null;
         console.log('✅ Realtime subscriptions per roll requests fermate');
+    }
+    
+    // Ferma anche il polling di fallback
+    if (window.rollRequestPollingFallback) {
+        clearInterval(window.rollRequestPollingFallback);
+        window.rollRequestPollingFallback = null;
+        console.log('🔄 [FALLBACK] Polling di backup fermato');
     }
 }
 

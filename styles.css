@@ -618,7 +618,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-sm);
+    padding: 0;
 }
 
 .dettagli-icon-svg svg {
