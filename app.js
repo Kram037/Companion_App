@@ -1154,6 +1154,11 @@ function navigateToPage(pageName) {
         stopCombattimentoRealtime();
     }
     
+    // Ferma Realtime subscription dettagli campagna se si esce dalla pagina
+    if (pageName !== 'dettagli') {
+        stopCampagnaDetailsRealtime();
+    }
+    
     // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
@@ -3327,6 +3332,9 @@ async function loadCampagnaDetails(campagnaId) {
     }
 
     try {
+        // Ferma subscription esistente se presente
+        stopCampagnaDetailsRealtime();
+
         // Carica i dati della campagna
         const { data: campagna, error } = await supabase
             .from('campagne')
@@ -3345,6 +3353,9 @@ async function loadCampagnaDetails(campagnaId) {
 
         // Mostra tutti i dettagli della campagna (ora async)
         await renderCampagnaDetailsContent(campagna);
+
+        // Avvia Realtime subscription per aggiornare quando viene avviata una sessione
+        startCampagnaDetailsRealtime(campagnaId);
     } catch (error) {
         console.error('❌ Errore nel caricamento dettagli campagna:', error);
         showNotification('Errore nel caricamento dei dettagli della campagna');
@@ -3444,7 +3455,7 @@ async function renderCampagnaDetailsContent(campagna) {
                         </svg>
                         Modifica
                     </button>
-                    <button class="btn-danger btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna">
+                    <button class="btn-secondary btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna" style="color: #dc3545;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -5862,6 +5873,98 @@ function stopCombattimentoRealtime() {
         supabase.removeChannel(window.combattimentoChannel);
         window.combattimentoChannel = null;
         console.log('✅ Realtime subscription per combattimento fermata');
+    }
+}
+
+/**
+ * Avvia Realtime subscription per aggiornare la pagina dettagli quando viene avviata una sessione
+ */
+function startCampagnaDetailsRealtime(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    // Ferma subscription esistente se presente
+    stopCampagnaDetailsRealtime();
+
+    // Verifica che siamo ancora nella pagina dettagli
+    const dettagliPage = document.getElementById('dettagliPage');
+    if (!dettagliPage || !dettagliPage.classList.contains('active')) {
+        return;
+    }
+
+    // Verifica che la campagna sia ancora quella corrente
+    if (AppState.currentCampagnaId !== campagnaId) {
+        return;
+    }
+
+    // Subscription per nuove sessioni per questa campagna
+    const campagnaDetailsChannel = supabase
+        .channel(`campagna-details-${campagnaId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'sessioni',
+                filter: `campagna_id=eq.${campagnaId}`
+            },
+            async (payload) => {
+                console.log('🔔 Nuova sessione avviata per campagna:', payload.new);
+                // Verifica che la sessione non abbia data_fine (sia attiva)
+                if (!payload.new.data_fine) {
+                    // Verifica che siamo ancora nella pagina dettagli
+                    const dettagliPage = document.getElementById('dettagliPage');
+                    if (dettagliPage && dettagliPage.classList.contains('active')) {
+                        // Verifica che la campagna sia ancora quella corrente
+                        if (AppState.currentCampagnaId === campagnaId) {
+                            // Ricarica i dettagli della campagna per aggiornare il bottone
+                            await loadCampagnaDetails(campagnaId);
+                        }
+                    }
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'sessioni',
+                filter: `campagna_id=eq.${campagnaId}`
+            },
+            async (payload) => {
+                console.log('🔔 Sessione aggiornata per campagna:', payload.new);
+                // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
+                if (payload.new.data_fine) {
+                    // Verifica che siamo ancora nella pagina dettagli
+                    const dettagliPage = document.getElementById('dettagliPage');
+                    if (dettagliPage && dettagliPage.classList.contains('active')) {
+                        // Verifica che la campagna sia ancora quella corrente
+                        if (AppState.currentCampagnaId === campagnaId) {
+                            // Ricarica i dettagli della campagna per aggiornare il bottone
+                            await loadCampagnaDetails(campagnaId);
+                        }
+                    }
+                }
+            }
+        )
+        .subscribe();
+
+    window.campagnaDetailsChannel = campagnaDetailsChannel;
+    console.log('✅ Realtime subscription per dettagli campagna avviata');
+}
+
+/**
+ * Ferma Realtime subscription per la pagina dettagli campagna
+ */
+function stopCampagnaDetailsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.campagnaDetailsChannel) {
+        supabase.removeChannel(window.campagnaDetailsChannel);
+        window.campagnaDetailsChannel = null;
+        console.log('✅ Realtime subscription per dettagli campagna fermata');
     }
 }
 
