@@ -309,6 +309,7 @@ function setupSupabaseAuth() {
                 // Avvia Realtime subscriptions per richieste tiro e sessioni
                 startRollRequestsRealtime();
                 startSessionRealtime();
+                startAppEventsRealtime();
             });
             } else {
                 // User is signed out
@@ -320,6 +321,7 @@ function setupSupabaseAuth() {
                 // Ferma Realtime subscriptions
                 stopRollRequestsRealtime();
                 stopSessionRealtime();
+                stopAppEventsRealtime();
                 
                 // Pulisci i dati quando l'utente esce
                 if (AppState.currentPage === 'campagne') {
@@ -375,8 +377,10 @@ async function checkAuthState() {
             // Avvia Realtime subscriptions per richieste tiro e sessioni
             startRollRequestsRealtime();
             startSessionRealtime();
+            startAppEventsRealtime();
         } else {
             updateUIForLoggedOut();
+            stopAppEventsRealtime();
             
             // Pulisci i dati quando l'utente esce
             if (AppState.currentPage === 'campagne') {
@@ -1347,6 +1351,7 @@ async function setTheme(theme, save = true) {
                     
                     if (error) throw error;
                     console.log('✅ Tema salvato in Supabase:', temaScuro);
+                    await sendAppEventBroadcast({ table: 'utenti', action: 'update', uid: AppState.currentUser.uid });
                 } catch (error) {
                     console.error('❌ Errore nel salvataggio tema in Supabase:', error);
                 }
@@ -1357,6 +1362,8 @@ async function setTheme(theme, save = true) {
 
 // Supabase - Campagne Management
 let campagneChannel = null;
+let appEventsChannel = null;
+let appEventsRefreshTimeout = null;
 let editingCampagnaId = null;
 
 async function loadCampagne(userId) {
@@ -2171,6 +2178,7 @@ async function handleSaveUserName() {
             .eq('id', utente.id);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'utenti', action: 'update', userId: utente.id });
 
         // Aggiorna l'UI
         if (elements.userName) {
@@ -2281,6 +2289,7 @@ async function initializeUserDocument(user) {
                 .single();
             
             if (error) throw error;
+            await sendAppEventBroadcast({ table: 'utenti', action: 'update', uid: user.id });
             
             console.log('✅ Utente aggiornato');
             
@@ -2361,6 +2370,7 @@ async function initializeUserDocument(user) {
                             if (!updateResult.error && updateResult.data) {
                                 data = updateResult.data;
                                 error = null;
+                                await sendAppEventBroadcast({ table: 'utenti', action: 'update', uid: user.id });
                                 break;
                             }
                         }
@@ -2651,6 +2661,7 @@ window.acceptFriendRequest = async function(requestId) {
             .eq('id', requestId);
         
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'richieste_amicizia', action: 'update', requestId });
         
         showNotification('Richiesta di amicizia accettata!');
         loadAmici();
@@ -2677,6 +2688,7 @@ window.rejectFriendRequest = async function(requestId) {
             .eq('id', requestId);
         
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'richieste_amicizia', action: 'update', requestId });
         
         showNotification('Richiesta di amicizia rifiutata');
         loadAmici();
@@ -2716,6 +2728,7 @@ window.rimuoviAmico = async function(amicoId) {
             .or(`and(richiedente_id.eq.${currentUser.id},destinatario_id.eq.${amicoId}),and(richiedente_id.eq.${amicoId},destinatario_id.eq.${currentUser.id})`);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'richieste_amicizia', action: 'delete', amicoId });
 
         showNotification('Amico rimosso');
         
@@ -3280,6 +3293,7 @@ async function handleCampagnaSubmit(e) {
                 .eq('id', editingCampagnaId);
             
             if (error) throw error;
+            await sendAppEventBroadcast({ table: 'campagne', action: 'update', campagnaId: editingCampagnaId });
             showNotification('Campagna aggiornata con successo!');
         } else {
             // Create new campagna
@@ -3294,6 +3308,7 @@ async function handleCampagnaSubmit(e) {
                 }
                 throw error;
             }
+            await sendAppEventBroadcast({ table: 'campagne', action: 'insert' });
             showNotification('Campagna creata con successo!');
         }
         closeCampagnaModal();
@@ -4163,6 +4178,8 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         } else {
             console.log('✅ selectNewDM: campagna aggiornata tramite RPC');
         }
+
+        await sendAppEventBroadcast({ table: 'campagne', action: 'update', campagnaId });
         
         // Per la verifica, usa una query normale
         const { data: campagnaVerifica, error: errorVerifica } = await supabase
@@ -4310,6 +4327,7 @@ async function updateCampagnaField(campagnaId, field, value) {
             .eq('id', campagnaId);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'campagne', action: 'update', campagnaId, field });
 
         showNotification('Campo aggiornato con successo!');
         
@@ -4436,6 +4454,7 @@ window.deleteCampagna = async function(campagnaId) {
             .eq('id', campagnaId);
         
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'campagne', action: 'delete', campagnaId });
         
         showNotification('Campagna eliminata con successo!');
         
@@ -4934,6 +4953,7 @@ window.togglePreferito = async function(campagnaId) {
             .eq('id', utente.id);
 
         if (updateError) throw updateError;
+        await sendAppEventBroadcast({ table: 'utenti', action: 'update', userId: utente.id, campagnaId });
 
         showNotification(!isPreferito ? 'Campagna aggiunta ai preferiti' : 'Campagna rimossa dai preferiti');
 
@@ -5036,6 +5056,7 @@ window.iniziaSessione = async function(campagnaId) {
             .single();
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: data?.id });
 
         showNotification('Sessione iniziata!');
         
@@ -5262,6 +5283,7 @@ window.finisciSessione = async function(sessioneId, campagnaId) {
             .eq('id', sessioneId);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'sessioni', action: 'update', campagnaId, sessioneId });
 
         stopSessioneTimer();
         showNotification('Sessione terminata!');
@@ -5318,6 +5340,7 @@ window.aggiungiIniziativa = async function(sessioneId) {
             });
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'iniziativa', action: 'insert', sessioneId });
 
         showNotification('Iniziativa aggiunta!');
         
@@ -6134,6 +6157,135 @@ function stopCampagnaDetailsRealtime() {
 }
 
 /**
+ * Avvia Realtime subscription globale per eventi app
+ */
+function startAppEventsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn) return;
+
+    stopAppEventsRealtime();
+
+    const channel = supabase
+        .channel('app-events')
+        .on(
+            'broadcast',
+            { event: 'app_change' },
+            (payload) => {
+                if (payload?.payload?.sourceUid && payload.payload.sourceUid === AppState.currentUser?.uid) {
+                    return;
+                }
+                scheduleAppEventsRefresh();
+            }
+        )
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('✅ Realtime subscription globale app attiva');
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.error('❌ Realtime subscription globale app in errore');
+            }
+        });
+
+    appEventsChannel = channel;
+    window.appEventsChannel = channel;
+}
+
+/**
+ * Ferma Realtime subscription globale per eventi app
+ */
+function stopAppEventsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (appEventsChannel) {
+        supabase.removeChannel(appEventsChannel);
+        appEventsChannel = null;
+        window.appEventsChannel = null;
+        console.log('✅ Realtime subscription globale app fermata');
+    }
+
+    if (appEventsRefreshTimeout) {
+        clearTimeout(appEventsRefreshTimeout);
+        appEventsRefreshTimeout = null;
+    }
+}
+
+function scheduleAppEventsRefresh() {
+    if (appEventsRefreshTimeout) {
+        clearTimeout(appEventsRefreshTimeout);
+    }
+    appEventsRefreshTimeout = setTimeout(() => {
+        refreshCurrentPageData();
+    }, 250);
+}
+
+async function refreshCurrentPageData() {
+    if (!AppState.isLoggedIn) return;
+
+    const page = AppState.currentPage;
+    try {
+        if (page === 'campagne' && AppState.currentUser?.uid) {
+            await loadCampagne(AppState.currentUser.uid);
+        } else if (page === 'amici') {
+            await loadAmici();
+        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
+            await loadCampagnaDetails(AppState.currentCampagnaId);
+        } else if (page === 'sessione' && AppState.currentCampagnaId) {
+            await renderSessioneContent(AppState.currentCampagnaId);
+        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
+        }
+    } catch (error) {
+        console.warn('⚠️ Errore refresh pagina corrente:', error);
+    }
+}
+
+/**
+ * Invia un broadcast globale per notificare cambiamenti app
+ */
+async function sendAppEventBroadcast(change) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const payload = {
+        ...change,
+        sourceUid: AppState.currentUser?.uid || null,
+        ts: Date.now()
+    };
+
+    if (appEventsChannel) {
+        try {
+            await appEventsChannel.send({
+                type: 'broadcast',
+                event: 'app_change',
+                payload
+            });
+        } catch (error) {
+            console.warn('⚠️ Errore broadcast app (channel):', error);
+        }
+        return;
+    }
+
+    const tempChannel = supabase.channel('app-events');
+    tempChannel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+            tempChannel.send({
+                type: 'broadcast',
+                event: 'app_change',
+                payload
+            }).catch((error) => {
+                console.warn('⚠️ Errore broadcast app (temp):', error);
+            }).finally(() => {
+                setTimeout(() => {
+                    supabase.removeChannel(tempChannel);
+                }, 300);
+            });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            supabase.removeChannel(tempChannel);
+        }
+    });
+}
+
+/**
  * Mostra una notifica in-app
  */
 function showInAppNotification({ title, message, campagnaId, sessioneId }) {
@@ -6281,6 +6433,7 @@ window.submitRollRequest = async function(requestId, tipo, valore) {
             .eq('id', requestId);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: tableName, action: 'update', requestId });
 
         showNotification('Tiro inviato!');
 
@@ -6399,10 +6552,12 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
         if (campagnaError) throw campagnaError;
 
         // Rimuovi eventuali richieste pending per questa sessione
-        await supabase
+        const { error: deleteError } = await supabase
             .from('richieste_tiro_iniziativa')
             .delete()
             .eq('sessione_id', sessioneId);
+        if (deleteError) throw deleteError;
+        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId });
 
         // Crea richieste solo per i giocatori (escludi il DM)
         const partecipanti = (campagna.giocatori || []).filter(Boolean);
@@ -6418,6 +6573,7 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
             .insert(richieste);
 
         if (insertError) throw insertError;
+        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'insert', sessioneId });
 
         showNotification('Richieste tiro iniziativa inviate!');
         
@@ -6474,6 +6630,7 @@ window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
             .insert(richieste);
 
         if (insertError) throw insertError;
+        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'insert', sessioneId });
 
         showNotification('Richieste tiro inviate!');
         
@@ -6618,6 +6775,7 @@ window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
             .eq('richiesta_id', richiestaId);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'delete', sessioneId, richiestaId });
 
         // Nascondi la tabella
         const tableElement = document.getElementById('tiroGenericoTable');
@@ -6662,6 +6820,7 @@ window.terminaCombattimento = async function(campagnaId, sessioneId) {
             .eq('sessione_id', sessioneId);
 
         if (deleteError) throw deleteError;
+        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId });
 
         showNotification('Combattimento terminato');
         
@@ -6691,6 +6850,7 @@ window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
             .eq('id', iniziativaId);
 
         if (error) throw error;
+        await sendAppEventBroadcast({ table: 'iniziativa', action: 'delete', sessioneId, iniziativaId });
 
         showNotification('Iniziativa rimossa!');
         
