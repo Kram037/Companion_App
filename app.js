@@ -5405,10 +5405,13 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             combattimentoTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Combattimento - Sessione ${numeroSessione}</div>`;
         }
 
-        // Carica i tiri di iniziativa dalla tabella richieste_tiro_iniziativa
+        // Carica i tiri di iniziativa dalla tabella richieste_tiro_iniziativa con join agli utenti
         const { data: tiriIniziativa, error: tiriError } = await supabase
             .from('richieste_tiro_iniziativa')
-            .select('*')
+            .select(`
+                *,
+                utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)
+            `)
             .eq('sessione_id', sessioneId)
             .order('valore', { ascending: false });
 
@@ -5418,11 +5421,11 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
         
-        // Verifica se l'utente è il DM (serve per mostrare il bottone)
+        // Verifica se l'utente è il DM (lo facciamo prima per mostrare il bottone sempre)
         const isDM = await isCurrentUserDM(campagnaId);
         const terminaCombattimentoHtml = isDM ? `
             <div style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
-                <button class="btn-secondary" onclick="terminaCombattimento('${campagnaId}', '${sessioneId}')" aria-label="Termina combattimento">
+                <button class="btn-danger btn-small" onclick="terminaCombattimento('${campagnaId}', '${sessioneId}')" aria-label="Termina combattimento">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -5431,38 +5434,6 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                 </button>
             </div>
         ` : '';
-        
-        // Recupera i nomi degli utenti con una query separata (fallback + RPC)
-        const giocatoriIds = [...new Set(tiriCompleted.map(t => t.giocatore_id).filter(Boolean))];
-        const nomiUtenti = new Map();
-        
-        if (giocatoriIds.length > 0) {
-            const { data: utenti, error: utentiError } = await supabase
-                .from('utenti')
-                .select('id, nome_utente, cid')
-                .in('id', giocatoriIds);
-            
-            if (!utentiError && utenti) {
-                utenti.forEach(u => {
-                    nomiUtenti.set(u.id, { nome_utente: u.nome_utente, cid: u.cid });
-                });
-            }
-
-            // Se mancano nomi (RLS), prova con RPC che bypassa le policy
-            if (nomiUtenti.size < giocatoriIds.length) {
-                const { data: giocatori, error: giocatoriError } = await supabase.rpc('get_giocatori_campagna', {
-                    campagna_id_param: campagnaId
-                });
-                
-                if (!giocatoriError && giocatori) {
-                    giocatori.forEach(u => {
-                        if (giocatoriIds.includes(u.id) && !nomiUtenti.has(u.id)) {
-                            nomiUtenti.set(u.id, { nome_utente: u.nome_utente, cid: u.cid });
-                        }
-                    });
-                }
-            }
-        }
         
         if (tiriCompleted.length === 0) {
             combattimentoContent.innerHTML = `
@@ -5474,9 +5445,9 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `;
         } else {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
-                const utenteData = nomiUtenti.get(tiro.giocatore_id);
-                const nomeUtente = utenteData?.nome_utente || 'Sconosciuto';
-                const cid = utenteData?.cid;
+                // I dati dell'utente vengono dal join
+                const nomeUtente = tiro.utenti?.nome_utente || 'Sconosciuto';
+                const cid = tiro.utenti?.cid;
                 
                 return `
                 <div class="combattimento-card">
