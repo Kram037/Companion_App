@@ -5418,7 +5418,21 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
         
-        // Recupera i nomi degli utenti con una query separata (fallback)
+        // Verifica se l'utente è il DM (serve per mostrare il bottone)
+        const isDM = await isCurrentUserDM(campagnaId);
+        const terminaCombattimentoHtml = isDM ? `
+            <div style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
+                <button class="btn-secondary" onclick="terminaCombattimento('${campagnaId}', '${sessioneId}')" aria-label="Termina combattimento">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Termina Combattimento
+                </button>
+            </div>
+        ` : '';
+        
+        // Recupera i nomi degli utenti con una query separata (fallback + RPC)
         const giocatoriIds = [...new Set(tiriCompleted.map(t => t.giocatore_id).filter(Boolean))];
         const nomiUtenti = new Map();
         
@@ -5433,6 +5447,21 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                     nomiUtenti.set(u.id, { nome_utente: u.nome_utente, cid: u.cid });
                 });
             }
+
+            // Se mancano nomi (RLS), prova con RPC che bypassa le policy
+            if (nomiUtenti.size < giocatoriIds.length) {
+                const { data: giocatori, error: giocatoriError } = await supabase.rpc('get_giocatori_campagna', {
+                    campagna_id_param: campagnaId
+                });
+                
+                if (!giocatoriError && giocatori) {
+                    giocatori.forEach(u => {
+                        if (giocatoriIds.includes(u.id) && !nomiUtenti.has(u.id)) {
+                            nomiUtenti.set(u.id, { nome_utente: u.nome_utente, cid: u.cid });
+                        }
+                    });
+                }
+            }
         }
         
         if (tiriCompleted.length === 0) {
@@ -5441,6 +5470,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                     <p>Combattimento in corso...</p>
                     <p style="margin-top: 1rem; color: var(--text-light);">I giocatori stanno tirando l'iniziativa</p>
                 </div>
+                ${terminaCombattimentoHtml}
             `;
         } else {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
@@ -5462,20 +5492,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `;
             }).join('');
 
-            // Verifica se l'utente è il DM
-            const isDM = await isCurrentUserDM(campagnaId);
-            
-            combattimentoContent.innerHTML = cardsHTML + (isDM ? `
-                <div style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
-                    <button class="btn-danger" onclick="terminaCombattimento('${campagnaId}', '${sessioneId}')" aria-label="Termina combattimento">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                        Termina Combattimento
-                    </button>
-                </div>
-            ` : '');
+            combattimentoContent.innerHTML = cardsHTML + terminaCombattimentoHtml;
         }
     } catch (error) {
         console.error('❌ Errore nel rendering combattimento:', error);
