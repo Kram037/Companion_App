@@ -15,14 +15,26 @@ RETURNS TABLE (
     campagna_nome_campagna TEXT,
     -- Campi inviante (DM)
     inviante_nome_utente TEXT,
-    inviante_cid INTEGER,
-    inviante_email TEXT
+    inviante_cid INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
+    -- Consenti solo al destinatario di leggere i propri inviti
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM utenti u
+        WHERE u.id = p_invitato_id
+          AND u.uid = auth.uid()::text
+    ) THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
     -- Recupera gli inviti pending per l'utente specificato
     -- Include i dati della campagna e dell'inviante (DM)
     RETURN QUERY
@@ -36,8 +48,7 @@ BEGIN
         ic.updated_at,
         c.nome_campagna AS campagna_nome_campagna,
         u.nome_utente AS inviante_nome_utente,
-        u.cid AS inviante_cid,
-        u.email AS inviante_email
+        u.cid AS inviante_cid
     FROM inviti_campagna ic
     LEFT JOIN campagne c ON c.id = ic.campagna_id
     LEFT JOIN utenti u ON u.id = ic.inviante_id

@@ -1,5 +1,6 @@
--- Schema Database Supabase per Companion App
--- Esegui questo script nella SQL Editor di Supabase
+-- Schema Database Supabase per Companion App (LEGACY)
+-- ATTENZIONE: questo file usa ID UUID ed è obsoleto.
+-- Per lo schema attuale con ID VARCHAR(10), usa `clean-and-recreate-schema.sql`.
 
 -- Abilita estensioni necessarie
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

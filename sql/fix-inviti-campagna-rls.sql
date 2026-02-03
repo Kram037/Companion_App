@@ -52,7 +52,7 @@ BEGIN
     
     RETURN v_invito_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Funzione per aggiornare lo stato di un invito (accetta/rifiuta)
 -- Gestisce anche l'aggiornamento dell'array giocatori:
@@ -142,7 +142,7 @@ BEGIN
     
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Funzione per rimuovere un giocatore dalla campagna (solo per DM)
 -- Aggiorna lo stato dell'invito a 'rejected' e rimuove il giocatore dall'array giocatori
@@ -204,7 +204,7 @@ BEGIN
     
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Grant execute alla funzione per gli utenti autenticati
 GRANT EXECUTE ON FUNCTION dm_rimuovi_giocatore(VARCHAR(10), VARCHAR(10), VARCHAR(10)) TO authenticated;

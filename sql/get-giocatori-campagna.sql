@@ -13,12 +13,37 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
+    v_current_user_id VARCHAR(10);
     v_giocatori VARCHAR(10)[];
+    v_id_dm VARCHAR(10);
 BEGIN
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
+    SELECT id INTO v_current_user_id
+    FROM utenti
+    WHERE uid = auth.uid()::text;
+
+    IF v_current_user_id IS NULL THEN
+        RAISE EXCEPTION 'Utente non trovato';
+    END IF;
+
     -- Ottieni l'array giocatori dalla campagna
-    SELECT c.giocatori INTO v_giocatori
+    SELECT c.giocatori, c.id_dm INTO v_giocatori, v_id_dm
     FROM campagne c
     WHERE c.id = campagna_id_param;
+
+    IF v_id_dm IS NULL THEN
+        RAISE EXCEPTION 'Campagna non trovata';
+    END IF;
+
+    v_giocatori := COALESCE(v_giocatori, ARRAY[]::VARCHAR(10)[]);
+
+    -- Autorizza solo DM o giocatori della campagna
+    IF v_current_user_id != v_id_dm AND NOT (v_current_user_id = ANY(v_giocatori)) THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
     
     -- Se non ci sono giocatori, ritorna vuoto
     IF v_giocatori IS NULL OR array_length(v_giocatori, 1) IS NULL THEN

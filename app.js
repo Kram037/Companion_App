@@ -1366,8 +1366,9 @@ let appEventsChannel = null;
 let appEventsRefreshTimeout = null;
 let editingCampagnaId = null;
 
-async function loadCampagne(userId) {
+async function loadCampagne(userId, options = {}) {
     const supabase = getSupabaseClient();
+    const { skipRealtimeSetup = false } = options;
     
     if (!supabase) {
         console.error('❌ Supabase non disponibile');
@@ -1393,7 +1394,7 @@ async function loadCampagne(userId) {
     const invitiRicevuti = await loadInvitiRicevuti(userId);
     
     // Disconnetti da eventuali subscription precedenti
-    if (campagneChannel) {
+    if (!skipRealtimeSetup && campagneChannel) {
         supabase.removeChannel(campagneChannel);
         campagneChannel = null;
     }
@@ -1480,30 +1481,24 @@ async function loadCampagne(userId) {
         renderCampagne(campagneFiltrate, true, invitiRicevuti);
 
         // Setup real-time subscription
-        campagneChannel = supabase
-            .channel('campagne-changes')
-            .on('postgres_changes', 
-                { 
-                    event: '*', 
-                    schema: 'public', 
-                    table: 'campagne',
-                    filter: `id_dm=eq.${utente.id}`
-                }, 
-                async (payload) => {
-                    console.log('🔄 Cambio rilevato nelle campagne:', payload);
-                    // Ricarica le campagne
-                    const { data: updatedCampagne, error: reloadError } = await supabase
-                        .from('campagne')
-                        .select('*')
-                        .eq('id_dm', utente.id)
-                        .order('data_creazione', { ascending: false });
-                    
-                    if (!reloadError && updatedCampagne) {
-                        renderCampagne(updatedCampagne, true);
+        if (!skipRealtimeSetup) {
+            campagneChannel = supabase
+                .channel('campagne-changes')
+                .on('postgres_changes', 
+                    { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'campagne',
+                        filter: `id_dm=eq.${utente.id}`
+                    }, 
+                    async (payload) => {
+                        console.log('🔄 Cambio rilevato nelle campagne:', payload);
+                        // Ricarica campagne preservando inviti, preferiti e filtri
+                        await loadCampagne(userId, { skipRealtimeSetup: true });
                     }
-                }
-            )
-            .subscribe();
+                )
+                .subscribe();
+        }
 
     } catch (error) {
         console.error('❌ Errore nel caricamento campagne:', error);
@@ -1556,8 +1551,7 @@ async function loadInvitiRicevuti(userId) {
             inviante: row.inviante_nome_utente ? {
                 id: row.inviante_id,
                 nome_utente: row.inviante_nome_utente,
-                cid: row.inviante_cid,
-                email: row.inviante_email
+                cid: row.inviante_cid
             } : null
         }));
 
@@ -2564,8 +2558,10 @@ async function handleCercaUtente(e) {
                 }
             }
             
+            const safeNomeUtente = escapeHtml(data.nome_utente || '');
+            const safeCid = escapeHtml(String(data.cid ?? ''));
             searchUserInfo.innerHTML = `
-                <p><strong>${data.nome_utente}</strong> (CID: ${data.cid})</p>
+                <p><strong>${safeNomeUtente}</strong> (CID: ${safeCid})</p>
                 ${statusText}
             `;
             
@@ -2786,8 +2782,7 @@ async function loadAmici() {
         const amici = (amiciResult.data || []).map(row => ({
             id: row.amico_id,
             nome_utente: row.nome_utente,
-            cid: row.cid,
-            email: row.email
+            cid: row.cid
         }));
         
         // Formatta le richieste in entrata
@@ -2796,8 +2791,7 @@ async function loadAmici() {
             utente: {
                 id: row.richiedente_id,
                 nome_utente: row.nome_utente,
-                cid: row.cid,
-                email: row.email
+                cid: row.cid
             }
         }));
         
@@ -2807,8 +2801,7 @@ async function loadAmici() {
             utente: {
                 id: row.destinatario_id,
                 nome_utente: row.nome_utente,
-                cid: row.cid,
-                email: row.email
+                cid: row.cid
             }
         }));
         
@@ -2849,8 +2842,8 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
                                 </svg>
                             </div>
                             <div>
-                                <p class="amico-nome">${req.utente?.nome_utente || 'Utente'}</p>
-                                <p class="amico-cid">CID: ${req.utente?.cid || ''}</p>
+                                <p class="amico-nome">${escapeHtml(req.utente?.nome_utente || 'Utente')}</p>
+                                <p class="amico-cid">CID: ${escapeHtml(String(req.utente?.cid ?? ''))}</p>
                             </div>
                         </div>
                         <div class="amico-actions">
@@ -2900,8 +2893,8 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
                             </svg>
                         </div>
                         <div>
-                            <p class="amico-nome">${amico.nome_utente || 'Utente'}</p>
-                            <p class="amico-cid">CID: ${amico.cid || ''}</p>
+                            <p class="amico-nome">${escapeHtml(amico.nome_utente || 'Utente')}</p>
+                            <p class="amico-cid">CID: ${escapeHtml(String(amico.cid ?? ''))}</p>
                         </div>
                     </div>
                     <div class="amico-actions">
@@ -3811,8 +3804,7 @@ async function renderInvitaGiocatoriTab(campagnaId) {
         const amici = (amiciData || []).map(row => ({
             id: row.amico_id,
             nome_utente: row.nome_utente,
-            cid: row.cid,
-            email: row.email
+            cid: row.cid
         }));
 
         // Filtra gli amici escludendo quelli già nella campagna
