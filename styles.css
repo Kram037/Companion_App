@@ -107,7 +107,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    height: 56px;
+    height: 64px;
 }
 
 [data-theme="dark"] .header {
@@ -175,8 +175,8 @@ body.user-logged-in .header-username {
 }
 
 .d20-logo {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2485,8 +2485,8 @@ body.user-logged-in .header-username {
 @media (max-width: 480px) {
     .main-content { padding: var(--spacing-sm); }
 
-    .header { padding: 0 var(--spacing-md); height: 52px; }
-    .d20-logo { width: 36px; height: 36px; }
+    .header { padding: 0 var(--spacing-md); height: 58px; }
+    .d20-logo { width: 42px; height: 42px; }
 
     .page-header { padding: 0; gap: var(--spacing-sm); }
     .page-header h1 { font-size: 1.2rem; }
