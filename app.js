@@ -65,6 +65,8 @@ const AppState = {
     currentSessioneId: null,
     currentCampagnaDetails: null,
     campagnaGiocatori: [],
+    cachedUserData: null,
+    cachedCampagne: null,
     campagneFilters: {
         searchText: '',
         tipologia: 'all',
@@ -283,38 +285,28 @@ function setupSupabaseAuth() {
                 };
                 AppState.isLoggedIn = true;
                 updateUIForLoggedIn();
-                console.log('✅ Utente autenticato:', session.user.email);
                 
-            // Initialize user document and load data
-            initializeUserDocument(session.user).then(() => {
-                // Naviga alla pagina salvata o carica i dati
-                if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-                    // Se siamo nella pagina combattimento, carica il contenuto e avvia Realtime
-                    navigateToPage('combattimento');
-                } else if (AppState.currentCampagnaId) {
-                    // Se c'è una campagna salvata, vai ai dettagli
-                    navigateToPage('dettagli');
-                } else {
-                    // Carica i dati in base alla pagina corrente
-                    if (AppState.currentPage === 'campagne') {
+                initializeUserDocument(session.user).then(() => {
+                    if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+                        navigateToPage('combattimento');
+                    } else if (AppState.currentCampagnaId) {
+                        navigateToPage('dettagli');
+                    } else if (AppState.currentPage === 'campagne') {
                         loadCampagne(session.user.id);
                     } else if (AppState.currentPage === 'amici') {
                         loadAmici();
                     } else {
-                        // Naviga alla pagina salvata
                         navigateToPage(AppState.currentPage || 'campagne');
                     }
-                }
-                
-                // Avvia Realtime subscriptions per richieste tiro e sessioni
-                startRollRequestsRealtime();
-                startSessionRealtime();
-                startAppEventsRealtime();
-            });
+                    
+                    startRollRequestsRealtime();
+                    startSessionRealtime();
+                    startAppEventsRealtime();
+                });
             } else {
-                // User is signed out
                 AppState.currentUser = null;
                 AppState.isLoggedIn = false;
+                invalidateUserCache();
                 updateUIForLoggedOut();
                 console.log('👤 Utente non autenticato');
                 
@@ -336,7 +328,6 @@ function setupSupabaseAuth() {
     }
 }
 
-// Check current auth state
 async function checkAuthState() {
     const supabase = getSupabaseClient();
     if (!supabase) return;
@@ -355,26 +346,18 @@ async function checkAuthState() {
             updateUIForLoggedIn();
             await initializeUserDocument(session.user);
             
-            // Naviga alla pagina salvata o carica i dati
             if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-                // Se siamo nella pagina combattimento, carica il contenuto e avvia Realtime
                 navigateToPage('combattimento');
             } else if (AppState.currentCampagnaId) {
-                // Se c'è una campagna salvata, vai ai dettagli
                 navigateToPage('dettagli');
+            } else if (AppState.currentPage === 'campagne') {
+                loadCampagne(session.user.id);
+            } else if (AppState.currentPage === 'amici') {
+                loadAmici();
             } else {
-                // Carica i dati in base alla pagina corrente
-                if (AppState.currentPage === 'campagne') {
-                    loadCampagne(session.user.id);
-                } else if (AppState.currentPage === 'amici') {
-                    loadAmici();
-                } else {
-                    // Naviga alla pagina salvata
-                    navigateToPage(AppState.currentPage || 'campagne');
-                }
+                navigateToPage(AppState.currentPage || 'campagne');
             }
             
-            // Avvia Realtime subscriptions per richieste tiro e sessioni
             startRollRequestsRealtime();
             startSessionRealtime();
             startAppEventsRealtime();
@@ -382,7 +365,6 @@ async function checkAuthState() {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
             
-            // Pulisci i dati quando l'utente esce
             if (AppState.currentPage === 'campagne') {
                 renderCampagne([], false);
             } else if (AppState.currentPage === 'amici') {
@@ -481,69 +463,24 @@ function updateUIForLoggedOut() {
 
 // Setup Event Listeners
 function setupEventListeners() {
-    console.log('🔧 Setup event listeners...');
-    console.log('Elementi disponibili:', Object.keys(elements).filter(key => elements[key] !== null));
-    console.log('Verifica elementi critici:', {
-        userBtn: !!elements.userBtn,
-        settingsBtn: !!elements.settingsBtn,
-        toolbarBtns: elements.toolbarBtns?.length || 0
-    });
-    
-    // User button - opens login if not logged in, or user menu if logged in
     if (elements.userBtn) {
-        // Use onclick for more reliable binding
         elements.userBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('👤 Click su user button');
-            console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
-            console.log('AppState.currentUser:', AppState.currentUser);
             if (!AppState.isLoggedIn) {
-                console.log('→ Apertura login modal');
                 openLoginModal();
             } else {
-                console.log('→ Apertura user modal');
                 openUserModal();
             }
         };
-        // Also add event listener as backup
-        elements.userBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('👤 Click su user button (addEventListener)');
-            console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
-            if (!AppState.isLoggedIn) {
-                console.log('→ Apertura login modal (addEventListener)');
-                openLoginModal();
-            } else {
-                console.log('→ Apertura user modal (addEventListener)');
-                openUserModal();
-            }
-        });
-        console.log('✅ Event listener aggiunto a userBtn');
-    } else {
-        console.error('❌ userBtn non trovato');
     }
 
-    // Settings button
     if (elements.settingsBtn) {
-        // Use onclick for more reliable binding
         elements.settingsBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('⚙️ Click su settings button');
             openSettingsModal();
         };
-        // Also add event listener as backup
-        elements.settingsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('⚙️ Click su settings button (addEventListener)');
-            openSettingsModal();
-        });
-        console.log('✅ Event listener aggiunto a settingsBtn');
-    } else {
-        console.error('❌ settingsBtn non trovato');
     }
 
     // Close modals
@@ -553,24 +490,13 @@ function setupEventListeners() {
             e.stopPropagation();
             closeLoginModal();
         };
-        elements.closeLoginModal.addEventListener('click', closeLoginModal);
     }
     if (elements.closeUserModal) {
-        console.log('✅ Trovato closeUserModal, aggiungo listener');
         elements.closeUserModal.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('❌ Click su closeUserModal');
             closeUserModal();
         };
-        elements.closeUserModal.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('❌ Click su closeUserModal (addEventListener)');
-            closeUserModal();
-        });
-    } else {
-        console.error('❌ closeUserModal non trovato!');
     }
     if (elements.closeSettingsModal) {
         elements.closeSettingsModal.onclick = function(e) {
@@ -578,7 +504,6 @@ function setupEventListeners() {
             e.stopPropagation();
             closeSettingsModal();
         };
-        elements.closeSettingsModal.addEventListener('click', closeSettingsModal);
     }
 
     // Close modal on background click
@@ -606,36 +531,19 @@ function setupEventListeners() {
         });
     }
 
-    // Theme buttons
     if (elements.themeLight) {
         elements.themeLight.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('🎨 Click su tema light');
             setTheme('light');
         };
-        // Also addEventListener as backup
-        elements.themeLight.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🎨 Click su tema light (addEventListener)');
-            setTheme('light');
-        });
     }
     if (elements.themeDark) {
         elements.themeDark.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('🎨 Click su tema dark');
             setTheme('dark');
         };
-        // Also addEventListener as backup
-        elements.themeDark.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🎨 Click su tema dark (addEventListener)');
-            setTheme('dark');
-        });
     }
 
     // Login form submission
@@ -648,28 +556,15 @@ function setupEventListeners() {
         elements.logoutBtn.addEventListener('click', handleLogout);
     }
 
-    // Toolbar navigation
     if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
-        elements.toolbarBtns.forEach((btn, index) => {
+        elements.toolbarBtns.forEach((btn) => {
             const page = btn.getAttribute('data-page');
-            // Use onclick for more reliable binding
             btn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📄 Click su toolbar button:', page);
                 navigateToPage(page);
             };
-            // Also add event listener as backup
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('📄 Click su toolbar button (addEventListener):', page);
-                navigateToPage(page);
-            });
         });
-        console.log(`✅ Event listeners aggiunti a ${elements.toolbarBtns.length} toolbar buttons`);
-    } else {
-        console.error('❌ toolbarBtns non trovati');
     }
 
     // Register/Login link toggle
@@ -699,23 +594,12 @@ function setupEventListeners() {
         console.log('✅ Event listener aggiunto a googleLoginBtn');
     }
 
-    // Campagne buttons
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('➕ Click su Crea Campagna');
             openCampagnaModal();
         };
-        elements.addCampagnaBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('➕ Click su Crea Campagna (addEventListener)');
-            openCampagnaModal();
-        });
-        console.log('✅ Event listener aggiunto a addCampagnaBtn');
-    } else {
-        console.error('❌ addCampagnaBtn non trovato');
     }
 
     // Filtri campagne
@@ -1085,25 +969,6 @@ function setupEventListeners() {
         });
     }
     
-    console.log('✅ Setup event listeners completato');
-    
-    // Test diretto: verifica che i bottoni siano cliccabili
-    setTimeout(() => {
-        console.log('🧪 Test bottoni...');
-        if (elements.userBtn) {
-            console.log('userBtn presente, verifico click handler...');
-            console.log('userBtn.onclick:', typeof elements.userBtn.onclick);
-        }
-        if (elements.settingsBtn) {
-            console.log('settingsBtn presente');
-        }
-        if (elements.toolbarBtns && elements.toolbarBtns.length > 0) {
-            console.log(`${elements.toolbarBtns.length} toolbar buttons presenti`);
-            elements.toolbarBtns.forEach((btn, i) => {
-                console.log(`Toolbar button ${i}:`, btn.getAttribute('data-page'), 'onclick:', typeof btn.onclick);
-            });
-        }
-    }, 300);
 }
 
 // Navigation
@@ -1163,16 +1028,9 @@ function navigateToPage(pageName) {
         stopCampagnaDetailsRealtime();
     }
     
-    // Carica dati specifici per la pagina
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
     } else if (pageName === 'campagne') {
-        // Se si naviga verso campagne ma si era nella pagina dettagli, torna ai dettagli
-        if (AppState.currentCampagnaId) {
-            navigateToPage('dettagli');
-            return;
-        }
-        // Altrimenti carica la lista campagne
         if (AppState.isLoggedIn && AppState.currentUser) {
             loadCampagne(AppState.currentUser.uid);
         }
@@ -1370,25 +1228,11 @@ async function loadCampagne(userId, options = {}) {
     const supabase = getSupabaseClient();
     const { skipRealtimeSetup = false } = options;
     
-    if (!supabase) {
-        console.error('❌ Supabase non disponibile');
-        return;
-    }
+    if (!supabase || !userId) return;
 
-    if (!userId) {
-        console.error('❌ userId non fornito');
-        return;
+    if (elements.campagneList) {
+        elements.campagneList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>';
     }
-
-    // Verifica che l'utente sia autenticato
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session || session.user.id !== userId) {
-        console.error('❌ Utente non autenticato o userId non corrisponde');
-        renderCampagne([], false);
-        return;
-    }
-    
-    console.log('📚 Caricamento campagne per utente:', userId);
     
     // Carica anche gli inviti ricevuti
     const invitiRicevuti = await loadInvitiRicevuti(userId);
@@ -1477,7 +1321,8 @@ async function loadCampagne(userId, options = {}) {
         console.log('✅ Campagne caricate:', campagne?.length || 0);
         
         // Applica i filtri prima di renderizzare (passa l'ID utente per filtri ruolo)
-        const campagneFiltrate = applyCampagneFilters(campagne || [], AppState.campagneFilters, utente.id);
+        AppState.cachedCampagne = campagne || [];
+        const campagneFiltrate = applyCampagneFilters(AppState.cachedCampagne, AppState.campagneFilters, utente.id);
         renderCampagne(campagneFiltrate, true, invitiRicevuti);
 
         // Setup real-time subscription
@@ -1703,16 +1548,19 @@ function setupCampagneFilters() {
 }
 
 /**
- * Applica i filtri e ricarica le campagne
+ * Applica i filtri usando i dati cached (senza ricaricare da DB)
  */
 async function applyFiltersAndRerender() {
     if (!AppState.currentUser || !AppState.isLoggedIn) return;
     
-    // Salva preferenze in localStorage
     localStorage.setItem('campagneFilters', JSON.stringify(AppState.campagneFilters));
     
-    // Ricarica le campagne (che applicheranno automaticamente i filtri)
-    await loadCampagne(AppState.currentUser.uid);
+    if (AppState.cachedCampagne && AppState.cachedUserData) {
+        const campagneFiltrate = applyCampagneFilters(AppState.cachedCampagne, AppState.campagneFilters, AppState.cachedUserData.id);
+        renderCampagne(campagneFiltrate, true);
+    } else {
+        await loadCampagne(AppState.currentUser.uid);
+    }
 }
 
 async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
@@ -1788,20 +1636,36 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         return;
     }
 
-    // Carica i nomi dei DM per tutte le campagne usando la funzione RPC (bypassa RLS)
     const dmIds = [...new Set(campagne.map(c => c.id_dm).filter(Boolean))];
     let dmMap = new Map();
     const supabase = getSupabaseClient();
+    
+    if (currentUserId && AppState.cachedUserData) {
+        dmMap.set(currentUserId, AppState.cachedUserData);
+    }
+    
     if (dmIds.length > 0 && supabase) {
-        const { data: dms, error: dmsError } = await supabase
-            .rpc('get_dms_campagne', {
-                p_dm_ids: dmIds
-            });
-        
-        if (dmsError) {
-            console.error('❌ Errore nel caricamento DM:', dmsError);
-        } else if (dms) {
-            dms.forEach(dm => dmMap.set(dm.id, dm));
+        try {
+            const { data: dms, error: dmsError } = await supabase
+                .rpc('get_dms_campagne', { p_dm_ids: dmIds });
+            
+            if (!dmsError && dms) {
+                dms.forEach(dm => dmMap.set(dm.id, dm));
+            } else if (dmsError) {
+                console.warn('⚠️ RPC get_dms_campagne fallita, fallback query diretta:', dmsError);
+                const missingIds = dmIds.filter(id => !dmMap.has(id));
+                if (missingIds.length > 0) {
+                    const { data: fallbackDms } = await supabase
+                        .from('utenti')
+                        .select('id, nome_utente, cid')
+                        .in('id', missingIds);
+                    if (fallbackDms) {
+                        fallbackDms.forEach(dm => dmMap.set(dm.id, dm));
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('❌ Errore nel caricamento DM:', err);
         }
     }
 
@@ -1835,21 +1699,9 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         // Calcola il numero di giocatori dall'array
         const numeroGiocatori = Array.isArray(campagna.giocatori) ? campagna.giocatori.length : 0;
 
-        // Renderizza l'icona della campagna
-        let iconaHTML = '';
-        if (campagna.icona_type === 'image' && campagna.icona_data) {
-            iconaHTML = `<img src="${escapeHtml(campagna.icona_data)}" alt="Icona campagna" class="campagna-icon-image">`;
-        } else if (campagna.icona_type === 'predefined' && campagna.icona_name) {
-            const selectedIcon = predefinedIcons.find(i => i.name === campagna.icona_name);
-            if (selectedIcon) {
-                iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
-            }
-        }
-        // Se non c'è icona, usa quella di default
-        if (!iconaHTML) {
-            const defaultIcon = predefinedIcons.find(i => i.name === 'dice');
-            iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${defaultIcon.svg}</svg></div>`;
-        }
+        const iconName = campagna.icona_name || 'dice';
+        const selectedIcon = predefinedIcons.find(i => i.name === iconName) || predefinedIcons[0];
+        const iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
 
         const isPreferito = campagna.isPreferito === true;
         return `
@@ -2127,7 +1979,7 @@ async function generateUniqueCid() {
         
         console.log('✅ CID generato dalla funzione SQL:', data);
         return data;
-        } catch (error) {
+    } catch (error) {
         console.error('❌ Errore nella generazione CID, uso fallback:', error);
         // Fallback: genera un numero casuale
         return Math.floor(1000 + Math.random() * 9000);
@@ -2193,75 +2045,64 @@ async function handleSaveUserName() {
 }
 
 /**
- * Trova l'utente per uid
+ * Trova l'utente per uid (con cache)
  */
-async function findUserByUid(uid) {
+async function findUserByUid(uid, forceRefresh = false) {
+    if (!forceRefresh && AppState.cachedUserData && AppState.currentUser && AppState.currentUser.uid === uid) {
+        return AppState.cachedUserData;
+    }
+
     const supabase = getSupabaseClient();
     if (!supabase) return null;
     
     try {
-        // Verifica che l'utente sia autenticato
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            console.warn('⚠️ Nessuna sessione attiva per la query utente');
-            return null;
-        }
-        
-        // Usa maybeSingle per evitare errori se non trovato
         const { data, error } = await supabase
             .from('utenti')
             .select('*')
             .eq('uid', uid)
-            .maybeSingle(); // maybeSingle ritorna null se non trova risultati invece di errore
+            .maybeSingle();
         
         if (error) {
-            // PGRST116 significa "nessun risultato", non è un errore critico
-            if (error.code === 'PGRST116') {
-        return null;
-            }
+            if (error.code === 'PGRST116') return null;
             console.error('❌ Errore nella ricerca utente per uid:', error);
             throw error;
         }
         
+        if (data && AppState.currentUser && AppState.currentUser.uid === uid) {
+            AppState.cachedUserData = data;
+        }
         return data;
     } catch (error) {
         console.error('❌ Errore nella ricerca utente per uid:', error);
-        // Non lanciare l'errore, ritorna null per evitare crash
         return null;
     }
+}
+
+function invalidateUserCache() {
+    AppState.cachedUserData = null;
+    AppState.cachedCampagne = null;
 }
 
 /**
  * Inizializza o aggiorna l'utente in Supabase
  */
 async function initializeUserDocument(user) {
-    console.log('🔧 Inizializzazione utente per:', user ? user.id : 'null');
-    
     const supabase = getSupabaseClient();
     
-    if (!supabase || !user) {
-        console.error('❌ Supabase o utente non disponibile per inizializzare utente');
-        return null;
-    }
+    if (!supabase || !user) return null;
     
-    // Evita inizializzazioni multiple simultanee per lo stesso utente
     if (initializingUsers.has(user.id)) {
-        console.log('⚠️ Inizializzazione già in corso per questo utente, aspetto...');
-        // Aspetta che l'inizializzazione corrente finisca
         let waitAttempts = 0;
         while (initializingUsers.has(user.id) && waitAttempts < 50) {
             await new Promise(resolve => setTimeout(resolve, 100));
             waitAttempts++;
         }
-        // Prova a caricare l'utente che dovrebbe essere stato creato
         return await findUserByUid(user.id);
     }
     
     initializingUsers.add(user.id);
     
     try {
-        console.log('📄 Controllo utente esistente...');
-        // Cerca l'utente per uid (user.id è l'UUID di Supabase Auth)
         const existingUser = await findUserByUid(user.id);
         
         const currentTheme = localStorage.getItem('theme') || 'light';
@@ -2269,41 +2110,33 @@ async function initializeUserDocument(user) {
         const nomeUtente = user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Utente';
         
         if (existingUser) {
-            console.log('✅ Utente già esistente, aggiorno...');
-            // Utente esistente: aggiorna solo i campi che potrebbero essere cambiati
             const { data, error } = await supabase
                 .from('utenti')
                 .update({
-                email: user.email,
-                nome_utente: nomeUtente,
-                tema_scuro: temaScuro
+                    email: user.email,
+                    tema_scuro: temaScuro
                 })
                 .eq('uid', user.id)
                 .select()
                 .single();
             
             if (error) throw error;
+            
+            if (data) {
+                AppState.cachedUserData = data;
+            }
+            
             await sendAppEventBroadcast({ table: 'utenti', action: 'update', uid: user.id });
-            
-            console.log('✅ Utente aggiornato');
-            
-            // Carica i dati utente per applicare il tema
             await loadUserData(user.id);
             
             return data;
         } else {
-            console.log('🆕 Nuovo utente, creo record...');
-            // Nuovo utente: crea record completo
-            console.log('🔢 Generazione CID...');
             let cid;
             try {
                 cid = await generateUniqueCid();
-                console.log('✅ CID generato:', cid);
             } catch (cidError) {
                 console.error('❌ Errore nella generazione CID, uso fallback:', cidError);
-                // Fallback: genera un CID senza verificare l'unicità
                 cid = Math.floor(1000 + Math.random() * 9000);
-                console.log('⚠️ Usando CID fallback:', cid);
             }
             
             const userData = {
@@ -2314,8 +2147,6 @@ async function initializeUserDocument(user) {
                 tema_scuro: temaScuro
             };
             
-            console.log('💾 Salvataggio utente...');
-            console.log('📋 Dati:', userData);
             
             // Usa upsert che gestisce automaticamente insert/update
             // onConflict su uid (chiave primaria per identificare l'utente)
@@ -2335,15 +2166,11 @@ async function initializeUserDocument(user) {
                 data = result.data;
                 error = result.error;
                 
-                if (!error) {
-                    break; // Successo
-                }
+                if (!error) break;
                 
-                // Se è un errore di chiave duplicata, aspetta un po' e riprova
                 if (error.code === '23505') {
                     attempts++;
                     if (attempts < 3) {
-                        console.log(`⚠️ Conflitto chiave duplicata, tentativo ${attempts + 1}/3...`);
                         await new Promise(resolve => setTimeout(resolve, 200));
                         // Prova a caricare l'utente esistente
                         const existingUser = await findUserByUid(user.id);
@@ -2374,15 +2201,11 @@ async function initializeUserDocument(user) {
                 break; // Errore diverso o troppi tentativi
             }
             
-            if (error) {
-                console.error('❌ Errore nell\'upsert utente dopo', attempts, 'tentativi:', error);
-                throw error;
+            if (error) throw error;
+            
+            if (data) {
+                AppState.cachedUserData = data;
             }
-            
-            console.log('✅ Utente creato/aggiornato con successo, CID:', data?.cid || cid);
-            
-            // Piccolo delay per assicurarsi che il database sia aggiornato
-            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Applica il tema
             if (temaScuro) {
@@ -2395,9 +2218,6 @@ async function initializeUserDocument(user) {
         }
     } catch (error) {
         console.error('❌ Errore nell\'inizializzazione utente:', error);
-        console.error('Messaggio errore:', error.message);
-        
-        showNotification('⚠️ Errore nell\'inizializzazione profilo. Controlla la console per i dettagli.');
         
         return null;
     } finally {
@@ -2742,14 +2562,15 @@ window.rimuoviAmico = async function(amicoId) {
  * Carica e visualizza gli amici e le richieste
  */
 async function loadAmici() {
-    if (!AppState.isLoggedIn || !AppState.currentUser) {
-        return;
-    }
+    if (!AppState.isLoggedIn || !AppState.currentUser) return;
     
     const supabase = getSupabaseClient();
-    if (!supabase) {
-        console.error('❌ Supabase non disponibile');
-        return;
+    if (!supabase) return;
+    
+    const amiciPlaceholder = document.getElementById('amiciPlaceholder');
+    if (amiciPlaceholder) {
+        amiciPlaceholder.style.display = 'block';
+        amiciPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Caricamento amici...</p>';
     }
     
     try {
@@ -2918,12 +2739,11 @@ async function loadUserData(userId) {
     const supabase = getSupabaseClient();
     
     if (!supabase || !userId) {
-        console.warn('⚠️ Supabase o userId non disponibile per caricare dati utente');
         return null;
     }
     
     try {
-        const userData = await findUserByUid(userId);
+        const userData = await findUserByUid(userId, true);
         
         if (userData) {
             console.log('✅ Dati utente caricati:', userData);
@@ -3027,19 +2847,11 @@ const predefinedIcons = [
 ];
 
 let selectedIconName = 'dice';
-let uploadedImageData = null;
 
 function setupIconSelector() {
     const iconGrid = document.getElementById('iconGrid');
-    const iconUpload = document.getElementById('iconUpload');
-    const iconUploadArea = document.getElementById('iconUploadArea');
+    if (!iconGrid) return;
     
-    if (!iconGrid) {
-        console.error('❌ iconGrid non trovato');
-        return;
-    }
-    
-    // Populate icon grid
     predefinedIcons.forEach((icon, index) => {
         const iconOption = document.createElement('div');
         iconOption.className = 'icon-option';
@@ -3050,107 +2862,17 @@ function setupIconSelector() {
         iconGrid.appendChild(iconOption);
     });
     
-    // Handle file input change
-    if (iconUpload) {
-        iconUpload.addEventListener('change', (e) => {
-            handleImageUpload(e.target.files[0]);
-        });
-    }
-    
-    // Setup drag and drop
-    if (iconUploadArea) {
-        // Prevent default drag behaviors
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            iconUploadArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        // Highlight drop area when item is dragged over it
-        ['dragenter', 'dragover'].forEach(eventName => {
-            iconUploadArea.addEventListener(eventName, () => {
-                iconUploadArea.classList.add('drag-over');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            iconUploadArea.addEventListener(eventName, () => {
-                iconUploadArea.classList.remove('drag-over');
-            }, false);
-        });
-
-        // Handle dropped files
-        iconUploadArea.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length > 0) {
-                handleImageUpload(files[0]);
-            }
-        }, false);
-    }
-    
-    // Set default icon
     selectPredefinedIcon('dice');
-}
-
-function handleImageUpload(file) {
-    if (!file) return;
-    
-    // Check if it's an image
-    if (!file.type.startsWith('image/')) {
-        showNotification('Per favore seleziona un file immagine.');
-        return;
-    }
-    
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-        showNotification('L\'immagine è troppo grande. Massimo 2MB.');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        uploadedImageData = event.target.result;
-        
-        // Deselect all predefined icons
-        document.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
-        
-        // Update preview (this will also update the icon name display)
-        updateIconPreview();
-        
-        // Update icon name display with file name
-        const iconNameDisplay = document.getElementById('iconNameDisplay');
-        if (iconNameDisplay) {
-            // Show file name without extension
-            const fileName = file.name.replace(/\.[^/.]+$/, '');
-            iconNameDisplay.textContent = fileName || file.name;
-        }
-    };
-    reader.readAsDataURL(file);
 }
 
 function selectPredefinedIcon(iconName) {
     selectedIconName = iconName;
-    uploadedImageData = null; // Clear uploaded image when selecting predefined icon
     
-    // Update selected state
     document.querySelectorAll('.icon-option').forEach(opt => {
         opt.classList.toggle('selected', opt.dataset.iconName === iconName);
     });
     
-    // Reset file input
-    const iconUpload = document.getElementById('iconUpload');
-    if (iconUpload) {
-        iconUpload.value = '';
-    }
-    
     updateIconPreview();
-    
-    // Close icon selector modal after selection
     closeIconSelectorModal();
 }
 
@@ -3158,6 +2880,7 @@ function selectPredefinedIcon(iconName) {
 const iconNameMap = {
     'dice': 'Dado',
     'sword': 'Spada',
+    'castle': 'Castello',
     'shield': 'Scudo',
     'book': 'Libro',
     'star': 'Stella',
@@ -3171,57 +2894,29 @@ const iconNameMap = {
 
 function updateIconPreview() {
     const iconDisplay = document.getElementById('iconDisplay');
-    const iconImageDisplay = document.getElementById('iconImageDisplay');
     const iconaCampagna = document.getElementById('iconaCampagna');
     const iconNameDisplay = document.getElementById('iconNameDisplay');
     
-    if (!iconDisplay || !iconImageDisplay) return;
+    if (!iconDisplay) return;
     
-    // Show uploaded image if available, otherwise show predefined icon
-    if (uploadedImageData) {
-        iconDisplay.style.display = 'none';
-        iconImageDisplay.style.display = 'block';
-        iconImageDisplay.src = uploadedImageData;
-        
-        if (iconaCampagna) {
-            iconaCampagna.value = uploadedImageData; // Store as data URL
+    const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
+    if (selectedIcon) {
+        iconDisplay.innerHTML = selectedIcon.svg;
+        if (iconNameDisplay) {
+            const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
+            iconNameDisplay.textContent = displayName;
         }
-    } else {
-        iconDisplay.style.display = 'block';
-        iconImageDisplay.style.display = 'none';
-        
-        const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
-        if (selectedIcon) {
-            iconDisplay.innerHTML = selectedIcon.svg;
-            
-            // Update icon name display
-            if (iconNameDisplay) {
-                const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
-                iconNameDisplay.textContent = displayName;
-            }
-            
-            if (iconaCampagna) {
-                iconaCampagna.value = selectedIconName; // Store icon name
-            }
+        if (iconaCampagna) {
+            iconaCampagna.value = selectedIconName;
         }
     }
 }
 
 function resetIconPreview() {
     selectedIconName = 'dice';
-    uploadedImageData = null;
-    
-    // Reset file input
-    const iconUpload = document.getElementById('iconUpload');
-    if (iconUpload) {
-        iconUpload.value = '';
-    }
-    
-    // Select first icon
     document.querySelectorAll('.icon-option').forEach((opt, index) => {
         opt.classList.toggle('selected', index === 0);
     });
-    
     updateIconPreview();
 }
 
@@ -3254,10 +2949,9 @@ async function handleCampagnaSubmit(e) {
         return;
     }
 
-    // Get icon data
-    const iconaType = uploadedImageData ? 'image' : 'predefined';
-    const iconaName = selectedIconName || null;
-    const iconaData = uploadedImageData || null;
+    const iconaType = 'predefined';
+    const iconaName = selectedIconName || 'dice';
+    const iconaData = null;
 
     const nomeCampagna = document.getElementById('nomeCampagna').value.trim();
     if (!nomeCampagna) {
@@ -3339,8 +3033,11 @@ async function loadCampagnaDetails(campagnaId) {
         return;
     }
 
+    if (elements.dettagliCampagnaContent) {
+        elements.dettagliCampagnaContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento dettagli...</p></div>';
+    }
+
     try {
-        // Ferma subscription esistente se presente
         stopCampagnaDetailsRealtime();
 
         // Carica i dati della campagna
@@ -3397,17 +3094,24 @@ async function renderCampagnaDetailsContent(campagna) {
             isDM = await isCurrentUserDM(campagna.id);
             console.log('🔍 Verifica DM per campagna', campagna.id, '- isDM:', isDM);
             
-            // Carica i dati del DM usando la funzione RPC (bypassa RLS)
             if (campagna.id_dm) {
-                const { data: dmData, error: dmError } = await supabase
-                    .rpc('get_dm_campagna', {
-                        p_campagna_id: campagna.id
-                    });
-                
-                if (dmError) {
-                    console.error('❌ Errore nel caricamento DM:', dmError);
-                } else if (dmData && dmData.length > 0) {
-                    nomeDM = dmData[0].nome_utente || 'DM sconosciuto';
+                if (AppState.cachedUserData && AppState.cachedUserData.id === campagna.id_dm) {
+                    nomeDM = AppState.cachedUserData.nome_utente || 'DM';
+                } else {
+                    const { data: dmData, error: dmError } = await supabase
+                        .rpc('get_dm_campagna', { p_campagna_id: campagna.id });
+                    
+                    if (!dmError && dmData && dmData.length > 0) {
+                        nomeDM = dmData[0].nome_utente || 'DM';
+                    } else {
+                        if (dmError) console.warn('⚠️ RPC get_dm_campagna fallita, fallback:', dmError);
+                        const { data: fallbackDm } = await supabase
+                            .from('utenti')
+                            .select('nome_utente')
+                            .eq('id', campagna.id_dm)
+                            .maybeSingle();
+                        if (fallbackDm) nomeDM = fallbackDm.nome_utente || 'DM';
+                    }
                 }
             }
             
@@ -3868,21 +3572,9 @@ async function renderInvitaGiocatoriTab(campagnaId) {
  * Renderizza l'header dei dettagli campagna (icona e nome)
  */
 function renderCampagnaDetailsHeader(campagna) {
-    // Renderizza l'icona
-    let iconaHTML = '';
-    if (campagna.icona_type === 'image' && campagna.icona_data) {
-        iconaHTML = `<img src="${escapeHtml(campagna.icona_data)}" alt="Icona campagna" class="dettagli-icon-image">`;
-    } else if (campagna.icona_type === 'predefined' && campagna.icona_name) {
-        const selectedIcon = predefinedIcons.find(i => i.name === campagna.icona_name);
-        if (selectedIcon) {
-            iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
-        }
-    }
-    // Se non c'è icona, usa quella di default
-    if (!iconaHTML) {
-        const defaultIcon = predefinedIcons.find(i => i.name === 'dice');
-        iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${defaultIcon.svg}</svg></div>`;
-    }
+    const iconName = campagna.icona_name || 'dice';
+    const selectedIcon = predefinedIcons.find(i => i.name === iconName) || predefinedIcons[0];
+    const iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
 
     // Aggiorna icona container
     if (elements.dettagliIconContainer) {
@@ -3891,7 +3583,7 @@ function renderCampagnaDetailsHeader(campagna) {
 
     // Aggiorna titolo
     if (elements.dettagliCampagnaTitle) {
-        elements.dettagliCampagnaTitle.textContent = escapeHtml(campagna.nome_campagna || 'Senza nome');
+        elements.dettagliCampagnaTitle.textContent = campagna.nome_campagna || 'Senza nome';
     }
 }
 
@@ -3922,30 +3614,6 @@ function closeInvitaGiocatoriModal() {
     elements.invitaGiocatoriModal.classList.remove('active');
     document.body.style.overflow = '';
 }
-
-/**
- * Modifica il numero di giocatori
- */
-window.editNumeroGiocatori = async function(campagnaId) {
-    // Verifica che l'utente sia il DM
-    const isDM = await isCurrentUserDM(campagnaId);
-    if (!isDM) {
-        showNotification('Solo il DM può modificare i dettagli della campagna');
-        return;
-    }
-
-    const nuovoNumero = await showPrompt('Inserisci il nuovo numero di giocatori:', 'Modifica Numero Giocatori');
-    if (nuovoNumero === null) return;
-    
-    const numero = parseInt(nuovoNumero);
-    if (isNaN(numero) || numero < 0) {
-        showNotification('Inserisci un numero valido');
-        return;
-    }
-
-    // Non aggiorniamo più numero_giocatori, viene calcolato dinamicamente dall'array giocatori
-    showNotification('Il numero di giocatori viene calcolato automaticamente dal numero di giocatori nella campagna');
-};
 
 /**
  * Modifica il numero di sessioni
@@ -4266,29 +3934,10 @@ async function isCurrentUserDM(campagnaId) {
             
             // Confronta id_dm invece di user_id
             const isDM = campagna.id_dm === currentUser.id;
-            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagna.id_dm);
-            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagna.id_dm, '=', isDM);
+            console.log('🔍 isCurrentUserDM (fallback): id_dm =', campagna.id_dm, '=', isDM);
             return isDM;
-            console.log('📋 isCurrentUserDM (fallback): campagna.id_dm =', campagna.id_dm, 'tipo:', typeof campagna.id_dm);
-            const isMatch = currentUser.id === campagna.id_dm;
-            console.log('✅ isCurrentUserDM (fallback): confronto', currentUser.id, '===', campagna.id_dm, '=', isMatch);
-            return isMatch;
         }
 
-        console.log('✅ isCurrentUserDM (RPC): risultato =', isDM, 'tipo:', typeof isDM);
-        
-        // Aggiungi anche una query diretta per confrontare
-        const { data: campagnaDirect, error: directError } = await supabase
-            .from('campagne')
-            .select('id_dm')
-            .eq('id', campagnaId)
-            .single();
-        
-        if (!directError && campagnaDirect) {
-            console.log('🔍 isCurrentUserDM: query diretta - id_dm =', campagnaDirect.id_dm);
-            console.log('🔍 isCurrentUserDM: confronto diretto', currentUser.id, '===', campagnaDirect.id_dm, '=', currentUser.id === campagnaDirect.id_dm);
-        }
-        
         return isDM === true;
     } catch (error) {
         console.error('❌ Errore nel controllo DM:', error);
@@ -4427,6 +4076,12 @@ window.rimuoviGiocatoreDaCampagna = async function(campagnaId, invitoId, giocato
 };
 
 window.deleteCampagna = async function(campagnaId) {
+    const isDM = await isCurrentUserDM(campagnaId);
+    if (!isDM) {
+        showNotification('Solo il DM può eliminare la campagna');
+        return;
+    }
+
     const confirmed = await showConfirm('Sei sicuro di voler eliminare questa campagna?', 'Elimina Campagna');
     if (!confirmed) {
         return;
@@ -4860,11 +4515,12 @@ function showNotification(message) {
     
     document.body.appendChild(notification);
     
-    // Rimuovi dopo 3 secondi
     setTimeout(() => {
         notification.style.animation = 'slideUp 0.3s ease';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
         }, 300);
     }, 3000);
 }
@@ -5147,8 +4803,8 @@ async function renderSessioneContent(campagnaId) {
             sessioneTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Sessione ${numeroSessione}</div>`;
         }
 
-        // Calcola durata corrente
         const dataInizio = new Date(sessione.data_inizio);
+        window._sessioneDataInizio = dataInizio.getTime();
         const durataMs = Date.now() - dataInizio.getTime();
         const durataMinuti = Math.floor(durataMs / 60000);
         const durataOre = Math.floor(durataMinuti / 60);
@@ -5226,17 +4882,23 @@ async function renderSessioneContent(campagnaId) {
 }
 
 /**
- * Avvia il timer per la sessione
+ * Avvia il timer per la sessione (aggiorna solo il DOM del timer, non ricarica tutto)
  */
 function startSessioneTimer(campagnaId) {
-    // Rimuovi timer esistente se presente
     if (window.sessioneTimerInterval) {
         clearInterval(window.sessioneTimerInterval);
     }
 
-    window.sessioneTimerInterval = setInterval(async () => {
-        await renderSessioneContent(campagnaId);
-    }, 60000); // Aggiorna ogni minuto
+    window.sessioneTimerInterval = setInterval(() => {
+        const timerElement = document.querySelector('.timer-value');
+        if (!timerElement || !window._sessioneDataInizio) return;
+        
+        const durataMs = Date.now() - window._sessioneDataInizio;
+        const durataMinuti = Math.floor(durataMs / 60000);
+        const ore = Math.floor(durataMinuti / 60);
+        const min = durataMinuti % 60;
+        timerElement.textContent = `${ore.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+    }, 10000);
 }
 
 /**
@@ -5397,18 +5059,25 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             combattimentoTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Combattimento - Sessione ${numeroSessione}</div>`;
         }
 
-        // Carica i tiri di iniziativa dalla tabella richieste_tiro_iniziativa con join agli utenti
-        const { data: tiriIniziativa, error: tiriError } = await supabase
-            .from('richieste_tiro_iniziativa')
-            .select(`
-                *,
-                utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)
-            `)
-            .eq('sessione_id', sessioneId)
-            .order('valore', { ascending: false });
+        let tiriIniziativa = null;
+        let tiriError = null;
+        
+        try {
+            const result = await supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId });
+            tiriIniziativa = result.data;
+            tiriError = result.error;
+        } catch (e) {
+            tiriError = e;
+        }
 
         if (tiriError) {
-            console.error('❌ Errore nel caricamento tiri iniziativa:', tiriError);
+            console.warn('⚠️ RPC get_tiri_iniziativa fallita, fallback JOIN diretto:', tiriError);
+            const fallback = await supabase
+                .from('richieste_tiro_iniziativa')
+                .select(`*, utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)`)
+                .eq('sessione_id', sessioneId)
+                .order('valore', { ascending: false });
+            tiriIniziativa = fallback.data;
         }
 
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
@@ -5437,9 +5106,8 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `;
         } else {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
-                // I dati dell'utente vengono dal join
-                const nomeUtente = tiro.utenti?.nome_utente || 'Sconosciuto';
-                const cid = tiro.utenti?.cid;
+                const nomeUtente = tiro.giocatore_nome || tiro.utenti?.nome_utente || 'Sconosciuto';
+                const cid = tiro.giocatore_cid || tiro.utenti?.cid;
                 
                 return `
                 <div class="combattimento-card">
@@ -5644,38 +5312,8 @@ function startRollRequestsRealtime() {
         };
 
         console.log('✅ Realtime subscriptions per roll requests avviate');
-        
-        // Fallback: avvia anche polling come backup se Realtime non funziona
-        // Il polling controllerà ogni 3 secondi se ci sono richieste pending
-        if (!window.rollRequestPollingFallback) {
-            window.rollRequestPollingFallback = setInterval(async () => {
-                if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
-                    return;
-                }
-                const request = await checkPendingRollRequests(AppState.currentUser.uid);
-                if (request) {
-                    console.log('🔄 [FALLBACK POLLING] Trovata richiesta pending:', request);
-                    showRollRequestModal(request);
-                }
-            }, 3000); // 3 secondi
-            console.log('🔄 [FALLBACK] Polling di backup avviato per roll requests');
-        }
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime roll requests:', error);
-        // Se Realtime fallisce, avvia comunque il polling
-        if (!window.rollRequestPollingFallback) {
-            window.rollRequestPollingFallback = setInterval(async () => {
-                if (!AppState.isLoggedIn || !AppState.currentUser || window.currentRollRequest) {
-                    return;
-                }
-                const request = await checkPendingRollRequests(AppState.currentUser.uid);
-                if (request) {
-                    console.log('🔄 [FALLBACK POLLING] Trovata richiesta pending:', request);
-                    showRollRequestModal(request);
-                }
-            }, 3000);
-            console.log('🔄 [FALLBACK] Polling di backup avviato (Realtime fallito)');
-        }
     });
 }
 
@@ -5711,8 +5349,8 @@ async function checkNewSessions(userId) {
                 .map(c => ({ id: c.id }));
         }
 
-        if (errorDM || errorPlayer) {
-            console.error('❌ Errore nel caricamento campagne per sessioni:', errorDM || errorPlayer);
+        if (errorDM || errorTutte) {
+            console.error('❌ Errore nel caricamento campagne per sessioni:', errorDM || errorTutte);
             return;
         }
 
@@ -5852,29 +5490,8 @@ function startSessionRealtime() {
 
         window.sessionChannel = sessionChannel;
         console.log('✅ Realtime subscription per sessioni avviata');
-        
-        // Fallback: avvia anche polling come backup
-        if (!window.sessionPollingFallback) {
-            window.sessionPollingFallback = setInterval(async () => {
-                if (!AppState.isLoggedIn || !AppState.currentUser) {
-                    return;
-                }
-                await checkNewSessions(AppState.currentUser.uid);
-            }, 5000); // 5 secondi
-            console.log('🔄 [FALLBACK] Polling di backup avviato per sessioni');
-        }
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime sessioni:', error);
-        // Se Realtime fallisce, avvia comunque il polling
-        if (!window.sessionPollingFallback) {
-            window.sessionPollingFallback = setInterval(async () => {
-                if (!AppState.isLoggedIn || !AppState.currentUser) {
-                    return;
-                }
-                await checkNewSessions(AppState.currentUser.uid);
-            }, 5000);
-            console.log('🔄 [FALLBACK] Polling di backup avviato (Realtime fallito)');
-        }
     });
 }
 
@@ -5888,14 +5505,6 @@ function stopSessionRealtime() {
     if (window.sessionChannel) {
         supabase.removeChannel(window.sessionChannel);
         window.sessionChannel = null;
-        console.log('✅ Realtime subscription per sessioni fermata');
-    }
-    
-    // Ferma anche il polling di fallback
-    if (window.sessionPollingFallback) {
-        clearInterval(window.sessionPollingFallback);
-        window.sessionPollingFallback = null;
-        console.log('🔄 [FALLBACK] Polling di backup fermato');
     }
 }
 
@@ -5953,19 +5562,6 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                 console.log('✅ [REALTIME] Subscription combattimento attiva');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 console.error('❌ [REALTIME] Errore subscription combattimento');
-                // Fallback polling se Realtime non funziona
-                if (!window.combattimentoPollingFallback) {
-                    window.combattimentoPollingFallback = setInterval(async () => {
-                        const combattimentoPage = document.getElementById('combattimentoPage');
-                        if (!combattimentoPage || !combattimentoPage.classList.contains('active')) {
-                            return;
-                        }
-                        if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
-                            await renderCombattimentoContent(campagnaId, sessioneId);
-                        }
-                    }, 3000); // 3 secondi
-                    console.log('🔄 [FALLBACK] Polling di backup avviato per combattimento');
-                }
             }
         });
 
@@ -6025,13 +5621,6 @@ function stopCombattimentoRealtime() {
     if (window.combattimentoChannel) {
         supabase.removeChannel(window.combattimentoChannel);
         window.combattimentoChannel = null;
-        console.log('✅ Realtime subscription per combattimento fermata');
-    }
-
-    if (window.combattimentoPollingFallback) {
-        clearInterval(window.combattimentoPollingFallback);
-        window.combattimentoPollingFallback = null;
-        console.log('🔄 [FALLBACK] Polling di backup fermato per combattimento');
     }
 }
 
@@ -6339,14 +5928,6 @@ function stopRollRequestsRealtime() {
             supabase.removeChannel(window.rollRequestsChannels.generico);
         }
         window.rollRequestsChannels = null;
-        console.log('✅ Realtime subscriptions per roll requests fermate');
-    }
-    
-    // Ferma anche il polling di fallback
-    if (window.rollRequestPollingFallback) {
-        clearInterval(window.rollRequestPollingFallback);
-        window.rollRequestPollingFallback = null;
-        console.log('🔄 [FALLBACK] Polling di backup fermato');
     }
 }
 
