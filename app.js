@@ -5790,6 +5790,16 @@ function startAppEventsRealtime() {
                     }, 500);
                 }
 
+                if (data.table === 'richieste_tiro_generico' && data.action === 'insert') {
+                    setTimeout(async () => {
+                        const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
+                        if (pending && !window.currentRollRequest) {
+                            showRollRequestModal(pending);
+                            sendBrowserNotification('Tiro Richiesto', 'Il DM ti ha richiesto di fare un tiro!');
+                        }
+                    }, 500);
+                }
+
                 if (data.table === 'sessioni' && data.action === 'insert' && data.campagnaId) {
                     try {
                         const userData = await findUserByUid(AppState.currentUser?.uid);
@@ -5877,7 +5887,14 @@ async function refreshCurrentPageData() {
         } else if (page === 'dettagli' && AppState.currentCampagnaId) {
             await loadCampagnaDetails(AppState.currentCampagnaId);
         } else if (page === 'sessione' && AppState.currentCampagnaId) {
-            await renderSessioneContent(AppState.currentCampagnaId);
+            if (window.currentTiroGenericoRichiestaId) {
+                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
+                if (sessione) {
+                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
+                }
+            } else {
+                await renderSessioneContent(AppState.currentCampagnaId);
+            }
         } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
         }
@@ -6380,11 +6397,10 @@ window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
 
         showNotification('Richieste tiro inviate!');
         
-        // Salva richiesta_id corrente
         window.currentTiroGenericoRichiestaId = richiestaId;
         
-        // Aggiorna la tabella tiri generici
         await updateTiroGenericoTable(sessioneId, richiestaId);
+        startTiroGenericoPolling(sessioneId);
     } catch (error) {
         console.error('❌ Errore nella richiesta tiro generico:', error);
         showNotification('Errore nella richiesta tiro generico: ' + (error.message || error));
@@ -6427,22 +6443,37 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
     if (!supabase) return;
 
     try {
-        // Carica tutti i tiri per questa richiesta
         const { data: tiri, error } = await supabase
             .from('richieste_tiro_generico')
-            .select(`
-                *,
-                utenti!richieste_tiro_generico_giocatore_id_fkey(nome_utente, cid)
-            `)
+            .select('*')
             .eq('sessione_id', sessioneId)
             .eq('richiesta_id', richiestaId)
-            .order('timestamp', { ascending: false });
+            .order('valore', { ascending: false, nullsFirst: false });
 
         if (error) throw error;
 
         if (!tiri || tiri.length === 0) {
             tableElement.style.display = 'none';
             return;
+        }
+
+        const giocatoreIds = [...new Set(tiri.map(t => t.giocatore_id).filter(Boolean))];
+        let utentiMap = {};
+        if (giocatoreIds.length > 0) {
+            try {
+                const { data: giocatoriData } = await supabase.rpc('get_giocatori_campagna', {
+                    campagna_id_param: AppState.currentCampagnaId
+                });
+                if (giocatoriData) {
+                    giocatoriData.forEach(g => { utentiMap[g.id] = g; });
+                }
+                const dmData = await findUserByUid(AppState.currentUser?.uid);
+                if (dmData) {
+                    utentiMap[dmData.id] = dmData;
+                }
+            } catch (e) {
+                console.warn('Fallback nomi giocatori:', e);
+            }
         }
 
         tableElement.style.display = 'block';
@@ -6463,11 +6494,14 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${tiri.map(tiro => `
+                    ${tiri.map(tiro => {
+                        const utente = utentiMap[tiro.giocatore_id];
+                        const nome = utente?.nome_utente || 'Giocatore';
+                        const cid = utente?.cid;
+                        return `
                         <tr>
                             <td style="padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${escapeHtml(tiro.utenti?.nome_utente || 'Sconosciuto')}
-                                ${tiro.utenti?.cid ? ` (CID: ${tiro.utenti.cid})` : ''}
+                                ${escapeHtml(nome)}${cid ? ` (CID: ${cid})` : ''}
                             </td>
                             <td style="text-align: right; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
                                 ${tiro.valore !== null ? tiro.valore : '-'}
@@ -6475,8 +6509,8 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
                             <td style="text-align: center; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
                                 ${tiro.stato === 'completed' ? '✓' : '⏳'}
                             </td>
-                        </tr>
-                    `).join('')}
+                        </tr>`;
+                    }).join('')}
                 </tbody>
             </table>
         `;
@@ -6529,10 +6563,10 @@ window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
             tableElement.style.display = 'none';
         }
 
-        // Reset richiesta_id corrente
         if (window.currentTiroGenericoRichiestaId === richiestaId) {
             window.currentTiroGenericoRichiestaId = null;
         }
+        stopTiroGenericoPolling();
 
         showNotification('Tabella tiri chiusa');
     } catch (error) {
