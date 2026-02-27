@@ -19,6 +19,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
     v_current_user_id VARCHAR(10);
     v_campagna_id VARCHAR(10);

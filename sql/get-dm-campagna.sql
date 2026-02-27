@@ -10,6 +10,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
     v_current_user_id VARCHAR(10);
     v_id_dm VARCHAR(10);
@@ -19,17 +20,17 @@ BEGIN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    SELECT id INTO v_current_user_id
-    FROM utenti
-    WHERE uid = auth.uid()::text;
+    SELECT u.id INTO v_current_user_id
+    FROM utenti u
+    WHERE u.uid = auth.uid()::text;
 
     IF v_current_user_id IS NULL THEN
         RAISE EXCEPTION 'Utente non trovato';
     END IF;
 
-    SELECT id_dm, giocatori INTO v_id_dm, v_giocatori
-    FROM campagne
-    WHERE id = p_campagna_id;
+    SELECT c.id_dm, c.giocatori INTO v_id_dm, v_giocatori
+    FROM campagne c
+    WHERE c.id = p_campagna_id;
 
     IF v_id_dm IS NULL THEN
         RAISE EXCEPTION 'Campagna non trovata';
@@ -66,6 +67,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
     v_current_user_id VARCHAR(10);
 BEGIN
@@ -73,9 +75,9 @@ BEGIN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    SELECT id INTO v_current_user_id
-    FROM utenti
-    WHERE uid = auth.uid()::text;
+    SELECT u.id INTO v_current_user_id
+    FROM utenti u
+    WHERE u.uid = auth.uid()::text;
 
     IF v_current_user_id IS NULL THEN
         RAISE EXCEPTION 'Utente non trovato';

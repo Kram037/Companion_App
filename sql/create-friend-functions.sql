@@ -7,7 +7,7 @@
 CREATE OR REPLACE FUNCTION get_current_user_id()
 RETURNS VARCHAR(10) AS $$
 BEGIN
-    RETURN (SELECT id FROM utenti WHERE uid = auth.uid()::text LIMIT 1);
+    RETURN (SELECT u.id FROM utenti u WHERE u.uid = auth.uid()::text LIMIT 1);
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public;
 
@@ -21,6 +21,7 @@ RETURNS TABLE (
     stato TEXT,
     created_at TIMESTAMPTZ
 ) AS $$
+#variable_conflict use_column
 DECLARE
     current_user_id VARCHAR(10);
 BEGIN
@@ -52,6 +53,7 @@ RETURNS TABLE (
     stato TEXT,
     created_at TIMESTAMPTZ
 ) AS $$
+#variable_conflict use_column
 DECLARE
     current_user_id VARCHAR(10);
 BEGIN
@@ -82,6 +84,7 @@ RETURNS TABLE (
     richiesta_id VARCHAR(10),
     created_at TIMESTAMPTZ
 ) AS $$
+#variable_conflict use_column
 DECLARE
     current_user_id VARCHAR(10);
 BEGIN
@@ -117,6 +120,7 @@ RETURNS TABLE (
     nome_utente TEXT,
     cid INTEGER
 ) AS $$
+#variable_conflict use_column
 BEGIN
     RETURN QUERY
     SELECT 

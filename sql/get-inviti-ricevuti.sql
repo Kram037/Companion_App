@@ -21,8 +21,8 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 BEGIN
-    -- Consenti solo al destinatario di leggere i propri inviti
     IF auth.uid() IS NULL THEN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;

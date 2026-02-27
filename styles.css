@@ -1752,6 +1752,7 @@ body.user-logged-in .header-username {
     height: 600px;
     max-height: 80vh;
     overflow: hidden;
+    padding-top: calc(var(--spacing-xl) + 8px);
 }
 
 .modal.active .modal-content {
