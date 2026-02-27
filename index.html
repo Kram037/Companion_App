@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1766952300">
+    <link rel="stylesheet" href="styles.css?v=1766952500">
 </head>
 <body>
     <!-- Header -->
@@ -126,11 +126,13 @@
         <section class="page" id="personaggiPage">
             <div class="page-content">
                 <div class="page-header">
-                <h1>Personaggi</h1>
+                    <h1>Personaggi</h1>
                     <button class="btn-primary btn-icon" id="addPersonaggioBtn" aria-label="Crea Personaggio">+</button>
                 </div>
-                <div id="personaggiPlaceholder" class="content-placeholder">
-                    <p>Accedi per vedere e creare i tuoi personaggi</p>
+                <div id="personaggiList" class="personaggi-list">
+                    <div class="content-placeholder">
+                        <p>Accedi per vedere e creare i tuoi personaggi</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -473,6 +475,105 @@
         </div>
     </div>
 
+    <!-- Personaggio Modal -->
+    <div class="modal" id="personaggioModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" id="closePersonaggioModal">&times;</button>
+            <h2 id="personaggioModalTitle">Nuovo Personaggio</h2>
+            <form id="personaggioForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pgNome">Nome</label>
+                        <input type="text" id="pgNome" required placeholder="Nome del personaggio">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label for="pgRazza">Razza</label>
+                        <input type="text" id="pgRazza" placeholder="Es. Elfo, Nano...">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgClasse">Classe</label>
+                        <input type="text" id="pgClasse" placeholder="Es. Guerriero...">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgLivello">Livello</label>
+                        <input type="number" id="pgLivello" min="1" max="20" value="1">
+                    </div>
+                </div>
+                <div class="form-section-label">Caratteristiche</div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label for="pgForza">FOR</label>
+                        <input type="number" id="pgForza" min="1" max="30" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgDestrezza">DES</label>
+                        <input type="number" id="pgDestrezza" min="1" max="30" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgCostituzione">COS</label>
+                        <input type="number" id="pgCostituzione" min="1" max="30" value="10">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label for="pgIntelligenza">INT</label>
+                        <input type="number" id="pgIntelligenza" min="1" max="30" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgSaggezza">SAG</label>
+                        <input type="number" id="pgSaggezza" min="1" max="30" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgCarisma">CAR</label>
+                        <input type="number" id="pgCarisma" min="1" max="30" value="10">
+                    </div>
+                </div>
+                <div class="form-section-label">Statistiche</div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label for="pgPV">PV Massimi</label>
+                        <input type="number" id="pgPV" min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgIniziativa">Iniziativa</label>
+                        <input type="number" id="pgIniziativa" value="0" placeholder="= DES mod">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-group">
+                        <label for="pgCA">CA</label>
+                        <input type="number" id="pgCA" min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgPercezione">Percezione</label>
+                        <input type="number" id="pgPercezione" min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="pgVelocita">Velocità</label>
+                        <input type="number" id="pgVelocita" min="0" step="0.5" value="9">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelPersonaggioBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="savePersonaggioBtn">Crea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scegli Personaggio Modal -->
+    <div class="modal" id="scegliPersonaggioModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeScegliPersonaggioModal">&times;</button>
+            <h2>Scegli Personaggio</h2>
+            <div id="scegliPersonaggioList" class="scegli-pg-list">
+                <p>Caricamento personaggi...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Aggiungi Amico Modal -->
     <div class="modal" id="addAmicoModal">
         <div class="modal-content">
@@ -526,7 +627,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766952400"></script>
+    <script src="app.js?v=1766952500"></script>
     
     <!-- Cache busting script for development -->
     <script>

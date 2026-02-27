@@ -177,7 +177,17 @@ async function init() {
         rollRequestInput: document.getElementById('rollRequestInput'),
         rollRequestForm: document.getElementById('rollRequestForm'),
         cancelRollRequestBtn: document.getElementById('cancelRollRequestBtn'),
-        submitRollRequestBtn: document.getElementById('submitRollRequestBtn')
+        submitRollRequestBtn: document.getElementById('submitRollRequestBtn'),
+        personaggiList: document.getElementById('personaggiList'),
+        personaggioModal: document.getElementById('personaggioModal'),
+        closePersonaggioModal: document.getElementById('closePersonaggioModal'),
+        personaggioForm: document.getElementById('personaggioForm'),
+        personaggioModalTitle: document.getElementById('personaggioModalTitle'),
+        cancelPersonaggioBtn: document.getElementById('cancelPersonaggioBtn'),
+        savePersonaggioBtn: document.getElementById('savePersonaggioBtn'),
+        scegliPersonaggioModal: document.getElementById('scegliPersonaggioModal'),
+        closeScegliPersonaggioModal: document.getElementById('closeScegliPersonaggioModal'),
+        scegliPersonaggioList: document.getElementById('scegliPersonaggioList')
     };
 
     // Check if all required elements exist
@@ -718,16 +728,45 @@ function setupEventListeners() {
         console.log('✅ Event listener aggiunto a addNemicoBtn');
     }
     
-    // Personaggi button
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('➕ Click su Crea Personaggio');
-            // TODO: Implementare funzione per creare personaggio
-            showNotification('Funzionalità in arrivo: Crea Personaggio');
+            openPersonaggioModal();
         };
-        console.log('✅ Event listener aggiunto a addPersonaggioBtn');
+    }
+
+    if (elements.closePersonaggioModal) {
+        elements.closePersonaggioModal.onclick = () => closePersonaggioModal();
+    }
+    if (elements.cancelPersonaggioBtn) {
+        elements.cancelPersonaggioBtn.onclick = () => closePersonaggioModal();
+    }
+    if (elements.personaggioModal) {
+        elements.personaggioModal.addEventListener('click', (e) => {
+            if (e.target === elements.personaggioModal) closePersonaggioModal();
+        });
+    }
+    if (elements.personaggioForm) {
+        elements.personaggioForm.addEventListener('submit', handleSavePersonaggio);
+    }
+
+    const pgDesField = document.getElementById('pgDestrezza');
+    const pgInitField = document.getElementById('pgIniziativa');
+    if (pgDesField && pgInitField) {
+        pgDesField.addEventListener('input', () => {
+            const des = parseInt(pgDesField.value) || 10;
+            const mod = Math.floor((des - 10) / 2);
+            pgInitField.placeholder = `= ${mod >= 0 ? '+' : ''}${mod} (DES mod)`;
+        });
+    }
+    if (elements.closeScegliPersonaggioModal) {
+        elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
+    }
+    if (elements.scegliPersonaggioModal) {
+        elements.scegliPersonaggioModal.addEventListener('click', (e) => {
+            if (e.target === elements.scegliPersonaggioModal) closeScegliPersonaggioModal();
+        });
     }
     
     if (elements.closeCampagnaModal) {
@@ -1079,7 +1118,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             AppState.currentSessioneId = null;
         }
     } else {
-        if (pageName === 'campagne' || pageName === 'amici') {
+        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'personaggi' || pageName === 'nemici') {
             sessionStorage.removeItem('currentCampagnaId');
             sessionStorage.removeItem('currentSessioneId');
             AppState.currentCampagnaId = null;
@@ -1113,11 +1152,11 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
         if (AppState.isLoggedIn && AppState.currentUser) {
             loadCampagne(AppState.currentUser.uid);
         }
+    } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
+        loadPersonaggi();
     } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
-        // Carica i dettagli della campagna
         loadCampagnaDetails(AppState.currentCampagnaId);
     } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-        // Se si naviga verso combattimento, carica il contenuto e avvia Realtime subscription
         renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId).then(() => {
             if (!window.combattimentoChannel) {
                 startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
@@ -2785,6 +2824,311 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
     }
 }
 
+// ============================================================================
+// PERSONAGGI MANAGEMENT
+// ============================================================================
+
+let editingPersonaggioId = null;
+
+async function loadPersonaggi() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn) return;
+
+    if (elements.personaggiList) {
+        elements.personaggiList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento personaggi...</p></div>';
+    }
+
+    try {
+        const { data: personaggi, error } = await supabase.rpc('get_personaggi_utente');
+        if (error) throw error;
+        renderPersonaggi(personaggi || []);
+    } catch (error) {
+        console.error('Errore caricamento personaggi:', error);
+        if (elements.personaggiList) {
+            elements.personaggiList.innerHTML = '<div class="content-placeholder"><p>Errore nel caricamento dei personaggi</p></div>';
+        }
+    }
+}
+
+function renderPersonaggi(personaggi) {
+    if (!elements.personaggiList) return;
+
+    if (personaggi.length === 0) {
+        elements.personaggiList.innerHTML = `
+            <div class="content-placeholder">
+                <p>Non hai ancora creato personaggi</p>
+                <button class="btn-primary" onclick="openPersonaggioModal()">Crea il tuo primo personaggio</button>
+            </div>`;
+        return;
+    }
+
+    elements.personaggiList.innerHTML = personaggi.map(pg => {
+        const initials = (pg.nome || '?').substring(0, 2).toUpperCase();
+        const mod = (val) => {
+            const m = Math.floor((val - 10) / 2);
+            return m >= 0 ? `+${m}` : `${m}`;
+        };
+        return `
+        <div class="pg-card" data-pg-id="${pg.id}">
+            <div class="pg-card-header">
+                <div class="pg-card-avatar">${escapeHtml(initials)}</div>
+                <div class="pg-card-identity">
+                    <p class="pg-card-name">${escapeHtml(pg.nome)}</p>
+                    <p class="pg-card-subtitle">${escapeHtml(pg.razza || '')} ${escapeHtml(pg.classe || '')}</p>
+                </div>
+                <div class="pg-card-level">Lv ${pg.livello || 1}</div>
+            </div>
+            <div class="pg-card-stats">
+                <div class="pg-stat"><div class="pg-stat-label">FOR</div><div class="pg-stat-value">${pg.forza} <small>(${mod(pg.forza)})</small></div></div>
+                <div class="pg-stat"><div class="pg-stat-label">DES</div><div class="pg-stat-value">${pg.destrezza} <small>(${mod(pg.destrezza)})</small></div></div>
+                <div class="pg-stat"><div class="pg-stat-label">COS</div><div class="pg-stat-value">${pg.costituzione} <small>(${mod(pg.costituzione)})</small></div></div>
+                <div class="pg-stat"><div class="pg-stat-label">INT</div><div class="pg-stat-value">${pg.intelligenza} <small>(${mod(pg.intelligenza)})</small></div></div>
+                <div class="pg-stat"><div class="pg-stat-label">SAG</div><div class="pg-stat-value">${pg.saggezza} <small>(${mod(pg.saggezza)})</small></div></div>
+                <div class="pg-stat"><div class="pg-stat-label">CAR</div><div class="pg-stat-value">${pg.carisma} <small>(${mod(pg.carisma)})</small></div></div>
+            </div>
+            <div class="pg-card-combat">
+                <div class="pg-combat-stat"><div class="pg-combat-label">PV</div><div class="pg-combat-value">${pg.punti_vita_max}</div></div>
+                <div class="pg-combat-stat"><div class="pg-combat-label">CA</div><div class="pg-combat-value">${pg.classe_armatura}</div></div>
+                <div class="pg-combat-stat"><div class="pg-combat-label">INIT</div><div class="pg-combat-value">${pg.iniziativa != null ? pg.iniziativa : mod(pg.destrezza)}</div></div>
+                <div class="pg-combat-stat"><div class="pg-combat-label">VEL</div><div class="pg-combat-value">${pg.velocita}</div></div>
+            </div>
+            <div class="pg-card-actions">
+                <button class="btn-secondary btn-small" onclick="openPersonaggioModal('${pg.id}')">Modifica</button>
+                <button class="btn-secondary btn-small" style="color: #dc3545;" onclick="deletePersonaggio('${pg.id}')">Elimina</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.openPersonaggioModal = function(personaggioId) {
+    editingPersonaggioId = personaggioId || null;
+    const form = elements.personaggioForm;
+    if (!form) return;
+
+    form.reset();
+
+    if (personaggioId) {
+        elements.personaggioModalTitle.textContent = 'Modifica Personaggio';
+        elements.savePersonaggioBtn.textContent = 'Salva';
+
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            supabase.from('personaggi').select('*').eq('id', personaggioId).single().then(({ data, error }) => {
+                if (data && !error) {
+                    document.getElementById('pgNome').value = data.nome || '';
+                    document.getElementById('pgRazza').value = data.razza || '';
+                    document.getElementById('pgClasse').value = data.classe || '';
+                    document.getElementById('pgLivello').value = data.livello || 1;
+                    document.getElementById('pgForza').value = data.forza || 10;
+                    document.getElementById('pgDestrezza').value = data.destrezza || 10;
+                    document.getElementById('pgCostituzione').value = data.costituzione || 10;
+                    document.getElementById('pgIntelligenza').value = data.intelligenza || 10;
+                    document.getElementById('pgSaggezza').value = data.saggezza || 10;
+                    document.getElementById('pgCarisma').value = data.carisma || 10;
+                    document.getElementById('pgPV').value = data.punti_vita_max || 10;
+                    document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : Math.floor((data.destrezza - 10) / 2);
+                    document.getElementById('pgCA').value = data.classe_armatura || 10;
+                    document.getElementById('pgPercezione').value = data.percezione_passiva || 10;
+                    document.getElementById('pgVelocita').value = data.velocita || 9;
+                }
+            });
+        }
+    } else {
+        elements.personaggioModalTitle.textContent = 'Nuovo Personaggio';
+        elements.savePersonaggioBtn.textContent = 'Crea';
+    }
+
+    elements.personaggioModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePersonaggioModal() {
+    if (elements.personaggioModal) {
+        elements.personaggioModal.classList.remove('active');
+        document.body.style.overflow = '';
+        editingPersonaggioId = null;
+    }
+}
+
+async function handleSavePersonaggio(e) {
+    e.preventDefault();
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) {
+        showNotification('Errore: utente non trovato');
+        return;
+    }
+
+    const destrezza = parseInt(document.getElementById('pgDestrezza').value) || 10;
+    const iniziativaVal = document.getElementById('pgIniziativa').value;
+    const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : Math.floor((destrezza - 10) / 2);
+
+    const pgData = {
+        nome: document.getElementById('pgNome').value.trim(),
+        razza: document.getElementById('pgRazza').value.trim() || null,
+        classe: document.getElementById('pgClasse').value.trim() || null,
+        livello: parseInt(document.getElementById('pgLivello').value) || 1,
+        forza: parseInt(document.getElementById('pgForza').value) || 10,
+        destrezza: destrezza,
+        costituzione: parseInt(document.getElementById('pgCostituzione').value) || 10,
+        intelligenza: parseInt(document.getElementById('pgIntelligenza').value) || 10,
+        saggezza: parseInt(document.getElementById('pgSaggezza').value) || 10,
+        carisma: parseInt(document.getElementById('pgCarisma').value) || 10,
+        punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
+        iniziativa: iniziativa,
+        classe_armatura: parseInt(document.getElementById('pgCA').value) || 10,
+        percezione_passiva: parseInt(document.getElementById('pgPercezione').value) || 10,
+        velocita: parseFloat(document.getElementById('pgVelocita').value) || 9,
+        updated_at: new Date().toISOString()
+    };
+
+    if (!pgData.nome) {
+        showNotification('Inserisci un nome per il personaggio');
+        return;
+    }
+
+    try {
+        if (editingPersonaggioId) {
+            const { error } = await supabase
+                .from('personaggi')
+                .update(pgData)
+                .eq('id', editingPersonaggioId);
+            if (error) throw error;
+            showNotification('Personaggio aggiornato');
+        } else {
+            pgData.user_id = userData.id;
+            const { error } = await supabase
+                .from('personaggi')
+                .insert(pgData);
+            if (error) throw error;
+            showNotification('Personaggio creato');
+        }
+
+        closePersonaggioModal();
+        await loadPersonaggi();
+        await sendAppEventBroadcast({ table: 'personaggi', action: editingPersonaggioId ? 'update' : 'insert' });
+    } catch (error) {
+        console.error('Errore salvataggio personaggio:', error);
+        showNotification('Errore: ' + (error.message || error));
+    }
+}
+
+window.deletePersonaggio = async function(personaggioId) {
+    const confirmed = await showConfirmDialog('Sei sicuro di voler eliminare questo personaggio? Verrà rimosso anche da tutte le campagne associate.');
+    if (!confirmed) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const { error } = await supabase
+            .from('personaggi')
+            .delete()
+            .eq('id', personaggioId);
+        if (error) throw error;
+
+        showNotification('Personaggio eliminato');
+        await loadPersonaggi();
+        await sendAppEventBroadcast({ table: 'personaggi', action: 'delete' });
+    } catch (error) {
+        console.error('Errore eliminazione personaggio:', error);
+        showNotification('Errore: ' + (error.message || error));
+    }
+}
+
+// --- Scegli personaggio per campagna ---
+
+window.openScegliPersonaggioModal = async function(campagnaId) {
+    if (!elements.scegliPersonaggioModal || !elements.scegliPersonaggioList) return;
+
+    elements.scegliPersonaggioList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+    elements.scegliPersonaggioModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const userData = await findUserByUid(AppState.currentUser?.uid);
+        if (!userData) throw new Error('Utente non trovato');
+
+        const { data: personaggi, error } = await supabase.rpc('get_personaggi_utente');
+        if (error) throw error;
+
+        const { data: assoc } = await supabase
+            .from('personaggi_campagna')
+            .select('personaggio_id')
+            .eq('campagna_id', campagnaId)
+            .eq('user_id', userData.id)
+            .maybeSingle();
+
+        const currentPgId = assoc?.personaggio_id || null;
+
+        if (!personaggi || personaggi.length === 0) {
+            elements.scegliPersonaggioList.innerHTML = `
+                <div class="content-placeholder">
+                    <p>Non hai personaggi. Creane uno prima!</p>
+                    <button class="btn-primary btn-small" onclick="closeScegliPersonaggioModal(); navigateToPage('personaggi');">Vai a Personaggi</button>
+                </div>`;
+            return;
+        }
+
+        elements.scegliPersonaggioList.innerHTML = personaggi.map(pg => {
+            const initials = (pg.nome || '?').substring(0, 2).toUpperCase();
+            const isSelected = pg.id === currentPgId;
+            return `
+            <div class="scegli-pg-item ${isSelected ? 'selected' : ''}" onclick="selectPersonaggioCampagna('${campagnaId}', '${pg.id}', '${userData.id}')">
+                <div class="scegli-pg-item-avatar">${escapeHtml(initials)}</div>
+                <div class="scegli-pg-item-info">
+                    <div class="scegli-pg-item-name">${escapeHtml(pg.nome)}${isSelected ? ' (attuale)' : ''}</div>
+                    <div class="scegli-pg-item-detail">${escapeHtml(pg.razza || '')} ${escapeHtml(pg.classe || '')} - Lv ${pg.livello || 1}</div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch (error) {
+        console.error('Errore caricamento personaggi per selezione:', error);
+        elements.scegliPersonaggioList.innerHTML = '<div class="content-placeholder"><p>Errore nel caricamento</p></div>';
+    }
+}
+
+function closeScegliPersonaggioModal() {
+    if (elements.scegliPersonaggioModal) {
+        elements.scegliPersonaggioModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+window.selectPersonaggioCampagna = async function(campagnaId, personaggioId, userId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const { error } = await supabase
+            .from('personaggi_campagna')
+            .upsert({
+                campagna_id: campagnaId,
+                user_id: userId,
+                personaggio_id: personaggioId,
+                created_at: new Date().toISOString()
+            }, { onConflict: 'campagna_id,user_id' });
+
+        if (error) throw error;
+
+        showNotification('Personaggio selezionato!');
+        closeScegliPersonaggioModal();
+        await sendAppEventBroadcast({ table: 'personaggi_campagna', action: 'upsert', campagnaId });
+
+        if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId === campagnaId) {
+            await loadCampagnaDetails(campagnaId);
+        }
+    } catch (error) {
+        console.error('Errore selezione personaggio:', error);
+        showNotification('Errore: ' + (error.message || error));
+    }
+}
+
 /**
  * Carica i dati utente da Supabase e applica le preferenze (es. tema)
  */
@@ -3272,22 +3616,49 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             `;
         } else {
-            // Per i giocatori, mostra solo il bottone "Sessione Attiva" se c'è una sessione attiva
-            if (sessioneAttiva) {
-                dettagliActionsElement.innerHTML = `
-                    <div class="dettagli-actions-start">
-                        <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            Sessione Attiva
-                        </button>
-                    </div>
-                `;
-            } else {
-                dettagliActionsElement.innerHTML = '';
-            }
+            let pgLabel = '';
+            try {
+                const uData = await findUserByUid(AppState.currentUser?.uid);
+                if (uData) {
+                    const { data: pgAssoc } = await supabase
+                        .from('personaggi_campagna')
+                        .select('personaggio_id')
+                        .eq('campagna_id', campagna.id)
+                        .eq('user_id', uData.id)
+                        .maybeSingle();
+                    if (pgAssoc?.personaggio_id) {
+                        const { data: pgData } = await supabase
+                            .from('personaggi')
+                            .select('nome')
+                            .eq('id', pgAssoc.personaggio_id)
+                            .single();
+                        if (pgData) pgLabel = pgData.nome;
+                    }
+                }
+            } catch (e) { console.warn('Errore caricamento pg campagna:', e); }
+
+            dettagliActionsElement.innerHTML = `
+                <div class="dettagli-actions-top">
+                    <button class="btn-secondary btn-small" onclick="openScegliPersonaggioModal('${campagna.id}')" aria-label="Scegli personaggio">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        ${pgLabel ? escapeHtml(pgLabel) : 'Scegli personaggio'}
+                    </button>
+                </div>
+                ${sessioneAttiva ? `
+                <div class="dettagli-actions-start">
+                    <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Sessione Attiva
+                    </button>
+                </div>
+                ` : ''}
+            `;
         }
     }
 
@@ -5882,6 +6253,8 @@ async function refreshCurrentPageData() {
     try {
         if (page === 'campagne' && AppState.currentUser?.uid) {
             await loadCampagne(AppState.currentUser.uid);
+        } else if (page === 'personaggi') {
+            await loadPersonaggi();
         } else if (page === 'amici') {
             await loadAmici();
         } else if (page === 'dettagli' && AppState.currentCampagnaId) {
