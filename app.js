@@ -2857,7 +2857,6 @@ function renderPersonaggi(personaggi) {
         elements.personaggiList.innerHTML = `
             <div class="content-placeholder">
                 <p>Non hai ancora creato personaggi</p>
-                <button class="btn-primary" onclick="openPersonaggioModal()">Crea il tuo primo personaggio</button>
             </div>`;
         return;
     }
