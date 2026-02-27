@@ -278,15 +278,33 @@ async function init() {
         if (success) {
             console.log('✅ Supabase pronto, setup auth...');
             setupSupabaseAuth();
-            // Load initial data after auth is ready
             checkAuthState();
         } else {
             console.warn('⚠️ Supabase non disponibile, app continua senza autenticazione');
         }
     }).catch((error) => {
         console.error('❌ Errore nell\'attesa Supabase:', error);
-        // Continue anyway - app works without Supabase
     });
+
+    if (localStorage.getItem('notificheEnabled') === 'true') {
+        registerServiceWorker();
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data?.type === 'NOTIFICATION_CLICK') {
+                if (event.data.campagnaId) {
+                    AppState.currentCampagnaId = event.data.campagnaId;
+                    if (event.data.sessioneId) {
+                        AppState.currentSessioneId = event.data.sessioneId;
+                        navigateToPage('sessione');
+                    } else {
+                        navigateToPage('dettagli');
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Setup Supabase Auth listeners
@@ -551,6 +569,33 @@ function setupEventListeners() {
         elements.settingsModal.addEventListener('click', (e) => {
             if (e.target === elements.settingsModal) {
                 closeSettingsModal();
+            }
+        });
+    }
+
+    const notificheToggle = document.getElementById('notificheToggle');
+    if (notificheToggle) {
+        const notifSaved = localStorage.getItem('notificheEnabled');
+        if (notifSaved !== null) {
+            notificheToggle.checked = notifSaved === 'true';
+        } else {
+            notificheToggle.checked = ('Notification' in window && Notification.permission === 'granted');
+        }
+
+        notificheToggle.addEventListener('change', async function() {
+            if (this.checked) {
+                const granted = await requestNotificationPermission();
+                if (granted) {
+                    localStorage.setItem('notificheEnabled', 'true');
+                    showNotification('Notifiche attivate');
+                    registerServiceWorker();
+                } else {
+                    this.checked = false;
+                    localStorage.setItem('notificheEnabled', 'false');
+                }
+            } else {
+                localStorage.setItem('notificheEnabled', 'false');
+                showNotification('Notifiche disattivate');
             }
         });
     }
@@ -5728,10 +5773,54 @@ function startAppEventsRealtime() {
         .on(
             'broadcast',
             { event: 'app_change' },
-            (payload) => {
-                if (payload?.payload?.sourceUid && payload.payload.sourceUid === AppState.currentUser?.uid) {
+            async (payload) => {
+                const data = payload?.payload;
+                if (!data) return;
+                if (data.sourceUid && data.sourceUid === AppState.currentUser?.uid) {
                     return;
                 }
+
+                if (data.table === 'richieste_tiro_iniziativa' && data.action === 'insert') {
+                    setTimeout(async () => {
+                        const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
+                        if (pending && !window.currentRollRequest) {
+                            showRollRequestModal(pending);
+                            sendBrowserNotification('Tiro di Iniziativa', 'Il DM ti ha richiesto un tiro di iniziativa!');
+                        }
+                    }, 500);
+                }
+
+                if (data.table === 'sessioni' && data.action === 'insert' && data.campagnaId) {
+                    try {
+                        const userData = await findUserByUid(AppState.currentUser?.uid);
+                        if (userData) {
+                            const { data: campagna } = await supabase
+                                .from('campagne')
+                                .select('nome_campagna, id_dm, giocatori')
+                                .eq('id', data.campagnaId)
+                                .single();
+
+                            if (campagna && campagna.id_dm !== userData.id) {
+                                const isPlayer = Array.isArray(campagna.giocatori) && campagna.giocatori.includes(userData.id);
+                                if (isPlayer) {
+                                    showInAppNotification({
+                                        title: 'Sessione Avviata!',
+                                        message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
+                                        campagnaId: data.campagnaId,
+                                        sessioneId: data.sessioneId
+                                    });
+                                    sendBrowserNotification(
+                                        'Sessione Avviata',
+                                        `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`
+                                    );
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Errore notifica sessione:', e);
+                    }
+                }
+
                 scheduleAppEventsRefresh();
             }
         )
@@ -5900,6 +5989,113 @@ window.closeInAppNotification = function(notificationId) {
     setTimeout(() => {
         notification.remove();
     }, 300);
+}
+
+/**
+ * Browser Notification API - system-level notifications
+ */
+function sendBrowserNotification(title, body) {
+    if (localStorage.getItem('notificheEnabled') !== 'true') return;
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+
+    try {
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+                type: 'SHOW_NOTIFICATION',
+                title,
+                body,
+                icon: 'images/icon d20.png'
+            });
+        } else {
+            new Notification(title, {
+                body,
+                icon: 'images/icon d20.png',
+                badge: 'images/icon d20.png',
+                tag: 'companion-app-' + Date.now(),
+                requireInteraction: true
+            });
+        }
+    } catch (e) {
+        console.warn('Errore invio notifica browser:', e);
+    }
+}
+
+async function requestNotificationPermission() {
+    if (!('Notification' in window)) {
+        showNotification('Il tuo browser non supporta le notifiche');
+        return false;
+    }
+
+    if (Notification.permission === 'granted') return true;
+    if (Notification.permission === 'denied') {
+        showNotification('Notifiche bloccate. Abilitale dalle impostazioni del browser.');
+        return false;
+    }
+
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+}
+
+async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return null;
+
+    try {
+        const registration = await navigator.serviceWorker.register('sw.js');
+        console.log('Service Worker registrato');
+
+        if ('PushManager' in window && registration.pushManager) {
+            const existingSub = await registration.pushManager.getSubscription();
+            if (!existingSub) {
+                await subscribeToPush(registration);
+            }
+        }
+
+        return registration;
+    } catch (e) {
+        console.warn('Service Worker registration fallita:', e);
+        return null;
+    }
+}
+
+async function subscribeToPush(registration) {
+    try {
+        const vapidKey = localStorage.getItem('vapidPublicKey');
+        if (!vapidKey) return null;
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidKey)
+        });
+
+        const supabase = getSupabaseClient();
+        if (supabase && AppState.currentUser) {
+            const userData = await findUserByUid(AppState.currentUser.uid);
+            if (userData) {
+                await supabase.from('push_subscriptions').upsert({
+                    user_id: userData.id,
+                    subscription: JSON.stringify(subscription),
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+            }
+        }
+
+        return subscription;
+    } catch (e) {
+        console.warn('Push subscription fallita:', e);
+        return null;
+    }
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 /**

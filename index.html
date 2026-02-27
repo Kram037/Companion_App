@@ -7,7 +7,10 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Companion App - D&D Helper</title>
-    <link rel="stylesheet" href="styles.css?v=1766952200">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B0000">
+    <link rel="apple-touch-icon" href="images/icon d20.png">
+    <link rel="stylesheet" href="styles.css?v=1766952300">
 </head>
 <body>
     <!-- Header -->
@@ -400,7 +403,7 @@
                 <div class="settings-item">
                     <span>Notifiche</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" id="notificheToggle">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
@@ -523,7 +526,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766952100"></script>
+    <script src="app.js?v=1766952300"></script>
     
     <!-- Cache busting script for development -->
     <script>
