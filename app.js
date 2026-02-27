@@ -2738,7 +2738,7 @@ async function loadUserData(userId) {
     }
 }
 
-function openCampagnaModal(campagnaId = null) {
+async function openCampagnaModal(campagnaId = null) {
     // Verifica che l'utente sia loggato
     if (!AppState.isLoggedIn) {
         showNotification('Devi essere loggato per creare una campagna');
@@ -2762,11 +2762,36 @@ function openCampagnaModal(campagnaId = null) {
     // Reset icon preview
     resetIconPreview();
     
-    // For now, we only support creating new campaigns (simple form)
-    // Editing will be handled separately if needed
     const modalTitle = document.querySelector('#campagnaModal h2');
-    if (modalTitle) {
-        modalTitle.textContent = 'Nuova Campagna';
+    const saveBtn = document.getElementById('saveCampagnaBtn');
+
+    if (campagnaId) {
+        if (modalTitle) modalTitle.textContent = 'Modifica Campagna';
+        if (saveBtn) saveBtn.textContent = 'Salva';
+
+        // Pre-fill form with existing campaign data
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            try {
+                const { data: campagna } = await supabase
+                    .from('campagne')
+                    .select('nome_campagna, icona_name')
+                    .eq('id', campagnaId)
+                    .single();
+                if (campagna) {
+                    const nomeInput = document.getElementById('nomeCampagna');
+                    if (nomeInput) nomeInput.value = campagna.nome_campagna || '';
+                    if (campagna.icona_name) {
+                        selectPredefinedIcon(campagna.icona_name);
+                    }
+                }
+            } catch (e) {
+                console.warn('Impossibile pre-caricare dati campagna:', e);
+            }
+        }
+    } else {
+        if (modalTitle) modalTitle.textContent = 'Nuova Campagna';
+        if (saveBtn) saveBtn.textContent = 'Crea';
     }
 
     elements.campagnaModal.classList.add('active');
@@ -2930,24 +2955,18 @@ async function handleCampagnaSubmit(e) {
         return;
     }
 
-    const campagnaData = {
-        nome_campagna: nomeCampagna,
-        icona_type: iconaType,
-        icona_name: iconaName,
-        icona_data: iconaData,
-        id_dm: utente.id, // Imposta l'ID del DM (foreign key verso utenti)
-        giocatori: [], // Array vuoto: il creatore è il DM, quindi non è nella lista giocatori
-        numero_sessioni: 0,
-        tempo_di_gioco: 0,
-        note: []
-    };
-
     try {
         if (editingCampagnaId) {
-            // Update existing campagna
+            // Update: only change name and icon, preserve everything else
+            const updateData = {
+                nome_campagna: nomeCampagna,
+                icona_type: iconaType,
+                icona_name: iconaName,
+                icona_data: iconaData,
+            };
             const { error } = await supabase
                 .from('campagne')
-                .update(campagnaData)
+                .update(updateData)
                 .eq('id', editingCampagnaId);
             
             if (error) throw error;
@@ -2955,6 +2974,17 @@ async function handleCampagnaSubmit(e) {
             showNotification('Campagna aggiornata con successo!');
         } else {
             // Create new campagna
+            const campagnaData = {
+                nome_campagna: nomeCampagna,
+                icona_type: iconaType,
+                icona_name: iconaName,
+                icona_data: iconaData,
+                id_dm: utente.id,
+                giocatori: [],
+                numero_sessioni: 0,
+                tempo_di_gioco: 0,
+                note: []
+            };
             const { error } = await supabase
                 .from('campagne')
                 .insert(campagnaData);
@@ -3555,7 +3585,7 @@ function renderCampagnaDetailsHeader(campagna) {
 /**
  * Apre il modal per gestire i giocatori della campagna
  */
-async function openInvitaGiocatoriModal(campagnaId) {
+window.openInvitaGiocatoriModal = async function(campagnaId) {
     if (!elements.invitaGiocatoriModal) return;
 
     // Verifica che l'utente sia il DM
@@ -3569,7 +3599,7 @@ async function openInvitaGiocatoriModal(campagnaId) {
     elements.invitaGiocatoriModal.classList.add('active');
     document.body.style.overflow = 'hidden';
     switchGiocatoriTab('gestisci', campagnaId);
-}
+};
 
 /**
  * Chiude il modal per invitare giocatori

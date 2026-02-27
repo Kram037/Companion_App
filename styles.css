@@ -480,7 +480,7 @@ body.user-logged-in .header-username {
 }
 
 .filter-chip-select {
-    padding: 6px 10px;
+    padding: 6px 12px;
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     background: var(--surface);
@@ -491,10 +491,10 @@ body.user-logged-in .header-username {
     transition: var(--transition-fast);
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2378716C'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2378716C'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center;
-    padding-right: 22px;
+    background-position: right 10px center;
+    padding-right: 26px;
 }
 
 .filter-chip-select:focus {
@@ -2477,65 +2477,175 @@ body.user-logged-in .header-username {
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE — Mobile first (target principale)
    ============================================ */
-@media (max-width: 767px) {
-    .main-content { padding: var(--spacing-md); }
+
+/* ── Mobile (<= 480px) — Telefoni piccoli ── */
+@media (max-width: 480px) {
+    .main-content { padding: var(--spacing-sm); }
+
+    .header { padding: 0 var(--spacing-md); height: 52px; }
+    .d20-logo { width: 36px; height: 36px; }
+
+    .page-header { padding: 0; gap: var(--spacing-sm); }
+    .page-header h1 { font-size: 1.2rem; }
+    .page-content h1 { font-size: 1.2rem; margin-bottom: var(--spacing-md); }
+
+    .page-header .btn-icon { width: 34px; height: 34px; min-width: 34px; font-size: 1.2rem; }
+
+    .filters-bar { gap: 6px; margin-bottom: var(--spacing-md); }
+    .filter-search { padding: 8px 10px 8px 32px; font-size: 0.85rem; }
+    .filter-chips { gap: 4px; }
+    .filter-chip-select { font-size: 0.72rem; padding: 5px 22px 5px 8px; }
+    .filter-chip-toggle { font-size: 0.72rem; padding: 5px 8px; }
+
+    .campagne-list { gap: var(--spacing-sm); }
+    .campagna-card { height: 130px; }
+    .campagna-header { padding: 8px 8px 0; padding-right: 46px; gap: 8px; }
+    .campagna-icon { width: 60px; height: 60px; }
+    .campagna-icon-svg svg { width: 32px; height: 32px; }
+    .campagna-title { font-size: 0.88rem; }
+    .campagna-info { padding: 0 8px 8px; }
+    .info-label, .info-value { font-size: 0.75rem; }
 
     .modal-content {
-        padding: var(--spacing-lg);
-        width: 95%;
-        max-height: 90vh;
+        padding: var(--spacing-md);
+        width: 96%;
+        max-height: 92vh;
         overflow-y: auto;
         border-radius: var(--radius-md);
     }
 
-    .modal-close {
-        font-size: 1.2rem;
-        width: 26px; height: 26px;
-    }
+    .modal-content h2 { font-size: 1.05rem; margin-bottom: var(--spacing-md); }
+    .modal-close { width: 26px; height: 26px; font-size: 1.1rem; top: 10px; right: 10px; }
 
     .form-group { margin-bottom: var(--spacing-md); }
+    .form-group label { font-size: 0.78rem; }
+    .form-group input { padding: 8px 10px; font-size: 0.88rem; }
 
-    .btn-primary, .btn-secondary, .btn-google {
-        padding: 8px 14px;
-        font-size: 0.88rem;
-    }
+    .btn-primary, .btn-secondary { padding: 9px 14px; font-size: 0.85rem; }
+    .btn-google { padding: 9px 14px; font-size: 0.85rem; }
+    .btn-google svg { width: 16px; height: 16px; }
 
-    .user-avatar { width: 44px; height: 44px; }
-    .user-avatar svg { width: 22px; height: 22px; }
+    .divider { margin: var(--spacing-md) 0; font-size: 0.72rem; }
+    .error-message { padding: 8px 10px; font-size: 0.82rem; }
+    .modal-footer-text { font-size: 0.82rem; margin-top: var(--spacing-md); }
 
-    .theme-selector { gap: 4px; }
-    .theme-btn { padding: 4px; min-width: 60px; }
-    .theme-preview { width: 44px; height: 30px; }
-    .icon-grid { grid-template-columns: repeat(4, 1fr); max-height: 150px; }
-    .icon-option { width: 40px; height: 40px; }
-
-    .form-actions {
-        gap: 6px;
-        margin-top: var(--spacing-md);
-    }
-
+    .form-actions { gap: 6px; margin-top: var(--spacing-md); padding-top: var(--spacing-md); }
     .form-actions .btn-primary,
-    .form-actions .btn-secondary {
-        font-size: 0.85rem;
-        height: 38px;
-    }
+    .form-actions .btn-secondary { font-size: 0.82rem; height: 36px; padding: 0 var(--spacing-md); }
+
+    .user-info { padding: var(--spacing-md); gap: var(--spacing-md); }
+    .user-avatar { width: 40px; height: 40px; }
+    .user-avatar svg { width: 20px; height: 20px; }
+    .user-name { font-size: 0.92rem; }
+    .user-email, .user-cid { font-size: 0.78rem; }
+
+    .settings-item { padding: 10px var(--spacing-md); font-size: 0.85rem; }
+    .theme-selector { gap: 4px; }
+    .theme-btn { padding: 3px; min-width: 56px; }
+    .theme-btn span { font-size: 0.72rem; }
+    .theme-preview { width: 40px; height: 28px; }
+
+    .icon-selector-container { gap: var(--spacing-sm) !important; }
+    .icon-preview-large { width: 72px !important; height: 72px !important; }
+    .icon-preview-large svg { width: 40px !important; height: 40px !important; }
+    .icon-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; max-height: 140px; }
+    .icon-option { width: 36px; height: 36px; padding: 4px; }
+    .icon-option svg { width: 20px; height: 20px; }
+    .btn-icon-selector { height: 36px; font-size: 0.82rem; padding: 8px 10px; }
+
+    .dettagli-header { padding: var(--spacing-md) 0; margin-bottom: var(--spacing-lg); }
+    .dettagli-title { font-size: 1.25rem; }
+    .dettagli-icon-container { width: 48px; height: 48px; }
+    .dettagli-section { padding: var(--spacing-md); }
+    .dettagli-section-title { font-size: 0.68rem; margin-bottom: var(--spacing-sm); }
+    .dettagli-info { padding: 2px var(--spacing-md); }
+    .dettagli-info .info-item { padding: 8px 0; }
+    .dettagli-info .info-label { font-size: 0.78rem; }
+    .dettagli-info .info-value { font-size: 0.85rem; }
+
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .stat-card { padding: var(--spacing-sm); gap: var(--spacing-sm); }
+    .stat-icon { width: 30px; height: 30px; font-size: 1.1rem; }
+    .stat-label { font-size: 0.65rem; }
+    .stat-value { font-size: 1rem; }
+
+    .btn-icon-small { width: 26px; height: 26px; }
+    .btn-icon-small svg { width: 12px; height: 12px; }
+
+    .sessione-timer { padding: var(--spacing-md); }
+    .timer-value { font-size: 1.6rem; }
+    .timer-label { font-size: 0.6rem; }
+
+    .sessione-actions .btn-primary,
+    .sessione-actions .btn-secondary { max-width: 100%; }
+
+    .iniziativa-item { grid-template-columns: 26px 1fr 40px auto; padding: 6px 10px; }
+    .iniziativa-ordine { width: 22px; height: 22px; font-size: 0.72rem; }
+    .iniziativa-nome { font-size: 0.85rem; }
+    .iniziativa-valore { font-size: 0.85rem; }
+
+    .combattimento-card { padding: var(--spacing-sm) var(--spacing-md); }
+    .combattimento-card-name { font-size: 0.85rem; }
+    .combattimento-card-value { font-size: 1rem; }
+
+    .invito-card { padding: var(--spacing-md); }
+    .invito-header h4 { font-size: 0.88rem; }
+    .invito-content p { font-size: 0.85rem; }
+
+    .amico-item { padding: var(--spacing-md); }
+    .amico-avatar { width: 36px; height: 36px; }
+    .amico-avatar svg { width: 18px; height: 18px; }
+    .amico-nome { font-size: 0.88rem; }
+    .amico-cid { font-size: 0.75rem; }
+
+    .amico-actions { gap: 4px; }
+    .btn-icon-amico { width: 30px; height: 30px; }
+    .btn-icon-amico svg { width: 16px; height: 16px; }
+
+    .bottom-toolbar { height: 60px; padding: 4px 0; }
+    .toolbar-btn svg { width: 20px; height: 20px; }
+    .toolbar-btn span { font-size: 0.6rem; }
+
+    .back-button-floating { width: 38px; height: 38px; bottom: 76px; }
+    .back-button-floating svg { width: 18px; height: 18px; }
+
+    .in-app-notifications { max-width: calc(100vw - 2rem); right: var(--spacing-sm); top: 60px; }
+    .in-app-notification { padding: 10px 12px; }
+    .in-app-notification-title { font-size: 0.82rem; }
+    .in-app-notification-message { font-size: 0.78rem; }
+
+    .modal-tabs { padding: 2px; }
+    .modal-tab { padding: 6px 8px; font-size: 0.78rem; }
+
+    .giocatore-modal-item { padding: 8px 10px; }
+    .giocatore-modal-item .giocatore-avatar { width: 32px; height: 32px; }
+    .giocatore-modal-item .giocatore-avatar svg { width: 16px; height: 16px; }
+    .giocatore-modal-item .giocatore-nome { font-size: 0.85rem; }
+
+    .player-item { padding: 8px 10px; }
+    .player-avatar { width: 32px; height: 32px; }
+    .player-avatar svg { width: 16px; height: 16px; }
+
+    .dettagli-notes { padding: var(--spacing-md); }
+    .dettagli-notes-content { font-size: 0.85rem; }
 }
 
+/* ── Tablet & Small desktop (<= 768px) ── */
 @media (max-width: 768px) {
+    .main-content { padding: var(--spacing-md); }
+
     .campagne-list { grid-template-columns: 1fr; }
 
     .amici-list {
         display: flex !important;
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: var(--spacing-sm);
     }
 
     .form-row { grid-template-columns: 1fr; }
-    .page-header { padding: var(--spacing-sm) 0; }
     .page-header h1 { font-size: 1.3rem; }
-    .page-header .btn-icon { width: 36px; height: 36px; min-width: 36px; }
     .page-content h1 { font-size: 1.3rem; }
 
     .icon-selector-container {
@@ -2548,21 +2658,15 @@ body.user-logged-in .header-username {
         width: 80px !important; height: 80px !important;
         flex-shrink: 0 !important; margin: 0 !important;
     }
-
     .icon-preview-large svg { width: 48px !important; height: 48px !important; }
     .icon-preview-large img { width: 100% !important; height: 100% !important; }
     .icon-options { flex: 1 !important; min-width: 0 !important; }
     .btn-icon-selector { width: 100%; }
 
+    .modal-content { padding: var(--spacing-lg); width: 95%; max-height: 90vh; overflow-y: auto; }
     .modal-content-small { max-width: 90vw; max-height: 85vh; }
     .modal-content-small .icon-grid { max-height: 60vh; }
-
-    .d20-logo { width: 44px; height: 44px; }
-
-    .invito-card { padding: var(--spacing-md); }
-    .amico-actions { gap: 6px; }
-    .btn-icon-amico { width: 30px; height: 30px; }
-    .btn-icon-amico svg { width: 16px; height: 16px; }
+    .icon-grid { grid-template-columns: repeat(5, 1fr); }
 
     .amico-actions .btn-icon-amico {
         text-indent: -9999px !important;
@@ -2570,18 +2674,12 @@ body.user-logged-in .header-username {
         font-size: 0 !important;
         color: transparent !important;
     }
-
-    .amico-actions .btn-icon-amico svg {
-        text-indent: 0;
-        position: relative;
-        z-index: 1;
-    }
-
-    .timer-value { font-size: 1.8rem; }
-    .iniziativa-item { grid-template-columns: 28px 1fr 44px auto; font-size: 0.88rem; }
+    .amico-actions .btn-icon-amico svg { text-indent: 0; position: relative; z-index: 1; }
 }
 
-@media (min-width: 768px) {
+/* ── Desktop (>= 769px) ── */
+@media (min-width: 769px) {
     .modal-content { padding: var(--spacing-xl); }
     .btn-google { font-size: 0.92rem; }
+    .icon-grid { grid-template-columns: repeat(6, 1fr); }
 }
