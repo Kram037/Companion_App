@@ -2883,9 +2883,14 @@ function pgWizardGoTo(step) {
     if (step === 1) updateAllAbilityMods();
     if (step === 2) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
+        const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
         if (initField && !initField.value && !editingPersonaggioId) {
-            initField.placeholder = `= ${formatMod(calcMod(des)).replace(/[()]/g, '')} (mod DES)`;
+            initField.placeholder = `(des)`;
+        }
+        const caField = document.getElementById('pgCA');
+        if (caField && !caField.value && !editingPersonaggioId) {
+            caField.placeholder = `(10+des)`;
         }
     }
 }
@@ -3024,23 +3029,28 @@ async function handleSavePersonaggio(e) {
     }
 
     const destrezza = parseInt(document.getElementById('pgDestrezza').value) || 10;
+    const desMod = calcMod(destrezza);
     const iniziativaVal = document.getElementById('pgIniziativa').value;
-    const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : calcMod(destrezza);
+    const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : desMod;
+    const caVal = document.getElementById('pgCA').value;
+    const classeArmatura = caVal !== '' ? parseInt(caVal) : (10 + desMod);
+
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
     const pgData = {
         nome: document.getElementById('pgNome').value.trim(),
         razza: document.getElementById('pgRazza').value.trim() || null,
         classe: document.getElementById('pgClasse').value.trim() || null,
         livello: parseInt(document.getElementById('pgLivello').value) || 1,
-        forza: parseInt(document.getElementById('pgForza').value) || 10,
-        destrezza: destrezza,
-        costituzione: parseInt(document.getElementById('pgCostituzione').value) || 10,
-        intelligenza: parseInt(document.getElementById('pgIntelligenza').value) || 10,
-        saggezza: parseInt(document.getElementById('pgSaggezza').value) || 10,
-        carisma: parseInt(document.getElementById('pgCarisma').value) || 10,
+        forza: clamp(parseInt(document.getElementById('pgForza').value) || 10, 1, 30),
+        destrezza: clamp(destrezza, 1, 30),
+        costituzione: clamp(parseInt(document.getElementById('pgCostituzione').value) || 10, 1, 30),
+        intelligenza: clamp(parseInt(document.getElementById('pgIntelligenza').value) || 10, 1, 30),
+        saggezza: clamp(parseInt(document.getElementById('pgSaggezza').value) || 10, 1, 30),
+        carisma: clamp(parseInt(document.getElementById('pgCarisma').value) || 10, 1, 30),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
-        classe_armatura: parseInt(document.getElementById('pgCA').value) || 10,
+        classe_armatura: classeArmatura,
         percezione_passiva: parseInt(document.getElementById('pgPercezione').value) || 10,
         velocita: parseFloat(document.getElementById('pgVelocita').value) || 9,
         updated_at: new Date().toISOString()
