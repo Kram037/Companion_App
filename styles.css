@@ -862,6 +862,74 @@ body.user-logged-in .header-username {
     border-bottom: 1px solid var(--border);
 }
 
+/* Wizard steps */
+.wizard-steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: var(--spacing-lg);
+}
+
+.wizard-step {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s ease;
+}
+
+.wizard-step.active {
+    background: var(--accent);
+}
+
+.wizard-page {
+    display: none;
+}
+
+.wizard-page.active {
+    display: block;
+    animation: wizardFadeIn 0.25s ease;
+}
+
+@keyframes wizardFadeIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Ability score with live modifier */
+.pg-ability {
+    position: relative;
+    text-align: center;
+}
+
+.pg-ability-input {
+    text-align: center;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    padding-bottom: 20px !important;
+}
+
+.pg-ability-mod {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: -16px;
+    padding-bottom: 4px;
+    transition: color 0.15s ease;
+}
+
+.pg-ability-mod.negative {
+    color: #dc3545;
+}
+
+.pg-ability-mod.positive {
+    color: var(--accent);
+}
+
+.pg-ability-mod.zero {
+    color: var(--text-light);
+}
+
 /* Scegli personaggio modal list */
 .scegli-pg-list {
     display: flex;

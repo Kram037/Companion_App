@@ -459,10 +459,9 @@ function updateUIForLoggedIn() {
 function updatePlaceholderMessages(isLoggedIn) {
     const amiciPlaceholder = document.getElementById('amiciPlaceholder');
     const nemiciPlaceholder = document.getElementById('nemiciPlaceholder');
-    const personaggiPlaceholder = document.getElementById('personaggiPlaceholder');
+    const personaggiList = document.getElementById('personaggiList');
     
     if (isLoggedIn) {
-        // Utente loggato ma senza dati
         if (amiciPlaceholder) {
             amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
         }
@@ -474,19 +473,18 @@ function updatePlaceholderMessages(isLoggedIn) {
                 </p>
             `;
         }
-        if (personaggiPlaceholder) {
-            personaggiPlaceholder.innerHTML = '<p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p>';
+        if (personaggiList) {
+            personaggiList.innerHTML = '<div class="content-placeholder"><p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p></div>';
         }
     } else {
-        // Utente non loggato
         if (amiciPlaceholder) {
             amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
         }
         if (nemiciPlaceholder) {
             nemiciPlaceholder.innerHTML = '<p>Accedi per vedere e creare i tuoi nemici</p>';
         }
-        if (personaggiPlaceholder) {
-            personaggiPlaceholder.innerHTML = '<p>Accedi per vedere e creare i tuoi personaggi</p>';
+        if (personaggiList) {
+            personaggiList.innerHTML = '<div class="content-placeholder"><p>Accedi per vedere e creare i tuoi personaggi</p></div>';
         }
     }
 }
@@ -751,15 +749,14 @@ function setupEventListeners() {
         elements.personaggioForm.addEventListener('submit', handleSavePersonaggio);
     }
 
-    const pgDesField = document.getElementById('pgDestrezza');
-    const pgInitField = document.getElementById('pgIniziativa');
-    if (pgDesField && pgInitField) {
-        pgDesField.addEventListener('input', () => {
-            const des = parseInt(pgDesField.value) || 10;
-            const mod = Math.floor((des - 10) / 2);
-            pgInitField.placeholder = `= ${mod >= 0 ? '+' : ''}${mod} (DES mod)`;
-        });
-    }
+    const abilityFields = ['Forza', 'Destrezza', 'Costituzione', 'Intelligenza', 'Saggezza', 'Carisma'];
+    abilityFields.forEach(name => {
+        const input = document.getElementById(`pg${name}`);
+        const modEl = document.getElementById(`mod${name}`);
+        if (input && modEl) {
+            input.addEventListener('input', () => updateAbilityMod(input, modEl));
+        }
+    });
     if (elements.closeScegliPersonaggioModal) {
         elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
     }
@@ -2829,6 +2826,69 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
 // ============================================================================
 
 let editingPersonaggioId = null;
+let pgWizardCurrentStep = 0;
+
+function calcMod(score) {
+    return Math.floor((score - 10) / 2);
+}
+
+function formatMod(mod) {
+    if (mod > 0) return `(+${mod})`;
+    if (mod < 0) return `(${mod})`;
+    return '(+0)';
+}
+
+function updateAbilityMod(input, modEl) {
+    const val = parseInt(input.value) || 10;
+    const mod = calcMod(val);
+    modEl.textContent = formatMod(mod);
+    modEl.className = 'pg-ability-mod ' + (mod > 0 ? 'positive' : mod < 0 ? 'negative' : 'zero');
+}
+
+function updateAllAbilityMods() {
+    ['Forza', 'Destrezza', 'Costituzione', 'Intelligenza', 'Saggezza', 'Carisma'].forEach(name => {
+        const input = document.getElementById(`pg${name}`);
+        const modEl = document.getElementById(`mod${name}`);
+        if (input && modEl) updateAbilityMod(input, modEl);
+    });
+}
+
+window.pgWizardNext = function() {
+    if (pgWizardCurrentStep === 0) {
+        const nome = document.getElementById('pgNome').value.trim();
+        if (!nome) {
+            showNotification('Inserisci un nome per il personaggio');
+            return;
+        }
+    }
+    pgWizardGoTo(pgWizardCurrentStep + 1);
+}
+
+window.pgWizardPrev = function() {
+    pgWizardGoTo(pgWizardCurrentStep - 1);
+}
+
+function pgWizardGoTo(step) {
+    if (step < 0 || step > 2) return;
+    pgWizardCurrentStep = step;
+
+    document.querySelectorAll('.wizard-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.wizard-step').forEach((s, i) => {
+        s.classList.toggle('active', i <= step);
+    });
+
+    const target = document.getElementById(`pgStep${step}`);
+    if (target) target.classList.add('active');
+
+    if (step === 1) updateAllAbilityMods();
+    if (step === 2) {
+        const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
+        const initField = document.getElementById('pgIniziativa');
+        if (initField && !initField.value && !editingPersonaggioId) {
+            initField.placeholder = `= ${formatMod(calcMod(des)).replace(/[()]/g, '')} (mod DES)`;
+        }
+    }
+}
 
 async function loadPersonaggi() {
     const supabase = getSupabaseClient();
@@ -2856,7 +2916,7 @@ function renderPersonaggi(personaggi) {
     if (personaggi.length === 0) {
         elements.personaggiList.innerHTML = `
             <div class="content-placeholder">
-                <p>Non hai ancora creato personaggi</p>
+                <p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p>
             </div>`;
         return;
     }
@@ -2905,6 +2965,7 @@ window.openPersonaggioModal = function(personaggioId) {
     if (!form) return;
 
     form.reset();
+    pgWizardGoTo(0);
 
     if (personaggioId) {
         elements.personaggioModalTitle.textContent = 'Modifica Personaggio';
@@ -2925,16 +2986,18 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgSaggezza').value = data.saggezza || 10;
                     document.getElementById('pgCarisma').value = data.carisma || 10;
                     document.getElementById('pgPV').value = data.punti_vita_max || 10;
-                    document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : Math.floor((data.destrezza - 10) / 2);
+                    document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : calcMod(data.destrezza || 10);
                     document.getElementById('pgCA').value = data.classe_armatura || 10;
                     document.getElementById('pgPercezione').value = data.percezione_passiva || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
+                    updateAllAbilityMods();
                 }
             });
         }
     } else {
         elements.personaggioModalTitle.textContent = 'Nuovo Personaggio';
         elements.savePersonaggioBtn.textContent = 'Crea';
+        updateAllAbilityMods();
     }
 
     elements.personaggioModal.classList.add('active');
@@ -2962,7 +3025,7 @@ async function handleSavePersonaggio(e) {
 
     const destrezza = parseInt(document.getElementById('pgDestrezza').value) || 10;
     const iniziativaVal = document.getElementById('pgIniziativa').value;
-    const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : Math.floor((destrezza - 10) / 2);
+    const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : calcMod(destrezza);
 
     const pgData = {
         nome: document.getElementById('pgNome').value.trim(),
