@@ -379,13 +379,10 @@ async function checkAuthState() {
 // Update UI when user is logged in
 function updateUIForLoggedIn() {
     document.body.classList.add('user-logged-in');
-    // Update user button to show logged in state
-    elements.userBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-    `;
+    const headerUserName = document.getElementById('headerUserName');
+    if (headerUserName) {
+        headerUserName.textContent = AppState.currentUser?.displayName || '';
+    }
     // Mostra i pulsanti quando l'utente è loggato
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'block';
@@ -1091,9 +1088,10 @@ async function openUserModal() {
                     } else {
                         elements.userCID.textContent = 'CID: ----';
                     }
-                    // Aggiorna anche il nome utente se disponibile
-                    if (userData.nome_utente && elements.userName) {
-                        elements.userName.textContent = userData.nome_utente;
+                    if (userData.nome_utente) {
+                        if (elements.userName) elements.userName.textContent = userData.nome_utente;
+                        const headerUserName = document.getElementById('headerUserName');
+                        if (headerUserName) headerUserName.textContent = userData.nome_utente;
                     }
                 } else {
                     elements.userCID.textContent = 'CID: ----';
@@ -1465,39 +1463,10 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
  * Setup event listeners per i filtri campagne
  */
 function setupCampagneFilters() {
-    const openFiltersBtn = document.getElementById('openFiltersBtn');
-    const filtersDropdown = document.getElementById('filtersDropdown');
     const searchInput = document.getElementById('campagneSearchInput');
     const tipologiaFilter = document.getElementById('campagneTipologiaFilter');
     const dmFilter = document.getElementById('campagneDMFilter');
     const preferitiFilter = document.getElementById('togglePreferitiFilter');
-
-    // Apri/chiudi tendina filtri
-    if (openFiltersBtn && filtersDropdown) {
-        openFiltersBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isActive = filtersDropdown.classList.contains('active');
-            if (isActive) {
-                filtersDropdown.classList.remove('active');
-                openFiltersBtn.classList.remove('active');
-            } else {
-                filtersDropdown.classList.add('active');
-                openFiltersBtn.classList.add('active');
-            }
-        });
-
-        // Chiudi tendina quando si clicca fuori
-        document.addEventListener('click', (e) => {
-            if (filtersDropdown && filtersDropdown.classList.contains('active')) {
-                if (!filtersDropdown.contains(e.target) && !openFiltersBtn.contains(e.target)) {
-                    filtersDropdown.classList.remove('active');
-                    openFiltersBtn.classList.remove('active');
-                }
-            }
-        });
-    }
-
-    // Debounce per ricerca testuale
     let searchTimeout;
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -2026,10 +1995,12 @@ async function handleSaveUserName() {
         if (error) throw error;
         await sendAppEventBroadcast({ table: 'utenti', action: 'update', userId: utente.id });
 
-        // Aggiorna l'UI
         if (elements.userName) {
             elements.userName.textContent = newName;
         }
+        const headerUserName = document.getElementById('headerUserName');
+        if (headerUserName) headerUserName.textContent = newName;
+        invalidateUserCache();
         if (elements.editUserNameForm) {
             elements.editUserNameForm.style.display = 'none';
         }

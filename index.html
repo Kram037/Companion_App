@@ -17,6 +17,7 @@
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
             </svg>
+            <span class="header-username" id="headerUserName"></span>
         </button>
         
         <div class="logo-container">
@@ -47,42 +48,32 @@
                     <h1>Campagne</h1>
                     <button class="btn-primary btn-icon" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
                 </div>
-                <div class="filters-container">
-                    <button class="btn-filters" id="openFiltersBtn" aria-label="Filtri">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                <div class="filters-bar">
+                    <div class="filter-search-wrap">
+                        <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
-                        <span>Filtri</span>
-                    </button>
-                    <div class="filters-dropdown" id="filtersDropdown">
-                        <div class="filters-dropdown-content">
-                            <div class="filter-group">
-                                <label for="campagneSearchInput">Ricerca per nome</label>
-                                <input type="text" id="campagneSearchInput" class="filter-input" placeholder="Cerca per nome...">
-                            </div>
-                            <div class="filter-group">
-                                <label for="campagneTipologiaFilter">Tipologia</label>
-                                <select id="campagneTipologiaFilter" class="filter-select">
-                                    <option value="all">Tutte</option>
-                                    <option value="lunghe">Campagne lunghe</option>
-                                    <option value="one-shot">One-shot</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="campagneDMFilter">DM</label>
-                                <select id="campagneDMFilter" class="filter-select">
-                                    <option value="all">Tutte</option>
-                                    <option value="yes">Solo dove sono DM</option>
-                                    <option value="no">Solo dove non sono DM</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-checkbox-label">
-                                    <input type="checkbox" id="togglePreferitiFilter" class="filter-checkbox">
-                                    <span>Preferiti</span>
-                                </label>
-                            </div>
-                        </div>
+                        <input type="text" id="campagneSearchInput" class="filter-search" placeholder="Cerca campagna...">
+                    </div>
+                    <div class="filter-chips">
+                        <select id="campagneTipologiaFilter" class="filter-chip-select">
+                            <option value="all">Tipo: Tutte</option>
+                            <option value="lunghe">Lunghe</option>
+                            <option value="one-shot">One-shot</option>
+                        </select>
+                        <select id="campagneDMFilter" class="filter-chip-select">
+                            <option value="all">Ruolo: Tutti</option>
+                            <option value="yes">Sono DM</option>
+                            <option value="no">Non sono DM</option>
+                        </select>
+                        <label class="filter-chip-toggle" id="preferitiChipLabel">
+                            <input type="checkbox" id="togglePreferitiFilter">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            <span>Preferiti</span>
+                        </label>
                     </div>
                 </div>
                 <div id="campagneList" class="campagne-list">
