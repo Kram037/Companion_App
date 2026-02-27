@@ -757,6 +757,10 @@ function setupEventListeners() {
             input.addEventListener('input', () => updateAbilityMod(input, modEl));
         }
     });
+    const pgLivelloInput = document.getElementById('pgLivello');
+    if (pgLivelloInput) {
+        pgLivelloInput.addEventListener('input', () => updateBonusCompetenza());
+    }
     if (elements.closeScegliPersonaggioModal) {
         elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
     }
@@ -2111,6 +2115,13 @@ async function handleSaveUserName() {
             .eq('id', utente.id);
 
         if (error) throw error;
+
+        if (AppState.currentUser) {
+            AppState.currentUser.displayName = newName;
+        }
+
+        await supabase.auth.updateUser({ data: { display_name: newName } });
+
         await sendAppEventBroadcast({ table: 'utenti', action: 'update', userId: utente.id });
 
         if (elements.userName) {
@@ -2832,6 +2843,17 @@ function calcMod(score) {
     return Math.floor((score - 10) / 2);
 }
 
+function calcBonusCompetenza(livello) {
+    return Math.floor((livello - 1) / 4) + 2;
+}
+
+function updateBonusCompetenza() {
+    const livello = parseInt(document.getElementById('pgLivello')?.value) || 1;
+    const bonus = calcBonusCompetenza(livello);
+    const field = document.getElementById('pgBonusCompetenza');
+    if (field) field.value = `+${bonus}`;
+}
+
 function formatMod(mod) {
     if (mod > 0) return `(+${mod})`;
     if (mod < 0) return `(${mod})`;
@@ -2886,12 +2908,18 @@ function pgWizardGoTo(step) {
         const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
         if (initField && !initField.value && !editingPersonaggioId) {
-            initField.placeholder = `(des)`;
+            initField.value = desMod;
         }
         const caField = document.getElementById('pgCA');
         if (caField && !caField.value && !editingPersonaggioId) {
-            caField.placeholder = `(10+des)`;
+            caField.value = 10 + desMod;
         }
+        const hintCA = document.getElementById('hintCA');
+        if (hintCA) hintCA.textContent = `(10+des = ${10 + desMod})`;
+        const hintInit = document.getElementById('hintIniziativa');
+        if (hintInit) hintInit.textContent = `(des = ${formatMod(desMod)})`;
+
+        updateBonusCompetenza();
     }
 }
 
@@ -2996,13 +3024,17 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgPercezione').value = data.percezione_passiva || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
                     updateAllAbilityMods();
+                    updateBonusCompetenza();
                 }
             });
         }
     } else {
         elements.personaggioModalTitle.textContent = 'Nuovo Personaggio';
         elements.savePersonaggioBtn.textContent = 'Crea';
+        document.getElementById('pgCA').value = '';
+        document.getElementById('pgIniziativa').value = '';
         updateAllAbilityMods();
+        updateBonusCompetenza();
     }
 
     elements.personaggioModal.classList.add('active');

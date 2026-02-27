@@ -697,6 +697,10 @@ body.user-logged-in .header-username {
     gap: var(--spacing-md);
 }
 
+.personaggi-list .content-placeholder {
+    grid-column: 1 / -1;
+}
+
 .pg-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -938,6 +942,25 @@ body.user-logged-in .header-username {
 .pg-ability-mod.negative { color: #dc3545; }
 .pg-ability-mod.positive { color: var(--accent); }
 .pg-ability-mod.zero { color: var(--text-light); }
+
+.pg-stat-with-hint { position: relative; }
+
+.pg-stat-hint {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 2px;
+}
+
+.pg-readonly-input {
+    background: var(--surface-hover) !important;
+    color: var(--accent) !important;
+    text-align: center;
+    font-weight: 700;
+    cursor: default;
+    opacity: 0.85;
+}
 
 /* Scegli personaggio modal list */
 .scegli-pg-list {
