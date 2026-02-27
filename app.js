@@ -3070,18 +3070,12 @@ async function renderCampagnaDetailsContent(campagna) {
                     nomeDM = AppState.cachedUserData.nome_utente || 'DM';
                 } else {
                     const { data: dmData, error: dmError } = await supabase
-                        .rpc('get_dm_campagna', { p_campagna_id: campagna.id });
+                        .rpc('get_dms_campagne', { p_dm_ids: [campagna.id_dm] });
                     
                     if (!dmError && dmData && dmData.length > 0) {
                         nomeDM = dmData[0].nome_utente || 'DM';
                     } else {
-                        if (dmError) console.warn('⚠️ RPC get_dm_campagna fallita, fallback:', dmError);
-                        const { data: fallbackDm } = await supabase
-                            .from('utenti')
-                            .select('nome_utente')
-                            .eq('id', campagna.id_dm)
-                            .maybeSingle();
-                        if (fallbackDm) nomeDM = fallbackDm.nome_utente || 'DM';
+                        if (dmError) console.warn('⚠️ RPC get_dms_campagne fallita:', dmError);
                     }
                 }
             }
