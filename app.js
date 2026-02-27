@@ -242,9 +242,36 @@ async function init() {
     // Setup event listeners immediately (don't wait for Supabase)
     console.log('🔧 Setup event listeners...');
     setupEventListeners();
+
+    // Browser back/forward navigation
+    window.addEventListener('popstate', async (event) => {
+        if (event.state && event.state.page) {
+            const st = event.state;
+            if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;
+            if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
+
+            navigateToPage(st.page, { pushHistory: false });
+
+            if (st.page === 'dettagli' && st.campagnaId) {
+                await loadCampagnaDetails(st.campagnaId);
+            } else if (st.page === 'sessione' && st.campagnaId) {
+                await renderSessioneContent(st.campagnaId);
+            } else if (st.page === 'combattimento' && st.campagnaId && st.sessioneId) {
+                await renderCombattimentoContent(st.campagnaId, st.sessioneId);
+            }
+        } else {
+            // No state = initial page, go to campagne
+            AppState.currentCampagnaId = null;
+            AppState.currentSessioneId = null;
+            navigateToPage('campagne', { pushHistory: false });
+        }
+    });
+
+    // Replace current history entry with initial state
+    history.replaceState({ page: AppState.currentPage || 'campagne' }, '', null);
+
     console.log('📄 Navigazione alla pagina iniziale...');
-    // Naviga alla pagina salvata o alla home
-    navigateToPage(AppState.currentPage || 'campagne');
+    navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
     
     // Wait for Supabase to be ready (in background, non-blocking)
     waitForSupabase().then((success) => {
@@ -969,7 +996,9 @@ function setupEventListeners() {
 }
 
 // Navigation
-function navigateToPage(pageName) {
+function navigateToPage(pageName, { pushHistory = true } = {}) {
+    const previousPage = AppState.currentPage;
+
     // Update active page
     elements.pages.forEach(page => {
         page.classList.remove('active');
@@ -990,7 +1019,7 @@ function navigateToPage(pageName) {
 
     AppState.currentPage = pageName;
     
-    // Salva la pagina corrente nel sessionStorage (si cancella quando si chiude il browser)
+    // Salva la pagina corrente nel sessionStorage
     sessionStorage.setItem('currentPage', pageName);
     
     // Salva currentCampagnaId e currentSessioneId solo per pagine che lo richiedono
@@ -1001,18 +1030,26 @@ function navigateToPage(pageName) {
         if (pageName === 'combattimento' && AppState.currentSessioneId) {
             sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
         } else {
-            // Rimuovi currentSessioneId se non siamo nella pagina combattimento
             sessionStorage.removeItem('currentSessioneId');
             AppState.currentSessioneId = null;
         }
     } else {
-        // Per altre pagine, rimuovi currentCampagnaId e currentSessioneId se presenti
         if (pageName === 'campagne' || pageName === 'amici') {
             sessionStorage.removeItem('currentCampagnaId');
             sessionStorage.removeItem('currentSessioneId');
             AppState.currentCampagnaId = null;
             AppState.currentSessioneId = null;
         }
+    }
+
+    // Push to browser history so back/forward buttons work within the app
+    if (pushHistory && previousPage !== pageName) {
+        const stateObj = {
+            page: pageName,
+            campagnaId: AppState.currentCampagnaId || null,
+            sessioneId: AppState.currentSessioneId || null
+        };
+        history.pushState(stateObj, '', null);
     }
     
     // Ferma Realtime subscription combattimento se si esce dalla pagina
@@ -3331,90 +3368,52 @@ function switchGiocatoriTab(tabName, campagnaId) {
 async function renderGestisciGiocatoriTab(campagnaId) {
     if (!elements.gestisciGiocatoriContent) return;
 
+    elements.gestisciGiocatoriContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+
     try {
         const supabase = getSupabaseClient();
         if (!supabase) {
-            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+            elements.gestisciGiocatoriContent.innerHTML = '<div class="content-placeholder"><p>Supabase non disponibile</p></div>';
             return;
         }
 
-        // 1. Carica la campagna per ottenere l'array giocatori
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('id, giocatori')
-            .eq('id', campagnaId)
-            .single();
-        
-        if (campagnaError) {
-            console.error('❌ Errore nel caricamento campagna:', campagnaError);
-            elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento della campagna</p>';
+        // Usa direttamente la RPC che bypassa RLS
+        const { data: utenti, error: utentiError } = await supabase
+            .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
+
+        if (utentiError) {
+            console.error('❌ Errore RPC get_giocatori_campagna:', utentiError);
+            elements.gestisciGiocatoriContent.innerHTML = `<div class="content-placeholder"><p>Errore: ${utentiError.message || 'Impossibile caricare i giocatori'}</p></div>`;
             return;
         }
 
-        console.log('📋 Campagna caricata:', campagna);
-        console.log('📋 Array giocatori:', campagna.giocatori);
-        console.log('📋 Tipo array giocatori:', typeof campagna.giocatori, Array.isArray(campagna.giocatori));
-        
-        // 2. Estrai gli ID dall'array giocatori
-        const giocatoriIds = Array.isArray(campagna.giocatori) ? campagna.giocatori.filter(id => id) : [];
-        console.log('🆔 ID giocatori da caricare:', giocatoriIds);
-        console.log('🆔 Tipo ID:', giocatoriIds.map(id => ({ id, type: typeof id })));
-        
-        // 3. Carica gli utenti usando la funzione RPC che bypassa RLS
         let giocatoriAttuali = [];
-        if (giocatoriIds.length > 0) {
-            console.log('🔍 Carico utenti usando RPC function get_giocatori_campagna...');
-            
-            // Usa la funzione RPC che bypassa RLS
-            const { data: utenti, error: utentiError } = await supabase
-                .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
-            
-            console.log('👥 Utenti caricati con RPC:', utenti);
-            console.log('❌ Errore caricamento utenti:', utentiError);
-            
-            if (utentiError) {
-                console.error('❌ Errore nel caricamento utenti via RPC:', utentiError);
-                elements.gestisciGiocatoriContent.innerHTML = `
-                    <div class="content-placeholder">
-                        <p>Errore nel caricamento dei giocatori. Assicurati di aver eseguito la funzione SQL get_giocatori_campagna.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            if (utenti && utenti.length > 0) {
-                // Per ogni giocatore, dobbiamo trovare l'invitoId corrispondente per poterlo rimuovere
-                // Carichiamo gli inviti per mappare gli ID
-                const { data: inviti, error: invitiError } = await supabase
+        if (utenti && utenti.length > 0) {
+            giocatoriAttuali = utenti.map(utente => ({
+                id: utente.id,
+                nome_utente: utente.nome_utente,
+                cid: utente.cid,
+                invitoId: null
+            }));
+
+            // Prova a caricare gli inviti per il mapping (non-blocking)
+            try {
+                const giocatoriIds = utenti.map(u => u.id);
+                const { data: inviti } = await supabase
                     .from('inviti_campagna')
                     .select('id, invitato_id')
                     .eq('campagna_id', campagnaId)
                     .eq('stato', 'accepted')
                     .in('invitato_id', giocatoriIds);
-                
-                const invitiMap = new Map();
-                if (!invitiError && inviti) {
-                    inviti.forEach(inv => {
-                        invitiMap.set(inv.invitato_id, inv.id);
-                    });
+
+                if (inviti) {
+                    const invitiMap = new Map(inviti.map(inv => [inv.invitato_id, inv.id]));
+                    giocatoriAttuali.forEach(g => { g.invitoId = invitiMap.get(g.id) || null; });
                 }
-                
-                giocatoriAttuali = utenti.map(utente => {
-                    const invitoId = invitiMap.get(utente.id);
-                    console.log('👤 Mappo utente:', utente, 'con invitoId:', invitoId);
-                    return {
-                        id: utente.id,
-                        nome_utente: utente.nome_utente,
-                        cid: utente.cid,
-                        invitoId: invitoId || null // Se non c'è invito, sarà null (non dovrebbe succedere)
-                    };
-                });
-                console.log('✅ Giocatori mappati:', giocatoriAttuali);
+            } catch (invErr) {
+                console.warn('⚠️ Impossibile caricare inviti (non critico):', invErr);
             }
         }
-
-        console.log('✅ Giocatori attuali finali:', giocatoriAttuali);
-        console.log('✅ Numero giocatori finali:', giocatoriAttuali.length);
 
         if (giocatoriAttuali.length === 0) {
             elements.gestisciGiocatoriContent.innerHTML = `
@@ -3462,43 +3461,40 @@ async function renderGestisciGiocatoriTab(campagnaId) {
 async function renderInvitaGiocatoriTab(campagnaId) {
     if (!elements.invitaGiocatoriContent) return;
 
+    elements.invitaGiocatoriContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+
     try {
         const supabase = getSupabaseClient();
         if (!supabase) {
-            elements.invitaGiocatoriContent.innerHTML = '<p>Errore: Supabase non disponibile</p>';
+            elements.invitaGiocatoriContent.innerHTML = '<div class="content-placeholder"><p>Supabase non disponibile</p></div>';
             return;
         }
 
-        const currentUser = await findUserByUid(AppState.currentUser.uid);
-        if (!currentUser) {
-            elements.invitaGiocatoriContent.innerHTML = '<p>Errore: utente corrente non trovato</p>';
-            return;
-        }
+        // Carica giocatori attuali con RPC (bypassa RLS)
+        const { data: giocatoriAttuali } = await supabase
+            .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
 
-        // Carica i giocatori attuali dall'array giocatori della campagna
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('giocatori, id_dm')
-            .eq('id', campagnaId)
-            .single();
-        
-        if (campagnaError) throw campagnaError;
-        
-        // Crea un Set con gli ID dei giocatori attuali (incluso il DM per escluderlo)
+        // Raccogli gli ID da escludere (giocatori attuali + DM)
         const giocatoriAttualiIds = new Set();
-        if (campagna.giocatori && Array.isArray(campagna.giocatori)) {
-            campagna.giocatori.forEach(id => giocatoriAttualiIds.add(id));
-        }
-        // Aggiungi anche il DM per escluderlo dalla lista
-        if (campagna.id_dm) {
-            giocatoriAttualiIds.add(campagna.id_dm);
+        if (giocatoriAttuali) {
+            giocatoriAttuali.forEach(g => giocatoriAttualiIds.add(g.id));
         }
 
-        // Carica gli amici
+        // Aggiungi il DM corrente alla lista di esclusione
+        const currentUser = await findUserByUid(AppState.currentUser?.uid);
+        if (currentUser) {
+            giocatoriAttualiIds.add(currentUser.id);
+        }
+
+        // Carica gli amici con RPC (bypassa RLS)
         const { data: amiciData, error: amiciError } = await supabase
             .rpc('get_amici');
 
-        if (amiciError) throw amiciError;
+        if (amiciError) {
+            console.error('❌ Errore RPC get_amici:', amiciError);
+            elements.invitaGiocatoriContent.innerHTML = `<div class="content-placeholder"><p>Errore: ${amiciError.message || 'Impossibile caricare gli amici'}</p></div>`;
+            return;
+        }
 
         const amici = (amiciData || []).map(row => ({
             id: row.amico_id,
@@ -3720,18 +3716,16 @@ async function openEditDMModal(campagnaId) {
     }
 
     try {
-        // Mostra il modal con stato di caricamento
-        elements.dmPlayersList.innerHTML = '<p>Caricamento giocatori...</p>';
+        elements.dmPlayersList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
         elements.editDMModal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
-        // Carica i giocatori usando la funzione RPC (stessa logica di renderGestisciGiocatoriTab)
         const { data: giocatori, error } = await supabase
             .rpc('get_giocatori_campagna', { campagna_id_param: campagnaId });
         
         if (error) {
-            console.error('❌ Errore nel caricamento giocatori:', error);
-            elements.dmPlayersList.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+            console.error('❌ Errore RPC get_giocatori_campagna:', error);
+            elements.dmPlayersList.innerHTML = `<div class="content-placeholder"><p>Errore: ${error.message || 'Impossibile caricare i giocatori'}</p></div>`;
             return;
         }
 
