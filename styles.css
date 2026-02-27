@@ -895,9 +895,15 @@ body.user-logged-in .header-username {
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* Abilities grid: 2 columns, 3 rows */
+.pg-abilities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm) var(--spacing-md);
+}
+
 /* Ability score with live modifier */
 .pg-ability {
-    position: relative;
     text-align: center;
 }
 
@@ -905,7 +911,6 @@ body.user-logged-in .header-username {
     text-align: center;
     font-size: 1.1rem !important;
     font-weight: 600 !important;
-    padding-bottom: 20px !important;
 }
 
 .pg-ability-mod {
@@ -913,22 +918,13 @@ body.user-logged-in .header-username {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--accent);
-    margin-top: -16px;
-    padding-bottom: 4px;
+    margin-top: 4px;
     transition: color 0.15s ease;
 }
 
-.pg-ability-mod.negative {
-    color: #dc3545;
-}
-
-.pg-ability-mod.positive {
-    color: var(--accent);
-}
-
-.pg-ability-mod.zero {
-    color: var(--text-light);
-}
+.pg-ability-mod.negative { color: #dc3545; }
+.pg-ability-mod.positive { color: var(--accent); }
+.pg-ability-mod.zero { color: var(--text-light); }
 
 /* Scegli personaggio modal list */
 .scegli-pg-list {

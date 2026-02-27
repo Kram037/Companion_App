@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1766952600">
+    <link rel="stylesheet" href="styles.css?v=1766952700">
 </head>
 <body>
     <!-- Header -->
@@ -512,11 +512,16 @@
                 <!-- Step 2: Caratteristiche -->
                 <div class="wizard-page" id="pgStep1">
                     <div class="form-section-label">Caratteristiche</div>
-                    <div class="form-row form-row-3">
+                    <div class="pg-abilities-grid">
                         <div class="form-group pg-ability">
                             <label for="pgForza">Forza</label>
                             <input type="number" id="pgForza" class="pg-ability-input" min="1" max="30" value="10">
                             <span class="pg-ability-mod" id="modForza">(+0)</span>
+                        </div>
+                        <div class="form-group pg-ability">
+                            <label for="pgIntelligenza">Intelligenza</label>
+                            <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10">
+                            <span class="pg-ability-mod" id="modIntelligenza">(+0)</span>
                         </div>
                         <div class="form-group pg-ability">
                             <label for="pgDestrezza">Destrezza</label>
@@ -524,21 +529,14 @@
                             <span class="pg-ability-mod" id="modDestrezza">(+0)</span>
                         </div>
                         <div class="form-group pg-ability">
-                            <label for="pgCostituzione">Costituzione</label>
-                            <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modCostituzione">(+0)</span>
-                        </div>
-                    </div>
-                    <div class="form-row form-row-3">
-                        <div class="form-group pg-ability">
-                            <label for="pgIntelligenza">Intelligenza</label>
-                            <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modIntelligenza">(+0)</span>
-                        </div>
-                        <div class="form-group pg-ability">
                             <label for="pgSaggezza">Saggezza</label>
                             <input type="number" id="pgSaggezza" class="pg-ability-input" min="1" max="30" value="10">
                             <span class="pg-ability-mod" id="modSaggezza">(+0)</span>
+                        </div>
+                        <div class="form-group pg-ability">
+                            <label for="pgCostituzione">Costituzione</label>
+                            <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10">
+                            <span class="pg-ability-mod" id="modCostituzione">(+0)</span>
                         </div>
                         <div class="form-group pg-ability">
                             <label for="pgCarisma">Carisma</label>
@@ -554,15 +552,19 @@
                 <!-- Step 3: Statistiche -->
                 <div class="wizard-page" id="pgStep2">
                     <div class="form-section-label">Statistiche</div>
-                    <div class="form-row">
+                    <div class="form-row form-row-2">
                         <div class="form-group">
-                            <label for="pgPV">Punti Ferita Massimi</label>
+                            <label for="pgPV">PF Massimi</label>
                             <input type="number" id="pgPV" min="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="pgPercezione">Percezione Passiva</label>
+                            <input type="number" id="pgPercezione" min="1" value="10">
                         </div>
                     </div>
                     <div class="form-row form-row-3">
                         <div class="form-group">
-                            <label for="pgCA">Classe Armatura</label>
+                            <label for="pgCA">CA</label>
                             <input type="number" id="pgCA" min="1" value="10">
                         </div>
                         <div class="form-group">
@@ -571,13 +573,7 @@
                         </div>
                         <div class="form-group">
                             <label for="pgVelocita">Velocità</label>
-                            <input type="number" id="pgVelocita" min="0" step="0.5" value="9">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pgPercezione">Percezione Passiva</label>
-                            <input type="number" id="pgPercezione" min="1" value="10">
+                            <input type="number" id="pgVelocita" min="0" step="1.5" value="9">
                         </div>
                     </div>
                     <div class="form-actions">
@@ -653,7 +649,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766952600"></script>
+    <script src="app.js?v=1766952700"></script>
     
     <!-- Cache busting script for development -->
     <script>
