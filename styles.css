@@ -905,7 +905,7 @@ body.user-logged-in .header-username {
 .scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); transition: background var(--transition-fast); }
 .scheda-ability-save:hover { background: var(--surface-hover); }
 .scheda-ability-save.proficient { color: var(--accent); font-weight: 600; }
-.scheda-save-dot { font-size: 0.7rem; }
+.scheda-save-dot { font-size: 1rem; }
 
 /* Four Boxes */
 .scheda-four-boxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: var(--spacing-sm); }
@@ -929,10 +929,10 @@ body.user-logged-in .header-username {
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
-.scheda-skill-dot { font-size: 0.65rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color var(--transition-fast); width: 14px; text-align: center; }
+.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color var(--transition-fast); width: 20px; text-align: center; line-height: 1; }
 .scheda-skill-dot:hover { color: var(--accent); }
 .scheda-skill-dot.active { color: var(--accent); }
-.scheda-skill-dot.expert { font-size: 0.7rem; }
+.scheda-skill-dot.expert { font-size: 1.05rem; }
 .scheda-skill-mod { min-width: 24px; font-weight: 600; text-align: right; color: var(--text); }
 .scheda-skill-name { flex: 1; }
 .scheda-skill-name small { opacity: 0.6; }

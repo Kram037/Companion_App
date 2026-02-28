@@ -3925,11 +3925,20 @@ window.schedaToggleSkillExpert = async function(pgId, skillKey) {
     if (!pg) return;
     const experts = [...(pg.maestrie_abilita || [])];
     const idx = experts.indexOf(skillKey);
-    if (idx >= 0) experts.splice(idx, 1); else experts.push(skillKey);
+    const adding = idx < 0;
+    if (adding) experts.push(skillKey); else experts.splice(idx, 1);
     pg.maestrie_abilita = experts;
 
+    const updates = { maestrie_abilita: experts };
+
+    if (adding && !(pg.competenze_abilita || []).includes(skillKey)) {
+        const skills = [...(pg.competenze_abilita || []), skillKey];
+        pg.competenze_abilita = skills;
+        updates.competenze_abilita = skills;
+    }
+
     schedaRefreshSkill(pg, skillKey);
-    schedaInstantSave(pgId, { maestrie_abilita: experts });
+    schedaInstantSave(pgId, updates);
 }
 
 function schedaRefreshSkill(pg, skillKey) {
