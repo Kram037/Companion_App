@@ -1067,7 +1067,10 @@ function setupEventListeners() {
                     showNotification('Inserisci un numero valido (minimo 1)');
                     return;
                 }
-                await submitRollRequest(window.currentRollRequest.id, window.currentRollRequest.tipo, valore);
+                const natRoll = elements.rollRequestInput.dataset.natRoll
+                    ? parseInt(elements.rollRequestInput.dataset.natRoll)
+                    : null;
+                await submitRollRequest(window.currentRollRequest.id, window.currentRollRequest.tipo, valore, natRoll);
                 closeRollRequestModal();
             }
         });
@@ -1075,20 +1078,32 @@ function setupEventListeners() {
     const autoRollBtn = document.getElementById('autoRollBtn');
     if (autoRollBtn) {
         autoRollBtn.addEventListener('click', () => {
+            if (autoRollBtn.disabled) return;
             const d20 = Math.floor(Math.random() * 20) + 1;
             const mod = window.currentRollModifier || 0;
             const total = d20 + mod;
+            const isNatCrit = d20 === 1 || d20 === 20;
+
             if (elements.rollRequestInput) {
                 elements.rollRequestInput.value = total;
+                elements.rollRequestInput.dataset.natRoll = d20;
             }
+
             const d20Text = document.getElementById('d20RollText');
-            if (d20Text) d20Text.textContent = d20;
-            const d20Icon = autoRollBtn.querySelector('.d20-icon');
-            if (d20Icon) {
-                d20Icon.classList.remove('rolling');
-                void d20Icon.offsetWidth;
-                d20Icon.classList.add('rolling');
+            if (d20Text) {
+                d20Text.textContent = d20;
+                d20Text.classList.add('show');
+                d20Text.classList.toggle('nat-crit', isNatCrit);
             }
+
+            const d20Img = autoRollBtn.querySelector('.roll-d20-img');
+            if (d20Img) {
+                d20Img.classList.remove('spinning');
+                void d20Img.offsetWidth;
+                d20Img.classList.add('spinning');
+            }
+
+            autoRollBtn.disabled = true;
         });
     }
 
@@ -1168,9 +1183,10 @@ function clearActiveSession() {
 function updateReturnToSessionBtn() {
     const btn = document.getElementById('btnReturnSession');
     if (!btn) return;
-    const show = AppState.activeSessionCampagnaId
-        && AppState.currentPage !== 'sessione'
-        && AppState.currentPage !== 'combattimento';
+    const isSessionPage = AppState.currentPage === 'sessione' || AppState.currentPage === 'combattimento';
+    const isDettagliOfActiveSession = AppState.currentPage === 'dettagli'
+        && AppState.currentCampagnaId === AppState.activeSessionCampagnaId;
+    const show = AppState.activeSessionCampagnaId && !isSessionPage && !isDettagliOfActiveSession;
     btn.style.display = show ? 'flex' : 'none';
 }
 
@@ -7243,7 +7259,15 @@ async function showRollRequestModal(request) {
         elements.rollRequestInput.max = '999';
     }
     const d20Text = document.getElementById('d20RollText');
-    if (d20Text) d20Text.textContent = '20';
+    if (d20Text) {
+        d20Text.textContent = '';
+        d20Text.classList.remove('show', 'nat-crit');
+    }
+    const autoRollBtnEl = document.getElementById('autoRollBtn');
+    if (autoRollBtnEl) autoRollBtnEl.disabled = false;
+    if (elements.rollRequestInput) {
+        delete elements.rollRequestInput.dataset.natRoll;
+    }
 
     elements.rollRequestModal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -7257,7 +7281,7 @@ async function showRollRequestModal(request) {
 /**
  * Invia il risultato di un tiro (globale per essere chiamata dal form)
  */
-window.submitRollRequest = async function(requestId, tipo, valore) {
+window.submitRollRequest = async function(requestId, tipo, valore, tiroNaturale) {
     const supabase = getSupabaseClient();
     if (!supabase) {
         showNotification('Errore: Supabase non disponibile');
@@ -7269,13 +7293,16 @@ window.submitRollRequest = async function(requestId, tipo, valore) {
             ? 'richieste_tiro_iniziativa' 
             : 'richieste_tiro_generico';
 
+        const updateData = { 
+            valore: valore,
+            stato: 'completed',
+            timestamp: new Date().toISOString()
+        };
+        if (tiroNaturale != null) updateData.tiro_naturale = tiroNaturale;
+
         const { error } = await supabase
             .from(tableName)
-            .update({ 
-                valore: valore,
-                stato: 'completed',
-                timestamp: new Date().toISOString()
-            })
+            .update(updateData)
             .eq('id', requestId);
 
         if (error) throw error;
@@ -7690,13 +7717,25 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
                         const pgName = pgNamesMap[tiro.giocatore_id];
                         const utente = utentiMap[tiro.giocatore_id];
                         const nome = pgName || utente?.nome_utente || 'Giocatore';
+                        const natRoll = tiro.tiro_naturale;
+                        const isNatCrit = natRoll === 1 || natRoll === 20;
+                        let risultatoHtml = '-';
+                        if (tiro.valore !== null) {
+                            if (isNatCrit) {
+                                const modDiff = tiro.valore - natRoll;
+                                const modStr = modDiff >= 0 ? `+${modDiff}` : `${modDiff}`;
+                                risultatoHtml = `<span style="color:#e74c3c;font-weight:700;">${natRoll}</span><span style="font-size:0.8em;opacity:0.7;margin-left:2px;">${modStr}</span> = ${tiro.valore}`;
+                            } else {
+                                risultatoHtml = `${tiro.valore}`;
+                            }
+                        }
                         return `
                         <tr>
                             <td style="padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
                                 ${escapeHtml(nome)}
                             </td>
                             <td style="text-align: right; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${tiro.valore !== null ? tiro.valore : '-'}
+                                ${risultatoHtml}
                             </td>
                             <td style="text-align: center; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
                                 ${tiro.stato === 'completed' ? '✓' : '⏳'}

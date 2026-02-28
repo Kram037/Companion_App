@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1767042000">
+    <link rel="stylesheet" href="styles.css?v=1767042600">
 </head>
 <body>
     <!-- Header -->
@@ -382,10 +382,10 @@
                     <div class="roll-input-row">
                         <input type="number" id="rollRequestInput" name="rollRequestInput" required min="1" max="999" placeholder="Inserisci il risultato">
                         <button type="button" class="btn-roll-d20" id="autoRollBtn" title="Tira d20 automaticamente">
-                            <svg class="d20-icon" viewBox="0 0 100 100" width="32" height="32">
-                                <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="currentColor" stroke-width="6"/>
-                                <text id="d20RollText" x="50" y="58" text-anchor="middle" font-size="30" font-weight="bold" fill="currentColor">20</text>
-                            </svg>
+                            <div class="roll-d20-wrapper">
+                                <img src="images/icon d20.png" alt="D20" class="roll-d20-img">
+                                <span class="roll-d20-number" id="d20RollText"></span>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -752,7 +752,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1767042000"></script>
+    <script src="app.js?v=1767042600"></script>
     
     <!-- Cache busting script for development -->
     <script>

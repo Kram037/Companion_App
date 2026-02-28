@@ -1068,34 +1068,59 @@ body.user-logged-in .header-username {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: 2px solid var(--primary);
+    width: 52px;
+    height: 52px;
+    border: none;
     border-radius: var(--radius-sm);
     background: transparent;
-    color: var(--primary);
     cursor: pointer;
     flex-shrink: 0;
-    padding: 6px;
+    padding: 4px;
 }
-.btn-roll-d20:hover {
-    background: var(--primary);
-    color: #fff;
-}
-.btn-roll-d20:active .d20-icon {
+.btn-roll-d20:active .roll-d20-img {
     transform: scale(0.85);
 }
-.d20-icon {
-    display: block;
+.btn-roll-d20:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.roll-d20-wrapper {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.roll-d20-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     transition: transform 0.15s;
 }
-.d20-icon.rolling {
-    animation: d20-spin 0.5s ease-out;
+.roll-d20-img.spinning {
+    animation: spin3Times 1.2s ease-in-out;
 }
-@keyframes d20-spin {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.2); }
-    100% { transform: rotate(360deg) scale(1); }
+.roll-d20-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    text-shadow: 0 0 4px rgba(0,0,0,0.7);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.roll-d20-number.show {
+    opacity: 1;
+}
+.roll-d20-number.nat-crit {
+    color: #e74c3c;
+    text-shadow: 0 0 8px rgba(231,76,60,0.6);
+    font-size: 1.1rem;
 }
 
 .tiro-players-list {
