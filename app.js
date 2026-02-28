@@ -436,7 +436,8 @@ function updateUIForLoggedIn() {
     document.body.classList.add('user-logged-in');
     const headerUserName = document.getElementById('headerUserName');
     if (headerUserName) {
-        headerUserName.textContent = AppState.currentUser?.displayName || '';
+        const dbName = AppState.cachedUserData?.nome_utente;
+        headerUserName.textContent = dbName || AppState.currentUser?.displayName || '';
     }
     // Mostra i pulsanti quando l'utente è loggato
     if (elements.addCampagnaBtn) {
@@ -3043,17 +3044,86 @@ window.pgToggleSkill = function(skillKey, checked) {
     pgUpdatePercezionPassiva();
 }
 
-function pgUpdatePercezionPassiva() {
-    const sagInput = document.getElementById('pgSaggezza');
-    const sagScore = parseInt(sagInput?.value) || 10;
+function pgCalcPercPassiva() {
+    const sagScore = parseInt(document.getElementById('pgSaggezza')?.value) || 10;
     const sagMod = calcMod(sagScore);
     const bonus = calcBonusCompetenza(pgGetTotalLevel());
     const isProf = pgCurrentSkillProficiencies.has('percezione');
-    const pp = 10 + sagMod + (isProf ? bonus : 0);
-    const ppField = document.getElementById('pgPercezione');
-    if (ppField) ppField.value = pp;
-    const hint = document.getElementById('hintPercezione');
-    if (hint) hint.textContent = `(10 + percezione = ${pp})`;
+    return 10 + sagMod + (isProf ? bonus : 0);
+}
+
+// --- Hit Dice & HP Calculation ---
+const CLASS_HIT_DIE = {
+    'Artefice': 8, 'Bardo': 8, 'Chierico': 8, 'Druido': 8,
+    'Ladro': 8, 'Monaco': 8, 'Warlock': 8,
+    'Barbaro': 12,
+    'Mago': 6, 'Stregone': 6,
+    'Guerriero': 10, 'Paladino': 10, 'Ranger': 10
+};
+
+function dieAvg(die) {
+    return Math.ceil(die / 2) + 1;
+}
+
+function pgCalcHP() {
+    if (pgSelectedClasses.length === 0) return 0;
+    const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
+    const totalLevel = pgGetTotalLevel();
+    let hp = 0;
+
+    pgSelectedClasses.forEach((cls, idx) => {
+        const die = CLASS_HIT_DIE[cls.nome] || 8;
+        const avg = dieAvg(die);
+        if (idx === 0) {
+            hp += die + (cls.livello - 1) * avg;
+        } else {
+            hp += cls.livello * avg;
+        }
+    });
+
+    hp += totalLevel * cosMod;
+    return Math.max(1, hp);
+}
+
+function pgRenderDadiVita() {
+    const container = document.getElementById('pgDadiVitaList');
+    if (!container) return;
+
+    if (pgSelectedClasses.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Seleziona una classe per vedere i dadi vita</p>';
+        return;
+    }
+
+    const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
+    const totalLevel = pgGetTotalLevel();
+
+    container.innerHTML = pgSelectedClasses.map((cls, idx) => {
+        const die = CLASS_HIT_DIE[cls.nome] || 8;
+        const avg = dieAvg(die);
+        let detail;
+        if (idx === 0) {
+            detail = `${die} + ${cls.livello - 1}×${avg}`;
+        } else {
+            detail = `${cls.livello}×${avg}`;
+        }
+        return `
+        <div class="pg-dado-vita-item">
+            <span class="pg-dado-vita-classe">${escapeHtml(cls.nome)}</span>
+            <span class="pg-dado-vita-dice">${cls.livello}d${die}</span>
+            <span class="pg-dado-vita-detail">${detail}</span>
+        </div>`;
+    }).join('');
+
+    const hp = pgCalcHP();
+    const cosTotal = totalLevel * cosMod;
+    const cosSign = cosTotal >= 0 ? '+' : '';
+    const hintPV = document.getElementById('hintPV');
+    if (hintPV) hintPV.textContent = `(calcolato: ${hp - cosTotal} ${cosSign}${cosTotal} COS = ${hp})`;
+
+    const pvField = document.getElementById('pgPV');
+    if (pvField && !pvField.dataset.manualEdit) {
+        pvField.value = hp;
+    }
 }
 
 // --- Wizard Navigation ---
@@ -3108,7 +3178,9 @@ function pgWizardGoTo(step) {
         const hintInit = document.getElementById('hintIniziativa');
         if (hintInit) hintInit.textContent = `(des = ${formatModPlain(desMod)})`;
 
-        pgUpdatePercezionPassiva();
+        const pvField = document.getElementById('pgPV');
+        if (pvField) pvField.dataset.manualEdit = '';
+        pgRenderDadiVita();
     }
 }
 
@@ -3244,7 +3316,6 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgPV').value = data.punti_vita_max || 10;
                     document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : calcMod(data.destrezza || 10);
                     document.getElementById('pgCA').value = data.classe_armatura || 10;
-                    document.getElementById('pgPercezione').value = data.percezione_passiva || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
                     updateAllAbilityMods();
                 }
@@ -3311,7 +3382,7 @@ async function handleSavePersonaggio(e) {
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
         classe_armatura: classeArmatura,
-        percezione_passiva: parseInt(document.getElementById('pgPercezione').value) || 10,
+        percezione_passiva: pgCalcPercPassiva(),
         velocita: parseFloat(document.getElementById('pgVelocita').value) || 9,
         updated_at: new Date().toISOString()
     };

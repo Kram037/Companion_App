@@ -976,6 +976,74 @@ body.user-logged-in .header-username {
     margin-top: 2px;
 }
 
+/* Stats row forced 3 columns */
+.pg-stats-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-xs);
+}
+
+.pg-stats-row-3 .form-group input {
+    padding: 8px 4px;
+    font-size: 0.85rem;
+    min-width: 0;
+}
+
+.pg-stats-row-3 .form-group label {
+    font-size: 0.75rem;
+}
+
+.pg-hp-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.pg-hp-row input {
+    flex: 1;
+}
+
+.pg-hp-row .pg-stat-hint {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Hit dice display */
+.pg-dadi-vita-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pg-dado-vita-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.pg-dado-vita-classe {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text);
+    min-width: 90px;
+}
+
+.pg-dado-vita-dice {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+.pg-dado-vita-detail {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
 .pg-readonly-input {
     background: var(--surface-hover) !important;
     color: var(--accent) !important;
