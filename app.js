@@ -332,16 +332,20 @@ function setupSupabaseAuth() {
             console.log('🔄 Auth state changed:', event, session?.user?.email || 'null');
             
             if (session?.user) {
-                // User is signed in
+                const prevName = AppState.currentUser?.displayName;
                 AppState.currentUser = {
                     uid: session.user.id,
                     email: session.user.email,
-                    displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Utente'
+                    displayName: prevName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Utente'
                 };
                 AppState.isLoggedIn = true;
                 updateUIForLoggedIn();
                 
                 initializeUserDocument(session.user).then(() => {
+                    if (AppState.cachedUserData?.nome_utente) {
+                        AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
+                        updateUIForLoggedIn();
+                    }
                     if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                         navigateToPage('combattimento');
                     } else if (AppState.currentCampagnaId) {
@@ -398,8 +402,11 @@ async function checkAuthState() {
                 displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Utente'
             };
             AppState.isLoggedIn = true;
-            updateUIForLoggedIn();
             await initializeUserDocument(session.user);
+            if (AppState.cachedUserData?.nome_utente) {
+                AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
+            }
+            updateUIForLoggedIn();
             
             if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                 navigateToPage('combattimento');
@@ -766,6 +773,18 @@ function setupEventListeners() {
         const cb = document.getElementById(`save${name}`);
         if (cb) cb.addEventListener('change', () => updateAllSaveValues());
     });
+    const pgPVInput = document.getElementById('pgPV');
+    if (pgPVInput) {
+        pgPVInput.addEventListener('input', () => { pgPVInput.dataset.autoHp = 'false'; });
+    }
+    const pgCosInput = document.getElementById('pgCostituzione');
+    if (pgCosInput) {
+        pgCosInput.addEventListener('input', () => {
+            const pvField = document.getElementById('pgPV');
+            if (pvField) pvField.dataset.autoHp = 'true';
+            pgRenderDadiVita();
+        });
+    }
     if (elements.closeScegliPersonaggioModal) {
         elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
     }
@@ -2966,6 +2985,7 @@ window.pgAddClasse = function() {
     pgRenderClassi();
     pgUpdateTotalLevel();
     pgUpdateSavingThrows();
+    pgResetAutoHP();
 }
 
 window.pgRemoveClasse = function(index) {
@@ -2973,12 +2993,20 @@ window.pgRemoveClasse = function(index) {
     pgRenderClassi();
     pgUpdateTotalLevel();
     pgUpdateSavingThrows();
+    pgResetAutoHP();
 }
 
 window.pgUpdateClassLevel = function(index, value) {
     const lv = Math.max(1, Math.min(20, parseInt(value) || 1));
     pgSelectedClasses[index].livello = lv;
     pgUpdateTotalLevel();
+    pgResetAutoHP();
+}
+
+function pgResetAutoHP() {
+    const pvField = document.getElementById('pgPV');
+    if (pvField) pvField.dataset.autoHp = 'true';
+    pgRenderDadiVita();
 }
 
 function pgRenderClassi() {
@@ -3121,7 +3149,7 @@ function pgRenderDadiVita() {
     if (hintPV) hintPV.textContent = `(calcolato: ${hp - cosTotal} ${cosSign}${cosTotal} COS = ${hp})`;
 
     const pvField = document.getElementById('pgPV');
-    if (pvField && !pvField.dataset.manualEdit) {
+    if (pvField && pvField.dataset.autoHp !== 'false') {
         pvField.value = hp;
     }
 }
@@ -3178,8 +3206,6 @@ function pgWizardGoTo(step) {
         const hintInit = document.getElementById('hintIniziativa');
         if (hintInit) hintInit.textContent = `(des = ${formatModPlain(desMod)})`;
 
-        const pvField = document.getElementById('pgPV');
-        if (pvField) pvField.dataset.manualEdit = '';
         pgRenderDadiVita();
     }
 }
@@ -3313,7 +3339,8 @@ window.openPersonaggioModal = function(personaggioId) {
                         pgCurrentSkillProficiencies = new Set(data.competenze_abilita);
                     }
 
-                    document.getElementById('pgPV').value = data.punti_vita_max || 10;
+                    const pvF = document.getElementById('pgPV');
+                    if (pvF) { pvF.value = data.punti_vita_max || 10; pvF.dataset.autoHp = 'false'; }
                     document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : calcMod(data.destrezza || 10);
                     document.getElementById('pgCA').value = data.classe_armatura || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
@@ -3326,6 +3353,8 @@ window.openPersonaggioModal = function(personaggioId) {
         elements.savePersonaggioBtn.textContent = 'Crea';
         document.getElementById('pgCA').value = '';
         document.getElementById('pgIniziativa').value = '';
+        const pvField = document.getElementById('pgPV');
+        if (pvField) { pvField.value = 10; pvField.dataset.autoHp = 'true'; }
         updateAllAbilityMods();
         updateBonusCompetenza();
     }
@@ -3342,10 +3371,13 @@ function closePersonaggioModal() {
     }
 }
 
+let pgSaving = false;
 async function handleSavePersonaggio(e) {
     e.preventDefault();
+    if (pgSaving) return;
+    pgSaving = true;
     const supabase = getSupabaseClient();
-    if (!supabase) return;
+    if (!supabase) { pgSaving = false; return; }
 
     const userData = await findUserByUid(AppState.currentUser?.uid);
     if (!userData) {
@@ -3415,6 +3447,8 @@ async function handleSavePersonaggio(e) {
     } catch (error) {
         console.error('Errore salvataggio personaggio:', error);
         showNotification('Errore: ' + (error.message || error));
+    } finally {
+        pgSaving = false;
     }
 }
 
