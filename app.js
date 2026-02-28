@@ -3643,7 +3643,6 @@ const CLASS_SPELL_ABILITY = {
 
 async function renderSchedaPersonaggio(personaggioId) {
     const content = document.getElementById('schedaContent');
-    const title = document.getElementById('schedaTitle');
     if (!content) return;
 
     const supabase = getSupabaseClient();
@@ -3657,8 +3656,6 @@ async function renderSchedaPersonaggio(personaggioId) {
         const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
         if (error || !pg) throw error || new Error('Personaggio non trovato');
         _schedaPgCache = pg;
-
-        if (title) title.textContent = pg.nome;
 
         const fMod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
         const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
@@ -3836,8 +3833,6 @@ async function renderSchedaPersonaggio(personaggioId) {
             });
         });
 
-        const deleteBtn = document.getElementById('schedaDeleteBtn');
-        if (deleteBtn) deleteBtn.onclick = () => deletePersonaggio(pg.id);
         const backBtn = document.getElementById('schedaBackBtn');
         if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
 
@@ -3974,7 +3969,6 @@ function schedaRefreshSkill(pg, skillKey) {
 // Spell Page
 window.schedaOpenSpellPage = async function(pgId) {
     const content = document.getElementById('schedaContent');
-    const title = document.getElementById('schedaTitle');
     if (!content) return;
 
     const supabase = getSupabaseClient();
@@ -3983,8 +3977,6 @@ window.schedaOpenSpellPage = async function(pgId) {
     const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
     if (!pg) return;
     _schedaPgCache = pg;
-
-    if (title) title.textContent = pg.nome + ' - Incantesimi';
 
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
     const classi = pg.classi || [];
@@ -4037,9 +4029,8 @@ window.schedaOpenSpellPage = async function(pgId) {
         <div class="scheda-section-title">Slot Incantesimo</div>
         <div class="scheda-slots-table">${slotsHtml}</div>
     </div>
-    <div class="scheda-spell-back" onclick="renderSchedaPersonaggio('${pgId}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        Torna alla scheda
+    <div class="scheda-spell-fab left" onclick="renderSchedaPersonaggio('${pgId}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     </div>
     `;
 
@@ -4052,7 +4043,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     });
 
     const backBtn = document.getElementById('schedaBackBtn');
-    if (backBtn) backBtn.onclick = () => renderSchedaPersonaggio(pgId);
+    if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
 }
 
 function schedaSlotToggleInline(pgId, level, index) {

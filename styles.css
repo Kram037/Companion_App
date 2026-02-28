@@ -363,8 +363,8 @@ body.user-logged-in .header-username {
    ============================================ */
 .back-button-floating {
     position: fixed;
-    bottom: 84px;
-    left: var(--spacing-lg);
+    top: 14px;
+    left: 14px;
     background: var(--surface);
     color: var(--text-secondary);
     border: 1px solid var(--border);
@@ -881,12 +881,7 @@ body.user-logged-in .header-username {
 }
 
 /* Scheda Personaggio Page */
-.scheda-content { max-width: 600px; margin: 0 auto; padding-bottom: 60px; }
-.scheda-header { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) 0; margin-bottom: var(--spacing-sm); }
-.scheda-header h1 { flex: 1; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.scheda-header-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.btn-back { background: none; border: none; color: var(--text); cursor: pointer; padding: 4px; display: flex; align-items: center; border-radius: var(--radius-sm); }
-.btn-back:hover { background: var(--surface-hover); }
+.scheda-content { max-width: 600px; margin: 0 auto; padding-bottom: 60px; padding-top: 8px; }
 
 .scheda-identity { text-align: center; padding: var(--spacing-xs) 0 var(--spacing-sm); }
 .scheda-name { font-size: 1.3rem; font-weight: 800; color: var(--text); }
@@ -902,8 +897,8 @@ body.user-logged-in .header-username {
 .scheda-ability-input { width: 48px; padding: 4px 4px; text-align: center; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; }
 .scheda-ability-input:focus { border-color: var(--accent); outline: none; }
 .scheda-ability-mod { font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: center; }
-.scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); transition: background var(--transition-fast); }
-.scheda-ability-save:hover { background: var(--surface-hover); }
+.scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); transition: background 0.15s; -webkit-tap-highlight-color: transparent; user-select: none; }
+@media (hover: hover) { .scheda-ability-save:hover { background: var(--surface-hover); } }
 .scheda-ability-save.proficient { color: var(--accent); font-weight: 600; }
 .scheda-save-dot { font-size: 1rem; }
 
@@ -929,8 +924,8 @@ body.user-logged-in .header-username {
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
-.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color var(--transition-fast); width: 20px; text-align: center; line-height: 1; }
-.scheda-skill-dot:hover { color: var(--accent); }
+.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; }
+@media (hover: hover) { .scheda-skill-dot:hover { color: var(--accent); } }
 .scheda-skill-dot.active { color: var(--accent); }
 .scheda-skill-dot.expert { font-size: 1.05rem; }
 .scheda-skill-mod { min-width: 24px; font-weight: 600; text-align: right; color: var(--text); }
@@ -951,11 +946,10 @@ body.user-logged-in .header-username {
 /* Spell FAB */
 .scheda-spell-fab { position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(var(--accent-rgb,139,92,246),0.4); transition: transform var(--transition-fast); z-index: 50; }
 .scheda-spell-fab:hover { transform: scale(1.1); }
+.scheda-spell-fab.left { right: auto; left: 20px; }
 
 /* Spell Page */
 .scheda-spell-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-.scheda-spell-back { display: flex; align-items: center; gap: 8px; padding: 12px; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-.scheda-spell-back:hover { text-decoration: underline; }
 
 /* Spell Slot Pips */
 .scheda-slots-table { display: flex; flex-direction: column; gap: 8px; }
@@ -3853,7 +3847,7 @@ body.user-logged-in .header-username {
     .toolbar-btn svg { width: 20px; height: 20px; }
     .toolbar-btn span { font-size: 0.6rem; }
 
-    .back-button-floating { width: 38px; height: 38px; bottom: 76px; }
+    .back-button-floating { width: 36px; height: 36px; top: 10px; left: 10px; }
     .back-button-floating svg { width: 18px; height: 18px; }
 
     .in-app-notifications { max-width: calc(100vw - 2rem); right: var(--spacing-sm); top: 60px; }
