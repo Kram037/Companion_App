@@ -2925,6 +2925,7 @@ function updateAbilityMod(input, modEl) {
     const mod = calcMod(val);
     modEl.textContent = formatModPlain(mod);
     modEl.className = 'pg-ability-mod ' + (mod > 0 ? 'positive' : mod < 0 ? 'negative' : 'zero');
+    updateAllSaveValues();
 }
 
 function updateAllAbilityMods() {

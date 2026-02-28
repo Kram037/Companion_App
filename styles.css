@@ -948,6 +948,7 @@ body.user-logged-in .header-username {
     font-weight: 600 !important;
     border: none !important;
     background: transparent !important;
+    color: var(--text) !important;
     padding: 6px 0 !important;
     min-width: 0;
 }
