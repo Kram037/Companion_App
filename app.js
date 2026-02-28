@@ -6653,6 +6653,19 @@ function startAppEventsRealtime() {
                     }, 500);
                 }
 
+                if (data.table === 'richieste_tiro_iniziativa' && data.action === 'delete') {
+                    closeRollRequestModal();
+                    if (AppState.currentPage === 'combattimento' && data.campagnaId) {
+                        showNotification('Il combattimento è terminato');
+                        navigateToPage('sessione');
+                        renderSessioneContent(data.campagnaId);
+                    }
+                }
+
+                if (data.table === 'richieste_tiro_generico' && data.action === 'delete') {
+                    closeRollRequestModal();
+                }
+
                 if (data.table === 'sessioni' && data.action === 'insert' && data.campagnaId) {
                     try {
                         const userData = await findUserByUid(AppState.currentUser?.uid);
@@ -6833,12 +6846,16 @@ function showInAppNotification({ title, message, campagnaId, sessioneId }) {
         </button>
     `;
 
-    // Click sulla notifica per aprire la sessione
     if (campagnaId && sessioneId) {
-        notification.onclick = function(e) {
+        notification.onclick = async function(e) {
             if (e.target.closest('.in-app-notification-close')) return;
             closeInAppNotification(notificationId);
-            openSessionePage(campagnaId);
+            const isDM = await isCurrentUserDM(campagnaId);
+            if (isDM) {
+                openSessionePage(campagnaId);
+            } else {
+                playerJoinSession(campagnaId);
+            }
         };
     }
 
@@ -7412,7 +7429,7 @@ window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
             .eq('richiesta_id', richiestaId);
 
         if (error) throw error;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'delete', sessioneId, richiestaId });
+        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'delete', sessioneId, richiestaId, campagnaId: AppState.currentCampagnaId });
 
         // Nascondi la tabella
         const tableElement = document.getElementById('tiroGenericoTable');
@@ -7450,18 +7467,16 @@ window.terminaCombattimento = async function(campagnaId, sessioneId) {
             return;
         }
 
-        // Elimina tutte le richieste di iniziativa per questa sessione
         const { error: deleteError } = await supabase
             .from('richieste_tiro_iniziativa')
             .delete()
             .eq('sessione_id', sessioneId);
 
         if (deleteError) throw deleteError;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId });
+        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId, campagnaId });
 
         showNotification('Combattimento terminato');
-        
-        // Torna alla pagina sessione
+
         navigateToPage('sessione');
         await renderSessioneContent(campagnaId);
     } catch (error) {
