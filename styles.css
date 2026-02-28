@@ -1044,7 +1044,7 @@ body.user-logged-in .header-username {
     margin-left: auto;
 }
 
-/* Roll type modal select */
+/* Roll type modal */
 .richiedi-tiro-options select {
     width: 100%;
     padding: 10px 12px;
@@ -1052,6 +1052,78 @@ body.user-logged-in .header-username {
     border-radius: var(--radius-sm);
     background: var(--surface);
     color: var(--text);
+    font-size: 0.9rem;
+}
+
+/* Auto-roll d20 button */
+.roll-input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+.roll-input-row input {
+    flex: 1;
+}
+.btn-roll-d20 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    flex-shrink: 0;
+}
+.btn-roll-d20:hover {
+    background: var(--primary);
+    color: #fff;
+}
+.btn-roll-d20:active {
+    transform: scale(0.9);
+}
+.btn-roll-d20.rolling {
+    animation: roll-spin 0.5s ease-out;
+}
+@keyframes roll-spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.15); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.tiro-players-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    max-height: 200px;
+    overflow-y: auto;
+}
+.tiro-player-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.tiro-player-item:hover {
+    background: var(--surface-hover, rgba(255,255,255,0.08));
+}
+.tiro-player-item input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+}
+.tiro-player-item label {
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
     font-size: 0.9rem;
 }
 

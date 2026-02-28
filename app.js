@@ -754,17 +754,13 @@ function setupEventListeners() {
         });
     }
     if (elements.personaggioForm) {
-        elements.personaggioForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (pgWizardCurrentStep === 3) {
-                handleSavePersonaggio(e);
-            }
-        });
+        elements.personaggioForm.addEventListener('submit', (e) => e.preventDefault());
         elements.personaggioForm.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && pgWizardCurrentStep < 3) {
-                e.preventDefault();
-            }
+            if (e.key === 'Enter') e.preventDefault();
         });
+    }
+    if (elements.savePersonaggioBtn) {
+        elements.savePersonaggioBtn.addEventListener('click', (e) => handleSavePersonaggio(e));
     }
 
     const abilityFields = ['Forza', 'Destrezza', 'Costituzione', 'Intelligenza', 'Saggezza', 'Carisma'];
@@ -1054,14 +1050,20 @@ function setupEventListeners() {
             }
         });
     }
-    // Il modal di richiesta tiro non può essere chiuso cliccando fuori (il giocatore deve fornire un tiro)
-    // if (elements.rollRequestModal) {
-    //     elements.rollRequestModal.addEventListener('click', (e) => {
-    //         if (e.target === elements.rollRequestModal) {
-    //             closeRollRequestModal();
-    //         }
-    //     });
-    // }
+    const autoRollBtn = document.getElementById('autoRollBtn');
+    if (autoRollBtn) {
+        autoRollBtn.addEventListener('click', () => {
+            const d20 = Math.floor(Math.random() * 20) + 1;
+            const mod = window.currentRollModifier || 0;
+            const total = d20 + mod;
+            if (elements.rollRequestInput) {
+                elements.rollRequestInput.value = total;
+            }
+            autoRollBtn.classList.remove('rolling');
+            void autoRollBtn.offsetWidth;
+            autoRollBtn.classList.add('rolling');
+        });
+    }
 
     // Confirm dialog modal setup
     if (elements.confirmDialogBtn) {
@@ -6056,6 +6058,7 @@ function closeRollRequestModal() {
         elements.rollRequestInput.value = '';
     }
     window.currentRollRequest = null;
+    window.currentRollModifier = 0;
 }
 
 /**
@@ -6671,10 +6674,14 @@ function startAppEventsRealtime() {
 
                 if (data.table === 'richieste_tiro_generico' && data.action === 'insert') {
                     const label = data.tiroLabel || 'Tiro Richiesto';
+                    const tipoTiro = data.tipoTiro || null;
+                    const targetTiro = data.targetTiro || null;
                     setTimeout(async () => {
                         const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
                         if (pending && !window.currentRollRequest) {
                             pending.tiroLabel = label;
+                            pending.tipoTiro = tipoTiro;
+                            pending.targetTiro = targetTiro;
                             showRollRequestModal(pending);
                             sendBrowserNotification(label, `Il DM ha richiesto: ${label}`);
                         }
@@ -7036,13 +7043,102 @@ function stopRollRequestsRealtime() {
 /**
  * Mostra il modal per la richiesta tiro
  */
-function showRollRequestModal(request) {
+function calcAbilityMod(score) {
+    return Math.floor((score - 10) / 2);
+}
+
+function getCharacterModifier(pg, tipoTiro, targetTiro) {
+    if (!pg || !tipoTiro || !targetTiro) return null;
+
+    const ABILITY_MAP = {
+        'forza': 'forza', 'destrezza': 'destrezza', 'costituzione': 'costituzione',
+        'intelligenza': 'intelligenza', 'saggezza': 'saggezza', 'carisma': 'carisma'
+    };
+
+    const SKILL_ABILITY_MAP = {
+        'acrobazia': 'destrezza', 'addestrare_animali': 'saggezza', 'arcano': 'intelligenza',
+        'atletica': 'forza', 'furtivita': 'destrezza', 'indagare': 'intelligenza',
+        'inganno': 'carisma', 'intimidire': 'carisma', 'intrattenere': 'carisma',
+        'intuizione': 'saggezza', 'medicina': 'saggezza', 'natura': 'intelligenza',
+        'percezione': 'saggezza', 'persuasione': 'carisma', 'rapidita_di_mano': 'destrezza',
+        'religione': 'intelligenza', 'sopravvivenza': 'saggezza', 'storia': 'intelligenza'
+    };
+
+    const totalLevel = pg.livello || 1;
+    const profBonus = Math.floor((totalLevel - 1) / 4) + 2;
+
+    if (tipoTiro === 'caratteristica') {
+        const abilityKey = ABILITY_MAP[targetTiro];
+        if (!abilityKey || pg[abilityKey] == null) return null;
+        return calcAbilityMod(pg[abilityKey]);
+    }
+
+    if (tipoTiro === 'salvezza') {
+        const abilityKey = ABILITY_MAP[targetTiro];
+        if (!abilityKey || pg[abilityKey] == null) return null;
+        let mod = calcAbilityMod(pg[abilityKey]);
+        const saves = pg.tiri_salvezza || [];
+        if (saves.includes(abilityKey) || saves.includes(targetTiro)) {
+            mod += profBonus;
+        }
+        return mod;
+    }
+
+    if (tipoTiro === 'abilita') {
+        const abilityKey = SKILL_ABILITY_MAP[targetTiro];
+        if (!abilityKey || pg[abilityKey] == null) return null;
+        let mod = calcAbilityMod(pg[abilityKey]);
+        const skills = pg.competenze_abilita || [];
+        if (skills.includes(targetTiro)) {
+            mod += profBonus;
+        }
+        return mod;
+    }
+
+    return null;
+}
+
+function formatMod(value) {
+    if (value == null) return '?';
+    return value >= 0 ? `+${value}` : `${value}`;
+}
+
+async function showRollRequestModal(request) {
     if (!elements.rollRequestModal) return;
 
     window.currentRollRequest = request;
 
     const isIniziativa = request.tipo === 'iniziativa';
     const tiroLabel = !isIniziativa && request.tiroLabel ? request.tiroLabel : null;
+    const tipoTiro = request.tipoTiro || null;
+    const targetTiro = request.targetTiro || null;
+
+    let modValue = null;
+    let modText = '';
+    window.currentRollModifier = 0;
+
+    try {
+        const supabase = getSupabaseClient();
+        const userData = await findUserByUid(AppState.currentUser?.uid);
+        if (supabase && userData && AppState.currentCampagnaId) {
+            const { data: pgData } = await supabase.rpc('get_personaggio_campagna', {
+                p_campagna_id: AppState.currentCampagnaId,
+                p_user_id: userData.id
+            });
+            if (pgData && pgData.length > 0) {
+                const pg = pgData[0];
+                if (isIniziativa) {
+                    modValue = pg.iniziativa != null ? pg.iniziativa : calcAbilityMod(pg.destrezza || 10);
+                } else if (tipoTiro && targetTiro) {
+                    modValue = getCharacterModifier(pg, tipoTiro, targetTiro);
+                }
+                if (modValue != null) window.currentRollModifier = modValue;
+            }
+        }
+    } catch (e) {
+        console.warn('Impossibile calcolare modificatore:', e);
+    }
+    modText = modValue != null ? ` (${formatMod(modValue)})` : '';
 
     if (elements.rollRequestTitle) {
         elements.rollRequestTitle.textContent = isIniziativa
@@ -7050,14 +7146,15 @@ function showRollRequestModal(request) {
             : (tiroLabel || 'Tiro Richiesto');
     }
     if (elements.rollRequestMessage) {
-        elements.rollRequestMessage.textContent = isIniziativa
-            ? 'Il DM ti ha richiesto di fare un tiro di iniziativa (d20 + modificatori)'
-            : `Il DM ha richiesto: ${tiroLabel || 'un tiro'} (d20 + modificatori)`;
+        if (isIniziativa) {
+            elements.rollRequestMessage.textContent = `d20 + modificatore iniziativa${modText}`;
+        } else {
+            const hintLabel = tiroLabel || 'un tiro';
+            elements.rollRequestMessage.textContent = `d20 + ${hintLabel}${modText}`;
+        }
     }
     if (elements.rollRequestLabel) {
-        elements.rollRequestLabel.textContent = isIniziativa
-            ? 'Risultato del tiro (d20 + modificatori):'
-            : 'Risultato del tiro (d20 + modificatori):';
+        elements.rollRequestLabel.textContent = 'Risultato del tiro:';
     }
     if (elements.rollRequestInput) {
         elements.rollRequestInput.value = '';
@@ -7310,7 +7407,7 @@ function getTiroLabel(tipo, target) {
     return `Prova di ${targetName}`;
 }
 
-window.richiediTiroGenerico = function(sessioneId, campagnaId) {
+window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
     const modal = document.getElementById('richiediTiroModal');
     if (!modal) return;
 
@@ -7318,8 +7415,41 @@ window.richiediTiroGenerico = function(sessioneId, campagnaId) {
     window._pendingTiroCampagnaId = campagnaId;
 
     updateTiroTargetOptions();
+
+    const playersList = document.getElementById('tiroPlayersList');
+    if (playersList) {
+        playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Caricamento...</p>';
+    }
+
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    const supabase = getSupabaseClient();
+    if (!supabase || !playersList) return;
+
+    try {
+        const pgNamesMap = await getCharacterNamesMap(campagnaId);
+        const { data: giocatoriData } = await supabase.rpc('get_giocatori_campagna', {
+            campagna_id_param: campagnaId
+        });
+
+        if (!giocatoriData || giocatoriData.length === 0) {
+            playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessun giocatore</p>';
+            return;
+        }
+
+        playersList.innerHTML = giocatoriData.map(g => {
+            const displayName = pgNamesMap[g.id] || g.nome_utente || 'Giocatore';
+            return `
+                <div class="tiro-player-item">
+                    <input type="checkbox" id="tiroPlayer_${g.id}" value="${g.id}" checked>
+                    <label for="tiroPlayer_${g.id}">${escapeHtml(displayName)}</label>
+                </div>`;
+        }).join('');
+    } catch (e) {
+        console.warn('Errore caricamento giocatori per tiro:', e);
+        playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Errore caricamento</p>';
+    }
 }
 
 function closeRichiediTiroModal() {
@@ -7335,6 +7465,13 @@ async function executeRichiediTiro() {
     const target = document.getElementById('tiroTargetSelect')?.value;
     if (!sessioneId || !campagnaId || !tipo || !target) return;
 
+    const selectedCheckboxes = document.querySelectorAll('#tiroPlayersList input[type="checkbox"]:checked');
+    const selectedPlayerIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+    if (selectedPlayerIds.length === 0) {
+        showNotification('Seleziona almeno un giocatore');
+        return;
+    }
+
     const tiroLabel = getTiroLabel(tipo, target);
     closeRichiediTiroModal();
 
@@ -7345,17 +7482,9 @@ async function executeRichiediTiro() {
         const isDM = await isCurrentUserDM(campagnaId);
         if (!isDM) { showNotification('Solo il DM può richiedere tiri'); return; }
 
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('giocatori, id_dm')
-            .eq('id', campagnaId)
-            .single();
-        if (campagnaError) throw campagnaError;
-
         const richiestaId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const partecipanti = (campagna.giocatori || []).filter(Boolean);
 
-        const richieste = partecipanti.map(giocatoreId => ({
+        const richieste = selectedPlayerIds.map(giocatoreId => ({
             sessione_id: sessioneId,
             richiesta_id: richiestaId,
             giocatore_id: giocatoreId,
@@ -7367,7 +7496,14 @@ async function executeRichiediTiro() {
             .insert(richieste);
         if (insertError) throw insertError;
 
-        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'insert', sessioneId, tiroLabel });
+        await sendAppEventBroadcast({
+            table: 'richieste_tiro_generico',
+            action: 'insert',
+            sessioneId,
+            tiroLabel,
+            tipoTiro: tipo,
+            targetTiro: target
+        });
         showNotification(`${tiroLabel} richiesto!`);
 
         window.currentTiroGenericoRichiestaId = richiestaId;
