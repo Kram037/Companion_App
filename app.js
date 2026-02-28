@@ -782,6 +782,10 @@ function setupEventListeners() {
     if (pgAddClasseBtn) {
         pgAddClasseBtn.onclick = () => pgAddClasse();
     }
+    const pgAddResistenzaBtn = document.getElementById('pgAddResistenzaBtn');
+    if (pgAddResistenzaBtn) {
+        pgAddResistenzaBtn.onclick = () => pgAddResistenza();
+    }
     ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(name => {
         const cb = document.getElementById(`save${name}`);
         if (cb) cb.addEventListener('change', () => updateAllSaveValues());
@@ -3098,17 +3102,37 @@ function pgResetAutoHP() {
     pgRenderDadiVita();
 }
 
+const THIRD_CASTER_SUBCLASSES = {
+    'Guerriero': 'Cavaliere Mistico',
+    'Ladro': 'Mistificatore Arcano'
+};
+
 function pgRenderClassi() {
     const container = document.getElementById('pgClassiList');
     if (!container) return;
-    container.innerHTML = pgSelectedClasses.map((c, i) => `
+    container.innerHTML = pgSelectedClasses.map((c, i) => {
+        const subLabel = THIRD_CASTER_SUBCLASSES[c.nome];
+        const subCheck = subLabel ? `
+            <label class="pg-subclass-check">
+                <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="pgToggleThirdCaster(${i}, this.checked)">
+                <span>${subLabel}</span>
+            </label>` : '';
+        return `
         <div class="pg-classe-chip">
-            <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
-            <span class="pg-classe-lv-label">Lv.</span>
-            <input type="number" class="pg-classe-livello" min="1" max="20" value="${c.livello}" onchange="pgUpdateClassLevel(${i}, this.value)" oninput="pgUpdateClassLevel(${i}, this.value)">
-            <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
-        </div>
-    `).join('');
+            <div class="pg-classe-chip-top">
+                <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
+                <span class="pg-classe-lv-label">Lv.</span>
+                <input type="number" class="pg-classe-livello" min="1" max="20" value="${c.livello}" onchange="pgUpdateClassLevel(${i}, this.value)" oninput="pgUpdateClassLevel(${i}, this.value)">
+                <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
+            </div>
+            ${subCheck}
+        </div>`;
+    }).join('');
+}
+
+window.pgToggleThirdCaster = function(index, checked) {
+    pgSelectedClasses[index].thirdCaster = checked;
+    pgResetAutoHP();
 }
 
 // --- Saving Throws ---
@@ -3167,6 +3191,160 @@ function pgCalcPercPassiva() {
     const bonus = calcBonusCompetenza(pgGetTotalLevel());
     const isProf = pgCurrentSkillProficiencies.has('percezione');
     return 10 + sagMod + (isProf ? bonus : 0);
+}
+
+// --- Resistenze ---
+let pgCurrentResistenze = [];
+
+function pgRenderResistenze() {
+    const container = document.getElementById('pgResistenzeList');
+    if (!container) return;
+    if (pgCurrentResistenze.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessuna resistenza aggiunta</p>';
+        return;
+    }
+    container.innerHTML = pgCurrentResistenze.map((r, i) => `
+        <div class="pg-resistenza-chip">
+            <span>${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>
+            <button type="button" class="pg-chip-remove" onclick="pgRemoveResistenza(${i})">&times;</button>
+        </div>`).join('');
+}
+
+window.pgAddResistenza = function() {
+    const sel = document.getElementById('pgResistenzaSelect');
+    if (!sel || !sel.value) return;
+    if (!pgCurrentResistenze.includes(sel.value)) {
+        pgCurrentResistenze.push(sel.value);
+        pgRenderResistenze();
+    }
+    sel.value = '';
+}
+
+window.pgRemoveResistenza = function(idx) {
+    pgCurrentResistenze.splice(idx, 1);
+    pgRenderResistenze();
+}
+
+// --- Spell Slots ---
+let pgCurrentSlotIncantesimo = {};
+
+const CLASS_SPELL_SLOTS = {
+    'full': {
+        1: {1:2}, 2: {1:3}, 3: {1:4,2:2}, 4: {1:4,2:3}, 5: {1:4,2:3,3:2},
+        6: {1:4,2:3,3:3}, 7: {1:4,2:3,3:3,4:1}, 8: {1:4,2:3,3:3,4:2},
+        9: {1:4,2:3,3:3,4:3,5:1}, 10: {1:4,2:3,3:3,4:3,5:2},
+        11: {1:4,2:3,3:3,4:3,5:2,6:1}, 12: {1:4,2:3,3:3,4:3,5:2,6:1},
+        13: {1:4,2:3,3:3,4:3,5:2,6:1,7:1}, 14: {1:4,2:3,3:3,4:3,5:2,6:1,7:1},
+        15: {1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1}, 16: {1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1},
+        17: {1:4,2:3,3:3,4:3,5:2,6:1,7:1,8:1,9:1}, 18: {1:4,2:3,3:3,4:3,5:3,6:1,7:1,8:1,9:1},
+        19: {1:4,2:3,3:3,4:3,5:3,6:2,7:1,8:1,9:1}, 20: {1:4,2:3,3:3,4:3,5:3,6:2,7:2,8:1,9:1}
+    },
+    'half': {
+        2: {1:2}, 3: {1:3}, 4: {1:3}, 5: {1:4,2:2}, 6: {1:4,2:2},
+        7: {1:4,2:3}, 8: {1:4,2:3}, 9: {1:4,2:3,3:2}, 10: {1:4,2:3,3:2},
+        11: {1:4,2:3,3:3}, 12: {1:4,2:3,3:3}, 13: {1:4,2:3,3:3,4:1}, 14: {1:4,2:3,3:3,4:1},
+        15: {1:4,2:3,3:3,4:2}, 16: {1:4,2:3,3:3,4:2}, 17: {1:4,2:3,3:3,4:3,5:1}, 18: {1:4,2:3,3:3,4:3,5:1},
+        19: {1:4,2:3,3:3,4:3,5:2}, 20: {1:4,2:3,3:3,4:3,5:2}
+    }
+};
+
+const CLASS_CASTER_TYPE = {
+    'Bardo': 'full', 'Chierico': 'full', 'Druido': 'full', 'Mago': 'full',
+    'Stregone': 'full', 'Warlock': 'pact',
+    'Paladino': 'half', 'Ranger': 'half',
+    'Artefice': 'half',
+    'Barbaro': null, 'Guerriero': null, 'Ladro': null, 'Monaco': null
+};
+
+function pgCalcSpellSlots() {
+    let totalCasterLevel = 0;
+    let hasPactMagic = false;
+    let pactLevel = 0;
+
+    pgSelectedClasses.forEach(cls => {
+        const type = CLASS_CASTER_TYPE[cls.nome];
+        if (type === 'full') totalCasterLevel += cls.livello;
+        else if (type === 'half') totalCasterLevel += Math.floor(cls.livello / 2);
+        else if (type === 'pact') { hasPactMagic = true; pactLevel += cls.livello; }
+        else if (type === null && cls.thirdCaster) {
+            totalCasterLevel += Math.floor(cls.livello / 3);
+        }
+    });
+
+    let slots = {};
+    if (totalCasterLevel > 0) {
+        const table = CLASS_SPELL_SLOTS['full'];
+        const level = Math.min(totalCasterLevel, 20);
+        slots = table[level] ? { ...table[level] } : {};
+    }
+
+    if (hasPactMagic) {
+        const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
+        let pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
+        const current = slots[pactSlotLevel] || 0;
+        slots[pactSlotLevel] = current + pactSlotCount;
+    }
+
+    return slots;
+}
+
+function pgRenderSlotIncantesimo() {
+    const container = document.getElementById('pgSlotIncantesimoList');
+    if (!container) return;
+
+    const defaultSlots = pgCalcSpellSlots();
+    const slotLevels = Object.keys(defaultSlots).map(Number).sort((a, b) => a - b);
+
+    if (slotLevels.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessun incantesimo disponibile per questa classe</p>';
+        pgCurrentSlotIncantesimo = {};
+        return;
+    }
+
+    const merged = {};
+    slotLevels.forEach(lvl => {
+        const maxDefault = defaultSlots[lvl] || 0;
+        const existing = pgCurrentSlotIncantesimo[lvl];
+        if (existing) {
+            merged[lvl] = { max: existing.max != null ? existing.max : maxDefault, current: existing.current != null ? existing.current : maxDefault };
+        } else {
+            merged[lvl] = { max: maxDefault, current: maxDefault };
+        }
+    });
+    pgCurrentSlotIncantesimo = merged;
+
+    container.innerHTML = slotLevels.map(lvl => {
+        const s = merged[lvl];
+        return `
+        <div class="pg-slot-row">
+            <span class="pg-slot-label">Livello ${lvl}</span>
+            <div class="pg-slot-controls">
+                <button type="button" class="pg-slot-btn" onclick="pgSlotDecrement(${lvl})">−</button>
+                <span class="pg-slot-value" id="slotCurrent${lvl}">${s.current}</span>
+                <span class="pg-slot-sep">/</span>
+                <span class="pg-slot-max">${s.max}</span>
+                <button type="button" class="pg-slot-btn" onclick="pgSlotIncrement(${lvl})">+</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.pgSlotDecrement = function(lvl) {
+    if (!pgCurrentSlotIncantesimo[lvl]) return;
+    if (pgCurrentSlotIncantesimo[lvl].current > 0) {
+        pgCurrentSlotIncantesimo[lvl].current--;
+        const el = document.getElementById(`slotCurrent${lvl}`);
+        if (el) el.textContent = pgCurrentSlotIncantesimo[lvl].current;
+    }
+}
+
+window.pgSlotIncrement = function(lvl) {
+    if (!pgCurrentSlotIncantesimo[lvl]) return;
+    if (pgCurrentSlotIncantesimo[lvl].current < pgCurrentSlotIncantesimo[lvl].max) {
+        pgCurrentSlotIncantesimo[lvl].current++;
+        const el = document.getElementById(`slotCurrent${lvl}`);
+        if (el) el.textContent = pgCurrentSlotIncantesimo[lvl].current;
+    }
 }
 
 // --- Hit Dice & HP Calculation ---
@@ -3258,7 +3436,7 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 3) return;
+    if (step < 0 || step > 5) return;
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
@@ -3280,6 +3458,12 @@ function pgWizardGoTo(step) {
         pgRenderSkills();
     }
     if (step === 3) {
+        pgRenderResistenze();
+    }
+    if (step === 4) {
+        pgRenderSlotIncantesimo();
+    }
+    if (step === 5) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
@@ -3365,6 +3549,8 @@ function renderPersonaggi(personaggi) {
                 <div class="pg-combat-stat"><div class="pg-combat-label">INIT</div><div class="pg-combat-value">${pg.iniziativa != null ? pg.iniziativa : mod(pg.destrezza)}</div></div>
                 <div class="pg-combat-stat"><div class="pg-combat-label">VEL</div><div class="pg-combat-value">${pg.velocita}</div></div>
             </div>
+            ${pg.resistenze && pg.resistenze.length > 0 ? `<div class="pg-card-resistenze"><span class="pg-card-res-label">Resistenze:</span> ${pg.resistenze.map(r => `<span class="pg-card-res-tag">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
+            ${pg.slot_incantesimo && Object.keys(pg.slot_incantesimo).length > 0 ? `<div class="pg-card-slots">${Object.keys(pg.slot_incantesimo).sort((a,b) => a-b).map(lvl => { const s = pg.slot_incantesimo[lvl]; return `<span class="pg-card-slot-tag">Lv${lvl}: ${s.current}/${s.max}</span>`; }).join('')}</div>` : ''}
             <div class="pg-card-actions">
                 <button class="btn-secondary btn-small" onclick="openPersonaggioModal('${pg.id}')">Modifica</button>
                 <button class="btn-secondary btn-small" style="color: #dc3545;" onclick="deletePersonaggio('${pg.id}')">Elimina</button>
@@ -3381,6 +3567,8 @@ window.openPersonaggioModal = function(personaggioId) {
     form.reset();
     pgSelectedClasses = [];
     pgCurrentSkillProficiencies = new Set();
+    pgCurrentResistenze = [];
+    pgCurrentSlotIncantesimo = {};
     pgRenderClassi();
     pgWizardGoTo(0);
 
@@ -3402,7 +3590,7 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgRazza').value = data.razza || '';
 
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
-                        pgSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1 }));
+                        pgSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1, thirdCaster: !!c.thirdCaster }));
                     } else if (data.classe) {
                         pgSelectedClasses = [{ nome: data.classe, livello: data.livello || 1 }];
                     }
@@ -3427,6 +3615,16 @@ window.openPersonaggioModal = function(personaggioId) {
 
                     if (data.competenze_abilita && Array.isArray(data.competenze_abilita)) {
                         pgCurrentSkillProficiencies = new Set(data.competenze_abilita);
+                    }
+
+                    if (data.resistenze && Array.isArray(data.resistenze)) {
+                        pgCurrentResistenze = [...data.resistenze];
+                    }
+                    if (data.slot_incantesimo && typeof data.slot_incantesimo === 'object') {
+                        pgCurrentSlotIncantesimo = {};
+                        Object.keys(data.slot_incantesimo).forEach(k => {
+                            pgCurrentSlotIncantesimo[parseInt(k)] = { ...data.slot_incantesimo[k] };
+                        });
                     }
 
                     const pvF = document.getElementById('pgPV');
@@ -3503,6 +3701,8 @@ async function handleSavePersonaggio(e) {
         carisma: clamp(parseInt(document.getElementById('pgCarisma').value) || 10, 1, 30),
         tiri_salvezza: pgGetSelectedSaves(),
         competenze_abilita: Array.from(pgCurrentSkillProficiencies),
+        resistenze: pgCurrentResistenze,
+        slot_incantesimo: pgCurrentSlotIncantesimo,
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
         classe_armatura: classeArmatura,
@@ -5821,7 +6021,11 @@ async function renderSessioneContent(campagnaId) {
             </div>
             ` : ''}
             `}
+
+            <div id="sessioneConditionsPanel"></div>
         `;
+
+        await renderSessioneConditions(campagnaId, isDM);
 
         // Avvia timer se non già avviato
         if (!window.sessioneTimerInterval) {
@@ -5992,6 +6196,210 @@ window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     startCombattimentoRealtime(campagnaId, sessioneId);
 };
 
+// --- Conditions / Status management ---
+const ALL_CONDITIONS = [
+    { key: 'concentrazione', label: 'Concentrazione' },
+    { key: 'accecato', label: 'Accecato' },
+    { key: 'affascinato', label: 'Affascinato' },
+    { key: 'afferrato', label: 'Afferrato' },
+    { key: 'assordato', label: 'Assordato' },
+    { key: 'avvelenato', label: 'Avvelenato' },
+    { key: 'incapacitato', label: 'Incapacitato' },
+    { key: 'invisibile', label: 'Invisibile' },
+    { key: 'paralizzato', label: 'Paralizzato' },
+    { key: 'pietrificato', label: 'Pietrificato' },
+    { key: 'privo_di_sensi', label: 'Privo di sensi' },
+    { key: 'prono', label: 'Prono' },
+    { key: 'spaventato', label: 'Spaventato' },
+    { key: 'stordito', label: 'Stordito' },
+    { key: 'trattenuto', label: 'Trattenuto' }
+];
+
+async function renderSessioneConditions(campagnaId, isDM) {
+    const panel = document.getElementById('sessioneConditionsPanel');
+    if (!panel) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        if (isDM) {
+            const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+            if (!pgList || pgList.length === 0) { panel.innerHTML = ''; return; }
+
+            const fullChars = [];
+            for (const pg of pgList) {
+                const { data: charData } = await supabase.from('personaggi').select('id, nome, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, slot_incantesimo').eq('id', pg.personaggio_id).single();
+                if (charData) fullChars.push(charData);
+            }
+
+            panel.innerHTML = `
+                <div class="form-section-label" style="margin-top:var(--spacing-md);">Stato Personaggi</div>
+                ${fullChars.map(pg => renderConditionsCard(pg, true)).join('')}
+            `;
+        } else {
+            const userData = await findUserByUid(AppState.currentUser?.uid);
+            if (!userData) return;
+            const { data: pgData } = await supabase.rpc('get_personaggio_campagna', { p_campagna_id: campagnaId, p_user_id: userData.id });
+            if (!pgData || pgData.length === 0) { panel.innerHTML = ''; return; }
+            const pg = pgData[0];
+            const { data: fullPg } = await supabase.from('personaggi').select('id, nome, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, slot_incantesimo').eq('id', pg.id).single();
+            if (!fullPg) return;
+
+            panel.innerHTML = `
+                <div class="form-section-label" style="margin-top:var(--spacing-md);">Il tuo Personaggio</div>
+                ${renderConditionsCard(fullPg, false)}
+            `;
+        }
+    } catch (e) {
+        console.error('Errore rendering condizioni:', e);
+    }
+}
+
+function renderConditionsCard(pg, showName) {
+    const activeConditions = ALL_CONDITIONS.filter(c => pg[c.key]);
+    const activeLabels = activeConditions.map(c => c.label);
+    const conditionsText = activeLabels.length > 0 ? activeLabels.join(', ') : 'Nessuna';
+
+    let slotsHtml = '';
+    if (pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object') {
+        const levels = Object.keys(pg.slot_incantesimo).map(Number).sort((a, b) => a - b);
+        if (levels.length > 0) {
+            slotsHtml = `
+            <div class="session-slots-row">
+                ${levels.map(lvl => {
+                    const s = pg.slot_incantesimo[lvl];
+                    return `<div class="session-slot-badge">
+                        <span class="session-slot-lvl">Lv${lvl}</span>
+                        <span class="session-slot-val" id="sessSlot_${pg.id}_${lvl}">${s.current}</span>/<span class="session-slot-max">${s.max}</span>
+                        <div class="session-slot-btns">
+                            <button type="button" class="pg-slot-btn-sm" onclick="sessionSlotChange('${pg.id}',${lvl},-1)">−</button>
+                            <button type="button" class="pg-slot-btn-sm" onclick="sessionSlotChange('${pg.id}',${lvl},1)">+</button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }
+    }
+
+    return `
+    <div class="session-condition-card" data-pg-id="${pg.id}">
+        ${showName ? `<div class="session-condition-name">${escapeHtml(pg.nome)}</div>` : ''}
+        <div class="session-condition-row">
+            <div class="session-condition-badges">
+                ${activeConditions.map(c => `<span class="condition-badge active">${c.label}</span>`).join('')}
+            </div>
+            <div class="session-condition-exhaustion">
+                <span class="exhaustion-label">Esaustione</span>
+                <span class="exhaustion-value">${pg.esaustione || 0}</span>/6
+            </div>
+        </div>
+        <div class="session-condition-actions">
+            <button type="button" class="btn-secondary btn-small" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
+        </div>
+        ${slotsHtml}
+    </div>`;
+}
+
+window.openConditionsModal = async function(personaggioId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: pg, error } = await supabase.from('personaggi').select('id, nome, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione').eq('id', personaggioId).single();
+    if (error || !pg) { showNotification('Errore nel caricamento del personaggio'); return; }
+
+    const modalHtml = `
+    <div class="modal active" id="conditionsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeConditionsModal()">&times;</button>
+            <h2>Stato: ${escapeHtml(pg.nome)}</h2>
+            <div class="form-section-label">Condizioni</div>
+            <div class="pg-conditions-grid">
+                ${ALL_CONDITIONS.map(c => `
+                    <label class="pg-condition-item">
+                        <input type="checkbox" id="cond_${c.key}" ${pg[c.key] ? 'checked' : ''}>
+                        <label for="cond_${c.key}">${c.label}</label>
+                    </label>
+                `).join('')}
+            </div>
+            <div class="form-section-label" style="margin-top:var(--spacing-sm);">Esaustione</div>
+            <div class="pg-exhaustion-row">
+                <label>Livello</label>
+                <input type="range" id="cond_esaustione" min="0" max="6" value="${pg.esaustione || 0}" oninput="document.getElementById('condExhaustionVal').textContent = this.value">
+                <span class="pg-exhaustion-value" id="condExhaustionVal">${pg.esaustione || 0}</span>
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="closeConditionsModal()">Annulla</button>
+                <button type="button" class="btn-primary" onclick="saveConditions('${personaggioId}')">Salva</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+}
+
+window.closeConditionsModal = function() {
+    const m = document.getElementById('conditionsModal');
+    if (m) m.remove();
+    document.body.style.overflow = '';
+}
+
+window.saveConditions = async function(personaggioId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const updates = {};
+    ALL_CONDITIONS.forEach(c => {
+        const cb = document.getElementById(`cond_${c.key}`);
+        if (cb) updates[c.key] = cb.checked;
+    });
+    const exhInput = document.getElementById('cond_esaustione');
+    if (exhInput) updates.esaustione = parseInt(exhInput.value) || 0;
+    updates.updated_at = new Date().toISOString();
+
+    try {
+        const { error } = await supabase.from('personaggi').update(updates).eq('id', personaggioId);
+        if (error) throw error;
+        showNotification('Stato aggiornato');
+        closeConditionsModal();
+        if (AppState.currentCampagnaId) {
+            const isDM = await isCurrentUserDM(AppState.currentCampagnaId);
+            await renderSessioneConditions(AppState.currentCampagnaId, isDM);
+        }
+        await sendAppEventBroadcast({ table: 'personaggi', action: 'update' });
+    } catch (e) {
+        console.error('Errore aggiornamento condizioni:', e);
+        showNotification('Errore: ' + (e.message || e));
+    }
+}
+
+window.sessionSlotChange = async function(personaggioId, level, delta) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', personaggioId).single();
+    if (!pg || !pg.slot_incantesimo) return;
+
+    const slots = { ...pg.slot_incantesimo };
+    const slot = slots[level];
+    if (!slot) return;
+
+    const newCurrent = Math.max(0, Math.min(slot.max, slot.current + delta));
+    if (newCurrent === slot.current) return;
+
+    slots[level] = { ...slot, current: newCurrent };
+
+    try {
+        const { error } = await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', personaggioId);
+        if (error) throw error;
+        const el = document.getElementById(`sessSlot_${personaggioId}_${level}`);
+        if (el) el.textContent = newCurrent;
+    } catch (e) {
+        console.error('Errore aggiornamento slot:', e);
+    }
+}
+
 /**
  * Builds a map: user_id -> character name for a campaign
  */
@@ -6005,6 +6413,21 @@ async function getCharacterNamesMap(campagnaId) {
             data.forEach(pg => { map[pg.player_user_id] = pg.nome; });
         }
     } catch (e) { console.warn('Errore caricamento nomi personaggi:', e); }
+    return map;
+}
+
+async function getCharacterConditionsMap(campagnaId) {
+    const map = {};
+    const supabase = getSupabaseClient();
+    if (!supabase || !campagnaId) return map;
+    try {
+        const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+        if (!pgList) return map;
+        for (const pg of pgList) {
+            const { data: charData } = await supabase.from('personaggi').select('concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione').eq('id', pg.personaggio_id).single();
+            if (charData) map[pg.player_user_id] = charData;
+        }
+    } catch (e) { console.warn('Errore caricamento condizioni:', e); }
     return map;
 }
 
@@ -6064,6 +6487,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
         
         const pgNamesMap = await getCharacterNamesMap(campagnaId);
+        const pgConditionsMap = await getCharacterConditionsMap(campagnaId);
 
         const isDM = await isCurrentUserDM(campagnaId);
         const terminaCombattimentoHtml = isDM ? `
@@ -6090,6 +6514,17 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
                 const pgName = pgNamesMap[tiro.giocatore_id];
                 const nomeDisplay = pgName || tiro.giocatore_nome || tiro.utenti?.nome_utente || 'Sconosciuto';
+                const conditions = pgConditionsMap[tiro.giocatore_id];
+                let condBadges = '';
+                if (conditions) {
+                    const active = ALL_CONDITIONS.filter(c => conditions[c.key]);
+                    if (active.length > 0) {
+                        condBadges = `<div class="combat-condition-badges">${active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('')}</div>`;
+                    }
+                    if (conditions.esaustione > 0) {
+                        condBadges += `<span class="condition-badge-sm exhaustion">Esaustione ${conditions.esaustione}</span>`;
+                    }
+                }
                 
                 return `
                 <div class="combattimento-card">
@@ -6097,6 +6532,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                         <span class="combattimento-card-position">#${index + 1}</span>
                         <span class="combattimento-card-name">
                             ${escapeHtml(nomeDisplay)}
+                            ${condBadges}
                         </span>
                     </div>
                     <span class="combattimento-card-value">${tiro.valore}</span>

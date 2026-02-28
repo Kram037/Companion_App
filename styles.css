@@ -828,6 +828,33 @@ body.user-logged-in .header-username {
     margin-top: 2px;
 }
 
+.pg-card-resistenze,
+.pg-card-slots {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+}
+
+.pg-card-res-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.pg-card-res-tag,
+.pg-card-slot-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(var(--accent-rgb, 139,92,246), 0.12);
+    color: var(--accent);
+}
+
 .pg-card-actions {
     display: flex;
     gap: var(--spacing-xs);
@@ -1044,6 +1071,345 @@ body.user-logged-in .header-username {
     margin-left: auto;
 }
 
+/* Resistenze */
+.pg-resistenze-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.pg-resistenze-add-row {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+.pg-resistenze-add-row select {
+    flex: 1;
+    padding: 10px 12px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.pg-resistenze-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+}
+
+.pg-resistenza-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.pg-resistenza-chip .pg-chip-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.pg-resistenza-chip .pg-chip-remove:hover {
+    color: var(--error);
+}
+
+/* Spell Slots */
+.pg-slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pg-slot-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.pg-slot-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.pg-slot-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pg-slot-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-hover);
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+}
+
+.pg-slot-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+.pg-slot-value {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--accent);
+    min-width: 20px;
+    text-align: center;
+}
+
+.pg-slot-sep {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.pg-slot-max {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Conditions / Status */
+.pg-conditions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.pg-condition-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.pg-condition-item:has(input:checked) {
+    background: rgba(var(--accent-rgb, 139,92,246), 0.15);
+    border-color: var(--accent);
+}
+
+.pg-condition-item label {
+    font-size: 0.82rem;
+    color: var(--text);
+    cursor: pointer;
+    flex: 1;
+}
+
+.pg-condition-item input[type="checkbox"] {
+    accent-color: var(--accent);
+}
+
+.pg-exhaustion-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-top: 8px;
+}
+
+.pg-exhaustion-row label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+.pg-exhaustion-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+}
+
+.pg-exhaustion-value {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--accent);
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Session Conditions Panel */
+.session-condition-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+}
+
+.session-condition-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.session-condition-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.session-condition-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+}
+
+.condition-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(var(--accent-rgb, 139,92,246), 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb, 139,92,246), 0.3);
+}
+
+.condition-badge-sm {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: rgba(var(--accent-rgb, 139,92,246), 0.15);
+    color: var(--accent);
+    margin-top: 2px;
+}
+
+.condition-badge-sm.exhaustion {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+.combat-condition-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+}
+
+.session-condition-exhaustion {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.exhaustion-label {
+    margin-right: 4px;
+}
+
+.exhaustion-value {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.session-condition-actions {
+    margin-top: 8px;
+}
+
+/* Session Spell Slots */
+.session-slots-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.session-slot-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+}
+
+.session-slot-lvl {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-right: 2px;
+}
+
+.session-slot-val {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.session-slot-max {
+    color: var(--text-muted);
+}
+
+.session-slot-btns {
+    display: flex;
+    gap: 2px;
+    margin-left: 4px;
+}
+
+.pg-slot-btn-sm {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.pg-slot-btn-sm:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
 /* Roll type modal */
 .richiedi-tiro-options select {
     width: 100%;
@@ -1211,12 +1577,37 @@ body.user-logged-in .header-username {
 
 .pg-classe-chip {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
+    flex-direction: column;
+    gap: 4px;
     background: var(--surface-hover);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 6px 10px;
+}
+
+.pg-classe-chip-top {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    width: 100%;
+}
+
+.pg-subclass-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding-left: 2px;
+}
+
+.pg-subclass-check input[type="checkbox"] {
+    accent-color: var(--accent);
+}
+
+.pg-subclass-check span {
+    font-style: italic;
 }
 
 .pg-classe-name {

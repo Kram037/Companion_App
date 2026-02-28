@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1767042600">
+    <link rel="stylesheet" href="styles.css?v=1767043800">
 </head>
 <body>
     <!-- Header -->
@@ -502,6 +502,8 @@
                 <div class="wizard-step" data-step="1"></div>
                 <div class="wizard-step" data-step="2"></div>
                 <div class="wizard-step" data-step="3"></div>
+                <div class="wizard-step" data-step="4"></div>
+                <div class="wizard-step" data-step="5"></div>
             </div>
             <form id="personaggioForm">
                 <!-- Step 0: Identità -->
@@ -621,8 +623,47 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 3: Statistiche -->
+                <!-- Step 3: Resistenze -->
                 <div class="wizard-page" id="pgStep3">
+                    <div class="form-section-label">Resistenze</div>
+                    <div class="pg-resistenze-section">
+                        <div class="pg-resistenze-add-row">
+                            <select id="pgResistenzaSelect">
+                                <option value="">Seleziona resistenza...</option>
+                                <option value="acido">Acido</option>
+                                <option value="contundente">Contundente</option>
+                                <option value="freddo">Freddo</option>
+                                <option value="fulmine">Fulmine</option>
+                                <option value="fuoco">Fuoco</option>
+                                <option value="forza">Forza</option>
+                                <option value="necrotico">Necrotico</option>
+                                <option value="perforante">Perforante</option>
+                                <option value="psichico">Psichico</option>
+                                <option value="radiante">Radiante</option>
+                                <option value="tagliente">Tagliente</option>
+                                <option value="tuono">Tuono</option>
+                                <option value="veleno">Veleno</option>
+                            </select>
+                            <button type="button" class="btn-icon-sm" id="pgAddResistenzaBtn">+</button>
+                        </div>
+                        <div id="pgResistenzeList" class="pg-resistenze-list"></div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
+                        <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
+                    </div>
+                </div>
+                <!-- Step 4: Slot Incantesimo -->
+                <div class="wizard-page" id="pgStep4">
+                    <div class="form-section-label">Slot Incantesimo</div>
+                    <div id="pgSlotIncantesimoList" class="pg-slot-list"></div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
+                        <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
+                    </div>
+                </div>
+                <!-- Step 5: Statistiche -->
+                <div class="wizard-page" id="pgStep5">
                     <div class="form-section-label">Statistiche</div>
                     <div class="pg-stats-row-3">
                         <div class="form-group pg-stat-with-hint">
@@ -752,7 +793,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1767042600"></script>
+    <script src="app.js?v=1767043800"></script>
     
     <!-- Cache busting script for development -->
     <script>
