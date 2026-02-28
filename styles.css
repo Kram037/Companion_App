@@ -363,7 +363,7 @@ body.user-logged-in .header-username {
    ============================================ */
 .back-button-floating {
     position: fixed;
-    top: 14px;
+    top: 78px;
     left: 14px;
     background: var(--surface);
     color: var(--text-secondary);
@@ -918,13 +918,32 @@ body.user-logged-in .header-username {
 .scheda-hp-right { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; text-align: center; }
 .scheda-hp-input { width: 100%; text-align: center; background: transparent; color: var(--text); border: none; font-size: 1.3rem; font-weight: 800; padding: 4px 0; }
 .scheda-hp-input:focus { outline: none; color: var(--accent); }
-.scheda-hp-input.pv-current { color: var(--accent); }
+.scheda-hp-display { font-size: 1.3rem; font-weight: 800; color: var(--text); padding: 4px 0; }
+.scheda-hp-display.pv-current { color: var(--accent); }
+.scheda-hp-cell.clickable, .scheda-hp-right.clickable { cursor: pointer; transition: background 0.15s; border-radius: var(--radius-sm); }
+.scheda-hp-cell.clickable:hover, .scheda-hp-right.clickable:hover { background: var(--surface-hover); }
 .scheda-hp-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+/* HP Calculator */
+.hp-calc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
+.hp-calc-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; width: 280px; text-align: center; box-shadow: var(--shadow-lg); }
+.hp-calc-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+.hp-calc-current { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+.hp-calc-input { width: 100%; padding: 10px; text-align: center; font-size: 1.2rem; font-weight: 700; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; }
+.hp-calc-input:focus { outline: none; border-color: var(--accent); }
+.hp-calc-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.hp-calc-btn { padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+.hp-calc-btn.heal { background: #22c55e; color: white; }
+.hp-calc-btn.damage { background: #ef4444; color: white; }
+.hp-calc-btn:hover { opacity: 0.85; }
+.hp-calc-actions { margin-top: 4px; }
 
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
-.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; }
+.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
+.scheda-skill-dot:focus { outline: none; color: var(--text-muted); }
+.scheda-skill-dot.active:focus { color: var(--accent); }
 @media (hover: hover) { .scheda-skill-dot:hover { color: var(--accent); } }
 .scheda-skill-dot.active { color: var(--accent); }
 .scheda-skill-dot.expert { font-size: 1.05rem; }
@@ -937,16 +956,29 @@ body.user-logged-in .header-username {
 .scheda-perc-val { font-size: 1rem; font-weight: 800; color: var(--accent); min-width: 28px; }
 .scheda-perc-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 
+/* Hit Dice Table */
+.scheda-hd-table { display: flex; flex-direction: column; gap: 0; }
+.scheda-hd-header { display: grid; grid-template-columns: 1fr 1fr; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.scheda-hd-header span:last-child { text-align: center; }
+.scheda-hd-row { display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(var(--border-rgb, 0,0,0), 0.05); }
+.scheda-hd-total { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.scheda-hd-total small { color: var(--text-muted); font-weight: 400; }
+.scheda-hd-avail { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.scheda-hd-val { font-size: 1rem; font-weight: 800; color: var(--accent); min-width: 24px; text-align: center; }
+.scheda-hd-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; padding: 0; line-height: 1; }
+.scheda-hd-btn:hover { border-color: var(--accent); background: var(--surface-hover); }
+
 /* Tags & Conditions */
 .scheda-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .scheda-tag { display: inline-block; padding: 3px 10px; border-radius: 14px; font-size: 0.75rem; font-weight: 600; background: rgba(var(--accent-rgb, 139,92,246), 0.12); color: var(--accent); }
 .scheda-empty { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
 .scheda-condition-extra { margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary); }
 
-/* Spell FAB */
-.scheda-spell-fab { position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(var(--accent-rgb,139,92,246),0.4); transition: transform var(--transition-fast); z-index: 50; }
-.scheda-spell-fab:hover { transform: scale(1.1); }
-.scheda-spell-fab.left { right: auto; left: 20px; }
+/* Scheda Tab Bar */
+.scheda-tab-bar { position: fixed; bottom: 68px; left: 50%; transform: translateX(-50%); display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); overflow: hidden; z-index: 50; box-shadow: var(--shadow-md); }
+.scheda-tab { padding: 10px 28px; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+.scheda-tab.active { background: var(--accent); color: white; }
+.scheda-tab:not(.active):hover { background: var(--surface-hover); }
 
 /* Spell Page */
 .scheda-spell-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -3847,7 +3879,7 @@ body.user-logged-in .header-username {
     .toolbar-btn svg { width: 20px; height: 20px; }
     .toolbar-btn span { font-size: 0.6rem; }
 
-    .back-button-floating { width: 36px; height: 36px; top: 10px; left: 10px; }
+    .back-button-floating { width: 36px; height: 36px; top: 68px; left: 10px; }
     .back-button-floating svg { width: 18px; height: 18px; }
 
     .in-app-notifications { max-width: calc(100vw - 2rem); right: var(--spacing-sm); top: 60px; }

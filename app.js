@@ -3706,8 +3706,8 @@ async function renderSchedaPersonaggio(personaggioId) {
             const totalStr = total >= 0 ? `+${total}` : `${total}`;
             return `
             <div class="scheda-skill">
-                <span class="scheda-skill-dot ${isProf ? 'active' : ''}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}')" title="Competenza">●</span>
-                <span class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}')" title="Maestria">★</span>
+                <span class="scheda-skill-dot ${isProf ? 'active' : ''}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}',event)" title="Competenza">●</span>
+                <span class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}',event)" title="Maestria">★</span>
                 <span class="scheda-skill-mod" id="sSkill_${sk.key}">${totalStr}</span>
                 <span class="scheda-skill-name">${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></span>
             </div>`;
@@ -3715,8 +3715,27 @@ async function renderSchedaPersonaggio(personaggioId) {
 
         // Hit dice
         const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
-        const hitDiceHtml = (pg.classi && pg.classi.length > 0) ?
-            pg.classi.map(c => `<span class="scheda-tag">${c.livello}d${CLASS_HD[c.nome] || 8} (${c.nome})</span>`).join('') : '';
+        const dadiDisp = pg.dadi_vita_disponibili || {};
+        let hitDiceHtml = '';
+        if (pg.classi && pg.classi.length > 0) {
+            hitDiceHtml = `<div class="scheda-hd-table">
+                <div class="scheda-hd-header"><span>DADI VITA</span><span>DISPONIBILI</span></div>
+                ${pg.classi.map(c => {
+                    const die = CLASS_HD[c.nome] || 8;
+                    const total = c.livello;
+                    const key = c.nome;
+                    const available = dadiDisp[key] != null ? dadiDisp[key] : total;
+                    return `<div class="scheda-hd-row">
+                        <span class="scheda-hd-total">${total}d${die} <small>(${c.nome})</small></span>
+                        <div class="scheda-hd-avail">
+                            <button class="scheda-hd-btn" onclick="schedaHdChange('${pg.id}','${key}',${available},-1)">−</button>
+                            <span class="scheda-hd-val" id="sHd_${key}">${available}</span>
+                            <button class="scheda-hd-btn" onclick="schedaHdChange('${pg.id}','${key}',${available},1,${total})">+</button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }
 
         // Resistenze
         const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
@@ -3769,14 +3788,14 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <input type="number" class="scheda-hp-input" value="${pg.punti_vita_max || 10}" data-field="punti_vita_max" data-pgid="${pg.id}">
                         <div class="scheda-hp-label">PV Massimi</div>
                     </div>
-                    <div class="scheda-hp-cell">
-                        <input type="number" class="scheda-hp-input pv-current" value="${pvAttuali}" data-field="pv_attuali" data-pgid="${pg.id}" max="${pg.punti_vita_max || 10}">
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max || 10})">
+                        <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
                         <div class="scheda-hp-label">PV Attuali</div>
                     </div>
                 </div>
             </div>
-            <div class="scheda-hp-right">
-                <input type="number" class="scheda-hp-input" value="${pg.pv_temporanei || 0}" min="0" data-field="pv_temporanei" data-pgid="${pg.id}">
+            <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pg.pv_temporanei || 0},-1)">
+                <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
                 <div class="scheda-hp-label">PV Temporanei</div>
             </div>
         </div>
@@ -3792,7 +3811,7 @@ async function renderSchedaPersonaggio(personaggioId) {
 
         <div class="scheda-section">
             <div class="scheda-section-title">Dadi Vita</div>
-            <div class="scheda-tags">${hitDiceHtml || '<span class="scheda-empty">-</span>'}</div>
+            ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
         </div>
 
         <div class="scheda-section">
@@ -3809,10 +3828,6 @@ async function renderSchedaPersonaggio(personaggioId) {
             <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
         </div>
 
-        ${hasSpellSlots ? `
-        <div class="scheda-spell-fab" onclick="schedaOpenSpellPage('${pg.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>` : ''}
         `;
 
         // Wire up editable inputs
@@ -3835,6 +3850,9 @@ async function renderSchedaPersonaggio(personaggioId) {
 
         const backBtn = document.getElementById('schedaBackBtn');
         if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+
+        schedaSetActiveTab('scheda');
+        schedaWireTabBar(pg.id);
 
     } catch (e) {
         console.error('Errore caricamento scheda:', e);
@@ -3903,7 +3921,8 @@ window.schedaToggleSave = async function(pgId, abilityKey) {
     schedaInstantSave(pgId, { tiri_salvezza: saves });
 }
 
-window.schedaToggleSkillProf = async function(pgId, skillKey) {
+window.schedaToggleSkillProf = async function(pgId, skillKey, evt) {
+    if (evt && evt.target) evt.target.blur();
     const pg = _schedaPgCache;
     if (!pg) return;
     const skills = [...(pg.competenze_abilita || [])];
@@ -3915,7 +3934,8 @@ window.schedaToggleSkillProf = async function(pgId, skillKey) {
     schedaInstantSave(pgId, { competenze_abilita: skills });
 }
 
-window.schedaToggleSkillExpert = async function(pgId, skillKey) {
+window.schedaToggleSkillExpert = async function(pgId, skillKey, evt) {
+    if (evt && evt.target) evt.target.blur();
     const pg = _schedaPgCache;
     if (!pg) return;
     const experts = [...(pg.maestrie_abilita || [])];
@@ -4029,9 +4049,6 @@ window.schedaOpenSpellPage = async function(pgId) {
         <div class="scheda-section-title">Slot Incantesimo</div>
         <div class="scheda-slots-table">${slotsHtml}</div>
     </div>
-    <div class="scheda-spell-fab left" onclick="renderSchedaPersonaggio('${pgId}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    </div>
     `;
 
     content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
@@ -4044,6 +4061,23 @@ window.schedaOpenSpellPage = async function(pgId) {
 
     const backBtn = document.getElementById('schedaBackBtn');
     if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+
+    schedaSetActiveTab('incantesimi');
+    schedaWireTabBar(pgId);
+}
+
+function schedaSetActiveTab(tab) {
+    const mainTab = document.getElementById('schedaTabMain');
+    const spellTab = document.getElementById('schedaTabSpell');
+    if (mainTab) mainTab.classList.toggle('active', tab === 'scheda');
+    if (spellTab) spellTab.classList.toggle('active', tab === 'incantesimi');
+}
+
+function schedaWireTabBar(pgId) {
+    const mainTab = document.getElementById('schedaTabMain');
+    const spellTab = document.getElementById('schedaTabSpell');
+    if (mainTab) mainTab.onclick = () => renderSchedaPersonaggio(pgId);
+    if (spellTab) spellTab.onclick = () => schedaOpenSpellPage(pgId);
 }
 
 function schedaSlotToggleInline(pgId, level, index) {
@@ -4071,6 +4105,93 @@ function schedaSlotToggleInline(pgId, level, index) {
     }
 
     schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
+}
+
+// HP Calculator
+let _hpCalcState = null;
+
+window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
+    _hpCalcState = { pgId, field, currentVal, maxVal };
+    const label = field === 'pv_attuali' ? 'Punti Vita Attuali' : 'Punti Vita Temporanei';
+
+    const existing = document.getElementById('hpCalcOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'hpCalcOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal">
+            <div class="hp-calc-title">${label}</div>
+            <div class="hp-calc-current" id="hpCalcCurrent">${currentVal}</div>
+            <input type="number" class="hp-calc-input" id="hpCalcAmount" value="0" min="0">
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
+                <button class="hp-calc-btn heal" onclick="schedaHpApply(1)">+ Cura</button>
+            </div>
+            <div class="hp-calc-actions">
+                <button class="btn-secondary btn-small" onclick="schedaCloseHpCalc()">Chiudi</button>
+            </div>
+        </div>
+    `;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) schedaCloseHpCalc(); });
+    document.body.appendChild(overlay);
+    document.getElementById('hpCalcAmount').focus();
+}
+
+window.schedaHpApply = function(direction) {
+    if (!_hpCalcState) return;
+    const amountInput = document.getElementById('hpCalcAmount');
+    const amount = parseInt(amountInput.value) || 0;
+    if (amount === 0) return;
+
+    let newVal = _hpCalcState.currentVal + (amount * direction);
+    if (newVal < 0) newVal = 0;
+    if (_hpCalcState.maxVal > 0 && newVal > _hpCalcState.maxVal) newVal = _hpCalcState.maxVal;
+    _hpCalcState.currentVal = newVal;
+
+    const display = document.getElementById('hpCalcCurrent');
+    if (display) display.textContent = newVal;
+    amountInput.value = '0';
+
+    const pgDisplay = _hpCalcState.field === 'pv_attuali' ? document.getElementById('schedaPvAttuali') : document.getElementById('schedaPvTemp');
+    if (pgDisplay) pgDisplay.textContent = newVal;
+    if (_schedaPgCache) _schedaPgCache[_hpCalcState.field] = newVal;
+
+    schedaInstantSave(_hpCalcState.pgId, { [_hpCalcState.field]: newVal });
+}
+
+window.schedaCloseHpCalc = function() {
+    const overlay = document.getElementById('hpCalcOverlay');
+    if (overlay) overlay.remove();
+    _hpCalcState = null;
+}
+
+window.schedaHdChange = function(pgId, className, current, delta, max) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let newVal = current + delta;
+    if (newVal < 0) newVal = 0;
+    if (max != null && newVal > max) newVal = max;
+
+    const dadi = { ...(pg.dadi_vita_disponibili || {}) };
+    dadi[className] = newVal;
+    pg.dadi_vita_disponibili = dadi;
+
+    const el = document.getElementById(`sHd_${className}`);
+    if (el) el.textContent = newVal;
+
+    const row = el?.closest('.scheda-hd-row');
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},-1)`);
+        if (btns[1]) {
+            const maxAttr = max != null ? max : 99;
+            btns[1].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},1,${maxAttr})`);
+        }
+    }
+
+    schedaInstantSave(pgId, { dadi_vita_disponibili: dadi });
 }
 
 window.openPersonaggioModal = function(personaggioId) {

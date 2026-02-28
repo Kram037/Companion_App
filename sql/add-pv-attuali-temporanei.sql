@@ -1,7 +1,8 @@
--- Add current HP and temp HP columns
+-- Add current HP, temp HP, expertise, hit dice columns
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS pv_attuali INTEGER;
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS pv_temporanei INTEGER DEFAULT 0;
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS maestrie_abilita JSONB DEFAULT '[]';
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS dadi_vita_disponibili JSONB DEFAULT '{}';
 
 -- Update RPCs
 DROP FUNCTION IF EXISTS get_personaggi_utente();
