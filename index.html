@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1766952900">
+    <link rel="stylesheet" href="styles.css?v=1766953000">
 </head>
 <body>
     <!-- Header -->
@@ -484,9 +484,10 @@
                 <div class="wizard-step active" data-step="0"></div>
                 <div class="wizard-step" data-step="1"></div>
                 <div class="wizard-step" data-step="2"></div>
+                <div class="wizard-step" data-step="3"></div>
             </div>
             <form id="personaggioForm">
-                <!-- Step 1: Identità -->
+                <!-- Step 0: Identità -->
                 <div class="wizard-page active" id="pgStep0">
                     <div class="form-group">
                         <label for="pgNome">Nome</label>
@@ -497,19 +498,46 @@
                         <input type="text" id="pgRazza" placeholder="Es. Elfo, Nano, Umano...">
                     </div>
                     <div class="form-group">
-                        <label for="pgClasse">Classe</label>
-                        <input type="text" id="pgClasse" placeholder="Es. Guerriero, Mago...">
+                        <label>Classe</label>
+                        <div class="pg-class-selector">
+                            <div class="pg-class-add-row">
+                                <select id="pgClasseSelect">
+                                    <option value="">Seleziona classe...</option>
+                                    <option value="Artefice">Artefice</option>
+                                    <option value="Barbaro">Barbaro</option>
+                                    <option value="Bardo">Bardo</option>
+                                    <option value="Chierico">Chierico</option>
+                                    <option value="Druido">Druido</option>
+                                    <option value="Guerriero">Guerriero</option>
+                                    <option value="Ladro">Ladro</option>
+                                    <option value="Mago">Mago</option>
+                                    <option value="Monaco">Monaco</option>
+                                    <option value="Paladino">Paladino</option>
+                                    <option value="Ranger">Ranger</option>
+                                    <option value="Stregone">Stregone</option>
+                                    <option value="Warlock">Warlock</option>
+                                </select>
+                                <button type="button" class="btn-icon-sm" id="pgAddClasseBtn">+</button>
+                            </div>
+                            <div id="pgClassiList" class="pg-classi-list"></div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="pgLivello">Livello</label>
-                        <input type="number" id="pgLivello" min="1" max="20" value="1">
+                    <div class="form-row form-row-2">
+                        <div class="form-group">
+                            <label>Livello Totale</label>
+                            <input type="number" id="pgLivello" readonly class="pg-readonly-input" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus Competenza</label>
+                            <input type="text" id="pgBonusCompetenza" value="+2" readonly class="pg-readonly-input">
+                        </div>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" id="cancelPersonaggioBtn">Annulla</button>
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 2: Caratteristiche -->
+                <!-- Step 1: Caratteristiche -->
                 <div class="wizard-page" id="pgStep1">
                     <div class="form-section-label">Caratteristiche</div>
                     <div class="pg-abilities-grid">
@@ -544,13 +572,31 @@
                             <span class="pg-ability-mod" id="modCarisma">(+0)</span>
                         </div>
                     </div>
+                    <div class="form-section-label" style="margin-top: var(--spacing-md);">Tiri Salvezza</div>
+                    <div class="pg-saves-grid">
+                        <label class="pg-save-item"><input type="checkbox" id="saveForza"> Forza</label>
+                        <label class="pg-save-item"><input type="checkbox" id="saveDestrezza"> Destrezza</label>
+                        <label class="pg-save-item"><input type="checkbox" id="saveCostituzione"> Costituzione</label>
+                        <label class="pg-save-item"><input type="checkbox" id="saveIntelligenza"> Intelligenza</label>
+                        <label class="pg-save-item"><input type="checkbox" id="saveSaggezza"> Saggezza</label>
+                        <label class="pg-save-item"><input type="checkbox" id="saveCarisma"> Carisma</label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
+                        <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
+                    </div>
+                </div>
+                <!-- Step 2: Abilità -->
+                <div class="wizard-page" id="pgStep2">
+                    <div class="form-section-label">Abilità</div>
+                    <div class="pg-skills-list" id="pgSkillsList"></div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
                 <!-- Step 3: Statistiche -->
-                <div class="wizard-page" id="pgStep2">
+                <div class="wizard-page" id="pgStep3">
                     <div class="form-section-label">Statistiche</div>
                     <div class="form-row form-row-3">
                         <div class="form-group pg-stat-with-hint">
@@ -568,18 +614,15 @@
                             <input type="number" id="pgVelocita" min="0" step="1.5" value="9">
                         </div>
                     </div>
-                    <div class="form-row form-row-3">
+                    <div class="form-row form-row-2">
                         <div class="form-group">
                             <label for="pgPV">PF Massimi</label>
                             <input type="number" id="pgPV" min="1" value="10">
                         </div>
-                        <div class="form-group">
-                            <label>Bonus Competenza</label>
-                            <input type="text" id="pgBonusCompetenza" value="+2" readonly class="pg-readonly-input">
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group pg-stat-with-hint">
                             <label for="pgPercezione">Percezione Passiva</label>
                             <input type="number" id="pgPercezione" min="1" value="10">
+                            <span class="pg-stat-hint" id="hintPercezione">(10 + percezione)</span>
                         </div>
                     </div>
                     <div class="form-actions">
@@ -655,7 +698,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766952900"></script>
+    <script src="app.js?v=1766953000"></script>
     
     <!-- Cache busting script for development -->
     <script>

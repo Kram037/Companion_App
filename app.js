@@ -757,9 +757,9 @@ function setupEventListeners() {
             input.addEventListener('input', () => updateAbilityMod(input, modEl));
         }
     });
-    const pgLivelloInput = document.getElementById('pgLivello');
-    if (pgLivelloInput) {
-        pgLivelloInput.addEventListener('input', () => updateBonusCompetenza());
+    const pgAddClasseBtn = document.getElementById('pgAddClasseBtn');
+    if (pgAddClasseBtn) {
+        pgAddClasseBtn.onclick = () => pgAddClasse();
     }
     if (elements.closeScegliPersonaggioModal) {
         elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
@@ -2838,6 +2838,46 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
 
 let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
+let pgSelectedClasses = [];
+
+const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero','Ladro','Mago','Monaco','Paladino','Ranger','Stregone','Warlock'];
+
+const CLASS_SAVES = {
+    'Artefice': ['costituzione','intelligenza'],
+    'Barbaro': ['forza','costituzione'],
+    'Bardo': ['destrezza','carisma'],
+    'Chierico': ['saggezza','carisma'],
+    'Druido': ['intelligenza','saggezza'],
+    'Guerriero': ['forza','costituzione'],
+    'Ladro': ['destrezza','intelligenza'],
+    'Mago': ['intelligenza','saggezza'],
+    'Monaco': ['forza','destrezza'],
+    'Paladino': ['saggezza','carisma'],
+    'Ranger': ['forza','destrezza'],
+    'Stregone': ['costituzione','carisma'],
+    'Warlock': ['saggezza','carisma']
+};
+
+const DND_SKILLS = [
+    { key: 'acrobazia', nome: 'Acrobazia', ability: 'destrezza', abbr: 'Des' },
+    { key: 'addestrare_animali', nome: 'Addestrare Animali', ability: 'saggezza', abbr: 'Sag' },
+    { key: 'arcano', nome: 'Arcano', ability: 'intelligenza', abbr: 'Int' },
+    { key: 'atletica', nome: 'Atletica', ability: 'forza', abbr: 'For' },
+    { key: 'furtivita', nome: 'Furtività', ability: 'destrezza', abbr: 'Des' },
+    { key: 'indagare', nome: 'Indagare', ability: 'intelligenza', abbr: 'Int' },
+    { key: 'inganno', nome: 'Inganno', ability: 'carisma', abbr: 'Car' },
+    { key: 'intimidire', nome: 'Intimidire', ability: 'carisma', abbr: 'Car' },
+    { key: 'intrattenere', nome: 'Intrattenere', ability: 'carisma', abbr: 'Car' },
+    { key: 'intuizione', nome: 'Intuizione', ability: 'saggezza', abbr: 'Sag' },
+    { key: 'medicina', nome: 'Medicina', ability: 'saggezza', abbr: 'Sag' },
+    { key: 'natura', nome: 'Natura', ability: 'intelligenza', abbr: 'Int' },
+    { key: 'percezione', nome: 'Percezione', ability: 'saggezza', abbr: 'Sag' },
+    { key: 'persuasione', nome: 'Persuasione', ability: 'carisma', abbr: 'Car' },
+    { key: 'rapidita_di_mano', nome: 'Rapidità di Mano', ability: 'destrezza', abbr: 'Des' },
+    { key: 'religione', nome: 'Religione', ability: 'intelligenza', abbr: 'Int' },
+    { key: 'sopravvivenza', nome: 'Sopravvivenza', ability: 'saggezza', abbr: 'Sag' },
+    { key: 'storia', nome: 'Storia', ability: 'intelligenza', abbr: 'Int' }
+];
 
 function calcMod(score) {
     return Math.floor((score - 10) / 2);
@@ -2848,16 +2888,32 @@ function calcBonusCompetenza(livello) {
 }
 
 function updateBonusCompetenza() {
-    const livello = parseInt(document.getElementById('pgLivello')?.value) || 1;
+    const livello = pgGetTotalLevel();
     const bonus = calcBonusCompetenza(livello);
     const field = document.getElementById('pgBonusCompetenza');
     if (field) field.value = `+${bonus}`;
+}
+
+function pgGetTotalLevel() {
+    return pgSelectedClasses.reduce((sum, c) => sum + (c.livello || 1), 0) || 1;
+}
+
+function pgUpdateTotalLevel() {
+    const total = pgGetTotalLevel();
+    const lvField = document.getElementById('pgLivello');
+    if (lvField) lvField.value = total;
+    updateBonusCompetenza();
 }
 
 function formatMod(mod) {
     if (mod > 0) return `(+${mod})`;
     if (mod < 0) return `(${mod})`;
     return '(+0)';
+}
+
+function formatModPlain(mod) {
+    if (mod >= 0) return `+${mod}`;
+    return `${mod}`;
 }
 
 function updateAbilityMod(input, modEl) {
@@ -2875,13 +2931,117 @@ function updateAllAbilityMods() {
     });
 }
 
+// --- Class multi-select ---
+window.pgAddClasse = function() {
+    const sel = document.getElementById('pgClasseSelect');
+    if (!sel || !sel.value) return;
+    const className = sel.value;
+    if (pgSelectedClasses.find(c => c.nome === className)) {
+        showNotification('Classe già selezionata');
+        return;
+    }
+    pgSelectedClasses.push({ nome: className, livello: 1 });
+    sel.value = '';
+    pgRenderClassi();
+    pgUpdateTotalLevel();
+    pgUpdateSavingThrows();
+}
+
+window.pgRemoveClasse = function(index) {
+    pgSelectedClasses.splice(index, 1);
+    pgRenderClassi();
+    pgUpdateTotalLevel();
+    pgUpdateSavingThrows();
+}
+
+window.pgUpdateClassLevel = function(index, value) {
+    const lv = Math.max(1, Math.min(20, parseInt(value) || 1));
+    pgSelectedClasses[index].livello = lv;
+    pgUpdateTotalLevel();
+}
+
+function pgRenderClassi() {
+    const container = document.getElementById('pgClassiList');
+    if (!container) return;
+    container.innerHTML = pgSelectedClasses.map((c, i) => `
+        <div class="pg-classe-chip">
+            <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
+            <span class="pg-classe-lv-label">Lv.</span>
+            <input type="number" class="pg-classe-livello" min="1" max="20" value="${c.livello}" onchange="pgUpdateClassLevel(${i}, this.value)" oninput="pgUpdateClassLevel(${i}, this.value)">
+            <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
+        </div>
+    `).join('');
+}
+
+// --- Saving Throws ---
+function pgUpdateSavingThrows() {
+    if (pgSelectedClasses.length === 0) return;
+    const primaryClass = pgSelectedClasses[0].nome;
+    const saves = CLASS_SAVES[primaryClass] || [];
+    const allSaves = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
+    allSaves.forEach(s => {
+        const cb = document.getElementById(`save${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        if (cb) cb.checked = saves.includes(s);
+    });
+}
+
+function pgGetSelectedSaves() {
+    const allSaves = ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'];
+    return allSaves.filter(s => {
+        const cb = document.getElementById(`save${s}`);
+        return cb && cb.checked;
+    }).map(s => s.toLowerCase());
+}
+
+// --- Skills ---
+function pgRenderSkills() {
+    const container = document.getElementById('pgSkillsList');
+    if (!container) return;
+    const bonus = calcBonusCompetenza(pgGetTotalLevel());
+    container.innerHTML = DND_SKILLS.map(skill => {
+        const abilityInput = document.getElementById(`pg${skill.ability.charAt(0).toUpperCase() + skill.ability.slice(1)}`);
+        const abilityScore = parseInt(abilityInput?.value) || 10;
+        const abilityMod = calcMod(abilityScore);
+        const isProf = pgCurrentSkillProficiencies.has(skill.key);
+        const totalVal = abilityMod + (isProf ? bonus : 0);
+        return `
+        <div class="pg-skill-item ${isProf ? 'proficient' : ''}">
+            <input type="checkbox" data-skill="${skill.key}" ${isProf ? 'checked' : ''} onchange="pgToggleSkill('${skill.key}', this.checked)">
+            <span class="pg-skill-value">${formatModPlain(totalVal)}</span>
+            <span class="pg-skill-name">${skill.nome}</span>
+            <span class="pg-skill-ability">(${skill.abbr})</span>
+        </div>`;
+    }).join('');
+}
+
+let pgCurrentSkillProficiencies = new Set();
+
+window.pgToggleSkill = function(skillKey, checked) {
+    if (checked) pgCurrentSkillProficiencies.add(skillKey);
+    else pgCurrentSkillProficiencies.delete(skillKey);
+    pgRenderSkills();
+    pgUpdatePercezionPassiva();
+}
+
+function pgUpdatePercezionPassiva() {
+    const sagInput = document.getElementById('pgSaggezza');
+    const sagScore = parseInt(sagInput?.value) || 10;
+    const sagMod = calcMod(sagScore);
+    const bonus = calcBonusCompetenza(pgGetTotalLevel());
+    const isProf = pgCurrentSkillProficiencies.has('percezione');
+    const pp = 10 + sagMod + (isProf ? bonus : 0);
+    const ppField = document.getElementById('pgPercezione');
+    if (ppField) ppField.value = pp;
+    const hint = document.getElementById('hintPercezione');
+    if (hint) hint.textContent = `(10 + percezione = ${pp})`;
+}
+
+// --- Wizard Navigation ---
 window.pgWizardNext = function() {
     if (pgWizardCurrentStep === 0) {
         const nome = document.getElementById('pgNome').value.trim();
-        if (!nome) {
-            showNotification('Inserisci un nome per il personaggio');
-            return;
-        }
+        if (!nome) { showNotification('Inserisci un nome per il personaggio'); return; }
+        if (pgSelectedClasses.length === 0) { showNotification('Seleziona almeno una classe'); return; }
     }
     pgWizardGoTo(pgWizardCurrentStep + 1);
 }
@@ -2891,35 +3051,43 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 2) return;
+    if (step < 0 || step > 3) return;
     pgWizardCurrentStep = step;
 
-    document.querySelectorAll('.wizard-page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.wizard-step').forEach((s, i) => {
+    document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#personaggioModal .wizard-step').forEach((s, i) => {
         s.classList.toggle('active', i <= step);
     });
 
     const target = document.getElementById(`pgStep${step}`);
     if (target) target.classList.add('active');
 
-    if (step === 1) updateAllAbilityMods();
+    if (step === 1) {
+        updateAllAbilityMods();
+        if (!editingPersonaggioId && pgSelectedClasses.length > 0) {
+            pgUpdateSavingThrows();
+        }
+    }
     if (step === 2) {
+        pgRenderSkills();
+    }
+    if (step === 3) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
-        if (initField && !initField.value && !editingPersonaggioId) {
+        if (initField && !initField.value) {
             initField.value = desMod;
         }
         const caField = document.getElementById('pgCA');
-        if (caField && !caField.value && !editingPersonaggioId) {
+        if (caField && !caField.value) {
             caField.value = 10 + desMod;
         }
         const hintCA = document.getElementById('hintCA');
         if (hintCA) hintCA.textContent = `(10+des = ${10 + desMod})`;
         const hintInit = document.getElementById('hintIniziativa');
-        if (hintInit) hintInit.textContent = `(des = ${formatMod(desMod)})`;
+        if (hintInit) hintInit.textContent = `(des = ${formatModPlain(desMod)})`;
 
-        updateBonusCompetenza();
+        pgUpdatePercezionPassiva();
     }
 }
 
@@ -2960,13 +3128,17 @@ function renderPersonaggi(personaggi) {
             const m = Math.floor((val - 10) / 2);
             return m >= 0 ? `+${m}` : `${m}`;
         };
+        let classeDisplay = pg.classe || '';
+        if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
+            classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
+        }
         return `
         <div class="pg-card" data-pg-id="${pg.id}">
             <div class="pg-card-header">
                 <div class="pg-card-avatar">${escapeHtml(initials)}</div>
                 <div class="pg-card-identity">
                     <p class="pg-card-name">${escapeHtml(pg.nome)}</p>
-                    <p class="pg-card-subtitle">${escapeHtml(pg.razza || '')} ${escapeHtml(pg.classe || '')}</p>
+                    <p class="pg-card-subtitle">${escapeHtml(pg.razza || '')} ${escapeHtml(classeDisplay)}</p>
                 </div>
                 <div class="pg-card-level">Lv ${pg.livello || 1}</div>
             </div>
@@ -2998,7 +3170,16 @@ window.openPersonaggioModal = function(personaggioId) {
     if (!form) return;
 
     form.reset();
+    pgSelectedClasses = [];
+    pgCurrentSkillProficiencies = new Set();
+    pgRenderClassi();
     pgWizardGoTo(0);
+
+    // Reset saving throws
+    ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(s => {
+        const cb = document.getElementById(`save${s}`);
+        if (cb) cb.checked = false;
+    });
 
     if (personaggioId) {
         elements.personaggioModalTitle.textContent = 'Modifica Personaggio';
@@ -3010,21 +3191,41 @@ window.openPersonaggioModal = function(personaggioId) {
                 if (data && !error) {
                     document.getElementById('pgNome').value = data.nome || '';
                     document.getElementById('pgRazza').value = data.razza || '';
-                    document.getElementById('pgClasse').value = data.classe || '';
-                    document.getElementById('pgLivello').value = data.livello || 1;
+
+                    if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
+                        pgSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1 }));
+                    } else if (data.classe) {
+                        pgSelectedClasses = [{ nome: data.classe, livello: data.livello || 1 }];
+                    }
+                    pgRenderClassi();
+                    pgUpdateTotalLevel();
+
                     document.getElementById('pgForza').value = data.forza || 10;
                     document.getElementById('pgDestrezza').value = data.destrezza || 10;
                     document.getElementById('pgCostituzione').value = data.costituzione || 10;
                     document.getElementById('pgIntelligenza').value = data.intelligenza || 10;
                     document.getElementById('pgSaggezza').value = data.saggezza || 10;
                     document.getElementById('pgCarisma').value = data.carisma || 10;
+
+                    if (data.tiri_salvezza && Array.isArray(data.tiri_salvezza)) {
+                        data.tiri_salvezza.forEach(s => {
+                            const cb = document.getElementById(`save${s.charAt(0).toUpperCase() + s.slice(1)}`);
+                            if (cb) cb.checked = true;
+                        });
+                    } else {
+                        pgUpdateSavingThrows();
+                    }
+
+                    if (data.competenze_abilita && Array.isArray(data.competenze_abilita)) {
+                        pgCurrentSkillProficiencies = new Set(data.competenze_abilita);
+                    }
+
                     document.getElementById('pgPV').value = data.punti_vita_max || 10;
                     document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : calcMod(data.destrezza || 10);
                     document.getElementById('pgCA').value = data.classe_armatura || 10;
                     document.getElementById('pgPercezione').value = data.percezione_passiva || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
                     updateAllAbilityMods();
-                    updateBonusCompetenza();
                 }
             });
         }
@@ -3069,17 +3270,23 @@ async function handleSavePersonaggio(e) {
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
+    const classeDisplay = pgSelectedClasses.map(c => `${c.nome} ${c.livello}`).join(' / ');
+    const totalLevel = pgGetTotalLevel();
+
     const pgData = {
         nome: document.getElementById('pgNome').value.trim(),
         razza: document.getElementById('pgRazza').value.trim() || null,
-        classe: document.getElementById('pgClasse').value.trim() || null,
-        livello: parseInt(document.getElementById('pgLivello').value) || 1,
+        classe: classeDisplay || null,
+        classi: pgSelectedClasses,
+        livello: totalLevel,
         forza: clamp(parseInt(document.getElementById('pgForza').value) || 10, 1, 30),
         destrezza: clamp(destrezza, 1, 30),
         costituzione: clamp(parseInt(document.getElementById('pgCostituzione').value) || 10, 1, 30),
         intelligenza: clamp(parseInt(document.getElementById('pgIntelligenza').value) || 10, 1, 30),
         saggezza: clamp(parseInt(document.getElementById('pgSaggezza').value) || 10, 1, 30),
         carisma: clamp(parseInt(document.getElementById('pgCarisma').value) || 10, 1, 30),
+        tiri_salvezza: pgGetSelectedSaves(),
+        competenze_abilita: Array.from(pgCurrentSkillProficiencies),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
         classe_armatura: classeArmatura,
