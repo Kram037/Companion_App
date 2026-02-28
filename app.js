@@ -234,6 +234,11 @@ async function init() {
         AppState.currentPage = savedPage;
         console.log('📌 Pagina salvata ripristinata dalla sessione:', savedPage);
     }
+
+    const savedActiveSession = sessionStorage.getItem('activeSessionCampagnaId');
+    if (savedActiveSession) {
+        AppState.activeSessionCampagnaId = savedActiveSession;
+    }
     
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
     if (elements.addCampagnaBtn) {
@@ -348,12 +353,13 @@ function setupSupabaseAuth() {
                     }
                     if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                         navigateToPage('combattimento');
-                    } else if (AppState.currentCampagnaId) {
+                    } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
+                        navigateToPage('sessione');
+                        renderSessioneContent(AppState.currentCampagnaId);
+                    } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
-                    } else if (AppState.currentPage === 'campagne') {
-                        loadCampagne(session.user.id);
-                    } else if (AppState.currentPage === 'amici') {
-                        loadAmici();
+                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici'].includes(AppState.currentPage)) {
+                        navigateToPage('dettagli');
                     } else {
                         navigateToPage(AppState.currentPage || 'campagne');
                     }
@@ -410,12 +416,13 @@ async function checkAuthState() {
             
             if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                 navigateToPage('combattimento');
-            } else if (AppState.currentCampagnaId) {
+            } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
+                navigateToPage('sessione');
+                renderSessioneContent(AppState.currentCampagnaId);
+            } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 navigateToPage('dettagli');
-            } else if (AppState.currentPage === 'campagne') {
-                loadCampagne(session.user.id);
-            } else if (AppState.currentPage === 'amici') {
-                loadAmici();
+            } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici'].includes(AppState.currentPage)) {
+                navigateToPage('dettagli');
             } else {
                 navigateToPage(AppState.currentPage || 'campagne');
             }
@@ -800,6 +807,21 @@ function setupEventListeners() {
         });
     }
 
+    const btnReturnSession = document.getElementById('btnReturnSession');
+    if (btnReturnSession) {
+        btnReturnSession.addEventListener('click', async () => {
+            const campagnaId = AppState.activeSessionCampagnaId;
+            if (!campagnaId) return;
+            const isActive = await checkSessioneAttiva(campagnaId);
+            if (isActive) {
+                openSessionePage(campagnaId);
+            } else {
+                clearActiveSession();
+                showNotification('La sessione è terminata');
+            }
+        });
+    }
+
     const richiediTiroModal = document.getElementById('richiediTiroModal');
     const closeRichiediTiroBtn = document.getElementById('closeRichiediTiroModal');
     const cancelRichiediTiroBtn = document.getElementById('cancelRichiediTiro');
@@ -1059,9 +1081,14 @@ function setupEventListeners() {
             if (elements.rollRequestInput) {
                 elements.rollRequestInput.value = total;
             }
-            autoRollBtn.classList.remove('rolling');
-            void autoRollBtn.offsetWidth;
-            autoRollBtn.classList.add('rolling');
+            const d20Text = document.getElementById('d20RollText');
+            if (d20Text) d20Text.textContent = d20;
+            const d20Icon = autoRollBtn.querySelector('.d20-icon');
+            if (d20Icon) {
+                d20Icon.classList.remove('rolling');
+                void d20Icon.offsetWidth;
+                d20Icon.classList.add('rolling');
+            }
         });
     }
 
@@ -1130,6 +1157,21 @@ function setupEventListeners() {
         });
     }
     
+}
+
+function clearActiveSession() {
+    AppState.activeSessionCampagnaId = null;
+    sessionStorage.removeItem('activeSessionCampagnaId');
+    updateReturnToSessionBtn();
+}
+
+function updateReturnToSessionBtn() {
+    const btn = document.getElementById('btnReturnSession');
+    if (!btn) return;
+    const show = AppState.activeSessionCampagnaId
+        && AppState.currentPage !== 'sessione'
+        && AppState.currentPage !== 'combattimento';
+    btn.style.display = show ? 'flex' : 'none';
 }
 
 // Navigation
@@ -1216,6 +1258,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             }
         });
     }
+
+    updateReturnToSessionBtn();
 }
 
 // Modal Functions
@@ -5624,6 +5668,8 @@ window.playerJoinSession = async function(campagnaId) {
 window.openSessionePage = async function(campagnaId) {
     AppState.currentCampagnaId = campagnaId;
     sessionStorage.setItem('currentCampagnaId', campagnaId);
+    AppState.activeSessionCampagnaId = campagnaId;
+    sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
     navigateToPage('sessione');
     await renderSessioneContent(campagnaId);
 };
@@ -5842,6 +5888,7 @@ window.finisciSessione = async function(sessioneId, campagnaId) {
         await sendAppEventBroadcast({ table: 'sessioni', action: 'update', campagnaId, sessioneId });
 
         stopSessioneTimer();
+        clearActiveSession();
         showNotification('Sessione terminata!');
         
         // Torna ai dettagli campagna
@@ -6735,6 +6782,18 @@ function startAppEventsRealtime() {
                     }
                 }
 
+                if (data.table === 'sessioni' && data.action === 'update' && data.campagnaId) {
+                    if (AppState.activeSessionCampagnaId === data.campagnaId) {
+                        clearActiveSession();
+                        if (AppState.currentPage === 'sessione') {
+                            stopSessioneTimer();
+                            showNotification('La sessione è terminata');
+                            navigateToPage('dettagli');
+                            loadCampagnaDetails(data.campagnaId);
+                        }
+                    }
+                }
+
                 const skipRefreshTables = [
                     'richieste_tiro_iniziativa',
                     'richieste_tiro_generico'
@@ -7172,12 +7231,8 @@ async function showRollRequestModal(request) {
             : (tiroLabel || 'Tiro Richiesto');
     }
     if (elements.rollRequestMessage) {
-        if (isIniziativa) {
-            elements.rollRequestMessage.textContent = `d20 + modificatore iniziativa${modText}`;
-        } else {
-            const hintLabel = tiroLabel || 'un tiro';
-            elements.rollRequestMessage.textContent = `d20 + ${hintLabel}${modText}`;
-        }
+        const modStr = modValue != null ? formatMod(modValue) : '?';
+        elements.rollRequestMessage.textContent = `d20 ${modStr}`;
     }
     if (elements.rollRequestLabel) {
         elements.rollRequestLabel.textContent = 'Risultato del tiro:';
@@ -7187,6 +7242,8 @@ async function showRollRequestModal(request) {
         elements.rollRequestInput.min = '1';
         elements.rollRequestInput.max = '999';
     }
+    const d20Text = document.getElementById('d20RollText');
+    if (d20Text) d20Text.textContent = '20';
 
     elements.rollRequestModal.classList.add('active');
     document.body.style.overflow = 'hidden';

@@ -1075,22 +1075,26 @@ body.user-logged-in .header-username {
     background: transparent;
     color: var(--primary);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
     flex-shrink: 0;
+    padding: 6px;
 }
 .btn-roll-d20:hover {
     background: var(--primary);
     color: #fff;
 }
-.btn-roll-d20:active {
-    transform: scale(0.9);
+.btn-roll-d20:active .d20-icon {
+    transform: scale(0.85);
 }
-.btn-roll-d20.rolling {
-    animation: roll-spin 0.5s ease-out;
+.d20-icon {
+    display: block;
+    transition: transform 0.15s;
 }
-@keyframes roll-spin {
+.d20-icon.rolling {
+    animation: d20-spin 0.5s ease-out;
+}
+@keyframes d20-spin {
     0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.15); }
+    50% { transform: rotate(180deg) scale(1.2); }
     100% { transform: rotate(360deg) scale(1); }
 }
 
@@ -3066,6 +3070,41 @@ body.user-logged-in .header-username {
 .btn-icon-invita svg { width: 18px; height: 18px; }
 
 .btn-disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============================================
+   FLOATING RETURN TO SESSION BUTTON
+   ============================================ */
+.btn-return-session {
+    position: fixed;
+    bottom: 80px;
+    left: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full, 50px);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    z-index: 900;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: btn-return-slide-in 0.3s ease-out;
+}
+.btn-return-session:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.btn-return-session:active {
+    transform: scale(0.96);
+}
+@keyframes btn-return-slide-in {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
 
 /* ============================================
    IN-APP NOTIFICATIONS
