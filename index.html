@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1766953000">
+    <link rel="stylesheet" href="styles.css?v=1766953100">
 </head>
 <body>
     <!-- Header -->
@@ -537,49 +537,58 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 1: Caratteristiche -->
+                <!-- Step 1: Caratteristiche + Tiri Salvezza -->
                 <div class="wizard-page" id="pgStep1">
                     <div class="form-section-label">Caratteristiche</div>
                     <div class="pg-abilities-grid">
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgForza">Forza</label>
-                            <input type="number" id="pgForza" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modForza">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgForza" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modForza">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveForza"> <span class="pg-save-val" id="saveValForza">+0</span></label>
                         </div>
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgIntelligenza">Intelligenza</label>
-                            <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modIntelligenza">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modIntelligenza">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveIntelligenza"> <span class="pg-save-val" id="saveValIntelligenza">+0</span></label>
                         </div>
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgDestrezza">Destrezza</label>
-                            <input type="number" id="pgDestrezza" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modDestrezza">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgDestrezza" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modDestrezza">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveDestrezza"> <span class="pg-save-val" id="saveValDestrezza">+0</span></label>
                         </div>
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgSaggezza">Saggezza</label>
-                            <input type="number" id="pgSaggezza" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modSaggezza">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgSaggezza" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modSaggezza">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveSaggezza"> <span class="pg-save-val" id="saveValSaggezza">+0</span></label>
                         </div>
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgCostituzione">Costituzione</label>
-                            <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modCostituzione">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modCostituzione">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveCostituzione"> <span class="pg-save-val" id="saveValCostituzione">+0</span></label>
                         </div>
-                        <div class="form-group pg-ability">
+                        <div class="pg-ability-block">
                             <label for="pgCarisma">Carisma</label>
-                            <input type="number" id="pgCarisma" class="pg-ability-input" min="1" max="30" value="10">
-                            <span class="pg-ability-mod" id="modCarisma">(+0)</span>
+                            <div class="pg-ability-row">
+                                <input type="number" id="pgCarisma" class="pg-ability-input" min="1" max="30" value="10">
+                                <span class="pg-ability-mod" id="modCarisma">+0</span>
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="saveCarisma"> <span class="pg-save-val" id="saveValCarisma">+0</span></label>
                         </div>
-                    </div>
-                    <div class="form-section-label" style="margin-top: var(--spacing-md);">Tiri Salvezza</div>
-                    <div class="pg-saves-grid">
-                        <label class="pg-save-item"><input type="checkbox" id="saveForza"> Forza</label>
-                        <label class="pg-save-item"><input type="checkbox" id="saveDestrezza"> Destrezza</label>
-                        <label class="pg-save-item"><input type="checkbox" id="saveCostituzione"> Costituzione</label>
-                        <label class="pg-save-item"><input type="checkbox" id="saveIntelligenza"> Intelligenza</label>
-                        <label class="pg-save-item"><input type="checkbox" id="saveSaggezza"> Saggezza</label>
-                        <label class="pg-save-item"><input type="checkbox" id="saveCarisma"> Carisma</label>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
@@ -698,7 +707,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1766953000"></script>
+    <script src="app.js?v=1766953100"></script>
     
     <!-- Cache busting script for development -->
     <script>

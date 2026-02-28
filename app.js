@@ -761,6 +761,10 @@ function setupEventListeners() {
     if (pgAddClasseBtn) {
         pgAddClasseBtn.onclick = () => pgAddClasse();
     }
+    ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(name => {
+        const cb = document.getElementById(`save${name}`);
+        if (cb) cb.addEventListener('change', () => updateAllSaveValues());
+    });
     if (elements.closeScegliPersonaggioModal) {
         elements.closeScegliPersonaggioModal.onclick = () => closeScegliPersonaggioModal();
     }
@@ -2919,7 +2923,7 @@ function formatModPlain(mod) {
 function updateAbilityMod(input, modEl) {
     const val = parseInt(input.value) || 10;
     const mod = calcMod(val);
-    modEl.textContent = formatMod(mod);
+    modEl.textContent = formatModPlain(mod);
     modEl.className = 'pg-ability-mod ' + (mod > 0 ? 'positive' : mod < 0 ? 'negative' : 'zero');
 }
 
@@ -2928,6 +2932,21 @@ function updateAllAbilityMods() {
         const input = document.getElementById(`pg${name}`);
         const modEl = document.getElementById(`mod${name}`);
         if (input && modEl) updateAbilityMod(input, modEl);
+    });
+    updateAllSaveValues();
+}
+
+function updateAllSaveValues() {
+    const bonus = calcBonusCompetenza(pgGetTotalLevel());
+    ['Forza', 'Destrezza', 'Costituzione', 'Intelligenza', 'Saggezza', 'Carisma'].forEach(name => {
+        const input = document.getElementById(`pg${name}`);
+        const cb = document.getElementById(`save${name}`);
+        const valEl = document.getElementById(`saveVal${name}`);
+        if (!input || !valEl) return;
+        const mod = calcMod(parseInt(input.value) || 10);
+        const isProf = cb && cb.checked;
+        const total = mod + (isProf ? bonus : 0);
+        valEl.textContent = formatModPlain(total);
     });
 }
 
@@ -3067,6 +3086,7 @@ function pgWizardGoTo(step) {
         if (!editingPersonaggioId && pgSelectedClasses.length > 0) {
             pgUpdateSavingThrows();
         }
+        updateAllSaveValues();
     }
     if (step === 2) {
         pgRenderSkills();

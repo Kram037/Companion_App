@@ -14,11 +14,14 @@ SET classi = jsonb_build_array(jsonb_build_object('nome', classe, 'livello', liv
 WHERE classe IS NOT NULL AND classe != ''
   AND (classi IS NULL OR classi = '[]'::jsonb);
 
--- Update the RPC function to return the new columns
+-- Drop the old function first (return type changed)
+DROP FUNCTION IF EXISTS get_personaggi_utente();
+
+-- Recreate with correct types (VARCHAR(10) for id/user_id, matching personaggi table)
 CREATE OR REPLACE FUNCTION get_personaggi_utente()
 RETURNS TABLE (
-    id UUID,
-    user_id UUID,
+    id VARCHAR(10),
+    user_id VARCHAR(10),
     nome TEXT,
     razza TEXT,
     classe TEXT,
@@ -43,6 +46,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+#variable_conflict use_column
 BEGIN
     RETURN QUERY
     SELECT p.id, p.user_id, p.nome, p.razza, p.classe, p.classi, p.livello,
@@ -51,7 +55,7 @@ BEGIN
            p.tiri_salvezza, p.competenze_abilita,
            p.created_at, p.updated_at
     FROM personaggi p
-    WHERE p.user_id = auth.uid()
+    WHERE p.user_id = (SELECT u.id FROM utenti u WHERE u.uid = auth.uid()::text)
     ORDER BY p.updated_at DESC;
 END;
 $$;
