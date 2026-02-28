@@ -4090,7 +4090,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
                 ${sessioneAttiva ? `
                 <div class="dettagli-actions-start">
-                    <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                    <button class="btn-primary btn-small" onclick="playerJoinSession('${campagna.id}')" aria-label="Vai alla sessione">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
@@ -5563,6 +5563,31 @@ window.iniziaSessione = async function(campagnaId) {
 };
 
 /**
+ * Verifica che il giocatore abbia un personaggio selezionato prima di entrare in sessione
+ */
+window.playerJoinSession = async function(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) return;
+
+    try {
+        const { data: pg } = await supabase.rpc('get_personaggio_campagna', {
+            p_campagna_id: campagnaId,
+            p_user_id: userData.id
+        });
+        if (!pg || pg.length === 0) {
+            showNotification('Devi scegliere un personaggio prima di unirti alla sessione');
+            return;
+        }
+        openSessionePage(campagnaId);
+    } catch (e) {
+        console.error('Errore verifica personaggio:', e);
+        showNotification('Devi scegliere un personaggio prima di unirti alla sessione');
+    }
+}
+
+/**
  * Apre la pagina sessione
  */
 window.openSessionePage = async function(campagnaId) {
@@ -5874,6 +5899,22 @@ window.openCombattimentoPage = async function(campagnaId, sessioneId) {
 };
 
 /**
+ * Builds a map: user_id -> character name for a campaign
+ */
+async function getCharacterNamesMap(campagnaId) {
+    const map = {};
+    const supabase = getSupabaseClient();
+    if (!supabase || !campagnaId) return map;
+    try {
+        const { data } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+        if (data) {
+            data.forEach(pg => { map[pg.player_user_id] = pg.nome; });
+        }
+    } catch (e) { console.warn('Errore caricamento nomi personaggi:', e); }
+    return map;
+}
+
+/**
  * Renderizza il contenuto della pagina combattimento
  */
 async function renderCombattimentoContent(campagnaId, sessioneId) {
@@ -5928,7 +5969,8 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
         
-        // Verifica se l'utente è il DM (lo facciamo prima per mostrare il bottone sempre)
+        const pgNamesMap = await getCharacterNamesMap(campagnaId);
+
         const isDM = await isCurrentUserDM(campagnaId);
         const terminaCombattimentoHtml = isDM ? `
             <div style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
@@ -5952,16 +5994,15 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             `;
         } else {
             const cardsHTML = tiriCompleted.map((tiro, index) => {
-                const nomeUtente = tiro.giocatore_nome || tiro.utenti?.nome_utente || 'Sconosciuto';
-                const cid = tiro.giocatore_cid || tiro.utenti?.cid;
+                const pgName = pgNamesMap[tiro.giocatore_id];
+                const nomeDisplay = pgName || tiro.giocatore_nome || tiro.utenti?.nome_utente || 'Sconosciuto';
                 
                 return `
                 <div class="combattimento-card">
                     <div class="combattimento-card-content">
                         <span class="combattimento-card-position">#${index + 1}</span>
                         <span class="combattimento-card-name">
-                            ${escapeHtml(nomeUtente)}
-                            ${cid ? `<span class="combattimento-card-cid">(CID: ${escapeHtml(cid)})</span>` : ''}
+                            ${escapeHtml(nomeDisplay)}
                         </span>
                     </div>
                     <span class="combattimento-card-value">${tiro.valore}</span>
@@ -7271,6 +7312,8 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
             return;
         }
 
+        const pgNamesMap = await getCharacterNamesMap(AppState.currentCampagnaId);
+        
         const giocatoreIds = [...new Set(tiri.map(t => t.giocatore_id).filter(Boolean))];
         let utentiMap = {};
         if (giocatoreIds.length > 0) {
@@ -7309,13 +7352,13 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
                 </thead>
                 <tbody>
                     ${tiri.map(tiro => {
+                        const pgName = pgNamesMap[tiro.giocatore_id];
                         const utente = utentiMap[tiro.giocatore_id];
-                        const nome = utente?.nome_utente || 'Giocatore';
-                        const cid = utente?.cid;
+                        const nome = pgName || utente?.nome_utente || 'Giocatore';
                         return `
                         <tr>
                             <td style="padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${escapeHtml(nome)}${cid ? ` (CID: ${cid})` : ''}
+                                ${escapeHtml(nome)}
                             </td>
                             <td style="text-align: right; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
                                 ${tiro.valore !== null ? tiro.valore : '-'}
