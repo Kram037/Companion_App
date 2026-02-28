@@ -63,6 +63,7 @@ const AppState = {
     isRegisterMode: false,
     currentCampagnaId: null,
     currentSessioneId: null,
+    currentPersonaggioId: null,
     currentCampagnaDetails: null,
     campagnaGiocatori: [],
     cachedUserData: null,
@@ -264,6 +265,7 @@ async function init() {
             const st = event.state;
             if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;
             if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
+            if (st.personaggioId) AppState.currentPersonaggioId = st.personaggioId;
 
             navigateToPage(st.page, { pushHistory: false });
 
@@ -273,6 +275,8 @@ async function init() {
                 await renderSessioneContent(st.campagnaId);
             } else if (st.page === 'combattimento' && st.campagnaId && st.sessioneId) {
                 await renderCombattimentoContent(st.campagnaId, st.sessioneId);
+            } else if (st.page === 'scheda' && st.personaggioId) {
+                await renderSchedaPersonaggio(st.personaggioId);
             }
         } else {
             // No state = initial page, go to campagne
@@ -1232,12 +1236,18 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             sessionStorage.removeItem('currentSessioneId');
             AppState.currentSessioneId = null;
         }
+    } else if (pageName === 'scheda') {
+        if (AppState.currentPersonaggioId) {
+            sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
+        }
     } else {
         if (pageName === 'campagne' || pageName === 'amici' || pageName === 'personaggi' || pageName === 'nemici') {
             sessionStorage.removeItem('currentCampagnaId');
             sessionStorage.removeItem('currentSessioneId');
+            sessionStorage.removeItem('currentPersonaggioId');
             AppState.currentCampagnaId = null;
             AppState.currentSessioneId = null;
+            AppState.currentPersonaggioId = null;
         }
     }
 
@@ -1246,7 +1256,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
         const stateObj = {
             page: pageName,
             campagnaId: AppState.currentCampagnaId || null,
-            sessioneId: AppState.currentSessioneId || null
+            sessioneId: AppState.currentSessioneId || null,
+            personaggioId: AppState.currentPersonaggioId || null
         };
         history.pushState(stateObj, '', null);
     }
@@ -1277,6 +1288,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
                 startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
             }
         });
+    } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
+        renderSchedaPersonaggio(AppState.currentPersonaggioId);
     }
 
     updateReturnToSessionBtn();
@@ -3288,6 +3301,24 @@ function pgCalcSpellSlots() {
     return slots;
 }
 
+function pgBuildSlotIncantesimo() {
+    const defaultSlots = pgCalcSpellSlots();
+    const levels = Object.keys(defaultSlots).map(Number).sort((a, b) => a - b);
+    if (levels.length === 0) return {};
+
+    const result = {};
+    levels.forEach(lvl => {
+        const maxDefault = defaultSlots[lvl] || 0;
+        const existing = pgCurrentSlotIncantesimo[lvl];
+        if (existing) {
+            result[lvl] = { max: maxDefault, current: Math.min(existing.current != null ? existing.current : maxDefault, maxDefault) };
+        } else {
+            result[lvl] = { max: maxDefault, current: maxDefault };
+        }
+    });
+    return result;
+}
+
 function pgRenderSlotIncantesimo() {
     const container = document.getElementById('pgSlotIncantesimoList');
     if (!container) return;
@@ -3436,7 +3467,7 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 5) return;
+    if (step < 0 || step > 4) return;
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
@@ -3461,9 +3492,6 @@ function pgWizardGoTo(step) {
         pgRenderResistenze();
     }
     if (step === 4) {
-        pgRenderSlotIncantesimo();
-    }
-    if (step === 5) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
@@ -3526,7 +3554,7 @@ function renderPersonaggi(personaggi) {
             classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
         }
         return `
-        <div class="pg-card" data-pg-id="${pg.id}">
+        <div class="pg-card pg-card-clickable" data-pg-id="${pg.id}" onclick="openSchedaPersonaggio('${pg.id}')">
             <div class="pg-card-header">
                 <div class="pg-card-avatar">${escapeHtml(initials)}</div>
                 <div class="pg-card-identity">
@@ -3535,28 +3563,268 @@ function renderPersonaggi(personaggi) {
                 </div>
                 <div class="pg-card-level">Lv ${pg.livello || 1}</div>
             </div>
-            <div class="pg-card-stats">
-                <div class="pg-stat"><div class="pg-stat-label">FOR</div><div class="pg-stat-value">${pg.forza} <small>(${mod(pg.forza)})</small></div></div>
-                <div class="pg-stat"><div class="pg-stat-label">DES</div><div class="pg-stat-value">${pg.destrezza} <small>(${mod(pg.destrezza)})</small></div></div>
-                <div class="pg-stat"><div class="pg-stat-label">COS</div><div class="pg-stat-value">${pg.costituzione} <small>(${mod(pg.costituzione)})</small></div></div>
-                <div class="pg-stat"><div class="pg-stat-label">INT</div><div class="pg-stat-value">${pg.intelligenza} <small>(${mod(pg.intelligenza)})</small></div></div>
-                <div class="pg-stat"><div class="pg-stat-label">SAG</div><div class="pg-stat-value">${pg.saggezza} <small>(${mod(pg.saggezza)})</small></div></div>
-                <div class="pg-stat"><div class="pg-stat-label">CAR</div><div class="pg-stat-value">${pg.carisma} <small>(${mod(pg.carisma)})</small></div></div>
-            </div>
             <div class="pg-card-combat">
                 <div class="pg-combat-stat"><div class="pg-combat-label">PV</div><div class="pg-combat-value">${pg.punti_vita_max}</div></div>
                 <div class="pg-combat-stat"><div class="pg-combat-label">CA</div><div class="pg-combat-value">${pg.classe_armatura}</div></div>
                 <div class="pg-combat-stat"><div class="pg-combat-label">INIT</div><div class="pg-combat-value">${pg.iniziativa != null ? pg.iniziativa : mod(pg.destrezza)}</div></div>
                 <div class="pg-combat-stat"><div class="pg-combat-label">VEL</div><div class="pg-combat-value">${pg.velocita}</div></div>
             </div>
-            ${pg.resistenze && pg.resistenze.length > 0 ? `<div class="pg-card-resistenze"><span class="pg-card-res-label">Resistenze:</span> ${pg.resistenze.map(r => `<span class="pg-card-res-tag">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
-            ${pg.slot_incantesimo && Object.keys(pg.slot_incantesimo).length > 0 ? `<div class="pg-card-slots">${Object.keys(pg.slot_incantesimo).sort((a,b) => a-b).map(lvl => { const s = pg.slot_incantesimo[lvl]; return `<span class="pg-card-slot-tag">Lv${lvl}: ${s.current}/${s.max}</span>`; }).join('')}</div>` : ''}
-            <div class="pg-card-actions">
-                <button class="btn-secondary btn-small" onclick="openPersonaggioModal('${pg.id}')">Modifica</button>
-                <button class="btn-secondary btn-small" style="color: #dc3545;" onclick="deletePersonaggio('${pg.id}')">Elimina</button>
-            </div>
         </div>`;
     }).join('');
+}
+
+// --- Scheda Personaggio Page ---
+window.openSchedaPersonaggio = async function(personaggioId) {
+    AppState.currentPersonaggioId = personaggioId;
+    sessionStorage.setItem('currentPersonaggioId', personaggioId);
+    navigateToPage('scheda');
+    await renderSchedaPersonaggio(personaggioId);
+}
+
+async function renderSchedaPersonaggio(personaggioId) {
+    const content = document.getElementById('schedaContent');
+    const title = document.getElementById('schedaTitle');
+    if (!content) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) { content.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
+
+    content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
+
+    try {
+        const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
+        if (error || !pg) throw error || new Error('Personaggio non trovato');
+
+        if (title) title.textContent = pg.nome;
+
+        const mod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
+        const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+
+        let classeDisplay = pg.classe || '';
+        if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
+            classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
+        }
+
+        const abilities = [
+            { key: 'forza', label: 'FOR', full: 'Forza' },
+            { key: 'destrezza', label: 'DES', full: 'Destrezza' },
+            { key: 'costituzione', label: 'COS', full: 'Costituzione' },
+            { key: 'intelligenza', label: 'INT', full: 'Intelligenza' },
+            { key: 'saggezza', label: 'SAG', full: 'Saggezza' },
+            { key: 'carisma', label: 'CAR', full: 'Carisma' }
+        ];
+
+        const saves = pg.tiri_salvezza || [];
+        const skillProf = pg.competenze_abilita || [];
+
+        const DND_SKILLS_SCHEDA = [
+            { key: 'acrobazia', label: 'Acrobazia', ability: 'destrezza' },
+            { key: 'addestrare_animali', label: 'Addestrare Animali', ability: 'saggezza' },
+            { key: 'arcano', label: 'Arcano', ability: 'intelligenza' },
+            { key: 'atletica', label: 'Atletica', ability: 'forza' },
+            { key: 'furtivita', label: 'Furtività', ability: 'destrezza' },
+            { key: 'indagare', label: 'Indagare', ability: 'intelligenza' },
+            { key: 'inganno', label: 'Inganno', ability: 'carisma' },
+            { key: 'intimidire', label: 'Intimidire', ability: 'carisma' },
+            { key: 'intrattenere', label: 'Intrattenere', ability: 'carisma' },
+            { key: 'intuizione', label: 'Intuizione', ability: 'saggezza' },
+            { key: 'medicina', label: 'Medicina', ability: 'saggezza' },
+            { key: 'natura', label: 'Natura', ability: 'intelligenza' },
+            { key: 'percezione', label: 'Percezione', ability: 'saggezza' },
+            { key: 'persuasione', label: 'Persuasione', ability: 'carisma' },
+            { key: 'rapidita_di_mano', label: 'Rapidità di Mano', ability: 'destrezza' },
+            { key: 'religione', label: 'Religione', ability: 'intelligenza' },
+            { key: 'sopravvivenza', label: 'Sopravvivenza', ability: 'saggezza' },
+            { key: 'storia', label: 'Storia', ability: 'intelligenza' }
+        ];
+
+        const abilitiesHtml = abilities.map(a => {
+            const val = pg[a.key] || 10;
+            const m = mod(val);
+            const isSaveProf = saves.includes(a.key);
+            const saveMod = parseInt(m) + (isSaveProf ? bonusComp : 0);
+            const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+            return `
+            <div class="scheda-ability">
+                <div class="scheda-ability-label">${a.label}</div>
+                <div class="scheda-ability-score">${val}</div>
+                <div class="scheda-ability-mod">${m}</div>
+                <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}">
+                    <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span> ${saveStr}
+                </div>
+            </div>`;
+        }).join('');
+
+        const skillsHtml = DND_SKILLS_SCHEDA.map(sk => {
+            const abilityVal = pg[sk.ability] || 10;
+            const abilityMod = Math.floor((abilityVal - 10) / 2);
+            const isProf = skillProf.includes(sk.key);
+            const total = abilityMod + (isProf ? bonusComp : 0);
+            const totalStr = total >= 0 ? `+${total}` : `${total}`;
+            return `
+            <div class="scheda-skill ${isProf ? 'proficient' : ''}">
+                <span class="scheda-skill-dot">${isProf ? '●' : '○'}</span>
+                <span class="scheda-skill-mod">${totalStr}</span>
+                <span class="scheda-skill-name">${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></span>
+            </div>`;
+        }).join('');
+
+        const percSkill = DND_SKILLS_SCHEDA.find(s => s.key === 'percezione');
+        const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
+        const percPassiva = 10 + sagMod + (skillProf.includes('percezione') ? bonusComp : 0);
+
+        const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
+            pg.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+            '<span class="scheda-empty">Nessuna</span>';
+
+        const conditionsActive = ALL_CONDITIONS.filter(c => pg[c.key]);
+        const conditionsHtml = conditionsActive.length > 0 ?
+            conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('') :
+            '<span class="scheda-empty">Nessuna</span>';
+
+        // Spell slots
+        let slotsHtml = '';
+        const slots = pg.slot_incantesimo;
+        if (slots && typeof slots === 'object' && Object.keys(slots).length > 0) {
+            const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
+            slotsHtml = `
+            <div class="scheda-section">
+                <div class="scheda-section-title">Slot Incantesimo</div>
+                <div class="scheda-slots-table">
+                    ${levels.map(lvl => {
+                        const s = slots[lvl];
+                        const pips = [];
+                        for (let i = 0; i < s.max; i++) {
+                            pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" onclick="schedaSlotToggle('${personaggioId}', ${lvl}, ${i})" data-pg="${personaggioId}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+                        }
+                        return `
+                        <div class="scheda-slot-row">
+                            <span class="scheda-slot-level">Lv ${lvl}</span>
+                            <div class="scheda-slot-pips">${pips.join('')}</div>
+                            <span class="scheda-slot-count">${s.current}/${s.max}</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        }
+
+        // Hit dice
+        let hitDiceHtml = '';
+        if (pg.classi && pg.classi.length > 0) {
+            const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
+            hitDiceHtml = pg.classi.map(c => `<span class="scheda-tag">${c.livello}d${CLASS_HD[c.nome] || 8} (${c.nome})</span>`).join('');
+        }
+
+        content.innerHTML = `
+        <div class="scheda-identity">
+            <div class="scheda-identity-main">
+                <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+                <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+            </div>
+        </div>
+
+        <div class="scheda-combat-bar">
+            <div class="scheda-combat-stat">
+                <div class="scheda-combat-val">${pg.classe_armatura || 10}</div>
+                <div class="scheda-combat-label">CA</div>
+            </div>
+            <div class="scheda-combat-stat">
+                <div class="scheda-combat-val">${pg.iniziativa != null ? (pg.iniziativa >= 0 ? '+' + pg.iniziativa : pg.iniziativa) : mod(pg.destrezza)}</div>
+                <div class="scheda-combat-label">Iniziativa</div>
+            </div>
+            <div class="scheda-combat-stat">
+                <div class="scheda-combat-val">${pg.velocita || 9}</div>
+                <div class="scheda-combat-label">Velocità</div>
+            </div>
+            <div class="scheda-combat-stat highlight">
+                <div class="scheda-combat-val">${pg.punti_vita_max || 10}</div>
+                <div class="scheda-combat-label">PV Max</div>
+            </div>
+        </div>
+
+        <div class="scheda-layout">
+            <div class="scheda-col-left">
+                <div class="scheda-section">
+                    <div class="scheda-section-title">Caratteristiche</div>
+                    <div class="scheda-abilities">${abilitiesHtml}</div>
+                </div>
+                <div class="scheda-section">
+                    <div class="scheda-section-title">Bonus Competenza</div>
+                    <div class="scheda-bonus-comp">+${bonusComp}</div>
+                </div>
+                <div class="scheda-section">
+                    <div class="scheda-section-title">Percezione Passiva</div>
+                    <div class="scheda-bonus-comp">${percPassiva}</div>
+                </div>
+            </div>
+            <div class="scheda-col-right">
+                <div class="scheda-section">
+                    <div class="scheda-section-title">Abilità</div>
+                    <div class="scheda-skills">${skillsHtml}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scheda-section">
+            <div class="scheda-section-title">Dadi Vita</div>
+            <div class="scheda-tags">${hitDiceHtml || '<span class="scheda-empty">-</span>'}</div>
+        </div>
+
+        <div class="scheda-section">
+            <div class="scheda-section-title">Resistenze</div>
+            <div class="scheda-tags">${resistenzeHtml}</div>
+        </div>
+
+        ${slotsHtml}
+
+        <div class="scheda-section">
+            <div class="scheda-section-title">Condizioni</div>
+            <div class="scheda-tags">${conditionsHtml}</div>
+            <div class="scheda-condition-extra">
+                <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
+            </div>
+            <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
+        </div>
+        `;
+
+        // Wire up header buttons
+        const editBtn = document.getElementById('schedaEditBtn');
+        if (editBtn) editBtn.onclick = () => openPersonaggioModal(pg.id);
+        const deleteBtn = document.getElementById('schedaDeleteBtn');
+        if (deleteBtn) deleteBtn.onclick = () => deletePersonaggio(pg.id);
+        const backBtn = document.getElementById('schedaBackBtn');
+        if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+
+    } catch (e) {
+        console.error('Errore caricamento scheda:', e);
+        content.innerHTML = '<div class="content-placeholder"><p>Errore nel caricamento della scheda</p></div>';
+    }
+}
+
+window.schedaSlotToggle = async function(personaggioId, level, index) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', personaggioId).single();
+    if (!pg || !pg.slot_incantesimo) return;
+
+    const slots = { ...pg.slot_incantesimo };
+    const slot = slots[level];
+    if (!slot) return;
+
+    if (index < slot.current) {
+        slot.current = index;
+    } else {
+        slot.current = index + 1;
+    }
+    slots[level] = { ...slot };
+
+    try {
+        await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', personaggioId);
+        await renderSchedaPersonaggio(personaggioId);
+    } catch (e) {
+        console.error('Errore aggiornamento slot:', e);
+    }
 }
 
 window.openPersonaggioModal = function(personaggioId) {
@@ -3702,7 +3970,7 @@ async function handleSavePersonaggio(e) {
         tiri_salvezza: pgGetSelectedSaves(),
         competenze_abilita: Array.from(pgCurrentSkillProficiencies),
         resistenze: pgCurrentResistenze,
-        slot_incantesimo: pgCurrentSlotIncantesimo,
+        slot_incantesimo: pgBuildSlotIncantesimo(),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
         classe_armatura: classeArmatura,
@@ -3733,9 +4001,14 @@ async function handleSavePersonaggio(e) {
             showNotification('Personaggio creato');
         }
 
+        const wasEditing = editingPersonaggioId;
         closePersonaggioModal();
-        await loadPersonaggi();
-        await sendAppEventBroadcast({ table: 'personaggi', action: editingPersonaggioId ? 'update' : 'insert' });
+        if (wasEditing && AppState.currentPage === 'scheda') {
+            await renderSchedaPersonaggio(wasEditing);
+        } else {
+            await loadPersonaggi();
+        }
+        await sendAppEventBroadcast({ table: 'personaggi', action: wasEditing ? 'update' : 'insert' });
     } catch (error) {
         console.error('Errore salvataggio personaggio:', error);
         showNotification('Errore: ' + (error.message || error));
@@ -3761,6 +4034,9 @@ window.deletePersonaggio = async function(personaggioId) {
         if (error) throw error;
 
         showNotification('Personaggio eliminato');
+        if (AppState.currentPage === 'scheda') {
+            navigateToPage('personaggi');
+        }
         await loadPersonaggi();
         await sendAppEventBroadcast({ table: 'personaggi', action: 'delete' });
     } catch (error) {
@@ -6363,6 +6639,9 @@ window.saveConditions = async function(personaggioId) {
         if (error) throw error;
         showNotification('Stato aggiornato');
         closeConditionsModal();
+        if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
+            await renderSchedaPersonaggio(AppState.currentPersonaggioId);
+        }
         if (AppState.currentCampagnaId) {
             const isDM = await isCurrentUserDM(AppState.currentCampagnaId);
             await renderSessioneConditions(AppState.currentCampagnaId, isDM);
@@ -7331,6 +7610,8 @@ async function refreshCurrentPageData() {
             }
         } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
+        } else if (page === 'scheda' && AppState.currentPersonaggioId) {
+            await renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
     } catch (error) {
         console.warn('⚠️ Errore refresh pagina corrente:', error);

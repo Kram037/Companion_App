@@ -223,6 +223,7 @@ $$;
 GRANT EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) TO authenticated;
 
 -- Allow DM to update character conditions during sessions
+DROP POLICY IF EXISTS "DM può aggiornare condizioni personaggi in campagna" ON personaggi;
 CREATE POLICY "DM può aggiornare condizioni personaggi in campagna"
     ON personaggi FOR UPDATE
     USING (
