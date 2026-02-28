@@ -1398,11 +1398,11 @@ let editingCampagnaId = null;
 
 async function loadCampagne(userId, options = {}) {
     const supabase = getSupabaseClient();
-    const { skipRealtimeSetup = false } = options;
-    
+    const { skipRealtimeSetup = false, silent = false } = options;
+
     if (!supabase || !userId) return;
 
-    if (elements.campagneList) {
+    if (!silent && elements.campagneList) {
         elements.campagneList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>';
     }
     
@@ -2713,14 +2713,15 @@ window.rimuoviAmico = async function(amicoId) {
 /**
  * Carica e visualizza gli amici e le richieste
  */
-async function loadAmici() {
+async function loadAmici(options = {}) {
     if (!AppState.isLoggedIn || !AppState.currentUser) return;
+    const { silent = false } = options;
     
     const supabase = getSupabaseClient();
     if (!supabase) return;
     
     const amiciPlaceholder = document.getElementById('amiciPlaceholder');
-    if (amiciPlaceholder) {
+    if (!silent && amiciPlaceholder) {
         amiciPlaceholder.style.display = 'block';
         amiciPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Caricamento amici...</p>';
     }
@@ -3238,11 +3239,12 @@ function pgWizardGoTo(step) {
     }
 }
 
-async function loadPersonaggi() {
+async function loadPersonaggi(options = {}) {
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.isLoggedIn) return;
+    const { silent = false } = options;
 
-    if (elements.personaggiList) {
+    if (!silent && elements.personaggiList) {
         elements.personaggiList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento personaggi...</p></div>';
     }
 
@@ -3922,14 +3924,15 @@ window.openCampagnaDetails = function(campagnaId) {
 /**
  * Carica e mostra i dettagli di una campagna
  */
-async function loadCampagnaDetails(campagnaId) {
+async function loadCampagnaDetails(campagnaId, options = {}) {
     const supabase = getSupabaseClient();
+    const { silent = false } = options;
     if (!supabase) {
         showNotification('Errore: Supabase non disponibile');
         return;
     }
 
-    if (elements.dettagliCampagnaContent) {
+    if (!silent && elements.dettagliCampagnaContent) {
         elements.dettagliCampagnaContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento dettagli...</p></div>';
     }
 
@@ -6732,7 +6735,14 @@ function startAppEventsRealtime() {
                     }
                 }
 
-                scheduleAppEventsRefresh();
+                const skipRefreshTables = [
+                    'richieste_tiro_iniziativa',
+                    'richieste_tiro_generico'
+                ];
+                const needsRefresh = !skipRefreshTables.includes(data.table);
+                if (needsRefresh) {
+                    scheduleAppEventsRefresh();
+                }
             }
         )
         .subscribe((status) => {
@@ -6767,28 +6777,38 @@ function stopAppEventsRealtime() {
     }
 }
 
+let _appRefreshRunning = false;
+let _appRefreshQueued = false;
+
 function scheduleAppEventsRefresh() {
     if (appEventsRefreshTimeout) {
         clearTimeout(appEventsRefreshTimeout);
     }
+    if (_appRefreshRunning) {
+        _appRefreshQueued = true;
+        return;
+    }
     appEventsRefreshTimeout = setTimeout(() => {
         refreshCurrentPageData();
-    }, 250);
+    }, 800);
 }
 
 async function refreshCurrentPageData() {
     if (!AppState.isLoggedIn) return;
+    if (_appRefreshRunning) { _appRefreshQueued = true; return; }
+    _appRefreshRunning = true;
+    _appRefreshQueued = false;
 
     const page = AppState.currentPage;
     try {
         if (page === 'campagne' && AppState.currentUser?.uid) {
-            await loadCampagne(AppState.currentUser.uid);
+            await loadCampagne(AppState.currentUser.uid, { silent: true });
         } else if (page === 'personaggi') {
-            await loadPersonaggi();
+            await loadPersonaggi({ silent: true });
         } else if (page === 'amici') {
-            await loadAmici();
+            await loadAmici({ silent: true });
         } else if (page === 'dettagli' && AppState.currentCampagnaId) {
-            await loadCampagnaDetails(AppState.currentCampagnaId);
+            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
         } else if (page === 'sessione' && AppState.currentCampagnaId) {
             if (window.currentTiroGenericoRichiestaId) {
                 const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
@@ -6803,6 +6823,12 @@ async function refreshCurrentPageData() {
         }
     } catch (error) {
         console.warn('⚠️ Errore refresh pagina corrente:', error);
+    } finally {
+        _appRefreshRunning = false;
+        if (_appRefreshQueued) {
+            _appRefreshQueued = false;
+            scheduleAppEventsRefresh();
+        }
     }
 }
 
