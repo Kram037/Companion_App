@@ -754,7 +754,17 @@ function setupEventListeners() {
         });
     }
     if (elements.personaggioForm) {
-        elements.personaggioForm.addEventListener('submit', handleSavePersonaggio);
+        elements.personaggioForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (pgWizardCurrentStep === 3) {
+                handleSavePersonaggio(e);
+            }
+        });
+        elements.personaggioForm.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && pgWizardCurrentStep < 3) {
+                e.preventDefault();
+            }
+        });
     }
 
     const abilityFields = ['Forza', 'Destrezza', 'Costituzione', 'Intelligenza', 'Saggezza', 'Carisma'];
@@ -793,7 +803,23 @@ function setupEventListeners() {
             if (e.target === elements.scegliPersonaggioModal) closeScegliPersonaggioModal();
         });
     }
-    
+
+    const richiediTiroModal = document.getElementById('richiediTiroModal');
+    const closeRichiediTiroBtn = document.getElementById('closeRichiediTiroModal');
+    const cancelRichiediTiroBtn = document.getElementById('cancelRichiediTiro');
+    const confirmRichiediTiroBtn = document.getElementById('confirmRichiediTiro');
+    const tipoTiroSelect = document.getElementById('tipoTiroSelect');
+
+    if (closeRichiediTiroBtn) closeRichiediTiroBtn.onclick = closeRichiediTiroModal;
+    if (cancelRichiediTiroBtn) cancelRichiediTiroBtn.onclick = closeRichiediTiroModal;
+    if (confirmRichiediTiroBtn) confirmRichiediTiroBtn.onclick = executeRichiediTiro;
+    if (tipoTiroSelect) tipoTiroSelect.addEventListener('change', updateTiroTargetOptions);
+    if (richiediTiroModal) {
+        richiediTiroModal.addEventListener('click', (e) => {
+            if (e.target === richiediTiroModal) closeRichiediTiroModal();
+        });
+    }
+
     if (elements.closeCampagnaModal) {
         elements.closeCampagnaModal.onclick = function(e) {
             e.preventDefault();
@@ -6644,11 +6670,13 @@ function startAppEventsRealtime() {
                 }
 
                 if (data.table === 'richieste_tiro_generico' && data.action === 'insert') {
+                    const label = data.tiroLabel || 'Tiro Richiesto';
                     setTimeout(async () => {
                         const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
                         if (pending && !window.currentRollRequest) {
+                            pending.tiroLabel = label;
                             showRollRequestModal(pending);
-                            sendBrowserNotification('Tiro Richiesto', 'Il DM ti ha richiesto di fare un tiro!');
+                            sendBrowserNotification(label, `Il DM ha richiesto: ${label}`);
                         }
                     }, 500);
                 }
@@ -7013,25 +7041,28 @@ function showRollRequestModal(request) {
 
     window.currentRollRequest = request;
 
+    const isIniziativa = request.tipo === 'iniziativa';
+    const tiroLabel = !isIniziativa && request.tiroLabel ? request.tiroLabel : null;
+
     if (elements.rollRequestTitle) {
-        elements.rollRequestTitle.textContent = request.tipo === 'iniziativa' 
-            ? 'Tiro di Iniziativa' 
-            : 'Tiro Richiesto';
+        elements.rollRequestTitle.textContent = isIniziativa
+            ? 'Tiro di Iniziativa'
+            : (tiroLabel || 'Tiro Richiesto');
     }
     if (elements.rollRequestMessage) {
-        elements.rollRequestMessage.textContent = request.tipo === 'iniziativa'
+        elements.rollRequestMessage.textContent = isIniziativa
             ? 'Il DM ti ha richiesto di fare un tiro di iniziativa (d20 + modificatori)'
-            : 'Il DM ti ha richiesto di fare un tiro (d20)';
+            : `Il DM ha richiesto: ${tiroLabel || 'un tiro'} (d20 + modificatori)`;
     }
     if (elements.rollRequestLabel) {
-        elements.rollRequestLabel.textContent = request.tipo === 'iniziativa'
+        elements.rollRequestLabel.textContent = isIniziativa
             ? 'Risultato del tiro (d20 + modificatori):'
-            : 'Risultato del tiro (d20):';
+            : 'Risultato del tiro (d20 + modificatori):';
     }
     if (elements.rollRequestInput) {
         elements.rollRequestInput.value = '';
         elements.rollRequestInput.min = '1';
-        elements.rollRequestInput.max = request.tipo === 'iniziativa' ? '999' : '20';
+        elements.rollRequestInput.max = '999';
     }
 
     elements.rollRequestModal.classList.add('active');
@@ -7221,38 +7252,109 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
 };
 
 /**
- * Richiede tiro generico a tutti i giocatori
+ * Apre il dialog per scegliere il tipo di tiro generico
  */
-window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-        showNotification('Errore: Supabase non disponibile');
-        return;
+const TIRO_CARATTERISTICHE = [
+    { value: 'forza', label: 'Forza' },
+    { value: 'destrezza', label: 'Destrezza' },
+    { value: 'costituzione', label: 'Costituzione' },
+    { value: 'intelligenza', label: 'Intelligenza' },
+    { value: 'saggezza', label: 'Saggezza' },
+    { value: 'carisma', label: 'Carisma' }
+];
+
+const TIRO_ABILITA = [
+    { value: 'acrobazia', label: 'Acrobazia' },
+    { value: 'addestrare_animali', label: 'Addestrare Animali' },
+    { value: 'arcano', label: 'Arcano' },
+    { value: 'atletica', label: 'Atletica' },
+    { value: 'furtivita', label: 'Furtività' },
+    { value: 'indagare', label: 'Indagare' },
+    { value: 'inganno', label: 'Inganno' },
+    { value: 'intimidire', label: 'Intimidire' },
+    { value: 'intrattenere', label: 'Intrattenere' },
+    { value: 'intuizione', label: 'Intuizione' },
+    { value: 'medicina', label: 'Medicina' },
+    { value: 'natura', label: 'Natura' },
+    { value: 'percezione', label: 'Percezione' },
+    { value: 'persuasione', label: 'Persuasione' },
+    { value: 'rapidita_di_mano', label: 'Rapidità di Mano' },
+    { value: 'religione', label: 'Religione' },
+    { value: 'sopravvivenza', label: 'Sopravvivenza' },
+    { value: 'storia', label: 'Storia' }
+];
+
+function updateTiroTargetOptions() {
+    const tipo = document.getElementById('tipoTiroSelect')?.value;
+    const targetSelect = document.getElementById('tiroTargetSelect');
+    const targetLabel = document.getElementById('tiroTargetLabel');
+    if (!targetSelect || !targetLabel) return;
+
+    let options = [];
+    if (tipo === 'salvezza' || tipo === 'caratteristica') {
+        options = TIRO_CARATTERISTICHE;
+        targetLabel.textContent = 'Caratteristica';
+    } else {
+        options = TIRO_ABILITA;
+        targetLabel.textContent = 'Abilità';
     }
+    targetSelect.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+}
+
+function getTiroLabel(tipo, target) {
+    const allOptions = [...TIRO_CARATTERISTICHE, ...TIRO_ABILITA];
+    const opt = allOptions.find(o => o.value === target);
+    const targetName = opt ? opt.label : target;
+    if (tipo === 'salvezza') return `Tiro salvezza su ${targetName}`;
+    if (tipo === 'abilita') return `Tiro di ${targetName}`;
+    return `Prova di ${targetName}`;
+}
+
+window.richiediTiroGenerico = function(sessioneId, campagnaId) {
+    const modal = document.getElementById('richiediTiroModal');
+    if (!modal) return;
+
+    window._pendingTiroSessioneId = sessioneId;
+    window._pendingTiroCampagnaId = campagnaId;
+
+    updateTiroTargetOptions();
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRichiediTiroModal() {
+    const modal = document.getElementById('richiediTiroModal');
+    if (modal) modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+async function executeRichiediTiro() {
+    const sessioneId = window._pendingTiroSessioneId;
+    const campagnaId = window._pendingTiroCampagnaId;
+    const tipo = document.getElementById('tipoTiroSelect')?.value;
+    const target = document.getElementById('tiroTargetSelect')?.value;
+    if (!sessioneId || !campagnaId || !tipo || !target) return;
+
+    const tiroLabel = getTiroLabel(tipo, target);
+    closeRichiediTiroModal();
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
 
     try {
-        // Verifica che l'utente sia il DM
         const isDM = await isCurrentUserDM(campagnaId);
-        if (!isDM) {
-            showNotification('Solo il DM può richiedere tiri');
-            return;
-        }
+        if (!isDM) { showNotification('Solo il DM può richiedere tiri'); return; }
 
-        // Carica la campagna per ottenere i giocatori
         const { data: campagna, error: campagnaError } = await supabase
             .from('campagne')
             .select('giocatori, id_dm')
             .eq('id', campagnaId)
             .single();
-
         if (campagnaError) throw campagnaError;
 
-        // Genera un ID univoco per questa richiesta (round)
         const richiestaId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const partecipanti = (campagna.giocatori || []).filter(Boolean);
 
-        // Crea richieste per tutti i partecipanti (DM + giocatori)
-        const partecipanti = [campagna.id_dm, ...(campagna.giocatori || [])].filter(Boolean);
-        
         const richieste = partecipanti.map(giocatoreId => ({
             sessione_id: sessioneId,
             richiesta_id: richiestaId,
@@ -7263,21 +7365,21 @@ window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
         const { error: insertError } = await supabase
             .from('richieste_tiro_generico')
             .insert(richieste);
-
         if (insertError) throw insertError;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'insert', sessioneId });
 
-        showNotification('Richieste tiro inviate!');
-        
+        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'insert', sessioneId, tiroLabel });
+        showNotification(`${tiroLabel} richiesto!`);
+
         window.currentTiroGenericoRichiestaId = richiestaId;
-        
+        window.currentTiroGenericoLabel = tiroLabel;
+
         await updateTiroGenericoTable(sessioneId, richiestaId);
         startTiroGenericoPolling(sessioneId);
     } catch (error) {
         console.error('❌ Errore nella richiesta tiro generico:', error);
-        showNotification('Errore nella richiesta tiro generico: ' + (error.message || error));
+        showNotification('Errore: ' + (error.message || error));
     }
-};
+}
 
 /**
  * Avvia polling per aggiornare la tabella tiri generici
@@ -7341,20 +7443,17 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
                 if (giocatoriData) {
                     giocatoriData.forEach(g => { utentiMap[g.id] = g; });
                 }
-                const dmData = await findUserByUid(AppState.currentUser?.uid);
-                if (dmData) {
-                    utentiMap[dmData.id] = dmData;
-                }
             } catch (e) {
                 console.warn('Fallback nomi giocatori:', e);
             }
         }
 
         tableElement.style.display = 'block';
+        const tiroLabel = window.currentTiroGenericoLabel || 'Tiri Richiesti';
 
         const tableHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
-                <h3 style="margin: 0;">Tiri Richiesti</h3>
+                <h3 style="margin: 0;">${escapeHtml(tiroLabel)}</h3>
                 <button class="btn-secondary btn-small" onclick="chiudiTabellaTiri('${sessioneId}', '${richiestaId}')" style="width: auto; padding: var(--spacing-xs) var(--spacing-sm);">
                     Chiudi
                 </button>
@@ -7439,6 +7538,7 @@ window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
 
         if (window.currentTiroGenericoRichiestaId === richiestaId) {
             window.currentTiroGenericoRichiestaId = null;
+            window.currentTiroGenericoLabel = null;
         }
         stopTiroGenericoPolling();
 

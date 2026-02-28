@@ -1044,6 +1044,17 @@ body.user-logged-in .header-username {
     margin-left: auto;
 }
 
+/* Roll type modal select */
+.richiedi-tiro-options select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
 .pg-readonly-input {
     background: var(--surface-hover) !important;
     color: var(--accent) !important;
