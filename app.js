@@ -3376,8 +3376,10 @@ async function handleSavePersonaggio(e) {
     e.preventDefault();
     if (pgSaving) return;
     pgSaving = true;
+    const saveBtn = document.getElementById('savePersonaggioBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
     const supabase = getSupabaseClient();
-    if (!supabase) { pgSaving = false; return; }
+    if (!supabase) { pgSaving = false; if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = editingPersonaggioId ? 'Salva' : 'Crea'; } return; }
 
     const userData = await findUserByUid(AppState.currentUser?.uid);
     if (!userData) {
@@ -3449,6 +3451,8 @@ async function handleSavePersonaggio(e) {
         showNotification('Errore: ' + (error.message || error));
     } finally {
         pgSaving = false;
+        const btn = document.getElementById('savePersonaggioBtn');
+        if (btn) { btn.disabled = false; btn.textContent = editingPersonaggioId ? 'Salva' : 'Crea'; }
     }
 }
 
