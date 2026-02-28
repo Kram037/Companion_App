@@ -3581,6 +3581,66 @@ window.openSchedaPersonaggio = async function(personaggioId) {
     await renderSchedaPersonaggio(personaggioId);
 }
 
+// Debounced save for scheda fields
+let _schedaSaveTimeout = null;
+let _schedaPgCache = null;
+
+function schedaDebouncedSave(personaggioId, field, value) {
+    if (_schedaSaveTimeout) clearTimeout(_schedaSaveTimeout);
+    _schedaSaveTimeout = setTimeout(async () => {
+        const supabase = getSupabaseClient();
+        if (!supabase) return;
+        try {
+            await supabase.from('personaggi').update({ [field]: value, updated_at: new Date().toISOString() }).eq('id', personaggioId);
+        } catch (e) { console.error('Errore salvataggio:', e); }
+    }, 500);
+}
+
+function schedaInstantSave(personaggioId, updates) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    updates.updated_at = new Date().toISOString();
+    supabase.from('personaggi').update(updates).eq('id', personaggioId).then(({ error }) => {
+        if (error) console.error('Errore salvataggio:', error);
+    });
+}
+
+const SCHEDA_ABILITIES = [
+    { key: 'forza', label: 'FOR', full: 'Forza' },
+    { key: 'destrezza', label: 'DES', full: 'Destrezza' },
+    { key: 'costituzione', label: 'COS', full: 'Costituzione' },
+    { key: 'intelligenza', label: 'INT', full: 'Intelligenza' },
+    { key: 'saggezza', label: 'SAG', full: 'Saggezza' },
+    { key: 'carisma', label: 'CAR', full: 'Carisma' }
+];
+
+const SCHEDA_SKILLS = [
+    { key: 'acrobazia', label: 'Acrobazia', ability: 'destrezza' },
+    { key: 'addestrare_animali', label: 'Addestrare Animali', ability: 'saggezza' },
+    { key: 'arcano', label: 'Arcano', ability: 'intelligenza' },
+    { key: 'atletica', label: 'Atletica', ability: 'forza' },
+    { key: 'furtivita', label: 'Furtività', ability: 'destrezza' },
+    { key: 'indagare', label: 'Indagare', ability: 'intelligenza' },
+    { key: 'inganno', label: 'Inganno', ability: 'carisma' },
+    { key: 'intimidire', label: 'Intimidire', ability: 'carisma' },
+    { key: 'intrattenere', label: 'Intrattenere', ability: 'carisma' },
+    { key: 'intuizione', label: 'Intuizione', ability: 'saggezza' },
+    { key: 'medicina', label: 'Medicina', ability: 'saggezza' },
+    { key: 'natura', label: 'Natura', ability: 'intelligenza' },
+    { key: 'percezione', label: 'Percezione', ability: 'saggezza' },
+    { key: 'persuasione', label: 'Persuasione', ability: 'carisma' },
+    { key: 'rapidita_di_mano', label: 'Rapidità di Mano', ability: 'destrezza' },
+    { key: 'religione', label: 'Religione', ability: 'intelligenza' },
+    { key: 'sopravvivenza', label: 'Sopravvivenza', ability: 'saggezza' },
+    { key: 'storia', label: 'Storia', ability: 'intelligenza' }
+];
+
+const CLASS_SPELL_ABILITY = {
+    'Bardo': 'carisma', 'Chierico': 'saggezza', 'Druido': 'saggezza', 'Mago': 'intelligenza',
+    'Stregone': 'carisma', 'Warlock': 'carisma', 'Paladino': 'carisma', 'Ranger': 'saggezza',
+    'Artefice': 'intelligenza'
+};
+
 async function renderSchedaPersonaggio(personaggioId) {
     const content = document.getElementById('schedaContent');
     const title = document.getElementById('schedaTitle');
@@ -3589,179 +3649,147 @@ async function renderSchedaPersonaggio(personaggioId) {
     const supabase = getSupabaseClient();
     if (!supabase) { content.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
 
-    content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
+    if (!_schedaPgCache || _schedaPgCache.id !== personaggioId) {
+        content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
+    }
 
     try {
         const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
         if (error || !pg) throw error || new Error('Personaggio non trovato');
+        _schedaPgCache = pg;
 
         if (title) title.textContent = pg.nome;
 
-        const mod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
+        const fMod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
         const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+        const saves = pg.tiri_salvezza || [];
+        const skillProf = pg.competenze_abilita || [];
+        const skillExpert = pg.maestrie_abilita || [];
+        const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
 
         let classeDisplay = pg.classe || '';
         if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
             classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
         }
 
-        const abilities = [
-            { key: 'forza', label: 'FOR', full: 'Forza' },
-            { key: 'destrezza', label: 'DES', full: 'Destrezza' },
-            { key: 'costituzione', label: 'COS', full: 'Costituzione' },
-            { key: 'intelligenza', label: 'INT', full: 'Intelligenza' },
-            { key: 'saggezza', label: 'SAG', full: 'Saggezza' },
-            { key: 'carisma', label: 'CAR', full: 'Carisma' }
-        ];
-
-        const saves = pg.tiri_salvezza || [];
-        const skillProf = pg.competenze_abilita || [];
-
-        const DND_SKILLS_SCHEDA = [
-            { key: 'acrobazia', label: 'Acrobazia', ability: 'destrezza' },
-            { key: 'addestrare_animali', label: 'Addestrare Animali', ability: 'saggezza' },
-            { key: 'arcano', label: 'Arcano', ability: 'intelligenza' },
-            { key: 'atletica', label: 'Atletica', ability: 'forza' },
-            { key: 'furtivita', label: 'Furtività', ability: 'destrezza' },
-            { key: 'indagare', label: 'Indagare', ability: 'intelligenza' },
-            { key: 'inganno', label: 'Inganno', ability: 'carisma' },
-            { key: 'intimidire', label: 'Intimidire', ability: 'carisma' },
-            { key: 'intrattenere', label: 'Intrattenere', ability: 'carisma' },
-            { key: 'intuizione', label: 'Intuizione', ability: 'saggezza' },
-            { key: 'medicina', label: 'Medicina', ability: 'saggezza' },
-            { key: 'natura', label: 'Natura', ability: 'intelligenza' },
-            { key: 'percezione', label: 'Percezione', ability: 'saggezza' },
-            { key: 'persuasione', label: 'Persuasione', ability: 'carisma' },
-            { key: 'rapidita_di_mano', label: 'Rapidità di Mano', ability: 'destrezza' },
-            { key: 'religione', label: 'Religione', ability: 'intelligenza' },
-            { key: 'sopravvivenza', label: 'Sopravvivenza', ability: 'saggezza' },
-            { key: 'storia', label: 'Storia', ability: 'intelligenza' }
-        ];
-
-        const abilitiesHtml = abilities.map(a => {
+        // 1. Abilities + Saves
+        const abilitiesHtml = SCHEDA_ABILITIES.map(a => {
             const val = pg[a.key] || 10;
-            const m = mod(val);
+            const m = fMod(val);
             const isSaveProf = saves.includes(a.key);
-            const saveMod = parseInt(m) + (isSaveProf ? bonusComp : 0);
+            const saveMod = Math.floor((val - 10) / 2) + (isSaveProf ? bonusComp : 0);
             const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
             return `
             <div class="scheda-ability">
-                <div class="scheda-ability-label">${a.label}</div>
-                <div class="scheda-ability-score">${val}</div>
-                <div class="scheda-ability-mod">${m}</div>
-                <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}">
-                    <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span> ${saveStr}
+                <div class="scheda-ability-label">${a.full}</div>
+                <input type="number" class="scheda-ability-input" value="${val}" min="1" max="30" data-field="${a.key}" data-pgid="${pg.id}">
+                <div class="scheda-ability-mod" id="sMod_${a.key}">${m}</div>
+                <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}" onclick="schedaToggleSave('${pg.id}','${a.key}')">
+                    <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span>
+                    <span class="scheda-save-val" id="sSave_${a.key}">${saveStr}</span>
                 </div>
             </div>`;
         }).join('');
 
-        const skillsHtml = DND_SKILLS_SCHEDA.map(sk => {
+        // 2. Four boxes
+        const initDisplay = pg.iniziativa != null ? pg.iniziativa : Math.floor(((pg.destrezza || 10) - 10) / 2);
+
+        // 4. Skills with proficiency + expertise
+        const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
+        const percProf = skillProf.includes('percezione');
+        const percExpert = skillExpert.includes('percezione');
+        const percPassiva = 10 + sagMod + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0);
+
+        const skillsHtml = SCHEDA_SKILLS.map(sk => {
             const abilityVal = pg[sk.ability] || 10;
             const abilityMod = Math.floor((abilityVal - 10) / 2);
             const isProf = skillProf.includes(sk.key);
-            const total = abilityMod + (isProf ? bonusComp : 0);
+            const isExpert = skillExpert.includes(sk.key);
+            const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
             const totalStr = total >= 0 ? `+${total}` : `${total}`;
             return `
-            <div class="scheda-skill ${isProf ? 'proficient' : ''}">
-                <span class="scheda-skill-dot">${isProf ? '●' : '○'}</span>
-                <span class="scheda-skill-mod">${totalStr}</span>
+            <div class="scheda-skill">
+                <span class="scheda-skill-dot ${isProf ? 'active' : ''}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}')" title="Competenza">●</span>
+                <span class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}')" title="Maestria">★</span>
+                <span class="scheda-skill-mod" id="sSkill_${sk.key}">${totalStr}</span>
                 <span class="scheda-skill-name">${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></span>
             </div>`;
         }).join('');
 
-        const percSkill = DND_SKILLS_SCHEDA.find(s => s.key === 'percezione');
-        const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
-        const percPassiva = 10 + sagMod + (skillProf.includes('percezione') ? bonusComp : 0);
+        // Hit dice
+        const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
+        const hitDiceHtml = (pg.classi && pg.classi.length > 0) ?
+            pg.classi.map(c => `<span class="scheda-tag">${c.livello}d${CLASS_HD[c.nome] || 8} (${c.nome})</span>`).join('') : '';
 
+        // Resistenze
         const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
             pg.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
             '<span class="scheda-empty">Nessuna</span>';
 
+        // Conditions
         const conditionsActive = ALL_CONDITIONS.filter(c => pg[c.key]);
         const conditionsHtml = conditionsActive.length > 0 ?
             conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('') :
             '<span class="scheda-empty">Nessuna</span>';
 
-        // Spell slots
-        let slotsHtml = '';
-        const slots = pg.slot_incantesimo;
-        if (slots && typeof slots === 'object' && Object.keys(slots).length > 0) {
-            const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
-            slotsHtml = `
-            <div class="scheda-section">
-                <div class="scheda-section-title">Slot Incantesimo</div>
-                <div class="scheda-slots-table">
-                    ${levels.map(lvl => {
-                        const s = slots[lvl];
-                        const pips = [];
-                        for (let i = 0; i < s.max; i++) {
-                            pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" onclick="schedaSlotToggle('${personaggioId}', ${lvl}, ${i})" data-pg="${personaggioId}" data-lvl="${lvl}" data-idx="${i}"></span>`);
-                        }
-                        return `
-                        <div class="scheda-slot-row">
-                            <span class="scheda-slot-level">Lv ${lvl}</span>
-                            <div class="scheda-slot-pips">${pips.join('')}</div>
-                            <span class="scheda-slot-count">${s.current}/${s.max}</span>
-                        </div>`;
-                    }).join('')}
-                </div>
-            </div>`;
-        }
-
-        // Hit dice
-        let hitDiceHtml = '';
-        if (pg.classi && pg.classi.length > 0) {
-            const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
-            hitDiceHtml = pg.classi.map(c => `<span class="scheda-tag">${c.livello}d${CLASS_HD[c.nome] || 8} (${c.nome})</span>`).join('');
-        }
+        // Check if spellcaster
+        const hasSpellSlots = pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object' && Object.keys(pg.slot_incantesimo).length > 0;
 
         content.innerHTML = `
         <div class="scheda-identity">
-            <div class="scheda-identity-main">
-                <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-                <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+            <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+            <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+        </div>
+
+        <div class="scheda-section">
+            <div class="scheda-section-title">Caratteristiche e Tiri Salvezza</div>
+            <div class="scheda-abilities">${abilitiesHtml}</div>
+        </div>
+
+        <div class="scheda-four-boxes">
+            <div class="scheda-box">
+                <div class="scheda-box-val">+${bonusComp}</div>
+                <div class="scheda-box-label">Competenza</div>
+            </div>
+            <div class="scheda-box editable">
+                <input type="number" class="scheda-box-input" value="${pg.classe_armatura || 10}" data-field="classe_armatura" data-pgid="${pg.id}">
+                <div class="scheda-box-label">CA</div>
+            </div>
+            <div class="scheda-box editable">
+                <input type="number" class="scheda-box-input" value="${initDisplay}" data-field="iniziativa" data-pgid="${pg.id}">
+                <div class="scheda-box-label">Iniziativa</div>
+            </div>
+            <div class="scheda-box editable">
+                <input type="number" class="scheda-box-input" value="${pg.velocita || 9}" step="1.5" data-field="velocita" data-pgid="${pg.id}">
+                <div class="scheda-box-label">Velocità</div>
             </div>
         </div>
 
-        <div class="scheda-combat-bar">
-            <div class="scheda-combat-stat">
-                <div class="scheda-combat-val">${pg.classe_armatura || 10}</div>
-                <div class="scheda-combat-label">CA</div>
+        <div class="scheda-hp-section">
+            <div class="scheda-hp-left">
+                <div class="scheda-hp-pair">
+                    <div class="scheda-hp-cell">
+                        <input type="number" class="scheda-hp-input" value="${pg.punti_vita_max || 10}" data-field="punti_vita_max" data-pgid="${pg.id}">
+                        <div class="scheda-hp-label">PV Massimi</div>
+                    </div>
+                    <div class="scheda-hp-cell">
+                        <input type="number" class="scheda-hp-input pv-current" value="${pvAttuali}" data-field="pv_attuali" data-pgid="${pg.id}" max="${pg.punti_vita_max || 10}">
+                        <div class="scheda-hp-label">PV Attuali</div>
+                    </div>
+                </div>
             </div>
-            <div class="scheda-combat-stat">
-                <div class="scheda-combat-val">${pg.iniziativa != null ? (pg.iniziativa >= 0 ? '+' + pg.iniziativa : pg.iniziativa) : mod(pg.destrezza)}</div>
-                <div class="scheda-combat-label">Iniziativa</div>
-            </div>
-            <div class="scheda-combat-stat">
-                <div class="scheda-combat-val">${pg.velocita || 9}</div>
-                <div class="scheda-combat-label">Velocità</div>
-            </div>
-            <div class="scheda-combat-stat highlight">
-                <div class="scheda-combat-val">${pg.punti_vita_max || 10}</div>
-                <div class="scheda-combat-label">PV Max</div>
+            <div class="scheda-hp-right">
+                <input type="number" class="scheda-hp-input" value="${pg.pv_temporanei || 0}" min="0" data-field="pv_temporanei" data-pgid="${pg.id}">
+                <div class="scheda-hp-label">PV Temporanei</div>
             </div>
         </div>
 
-        <div class="scheda-layout">
-            <div class="scheda-col-left">
-                <div class="scheda-section">
-                    <div class="scheda-section-title">Caratteristiche</div>
-                    <div class="scheda-abilities">${abilitiesHtml}</div>
-                </div>
-                <div class="scheda-section">
-                    <div class="scheda-section-title">Bonus Competenza</div>
-                    <div class="scheda-bonus-comp">+${bonusComp}</div>
-                </div>
-                <div class="scheda-section">
-                    <div class="scheda-section-title">Percezione Passiva</div>
-                    <div class="scheda-bonus-comp">${percPassiva}</div>
-                </div>
-            </div>
-            <div class="scheda-col-right">
-                <div class="scheda-section">
-                    <div class="scheda-section-title">Abilità</div>
-                    <div class="scheda-skills">${skillsHtml}</div>
-                </div>
+        <div class="scheda-section">
+            <div class="scheda-section-title">Abilità</div>
+            <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
+            <div class="scheda-perc-passiva">
+                <span class="scheda-perc-val" id="sPercPassiva">${percPassiva}</span>
+                <span class="scheda-perc-label">Percezione Passiva</span>
             </div>
         </div>
 
@@ -3775,8 +3803,6 @@ async function renderSchedaPersonaggio(personaggioId) {
             <div class="scheda-tags">${resistenzeHtml}</div>
         </div>
 
-        ${slotsHtml}
-
         <div class="scheda-section">
             <div class="scheda-section-title">Condizioni</div>
             <div class="scheda-tags">${conditionsHtml}</div>
@@ -3785,11 +3811,31 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>
             <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
         </div>
+
+        ${hasSpellSlots ? `
+        <div class="scheda-spell-fab" onclick="schedaOpenSpellPage('${pg.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>` : ''}
         `;
 
-        // Wire up header buttons
-        const editBtn = document.getElementById('schedaEditBtn');
-        if (editBtn) editBtn.onclick = () => openPersonaggioModal(pg.id);
+        // Wire up editable inputs
+        content.querySelectorAll('.scheda-ability-input').forEach(input => {
+            input.addEventListener('input', () => {
+                const field = input.dataset.field;
+                const val = Math.max(1, Math.min(30, parseInt(input.value) || 10));
+                schedaDebouncedSave(pg.id, field, val);
+                schedaRecalcAbility(field, val, pg.id);
+            });
+        });
+
+        content.querySelectorAll('.scheda-box-input, .scheda-hp-input').forEach(input => {
+            input.addEventListener('input', () => {
+                const field = input.dataset.field;
+                let val = field === 'velocita' ? parseFloat(input.value) || 0 : parseInt(input.value) || 0;
+                schedaDebouncedSave(pg.id, field, val);
+            });
+        });
+
         const deleteBtn = document.getElementById('schedaDeleteBtn');
         if (deleteBtn) deleteBtn.onclick = () => deletePersonaggio(pg.id);
         const backBtn = document.getElementById('schedaBackBtn');
@@ -3801,15 +3847,210 @@ async function renderSchedaPersonaggio(personaggioId) {
     }
 }
 
-window.schedaSlotToggle = async function(personaggioId, level, index) {
+function schedaRecalcAbility(abilityKey, val, pgId) {
+    const m = Math.floor((val - 10) / 2);
+    const mStr = m >= 0 ? `+${m}` : `${m}`;
+    const modEl = document.getElementById(`sMod_${abilityKey}`);
+    if (modEl) modEl.textContent = mStr;
+
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const saves = pg.tiri_salvezza || [];
+    const isSaveProf = saves.includes(abilityKey);
+    const saveMod = m + (isSaveProf ? bonusComp : 0);
+    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+    const saveEl = document.getElementById(`sSave_${abilityKey}`);
+    if (saveEl) saveEl.textContent = saveStr;
+
+    // Update skills that depend on this ability
+    const skillProf = pg.competenze_abilita || [];
+    const skillExpert = pg.maestrie_abilita || [];
+    SCHEDA_SKILLS.filter(sk => sk.ability === abilityKey).forEach(sk => {
+        const isProf = skillProf.includes(sk.key);
+        const isExpert = skillExpert.includes(sk.key);
+        const total = m + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+        const totalStr = total >= 0 ? `+${total}` : `${total}`;
+        const el = document.getElementById(`sSkill_${sk.key}`);
+        if (el) el.textContent = totalStr;
+    });
+
+    if (abilityKey === 'saggezza') {
+        const percProf = skillProf.includes('percezione');
+        const percExpert = skillExpert.includes('percezione');
+        const pp = 10 + m + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0);
+        const ppEl = document.getElementById('sPercPassiva');
+        if (ppEl) ppEl.textContent = pp;
+    }
+}
+
+window.schedaToggleSave = async function(pgId, abilityKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const saves = [...(pg.tiri_salvezza || [])];
+    const idx = saves.indexOf(abilityKey);
+    if (idx >= 0) saves.splice(idx, 1); else saves.push(abilityKey);
+    pg.tiri_salvezza = saves;
+
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const val = pg[abilityKey] || 10;
+    const m = Math.floor((val - 10) / 2);
+    const isProf = saves.includes(abilityKey);
+    const saveMod = m + (isProf ? bonusComp : 0);
+    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+
+    const saveEl = document.querySelector(`.scheda-ability-save[data-save="${abilityKey}"]`);
+    if (saveEl) {
+        saveEl.classList.toggle('proficient', isProf);
+        saveEl.querySelector('.scheda-save-dot').textContent = isProf ? '●' : '○';
+        saveEl.querySelector('.scheda-save-val').textContent = saveStr;
+    }
+    schedaInstantSave(pgId, { tiri_salvezza: saves });
+}
+
+window.schedaToggleSkillProf = async function(pgId, skillKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const skills = [...(pg.competenze_abilita || [])];
+    const idx = skills.indexOf(skillKey);
+    if (idx >= 0) skills.splice(idx, 1); else skills.push(skillKey);
+    pg.competenze_abilita = skills;
+
+    schedaRefreshSkill(pg, skillKey);
+    schedaInstantSave(pgId, { competenze_abilita: skills });
+}
+
+window.schedaToggleSkillExpert = async function(pgId, skillKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const experts = [...(pg.maestrie_abilita || [])];
+    const idx = experts.indexOf(skillKey);
+    if (idx >= 0) experts.splice(idx, 1); else experts.push(skillKey);
+    pg.maestrie_abilita = experts;
+
+    schedaRefreshSkill(pg, skillKey);
+    schedaInstantSave(pgId, { maestrie_abilita: experts });
+}
+
+function schedaRefreshSkill(pg, skillKey) {
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const sk = SCHEDA_SKILLS.find(s => s.key === skillKey);
+    if (!sk) return;
+
+    const abilityVal = pg[sk.ability] || 10;
+    const abilityMod = Math.floor((abilityVal - 10) / 2);
+    const isProf = (pg.competenze_abilita || []).includes(skillKey);
+    const isExpert = (pg.maestrie_abilita || []).includes(skillKey);
+    const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+    const totalStr = total >= 0 ? `+${total}` : `${total}`;
+
+    const el = document.getElementById(`sSkill_${skillKey}`);
+    if (el) el.textContent = totalStr;
+
+    const row = el?.closest('.scheda-skill');
+    if (row) {
+        const dots = row.querySelectorAll('.scheda-skill-dot');
+        if (dots[0]) dots[0].classList.toggle('active', isProf);
+        if (dots[1]) dots[1].classList.toggle('active', isExpert);
+    }
+
+    if (skillKey === 'percezione') {
+        const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
+        const pp = 10 + sagMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+        const ppEl = document.getElementById('sPercPassiva');
+        if (ppEl) ppEl.textContent = pp;
+    }
+}
+
+// Spell Page
+window.schedaOpenSpellPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    const title = document.getElementById('schedaTitle');
+    if (!content) return;
+
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
-    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', personaggioId).single();
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+
+    if (title) title.textContent = pg.nome + ' - Incantesimi';
+
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const classi = pg.classi || [];
+
+    const spellAbilities = [];
+    classi.forEach(c => {
+        const ab = CLASS_SPELL_ABILITY[c.nome];
+        if (ab && !spellAbilities.find(s => s.ability === ab)) {
+            const val = pg[ab] || 10;
+            const m = Math.floor((val - 10) / 2);
+            spellAbilities.push({ classe: c.nome, ability: ab, mod: m });
+        }
+    });
+
+    const spellStatsHtml = spellAbilities.length > 0 ? spellAbilities.map(sa => {
+        const atkBonus = sa.mod + bonusComp;
+        const dc = 8 + bonusComp + sa.mod;
+        const atkStr = atkBonus >= 0 ? `+${atkBonus}` : `${atkBonus}`;
+        const modStr = sa.mod >= 0 ? `+${sa.mod}` : `${sa.mod}`;
+        return `
+        <div class="scheda-spell-stats-row">
+            <div class="scheda-box"><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
+            <div class="scheda-box"><div class="scheda-box-val">${atkStr}</div><div class="scheda-box-label">Attacco Inc.</div></div>
+            <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD Inc.</div></div>
+        </div>`;
+    }).join('') : '<p class="scheda-empty">Nessuna classe incantatrice</p>';
+
+    const slots = pg.slot_incantesimo || {};
+    const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
+    const slotsHtml = levels.length > 0 ? levels.map(lvl => {
+        const s = slots[lvl];
+        const pips = [];
+        for (let i = 0; i < s.max; i++) {
+            pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+        }
+        return `
+        <div class="scheda-slot-row">
+            <span class="scheda-slot-level">Lv ${lvl}</span>
+            <div class="scheda-slot-pips">${pips.join('')}</div>
+            <span class="scheda-slot-count" id="sSlotCount_${lvl}">${s.current}/${s.max}</span>
+        </div>`;
+    }).join('') : '<p class="scheda-empty">Nessuno slot disponibile</p>';
+
+    content.innerHTML = `
+    <div class="scheda-section">
+        <div class="scheda-section-title">Statistiche Incantatore</div>
+        ${spellStatsHtml}
+    </div>
+    <div class="scheda-section">
+        <div class="scheda-section-title">Slot Incantesimo</div>
+        <div class="scheda-slots-table">${slotsHtml}</div>
+    </div>
+    <div class="scheda-spell-back" onclick="renderSchedaPersonaggio('${pgId}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Torna alla scheda
+    </div>
+    `;
+
+    content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+        pip.addEventListener('click', () => {
+            const lvl = parseInt(pip.dataset.lvl);
+            const idx = parseInt(pip.dataset.idx);
+            schedaSlotToggleInline(pgId, lvl, idx);
+        });
+    });
+
+    const backBtn = document.getElementById('schedaBackBtn');
+    if (backBtn) backBtn.onclick = () => renderSchedaPersonaggio(pgId);
+}
+
+function schedaSlotToggleInline(pgId, level, index) {
+    const pg = _schedaPgCache;
     if (!pg || !pg.slot_incantesimo) return;
 
-    const slots = { ...pg.slot_incantesimo };
-    const slot = slots[level];
+    const slot = pg.slot_incantesimo[level];
     if (!slot) return;
 
     if (index < slot.current) {
@@ -3817,14 +4058,19 @@ window.schedaSlotToggle = async function(personaggioId, level, index) {
     } else {
         slot.current = index + 1;
     }
-    slots[level] = { ...slot };
 
-    try {
-        await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', personaggioId);
-        await renderSchedaPersonaggio(personaggioId);
-    } catch (e) {
-        console.error('Errore aggiornamento slot:', e);
+    // Update pips without reloading
+    const content = document.getElementById('schedaContent');
+    if (content) {
+        const pips = content.querySelectorAll(`.scheda-slot-pip[data-lvl="${level}"]`);
+        pips.forEach((p, i) => {
+            p.classList.toggle('filled', i < slot.current);
+        });
+        const countEl = document.getElementById(`sSlotCount_${level}`);
+        if (countEl) countEl.textContent = `${slot.current}/${slot.max}`;
     }
+
+    schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
 }
 
 window.openPersonaggioModal = function(personaggioId) {
@@ -3972,6 +4218,7 @@ async function handleSavePersonaggio(e) {
         resistenze: pgCurrentResistenze,
         slot_incantesimo: pgBuildSlotIncantesimo(),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
+        pv_attuali: parseInt(document.getElementById('pgPV').value) || 10,
         iniziativa: iniziativa,
         classe_armatura: classeArmatura,
         percezione_passiva: pgCalcPercPassiva(),
