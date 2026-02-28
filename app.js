@@ -3348,7 +3348,7 @@ async function handleSavePersonaggio(e) {
 }
 
 window.deletePersonaggio = async function(personaggioId) {
-    const confirmed = await showConfirmDialog('Sei sicuro di voler eliminare questo personaggio? Verrà rimosso anche da tutte le campagne associate.');
+    const confirmed = await showConfirm('Sei sicuro di voler eliminare questo personaggio? Verrà rimosso anche da tutte le campagne associate.');
     if (!confirmed) return;
 
     const supabase = getSupabaseClient();
