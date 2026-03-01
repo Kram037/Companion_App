@@ -49,7 +49,7 @@ CREATE POLICY "DM può gestire mostri combattimento" ON mostri_combattimento
 FOR ALL USING (
     EXISTS (
         SELECT 1 FROM campagne c
-        JOIN utenti u ON u.id = c.dm_id
+        JOIN utenti u ON u.id = c.id_dm
         WHERE c.id = mostri_combattimento.campagna_id
         AND u.uid = auth.uid()::text
     )
