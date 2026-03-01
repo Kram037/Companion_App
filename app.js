@@ -1483,20 +1483,17 @@ async function loadCampagne(userId, options = {}) {
         elements.campagneList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>';
     }
     
-    // Carica anche gli inviti ricevuti
-    const invitiRicevuti = await loadInvitiRicevuti(userId);
-    
     // Disconnetti da eventuali subscription precedenti
     if (!skipRealtimeSetup && campagneChannel) {
         supabase.removeChannel(campagneChannel);
         campagneChannel = null;
     }
 
-    // Carica inizialmente le campagne
     try {
-        // Prima trova l'utente nella tabella utenti per ottenere l'ID
-        // Usa findUserByUid che già gestisce correttamente le RLS e gli errori
-        const utente = await findUserByUid(userId);
+        const [invitiRicevuti, utente] = await Promise.all([
+            loadInvitiRicevuti(userId),
+            findUserByUid(userId)
+        ]);
         
         if (!utente) {
             console.error('❌ Utente non trovato nella tabella utenti');
@@ -1504,54 +1501,27 @@ async function loadCampagne(userId, options = {}) {
             return;
         }
 
-        // Carica le campagne: sia quelle create dall'utente che quelle a cui partecipa (invito accettato)
-        const { data: campagneCreate, error: errorCreate } = await supabase
-            .from('campagne')
-            .select('*')
-            .eq('id_dm', utente.id)
-            .order('data_creazione', { ascending: false });
+        const [campagneResult, invitiResult, preferitiResult] = await Promise.all([
+            supabase.from('campagne').select('*').eq('id_dm', utente.id).order('data_creazione', { ascending: false }),
+            supabase.from('inviti_campagna').select(`campagna_id, campagne:campagne!inviti_campagna_campagna_id_fkey(*)`).eq('invitato_id', utente.id).eq('stato', 'accepted'),
+            supabase.from('utenti').select('campagne_preferite').eq('id', utente.id).single()
+        ]);
 
-        if (errorCreate) throw errorCreate;
+        if (campagneResult.error) throw campagneResult.error;
+        const campagneCreate = campagneResult.data;
+        const invitiAccettati = invitiResult.data;
+        if (invitiResult.error) console.error('❌ Errore nel caricamento inviti accettati:', invitiResult.error);
 
-        // Carica anche le campagne dove l'utente ha accettato un invito
-        const { data: invitiAccettati, error: errorInviti } = await supabase
-            .from('inviti_campagna')
-            .select(`
-                campagna_id,
-                campagne:campagne!inviti_campagna_campagna_id_fkey(*)
-            `)
-            .eq('invitato_id', utente.id)
-            .eq('stato', 'accepted');
-
-        if (errorInviti) {
-            console.error('❌ Errore nel caricamento inviti accettati:', errorInviti);
-        } else {
-            console.log('✅ Inviti accettati caricati:', invitiAccettati?.length || 0);
-        }
-
-        // Combina le campagne create e quelle a cui partecipa
         const campagne = campagneCreate || [];
         if (invitiAccettati && invitiAccettati.length > 0) {
             const campagnePartecipate = invitiAccettati
-                .map(inv => {
-                    // Usa l'alias 'campagne' dalla query
-                    return inv.campagne;
-                })
+                .map(inv => inv.campagne)
                 .filter(Boolean)
-                .filter(camp => !campagne.some(c => c.id === camp.id)); // Evita duplicati
-
-            console.log('📋 Campagne a cui partecipa:', campagnePartecipate.length);
+                .filter(camp => !campagne.some(c => c.id === camp.id));
             campagne.push(...campagnePartecipate);
         }
 
-        // Carica i preferiti dell'utente
-        const { data: utenteConPreferiti, error: preferitiError } = await supabase
-            .from('utenti')
-            .select('campagne_preferite')
-            .eq('id', utente.id)
-            .single();
-
-        const campagnePreferite = (utenteConPreferiti?.campagne_preferite || []);
+        const campagnePreferite = (preferitiResult.data?.campagne_preferite || []);
 
         // Aggiungi un campo isPreferito a ogni campagna
         campagne.forEach(campagna => {
@@ -4890,49 +4860,42 @@ async function renderCampagnaDetailsContent(campagna) {
     
     if (supabase && AppState.currentUser) {
         try {
-            // Usa la funzione isCurrentUserDM che fa una query fresca al database
-            isDM = await isCurrentUserDM(campagna.id);
-            console.log('🔍 Verifica DM per campagna', campagna.id, '- isDM:', isDM);
-            
-            if (campagna.id_dm) {
-                if (AppState.cachedUserData && AppState.cachedUserData.id === campagna.id_dm) {
-                    nomeDM = AppState.cachedUserData.nome_utente || 'DM';
-                } else {
-                    const { data: dmData, error: dmError } = await supabase
-                        .rpc('get_dms_campagne', { p_dm_ids: [campagna.id_dm] });
-                    
-                    if (!dmError && dmData && dmData.length > 0) {
-                        nomeDM = dmData[0].nome_utente || 'DM';
-                    } else {
-                        if (dmError) console.warn('⚠️ RPC get_dms_campagne fallita:', dmError);
-                    }
-                }
+            const dmNamePromise = (campagna.id_dm && (!AppState.cachedUserData || AppState.cachedUserData.id !== campagna.id_dm))
+                ? supabase.rpc('get_dms_campagne', { p_dm_ids: [campagna.id_dm] })
+                : Promise.resolve(null);
+
+            const giocatoriPromise = (campagna.giocatori && campagna.giocatori.length > 0)
+                ? Promise.all([
+                    supabase.from('utenti').select('id, nome_utente, cid').in('id', campagna.giocatori),
+                    supabase.from('inviti_campagna').select('id, invitato_id').eq('campagna_id', campagna.id).in('invitato_id', campagna.giocatori).eq('stato', 'accepted')
+                  ])
+                : Promise.resolve(null);
+
+            const [isDMResult, dmNameResult, giocatoriResult] = await Promise.all([
+                isCurrentUserDM(campagna.id),
+                dmNamePromise,
+                giocatoriPromise
+            ]);
+
+            isDM = isDMResult;
+
+            if (AppState.cachedUserData && AppState.cachedUserData.id === campagna.id_dm) {
+                nomeDM = AppState.cachedUserData.nome_utente || 'DM';
+            } else if (dmNameResult && !dmNameResult.error && dmNameResult.data?.length > 0) {
+                nomeDM = dmNameResult.data[0].nome_utente || 'DM';
             }
-            
-            // Calcola il numero di giocatori dall'array
+
             numeroGiocatori = Array.isArray(campagna.giocatori) ? campagna.giocatori.length : 0;
-            
-            // Carica i dettagli dei giocatori se l'array non è vuoto
-            if (campagna.giocatori && campagna.giocatori.length > 0) {
-                const { data: giocatoriData } = await supabase
-                    .from('utenti')
-                    .select('id, nome_utente, cid')
-                    .in('id', campagna.giocatori);
-                
+
+            if (giocatoriResult) {
+                const [giocatoriDataResult, invitiResult] = giocatoriResult;
+                const giocatoriData = giocatoriDataResult.data;
                 if (giocatoriData) {
-                    // Mappa i giocatori con i loro inviti per poterli rimuovere
-                    const { data: inviti } = await supabase
-                        .from('inviti_campagna')
-                        .select('id, invitato_id')
-                        .eq('campagna_id', campagna.id)
-                        .in('invitato_id', campagna.giocatori)
-                        .eq('stato', 'accepted');
-                    
                     const invitiMap = new Map();
-                    if (inviti) {
-                        inviti.forEach(inv => invitiMap.set(inv.invitato_id, inv.id));
+                    if (invitiResult.data) {
+                        invitiResult.data.forEach(inv => invitiMap.set(inv.invitato_id, inv.id));
                     }
-                    
+
                     giocatoriCampagna = giocatoriData.map(giocatore => ({
                         ...giocatore,
                         invitoId: invitiMap.get(giocatore.id)
@@ -5662,29 +5625,20 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
 }
 
 /**
- * Verifica se l'utente corrente è il DM di una campagna
+ * Verifica se l'utente corrente è il DM di una campagna (con cache a breve durata)
  */
+const _dmCache = {};
 async function isCurrentUserDM(campagnaId) {
+    const cacheKey = campagnaId;
+    const cached = _dmCache[cacheKey];
+    if (cached && Date.now() - cached.ts < 30000) return cached.value;
+
     const supabase = getSupabaseClient();
-    if (!supabase || !AppState.currentUser) {
-        console.log('❌ isCurrentUserDM: supabase o currentUser non disponibili');
-        return false;
-    }
+    if (!supabase || !AppState.currentUser) return false;
 
     try {
-        const currentUser = await findUserByUid(AppState.currentUser.uid);
-        if (!currentUser) {
-            console.log('❌ isCurrentUserDM: currentUser non trovato');
-            return false;
-        }
-        console.log('👤 isCurrentUserDM: currentUser.id =', currentUser.id, 'tipo:', typeof currentUser.id);
-        console.log('📋 isCurrentUserDM: campagnaId =', campagnaId, 'tipo:', typeof campagnaId);
-
-        // Usa la funzione RPC per bypassare RLS e ottenere il vero valore dal database
-        console.log('🔍 isCurrentUserDM: chiamata RPC con parametri:', {
-            p_campagna_id: campagnaId,
-            p_user_id: currentUser.id
-        });
+        const currentUser = AppState.cachedUserData || await findUserByUid(AppState.currentUser.uid);
+        if (!currentUser) return false;
         
         const { data: isDM, error: rpcError } = await supabase.rpc('check_dm_campagna', {
             p_campagna_id: campagnaId,
@@ -5692,31 +5646,22 @@ async function isCurrentUserDM(campagnaId) {
         });
 
         if (rpcError) {
-            console.error('❌ isCurrentUserDM: errore nella funzione RPC:', rpcError);
-            // Fallback: usa la query normale se la RPC non è disponibile
-            console.log('⚠️ isCurrentUserDM: fallback alla query normale');
             const { data: campagna, error } = await supabase
                 .from('campagne')
                 .select('id_dm')
                 .eq('id', campagnaId)
                 .single();
 
-            if (error) {
-                console.error('❌ isCurrentUserDM: errore nel caricamento campagna:', error);
-                return false;
-            }
-            if (!campagna) {
-                console.log('❌ isCurrentUserDM: campagna non trovata');
-                return false;
-            }
+            if (error || !campagna) return false;
             
-            // Confronta id_dm invece di user_id
-            const isDM = campagna.id_dm === currentUser.id;
-            console.log('🔍 isCurrentUserDM (fallback): id_dm =', campagna.id_dm, '=', isDM);
-            return isDM;
+            const result = campagna.id_dm === currentUser.id;
+            _dmCache[cacheKey] = { value: result, ts: Date.now() };
+            return result;
         }
 
-        return isDM === true;
+        const result = isDM === true;
+        _dmCache[cacheKey] = { value: result, ts: Date.now() };
+        return result;
     } catch (error) {
         console.error('❌ Errore nel controllo DM:', error);
         return false;
@@ -6572,21 +6517,15 @@ async function renderSessioneContent(campagnaId) {
     }
 
     try {
-        // Verifica se l'utente è DM
-        const isDM = await isCurrentUserDM(campagnaId);
+        const [isDM, campagnaResult, sessione] = await Promise.all([
+            isCurrentUserDM(campagnaId),
+            supabase.from('campagne').select('nome_campagna').eq('id', campagnaId).single(),
+            getSessioneAttiva(campagnaId)
+        ]);
 
-        // Carica la campagna
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('nome_campagna')
-            .eq('id', campagnaId)
-            .single();
+        const campagna = campagnaResult.data;
+        if (campagnaResult.error) throw campagnaResult.error;
 
-        if (campagnaError) throw campagnaError;
-
-        // Carica la sessione attiva
-        const sessione = await getSessioneAttiva(campagnaId);
-        
         if (!sessione) {
             sessioneContent.innerHTML = `
                 <div class="content-placeholder">
@@ -6600,10 +6539,11 @@ async function renderSessioneContent(campagnaId) {
             return;
         }
 
-        // Calcola numero sessione
-        const numeroSessione = await getNumeroSessione(campagnaId);
+        const [numeroSessione, richiesteResult] = await Promise.all([
+            getNumeroSessione(campagnaId),
+            supabase.from('richieste_tiro_iniziativa').select('id, stato').eq('sessione_id', sessione.id).limit(1)
+        ]);
 
-        // Aggiorna titolo
         if (sessioneTitle) {
             sessioneTitle.innerHTML = `<div>${escapeHtml(campagna.nome_campagna)}</div><div>Sessione ${numeroSessione}</div>`;
         }
@@ -6615,14 +6555,7 @@ async function renderSessioneContent(campagnaId) {
         const durataOre = Math.floor(durataMinuti / 60);
         const durataMinutiResto = durataMinuti % 60;
 
-        // Verifica se c'è combattimento attivo (ci sono richieste tiro iniziativa per questa sessione)
-        const { data: richiesteIniziativa } = await supabase
-            .from('richieste_tiro_iniziativa')
-            .select('id, stato')
-            .eq('sessione_id', sessione.id)
-            .limit(1);
-        
-        const inCombattimento = richiesteIniziativa && richiesteIniziativa.length > 0;
+        const inCombattimento = richiesteResult.data && richiesteResult.data.length > 0;
 
         sessioneContent.innerHTML = `
             <div class="sessione-timer">
@@ -6868,18 +6801,17 @@ async function renderSessioneConditions(campagnaId, isDM) {
             const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
             if (!pgList || pgList.length === 0) { panel.innerHTML = ''; return; }
 
-            const fullChars = [];
-            for (const pg of pgList) {
-                const { data: charData } = await supabase.from('personaggi').select('id, nome, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, slot_incantesimo').eq('id', pg.personaggio_id).single();
-                if (charData) fullChars.push(charData);
-            }
+            const pgIds = pgList.map(pg => pg.personaggio_id).filter(Boolean);
+            const { data: fullChars } = await supabase.from('personaggi')
+                .select('id, nome, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, slot_incantesimo')
+                .in('id', pgIds);
 
             panel.innerHTML = `
                 <div class="form-section-label" style="margin-top:var(--spacing-md);">Stato Personaggi</div>
-                ${fullChars.map(pg => renderConditionsCard(pg, true)).join('')}
+                ${(fullChars || []).map(pg => renderConditionsCard(pg, true)).join('')}
             `;
         } else {
-            const userData = await findUserByUid(AppState.currentUser?.uid);
+            const userData = AppState.cachedUserData || await findUserByUid(AppState.currentUser?.uid);
             if (!userData) return;
             const { data: pgData } = await supabase.rpc('get_personaggio_campagna', { p_campagna_id: campagnaId, p_user_id: userData.id });
             if (!pgData || pgData.length === 0) { panel.innerHTML = ''; return; }
@@ -7045,34 +6977,45 @@ window.sessionSlotChange = async function(personaggioId, level, delta) {
 }
 
 /**
- * Builds a map: user_id -> character name for a campaign
+ * Fetches campaign characters once and returns both names and conditions maps.
+ * Avoids duplicate RPC + eliminates N+1 queries.
  */
-async function getCharacterNamesMap(campagnaId) {
-    const map = {};
+async function getCampaignCharacterData(campagnaId) {
+    const namesMap = {};
+    const conditionsMap = {};
     const supabase = getSupabaseClient();
-    if (!supabase || !campagnaId) return map;
+    if (!supabase || !campagnaId) return { namesMap, conditionsMap };
     try {
-        const { data } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
-        if (data) {
-            data.forEach(pg => { map[pg.player_user_id] = pg.nome; });
+        const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+        if (!pgList || pgList.length === 0) return { namesMap, conditionsMap };
+
+        pgList.forEach(pg => { namesMap[pg.player_user_id] = pg.nome; });
+
+        const pgIds = pgList.map(pg => pg.personaggio_id).filter(Boolean);
+        if (pgIds.length > 0) {
+            const { data: charRows } = await supabase.from('personaggi')
+                .select('id, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, punti_vita_max, pv_attuali')
+                .in('id', pgIds);
+            if (charRows) {
+                const charById = {};
+                charRows.forEach(c => { charById[c.id] = c; });
+                pgList.forEach(pg => {
+                    if (charById[pg.personaggio_id]) conditionsMap[pg.player_user_id] = charById[pg.personaggio_id];
+                });
+            }
         }
-    } catch (e) { console.warn('Errore caricamento nomi personaggi:', e); }
-    return map;
+    } catch (e) { console.warn('Errore caricamento dati personaggi campagna:', e); }
+    return { namesMap, conditionsMap };
+}
+
+async function getCharacterNamesMap(campagnaId) {
+    const { namesMap } = await getCampaignCharacterData(campagnaId);
+    return namesMap;
 }
 
 async function getCharacterConditionsMap(campagnaId) {
-    const map = {};
-    const supabase = getSupabaseClient();
-    if (!supabase || !campagnaId) return map;
-    try {
-        const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
-        if (!pgList) return map;
-        for (const pg of pgList) {
-            const { data: charData } = await supabase.from('personaggi').select('concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, punti_vita_max, pv_attuali').eq('id', pg.personaggio_id).single();
-            if (charData) map[pg.player_user_id] = charData;
-        }
-    } catch (e) { console.warn('Errore caricamento condizioni:', e); }
-    return map;
+    const { conditionsMap } = await getCampaignCharacterData(campagnaId);
+    return conditionsMap;
 }
 
 /**
@@ -7099,17 +7042,21 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
     if (!supabase) { cardsCol.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
 
     try {
-        const { data: sessione } = await supabase.from('sessioni').select('combat_round, combat_turn_index').eq('id', sessioneId).single();
+        const [sessioneResult, tiriResult, monstersResult, charData, isDM, currentUserId] = await Promise.all([
+            supabase.from('sessioni').select('combat_round, combat_turn_index').eq('id', sessioneId).single(),
+            supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId }).catch(() => ({ data: null, error: true })),
+            supabase.from('mostri_combattimento').select('*').eq('sessione_id', sessioneId).order('iniziativa', { ascending: false, nullsFirst: false }),
+            getCampaignCharacterData(campagnaId),
+            isCurrentUserDM(campagnaId),
+            getCurrentInternalUserId()
+        ]);
+
+        const sessione = sessioneResult.data;
         const combatRound = sessione?.combat_round || 1;
         const combatTurnIdx = sessione?.combat_turn_index || 0;
 
-        let tiriIniziativa = null;
-        let tiriError = null;
-        try {
-            const result = await supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId });
-            tiriIniziativa = result.data; tiriError = result.error;
-        } catch (e) { tiriError = e; }
-        if (tiriError) {
+        let tiriIniziativa = tiriResult.data;
+        if (tiriResult.error || !tiriIniziativa) {
             const fallback = await supabase.from('richieste_tiro_iniziativa')
                 .select(`*, utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)`)
                 .eq('sessione_id', sessioneId).order('valore', { ascending: false });
@@ -7117,13 +7064,10 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         }
         const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
 
-        const { data: monsters } = await supabase.from('mostri_combattimento').select('*').eq('sessione_id', sessioneId).order('iniziativa', { ascending: false, nullsFirst: false });
-        _combatMonsters = monsters || [];
+        _combatMonsters = monstersResult.data || [];
 
-        const pgNamesMap = await getCharacterNamesMap(campagnaId);
-        const pgConditionsMap = await getCharacterConditionsMap(campagnaId);
-        const isDM = await isCurrentUserDM(campagnaId);
-        const currentUserId = await getCurrentInternalUserId();
+        const pgNamesMap = charData.namesMap;
+        const pgConditionsMap = charData.conditionsMap;
 
         // Build initiative order
         const order = [];
@@ -7243,6 +7187,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 }
 
 async function getCurrentInternalUserId() {
+    if (AppState.cachedUserData?.id) return AppState.cachedUserData.id;
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.currentUser) return null;
     try {

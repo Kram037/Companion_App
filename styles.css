@@ -2812,7 +2812,7 @@ body.user-logged-in .header-username {
 .combat-dm-actions { display: flex; gap: 6px; margin-top: 10px; }
 
 /* Combat DM Toolbar (floating bottom) */
-.combat-toolbar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 4px; z-index: 50; box-shadow: var(--shadow-md); }
+.combat-toolbar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 4px; z-index: 50; box-shadow: var(--shadow-md); }
 .combat-toolbar-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 48px; height: 42px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; gap: 2px; }
 .combat-toolbar-btn:hover { background: var(--surface-hover); }
 .combat-toolbar-btn svg { width: 18px; height: 18px; }
