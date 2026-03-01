@@ -4007,7 +4007,13 @@ window.schedaOpenSpellPage = async function(pgId) {
         </div>`;
     }).join('') : '<p class="scheda-empty">Nessuno slot disponibile</p>';
 
+    const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
+
     content.innerHTML = `
+    <div class="scheda-identity" style="margin-top: 38px;">
+        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+        <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+    </div>
     <div class="scheda-section">
         <div class="scheda-section-title">Statistiche Incantatore</div>
         ${spellStatsHtml}
@@ -7044,7 +7050,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
     try {
         const [sessioneResult, tiriResult, monstersResult, charData, isDM, currentUserId] = await Promise.all([
             supabase.from('sessioni').select('combat_round, combat_turn_index').eq('id', sessioneId).single(),
-            supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId }).catch(() => ({ data: null, error: true })),
+            supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId }),
             supabase.from('mostri_combattimento').select('*').eq('sessione_id', sessioneId).order('iniziativa', { ascending: false, nullsFirst: false }),
             getCampaignCharacterData(campagnaId),
             isCurrentUserDM(campagnaId),
