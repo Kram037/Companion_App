@@ -2743,8 +2743,11 @@ body.user-logged-in .header-username {
     font-size: 0.88rem;
 }
 
+/* Combat Page Frame */
+#combattimentoPage { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
 /* Combat Header */
-.combat-header { display: flex; align-items: center; padding: 10px 50px; position: relative; min-height: 50px; justify-content: center; }
+.combat-header { display: flex; align-items: center; padding: 10px 50px; min-height: 50px; justify-content: center; flex-shrink: 0; border-bottom: 1px solid var(--border); }
 .combat-back.back-button-floating { position: fixed; top: 78px; left: 14px; transform: none; }
 .combat-round-center { flex: 1; text-align: center; }
 .combat-round-num { font-size: 0.82rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -2753,8 +2756,8 @@ body.user-logged-in .header-username {
 .combat-next-btn:hover { opacity: 0.85; }
 
 /* Combat Body: icon col + cards col */
-.combat-body { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 56px - 64px - 56px); }
-.combat-initiative-col { width: 54px; min-width: 54px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); }
+.combat-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.combat-initiative-col { width: 54px; min-width: 54px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); flex-shrink: 0; }
 .combat-cards-col { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
 
 /* Combat Icons */
@@ -2768,15 +2771,15 @@ body.user-logged-in .header-username {
 .combat-icon-init { font-size: 0.5rem; color: var(--text-muted); line-height: 1; margin-top: 1px; }
 
 /* Combat Cards (collapsed) */
-.combat-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; min-height: 44px; }
+.combat-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; height: 48px; flex-shrink: 0; overflow: hidden; }
 .combat-card:hover { border-color: var(--accent-light); }
 .combat-card.is-turn { border-color: var(--accent); background: var(--accent-subtle); }
 .combat-card.monster-card { border-left: 3px solid #ef4444; }
-.combat-card-name { font-size: 0.85rem; font-weight: 700; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.combat-card-hp { font-size: 0.78rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
-.combat-card-badges { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; flex-shrink: 0; max-width: 120px; }
-.combat-card-badges .condition-badge-sm { font-size: 0.55rem; padding: 1px 4px; }
-.combat-card-init { font-size: 0.75rem; font-weight: 700; color: var(--accent); flex-shrink: 0; min-width: 20px; text-align: right; }
+.combat-card-name { font-size: 0.85rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.combat-card-center { flex: 1; display: flex; align-items: center; gap: 4px; overflow: hidden; min-width: 0; }
+.combat-card-badges { display: flex; gap: 2px; overflow: hidden; flex-shrink: 1; min-width: 0; }
+.combat-card-badges .condition-badge-sm { font-size: 0.55rem; padding: 1px 4px; white-space: nowrap; flex-shrink: 0; }
+.combat-card-hp { font-size: 0.82rem; font-weight: 800; color: var(--accent); flex-shrink: 0; white-space: nowrap; margin-left: auto; }
 
 /* Combat Card Expanded (sheet) */
 .combat-card-expanded { background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px; animation: combatExpand 0.2s ease; }

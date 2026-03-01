@@ -7068,7 +7068,7 @@ async function getCharacterConditionsMap(campagnaId) {
         const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
         if (!pgList) return map;
         for (const pg of pgList) {
-            const { data: charData } = await supabase.from('personaggi').select('concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione').eq('id', pg.personaggio_id).single();
+            const { data: charData } = await supabase.from('personaggi').select('concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, punti_vita_max, pv_attuali').eq('id', pg.personaggio_id).single();
             if (charData) map[pg.player_user_id] = charData;
         }
     } catch (e) { console.warn('Errore caricamento condizioni:', e); }
@@ -7191,17 +7191,21 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 
                 let hpDisplay = '';
                 if (isMonster && isDM && entry.monster) {
-                    hpDisplay = `<span class="combat-card-hp">${entry.monster.pv_attuali ?? entry.monster.punti_vita_max}/${entry.monster.punti_vita_max}</span>`;
-                } else if (!isMonster) {
-                    hpDisplay = '';
+                    const mHp = entry.monster.pv_attuali ?? entry.monster.punti_vita_max;
+                    hpDisplay = `<span class="combat-card-hp">${mHp}/${entry.monster.punti_vita_max}</span>`;
+                } else if (!isMonster && entry.conditions) {
+                    const pHp = entry.conditions.pv_attuali != null ? entry.conditions.pv_attuali : entry.conditions.punti_vita_max;
+                    const pMax = entry.conditions.punti_vita_max || '?';
+                    hpDisplay = `<span class="combat-card-hp">${pHp}/${pMax}</span>`;
                 }
 
                 return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''}" 
                     onclick="combatSelectEntry('${entry.type}','${entry.id}','${campagnaId}','${sessioneId}',${isDM},${entry.id === currentUserId})">
-                    <span class="combat-card-name">${escapeHtml(entry.name)}</span>
-                    ${condBadges ? `<div class="combat-card-badges">${condBadges}</div>` : ''}
+                    <div class="combat-card-center">
+                        <span class="combat-card-name">${escapeHtml(entry.name)}</span>
+                        ${condBadges ? `<div class="combat-card-badges">${condBadges}</div>` : ''}
+                    </div>
                     ${hpDisplay}
-                    <span class="combat-card-init">${entry.init}</span>
                 </div>`;
             }).join('');
         }
