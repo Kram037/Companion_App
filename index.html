@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1767046000">
+    <link rel="stylesheet" href="styles.css?v=1767047000">
 </head>
 <body>
     <!-- Header -->
@@ -181,19 +181,23 @@
 
         <!-- Combattimento Page -->
         <section class="page" id="combattimentoPage">
-            <div class="page-content combattimento-content">
-                <div class="combattimento-header">
-                    <h1 id="combattimentoCampagnaTitle" class="combattimento-title">Combattimento</h1>
-                    <button class="back-button-floating" id="backToSessioneBtn" aria-label="Torna alla sessione">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                    </button>
+            <div class="combat-layout">
+                <div class="combat-sidebar" id="combatSidebar">
+                    <!-- Initiative icons go here -->
                 </div>
-                <div id="combattimentoContent">
-                    <!-- Il contenuto verrà popolato dinamicamente -->
+                <div class="combat-main" id="combatMain">
+                    <div class="combat-top-bar">
+                        <div class="combat-round-info" id="combatRoundInfo">Round 1 - Turno 1</div>
+                        <button class="btn-primary btn-small combat-next-btn" id="combatNextTurnBtn" style="display:none;">Prossimo Turno</button>
+                    </div>
+                    <div id="combattimentoContent"></div>
                 </div>
             </div>
+            <button class="back-button-floating" id="backToSessioneBtn" aria-label="Torna alla sessione">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </button>
         </section>
 
         <!-- Dettagli Campagna Page -->
@@ -799,7 +803,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1767046000"></script>
+    <script src="app.js?v=1767047000"></script>
     
     <!-- Cache busting script for development -->
     <script>
