@@ -901,8 +901,10 @@ body.user-logged-in .header-username {
 @media (hover: hover) { .scheda-ability-save:hover { background: var(--surface-hover); } }
 .scheda-ability-save.proficient { color: var(--accent); font-weight: 600; }
 .scheda-save-dot { font-size: 1rem; }
+.scheda-save-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
 
-/* Four Boxes */
+/* Stat Boxes */
+.scheda-three-boxes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: var(--spacing-sm); }
 .scheda-four-boxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: var(--spacing-sm); }
 .scheda-box { text-align: center; padding: 10px 4px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .scheda-box-val { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
@@ -2742,9 +2744,8 @@ body.user-logged-in .header-username {
 }
 
 /* Combat Header */
-.combat-header { display: flex; align-items: center; padding: 10px 16px 10px 60px; position: relative; border-bottom: 1px solid var(--border); background: var(--surface); min-height: 56px; }
-.combat-back { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
-.combat-back.back-button-floating { position: absolute; top: 50%; transform: translateY(-50%); }
+.combat-header { display: flex; align-items: center; padding: 10px 50px; position: relative; min-height: 50px; justify-content: center; }
+.combat-back.back-button-floating { position: fixed; top: 78px; left: 14px; transform: none; }
 .combat-round-center { flex: 1; text-align: center; }
 .combat-round-num { font-size: 0.82rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
 .combat-turn-name { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
@@ -2798,6 +2799,11 @@ body.user-logged-in .header-username {
 .combat-ability-mod { font-size: 0.7rem; font-weight: 600; color: var(--accent); }
 .combat-conditions { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
 .combat-section-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 6px 0 3px; }
+.combat-ability-save-mini { font-size: 0.55rem; color: var(--text-muted); display: block; }
+.combat-ability-save-mini.prof { color: var(--accent); font-weight: 700; }
+.combat-sheet-tabs { display: flex; gap: 2px; margin-bottom: 10px; background: var(--bg); border-radius: var(--radius-sm); padding: 2px; }
+.combat-sheet-tab { flex: 1; padding: 6px 8px; font-size: 0.75rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
+.combat-sheet-tab.active { background: var(--accent); color: white; }
 .combat-dm-actions { display: flex; gap: 6px; margin-top: 10px; }
 
 /* Combat DM Toolbar (floating bottom) */

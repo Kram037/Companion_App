@@ -3683,6 +3683,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <div class="scheda-ability-mod" id="sMod_${a.key}">${m}</div>
                 <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}" onclick="schedaToggleSave('${pg.id}','${a.key}')">
                     <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span>
+                    <span class="scheda-save-label">TS</span>
                     <span class="scheda-save-val" id="sSave_${a.key}">${saveStr}</span>
                 </div>
             </div>`;
@@ -3762,11 +3763,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             <div class="scheda-abilities">${abilitiesHtml}</div>
         </div>
 
-        <div class="scheda-four-boxes">
-            <div class="scheda-box">
-                <div class="scheda-box-val">+${bonusComp}</div>
-                <div class="scheda-box-label">Competenza</div>
-            </div>
+        <div class="scheda-three-boxes">
             <div class="scheda-box editable">
                 <input type="number" class="scheda-box-input" value="${pg.classe_armatura || 10}" data-field="classe_armatura" data-pgid="${pg.id}">
                 <div class="scheda-box-label">CA</div>
@@ -7299,9 +7296,51 @@ async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessio
     const fMod = (v) => { const m = Math.floor(((v||10)-10)/2); return m >= 0 ? `+${m}` : `${m}`; };
     const bonusComp = Math.floor(((pg.livello||1)-1)/4)+2;
     const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+    const saves = pg.tiri_salvezza || [];
 
     const conditionsActive = ALL_CONDITIONS.filter(c => pg[c.key]);
     const condBadges = conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('');
+
+    const hasSpellSlots = pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object' && Object.keys(pg.slot_incantesimo).length > 0;
+
+    // Spell page content
+    let spellPageHtml = '';
+    if (hasSpellSlots) {
+        const classi = pg.classi || [];
+        const spellAbilities = [];
+        classi.forEach(c => {
+            const ab = CLASS_SPELL_ABILITY[c.nome];
+            if (ab && !spellAbilities.find(s => s.ability === ab)) {
+                const val = pg[ab] || 10;
+                const m = Math.floor((val - 10) / 2);
+                spellAbilities.push({ classe: c.nome, ability: ab, mod: m });
+            }
+        });
+        const spellStatsHtml = spellAbilities.map(sa => {
+            const atkBonus = sa.mod + bonusComp;
+            const dc = 8 + bonusComp + sa.mod;
+            return `<div class="scheda-box"><div class="scheda-box-val">${sa.mod >= 0 ? '+'+sa.mod : sa.mod}</div><div class="scheda-box-label">${sa.ability.substring(0,3).toUpperCase()}</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>`;
+        }).join('');
+
+        const slots = pg.slot_incantesimo;
+        const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const pips = [];
+            for (let i = 0; i < s.max; i++) {
+                pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+            }
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips.join('')}</div><span class="scheda-slot-count" id="cSlotCount_${lvl}">${s.current}/${s.max}</span></div>`;
+        }).join('');
+
+        spellPageHtml = `
+        <div id="combatSpellPage" style="display:none;">
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">${spellStatsHtml}</div>
+            <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>`;
+    }
 
     content.innerHTML = `
     <div class="combat-card-expanded">
@@ -7310,28 +7349,75 @@ async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessio
             <span class="combat-sheet-sub">${escapeHtml(pg.razza || '')} · Lv ${pg.livello || 1}</span>
             <button class="combat-sheet-close" onclick="combatCloseSheet('${campagnaId}','${sessioneId}')">&times;</button>
         </div>
-        <div class="scheda-four-boxes">
-            <div class="scheda-box"><div class="scheda-box-val">${pg.classe_armatura || 10}</div><div class="scheda-box-label">CA</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${fMod(pg.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${pg.velocita || 9}</div><div class="scheda-box-label">Velocità</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">+${bonusComp}</div><div class="scheda-box-label">Competenza</div></div>
-        </div>
-        <div class="combat-hp-bar">
-            <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max||10})"` : ''}>
-                <span class="combat-hp-val ${canEdit ? 'editable' : ''}" id="combatPvAttuali">${pvAttuali}</span>/<span>${pg.punti_vita_max||10}</span>
-                <div class="scheda-hp-label">PV</div>
+        ${hasSpellSlots ? `<div class="combat-sheet-tabs"><button class="combat-sheet-tab active" onclick="combatSheetTab(0)">Scheda</button><button class="combat-sheet-tab" onclick="combatSheetTab(1)">Incantesimi</button></div>` : ''}
+        <div id="combatStatsPage">
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${pg.classe_armatura || 10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${pg.iniziativa != null ? pg.iniziativa : fMod(pg.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${pg.velocita || 9}</div><div class="scheda-box-label">Velocità</div></div>
             </div>
-            <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pg.pv_temporanei||0},-1)"` : ''}>
-                <span class="combat-hp-val ${canEdit ? 'editable' : ''}" id="combatPvTemp">${pg.pv_temporanei||0}</span>
-                <div class="scheda-hp-label">PV Temp</div>
+            <div class="combat-hp-bar">
+                <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max||10})"` : ''}>
+                    <span class="combat-hp-val ${canEdit ? 'editable' : ''}">${pvAttuali}</span>/<span>${pg.punti_vita_max||10}</span>
+                    <div class="scheda-hp-label">PV</div>
+                </div>
+                <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pg.pv_temporanei||0},-1)"` : ''}>
+                    <span class="combat-hp-val ${canEdit ? 'editable' : ''}">${pg.pv_temporanei||0}</span>
+                    <div class="scheda-hp-label">PV Temp</div>
+                </div>
             </div>
+            <div class="combat-abilities-grid">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const v = pg[a.key]||10;
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor((v-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${v}</span><span class="combat-ability-mod">${fMod(v)}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${condBadges || pg.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${pg.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${pg.esaustione}</span>` : ''}</div>` : ''}
+            ${canEdit ? `<button class="btn-secondary btn-small" style="margin-top:10px;" onclick="openConditionsModal('${pg.id}')">Condizioni</button>` : ''}
         </div>
-        <div class="combat-abilities-grid">
-            ${SCHEDA_ABILITIES.map(a => `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${pg[a.key]||10}</span><span class="combat-ability-mod">${fMod(pg[a.key])}</span></div>`).join('')}
-        </div>
-        ${condBadges || pg.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${pg.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${pg.esaustione}</span>` : ''}</div>` : ''}
-        ${canEdit ? `<button class="btn-secondary btn-small" style="margin-top:12px;" onclick="openConditionsModal('${pg.id}')">Modifica condizioni</button>` : ''}
+        ${spellPageHtml}
     </div>`;
+
+    // Wire slot pips if caster
+    if (hasSpellSlots && canEdit) {
+        content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+            pip.addEventListener('click', () => {
+                const lvl = parseInt(pip.dataset.lvl);
+                const idx = parseInt(pip.dataset.idx);
+                combatSlotToggle(pg.id, lvl, idx);
+            });
+        });
+    }
+}
+
+window.combatSheetTab = function(tabIdx) {
+    const statsPage = document.getElementById('combatStatsPage');
+    const spellPage = document.getElementById('combatSpellPage');
+    const tabs = document.querySelectorAll('.combat-sheet-tab');
+    tabs.forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+    if (statsPage) statsPage.style.display = tabIdx === 0 ? '' : 'none';
+    if (spellPage) spellPage.style.display = tabIdx === 1 ? '' : 'none';
+}
+
+function combatSlotToggle(pgId, level, index) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single().then(({ data: pg }) => {
+        if (!pg || !pg.slot_incantesimo) return;
+        const slot = pg.slot_incantesimo[level];
+        if (!slot) return;
+        slot.current = index < slot.current ? index : index + 1;
+        const content = document.getElementById('combattimentoContent');
+        if (content) {
+            content.querySelectorAll(`.scheda-slot-pip[data-lvl="${level}"]`).forEach((p, i) => p.classList.toggle('filled', i < slot.current));
+            const countEl = document.getElementById(`cSlotCount_${level}`);
+            if (countEl) countEl.textContent = `${slot.current}/${slot.max}`;
+        }
+        supabase.from('personaggi').update({ slot_incantesimo: pg.slot_incantesimo, updated_at: new Date().toISOString() }).eq('id', pgId).then(() => {});
+    });
 }
 
 async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId) {
