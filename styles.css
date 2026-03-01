@@ -262,7 +262,8 @@ body.user-logged-in .header-username {
 }
 
 .page.active { display: block; }
-#combattimentoPage.active { display: flex; flex-direction: column; height: calc(100vh - 64px - 56px); overflow: hidden; position: relative; }
+#combattimentoPage.active { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+.main-content:has(#combattimentoPage.active) { overflow: hidden; padding: 0; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(6px); }
