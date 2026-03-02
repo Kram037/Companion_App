@@ -68,7 +68,7 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow(event.notification.data?.url || '/');
+                return clients.openWindow(event.notification.data?.url || './index.html');
             }
         })
     );

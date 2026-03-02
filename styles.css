@@ -946,10 +946,10 @@ body.user-logged-in .header-username {
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
 .scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
-.scheda-skill-dot:focus { outline: none; color: var(--text-muted); }
-.scheda-skill-dot.active:focus { color: var(--accent); }
-@media (hover: hover) { .scheda-skill-dot:hover { color: var(--accent); } }
+.scheda-skill-dot:focus, .scheda-skill-dot:active { outline: none; color: var(--text-muted); }
 .scheda-skill-dot.active { color: var(--accent); }
+.scheda-skill-dot.active:focus, .scheda-skill-dot.active:active { color: var(--accent); }
+@media (hover: hover) { .scheda-skill-dot:not(.active):hover { color: var(--accent); opacity: 0.5; } }
 .scheda-skill-dot.expert { font-size: 1.05rem; }
 .scheda-skill-mod { min-width: 24px; font-weight: 600; text-align: right; color: var(--text); }
 .scheda-skill-name { flex: 1; }

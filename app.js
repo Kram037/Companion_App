@@ -3889,7 +3889,6 @@ window.schedaToggleSave = async function(pgId, abilityKey) {
 }
 
 window.schedaToggleSkillProf = async function(pgId, skillKey, evt) {
-    if (evt && evt.target) evt.target.blur();
     const pg = _schedaPgCache;
     if (!pg) return;
     const skills = [...(pg.competenze_abilita || [])];
@@ -3898,11 +3897,11 @@ window.schedaToggleSkillProf = async function(pgId, skillKey, evt) {
     pg.competenze_abilita = skills;
 
     schedaRefreshSkill(pg, skillKey);
+    if (evt && evt.target) setTimeout(() => evt.target.blur(), 0);
     schedaInstantSave(pgId, { competenze_abilita: skills });
 }
 
 window.schedaToggleSkillExpert = async function(pgId, skillKey, evt) {
-    if (evt && evt.target) evt.target.blur();
     const pg = _schedaPgCache;
     if (!pg) return;
     const experts = [...(pg.maestrie_abilita || [])];
@@ -3920,6 +3919,7 @@ window.schedaToggleSkillExpert = async function(pgId, skillKey, evt) {
     }
 
     schedaRefreshSkill(pg, skillKey);
+    if (evt && evt.target) setTimeout(() => evt.target.blur(), 0);
     schedaInstantSave(pgId, updates);
 }
 
@@ -4010,7 +4010,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
     content.innerHTML = `
-    <div class="scheda-identity" style="margin-top: 38px;">
+    <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
     </div>
