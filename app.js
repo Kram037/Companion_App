@@ -371,6 +371,7 @@ function setupSupabaseAuth() {
                     startRollRequestsRealtime();
                     startSessionRealtime();
                     startAppEventsRealtime();
+                    checkStartupNotifications();
                 });
             } else {
                 AppState.currentUser = null;
@@ -434,6 +435,7 @@ async function checkAuthState() {
             startRollRequestsRealtime();
             startSessionRealtime();
             startAppEventsRealtime();
+            checkStartupNotifications();
         } else {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
@@ -6406,6 +6408,52 @@ async function getSessioneAttiva(campagnaId) {
     } catch (error) {
         console.error('❌ Errore nel recupero sessione attiva:', error);
         return null;
+    }
+}
+
+/**
+ * Controlla all'avvio se ci sono sessioni attive o richieste di tiro pending
+ */
+async function checkStartupNotifications() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn || !AppState.currentUser) return;
+
+    try {
+        const userData = await findUserByUid(AppState.currentUser.uid);
+        if (!userData) return;
+
+        const [pendingRoll, activeSessionResult] = await Promise.all([
+            checkPendingRollRequests(AppState.currentUser.uid),
+            supabase
+                .from('sessioni')
+                .select('id, campagna_id, campagne:campagne!sessioni_campagna_id_fkey(id, nome, giocatori, id_dm)')
+                .is('data_fine', null)
+        ]);
+
+        if (pendingRoll && !window.currentRollRequest) {
+            showRollRequestModal(pendingRoll);
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+
+        if (!AppState.activeSessionCampagnaId && activeSessionResult.data) {
+            const myCampagna = activeSessionResult.data.find(s =>
+                s.campagne && (
+                    (s.campagne.giocatori || []).includes(userData.id) ||
+                    s.campagne.id_dm === userData.id
+                )
+            );
+            if (myCampagna) {
+                AppState.activeSessionCampagnaId = myCampagna.campagna_id;
+                sessionStorage.setItem('activeSessionCampagnaId', myCampagna.campagna_id);
+                AppState.currentCampagnaId = myCampagna.campagna_id;
+                sessionStorage.setItem('currentCampagnaId', myCampagna.campagna_id);
+                AppState.currentSessioneId = myCampagna.id;
+                sessionStorage.setItem('currentSessioneId', myCampagna.id);
+                updateReturnToSessionBtn();
+            }
+        }
+    } catch (error) {
+        console.error('Errore checkStartupNotifications:', error);
     }
 }
 
