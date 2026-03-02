@@ -7638,84 +7638,200 @@ window.saveMonsterConditions = async function(mId, campagnaId, sessioneId) {
 
 // Monster creation modal
 window.openMonsterCreationModal = function(campagnaId, sessioneId) {
-    const existing = document.getElementById('hpCalcOverlay');
-    if (existing) existing.remove();
+    let modal = document.getElementById('monsterModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'monsterModal';
+        modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content modal-content-lg" id="monsterModalContent"></div>`;
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeMonsterModal(); });
+        document.body.appendChild(modal);
+    }
 
-    const overlay = document.createElement('div');
-    overlay.id = 'hpCalcOverlay';
-    overlay.className = 'hp-calc-overlay';
-    overlay.innerHTML = `
-        <div class="monster-create-modal">
-            <div class="hp-calc-title">Crea Mostro</div>
-            <div class="monster-wizard" id="monsterWizard">
-                <div class="monster-step" data-step="0">
-                    <div class="form-group"><label>Nome</label><input type="text" id="mNome" class="form-input" required></div>
-                    <div class="form-group"><label>Tipologia</label><select id="mTipologia" class="form-input">${MONSTER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}</select></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Taglia</label><select id="mTaglia" class="form-input">${MONSTER_SIZES.map(s => `<option value="${s}" ${s==='Media'?'selected':''}>${s}</option>`).join('')}</select></div>
-                        <div class="form-group"><label>GS</label><input type="text" id="mGS" class="form-input" value="0"></div>
+    const resistenzeOptions = ['Acido','Contundente','Freddo','Fulmine','Fuoco','Forza','Necrotico','Perforante','Psichico','Radiante','Tagliente','Tuono','Veleno'];
+
+    document.getElementById('monsterModalContent').innerHTML = `
+        <button class="modal-close" onclick="closeMonsterModal()">&times;</button>
+        <h2>Nuovo Mostro</h2>
+        <div class="wizard-steps">
+            <div class="wizard-step active" data-step="0"></div>
+            <div class="wizard-step" data-step="1"></div>
+            <div class="wizard-step" data-step="2"></div>
+            <div class="wizard-step" data-step="3"></div>
+            <div class="wizard-step" data-step="4"></div>
+        </div>
+        <form id="monsterForm" onsubmit="return false;">
+            <div class="wizard-page active" id="mStep0">
+                <div class="form-group">
+                    <label for="mNome">Nome</label>
+                    <input type="text" id="mNome" required placeholder="Nome del mostro">
+                </div>
+                <div class="form-group">
+                    <label for="mTipologia">Tipologia</label>
+                    <select id="mTipologia">${MONSTER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+                </div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label for="mTaglia">Taglia</label>
+                        <select id="mTaglia">${MONSTER_SIZES.map(s => `<option value="${s}" ${s === 'Media' ? 'selected' : ''}>${s}</option>`).join('')}</select>
                     </div>
-                    <div class="form-group"><label>Allineamento</label><select id="mAllineamento" class="form-input">${MONSTER_ALIGNMENTS.map(a => `<option value="${a}">${a}</option>`).join('')}</select></div>
-                </div>
-                <div class="monster-step" data-step="1" style="display:none;">
-                    <div class="form-row">${SCHEDA_ABILITIES.map(a => `<div class="form-group"><label>${a.label}</label><input type="number" id="m${a.key}" class="form-input" value="10" min="1" max="30"></div>`).join('')}</div>
-                    <div class="form-group"><label>Tiri Salvezza (competenti)</label>
-                    <div class="monster-saves-grid">${SCHEDA_ABILITIES.map(a => `<label class="pg-condition-item"><input type="checkbox" id="mSave_${a.key}"> ${a.label}</label>`).join('')}</div></div>
-                </div>
-                <div class="monster-step" data-step="2" style="display:none;">
-                    <div class="form-group"><label>Abilità (competenti)</label>
-                    <div class="monster-skills-grid">${SCHEDA_SKILLS.map(sk => `<label class="pg-condition-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label}</label>`).join('')}</div></div>
-                </div>
-                <div class="monster-step" data-step="3" style="display:none;">
-                    <div class="form-row">
-                        <div class="form-group"><label>PV Max</label><input type="number" id="mPV" class="form-input" value="10" min="1"></div>
-                        <div class="form-group"><label>CA</label><input type="number" id="mCA" class="form-input" value="10" min="1"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Velocità</label><input type="number" id="mVel" class="form-input" value="9" step="1.5"></div>
-                        <div class="form-group"><label>Iniziativa</label><input type="number" id="mInit" class="form-input" value="10"></div>
+                    <div class="form-group">
+                        <label for="mGS">Grado Sfida</label>
+                        <input type="text" id="mGS" value="0">
                     </div>
                 </div>
-                <div class="monster-step" data-step="4" style="display:none;">
-                    <div class="form-group"><label>Resistenze (separate da virgola)</label><input type="text" id="mResistenze" class="form-input" placeholder="es. Fuoco, Freddo"></div>
-                    <div class="form-group"><label>Immunità (separate da virgola)</label><input type="text" id="mImmunita" class="form-input" placeholder="es. Veleno, Necrotico"></div>
+                <div class="form-group">
+                    <label for="mAllineamento">Allineamento</label>
+                    <select id="mAllineamento">${MONSTER_ALIGNMENTS.map(a => `<option value="${a}">${a}</option>`).join('')}</select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeMonsterModal()">Annulla</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="monster-wizard-nav">
-                <button class="btn-secondary btn-small" id="mPrevBtn" onclick="monsterWizardNav(-1)" style="display:none;">Indietro</button>
-                <span style="flex:1;"></span>
-                <button class="btn-secondary btn-small" onclick="schedaCloseHpCalc()">Annulla</button>
-                <button class="btn-primary btn-small" id="mNextBtn" onclick="monsterWizardNav(1)">Avanti</button>
+            <div class="wizard-page" id="mStep1">
+                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
+                <div class="pg-abilities-grid">
+                    ${SCHEDA_ABILITIES.map(a => `
+                    <div class="pg-ability-block">
+                        <label>${a.full}</label>
+                        <div class="pg-ability-row">
+                            <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="10">
+                        </div>
+                        <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}"> <span>TS</span></label>
+                    </div>`).join('')}
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
             </div>
-        </div>`;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) schedaCloseHpCalc(); });
-    overlay.dataset.campagnaId = campagnaId;
-    overlay.dataset.sessioneId = sessioneId;
-    document.body.appendChild(overlay);
+            <div class="wizard-page" id="mStep2">
+                <div class="form-section-label">Abilità</div>
+                <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
+                    <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep3">
+                <div class="form-section-label">Statistiche</div>
+                <div class="pg-stats-row-3">
+                    <div class="form-group">
+                        <label for="mCA">CA</label>
+                        <input type="number" id="mCA" min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="mInit">Iniziativa</label>
+                        <input type="number" id="mInit" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="mVel">Velocità</label>
+                        <input type="number" id="mVel" min="0" step="1.5" value="9">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: var(--spacing-sm);">
+                    <label for="mPV">Punti Ferita Massimi</label>
+                    <input type="number" id="mPV" min="1" value="10">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep4">
+                <div class="form-section-label">Resistenze e Immunità</div>
+                <div class="form-group">
+                    <label>Resistenze</label>
+                    <div class="pg-resistenze-section">
+                        <div class="pg-resistenze-add-row">
+                            <select id="mResistenzaSelect"><option value="">Seleziona...</option>${resistenzeOptions.map(r => `<option value="${r.toLowerCase()}">${r}</option>`).join('')}</select>
+                            <button type="button" class="btn-icon-sm" onclick="monsterAddTag('resistenza')">+</button>
+                        </div>
+                        <div id="mResistenzeList" class="pg-resistenze-list"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Immunità</label>
+                    <div class="pg-resistenze-section">
+                        <div class="pg-resistenze-add-row">
+                            <select id="mImmunitaSelect"><option value="">Seleziona...</option>${resistenzeOptions.map(r => `<option value="${r.toLowerCase()}">${r}</option>`).join('')}</select>
+                            <button type="button" class="btn-icon-sm" onclick="monsterAddTag('immunita')">+</button>
+                        </div>
+                        <div id="mImmunitaList" class="pg-resistenze-list"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="saveMonster()">Crea</button>
+                </div>
+            </div>
+        </form>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    modal.dataset.campagnaId = campagnaId;
+    modal.dataset.sessioneId = sessioneId;
     window._monsterWizardStep = 0;
+    window._monsterResistenze = [];
+    window._monsterImmunita = [];
+}
+
+window.closeMonsterModal = function() {
+    const modal = document.getElementById('monsterModal');
+    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+}
+
+window.monsterAddTag = function(type) {
+    const selectId = type === 'resistenza' ? 'mResistenzaSelect' : 'mImmunitaSelect';
+    const listId = type === 'resistenza' ? 'mResistenzeList' : 'mImmunitaList';
+    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
+    const sel = document.getElementById(selectId);
+    const val = sel?.value;
+    if (!val || arr.includes(val)) return;
+    arr.push(val);
+    sel.value = '';
+    const list = document.getElementById(listId);
+    if (list) {
+        list.innerHTML = arr.map(r => `<span class="pg-resistenza-tag">${r} <button type="button" onclick="monsterRemoveTag('${type}','${r}')">&times;</button></span>`).join('');
+    }
+}
+
+window.monsterRemoveTag = function(type, val) {
+    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
+    const idx = arr.indexOf(val);
+    if (idx >= 0) arr.splice(idx, 1);
+    monsterAddTag(type);
+    const listId = type === 'resistenza' ? 'mResistenzeList' : 'mImmunitaList';
+    const list = document.getElementById(listId);
+    if (list) {
+        list.innerHTML = arr.map(r => `<span class="pg-resistenza-tag">${r} <button type="button" onclick="monsterRemoveTag('${type}','${r}')">&times;</button></span>`).join('');
+    }
 }
 
 window.monsterWizardNav = function(dir) {
-    const steps = document.querySelectorAll('.monster-step');
-    const maxStep = steps.length - 1;
+    const totalSteps = 5;
+    const maxStep = totalSteps - 1;
     window._monsterWizardStep = Math.max(0, Math.min(maxStep, (window._monsterWizardStep || 0) + dir));
     const step = window._monsterWizardStep;
-    steps.forEach((s, i) => s.style.display = i === step ? '' : 'none');
-    document.getElementById('mPrevBtn').style.display = step === 0 ? 'none' : '';
-    const nextBtn = document.getElementById('mNextBtn');
-    if (step === maxStep) {
-        nextBtn.textContent = 'Crea';
-        nextBtn.onclick = () => saveMonster();
-    } else {
-        nextBtn.textContent = 'Avanti';
-        nextBtn.onclick = () => monsterWizardNav(1);
+    for (let i = 0; i <= maxStep; i++) {
+        const page = document.getElementById(`mStep${i}`);
+        if (page) page.classList.toggle('active', i === step);
+    }
+    const modal = document.getElementById('monsterModal');
+    if (modal) {
+        modal.querySelectorAll('.wizard-step').forEach((dot, i) => {
+            dot.classList.toggle('active', i <= step);
+        });
     }
 }
 
 window.saveMonster = async function() {
-    const overlay = document.getElementById('hpCalcOverlay');
-    const campagnaId = overlay?.dataset.campagnaId;
-    const sessioneId = overlay?.dataset.sessioneId;
+    const modal = document.getElementById('monsterModal');
+    const campagnaId = modal?.dataset.campagnaId;
+    const sessioneId = modal?.dataset.sessioneId;
     if (!campagnaId || !sessioneId) return;
 
     const nome = document.getElementById('mNome')?.value?.trim();
@@ -7723,10 +7839,8 @@ window.saveMonster = async function() {
 
     const saves = SCHEDA_ABILITIES.filter(a => document.getElementById(`mSave_${a.key}`)?.checked).map(a => a.key);
     const skills = SCHEDA_SKILLS.filter(s => document.getElementById(`mSkill_${s.key}`)?.checked).map(s => s.key);
-    const resistenzeRaw = document.getElementById('mResistenze')?.value || '';
-    const immunitaRaw = document.getElementById('mImmunita')?.value || '';
-    const resistenze = resistenzeRaw.split(',').map(s => s.trim()).filter(Boolean);
-    const immunita = immunitaRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const resistenze = window._monsterResistenze || [];
+    const immunita = window._monsterImmunita || [];
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
 
     const monster = {
@@ -7759,7 +7873,7 @@ window.saveMonster = async function() {
     const { error } = await supabase.from('mostri_combattimento').insert(monster);
     if (error) { showNotification('Errore creazione mostro: ' + error.message); return; }
 
-    schedaCloseHpCalc();
+    closeMonsterModal();
     showNotification(`${nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
     await renderCombattimentoContent(campagnaId, sessioneId);
