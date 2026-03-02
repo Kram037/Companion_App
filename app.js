@@ -3344,37 +3344,31 @@ function pgCalcPercPassiva() {
 
 // --- Resistenze ---
 let pgCurrentResistenze = [];
+let pgCurrentImmunita = [];
 
-window.pgOpenResistenzeSelect = function() {
-    openMultiSelect(
-        DAMAGE_TYPES,
-        pgCurrentResistenze,
-        (selected) => {
-            pgCurrentResistenze = selected;
-            pgRenderResistenze();
-        },
-        'Seleziona Resistenze'
-    );
-}
-
-function pgRenderResistenze() {
-    const container = document.getElementById('pgResistenzeList');
+function pgRenderResImmGrid(containerId) {
+    const container = document.getElementById(containerId);
     if (!container) return;
-    if (pgCurrentResistenze.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessuna resistenza aggiunta</p>';
-        return;
-    }
-    container.innerHTML = pgCurrentResistenze.map((r, i) => `
-        <div class="pg-resistenza-chip">
-            <span>${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>
-            <button type="button" class="pg-chip-remove" onclick="pgRemoveResistenza(${i})">&times;</button>
-        </div>`).join('');
+    container.innerHTML = DAMAGE_TYPES.map(dt => {
+        const isRes = pgCurrentResistenze.includes(dt.value);
+        const isImm = pgCurrentImmunita.includes(dt.value);
+        return `
+        <div class="pg-res-row">
+            <span class="pg-res-label">${dt.label}</span>
+            <input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} onchange="pgToggleRes('${dt.value}', this.checked)" title="Resistenza">
+            <input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} onchange="pgToggleImm('${dt.value}', this.checked)" title="Immunità">
+        </div>`;
+    }).join('');
 }
 
+window.pgToggleRes = function(val, checked) {
+    if (checked) { if (!pgCurrentResistenze.includes(val)) pgCurrentResistenze.push(val); }
+    else { pgCurrentResistenze = pgCurrentResistenze.filter(r => r !== val); }
+}
 
-window.pgRemoveResistenza = function(idx) {
-    pgCurrentResistenze.splice(idx, 1);
-    pgRenderResistenze();
+window.pgToggleImm = function(val, checked) {
+    if (checked) { if (!pgCurrentImmunita.includes(val)) pgCurrentImmunita.push(val); }
+    else { pgCurrentImmunita = pgCurrentImmunita.filter(r => r !== val); }
 }
 
 // --- Spell Slots ---
@@ -3628,7 +3622,7 @@ function pgWizardGoTo(step) {
         pgRenderSkills();
     }
     if (step === 3) {
-        pgRenderResistenze();
+        pgRenderResImmGrid('pgResImmGrid');
     }
     if (step === 4) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
@@ -3902,9 +3896,12 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>`;
         }
 
-        // Resistenze
+        // Resistenze & Immunità
         const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
             pg.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+            '<span class="scheda-empty">Nessuna</span>';
+        const immunitaHtml = (pg.immunita && pg.immunita.length > 0) ?
+            pg.immunita.map(r => `<span class="scheda-tag scheda-tag-imm">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
             '<span class="scheda-empty">Nessuna</span>';
 
         // Conditions
@@ -3976,8 +3973,15 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Resistenze</div>
-            <div class="scheda-tags">${resistenzeHtml}</div>
+            <div class="scheda-section-title">
+                Resistenze e Immunità
+                <button class="scheda-edit-btn" onclick="schedaOpenResImmEdit('${pg.id}')" title="Modifica">&#9998;</button>
+            </div>
+            <div class="scheda-res-imm-display" id="schedaResImmDisplay">
+                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenzeHtml}</div></div>
+                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunitaHtml}</div></div>
+            </div>
+            <div id="schedaResImmEditGrid" style="display:none;"></div>
         </div>
 
         <div class="scheda-section">
@@ -4274,6 +4278,78 @@ function schedaSlotToggleInline(pgId, level, index) {
     schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
 }
 
+// Res/Imm inline edit on character sheet
+window.schedaOpenResImmEdit = function(pgId) {
+    const display = document.getElementById('schedaResImmDisplay');
+    const grid = document.getElementById('schedaResImmEditGrid');
+    if (!display || !grid) return;
+
+    if (grid.style.display !== 'none') {
+        grid.style.display = 'none';
+        display.style.display = '';
+        return;
+    }
+
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const res = pg.resistenze || [];
+    const imm = pg.immunita || [];
+
+    grid.innerHTML = `
+        <div class="pg-res-header">
+            <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
+        </div>
+        <div class="pg-res-grid">
+            ${DAMAGE_TYPES.map(dt => {
+                const isRes = res.includes(dt.value);
+                const isImm = imm.includes(dt.value);
+                return `<div class="pg-res-row">
+                    <span class="pg-res-label">${dt.label}</span>
+                    <input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} data-val="${dt.value}" data-type="res" title="Resistenza">
+                    <input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} data-val="${dt.value}" data-type="imm" title="Immunità">
+                </div>`;
+            }).join('')}
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+            <button class="btn-primary" id="schedaResImmSaveBtn" style="padding:6px 24px;font-size:0.85rem;">Salva</button>
+        </div>`;
+
+    display.style.display = 'none';
+    grid.style.display = '';
+
+    document.getElementById('schedaResImmSaveBtn').addEventListener('click', async () => {
+        const newRes = [];
+        const newImm = [];
+        grid.querySelectorAll('.pg-res-cb:checked').forEach(cb => newRes.push(cb.dataset.val));
+        grid.querySelectorAll('.pg-imm-cb:checked').forEach(cb => newImm.push(cb.dataset.val));
+
+        const supabase = getSupabaseClient();
+        if (!supabase) return;
+        const { error } = await supabase.from('personaggi').update({ resistenze: newRes, immunita: newImm }).eq('id', pgId);
+        if (error) { showNotification('Errore: ' + error.message); return; }
+
+        if (_schedaPgCache) {
+            _schedaPgCache.resistenze = newRes;
+            _schedaPgCache.immunita = newImm;
+        }
+
+        const resDisp = newRes.length > 0 ?
+            newRes.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+            '<span class="scheda-empty">Nessuna</span>';
+        const immDisp = newImm.length > 0 ?
+            newImm.map(r => `<span class="scheda-tag scheda-tag-imm">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+            '<span class="scheda-empty">Nessuna</span>';
+
+        display.innerHTML = `
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resDisp}</div></div>
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immDisp}</div></div>`;
+
+        grid.style.display = 'none';
+        display.style.display = '';
+        showNotification('Resistenze e immunità aggiornate');
+    });
+}
+
 // HP Calculator
 let _hpCalcState = null;
 
@@ -4454,6 +4530,7 @@ window.openPersonaggioModal = function(personaggioId) {
     pgSelectedClasses = [];
     pgCurrentSkillProficiencies = new Set();
     pgCurrentResistenze = [];
+    pgCurrentImmunita = [];
     pgCurrentSlotIncantesimo = {};
     pgRenderClassi();
     pgWizardGoTo(0);
@@ -4505,6 +4582,9 @@ window.openPersonaggioModal = function(personaggioId) {
 
                     if (data.resistenze && Array.isArray(data.resistenze)) {
                         pgCurrentResistenze = [...data.resistenze];
+                    }
+                    if (data.immunita && Array.isArray(data.immunita)) {
+                        pgCurrentImmunita = [...data.immunita];
                     }
                     if (data.slot_incantesimo && typeof data.slot_incantesimo === 'object') {
                         pgCurrentSlotIncantesimo = {};
@@ -4588,6 +4668,7 @@ async function handleSavePersonaggio(e) {
         tiri_salvezza: pgGetSelectedSaves(),
         competenze_abilita: Array.from(pgCurrentSkillProficiencies),
         resistenze: pgCurrentResistenze,
+        immunita: pgCurrentImmunita,
         slot_incantesimo: pgBuildSlotIncantesimo(),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         pv_attuali: parseInt(document.getElementById('pgPV').value) || 10,
@@ -8011,19 +8092,11 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
             </div>
             <div class="wizard-page" id="mStep4">
                 <div class="form-section-label">Resistenze e Immunità</div>
-                <div class="form-group">
-                    <label>Resistenze</label>
-                    <div class="pg-resistenze-section">
-                        <button type="button" class="custom-select-trigger" onclick="monsterOpenResSelect('resistenza')">Seleziona resistenze...</button>
-                        <div id="mResistenzeList" class="pg-resistenze-list"></div>
-                    </div>
+                <div class="pg-res-header">
+                    <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
                 </div>
-                <div class="form-group">
-                    <label>Immunità</label>
-                    <div class="pg-resistenze-section">
-                        <button type="button" class="custom-select-trigger" onclick="monsterOpenResSelect('immunita')">Seleziona immunità...</button>
-                        <div id="mImmunitaList" class="pg-resistenze-list"></div>
-                    </div>
+                <div class="wizard-page-scroll">
+                    <div id="mResImmGrid" class="pg-res-grid"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -8057,37 +8130,33 @@ window.openMonsterFieldSelect = function(fieldId, options, title) {
     );
 }
 
-window.monsterOpenResSelect = function(type) {
-    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
-    openMultiSelect(
-        DAMAGE_TYPES,
-        arr,
-        (selected) => {
-            if (type === 'resistenza') window._monsterResistenze = selected;
-            else window._monsterImmunita = selected;
-            monsterRenderResTags(type);
-        },
-        type === 'resistenza' ? 'Seleziona Resistenze' : 'Seleziona Immunità'
-    );
+function monsterRenderResImmGrid() {
+    const container = document.getElementById('mResImmGrid');
+    if (!container) return;
+    container.innerHTML = DAMAGE_TYPES.map(dt => {
+        const isRes = (window._monsterResistenze || []).includes(dt.value);
+        const isImm = (window._monsterImmunita || []).includes(dt.value);
+        return `
+        <div class="pg-res-row">
+            <span class="pg-res-label">${dt.label}</span>
+            <input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} onchange="monsterToggleRes('${dt.value}', this.checked)" title="Resistenza">
+            <input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} onchange="monsterToggleImm('${dt.value}', this.checked)" title="Immunità">
+        </div>`;
+    }).join('');
 }
 
-function monsterRenderResTags(type) {
-    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
-    const listId = type === 'resistenza' ? 'mResistenzeList' : 'mImmunitaList';
-    const list = document.getElementById(listId);
-    if (!list) return;
-    list.innerHTML = arr.map((r, i) => `
-        <div class="pg-resistenza-chip">
-            <span>${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>
-            <button type="button" class="pg-chip-remove" onclick="monsterRemoveTag('${type}',${i})">&times;</button>
-        </div>`).join('');
+window.monsterToggleRes = function(val, checked) {
+    if (!window._monsterResistenze) window._monsterResistenze = [];
+    if (checked) { if (!window._monsterResistenze.includes(val)) window._monsterResistenze.push(val); }
+    else { window._monsterResistenze = window._monsterResistenze.filter(r => r !== val); }
 }
 
-window.monsterRemoveTag = function(type, idx) {
-    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
-    arr.splice(idx, 1);
-    monsterRenderResTags(type);
+window.monsterToggleImm = function(val, checked) {
+    if (!window._monsterImmunita) window._monsterImmunita = [];
+    if (checked) { if (!window._monsterImmunita.includes(val)) window._monsterImmunita.push(val); }
+    else { window._monsterImmunita = window._monsterImmunita.filter(r => r !== val); }
 }
+
 
 window.monsterWizardNav = function(dir) {
     if (dir > 0 && (window._monsterWizardStep || 0) === 0) {
@@ -8102,6 +8171,7 @@ window.monsterWizardNav = function(dir) {
         const page = document.getElementById(`mStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
+    if (step === 4) monsterRenderResImmGrid();
     const modal = document.getElementById('monsterModal');
     if (modal) {
         modal.querySelectorAll('.wizard-step').forEach((dot, i) => {

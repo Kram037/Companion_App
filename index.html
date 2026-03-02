@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1767052300">
+    <link rel="stylesheet" href="styles.css?v=1767052400">
 </head>
 <body>
     <!-- Header -->
@@ -623,12 +623,14 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 3: Resistenze -->
+                <!-- Step 3: Resistenze e Immunità -->
                 <div class="wizard-page" id="pgStep3">
-                    <div class="form-section-label">Resistenze</div>
-                    <div class="pg-resistenze-section">
-                        <button type="button" class="custom-select-trigger" onclick="pgOpenResistenzeSelect()">Seleziona resistenze...</button>
-                        <div id="pgResistenzeList" class="pg-resistenze-list"></div>
+                    <div class="form-section-label">Resistenze e Immunità</div>
+                    <div class="pg-res-header">
+                        <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
+                    </div>
+                    <div class="wizard-page-scroll">
+                        <div id="pgResImmGrid" class="pg-res-grid"></div>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
@@ -766,7 +768,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1767052300"></script>
+    <script src="app.js?v=1767052400"></script>
     
     <!-- Cache busting script for development -->
     <script>

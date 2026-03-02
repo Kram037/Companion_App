@@ -989,7 +989,13 @@ body.user-logged-in .header-username {
 /* Tags & Conditions */
 .scheda-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .scheda-tag { display: inline-block; padding: 3px 10px; border-radius: 14px; font-size: 0.75rem; font-weight: 600; background: rgba(var(--accent-rgb, 139,92,246), 0.12); color: var(--accent); }
+.scheda-tag-imm { background: rgba(239,68,68,0.12); color: #ef4444; }
 .scheda-empty { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
+.scheda-edit-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0 4px; margin-left: 6px; vertical-align: middle; }
+.scheda-edit-btn:hover { color: var(--accent); }
+.scheda-res-imm-display { display: flex; flex-direction: column; gap: 6px; }
+.scheda-res-imm-row { display: flex; align-items: flex-start; gap: 8px; }
+.scheda-res-imm-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); min-width: 70px; padding-top: 2px; }
 .scheda-condition-extra { margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary); }
 
 /* Scheda Tab Bar */
@@ -1726,7 +1732,7 @@ body.user-logged-in .header-username {
 }
 
 /* Class multi-select */
-.pg-class-selector { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+.pg-class-selector { display: flex; flex-direction: column; gap: var(--spacing-xs); max-height: 180px; overflow-y: auto; }
 
 .pg-add-class-btn {
     display: flex; align-items: center; gap: 6px;
@@ -1788,14 +1794,18 @@ body.user-logged-in .header-username {
     color: var(--text-secondary);
     cursor: pointer;
     padding-left: 2px;
+    flex-wrap: nowrap;
+    margin-top: 4px;
 }
 
 .pg-subclass-check input[type="checkbox"] {
     accent-color: var(--accent);
+    flex-shrink: 0;
 }
 
 .pg-subclass-check span {
     font-style: italic;
+    white-space: nowrap;
 }
 
 .pg-classe-name {
@@ -1875,9 +1885,48 @@ body.user-logged-in .header-username {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 4px;
+}
+
+/* Resistance/Immunity grid */
+.pg-res-header {
+    display: grid;
+    grid-template-columns: 1fr 40px 40px;
+    gap: 4px;
+    padding: 0 10px 4px;
+    flex-shrink: 0;
+}
+.pg-res-col-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: center;
+}
+.pg-res-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.pg-res-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 40px;
+    gap: 4px;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.pg-res-label {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+.pg-res-cb, .pg-imm-cb {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    justify-self: center;
 }
 
 .pg-skill-item {
