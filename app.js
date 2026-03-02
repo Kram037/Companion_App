@@ -3509,10 +3509,10 @@ async function loadPersonaggi(options = {}) {
                 const campagnaIds = [...new Set(assocs.map(a => a.campagna_id))];
                 const { data: campagne } = await supabase
                     .from('campagne')
-                    .select('id, nome')
+                    .select('id, nome_campagna')
                     .in('id', campagnaIds);
                 const nomiMap = {};
-                if (campagne) campagne.forEach(c => { nomiMap[c.id] = c.nome; });
+                if (campagne) campagne.forEach(c => { nomiMap[c.id] = c.nome_campagna; });
                 assocs.forEach(a => {
                     if (!campagneMap[a.personaggio_id]) campagneMap[a.personaggio_id] = [];
                     const nome = nomiMap[a.campagna_id];
