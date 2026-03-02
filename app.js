@@ -7954,8 +7954,8 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep1">
+                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                 <div class="wizard-page-scroll">
-                    <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                     <div class="pg-abilities-grid">
                         ${SCHEDA_ABILITIES.map(a => `
                         <div class="pg-ability-block">
@@ -7973,8 +7973,8 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep2">
+                <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
-                    <div class="form-section-label">Abilità</div>
                     <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
                         <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
                     </div>

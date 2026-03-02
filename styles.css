@@ -1048,7 +1048,7 @@ body.user-logged-in .header-username {
 }
 
 /* Custom Select */
-.custom-select-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 210; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+.custom-select-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
 .custom-select-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 300px; max-width: 90vw; max-height: 70vh; display: flex; flex-direction: column; box-shadow: var(--shadow-xl); }
 .custom-select-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
 .custom-select-header span { font-weight: 700; font-size: 0.95rem; color: var(--text); }
@@ -1097,6 +1097,7 @@ body.user-logged-in .header-username {
     margin: var(--spacing-md) 0 var(--spacing-xs);
     padding-bottom: var(--spacing-xs);
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
 }
 
 /* Wizard steps */
