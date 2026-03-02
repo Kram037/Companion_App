@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="styles.css?v=1767051600">
+    <link rel="stylesheet" href="styles.css?v=1767052200">
 </head>
 <body>
     <!-- Header -->
@@ -537,28 +537,7 @@
                     </div>
                     <div class="form-group">
                         <label>Classe</label>
-                        <div class="pg-class-selector">
-                            <div class="pg-class-add-row">
-                                <select id="pgClasseSelect">
-                                    <option value="">Seleziona classe...</option>
-                                    <option value="Artefice">Artefice</option>
-                                    <option value="Barbaro">Barbaro</option>
-                                    <option value="Bardo">Bardo</option>
-                                    <option value="Chierico">Chierico</option>
-                                    <option value="Druido">Druido</option>
-                                    <option value="Guerriero">Guerriero</option>
-                                    <option value="Ladro">Ladro</option>
-                                    <option value="Mago">Mago</option>
-                                    <option value="Monaco">Monaco</option>
-                                    <option value="Paladino">Paladino</option>
-                                    <option value="Ranger">Ranger</option>
-                                    <option value="Stregone">Stregone</option>
-                                    <option value="Warlock">Warlock</option>
-                                </select>
-                                <button type="button" class="btn-icon-sm" id="pgAddClasseBtn">+</button>
-                            </div>
-                            <div id="pgClassiList" class="pg-classi-list"></div>
-                        </div>
+                        <div id="pgClassiList" class="pg-class-selector"></div>
                     </div>
                     <div class="form-row form-row-2">
                         <div class="form-group">
@@ -635,8 +614,10 @@
                 </div>
                 <!-- Step 2: Abilità -->
                 <div class="wizard-page" id="pgStep2">
-                    <div class="form-section-label">Abilità</div>
-                    <div class="pg-skills-list" id="pgSkillsList"></div>
+                    <div class="wizard-page-scroll">
+                        <div class="form-section-label">Abilità</div>
+                        <div class="pg-skills-list" id="pgSkillsList"></div>
+                    </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
@@ -646,25 +627,7 @@
                 <div class="wizard-page" id="pgStep3">
                     <div class="form-section-label">Resistenze</div>
                     <div class="pg-resistenze-section">
-                        <div class="pg-resistenze-add-row">
-                            <select id="pgResistenzaSelect">
-                                <option value="">Seleziona resistenza...</option>
-                                <option value="acido">Acido</option>
-                                <option value="contundente">Contundente</option>
-                                <option value="freddo">Freddo</option>
-                                <option value="fulmine">Fulmine</option>
-                                <option value="fuoco">Fuoco</option>
-                                <option value="forza">Forza</option>
-                                <option value="necrotico">Necrotico</option>
-                                <option value="perforante">Perforante</option>
-                                <option value="psichico">Psichico</option>
-                                <option value="radiante">Radiante</option>
-                                <option value="tagliente">Tagliente</option>
-                                <option value="tuono">Tuono</option>
-                                <option value="veleno">Veleno</option>
-                            </select>
-                            <button type="button" class="btn-icon-sm" id="pgAddResistenzaBtn">+</button>
-                        </div>
+                        <button type="button" class="custom-select-trigger" onclick="pgOpenResistenzeSelect()">Seleziona resistenze...</button>
                         <div id="pgResistenzeList" class="pg-resistenze-list"></div>
                     </div>
                     <div class="form-actions">
@@ -803,7 +766,7 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="app.js?v=1767051700"></script>
+    <script src="app.js?v=1767052200"></script>
     
     <!-- Cache busting script for development -->
     <script>

@@ -1019,22 +1019,52 @@ body.user-logged-in .header-username {
     max-width: 520px;
     height: 560px;
     max-height: 85vh;
-    overflow-y: auto;
+    overflow: hidden;
 }
 .modal-content-lg form {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
 }
 .modal-content-lg .wizard-page.active {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+.modal-content-lg .wizard-page-scroll {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
 }
 .modal-content-lg .wizard-page .form-actions {
+    flex-shrink: 0;
     margin-top: auto;
     padding-top: var(--spacing-md);
 }
+
+/* Custom Select */
+.custom-select-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 210; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+.custom-select-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 300px; max-width: 90vw; max-height: 70vh; display: flex; flex-direction: column; box-shadow: var(--shadow-xl); }
+.custom-select-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.custom-select-header span { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+.custom-select-close { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1; }
+.custom-select-close:hover { color: var(--text); }
+.custom-select-list { overflow-y: auto; flex: 1; padding: 4px 0; }
+.custom-select-item { display: block; width: 100%; padding: 11px 16px; border: none; background: transparent; color: var(--text); font-size: 0.9rem; text-align: left; cursor: pointer; transition: background 0.15s; }
+.custom-select-item:hover { background: var(--accent); color: white; }
+.custom-select-check-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: background 0.15s; font-size: 0.9rem; color: var(--text); }
+.custom-select-check-item:hover { background: rgba(255,255,255,0.06); }
+.custom-select-check-item input[type="checkbox"] { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+.custom-select-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+.custom-select-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 0.9rem; cursor: pointer; text-align: left; transition: border-color 0.15s; }
+.custom-select-trigger::after { content: '▾'; margin-left: 8px; color: var(--text-muted); font-size: 0.8rem; flex-shrink: 0; }
+.custom-select-trigger:hover { border-color: var(--accent); }
+.custom-select-trigger.placeholder { color: var(--text-muted); }
 
 .form-row {
     display: grid;
@@ -1697,21 +1727,15 @@ body.user-logged-in .header-username {
 /* Class multi-select */
 .pg-class-selector { display: flex; flex-direction: column; gap: var(--spacing-xs); }
 
-.pg-class-add-row {
-    display: flex;
-    gap: var(--spacing-xs);
-    align-items: center;
+.pg-add-class-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 14px; border: 1px dashed var(--border);
+    border-radius: var(--radius-sm); background: transparent;
+    color: var(--text-muted); font-size: 0.88rem;
+    cursor: pointer; transition: all 0.15s; width: 100%;
 }
-
-.pg-class-add-row select {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 0.9rem;
-}
+.pg-add-class-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pg-add-class-plus { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
 
 .btn-icon-sm {
     width: 38px;

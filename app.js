@@ -794,14 +794,7 @@ function setupEventListeners() {
             input.addEventListener('input', () => updateAbilityMod(input, modEl));
         }
     });
-    const pgAddClasseBtn = document.getElementById('pgAddClasseBtn');
-    if (pgAddClasseBtn) {
-        pgAddClasseBtn.onclick = () => pgAddClasse();
-    }
-    const pgAddResistenzaBtn = document.getElementById('pgAddResistenzaBtn');
-    if (pgAddResistenzaBtn) {
-        pgAddResistenzaBtn.onclick = () => pgAddResistenza();
-    }
+    
     ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(name => {
         const cb = document.getElementById(`save${name}`);
         if (cb) cb.addEventListener('change', () => updateAllSaveValues());
@@ -2945,6 +2938,161 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
 }
 
 // ============================================================================
+// CUSTOM DROPDOWN COMPONENT
+// ============================================================================
+
+window.openCustomDropdown = function(options, { selected, multi, title, onConfirm, onSelect }) {
+    const existing = document.getElementById('customDropdownOverlay');
+    if (existing) existing.remove();
+
+    const selectedSet = new Set(Array.isArray(selected) ? selected : (selected ? [selected] : []));
+
+    const overlay = document.createElement('div');
+    overlay.id = 'customDropdownOverlay';
+    overlay.className = 'custom-dd-overlay';
+
+    const optionsHtml = options.map(opt => {
+        const val = typeof opt === 'string' ? opt : opt.value;
+        const label = typeof opt === 'string' ? opt : opt.label;
+        const isSelected = selectedSet.has(val);
+        if (multi) {
+            return `<label class="custom-dd-option" data-value="${escapeHtml(val)}">
+                <input type="checkbox" ${isSelected ? 'checked' : ''} value="${escapeHtml(val)}">
+                <span>${escapeHtml(label)}</span>
+            </label>`;
+        }
+        return `<div class="custom-dd-option ${isSelected ? 'active' : ''}" data-value="${escapeHtml(val)}">${escapeHtml(label)}</div>`;
+    }).join('');
+
+    overlay.innerHTML = `
+        <div class="custom-dd-modal">
+            <div class="custom-dd-header">
+                <span class="custom-dd-title">${escapeHtml(title || 'Seleziona')}</span>
+                <button class="custom-dd-close" onclick="closeCustomDropdown()">&times;</button>
+            </div>
+            <div class="custom-dd-options">${optionsHtml}</div>
+            ${multi ? '<div class="custom-dd-footer"><button class="btn-primary btn-small custom-dd-confirm">Aggiungi</button></div>' : ''}
+        </div>`;
+
+    if (multi) {
+        overlay.querySelector('.custom-dd-confirm').addEventListener('click', () => {
+            const checked = [...overlay.querySelectorAll('.custom-dd-option input:checked')].map(cb => cb.value);
+            closeCustomDropdown();
+            if (onConfirm) onConfirm(checked);
+        });
+    } else {
+        overlay.querySelectorAll('.custom-dd-option').forEach(el => {
+            el.addEventListener('click', () => {
+                closeCustomDropdown();
+                if (onSelect) onSelect(el.dataset.value);
+            });
+        });
+    }
+
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomDropdown(); });
+    document.body.appendChild(overlay);
+}
+
+window.closeCustomDropdown = function() {
+    const overlay = document.getElementById('customDropdownOverlay');
+    if (overlay) overlay.remove();
+}
+
+// RESISTENZE_OPTIONS removed — use DAMAGE_TYPES from custom select component
+
+// ============================================================================
+// CUSTOM SELECT COMPONENT
+// ============================================================================
+
+window.openCustomSelect = function(options, callback, title) {
+    closeCustomSelect();
+    window._customSelectOptions = options;
+    window._customSelectCb = callback;
+    const overlay = document.createElement('div');
+    overlay.id = 'customSelectOverlay';
+    overlay.className = 'custom-select-overlay';
+    overlay.innerHTML = `
+        <div class="custom-select-panel">
+            <div class="custom-select-header">
+                <span>${escapeHtml(title || 'Seleziona')}</span>
+                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+            </div>
+            <div class="custom-select-list">
+                ${options.map((o, i) => `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}</button>`).join('')}
+            </div>
+        </div>`;
+    overlay.querySelector('.custom-select-list').addEventListener('click', (e) => {
+        const btn = e.target.closest('.custom-select-item');
+        if (btn) {
+            const opt = window._customSelectOptions[parseInt(btn.dataset.idx)];
+            if (opt && window._customSelectCb) window._customSelectCb(opt.value, opt.label);
+            closeCustomSelect();
+        }
+    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+    document.body.appendChild(overlay);
+}
+
+window.openMultiSelect = function(options, currentSelected, callback, title) {
+    closeCustomSelect();
+    window._multiSelectState = new Set(currentSelected || []);
+    window._multiSelectCb = callback;
+    const overlay = document.createElement('div');
+    overlay.id = 'customSelectOverlay';
+    overlay.className = 'custom-select-overlay';
+    overlay.innerHTML = `
+        <div class="custom-select-panel">
+            <div class="custom-select-header">
+                <span>${escapeHtml(title || 'Seleziona')}</span>
+                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+            </div>
+            <div class="custom-select-list">
+                ${options.map((o, i) => `
+                <label class="custom-select-check-item">
+                    <input type="checkbox" data-idx="${i}" ${window._multiSelectState.has(o.value) ? 'checked' : ''}>
+                    <span>${escapeHtml(o.label)}</span>
+                </label>`).join('')}
+            </div>
+            <div class="custom-select-footer">
+                <button type="button" class="btn-primary btn-small" onclick="confirmMultiSelect()">Aggiungi</button>
+            </div>
+        </div>`;
+    overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const opt = options[parseInt(cb.dataset.idx)];
+            if (cb.checked) window._multiSelectState.add(opt.value);
+            else window._multiSelectState.delete(opt.value);
+        });
+    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+    document.body.appendChild(overlay);
+}
+
+window.confirmMultiSelect = function() {
+    if (window._multiSelectCb) window._multiSelectCb([...window._multiSelectState]);
+    closeCustomSelect();
+}
+
+window.closeCustomSelect = function() {
+    const el = document.getElementById('customSelectOverlay');
+    if (el) el.remove();
+    window._customSelectCb = null;
+    window._customSelectOptions = null;
+    window._multiSelectCb = null;
+    window._multiSelectState = null;
+}
+
+const DAMAGE_TYPES = [
+    { value: 'acido', label: 'Acido' }, { value: 'contundente', label: 'Contundente' },
+    { value: 'freddo', label: 'Freddo' }, { value: 'fulmine', label: 'Fulmine' },
+    { value: 'fuoco', label: 'Fuoco' }, { value: 'forza', label: 'Forza' },
+    { value: 'necrotico', label: 'Necrotico' }, { value: 'perforante', label: 'Perforante' },
+    { value: 'psichico', label: 'Psichico' }, { value: 'radiante', label: 'Radiante' },
+    { value: 'tagliente', label: 'Tagliente' }, { value: 'tuono', label: 'Tuono' },
+    { value: 'veleno', label: 'Veleno' }
+];
+
+// ============================================================================
 // PERSONAGGI MANAGEMENT
 // ============================================================================
 
@@ -3060,20 +3208,21 @@ function updateAllSaveValues() {
 }
 
 // --- Class multi-select ---
-window.pgAddClasse = function() {
-    const sel = document.getElementById('pgClasseSelect');
-    if (!sel || !sel.value) return;
-    const className = sel.value;
-    if (pgSelectedClasses.find(c => c.nome === className)) {
-        showNotification('Classe già selezionata');
-        return;
-    }
-    pgSelectedClasses.push({ nome: className, livello: 1 });
-    sel.value = '';
-    pgRenderClassi();
-    pgUpdateTotalLevel();
-    pgUpdateSavingThrows();
-    pgResetAutoHP();
+window.pgOpenClassDropdown = function() {
+    const available = DND_CLASSES.filter(c => !pgSelectedClasses.find(s => s.nome === c));
+    if (available.length === 0) { showNotification('Tutte le classi sono già selezionate'); return; }
+    openCustomSelect(
+        available.map(c => ({ value: c, label: c })),
+        (value) => {
+            if (pgSelectedClasses.find(c => c.nome === value)) return;
+            pgSelectedClasses.push({ nome: value, livello: 1 });
+            pgRenderClassi();
+            pgUpdateTotalLevel();
+            pgUpdateSavingThrows();
+            pgResetAutoHP();
+        },
+        'Seleziona Classe'
+    );
 }
 
 window.pgRemoveClasse = function(index) {
@@ -3105,7 +3254,7 @@ const THIRD_CASTER_SUBCLASSES = {
 function pgRenderClassi() {
     const container = document.getElementById('pgClassiList');
     if (!container) return;
-    container.innerHTML = pgSelectedClasses.map((c, i) => {
+    const chipsHtml = pgSelectedClasses.map((c, i) => {
         const subLabel = THIRD_CASTER_SUBCLASSES[c.nome];
         const subCheck = subLabel ? `
             <label class="pg-subclass-check">
@@ -3123,6 +3272,11 @@ function pgRenderClassi() {
             ${subCheck}
         </div>`;
     }).join('');
+
+    const addBtn = `<button type="button" class="pg-add-class-btn" onclick="pgOpenClassDropdown()">
+        <span class="pg-add-class-plus">+</span> Aggiungi classe
+    </button>`;
+    container.innerHTML = chipsHtml + addBtn;
 }
 
 window.pgToggleThirdCaster = function(index, checked) {
@@ -3191,6 +3345,18 @@ function pgCalcPercPassiva() {
 // --- Resistenze ---
 let pgCurrentResistenze = [];
 
+window.pgOpenResistenzeSelect = function() {
+    openMultiSelect(
+        DAMAGE_TYPES,
+        pgCurrentResistenze,
+        (selected) => {
+            pgCurrentResistenze = selected;
+            pgRenderResistenze();
+        },
+        'Seleziona Resistenze'
+    );
+}
+
 function pgRenderResistenze() {
     const container = document.getElementById('pgResistenzeList');
     if (!container) return;
@@ -3205,15 +3371,6 @@ function pgRenderResistenze() {
         </div>`).join('');
 }
 
-window.pgAddResistenza = function() {
-    const sel = document.getElementById('pgResistenzaSelect');
-    if (!sel || !sel.value) return;
-    if (!pgCurrentResistenze.includes(sel.value)) {
-        pgCurrentResistenze.push(sel.value);
-        pgRenderResistenze();
-    }
-    sel.value = '';
-}
 
 window.pgRemoveResistenza = function(idx) {
     pgCurrentResistenze.splice(idx, 1);
@@ -7757,8 +7914,6 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
         document.body.appendChild(modal);
     }
 
-    const resistenzeOptions = ['Acido','Contundente','Freddo','Fulmine','Fuoco','Forza','Necrotico','Perforante','Psichico','Radiante','Tagliente','Tuono','Veleno'];
-
     document.getElementById('monsterModalContent').innerHTML = `
         <button class="modal-close" onclick="closeMonsterModal()">&times;</button>
         <h2>Nuovo Mostro</h2>
@@ -7776,13 +7931,13 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                     <input type="text" id="mNome" required placeholder="Nome del mostro">
                 </div>
                 <div class="form-group">
-                    <label for="mTipologia">Tipologia</label>
-                    <select id="mTipologia">${MONSTER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+                    <label>Tipologia</label>
+                    <button type="button" class="custom-select-trigger" id="mTipologia" data-value="${MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('mTipologia',MONSTER_TYPES,'Tipologia')">${MONSTER_TYPES[0]}</button>
                 </div>
                 <div class="form-row form-row-2">
                     <div class="form-group">
-                        <label for="mTaglia">Taglia</label>
-                        <select id="mTaglia">${MONSTER_SIZES.map(s => `<option value="${s}" ${s === 'Media' ? 'selected' : ''}>${s}</option>`).join('')}</select>
+                        <label>Taglia</label>
+                        <button type="button" class="custom-select-trigger" id="mTaglia" data-value="Media" onclick="openMonsterFieldSelect('mTaglia',MONSTER_SIZES,'Taglia')">Media</button>
                     </div>
                     <div class="form-group">
                         <label for="mGS">Grado Sfida</label>
@@ -7790,8 +7945,8 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="mAllineamento">Allineamento</label>
-                    <select id="mAllineamento">${MONSTER_ALIGNMENTS.map(a => `<option value="${a}">${a}</option>`).join('')}</select>
+                    <label>Allineamento</label>
+                    <button type="button" class="custom-select-trigger" id="mAllineamento" data-value="${MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('mAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${MONSTER_ALIGNMENTS[0]}</button>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeMonsterModal()">Annulla</button>
@@ -7799,16 +7954,18 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep1">
-                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
-                <div class="pg-abilities-grid">
-                    ${SCHEDA_ABILITIES.map(a => `
-                    <div class="pg-ability-block">
-                        <label>${a.full}</label>
-                        <div class="pg-ability-row">
-                            <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="10">
-                        </div>
-                        <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}"> <span>TS</span></label>
-                    </div>`).join('')}
+                <div class="wizard-page-scroll">
+                    <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
+                    <div class="pg-abilities-grid">
+                        ${SCHEDA_ABILITIES.map(a => `
+                        <div class="pg-ability-block">
+                            <label>${a.full}</label>
+                            <div class="pg-ability-row">
+                                <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="10">
+                            </div>
+                            <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}"> <span>TS</span></label>
+                        </div>`).join('')}
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -7816,9 +7973,11 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep2">
-                <div class="form-section-label">Abilità</div>
-                <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
-                    <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                <div class="wizard-page-scroll">
+                    <div class="form-section-label">Abilità</div>
+                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
+                        <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -7855,20 +8014,14 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 <div class="form-group">
                     <label>Resistenze</label>
                     <div class="pg-resistenze-section">
-                        <div class="pg-resistenze-add-row">
-                            <select id="mResistenzaSelect"><option value="">Seleziona...</option>${resistenzeOptions.map(r => `<option value="${r.toLowerCase()}">${r}</option>`).join('')}</select>
-                            <button type="button" class="btn-icon-sm" onclick="monsterAddTag('resistenza')">+</button>
-                        </div>
+                        <button type="button" class="custom-select-trigger" onclick="monsterOpenResSelect('resistenza')">Seleziona resistenze...</button>
                         <div id="mResistenzeList" class="pg-resistenze-list"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Immunità</label>
                     <div class="pg-resistenze-section">
-                        <div class="pg-resistenze-add-row">
-                            <select id="mImmunitaSelect"><option value="">Seleziona...</option>${resistenzeOptions.map(r => `<option value="${r.toLowerCase()}">${r}</option>`).join('')}</select>
-                            <button type="button" class="btn-icon-sm" onclick="monsterAddTag('immunita')">+</button>
-                        </div>
+                        <button type="button" class="custom-select-trigger" onclick="monsterOpenResSelect('immunita')">Seleziona immunità...</button>
                         <div id="mImmunitaList" class="pg-resistenze-list"></div>
                     </div>
                 </div>
@@ -7893,31 +8046,47 @@ window.closeMonsterModal = function() {
     if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
 }
 
-window.monsterAddTag = function(type) {
-    const selectId = type === 'resistenza' ? 'mResistenzaSelect' : 'mImmunitaSelect';
-    const listId = type === 'resistenza' ? 'mResistenzeList' : 'mImmunitaList';
-    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
-    const sel = document.getElementById(selectId);
-    const val = sel?.value;
-    if (!val || arr.includes(val)) return;
-    arr.push(val);
-    sel.value = '';
-    const list = document.getElementById(listId);
-    if (list) {
-        list.innerHTML = arr.map(r => `<span class="pg-resistenza-tag">${r} <button type="button" onclick="monsterRemoveTag('${type}','${r}')">&times;</button></span>`).join('');
-    }
+window.openMonsterFieldSelect = function(fieldId, options, title) {
+    openCustomSelect(
+        options.map(o => ({ value: o, label: o })),
+        (value) => {
+            const btn = document.getElementById(fieldId);
+            if (btn) { btn.dataset.value = value; btn.textContent = value; btn.classList.remove('placeholder'); }
+        },
+        title
+    );
 }
 
-window.monsterRemoveTag = function(type, val) {
+window.monsterOpenResSelect = function(type) {
     const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
-    const idx = arr.indexOf(val);
-    if (idx >= 0) arr.splice(idx, 1);
-    monsterAddTag(type);
+    openMultiSelect(
+        DAMAGE_TYPES,
+        arr,
+        (selected) => {
+            if (type === 'resistenza') window._monsterResistenze = selected;
+            else window._monsterImmunita = selected;
+            monsterRenderResTags(type);
+        },
+        type === 'resistenza' ? 'Seleziona Resistenze' : 'Seleziona Immunità'
+    );
+}
+
+function monsterRenderResTags(type) {
+    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
     const listId = type === 'resistenza' ? 'mResistenzeList' : 'mImmunitaList';
     const list = document.getElementById(listId);
-    if (list) {
-        list.innerHTML = arr.map(r => `<span class="pg-resistenza-tag">${r} <button type="button" onclick="monsterRemoveTag('${type}','${r}')">&times;</button></span>`).join('');
-    }
+    if (!list) return;
+    list.innerHTML = arr.map((r, i) => `
+        <div class="pg-resistenza-chip">
+            <span>${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>
+            <button type="button" class="pg-chip-remove" onclick="monsterRemoveTag('${type}',${i})">&times;</button>
+        </div>`).join('');
+}
+
+window.monsterRemoveTag = function(type, idx) {
+    const arr = type === 'resistenza' ? window._monsterResistenze : window._monsterImmunita;
+    arr.splice(idx, 1);
+    monsterRenderResTags(type);
 }
 
 window.monsterWizardNav = function(dir) {
@@ -7960,9 +8129,9 @@ window.saveMonster = async function() {
         sessione_id: sessioneId,
         campagna_id: campagnaId,
         nome,
-        tipologia: document.getElementById('mTipologia')?.value || 'Bestia',
-        taglia: document.getElementById('mTaglia')?.value || 'Media',
-        allineamento: document.getElementById('mAllineamento')?.value || 'Neutrale',
+        tipologia: document.getElementById('mTipologia')?.dataset?.value || 'Bestia',
+        taglia: document.getElementById('mTaglia')?.dataset?.value || 'Media',
+        allineamento: document.getElementById('mAllineamento')?.dataset?.value || 'Neutrale',
         grado_sfida: document.getElementById('mGS')?.value || '0',
         forza: parseInt(document.getElementById('mforza')?.value) || 10,
         destrezza: parseInt(document.getElementById('mdestrezza')?.value) || 10,
