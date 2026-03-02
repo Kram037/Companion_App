@@ -3500,14 +3500,23 @@ async function loadPersonaggi(options = {}) {
         let campagneMap = {};
         if (pgList.length > 0) {
             const pgIds = pgList.map(p => p.id);
-            const { data: assocs } = await supabase
+            const { data: assocs, error: assocErr } = await supabase
                 .from('personaggi_campagna')
-                .select('personaggio_id, campagne:campagne!personaggi_campagna_campagna_id_fkey(id, nome)')
+                .select('personaggio_id, campagna_id')
                 .in('personaggio_id', pgIds);
-            if (assocs) {
+            if (assocErr) console.error('Errore caricamento associazioni pg-campagna:', assocErr);
+            if (assocs && assocs.length > 0) {
+                const campagnaIds = [...new Set(assocs.map(a => a.campagna_id))];
+                const { data: campagne } = await supabase
+                    .from('campagne')
+                    .select('id, nome')
+                    .in('id', campagnaIds);
+                const nomiMap = {};
+                if (campagne) campagne.forEach(c => { nomiMap[c.id] = c.nome; });
                 assocs.forEach(a => {
                     if (!campagneMap[a.personaggio_id]) campagneMap[a.personaggio_id] = [];
-                    if (a.campagne) campagneMap[a.personaggio_id].push(a.campagne.nome);
+                    const nome = nomiMap[a.campagna_id];
+                    if (nome) campagneMap[a.personaggio_id].push(nome);
                 });
             }
         }
@@ -3552,7 +3561,7 @@ function renderPersonaggi(personaggi, campagneMap = {}) {
             </div>
             <div class="pg-card-footer">
                 <div class="pg-card-campaigns"><span class="pg-card-campaigns-icon">⚔</span> ${campagneText}</div>
-                <button class="pg-card-delete" onclick="event.stopPropagation(); deletePersonaggio('${pg.id}')" aria-label="Elimina personaggio">🗑</button>
+                <button class="pg-card-delete" onclick="event.stopPropagation(); deletePersonaggio('${pg.id}')" aria-label="Elimina personaggio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
             </div>
         </div>`;
     }).join('');
@@ -6422,12 +6431,10 @@ async function checkStartupNotifications() {
         const userData = await findUserByUid(AppState.currentUser.uid);
         if (!userData) return;
 
-        const [pendingRoll, activeSessionResult] = await Promise.all([
+        const [pendingRoll, dmCampagneResult, playerCampagneResult] = await Promise.all([
             checkPendingRollRequests(AppState.currentUser.uid),
-            supabase
-                .from('sessioni')
-                .select('id, campagna_id, campagne:campagne!sessioni_campagna_id_fkey(id, nome, giocatori, id_dm)')
-                .is('data_fine', null)
+            supabase.from('campagne').select('id').eq('id_dm', userData.id),
+            supabase.from('inviti_campagna').select('campagna_id').eq('invitato_id', userData.id).eq('stato', 'accepted')
         ]);
 
         if (pendingRoll && !window.currentRollRequest) {
@@ -6435,21 +6442,29 @@ async function checkStartupNotifications() {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         }
 
-        if (!AppState.activeSessionCampagnaId && activeSessionResult.data) {
-            const myCampagna = activeSessionResult.data.find(s =>
-                s.campagne && (
-                    (s.campagne.giocatori || []).includes(userData.id) ||
-                    s.campagne.id_dm === userData.id
-                )
-            );
-            if (myCampagna) {
-                AppState.activeSessionCampagnaId = myCampagna.campagna_id;
-                sessionStorage.setItem('activeSessionCampagnaId', myCampagna.campagna_id);
-                AppState.currentCampagnaId = myCampagna.campagna_id;
-                sessionStorage.setItem('currentCampagnaId', myCampagna.campagna_id);
-                AppState.currentSessioneId = myCampagna.id;
-                sessionStorage.setItem('currentSessioneId', myCampagna.id);
-                updateReturnToSessionBtn();
+        if (!AppState.activeSessionCampagnaId) {
+            const myCampagnaIds = [
+                ...(dmCampagneResult.data || []).map(c => c.id),
+                ...(playerCampagneResult.data || []).map(c => c.campagna_id)
+            ];
+            if (myCampagnaIds.length > 0) {
+                const { data: activeSessions } = await supabase
+                    .from('sessioni')
+                    .select('id, campagna_id')
+                    .in('campagna_id', myCampagnaIds)
+                    .is('data_fine', null)
+                    .limit(1);
+
+                if (activeSessions && activeSessions.length > 0) {
+                    const sess = activeSessions[0];
+                    AppState.activeSessionCampagnaId = sess.campagna_id;
+                    sessionStorage.setItem('activeSessionCampagnaId', sess.campagna_id);
+                    AppState.currentCampagnaId = sess.campagna_id;
+                    sessionStorage.setItem('currentCampagnaId', sess.campagna_id);
+                    AppState.currentSessioneId = sess.id;
+                    sessionStorage.setItem('currentSessioneId', sess.id);
+                    updateReturnToSessionBtn();
+                }
             }
         }
     } catch (error) {
@@ -8863,9 +8878,18 @@ async function showRollRequestModal(request) {
     try {
         const supabase = getSupabaseClient();
         const userData = await findUserByUid(AppState.currentUser?.uid);
-        if (supabase && userData && AppState.currentCampagnaId) {
+        let campagnaId = AppState.currentCampagnaId;
+        if (!campagnaId && request.sessione_id && supabase) {
+            const { data: sess } = await supabase.from('sessioni').select('campagna_id').eq('id', request.sessione_id).single();
+            if (sess) {
+                campagnaId = sess.campagna_id;
+                AppState.currentCampagnaId = campagnaId;
+                sessionStorage.setItem('currentCampagnaId', campagnaId);
+            }
+        }
+        if (supabase && userData && campagnaId) {
             const { data: pgData } = await supabase.rpc('get_personaggio_campagna', {
-                p_campagna_id: AppState.currentCampagnaId,
+                p_campagna_id: campagnaId,
                 p_user_id: userData.id
             });
             if (pgData && pgData.length > 0) {

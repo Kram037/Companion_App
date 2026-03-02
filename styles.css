@@ -827,15 +827,15 @@ body.user-logged-in .header-username {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.1rem;
     padding: 4px 6px;
     border-radius: var(--radius-sm);
-    opacity: 0.5;
-    transition: opacity 0.15s;
+    color: var(--text-muted);
+    transition: color 0.15s;
     line-height: 1;
+    flex-shrink: 0;
 }
 
-.pg-card-delete:hover { opacity: 1; }
+.pg-card-delete:hover { color: #dc3545; }
 
 .pg-card-resistenze,
 .pg-card-slots {
