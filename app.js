@@ -3649,6 +3649,9 @@ async function renderSchedaPersonaggio(personaggioId) {
     try {
         const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
         if (error || !pg) throw error || new Error('Personaggio non trovato');
+        if (_hpCalcState && _hpCalcState.pgId === personaggioId) {
+            pg[_hpCalcState.field] = _hpCalcState.currentVal;
+        }
         _schedaPgCache = pg;
 
         const fMod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
@@ -4110,6 +4113,7 @@ let _hpCalcState = null;
 window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     _hpCalcState = { pgId, field, currentVal, maxVal };
     const label = field === 'pv_attuali' ? 'Punti Vita Attuali' : 'Punti Vita Temporanei';
+    const maxDisplay = maxVal > 0 ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
 
     const existing = document.getElementById('hpCalcOverlay');
     if (existing) existing.remove();
@@ -4119,24 +4123,21 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     overlay.className = 'hp-calc-overlay';
     overlay.innerHTML = `
         <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
-            <div class="hp-calc-current" id="hpCalcCurrent">${currentVal}</div>
+            <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span>${maxDisplay}</div>
             <input type="number" class="hp-calc-input" id="hpCalcAmount" value="0" min="0">
             <div class="hp-calc-buttons">
                 <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
                 <button class="hp-calc-btn heal" onclick="schedaHpApply(1)">+ Cura</button>
             </div>
-            <div class="hp-calc-actions">
-                <button class="btn-secondary btn-small" onclick="schedaCloseHpCalc()">Chiudi</button>
-            </div>
         </div>
     `;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) schedaCloseHpCalc(); });
     document.body.appendChild(overlay);
     document.getElementById('hpCalcAmount').focus();
 }
 
-window.schedaHpApply = function(direction) {
+window.schedaHpApply = async function(direction) {
     if (!_hpCalcState) return;
     const amountInput = document.getElementById('hpCalcAmount');
     const amount = parseInt(amountInput.value) || 0;
@@ -4150,18 +4151,28 @@ window.schedaHpApply = function(direction) {
     const display = document.getElementById('hpCalcCurrent');
     if (display) display.textContent = newVal;
     amountInput.value = '0';
+    amountInput.focus();
 
     const pgDisplay = _hpCalcState.field === 'pv_attuali' ? document.getElementById('schedaPvAttuali') : document.getElementById('schedaPvTemp');
     if (pgDisplay) pgDisplay.textContent = newVal;
     if (_schedaPgCache) _schedaPgCache[_hpCalcState.field] = newVal;
 
-    schedaInstantSave(_hpCalcState.pgId, { [_hpCalcState.field]: newVal });
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ [_hpCalcState.field]: newVal, updated_at: new Date().toISOString() }).eq('id', _hpCalcState.pgId);
+    }
 }
 
-window.schedaCloseHpCalc = function() {
+window.schedaCloseHpCalc = async function() {
     const overlay = document.getElementById('hpCalcOverlay');
     if (overlay) overlay.remove();
+    const wasMonster = _hpCalcState?.isMonster;
+    const campagnaId = _hpCalcState?.campagnaId;
+    const sessioneId = _hpCalcState?.sessioneId;
     _hpCalcState = null;
+    if (wasMonster && campagnaId && sessioneId) {
+        await renderCombattimentoContent(campagnaId, sessioneId);
+    }
 }
 
 window.schedaHdChange = function(pgId, className, current, delta, max) {
@@ -7504,6 +7515,7 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
 window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sessioneId) {
     _hpCalcState = { pgId: mId, field, currentVal, maxVal, isMonster: true, campagnaId, sessioneId };
     const label = 'Punti Vita Mostro';
+    const maxDisplay = maxVal > 0 ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
     const existing = document.getElementById('hpCalcOverlay');
     if (existing) existing.remove();
     const overlay = document.createElement('div');
@@ -7511,25 +7523,23 @@ window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sess
     overlay.className = 'hp-calc-overlay';
     overlay.innerHTML = `
         <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
-            <div class="hp-calc-current" id="hpCalcCurrent">${currentVal}</div>
+            <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span>${maxDisplay}</div>
             <input type="number" class="hp-calc-input" id="hpCalcAmount" value="0" min="0">
             <div class="hp-calc-buttons">
                 <button class="hp-calc-btn damage" onclick="monsterHpApply(-1)">− Danno</button>
                 <button class="hp-calc-btn heal" onclick="monsterHpApply(1)">+ Cura</button>
             </div>
-            <div class="hp-calc-actions">
-                <button class="btn-secondary btn-small" onclick="schedaCloseHpCalc()">Chiudi</button>
-            </div>
         </div>`;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) schedaCloseHpCalc(); });
     document.body.appendChild(overlay);
     document.getElementById('hpCalcAmount').focus();
 }
 
 window.monsterHpApply = async function(direction) {
     if (!_hpCalcState) return;
-    const amount = parseInt(document.getElementById('hpCalcAmount')?.value) || 0;
+    const amountInput = document.getElementById('hpCalcAmount');
+    const amount = parseInt(amountInput?.value) || 0;
     if (amount === 0) return;
     let newVal = _hpCalcState.currentVal + (amount * direction);
     if (newVal < 0) newVal = 0;
@@ -7537,12 +7547,11 @@ window.monsterHpApply = async function(direction) {
     _hpCalcState.currentVal = newVal;
     const display = document.getElementById('hpCalcCurrent');
     if (display) display.textContent = newVal;
-    document.getElementById('hpCalcAmount').value = '0';
+    if (amountInput) { amountInput.value = '0'; amountInput.focus(); }
     const supabase = getSupabaseClient();
     if (supabase) {
         await supabase.from('mostri_combattimento').update({ pv_attuali: newVal }).eq('id', _hpCalcState.pgId);
     }
-    await renderCombatMonsterSheet(_hpCalcState.pgId, true, _hpCalcState.campagnaId, _hpCalcState.sessioneId);
 }
 
 window.removeMonster = async function(mId, campagnaId, sessioneId) {
@@ -7812,6 +7821,10 @@ window.monsterRemoveTag = function(type, val) {
 }
 
 window.monsterWizardNav = function(dir) {
+    if (dir > 0 && (window._monsterWizardStep || 0) === 0) {
+        const nome = document.getElementById('mNome')?.value?.trim();
+        if (!nome) { showNotification('Inserisci un nome per il mostro'); return; }
+    }
     const totalSteps = 5;
     const maxStep = totalSteps - 1;
     window._monsterWizardStep = Math.max(0, Math.min(maxStep, (window._monsterWizardStep || 0) + dir));
@@ -8642,6 +8655,8 @@ async function refreshCurrentPageData() {
     if (_appRefreshRunning) { _appRefreshQueued = true; return; }
     _appRefreshRunning = true;
     _appRefreshQueued = false;
+
+    if (_hpCalcState) { _appRefreshRunning = false; return; }
 
     const page = AppState.currentPage;
     try {

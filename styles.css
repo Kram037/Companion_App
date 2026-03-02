@@ -937,17 +937,20 @@ body.user-logged-in .header-username {
 
 /* HP Calculator */
 .hp-calc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
-.hp-calc-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; width: 280px; text-align: center; box-shadow: var(--shadow-lg); }
+.hp-calc-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; width: 280px; text-align: center; box-shadow: var(--shadow-lg); position: relative; }
+.hp-calc-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 4px 8px; line-height: 1; }
+.hp-calc-close:hover { color: var(--text); }
 .hp-calc-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
-.hp-calc-current { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+.hp-calc-hp-display { margin-bottom: 16px; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+.hp-calc-current { font-size: 2.5rem; font-weight: 900; color: var(--accent); }
+.hp-calc-max { font-size: 1.4rem; font-weight: 600; color: var(--text-muted); }
 .hp-calc-input { width: 100%; padding: 10px; text-align: center; font-size: 1.2rem; font-weight: 700; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; }
 .hp-calc-input:focus { outline: none; border-color: var(--accent); }
-.hp-calc-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.hp-calc-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .hp-calc-btn { padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
 .hp-calc-btn.heal { background: #22c55e; color: white; }
 .hp-calc-btn.damage { background: #ef4444; color: white; }
 .hp-calc-btn:hover { opacity: 0.85; }
-.hp-calc-actions { margin-top: 4px; }
 
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
@@ -1010,6 +1013,23 @@ body.user-logged-in .header-username {
 /* Form layout */
 .modal-content-lg {
     max-width: 520px;
+    height: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+.modal-content-lg form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.modal-content-lg .wizard-page.active {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.modal-content-lg .wizard-page .form-actions {
+    margin-top: auto;
+    padding-top: var(--spacing-md);
 }
 
 .form-row {
