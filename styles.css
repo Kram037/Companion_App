@@ -944,12 +944,16 @@ body.user-logged-in .header-username {
 .hp-calc-hp-display { margin-bottom: 16px; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
 .hp-calc-current { font-size: 2.5rem; font-weight: 900; color: var(--accent); }
 .hp-calc-max { font-size: 1.4rem; font-weight: 600; color: var(--text-muted); }
-.hp-calc-input { width: 100%; padding: 10px; text-align: center; font-size: 1.2rem; font-weight: 700; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; }
-.hp-calc-input:focus { outline: none; border-color: var(--accent); }
+.hp-calc-input-display { width: 100%; padding: 10px; text-align: center; font-size: 1.4rem; font-weight: 700; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; min-height: 44px; line-height: 1.4; }
+.hp-calc-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+.hp-calc-numpad-btn { padding: 12px 0; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.hp-calc-numpad-btn:hover { background: var(--surface-hover, rgba(255,255,255,0.08)); }
+.hp-calc-numpad-btn:active { background: var(--accent); color: white; }
 .hp-calc-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .hp-calc-btn { padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
 .hp-calc-btn.heal { background: #22c55e; color: white; }
 .hp-calc-btn.damage { background: #ef4444; color: white; }
+.hp-calc-btn.hp-calc-btn-full { grid-column: 1 / -1; }
 .hp-calc-btn:hover { opacity: 0.85; }
 
 /* Skills */

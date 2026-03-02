@@ -3788,8 +3788,8 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-hp-section">
             <div class="scheda-hp-left">
                 <div class="scheda-hp-pair">
-                    <div class="scheda-hp-cell">
-                        <input type="number" class="scheda-hp-input" value="${pg.punti_vita_max || 10}" data-field="punti_vita_max" data-pgid="${pg.id}">
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','punti_vita_max',${pg.punti_vita_max || 10},-1)">
+                        <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
                         <div class="scheda-hp-label">PV Massimi</div>
                     </div>
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max || 10})">
@@ -4121,9 +4121,10 @@ function schedaSlotToggleInline(pgId, level, index) {
 let _hpCalcState = null;
 
 window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
-    _hpCalcState = { pgId, field, currentVal, maxVal };
-    const label = field === 'pv_attuali' ? 'Punti Vita Attuali' : 'Punti Vita Temporanei';
-    const maxDisplay = maxVal > 0 ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
+    _hpCalcState = { pgId, field, currentVal, maxVal, inputBuffer: '0' };
+    const labels = { pv_attuali: 'Punti Vita Attuali', pv_temporanei: 'Punti Vita Temporanei', punti_vita_max: 'Punti Vita Massimi' };
+    const label = labels[field] || 'Punti Vita';
+    const maxDisplay = (maxVal > 0 && field !== 'punti_vita_max') ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
 
     const existing = document.getElementById('hpCalcOverlay');
     if (existing) existing.remove();
@@ -4131,39 +4132,67 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     const overlay = document.createElement('div');
     overlay.id = 'hpCalcOverlay';
     overlay.className = 'hp-calc-overlay';
+
+    const isDirectEdit = field === 'punti_vita_max' || field === 'pv_temporanei';
+    const actionButtons = isDirectEdit
+        ? `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`
+        : `<div class="hp-calc-buttons">
+            <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
+            <button class="hp-calc-btn heal" onclick="schedaHpApply(1)">+ Cura</button>
+           </div>`;
+
     overlay.innerHTML = `
         <div class="hp-calc-modal">
             <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
             <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span>${maxDisplay}</div>
-            <input type="number" class="hp-calc-input" id="hpCalcAmount" value="0" min="0">
-            <div class="hp-calc-buttons">
-                <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
-                <button class="hp-calc-btn heal" onclick="schedaHpApply(1)">+ Cura</button>
+            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
             </div>
+            ${actionButtons}
         </div>
     `;
     document.body.appendChild(overlay);
-    document.getElementById('hpCalcAmount').focus();
 }
 
-window.schedaHpApply = async function(direction) {
+window.hpCalcNumpad = function(key) {
     if (!_hpCalcState) return;
-    const amountInput = document.getElementById('hpCalcAmount');
-    const amount = parseInt(amountInput.value) || 0;
-    if (amount === 0) return;
+    if (key === 'C') {
+        _hpCalcState.inputBuffer = '0';
+    } else if (key === '⌫') {
+        _hpCalcState.inputBuffer = _hpCalcState.inputBuffer.length > 1 ? _hpCalcState.inputBuffer.slice(0, -1) : '0';
+    } else {
+        _hpCalcState.inputBuffer = _hpCalcState.inputBuffer === '0' ? key : _hpCalcState.inputBuffer + key;
+    }
+    const display = document.getElementById('hpCalcAmountDisplay');
+    if (display) display.textContent = _hpCalcState.inputBuffer;
+}
 
-    let newVal = _hpCalcState.currentVal + (amount * direction);
-    if (newVal < 0) newVal = 0;
-    if (_hpCalcState.maxVal > 0 && newVal > _hpCalcState.maxVal) newVal = _hpCalcState.maxVal;
+window.schedaHpSetDirect = async function() {
+    if (!_hpCalcState) return;
+    const newVal = parseInt(_hpCalcState.inputBuffer) || 0;
     _hpCalcState.currentVal = newVal;
 
     const display = document.getElementById('hpCalcCurrent');
     if (display) display.textContent = newVal;
-    amountInput.value = '0';
-    amountInput.focus();
+    _hpCalcState.inputBuffer = '0';
+    const amountDisplay = document.getElementById('hpCalcAmountDisplay');
+    if (amountDisplay) amountDisplay.textContent = '0';
 
-    const pgDisplay = _hpCalcState.field === 'pv_attuali' ? document.getElementById('schedaPvAttuali') : document.getElementById('schedaPvTemp');
+    const displayId = { pv_attuali: 'schedaPvAttuali', pv_temporanei: 'schedaPvTemp', punti_vita_max: 'schedaPvMax' };
+    const pgDisplay = document.getElementById(displayId[_hpCalcState.field]);
     if (pgDisplay) pgDisplay.textContent = newVal;
     if (_schedaPgCache) _schedaPgCache[_hpCalcState.field] = newVal;
 
@@ -4173,6 +4202,35 @@ window.schedaHpApply = async function(direction) {
     }
 }
 
+window.schedaHpApply = async function(direction) {
+    if (!_hpCalcState) return;
+    const amount = parseInt(_hpCalcState.inputBuffer) || 0;
+    if (amount === 0) return;
+
+    let newVal = _hpCalcState.currentVal + (amount * direction);
+    if (newVal < 0) newVal = 0;
+    if (_hpCalcState.maxVal > 0 && newVal > _hpCalcState.maxVal) newVal = _hpCalcState.maxVal;
+    _hpCalcState.currentVal = newVal;
+    _hpCalcState.inputBuffer = '0';
+
+    const display = document.getElementById('hpCalcCurrent');
+    if (display) display.textContent = newVal;
+    const amountDisplay = document.getElementById('hpCalcAmountDisplay');
+    if (amountDisplay) amountDisplay.textContent = '0';
+
+    const displayId = { pv_attuali: 'schedaPvAttuali', pv_temporanei: 'schedaPvTemp', punti_vita_max: 'schedaPvMax' };
+    const pgDisplay = document.getElementById(displayId[_hpCalcState.field]);
+    if (pgDisplay) pgDisplay.textContent = newVal;
+    if (_schedaPgCache) _schedaPgCache[_hpCalcState.field] = newVal;
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ [_hpCalcState.field]: newVal, updated_at: new Date().toISOString() }).eq('id', _hpCalcState.pgId);
+    }
+}
+
+let _hpCalcClosedAt = 0;
+
 window.schedaCloseHpCalc = async function() {
     const overlay = document.getElementById('hpCalcOverlay');
     if (overlay) overlay.remove();
@@ -4180,6 +4238,7 @@ window.schedaCloseHpCalc = async function() {
     const campagnaId = _hpCalcState?.campagnaId;
     const sessioneId = _hpCalcState?.sessioneId;
     _hpCalcState = null;
+    _hpCalcClosedAt = Date.now();
     if (wasMonster && campagnaId && sessioneId) {
         await renderCombattimentoContent(campagnaId, sessioneId);
     }
@@ -7523,7 +7582,7 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
 
 // Monster HP Calculator (reuses the same overlay UI)
 window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sessioneId) {
-    _hpCalcState = { pgId: mId, field, currentVal, maxVal, isMonster: true, campagnaId, sessioneId };
+    _hpCalcState = { pgId: mId, field, currentVal, maxVal, isMonster: true, campagnaId, sessioneId, inputBuffer: '0' };
     const label = 'Punti Vita Mostro';
     const maxDisplay = maxVal > 0 ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
     const existing = document.getElementById('hpCalcOverlay');
@@ -7536,28 +7595,42 @@ window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sess
             <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
             <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span>${maxDisplay}</div>
-            <input type="number" class="hp-calc-input" id="hpCalcAmount" value="0" min="0">
+            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
+            </div>
             <div class="hp-calc-buttons">
                 <button class="hp-calc-btn damage" onclick="monsterHpApply(-1)">− Danno</button>
                 <button class="hp-calc-btn heal" onclick="monsterHpApply(1)">+ Cura</button>
             </div>
         </div>`;
     document.body.appendChild(overlay);
-    document.getElementById('hpCalcAmount').focus();
 }
 
 window.monsterHpApply = async function(direction) {
     if (!_hpCalcState) return;
-    const amountInput = document.getElementById('hpCalcAmount');
-    const amount = parseInt(amountInput?.value) || 0;
+    const amount = parseInt(_hpCalcState.inputBuffer) || 0;
     if (amount === 0) return;
     let newVal = _hpCalcState.currentVal + (amount * direction);
     if (newVal < 0) newVal = 0;
     if (_hpCalcState.maxVal > 0 && newVal > _hpCalcState.maxVal) newVal = _hpCalcState.maxVal;
     _hpCalcState.currentVal = newVal;
+    _hpCalcState.inputBuffer = '0';
     const display = document.getElementById('hpCalcCurrent');
     if (display) display.textContent = newVal;
-    if (amountInput) { amountInput.value = '0'; amountInput.focus(); }
+    const amountDisplay = document.getElementById('hpCalcAmountDisplay');
+    if (amountDisplay) amountDisplay.textContent = '0';
     const supabase = getSupabaseClient();
     if (supabase) {
         await supabase.from('mostri_combattimento').update({ pv_attuali: newVal }).eq('id', _hpCalcState.pgId);
@@ -8666,7 +8739,7 @@ async function refreshCurrentPageData() {
     _appRefreshRunning = true;
     _appRefreshQueued = false;
 
-    if (_hpCalcState) { _appRefreshRunning = false; return; }
+    if (_hpCalcState || (Date.now() - _hpCalcClosedAt < 2000)) { _appRefreshRunning = false; return; }
 
     const page = AppState.currentPage;
     try {
