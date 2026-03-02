@@ -3493,7 +3493,23 @@ async function loadPersonaggi(options = {}) {
     try {
         const { data: personaggi, error } = await supabase.rpc('get_personaggi_utente');
         if (error) throw error;
-        renderPersonaggi(personaggi || []);
+
+        const pgList = personaggi || [];
+        let campagneMap = {};
+        if (pgList.length > 0) {
+            const pgIds = pgList.map(p => p.id);
+            const { data: assocs } = await supabase
+                .from('personaggi_campagna')
+                .select('personaggio_id, campagne:campagne!personaggi_campagna_campagna_id_fkey(id, nome)')
+                .in('personaggio_id', pgIds);
+            if (assocs) {
+                assocs.forEach(a => {
+                    if (!campagneMap[a.personaggio_id]) campagneMap[a.personaggio_id] = [];
+                    if (a.campagne) campagneMap[a.personaggio_id].push(a.campagne.nome);
+                });
+            }
+        }
+        renderPersonaggi(pgList, campagneMap);
     } catch (error) {
         console.error('Errore caricamento personaggi:', error);
         if (elements.personaggiList) {
@@ -3502,7 +3518,7 @@ async function loadPersonaggi(options = {}) {
     }
 }
 
-function renderPersonaggi(personaggi) {
+function renderPersonaggi(personaggi, campagneMap = {}) {
     if (!elements.personaggiList) return;
 
     if (personaggi.length === 0) {
@@ -3515,14 +3531,13 @@ function renderPersonaggi(personaggi) {
 
     elements.personaggiList.innerHTML = personaggi.map(pg => {
         const initials = (pg.nome || '?').substring(0, 2).toUpperCase();
-        const mod = (val) => {
-            const m = Math.floor((val - 10) / 2);
-            return m >= 0 ? `+${m}` : `${m}`;
-        };
         let classeDisplay = pg.classe || '';
         if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
             classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
         }
+        const campagne = campagneMap[pg.id] || [];
+        const campagneText = campagne.length > 0 ? campagne.map(n => escapeHtml(n)).join(', ') : 'Nessuna campagna';
+
         return `
         <div class="pg-card pg-card-clickable" data-pg-id="${pg.id}" onclick="openSchedaPersonaggio('${pg.id}')">
             <div class="pg-card-header">
@@ -3533,11 +3548,9 @@ function renderPersonaggi(personaggi) {
                 </div>
                 <div class="pg-card-level">Lv ${pg.livello || 1}</div>
             </div>
-            <div class="pg-card-combat">
-                <div class="pg-combat-stat"><div class="pg-combat-label">PV</div><div class="pg-combat-value">${pg.punti_vita_max}</div></div>
-                <div class="pg-combat-stat"><div class="pg-combat-label">CA</div><div class="pg-combat-value">${pg.classe_armatura}</div></div>
-                <div class="pg-combat-stat"><div class="pg-combat-label">INIT</div><div class="pg-combat-value">${pg.iniziativa != null ? pg.iniziativa : mod(pg.destrezza)}</div></div>
-                <div class="pg-combat-stat"><div class="pg-combat-label">VEL</div><div class="pg-combat-value">${pg.velocita}</div></div>
+            <div class="pg-card-footer">
+                <div class="pg-card-campaigns"><span class="pg-card-campaigns-icon">⚔</span> ${campagneText}</div>
+                <button class="pg-card-delete" onclick="event.stopPropagation(); deletePersonaggio('${pg.id}')" aria-label="Elimina personaggio">🗑</button>
             </div>
         </div>`;
     }).join('');
@@ -8311,6 +8324,7 @@ function startAppEventsRealtime() {
                         if (pending && !window.currentRollRequest) {
                             showRollRequestModal(pending);
                             sendBrowserNotification('Tiro di Iniziativa', 'Il DM ti ha richiesto un tiro di iniziativa!');
+                            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                         }
                     }, 500);
                 }
@@ -8327,6 +8341,7 @@ function startAppEventsRealtime() {
                             pending.targetTiro = targetTiro;
                             showRollRequestModal(pending);
                             sendBrowserNotification(label, `Il DM ha richiesto: ${label}`);
+                            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                         }
                     }, 500);
                 }
