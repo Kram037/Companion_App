@@ -3788,17 +3788,17 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-hp-section">
             <div class="scheda-hp-left">
                 <div class="scheda-hp-pair">
-                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','punti_vita_max',${pg.punti_vita_max || 10},-1)">
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
                         <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
                         <div class="scheda-hp-label">PV Massimi</div>
                     </div>
-                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max || 10})">
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_attuali')">
                         <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
                         <div class="scheda-hp-label">PV Attuali</div>
                     </div>
                 </div>
             </div>
-            <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pg.pv_temporanei || 0},-1)">
+            <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
                 <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
                 <div class="scheda-hp-label">PV Temporanei</div>
             </div>
@@ -4119,6 +4119,23 @@ function schedaSlotToggleInline(pgId, level, index) {
 
 // HP Calculator
 let _hpCalcState = null;
+
+window.schedaOpenHpCalcLive = function(pgId, field) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let currentVal, maxVal;
+    if (field === 'pv_attuali') {
+        currentVal = pg.pv_attuali != null ? pg.pv_attuali : (pg.punti_vita_max || 10);
+        maxVal = pg.punti_vita_max || 10;
+    } else if (field === 'pv_temporanei') {
+        currentVal = pg.pv_temporanei || 0;
+        maxVal = -1;
+    } else if (field === 'punti_vita_max') {
+        currentVal = pg.punti_vita_max || 10;
+        maxVal = -1;
+    }
+    schedaOpenHpCalc(pgId, field, currentVal, maxVal);
+}
 
 window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     _hpCalcState = { pgId, field, currentVal, maxVal, inputBuffer: '0' };
