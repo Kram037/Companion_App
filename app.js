@@ -229,6 +229,12 @@ async function init() {
         console.log('📌 Sessione salvata ripristinata dalla sessione:', savedSessioneId);
     }
     
+    const savedPersonaggioId = sessionStorage.getItem('currentPersonaggioId');
+    if (savedPersonaggioId) {
+        AppState.currentPersonaggioId = savedPersonaggioId;
+        console.log('📌 Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
+    }
+
     // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
     const savedPage = sessionStorage.getItem('currentPage');
     if (savedPage) {
@@ -355,14 +361,16 @@ function setupSupabaseAuth() {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
                     }
-                    if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+                    if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
+                        navigateToPage('scheda');
+                    } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                         navigateToPage('combattimento');
                     } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                         navigateToPage('sessione');
                         renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
-                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici'].includes(AppState.currentPage)) {
+                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici','scheda'].includes(AppState.currentPage)) {
                         navigateToPage('dettagli');
                     } else {
                         navigateToPage(AppState.currentPage || 'campagne');
@@ -419,14 +427,16 @@ async function checkAuthState() {
             }
             updateUIForLoggedIn();
             
-            if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
+                navigateToPage('scheda');
+            } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                 navigateToPage('combattimento');
             } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                 navigateToPage('sessione');
                 renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 navigateToPage('dettagli');
-            } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici'].includes(AppState.currentPage)) {
+            } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici','scheda'].includes(AppState.currentPage)) {
                 navigateToPage('dettagli');
             } else {
                 navigateToPage(AppState.currentPage || 'campagne');
