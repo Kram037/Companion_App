@@ -3102,6 +3102,22 @@ let pgSelectedClasses = [];
 
 const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero','Ladro','Mago','Monaco','Paladino','Ranger','Stregone','Warlock'];
 
+const DND_RACES = [
+    'Umano','Elfo','Elfo Alto','Elfo dei Boschi','Elfo Oscuro (Drow)','Nano','Nano delle Colline','Nano delle Montagne',
+    'Halfling','Halfling Piedelesto','Halfling Tozzo','Gnomo','Gnomo delle Foreste','Gnomo delle Rocce',
+    'Mezzelfo','Mezzorco','Tiefling','Dragonide','Aasimar','Genasi','Genasi dell\'Aria','Genasi del Fuoco',
+    'Genasi dell\'Acqua','Genasi della Terra','Goliath','Firbolg','Kenku','Tabaxi','Tortle','Lizardfolk',
+    'Goblin','Hobgoblin','Bugbear','Kobold','Orco','Yuan-Ti','Changeling','Kalashtar','Shifter','Warforged',
+    'Centauro','Minotauro','Satiro','Fatina','Harengon','Automa','Githyanki','Githzerai'
+];
+
+const DND_BACKGROUNDS = [
+    'Accolito','Artigiano di Gilda','Ciarlatano','Criminale','Eremita','Eroe Popolare','Forestiero',
+    'Intrattenitore','Marinaio','Monello','Nobile','Ricercatore','Soldato','Viandante',
+    'Agente Zhentarim','Agente dei Lord','Agente dell\'Arpa','Agente dell\'Ordine del Guanto','Agente dell\'Enclave di Smeraldo',
+    'Cavaliere','Pirata','Spia','Gladiatore','Archeologo','Antropologo','Contrabbandiere'
+];
+
 const CLASS_SAVES = {
     'Artefice': ['costituzione','intelligenza'],
     'Barbaro': ['forza','costituzione'],
@@ -3208,6 +3224,30 @@ function updateAllSaveValues() {
 }
 
 // --- Class multi-select ---
+window.pgOpenRazzaSelect = function() {
+    openCustomSelect(
+        DND_RACES.map(r => ({ value: r, label: r })),
+        (value) => {
+            document.getElementById('pgRazza').value = value;
+            const btn = document.getElementById('pgRazzaBtn');
+            if (btn) btn.textContent = value;
+        },
+        'Seleziona Razza'
+    );
+}
+
+window.pgOpenBackgroundSelect = function() {
+    openCustomSelect(
+        DND_BACKGROUNDS.map(b => ({ value: b, label: b })),
+        (value) => {
+            document.getElementById('pgBackground').value = value;
+            const btn = document.getElementById('pgBackgroundBtn');
+            if (btn) btn.textContent = value;
+        },
+        'Seleziona Background'
+    );
+}
+
 window.pgOpenClassDropdown = function() {
     const available = DND_CLASSES.filter(c => !pgSelectedClasses.find(s => s.nome === c));
     if (available.length === 0) { showNotification('Tutte le classi sono già selezionate'); return; }
@@ -3590,6 +3630,8 @@ window.pgWizardNext = function() {
     if (pgWizardCurrentStep === 0) {
         const nome = document.getElementById('pgNome').value.trim();
         if (!nome) { showNotification('Inserisci un nome per il personaggio'); return; }
+    }
+    if (pgWizardCurrentStep === 1) {
         if (pgSelectedClasses.length === 0) { showNotification('Seleziona almeno una classe'); return; }
     }
     pgWizardGoTo(pgWizardCurrentStep + 1);
@@ -3600,7 +3642,7 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 4) return;
+    if (step < 0 || step > 5) return;
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
@@ -3611,20 +3653,20 @@ function pgWizardGoTo(step) {
     const target = document.getElementById(`pgStep${step}`);
     if (target) target.classList.add('active');
 
-    if (step === 1) {
+    if (step === 2) {
         updateAllAbilityMods();
         if (!editingPersonaggioId && pgSelectedClasses.length > 0) {
             pgUpdateSavingThrows();
         }
         updateAllSaveValues();
     }
-    if (step === 2) {
+    if (step === 3) {
         pgRenderSkills();
     }
-    if (step === 3) {
+    if (step === 4) {
         pgRenderResImmGrid('pgResImmGrid');
     }
-    if (step === 4) {
+    if (step === 5) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const desMod = calcMod(des);
         const initField = document.getElementById('pgIniziativa');
@@ -3916,7 +3958,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         content.innerHTML = `
         <div class="scheda-identity">
             <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-            <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+            <div class="scheda-subtitle">${[pg.razza, pg.background, classeDisplay, `Lv ${pg.livello || 1}`].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
         </div>
 
         <div class="scheda-section">
@@ -4210,7 +4252,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     content.innerHTML = `
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-        <div class="scheda-subtitle">${escapeHtml(pg.razza || '')} &middot; ${escapeHtml(classeDisplay)} &middot; Lv ${pg.livello || 1}</div>
+        <div class="scheda-subtitle">${[pg.razza, pg.background, classeDisplay, `Lv ${pg.livello || 1}`].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
     </div>
     <div class="scheda-section">
         <div class="scheda-section-title">Statistiche Incantatore</div>
@@ -4535,6 +4577,15 @@ window.openPersonaggioModal = function(personaggioId) {
     pgRenderClassi();
     pgWizardGoTo(0);
 
+    const razzaBtn = document.getElementById('pgRazzaBtn');
+    const razzaInput = document.getElementById('pgRazza');
+    if (razzaBtn) razzaBtn.textContent = 'Seleziona razza...';
+    if (razzaInput) razzaInput.value = '';
+    const bgBtn = document.getElementById('pgBackgroundBtn');
+    const bgInput = document.getElementById('pgBackground');
+    if (bgBtn) bgBtn.textContent = 'Seleziona background...';
+    if (bgInput) bgInput.value = '';
+
     // Reset saving throws
     ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(s => {
         const cb = document.getElementById(`save${s}`);
@@ -4550,7 +4601,14 @@ window.openPersonaggioModal = function(personaggioId) {
             supabase.from('personaggi').select('*').eq('id', personaggioId).single().then(({ data, error }) => {
                 if (data && !error) {
                     document.getElementById('pgNome').value = data.nome || '';
-                    document.getElementById('pgRazza').value = data.razza || '';
+                    const razzaVal = data.razza || '';
+                    document.getElementById('pgRazza').value = razzaVal;
+                    const rBtn = document.getElementById('pgRazzaBtn');
+                    if (rBtn) rBtn.textContent = razzaVal || 'Seleziona razza...';
+                    const bgVal = data.background || '';
+                    document.getElementById('pgBackground').value = bgVal;
+                    const bBtn = document.getElementById('pgBackgroundBtn');
+                    if (bBtn) bBtn.textContent = bgVal || 'Seleziona background...';
 
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
                         pgSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1, thirdCaster: !!c.thirdCaster }));
@@ -4655,7 +4713,8 @@ async function handleSavePersonaggio(e) {
 
     const pgData = {
         nome: document.getElementById('pgNome').value.trim(),
-        razza: document.getElementById('pgRazza').value.trim() || null,
+        razza: document.getElementById('pgRazza').value || null,
+        background: document.getElementById('pgBackground').value || null,
         classe: classeDisplay || null,
         classi: pgSelectedClasses,
         livello: totalLevel,
