@@ -3100,22 +3100,51 @@ let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
 let pgSelectedClasses = [];
 
+// =====================================================
+// FONTI APPROVATE:
+// PHB  = Manuale del Giocatore
+// DMG  = Manuale del Dungeon Master
+// MM   = Manuale dei Mostri
+// XGtE = Guida Omnicomprensiva di Xanathar
+// TCoE = Calderone Omnicomprensivo di Tasha
+// FToD = Il Tesoro dei Draghi di Fizban
+// EBR  = Eberron: Nascita dal Ultimo Guerra
+// MToF = Tomo dei Nemici di Mordenkainen
+// =====================================================
+
 const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero','Ladro','Mago','Monaco','Paladino','Ranger','Stregone','Warlock'];
 
 const DND_RACES = [
-    'Umano','Elfo','Elfo Alto','Elfo dei Boschi','Elfo Oscuro (Drow)','Nano','Nano delle Colline','Nano delle Montagne',
-    'Halfling','Halfling Piedelesto','Halfling Tozzo','Gnomo','Gnomo delle Foreste','Gnomo delle Rocce',
-    'Mezzelfo','Mezzorco','Tiefling','Dragonide','Aasimar','Genasi','Genasi dell\'Aria','Genasi del Fuoco',
-    'Genasi dell\'Acqua','Genasi della Terra','Goliath','Firbolg','Kenku','Tabaxi','Tortle','Lizardfolk',
-    'Goblin','Hobgoblin','Bugbear','Kobold','Orco','Yuan-Ti','Changeling','Kalashtar','Shifter','Warforged',
-    'Centauro','Minotauro','Satiro','Fatina','Harengon','Automa','Githyanki','Githzerai'
+    // PHB
+    'Dragonide','Elfo Alto','Elfo dei Boschi','Elfo Oscuro (Drow)',
+    'Gnomo delle Foreste','Gnomo delle Rocce',
+    'Halfling Piedelesto','Halfling Tozzo',
+    'Mezzelfo','Mezzorco',
+    'Nano delle Colline','Nano delle Montagne',
+    'Tiefling','Umano',
+    // MToF
+    'Duergar','Eladrin','Elfo del Mare','Shadar-kai',
+    'Githyanki','Githzerai','Gnomo del Profondo',
+    'Tiefling di Baalzebul','Tiefling di Dispater','Tiefling di Fierna',
+    'Tiefling di Glasya','Tiefling di Levistus','Tiefling di Mammon',
+    'Tiefling di Mephistopheles','Tiefling di Zariel',
+    // TCoE
+    'Lineaggio Personalizzato',
+    // FToD
+    'Dragonide Cromatico','Dragonide di Gemma','Dragonide Metallico',
+    // EBR
+    'Bugbear','Changeling','Goblin','Hobgoblin','Kalashtar','Orco','Shifter','Warforged'
 ];
 
 const DND_BACKGROUNDS = [
-    'Accolito','Artigiano di Gilda','Ciarlatano','Criminale','Eremita','Eroe Popolare','Forestiero',
-    'Intrattenitore','Marinaio','Monello','Nobile','Ricercatore','Soldato','Viandante',
-    'Agente Zhentarim','Agente dei Lord','Agente dell\'Arpa','Agente dell\'Ordine del Guanto','Agente dell\'Enclave di Smeraldo',
-    'Cavaliere','Pirata','Spia','Gladiatore','Archeologo','Antropologo','Contrabbandiere'
+    // PHB
+    'Accolito','Artigiano di Gilda','Ciarlatano','Criminale','Eremita',
+    'Eroe Popolare','Forestiero','Intrattenitore','Marinaio','Monello',
+    'Nobile','Ricercatore','Soldato',
+    // PHB (varianti)
+    'Cavaliere','Gladiatore','Mercante di Gilda','Pirata','Spia',
+    // EBR
+    'Agente di Casata'
 ];
 
 const CLASS_SAVES = {
