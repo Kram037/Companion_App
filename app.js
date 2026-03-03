@@ -68,6 +68,8 @@ const AppState = {
     campagnaGiocatori: [],
     cachedUserData: null,
     cachedCampagne: null,
+    cachedRazze: null,
+    cachedBackground: null,
     campagneFilters: {
         searchText: '',
         tipologia: 'all',
@@ -357,6 +359,7 @@ function setupSupabaseAuth() {
                 updateUIForLoggedIn();
                 
                 initializeUserDocument(session.user).then(() => {
+                    loadRazzeBackground();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -404,6 +407,19 @@ function setupSupabaseAuth() {
     } catch (error) {
         console.error('❌ Errore nel setup Supabase Auth:', error);
     }
+}
+
+async function loadRazzeBackground() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    try {
+        const [razzeRes, bgRes] = await Promise.all([
+            supabase.from('razze').select('*').order('gruppo').order('nome'),
+            supabase.from('background').select('*').order('nome')
+        ]);
+        if (razzeRes.data) AppState.cachedRazze = razzeRes.data;
+        if (bgRes.data) AppState.cachedBackground = bgRes.data;
+    } catch (e) { console.warn('Errore caricamento razze/background:', e); }
 }
 
 async function checkAuthState() {
@@ -3110,8 +3126,9 @@ let pgSelectedClasses = [];
 // XGtE = Guida Omnicomprensiva di Xanathar
 // TCoE = Calderone Omnicomprensivo di Tasha
 // FToD = Il Tesoro dei Draghi di Fizban
-// EBR  = Eberron: Nascita dal Ultimo Guerra
+// EBR  = Eberron: Nascita dall'Ultima Guerra
 // MToF = Tomo dei Nemici di Mordenkainen
+// VGtM = Guida dei Mostri di Volo
 // =====================================================
 
 const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero','Ladro','Mago','Monaco','Paladino','Ranger','Stregone','Warlock'];
@@ -3153,19 +3170,32 @@ const DND_RACES_GROUPED = [
     'Tiefling di Mammon',               // MToF
     'Tiefling di Mephistopheles',       // MToF
     'Tiefling di Zariel',               // MToF
+    { label: 'Aasimar', type: 'divider' },
+    'Aasimar',                          // VGtM
+    'Aasimar Protettore',               // VGtM
+    'Aasimar Flagello',                 // VGtM
+    'Aasimar Caduto',                   // VGtM
     { label: 'Altre Razze', type: 'divider' },
-    'Bugbear',                          // EBR
+    'Bugbear',                          // EBR / VGtM
     'Changeling',                       // EBR
-    'Goblin',                           // EBR
-    'Hobgoblin',                        // EBR
+    'Firbolg',                          // VGtM
+    'Goblin',                           // EBR / VGtM
+    'Goliath',                          // VGtM
+    'Hobgoblin',                        // EBR / VGtM
     'Kalashtar',                        // EBR
+    'Kenku',                            // VGtM
+    'Kobold',                           // VGtM
     'Lineaggio Personalizzato',         // TCoE
+    'Lizardfolk',                       // VGtM
     'Mezzelfo',                         // PHB
     'Mezzorco',                         // PHB
-    'Orco',                             // EBR
+    'Orco',                             // EBR / VGtM
     'Shifter',                          // EBR
+    'Tabaxi',                           // VGtM
+    'Triton',                           // VGtM
     'Umano',                            // PHB
     'Warforged',                        // EBR
+    'Yuan-Ti Purblood',                 // VGtM
 ];
 
 const DND_BACKGROUNDS = [
@@ -3284,21 +3314,60 @@ function updateAllSaveValues() {
     });
 }
 
-// --- Class multi-select ---
-function buildGroupedRaceOptions() {
-    return DND_RACES_GROUPED.map(r => {
-        if (typeof r === 'object') return r;
-        return { value: r, label: r };
+// --- Race/Background selects ---
+function buildRaceOptionsFromDB() {
+    const razze = AppState.cachedRazze;
+    if (!razze || razze.length === 0) {
+        return DND_RACES_GROUPED.map(r => typeof r === 'object' ? r : { value: r, label: r });
+    }
+    const options = [];
+    let lastGruppo = null;
+    razze.forEach(r => {
+        if (r.gruppo && r.gruppo !== lastGruppo) {
+            options.push({ type: 'divider', label: r.gruppo });
+            lastGruppo = r.gruppo;
+        }
+        options.push({ value: r.nome, label: r.nome });
     });
+    return options;
+}
+
+function buildBackgroundOptionsFromDB() {
+    const bgs = AppState.cachedBackground;
+    if (!bgs || bgs.length === 0) {
+        return DND_BACKGROUNDS.map(b => ({ value: b, label: b }));
+    }
+    return bgs.map(b => ({ value: b.nome, label: b.nome }));
+}
+
+function getRaceData(nome) {
+    if (!AppState.cachedRazze) return null;
+    return AppState.cachedRazze.find(r => r.nome === nome) || null;
+}
+
+function getBackgroundData(nome) {
+    if (!AppState.cachedBackground) return null;
+    return AppState.cachedBackground.find(b => b.nome === nome) || null;
 }
 
 window.pgOpenRazzaSelect = function() {
     openCustomSelect(
-        buildGroupedRaceOptions(),
+        buildRaceOptionsFromDB(),
         (value) => {
             document.getElementById('pgRazza').value = value;
             const btn = document.getElementById('pgRazzaBtn');
             if (btn) btn.textContent = value;
+            const data = getRaceData(value);
+            if (data) {
+                const velField = document.getElementById('pgVelocita');
+                if (velField) velField.value = data.velocita || 9;
+                if (data.resistenze && data.resistenze.length > 0) {
+                    data.resistenze.forEach(r => { if (!pgCurrentResistenze.includes(r)) pgCurrentResistenze.push(r); });
+                }
+                if (data.competenze_abilita && data.competenze_abilita.length > 0) {
+                    data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
+                }
+            }
         },
         'Seleziona Razza'
     );
@@ -3306,11 +3375,15 @@ window.pgOpenRazzaSelect = function() {
 
 window.pgOpenBackgroundSelect = function() {
     openCustomSelect(
-        DND_BACKGROUNDS.map(b => ({ value: b, label: b })),
+        buildBackgroundOptionsFromDB(),
         (value) => {
             document.getElementById('pgBackground').value = value;
             const btn = document.getElementById('pgBackgroundBtn');
             if (btn) btn.textContent = value;
+            const data = getBackgroundData(value);
+            if (data && data.competenze_abilita && data.competenze_abilita.length > 0) {
+                data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
+            }
         },
         'Seleziona Background'
     );
