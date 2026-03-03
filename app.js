@@ -3011,15 +3011,17 @@ window.openCustomSelect = function(options, callback, title) {
     const overlay = document.createElement('div');
     overlay.id = 'customSelectOverlay';
     overlay.className = 'custom-select-overlay';
+    const listHtml = options.map((o, i) => {
+        if (o.type === 'divider') return `<div class="custom-select-divider">${escapeHtml(o.label)}</div>`;
+        return `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}</button>`;
+    }).join('');
     overlay.innerHTML = `
         <div class="custom-select-panel">
             <div class="custom-select-header">
                 <span>${escapeHtml(title || 'Seleziona')}</span>
                 <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
             </div>
-            <div class="custom-select-list">
-                ${options.map((o, i) => `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}</button>`).join('')}
-            </div>
+            <div class="custom-select-list">${listHtml}</div>
         </div>`;
     overlay.querySelector('.custom-select-list').addEventListener('click', (e) => {
         const btn = e.target.closest('.custom-select-item');
@@ -3114,26 +3116,56 @@ let pgSelectedClasses = [];
 
 const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero','Ladro','Mago','Monaco','Paladino','Ranger','Stregone','Warlock'];
 
-const DND_RACES = [
-    // PHB
-    'Dragonide','Elfo Alto','Elfo dei Boschi','Elfo Oscuro (Drow)',
-    'Gnomo delle Foreste','Gnomo delle Rocce',
-    'Halfling Piedelesto','Halfling Tozzo',
-    'Mezzelfo','Mezzorco',
-    'Nano delle Colline','Nano delle Montagne',
-    'Tiefling','Umano',
-    // MToF
-    'Duergar','Eladrin','Elfo del Mare','Shadar-kai',
-    'Githyanki','Githzerai','Gnomo del Profondo',
-    'Tiefling di Baalzebul','Tiefling di Dispater','Tiefling di Fierna',
-    'Tiefling di Glasya','Tiefling di Levistus','Tiefling di Mammon',
-    'Tiefling di Mephistopheles','Tiefling di Zariel',
-    // TCoE
-    'Lineaggio Personalizzato',
-    // FToD
-    'Dragonide Cromatico','Dragonide di Gemma','Dragonide Metallico',
-    // EBR
-    'Bugbear','Changeling','Goblin','Hobgoblin','Kalashtar','Orco','Shifter','Warforged'
+const DND_RACES_GROUPED = [
+    { label: 'Dragonidi', type: 'divider' },
+    'Dragonide',                        // PHB
+    'Dragonide Cromatico',              // FToD
+    'Dragonide di Gemma',               // FToD
+    'Dragonide Metallico',              // FToD
+    { label: 'Elfi', type: 'divider' },
+    'Elfo Alto',                        // PHB
+    'Elfo dei Boschi',                  // PHB
+    'Elfo del Mare',                    // MToF
+    'Elfo Oscuro (Drow)',               // PHB
+    'Eladrin',                          // MToF
+    'Shadar-kai',                       // MToF
+    { label: 'Gith', type: 'divider' },
+    'Githyanki',                        // MToF
+    'Githzerai',                        // MToF
+    { label: 'Gnomi', type: 'divider' },
+    'Gnomo delle Foreste',              // PHB
+    'Gnomo delle Rocce',                // PHB
+    'Gnomo del Profondo',               // MToF
+    { label: 'Halfling', type: 'divider' },
+    'Halfling Piedelesto',              // PHB
+    'Halfling Tozzo',                   // PHB
+    { label: 'Nani', type: 'divider' },
+    'Nano delle Colline',               // PHB
+    'Nano delle Montagne',              // PHB
+    'Duergar',                          // MToF
+    { label: 'Tiefling', type: 'divider' },
+    'Tiefling',                         // PHB
+    'Tiefling di Baalzebul',            // MToF
+    'Tiefling di Dispater',             // MToF
+    'Tiefling di Fierna',               // MToF
+    'Tiefling di Glasya',               // MToF
+    'Tiefling di Levistus',             // MToF
+    'Tiefling di Mammon',               // MToF
+    'Tiefling di Mephistopheles',       // MToF
+    'Tiefling di Zariel',               // MToF
+    { label: 'Altre Razze', type: 'divider' },
+    'Bugbear',                          // EBR
+    'Changeling',                       // EBR
+    'Goblin',                           // EBR
+    'Hobgoblin',                        // EBR
+    'Kalashtar',                        // EBR
+    'Lineaggio Personalizzato',         // TCoE
+    'Mezzelfo',                         // PHB
+    'Mezzorco',                         // PHB
+    'Orco',                             // EBR
+    'Shifter',                          // EBR
+    'Umano',                            // PHB
+    'Warforged',                        // EBR
 ];
 
 const DND_BACKGROUNDS = [
@@ -3253,9 +3285,16 @@ function updateAllSaveValues() {
 }
 
 // --- Class multi-select ---
+function buildGroupedRaceOptions() {
+    return DND_RACES_GROUPED.map(r => {
+        if (typeof r === 'object') return r;
+        return { value: r, label: r };
+    });
+}
+
 window.pgOpenRazzaSelect = function() {
     openCustomSelect(
-        DND_RACES.map(r => ({ value: r, label: r })),
+        buildGroupedRaceOptions(),
         (value) => {
             document.getElementById('pgRazza').value = value;
             const btn = document.getElementById('pgRazzaBtn');
