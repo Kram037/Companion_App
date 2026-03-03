@@ -3135,33 +3135,32 @@ const DND_CLASSES = ['Artefice','Barbaro','Bardo','Chierico','Druido','Guerriero
 
 const DND_RACES_GROUPED = [
     { label: 'Dragonidi', type: 'divider' },
-    'Dragonide',                        // PHB
     'Dragonide Cromatico',              // FToD
     'Dragonide di Gemma',               // FToD
     'Dragonide Metallico',              // FToD
     { label: 'Elfi', type: 'divider' },
+    'Eladrin',                          // MToF
     'Elfo Alto',                        // PHB
     'Elfo dei Boschi',                  // PHB
     'Elfo del Mare',                    // MToF
     'Elfo Oscuro (Drow)',               // PHB
-    'Eladrin',                          // MToF
     'Shadar-kai',                       // MToF
     { label: 'Gith', type: 'divider' },
     'Githyanki',                        // MToF
     'Githzerai',                        // MToF
     { label: 'Gnomi', type: 'divider' },
+    'Gnomo del Profondo',               // MToF
     'Gnomo delle Foreste',              // PHB
     'Gnomo delle Rocce',                // PHB
-    'Gnomo del Profondo',               // MToF
     { label: 'Halfling', type: 'divider' },
     'Halfling Piedelesto',              // PHB
     'Halfling Tozzo',                   // PHB
     { label: 'Nani', type: 'divider' },
+    'Duergar',                          // MToF
     'Nano delle Colline',               // PHB
     'Nano delle Montagne',              // PHB
-    'Duergar',                          // MToF
     { label: 'Tiefling', type: 'divider' },
-    'Tiefling',                         // PHB
+    'Tiefling di Asmodeus',             // PHB
     'Tiefling di Baalzebul',            // MToF
     'Tiefling di Dispater',             // MToF
     'Tiefling di Fierna',               // MToF
@@ -3170,12 +3169,8 @@ const DND_RACES_GROUPED = [
     'Tiefling di Mammon',               // MToF
     'Tiefling di Mephistopheles',       // MToF
     'Tiefling di Zariel',               // MToF
-    { label: 'Aasimar', type: 'divider' },
+    // Razze senza sottogruppo (ordine alfabetico)
     'Aasimar',                          // VGtM
-    'Aasimar Protettore',               // VGtM
-    'Aasimar Flagello',                 // VGtM
-    'Aasimar Caduto',                   // VGtM
-    { label: 'Altre Razze', type: 'divider' },
     'Bugbear',                          // EBR / VGtM
     'Changeling',                       // EBR
     'Firbolg',                          // VGtM
@@ -3809,17 +3804,34 @@ function pgWizardGoTo(step) {
     }
     if (step === 5) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
+        const cos = parseInt(document.getElementById('pgCostituzione')?.value) || 10;
+        const sag = parseInt(document.getElementById('pgSaggezza')?.value) || 10;
         const desMod = calcMod(des);
+        const cosMod = calcMod(cos);
+        const sagMod = calcMod(sag);
+
         const initField = document.getElementById('pgIniziativa');
         if (initField && !initField.value) {
             initField.value = desMod;
         }
-        const caField = document.getElementById('pgCA');
-        if (caField && !caField.value) {
-            caField.value = 10 + desMod;
+
+        const classNames = pgSelectedClasses.map(c => c.nome);
+        let caBase, caHint;
+        if (classNames.includes('Barbaro')) {
+            caBase = 10 + desMod + cosMod;
+            caHint = `(10+des+cos = ${caBase})`;
+        } else if (classNames.includes('Monaco')) {
+            caBase = 10 + desMod + sagMod;
+            caHint = `(10+des+sag = ${caBase})`;
+        } else {
+            caBase = 10 + desMod;
+            caHint = `(10+des = ${caBase})`;
         }
+
+        const caField = document.getElementById('pgCA');
+        if (caField && !caField.value) caField.value = caBase;
         const hintCA = document.getElementById('hintCA');
-        if (hintCA) hintCA.textContent = `(10+des = ${10 + desMod})`;
+        if (hintCA) hintCA.textContent = caHint;
         const hintInit = document.getElementById('hintIniziativa');
         if (hintInit) hintInit.textContent = `(des = ${formatModPlain(desMod)})`;
 
@@ -3973,6 +3985,18 @@ const SCHEDA_SKILLS = [
     { key: 'storia', label: 'Storia', ability: 'intelligenza' }
 ];
 
+const CLASS_RESOURCES = {
+    'Barbaro': { nome: 'Ire', perLivello: [0,2,2,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,99], fromLevel: 1 },
+    'Bardo': { nome: 'Ispirazioni Bardiche', perLivello: [0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3], usaMod: 'carisma', fromLevel: 1 },
+    'Chierico': { nome: 'Incanalare Divinità', perLivello: [0,0,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3], fromLevel: 2 },
+    'Druido': { nome: 'Forma Selvatica', perLivello: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 2 },
+    'Guerriero': { nome: 'Secondo Vento', perLivello: [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 1 },
+    'Monaco': { nome: 'Punti Ki', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 },
+    'Paladino': { nome: 'Imposizione delle Mani', perLivello: null, hpPool: true, fromLevel: 1 },
+    'Stregone': { nome: 'Punti Stregoneria', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 },
+    'Warlock': { nome: 'Slot del Patto', perLivello: [0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 1 },
+};
+
 const CLASS_SPELL_ABILITY = {
     'Bardo': 'carisma', 'Chierico': 'saggezza', 'Druido': 'saggezza', 'Mago': 'intelligenza',
     'Stregone': 'carisma', 'Warlock': 'carisma', 'Paladino': 'carisma', 'Ranger': 'saggezza',
@@ -4079,6 +4103,43 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>`;
         }
 
+        // Class Resources
+        const classResources = pg.risorse_classe || {};
+        let classResourcesHtml = '';
+        if (pg.classi && pg.classi.length > 0) {
+            const resItems = [];
+            pg.classi.forEach(c => {
+                const res = CLASS_RESOURCES[c.nome];
+                if (!res || c.livello < res.fromLevel) return;
+                let maxVal;
+                if (res.hpPool) {
+                    maxVal = c.livello * 5;
+                } else if (res.usaMod) {
+                    maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
+                } else if (res.perLivello) {
+                    maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
+                } else { return; }
+                if (maxVal <= 0) return;
+                const key = `${c.nome}_res`;
+                const current = classResources[key] != null ? classResources[key] : maxVal;
+                resItems.push(`<div class="scheda-hd-row">
+                    <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1)">−</button>
+                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                        <span class="scheda-hd-max">/ ${maxVal}</span>
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
+                    </div>
+                </div>`);
+            });
+            if (resItems.length > 0) {
+                classResourcesHtml = `<div class="scheda-section">
+                    <div class="scheda-section-title">Risorse di Classe</div>
+                    <div class="scheda-hd-table">${resItems.join('')}</div>
+                </div>`;
+            }
+        }
+
         // Resistenze & Immunità
         const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
             pg.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
@@ -4154,6 +4215,8 @@ async function renderSchedaPersonaggio(personaggioId) {
             <div class="scheda-section-title">Dadi Vita</div>
             ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
         </div>
+
+        ${classResourcesHtml}
 
         <div class="scheda-section">
             <div class="scheda-section-title">
@@ -4704,6 +4767,31 @@ window.schedaHdChange = function(pgId, className, current, delta, max) {
     schedaInstantSave(pgId, { dadi_vita_disponibili: dadi });
 }
 
+window.schedaClassResChange = function(pgId, key, current, delta, max) {
+    const newVal = Math.max(0, max != null ? Math.min(max, current + delta) : current + delta);
+    if (newVal === current) return;
+
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    pg.risorse_classe[key] = newVal;
+
+    const el = document.getElementById(`sCRes_${key}`);
+    if (el) el.textContent = newVal;
+
+    const row = el?.closest('.scheda-hd-row');
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},-1)`);
+        if (btns[1]) {
+            const maxAttr = max != null ? max : 99;
+            btns[1].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},1,${maxAttr})`);
+        }
+    }
+
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+}
+
 window.openPersonaggioModal = function(personaggioId) {
     editingPersonaggioId = personaggioId || null;
     const form = elements.personaggioForm;
@@ -4845,7 +4933,11 @@ async function handleSavePersonaggio(e) {
     const iniziativaVal = document.getElementById('pgIniziativa').value;
     const iniziativa = iniziativaVal !== '' ? parseInt(iniziativaVal) : desMod;
     const caVal = document.getElementById('pgCA').value;
-    const classeArmatura = caVal !== '' ? parseInt(caVal) : (10 + desMod);
+    let caDefault = 10 + desMod;
+    const classNames = pgSelectedClasses.map(c => c.nome);
+    if (classNames.includes('Barbaro')) caDefault = 10 + desMod + calcMod(parseInt(document.getElementById('pgCostituzione').value) || 10);
+    else if (classNames.includes('Monaco')) caDefault = 10 + desMod + calcMod(parseInt(document.getElementById('pgSaggezza').value) || 10);
+    const classeArmatura = caVal !== '' ? parseInt(caVal) : caDefault;
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 

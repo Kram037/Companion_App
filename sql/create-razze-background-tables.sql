@@ -58,10 +58,6 @@ CREATE POLICY "background_delete" ON background FOR DELETE USING (
 -- SEED: Razze ufficiali
 -- =====================================================
 
--- PHB - Dragonidi
-INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
-('Dragonide', 'Dragonidi', 'Media', 9, '[]', '[]', 'PHB', false);
-
 -- FToD - Dragonidi
 INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
 ('Dragonide Cromatico', 'Dragonidi', 'Media', 9, '[]', '[]', 'FToD', false),
@@ -108,9 +104,9 @@ INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenz
 INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
 ('Duergar', 'Nani', 'Media', 7.5, '[]', '["veleno"]', 'MToF', false);
 
--- PHB - Tiefling
+-- Tiefling
 INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
-('Tiefling', 'Tiefling', 'Media', 9, '[]', '["fuoco"]', 'PHB', false);
+('Tiefling di Asmodeus', 'Tiefling', 'Media', 9, '[]', '["fuoco"]', 'PHB', false);
 
 -- MToF - Tiefling varianti
 INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
@@ -123,35 +119,29 @@ INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenz
 ('Tiefling di Mephistopheles', 'Tiefling', 'Media', 9, '[]', '["fuoco"]', 'MToF', false),
 ('Tiefling di Zariel', 'Tiefling', 'Media', 9, '[]', '["fuoco"]', 'MToF', false);
 
--- VGtM - Aasimar
+-- Razze singole (ordine alfabetico, senza gruppo)
 INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
-('Aasimar', 'Aasimar', 'Media', 9, '[]', '["necrotico","radiante"]', 'VGtM', false),
-('Aasimar Protettore', 'Aasimar', 'Media', 9, '[]', '["necrotico","radiante"]', 'VGtM', false),
-('Aasimar Flagello', 'Aasimar', 'Media', 9, '[]', '["necrotico","radiante"]', 'VGtM', false),
-('Aasimar Caduto', 'Aasimar', 'Media', 9, '[]', '["necrotico","radiante"]', 'VGtM', false);
-
--- Altre razze
-INSERT INTO razze (nome, gruppo, taglia, velocita, competenze_abilita, resistenze, fonte, homebrew) VALUES
-('Bugbear', 'Altre Razze', 'Media', 9, '["furtivita"]', '[]', 'VGtM', false),
-('Changeling', 'Altre Razze', 'Media', 9, '[]', '[]', 'EBR', false),
-('Firbolg', 'Altre Razze', 'Media', 9, '[]', '[]', 'VGtM', false),
-('Goblin', 'Altre Razze', 'Piccola', 9, '[]', '[]', 'VGtM', false),
-('Goliath', 'Altre Razze', 'Media', 9, '["atletica"]', '[]', 'VGtM', false),
-('Hobgoblin', 'Altre Razze', 'Media', 9, '[]', '[]', 'VGtM', false),
-('Kalashtar', 'Altre Razze', 'Media', 9, '[]', '["psichico"]', 'EBR', false),
-('Kenku', 'Altre Razze', 'Media', 9, '[]', '[]', 'VGtM', false),
-('Kobold', 'Altre Razze', 'Piccola', 9, '[]', '[]', 'VGtM', false),
-('Lineaggio Personalizzato', 'Altre Razze', 'Media', 9, '[]', '[]', 'TCoE', false),
-('Lizardfolk', 'Altre Razze', 'Media', 9, '[]', '[]', 'VGtM', false),
-('Mezzelfo', 'Altre Razze', 'Media', 9, '[]', '[]', 'PHB', false),
-('Mezzorco', 'Altre Razze', 'Media', 9, '["intimidire"]', '[]', 'PHB', false),
-('Orco', 'Altre Razze', 'Media', 9, '["intimidire"]', '[]', 'VGtM', false),
-('Shifter', 'Altre Razze', 'Media', 9, '[]', '[]', 'EBR', false),
-('Tabaxi', 'Altre Razze', 'Media', 9, '["percezione","furtivita"]', '[]', 'VGtM', false),
-('Triton', 'Altre Razze', 'Media', 9, '[]', '["freddo"]', 'VGtM', false),
-('Umano', 'Altre Razze', 'Media', 9, '[]', '[]', 'PHB', false),
-('Warforged', 'Altre Razze', 'Media', 9, '[]', '["veleno"]', 'EBR', false),
-('Yuan-Ti Purblood', 'Altre Razze', 'Media', 9, '[]', '["veleno"]', 'VGtM', false);
+('Aasimar', NULL, 'Media', 9, '[]', '["necrotico","radiante"]', 'VGtM', false),
+('Bugbear', NULL, 'Media', 9, '["furtivita"]', '[]', 'VGtM', false),
+('Changeling', NULL, 'Media', 9, '[]', '[]', 'EBR', false),
+('Firbolg', NULL, 'Media', 9, '[]', '[]', 'VGtM', false),
+('Goblin', NULL, 'Piccola', 9, '[]', '[]', 'VGtM', false),
+('Goliath', NULL, 'Media', 9, '["atletica"]', '[]', 'VGtM', false),
+('Hobgoblin', NULL, 'Media', 9, '[]', '[]', 'VGtM', false),
+('Kalashtar', NULL, 'Media', 9, '[]', '["psichico"]', 'EBR', false),
+('Kenku', NULL, 'Media', 9, '[]', '[]', 'VGtM', false),
+('Kobold', NULL, 'Piccola', 9, '[]', '[]', 'VGtM', false),
+('Lineaggio Personalizzato', NULL, 'Media', 9, '[]', '[]', 'TCoE', false),
+('Lizardfolk', NULL, 'Media', 9, '[]', '[]', 'VGtM', false),
+('Mezzelfo', NULL, 'Media', 9, '[]', '[]', 'PHB', false),
+('Mezzorco', NULL, 'Media', 9, '["intimidire"]', '[]', 'PHB', false),
+('Orco', NULL, 'Media', 9, '["intimidire"]', '[]', 'VGtM', false),
+('Shifter', NULL, 'Media', 9, '[]', '[]', 'EBR', false),
+('Tabaxi', NULL, 'Media', 9, '["percezione","furtivita"]', '[]', 'VGtM', false),
+('Triton', NULL, 'Media', 9, '[]', '["freddo"]', 'VGtM', false),
+('Umano', NULL, 'Media', 9, '[]', '[]', 'PHB', false),
+('Warforged', NULL, 'Media', 9, '[]', '["veleno"]', 'EBR', false),
+('Yuan-Ti Purblood', NULL, 'Media', 9, '[]', '["veleno"]', 'VGtM', false);
 
 -- =====================================================
 -- SEED: Background ufficiali
