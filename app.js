@@ -3316,11 +3316,12 @@ function buildRaceOptionsFromDB() {
         return DND_RACES_GROUPED.map(r => typeof r === 'object' ? r : { value: r, label: r });
     }
     const options = [];
-    let lastGruppo = null;
+    let lastGruppo = '__init__';
     razze.forEach(r => {
-        if (r.gruppo && r.gruppo !== lastGruppo) {
-            options.push({ type: 'divider', label: r.gruppo });
-            lastGruppo = r.gruppo;
+        const g = r.gruppo || null;
+        if (g !== lastGruppo) {
+            options.push({ type: 'divider', label: g || '' });
+            lastGruppo = g;
         }
         options.push({ value: r.nome, label: r.nome });
     });
