@@ -3442,8 +3442,12 @@ function pgRenderClassi() {
         <div class="pg-classe-chip">
             <div class="pg-classe-chip-top">
                 <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
-                <span class="pg-classe-lv-label">Lv.</span>
-                <input type="number" class="pg-classe-livello" min="1" max="20" value="${c.livello}" onchange="pgUpdateClassLevel(${i}, this.value)" oninput="pgUpdateClassLevel(${i}, this.value)">
+                <div class="pg-classe-lv-controls">
+                    <span class="pg-classe-lv-label">Lv.</span>
+                    <button type="button" class="pg-classe-lv-btn" onclick="pgClassLevelChange(${i},-1)">−</button>
+                    <span class="pg-classe-lv-val">${c.livello}</span>
+                    <button type="button" class="pg-classe-lv-btn" onclick="pgClassLevelChange(${i},1)">+</button>
+                </div>
                 <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
             </div>
             ${subCheck}
@@ -3454,6 +3458,15 @@ function pgRenderClassi() {
         <span class="pg-add-class-plus">+</span> Aggiungi classe
     </button>`;
     container.innerHTML = chipsHtml + addBtn;
+}
+
+window.pgClassLevelChange = function(index, delta) {
+    const c = pgSelectedClasses[index];
+    if (!c) return;
+    c.livello = Math.max(1, Math.min(20, c.livello + delta));
+    pgRenderClassi();
+    pgUpdateTotalLevel();
+    pgResetAutoHP();
 }
 
 window.pgToggleThirdCaster = function(index, checked) {
@@ -4091,11 +4104,11 @@ async function renderSchedaPersonaggio(personaggioId) {
                     const die = CLASS_HD[c.nome] || 8;
                     const total = c.livello;
                     const key = c.nome;
-                    const available = dadiDisp[key] != null ? dadiDisp[key] : total;
+                    const available = Math.min(total, dadiDisp[key] != null ? dadiDisp[key] : total);
                     return `<div class="scheda-hd-row">
                         <span class="scheda-hd-total">${total}d${die} <small>(${c.nome})</small></span>
                         <div class="scheda-hd-avail">
-                            <button class="scheda-hd-btn" onclick="schedaHdChange('${pg.id}','${key}',${available},-1)">−</button>
+                            <button class="scheda-hd-btn" onclick="schedaHdChange('${pg.id}','${key}',${available},-1,${total})">−</button>
                             <span class="scheda-hd-val" id="sHd_${key}">${available}</span>
                             <button class="scheda-hd-btn" onclick="schedaHdChange('${pg.id}','${key}',${available},1,${total})">+</button>
                         </div>
@@ -4122,11 +4135,11 @@ async function renderSchedaPersonaggio(personaggioId) {
                 } else { return; }
                 if (maxVal <= 0) return;
                 const key = `${c.nome}_res`;
-                const current = classResources[key] != null ? classResources[key] : maxVal;
+                const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
                 resItems.push(`<div class="scheda-hd-row">
                     <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
                     <div class="scheda-hd-avail">
-                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1)">−</button>
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
                         <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
                         <span class="scheda-hd-max">/ ${maxVal}</span>
                         <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
@@ -4161,7 +4174,8 @@ async function renderSchedaPersonaggio(personaggioId) {
         content.innerHTML = `
         <div class="scheda-identity">
             <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-            <div class="scheda-subtitle">${[pg.razza, pg.background, classeDisplay, `Lv ${pg.livello || 1}`].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
+            <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
+            <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
         </div>
 
         <div class="scheda-section">
@@ -4457,7 +4471,8 @@ window.schedaOpenSpellPage = async function(pgId) {
     content.innerHTML = `
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-        <div class="scheda-subtitle">${[pg.razza, pg.background, classeDisplay, `Lv ${pg.livello || 1}`].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
+        <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
+        <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
     </div>
     <div class="scheda-section">
         <div class="scheda-section-title">Statistiche Incantatore</div>
@@ -4757,12 +4772,10 @@ window.schedaHdChange = function(pgId, className, current, delta, max) {
 
     const row = el?.closest('.scheda-hd-row');
     if (row) {
+        const maxAttr = max != null ? max : 99;
         const btns = row.querySelectorAll('.scheda-hd-btn');
-        if (btns[0]) btns[0].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},-1)`);
-        if (btns[1]) {
-            const maxAttr = max != null ? max : 99;
-            btns[1].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},1,${maxAttr})`);
-        }
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},-1,${maxAttr})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaHdChange('${pgId}','${className}',${newVal},1,${maxAttr})`);
     }
 
     schedaInstantSave(pgId, { dadi_vita_disponibili: dadi });
@@ -4782,12 +4795,10 @@ window.schedaClassResChange = function(pgId, key, current, delta, max) {
 
     const row = el?.closest('.scheda-hd-row');
     if (row) {
+        const maxAttr = max != null ? max : 99;
         const btns = row.querySelectorAll('.scheda-hd-btn');
-        if (btns[0]) btns[0].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},-1)`);
-        if (btns[1]) {
-            const maxAttr = max != null ? max : 99;
-            btns[1].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},1,${maxAttr})`);
-        }
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},-1,${maxAttr})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaClassResChange('${pgId}','${key}',${newVal},1,${maxAttr})`);
     }
 
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
