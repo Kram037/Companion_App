@@ -3169,7 +3169,7 @@ const DND_RACES_GROUPED = [
     'Tiefling di Mammon',               // MToF
     'Tiefling di Mephistopheles',       // MToF
     'Tiefling di Zariel',               // MToF
-    // Razze senza sottogruppo (ordine alfabetico)
+    { type: 'divider', label: '' },
     'Aasimar',                          // VGtM
     'Bugbear',                          // EBR / VGtM
     'Changeling',                       // EBR
