@@ -5,6 +5,70 @@
 let campagneChannel = null;
 let editingCampagnaId = null;
 
+async function openCampagnaModal(campagnaId = null) {
+    if (!AppState.isLoggedIn) {
+        showNotification('Devi essere loggato per creare una campagna');
+        openLoginModal();
+        return;
+    }
+    editingCampagnaId = campagnaId;
+    if (!elements.campagnaModal || !elements.campagnaForm) {
+        console.error('❌ campagnaModal o campagnaForm non trovati');
+        return;
+    }
+    elements.campagnaForm.reset();
+    resetIconPreview();
+    const modalTitle = document.querySelector('#campagnaModal h2');
+    const saveBtn = document.getElementById('saveCampagnaBtn');
+    if (campagnaId) {
+        if (modalTitle) modalTitle.textContent = 'Modifica Campagna';
+        if (saveBtn) saveBtn.textContent = 'Salva';
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            try {
+                const { data: campagna } = await supabase
+                    .from('campagne')
+                    .select('nome_campagna, icona_name')
+                    .eq('id', campagnaId)
+                    .single();
+                if (campagna) {
+                    const nomeInput = document.getElementById('nomeCampagna');
+                    if (nomeInput) nomeInput.value = campagna.nome_campagna || '';
+                    if (campagna.icona_name) selectPredefinedIcon(campagna.icona_name);
+                }
+            } catch (e) { console.warn('Impossibile pre-caricare dati campagna:', e); }
+        }
+    } else {
+        if (modalTitle) modalTitle.textContent = 'Nuova Campagna';
+        if (saveBtn) saveBtn.textContent = 'Crea';
+    }
+    elements.campagnaModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCampagnaModal() {
+    if (!elements.campagnaModal) return;
+    elements.campagnaModal.classList.remove('active');
+    document.body.style.overflow = '';
+    editingCampagnaId = null;
+    if (elements.campagnaForm) elements.campagnaForm.reset();
+    resetIconPreview();
+}
+
+function openIconSelectorModal() {
+    if (elements.iconSelectorModal) {
+        elements.iconSelectorModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeIconSelectorModal() {
+    if (elements.iconSelectorModal) {
+        elements.iconSelectorModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 // Icon Selector Functions
 const predefinedIcons = [
     { name: 'dice', svg: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="9" r="1"></circle><circle cx="15" cy="9" r="1"></circle><circle cx="9" cy="15" r="1"></circle><circle cx="15" cy="15" r="1"></circle><circle cx="12" cy="12" r="1"></circle>' },

@@ -652,3 +652,37 @@ async function getCharacterConditionsMap(campagnaId) {
     const { conditionsMap } = await getCampaignCharacterData(campagnaId);
     return conditionsMap;
 }
+
+window.aggiungiIniziativa = async function(sessioneId) {
+    const nome = await showPrompt('Nome personaggio:', 'Aggiungi Iniziativa');
+    if (!nome || nome.trim() === '') return;
+    const valoreStr = await showPrompt('Valore iniziativa (d20 + modificatori):', 'Aggiungi Iniziativa');
+    if (!valoreStr) return;
+    const valore = parseInt(valoreStr);
+    if (isNaN(valore)) { showNotification('Inserisci un numero valido'); return; }
+    const supabase = getSupabaseClient();
+    if (!supabase) { showNotification('Errore: Supabase non disponibile'); return; }
+    try {
+        const { data: existing } = await supabase.from('iniziativa').select('ordine').eq('sessione_id', sessioneId).order('ordine', { ascending: false }).limit(1);
+        const nuovoOrdine = existing && existing.length > 0 ? existing[0].ordine + 1 : 1;
+        const { error } = await supabase.from('iniziativa').insert({ sessione_id: sessioneId, personaggio_nome: nome.trim(), valore_iniziativa: valore, ordine: nuovoOrdine });
+        if (error) throw error;
+        await sendAppEventBroadcast({ table: 'iniziativa', action: 'insert', sessioneId });
+        showNotification('Iniziativa aggiunta!');
+        const { data: sessione } = await supabase.from('sessioni').select('campagna_id').eq('id', sessioneId).single();
+        if (sessione) await renderSessioneContent(sessione.campagna_id);
+    } catch (error) {
+        console.error('❌ Errore nell\'aggiunta iniziativa:', error);
+        showNotification('Errore nell\'aggiunta dell\'iniziativa: ' + (error.message || error));
+    }
+};
+
+window.openCombattimentoPage = async function(campagnaId, sessioneId) {
+    AppState.currentCampagnaId = campagnaId;
+    AppState.currentSessioneId = sessioneId;
+    sessionStorage.setItem('currentCampagnaId', campagnaId);
+    sessionStorage.setItem('currentSessioneId', sessioneId);
+    navigateToPage('combattimento');
+    await renderCombattimentoContent(campagnaId, sessioneId);
+    startCombattimentoRealtime(campagnaId, sessioneId);
+};

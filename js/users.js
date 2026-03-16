@@ -134,6 +134,26 @@ function invalidateUserCache() {
     AppState.cachedCampagne = null;
 }
 
+async function loadUserData(userId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !userId) return null;
+    try {
+        const userData = await findUserByUid(userId, true);
+        if (userData) {
+            if (userData.tema_scuro !== undefined) {
+                const theme = userData.tema_scuro ? 'dark' : 'light';
+                setTheme(theme, false);
+                localStorage.setItem('theme', theme);
+            }
+            return userData;
+        }
+        return null;
+    } catch (error) {
+        console.error('❌ Errore nel caricamento dati utente:', error);
+        return null;
+    }
+}
+
 /**
  * Inizializza o aggiorna l'utente in Supabase
  */
