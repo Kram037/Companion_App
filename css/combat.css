@@ -1,0 +1,168 @@
+/* Iniziativa */
+.sessione-iniziativa {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+}
+
+.sessione-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.iniziativa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.iniziativa-item {
+    display: grid;
+    grid-template-columns: 32px 1fr 50px auto;
+    align-items: center;
+    padding: 8px var(--spacing-md);
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    gap: var(--spacing-md);
+    transition: var(--transition-fast);
+}
+
+.iniziativa-item:hover {
+    border-color: var(--accent-light);
+}
+
+.iniziativa-ordine {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: white;
+    background: var(--accent);
+    width: 26px; height: 26px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iniziativa-nome {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.iniziativa-valore {
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: right;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.no-iniziativa {
+    text-align: center;
+    color: var(--text-muted);
+    padding: var(--spacing-xl);
+    font-size: 0.88rem;
+}
+
+/* Combat Header */
+.combat-header { display: flex; align-items: center; padding: 10px 50px; min-height: 50px; justify-content: center; flex-shrink: 0; border-bottom: 1px solid var(--border); position: relative; }
+#combattimentoPage .combat-back.back-button-floating { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 10; }
+.combat-round-center { text-align: center; flex: 1; }
+.combat-round-num { font-size: 0.82rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+.combat-turn-name { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
+.combat-next-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
+.combat-next-btn:hover { opacity: 0.85; }
+
+/* Combat Body: icon col + cards col */
+.combat-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.combat-initiative-col { width: 54px; min-width: 54px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); flex-shrink: 0; }
+.combat-cards-col { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Combat Icons */
+.combat-icon { width: 44px; height: 48px; border-radius: var(--radius-sm); background: var(--bg); border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.combat-icon:hover { border-color: var(--accent-light); }
+.combat-icon.active { border-color: var(--accent); background: var(--accent-subtle); }
+.combat-icon.dimmed { opacity: 0.35; }
+.combat-icon.monster { background: rgba(239,68,68,0.06); }
+.combat-icon.monster.active { border-color: #ef4444; background: rgba(239,68,68,0.12); }
+.combat-icon-initials { font-size: 0.6rem; font-weight: 800; color: var(--text); line-height: 1; }
+.combat-icon-init { font-size: 0.5rem; color: var(--text-muted); line-height: 1; margin-top: 1px; }
+
+/* Combat Cards (collapsed) */
+.combat-card { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; height: 48px; flex-shrink: 0; overflow: hidden; }
+.combat-card:hover { border-color: var(--accent-light); }
+.combat-card.is-turn { border-color: var(--accent); background: var(--accent-subtle); }
+.combat-card.monster-card { border-left: 3px solid #ef4444; }
+.combat-card-name { font-size: 0.85rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.combat-card-center { flex: 1; display: flex; align-items: center; gap: 4px; overflow: hidden; min-width: 0; }
+.combat-card-badges { display: flex; gap: 2px; overflow: hidden; flex-shrink: 1; min-width: 0; }
+.combat-card-badges .condition-badge-sm { font-size: 0.55rem; padding: 1px 4px; white-space: nowrap; flex-shrink: 0; }
+.combat-card-hp { font-size: 0.82rem; font-weight: 800; color: var(--accent); flex-shrink: 0; white-space: nowrap; margin-left: auto; }
+
+/* Combat Card Expanded (sheet) */
+.combat-card-expanded { background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px; animation: combatExpand 0.2s ease; }
+@keyframes combatExpand { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Combat Sheet (inline) */
+.combat-sheet-header { margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; }
+.combat-sheet-header h3 { font-size: 1rem; font-weight: 800; color: var(--text); margin: 0; }
+.combat-sheet-sub { font-size: 0.75rem; color: var(--text-muted); }
+.combat-sheet-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+.combat-sheet-close:hover { color: var(--text); }
+.combat-hp-bar { display: flex; gap: 6px; margin-bottom: 10px; }
+.combat-hp-block { flex: 1; text-align: center; padding: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.combat-hp-val { font-size: 1.3rem; font-weight: 800; color: var(--text); }
+.combat-hp-val.editable { color: var(--accent); cursor: pointer; }
+.combat-abilities-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-bottom: 10px; }
+.combat-ability { text-align: center; padding: 4px 2px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.combat-ability-label { font-size: 0.55rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+.combat-ability-val { font-size: 0.8rem; font-weight: 700; color: var(--text); display: block; }
+.combat-ability-mod { font-size: 0.7rem; font-weight: 600; color: var(--accent); }
+.combat-conditions { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
+.combat-section-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 6px 0 3px; }
+.combat-ability-save-mini { font-size: 0.55rem; color: var(--text-muted); display: block; }
+.combat-ability-save-mini.prof { color: var(--accent); font-weight: 700; }
+.combat-sheet-tabs { display: flex; gap: 2px; margin-bottom: 10px; background: var(--bg); border-radius: var(--radius-sm); padding: 2px; }
+.combat-sheet-tab { flex: 1; padding: 6px 8px; font-size: 0.75rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
+.combat-sheet-tab.active { background: var(--accent); color: white; }
+.combat-dm-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+/* Combat DM Toolbar (floating bottom) */
+.combat-toolbar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 4px; z-index: 50; box-shadow: var(--shadow-md); }
+.combat-toolbar-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 48px; height: 42px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; gap: 2px; }
+.combat-toolbar-btn:hover { background: var(--surface-hover); }
+.combat-toolbar-btn svg { width: 18px; height: 18px; }
+.combat-toolbar-btn span { font-size: 0.5rem; font-weight: 700; text-transform: uppercase; }
+.combat-toolbar-btn.danger { color: #ef4444; }
+.combat-toolbar-btn.danger:hover { background: rgba(239,68,68,0.1); }
+
+/* Monster skill check items */
+.pg-skill-check-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 5px 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.pg-skill-check-item input[type="checkbox"] { accent-color: var(--accent); }
+.pg-skill-check-item small { opacity: 0.6; margin-left: 2px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.form-row .form-group { margin-bottom: 8px; }
+
+@media (max-width: 480px) {
+    .combat-header { padding-left: 50px; }
+    .combat-initiative-col { width: 46px; min-width: 46px; }
+    .combat-icon { width: 38px; height: 48px; }
+    .combat-icon-initials { font-size: 0.5rem; }
+    .combat-abilities-grid { grid-template-columns: repeat(3, 1fr); }
+    .combat-toolbar-btn { width: 42px; height: 38px; }
+}

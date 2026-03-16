@@ -1,0 +1,380 @@
+/* Session Conditions Panel */
+.session-condition-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+}
+
+.session-condition-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.session-condition-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.session-condition-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+}
+
+.condition-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(var(--accent-rgb, 139,92,246), 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(var(--accent-rgb, 139,92,246), 0.3);
+}
+
+.condition-badge-sm {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: rgba(var(--accent-rgb, 139,92,246), 0.15);
+    color: var(--accent);
+    margin-top: 2px;
+}
+
+.condition-badge-sm.exhaustion {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+.combat-condition-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+}
+
+.session-condition-exhaustion {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.exhaustion-label {
+    margin-right: 4px;
+}
+
+.exhaustion-value {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.session-condition-actions {
+    margin-top: 8px;
+}
+
+/* Session Spell Slots */
+.session-slots-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.session-slot-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+}
+
+.session-slot-lvl {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-right: 2px;
+}
+
+.session-slot-val {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.session-slot-max {
+    color: var(--text-muted);
+}
+
+.session-slot-btns {
+    display: flex;
+    gap: 2px;
+    margin-left: 4px;
+}
+
+.pg-slot-btn-sm {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.pg-slot-btn-sm:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+/* Roll type modal */
+.richiedi-tiro-options select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+/* Auto-roll d20 button */
+.roll-input-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+.roll-input-row input {
+    flex: 1;
+}
+.btn-roll-d20 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 4px;
+}
+.btn-roll-d20:active .roll-d20-img {
+    transform: scale(0.85);
+}
+.btn-roll-d20:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.roll-d20-wrapper {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.roll-d20-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.15s;
+}
+.roll-d20-img.spinning {
+    animation: spin3Times 1.2s ease-in-out;
+}
+.roll-d20-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text);
+    text-shadow: 0 0 4px rgba(0,0,0,0.7);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.roll-d20-number.show {
+    opacity: 1;
+}
+.roll-d20-number.nat-crit {
+    color: #e74c3c;
+    text-shadow: 0 0 8px rgba(231,76,60,0.6);
+    font-size: 1.1rem;
+}
+
+.tiro-players-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    max-height: 200px;
+    overflow-y: auto;
+}
+.tiro-player-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.tiro-player-item:hover {
+    background: var(--surface-hover, rgba(255,255,255,0.08));
+}
+.tiro-player-item input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+}
+.tiro-player-item label {
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.pg-readonly-input {
+    background: var(--surface-hover) !important;
+    color: var(--accent) !important;
+    text-align: center;
+    font-weight: 700;
+    cursor: default;
+    opacity: 0.85;
+}
+
+/* ============================================
+   SESSIONE / COMBATTIMENTO
+   ============================================ */
+.sessione-header {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+}
+
+.sessione-title,
+.combattimento-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-light);
+    text-align: center;
+    margin: 0 0 var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sessione-title > div:first-child,
+.combattimento-title > div:first-child { font-size: 0.85rem; }
+
+.sessione-title > div:last-child,
+.combattimento-title > div:last-child {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.sessione-timer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.timer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.timer-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.sessione-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    align-items: center;
+}
+
+.sessione-actions .btn-primary,
+.sessione-actions .btn-secondary {
+    width: 100%;
+    max-width: 260px;
+    margin-top: 0;
+}
+
+/* Tiro generico table */
+.tiro-generico-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    overflow: hidden;
+}
+
+.tiro-generico-table table { width: 100%; border-collapse: collapse; }
+
+.tiro-generico-table th,
+.tiro-generico-table td {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.tiro-generico-table th {
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.tiro-generico-table td {
+    color: var(--text);
+    font-size: 0.88rem;
+}
+
+.tiro-generico-table tr:last-child td { border-bottom: none; }
