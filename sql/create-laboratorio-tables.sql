@@ -106,6 +106,9 @@ CREATE TABLE IF NOT EXISTS homebrew_oggetti (
 -- MicroScheda: add tipo_scheda column to personaggi
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS tipo_scheda TEXT DEFAULT 'completa';
 
+-- Talenti column for personaggi
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS talenti JSONB DEFAULT '[]';
+
 -- ============================================================================
 -- RLS Policies
 -- ============================================================================

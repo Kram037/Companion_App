@@ -901,14 +901,27 @@
     border-color: var(--accent);
     background: rgba(139, 0, 0, 0.08);
 }
+.pg-skill-item.expert {
+    border-color: var(--accent);
+    background: rgba(139, 0, 0, 0.14);
+}
 
-.pg-skill-item input[type="checkbox"] {
-    accent-color: var(--accent);
-    width: 15px;
-    height: 15px;
+.pg-skill-dot {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    color: var(--text-muted);
     cursor: pointer;
     flex-shrink: 0;
+    border-radius: 50%;
+    transition: color 0.15s;
 }
+.pg-skill-dot.active { color: var(--accent); }
+.pg-skill-dot.expert { font-size: 0.65em; }
+.pg-skill-dot.expert.active { color: goldenrod; }
 
 .pg-skill-value {
     width: 32px;
@@ -929,6 +942,78 @@
     font-size: 0.75rem;
     color: var(--text-muted);
     flex-shrink: 0;
+}
+
+/* Talenti */
+.pg-talenti-list { display: flex; flex-direction: column; gap: 0; }
+.pg-talenti-selected { margin-bottom: var(--spacing-sm); }
+.pg-talento-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--surface);
+}
+.pg-talento-item:hover { border-color: var(--primary); }
+.pg-talento-item.selected {
+    border-color: var(--accent);
+    background: rgba(139, 0, 0, 0.08);
+    cursor: default;
+}
+.pg-talento-name { flex: 1; font-size: 0.88em; color: var(--text); }
+.pg-talento-remove {
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    font-size: 1em; padding: 2px 6px; border-radius: 50%;
+}
+.pg-talento-remove:hover { color: #e53935; }
+.pg-talenti-available { max-height: none; }
+
+/* Concentrazione button */
+.scheda-concentrazione-row { display: flex; justify-content: center; }
+.scheda-concentrazione-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 20px; border-radius: 999px;
+    border: 2px solid var(--border); background: var(--card-bg);
+    color: var(--text-secondary); cursor: pointer;
+    font-size: 0.9em; font-weight: 600;
+    transition: all 0.25s;
+}
+.scheda-concentrazione-btn:hover { border-color: var(--primary); }
+.scheda-concentrazione-btn.active {
+    border-color: var(--primary); background: var(--primary);
+    color: #fff;
+}
+.scheda-conc-icon { font-size: 1.1em; }
+
+/* Slot grid for micro scheda */
+.scheda-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.scheda-slot-block {
+    text-align: center;
+    padding: 8px 4px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+.scheda-slot-level {
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+.scheda-slot-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }
 
 /* Scegli personaggio modal list */

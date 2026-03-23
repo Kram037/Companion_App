@@ -129,6 +129,101 @@ const DND_SKILLS = [
     { key: 'storia', nome: 'Storia', ability: 'intelligenza', abbr: 'Int' }
 ];
 
+// Talenti from PHB, XGtE, TCoE
+const DND_TALENTI = [
+    { nome: 'Allerta', fonte: 'PHB' },
+    { nome: 'Atleta', fonte: 'PHB' },
+    { nome: 'Attore', fonte: 'PHB' },
+    { nome: 'Abile', fonte: 'PHB' },
+    { nome: 'Arma da Guerra Preferita', fonte: 'PHB' },
+    { nome: 'Carica Possente', fonte: 'PHB' },
+    { nome: 'Cecchino Letale', fonte: 'PHB' },
+    { nome: 'Combattente a Due Armi', fonte: 'PHB' },
+    { nome: 'Combattente con Arma a Due Mani', fonte: 'PHB' },
+    { nome: 'Combattente con Scudo', fonte: 'PHB' },
+    { nome: 'Difensore da Sentinella', fonte: 'PHB' },
+    { nome: 'Duro a Morire', fonte: 'PHB' },
+    { nome: 'Duro come la Roccia', fonte: 'PHB' },
+    { nome: 'Elementalista', fonte: 'PHB' },
+    { nome: 'Guerriero a Distanza', fonte: 'PHB' },
+    { nome: 'Incantatore da Guerra', fonte: 'PHB' },
+    { nome: 'Iniziato alla Magia', fonte: 'PHB' },
+    { nome: 'Ispiratore', fonte: 'PHB' },
+    { nome: 'Linguista', fonte: 'PHB' },
+    { nome: 'Lottatore', fonte: 'PHB' },
+    { nome: 'Mago da Guerra', fonte: 'PHB' },
+    { nome: 'Mobile', fonte: 'PHB' },
+    { nome: 'Osservatore', fonte: 'PHB' },
+    { nome: 'Robusto', fonte: 'PHB' },
+    { nome: 'Sentinella', fonte: 'PHB' },
+    { nome: 'Tiratore Scelto', fonte: 'PHB' },
+    { nome: 'Duttile', fonte: 'PHB' },
+    { nome: 'Fortuna', fonte: 'PHB' },
+    { nome: 'Guaritore', fonte: 'PHB' },
+    { nome: 'Maestro delle Armature Leggere', fonte: 'PHB' },
+    { nome: 'Maestro delle Armature Medie', fonte: 'PHB' },
+    { nome: 'Maestro delle Armature Pesanti', fonte: 'PHB' },
+    { nome: 'Maestro delle Pozioni', fonte: 'XGtE' },
+    { nome: 'Prodigio', fonte: 'XGtE' },
+    { nome: 'Elfico', fonte: 'XGtE' },
+    { nome: 'Infernale', fonte: 'XGtE' },
+    { nome: 'Nanico', fonte: 'XGtE' },
+    { nome: 'Orchesco', fonte: 'XGtE' },
+    { nome: 'Secondo Respiro', fonte: 'XGtE' },
+    { nome: 'Silvano', fonte: 'XGtE' },
+    { nome: 'Telepate', fonte: 'TCoE' },
+    { nome: 'Telecineta', fonte: 'TCoE' },
+    { nome: 'Metamago', fonte: 'TCoE' },
+    { nome: 'Adepto Marziale', fonte: 'TCoE' },
+    { nome: 'Iniziato agli Artifici', fonte: 'TCoE' },
+    { nome: 'Cuoco', fonte: 'TCoE' },
+    { nome: 'Avvelenatore', fonte: 'TCoE' },
+    { nome: 'Abile Combattente', fonte: 'TCoE' },
+    { nome: 'Schermitore', fonte: 'TCoE' },
+    { nome: 'Frantoio', fonte: 'TCoE' },
+    { nome: 'Trafittore', fonte: 'TCoE' },
+    { nome: 'Tagliatore', fonte: 'TCoE' }
+];
+
+let pgCurrentTalenti = [];
+
+function pgRenderTalenti() {
+    const container = document.getElementById('pgTalentiList');
+    if (!container) return;
+
+    const selectedHtml = pgCurrentTalenti.map((t, i) => `
+        <div class="pg-talento-item selected">
+            <span class="pg-talento-name">${escapeHtml(t)}</span>
+            <button type="button" class="pg-talento-remove" onclick="pgRemoveTalento(${i})">✕</button>
+        </div>
+    `).join('');
+
+    const available = DND_TALENTI.filter(t => !pgCurrentTalenti.includes(t.nome));
+    const listHtml = available.map(t => `
+        <div class="pg-talento-item" onclick="pgAddTalento('${escapeHtml(t.nome)}')">
+            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
+            <span class="option-source">(${t.fonte})</span>
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        ${selectedHtml ? `<div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        <div class="pg-talenti-available">${listHtml}</div>
+    `;
+}
+
+window.pgAddTalento = function(nome) {
+    if (!pgCurrentTalenti.includes(nome)) {
+        pgCurrentTalenti.push(nome);
+        pgRenderTalenti();
+    }
+};
+
+window.pgRemoveTalento = function(index) {
+    pgCurrentTalenti.splice(index, 1);
+    pgRenderTalenti();
+};
+
 function calcMod(score) {
     return Math.floor((score - 10) / 2);
 }
@@ -377,6 +472,9 @@ function pgGetSelectedSaves() {
 }
 
 // --- Skills ---
+let pgCurrentSkillProficiencies = new Set();
+let pgCurrentSkillExpertise = new Set();
+
 function pgRenderSkills() {
     const container = document.getElementById('pgSkillsList');
     if (!container) return;
@@ -386,10 +484,12 @@ function pgRenderSkills() {
         const abilityScore = parseInt(abilityInput?.value) || 10;
         const abilityMod = calcMod(abilityScore);
         const isProf = pgCurrentSkillProficiencies.has(skill.key);
-        const totalVal = abilityMod + (isProf ? bonus : 0);
+        const isExpert = pgCurrentSkillExpertise.has(skill.key);
+        const totalVal = abilityMod + (isProf ? bonus : 0) + (isExpert ? bonus : 0);
         return `
-        <div class="pg-skill-item ${isProf ? 'proficient' : ''}">
-            <input type="checkbox" data-skill="${skill.key}" ${isProf ? 'checked' : ''} onchange="pgToggleSkill('${skill.key}', this.checked)">
+        <div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExpert ? 'expert' : ''}">
+            <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="pgToggleSkill('${skill.key}')" title="Competenza">●</span>
+            <span class="pg-skill-dot expert ${isExpert ? 'active' : ''}" onclick="pgToggleSkillExpert('${skill.key}')" title="Maestria">★</span>
             <span class="pg-skill-value">${formatModPlain(totalVal)}</span>
             <span class="pg-skill-name">${skill.nome}</span>
             <span class="pg-skill-ability">(${skill.abbr})</span>
@@ -397,11 +497,24 @@ function pgRenderSkills() {
     }).join('');
 }
 
-let pgCurrentSkillProficiencies = new Set();
+window.pgToggleSkill = function(skillKey) {
+    if (pgCurrentSkillProficiencies.has(skillKey)) {
+        pgCurrentSkillProficiencies.delete(skillKey);
+        pgCurrentSkillExpertise.delete(skillKey);
+    } else {
+        pgCurrentSkillProficiencies.add(skillKey);
+    }
+    pgRenderSkills();
+    pgUpdatePercezionPassiva();
+}
 
-window.pgToggleSkill = function(skillKey, checked) {
-    if (checked) pgCurrentSkillProficiencies.add(skillKey);
-    else pgCurrentSkillProficiencies.delete(skillKey);
+window.pgToggleSkillExpert = function(skillKey) {
+    if (pgCurrentSkillExpertise.has(skillKey)) {
+        pgCurrentSkillExpertise.delete(skillKey);
+    } else {
+        pgCurrentSkillProficiencies.add(skillKey);
+        pgCurrentSkillExpertise.add(skillKey);
+    }
     pgRenderSkills();
     pgUpdatePercezionPassiva();
 }
@@ -411,7 +524,8 @@ function pgCalcPercPassiva() {
     const sagMod = calcMod(sagScore);
     const bonus = calcBonusCompetenza(pgGetTotalLevel());
     const isProf = pgCurrentSkillProficiencies.has('percezione');
-    return 10 + sagMod + (isProf ? bonus : 0);
+    const isExpert = pgCurrentSkillExpertise.has('percezione');
+    return 10 + sagMod + (isProf ? bonus : 0) + (isExpert ? bonus : 0);
 }
 
 // --- Resistenze ---
@@ -674,7 +788,7 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 5) return;
+    if (step < 0 || step > 6) return;
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
@@ -699,6 +813,9 @@ function pgWizardGoTo(step) {
         pgRenderResImmGrid('pgResImmGrid');
     }
     if (step === 5) {
+        pgRenderTalenti();
+    }
+    if (step === 6) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const cos = parseInt(document.getElementById('pgCostituzione')?.value) || 10;
         const sag = parseInt(document.getElementById('pgSaggezza')?.value) || 10;
@@ -1054,11 +1171,12 @@ async function renderSchedaPersonaggio(personaggioId) {
             pg.immunita.map(r => `<span class="scheda-tag scheda-tag-imm">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
             '<span class="scheda-empty">Nessuna</span>';
 
-        // Conditions
-        const conditionsActive = ALL_CONDITIONS.filter(c => pg[c.key]);
+        // Conditions (excluding concentrazione which is shown separately)
+        const conditionsActive = ALL_CONDITIONS.filter(c => c.key !== 'concentrazione' && pg[c.key]);
         const conditionsHtml = conditionsActive.length > 0 ?
             conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('') :
             '<span class="scheda-empty">Nessuna</span>';
+        const isConcentrating = !!pg.concentrazione;
 
         // Check if spellcaster
         const hasSpellSlots = pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object' && Object.keys(pg.slot_incantesimo).length > 0;
@@ -1139,7 +1257,12 @@ async function renderSchedaPersonaggio(personaggioId) {
 
         <div class="scheda-section">
             <div class="scheda-section-title">Condizioni</div>
-            <div class="scheda-tags">${conditionsHtml}</div>
+            <div class="scheda-concentrazione-row">
+                <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">
+                    <span class="scheda-conc-icon">◎</span> Concentrazione
+                </button>
+            </div>
+            <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
             <div class="scheda-condition-extra">
                 <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
             </div>
@@ -1648,6 +1771,15 @@ window.schedaCloseHpCalc = async function() {
     }
 }
 
+window.schedaToggleConcentrazione = async function(pgId, el) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const isActive = el.classList.contains('active');
+    await supabase.from('personaggi').update({ concentrazione: !isActive, updated_at: new Date().toISOString() }).eq('id', pgId);
+    el.classList.toggle('active');
+    if (_schedaPgCache) _schedaPgCache.concentrazione = !isActive;
+};
+
 window.schedaHdChange = function(pgId, className, current, delta, max) {
     const pg = _schedaPgCache;
     if (!pg) return;
@@ -1704,9 +1836,11 @@ window.openPersonaggioModal = function(personaggioId) {
     form.reset();
     pgSelectedClasses = [];
     pgCurrentSkillProficiencies = new Set();
+    pgCurrentSkillExpertise = new Set();
     pgCurrentResistenze = [];
     pgCurrentImmunita = [];
     pgCurrentSlotIncantesimo = {};
+    pgCurrentTalenti = [];
     pgRenderClassi();
     pgWizardGoTo(0);
 
@@ -1769,6 +1903,12 @@ window.openPersonaggioModal = function(personaggioId) {
 
                     if (data.competenze_abilita && Array.isArray(data.competenze_abilita)) {
                         pgCurrentSkillProficiencies = new Set(data.competenze_abilita);
+                    }
+                    if (data.maestrie_abilita && Array.isArray(data.maestrie_abilita)) {
+                        pgCurrentSkillExpertise = new Set(data.maestrie_abilita);
+                    }
+                    if (data.talenti && Array.isArray(data.talenti)) {
+                        pgCurrentTalenti = [...data.talenti];
                     }
 
                     if (data.resistenze && Array.isArray(data.resistenze)) {
@@ -1863,6 +2003,8 @@ async function handleSavePersonaggio(e) {
         carisma: clamp(parseInt(document.getElementById('pgCarisma').value) || 10, 1, 30),
         tiri_salvezza: pgGetSelectedSaves(),
         competenze_abilita: Array.from(pgCurrentSkillProficiencies),
+        maestrie_abilita: Array.from(pgCurrentSkillExpertise),
+        talenti: pgCurrentTalenti,
         resistenze: pgCurrentResistenze,
         immunita: pgCurrentImmunita,
         slot_incantesimo: pgBuildSlotIncantesimo(),
@@ -2047,43 +2189,97 @@ window.closeTipoSchedaModal = function() {
 };
 
 // ============================================================================
-// MICROSCHEDA CREATION
+// MICRO SCHEDA CREATION
 // ============================================================================
 
 let _microEditingId = null;
+let _microSelectedClasses = [];
+
+function microRenderClassi() {
+    const container = document.getElementById('microClassiList');
+    if (!container) return;
+    let html = '';
+    _microSelectedClasses.forEach((c, i) => {
+        html += `
+        <div class="pg-classe-row">
+            <div class="pg-classe-header">
+                <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
+                <button type="button" class="pg-classe-remove" onclick="microRemoveClass(${i})">✕</button>
+            </div>
+            <div class="pg-classe-lv-controls">
+                <span class="pg-classe-lv-label">Lv.</span>
+                <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},-1)">−</button>
+                <span class="pg-classe-lv-val">${c.livello}</span>
+                <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},1)">+</button>
+            </div>
+        </div>`;
+    });
+    const available = DND_CLASSES.filter(cls => !_microSelectedClasses.some(s => s.nome === cls));
+    if (available.length > 0) {
+        html += `<button type="button" class="custom-select-trigger" onclick="microOpenClasseSelect()">+ Aggiungi classe</button>`;
+    }
+    container.innerHTML = html;
+    microUpdateTotalLevel();
+}
+
+function microUpdateTotalLevel() {
+    const total = _microSelectedClasses.reduce((s, c) => s + c.livello, 0);
+    const field = document.getElementById('microLivello');
+    if (field) field.value = total;
+}
+
+window.microOpenClasseSelect = function() {
+    const available = DND_CLASSES.filter(cls => !_microSelectedClasses.some(s => s.nome === cls));
+    const classOptions = available.map(c => ({ value: c, label: c }));
+    openCustomSelect(classOptions, (value) => {
+        _microSelectedClasses.push({ nome: value, livello: 1 });
+        microRenderClassi();
+    }, 'Seleziona Classe');
+};
+
+window.microRemoveClass = function(i) {
+    _microSelectedClasses.splice(i, 1);
+    microRenderClassi();
+};
+
+window.microClassLevelChange = function(i, delta) {
+    const c = _microSelectedClasses[i];
+    if (!c) return;
+    c.livello = Math.max(1, Math.min(20, c.livello + delta));
+    microRenderClassi();
+};
 
 window.openMicroSchedaModal = function(personaggioId) {
     _microEditingId = personaggioId || null;
     const form = document.getElementById('microSchedaForm');
     if (form) form.reset();
-
-    const classeBtn = document.getElementById('microClasseBtn');
-    const classeInput = document.getElementById('microClasse');
-    if (classeBtn) classeBtn.textContent = 'Seleziona classe...';
-    if (classeInput) classeInput.value = '';
+    _microSelectedClasses = [];
 
     const title = document.getElementById('microSchedaModalTitle');
     const saveBtn = document.getElementById('saveMicroSchedaBtn');
     if (_microEditingId) {
-        if (title) title.textContent = 'Modifica MicroScheda';
+        if (title) title.textContent = 'Modifica Micro Scheda';
         if (saveBtn) saveBtn.textContent = 'Salva';
         const supabase = getSupabaseClient();
         if (supabase) {
             supabase.from('personaggi').select('*').eq('id', personaggioId).single().then(({ data }) => {
                 if (data) {
                     document.getElementById('microNome').value = data.nome || '';
-                    document.getElementById('microLivello').value = data.livello || 1;
                     document.getElementById('microPVMax').value = data.punti_vita_max || 10;
-                    const cls = (data.classi && data.classi[0]) ? data.classi[0].nome : (data.classe || '');
-                    if (classeInput) classeInput.value = cls;
-                    if (classeBtn) classeBtn.textContent = cls || 'Seleziona classe...';
+                    if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
+                        _microSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1 }));
+                    } else if (data.classe) {
+                        _microSelectedClasses = [{ nome: data.classe, livello: data.livello || 1 }];
+                    }
+                    microRenderClassi();
                 }
             });
         }
     } else {
-        if (title) title.textContent = 'Nuova MicroScheda';
+        if (title) title.textContent = 'Nuova Micro Scheda';
         if (saveBtn) saveBtn.textContent = 'Crea';
     }
+    microRenderClassi();
 
     const modal = document.getElementById('microSchedaModal');
     if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
@@ -2095,14 +2291,6 @@ window.closeMicroSchedaModal = function() {
     _microEditingId = null;
 };
 
-window.microOpenClasseSelect = function() {
-    const classOptions = DND_CLASSES.map(c => ({ value: c, label: c }));
-    openCustomSelect(classOptions, (value) => {
-        document.getElementById('microClasse').value = value;
-        document.getElementById('microClasseBtn').textContent = value;
-    }, 'Seleziona Classe');
-};
-
 async function handleSaveMicroScheda(e) {
     e.preventDefault();
     const supabase = getSupabaseClient();
@@ -2110,10 +2298,11 @@ async function handleSaveMicroScheda(e) {
 
     const nome = document.getElementById('microNome')?.value?.trim();
     if (!nome) { showNotification('Inserisci un nome'); return; }
+    if (_microSelectedClasses.length === 0) { showNotification('Seleziona almeno una classe'); return; }
 
-    const classe = document.getElementById('microClasse')?.value || '';
-    const livello = parseInt(document.getElementById('microLivello')?.value) || 1;
     const pvMax = parseInt(document.getElementById('microPVMax')?.value) || 10;
+    const totalLevel = _microSelectedClasses.reduce((s, c) => s + c.livello, 0);
+    const classeDisplay = _microSelectedClasses.map(c => `${c.nome} ${c.livello}`).join(' / ');
 
     const saveBtn = document.getElementById('saveMicroSchedaBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
@@ -2123,9 +2312,9 @@ async function handleSaveMicroScheda(e) {
 
     const pgData = {
         nome,
-        classe: classe || null,
-        classi: classe ? [{ nome: classe, livello }] : [],
-        livello,
+        classe: classeDisplay,
+        classi: _microSelectedClasses,
+        livello: totalLevel,
         punti_vita_max: pvMax,
         pv_attuali: pvMax,
         tipo_scheda: 'micro',
@@ -2136,7 +2325,7 @@ async function handleSaveMicroScheda(e) {
         if (_microEditingId) {
             const { error } = await supabase.from('personaggi').update(pgData).eq('id', _microEditingId);
             if (error) throw error;
-            showNotification('MicroScheda aggiornata');
+            showNotification('Micro Scheda aggiornata');
         } else {
             pgData.user_id = userData.id;
             pgData.forza = 10; pgData.destrezza = 10; pgData.costituzione = 10;
@@ -2145,12 +2334,12 @@ async function handleSaveMicroScheda(e) {
             pgData.percezione_passiva = 10;
             const { error } = await supabase.from('personaggi').insert(pgData);
             if (error) throw error;
-            showNotification('MicroScheda creata');
+            showNotification('Micro Scheda creata');
         }
         closeMicroSchedaModal();
         loadPersonaggi();
     } catch (err) {
-        console.error('Errore salvataggio microscheda:', err);
+        console.error('Errore salvataggio micro scheda:', err);
         showNotification('Errore nel salvataggio');
     } finally {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = _microEditingId ? 'Salva' : 'Crea'; }
@@ -2158,7 +2347,7 @@ async function handleSaveMicroScheda(e) {
 }
 
 // ============================================================================
-// MICROSCHEDA RENDERING (scheda page)
+// MICRO SCHEDA RENDERING
 // ============================================================================
 
 async function renderMicroScheda(personaggioId) {
@@ -2179,6 +2368,8 @@ async function renderMicroScheda(personaggioId) {
 
     const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
     const pvTemp = pg.pv_temporanei || 0;
+    const initDisplay = pg.iniziativa != null ? pg.iniziativa : 0;
+    const initStr = initDisplay >= 0 ? `+${initDisplay}` : `${initDisplay}`;
 
     const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
     const dadiDisp = pg.dadi_vita_disponibili || {};
@@ -2190,105 +2381,122 @@ async function renderMicroScheda(personaggioId) {
             const key = `d${hd}`;
             const available = Math.min(total, dadiDisp[key] != null ? dadiDisp[key] : total);
             hitDiceHtml += `
-            <div class="micro-dice-row">
-                <span class="micro-dice-label">${c.nome} (d${hd})</span>
-                <div class="micro-dice-controls">
-                    <button type="button" onclick="microHdChange('${pg.id}','${key}',-1,${total})">−</button>
-                    <span class="micro-dice-val">${available}/${total}</span>
-                    <button type="button" onclick="microHdChange('${pg.id}','${key}',1,${total})">+</button>
+            <div class="scheda-hd-row">
+                <span class="scheda-hd-label">${c.nome} (d${hd})</span>
+                <div class="scheda-hd-controls">
+                    <button type="button" class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',-1,${total})">−</button>
+                    <span class="scheda-hd-val">${available}/${total}</span>
+                    <button type="button" class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',1,${total})">+</button>
                 </div>
             </div>`;
         });
     }
 
-    const ALL_CONDITIONS = ['Accecato','Affascinato','Assordato','Avvelenato','Incapacitato','Invisibile','Paralizzato','Pietrificato','Prono','Spaventato','Stordito','Trattenuto'];
-    const conditionsHtml = ALL_CONDITIONS.map(c => {
-        const key = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const isActive = !!pg[key];
-        return `<span class="micro-cond-tag ${isActive ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','${key}',this)">${c}</span>`;
+    const isConcentrating = !!pg.concentrazione;
+    const MICRO_CONDITIONS = [
+        { key: 'accecato', label: 'Accecato' }, { key: 'affascinato', label: 'Affascinato' },
+        { key: 'afferrato', label: 'Afferrato' }, { key: 'assordato', label: 'Assordato' },
+        { key: 'avvelenato', label: 'Avvelenato' }, { key: 'incapacitato', label: 'Incapacitato' },
+        { key: 'invisibile', label: 'Invisibile' }, { key: 'paralizzato', label: 'Paralizzato' },
+        { key: 'pietrificato', label: 'Pietrificato' }, { key: 'privo_di_sensi', label: 'Privo di sensi' },
+        { key: 'prono', label: 'Prono' }, { key: 'spaventato', label: 'Spaventato' },
+        { key: 'stordito', label: 'Stordito' }, { key: 'trattenuto', label: 'Trattenuto' }
+    ];
+    const conditionsHtml = MICRO_CONDITIONS.map(c => {
+        const isActive = !!pg[c.key];
+        return `<span class="condition-badge ${isActive ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','${c.key}',this)">${c.label}</span>`;
     }).join('');
 
     const resistenze = pg.resistenze || [];
     const immunita = pg.immunita || [];
     let resImmHtml = '';
-    if (resistenze.length > 0) {
-        resImmHtml += `<div class="micro-section-title">Resistenze</div><div class="micro-res-list">${resistenze.map(r => `<span class="micro-res-tag">${escapeHtml(r)}</span>`).join('')}</div>`;
-    }
-    if (immunita.length > 0) {
-        resImmHtml += `<div class="micro-section-title" style="margin-top:8px">Immunità</div><div class="micro-res-list">${immunita.map(r => `<span class="micro-res-tag">${escapeHtml(r)}</span>`).join('')}</div>`;
+    if (resistenze.length > 0 || immunita.length > 0) {
+        const resHtml = resistenze.length > 0 ?
+            `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenze.map(r => `<span class="condition-badge">${escapeHtml(r)}</span>`).join('')}</div></div>` : '';
+        const immHtml = immunita.length > 0 ?
+            `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunita.map(r => `<span class="condition-badge">${escapeHtml(r)}</span>`).join('')}</div></div>` : '';
+        resImmHtml = `<div class="scheda-section"><div class="scheda-section-title">Resistenze e Immunità</div>${resHtml}${immHtml}</div>`;
     }
 
     const slots = pg.slot_incantesimo || {};
     let slotsHtml = '';
     const sortedLevels = Object.keys(slots).map(Number).filter(l => l > 0 && slots[l]?.max > 0).sort((a, b) => a - b);
     if (sortedLevels.length > 0) {
-        slotsHtml = sortedLevels.map(lv => {
+        const slotItems = sortedLevels.map(lv => {
             const s = slots[lv];
             const used = Math.min(s.max, s.used != null ? s.used : 0);
             return `
-            <div class="micro-slot-block">
-                <div class="micro-slot-level">${lv}° Lv</div>
-                <div class="micro-slot-controls">
-                    <button type="button" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
-                    <span class="micro-slot-val">${used}/${s.max}</span>
-                    <button type="button" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
+            <div class="scheda-slot-block">
+                <div class="scheda-slot-level">${lv}°</div>
+                <div class="scheda-slot-controls">
+                    <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
+                    <span class="scheda-hd-val">${used}/${s.max}</span>
+                    <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
                 </div>
             </div>`;
         }).join('');
+        slotsHtml = `<div class="scheda-section"><div class="scheda-section-title">Slot Incantesimo</div><div class="scheda-slots-grid">${slotItems}</div></div>`;
     }
 
     const tabBar = document.getElementById('schedaTabBar');
     if (tabBar) tabBar.style.display = 'none';
 
     content.innerHTML = `
-    <div class="micro-scheda-container">
-        <div class="micro-scheda-header">
-            <div class="scheda-nome">${escapeHtml(pg.nome)}</div>
-            <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
-            ${pg.razza ? `<div class="scheda-subtitle">${escapeHtml(pg.razza)}${pg.background ? ' · ' + escapeHtml(pg.background) : ''}</div>` : ''}
-        </div>
+    <div class="scheda-identity">
+        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+        <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
+        <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
+    </div>
 
-        <div class="micro-section">
-            <div class="micro-section-title">Punti Ferita</div>
-            <div class="micro-hp-row">
-                <div class="micro-hp-block">
-                    <label>Attuali</label>
-                    <input type="number" class="micro-hp-input" value="${pvAttuali}" data-field="pv_attuali" data-pgid="${pg.id}" data-max="${pg.punti_vita_max}" onchange="microHpChange(this)">
+    <div class="scheda-three-boxes">
+        <div class="scheda-box">
+            <div class="scheda-box-value">${initStr}</div>
+            <div class="scheda-box-label">Iniziativa</div>
+        </div>
+    </div>
+
+    <div class="scheda-hp-section">
+        <div class="scheda-hp-left">
+            <div class="scheda-hp-pair">
+                <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','punti_vita_max',${pg.punti_vita_max},-1)">
+                    <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
+                    <div class="scheda-hp-label">PV Massimi</div>
                 </div>
-                <span class="micro-hp-sep">/</span>
-                <div class="micro-hp-block">
-                    <label>Massimi</label>
-                    <span class="micro-hp-val">${pg.punti_vita_max}</span>
+                <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max})">
+                    <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
+                    <div class="scheda-hp-label">PV Attuali</div>
                 </div>
             </div>
-            <div class="micro-temp-hp">
-                <label>PV Temporanei</label>
-                <input type="number" class="micro-hp-input" value="${pvTemp}" data-field="pv_temporanei" data-pgid="${pg.id}" style="width:50px;font-size:1em;" onchange="microHpChange(this)">
-            </div>
         </div>
-
-        ${hitDiceHtml ? `<div class="micro-section"><div class="micro-section-title">Dadi Vita</div>${hitDiceHtml}</div>` : ''}
-
-        <div class="micro-section">
-            <div class="micro-section-title">Condizioni</div>
-            <div class="micro-conditions-grid">${conditionsHtml}</div>
+        <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pvTemp},-1)">
+            <div class="scheda-hp-display" id="schedaPvTemp">${pvTemp}</div>
+            <div class="scheda-hp-label">PV Temp</div>
         </div>
+    </div>
 
-        ${resImmHtml ? `<div class="micro-section">${resImmHtml}</div>` : ''}
+    <div class="scheda-section">
+        <div class="scheda-section-title">Dadi Vita</div>
+        ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
+    </div>
 
-        ${slotsHtml ? `<div class="micro-section"><div class="micro-section-title">Slot Incantesimo</div><div class="micro-slots-grid">${slotsHtml}</div></div>` : ''}
-    </div>`;
+    <div class="scheda-section">
+        <div class="scheda-section-title">Condizioni</div>
+        <div class="scheda-concentrazione-row">
+            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','concentrazione',this)">
+                <span class="scheda-conc-icon">◎</span> Concentrazione
+            </button>
+        </div>
+        <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
+        <div class="scheda-condition-extra">
+            <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
+        </div>
+    </div>
+
+    ${resImmHtml}
+
+    ${slotsHtml}
+    `;
 }
-
-window.microHpChange = function(input) {
-    const pgId = input.dataset.pgid;
-    const field = input.dataset.field;
-    const max = input.dataset.max ? parseInt(input.dataset.max) : null;
-    let val = parseInt(input.value) || 0;
-    if (max != null && val > max) { val = max; input.value = val; }
-    if (val < 0) { val = 0; input.value = 0; }
-    schedaDebouncedSave(pgId, field, val);
-};
 
 window.microHdChange = async function(pgId, key, delta, max) {
     const supabase = getSupabaseClient();
