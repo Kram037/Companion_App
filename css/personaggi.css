@@ -244,6 +244,9 @@
 .scheda-box-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 .scheda-box-input { width: 100%; text-align: center; background: transparent; color: var(--text); border: none; font-size: 1.2rem; font-weight: 800; padding: 0; }
 .scheda-box-input:focus { outline: none; color: var(--accent); }
+.scheda-box.clickable { cursor: pointer; transition: background 0.15s; }
+.scheda-box.clickable:hover { background: var(--surface-hover); }
+.scheda-box.clickable:active { background: var(--accent-subtle); }
 
 /* HP Section */
 .scheda-hp-section { display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: var(--spacing-sm); }
@@ -283,12 +286,12 @@
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
-.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
-.scheda-skill-dot:focus, .scheda-skill-dot:active { outline: none; color: var(--text-muted); }
+.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none !important; }
+.scheda-skill-dot:focus, .scheda-skill-dot:active, .scheda-skill-dot:focus-visible { outline: none !important; box-shadow: none !important; }
 .scheda-skill-dot.active { color: var(--accent); }
-.scheda-skill-dot.active:focus, .scheda-skill-dot.active:active { color: var(--accent); }
 @media (hover: hover) { .scheda-skill-dot:not(.active):hover { color: var(--accent); opacity: 0.5; } }
 .scheda-skill-dot.expert { font-size: 1.05rem; }
+.scheda-skill-dot.expert.active { color: goldenrod; }
 .scheda-skill-mod { min-width: 24px; font-weight: 600; text-align: right; color: var(--text); }
 .scheda-skill-name { flex: 1; }
 .scheda-skill-name small { opacity: 0.6; }

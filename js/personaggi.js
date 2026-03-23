@@ -588,6 +588,38 @@ const CLASS_CASTER_TYPE = {
     'Barbaro': null, 'Guerriero': null, 'Ladro': null, 'Monaco': null
 };
 
+function calcSpellSlotsFromClassi(classi) {
+    let totalCasterLevel = 0;
+    let hasPactMagic = false;
+    let pactLevel = 0;
+
+    classi.forEach(cls => {
+        const type = CLASS_CASTER_TYPE[cls.nome];
+        if (type === 'full') totalCasterLevel += cls.livello;
+        else if (type === 'half') totalCasterLevel += Math.floor(cls.livello / 2);
+        else if (type === 'pact') { hasPactMagic = true; pactLevel += cls.livello; }
+        else if (type === null && cls.thirdCaster) {
+            totalCasterLevel += Math.floor(cls.livello / 3);
+        }
+    });
+
+    let slots = {};
+    if (totalCasterLevel > 0) {
+        const table = CLASS_SPELL_SLOTS['full'];
+        const level = Math.min(totalCasterLevel, 20);
+        slots = table[level] ? { ...table[level] } : {};
+    }
+
+    if (hasPactMagic) {
+        const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
+        let pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
+        const current = slots[pactSlotLevel] || 0;
+        slots[pactSlotLevel] = current + pactSlotCount;
+    }
+
+    return slots;
+}
+
 function pgCalcSpellSlots() {
     let totalCasterLevel = 0;
     let hasPactMagic = false;
@@ -1095,8 +1127,8 @@ async function renderSchedaPersonaggio(personaggioId) {
             const totalStr = total >= 0 ? `+${total}` : `${total}`;
             return `
             <div class="scheda-skill">
-                <span class="scheda-skill-dot ${isProf ? 'active' : ''}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}',event)" title="Competenza">●</span>
-                <span class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}',event)" title="Maestria">★</span>
+                <span class="scheda-skill-dot ${isProf ? 'active' : ''}" tabindex="-1" onmousedown="event.preventDefault();schedaToggleSkillProf('${pg.id}','${sk.key}')" ontouchend="event.preventDefault();schedaToggleSkillProf('${pg.id}','${sk.key}')" title="Competenza">●</span>
+                <span class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" tabindex="-1" onmousedown="event.preventDefault();schedaToggleSkillExpert('${pg.id}','${sk.key}')" ontouchend="event.preventDefault();schedaToggleSkillExpert('${pg.id}','${sk.key}')" title="Maestria">★</span>
                 <span class="scheda-skill-mod" id="sSkill_${sk.key}">${totalStr}</span>
                 <span class="scheda-skill-name">${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></span>
             </div>`;
@@ -1193,16 +1225,16 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-three-boxes">
-            <div class="scheda-box editable">
-                <input type="number" class="scheda-box-input" value="${pg.classe_armatura || 10}" data-field="classe_armatura" data-pgid="${pg.id}">
+            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura',${pg.classe_armatura || 10})">
+                <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
                 <div class="scheda-box-label">CA</div>
             </div>
-            <div class="scheda-box editable">
-                <input type="number" class="scheda-box-input" value="${initDisplay}" data-field="iniziativa" data-pgid="${pg.id}">
+            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa',${initDisplay})">
+                <div class="scheda-box-val" id="schedaInit">${initDisplay >= 0 ? '+' + initDisplay : initDisplay}</div>
                 <div class="scheda-box-label">Iniziativa</div>
             </div>
-            <div class="scheda-box editable">
-                <input type="number" class="scheda-box-input" value="${pg.velocita || 9}" step="1.5" data-field="velocita" data-pgid="${pg.id}">
+            <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}',${pg.velocita || 9})">
+                <div class="scheda-box-val" id="schedaSpeed">${pg.velocita || 9}</div>
                 <div class="scheda-box-label">Velocità</div>
             </div>
         </div>
@@ -1236,7 +1268,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Dadi Vita - Disponibili</div>
+            <div class="scheda-section-title">Dadi Vita</div>
             ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
         </div>
 
@@ -1266,11 +1298,15 @@ async function renderSchedaPersonaggio(personaggioId) {
             <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
         </div>
 
-        ${(pg.talenti && pg.talenti.length > 0) ? `
         <div class="scheda-section">
-            <div class="scheda-section-title">Talenti</div>
-            <div class="scheda-tags">${pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')}</div>
-        </div>` : ''}
+            <div class="scheda-section-title">
+                Talenti
+                <button class="scheda-edit-btn" onclick="schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
+            </div>
+            <div class="scheda-tags" id="schedaTalentiDisplay">${(pg.talenti && pg.talenti.length > 0) ?
+                pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
+                '<span class="scheda-empty">Nessun talento</span>'}</div>
+        </div>
 
         `;
 
@@ -1281,14 +1317,6 @@ async function renderSchedaPersonaggio(personaggioId) {
                 const val = Math.max(1, Math.min(30, parseInt(input.value) || 10));
                 schedaDebouncedSave(pg.id, field, val);
                 schedaRecalcAbility(field, val, pg.id);
-            });
-        });
-
-        content.querySelectorAll('.scheda-box-input, .scheda-hp-input').forEach(input => {
-            input.addEventListener('input', () => {
-                const field = input.dataset.field;
-                let val = field === 'velocita' ? parseFloat(input.value) || 0 : parseInt(input.value) || 0;
-                schedaDebouncedSave(pg.id, field, val);
             });
         });
 
@@ -1365,7 +1393,7 @@ window.schedaToggleSave = async function(pgId, abilityKey) {
     schedaInstantSave(pgId, { tiri_salvezza: saves });
 }
 
-window.schedaToggleSkillProf = async function(pgId, skillKey, evt) {
+window.schedaToggleSkillProf = async function(pgId, skillKey) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const skills = [...(pg.competenze_abilita || [])];
@@ -1374,11 +1402,10 @@ window.schedaToggleSkillProf = async function(pgId, skillKey, evt) {
     pg.competenze_abilita = skills;
 
     schedaRefreshSkill(pg, skillKey);
-    if (evt && evt.target) setTimeout(() => evt.target.blur(), 0);
     schedaInstantSave(pgId, { competenze_abilita: skills });
 }
 
-window.schedaToggleSkillExpert = async function(pgId, skillKey, evt) {
+window.schedaToggleSkillExpert = async function(pgId, skillKey) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const experts = [...(pg.maestrie_abilita || [])];
@@ -1396,7 +1423,6 @@ window.schedaToggleSkillExpert = async function(pgId, skillKey, evt) {
     }
 
     schedaRefreshSkill(pg, skillKey);
-    if (evt && evt.target) setTimeout(() => evt.target.blur(), 0);
     schedaInstantSave(pgId, updates);
 }
 
@@ -1630,6 +1656,119 @@ window.schedaOpenResImmEdit = function(pgId) {
     });
 }
 
+// Talenti Edit on Scheda
+window.schedaOpenTalentiEdit = function(pgId) {
+    const pg = _schedaPgCache;
+    const currentTalenti = pg?.talenti ? [...pg.talenti] : [];
+
+    const selectedHtml = currentTalenti.map((t, i) => `
+        <div class="pg-talento-item selected">
+            <span class="pg-talento-name">${escapeHtml(t)}</span>
+            <button type="button" class="pg-talento-remove" onclick="schedaTalentoRemove(${i})">✕</button>
+        </div>
+    `).join('');
+
+    const available = DND_TALENTI.filter(t => !currentTalenti.includes(t.nome));
+    const listHtml = available.map(t => `
+        <div class="pg-talento-item" onclick="schedaTalentoAdd('${escapeHtml(t.nome)}')">
+            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
+            <span class="option-source">(${t.fonte})</span>
+        </div>
+    `).join('');
+
+    const modalHtml = `
+    <div class="modal active" id="schedaTalentiModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" onclick="schedaCloseTalentiEdit()">&times;</button>
+            <h2>Modifica Talenti</h2>
+            <div class="wizard-page-scroll" id="schedaTalentiContent">
+                ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+                <div class="form-section-label">Disponibili</div>
+                <div class="pg-talenti-available">${listHtml}</div>
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="schedaCloseTalentiEdit()">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+    window._schedaTalentiEditPgId = pgId;
+    window._schedaTalentiEditList = currentTalenti;
+};
+
+window.schedaTalentoAdd = async function(nome) {
+    if (!window._schedaTalentiEditList) return;
+    if (!window._schedaTalentiEditList.includes(nome)) {
+        window._schedaTalentiEditList.push(nome);
+        await _schedaTalentiSave();
+        _schedaTalentiRefreshModal();
+    }
+};
+
+window.schedaTalentoRemove = async function(index) {
+    if (!window._schedaTalentiEditList) return;
+    window._schedaTalentiEditList.splice(index, 1);
+    await _schedaTalentiSave();
+    _schedaTalentiRefreshModal();
+};
+
+async function _schedaTalentiSave() {
+    const pgId = window._schedaTalentiEditPgId;
+    const talenti = window._schedaTalentiEditList;
+    if (!pgId) return;
+
+    if (_schedaPgCache) _schedaPgCache.talenti = talenti;
+
+    const display = document.getElementById('schedaTalentiDisplay');
+    if (display) {
+        display.innerHTML = talenti.length > 0
+            ? talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')
+            : '<span class="scheda-empty">Nessun talento</span>';
+    }
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ talenti, updated_at: new Date().toISOString() }).eq('id', pgId);
+    }
+}
+
+function _schedaTalentiRefreshModal() {
+    const container = document.getElementById('schedaTalentiContent');
+    if (!container) return;
+    const talenti = window._schedaTalentiEditList || [];
+
+    const selectedHtml = talenti.map((t, i) => `
+        <div class="pg-talento-item selected">
+            <span class="pg-talento-name">${escapeHtml(t)}</span>
+            <button type="button" class="pg-talento-remove" onclick="schedaTalentoRemove(${i})">✕</button>
+        </div>
+    `).join('');
+
+    const available = DND_TALENTI.filter(t => !talenti.includes(t.nome));
+    const listHtml = available.map(t => `
+        <div class="pg-talento-item" onclick="schedaTalentoAdd('${escapeHtml(t.nome)}')">
+            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
+            <span class="option-source">(${t.fonte})</span>
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        <div class="form-section-label">Disponibili</div>
+        <div class="pg-talenti-available">${listHtml}</div>
+    `;
+}
+
+window.schedaCloseTalentiEdit = function() {
+    const m = document.getElementById('schedaTalentiModal');
+    if (m) m.remove();
+    document.body.style.overflow = '';
+    window._schedaTalentiEditPgId = null;
+    window._schedaTalentiEditList = null;
+};
+
 // HP Calculator
 let _hpCalcState = null;
 
@@ -1773,6 +1912,140 @@ window.schedaCloseHpCalc = async function() {
         await renderCombattimentoContent(campagnaId, sessioneId);
     }
 }
+
+window.schedaOpenStatCalc = function(pgId, field, currentVal) {
+    _hpCalcState = { pgId, field, currentVal, maxVal: -1, inputBuffer: '0' };
+    const labels = { classe_armatura: 'Classe Armatura', iniziativa: 'Iniziativa' };
+    const label = labels[field] || field;
+
+    const existing = document.getElementById('hpCalcOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'hpCalcOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
+            <div class="hp-calc-title">${label}</div>
+            <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span></div>
+            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaStatConfirm()">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.schedaStatConfirm = async function() {
+    if (!_hpCalcState) return;
+    const newVal = parseInt(_hpCalcState.inputBuffer) || 0;
+    const field = _hpCalcState.field;
+    const pgId = _hpCalcState.pgId;
+
+    if (_schedaPgCache) _schedaPgCache[field] = newVal;
+
+    const displayIds = { classe_armatura: 'schedaCA', iniziativa: 'schedaInit' };
+    const el = document.getElementById(displayIds[field]);
+    if (el) {
+        el.textContent = field === 'iniziativa' ? (newVal >= 0 ? '+' + newVal : '' + newVal) : newVal;
+    }
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ [field]: newVal, updated_at: new Date().toISOString() }).eq('id', pgId);
+    }
+    schedaCloseHpCalc();
+};
+
+window.schedaOpenSpeedCalc = function(pgId, currentVal) {
+    _hpCalcState = { pgId, field: 'velocita', currentVal, maxVal: -1, inputBuffer: '0', isSpeed: true };
+
+    const existing = document.getElementById('hpCalcOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'hpCalcOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
+            <div class="hp-calc-title">Velocità</div>
+            <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span><span class="hp-calc-max">m</span></div>
+            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
+            </div>
+            <div class="hp-calc-buttons" style="grid-template-columns:1fr 1fr 1fr;">
+                <button class="hp-calc-btn damage" onclick="schedaSpeedAdjust(-1.5)">− 1.5</button>
+                <button class="hp-calc-btn heal" onclick="schedaSpeedAdjust(1.5)">+ 1.5</button>
+                <button class="hp-calc-btn heal" onclick="schedaStatConfirmSpeed()" style="background:var(--accent);">Imposta</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.schedaSpeedAdjust = async function(delta) {
+    if (!_hpCalcState) return;
+    let newVal = _hpCalcState.currentVal + delta;
+    if (newVal < 0) newVal = 0;
+    _hpCalcState.currentVal = newVal;
+
+    const display = document.getElementById('hpCalcCurrent');
+    if (display) display.textContent = newVal;
+
+    if (_schedaPgCache) _schedaPgCache.velocita = newVal;
+    const el = document.getElementById('schedaSpeed');
+    if (el) el.textContent = newVal;
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ velocita: newVal, updated_at: new Date().toISOString() }).eq('id', _hpCalcState.pgId);
+    }
+};
+
+window.schedaStatConfirmSpeed = async function() {
+    if (!_hpCalcState) return;
+    const newVal = parseFloat(_hpCalcState.inputBuffer) || 0;
+    const pgId = _hpCalcState.pgId;
+
+    if (_schedaPgCache) _schedaPgCache.velocita = newVal;
+    const el = document.getElementById('schedaSpeed');
+    if (el) el.textContent = newVal;
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({ velocita: newVal, updated_at: new Date().toISOString() }).eq('id', pgId);
+    }
+    schedaCloseHpCalc();
+};
 
 window.schedaToggleConcentrazione = async function(pgId, el) {
     const supabase = getSupabaseClient();
@@ -2313,6 +2586,12 @@ async function handleSaveMicroScheda(e) {
     const userData = await findUserByUid(AppState.currentUser?.uid);
     if (!userData) { showNotification('Errore: utente non trovato'); return; }
 
+    const autoSlots = calcSpellSlotsFromClassi(_microSelectedClasses);
+    const slotIncantesimo = {};
+    Object.keys(autoSlots).forEach(lv => {
+        slotIncantesimo[lv] = { max: autoSlots[lv], current: autoSlots[lv], used: 0 };
+    });
+
     const pgData = {
         nome,
         classe: classeDisplay,
@@ -2320,6 +2599,7 @@ async function handleSaveMicroScheda(e) {
         livello: totalLevel,
         punti_vita_max: pvMax,
         pv_attuali: pvMax,
+        slot_incantesimo: slotIncantesimo,
         tipo_scheda: 'micro',
         updated_at: new Date().toISOString()
     };
@@ -2404,14 +2684,23 @@ async function renderMicroScheda(personaggioId) {
 
     const resistenze = pg.resistenze || [];
     const immunita = pg.immunita || [];
-    let resImmHtml = '';
-    if (resistenze.length > 0 || immunita.length > 0) {
-        const resHtml = resistenze.length > 0 ?
-            `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenze.map(r => `<span class="condition-badge">${escapeHtml(r)}</span>`).join('')}</div></div>` : '';
-        const immHtml = immunita.length > 0 ?
-            `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunita.map(r => `<span class="condition-badge">${escapeHtml(r)}</span>`).join('')}</div></div>` : '';
-        resImmHtml = `<div class="scheda-section"><div class="scheda-section-title">Resistenze e Immunità</div>${resHtml}${immHtml}</div>`;
-    }
+    const microResHtml = resistenze.length > 0 ?
+        resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+        '<span class="scheda-empty">Nessuna</span>';
+    const microImmHtml = immunita.length > 0 ?
+        immunita.map(r => `<span class="scheda-tag scheda-tag-imm">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
+        '<span class="scheda-empty">Nessuna</span>';
+    const resImmHtml = `<div class="scheda-section">
+        <div class="scheda-section-title">
+            Resistenze e Immunità
+            <button class="scheda-edit-btn" onclick="schedaOpenResImmEdit('${pg.id}')" title="Modifica">&#9998;</button>
+        </div>
+        <div class="scheda-res-imm-display" id="schedaResImmDisplay">
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${microResHtml}</div></div>
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${microImmHtml}</div></div>
+        </div>
+        <div id="schedaResImmEditGrid" style="display:none;"></div>
+    </div>`;
 
     const slots = pg.slot_incantesimo || {};
     let slotsHtml = '';
@@ -2445,8 +2734,8 @@ async function renderMicroScheda(personaggioId) {
     </div>
 
     <div class="scheda-three-boxes">
-        <div class="scheda-box">
-            <input type="number" class="scheda-ability-input" value="${initDisplay}" data-field="iniziativa" style="width:48px;text-align:center;font-size:1.3rem;font-weight:700;">
+        <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa',${initDisplay})">
+            <div class="scheda-box-val" id="schedaInit">${initStr}</div>
             <div class="scheda-box-label">Iniziativa</div>
         </div>
     </div>
@@ -2471,7 +2760,7 @@ async function renderMicroScheda(personaggioId) {
     </div>
 
     <div class="scheda-section">
-        <div class="scheda-section-title">Dadi Vita - Disponibili</div>
+        <div class="scheda-section-title">Dadi Vita</div>
         ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
     </div>
 
@@ -2492,13 +2781,6 @@ async function renderMicroScheda(personaggioId) {
     ${slotsHtml}
     `;
 
-    content.querySelectorAll('.scheda-ability-input').forEach(input => {
-        input.addEventListener('input', () => {
-            const field = input.dataset.field;
-            const val = parseInt(input.value) || 0;
-            schedaDebouncedSave(pg.id, field, val);
-        });
-    });
 }
 
 window.microHdChange = async function(pgId, key, delta, max) {
