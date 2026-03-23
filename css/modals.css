@@ -25,6 +25,45 @@
     min-height: 0;
     padding-right: 4px;
 }
+
+/* Custom scrollbar for modals */
+.wizard-page-scroll::-webkit-scrollbar,
+.modal-content-lg::-webkit-scrollbar,
+.custom-select-list::-webkit-scrollbar,
+.pg-class-selector::-webkit-scrollbar,
+.pg-skills-list::-webkit-scrollbar {
+    width: 5px;
+}
+.wizard-page-scroll::-webkit-scrollbar-track,
+.modal-content-lg::-webkit-scrollbar-track,
+.custom-select-list::-webkit-scrollbar-track,
+.pg-class-selector::-webkit-scrollbar-track,
+.pg-skills-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.wizard-page-scroll::-webkit-scrollbar-thumb,
+.modal-content-lg::-webkit-scrollbar-thumb,
+.custom-select-list::-webkit-scrollbar-thumb,
+.pg-class-selector::-webkit-scrollbar-thumb,
+.pg-skills-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+.wizard-page-scroll::-webkit-scrollbar-thumb:hover,
+.modal-content-lg::-webkit-scrollbar-thumb:hover,
+.custom-select-list::-webkit-scrollbar-thumb:hover,
+.pg-class-selector::-webkit-scrollbar-thumb:hover,
+.pg-skills-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+/* Firefox */
+.wizard-page-scroll,
+.custom-select-list,
+.pg-class-selector,
+.pg-skills-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
 .modal-content-lg .wizard-page .form-actions {
     flex-shrink: 0;
     margin-top: auto;
