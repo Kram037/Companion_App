@@ -300,8 +300,6 @@
 
 /* Hit Dice Table */
 .scheda-hd-table { display: flex; flex-direction: column; gap: 0; }
-.scheda-hd-header { display: grid; grid-template-columns: 1fr 1fr; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
-.scheda-hd-header span:last-child { text-align: center; }
 .scheda-hd-row { display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(var(--border-rgb, 0,0,0), 0.05); }
 .scheda-hd-total { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .scheda-hd-total small { color: var(--text-muted); font-weight: 400; }
@@ -974,7 +972,7 @@
 .pg-talenti-available { max-height: none; }
 
 /* Concentrazione button */
-.scheda-concentrazione-row { display: flex; justify-content: center; }
+.scheda-concentrazione-row { display: flex; justify-content: center; margin-bottom: 4px; }
 .scheda-concentrazione-btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 8px 20px; border-radius: 999px;
@@ -983,12 +981,11 @@
     font-size: 0.9em; font-weight: 600;
     transition: all 0.25s;
 }
-.scheda-concentrazione-btn:hover { border-color: var(--primary); }
+.scheda-concentrazione-btn:hover { border-color: #ef4444; }
 .scheda-concentrazione-btn.active {
-    border-color: var(--primary); background: var(--primary);
+    border-color: #ef4444; background: #ef4444;
     color: #fff;
 }
-.scheda-conc-icon { font-size: 1.1em; }
 
 /* Slot grid for micro scheda */
 .scheda-slots-grid {
@@ -1014,6 +1011,24 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+}
+
+/* Slot config modal */
+.micro-slot-config-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.micro-slot-config-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    color: var(--text);
 }
 
 /* Scegli personaggio modal list */

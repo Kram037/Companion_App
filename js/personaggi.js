@@ -1108,7 +1108,6 @@ async function renderSchedaPersonaggio(personaggioId) {
         let hitDiceHtml = '';
         if (pg.classi && pg.classi.length > 0) {
             hitDiceHtml = `<div class="scheda-hd-table">
-                <div class="scheda-hd-header"><span>DADI VITA</span><span>DISPONIBILI</span></div>
                 ${pg.classi.map(c => {
                     const die = CLASS_HD[c.nome] || 8;
                     const total = c.livello;
@@ -1237,7 +1236,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Dadi Vita</div>
+            <div class="scheda-section-title">Dadi Vita - Disponibili</div>
             ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
         </div>
 
@@ -1258,9 +1257,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-section">
             <div class="scheda-section-title">Condizioni</div>
             <div class="scheda-concentrazione-row">
-                <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">
-                    <span class="scheda-conc-icon">◎</span> Concentrazione
-                </button>
+                <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
             </div>
             <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
             <div class="scheda-condition-extra">
@@ -1268,6 +1265,12 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>
             <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
         </div>
+
+        ${(pg.talenti && pg.talenti.length > 0) ? `
+        <div class="scheda-section">
+            <div class="scheda-section-title">Talenti</div>
+            <div class="scheda-tags">${pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')}</div>
+        </div>` : ''}
 
         `;
 
@@ -2374,38 +2377,30 @@ async function renderMicroScheda(personaggioId) {
     const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
     const dadiDisp = pg.dadi_vita_disponibili || {};
     let hitDiceHtml = '';
-    if (pg.classi && Array.isArray(pg.classi)) {
-        pg.classi.forEach(c => {
-            const hd = CLASS_HD[c.nome] || 8;
-            const total = c.livello || 1;
-            const key = `d${hd}`;
-            const available = Math.min(total, dadiDisp[key] != null ? dadiDisp[key] : total);
-            hitDiceHtml += `
-            <div class="scheda-hd-row">
-                <span class="scheda-hd-label">${c.nome} (d${hd})</span>
-                <div class="scheda-hd-controls">
-                    <button type="button" class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',-1,${total})">−</button>
-                    <span class="scheda-hd-val">${available}/${total}</span>
-                    <button type="button" class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',1,${total})">+</button>
-                </div>
-            </div>`;
-        });
+    if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
+        hitDiceHtml = `<div class="scheda-hd-table">
+            ${pg.classi.map(c => {
+                const die = CLASS_HD[c.nome] || 8;
+                const total = c.livello || 1;
+                const key = c.nome;
+                const available = Math.min(total, dadiDisp[key] != null ? dadiDisp[key] : total);
+                return `<div class="scheda-hd-row">
+                    <span class="scheda-hd-total">${total}d${die} <small>(${c.nome})</small></span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',-1,${total})">−</button>
+                        <span class="scheda-hd-val" id="sHd_${key}">${available}</span>
+                        <button class="scheda-hd-btn" onclick="microHdChange('${pg.id}','${key}',1,${total})">+</button>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
     }
 
     const isConcentrating = !!pg.concentrazione;
-    const MICRO_CONDITIONS = [
-        { key: 'accecato', label: 'Accecato' }, { key: 'affascinato', label: 'Affascinato' },
-        { key: 'afferrato', label: 'Afferrato' }, { key: 'assordato', label: 'Assordato' },
-        { key: 'avvelenato', label: 'Avvelenato' }, { key: 'incapacitato', label: 'Incapacitato' },
-        { key: 'invisibile', label: 'Invisibile' }, { key: 'paralizzato', label: 'Paralizzato' },
-        { key: 'pietrificato', label: 'Pietrificato' }, { key: 'privo_di_sensi', label: 'Privo di sensi' },
-        { key: 'prono', label: 'Prono' }, { key: 'spaventato', label: 'Spaventato' },
-        { key: 'stordito', label: 'Stordito' }, { key: 'trattenuto', label: 'Trattenuto' }
-    ];
-    const conditionsHtml = MICRO_CONDITIONS.map(c => {
-        const isActive = !!pg[c.key];
-        return `<span class="condition-badge ${isActive ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','${c.key}',this)">${c.label}</span>`;
-    }).join('');
+    const conditionsActive = ALL_CONDITIONS.filter(c => c.key !== 'concentrazione' && pg[c.key]);
+    const conditionsHtml = conditionsActive.length > 0 ?
+        conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('') :
+        '<span class="scheda-empty">Nessuna</span>';
 
     const resistenze = pg.resistenze || [];
     const immunita = pg.immunita || [];
@@ -2421,22 +2416,23 @@ async function renderMicroScheda(personaggioId) {
     const slots = pg.slot_incantesimo || {};
     let slotsHtml = '';
     const sortedLevels = Object.keys(slots).map(Number).filter(l => l > 0 && slots[l]?.max > 0).sort((a, b) => a - b);
-    if (sortedLevels.length > 0) {
-        const slotItems = sortedLevels.map(lv => {
-            const s = slots[lv];
-            const used = Math.min(s.max, s.used != null ? s.used : 0);
-            return `
-            <div class="scheda-slot-block">
-                <div class="scheda-slot-level">${lv}°</div>
-                <div class="scheda-slot-controls">
-                    <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
-                    <span class="scheda-hd-val">${used}/${s.max}</span>
-                    <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
-                </div>
-            </div>`;
-        }).join('');
-        slotsHtml = `<div class="scheda-section"><div class="scheda-section-title">Slot Incantesimo</div><div class="scheda-slots-grid">${slotItems}</div></div>`;
-    }
+    const slotItems = sortedLevels.map(lv => {
+        const s = slots[lv];
+        const used = Math.min(s.max, s.used != null ? s.used : 0);
+        return `
+        <div class="scheda-slot-block">
+            <div class="scheda-slot-level">${lv}°</div>
+            <div class="scheda-slot-controls">
+                <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
+                <span class="scheda-hd-val">${used}/${s.max}</span>
+                <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
+            </div>
+        </div>`;
+    }).join('');
+    slotsHtml = `<div class="scheda-section">
+        <div class="scheda-section-title">Slot Incantesimo <button class="scheda-edit-btn" onclick="microOpenSlotConfig('${pg.id}')" title="Configura">&#9998;</button></div>
+        ${slotItems ? `<div class="scheda-slots-grid">${slotItems}</div>` : '<span class="scheda-empty">Nessuno slot configurato</span>'}
+    </div>`;
 
     const tabBar = document.getElementById('schedaTabBar');
     if (tabBar) tabBar.style.display = 'none';
@@ -2450,7 +2446,7 @@ async function renderMicroScheda(personaggioId) {
 
     <div class="scheda-three-boxes">
         <div class="scheda-box">
-            <div class="scheda-box-value">${initStr}</div>
+            <input type="number" class="scheda-ability-input" value="${initDisplay}" data-field="iniziativa" style="width:48px;text-align:center;font-size:1.3rem;font-weight:700;">
             <div class="scheda-box-label">Iniziativa</div>
         </div>
     </div>
@@ -2475,27 +2471,34 @@ async function renderMicroScheda(personaggioId) {
     </div>
 
     <div class="scheda-section">
-        <div class="scheda-section-title">Dadi Vita</div>
+        <div class="scheda-section-title">Dadi Vita - Disponibili</div>
         ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
     </div>
 
     <div class="scheda-section">
         <div class="scheda-section-title">Condizioni</div>
         <div class="scheda-concentrazione-row">
-            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','concentrazione',this)">
-                <span class="scheda-conc-icon">◎</span> Concentrazione
-            </button>
+            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
         </div>
         <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
         <div class="scheda-condition-extra">
             <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
         </div>
+        <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
     </div>
 
     ${resImmHtml}
 
     ${slotsHtml}
     `;
+
+    content.querySelectorAll('.scheda-ability-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const field = input.dataset.field;
+            const val = parseInt(input.value) || 0;
+            schedaDebouncedSave(pg.id, field, val);
+        });
+    });
 }
 
 window.microHdChange = async function(pgId, key, delta, max) {
@@ -2528,4 +2531,66 @@ window.microSlotChange = async function(pgId, level, delta, max) {
     slots[level].used = Math.max(0, Math.min(max, current + delta));
     await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', pgId);
     renderMicroScheda(pgId);
+};
+
+window.microOpenSlotConfig = async function(pgId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single();
+    const slots = pg?.slot_incantesimo || {};
+
+    let rows = '';
+    for (let lv = 1; lv <= 9; lv++) {
+        const maxVal = slots[lv]?.max || 0;
+        rows += `<div class="micro-slot-config-row">
+            <span>${lv}° Livello</span>
+            <input type="number" min="0" max="20" value="${maxVal}" id="microSlotMax_${lv}" class="form-control" style="width:60px;text-align:center;">
+        </div>`;
+    }
+
+    const modalHtml = `
+    <div class="modal active" id="microSlotConfigModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeMicroSlotConfig()">&times;</button>
+            <h2>Configura Slot Incantesimo</h2>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Imposta il numero massimo di slot per livello</p>
+            <div class="micro-slot-config-grid">${rows}</div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="closeMicroSlotConfig()">Annulla</button>
+                <button type="button" class="btn-primary" onclick="saveMicroSlotConfig('${pgId}')">Salva</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeMicroSlotConfig = function() {
+    const m = document.getElementById('microSlotConfigModal');
+    if (m) m.remove();
+    document.body.style.overflow = '';
+};
+
+window.saveMicroSlotConfig = async function(pgId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single();
+    const slots = pg?.slot_incantesimo || {};
+
+    for (let lv = 1; lv <= 9; lv++) {
+        const input = document.getElementById(`microSlotMax_${lv}`);
+        const maxVal = parseInt(input?.value) || 0;
+        if (maxVal > 0) {
+            if (!slots[lv]) slots[lv] = { max: maxVal, used: 0 };
+            else slots[lv].max = maxVal;
+        } else {
+            delete slots[lv];
+        }
+    }
+
+    await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', pgId);
+    closeMicroSlotConfig();
+    renderMicroScheda(pgId);
+    showNotification('Slot incantesimo aggiornati');
 };
