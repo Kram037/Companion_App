@@ -253,7 +253,8 @@ window.openCustomSelect = function(options, callback, title) {
     overlay.className = 'custom-select-overlay';
     const listHtml = options.map((o, i) => {
         if (o.type === 'divider') return `<div class="custom-select-divider">${escapeHtml(o.label)}</div>`;
-        return `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}</button>`;
+        const srcHtml = o.source ? ` <span class="option-source">(${escapeHtml(o.source)})</span>` : '';
+        return `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}${srcHtml}</button>`;
     }).join('');
     overlay.innerHTML = `
         <div class="custom-select-panel">

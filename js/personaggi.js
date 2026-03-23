@@ -205,7 +205,7 @@ function buildRaceOptionsFromDB() {
             options.push({ type: 'divider', label: g || '' });
             lastGruppo = g;
         }
-        options.push({ value: r.nome, label: r.nome });
+        options.push({ value: r.nome, label: r.nome, source: r.fonte || '' });
     });
     return options;
 }
@@ -215,7 +215,7 @@ function buildBackgroundOptionsFromDB() {
     if (!bgs || bgs.length === 0) {
         return DND_BACKGROUNDS.map(b => ({ value: b, label: b }));
     }
-    return bgs.map(b => ({ value: b.nome, label: b.nome }));
+    return bgs.map(b => ({ value: b.nome, label: b.nome, source: b.fonte || '' }));
 }
 
 function getRaceData(nome) {
