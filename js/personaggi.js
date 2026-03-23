@@ -1225,15 +1225,15 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-three-boxes">
-            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura',${pg.classe_armatura || 10})">
+            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura')">
                 <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
                 <div class="scheda-box-label">CA</div>
             </div>
-            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa',${initDisplay})">
+            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa')">
                 <div class="scheda-box-val" id="schedaInit">${initDisplay >= 0 ? '+' + initDisplay : initDisplay}</div>
                 <div class="scheda-box-label">Iniziativa</div>
             </div>
-            <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}',${pg.velocita || 9})">
+            <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}')">
                 <div class="scheda-box-val" id="schedaSpeed">${pg.velocita || 9}</div>
                 <div class="scheda-box-label">Velocità</div>
             </div>
@@ -1802,7 +1802,7 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     overlay.id = 'hpCalcOverlay';
     overlay.className = 'hp-calc-overlay';
 
-    const isDirectEdit = field === 'punti_vita_max' || field === 'pv_temporanei';
+    const isDirectEdit = field === 'punti_vita_max';
     const actionButtons = isDirectEdit
         ? `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`
         : `<div class="hp-calc-buttons">
@@ -1913,7 +1913,8 @@ window.schedaCloseHpCalc = async function() {
     }
 }
 
-window.schedaOpenStatCalc = function(pgId, field, currentVal) {
+window.schedaOpenStatCalc = function(pgId, field) {
+    const currentVal = _schedaPgCache?.[field] ?? 0;
     _hpCalcState = { pgId, field, currentVal, maxVal: -1, inputBuffer: '0' };
     const labels = { classe_armatura: 'Classe Armatura', iniziativa: 'Iniziativa' };
     const label = labels[field] || field;
@@ -1973,7 +1974,8 @@ window.schedaStatConfirm = async function() {
     schedaCloseHpCalc();
 };
 
-window.schedaOpenSpeedCalc = function(pgId, currentVal) {
+window.schedaOpenSpeedCalc = function(pgId) {
+    const currentVal = _schedaPgCache?.velocita ?? 9;
     _hpCalcState = { pgId, field: 'velocita', currentVal, maxVal: -1, inputBuffer: '0', isSpeed: true };
 
     const existing = document.getElementById('hpCalcOverlay');
@@ -1987,25 +1989,9 @@ window.schedaOpenSpeedCalc = function(pgId, currentVal) {
             <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">Velocità</div>
             <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span><span class="hp-calc-max">m</span></div>
-            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
-            <div class="hp-calc-numpad">
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
-                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
-            </div>
-            <div class="hp-calc-buttons" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="hp-calc-buttons">
                 <button class="hp-calc-btn damage" onclick="schedaSpeedAdjust(-1.5)">− 1.5</button>
                 <button class="hp-calc-btn heal" onclick="schedaSpeedAdjust(1.5)">+ 1.5</button>
-                <button class="hp-calc-btn heal" onclick="schedaStatConfirmSpeed()" style="background:var(--accent);">Imposta</button>
             </div>
         </div>
     `;
@@ -2029,24 +2015,6 @@ window.schedaSpeedAdjust = async function(delta) {
     if (supabase) {
         await supabase.from('personaggi').update({ velocita: newVal, updated_at: new Date().toISOString() }).eq('id', _hpCalcState.pgId);
     }
-};
-
-window.schedaStatConfirmSpeed = async function() {
-    if (!_hpCalcState) return;
-    const bufferVal = _hpCalcState.inputBuffer;
-    const newVal = (bufferVal === '0') ? _hpCalcState.currentVal : (parseFloat(bufferVal) || 0);
-    const pgId = _hpCalcState.pgId;
-
-    _hpCalcState.currentVal = newVal;
-    if (_schedaPgCache) _schedaPgCache.velocita = newVal;
-    const el = document.getElementById('schedaSpeed');
-    if (el) el.textContent = newVal;
-
-    const supabase = getSupabaseClient();
-    if (supabase) {
-        await supabase.from('personaggi').update({ velocita: newVal, updated_at: new Date().toISOString() }).eq('id', pgId);
-    }
-    schedaCloseHpCalc();
 };
 
 window.schedaToggleConcentrazione = async function(pgId, el) {
@@ -2746,7 +2714,7 @@ async function renderMicroScheda(personaggioId) {
     </div>
 
     <div class="scheda-three-boxes">
-        <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa',${initDisplay})">
+        <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa')">
             <div class="scheda-box-val" id="schedaInit">${initStr}</div>
             <div class="scheda-box-label">Iniziativa</div>
         </div>
