@@ -45,7 +45,7 @@ async function init() {
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
-        addNemicoBtn: document.getElementById('addNemicoBtn'),
+        addHomebrewBtn: document.getElementById('addHomebrewBtn'),
         addPersonaggioBtn: document.getElementById('addPersonaggioBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
@@ -173,8 +173,8 @@ async function init() {
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
     }
-    if (elements.addNemicoBtn) {
-        elements.addNemicoBtn.style.display = 'none';
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = 'none';
     }
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = 'none';
@@ -454,24 +454,37 @@ function setupEventListeners() {
         elements.invitaAmicoBtn.addEventListener('click', handleInvitaAmico);
     }
     
-    // Nemici button
-    if (elements.addNemicoBtn) {
-        elements.addNemicoBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('➕ Click su Crea Nemico');
-            // TODO: Implementare funzione per creare nemico
-            showNotification('Funzionalità in arrivo: Crea Nemico');
-        };
-        console.log('✅ Event listener aggiunto a addNemicoBtn');
-    }
+    // Laboratorio init
+    initLaboratorio();
     
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            openPersonaggioModal();
+            openTipoSchedaModal();
         };
+    }
+
+    const closeTipoSchedaBtn = document.getElementById('closeTipoSchedaModal');
+    if (closeTipoSchedaBtn) closeTipoSchedaBtn.addEventListener('click', closeTipoSchedaModal);
+    const tipoSchedaModalEl = document.getElementById('tipoSchedaModal');
+    if (tipoSchedaModalEl) tipoSchedaModalEl.addEventListener('click', (e) => { if (e.target === tipoSchedaModalEl) closeTipoSchedaModal(); });
+    const tipoCompletaBtn = document.getElementById('tipoSchedaCompleta');
+    if (tipoCompletaBtn) tipoCompletaBtn.addEventListener('click', () => { closeTipoSchedaModal(); openPersonaggioModal(); });
+    const tipoMicroBtn = document.getElementById('tipoSchedaMicro');
+    if (tipoMicroBtn) tipoMicroBtn.addEventListener('click', () => { closeTipoSchedaModal(); openMicroSchedaModal(); });
+
+    // MicroScheda modal bindings
+    const closeMicroBtn = document.getElementById('closeMicroSchedaModal');
+    if (closeMicroBtn) closeMicroBtn.addEventListener('click', closeMicroSchedaModal);
+    const cancelMicroBtn = document.getElementById('cancelMicroSchedaBtn');
+    if (cancelMicroBtn) cancelMicroBtn.addEventListener('click', closeMicroSchedaModal);
+    const microModal = document.getElementById('microSchedaModal');
+    if (microModal) microModal.addEventListener('click', (e) => { if (e.target === microModal) closeMicroSchedaModal(); });
+    const microForm = document.getElementById('microSchedaForm');
+    if (microForm) {
+        microForm.addEventListener('submit', handleSaveMicroScheda);
+        microForm.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
     }
 
     if (elements.closePersonaggioModal) {

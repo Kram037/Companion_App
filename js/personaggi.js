@@ -801,12 +801,13 @@ function renderPersonaggi(personaggi, campagneMap = {}) {
         const campagne = campagneMap[pg.id] || [];
         const campagneText = campagne.length > 0 ? campagne.map(n => escapeHtml(n)).join(', ') : 'Nessuna campagna';
 
+        const isMicro = pg.tipo_scheda === 'micro';
         return `
-        <div class="pg-card pg-card-clickable" data-pg-id="${pg.id}" onclick="openSchedaPersonaggio('${pg.id}')">
+        <div class="pg-card pg-card-clickable ${isMicro ? 'pg-card-micro' : ''}" data-pg-id="${pg.id}" onclick="openSchedaPersonaggio('${pg.id}')">
             <div class="pg-card-header">
                 <div class="pg-card-avatar">${escapeHtml(initials)}</div>
                 <div class="pg-card-identity">
-                    <p class="pg-card-name">${escapeHtml(pg.nome)}</p>
+                    <p class="pg-card-name">${escapeHtml(pg.nome)}${isMicro ? ' <span class="pg-micro-badge">μ</span>' : ''}</p>
                     <p class="pg-card-subtitle">${escapeHtml(pg.razza || '')} ${escapeHtml(classeDisplay)}</p>
                 </div>
                 <div class="pg-card-level">Lv ${pg.livello || 1}</div>
@@ -905,6 +906,15 @@ async function renderSchedaPersonaggio(personaggioId) {
 
     const supabase = getSupabaseClient();
     if (!supabase) { content.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
+
+    // Check tipo_scheda to route to micro view
+    const { data: checkPg } = await supabase.from('personaggi').select('tipo_scheda').eq('id', personaggioId).single();
+    if (checkPg?.tipo_scheda === 'micro') {
+        return renderMicroScheda(personaggioId);
+    }
+
+    const tabBar = document.getElementById('schedaTabBar');
+    if (tabBar) tabBar.style.display = '';
 
     if (!_schedaPgCache || _schedaPgCache.id !== personaggioId) {
         content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
@@ -2021,3 +2031,293 @@ window.selectPersonaggioCampagna = async function(campagnaId, personaggioId, use
         showNotification('Errore: ' + (error.message || error));
     }
 }
+
+// ============================================================================
+// TIPO SCHEDA MODAL
+// ============================================================================
+
+window.openTipoSchedaModal = function() {
+    const modal = document.getElementById('tipoSchedaModal');
+    if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+};
+
+window.closeTipoSchedaModal = function() {
+    const modal = document.getElementById('tipoSchedaModal');
+    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+};
+
+// ============================================================================
+// MICROSCHEDA CREATION
+// ============================================================================
+
+let _microEditingId = null;
+
+window.openMicroSchedaModal = function(personaggioId) {
+    _microEditingId = personaggioId || null;
+    const form = document.getElementById('microSchedaForm');
+    if (form) form.reset();
+
+    const classeBtn = document.getElementById('microClasseBtn');
+    const classeInput = document.getElementById('microClasse');
+    if (classeBtn) classeBtn.textContent = 'Seleziona classe...';
+    if (classeInput) classeInput.value = '';
+
+    const title = document.getElementById('microSchedaModalTitle');
+    const saveBtn = document.getElementById('saveMicroSchedaBtn');
+    if (_microEditingId) {
+        if (title) title.textContent = 'Modifica MicroScheda';
+        if (saveBtn) saveBtn.textContent = 'Salva';
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            supabase.from('personaggi').select('*').eq('id', personaggioId).single().then(({ data }) => {
+                if (data) {
+                    document.getElementById('microNome').value = data.nome || '';
+                    document.getElementById('microLivello').value = data.livello || 1;
+                    document.getElementById('microPVMax').value = data.punti_vita_max || 10;
+                    const cls = (data.classi && data.classi[0]) ? data.classi[0].nome : (data.classe || '');
+                    if (classeInput) classeInput.value = cls;
+                    if (classeBtn) classeBtn.textContent = cls || 'Seleziona classe...';
+                }
+            });
+        }
+    } else {
+        if (title) title.textContent = 'Nuova MicroScheda';
+        if (saveBtn) saveBtn.textContent = 'Crea';
+    }
+
+    const modal = document.getElementById('microSchedaModal');
+    if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+};
+
+window.closeMicroSchedaModal = function() {
+    const modal = document.getElementById('microSchedaModal');
+    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+    _microEditingId = null;
+};
+
+window.microOpenClasseSelect = function() {
+    const classOptions = DND_CLASSES.map(c => ({ value: c, label: c }));
+    openCustomSelect(classOptions, (value) => {
+        document.getElementById('microClasse').value = value;
+        document.getElementById('microClasseBtn').textContent = value;
+    }, 'Seleziona Classe');
+};
+
+async function handleSaveMicroScheda(e) {
+    e.preventDefault();
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const nome = document.getElementById('microNome')?.value?.trim();
+    if (!nome) { showNotification('Inserisci un nome'); return; }
+
+    const classe = document.getElementById('microClasse')?.value || '';
+    const livello = parseInt(document.getElementById('microLivello')?.value) || 1;
+    const pvMax = parseInt(document.getElementById('microPVMax')?.value) || 10;
+
+    const saveBtn = document.getElementById('saveMicroSchedaBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
+
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) { showNotification('Errore: utente non trovato'); return; }
+
+    const pgData = {
+        nome,
+        classe: classe || null,
+        classi: classe ? [{ nome: classe, livello }] : [],
+        livello,
+        punti_vita_max: pvMax,
+        pv_attuali: pvMax,
+        tipo_scheda: 'micro',
+        updated_at: new Date().toISOString()
+    };
+
+    try {
+        if (_microEditingId) {
+            const { error } = await supabase.from('personaggi').update(pgData).eq('id', _microEditingId);
+            if (error) throw error;
+            showNotification('MicroScheda aggiornata');
+        } else {
+            pgData.user_id = userData.id;
+            pgData.forza = 10; pgData.destrezza = 10; pgData.costituzione = 10;
+            pgData.intelligenza = 10; pgData.saggezza = 10; pgData.carisma = 10;
+            pgData.classe_armatura = 10; pgData.iniziativa = 0; pgData.velocita = 9;
+            pgData.percezione_passiva = 10;
+            const { error } = await supabase.from('personaggi').insert(pgData);
+            if (error) throw error;
+            showNotification('MicroScheda creata');
+        }
+        closeMicroSchedaModal();
+        loadPersonaggi();
+    } catch (err) {
+        console.error('Errore salvataggio microscheda:', err);
+        showNotification('Errore nel salvataggio');
+    } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = _microEditingId ? 'Salva' : 'Crea'; }
+    }
+}
+
+// ============================================================================
+// MICROSCHEDA RENDERING (scheda page)
+// ============================================================================
+
+async function renderMicroScheda(personaggioId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) { content.innerHTML = '<p>Errore</p>'; return; }
+
+    const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
+    if (error || !pg) { content.innerHTML = '<p>Personaggio non trovato</p>'; return; }
+    _schedaPgCache = pg;
+
+    let classeDisplay = pg.classe || '';
+    if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
+        classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
+    }
+
+    const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+    const pvTemp = pg.pv_temporanei || 0;
+
+    const CLASS_HD = { 'Artefice':8,'Bardo':8,'Chierico':8,'Druido':8,'Ladro':8,'Monaco':8,'Warlock':8,'Barbaro':12,'Mago':6,'Stregone':6,'Guerriero':10,'Paladino':10,'Ranger':10 };
+    const dadiDisp = pg.dadi_vita_disponibili || {};
+    let hitDiceHtml = '';
+    if (pg.classi && Array.isArray(pg.classi)) {
+        pg.classi.forEach(c => {
+            const hd = CLASS_HD[c.nome] || 8;
+            const total = c.livello || 1;
+            const key = `d${hd}`;
+            const available = Math.min(total, dadiDisp[key] != null ? dadiDisp[key] : total);
+            hitDiceHtml += `
+            <div class="micro-dice-row">
+                <span class="micro-dice-label">${c.nome} (d${hd})</span>
+                <div class="micro-dice-controls">
+                    <button type="button" onclick="microHdChange('${pg.id}','${key}',-1,${total})">−</button>
+                    <span class="micro-dice-val">${available}/${total}</span>
+                    <button type="button" onclick="microHdChange('${pg.id}','${key}',1,${total})">+</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    const ALL_CONDITIONS = ['Accecato','Affascinato','Assordato','Avvelenato','Incapacitato','Invisibile','Paralizzato','Pietrificato','Prono','Spaventato','Stordito','Trattenuto'];
+    const conditionsHtml = ALL_CONDITIONS.map(c => {
+        const key = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const isActive = !!pg[key];
+        return `<span class="micro-cond-tag ${isActive ? 'active' : ''}" onclick="microToggleCondition('${pg.id}','${key}',this)">${c}</span>`;
+    }).join('');
+
+    const resistenze = pg.resistenze || [];
+    const immunita = pg.immunita || [];
+    let resImmHtml = '';
+    if (resistenze.length > 0) {
+        resImmHtml += `<div class="micro-section-title">Resistenze</div><div class="micro-res-list">${resistenze.map(r => `<span class="micro-res-tag">${escapeHtml(r)}</span>`).join('')}</div>`;
+    }
+    if (immunita.length > 0) {
+        resImmHtml += `<div class="micro-section-title" style="margin-top:8px">Immunità</div><div class="micro-res-list">${immunita.map(r => `<span class="micro-res-tag">${escapeHtml(r)}</span>`).join('')}</div>`;
+    }
+
+    const slots = pg.slot_incantesimo || {};
+    let slotsHtml = '';
+    const sortedLevels = Object.keys(slots).map(Number).filter(l => l > 0 && slots[l]?.max > 0).sort((a, b) => a - b);
+    if (sortedLevels.length > 0) {
+        slotsHtml = sortedLevels.map(lv => {
+            const s = slots[lv];
+            const used = Math.min(s.max, s.used != null ? s.used : 0);
+            return `
+            <div class="micro-slot-block">
+                <div class="micro-slot-level">${lv}° Lv</div>
+                <div class="micro-slot-controls">
+                    <button type="button" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
+                    <span class="micro-slot-val">${used}/${s.max}</span>
+                    <button type="button" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    const tabBar = document.getElementById('schedaTabBar');
+    if (tabBar) tabBar.style.display = 'none';
+
+    content.innerHTML = `
+    <div class="micro-scheda-container">
+        <div class="micro-scheda-header">
+            <div class="scheda-nome">${escapeHtml(pg.nome)}</div>
+            <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
+            ${pg.razza ? `<div class="scheda-subtitle">${escapeHtml(pg.razza)}${pg.background ? ' · ' + escapeHtml(pg.background) : ''}</div>` : ''}
+        </div>
+
+        <div class="micro-section">
+            <div class="micro-section-title">Punti Ferita</div>
+            <div class="micro-hp-row">
+                <div class="micro-hp-block">
+                    <label>Attuali</label>
+                    <input type="number" class="micro-hp-input" value="${pvAttuali}" data-field="pv_attuali" data-pgid="${pg.id}" data-max="${pg.punti_vita_max}" onchange="microHpChange(this)">
+                </div>
+                <span class="micro-hp-sep">/</span>
+                <div class="micro-hp-block">
+                    <label>Massimi</label>
+                    <span class="micro-hp-val">${pg.punti_vita_max}</span>
+                </div>
+            </div>
+            <div class="micro-temp-hp">
+                <label>PV Temporanei</label>
+                <input type="number" class="micro-hp-input" value="${pvTemp}" data-field="pv_temporanei" data-pgid="${pg.id}" style="width:50px;font-size:1em;" onchange="microHpChange(this)">
+            </div>
+        </div>
+
+        ${hitDiceHtml ? `<div class="micro-section"><div class="micro-section-title">Dadi Vita</div>${hitDiceHtml}</div>` : ''}
+
+        <div class="micro-section">
+            <div class="micro-section-title">Condizioni</div>
+            <div class="micro-conditions-grid">${conditionsHtml}</div>
+        </div>
+
+        ${resImmHtml ? `<div class="micro-section">${resImmHtml}</div>` : ''}
+
+        ${slotsHtml ? `<div class="micro-section"><div class="micro-section-title">Slot Incantesimo</div><div class="micro-slots-grid">${slotsHtml}</div></div>` : ''}
+    </div>`;
+}
+
+window.microHpChange = function(input) {
+    const pgId = input.dataset.pgid;
+    const field = input.dataset.field;
+    const max = input.dataset.max ? parseInt(input.dataset.max) : null;
+    let val = parseInt(input.value) || 0;
+    if (max != null && val > max) { val = max; input.value = val; }
+    if (val < 0) { val = 0; input.value = 0; }
+    schedaDebouncedSave(pgId, field, val);
+};
+
+window.microHdChange = async function(pgId, key, delta, max) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('dadi_vita_disponibili').eq('id', pgId).single();
+    const dadiDisp = pg?.dadi_vita_disponibili || {};
+    const current = dadiDisp[key] != null ? dadiDisp[key] : max;
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    dadiDisp[key] = newVal;
+    await supabase.from('personaggi').update({ dadi_vita_disponibili: dadiDisp, updated_at: new Date().toISOString() }).eq('id', pgId);
+    renderMicroScheda(pgId);
+};
+
+window.microToggleCondition = async function(pgId, key, el) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const isActive = el.classList.contains('active');
+    await supabase.from('personaggi').update({ [key]: !isActive, updated_at: new Date().toISOString() }).eq('id', pgId);
+    el.classList.toggle('active');
+};
+
+window.microSlotChange = async function(pgId, level, delta, max) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single();
+    const slots = pg?.slot_incantesimo || {};
+    if (!slots[level]) slots[level] = { max, used: 0 };
+    const current = slots[level].used || 0;
+    slots[level].used = Math.max(0, Math.min(max, current + delta));
+    await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', pgId);
+    renderMicroScheda(pgId);
+};

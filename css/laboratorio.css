@@ -1,0 +1,444 @@
+/* ============================================================================
+   LABORATORIO PAGE
+   ============================================================================ */
+
+.lab-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 0 var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.lab-tabs::-webkit-scrollbar { display: none; }
+
+.lab-tab {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-size: 0.78em;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.lab-tab:hover { border-color: var(--primary); color: var(--text); }
+.lab-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.lab-content {
+    padding: 0 var(--spacing-sm);
+}
+
+.lab-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.lab-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: border-color 0.2s;
+}
+.lab-card:hover { border-color: var(--primary); }
+
+.lab-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-light, rgba(139, 0, 0, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.2em;
+}
+
+.lab-card-info {
+    flex: 1;
+    min-width: 0;
+}
+.lab-card-name {
+    font-weight: 600;
+    font-size: 0.95em;
+    color: var(--text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.lab-card-detail {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    margin: 2px 0 0;
+}
+
+.lab-card-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.lab-card-actions button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius);
+    transition: color 0.2s, background 0.2s;
+}
+.lab-card-actions button:hover {
+    color: var(--primary);
+    background: var(--primary-light, rgba(139, 0, 0, 0.08));
+}
+.lab-card-actions .lab-delete:hover { color: #e53935; }
+
+.lab-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--spacing-xl) 0;
+    font-size: 0.9em;
+}
+
+/* ============================================================================
+   HOMEBREW MODAL FORM
+   ============================================================================ */
+
+#homebrewFormContent {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+#homebrewFormContent::-webkit-scrollbar { width: 5px; }
+#homebrewFormContent::-webkit-scrollbar-track { background: transparent; }
+#homebrewFormContent::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.hb-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.hb-stats-grid .form-group { margin-bottom: 0; }
+.hb-stats-grid label { font-size: 0.78em; }
+.hb-stats-grid input { text-align: center; }
+
+.hb-attacks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: var(--spacing-sm);
+}
+.hb-attack-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.hb-attack-row input { flex: 1; min-width: 0; font-size: 0.85em; }
+.hb-attack-row button {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+.hb-attack-row button:hover { border-color: #e53935; color: #e53935; }
+
+.hb-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--text-secondary);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.82em;
+    transition: border-color 0.2s, color 0.2s;
+}
+.hb-add-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ============================================================================
+   TIPO SCHEDA MODAL
+   ============================================================================ */
+
+.tipo-scheda-desc {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.88em;
+    margin-bottom: var(--spacing-md);
+}
+
+.tipo-scheda-options {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.tipo-scheda-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: var(--spacing-lg) var(--spacing-md);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+}
+.tipo-scheda-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.tipo-scheda-icon {
+    color: var(--primary);
+    opacity: 0.85;
+}
+.tipo-scheda-label {
+    font-weight: 700;
+    font-size: 1em;
+    color: var(--text);
+}
+.tipo-scheda-sublabel {
+    font-size: 0.78em;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+/* ============================================================================
+   MICROSCHEDA VIEW
+   ============================================================================ */
+
+.micro-scheda-container {
+    padding: var(--spacing-md);
+}
+
+.micro-scheda-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+.micro-scheda-header .scheda-nome {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--text);
+}
+.micro-scheda-header .scheda-subtitle {
+    font-size: 0.88em;
+    color: var(--text-secondary);
+}
+
+.micro-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+.micro-section-title {
+    font-weight: 600;
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.micro-hp-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+.micro-hp-block {
+    text-align: center;
+}
+.micro-hp-block label {
+    display: block;
+    font-size: 0.75em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+.micro-hp-val {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 48px;
+    display: inline-block;
+}
+.micro-hp-sep {
+    font-size: 1.4em;
+    color: var(--text-secondary);
+    font-weight: 300;
+}
+
+.micro-hp-input {
+    width: 60px;
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    padding: 4px;
+}
+.micro-hp-input:focus { border-color: var(--primary); outline: none; }
+
+.micro-temp-hp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
+}
+.micro-temp-hp label {
+    font-size: 0.82em;
+    color: var(--text-secondary);
+}
+
+.micro-dice-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+}
+.micro-dice-row + .micro-dice-row {
+    border-top: 1px solid var(--border);
+}
+.micro-dice-label {
+    font-size: 0.88em;
+    color: var(--text);
+}
+.micro-dice-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.micro-dice-controls button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+}
+.micro-dice-controls button:hover { border-color: var(--primary); }
+.micro-dice-val {
+    font-weight: 600;
+    min-width: 36px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.micro-conditions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.micro-cond-tag {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78em;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.micro-cond-tag.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.micro-res-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.micro-res-tag {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    background: rgba(139, 0, 0, 0.08);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.micro-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.micro-slot-block {
+    text-align: center;
+    padding: 8px 4px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+.micro-slot-level {
+    font-size: 0.72em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+.micro-slot-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+.micro-slot-controls button {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.micro-slot-val {
+    font-weight: 600;
+    font-size: 0.85em;
+    min-width: 24px;
+    display: inline-block;
+}
+
+@media (max-width: 480px) {
+    .tipo-scheda-options { flex-direction: column; }
+    .micro-slots-grid { grid-template-columns: repeat(3, 1fr); }
+}

@@ -57,7 +57,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
         }
     } else {
-        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'personaggi' || pageName === 'nemici') {
+        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'personaggi' || pageName === 'laboratorio') {
             sessionStorage.removeItem('currentCampagnaId');
             sessionStorage.removeItem('currentSessioneId');
             sessionStorage.removeItem('currentPersonaggioId');
@@ -94,6 +94,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
         if (AppState.isLoggedIn && AppState.currentUser) {
             loadCampagne(AppState.currentUser.uid);
         }
+    } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
+        loadLabContent();
     } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
         loadPersonaggi();
     } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {

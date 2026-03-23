@@ -64,6 +64,21 @@
     text-overflow: ellipsis;
 }
 
+.pg-micro-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
 .pg-card-subtitle {
     font-size: 0.8rem;
     color: var(--text-light);

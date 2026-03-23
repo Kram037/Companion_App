@@ -37,7 +37,7 @@ function setupSupabaseAuth() {
                         renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
-                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici','scheda'].includes(AppState.currentPage)) {
+                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
                         navigateToPage('dettagli');
                     } else {
                         navigateToPage(AppState.currentPage || 'campagne');
@@ -116,7 +116,7 @@ async function checkAuthState() {
                 renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 navigateToPage('dettagli');
-            } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','nemici','scheda'].includes(AppState.currentPage)) {
+            } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
                 navigateToPage('dettagli');
             } else {
                 navigateToPage(AppState.currentPage || 'campagne');
@@ -156,33 +156,28 @@ function updateUIForLoggedIn() {
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'block';
     }
-    if (elements.addNemicoBtn) {
-        elements.addNemicoBtn.style.display = 'block';
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = 'block';
     }
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = 'block';
     }
-    // Aggiorna i placeholder per amici, nemici e personaggi (nessun dato ancora)
+    // Aggiorna i placeholder per amici, laboratorio e personaggi (nessun dato ancora)
     updatePlaceholderMessages(true);
 }
 
 // Aggiorna i messaggi dei placeholder in base allo stato di login
 function updatePlaceholderMessages(isLoggedIn) {
     const amiciPlaceholder = document.getElementById('amiciPlaceholder');
-    const nemiciPlaceholder = document.getElementById('nemiciPlaceholder');
+    const labPlaceholder = document.getElementById('laboratorioPlaceholder');
     const personaggiList = document.getElementById('personaggiList');
     
     if (isLoggedIn) {
         if (amiciPlaceholder) {
             amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
         }
-        if (nemiciPlaceholder) {
-            nemiciPlaceholder.innerHTML = `
-                <p>Non ci sono nemici. Crea la tua schiera!</p>
-                <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 0.5em;">
-                    Companion App non si assume responsabilità di eventuali conflitti al tavolo con i tuoi "amici".
-                </p>
-            `;
+        if (labPlaceholder) {
+            labPlaceholder.style.display = 'none';
         }
         if (personaggiList) {
             personaggiList.innerHTML = '<div class="content-placeholder"><p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p></div>';
@@ -191,8 +186,9 @@ function updatePlaceholderMessages(isLoggedIn) {
         if (amiciPlaceholder) {
             amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
         }
-        if (nemiciPlaceholder) {
-            nemiciPlaceholder.innerHTML = '<p>Accedi per vedere e creare i tuoi nemici</p>';
+        if (labPlaceholder) {
+            labPlaceholder.style.display = 'block';
+            labPlaceholder.innerHTML = '<p>Accedi per creare i tuoi contenuti homebrew</p>';
         }
         if (personaggiList) {
             personaggiList.innerHTML = '<div class="content-placeholder"><p>Accedi per vedere e creare i tuoi personaggi</p></div>';
@@ -210,15 +206,15 @@ function updateUIForLoggedOut() {
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
     }
-    if (elements.addNemicoBtn) {
-        elements.addNemicoBtn.style.display = 'none';
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = 'none';
     }
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = 'none';
     }
     // Show login message in campagne list
     renderCampagne([], false);
-    // Aggiorna i placeholder per amici, nemici e personaggi
+    // Aggiorna i placeholder per amici, laboratorio e personaggi
     updatePlaceholderMessages(false);
 }
 

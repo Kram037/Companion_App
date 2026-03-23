@@ -10,13 +10,14 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/base.css?v=1767700000">
-    <link rel="stylesheet" href="css/components.css?v=1767700000">
-    <link rel="stylesheet" href="css/modals.css?v=1767700000">
-    <link rel="stylesheet" href="css/campagne.css?v=1767700000">
-    <link rel="stylesheet" href="css/personaggi.css?v=1767700000">
-    <link rel="stylesheet" href="css/sessions.css?v=1767700000">
-    <link rel="stylesheet" href="css/combat.css?v=1767700000">
+    <link rel="stylesheet" href="css/base.css?v=1767800000">
+    <link rel="stylesheet" href="css/components.css?v=1767800000">
+    <link rel="stylesheet" href="css/modals.css?v=1767800000">
+    <link rel="stylesheet" href="css/campagne.css?v=1767800000">
+    <link rel="stylesheet" href="css/personaggi.css?v=1767800000">
+    <link rel="stylesheet" href="css/sessions.css?v=1767800000">
+    <link rel="stylesheet" href="css/combat.css?v=1767800000">
+    <link rel="stylesheet" href="css/laboratorio.css?v=1767800000">
 </head>
 <body>
     <!-- Header -->
@@ -124,15 +125,26 @@
             </div>
         </section>
 
-        <!-- Nemici Page -->
-        <section class="page" id="nemiciPage">
+        <!-- Laboratorio Page -->
+        <section class="page" id="laboratorioPage">
             <div class="page-content">
                 <div class="page-header">
-                <h1>Nemici</h1>
-                    <button class="btn-primary btn-icon" id="addNemicoBtn" aria-label="Crea Nemico">+</button>
+                    <h1>Laboratorio</h1>
+                    <button class="btn-primary btn-icon" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
                 </div>
-                <div id="nemiciPlaceholder" class="content-placeholder">
-                    <p>Accedi per vedere e creare i tuoi nemici</p>
+                <div class="lab-tabs" id="labTabs">
+                    <button class="lab-tab active" data-lab="classi">Classi</button>
+                    <button class="lab-tab" data-lab="razze">Razze</button>
+                    <button class="lab-tab" data-lab="background">Background</button>
+                    <button class="lab-tab" data-lab="incantesimi">Incantesimi</button>
+                    <button class="lab-tab" data-lab="nemici">Nemici</button>
+                    <button class="lab-tab" data-lab="talenti">Talenti</button>
+                    <button class="lab-tab" data-lab="oggetti">Oggetti</button>
+                </div>
+                <div id="labContent" class="lab-content">
+                    <div id="laboratorioPlaceholder" class="content-placeholder">
+                        <p>Accedi per creare i tuoi contenuti homebrew</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -249,13 +261,13 @@
             </svg>
             <span>Amici</span>
         </button>
-        <button class="toolbar-btn" data-page="nemici" aria-label="Nemici">
+        <button class="toolbar-btn" data-page="laboratorio" aria-label="Laboratorio">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                <path d="M2 17l10 5 10-5"></path>
-                <path d="M2 12l10 5 10-5"></path>
+                <path d="M9 3h6v5.5l3 3V20a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-8.5l3-3V3z"></path>
+                <path d="M9 3h6" stroke-linecap="round"></path>
+                <circle cx="12" cy="16" r="2"></circle>
             </svg>
-            <span>Nemici</span>
+            <span>Laboratorio</span>
         </button>
         <button class="toolbar-btn" data-page="personaggi" aria-label="Personaggi">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -699,6 +711,90 @@
         </div>
     </div>
 
+    <!-- Laboratorio Homebrew Modal -->
+    <div class="modal" id="homebrewModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" id="closeHomebrewModal">&times;</button>
+            <h2 id="homebrewModalTitle">Nuovo Contenuto</h2>
+            <form id="homebrewForm">
+                <div id="homebrewFormContent"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelHomebrewBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="saveHomebrewBtn">Crea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scelta tipo scheda Modal -->
+    <div class="modal" id="tipoSchedaModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeTipoSchedaModal">&times;</button>
+            <h2>Tipo di Scheda</h2>
+            <p class="tipo-scheda-desc">Scegli il tipo di scheda per il tuo personaggio</p>
+            <div class="tipo-scheda-options">
+                <button type="button" class="tipo-scheda-card" id="tipoSchedaCompleta">
+                    <div class="tipo-scheda-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="8" y1="13" x2="16" y2="13"></line>
+                            <line x1="8" y1="17" x2="16" y2="17"></line>
+                            <line x1="8" y1="9" x2="10" y2="9"></line>
+                        </svg>
+                    </div>
+                    <div class="tipo-scheda-label">Scheda Completa</div>
+                    <div class="tipo-scheda-sublabel">Gestisci ogni dettaglio del personaggio</div>
+                </button>
+                <button type="button" class="tipo-scheda-card" id="tipoSchedaMicro">
+                    <div class="tipo-scheda-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
+                            <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                            <line x1="9" y1="7" x2="15" y2="7"></line>
+                            <line x1="9" y1="11" x2="15" y2="11"></line>
+                            <line x1="9" y1="15" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="tipo-scheda-label">MicroScheda</div>
+                    <div class="tipo-scheda-sublabel">Solo i contatori essenziali, per chi usa carta e penna</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MicroScheda Creation Modal -->
+    <div class="modal" id="microSchedaModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeMicroSchedaModal">&times;</button>
+            <h2 id="microSchedaModalTitle">Nuova MicroScheda</h2>
+            <form id="microSchedaForm">
+                <div class="form-group">
+                    <label for="microNome">Nome</label>
+                    <input type="text" id="microNome" required placeholder="Nome del personaggio">
+                </div>
+                <div class="form-group">
+                    <label>Classe</label>
+                    <button type="button" class="custom-select-trigger" id="microClasseBtn" onclick="microOpenClasseSelect()">Seleziona classe...</button>
+                    <input type="hidden" id="microClasse" value="">
+                </div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label for="microLivello">Livello</label>
+                        <input type="number" id="microLivello" min="1" max="20" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="microPVMax">PV Massimi</label>
+                        <input type="number" id="microPVMax" min="1" value="10">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelMicroSchedaBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="saveMicroSchedaBtn">Crea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scegli Personaggio Modal -->
     <div class="modal" id="scegliPersonaggioModal">
         <div class="modal-content">
@@ -793,21 +889,22 @@
         
         console.log('✅ Supabase caricato e inizializzato (ES Module)');
     </script>
-    <script src="js/supabase.js?v=1767700000"></script>
-    <script src="js/state.js?v=1767700000"></script>
-    <script src="js/utils.js?v=1767700000"></script>
-    <script src="js/theme.js?v=1767700000"></script>
-    <script src="js/navigation.js?v=1767700000"></script>
-    <script src="js/auth.js?v=1767700000"></script>
-    <script src="js/users.js?v=1767700000"></script>
-    <script src="js/amici.js?v=1767700000"></script>
-    <script src="js/campagne.js?v=1767700000"></script>
-    <script src="js/personaggi.js?v=1767700000"></script>
-    <script src="js/sessions.js?v=1767700000"></script>
-    <script src="js/combat.js?v=1767700000"></script>
-    <script src="js/realtime.js?v=1767700000"></script>
-    <script src="js/initiative.js?v=1767700000"></script>
-    <script src="js/init.js?v=1767700000"></script>
+    <script src="js/supabase.js?v=1767800000"></script>
+    <script src="js/state.js?v=1767800000"></script>
+    <script src="js/utils.js?v=1767800000"></script>
+    <script src="js/theme.js?v=1767800000"></script>
+    <script src="js/navigation.js?v=1767800000"></script>
+    <script src="js/auth.js?v=1767800000"></script>
+    <script src="js/users.js?v=1767800000"></script>
+    <script src="js/amici.js?v=1767800000"></script>
+    <script src="js/campagne.js?v=1767800000"></script>
+    <script src="js/personaggi.js?v=1767800000"></script>
+    <script src="js/sessions.js?v=1767800000"></script>
+    <script src="js/combat.js?v=1767800000"></script>
+    <script src="js/laboratorio.js?v=1767800000"></script>
+    <script src="js/realtime.js?v=1767800000"></script>
+    <script src="js/initiative.js?v=1767800000"></script>
+    <script src="js/init.js?v=1767800000"></script>
     
     <!-- Cache busting script for development -->
     <script>
