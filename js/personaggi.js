@@ -2033,9 +2033,11 @@ window.schedaSpeedAdjust = async function(delta) {
 
 window.schedaStatConfirmSpeed = async function() {
     if (!_hpCalcState) return;
-    const newVal = parseFloat(_hpCalcState.inputBuffer) || 0;
+    const bufferVal = _hpCalcState.inputBuffer;
+    const newVal = (bufferVal === '0') ? _hpCalcState.currentVal : (parseFloat(bufferVal) || 0);
     const pgId = _hpCalcState.pgId;
 
+    _hpCalcState.currentVal = newVal;
     if (_schedaPgCache) _schedaPgCache.velocita = newVal;
     const el = document.getElementById('schedaSpeed');
     if (el) el.textContent = newVal;
@@ -2474,27 +2476,33 @@ let _microSelectedClasses = [];
 function microRenderClassi() {
     const container = document.getElementById('microClassiList');
     if (!container) return;
-    let html = '';
-    _microSelectedClasses.forEach((c, i) => {
-        html += `
-        <div class="pg-classe-row">
-            <div class="pg-classe-header">
+    const chipsHtml = _microSelectedClasses.map((c, i) => {
+        const subLabel = THIRD_CASTER_SUBCLASSES[c.nome];
+        const subCheck = subLabel ? `
+            <label class="pg-subclass-check">
+                <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="microToggleThirdCaster(${i}, this.checked)">
+                <span>${subLabel}</span>
+            </label>` : '';
+        return `
+        <div class="pg-classe-chip">
+            <div class="pg-classe-chip-top">
                 <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
-                <button type="button" class="pg-classe-remove" onclick="microRemoveClass(${i})">✕</button>
+                <div class="pg-classe-lv-controls">
+                    <span class="pg-classe-lv-label">Lv.</span>
+                    <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},-1)">−</button>
+                    <span class="pg-classe-lv-val">${c.livello}</span>
+                    <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},1)">+</button>
+                </div>
+                <button type="button" class="pg-classe-remove" onclick="microRemoveClass(${i})">&times;</button>
             </div>
-            <div class="pg-classe-lv-controls">
-                <span class="pg-classe-lv-label">Lv.</span>
-                <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},-1)">−</button>
-                <span class="pg-classe-lv-val">${c.livello}</span>
-                <button type="button" class="pg-classe-lv-btn" onclick="microClassLevelChange(${i},1)">+</button>
-            </div>
+            ${subCheck}
         </div>`;
-    });
-    const available = DND_CLASSES.filter(cls => !_microSelectedClasses.some(s => s.nome === cls));
-    if (available.length > 0) {
-        html += `<button type="button" class="custom-select-trigger" onclick="microOpenClasseSelect()">+ Aggiungi classe</button>`;
-    }
-    container.innerHTML = html;
+    }).join('');
+
+    const addBtn = `<button type="button" class="pg-add-class-btn" onclick="microOpenClasseSelect()">
+        <span class="pg-add-class-plus">+</span> Aggiungi classe
+    </button>`;
+    container.innerHTML = chipsHtml + addBtn;
     microUpdateTotalLevel();
 }
 
@@ -2508,7 +2516,7 @@ window.microOpenClasseSelect = function() {
     const available = DND_CLASSES.filter(cls => !_microSelectedClasses.some(s => s.nome === cls));
     const classOptions = available.map(c => ({ value: c, label: c }));
     openCustomSelect(classOptions, (value) => {
-        _microSelectedClasses.push({ nome: value, livello: 1 });
+        _microSelectedClasses.push({ nome: value, livello: 1, thirdCaster: false });
         microRenderClassi();
     }, 'Seleziona Classe');
 };
@@ -2523,6 +2531,10 @@ window.microClassLevelChange = function(i, delta) {
     if (!c) return;
     c.livello = Math.max(1, Math.min(20, c.livello + delta));
     microRenderClassi();
+};
+
+window.microToggleThirdCaster = function(index, checked) {
+    _microSelectedClasses[index].thirdCaster = checked;
 };
 
 window.openMicroSchedaModal = function(personaggioId) {
@@ -2543,9 +2555,9 @@ window.openMicroSchedaModal = function(personaggioId) {
                     document.getElementById('microNome').value = data.nome || '';
                     document.getElementById('microPVMax').value = data.punti_vita_max || 10;
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
-                        _microSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1 }));
+                        _microSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1, thirdCaster: !!c.thirdCaster }));
                     } else if (data.classe) {
-                        _microSelectedClasses = [{ nome: data.classe, livello: data.livello || 1 }];
+                        _microSelectedClasses = [{ nome: data.classe, livello: data.livello || 1, thirdCaster: false }];
                     }
                     microRenderClassi();
                 }
@@ -2781,6 +2793,8 @@ async function renderMicroScheda(personaggioId) {
     ${slotsHtml}
     `;
 
+    const backBtn = document.getElementById('schedaBackBtn');
+    if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
 }
 
 window.microHdChange = async function(pgId, key, delta, max) {
