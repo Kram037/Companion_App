@@ -3,13 +3,13 @@
    ============================================================================ */
 
 /* Lock scroll when hub is visible */
-.main-content:has(#labHub:not([style*="display: none"])) { overflow: hidden; }
+.main-content:has(.lab-hub-active) { overflow: hidden; }
 
 /* Hub */
 #labHub {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 64px - 72px - 3rem);
+    height: calc(100svh - 64px - 72px - 3rem);
     overflow: hidden;
 }
 .lab-hub-title {
@@ -539,14 +539,12 @@
 
 @media (max-width: 768px) {
     #labHub {
-        /* header(58) + body pb for toolbar(72) + main-content padding(1rem*2) */
-        height: calc(100dvh - 58px - 72px - 2rem);
+        height: calc(100svh - 58px - 72px - 2rem);
     }
 }
 @media (max-width: 480px) {
     #labHub {
-        /* header(58) + body pb(72) + main-content padding(0.75rem*2) */
-        height: calc(100dvh - 58px - 72px - 1.5rem);
+        height: calc(100svh - 58px - 72px - 1.5rem);
     }
 }
 @media (max-width: 480px) {

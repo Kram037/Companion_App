@@ -76,6 +76,7 @@ function labRenderHub() {
             <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
         </div>
     `).join('');
+    document.getElementById('laboratorioPage')?.classList.add('lab-hub-active');
 }
 
 window.labOpenCategory = function(tab) {
@@ -87,6 +88,8 @@ window.labOpenCategory = function(tab) {
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = 'none';
     if (sub) sub.style.display = '';
+
+    document.getElementById('laboratorioPage')?.classList.remove('lab-hub-active');
 
     const title = document.getElementById('labSubTitle');
     if (title) title.textContent = cat.labelPlural || cat.label;
@@ -106,6 +109,7 @@ window.labBackToHub = function() {
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = '';
     if (sub) sub.style.display = 'none';
+    document.getElementById('laboratorioPage')?.classList.add('lab-hub-active');
 };
 
 async function loadLabContent() {
