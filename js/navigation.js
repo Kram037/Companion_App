@@ -95,7 +95,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             loadCampagne(AppState.currentUser.uid);
         }
     } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
-        loadLabContent();
+        labBackToHub();
     } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
         loadPersonaggi();
     } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {

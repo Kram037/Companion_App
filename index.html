@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/personaggi.css?v=1767901200">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767900400">
-    <link rel="stylesheet" href="css/laboratorio.css?v=1767900400">
+    <link rel="stylesheet" href="css/laboratorio.css?v=1767901300">
 </head>
 <body>
     <!-- Header -->
@@ -128,23 +128,22 @@
         <!-- Laboratorio Page -->
         <section class="page" id="laboratorioPage">
             <div class="page-content">
-                <div class="page-header">
-                    <h1>Laboratorio</h1>
-                    <button class="btn-primary btn-icon" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
+                <!-- Hub view -->
+                <div id="labHub">
+                    <h1 class="lab-hub-title">Laboratorio</h1>
+                    <p class="lab-hub-subtitle">Il tuo mondo, le tue regole</p>
+                    <div class="lab-hub-grid" id="labHubGrid"></div>
                 </div>
-                <div class="lab-tabs" id="labTabs">
-                    <button class="lab-tab active" data-lab="classi">Classi</button>
-                    <button class="lab-tab" data-lab="razze">Razze</button>
-                    <button class="lab-tab" data-lab="background">Background</button>
-                    <button class="lab-tab" data-lab="incantesimi">Incantesimi</button>
-                    <button class="lab-tab" data-lab="nemici">Nemici</button>
-                    <button class="lab-tab" data-lab="talenti">Talenti</button>
-                    <button class="lab-tab" data-lab="oggetti">Oggetti</button>
-                </div>
-                <div id="labContent" class="lab-content">
-                    <div id="laboratorioPlaceholder" class="content-placeholder">
-                        <p>Accedi per creare i tuoi contenuti homebrew</p>
+                <!-- Sub-page view (hidden by default) -->
+                <div id="labSubPage" style="display:none;">
+                    <div class="page-header">
+                        <button class="btn-back" onclick="labBackToHub()" aria-label="Indietro">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <h1 id="labSubTitle">Laboratorio</h1>
+                        <button class="btn-primary btn-icon" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
                     </div>
+                    <div id="labContent" class="lab-content"></div>
                 </div>
             </div>
         </section>
@@ -252,14 +251,12 @@
             </svg>
             <span>Campagne</span>
         </button>
-        <button class="toolbar-btn" data-page="amici" aria-label="Amici">
+        <button class="toolbar-btn" data-page="personaggi" aria-label="Personaggi">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>Amici</span>
+            <span>Personaggi</span>
         </button>
         <button class="toolbar-btn" data-page="laboratorio" aria-label="Laboratorio">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -269,12 +266,14 @@
             </svg>
             <span>Laboratorio</span>
         </button>
-        <button class="toolbar-btn" data-page="personaggi" aria-label="Personaggi">
+        <button class="toolbar-btn" data-page="amici" aria-label="Amici">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>Personaggi</span>
+            <span>Amici</span>
         </button>
     </nav>
 
@@ -926,7 +925,7 @@
     <script src="js/personaggi.js?v=1767901100"></script>
     <script src="js/sessions.js?v=1767900400"></script>
     <script src="js/combat.js?v=1767900400"></script>
-    <script src="js/laboratorio.js?v=1767901200"></script>
+    <script src="js/laboratorio.js?v=1767901300"></script>
     <script src="js/realtime.js?v=1767900400"></script>
     <script src="js/initiative.js?v=1767900400"></script>
     <script src="js/init.js?v=1767900400"></script>

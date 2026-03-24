@@ -9,58 +9,87 @@ const LAB_CATEGORIES = {
     classi: {
         table: 'homebrew_classi',
         label: 'Classe',
+        labelPlural: 'Classi',
         icon: '⚔',
         fields: () => labFieldsClassi()
     },
     razze: {
         table: 'homebrew_razze',
         label: 'Razza',
+        labelPlural: 'Razze',
         icon: '🧬',
         fields: () => labFieldsRazze()
     },
     background: {
         table: 'homebrew_background',
         label: 'Background',
+        labelPlural: 'Background',
         icon: '📜',
         fields: () => labFieldsBackground()
     },
     incantesimi: {
         table: 'homebrew_incantesimi',
         label: 'Incantesimo',
+        labelPlural: 'Incantesimi',
         icon: '✨',
         fields: () => labFieldsIncantesimi()
     },
     nemici: {
         table: 'homebrew_nemici',
         label: 'Nemico',
+        labelPlural: 'Nemici',
         icon: '💀',
         fields: () => labFieldsNemici()
     },
     talenti: {
         table: 'homebrew_talenti',
         label: 'Talento',
+        labelPlural: 'Talenti',
         icon: '⭐',
         fields: () => labFieldsTalenti()
     },
     oggetti: {
         table: 'homebrew_oggetti',
         label: 'Oggetto',
+        labelPlural: 'Oggetti',
         icon: '🎒',
         fields: () => labFieldsOggetti()
     }
 };
 
 // ============================================================================
-// TAB SWITCHING & LOADING
+// HUB & SUB-PAGE NAVIGATION
 // ============================================================================
 
-function labSwitchTab(tab) {
-    _labCurrentTab = tab;
-    document.querySelectorAll('.lab-tab').forEach(t => {
-        t.classList.toggle('active', t.dataset.lab === tab);
-    });
-    loadLabContent();
+function labRenderHub() {
+    const grid = document.getElementById('labHubGrid');
+    if (!grid) return;
+    grid.innerHTML = Object.entries(LAB_CATEGORIES).map(([key, cat]) => `
+        <div class="lab-hub-card" onclick="labOpenCategory('${key}')">
+            <span class="lab-hub-card-icon">${cat.icon}</span>
+            <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
+        </div>
+    `).join('');
 }
+
+window.labOpenCategory = function(tab) {
+    _labCurrentTab = tab;
+    const hub = document.getElementById('labHub');
+    const sub = document.getElementById('labSubPage');
+    if (hub) hub.style.display = 'none';
+    if (sub) sub.style.display = '';
+    const cat = LAB_CATEGORIES[tab];
+    const title = document.getElementById('labSubTitle');
+    if (title) title.textContent = cat ? cat.labelPlural || (cat.label + 'i') : 'Laboratorio';
+    loadLabContent();
+};
+
+window.labBackToHub = function() {
+    const hub = document.getElementById('labHub');
+    const sub = document.getElementById('labSubPage');
+    if (hub) hub.style.display = '';
+    if (sub) sub.style.display = 'none';
+};
 
 async function loadLabContent() {
     const container = document.getElementById('labContent');
@@ -76,6 +105,8 @@ async function loadLabContent() {
     if (!cat) return;
 
     if (!AppState.currentUser?.uid) return;
+
+    container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
 
     const { data, error } = await supabase
         .from(cat.table)
@@ -571,13 +602,7 @@ async function handleSaveHomebrew(e) {
 // ============================================================================
 
 function initLaboratorio() {
-    const tabsContainer = document.getElementById('labTabs');
-    if (tabsContainer) {
-        tabsContainer.addEventListener('click', (e) => {
-            const tab = e.target.closest('.lab-tab');
-            if (tab && tab.dataset.lab) labSwitchTab(tab.dataset.lab);
-        });
-    }
+    labRenderHub();
 
     const addBtn = document.getElementById('addHomebrewBtn');
     if (addBtn) {
