@@ -6,8 +6,8 @@
 #labHub {
     display: flex;
     flex-direction: column;
-    /* 100dvh - header(64) - body padding-bottom for toolbar(72) - main-content padding top+bottom(1.5rem*2) */
     height: calc(100dvh - 64px - 72px - 3rem);
+    overflow: hidden;
 }
 .lab-hub-title {
     text-align: center;
