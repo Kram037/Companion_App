@@ -1094,3 +1094,35 @@
     font-size: 0.75rem;
     color: var(--text-light);
 }
+
+.scheda-custom-res-del {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0 4px;
+    margin-left: 6px;
+    opacity: 0.6;
+    vertical-align: middle;
+}
+.scheda-custom-res-del:hover { opacity: 1; color: #ef4444; }
+
+.custom-res-type-row,
+.custom-res-dice-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.custom-res-type-btn,
+.custom-res-dice-btn {
+    flex: 1;
+    min-width: 50px;
+    text-align: center;
+}
+.custom-res-type-btn.active,
+.custom-res-dice-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}

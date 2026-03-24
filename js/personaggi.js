@@ -1055,15 +1055,35 @@ const SCHEDA_SKILLS = [
 ];
 
 const CLASS_RESOURCES = {
-    'Barbaro': { nome: 'Ire', perLivello: [0,2,2,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,99], fromLevel: 1 },
-    'Bardo': { nome: 'Ispirazioni Bardiche', perLivello: [0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3], usaMod: 'carisma', fromLevel: 1 },
-    'Chierico': { nome: 'Incanalare Divinità', perLivello: [0,0,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3], fromLevel: 2 },
-    'Druido': { nome: 'Forma Selvatica', perLivello: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 2 },
-    'Guerriero': { nome: 'Secondo Vento', perLivello: [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 1 },
-    'Monaco': { nome: 'Punti Ki', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 },
-    'Paladino': { nome: 'Imposizione delle Mani', perLivello: null, hpPool: true, fromLevel: 1 },
-    'Stregone': { nome: 'Punti Stregoneria', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 },
-    'Warlock': { nome: 'Slot del Patto', perLivello: [0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 1 },
+    'Barbaro': [
+        { nome: 'Ire', perLivello: [0,2,2,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,99], fromLevel: 1 }
+    ],
+    'Bardo': [
+        { nome: 'Ispirazioni Bardiche', usaMod: 'carisma', fromLevel: 1 }
+    ],
+    'Chierico': [
+        { nome: 'Incanalare Divinità', perLivello: [0,0,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3], fromLevel: 2 }
+    ],
+    'Druido': [
+        { nome: 'Forma Selvatica', perLivello: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 2 }
+    ],
+    'Guerriero': [
+        { nome: 'Secondo Vento', perLivello: [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 1 },
+        { nome: 'Impeto', perLivello: [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2], fromLevel: 2 }
+    ],
+    'Monaco': [
+        { nome: 'Punti Ki', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 }
+    ],
+    'Paladino': [
+        { nome: 'Imposizione delle Mani', hpPool: true, fromLevel: 1 },
+        { nome: 'Incanalare Divinità', perLivello: [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 3 }
+    ],
+    'Stregone': [
+        { nome: 'Punti Stregoneria', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 }
+    ],
+    'Warlock': [
+        { nome: 'Slot del Patto', perLivello: [0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 1 }
+    ],
 };
 
 const CLASS_SPELL_ABILITY = {
@@ -1180,42 +1200,61 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>`;
         }
 
-        // Class Resources
+        // Class Resources (built-in + custom)
         const classResources = pg.risorse_classe || {};
         let classResourcesHtml = '';
+        const resItems = [];
         if (pg.classi && pg.classi.length > 0) {
-            const resItems = [];
             pg.classi.forEach(c => {
-                const res = CLASS_RESOURCES[c.nome];
-                if (!res || c.livello < res.fromLevel) return;
-                let maxVal;
-                if (res.hpPool) {
-                    maxVal = c.livello * 5;
-                } else if (res.usaMod) {
-                    maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
-                } else if (res.perLivello) {
-                    maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
-                } else { return; }
-                if (maxVal <= 0) return;
-                const key = `${c.nome}_res`;
-                const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
-                resItems.push(`<div class="scheda-hd-row">
-                    <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
-                    <div class="scheda-hd-avail">
-                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
-                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
-                        <span class="scheda-hd-max">/ ${maxVal}</span>
-                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
-                    </div>
-                </div>`);
+                const resList = CLASS_RESOURCES[c.nome];
+                if (!resList) return;
+                resList.forEach((res, rIdx) => {
+                    if (c.livello < res.fromLevel) return;
+                    let maxVal;
+                    if (res.hpPool) {
+                        maxVal = c.livello * 5;
+                    } else if (res.usaMod) {
+                        maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
+                    } else if (res.perLivello) {
+                        maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
+                    } else { return; }
+                    if (maxVal <= 0) return;
+                    const key = rIdx === 0 ? `${c.nome}_res` : `${c.nome}_res_${rIdx}`;
+                    const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
+                    resItems.push(`<div class="scheda-hd-row">
+                        <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
+                        <div class="scheda-hd-avail">
+                            <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
+                            <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                            <span class="scheda-hd-max">/ ${maxVal}</span>
+                            <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
+                        </div>
+                    </div>`);
+                });
             });
-            if (resItems.length > 0) {
-                classResourcesHtml = `<div class="scheda-section">
-                    <div class="scheda-section-title">Risorse di Classe</div>
-                    <div class="scheda-hd-table">${resItems.join('')}</div>
-                </div>`;
-            }
         }
+        const customRes = classResources._custom || [];
+        customRes.forEach((cr, i) => {
+            const current = cr.current != null ? cr.current : cr.max;
+            const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
+            resItems.push(`<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${label}
+                    <button class="scheda-custom-res-del" onclick="schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
+                </span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
+                    <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
+                    <span class="scheda-hd-max">/ ${cr.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},1,${cr.max})">+</button>
+                </div>
+            </div>`);
+        });
+        classResourcesHtml = `<div class="scheda-section">
+            <div class="scheda-section-title">Risorse di Classe
+                <button class="scheda-edit-btn" onclick="schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
+            </div>
+            ${resItems.length > 0 ? `<div class="scheda-hd-table">${resItems.join('')}</div>` : '<span class="scheda-empty">Nessuna risorsa</span>'}
+        </div>`;
 
         // Resistenze & Immunità
         const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
@@ -2097,6 +2136,130 @@ window.schedaClassResChange = function(pgId, key, current, delta, max) {
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 }
 
+window.schedaCustomResChange = function(pgId, index, current, delta, max) {
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    if (newVal === current) return;
+
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._custom) pg.risorse_classe._custom = [];
+    const cr = pg.risorse_classe._custom[index];
+    if (!cr) return;
+    cr.current = newVal;
+
+    const el = document.getElementById(`sCusRes_${index}`);
+    if (el) el.textContent = newVal;
+
+    const row = el?.closest('.scheda-hd-row');
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaCustomResChange('${pgId}',${index},${newVal},-1,${max})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaCustomResChange('${pgId}',${index},${newVal},1,${max})`);
+    }
+
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+}
+
+window.schedaOpenAddCustomRes = function(pgId) {
+    const modalHtml = `
+    <div class="modal active" id="customResModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="schedaCloseCustomResModal()">&times;</button>
+            <h2>Aggiungi Risorsa</h2>
+            <div class="form-group">
+                <label class="form-label">Nome della risorsa</label>
+                <input type="text" id="customResNome" class="form-input" placeholder="Es. Dadi di Superiorità">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo</label>
+                <div class="custom-res-type-row">
+                    <button type="button" class="btn-secondary custom-res-type-btn active" id="crTypePunti" onclick="schedaCrTypeSelect('punti')">Punti</button>
+                    <button type="button" class="btn-secondary custom-res-type-btn" id="crTypeDadi" onclick="schedaCrTypeSelect('dadi')">Dadi</button>
+                </div>
+            </div>
+            <div class="form-group" id="crDadoGroup" style="display:none;">
+                <label class="form-label">Tipo di dado</label>
+                <div class="custom-res-dice-row">
+                    ${['d4','d6','d8','d10','d12'].map(d =>
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${d === 'd8' ? 'active' : ''}" onclick="schedaCrDadoSelect('${d}')">${d}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Utilizzi massimi</label>
+                <input type="number" id="customResMax" class="form-input" min="1" value="1" inputmode="numeric">
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="schedaCloseCustomResModal()">Annulla</button>
+                <button type="button" class="btn-primary" onclick="schedaConfirmCustomRes('${pgId}')">Aggiungi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+    window._crType = 'punti';
+    window._crDado = 'd8';
+}
+
+window.schedaCrTypeSelect = function(tipo) {
+    window._crType = tipo;
+    document.getElementById('crTypePunti')?.classList.toggle('active', tipo === 'punti');
+    document.getElementById('crTypeDadi')?.classList.toggle('active', tipo === 'dadi');
+    document.getElementById('crDadoGroup').style.display = tipo === 'dadi' ? '' : 'none';
+}
+
+window.schedaCrDadoSelect = function(dado) {
+    window._crDado = dado;
+    document.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.toggle('active', b.textContent === dado));
+}
+
+window.schedaConfirmCustomRes = async function(pgId) {
+    const nome = document.getElementById('customResNome')?.value?.trim();
+    if (!nome) { showNotification('Inserisci un nome', 'error'); return; }
+    const max = parseInt(document.getElementById('customResMax')?.value) || 1;
+    const tipo = window._crType || 'punti';
+    const newRes = { nome, tipo, max, current: max };
+    if (tipo === 'dadi') newRes.dado = window._crDado || 'd8';
+
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._custom) pg.risorse_classe._custom = [];
+    pg.risorse_classe._custom.push(newRes);
+
+    await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+    schedaCloseCustomResModal();
+
+    if (pg.tipo_scheda === 'micro') {
+        renderMicroScheda(pgId);
+    } else {
+        renderSchedaPersonaggio(pgId);
+    }
+    showNotification('Risorsa aggiunta');
+}
+
+window.schedaDeleteCustomRes = async function(pgId, index) {
+    const pg = _schedaPgCache;
+    if (!pg?.risorse_classe?._custom) return;
+    pg.risorse_classe._custom.splice(index, 1);
+
+    await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+
+    if (pg.tipo_scheda === 'micro') {
+        renderMicroScheda(pgId);
+    } else {
+        renderSchedaPersonaggio(pgId);
+    }
+    showNotification('Risorsa rimossa');
+}
+
+window.schedaCloseCustomResModal = function() {
+    const modal = document.getElementById('customResModal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
+}
+
 window.openPersonaggioModal = function(personaggioId) {
     editingPersonaggioId = personaggioId || null;
     const form = elements.personaggioForm;
@@ -2679,6 +2842,61 @@ async function renderMicroScheda(personaggioId) {
         </div>`;
     }
 
+    // Micro scheda: class resources
+    const microClassRes = pg.risorse_classe || {};
+    const microResItems = [];
+    if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
+        pg.classi.forEach(c => {
+            const resList = CLASS_RESOURCES[c.nome];
+            if (!resList) return;
+            resList.forEach((res, rIdx) => {
+                if (c.livello < res.fromLevel) return;
+                let maxVal;
+                if (res.hpPool) {
+                    maxVal = c.livello * 5;
+                } else if (res.usaMod) {
+                    maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
+                } else if (res.perLivello) {
+                    maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
+                } else { return; }
+                if (maxVal <= 0) return;
+                const key = rIdx === 0 ? `${c.nome}_res` : `${c.nome}_res_${rIdx}`;
+                const current = Math.min(maxVal, microClassRes[key] != null ? microClassRes[key] : maxVal);
+                microResItems.push(`<div class="scheda-hd-row">
+                    <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
+                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                        <span class="scheda-hd-max">/ ${maxVal}</span>
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
+                    </div>
+                </div>`);
+            });
+        });
+    }
+    const microCustomRes = microClassRes._custom || [];
+    microCustomRes.forEach((cr, i) => {
+        const current = cr.current != null ? cr.current : cr.max;
+        const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
+        microResItems.push(`<div class="scheda-hd-row">
+            <span class="scheda-hd-total">${label}
+                <button class="scheda-custom-res-del" onclick="schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
+            </span>
+            <div class="scheda-hd-avail">
+                <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
+                <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
+                <span class="scheda-hd-max">/ ${cr.max}</span>
+                <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},1,${cr.max})">+</button>
+            </div>
+        </div>`);
+    });
+    const microClassResHtml = `<div class="scheda-section">
+        <div class="scheda-section-title">Risorse di Classe
+            <button class="scheda-edit-btn" onclick="schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
+        </div>
+        ${microResItems.length > 0 ? `<div class="scheda-hd-table">${microResItems.join('')}</div>` : '<span class="scheda-empty">Nessuna risorsa</span>'}
+    </div>`;
+
     const isConcentrating = !!pg.concentrazione;
     const conditionsActive = ALL_CONDITIONS.filter(c => c.key !== 'concentrazione' && pg[c.key]);
     const conditionsHtml = conditionsActive.length > 0 ?
@@ -2766,6 +2984,8 @@ async function renderMicroScheda(personaggioId) {
         <div class="scheda-section-title">Dadi Vita</div>
         ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
     </div>
+
+    ${microClassResHtml}
 
     <div class="scheda-section">
         <div class="scheda-section-title">Condizioni</div>
