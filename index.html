@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/components.css?v=1767900400">
     <link rel="stylesheet" href="css/modals.css?v=1767900400">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
-    <link rel="stylesheet" href="css/personaggi.css?v=1767901000">
+    <link rel="stylesheet" href="css/personaggi.css?v=1767901100">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767900400">
     <link rel="stylesheet" href="css/laboratorio.css?v=1767900400">
@@ -418,7 +418,7 @@
                 <div class="form-group">
                     <label id="rollRequestLabel" for="rollRequestInput">Risultato del tiro:</label>
                     <div class="roll-input-row">
-                        <input type="number" id="rollRequestInput" name="rollRequestInput" required min="1" max="999" placeholder="Inserisci il risultato">
+                        <input type="number" id="rollRequestInput" name="rollRequestInput" required min="1" max="999" placeholder="Inserisci il risultato" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                         <button type="button" class="btn-roll-d20" id="autoRollBtn" title="Tira d20 automaticamente">
                             <div class="roll-d20-wrapper">
                                 <img src="images/icon d20.png" alt="D20" class="roll-d20-img">
@@ -597,7 +597,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgForza">Forza</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgForza" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgForza" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modForza">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveForza"> <span class="pg-save-val" id="saveValForza">+0</span></label>
@@ -605,7 +605,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgIntelligenza">Intelligenza</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgIntelligenza" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modIntelligenza">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveIntelligenza"> <span class="pg-save-val" id="saveValIntelligenza">+0</span></label>
@@ -613,7 +613,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgDestrezza">Destrezza</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgDestrezza" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgDestrezza" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modDestrezza">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveDestrezza"> <span class="pg-save-val" id="saveValDestrezza">+0</span></label>
@@ -621,7 +621,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgSaggezza">Saggezza</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgSaggezza" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgSaggezza" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modSaggezza">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveSaggezza"> <span class="pg-save-val" id="saveValSaggezza">+0</span></label>
@@ -629,7 +629,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgCostituzione">Costituzione</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgCostituzione" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modCostituzione">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveCostituzione"> <span class="pg-save-val" id="saveValCostituzione">+0</span></label>
@@ -637,7 +637,7 @@
                             <div class="pg-ability-block">
                                 <label for="pgCarisma">Carisma</label>
                                 <div class="pg-ability-row">
-                                    <input type="number" id="pgCarisma" class="pg-ability-input" min="1" max="30" value="10">
+                                    <input type="number" id="pgCarisma" class="pg-ability-input" min="1" max="30" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                     <span class="pg-ability-mod" id="modCarisma">+0</span>
                                 </div>
                                 <label class="pg-save-item"><input type="checkbox" id="saveCarisma"> <span class="pg-save-val" id="saveValCarisma">+0</span></label>
@@ -705,23 +705,23 @@
                         <div class="pg-stats-row-3">
                             <div class="form-group pg-stat-with-hint">
                                 <label for="pgCA">CA</label>
-                                <input type="number" id="pgCA" min="1">
+                                <input type="number" id="pgCA" min="1" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                 <span class="pg-stat-hint" id="hintCA">(10+des)</span>
                             </div>
                             <div class="form-group pg-stat-with-hint">
                                 <label for="pgIniziativa">Iniziativa</label>
-                                <input type="number" id="pgIniziativa">
+                                <input type="number" id="pgIniziativa" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                 <span class="pg-stat-hint" id="hintIniziativa">(des)</span>
                             </div>
                             <div class="form-group">
                                 <label for="pgVelocita">Velocità</label>
-                                <input type="number" id="pgVelocita" min="0" step="1.5" value="9">
+                                <input type="number" id="pgVelocita" min="0" step="1.5" value="9" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: var(--spacing-sm);">
                             <label for="pgPV">Punti Ferita Massimi</label>
                             <div class="pg-hp-row">
-                                <input type="number" id="pgPV" min="1" value="10">
+                                <input type="number" id="pgPV" min="1" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                                 <span class="pg-stat-hint" id="hintPV"></span>
                             </div>
                         </div>
@@ -809,7 +809,7 @@
                     </div>
                     <div class="form-group">
                         <label for="microPVMax">PV Massimi</label>
-                        <input type="number" id="microPVMax" min="1" value="10">
+                        <input type="number" id="microPVMax" min="1" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                     </div>
                 </div>
                 <div class="form-actions">
@@ -873,7 +873,7 @@
                 </div>
                 <div class="form-group">
                     <label for="amicoCID">CID</label>
-                    <input type="number" id="amicoCID" name="amicoCID" required placeholder="Inserisci il CID (4 cifre)" min="1000" max="9999">
+                    <input type="number" id="amicoCID" name="amicoCID" required placeholder="Inserisci il CID (4 cifre)" min="1000" max="9999" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                     <small style="color: var(--text-secondary); font-size: 0.85rem;">Il CID è il codice identificativo a 4 cifre dell'utente</small>
                 </div>
                 <div id="searchUserResult" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius-md);">
@@ -923,7 +923,7 @@
     <script src="js/users.js?v=1767900400"></script>
     <script src="js/amici.js?v=1767900400"></script>
     <script src="js/campagne.js?v=1767900400"></script>
-    <script src="js/personaggi.js?v=1767901000"></script>
+    <script src="js/personaggi.js?v=1767901100"></script>
     <script src="js/sessions.js?v=1767900400"></script>
     <script src="js/combat.js?v=1767900400"></script>
     <script src="js/laboratorio.js?v=1767900400"></script>

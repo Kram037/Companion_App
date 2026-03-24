@@ -227,8 +227,8 @@
 .scheda-abilities { display: flex; flex-direction: column; gap: 4px; }
 .scheda-ability { display: grid; grid-template-columns: 80px 48px 36px 1fr; align-items: center; gap: 6px; padding: 4px 0; }
 .scheda-ability-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-.scheda-ability-input { width: 48px; padding: 4px 4px; text-align: center; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; }
-.scheda-ability-input:focus { border-color: var(--accent); outline: none; }
+.scheda-ability-input { width: 48px; padding: 4px 4px; text-align: center; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+.scheda-ability-input:active { border-color: var(--accent); }
 .scheda-ability-mod { font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: center; }
 .scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); transition: background 0.15s; -webkit-tap-highlight-color: transparent; user-select: none; }
 @media (hover: hover) { .scheda-ability-save:hover { background: var(--surface-hover); } }

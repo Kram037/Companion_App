@@ -1022,6 +1022,78 @@ function pgRenderDadiVita() {
     }
 }
 
+// --- Generic numeric keypad for inputs ---
+window.pgOpenAbilityKeypad = function(inputEl) {
+    const existing = document.getElementById('pgKeypadOverlay');
+    if (existing) existing.remove();
+
+    const currentVal = inputEl.value || '0';
+    window._kpTarget = inputEl;
+    window._kpBuffer = currentVal;
+
+    const label = inputEl.closest('.form-group')?.querySelector('label')?.textContent
+              || inputEl.closest('.pg-ability-block')?.querySelector('label')?.textContent
+              || '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'pgKeypadOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="pgCloseKeypad()">&times;</button>
+            <div class="hp-calc-title">${escapeHtml(label)}</div>
+            <div class="hp-calc-input-display" id="kpDisplay">${escapeHtml(currentVal)}</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('⌫')">⌫</button>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="pgKeypadConfirm()">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.pgKeypadInput = function(key) {
+    if (key === 'C') { window._kpBuffer = '0'; }
+    else if (key === '⌫') { window._kpBuffer = window._kpBuffer.length > 1 ? window._kpBuffer.slice(0, -1) : '0'; }
+    else { window._kpBuffer = window._kpBuffer === '0' ? key : window._kpBuffer + key; }
+    const disp = document.getElementById('kpDisplay');
+    if (disp) disp.textContent = window._kpBuffer;
+};
+
+window.pgKeypadConfirm = function() {
+    const input = window._kpTarget;
+    if (input) {
+        const val = parseInt(window._kpBuffer) || 0;
+        input.value = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        if (input.classList.contains('pg-ability-input')) {
+            updateAllAbilityMods();
+        }
+    }
+    pgCloseKeypad();
+};
+
+window.pgCloseKeypad = function() {
+    const o = document.getElementById('pgKeypadOverlay');
+    if (o) o.remove();
+    window._kpTarget = null;
+    window._kpBuffer = '0';
+};
+
 // --- Wizard Navigation ---
 window.pgWizardNext = function() {
     if (pgWizardCurrentStep === 0) {
@@ -1339,7 +1411,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             return `
             <div class="scheda-ability">
                 <div class="scheda-ability-label">${a.full}</div>
-                <input type="number" class="scheda-ability-input" value="${val}" min="1" max="30" data-field="${a.key}" data-pgid="${pg.id}">
+                <div class="scheda-ability-input clickable" id="sAbil_${a.key}" data-field="${a.key}" data-pgid="${pg.id}" onclick="schedaOpenAbilityCalc('${pg.id}','${a.key}')">${val}</div>
                 <div class="scheda-ability-mod" id="sMod_${a.key}">${m}</div>
                 <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}" onclick="schedaToggleSave('${pg.id}','${a.key}')">
                     <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span>
@@ -1574,15 +1646,6 @@ async function renderSchedaPersonaggio(personaggioId) {
         `;
 
         // Wire up editable inputs
-        content.querySelectorAll('.scheda-ability-input').forEach(input => {
-            input.addEventListener('input', () => {
-                const field = input.dataset.field;
-                const val = Math.max(1, Math.min(30, parseInt(input.value) || 10));
-                schedaDebouncedSave(pg.id, field, val);
-                schedaRecalcAbility(field, val, pg.id);
-            });
-        });
-
         const backBtn = document.getElementById('schedaBackBtn');
         if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
 
@@ -2223,23 +2286,75 @@ window.schedaOpenStatCalc = function(pgId, field) {
     document.body.appendChild(overlay);
 };
 
+window.schedaOpenAbilityCalc = function(pgId, abilityKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const currentVal = pg[abilityKey] || 10;
+    const abilityInfo = SCHEDA_ABILITIES.find(a => a.key === abilityKey);
+    const label = abilityInfo ? abilityInfo.full : abilityKey;
+    _hpCalcState = { pgId, field: abilityKey, currentVal, maxVal: -1, inputBuffer: String(currentVal), isAbility: true };
+
+    const existing = document.getElementById('hpCalcOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'hpCalcOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal">
+            <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
+            <div class="hp-calc-title">${escapeHtml(label)}</div>
+            <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span></div>
+            <div class="hp-calc-input-display" id="hpCalcAmountDisplay">${currentVal}</div>
+            <div class="hp-calc-numpad">
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('2')">2</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('3')">3</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('4')">4</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('5')">5</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('6')">6</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('7')">7</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('8')">8</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('9')">9</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
+                <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaStatConfirm()">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
 window.schedaStatConfirm = async function() {
     if (!_hpCalcState) return;
     const newVal = parseInt(_hpCalcState.inputBuffer) || 0;
     const field = _hpCalcState.field;
     const pgId = _hpCalcState.pgId;
+    const pg = _schedaPgCache;
 
-    if (_schedaPgCache) _schedaPgCache[field] = newVal;
+    if (pg) pg[field] = newVal;
 
-    const displayIds = { classe_armatura: 'schedaCA', iniziativa: 'schedaInit' };
-    const el = document.getElementById(displayIds[field]);
-    if (el) {
-        el.textContent = field === 'iniziativa' ? (newVal >= 0 ? '+' + newVal : '' + newVal) : newVal;
-    }
-
-    const supabase = getSupabaseClient();
-    if (supabase) {
-        await supabase.from('personaggi').update({ [field]: newVal, updated_at: new Date().toISOString() }).eq('id', pgId);
+    if (_hpCalcState.isAbility) {
+        const clampedVal = Math.max(1, Math.min(30, newVal));
+        if (pg) pg[field] = clampedVal;
+        const abilEl = document.getElementById(`sAbil_${field}`);
+        if (abilEl) abilEl.textContent = clampedVal;
+        schedaRecalcAbility(field, clampedVal, pgId);
+        await schedaInstantSave(pgId, { [field]: clampedVal });
+        _recalcEquipFromStats(pgId);
+    } else {
+        const displayIds = { classe_armatura: 'schedaCA', iniziativa: 'schedaInit' };
+        const el = document.getElementById(displayIds[field]);
+        if (el) {
+            el.textContent = field === 'iniziativa' ? (newVal >= 0 ? '+' + newVal : '' + newVal) : newVal;
+        }
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            await supabase.from('personaggi').update({ [field]: newVal, updated_at: new Date().toISOString() }).eq('id', pgId);
+        }
     }
     schedaCloseHpCalc();
 };
@@ -2396,7 +2511,7 @@ window.schedaOpenAddCustomRes = function(pgId) {
             </div>
             <div class="form-group">
                 <label class="form-label">Utilizzi massimi</label>
-                <input type="number" id="customResMax" class="form-input" min="1" value="1" inputmode="numeric">
+                <input type="number" id="customResMax" class="form-input" min="1" value="1" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseCustomResModal()">Annulla</button>
@@ -2471,6 +2586,43 @@ window.schedaCloseCustomResModal = function() {
 // =====================================================
 // EQUIPAGGIAMENTO
 // =====================================================
+async function _recalcEquipFromStats(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg || !pg.equipaggiamento || pg.equipaggiamento.length === 0) return;
+    const modFor = calcMod(pg.forza || 10);
+    const modDes = calcMod(pg.destrezza || 10);
+    const totalLevel = (pg.classi || []).reduce((s, c) => s + (c.livello || 1), 0) || pg.livello || 1;
+    const profBonus = calcBonusCompetenza(totalLevel);
+    let changed = false;
+    pg.equipaggiamento.forEach(e => {
+        if (e.tipo === 'arma') {
+            const armaRef = DND_ARMI.find(a => a.nome === e.nome);
+            const isFinesse = e.proprieta?.some(p => p.includes('Accurata'));
+            const isRanged = armaRef ? armaRef.cat.includes('distanza') : e.proprieta?.some(p => p.includes('Munizioni'));
+            const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
+            const magic = e.magic_bonus || 0;
+            const newColpire = profBonus + atkMod + magic;
+            const newDanno = atkMod + magic;
+            if (e.bonus_colpire !== newColpire || e.bonus_danno !== newDanno) {
+                e.bonus_colpire = newColpire;
+                e.bonus_danno = newDanno;
+                changed = true;
+            }
+        }
+    });
+    const newCA = calcCAFromEquip(pg);
+    if (pg.classe_armatura !== newCA) {
+        pg.classe_armatura = newCA;
+        changed = true;
+        const caEl = document.getElementById('schedaCA');
+        if (caEl) caEl.textContent = newCA;
+    }
+    if (changed) {
+        await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: pg.classe_armatura });
+        renderSchedaPersonaggio(pgId);
+    }
+}
+
 function formatEquipName(e) {
     const magic = e.magic_bonus ? ` +${e.magic_bonus}` : '';
     return escapeHtml(e.nome) + magic;
@@ -2716,7 +2868,7 @@ window.schedaEditEquip = function(pgId, index) {
                 <label class="form-label">Bonus Magico</label>
                 <div class="custom-res-dice-row">
                     ${[0,1,2,3].map(b =>
-                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'Nessuno' : '+' + b}</button>`
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
                     ).join('')}
                 </div>
             </div>
@@ -3774,7 +3926,7 @@ window.microOpenSlotConfig = async function(pgId) {
         const maxVal = slots[lv]?.max || 0;
         rows += `<div class="micro-slot-config-row">
             <span>${lv}° Livello</span>
-            <input type="number" min="0" max="20" value="${maxVal}" id="microSlotMax_${lv}" class="form-control" style="width:60px;text-align:center;">
+            <input type="number" min="0" max="20" value="${maxVal}" id="microSlotMax_${lv}" class="form-control" style="width:60px;text-align:center;" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
         </div>`;
     }
 
