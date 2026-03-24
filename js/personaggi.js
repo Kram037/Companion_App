@@ -1044,29 +1044,22 @@ function pgWizardGoTo(step) {
         const cos = parseInt(document.getElementById('pgCostituzione')?.value) || 10;
         const sag = parseInt(document.getElementById('pgSaggezza')?.value) || 10;
         const desMod = calcMod(des);
-        const cosMod = calcMod(cos);
-        const sagMod = calcMod(sag);
 
         const initField = document.getElementById('pgIniziativa');
         if (initField && !initField.value) {
             initField.value = desMod;
         }
 
-        const classNames = pgSelectedClasses.map(c => c.nome);
-        let caBase, caHint;
-        if (classNames.includes('Barbaro')) {
-            caBase = 10 + desMod + cosMod;
-            caHint = `(10+des+cos = ${caBase})`;
-        } else if (classNames.includes('Monaco')) {
-            caBase = 10 + desMod + sagMod;
-            caHint = `(10+des+sag = ${caBase})`;
-        } else {
-            caBase = 10 + desMod;
-            caHint = `(10+des = ${caBase})`;
-        }
+        const fakePg = {
+            destrezza: des, costituzione: cos, saggezza: sag,
+            classi: pgSelectedClasses, equipaggiamento: pgSelectedEquipment
+        };
+        const caBase = calcCAFromEquip(fakePg);
+        const breakdownLines = getCABreakdown(fakePg);
+        const caHint = `(${breakdownLines.join(' | ')})`;
 
         const caField = document.getElementById('pgCA');
-        if (caField && !caField.value) caField.value = caBase;
+        if (caField) caField.value = caBase;
         const hintCA = document.getElementById('hintCA');
         if (hintCA) hintCA.textContent = caHint;
         const hintInit = document.getElementById('hintIniziativa');
@@ -2153,6 +2146,12 @@ window.schedaOpenStatCalc = function(pgId, field) {
     const labels = { classe_armatura: 'Classe Armatura', iniziativa: 'Iniziativa' };
     const label = labels[field] || field;
 
+    let breakdownHtml = '';
+    if (field === 'classe_armatura' && _schedaPgCache) {
+        const lines = getCABreakdown(_schedaPgCache);
+        breakdownHtml = `<div class="ca-breakdown">${lines.map(l => `<div class="ca-breakdown-line">${escapeHtml(l)}</div>`).join('')}</div>`;
+    }
+
     const existing = document.getElementById('hpCalcOverlay');
     if (existing) existing.remove();
 
@@ -2163,6 +2162,7 @@ window.schedaOpenStatCalc = function(pgId, field) {
         <div class="hp-calc-modal">
             <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
+            ${breakdownHtml}
             <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span></div>
             <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
             <div class="hp-calc-numpad">
@@ -2473,6 +2473,63 @@ function buildEquipSection(pg) {
     </div>`;
 }
 
+function calcCAFromEquip(pg) {
+    const equip = pg.equipaggiamento || [];
+    const desMod = calcMod(pg.destrezza || 10);
+    const armor = equip.find(e => e.tipo === 'armatura');
+    const shield = equip.find(e => e.tipo === 'scudo');
+    let ca;
+    if (armor) {
+        if (armor.mod_des) {
+            const desBonus = armor.max_des < 99 ? Math.min(desMod, armor.max_des) : desMod;
+            ca = armor.ca_base + desBonus;
+        } else {
+            ca = armor.ca_base;
+        }
+    } else {
+        const classNames = (pg.classi || []).map(c => c.nome);
+        if (classNames.includes('Barbaro')) {
+            ca = 10 + desMod + calcMod(pg.costituzione || 10);
+        } else if (classNames.includes('Monaco')) {
+            ca = 10 + desMod + calcMod(pg.saggezza || 10);
+        } else {
+            ca = 10 + desMod;
+        }
+    }
+    if (shield) ca += shield.ca_base;
+    return ca;
+}
+
+function getCABreakdown(pg) {
+    const equip = pg.equipaggiamento || [];
+    const desMod = calcMod(pg.destrezza || 10);
+    const armor = equip.find(e => e.tipo === 'armatura');
+    const shield = equip.find(e => e.tipo === 'scudo');
+    const lines = [];
+    if (armor) {
+        let desc = `${armor.nome}: ${armor.ca_base}`;
+        if (armor.mod_des) {
+            const desBonus = armor.max_des < 99 ? Math.min(desMod, armor.max_des) : desMod;
+            const maxNote = armor.max_des < 99 ? ` (max ${armor.max_des})` : '';
+            desc += ` + Des ${desBonus >= 0 ? '+' : ''}${desBonus}${maxNote}`;
+        }
+        lines.push(desc);
+    } else {
+        const classNames = (pg.classi || []).map(c => c.nome);
+        if (classNames.includes('Barbaro')) {
+            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod} + Cos ${calcMod(pg.costituzione || 10) >= 0 ? '+' : ''}${calcMod(pg.costituzione || 10)}`);
+        } else if (classNames.includes('Monaco')) {
+            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod} + Sag ${calcMod(pg.saggezza || 10) >= 0 ? '+' : ''}${calcMod(pg.saggezza || 10)}`);
+        } else {
+            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod}`);
+        }
+    }
+    if (shield) {
+        lines.push(`${shield.nome}: +${shield.ca_base}`);
+    }
+    return lines;
+}
+
 window.schedaOpenAddEquip = function(pgId) {
     const ARMA_CATS = {
         'semplice_mischia': 'Armi da Mischia Semplici',
@@ -2511,11 +2568,6 @@ window.schedaOpenAddEquip = function(pgId) {
                 ${armiHtml}
                 <div class="form-section-label" style="font-size:1.1rem;margin-top:16px;margin-bottom:4px;">Armature</div>
                 ${armatureHtml}
-                <div class="form-section-label" style="font-size:1.1rem;margin-top:16px;margin-bottom:4px;">Oggetto Personalizzato</div>
-                <div class="form-group" style="margin:8px 0;">
-                    <input type="text" id="customEquipNome" class="form-input" placeholder="Nome oggetto">
-                </div>
-                <button type="button" class="btn-primary btn-small" onclick="schedaAddCustomEquip('${pgId}')">Aggiungi oggetto</button>
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
@@ -2556,36 +2608,37 @@ window.schedaAddArmatura = async function(pgId, nome) {
     const pg = _schedaPgCache;
     if (!pg) return;
     if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    if (arm.cat !== 'scudo') {
+        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.tipo !== 'armatura');
+    } else {
+        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.tipo !== 'scudo');
+    }
     pg.equipaggiamento.push({
         nome: arm.nome, tipo: arm.cat === 'scudo' ? 'scudo' : 'armatura',
         ca_base: arm.ca_base, categoria: arm.cat, mod_des: arm.mod_des, max_des: arm.max_des
     });
-    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    const newCA = calcCAFromEquip(pg);
+    pg.classe_armatura = newCA;
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA });
     renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
-    showNotification(`${arm.nome} aggiunta`);
-}
-
-window.schedaAddCustomEquip = async function(pgId) {
-    const nome = document.getElementById('customEquipNome')?.value?.trim();
-    if (!nome) { showNotification('Inserisci un nome', 'error'); return; }
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    if (!pg.equipaggiamento) pg.equipaggiamento = [];
-    pg.equipaggiamento.push({ nome, tipo: 'altro' });
-    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
-    renderSchedaPersonaggio(pgId);
-    document.getElementById('equipModal')?.remove();
-    document.body.style.overflow = '';
-    showNotification(`${nome} aggiunto`);
+    showNotification(`${arm.nome} equipaggiata — CA: ${newCA}`);
 }
 
 window.schedaRemoveEquip = async function(pgId, index) {
     const pg = _schedaPgCache;
     if (!pg?.equipaggiamento) return;
+    const removed = pg.equipaggiamento[index];
     pg.equipaggiamento.splice(index, 1);
-    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    const isArmor = removed?.tipo === 'armatura' || removed?.tipo === 'scudo';
+    const updates = { equipaggiamento: pg.equipaggiamento };
+    if (isArmor) {
+        const newCA = calcCAFromEquip(pg);
+        pg.classe_armatura = newCA;
+        updates.classe_armatura = newCA;
+    }
+    await schedaInstantSave(pgId, updates);
     renderSchedaPersonaggio(pgId);
     showNotification('Oggetto rimosso');
 }

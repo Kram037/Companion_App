@@ -1095,6 +1095,26 @@
     color: var(--text-light);
 }
 
+.ca-breakdown {
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 8px 0 4px;
+    font-size: 0.85rem;
+}
+.ca-breakdown-line {
+    padding: 3px 0;
+    color: var(--text-secondary, #ccc);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.ca-breakdown-line::before {
+    content: '•';
+    color: var(--accent);
+    font-weight: 700;
+}
+
 .scheda-equip-table {
     width: 100%;
     border-collapse: collapse;
