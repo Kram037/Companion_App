@@ -6,8 +6,8 @@
 #labHub {
     display: flex;
     flex-direction: column;
-    /* fill available viewport: 100dvh minus header(64) + toolbar(64) + main-content padding(2*1.5rem=48px) */
-    height: calc(100dvh - 64px - 64px - 3rem);
+    /* 100dvh - header(64) - body padding-bottom for toolbar(72) - main-content padding top+bottom(1.5rem*2) */
+    height: calc(100dvh - 64px - 72px - 3rem);
 }
 .lab-hub-title {
     text-align: center;
@@ -536,7 +536,14 @@
 
 @media (max-width: 768px) {
     #labHub {
-        height: calc(100dvh - 58px - 60px - 1.5rem);
+        /* header(58) + body pb for toolbar(72) + main-content padding(1rem*2) */
+        height: calc(100dvh - 58px - 72px - 2rem);
+    }
+}
+@media (max-width: 480px) {
+    #labHub {
+        /* header(58) + body pb(72) + main-content padding(0.75rem*2) */
+        height: calc(100dvh - 58px - 72px - 1.5rem);
     }
 }
 @media (max-width: 480px) {
