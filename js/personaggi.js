@@ -6,6 +6,9 @@ let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
 let pgSelectedClasses = [];
 let pgSelectedEquipment = [];
+let _pgRaceSkills = [];
+let _pgBgSkills = [];
+let _pgRaceResistances = [];
 
 // =====================================================
 // FONTI APPROVATE:
@@ -519,14 +522,22 @@ window.pgOpenRazzaSelect = function() {
             document.getElementById('pgRazza').value = value;
             const btn = document.getElementById('pgRazzaBtn');
             if (btn) btn.textContent = value;
+
+            _pgRaceSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
+            _pgRaceResistances.forEach(r => { const i = pgCurrentResistenze.indexOf(r); if (i >= 0) pgCurrentResistenze.splice(i, 1); });
+            _pgRaceSkills = [];
+            _pgRaceResistances = [];
+
             const data = getRaceData(value);
             if (data) {
                 const velField = document.getElementById('pgVelocita');
                 if (velField) velField.value = data.velocita || 9;
                 if (data.resistenze && data.resistenze.length > 0) {
+                    _pgRaceResistances = [...data.resistenze];
                     data.resistenze.forEach(r => { if (!pgCurrentResistenze.includes(r)) pgCurrentResistenze.push(r); });
                 }
                 if (data.competenze_abilita && data.competenze_abilita.length > 0) {
+                    _pgRaceSkills = [...data.competenze_abilita];
                     data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
                 }
             }
@@ -542,8 +553,13 @@ window.pgOpenBackgroundSelect = function() {
             document.getElementById('pgBackground').value = value;
             const btn = document.getElementById('pgBackgroundBtn');
             if (btn) btn.textContent = value;
+
+            _pgBgSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
+            _pgBgSkills = [];
+
             const data = getBackgroundData(value);
             if (data && data.competenze_abilita && data.competenze_abilita.length > 0) {
+                _pgBgSkills = [...data.competenze_abilita];
                 data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
             }
         },
@@ -2769,6 +2785,9 @@ window.openPersonaggioModal = function(personaggioId) {
     pgCurrentSlotIncantesimo = {};
     pgCurrentTalenti = [];
     pgSelectedEquipment = [];
+    _pgRaceSkills = [];
+    _pgBgSkills = [];
+    _pgRaceResistances = [];
     pgRenderClassi();
     pgWizardGoTo(0);
 
