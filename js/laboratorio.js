@@ -54,6 +54,12 @@ const LAB_CATEGORIES = {
         labelPlural: 'Oggetti',
         icon: '🎒',
         fields: () => labFieldsOggetti()
+    },
+    impostazioni: {
+        label: 'Impostazioni',
+        labelPlural: 'Impostazioni',
+        icon: '⚙',
+        isSettings: true
     }
 };
 
@@ -74,14 +80,25 @@ function labRenderHub() {
 
 window.labOpenCategory = function(tab) {
     _labCurrentTab = tab;
+    const cat = LAB_CATEGORIES[tab];
+    if (!cat) return;
+
     const hub = document.getElementById('labHub');
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = 'none';
     if (sub) sub.style.display = '';
-    const cat = LAB_CATEGORIES[tab];
+
     const title = document.getElementById('labSubTitle');
-    if (title) title.textContent = cat ? cat.labelPlural || (cat.label + 'i') : 'Laboratorio';
-    loadLabContent();
+    if (title) title.textContent = cat.labelPlural || cat.label;
+
+    const addBtn = document.getElementById('addHomebrewBtn');
+    if (addBtn) addBtn.style.display = cat.isSettings ? 'none' : '';
+
+    if (cat.isSettings) {
+        labRenderSettings();
+    } else {
+        loadLabContent();
+    }
 };
 
 window.labBackToHub = function() {
@@ -596,6 +613,92 @@ async function handleSaveHomebrew(e) {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea'; }
     }
 }
+
+// ============================================================================
+// SETTINGS PAGE
+// ============================================================================
+
+async function labRenderSettings() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) {
+        container.innerHTML = '<div class="lab-empty">Accedi per gestire le impostazioni</div>';
+        return;
+    }
+
+    container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const userData = await findUserByUid(AppState.currentUser.uid);
+    if (!userData) { container.innerHTML = '<div class="lab-empty">Errore</div>'; return; }
+
+    const hbSettings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    const isEnabled = hbSettings.enabled !== false;
+
+    const { data: amici } = await supabase.rpc('get_amici');
+    const amiciList = amici || [];
+
+    const amiciHtml = amiciList.length > 0 ? amiciList.map(a => {
+        const checked = (hbSettings.amici_abilitati || []).includes(a.amico_id) ? 'checked' : '';
+        return `<label class="lab-settings-friend">
+            <input type="checkbox" value="${a.amico_id}" ${checked} onchange="labToggleFriendHb(this)">
+            <span>${escapeHtml(a.nome_utente || 'Amico')}${a.cid ? ' #' + a.cid : ''}</span>
+        </label>`;
+    }).join('') : '<p class="lab-empty" style="padding:8px 0;">Nessun amico aggiunto</p>';
+
+    container.innerHTML = `
+    <div class="lab-settings">
+        <div class="lab-settings-section">
+            <div class="lab-settings-row">
+                <span class="lab-settings-label">Mostra contenuti homebrew</span>
+                <label class="lab-toggle">
+                    <input type="checkbox" id="labHbEnabled" ${isEnabled ? 'checked' : ''} onchange="labToggleHbEnabled(this)">
+                    <span class="lab-toggle-slider"></span>
+                </label>
+            </div>
+            <p class="lab-settings-hint">Quando attivo, i contenuti homebrew tuoi e degli amici selezionati saranno visibili durante la creazione dei personaggi.</p>
+        </div>
+
+        <div class="lab-settings-section">
+            <div class="lab-settings-section-title">Homebrew degli amici</div>
+            <p class="lab-settings-hint">Seleziona gli amici di cui vuoi visualizzare i contenuti homebrew.</p>
+            <div class="lab-settings-friends" id="labFriendsList">
+                ${amiciHtml}
+            </div>
+        </div>
+    </div>`;
+}
+
+window.labToggleHbEnabled = async function(cb) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) return;
+    const settings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    settings.enabled = cb.checked;
+    await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
+    userData.homebrew_settings = settings;
+    showNotification(cb.checked ? 'Homebrew attivato' : 'Homebrew disattivato');
+};
+
+window.labToggleFriendHb = async function(cb) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) return;
+    const settings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    if (!settings.amici_abilitati) settings.amici_abilitati = [];
+    const friendId = cb.value;
+    if (cb.checked) {
+        if (!settings.amici_abilitati.includes(friendId)) settings.amici_abilitati.push(friendId);
+    } else {
+        settings.amici_abilitati = settings.amici_abilitati.filter(id => id !== friendId);
+    }
+    await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
+    userData.homebrew_settings = settings;
+    showNotification('Impostazioni aggiornate');
+};
 
 // ============================================================================
 // INIT BINDINGS (called from init.js)
