@@ -75,13 +75,12 @@ async function loadLabContent() {
     const cat = LAB_CATEGORIES[_labCurrentTab];
     if (!cat) return;
 
-    const userData = await findUserByUid(AppState.currentUser?.uid);
-    if (!userData) return;
+    if (!AppState.currentUser?.id) return;
 
     const { data, error } = await supabase
         .from(cat.table)
         .select('*')
-        .eq('user_id', userData.id)
+        .eq('user_id', AppState.currentUser.id)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -484,8 +483,7 @@ async function handleSaveHomebrew(e) {
     const nome = document.getElementById('hbNome')?.value?.trim();
     if (!nome) { showNotification('Inserisci un nome'); return; }
 
-    const userData = await findUserByUid(AppState.currentUser?.uid);
-    if (!userData) { showNotification('Errore: utente non trovato'); return; }
+    if (!AppState.currentUser?.id) { showNotification('Errore: utente non trovato'); return; }
 
     const saveBtn = document.getElementById('saveHomebrewBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
@@ -553,7 +551,7 @@ async function handleSaveHomebrew(e) {
             if (error) throw error;
             showNotification(`${cat.label} aggiornato`);
         } else {
-            record.user_id = userData.id;
+            record.user_id = AppState.currentUser.id;
             const { error } = await supabase.from(cat.table).insert(record);
             if (error) throw error;
             showNotification(`${cat.label} creato`);
