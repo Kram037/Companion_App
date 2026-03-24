@@ -194,20 +194,34 @@ const DND_ARMATURE = [
     { nome:'Scudo', cat:'scudo', ca_base:2, mod_des:false, max_des:0, forza:0, furtivita:null },
 ];
 
-const DND_COMPETENZE_STRUMENTI = [
-    'Arnesi da Falsario','Arnesi da Scasso','Borsa da Erborista',
-    'Sostanze da Avvelenatore','Trucchi per il Camuffamento','Strumenti da Navigatore',
-    'Strumenti da Alchimista','Strumenti da Calligrafo','Strumenti da Calzolaio',
-    'Strumenti da Cartografo','Strumenti da Conciatore','Strumenti da Costruttore',
-    'Strumenti da Fabbro','Strumenti da Falegname','Strumenti da Gioielliere',
-    'Strumenti da Intagliatore','Strumenti da Inventore','Strumenti da Pittore',
-    'Strumenti da Soffiatore','Strumenti da Tessitore','Strumenti da Vasaio',
-    'Utensili da Cuoco','Strumenti da Mescitore',
-    'Ciaramella','Cornamusa','Corno','Dulcimer','Flauto','Flauto di Pan',
-    'Lira','Liuto','Tamburo','Viola',
-    'Dadi','Mazzo di Carte','Scacchi dei Draghi','Tre Draghi al Buio',
-    'Veicoli Terrestri','Veicoli Acquatici'
-];
+const DND_COMPETENZE_STRUMENTI_GROUPED = {
+    'Arnesi e Strumenti': {
+        items: [
+            'Arnesi da Falsario','Arnesi da Scasso','Borsa da Erborista',
+            'Sostanze da Avvelenatore','Trucchi per il Camuffamento','Strumenti da Navigatore',
+            'Strumenti da Alchimista','Strumenti da Calligrafo','Strumenti da Calzolaio',
+            'Strumenti da Cartografo','Strumenti da Conciatore','Strumenti da Costruttore',
+            'Strumenti da Fabbro','Strumenti da Falegname','Strumenti da Gioielliere',
+            'Strumenti da Intagliatore','Strumenti da Inventore','Strumenti da Pittore',
+            'Strumenti da Soffiatore','Strumenti da Tessitore','Strumenti da Vasaio',
+            'Utensili da Cuoco','Strumenti da Mescitore'
+        ],
+        allowMastery: true
+    },
+    'Strumenti Musicali': {
+        items: ['Ciaramella','Cornamusa','Corno','Dulcimer','Flauto','Flauto di Pan','Lira','Liuto','Tamburo','Viola'],
+        allowMastery: false
+    },
+    'Giochi': {
+        items: ['Dadi','Mazzo di Carte','Scacchi dei Draghi','Tre Draghi al Buio'],
+        allowMastery: false
+    },
+    'Veicoli': {
+        items: ['Veicoli Terrestri','Veicoli Acquatici'],
+        allowMastery: false
+    }
+};
+const DND_COMPETENZE_STRUMENTI = Object.values(DND_COMPETENZE_STRUMENTI_GROUPED).flatMap(g => g.items);
 
 // Talenti from PHB, XGtE, TCoE
 const DND_TALENTI = [
@@ -1072,12 +1086,12 @@ function pgWizardGoTo(step) {
         };
         const caBase = calcCAFromEquip(fakePg);
         const breakdownLines = getCABreakdown(fakePg);
-        const caHint = `(${breakdownLines.join(' | ')})`;
+        const caHint = breakdownLines.join(' | ');
 
         const caField = document.getElementById('pgCA');
         if (caField) caField.value = caBase;
         const hintCA = document.getElementById('hintCA');
-        if (hintCA) hintCA.textContent = caHint;
+        if (hintCA) hintCA.innerHTML = caHint;
         const hintInit = document.getElementById('hintIniziativa');
         if (hintInit) hintInit.textContent = `(des = ${formatModPlain(desMod)})`;
 
@@ -1232,6 +1246,11 @@ const SCHEDA_SKILLS = [
 ];
 
 const CLASS_RESOURCES = {
+    'Artefice': [
+        { nome: 'Invenzione Magica', usaMod: 'intelligenza', fromLevel: 1 },
+        { nome: 'Infondere negli Oggetti', perLivello: [0,0,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6], fromLevel: 2 },
+        { nome: 'Lampo di Genio', usaMod: 'intelligenza', fromLevel: 7 }
+    ],
     'Barbaro': [
         { nome: 'Ire', perLivello: [0,2,2,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,99], fromLevel: 1 }
     ],
@@ -1245,8 +1264,9 @@ const CLASS_RESOURCES = {
         { nome: 'Forma Selvatica', perLivello: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 2 }
     ],
     'Guerriero': [
-        { nome: 'Secondo Vento', perLivello: [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 1 },
-        { nome: 'Impeto', perLivello: [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2], fromLevel: 2 }
+        { nome: 'Recuperare Energie', perLivello: [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], fromLevel: 1 },
+        { nome: 'Azione Impetuosa', perLivello: [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2], fromLevel: 2 },
+        { nome: 'Indomito', perLivello: [0,0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3], fromLevel: 9 }
     ],
     'Monaco': [
         { nome: 'Punti Ki', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 }
@@ -2165,7 +2185,7 @@ window.schedaOpenStatCalc = function(pgId, field) {
     let breakdownHtml = '';
     if (field === 'classe_armatura' && _schedaPgCache) {
         const lines = getCABreakdown(_schedaPgCache);
-        breakdownHtml = `<div class="ca-breakdown">${lines.map(l => `<div class="ca-breakdown-line">${escapeHtml(l)}</div>`).join('')}</div>`;
+        breakdownHtml = `<div class="ca-breakdown">${lines.map(l => `<div class="ca-breakdown-line">${l}</div>`).join('')}</div>`;
     }
 
     const existing = document.getElementById('hpCalcOverlay');
@@ -2451,24 +2471,33 @@ window.schedaCloseCustomResModal = function() {
 // =====================================================
 // EQUIPAGGIAMENTO
 // =====================================================
+function formatEquipName(e) {
+    const magic = e.magic_bonus ? ` +${e.magic_bonus}` : '';
+    return escapeHtml(e.nome) + magic;
+}
+
 function buildEquipSection(pg) {
     const equip = pg.equipaggiamento || [];
     const armiRows = equip.filter(e => e.tipo === 'arma').map((e, i) => {
+        const idx = equip.indexOf(e);
         const bonus = e.bonus_colpire != null ? (e.bonus_colpire >= 0 ? `+${e.bonus_colpire}` : e.bonus_colpire) : '-';
-        const danno = e.danni || '-';
+        const dmgBonus = e.bonus_danno || 0;
+        const dannoStr = e.danni ? `${e.danni}${dmgBonus !== 0 ? (dmgBonus > 0 ? '+' + dmgBonus : dmgBonus) : ''}` : '-';
         return `<tr>
-            <td>${escapeHtml(e.nome)}</td>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
             <td class="text-center">${bonus}</td>
-            <td class="text-center">${danno} ${e.tipo_danno ? escapeHtml(e.tipo_danno.slice(0,3)) + '.' : ''}</td>
-            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${equip.indexOf(e)})">✕</button></td>
+            <td class="text-center">${dannoStr} ${e.tipo_danno ? escapeHtml(e.tipo_danno.slice(0,3)) + '.' : ''}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
         </tr>`;
     }).join('');
     const armaturaItems = equip.filter(e => e.tipo === 'armatura' || e.tipo === 'scudo');
     const armaturaRows = armaturaItems.map(e => {
         const idx = equip.indexOf(e);
+        const totalCA = (e.ca_base || 0) + (e.magic_bonus || 0);
+        const magicStr = e.magic_bonus ? ` (+${e.magic_bonus})` : '';
         return `<tr>
-            <td>${escapeHtml(e.nome)}</td>
-            <td class="text-center">${e.ca_base || '-'}</td>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
+            <td class="text-center">${totalCA}${magicStr}</td>
             <td class="text-center">${e.categoria || '-'}</td>
             <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
         </tr>`;
@@ -2512,8 +2541,14 @@ function calcCAFromEquip(pg) {
             ca = 10 + desMod;
         }
     }
-    if (shield) ca += shield.ca_base;
+    if (armor?.magic_bonus) ca += armor.magic_bonus;
+    if (shield) ca += shield.ca_base + (shield.magic_bonus || 0);
     return ca;
+}
+
+function _caModStr(val, statLabel) {
+    const sign = val >= 0 ? '+' : '';
+    return `${sign}${val} <span class="ca-stat-label">(${statLabel})</span>`;
 }
 
 function getCABreakdown(pg) {
@@ -2523,25 +2558,30 @@ function getCABreakdown(pg) {
     const shield = equip.find(e => e.tipo === 'scudo');
     const lines = [];
     if (armor) {
-        let desc = `${armor.nome}: ${armor.ca_base}`;
+        const magic = armor.magic_bonus ? ` +${armor.magic_bonus} <span class="ca-stat-label">(magico)</span>` : '';
+        let desc = `${escapeHtml(armor.nome)}: ${armor.ca_base}`;
         if (armor.mod_des) {
             const desBonus = armor.max_des < 99 ? Math.min(desMod, armor.max_des) : desMod;
-            const maxNote = armor.max_des < 99 ? ` (max ${armor.max_des})` : '';
-            desc += ` + Des ${desBonus >= 0 ? '+' : ''}${desBonus}${maxNote}`;
+            const maxNote = armor.max_des < 99 ? ` max ${armor.max_des}` : '';
+            desc += ` ${_caModStr(desBonus, 'des' + maxNote)}`;
         }
+        desc += magic;
         lines.push(desc);
     } else {
         const classNames = (pg.classi || []).map(c => c.nome);
         if (classNames.includes('Barbaro')) {
-            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod} + Cos ${calcMod(pg.costituzione || 10) >= 0 ? '+' : ''}${calcMod(pg.costituzione || 10)}`);
+            const cosMod = calcMod(pg.costituzione || 10);
+            lines.push(`Senza armatura: 10 ${_caModStr(desMod, 'des')} ${_caModStr(cosMod, 'cos')}`);
         } else if (classNames.includes('Monaco')) {
-            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod} + Sag ${calcMod(pg.saggezza || 10) >= 0 ? '+' : ''}${calcMod(pg.saggezza || 10)}`);
+            const sagMod = calcMod(pg.saggezza || 10);
+            lines.push(`Senza armatura: 10 ${_caModStr(desMod, 'des')} ${_caModStr(sagMod, 'sag')}`);
         } else {
-            lines.push(`Senza armatura: 10 + Des ${desMod >= 0 ? '+' : ''}${desMod}`);
+            lines.push(`Senza armatura: 10 ${_caModStr(desMod, 'des')}`);
         }
     }
     if (shield) {
-        lines.push(`${shield.nome}: +${shield.ca_base}`);
+        const shieldMagic = shield.magic_bonus ? ` +${shield.magic_bonus} <span class="ca-stat-label">(magico)</span>` : '';
+        lines.push(`${escapeHtml(shield.nome)}: +${shield.ca_base}${shieldMagic}`);
     }
     return lines;
 }
@@ -2659,25 +2699,108 @@ window.schedaRemoveEquip = async function(pgId, index) {
     showNotification('Oggetto rimosso');
 }
 
+window.schedaEditEquip = function(pgId, index) {
+    const pg = _schedaPgCache;
+    if (!pg?.equipaggiamento?.[index]) return;
+    const e = pg.equipaggiamento[index];
+    const currentBonus = e.magic_bonus || 0;
+    const isArma = e.tipo === 'arma';
+
+    const modalHtml = `
+    <div class="modal active" id="editEquipModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">&times;</button>
+            <h2>${formatEquipName(e)}</h2>
+            ${e.proprieta ? `<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:12px;">${e.proprieta.join(', ')}</p>` : ''}
+            <div class="form-group">
+                <label class="form-label">Bonus Magico</label>
+                <div class="custom-res-dice-row">
+                    ${[0,1,2,3].map(b =>
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'Nessuno' : '+' + b}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+}
+
+window.schedaSetMagicBonus = async function(pgId, index, bonus) {
+    const pg = _schedaPgCache;
+    if (!pg?.equipaggiamento?.[index]) return;
+    const e = pg.equipaggiamento[index];
+    const oldBonus = e.magic_bonus || 0;
+    e.magic_bonus = bonus;
+
+    if (e.tipo === 'arma') {
+        e.bonus_colpire = (e.bonus_colpire || 0) - oldBonus + bonus;
+        e.bonus_danno = (e.bonus_danno || 0) - oldBonus + bonus;
+    }
+
+    const updates = { equipaggiamento: pg.equipaggiamento };
+    if (e.tipo === 'armatura' || e.tipo === 'scudo') {
+        const newCA = calcCAFromEquip(pg);
+        pg.classe_armatura = newCA;
+        updates.classe_armatura = newCA;
+    }
+
+    await schedaInstantSave(pgId, updates);
+    document.getElementById('editEquipModal')?.remove();
+    document.body.style.overflow = '';
+    renderSchedaPersonaggio(pgId);
+    showNotification(`${e.nome} ${bonus > 0 ? '+' + bonus : ''} aggiornato`);
+}
+
 // =====================================================
 // LINGUAGGI E COMPETENZE
 // =====================================================
+function _parseToolEntry(t) {
+    if (typeof t === 'object' && t !== null) return t;
+    return { nome: t, maestria: false };
+}
+
+function _toolsByGroup(compStrum) {
+    const parsed = (compStrum || []).map(_parseToolEntry);
+    const grouped = {};
+    for (const [groupName, groupDef] of Object.entries(DND_COMPETENZE_STRUMENTI_GROUPED)) {
+        const items = parsed.filter(t => groupDef.items.includes(t.nome));
+        if (items.length > 0) grouped[groupName] = items;
+    }
+    return grouped;
+}
+
 function buildLangProfSection(pg) {
     const linguaggi = pg.linguaggi || [];
     const compStrum = pg.competenze_strumenti || [];
     const langHtml = linguaggi.length > 0 ?
         linguaggi.map(l => `<span class="scheda-tag">${escapeHtml(l)}</span>`).join('') :
         '<span class="scheda-empty">Nessuno</span>';
-    const toolHtml = compStrum.length > 0 ?
-        compStrum.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
-        '<span class="scheda-empty">Nessuna</span>';
+
+    const grouped = _toolsByGroup(compStrum);
+    let toolSectionsHtml = '';
+    if (Object.keys(grouped).length > 0) {
+        for (const [groupName, items] of Object.entries(grouped)) {
+            const tags = items.map(t => {
+                const cls = t.maestria ? 'scheda-tag scheda-tag-mastery' : 'scheda-tag';
+                return `<span class="${cls}">${escapeHtml(t.nome)}${t.maestria ? ' ★' : ''}</span>`;
+            }).join('');
+            toolSectionsHtml += `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">${escapeHtml(groupName)}</span><div class="scheda-tags">${tags}</div></div>`;
+        }
+    } else {
+        toolSectionsHtml = '<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Strumenti</span><div class="scheda-tags"><span class="scheda-empty">Nessuna</span></div></div>';
+    }
+
     return `<div class="scheda-section">
         <div class="scheda-section-title">Linguaggi e Competenze
             <button class="scheda-edit-btn" onclick="schedaOpenLangProfEdit('${pg.id}')" title="Modifica">&#9998;</button>
         </div>
-        <div class="scheda-res-imm-display">
+        <div class="scheda-res-imm-display" id="schedaLangProfDisplay">
             <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Linguaggi</span><div class="scheda-tags" id="schedaLangDisplay">${langHtml}</div></div>
-            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Strumenti</span><div class="scheda-tags" id="schedaToolDisplay">${toolHtml}</div></div>
+            ${toolSectionsHtml}
         </div>
     </div>`;
 }
@@ -2686,17 +2809,29 @@ window.schedaOpenLangProfEdit = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const currentLangs = pg.linguaggi ? [...pg.linguaggi] : [];
-    const currentTools = pg.competenze_strumenti ? [...pg.competenze_strumenti] : [];
+    const currentToolsRaw = pg.competenze_strumenti || [];
+    const currentTools = currentToolsRaw.map(_parseToolEntry);
 
     const langCheckboxes = DND_LINGUAGGI.map(l => {
         const checked = currentLangs.includes(l) ? 'checked' : '';
         return `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(l)}" ${checked} onchange="schedaLangToggle(this)"><span>${escapeHtml(l)}</span></label>`;
     }).join('');
 
-    const toolCheckboxes = DND_COMPETENZE_STRUMENTI.map(t => {
-        const checked = currentTools.includes(t) ? 'checked' : '';
-        return `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(t)}" ${checked} onchange="schedaToolToggle(this)"><span>${escapeHtml(t)}</span></label>`;
-    }).join('');
+    let toolSectionsHtml = '';
+    for (const [groupName, groupDef] of Object.entries(DND_COMPETENZE_STRUMENTI_GROUPED)) {
+        const items = groupDef.items.map(t => {
+            const entry = currentTools.find(e => e.nome === t);
+            const checked = entry ? 'checked' : '';
+            const hasMastery = entry?.maestria ? 'checked' : '';
+            let html = `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(t)}" ${checked} onchange="schedaToolToggle(this)"><span>${escapeHtml(t)}</span>`;
+            if (groupDef.allowMastery) {
+                html += `<label class="scheda-mastery-toggle" title="Maestria"><input type="checkbox" data-tool="${escapeHtml(t)}" ${hasMastery} onchange="schedaToolMasteryToggle(this)" ${!entry ? 'disabled' : ''}>★</label>`;
+            }
+            html += `</label>`;
+            return html;
+        }).join('');
+        toolSectionsHtml += `<div class="form-section-label" style="margin-top:16px;">${escapeHtml(groupName)}</div><div class="scheda-checkbox-grid">${items}</div>`;
+    }
 
     const modalHtml = `
     <div class="modal active" id="langProfModal">
@@ -2706,8 +2841,7 @@ window.schedaOpenLangProfEdit = function(pgId) {
             <div class="wizard-page-scroll">
                 <div class="form-section-label">Linguaggi</div>
                 <div class="scheda-checkbox-grid">${langCheckboxes}</div>
-                <div class="form-section-label" style="margin-top:16px;">Competenze negli Strumenti</div>
-                <div class="scheda-checkbox-grid">${toolCheckboxes}</div>
+                ${toolSectionsHtml}
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseLangProfEdit()">Chiudi</button>
@@ -2739,21 +2873,57 @@ window.schedaLangToggle = async function(cb) {
     await schedaInstantSave(pgId, { linguaggi: window._schedaLangList });
 }
 
+function _refreshToolDisplay() {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    pg.competenze_strumenti = window._schedaToolList.map(t => ({ ...t }));
+    const container = document.getElementById('schedaLangProfDisplay');
+    if (!container) return;
+    const langDisplay = document.getElementById('schedaLangDisplay');
+    const langRow = langDisplay ? langDisplay.closest('.scheda-res-imm-row') : null;
+    const grouped = _toolsByGroup(window._schedaToolList);
+    let toolHtml = '';
+    if (Object.keys(grouped).length > 0) {
+        for (const [groupName, items] of Object.entries(grouped)) {
+            const tags = items.map(t => {
+                const cls = t.maestria ? 'scheda-tag scheda-tag-mastery' : 'scheda-tag';
+                return `<span class="${cls}">${escapeHtml(t.nome)}${t.maestria ? ' ★' : ''}</span>`;
+            }).join('');
+            toolHtml += `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">${escapeHtml(groupName)}</span><div class="scheda-tags">${tags}</div></div>`;
+        }
+    } else {
+        toolHtml = '<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Strumenti</span><div class="scheda-tags"><span class="scheda-empty">Nessuna</span></div></div>';
+    }
+    container.innerHTML = (langRow ? langRow.outerHTML : '') + toolHtml;
+}
+
 window.schedaToolToggle = async function(cb) {
     const pgId = window._schedaLangEditPgId;
     if (!pgId) return;
-    const tool = cb.value;
+    const toolName = cb.value;
     if (cb.checked) {
-        if (!window._schedaToolList.includes(tool)) window._schedaToolList.push(tool);
+        if (!window._schedaToolList.find(t => t.nome === toolName)) {
+            window._schedaToolList.push({ nome: toolName, maestria: false });
+        }
     } else {
-        window._schedaToolList = window._schedaToolList.filter(t => t !== tool);
+        window._schedaToolList = window._schedaToolList.filter(t => t.nome !== toolName);
     }
-    const pg = _schedaPgCache;
-    if (pg) pg.competenze_strumenti = [...window._schedaToolList];
-    const display = document.getElementById('schedaToolDisplay');
-    if (display) display.innerHTML = window._schedaToolList.length > 0 ?
-        window._schedaToolList.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
-        '<span class="scheda-empty">Nessuna</span>';
+    const masteryInput = cb.closest('.scheda-checkbox-item')?.querySelector('[data-tool]');
+    if (masteryInput) {
+        masteryInput.disabled = !cb.checked;
+        if (!cb.checked) masteryInput.checked = false;
+    }
+    _refreshToolDisplay();
+    await schedaInstantSave(pgId, { competenze_strumenti: window._schedaToolList });
+}
+
+window.schedaToolMasteryToggle = async function(cb) {
+    const pgId = window._schedaLangEditPgId;
+    if (!pgId) return;
+    const toolName = cb.dataset.tool;
+    const entry = window._schedaToolList.find(t => t.nome === toolName);
+    if (entry) entry.maestria = cb.checked;
+    _refreshToolDisplay();
     await schedaInstantSave(pgId, { competenze_strumenti: window._schedaToolList });
 }
 

@@ -1100,19 +1100,25 @@
     border-radius: 8px;
     padding: 8px 12px;
     margin: 8px 0 4px;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
 }
 .ca-breakdown-line {
     padding: 3px 0;
     color: var(--text-secondary, #ccc);
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 4px;
 }
 .ca-breakdown-line::before {
     content: '•';
     color: var(--accent);
     font-weight: 700;
+    flex-shrink: 0;
+}
+.ca-stat-label {
+    opacity: 0.45;
+    font-size: 0.75em;
 }
 
 .scheda-equip-table {
@@ -1134,6 +1140,8 @@
     border-bottom: 1px solid var(--border-light, rgba(0,0,0,0.06));
 }
 .scheda-equip-table .text-center { text-align: center; }
+.equip-name-cell { cursor: pointer; color: var(--accent); }
+.equip-name-cell:hover { text-decoration: underline; }
 
 .scheda-checkbox-grid {
     display: grid;
@@ -1153,6 +1161,24 @@
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+}
+.scheda-mastery-toggle {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.85rem;
+    color: var(--accent);
+    cursor: pointer;
+    opacity: 0.35;
+    transition: opacity 0.2s;
+}
+.scheda-mastery-toggle:has(input:checked) { opacity: 1; }
+.scheda-mastery-toggle:has(input:disabled) { opacity: 0.15; pointer-events: none; }
+.scheda-mastery-toggle input { display: none; }
+.scheda-tag-mastery {
+    border: 1px solid var(--accent);
+    color: var(--accent);
 }
 
 .scheda-custom-res-del {

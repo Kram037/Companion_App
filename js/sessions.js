@@ -523,7 +523,7 @@ window.openConditionsModal = async function(personaggioId) {
             <h2>Stato: ${escapeHtml(pg.nome)}</h2>
             <div class="form-section-label">Condizioni</div>
             <div class="pg-conditions-grid">
-                ${ALL_CONDITIONS.map(c => `
+                ${ALL_CONDITIONS.filter(c => c.key !== 'concentrazione').map(c => `
                     <label class="pg-condition-item">
                         <input type="checkbox" id="cond_${c.key}" ${pg[c.key] ? 'checked' : ''}>
                         <label for="cond_${c.key}">${c.label}</label>
