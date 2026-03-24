@@ -2,6 +2,9 @@
    LABORATORIO PAGE
    ============================================================================ */
 
+/* Lock scroll when hub is visible */
+.main-content:has(#labHub:not([style*="display: none"])) { overflow: hidden; }
+
 /* Hub */
 #labHub {
     display: flex;
