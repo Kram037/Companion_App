@@ -2,16 +2,12 @@
    LABORATORIO PAGE
    ============================================================================ */
 
-/* Page fill */
-#laboratorioPage.active { display: flex; flex-direction: column; height: 100%; }
-#laboratorioPage > .page-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-
 /* Hub */
 #labHub {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-height: 0;
+    /* fill available viewport: 100dvh minus header(64) + toolbar(64) + main-content padding(2*1.5rem=48px) */
+    height: calc(100dvh - 64px - 64px - 3rem);
 }
 .lab-hub-title {
     text-align: center;
@@ -36,12 +32,12 @@
     gap: 8px;
     padding: 0 var(--spacing-sm);
     flex: 1;
+    min-height: 0;
 }
 .lab-hub-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg, 12px);
-    padding: 12px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -51,11 +47,12 @@
     transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    min-height: 0;
 }
 .lab-hub-card:active { transform: scale(0.97); }
 .lab-hub-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.lab-hub-card-icon { font-size: 1.4rem; line-height: 1; }
-.lab-hub-card-label { font-weight: 600; font-size: 0.82rem; color: var(--text); line-height: 1; }
+.lab-hub-card-icon { font-size: 1.6rem; line-height: 1; }
+.lab-hub-card-label { font-weight: 600; font-size: 0.85rem; color: var(--text); line-height: 1; }
 
 /* Sub-page back button */
 .btn-back {
@@ -537,6 +534,11 @@
     display: inline-block;
 }
 
+@media (max-width: 768px) {
+    #labHub {
+        height: calc(100dvh - 58px - 60px - 1.5rem);
+    }
+}
 @media (max-width: 480px) {
     .tipo-scheda-options { flex-direction: column; }
     .micro-slots-grid { grid-template-columns: repeat(3, 1fr); }
