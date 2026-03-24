@@ -92,7 +92,7 @@ window.labOpenCategory = function(tab) {
     if (title) title.textContent = cat.labelPlural || cat.label;
 
     const addBtn = document.getElementById('addHomebrewBtn');
-    if (addBtn) addBtn.style.display = cat.isSettings ? 'none' : '';
+    if (addBtn) addBtn.style.visibility = cat.isSettings ? 'hidden' : '';
 
     if (cat.isSettings) {
         labRenderSettings();
@@ -679,7 +679,6 @@ window.labToggleHbEnabled = async function(cb) {
     settings.enabled = cb.checked;
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
-    showNotification(cb.checked ? 'Homebrew attivato' : 'Homebrew disattivato');
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -697,7 +696,6 @@ window.labToggleFriendHb = async function(cb) {
     }
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
-    showNotification('Impostazioni aggiornate');
 };
 
 // ============================================================================
