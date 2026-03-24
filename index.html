@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/components.css?v=1767900400">
     <link rel="stylesheet" href="css/modals.css?v=1767900400">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
-    <link rel="stylesheet" href="css/personaggi.css?v=1767900500">
+    <link rel="stylesheet" href="css/personaggi.css?v=1767900600">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767900400">
     <link rel="stylesheet" href="css/laboratorio.css?v=1767900400">
@@ -543,6 +543,7 @@
                 <div class="wizard-step" data-step="4"></div>
                 <div class="wizard-step" data-step="5"></div>
                 <div class="wizard-step" data-step="6"></div>
+                <div class="wizard-step" data-step="7"></div>
             </div>
             <form id="personaggioForm">
                 <!-- Step 0: Identità -->
@@ -684,8 +685,21 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 6: Statistiche -->
+                <!-- Step 6: Equipaggiamento -->
                 <div class="wizard-page" id="pgStep6">
+                    <div class="form-section-label">Equipaggiamento</div>
+                    <div class="wizard-page-scroll">
+                        <div id="pgEquipSelected" class="pg-equip-selected"></div>
+                        <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="pgOpenEquipSelect('arma')">+ Aggiungi Arma</button>
+                        <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="pgOpenEquipSelect('armatura')">+ Aggiungi Armatura</button>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="pgWizardPrev()">Indietro</button>
+                        <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
+                    </div>
+                </div>
+                <!-- Step 7: Statistiche -->
+                <div class="wizard-page" id="pgStep7">
                     <div class="form-section-label">Statistiche</div>
                     <div class="wizard-page-scroll">
                         <div class="pg-stats-row-3">
@@ -909,7 +923,7 @@
     <script src="js/users.js?v=1767900400"></script>
     <script src="js/amici.js?v=1767900400"></script>
     <script src="js/campagne.js?v=1767900400"></script>
-    <script src="js/personaggi.js?v=1767900500"></script>
+    <script src="js/personaggi.js?v=1767900600"></script>
     <script src="js/sessions.js?v=1767900400"></script>
     <script src="js/combat.js?v=1767900400"></script>
     <script src="js/laboratorio.js?v=1767900400"></script>

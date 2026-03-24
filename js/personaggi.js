@@ -5,6 +5,7 @@
 let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
 let pgSelectedClasses = [];
+let pgSelectedEquipment = [];
 
 // =====================================================
 // FONTI APPROVATE:
@@ -129,6 +130,82 @@ const DND_SKILLS = [
     { key: 'storia', nome: 'Storia', ability: 'intelligenza', abbr: 'Int' }
 ];
 
+const DND_LINGUAGGI = [
+    'Comune','Elfico','Gigante','Gnomesco','Goblin','Halfling','Nanico','Orchesco',
+    'Abissale','Celestiale','Draconico','Gergo delle Profondità','Infernale','Primordiale','Silvano','Sottocomune'
+];
+
+const DND_ARMI = [
+    { nome:'Ascia', cat:'semplice_mischia', danni:'1d6', tipo_danno:'taglienti', proprieta:['Lancio (6/18)','Leggera'] },
+    { nome:'Bastone Ferrato', cat:'semplice_mischia', danni:'1d6', tipo_danno:'contundenti', proprieta:['Versatile (1d8)'] },
+    { nome:'Falcetto', cat:'semplice_mischia', danni:'1d4', tipo_danno:'taglienti', proprieta:['Leggera'] },
+    { nome:'Giavellotto', cat:'semplice_mischia', danni:'1d6', tipo_danno:'perforanti', proprieta:['Lancio (9/36)'] },
+    { nome:'Lancia', cat:'semplice_mischia', danni:'1d6', tipo_danno:'perforanti', proprieta:['Lancio (6/18)','Versatile (1d8)'] },
+    { nome:'Martello Leggero', cat:'semplice_mischia', danni:'1d4', tipo_danno:'contundenti', proprieta:['Lancio (6/18)','Leggera'] },
+    { nome:'Mazza', cat:'semplice_mischia', danni:'1d6', tipo_danno:'contundenti', proprieta:[] },
+    { nome:'Pugnale', cat:'semplice_mischia', danni:'1d4', tipo_danno:'perforanti', proprieta:['Accurata','Lancio (6/18)','Leggera'] },
+    { nome:'Randello', cat:'semplice_mischia', danni:'1d4', tipo_danno:'contundenti', proprieta:['Leggera'] },
+    { nome:'Randello Pesante', cat:'semplice_mischia', danni:'1d8', tipo_danno:'contundenti', proprieta:['Due Mani'] },
+    { nome:'Arco Corto', cat:'semplice_distanza', danni:'1d6', tipo_danno:'perforanti', proprieta:['Due Mani','Munizioni (24/96)'] },
+    { nome:'Balestra Leggera', cat:'semplice_distanza', danni:'1d8', tipo_danno:'perforanti', proprieta:['Due Mani','Munizioni (24/96)','Ricarica'] },
+    { nome:'Dardo', cat:'semplice_distanza', danni:'1d4', tipo_danno:'perforanti', proprieta:['Accurata','Lancio (6/18)'] },
+    { nome:'Fionda', cat:'semplice_distanza', danni:'1d4', tipo_danno:'contundenti', proprieta:['Munizioni (9/36)'] },
+    { nome:'Alabarda', cat:'guerra_mischia', danni:'1d10', tipo_danno:'taglienti', proprieta:['Due Mani','Pesante','Portata'] },
+    { nome:'Ascia Bipenne', cat:'guerra_mischia', danni:'1d12', tipo_danno:'taglienti', proprieta:['Due Mani','Pesante'] },
+    { nome:'Ascia da Battaglia', cat:'guerra_mischia', danni:'1d8', tipo_danno:'taglienti', proprieta:['Versatile (1d10)'] },
+    { nome:'Falcione', cat:'guerra_mischia', danni:'1d10', tipo_danno:'taglienti', proprieta:['Due Mani','Pesante','Portata'] },
+    { nome:'Frusta', cat:'guerra_mischia', danni:'1d4', tipo_danno:'taglienti', proprieta:['Accurata','Portata'] },
+    { nome:'Lancia da Cavaliere', cat:'guerra_mischia', danni:'1d12', tipo_danno:'perforanti', proprieta:['Portata','Speciale'] },
+    { nome:'Maglio', cat:'guerra_mischia', danni:'2d6', tipo_danno:'contundenti', proprieta:['Due Mani','Pesante'] },
+    { nome:'Martello da Guerra', cat:'guerra_mischia', danni:'1d8', tipo_danno:'contundenti', proprieta:['Versatile (1d10)'] },
+    { nome:'Mazzafrusto', cat:'guerra_mischia', danni:'1d8', tipo_danno:'contundenti', proprieta:[] },
+    { nome:'Morning Star', cat:'guerra_mischia', danni:'1d8', tipo_danno:'perforanti', proprieta:[] },
+    { nome:'Picca', cat:'guerra_mischia', danni:'1d10', tipo_danno:'perforanti', proprieta:['Due Mani','Pesante','Portata'] },
+    { nome:'Piccone da Guerra', cat:'guerra_mischia', danni:'1d8', tipo_danno:'perforanti', proprieta:[] },
+    { nome:'Scimitarra', cat:'guerra_mischia', danni:'1d6', tipo_danno:'taglienti', proprieta:['Accurata','Leggera'] },
+    { nome:'Spada Corta', cat:'guerra_mischia', danni:'1d6', tipo_danno:'perforanti', proprieta:['Accurata','Leggera'] },
+    { nome:'Spada Lunga', cat:'guerra_mischia', danni:'1d8', tipo_danno:'taglienti', proprieta:['Versatile (1d10)'] },
+    { nome:'Spadone', cat:'guerra_mischia', danni:'2d6', tipo_danno:'taglienti', proprieta:['Due Mani','Pesante'] },
+    { nome:'Stocco', cat:'guerra_mischia', danni:'1d8', tipo_danno:'perforanti', proprieta:['Accurata'] },
+    { nome:'Tridente', cat:'guerra_mischia', danni:'1d6', tipo_danno:'perforanti', proprieta:['Lancio (6/18)','Versatile (1d8)'] },
+    { nome:'Arco Lungo', cat:'guerra_distanza', danni:'1d8', tipo_danno:'perforanti', proprieta:['Due Mani','Munizioni (45/180)','Pesante'] },
+    { nome:'Balestra a Mano', cat:'guerra_distanza', danni:'1d6', tipo_danno:'perforanti', proprieta:['Leggera','Munizioni (9/36)','Ricarica'] },
+    { nome:'Balestra Pesante', cat:'guerra_distanza', danni:'1d10', tipo_danno:'perforanti', proprieta:['Due Mani','Munizioni (30/120)','Pesante','Ricarica'] },
+    { nome:'Cerbottana', cat:'guerra_distanza', danni:'1', tipo_danno:'perforanti', proprieta:['Munizioni (7.5/30)','Ricarica'] },
+    { nome:'Rete', cat:'guerra_distanza', danni:'-', tipo_danno:'-', proprieta:['Lancio (1.5/4.5)','Speciale'] },
+];
+
+const DND_ARMATURE = [
+    { nome:'Imbottita', cat:'leggera', ca_base:11, mod_des:true, max_des:99, forza:0, furtivita:'svantaggio' },
+    { nome:'Cuoio', cat:'leggera', ca_base:11, mod_des:true, max_des:99, forza:0, furtivita:null },
+    { nome:'Cuoio Borchiato', cat:'leggera', ca_base:12, mod_des:true, max_des:99, forza:0, furtivita:null },
+    { nome:'Pelle', cat:'media', ca_base:12, mod_des:true, max_des:2, forza:0, furtivita:null },
+    { nome:'Giaco di Maglia', cat:'media', ca_base:13, mod_des:true, max_des:2, forza:0, furtivita:null },
+    { nome:'Corazza di Scaglie', cat:'media', ca_base:14, mod_des:true, max_des:2, forza:0, furtivita:'svantaggio' },
+    { nome:'Corazza di Piastre', cat:'media', ca_base:14, mod_des:true, max_des:2, forza:0, furtivita:null },
+    { nome:'Mezza Armatura', cat:'media', ca_base:15, mod_des:true, max_des:2, forza:0, furtivita:'svantaggio' },
+    { nome:'Corazza ad Anelli', cat:'pesante', ca_base:14, mod_des:false, max_des:0, forza:0, furtivita:'svantaggio' },
+    { nome:'Cotta di Maglia', cat:'pesante', ca_base:16, mod_des:false, max_des:0, forza:13, furtivita:'svantaggio' },
+    { nome:'Corazza a Strisce', cat:'pesante', ca_base:17, mod_des:false, max_des:0, forza:15, furtivita:'svantaggio' },
+    { nome:'Armatura Completa', cat:'pesante', ca_base:18, mod_des:false, max_des:0, forza:15, furtivita:'svantaggio' },
+    { nome:'Scudo', cat:'scudo', ca_base:2, mod_des:false, max_des:0, forza:0, furtivita:null },
+];
+
+const DND_COMPETENZE_STRUMENTI = [
+    'Arnesi da Falsario','Arnesi da Scasso','Borsa da Erborista',
+    'Sostanze da Avvelenatore','Trucchi per il Camuffamento','Strumenti da Navigatore',
+    'Strumenti da Alchimista','Strumenti da Calligrafo','Strumenti da Calzolaio',
+    'Strumenti da Cartografo','Strumenti da Conciatore','Strumenti da Costruttore',
+    'Strumenti da Fabbro','Strumenti da Falegname','Strumenti da Gioielliere',
+    'Strumenti da Intagliatore','Strumenti da Inventore','Strumenti da Pittore',
+    'Strumenti da Soffiatore','Strumenti da Tessitore','Strumenti da Vasaio',
+    'Utensili da Cuoco','Strumenti da Mescitore',
+    'Ciaramella','Cornamusa','Corno','Dulcimer','Flauto','Flauto di Pan',
+    'Lira','Liuto','Tamburo','Viola',
+    'Dadi','Mazzo di Carte','Scacchi dei Draghi','Tre Draghi al Buio',
+    'Veicoli Terrestri','Veicoli Acquatici'
+];
+
 // Talenti from PHB, XGtE, TCoE
 const DND_TALENTI = [
     // PHB
@@ -246,6 +323,95 @@ window.pgRemoveTalento = function(index) {
     pgCurrentTalenti.splice(index, 1);
     pgRenderTalenti();
 };
+
+// =====================================================
+// WIZARD STEP 6: EQUIPAGGIAMENTO
+// =====================================================
+function pgRenderEquipSelected() {
+    const container = document.getElementById('pgEquipSelected');
+    if (!container) return;
+    if (pgSelectedEquipment.length === 0) {
+        container.innerHTML = '<span class="scheda-empty">Nessun equipaggiamento selezionato</span>';
+        return;
+    }
+    container.innerHTML = pgSelectedEquipment.map((e, i) => `
+        <div class="pg-talento-item selected">
+            <span class="pg-talento-name">${escapeHtml(e.nome)}${e.tipo === 'arma' ? ` <small>(${e.danni} ${e.tipo_danno})</small>` : e.ca_base ? ` <small>(CA ${e.ca_base})</small>` : ''}</span>
+            <button type="button" class="pg-talento-remove" onclick="pgRemoveEquip(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+window.pgOpenEquipSelect = function(tipo) {
+    let listHtml = '';
+    if (tipo === 'arma') {
+        const ARMA_CATS = {
+            'semplice_mischia': 'Armi da Mischia Semplici',
+            'semplice_distanza': 'Armi a Distanza Semplici',
+            'guerra_mischia': 'Armi da Mischia da Guerra',
+            'guerra_distanza': 'Armi a Distanza da Guerra'
+        };
+        listHtml = Object.entries(ARMA_CATS).map(([cat, label]) => {
+            const items = DND_ARMI.filter(a => a.cat === cat).map(a =>
+                `<div class="pg-talento-item" onclick="pgSelectEquipArma('${escapeHtml(a.nome)}')">
+                    <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
+                    <span class="option-source">${a.danni} ${a.tipo_danno}</span>
+                </div>`
+            ).join('');
+            return `<div class="form-section-label">${label}</div>${items}`;
+        }).join('');
+    } else {
+        listHtml = ['leggera','media','pesante','scudo'].map(cat => {
+            const label = cat === 'scudo' ? 'Scudi' : `Armature ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+            const items = DND_ARMATURE.filter(a => a.cat === cat).map(a =>
+                `<div class="pg-talento-item" onclick="pgSelectEquipArmatura('${escapeHtml(a.nome)}')">
+                    <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
+                    <span class="option-source">CA ${a.ca_base}</span>
+                </div>`
+            ).join('');
+            return `<div class="form-section-label">${label}</div>${items}`;
+        }).join('');
+    }
+    const modalHtml = `
+    <div class="modal active" id="pgEquipSelectModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" onclick="document.getElementById('pgEquipSelectModal')?.remove();document.body.style.overflow='hidden'">&times;</button>
+            <h2>${tipo === 'arma' ? 'Scegli Arma' : 'Scegli Armatura'}</h2>
+            <div class="wizard-page-scroll">${listHtml}</div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('pgEquipSelectModal')?.remove();document.body.style.overflow='hidden'">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+window.pgSelectEquipArma = function(nome) {
+    const arma = DND_ARMI.find(a => a.nome === nome);
+    if (!arma) return;
+    pgSelectedEquipment.push({
+        nome: arma.nome, tipo: 'arma', danni: arma.danni, tipo_danno: arma.tipo_danno,
+        proprieta: arma.proprieta, bonus_colpire: 0, bonus_danno: 0
+    });
+    document.getElementById('pgEquipSelectModal')?.remove();
+    pgRenderEquipSelected();
+}
+
+window.pgSelectEquipArmatura = function(nome) {
+    const arm = DND_ARMATURE.find(a => a.nome === nome);
+    if (!arm) return;
+    pgSelectedEquipment.push({
+        nome: arm.nome, tipo: arm.cat === 'scudo' ? 'scudo' : 'armatura',
+        ca_base: arm.ca_base, categoria: arm.cat, mod_des: arm.mod_des, max_des: arm.max_des
+    });
+    document.getElementById('pgEquipSelectModal')?.remove();
+    pgRenderEquipSelected();
+}
+
+window.pgRemoveEquip = function(index) {
+    pgSelectedEquipment.splice(index, 1);
+    pgRenderEquipSelected();
+}
 
 function calcMod(score) {
     return Math.floor((score - 10) / 2);
@@ -843,7 +1009,7 @@ window.pgWizardPrev = function() {
 }
 
 function pgWizardGoTo(step) {
-    if (step < 0 || step > 6) return;
+    if (step < 0 || step > 7) return;
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
@@ -871,6 +1037,9 @@ function pgWizardGoTo(step) {
         pgRenderTalenti();
     }
     if (step === 6) {
+        pgRenderEquipSelected();
+    }
+    if (step === 7) {
         const des = parseInt(document.getElementById('pgDestrezza')?.value) || 10;
         const cos = parseInt(document.getElementById('pgCostituzione')?.value) || 10;
         const sag = parseInt(document.getElementById('pgSaggezza')?.value) || 10;
@@ -1015,13 +1184,12 @@ function schedaDebouncedSave(personaggioId, field, value) {
     }, 500);
 }
 
-function schedaInstantSave(personaggioId, updates) {
+async function schedaInstantSave(personaggioId, updates) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
     updates.updated_at = new Date().toISOString();
-    supabase.from('personaggi').update(updates).eq('id', personaggioId).then(({ error }) => {
-        if (error) console.error('Errore salvataggio:', error);
-    });
+    const { error } = await supabase.from('personaggi').update(updates).eq('id', personaggioId);
+    if (error) console.error('Errore salvataggio:', error);
 }
 
 const SCHEDA_ABILITIES = [
@@ -1369,6 +1537,10 @@ async function renderSchedaPersonaggio(personaggioId) {
                 pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
                 '<span class="scheda-empty">Nessun talento</span>'}</div>
         </div>
+
+        ${buildEquipSection(pg)}
+
+        ${buildLangProfSection(pg)}
 
         `;
 
@@ -2181,7 +2353,7 @@ window.schedaOpenAddCustomRes = function(pgId) {
             <div class="form-group" id="crDadoGroup" style="display:none;">
                 <label class="form-label">Tipo di dado</label>
                 <div class="custom-res-dice-row">
-                    ${['d4','d6','d8','d10','d12'].map(d =>
+                    ${['d4','d6','d8','d10','d12','d20'].map(d =>
                         `<button type="button" class="btn-secondary custom-res-dice-btn ${d === 'd8' ? 'active' : ''}" onclick="schedaCrDadoSelect('${d}')">${d}</button>`
                     ).join('')}
                 </div>
@@ -2260,6 +2432,276 @@ window.schedaCloseCustomResModal = function() {
     document.body.style.overflow = '';
 }
 
+// =====================================================
+// EQUIPAGGIAMENTO
+// =====================================================
+function buildEquipSection(pg) {
+    const equip = pg.equipaggiamento || [];
+    const armiRows = equip.filter(e => e.tipo === 'arma').map((e, i) => {
+        const bonus = e.bonus_colpire != null ? (e.bonus_colpire >= 0 ? `+${e.bonus_colpire}` : e.bonus_colpire) : '-';
+        const danno = e.danni || '-';
+        return `<tr>
+            <td>${escapeHtml(e.nome)}</td>
+            <td class="text-center">${bonus}</td>
+            <td class="text-center">${danno} ${e.tipo_danno ? escapeHtml(e.tipo_danno.slice(0,3)) + '.' : ''}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${equip.indexOf(e)})">✕</button></td>
+        </tr>`;
+    }).join('');
+    const armaturaItems = equip.filter(e => e.tipo === 'armatura' || e.tipo === 'scudo');
+    const armaturaRows = armaturaItems.map(e => {
+        const idx = equip.indexOf(e);
+        return `<tr>
+            <td>${escapeHtml(e.nome)}</td>
+            <td class="text-center">${e.ca_base || '-'}</td>
+            <td class="text-center">${e.categoria || '-'}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
+        </tr>`;
+    }).join('');
+    return `<div class="scheda-section">
+        <div class="scheda-section-title">Equipaggiamento
+            <button class="scheda-edit-btn" onclick="schedaOpenAddEquip('${pg.id}')" title="Aggiungi">+</button>
+        </div>
+        ${armiRows ? `<table class="scheda-equip-table">
+            <thead><tr><th>Arma</th><th>Colpire</th><th>Danno</th><th></th></tr></thead>
+            <tbody>${armiRows}</tbody>
+        </table>` : ''}
+        ${armaturaRows ? `<table class="scheda-equip-table" style="margin-top:8px;">
+            <thead><tr><th>Armatura</th><th>CA</th><th>Tipo</th><th></th></tr></thead>
+            <tbody>${armaturaRows}</tbody>
+        </table>` : ''}
+        ${!armiRows && !armaturaRows ? '<span class="scheda-empty">Nessun equipaggiamento</span>' : ''}
+    </div>`;
+}
+
+window.schedaOpenAddEquip = function(pgId) {
+    const ARMA_CATS = {
+        'semplice_mischia': 'Armi da Mischia Semplici',
+        'semplice_distanza': 'Armi a Distanza Semplici',
+        'guerra_mischia': 'Armi da Mischia da Guerra',
+        'guerra_distanza': 'Armi a Distanza da Guerra'
+    };
+    const armiHtml = Object.entries(ARMA_CATS).map(([cat, label]) => {
+        const items = DND_ARMI.filter(a => a.cat === cat).map(a =>
+            `<div class="pg-talento-item" onclick="schedaAddArma('${pgId}','${escapeHtml(a.nome)}')">
+                <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
+                <span class="option-source">${a.danni} ${a.tipo_danno}</span>
+            </div>`
+        ).join('');
+        return `<div class="form-section-label">${label}</div>${items}`;
+    }).join('');
+
+    const armatureHtml = ['leggera','media','pesante','scudo'].map(cat => {
+        const label = cat === 'scudo' ? 'Scudi' : `Armature ${cat.charAt(0).toUpperCase() + cat.slice(1)}${cat === 'leggera' ? '' : cat === 'media' ? '' : ''}`;
+        const items = DND_ARMATURE.filter(a => a.cat === cat).map(a =>
+            `<div class="pg-talento-item" onclick="schedaAddArmatura('${pgId}','${escapeHtml(a.nome)}')">
+                <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
+                <span class="option-source">CA ${a.ca_base}</span>
+            </div>`
+        ).join('');
+        return `<div class="form-section-label">${label}</div>${items}`;
+    }).join('');
+
+    const modalHtml = `
+    <div class="modal active" id="equipModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">&times;</button>
+            <h2>Aggiungi Equipaggiamento</h2>
+            <div class="wizard-page-scroll">
+                <div class="form-section-label" style="font-size:1.1rem;margin-bottom:4px;">Armi</div>
+                ${armiHtml}
+                <div class="form-section-label" style="font-size:1.1rem;margin-top:16px;margin-bottom:4px;">Armature</div>
+                ${armatureHtml}
+                <div class="form-section-label" style="font-size:1.1rem;margin-top:16px;margin-bottom:4px;">Oggetto Personalizzato</div>
+                <div class="form-group" style="margin:8px 0;">
+                    <input type="text" id="customEquipNome" class="form-input" placeholder="Nome oggetto">
+                </div>
+                <button type="button" class="btn-primary btn-small" onclick="schedaAddCustomEquip('${pgId}')">Aggiungi oggetto</button>
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+}
+
+window.schedaAddArma = async function(pgId, nome) {
+    const arma = DND_ARMI.find(a => a.nome === nome);
+    if (!arma) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    const profBonus = 2;
+    const modFor = calcMod(pg.forza || 10);
+    const modDes = calcMod(pg.destrezza || 10);
+    const isFinesse = arma.proprieta.some(p => p.includes('Accurata'));
+    const isRanged = arma.cat.includes('distanza');
+    const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
+    const dmgMod = atkMod;
+    pg.equipaggiamento.push({
+        nome: arma.nome, tipo: 'arma', danni: arma.danni, tipo_danno: arma.tipo_danno,
+        proprieta: arma.proprieta, bonus_colpire: profBonus + atkMod, bonus_danno: dmgMod
+    });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${arma.nome} aggiunta`);
+}
+
+window.schedaAddArmatura = async function(pgId, nome) {
+    const arm = DND_ARMATURE.find(a => a.nome === nome);
+    if (!arm) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    pg.equipaggiamento.push({
+        nome: arm.nome, tipo: arm.cat === 'scudo' ? 'scudo' : 'armatura',
+        ca_base: arm.ca_base, categoria: arm.cat, mod_des: arm.mod_des, max_des: arm.max_des
+    });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${arm.nome} aggiunta`);
+}
+
+window.schedaAddCustomEquip = async function(pgId) {
+    const nome = document.getElementById('customEquipNome')?.value?.trim();
+    if (!nome) { showNotification('Inserisci un nome', 'error'); return; }
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    pg.equipaggiamento.push({ nome, tipo: 'altro' });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${nome} aggiunto`);
+}
+
+window.schedaRemoveEquip = async function(pgId, index) {
+    const pg = _schedaPgCache;
+    if (!pg?.equipaggiamento) return;
+    pg.equipaggiamento.splice(index, 1);
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    showNotification('Oggetto rimosso');
+}
+
+// =====================================================
+// LINGUAGGI E COMPETENZE
+// =====================================================
+function buildLangProfSection(pg) {
+    const linguaggi = pg.linguaggi || [];
+    const compStrum = pg.competenze_strumenti || [];
+    const langHtml = linguaggi.length > 0 ?
+        linguaggi.map(l => `<span class="scheda-tag">${escapeHtml(l)}</span>`).join('') :
+        '<span class="scheda-empty">Nessuno</span>';
+    const toolHtml = compStrum.length > 0 ?
+        compStrum.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
+        '<span class="scheda-empty">Nessuna</span>';
+    return `<div class="scheda-section">
+        <div class="scheda-section-title">Linguaggi e Competenze
+            <button class="scheda-edit-btn" onclick="schedaOpenLangProfEdit('${pg.id}')" title="Modifica">&#9998;</button>
+        </div>
+        <div class="scheda-res-imm-display">
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Linguaggi</span><div class="scheda-tags" id="schedaLangDisplay">${langHtml}</div></div>
+            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Strumenti</span><div class="scheda-tags" id="schedaToolDisplay">${toolHtml}</div></div>
+        </div>
+    </div>`;
+}
+
+window.schedaOpenLangProfEdit = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const currentLangs = pg.linguaggi ? [...pg.linguaggi] : [];
+    const currentTools = pg.competenze_strumenti ? [...pg.competenze_strumenti] : [];
+
+    const langCheckboxes = DND_LINGUAGGI.map(l => {
+        const checked = currentLangs.includes(l) ? 'checked' : '';
+        return `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(l)}" ${checked} onchange="schedaLangToggle(this)"><span>${escapeHtml(l)}</span></label>`;
+    }).join('');
+
+    const toolCheckboxes = DND_COMPETENZE_STRUMENTI.map(t => {
+        const checked = currentTools.includes(t) ? 'checked' : '';
+        return `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(t)}" ${checked} onchange="schedaToolToggle(this)"><span>${escapeHtml(t)}</span></label>`;
+    }).join('');
+
+    const modalHtml = `
+    <div class="modal active" id="langProfModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" onclick="schedaCloseLangProfEdit()">&times;</button>
+            <h2>Linguaggi e Competenze</h2>
+            <div class="wizard-page-scroll">
+                <div class="form-section-label">Linguaggi</div>
+                <div class="scheda-checkbox-grid">${langCheckboxes}</div>
+                <div class="form-section-label" style="margin-top:16px;">Competenze negli Strumenti</div>
+                <div class="scheda-checkbox-grid">${toolCheckboxes}</div>
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="schedaCloseLangProfEdit()">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+    window._schedaLangEditPgId = pgId;
+    window._schedaLangList = currentLangs;
+    window._schedaToolList = currentTools;
+}
+
+window.schedaLangToggle = async function(cb) {
+    const pgId = window._schedaLangEditPgId;
+    if (!pgId) return;
+    const lang = cb.value;
+    if (cb.checked) {
+        if (!window._schedaLangList.includes(lang)) window._schedaLangList.push(lang);
+    } else {
+        window._schedaLangList = window._schedaLangList.filter(l => l !== lang);
+    }
+    const pg = _schedaPgCache;
+    if (pg) pg.linguaggi = [...window._schedaLangList];
+    const display = document.getElementById('schedaLangDisplay');
+    if (display) display.innerHTML = window._schedaLangList.length > 0 ?
+        window._schedaLangList.map(l => `<span class="scheda-tag">${escapeHtml(l)}</span>`).join('') :
+        '<span class="scheda-empty">Nessuno</span>';
+    await schedaInstantSave(pgId, { linguaggi: window._schedaLangList });
+}
+
+window.schedaToolToggle = async function(cb) {
+    const pgId = window._schedaLangEditPgId;
+    if (!pgId) return;
+    const tool = cb.value;
+    if (cb.checked) {
+        if (!window._schedaToolList.includes(tool)) window._schedaToolList.push(tool);
+    } else {
+        window._schedaToolList = window._schedaToolList.filter(t => t !== tool);
+    }
+    const pg = _schedaPgCache;
+    if (pg) pg.competenze_strumenti = [...window._schedaToolList];
+    const display = document.getElementById('schedaToolDisplay');
+    if (display) display.innerHTML = window._schedaToolList.length > 0 ?
+        window._schedaToolList.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
+        '<span class="scheda-empty">Nessuna</span>';
+    await schedaInstantSave(pgId, { competenze_strumenti: window._schedaToolList });
+}
+
+window.schedaCloseLangProfEdit = function() {
+    document.getElementById('langProfModal')?.remove();
+    document.body.style.overflow = '';
+}
+
+// =====================================================
+// AUTO-POPULATE LINGUAGGI FROM RACE
+// =====================================================
+function autoPopulateLinguaggi(razzaNome) {
+    const raceData = getRaceData(razzaNome);
+    if (!raceData) return ['Comune'];
+    return raceData.linguaggi && raceData.linguaggi.length > 0 ? [...raceData.linguaggi] : ['Comune'];
+}
+
 window.openPersonaggioModal = function(personaggioId) {
     editingPersonaggioId = personaggioId || null;
     const form = elements.personaggioForm;
@@ -2273,6 +2715,7 @@ window.openPersonaggioModal = function(personaggioId) {
     pgCurrentImmunita = [];
     pgCurrentSlotIncantesimo = {};
     pgCurrentTalenti = [];
+    pgSelectedEquipment = [];
     pgRenderClassi();
     pgWizardGoTo(0);
 
@@ -2341,6 +2784,9 @@ window.openPersonaggioModal = function(personaggioId) {
                     }
                     if (data.talenti && Array.isArray(data.talenti)) {
                         pgCurrentTalenti = [...data.talenti];
+                    }
+                    if (data.equipaggiamento && Array.isArray(data.equipaggiamento)) {
+                        pgSelectedEquipment = [...data.equipaggiamento];
                     }
 
                     if (data.resistenze && Array.isArray(data.resistenze)) {
@@ -2439,6 +2885,20 @@ async function handleSavePersonaggio(e) {
         talenti: pgCurrentTalenti,
         resistenze: pgCurrentResistenze,
         immunita: pgCurrentImmunita,
+        linguaggi: autoPopulateLinguaggi(document.getElementById('pgRazza').value),
+        equipaggiamento: pgSelectedEquipment.map(e => {
+            if (e.tipo === 'arma') {
+                const forza = clamp(parseInt(document.getElementById('pgForza').value) || 10, 1, 30);
+                const modFor = calcMod(forza);
+                const modDes = desMod;
+                const isFinesse = e.proprieta?.some(p => p.includes('Accurata'));
+                const isRanged = e.proprieta?.some(p => p.includes('Munizioni')) || e.proprieta?.some(p => p.includes('Lancio'));
+                const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
+                const profBonus = calcBonusCompetenza(totalLevel);
+                return { ...e, bonus_colpire: profBonus + atkMod, bonus_danno: atkMod };
+            }
+            return e;
+        }),
         slot_incantesimo: pgBuildSlotIncantesimo(),
         punti_vita_max: parseInt(document.getElementById('pgPV').value) || 10,
         pv_attuali: parseInt(document.getElementById('pgPV').value) || 10,
@@ -2926,22 +3386,23 @@ async function renderMicroScheda(personaggioId) {
     const slots = pg.slot_incantesimo || {};
     let slotsHtml = '';
     const sortedLevels = Object.keys(slots).map(Number).filter(l => l > 0 && slots[l]?.max > 0).sort((a, b) => a - b);
-    const slotItems = sortedLevels.map(lv => {
+    const slotRows = sortedLevels.map(lv => {
         const s = slots[lv];
-        const used = Math.min(s.max, s.used != null ? s.used : 0);
+        const currentAvail = s.current != null ? s.current : (s.max - (s.used || 0));
+        const pips = [];
+        for (let i = 0; i < s.max; i++) {
+            pips.push(`<span class="scheda-slot-pip ${i < currentAvail ? 'filled' : ''}" data-lvl="${lv}" data-idx="${i}"></span>`);
+        }
         return `
-        <div class="scheda-slot-block">
-            <div class="scheda-slot-level">${lv}°</div>
-            <div class="scheda-slot-controls">
-                <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},-1,${s.max})">−</button>
-                <span class="scheda-hd-val">${used}/${s.max}</span>
-                <button type="button" class="scheda-hd-btn" onclick="microSlotChange('${pg.id}',${lv},1,${s.max})">+</button>
-            </div>
+        <div class="scheda-slot-row">
+            <span class="scheda-slot-level">Lv ${lv}</span>
+            <div class="scheda-slot-pips">${pips.join('')}</div>
+            <span class="scheda-slot-count">${currentAvail}/${s.max}</span>
         </div>`;
     }).join('');
     slotsHtml = `<div class="scheda-section">
         <div class="scheda-section-title">Slot Incantesimo <button class="scheda-edit-btn" onclick="microOpenSlotConfig('${pg.id}')" title="Configura">&#9998;</button></div>
-        ${slotItems ? `<div class="scheda-slots-grid">${slotItems}</div>` : '<span class="scheda-empty">Nessuno slot configurato</span>'}
+        ${slotRows ? `<div class="scheda-slots-table">${slotRows}</div>` : '<span class="scheda-empty">Nessuno slot configurato</span>'}
     </div>`;
 
     const tabBar = document.getElementById('schedaTabBar');
@@ -3004,8 +3465,27 @@ async function renderMicroScheda(personaggioId) {
     ${slotsHtml}
     `;
 
+    content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+        pip.addEventListener('click', () => {
+            const lvl = parseInt(pip.dataset.lvl);
+            const idx = parseInt(pip.dataset.idx);
+            microSlotToggle(pg.id, lvl, idx);
+        });
+    });
+
     const backBtn = document.getElementById('schedaBackBtn');
     if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+}
+
+window.microSlotToggle = async function(pgId, level, index) {
+    const pg = _schedaPgCache;
+    if (!pg?.slot_incantesimo?.[level]) return;
+    const slot = pg.slot_incantesimo[level];
+    const currentAvail = slot.current != null ? slot.current : (slot.max - (slot.used || 0));
+    slot.current = index < currentAvail ? index : index + 1;
+    slot.used = slot.max - slot.current;
+    await schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
+    renderMicroScheda(pgId);
 }
 
 window.microHdChange = async function(pgId, key, delta, max) {
@@ -3029,14 +3509,15 @@ window.microToggleCondition = async function(pgId, key, el) {
 };
 
 window.microSlotChange = async function(pgId, level, delta, max) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { data: pg } = await supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single();
-    const slots = pg?.slot_incantesimo || {};
-    if (!slots[level]) slots[level] = { max, used: 0 };
-    const current = slots[level].used || 0;
-    slots[level].used = Math.max(0, Math.min(max, current + delta));
-    await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', pgId);
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const slots = pg.slot_incantesimo || {};
+    if (!slots[level]) slots[level] = { max, current: max, used: 0 };
+    const avail = slots[level].current != null ? slots[level].current : (max - (slots[level].used || 0));
+    const newAvail = Math.max(0, Math.min(max, avail - delta));
+    slots[level].current = newAvail;
+    slots[level].used = max - newAvail;
+    await schedaInstantSave(pgId, { slot_incantesimo: slots });
     renderMicroScheda(pgId);
 };
 

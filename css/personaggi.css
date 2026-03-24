@@ -1095,6 +1095,46 @@
     color: var(--text-light);
 }
 
+.scheda-equip-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+.scheda-equip-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border);
+}
+.scheda-equip-table td {
+    padding: 6px;
+    border-bottom: 1px solid var(--border-light, rgba(0,0,0,0.06));
+}
+.scheda-equip-table .text-center { text-align: center; }
+
+.scheda-checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+}
+.scheda-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 0;
+}
+.scheda-checkbox-item input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
 .scheda-custom-res-del {
     background: none;
     border: none;
