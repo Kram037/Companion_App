@@ -158,6 +158,60 @@
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .form-row .form-group { margin-bottom: 8px; }
 
+/* Monster creation choice */
+.monster-choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+}
+.monster-choice-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 12px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    text-align: center;
+}
+.monster-choice-card:active { transform: scale(0.97); }
+.monster-choice-card:hover { border-color: var(--primary); }
+.monster-choice-icon { font-size: 1.8rem; }
+.monster-choice-label { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+.monster-choice-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.3; }
+
+/* Homebrew monster list */
+.monster-hb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 50vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.monster-hb-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 8px);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.monster-hb-item:hover { border-color: var(--primary); }
+.monster-hb-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.monster-hb-name { font-weight: 600; font-size: 0.92rem; color: var(--text); }
+.monster-hb-sub { font-size: 0.78rem; color: var(--text-secondary); }
+.monster-hb-arrow { font-size: 1.4rem; color: var(--text-secondary); font-weight: 300; flex-shrink: 0; }
+
 @media (max-width: 480px) {
     .combat-header { padding-left: 50px; }
     .combat-initiative-col { width: 46px; min-width: 46px; }

@@ -390,6 +390,7 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
         ${isDM ? `
         <div class="combat-dm-actions">
             <button class="btn-secondary btn-small" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
+            <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
             <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
         </div>` : ''}
     </div>`;
@@ -461,6 +462,57 @@ window.removeMonster = async function(mId, campagnaId, sessioneId) {
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
     await renderCombattimentoContent(campagnaId, sessioneId);
 }
+
+window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: original } = await supabase.from('mostri_combattimento').select('*').eq('id', mId).single();
+    if (!original) { showNotification('Mostro non trovato'); return; }
+
+    const baseName = original.nome.replace(/\s*#\d+$/, '');
+    const existing = _combatMonsters.filter(m => {
+        const b = m.nome.replace(/\s*#\d+$/, '');
+        return b === baseName;
+    });
+
+    if (!/#\d+$/.test(original.nome)) {
+        await supabase.from('mostri_combattimento').update({ nome: `${baseName} #1` }).eq('id', mId);
+    }
+
+    const num = existing.length + 1;
+    const clone = {
+        sessione_id: original.sessione_id,
+        campagna_id: original.campagna_id,
+        nome: `${baseName} #${num}`,
+        tipologia: original.tipologia,
+        taglia: original.taglia,
+        allineamento: original.allineamento,
+        grado_sfida: original.grado_sfida,
+        forza: original.forza,
+        destrezza: original.destrezza,
+        costituzione: original.costituzione,
+        intelligenza: original.intelligenza,
+        saggezza: original.saggezza,
+        carisma: original.carisma,
+        punti_vita_max: original.punti_vita_max,
+        pv_attuali: original.punti_vita_max,
+        classe_armatura: original.classe_armatura,
+        velocita: original.velocita,
+        iniziativa: original.iniziativa,
+        tiri_salvezza: original.tiri_salvezza,
+        competenze_abilita: original.competenze_abilita,
+        resistenze: original.resistenze,
+        immunita: original.immunita
+    };
+
+    const { error } = await supabase.from('mostri_combattimento').insert(clone);
+    if (error) { showNotification('Errore nella duplicazione'); return; }
+
+    showNotification(`${clone.nome} aggiunto!`);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
 
 // Combat toolbar placeholders
 window.combatDiceRoll = function() {
@@ -545,6 +597,7 @@ window.saveMonsterConditions = async function(mId, campagnaId, sessioneId) {
 
 // Monster creation modal
 window.openMonsterCreationModal = function(campagnaId, sessioneId) {
+    _monsterFromHomebrew = null;
     let modal = document.getElementById('monsterModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -557,7 +610,94 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
 
     document.getElementById('monsterModalContent').innerHTML = `
         <button class="modal-close" onclick="closeMonsterModal()">&times;</button>
-        <h2>Nuovo Mostro</h2>
+        <h2>Aggiungi Mostro</h2>
+        <div id="monsterChoicePage">
+            <div class="monster-choice-grid">
+                <div class="monster-choice-card" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">
+                    <span class="monster-choice-icon">✏️</span>
+                    <span class="monster-choice-label">Crea nuovo</span>
+                    <span class="monster-choice-desc">Crea un mostro da zero</span>
+                </div>
+                <div class="monster-choice-card" onclick="monsterFromHomebrew('${campagnaId}','${sessioneId}')">
+                    <span class="monster-choice-icon">📖</span>
+                    <span class="monster-choice-label">Da Homebrew</span>
+                    <span class="monster-choice-desc">Importa dal laboratorio</span>
+                </div>
+            </div>
+        </div>
+        <div id="monsterWizardContainer" style="display:none;"></div>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    modal.dataset.campagnaId = campagnaId;
+    modal.dataset.sessioneId = sessioneId;
+};
+
+let _monsterFromHomebrew = null;
+
+window.monsterStartNew = function(campagnaId, sessioneId) {
+    _monsterFromHomebrew = null;
+    _showMonsterWizard(campagnaId, sessioneId);
+};
+
+window.monsterFromHomebrew = async function(campagnaId, sessioneId) {
+    const choicePage = document.getElementById('monsterChoicePage');
+    if (choicePage) choicePage.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: myNemici } = await supabase.from('homebrew_nemici').select('*').eq('user_id', AppState.currentUser?.uid).order('nome');
+    const allNemici = myNemici || [];
+
+    if (allNemici.length === 0) {
+        if (choicePage) choicePage.innerHTML = `
+            <div class="lab-empty">Nessun nemico homebrew trovato</div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">Crea da zero</button>
+            </div>`;
+        return;
+    }
+
+    if (choicePage) choicePage.innerHTML = `
+        <div class="monster-hb-list">
+            ${allNemici.map(n => `
+                <div class="monster-hb-item" onclick="monsterSelectHomebrew('${n.id}','${campagnaId}','${sessioneId}')">
+                    <div class="monster-hb-info">
+                        <span class="monster-hb-name">${escapeHtml(n.nome)}</span>
+                        <span class="monster-hb-sub">${escapeHtml(n.tipo || '')} · GS ${n.grado_sfida || 0} · PV ${n.punti_vita_max || '?'}</span>
+                    </div>
+                    <span class="monster-hb-arrow">›</span>
+                </div>`).join('')}
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+            <button type="button" class="btn-secondary" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">Crea da zero</button>
+        </div>`;
+};
+
+window.monsterSelectHomebrew = function(nemiciId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    supabase.from('homebrew_nemici').select('*').eq('id', nemiciId).single().then(({ data }) => {
+        if (!data) { showNotification('Errore nel caricamento'); return; }
+        _monsterFromHomebrew = data;
+        _showMonsterWizard(campagnaId, sessioneId, data);
+    });
+};
+
+function _showMonsterWizard(campagnaId, sessioneId, prefill) {
+    const p = prefill || {};
+    const choicePage = document.getElementById('monsterChoicePage');
+    if (choicePage) choicePage.style.display = 'none';
+    const container = document.getElementById('monsterWizardContainer');
+    if (!container) return;
+    container.style.display = '';
+
+    const modalContent = document.getElementById('monsterModalContent');
+    const h2 = modalContent?.querySelector('h2');
+    if (h2) h2.textContent = prefill ? 'Importa Mostro' : 'Nuovo Mostro';
+
+    container.innerHTML = `
         <div class="wizard-steps">
             <div class="wizard-step active" data-step="0"></div>
             <div class="wizard-step" data-step="1"></div>
@@ -569,25 +709,25 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
             <div class="wizard-page active" id="mStep0">
                 <div class="form-group">
                     <label for="mNome">Nome</label>
-                    <input type="text" id="mNome" required placeholder="Nome del mostro">
+                    <input type="text" id="mNome" required placeholder="Nome del mostro" value="${escapeHtml(p.nome || '')}">
                 </div>
                 <div class="form-group">
                     <label>Tipologia</label>
-                    <button type="button" class="custom-select-trigger" id="mTipologia" data-value="${MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('mTipologia',MONSTER_TYPES,'Tipologia')">${MONSTER_TYPES[0]}</button>
+                    <button type="button" class="custom-select-trigger" id="mTipologia" data-value="${p.tipo || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('mTipologia',MONSTER_TYPES,'Tipologia')">${p.tipo || MONSTER_TYPES[0]}</button>
                 </div>
                 <div class="form-row form-row-2">
                     <div class="form-group">
                         <label>Taglia</label>
-                        <button type="button" class="custom-select-trigger" id="mTaglia" data-value="Media" onclick="openMonsterFieldSelect('mTaglia',MONSTER_SIZES,'Taglia')">Media</button>
+                        <button type="button" class="custom-select-trigger" id="mTaglia" data-value="${p.taglia || 'Media'}" onclick="openMonsterFieldSelect('mTaglia',MONSTER_SIZES,'Taglia')">${p.taglia || 'Media'}</button>
                     </div>
                     <div class="form-group">
                         <label for="mGS">Grado Sfida</label>
-                        <input type="text" id="mGS" value="0">
+                        <input type="text" id="mGS" value="${p.grado_sfida || '0'}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Allineamento</label>
-                    <button type="button" class="custom-select-trigger" id="mAllineamento" data-value="${MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('mAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${MONSTER_ALIGNMENTS[0]}</button>
+                    <button type="button" class="custom-select-trigger" id="mAllineamento" data-value="${p.allineamento || MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('mAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${p.allineamento || MONSTER_ALIGNMENTS[0]}</button>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeMonsterModal()">Annulla</button>
@@ -602,7 +742,7 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
                             <div class="pg-ability-row">
-                                <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="10">
+                                <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}">
                             </div>
                             <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}"> <span>TS</span></label>
                         </div>`).join('')}
@@ -630,7 +770,7 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 <div class="pg-stats-row-3">
                     <div class="form-group">
                         <label for="mCA">CA</label>
-                        <input type="number" id="mCA" min="1" value="10">
+                        <input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}">
                     </div>
                     <div class="form-group">
                         <label for="mInit">Iniziativa</label>
@@ -638,12 +778,12 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                     </div>
                     <div class="form-group">
                         <label for="mVel">Velocità</label>
-                        <input type="number" id="mVel" min="0" step="1.5" value="9">
+                        <input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}">
                     </div>
                 </div>
                 <div class="form-group" style="margin-top: var(--spacing-sm);">
                     <label for="mPV">Punti Ferita Massimi</label>
-                    <input type="number" id="mPV" min="1" value="10">
+                    <input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -665,13 +805,9 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
             </div>
         </form>`;
 
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    modal.dataset.campagnaId = campagnaId;
-    modal.dataset.sessioneId = sessioneId;
     window._monsterWizardStep = 0;
-    window._monsterResistenze = [];
-    window._monsterImmunita = [];
+    window._monsterResistenze = (p.resistenze || []).slice();
+    window._monsterImmunita = (p.immunita || []).slice();
 }
 
 window.closeMonsterModal = function() {
