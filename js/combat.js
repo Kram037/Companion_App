@@ -356,45 +356,146 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
     if (!m) { content.innerHTML = '<p>Mostro non trovato</p>'; return; }
 
     const fMod = (v) => { const mod = Math.floor(((v||10)-10)/2); return mod >= 0 ? `+${mod}` : `${mod}`; };
+    const bonusComp = Math.max(2, Math.floor(((parseInt(m.grado_sfida)||0)-1)/4)+2);
     const conditionsActive = ALL_CONDITIONS.filter(c => m[c.key]);
     const condBadges = conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('');
+    const saves = m.tiri_salvezza || [];
 
     const resistenzeHtml = (m.resistenze && m.resistenze.length > 0) ? m.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r)}</span>`).join('') : '';
     const immunitaHtml = (m.immunita && m.immunita.length > 0) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
 
+    const attacks = m.attacchi || [];
+    const attacksHtml = attacks.length > 0 ? attacks.map(a =>
+        `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus)}</span><span class="monster-attack-dmg">${escapeHtml(a.danno)}</span></div>`
+    ).join('') : '';
+
+    const leggActions = m.azioni_leggendarie || [];
+    const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${escapeHtml(a.descrizione || '')}</span></div>`
+    ).join('') : '';
+
+    const resLeggMax = m.resistenze_leggendarie || 0;
+    const resLeggCur = m.res_legg_attuali ?? resLeggMax;
+
+    const hasSpells = m.slot_incantesimo && typeof m.slot_incantesimo === 'object' && Object.keys(m.slot_incantesimo).length > 0;
+
+    let spellPageHtml = '';
+    if (hasSpells) {
+        const carInc = m.caratteristica_incantatore;
+        const incVal = m[carInc] || 10;
+        const incMod = Math.floor((incVal - 10) / 2);
+        const atkBonus = incMod + bonusComp;
+        const dc = 8 + bonusComp + incMod;
+        const slots = m.slot_incantesimo;
+        const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const pips = [];
+            for (let i = 0; i < s.max; i++) {
+                pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+            }
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips.join('')}</div><span class="scheda-slot-count" id="mSlotCount_${lvl}">${s.current}/${s.max}</span></div>`;
+        }).join('');
+
+        spellPageHtml = `
+        <div id="monsterSpellPage" style="display:none;">
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">
+                <div class="scheda-box"><div class="scheda-box-val">${incMod >= 0 ? '+'+incMod : incMod}</div><div class="scheda-box-label">${(carInc||'').substring(0,3).toUpperCase()}</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>
+            </div>
+            <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>`;
+    }
+
     content.innerHTML = `
-    <div class="combat-card-expanded">
+    <div class="combat-card-expanded combat-monster-sheet">
         <div class="combat-sheet-header">
             <h3>${escapeHtml(m.nome)}</h3>
             <span class="combat-sheet-sub">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</span>
             <button class="combat-sheet-close" onclick="combatCloseSheet('${campagnaId}','${sessioneId}')">&times;</button>
         </div>
-        <div class="scheda-four-boxes">
-            <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${fMod(m.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${m.grado_sfida||0}</div><div class="scheda-box-label">GS</div></div>
-        </div>
-        <div class="combat-hp-bar">
-            <div class="combat-hp-block" ${isDM ? `onclick="monsterHpCalc('${m.id}','pv_attuali',${m.pv_attuali??m.punti_vita_max},${m.punti_vita_max||10},'${campagnaId}','${sessioneId}')"` : ''}>
-                <span class="combat-hp-val ${isDM ? 'editable' : ''}">${m.pv_attuali??m.punti_vita_max}</span>/<span>${m.punti_vita_max||10}</span>
-                <div class="scheda-hp-label">PV</div>
+        ${hasSpells ? `<div class="combat-sheet-tabs"><button class="combat-sheet-tab active" onclick="monsterSheetTab(0)">Scheda</button><button class="combat-sheet-tab" onclick="monsterSheetTab(1)">Incantesimi</button></div>` : ''}
+        <div id="monsterStatsPage" class="combat-monster-scroll">
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.iniziativa != null ? m.iniziativa : fMod(m.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
             </div>
+            <div class="combat-hp-bar">
+                <div class="combat-hp-block" ${isDM ? `onclick="monsterHpCalc('${m.id}','pv_attuali',${m.pv_attuali??m.punti_vita_max},${m.punti_vita_max||10},'${campagnaId}','${sessioneId}')"` : ''}>
+                    <span class="combat-hp-val ${isDM ? 'editable' : ''}">${m.pv_attuali??m.punti_vita_max}</span>/<span>${m.punti_vita_max||10}</span>
+                    <div class="scheda-hp-label">PV</div>
+                </div>
+            </div>
+            ${resLeggMax > 0 ? `
+            <div class="combat-section-label">Resistenze Leggendarie</div>
+            <div class="monster-res-legg-counter" id="mResLeggCounter">
+                ${Array.from({length: resLeggMax}, (_,i) => `<span class="monster-res-legg-pip ${i < resLeggCur ? 'filled' : ''}" data-idx="${i}" ${isDM ? `onclick="monsterToggleResLegg('${m.id}',${i},'${campagnaId}','${sessioneId}')"` : ''}></span>`).join('')}
+                <span class="monster-res-legg-label">${resLeggCur}/${resLeggMax}</span>
+            </div>` : ''}
+            <div class="combat-abilities-grid">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${attacksHtml ? `<div class="combat-section-label">Attacchi</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+            ${leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie</div><div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+            ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
+            ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
+            ${condBadges || m.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>` : ''}
+            ${isDM ? `
+            <div class="combat-dm-actions">
+                <button class="btn-secondary btn-small" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
+                <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
+                <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+            </div>` : ''}
         </div>
-        <div class="combat-abilities-grid">
-            ${SCHEDA_ABILITIES.map(a => `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span></div>`).join('')}
-        </div>
-        ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
-        ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
-        ${condBadges || m.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>` : ''}
-        ${isDM ? `
-        <div class="combat-dm-actions">
-            <button class="btn-secondary btn-small" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
-            <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
-            <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
-        </div>` : ''}
+        ${spellPageHtml}
     </div>`;
+
+    if (hasSpells && isDM) {
+        content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+            pip.addEventListener('click', async () => {
+                const lvl = parseInt(pip.dataset.lvl);
+                const idx = parseInt(pip.dataset.idx);
+                const slots = m.slot_incantesimo;
+                const slot = slots[lvl];
+                if (!slot) return;
+                slot.current = idx < slot.current ? idx : idx + 1;
+                content.querySelectorAll(`.scheda-slot-pip[data-lvl="${lvl}"]`).forEach((p, i) => p.classList.toggle('filled', i < slot.current));
+                const countEl = document.getElementById(`mSlotCount_${lvl}`);
+                if (countEl) countEl.textContent = `${slot.current}/${slot.max}`;
+                await supabase.from('mostri_combattimento').update({ slot_incantesimo: slots }).eq('id', m.id);
+            });
+        });
+    }
 }
+
+window.monsterSheetTab = function(tab) {
+    const statsPage = document.getElementById('monsterStatsPage');
+    const spellPage = document.getElementById('monsterSpellPage');
+    if (statsPage) statsPage.style.display = tab === 0 ? '' : 'none';
+    if (spellPage) spellPage.style.display = tab === 1 ? '' : 'none';
+    const content = document.getElementById('combattimentoContent');
+    if (content) {
+        content.querySelectorAll('.combat-sheet-tab').forEach((btn, i) => btn.classList.toggle('active', i === tab));
+    }
+};
+
+window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('res_legg_attuali, resistenze_leggendarie').eq('id', mId).single();
+    if (!m) return;
+    const cur = m.res_legg_attuali ?? m.resistenze_leggendarie;
+    const newVal = idx < cur ? idx : idx + 1;
+    await supabase.from('mostri_combattimento').update({ res_legg_attuali: newVal }).eq('id', mId);
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
 
 // Monster HP Calculator (reuses the same overlay UI)
 window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sessioneId) {
@@ -503,7 +604,13 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
         tiri_salvezza: original.tiri_salvezza,
         competenze_abilita: original.competenze_abilita,
         resistenze: original.resistenze,
-        immunita: original.immunita
+        immunita: original.immunita,
+        attacchi: original.attacchi,
+        azioni_leggendarie: original.azioni_leggendarie,
+        resistenze_leggendarie: original.resistenze_leggendarie,
+        res_legg_attuali: original.resistenze_leggendarie,
+        slot_incantesimo: original.slot_incantesimo ? JSON.parse(JSON.stringify(original.slot_incantesimo)) : null,
+        caratteristica_incantatore: original.caratteristica_incantatore
     };
 
     const { error } = await supabase.from('mostri_combattimento').insert(clone);
@@ -697,13 +804,15 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     const h2 = modalContent?.querySelector('h2');
     if (h2) h2.textContent = prefill ? 'Importa Mostro' : 'Nuovo Mostro';
 
+    const pSaves = p.tiri_salvezza || [];
+    const pSkills = p.competenze_abilita || [];
+    const pSlots = p.slot_incantesimo || {};
+    const SPELL_ABILITIES = ['intelligenza','saggezza','carisma'];
+    const SPELL_AB_LABELS = { intelligenza:'Intelligenza', saggezza:'Saggezza', carisma:'Carisma' };
+
     container.innerHTML = `
         <div class="wizard-steps">
-            <div class="wizard-step active" data-step="0"></div>
-            <div class="wizard-step" data-step="1"></div>
-            <div class="wizard-step" data-step="2"></div>
-            <div class="wizard-step" data-step="3"></div>
-            <div class="wizard-step" data-step="4"></div>
+            ${[0,1,2,3,4,5,6].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('')}
         </div>
         <form id="monsterForm" onsubmit="return false;">
             <div class="wizard-page active" id="mStep0">
@@ -713,7 +822,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 </div>
                 <div class="form-group">
                     <label>Tipologia</label>
-                    <button type="button" class="custom-select-trigger" id="mTipologia" data-value="${p.tipo || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('mTipologia',MONSTER_TYPES,'Tipologia')">${p.tipo || MONSTER_TYPES[0]}</button>
+                    <button type="button" class="custom-select-trigger" id="mTipologia" data-value="${p.tipo || p.tipologia || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('mTipologia',MONSTER_TYPES,'Tipologia')">${p.tipo || p.tipologia || MONSTER_TYPES[0]}</button>
                 </div>
                 <div class="form-row form-row-2">
                     <div class="form-group">
@@ -735,16 +844,21 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep1">
-                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
+                <div class="form-section-label">Statistiche</div>
                 <div class="wizard-page-scroll">
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label for="mCA">CA</label><input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}"></div>
+                        <div class="form-group"><label for="mInit">Iniziativa</label><input type="number" id="mInit" value="${p.iniziativa || 10}"></div>
+                        <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
+                    </div>
+                    <div class="form-group" style="margin-top:var(--spacing-sm);"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-md);">Caratteristiche e Tiri Salvezza</div>
                     <div class="pg-abilities-grid">
                         ${SCHEDA_ABILITIES.map(a => `
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
-                            <div class="pg-ability-row">
-                                <input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}">
-                            </div>
-                            <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}"> <span>TS</span></label>
+                            <div class="pg-ability-row"><input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}"></div>
+                            <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
                         </div>`).join('')}
                     </div>
                 </div>
@@ -757,7 +871,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
-                        <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}"> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                        <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}" ${pSkills.includes(sk.key)?'checked':''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
                     </div>
                 </div>
                 <div class="form-actions">
@@ -766,37 +880,54 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep3">
-                <div class="form-section-label">Statistiche</div>
-                <div class="pg-stats-row-3">
-                    <div class="form-group">
-                        <label for="mCA">CA</label>
-                        <input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}">
-                    </div>
-                    <div class="form-group">
-                        <label for="mInit">Iniziativa</label>
-                        <input type="number" id="mInit" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label for="mVel">Velocità</label>
-                        <input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}">
-                    </div>
-                </div>
-                <div class="form-group" style="margin-top: var(--spacing-sm);">
-                    <label for="mPV">Punti Ferita Massimi</label>
-                    <input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}">
-                </div>
+                <div class="form-section-label">Resistenze e Immunità</div>
+                <div class="pg-res-header"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
+                <div class="wizard-page-scroll"><div id="mResImmGrid" class="pg-res-grid"></div></div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
             <div class="wizard-page" id="mStep4">
-                <div class="form-section-label">Resistenze e Immunità</div>
-                <div class="pg-res-header">
-                    <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
-                </div>
+                <div class="form-section-label">Attacchi</div>
                 <div class="wizard-page-scroll">
-                    <div id="mResImmGrid" class="pg-res-grid"></div>
+                    <div id="mAttacchiList">${_renderMonsterAttacks(p.attacchi || [])}</div>
+                    <button type="button" class="hb-add-btn" onclick="monsterAddAttack()">+ Aggiungi attacco</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep5">
+                <div class="form-section-label">Leggendario</div>
+                <div class="wizard-page-scroll">
+                    <div class="form-group"><label for="mResLegg">Resistenze Leggendarie</label><input type="number" id="mResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
+                    <div class="form-group" style="margin-top:var(--spacing-sm);">
+                        <label>Azioni Leggendarie</label>
+                        <div id="mAzioniLeggList">${_renderMonsterLeggActions(p.azioni_leggendarie || [])}</div>
+                        <button type="button" class="hb-add-btn" onclick="monsterAddLeggAction()">+ Aggiungi azione</button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep6">
+                <div class="form-section-label">Incantesimi (opzionale)</div>
+                <div class="wizard-page-scroll">
+                    <div class="form-group">
+                        <label>Caratteristica da incantatore</label>
+                        <select id="mCarInc">
+                            <option value="">Nessuna (non incantatore)</option>
+                            ${SPELL_ABILITIES.map(a => `<option value="${a}" ${p.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-sm);">Slot per livello</div>
+                    <div class="hb-stats-grid">
+                        ${[1,2,3,4,5,6,7,8,9].map(lv => `<div class="form-group"><label>Lv ${lv}</label><input type="number" id="mSlot${lv}" min="0" value="${pSlots[lv]?.max || 0}"></div>`).join('')}
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -809,6 +940,45 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     window._monsterResistenze = (p.resistenze || []).slice();
     window._monsterImmunita = (p.immunita || []).slice();
 }
+
+function _renderMonsterAttacks(attacks) {
+    if (!attacks || !attacks.length) return '';
+    return attacks.map((a, i) => `<div class="hb-attack-row" data-idx="${i}">
+        <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="mAtkNome">
+        <input type="text" placeholder="+Hit" value="${escapeHtml(a.bonus || '')}" class="mAtkBonus" style="width:50px">
+        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="mAtkDanno" style="width:65px">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`).join('');
+}
+window.monsterAddAttack = function() {
+    const list = document.getElementById('mAttacchiList');
+    if (!list) return;
+    const idx = list.querySelectorAll('.hb-attack-row').length;
+    list.insertAdjacentHTML('beforeend', `<div class="hb-attack-row" data-idx="${idx}">
+        <input type="text" placeholder="Nome" class="mAtkNome">
+        <input type="text" placeholder="+Hit" class="mAtkBonus" style="width:50px">
+        <input type="text" placeholder="Danno" class="mAtkDanno" style="width:65px">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`);
+};
+
+function _renderMonsterLeggActions(actions) {
+    if (!actions || !actions.length) return '';
+    return actions.map((a, i) => `<div class="hb-attack-row" data-idx="${i}">
+        <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="mLeggNome">
+        <input type="text" placeholder="Descrizione" value="${escapeHtml(a.descrizione || '')}" class="mLeggDesc" style="flex:2">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`).join('');
+}
+window.monsterAddLeggAction = function() {
+    const list = document.getElementById('mAzioniLeggList');
+    if (!list) return;
+    list.insertAdjacentHTML('beforeend', `<div class="hb-attack-row">
+        <input type="text" placeholder="Nome" class="mLeggNome">
+        <input type="text" placeholder="Descrizione" class="mLeggDesc" style="flex:2">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`);
+};
 
 window.closeMonsterModal = function() {
     const modal = document.getElementById('monsterModal');
@@ -859,7 +1029,7 @@ window.monsterWizardNav = function(dir) {
         const nome = document.getElementById('mNome')?.value?.trim();
         if (!nome) { showNotification('Inserisci un nome per il mostro'); return; }
     }
-    const totalSteps = 5;
+    const totalSteps = 7;
     const maxStep = totalSteps - 1;
     window._monsterWizardStep = Math.max(0, Math.min(maxStep, (window._monsterWizardStep || 0) + dir));
     const step = window._monsterWizardStep;
@@ -867,7 +1037,7 @@ window.monsterWizardNav = function(dir) {
         const page = document.getElementById(`mStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
-    if (step === 4) monsterRenderResImmGrid();
+    if (step === 3) monsterRenderResImmGrid();
     const modal = document.getElementById('monsterModal');
     if (modal) {
         modal.querySelectorAll('.wizard-step').forEach((dot, i) => {
@@ -890,6 +1060,29 @@ window.saveMonster = async function() {
     const resistenze = window._monsterResistenze || [];
     const immunita = window._monsterImmunita || [];
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
+    const resLegg = parseInt(document.getElementById('mResLegg')?.value) || 0;
+
+    const attacchi = [...document.querySelectorAll('#mAttacchiList .hb-attack-row')].map(row => ({
+        nome: row.querySelector('.mAtkNome')?.value || '',
+        bonus: row.querySelector('.mAtkBonus')?.value || '',
+        danno: row.querySelector('.mAtkDanno')?.value || ''
+    })).filter(a => a.nome);
+
+    const azioniLegg = [...document.querySelectorAll('#mAzioniLeggList .hb-attack-row')].map(row => ({
+        nome: row.querySelector('.mLeggNome')?.value || '',
+        descrizione: row.querySelector('.mLeggDesc')?.value || ''
+    })).filter(a => a.nome);
+
+    const carInc = document.getElementById('mCarInc')?.value || null;
+    let slotInc = null;
+    if (carInc) {
+        slotInc = {};
+        for (let lv = 1; lv <= 9; lv++) {
+            const max = parseInt(document.getElementById(`mSlot${lv}`)?.value) || 0;
+            if (max > 0) slotInc[lv] = { max, current: max };
+        }
+        if (Object.keys(slotInc).length === 0) slotInc = null;
+    }
 
     const monster = {
         sessione_id: sessioneId,
@@ -913,7 +1106,13 @@ window.saveMonster = async function() {
         tiri_salvezza: saves,
         competenze_abilita: skills,
         resistenze,
-        immunita
+        immunita,
+        attacchi,
+        azioni_leggendarie: azioniLegg,
+        resistenze_leggendarie: resLegg,
+        res_legg_attuali: resLegg,
+        slot_incantesimo: slotInc,
+        caratteristica_incantatore: carInc
     };
 
     const supabase = getSupabaseClient();

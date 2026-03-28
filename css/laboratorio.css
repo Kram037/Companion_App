@@ -273,6 +273,7 @@
     transition: border-color 0.2s, color 0.2s;
 }
 .hb-add-btn:hover { border-color: var(--primary); color: var(--primary); }
+.lab-wizard-hide { display: none !important; }
 
 .hb-saves-row {
     display: flex;
