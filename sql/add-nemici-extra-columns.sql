@@ -5,3 +5,4 @@ ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS azioni_leggendarie JSONB DE
 ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS resistenze_leggendarie INTEGER DEFAULT 0;
 ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS slot_incantesimo JSONB DEFAULT NULL;
 ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS caratteristica_incantatore TEXT DEFAULT NULL;
+ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS azioni_legg_max INTEGER DEFAULT 0;

@@ -83,7 +83,8 @@
 /* Combat Body: icon col + cards col */
 .combat-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 .combat-initiative-col { width: 54px; min-width: 54px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); flex-shrink: 0; }
-.combat-cards-col { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.combat-cards-col { flex: 1; overflow-y: auto; padding: 8px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.combat-cards-col:has(.combat-card-expanded) { overflow: hidden; }
 
 /* Combat Icons */
 .combat-icon { width: 44px; height: 48px; border-radius: var(--radius-sm); background: var(--bg); border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
@@ -107,8 +108,19 @@
 .combat-card-hp { font-size: 0.82rem; font-weight: 800; color: var(--accent); flex-shrink: 0; white-space: nowrap; margin-left: auto; }
 
 /* Combat Card Expanded (sheet) */
-.combat-card-expanded { background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px; animation: combatExpand 0.2s ease; flex-shrink: 0; }
-.combat-card-expanded.combat-monster-sheet { flex-shrink: 1; min-height: 0; }
+.combat-card-expanded {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    animation: combatExpand 0.2s ease;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 @keyframes combatExpand { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Combat Sheet (inline) */
@@ -178,11 +190,10 @@
 .combat-monster-scroll::-webkit-scrollbar-track { background: transparent; }
 .combat-monster-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-/* Monster attacks in sheet */
+/* Monster actions in sheet */
 .monster-attacks-list, .monster-legg-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 .monster-attack-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+    display: flex;
     gap: 8px;
     padding: 6px 8px;
     background: var(--bg);
@@ -190,10 +201,19 @@
     border: 1px solid var(--border);
     font-size: 0.85rem;
     align-items: center;
+    flex-wrap: wrap;
 }
-.monster-attack-name { font-weight: 600; color: var(--text); }
+.monster-attack-name { font-weight: 600; color: var(--text); flex: 1; min-width: 0; }
 .monster-attack-hit { color: var(--accent); font-weight: 600; }
 .monster-attack-dmg { color: var(--text-secondary); }
+.monster-action-uses { display: flex; gap: 3px; align-items: center; }
+.monster-action-use-pip {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--accent); background: transparent;
+    cursor: pointer; transition: background 0.15s;
+}
+.monster-action-use-pip.filled { background: var(--accent); }
+.monster-action-use-pip:hover { opacity: 0.7; }
 .monster-legg-row {
     padding: 6px 8px;
     background: var(--bg);
@@ -223,23 +243,27 @@
 .monster-res-legg-pip.filled { background: var(--accent); }
 .monster-res-legg-label { font-size: 0.8rem; color: var(--text-secondary); margin-left: 4px; }
 
-/* DM actions consistent */
+/* DM actions */
 .combat-dm-actions {
     display: flex;
+    flex-direction: column;
     gap: 6px;
     margin-top: 12px;
     padding-top: 10px;
     border-top: 1px solid var(--border);
-    flex-wrap: wrap;
 }
 .combat-dm-actions .btn-small {
-    flex: 1;
-    min-width: 0;
-    font-size: 0.8rem;
-    padding: 8px 6px;
+    font-size: 0.82rem;
+    padding: 8px 10px;
     text-align: center;
     border-radius: var(--radius, 6px);
 }
+.combat-dm-btn-full { width: 100%; }
+.combat-dm-actions-row {
+    display: flex;
+    gap: 6px;
+}
+.combat-dm-actions-row .btn-small { flex: 1; }
 
 /* Monster creation choice */
 .monster-choice-grid {

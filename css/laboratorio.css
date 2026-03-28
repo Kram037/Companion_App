@@ -258,6 +258,13 @@
     font-size: 0.85em;
 }
 .hb-attack-row button:hover { border-color: #e53935; color: #e53935; }
+.mAtkUsiLabel {
+    display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+    font-size: 0.78em; color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+}
+.mAtkUsiLabel input[type="checkbox"] { width: 14px; height: 14px; margin: 0; }
+.mAtkUsiLabel span { user-select: none; }
+.hb-attack-row .hbAtkUsiMax, .hb-attack-row .mAtkUsiMax { flex: 0 0 40px; min-width: 40px; text-align: center; }
 
 .hb-add-btn {
     display: inline-flex;

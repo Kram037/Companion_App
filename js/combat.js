@@ -183,6 +183,20 @@ window.combatNextTurn = async function(campagnaId, sessioneId, orderLen, round, 
     }
     const supabase = getSupabaseClient();
     if (!supabase) return;
+
+    const nextEntry = _combatInitiativeOrder[nextIdx];
+    if (nextEntry && nextEntry.type === 'monster') {
+        const m = nextEntry.monster;
+        if (m) {
+            const updates = {};
+            if ((m.resistenze_leggendarie || 0) > 0) updates.res_legg_attuali = m.resistenze_leggendarie;
+            if ((m.azioni_legg_max || 0) > 0) updates.azioni_legg_attuali = m.azioni_legg_max;
+            if (Object.keys(updates).length > 0) {
+                await supabase.from('mostri_combattimento').update(updates).eq('id', m.id);
+            }
+        }
+    }
+
     await supabase.from('sessioni').update({ combat_round: nextRound, combat_turn_index: nextIdx }).eq('id', sessioneId);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
     await renderCombattimentoContent(campagnaId, sessioneId);
@@ -262,7 +276,7 @@ async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessio
         }).join('');
 
         spellPageHtml = `
-        <div id="combatSpellPage" style="display:none;">
+        <div id="combatSpellPage" class="combat-monster-scroll" style="display:none;">
             <div class="scheda-three-boxes" style="margin-bottom:10px;">${spellStatsHtml}</div>
             <div class="scheda-slots-table">${slotsHtml}</div>
         </div>`;
@@ -276,7 +290,7 @@ async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessio
             <button class="combat-sheet-close" onclick="combatCloseSheet('${campagnaId}','${sessioneId}')">&times;</button>
         </div>
         ${hasSpellSlots ? `<div class="combat-sheet-tabs"><button class="combat-sheet-tab active" onclick="combatSheetTab(0)">Scheda</button><button class="combat-sheet-tab" onclick="combatSheetTab(1)">Incantesimi</button></div>` : ''}
-        <div id="combatStatsPage">
+        <div id="combatStatsPage" class="combat-monster-scroll">
             <div class="scheda-three-boxes">
                 <div class="scheda-box"><div class="scheda-box-val">${pg.classe_armatura || 10}</div><div class="scheda-box-label">CA</div></div>
                 <div class="scheda-box"><div class="scheda-box-val">${pg.iniziativa != null ? pg.iniziativa : fMod(pg.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
@@ -365,9 +379,14 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
     const immunitaHtml = (m.immunita && m.immunita.length > 0) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
 
     const attacks = m.attacchi || [];
-    const attacksHtml = attacks.length > 0 ? attacks.map(a =>
-        `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus)}</span><span class="monster-attack-dmg">${escapeHtml(a.danno)}</span></div>`
-    ).join('') : '';
+    const attacksHtml = attacks.length > 0 ? attacks.map((a, i) => {
+        const hasUsi = a.usi_max > 0;
+        const usiCur = a.usi_attuali ?? a.usi_max;
+        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_,j) =>
+            `<span class="monster-action-use-pip ${j < usiCur ? 'filled' : ''}" ${isDM ? `onclick="monsterToggleActionUse('${m.id}',${i},${j},'${campagnaId}','${sessioneId}')"` : ''}></span>`
+        ).join('')}</span>` : '';
+        return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
+    }).join('') : '';
 
     const leggActions = m.azioni_leggendarie || [];
     const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
@@ -376,6 +395,8 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
 
     const resLeggMax = m.resistenze_leggendarie || 0;
     const resLeggCur = m.res_legg_attuali ?? resLeggMax;
+    const azLeggMax = m.azioni_legg_max || 0;
+    const azLeggCur = m.azioni_legg_attuali ?? azLeggMax;
 
     const hasSpells = m.slot_incantesimo && typeof m.slot_incantesimo === 'object' && Object.keys(m.slot_incantesimo).length > 0;
 
@@ -398,7 +419,7 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
         }).join('');
 
         spellPageHtml = `
-        <div id="monsterSpellPage" style="display:none;">
+        <div id="monsterSpellPage" class="combat-monster-scroll" style="display:none;">
             <div class="scheda-three-boxes" style="margin-bottom:10px;">
                 <div class="scheda-box"><div class="scheda-box-val">${incMod >= 0 ? '+'+incMod : incMod}</div><div class="scheda-box-label">${(carInc||'').substring(0,3).toUpperCase()}</div></div>
                 <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
@@ -442,16 +463,23 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
                     return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
                 }).join('')}
             </div>
-            ${attacksHtml ? `<div class="combat-section-label">Attacchi</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
-            ${leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie</div><div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+            ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+            ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie</div>` : ''}
+            ${azLeggMax > 0 ? `<div class="monster-res-legg-counter" id="mAzLeggCounter">
+                ${Array.from({length: azLeggMax}, (_,i) => `<span class="monster-res-legg-pip ${i < azLeggCur ? 'filled' : ''}" data-idx="${i}" ${isDM ? `onclick="monsterToggleAzLegg('${m.id}',${i},'${campagnaId}','${sessioneId}')"` : ''}></span>`).join('')}
+                <span class="monster-res-legg-label">${azLeggCur}/${azLeggMax}</span>
+            </div>` : ''}
+            ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
             ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
             ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
             ${condBadges || m.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>` : ''}
             ${isDM ? `
             <div class="combat-dm-actions">
-                <button class="btn-secondary btn-small" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
-                <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
-                <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+                <button class="btn-secondary btn-small combat-dm-btn-full" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
+                <div class="combat-dm-actions-row">
+                    <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
+                    <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+                </div>
             </div>` : ''}
         </div>
         ${spellPageHtml}
@@ -494,6 +522,31 @@ window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
     const cur = m.res_legg_attuali ?? m.resistenze_leggendarie;
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ res_legg_attuali: newVal }).eq('id', mId);
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('azioni_legg_attuali, azioni_legg_max').eq('id', mId).single();
+    if (!m) return;
+    const cur = m.azioni_legg_attuali ?? m.azioni_legg_max;
+    const newVal = idx < cur ? idx : idx + 1;
+    await supabase.from('mostri_combattimento').update({ azioni_legg_attuali: newVal }).eq('id', mId);
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('attacchi').eq('id', mId).single();
+    if (!m || !m.attacchi || !m.attacchi[actionIdx]) return;
+    const action = m.attacchi[actionIdx];
+    const cur = action.usi_attuali ?? action.usi_max;
+    action.usi_attuali = pipIdx < cur ? pipIdx : pipIdx + 1;
+    const updated = [...m.attacchi];
+    updated[actionIdx] = action;
+    await supabase.from('mostri_combattimento').update({ attacchi: updated }).eq('id', mId);
     await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
@@ -605,10 +658,12 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
         competenze_abilita: original.competenze_abilita,
         resistenze: original.resistenze,
         immunita: original.immunita,
-        attacchi: original.attacchi,
+        attacchi: (original.attacchi || []).map(a => ({...a, usi_attuali: a.usi_max || 0})),
         azioni_leggendarie: original.azioni_leggendarie,
         resistenze_leggendarie: original.resistenze_leggendarie,
         res_legg_attuali: original.resistenze_leggendarie,
+        azioni_legg_max: original.azioni_legg_max || 0,
+        azioni_legg_attuali: original.azioni_legg_max || 0,
         slot_incantesimo: original.slot_incantesimo ? JSON.parse(JSON.stringify(original.slot_incantesimo)) : null,
         caratteristica_incantatore: original.caratteristica_incantatore
     };
@@ -889,10 +944,10 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep4">
-                <div class="form-section-label">Attacchi</div>
+                <div class="form-section-label">Azioni</div>
                 <div class="wizard-page-scroll">
                     <div id="mAttacchiList">${_renderMonsterAttacks(p.attacchi || [])}</div>
-                    <button type="button" class="hb-add-btn" onclick="monsterAddAttack()">+ Aggiungi attacco</button>
+                    <button type="button" class="hb-add-btn" onclick="monsterAddAttack()">+ Aggiungi azione</button>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -903,6 +958,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="form-section-label">Leggendario</div>
                 <div class="wizard-page-scroll">
                     <div class="form-group"><label for="mResLegg">Resistenze Leggendarie</label><input type="number" id="mResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
+                    <div class="form-group"><label for="mAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="mAzLeggMax" min="0" value="${p.azioni_legg_max || 0}"></div>
                     <div class="form-group" style="margin-top:var(--spacing-sm);">
                         <label>Azioni Leggendarie</label>
                         <div id="mAzioniLeggList">${_renderMonsterLeggActions(p.azioni_leggendarie || [])}</div>
@@ -943,12 +999,17 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
 
 function _renderMonsterAttacks(attacks) {
     if (!attacks || !attacks.length) return '';
-    return attacks.map((a, i) => `<div class="hb-attack-row" data-idx="${i}">
+    return attacks.map((a, i) => {
+        const hasUsi = (a.usi_max || 0) > 0;
+        return `<div class="hb-attack-row" data-idx="${i}">
         <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="mAtkNome">
         <input type="text" placeholder="+Hit" value="${escapeHtml(a.bonus || '')}" class="mAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="mAtkDanno" style="width:65px">
+        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="mAtkDanno" style="width:60px">
+        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="mAtkHasUsi" ${hasUsi ? 'checked' : ''} onchange="monsterToggleAtkUsi(this)"><span>Usi</span></label>
+        <input type="number" class="mAtkUsiMax" placeholder="N" min="1" value="${a.usi_max || ''}" style="width:40px;${hasUsi ? '' : 'display:none'}">
         <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`).join('');
+    </div>`;
+    }).join('');
 }
 window.monsterAddAttack = function() {
     const list = document.getElementById('mAttacchiList');
@@ -957,9 +1018,15 @@ window.monsterAddAttack = function() {
     list.insertAdjacentHTML('beforeend', `<div class="hb-attack-row" data-idx="${idx}">
         <input type="text" placeholder="Nome" class="mAtkNome">
         <input type="text" placeholder="+Hit" class="mAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" class="mAtkDanno" style="width:65px">
+        <input type="text" placeholder="Danno" class="mAtkDanno" style="width:60px">
+        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="mAtkHasUsi" onchange="monsterToggleAtkUsi(this)"><span>Usi</span></label>
+        <input type="number" class="mAtkUsiMax" placeholder="N" min="1" style="width:40px;display:none">
         <button type="button" onclick="this.parentElement.remove()">✕</button>
     </div>`);
+};
+window.monsterToggleAtkUsi = function(cb) {
+    const usiInput = cb.closest('.hb-attack-row')?.querySelector('.mAtkUsiMax');
+    if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
 };
 
 function _renderMonsterLeggActions(actions) {
@@ -1062,16 +1129,24 @@ window.saveMonster = async function() {
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
     const resLegg = parseInt(document.getElementById('mResLegg')?.value) || 0;
 
-    const attacchi = [...document.querySelectorAll('#mAttacchiList .hb-attack-row')].map(row => ({
-        nome: row.querySelector('.mAtkNome')?.value || '',
-        bonus: row.querySelector('.mAtkBonus')?.value || '',
-        danno: row.querySelector('.mAtkDanno')?.value || ''
-    })).filter(a => a.nome);
+    const attacchi = [...document.querySelectorAll('#mAttacchiList .hb-attack-row')].map(row => {
+        const hasUsi = row.querySelector('.mAtkHasUsi')?.checked;
+        const usiMax = hasUsi ? (parseInt(row.querySelector('.mAtkUsiMax')?.value) || 0) : 0;
+        return {
+            nome: row.querySelector('.mAtkNome')?.value || '',
+            bonus: row.querySelector('.mAtkBonus')?.value || '',
+            danno: row.querySelector('.mAtkDanno')?.value || '',
+            usi_max: usiMax,
+            usi_attuali: usiMax
+        };
+    }).filter(a => a.nome);
 
     const azioniLegg = [...document.querySelectorAll('#mAzioniLeggList .hb-attack-row')].map(row => ({
         nome: row.querySelector('.mLeggNome')?.value || '',
         descrizione: row.querySelector('.mLeggDesc')?.value || ''
     })).filter(a => a.nome);
+
+    const azLeggMaxVal = parseInt(document.getElementById('mAzLeggMax')?.value) || 0;
 
     const carInc = document.getElementById('mCarInc')?.value || null;
     let slotInc = null;
@@ -1111,6 +1186,8 @@ window.saveMonster = async function() {
         azioni_leggendarie: azioniLegg,
         resistenze_leggendarie: resLegg,
         res_legg_attuali: resLegg,
+        azioni_legg_max: azLeggMaxVal,
+        azioni_legg_attuali: azLeggMaxVal,
         slot_incantesimo: slotInc,
         caratteristica_incantatore: carInc
     };

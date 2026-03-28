@@ -361,7 +361,8 @@ function labFieldsNemici(data) {
     window._labNemWizardStep = 0;
 
     setTimeout(() => {
-        document.getElementById('homebrewForm')?.querySelector('.form-actions')?.classList.add('lab-wizard-hide');
+        const bottomActions = document.getElementById('saveHomebrewBtn')?.parentElement;
+        if (bottomActions) bottomActions.classList.add('lab-wizard-hide');
     }, 0);
 
     return `
@@ -416,10 +417,10 @@ function labFieldsNemici(data) {
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
     <div class="wizard-page" id="hbNStep4">
-        <div class="form-section-label">Attacchi</div>
+        <div class="form-section-label">Azioni</div>
         <div class="wizard-page-scroll">
             <div id="hbAttacchiList">${labRenderAttacchi(data?.attacchi || [])}</div>
-            <button type="button" class="hb-add-btn" onclick="labAddAttacco()">+ Aggiungi attacco</button>
+            <button type="button" class="hb-add-btn" onclick="labAddAttacco()">+ Aggiungi azione</button>
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
@@ -427,6 +428,7 @@ function labFieldsNemici(data) {
         <div class="form-section-label">Leggendario</div>
         <div class="wizard-page-scroll">
             <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${data?.resistenze_leggendarie || 0}"></div>
+            <div class="form-group"><label for="hbAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="hbAzLeggMax" min="0" value="${data?.azioni_legg_max || 0}"></div>
             <div class="form-group" style="margin-top:var(--spacing-sm);"><label>Azioni Leggendarie</label><div id="hbAzioniLeggList">${labRenderAzioniLegg(data?.azioni_leggendarie || [])}</div><button type="button" class="hb-add-btn" onclick="labAddAzioneLegg()">+ Aggiungi azione</button></div>
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
@@ -471,13 +473,18 @@ window.labNemToggleImm = function(val, checked) {
 
 function labRenderAttacchi(attacchi) {
     if (!attacchi.length) return '';
-    return attacchi.map((a, i) => `
+    return attacchi.map((a, i) => {
+        const hasUsi = (a.usi_max || 0) > 0;
+        return `
     <div class="hb-attack-row" data-idx="${i}">
         <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="hbAtkNome">
-        <input type="text" placeholder="Bonus" value="${escapeHtml(a.bonus || '')}" class="hbAtkBonus" style="width:55px">
-        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="hbAtkDanno" style="width:70px">
+        <input type="text" placeholder="+Hit" value="${escapeHtml(a.bonus || '')}" class="hbAtkBonus" style="width:50px">
+        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="hbAtkDanno" style="width:60px">
+        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="hbAtkHasUsi" ${hasUsi ? 'checked' : ''} onchange="labToggleAtkUsi(this)"><span>Usi</span></label>
+        <input type="number" class="hbAtkUsiMax" placeholder="N" min="1" value="${a.usi_max || ''}" style="width:40px;${hasUsi ? '' : 'display:none'}">
         <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`).join('');
+    </div>`;
+    }).join('');
 }
 
 function labRenderAzioniLegg(azioni) {
@@ -509,10 +516,16 @@ window.labAddAttacco = function() {
     row.className = 'hb-attack-row';
     row.innerHTML = `
         <input type="text" placeholder="Nome" class="hbAtkNome">
-        <input type="text" placeholder="Bonus" class="hbAtkBonus" style="width:55px">
-        <input type="text" placeholder="Danno" class="hbAtkDanno" style="width:70px">
+        <input type="text" placeholder="+Hit" class="hbAtkBonus" style="width:50px">
+        <input type="text" placeholder="Danno" class="hbAtkDanno" style="width:60px">
+        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="hbAtkHasUsi" onchange="labToggleAtkUsi(this)"><span>Usi</span></label>
+        <input type="number" class="hbAtkUsiMax" placeholder="N" min="1" style="width:40px;display:none">
         <button type="button" onclick="this.parentElement.remove()">✕</button>`;
     list.appendChild(row);
+};
+window.labToggleAtkUsi = function(cb) {
+    const usiInput = cb.closest('.hb-attack-row')?.querySelector('.hbAtkUsiMax');
+    if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
 };
 
 function labFieldsTalenti(data) {
@@ -588,8 +601,8 @@ window.closeHomebrewModal = function() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
         _labEditingId = null;
-        const defaultActions = document.getElementById('homebrewForm')?.querySelector('.form-actions.lab-wizard-hide');
-        if (defaultActions) defaultActions.classList.remove('lab-wizard-hide');
+        const bottomActions = document.getElementById('saveHomebrewBtn')?.parentElement;
+        if (bottomActions) bottomActions.classList.remove('lab-wizard-hide');
     }
 };
 
@@ -677,12 +690,18 @@ async function handleSaveHomebrew(e) {
                 .filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key);
             record.resistenze = window._labNemResistenze || [];
             record.immunita = window._labNemImmunita || [];
-            record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => ({
-                nome: row.querySelector('.hbAtkNome')?.value || '',
-                bonus: row.querySelector('.hbAtkBonus')?.value || '',
-                danno: row.querySelector('.hbAtkDanno')?.value || ''
-            })).filter(a => a.nome);
+            record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
+                const hasUsi = row.querySelector('.hbAtkHasUsi')?.checked;
+                const usiMax = hasUsi ? (parseInt(row.querySelector('.hbAtkUsiMax')?.value) || 0) : 0;
+                return {
+                    nome: row.querySelector('.hbAtkNome')?.value || '',
+                    bonus: row.querySelector('.hbAtkBonus')?.value || '',
+                    danno: row.querySelector('.hbAtkDanno')?.value || '',
+                    usi_max: usiMax
+                };
+            }).filter(a => a.nome);
             record.resistenze_leggendarie = parseInt(document.getElementById('hbResLegg')?.value) || 0;
+            record.azioni_legg_max = parseInt(document.getElementById('hbAzLeggMax')?.value) || 0;
             record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-attack-row')].map(row => ({
                 nome: row.querySelector('.hbLeggNome')?.value || '',
                 descrizione: row.querySelector('.hbLeggDesc')?.value || ''
