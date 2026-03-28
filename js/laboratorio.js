@@ -344,10 +344,6 @@ function labFieldsIncantesimi(data) {
 }
 
 function labFieldsNemici(data) {
-    const tipi = ['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fatato','Immondo','Melma','Mostruosità','Non Morto','Pianta','Gigante','Umanoide'];
-    const taglie = ['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
-    const saves = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
-    const savesLabels = { forza:'FOR', destrezza:'DES', costituzione:'COS', intelligenza:'INT', saggezza:'SAG', carisma:'CAR' };
     const dataSaves = data?.tiri_salvezza || [];
     const dataSkills = data?.competenze_abilita || [];
     const dataRes = data?.resistenze || [];
@@ -361,19 +357,21 @@ function labFieldsNemici(data) {
     window._labNemWizardStep = 0;
 
     setTimeout(() => {
-        const bottomActions = document.getElementById('saveHomebrewBtn')?.parentElement;
-        if (bottomActions) bottomActions.classList.add('lab-wizard-hide');
+        document.getElementById('homebrewDefaultActions')?.classList.add('lab-wizard-hide');
+        const stepsBar = document.getElementById('homebrewWizardSteps');
+        if (stepsBar) {
+            stepsBar.style.display = '';
+            stepsBar.innerHTML = [0,1,2,3,4,5,6,7].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('');
+        }
     }, 0);
 
     return `
-    <div class="wizard-steps">
-        ${[0,1,2,3,4,5,6].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('')}
-    </div>
     <div class="wizard-page active" id="hbNStep0">
+        <div class="form-section-label">Identità</div>
         <div class="form-group"><label for="hbNome">Nome</label><input type="text" id="hbNome" required placeholder="Nome del nemico" value="${escapeHtml(data?.nome || '')}"></div>
         <div class="form-group">
             <label>Tipologia</label>
-            <button type="button" class="custom-select-trigger" id="hbTipo" data-value="${data?.tipo || tipi[0]}" onclick="openMonsterFieldSelect('hbTipo',MONSTER_TYPES,'Tipologia')">${data?.tipo || tipi[0]}</button>
+            <button type="button" class="custom-select-trigger" id="hbTipo" data-value="${data?.tipo || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('hbTipo',MONSTER_TYPES,'Tipologia')">${data?.tipo || MONSTER_TYPES[0]}</button>
         </div>
         <div class="form-row form-row-2">
             <div class="form-group">
@@ -382,14 +380,24 @@ function labFieldsNemici(data) {
             </div>
             <div class="form-group"><label for="hbGS">Grado Sfida</label><input type="text" id="hbGS" placeholder="1" value="${escapeHtml(data?.grado_sfida || '')}"></div>
         </div>
-        <div class="pg-stats-row-3">
-            <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${data?.classe_armatura || 10}"></div>
-            <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${data?.punti_vita_max || 10}"></div>
-            <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(data?.velocita || '9')}"></div>
+        <div class="form-group">
+            <label>Allineamento</label>
+            <button type="button" class="custom-select-trigger" id="hbAllineamento" data-value="${data?.allineamento || MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('hbAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${data?.allineamento || MONSTER_ALIGNMENTS[0]}</button>
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
     <div class="wizard-page" id="hbNStep1">
+        <div class="form-section-label">Statistiche</div>
+        <div class="wizard-page-scroll">
+            <div class="pg-stats-row-3">
+                <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${data?.classe_armatura || 10}"></div>
+                <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(data?.velocita || '9')}"></div>
+                <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${data?.punti_vita_max || 10}"></div>
+            </div>
+        </div>
+        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
+    </div>
+    <div class="wizard-page" id="hbNStep2">
         <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
         <div class="wizard-page-scroll">
             <div class="pg-abilities-grid">
@@ -403,15 +411,15 @@ function labFieldsNemici(data) {
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
-    <div class="wizard-page" id="hbNStep2">
+    <div class="wizard-page" id="hbNStep3">
         <div class="form-section-label">Abilità</div>
         <div class="wizard-page-scroll"><div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
             <label class="pg-skill-check-item"><input type="checkbox" id="hbSkill_${sk.key}" ${dataSkills.includes(sk.key) ? 'checked' : ''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}</div></div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
-    <div class="wizard-page" id="hbNStep3">
+    <div class="wizard-page" id="hbNStep4">
         <div class="form-section-label">Resistenze e Immunità</div>
-        <div class="pg-res-header" style="margin-bottom:4px;"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
+        <div class="pg-res-header"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
         <div class="wizard-page-scroll"><div id="hbResImmGrid" class="pg-res-grid">${DAMAGE_TYPES.map(dt => {
             const isRes = dataRes.includes(dt.value);
             const isImm = dataImm.includes(dt.value);
@@ -419,7 +427,7 @@ function labFieldsNemici(data) {
         }).join('')}</div></div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
-    <div class="wizard-page" id="hbNStep4">
+    <div class="wizard-page" id="hbNStep5">
         <div class="form-section-label">Azioni</div>
         <div class="wizard-page-scroll">
             <div id="hbAttacchiList">${labRenderAttacchi(data?.attacchi || [])}</div>
@@ -427,7 +435,7 @@ function labFieldsNemici(data) {
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
-    <div class="wizard-page" id="hbNStep5">
+    <div class="wizard-page" id="hbNStep6">
         <div class="form-section-label">Leggendario</div>
         <div class="wizard-page-scroll">
             <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${data?.resistenze_leggendarie || 0}"></div>
@@ -436,7 +444,7 @@ function labFieldsNemici(data) {
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
-    <div class="wizard-page" id="hbNStep6">
+    <div class="wizard-page" id="hbNStep7">
         <div class="form-section-label">Incantesimi (opzionale)</div>
         <div class="wizard-page-scroll">
             <div class="form-group"><label>Caratteristica da incantatore</label><select id="hbCarInc"><option value="">Nessuna</option>${SPELL_ABILITIES.map(a => `<option value="${a}" ${data?.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}</select></div>
@@ -452,15 +460,15 @@ window.labNemWizardNav = function(dir) {
         const nome = document.getElementById('hbNome')?.value?.trim();
         if (!nome) { showNotification('Inserisci un nome'); return; }
     }
-    const total = 7, maxStep = total - 1;
+    const total = 8, maxStep = total - 1;
     window._labNemWizardStep = Math.max(0, Math.min(maxStep, (window._labNemWizardStep || 0) + dir));
     const step = window._labNemWizardStep;
     for (let i = 0; i <= maxStep; i++) {
         const page = document.getElementById(`hbNStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
-    const form = document.getElementById('homebrewFormContent') || document.getElementById('homebrewForm');
-    if (form) form.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
+    const stepsBar = document.getElementById('homebrewWizardSteps');
+    if (stepsBar) stepsBar.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
 };
 
 window.labNemToggleRes = function(val, checked) {
@@ -590,6 +598,11 @@ window.openHomebrewModal = function(editData) {
     const content = document.getElementById('homebrewFormContent');
     const saveBtn = document.getElementById('saveHomebrewBtn');
 
+    const stepsBar = document.getElementById('homebrewWizardSteps');
+    if (stepsBar) { stepsBar.style.display = 'none'; stepsBar.innerHTML = ''; }
+    const defaultActions = document.getElementById('homebrewDefaultActions');
+    if (defaultActions) defaultActions.classList.remove('lab-wizard-hide');
+
     title.textContent = _labEditingId ? `Modifica ${cat.label}` : `${cat.label} Homebrew`;
     saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea';
     content.innerHTML = cat.fields(editData);
@@ -604,8 +617,10 @@ window.closeHomebrewModal = function() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
         _labEditingId = null;
-        const bottomActions = document.getElementById('saveHomebrewBtn')?.parentElement;
-        if (bottomActions) bottomActions.classList.remove('lab-wizard-hide');
+        const defaultActions = document.getElementById('homebrewDefaultActions');
+        if (defaultActions) defaultActions.classList.remove('lab-wizard-hide');
+        const stepsBar = document.getElementById('homebrewWizardSteps');
+        if (stepsBar) { stepsBar.style.display = 'none'; stepsBar.innerHTML = ''; }
     }
 };
 
@@ -677,6 +692,7 @@ async function handleSaveHomebrew(e) {
         case 'nemici':
             record.tipo = document.getElementById('hbTipo')?.dataset?.value || document.getElementById('hbTipo')?.value || null;
             record.taglia = document.getElementById('hbTaglia')?.dataset?.value || document.getElementById('hbTaglia')?.value || 'Media';
+            record.allineamento = document.getElementById('hbAllineamento')?.dataset?.value || null;
             record.classe_armatura = parseInt(document.getElementById('hbCA')?.value) || 10;
             record.punti_vita_max = parseInt(document.getElementById('hbPV')?.value) || 10;
             record.grado_sfida = document.getElementById('hbGS')?.value?.trim() || '0';

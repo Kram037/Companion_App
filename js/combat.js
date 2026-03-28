@@ -772,7 +772,10 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
 
     document.getElementById('monsterModalContent').innerHTML = `
         <button class="modal-close" onclick="closeMonsterModal()">&times;</button>
-        <h2>Aggiungi Mostro</h2>
+        <h2 id="monsterModalTitle">Aggiungi Mostro</h2>
+        <div class="wizard-steps" id="monsterWizardSteps" style="display:none;">
+            ${[0,1,2,3,4,5,6,7].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('')}
+        </div>
         <div id="monsterChoicePage">
             <div class="monster-choice-grid">
                 <div class="monster-choice-card" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">
@@ -855,9 +858,10 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     if (!container) return;
     container.style.display = 'flex';
 
-    const modalContent = document.getElementById('monsterModalContent');
-    const h2 = modalContent?.querySelector('h2');
+    const h2 = document.getElementById('monsterModalTitle');
     if (h2) h2.textContent = prefill ? 'Importa Mostro' : 'Nuovo Mostro';
+    const stepsBar = document.getElementById('monsterWizardSteps');
+    if (stepsBar) { stepsBar.style.display = ''; stepsBar.querySelectorAll('.wizard-step').forEach((s,i) => s.classList.toggle('active', i === 0)); }
 
     const pSaves = p.tiri_salvezza || [];
     const pSkills = p.competenze_abilita || [];
@@ -866,11 +870,9 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     const SPELL_AB_LABELS = { intelligenza:'Intelligenza', saggezza:'Saggezza', carisma:'Carisma' };
 
     container.innerHTML = `
-        <div class="wizard-steps">
-            ${[0,1,2,3,4,5,6].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('')}
-        </div>
         <form id="monsterForm" onsubmit="return false;">
             <div class="wizard-page active" id="mStep0">
+                <div class="form-section-label">Identità</div>
                 <div class="form-group">
                     <label for="mNome">Nome</label>
                     <input type="text" id="mNome" required placeholder="Nome del mostro" value="${escapeHtml(p.nome || '')}">
@@ -906,8 +908,16 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                         <div class="form-group"><label for="mInit">Iniziativa</label><input type="number" id="mInit" value="${p.iniziativa || 10}"></div>
                         <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
                     </div>
-                    <div class="form-group" style="margin-top:var(--spacing-sm);"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
-                    <div class="form-section-label" style="margin-top:var(--spacing-md);">Caratteristiche e Tiri Salvezza</div>
+                    <div class="form-group"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep2">
+                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
+                <div class="wizard-page-scroll">
                     <div class="pg-abilities-grid">
                         ${SCHEDA_ABILITIES.map(a => `
                         <div class="pg-ability-block">
@@ -922,7 +932,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="mStep2">
+            <div class="wizard-page" id="mStep3">
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
@@ -934,7 +944,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="mStep3">
+            <div class="wizard-page" id="mStep4">
                 <div class="form-section-label">Resistenze e Immunità</div>
                 <div class="pg-res-header"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
                 <div class="wizard-page-scroll"><div id="mResImmGrid" class="pg-res-grid"></div></div>
@@ -943,7 +953,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="mStep4">
+            <div class="wizard-page" id="mStep5">
                 <div class="form-section-label">Azioni</div>
                 <div class="wizard-page-scroll">
                     <div id="mAttacchiList">${_renderMonsterAttacks(p.attacchi || [])}</div>
@@ -954,7 +964,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="mStep5">
+            <div class="wizard-page" id="mStep6">
                 <div class="form-section-label">Leggendario</div>
                 <div class="wizard-page-scroll">
                     <div class="form-group"><label for="mResLegg">Resistenze Leggendarie</label><input type="number" id="mResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
@@ -970,7 +980,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="mStep6">
+            <div class="wizard-page" id="mStep7">
                 <div class="form-section-label">Incantesimi (opzionale)</div>
                 <div class="wizard-page-scroll">
                     <div class="form-group">
@@ -1096,7 +1106,7 @@ window.monsterWizardNav = function(dir) {
         const nome = document.getElementById('mNome')?.value?.trim();
         if (!nome) { showNotification('Inserisci un nome per il mostro'); return; }
     }
-    const totalSteps = 7;
+    const totalSteps = 8;
     const maxStep = totalSteps - 1;
     window._monsterWizardStep = Math.max(0, Math.min(maxStep, (window._monsterWizardStep || 0) + dir));
     const step = window._monsterWizardStep;
@@ -1104,12 +1114,10 @@ window.monsterWizardNav = function(dir) {
         const page = document.getElementById(`mStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
-    if (step === 3) monsterRenderResImmGrid();
-    const modal = document.getElementById('monsterModal');
-    if (modal) {
-        modal.querySelectorAll('.wizard-step').forEach((dot, i) => {
-            dot.classList.toggle('active', i <= step);
-        });
+    if (step === 4) monsterRenderResImmGrid();
+    const stepsBar = document.getElementById('monsterWizardSteps');
+    if (stepsBar) {
+        stepsBar.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
     }
 }
 
