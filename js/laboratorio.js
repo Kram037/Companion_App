@@ -344,8 +344,18 @@ function labFieldsIncantesimi(data) {
 }
 
 function labFieldsNemici(data) {
-    const tipi = ['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fatato','Immondo','Melma','Mostruosità','Non Morto','Pianta','Umanoide'];
+    const tipi = ['Aberrazione','Bestia','Celestiale','Costrutto','Drago','Elementale','Fatato','Immondo','Melma','Mostruosità','Non Morto','Pianta','Gigante','Umanoide'];
     const taglie = ['Minuscola','Piccola','Media','Grande','Enorme','Mastodontica'];
+    const saves = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
+    const savesLabels = { forza:'FOR', destrezza:'DES', costituzione:'COS', intelligenza:'INT', saggezza:'SAG', carisma:'CAR' };
+    const dataSaves = data?.tiri_salvezza || [];
+    const dataSkills = data?.competenze_abilita || [];
+    const dataRes = data?.resistenze || [];
+    const dataImm = data?.immunita || [];
+
+    window._labNemResistenze = dataRes.slice();
+    window._labNemImmunita = dataImm.slice();
+
     return `
     <div class="form-group">
         <label for="hbNome">Nome</label>
@@ -395,12 +405,63 @@ function labFieldsNemici(data) {
         <div class="form-group"><label>SAG</label><input type="number" id="hbSag" value="${data?.saggezza || 10}"></div>
         <div class="form-group"><label>CAR</label><input type="number" id="hbCar" value="${data?.carisma || 10}"></div>
     </div>
+
+    <div class="form-section-label" style="margin-top: var(--spacing-sm);">Tiri Salvezza</div>
+    <div class="hb-saves-row">
+        ${saves.map(s => `<label class="hb-save-check"><input type="checkbox" id="hbSave_${s}" ${dataSaves.includes(s) ? 'checked' : ''}> ${savesLabels[s]}</label>`).join('')}
+    </div>
+
+    <div class="form-section-label" style="margin-top: var(--spacing-sm);">Abilità</div>
+    <div class="hb-skills-grid">
+        ${SCHEDA_SKILLS.map(sk => `<label class="hb-skill-check"><input type="checkbox" id="hbSkill_${sk.key}" ${dataSkills.includes(sk.key) ? 'checked' : ''}> ${sk.label}</label>`).join('')}
+    </div>
+
+    <div class="form-section-label" style="margin-top: var(--spacing-sm);">Resistenze e Immunità</div>
+    <div class="pg-res-header" style="margin-bottom:4px;">
+        <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
+    </div>
+    <div id="hbResImmGrid" class="pg-res-grid">
+        ${DAMAGE_TYPES.map(dt => {
+            const isRes = dataRes.includes(dt.value);
+            const isImm = dataImm.includes(dt.value);
+            return `<div class="pg-res-row">
+                <span class="pg-res-label">${dt.label}</span>
+                <input type="checkbox" class="pg-res-cb" data-val="${dt.value}" ${isRes ? 'checked' : ''} onchange="labNemToggleRes('${dt.value}', this.checked)">
+                <input type="checkbox" class="pg-imm-cb" data-val="${dt.value}" ${isImm ? 'checked' : ''} onchange="labNemToggleImm('${dt.value}', this.checked)">
+            </div>`;
+        }).join('')}
+    </div>
+
     <div class="form-group" style="margin-top: var(--spacing-sm);">
         <label>Attacchi</label>
         <div id="hbAttacchiList">${labRenderAttacchi(data?.attacchi || [])}</div>
         <button type="button" class="hb-add-btn" onclick="labAddAttacco()">+ Aggiungi attacco</button>
+    </div>
+
+    <div class="form-section-label" style="margin-top: var(--spacing-sm);">Leggendario</div>
+    <div class="form-row form-row-2">
+        <div class="form-group">
+            <label for="hbResLegg">Resistenze Leggendarie</label>
+            <input type="number" id="hbResLegg" min="0" value="${data?.resistenze_leggendarie || 0}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Azioni Leggendarie</label>
+        <div id="hbAzioniLeggList">${labRenderAzioniLegg(data?.azioni_leggendarie || [])}</div>
+        <button type="button" class="hb-add-btn" onclick="labAddAzioneLegg()">+ Aggiungi azione</button>
     </div>`;
 }
+
+window.labNemToggleRes = function(val, checked) {
+    if (!window._labNemResistenze) window._labNemResistenze = [];
+    if (checked) { if (!window._labNemResistenze.includes(val)) window._labNemResistenze.push(val); }
+    else { window._labNemResistenze = window._labNemResistenze.filter(r => r !== val); }
+};
+window.labNemToggleImm = function(val, checked) {
+    if (!window._labNemImmunita) window._labNemImmunita = [];
+    if (checked) { if (!window._labNemImmunita.includes(val)) window._labNemImmunita.push(val); }
+    else { window._labNemImmunita = window._labNemImmunita.filter(r => r !== val); }
+};
 
 function labRenderAttacchi(attacchi) {
     if (!attacchi.length) return '';
@@ -412,6 +473,28 @@ function labRenderAttacchi(attacchi) {
         <button type="button" onclick="this.parentElement.remove()">✕</button>
     </div>`).join('');
 }
+
+function labRenderAzioniLegg(azioni) {
+    if (!azioni || !azioni.length) return '';
+    return azioni.map((a, i) => `
+    <div class="hb-attack-row" data-idx="${i}">
+        <input type="text" placeholder="Nome azione" value="${escapeHtml(a.nome || '')}" class="hbLeggNome">
+        <input type="text" placeholder="Descrizione" value="${escapeHtml(a.descrizione || '')}" class="hbLeggDesc" style="flex:2">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`).join('');
+}
+
+window.labAddAzioneLegg = function() {
+    const list = document.getElementById('hbAzioniLeggList');
+    if (!list) return;
+    const idx = list.querySelectorAll('.hb-attack-row').length;
+    list.insertAdjacentHTML('beforeend', `
+    <div class="hb-attack-row" data-idx="${idx}">
+        <input type="text" placeholder="Nome azione" class="hbLeggNome">
+        <input type="text" placeholder="Descrizione" class="hbLeggDesc" style="flex:2">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>`);
+};
 
 window.labAddAttacco = function() {
     const list = document.getElementById('hbAttacchiList');
@@ -580,10 +663,21 @@ async function handleSaveHomebrew(e) {
             record.intelligenza = parseInt(document.getElementById('hbInt')?.value) || 10;
             record.saggezza = parseInt(document.getElementById('hbSag')?.value) || 10;
             record.carisma = parseInt(document.getElementById('hbCar')?.value) || 10;
+            record.tiri_salvezza = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma']
+                .filter(s => document.getElementById(`hbSave_${s}`)?.checked);
+            record.competenze_abilita = SCHEDA_SKILLS
+                .filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key);
+            record.resistenze = window._labNemResistenze || [];
+            record.immunita = window._labNemImmunita || [];
             record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => ({
                 nome: row.querySelector('.hbAtkNome')?.value || '',
                 bonus: row.querySelector('.hbAtkBonus')?.value || '',
                 danno: row.querySelector('.hbAtkDanno')?.value || ''
+            })).filter(a => a.nome);
+            record.resistenze_leggendarie = parseInt(document.getElementById('hbResLegg')?.value) || 0;
+            record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-attack-row')].map(row => ({
+                nome: row.querySelector('.hbLeggNome')?.value || '',
+                descrizione: row.querySelector('.hbLeggDesc')?.value || ''
             })).filter(a => a.nome);
             break;
         case 'talenti':

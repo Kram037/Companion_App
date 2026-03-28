@@ -691,7 +691,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     if (choicePage) choicePage.style.display = 'none';
     const container = document.getElementById('monsterWizardContainer');
     if (!container) return;
-    container.style.display = '';
+    container.style.display = 'flex';
 
     const modalContent = document.getElementById('monsterModalContent');
     const h2 = modalContent?.querySelector('h2');
