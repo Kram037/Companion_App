@@ -343,117 +343,165 @@ function labFieldsIncantesimi(data) {
     </div>`;
 }
 
-function labFieldsNemici(data) {
-    const dataSaves = data?.tiri_salvezza || [];
-    const dataSkills = data?.competenze_abilita || [];
-    const dataRes = data?.resistenze || [];
-    const dataImm = data?.immunita || [];
-    const pSlots = data?.slot_incantesimo || {};
+function _openLabNemiciWizard(data) {
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    const mlg = modal.querySelector('.modal-content-lg');
+    if (!mlg) return;
+
+    const p = data || {};
+    const pSaves = p.tiri_salvezza || [];
+    const pSkills = p.competenze_abilita || [];
+    const pSlots = p.slot_incantesimo || {};
     const SPELL_ABILITIES = ['intelligenza','saggezza','carisma'];
     const SPELL_AB_LABELS = { intelligenza:'Intelligenza', saggezza:'Saggezza', carisma:'Carisma' };
 
-    window._labNemResistenze = dataRes.slice();
-    window._labNemImmunita = dataImm.slice();
+    window._labNemResistenze = (p.resistenze || []).slice();
+    window._labNemImmunita = (p.immunita || []).slice();
     window._labNemWizardStep = 0;
 
-    setTimeout(() => {
-        document.getElementById('homebrewDefaultActions')?.classList.add('lab-wizard-hide');
-        const stepsBar = document.getElementById('homebrewWizardSteps');
-        if (stepsBar) {
-            stepsBar.style.display = '';
-            stepsBar.innerHTML = [0,1,2,3,4,5,6,7].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('');
-        }
-    }, 0);
+    mlg.innerHTML = `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${_labEditingId ? 'Modifica Nemico' : 'Nemico Homebrew'}</h2>
+        <div class="wizard-steps">
+            ${[0,1,2,3,4,5,6,7].map(i => `<div class="wizard-step ${i===0?'active':''}" data-step="${i}"></div>`).join('')}
+        </div>
+        <form id="labNemiciForm" onsubmit="return false;">
+            <div class="wizard-page active" id="hbNStep0">
+                <div class="form-section-label">Identità</div>
+                <div class="form-group">
+                    <label for="hbNome">Nome</label>
+                    <input type="text" id="hbNome" required placeholder="Nome del nemico" value="${escapeHtml(p.nome || '')}">
+                </div>
+                <div class="form-group">
+                    <label>Tipologia</label>
+                    <button type="button" class="custom-select-trigger" id="hbTipo" data-value="${p.tipo || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('hbTipo',MONSTER_TYPES,'Tipologia')">${p.tipo || MONSTER_TYPES[0]}</button>
+                </div>
+                <div class="form-row form-row-2">
+                    <div class="form-group">
+                        <label>Taglia</label>
+                        <button type="button" class="custom-select-trigger" id="hbTaglia" data-value="${p.taglia || 'Media'}" onclick="openMonsterFieldSelect('hbTaglia',MONSTER_SIZES,'Taglia')">${p.taglia || 'Media'}</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="hbGS">Grado Sfida</label>
+                        <input type="text" id="hbGS" placeholder="1" value="${escapeHtml(p.grado_sfida || '')}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Allineamento</label>
+                    <button type="button" class="custom-select-trigger" id="hbAllineamento" data-value="${p.allineamento || MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('hbAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${p.allineamento || MONSTER_ALIGNMENTS[0]}</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep1">
+                <div class="form-section-label">Statistiche</div>
+                <div class="wizard-page-scroll">
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${p.classe_armatura || 10}"></div>
+                        <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(p.velocita || '9')}"></div>
+                        <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${p.punti_vita_max || 10}"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep2">
+                <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
+                <div class="wizard-page-scroll">
+                    <div class="pg-abilities-grid">
+                        ${SCHEDA_ABILITIES.map(a => `
+                        <div class="pg-ability-block">
+                            <label>${a.full}</label>
+                            <div class="pg-ability-row"><input type="number" id="hb${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}"></div>
+                            <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
+                        </div>`).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep3">
+                <div class="form-section-label">Abilità</div>
+                <div class="wizard-page-scroll">
+                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
+                        <label class="pg-skill-check-item"><input type="checkbox" id="hbSkill_${sk.key}" ${pSkills.includes(sk.key)?'checked':''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep4">
+                <div class="form-section-label">Resistenze e Immunità</div>
+                <div class="pg-res-header"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
+                <div class="wizard-page-scroll"><div id="hbResImmGrid" class="pg-res-grid"></div></div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep5">
+                <div class="form-section-label">Azioni</div>
+                <div class="wizard-page-scroll">
+                    <div id="hbAttacchiList">${labRenderAttacchi(p.attacchi || [])}</div>
+                    <button type="button" class="hb-add-btn" onclick="labAddAttacco()">+ Aggiungi azione</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep6">
+                <div class="form-section-label">Leggendario</div>
+                <div class="wizard-page-scroll">
+                    <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
+                    <div class="form-group"><label for="hbAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="hbAzLeggMax" min="0" value="${p.azioni_legg_max || 0}"></div>
+                    <div class="form-group" style="margin-top:var(--spacing-sm);">
+                        <label>Azioni Leggendarie</label>
+                        <div id="hbAzioniLeggList">${labRenderAzioniLegg(p.azioni_leggendarie || [])}</div>
+                        <button type="button" class="hb-add-btn" onclick="labAddAzioneLegg()">+ Aggiungi azione</button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep7">
+                <div class="form-section-label">Incantesimi (opzionale)</div>
+                <div class="wizard-page-scroll">
+                    <div class="form-group">
+                        <label>Caratteristica da incantatore</label>
+                        <select id="hbCarInc">
+                            <option value="">Nessuna (non incantatore)</option>
+                            ${SPELL_ABILITIES.map(a => `<option value="${a}" ${p.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-sm);">Slot per livello</div>
+                    <div class="hb-stats-grid">
+                        ${[1,2,3,4,5,6,7,8,9].map(lv => `<div class="form-group"><label>Lv ${lv}</label><input type="number" id="hbSlot${lv}" min="0" value="${pSlots[lv]?.max || 0}"></div>`).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="saveLabNemico()">${_labEditingId ? 'Salva' : 'Crea'}</button>
+                </div>
+            </div>
+        </form>`;
 
-    return `
-    <div class="wizard-page active" id="hbNStep0">
-        <div class="form-section-label">Identità</div>
-        <div class="form-group"><label for="hbNome">Nome</label><input type="text" id="hbNome" required placeholder="Nome del nemico" value="${escapeHtml(data?.nome || '')}"></div>
-        <div class="form-group">
-            <label>Tipologia</label>
-            <button type="button" class="custom-select-trigger" id="hbTipo" data-value="${data?.tipo || MONSTER_TYPES[0]}" onclick="openMonsterFieldSelect('hbTipo',MONSTER_TYPES,'Tipologia')">${data?.tipo || MONSTER_TYPES[0]}</button>
-        </div>
-        <div class="form-row form-row-2">
-            <div class="form-group">
-                <label>Taglia</label>
-                <button type="button" class="custom-select-trigger" id="hbTaglia" data-value="${data?.taglia || 'Media'}" onclick="openMonsterFieldSelect('hbTaglia',MONSTER_SIZES,'Taglia')">${data?.taglia || 'Media'}</button>
-            </div>
-            <div class="form-group"><label for="hbGS">Grado Sfida</label><input type="text" id="hbGS" placeholder="1" value="${escapeHtml(data?.grado_sfida || '')}"></div>
-        </div>
-        <div class="form-group">
-            <label>Allineamento</label>
-            <button type="button" class="custom-select-trigger" id="hbAllineamento" data-value="${data?.allineamento || MONSTER_ALIGNMENTS[0]}" onclick="openMonsterFieldSelect('hbAllineamento',MONSTER_ALIGNMENTS,'Allineamento')">${data?.allineamento || MONSTER_ALIGNMENTS[0]}</button>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep1">
-        <div class="form-section-label">Statistiche</div>
-        <div class="wizard-page-scroll">
-            <div class="pg-stats-row-3">
-                <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${data?.classe_armatura || 10}"></div>
-                <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(data?.velocita || '9')}"></div>
-                <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${data?.punti_vita_max || 10}"></div>
-            </div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep2">
-        <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
-        <div class="wizard-page-scroll">
-            <div class="pg-abilities-grid">
-                ${[{key:'forza',id:'hbFor',label:'FOR'},{key:'destrezza',id:'hbDes',label:'DES'},{key:'costituzione',id:'hbCos',label:'COS'},{key:'intelligenza',id:'hbInt',label:'INT'},{key:'saggezza',id:'hbSag',label:'SAG'},{key:'carisma',id:'hbCar',label:'CAR'}].map(a => `
-                <div class="pg-ability-block">
-                    <label>${a.label}</label>
-                    <div class="pg-ability-row"><input type="number" id="${a.id}" class="pg-ability-input" min="1" max="30" value="${data?.[a.key] || 10}"></div>
-                    <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${dataSaves.includes(a.key) ? 'checked' : ''}> <span>TS</span></label>
-                </div>`).join('')}
-            </div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep3">
-        <div class="form-section-label">Abilità</div>
-        <div class="wizard-page-scroll"><div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
-            <label class="pg-skill-check-item"><input type="checkbox" id="hbSkill_${sk.key}" ${dataSkills.includes(sk.key) ? 'checked' : ''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}</div></div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep4">
-        <div class="form-section-label">Resistenze e Immunità</div>
-        <div class="pg-res-header"><span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span></div>
-        <div class="wizard-page-scroll"><div id="hbResImmGrid" class="pg-res-grid">${DAMAGE_TYPES.map(dt => {
-            const isRes = dataRes.includes(dt.value);
-            const isImm = dataImm.includes(dt.value);
-            return `<div class="pg-res-row"><span class="pg-res-label">${dt.label}</span><input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} onchange="labNemToggleRes('${dt.value}', this.checked)"><input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} onchange="labNemToggleImm('${dt.value}', this.checked)"></div>`;
-        }).join('')}</div></div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep5">
-        <div class="form-section-label">Azioni</div>
-        <div class="wizard-page-scroll">
-            <div id="hbAttacchiList">${labRenderAttacchi(data?.attacchi || [])}</div>
-            <button type="button" class="hb-add-btn" onclick="labAddAttacco()">+ Aggiungi azione</button>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep6">
-        <div class="form-section-label">Leggendario</div>
-        <div class="wizard-page-scroll">
-            <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${data?.resistenze_leggendarie || 0}"></div>
-            <div class="form-group"><label for="hbAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="hbAzLeggMax" min="0" value="${data?.azioni_legg_max || 0}"></div>
-            <div class="form-group" style="margin-top:var(--spacing-sm);"><label>Azioni Leggendarie</label><div id="hbAzioniLeggList">${labRenderAzioniLegg(data?.azioni_leggendarie || [])}</div><button type="button" class="hb-add-btn" onclick="labAddAzioneLegg()">+ Aggiungi azione</button></div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
-    </div>
-    <div class="wizard-page" id="hbNStep7">
-        <div class="form-section-label">Incantesimi (opzionale)</div>
-        <div class="wizard-page-scroll">
-            <div class="form-group"><label>Caratteristica da incantatore</label><select id="hbCarInc"><option value="">Nessuna</option>${SPELL_ABILITIES.map(a => `<option value="${a}" ${data?.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}</select></div>
-            <div class="form-section-label" style="margin-top:var(--spacing-sm);">Slot per livello</div>
-            <div class="hb-stats-grid">${[1,2,3,4,5,6,7,8,9].map(lv => `<div class="form-group"><label>Lv ${lv}</label><input type="number" id="hbSlot${lv}" min="0" value="${pSlots[lv]?.max || 0}"></div>`).join('')}</div>
-        </div>
-        <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="submit" class="btn-primary">${data ? 'Salva' : 'Crea'}</button></div>
-    </div>`;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
+
+function labFieldsNemici(data) { return ''; }
 
 window.labNemWizardNav = function(dir) {
     if (dir > 0 && window._labNemWizardStep === 0) {
@@ -467,8 +515,9 @@ window.labNemWizardNav = function(dir) {
         const page = document.getElementById(`hbNStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
-    const stepsBar = document.getElementById('homebrewWizardSteps');
-    if (stepsBar) stepsBar.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
+    if (step === 4) labRenderResImmGrid();
+    const modal = document.getElementById('homebrewModal');
+    if (modal) modal.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
 };
 
 window.labNemToggleRes = function(val, checked) {
@@ -539,6 +588,96 @@ window.labToggleAtkUsi = function(cb) {
     if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
 };
 
+function labRenderResImmGrid() {
+    const container = document.getElementById('hbResImmGrid');
+    if (!container) return;
+    container.innerHTML = DAMAGE_TYPES.map(dt => {
+        const isRes = (window._labNemResistenze || []).includes(dt.value);
+        const isImm = (window._labNemImmunita || []).includes(dt.value);
+        return `<div class="pg-res-row"><span class="pg-res-label">${dt.label}</span><input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} onchange="labNemToggleRes('${dt.value}', this.checked)"><input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} onchange="labNemToggleImm('${dt.value}', this.checked)"></div>`;
+    }).join('');
+}
+
+window.saveLabNemico = async function() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    if (!AppState.currentUser?.uid) { showNotification('Errore: utente non trovato'); return; }
+
+    const nome = document.getElementById('hbNome')?.value?.trim();
+    if (!nome) { showNotification('Inserisci un nome'); return; }
+
+    const record = {
+        nome,
+        updated_at: new Date().toISOString(),
+        tipo: document.getElementById('hbTipo')?.dataset?.value || null,
+        taglia: document.getElementById('hbTaglia')?.dataset?.value || 'Media',
+        allineamento: document.getElementById('hbAllineamento')?.dataset?.value || null,
+        classe_armatura: parseInt(document.getElementById('hbCA')?.value) || 10,
+        punti_vita_max: parseInt(document.getElementById('hbPV')?.value) || 10,
+        grado_sfida: document.getElementById('hbGS')?.value?.trim() || '0',
+        velocita: document.getElementById('hbVelocita')?.value?.trim() || '9',
+        forza: parseInt(document.getElementById('hbforza')?.value) || 10,
+        destrezza: parseInt(document.getElementById('hbdestrezza')?.value) || 10,
+        costituzione: parseInt(document.getElementById('hbcostituzione')?.value) || 10,
+        intelligenza: parseInt(document.getElementById('hbintelligenza')?.value) || 10,
+        saggezza: parseInt(document.getElementById('hbsaggezza')?.value) || 10,
+        carisma: parseInt(document.getElementById('hbcarisma')?.value) || 10,
+        tiri_salvezza: SCHEDA_ABILITIES.filter(a => document.getElementById(`hbSave_${a.key}`)?.checked).map(a => a.key),
+        competenze_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key),
+        resistenze: window._labNemResistenze || [],
+        immunita: window._labNemImmunita || [],
+        resistenze_leggendarie: parseInt(document.getElementById('hbResLegg')?.value) || 0,
+        azioni_legg_max: parseInt(document.getElementById('hbAzLeggMax')?.value) || 0,
+        caratteristica_incantatore: document.getElementById('hbCarInc')?.value || null,
+    };
+
+    record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
+        const hasUsi = row.querySelector('.hbAtkHasUsi')?.checked;
+        const usiMax = hasUsi ? (parseInt(row.querySelector('.hbAtkUsiMax')?.value) || 0) : 0;
+        return {
+            nome: row.querySelector('.hbAtkNome')?.value || '',
+            bonus: row.querySelector('.hbAtkBonus')?.value || '',
+            danno: row.querySelector('.hbAtkDanno')?.value || '',
+            usi_max: usiMax
+        };
+    }).filter(a => a.nome);
+
+    record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-attack-row')].map(row => ({
+        nome: row.querySelector('.hbLeggNome')?.value || '',
+        descrizione: row.querySelector('.hbLeggDesc')?.value || ''
+    })).filter(a => a.nome);
+
+    const carInc = record.caratteristica_incantatore;
+    let slotInc = null;
+    if (carInc) {
+        slotInc = {};
+        for (let lv = 1; lv <= 9; lv++) {
+            const max = parseInt(document.getElementById(`hbSlot${lv}`)?.value) || 0;
+            if (max > 0) slotInc[lv] = { max, current: max };
+        }
+        if (Object.keys(slotInc).length === 0) slotInc = null;
+    }
+    record.slot_incantesimo = slotInc;
+
+    try {
+        if (_labEditingId) {
+            const { error } = await supabase.from('homebrew_nemici').update(record).eq('id', _labEditingId);
+            if (error) throw error;
+            showNotification('Nemico aggiornato');
+        } else {
+            record.user_id = AppState.currentUser.uid;
+            const { error } = await supabase.from('homebrew_nemici').insert(record);
+            if (error) throw error;
+            showNotification('Nemico creato');
+        }
+        closeHomebrewModal();
+        loadLabContent();
+    } catch (err) {
+        console.error('Errore salvataggio nemico:', err);
+        showNotification('Errore nel salvataggio');
+    }
+};
+
 function labFieldsTalenti(data) {
     return `
     <div class="form-group">
@@ -593,15 +732,16 @@ window.openHomebrewModal = function(editData) {
     const cat = LAB_CATEGORIES[_labCurrentTab];
     if (!cat) return;
 
+    if (_labCurrentTab === 'nemici') {
+        _openLabNemiciWizard(editData);
+        return;
+    }
+
     const modal = document.getElementById('homebrewModal');
+    _restoreHomebrewModalStructure();
     const title = document.getElementById('homebrewModalTitle');
     const content = document.getElementById('homebrewFormContent');
     const saveBtn = document.getElementById('saveHomebrewBtn');
-
-    const stepsBar = document.getElementById('homebrewWizardSteps');
-    if (stepsBar) { stepsBar.style.display = 'none'; stepsBar.innerHTML = ''; }
-    const defaultActions = document.getElementById('homebrewDefaultActions');
-    if (defaultActions) defaultActions.classList.remove('lab-wizard-hide');
 
     title.textContent = _labEditingId ? `Modifica ${cat.label}` : `${cat.label} Homebrew`;
     saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea';
@@ -611,16 +751,37 @@ window.openHomebrewModal = function(editData) {
     document.body.style.overflow = 'hidden';
 };
 
+const _HOMEBREW_MODAL_ORIGINAL_HTML = null;
+
+function _restoreHomebrewModalStructure() {
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    const mlg = modal.querySelector('.modal-content-lg');
+    if (!mlg) return;
+    if (!document.getElementById('homebrewForm')) {
+        mlg.innerHTML = `
+            <button class="modal-close" id="closeHomebrewModal">&times;</button>
+            <h2 id="homebrewModalTitle">Nuovo Contenuto</h2>
+            <form id="homebrewForm">
+                <div id="homebrewFormContent"></div>
+                <div class="form-actions" id="homebrewDefaultActions">
+                    <button type="button" class="btn-secondary" id="cancelHomebrewBtn">Annulla</button>
+                    <button type="submit" class="btn-primary" id="saveHomebrewBtn">Crea</button>
+                </div>
+            </form>`;
+        document.getElementById('closeHomebrewModal')?.addEventListener('click', closeHomebrewModal);
+        document.getElementById('cancelHomebrewBtn')?.addEventListener('click', closeHomebrewModal);
+        document.getElementById('homebrewForm')?.addEventListener('submit', handleSaveHomebrew);
+        document.getElementById('homebrewForm')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
+    }
+}
+
 window.closeHomebrewModal = function() {
     const modal = document.getElementById('homebrewModal');
     if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = '';
         _labEditingId = null;
-        const defaultActions = document.getElementById('homebrewDefaultActions');
-        if (defaultActions) defaultActions.classList.remove('lab-wizard-hide');
-        const stepsBar = document.getElementById('homebrewWizardSteps');
-        if (stepsBar) { stepsBar.style.display = 'none'; stepsBar.innerHTML = ''; }
     }
 };
 
