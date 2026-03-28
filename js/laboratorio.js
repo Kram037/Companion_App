@@ -371,39 +371,42 @@ function labFieldsNemici(data) {
     </div>
     <div class="wizard-page active" id="hbNStep0">
         <div class="form-group"><label for="hbNome">Nome</label><input type="text" id="hbNome" required placeholder="Nome del nemico" value="${escapeHtml(data?.nome || '')}"></div>
-        <div class="form-row form-row-2">
-            <div class="form-group"><label for="hbTipo">Tipo</label><select id="hbTipo"><option value="">-</option>${tipi.map(t => `<option value="${t}" ${data?.tipo === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-            <div class="form-group"><label for="hbTaglia">Taglia</label><select id="hbTaglia">${taglie.map(t => `<option value="${t}" ${(data?.taglia || 'Media') === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+        <div class="form-group">
+            <label>Tipologia</label>
+            <button type="button" class="custom-select-trigger" id="hbTipo" data-value="${data?.tipo || tipi[0]}" onclick="openMonsterFieldSelect('hbTipo',MONSTER_TYPES,'Tipologia')">${data?.tipo || tipi[0]}</button>
         </div>
         <div class="form-row form-row-2">
-            <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${data?.classe_armatura || 10}"></div>
-            <div class="form-group"><label for="hbPV">PV Massimi</label><input type="number" id="hbPV" value="${data?.punti_vita_max || 10}"></div>
-        </div>
-        <div class="form-row form-row-2">
+            <div class="form-group">
+                <label>Taglia</label>
+                <button type="button" class="custom-select-trigger" id="hbTaglia" data-value="${data?.taglia || 'Media'}" onclick="openMonsterFieldSelect('hbTaglia',MONSTER_SIZES,'Taglia')">${data?.taglia || 'Media'}</button>
+            </div>
             <div class="form-group"><label for="hbGS">Grado Sfida</label><input type="text" id="hbGS" placeholder="1" value="${escapeHtml(data?.grado_sfida || '')}"></div>
-            <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9m" value="${escapeHtml(data?.velocita || '9m')}"></div>
+        </div>
+        <div class="pg-stats-row-3">
+            <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${data?.classe_armatura || 10}"></div>
+            <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${data?.punti_vita_max || 10}"></div>
+            <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(data?.velocita || '9')}"></div>
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
     <div class="wizard-page" id="hbNStep1">
         <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
         <div class="wizard-page-scroll">
-            <div class="hb-stats-grid">
-                <div class="form-group"><label>FOR</label><input type="number" id="hbFor" value="${data?.forza || 10}"></div>
-                <div class="form-group"><label>DES</label><input type="number" id="hbDes" value="${data?.destrezza || 10}"></div>
-                <div class="form-group"><label>COS</label><input type="number" id="hbCos" value="${data?.costituzione || 10}"></div>
-                <div class="form-group"><label>INT</label><input type="number" id="hbInt" value="${data?.intelligenza || 10}"></div>
-                <div class="form-group"><label>SAG</label><input type="number" id="hbSag" value="${data?.saggezza || 10}"></div>
-                <div class="form-group"><label>CAR</label><input type="number" id="hbCar" value="${data?.carisma || 10}"></div>
+            <div class="pg-abilities-grid">
+                ${[{key:'forza',id:'hbFor',label:'FOR'},{key:'destrezza',id:'hbDes',label:'DES'},{key:'costituzione',id:'hbCos',label:'COS'},{key:'intelligenza',id:'hbInt',label:'INT'},{key:'saggezza',id:'hbSag',label:'SAG'},{key:'carisma',id:'hbCar',label:'CAR'}].map(a => `
+                <div class="pg-ability-block">
+                    <label>${a.label}</label>
+                    <div class="pg-ability-row"><input type="number" id="${a.id}" class="pg-ability-input" min="1" max="30" value="${data?.[a.key] || 10}"></div>
+                    <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${dataSaves.includes(a.key) ? 'checked' : ''}> <span>TS</span></label>
+                </div>`).join('')}
             </div>
-            <div class="form-section-label" style="margin-top:var(--spacing-sm);">Tiri Salvezza</div>
-            <div class="hb-saves-row">${saves.map(s => `<label class="hb-save-check"><input type="checkbox" id="hbSave_${s}" ${dataSaves.includes(s) ? 'checked' : ''}> ${savesLabels[s]}</label>`).join('')}</div>
         </div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
     <div class="wizard-page" id="hbNStep2">
         <div class="form-section-label">Abilità</div>
-        <div class="wizard-page-scroll"><div class="hb-skills-grid">${SCHEDA_SKILLS.map(sk => `<label class="hb-skill-check"><input type="checkbox" id="hbSkill_${sk.key}" ${dataSkills.includes(sk.key) ? 'checked' : ''}> ${sk.label}</label>`).join('')}</div></div>
+        <div class="wizard-page-scroll"><div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
+            <label class="pg-skill-check-item"><input type="checkbox" id="hbSkill_${sk.key}" ${dataSkills.includes(sk.key) ? 'checked' : ''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}</div></div>
         <div class="form-actions"><button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button><button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button></div>
     </div>
     <div class="wizard-page" id="hbNStep3">
@@ -672,8 +675,8 @@ async function handleSaveHomebrew(e) {
             record.descrizione = document.getElementById('hbDescrizione')?.value?.trim() || null;
             break;
         case 'nemici':
-            record.tipo = document.getElementById('hbTipo')?.value || null;
-            record.taglia = document.getElementById('hbTaglia')?.value || 'Media';
+            record.tipo = document.getElementById('hbTipo')?.dataset?.value || document.getElementById('hbTipo')?.value || null;
+            record.taglia = document.getElementById('hbTaglia')?.dataset?.value || document.getElementById('hbTaglia')?.value || 'Media';
             record.classe_armatura = parseInt(document.getElementById('hbCA')?.value) || 10;
             record.punti_vita_max = parseInt(document.getElementById('hbPV')?.value) || 10;
             record.grado_sfida = document.getElementById('hbGS')?.value?.trim() || '0';
