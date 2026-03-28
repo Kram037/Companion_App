@@ -1,0 +1,1 @@
+ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS mod_iniziativa INTEGER DEFAULT NULL;

@@ -397,20 +397,6 @@ function _openLabNemiciWizard(data) {
                 </div>
             </div>
             <div class="wizard-page" id="hbNStep1">
-                <div class="form-section-label">Statistiche</div>
-                <div class="wizard-page-scroll">
-                    <div class="pg-stats-row-3">
-                        <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${p.classe_armatura || 10}"></div>
-                        <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(p.velocita || '9')}"></div>
-                        <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${p.punti_vita_max || 10}"></div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
-                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
-                </div>
-            </div>
-            <div class="wizard-page" id="hbNStep2">
                 <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-abilities-grid">
@@ -421,6 +407,21 @@ function _openLabNemiciWizard(data) {
                             <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
                         </div>`).join('')}
                     </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labNemWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbNStep2">
+                <div class="form-section-label">Statistiche</div>
+                <div class="wizard-page-scroll">
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${p.classe_armatura || 10}"></div>
+                        <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(p.velocita || '9')}"></div>
+                        <div class="form-group"><label for="hbInitMod">Mod. Iniz.</label><input type="number" id="hbInitMod" value="${p.mod_iniziativa ?? ''}"></div>
+                    </div>
+                    <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${p.punti_vita_max || 10}"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
@@ -626,6 +627,7 @@ window.saveLabNemico = async function() {
         competenze_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key),
         resistenze: window._labNemResistenze || [],
         immunita: window._labNemImmunita || [],
+        mod_iniziativa: parseInt(document.getElementById('hbInitMod')?.value) || null,
         resistenze_leggendarie: parseInt(document.getElementById('hbResLegg')?.value) || 0,
         azioni_legg_max: parseInt(document.getElementById('hbAzLeggMax')?.value) || 0,
         caratteristica_incantatore: document.getElementById('hbCarInc')?.value || null,

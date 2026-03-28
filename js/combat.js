@@ -653,7 +653,7 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
         pv_attuali: original.punti_vita_max,
         classe_armatura: original.classe_armatura,
         velocita: original.velocita,
-        iniziativa: original.iniziativa,
+        iniziativa: (() => { const dexMod = Math.floor(((original.destrezza || 10) - 10) / 2); return Math.floor(Math.random() * 20) + 1 + dexMod; })(),
         tiri_salvezza: original.tiri_salvezza,
         competenze_abilita: original.competenze_abilita,
         resistenze: original.resistenze,
@@ -901,21 +901,6 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 </div>
             </div>
             <div class="wizard-page" id="mStep1">
-                <div class="form-section-label">Statistiche</div>
-                <div class="wizard-page-scroll">
-                    <div class="pg-stats-row-3">
-                        <div class="form-group"><label for="mCA">CA</label><input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}"></div>
-                        <div class="form-group"><label for="mInit">Iniziativa</label><input type="number" id="mInit" value="${p.iniziativa || 10}"></div>
-                        <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
-                    </div>
-                    <div class="form-group"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
-                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
-                </div>
-            </div>
-            <div class="wizard-page" id="mStep2">
                 <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-abilities-grid">
@@ -926,6 +911,21 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                             <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
                         </div>`).join('')}
                     </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="monsterWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="mStep2">
+                <div class="form-section-label">Statistiche</div>
+                <div class="wizard-page-scroll">
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label for="mCA">CA</label><input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}"></div>
+                        <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
+                        <div class="form-group"><label for="mInitMod">Mod. Iniz.</label><input type="number" id="mInitMod" value="${p.mod_iniziativa ?? ''}"></div>
+                    </div>
+                    <div class="form-group"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -1185,7 +1185,7 @@ window.saveMonster = async function() {
         pv_attuali: pvMax,
         classe_armatura: parseInt(document.getElementById('mCA')?.value) || 10,
         velocita: parseFloat(document.getElementById('mVel')?.value) || 9,
-        iniziativa: parseInt(document.getElementById('mInit')?.value) || 10,
+        iniziativa: (() => { const mod = parseInt(document.getElementById('mInitMod')?.value); const dexMod = Math.floor(((parseInt(document.getElementById('mdestrezza')?.value) || 10) - 10) / 2); const finalMod = isNaN(mod) ? dexMod : mod; return Math.floor(Math.random() * 20) + 1 + finalMod; })(),
         tiri_salvezza: saves,
         competenze_abilita: skills,
         resistenze,
