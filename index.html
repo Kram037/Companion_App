@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/base.css?v=1767900400">
+    <link rel="stylesheet" href="css/base.css?v=1767910000">
     <link rel="stylesheet" href="css/components.css?v=1767900400">
     <link rel="stylesheet" href="css/modals.css?v=1767903000">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
@@ -65,7 +65,6 @@
             <div class="page-content">
                 <div class="page-header">
                     <h1>Campagne</h1>
-                    <button class="btn-primary btn-icon" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
                 </div>
                 <div class="filters-bar">
                     <div class="filter-search-wrap">
@@ -101,14 +100,14 @@
                     </div>
                 </div>
             </div>
+            <button class="btn-fab" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
         </section>
 
         <!-- Amici Page -->
         <section class="page" id="amiciPage">
             <div class="page-content">
                 <div class="page-header">
-                <h1>Amici</h1>
-                    <button class="btn-primary btn-icon" id="addAmicoBtn" aria-label="Aggiungi Amico">+</button>
+                    <h1>Amici</h1>
                 </div>
                 
                 <!-- Richieste in entrata -->
@@ -123,6 +122,7 @@
                     <p>Accedi per vedere i tuoi amici</p>
                 </div>
             </div>
+            <button class="btn-fab" id="addAmicoBtn" aria-label="Aggiungi Amico">+</button>
         </section>
 
         <!-- Laboratorio Page -->
@@ -137,13 +137,15 @@
                 <!-- Sub-page view (hidden by default) -->
                 <div id="labSubPage" style="display:none;">
                     <div class="page-header">
-                        <button class="btn-back" onclick="labBackToHub()" aria-label="Indietro">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
                         <h1 id="labSubTitle">Laboratorio</h1>
-                        <button class="btn-primary btn-icon" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
                     </div>
                     <div id="labContent" class="lab-content"></div>
+                    <button class="back-button-floating" onclick="labBackToHub()" aria-label="Indietro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button class="btn-fab" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
                 </div>
             </div>
         </section>
@@ -153,7 +155,6 @@
             <div class="page-content">
                 <div class="page-header">
                     <h1>Personaggi</h1>
-                    <button class="btn-primary btn-icon" id="addPersonaggioBtn" aria-label="Crea Personaggio">+</button>
                 </div>
                 <div id="personaggiList" class="personaggi-list">
                     <div class="content-placeholder">
@@ -161,6 +162,7 @@
                     </div>
                 </div>
             </div>
+            <button class="btn-fab" id="addPersonaggioBtn" aria-label="Crea Personaggio">+</button>
         </section>
 
         <!-- Scheda Personaggio Page -->
@@ -184,16 +186,16 @@
             <div class="page-content sessione-content">
                 <div class="sessione-header">
                     <h1 id="sessioneCampagnaTitle" class="sessione-title">Sessione</h1>
-                    <button class="back-button-floating" id="backToDettagliBtn" aria-label="Torna ai dettagli">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                    </button>
                 </div>
                 <div id="sessioneContent">
                     <!-- Il contenuto verrà popolato dinamicamente -->
                 </div>
             </div>
+            <button class="back-button-floating" id="backToDettagliBtn" aria-label="Torna ai dettagli">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </button>
         </section>
 
         <!-- Combattimento Page -->
@@ -919,14 +921,14 @@
     <script src="js/utils.js?v=1767900400"></script>
     <script src="js/theme.js?v=1767900400"></script>
     <script src="js/navigation.js?v=1767900400"></script>
-    <script src="js/auth.js?v=1767900400"></script>
+    <script src="js/auth.js?v=1767910000"></script>
     <script src="js/users.js?v=1767900400"></script>
     <script src="js/amici.js?v=1767900400"></script>
     <script src="js/campagne.js?v=1767900400"></script>
     <script src="js/personaggi.js?v=1767901100"></script>
     <script src="js/sessions.js?v=1767900400"></script>
-    <script src="js/combat.js?v=1767903200"></script>
-    <script src="js/laboratorio.js?v=1767903200"></script>
+    <script src="js/combat.js?v=1767910000"></script>
+    <script src="js/laboratorio.js?v=1767910000"></script>
     <script src="js/realtime.js?v=1767900400"></script>
     <script src="js/initiative.js?v=1767900400"></script>
     <script src="js/init.js?v=1767900400"></script>

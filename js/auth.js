@@ -151,16 +151,16 @@ function updateUIForLoggedIn() {
     }
     // Mostra i pulsanti quando l'utente è loggato
     if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = 'block';
+        elements.addCampagnaBtn.style.display = '';
     }
     if (elements.addAmicoBtn) {
-        elements.addAmicoBtn.style.display = 'block';
+        elements.addAmicoBtn.style.display = '';
     }
     if (elements.addHomebrewBtn) {
-        elements.addHomebrewBtn.style.display = 'block';
+        elements.addHomebrewBtn.style.display = '';
     }
     if (elements.addPersonaggioBtn) {
-        elements.addPersonaggioBtn.style.display = 'block';
+        elements.addPersonaggioBtn.style.display = '';
     }
     // Aggiorna i placeholder per amici, laboratorio e personaggi (nessun dato ancora)
     updatePlaceholderMessages(true);

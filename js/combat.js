@@ -935,8 +935,14 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
             <div class="wizard-page" id="mStep3">
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
-                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
-                        <label class="pg-skill-check-item"><input type="checkbox" id="mSkill_${sk.key}" ${pSkills.includes(sk.key)?'checked':''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
+                        const isProf = pSkills.includes(sk.key);
+                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''}" id="mSkillRow_${sk.key}">
+                            <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="monsterToggleSkill('${sk.key}')" title="Competenza">●</span>
+                            <span class="pg-skill-name">${sk.label}</span>
+                            <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
+                        </div>`;
+                    }).join('')}
                     </div>
                 </div>
                 <div class="form-actions">
@@ -985,10 +991,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="wizard-page-scroll">
                     <div class="form-group">
                         <label>Caratteristica da incantatore</label>
-                        <select id="mCarInc">
-                            <option value="">Nessuna (non incantatore)</option>
-                            ${SPELL_ABILITIES.map(a => `<option value="${a}" ${p.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}
-                        </select>
+                        <button type="button" class="custom-select-trigger" id="mCarInc" data-value="${p.caratteristica_incantatore || ''}" onclick="openSpellAbilitySelect('mCarInc')">${p.caratteristica_incantatore ? SPELL_AB_LABELS[p.caratteristica_incantatore] : 'Nessuna'}</button>
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm);">Slot per livello</div>
                     <div class="hb-stats-grid">
@@ -1073,6 +1076,35 @@ window.openMonsterFieldSelect = function(fieldId, options, title) {
     );
 }
 
+window.monsterToggleSkill = function(skillKey) {
+    const row = document.getElementById(`mSkillRow_${skillKey}`);
+    if (!row) return;
+    const dot = row.querySelector('.pg-skill-dot');
+    const isActive = dot?.classList.toggle('active');
+    row.classList.toggle('proficient', isActive);
+};
+
+window.openSpellAbilitySelect = function(fieldId) {
+    const SPELL_OPTIONS = [
+        { value: '', label: 'Nessuna' },
+        { value: 'intelligenza', label: 'Intelligenza' },
+        { value: 'saggezza', label: 'Saggezza' },
+        { value: 'carisma', label: 'Carisma' }
+    ];
+    openCustomSelect(
+        SPELL_OPTIONS,
+        (value) => {
+            const btn = document.getElementById(fieldId);
+            if (btn) {
+                btn.dataset.value = value;
+                btn.textContent = SPELL_OPTIONS.find(o => o.value === value)?.label || 'Nessuna';
+                btn.classList.remove('placeholder');
+            }
+        },
+        'Caratteristica incantatore'
+    );
+};
+
 function monsterRenderResImmGrid() {
     const container = document.getElementById('mResImmGrid');
     if (!container) return;
@@ -1131,7 +1163,7 @@ window.saveMonster = async function() {
     if (!nome) { showNotification('Inserisci un nome per il mostro'); return; }
 
     const saves = SCHEDA_ABILITIES.filter(a => document.getElementById(`mSave_${a.key}`)?.checked).map(a => a.key);
-    const skills = SCHEDA_SKILLS.filter(s => document.getElementById(`mSkill_${s.key}`)?.checked).map(s => s.key);
+    const skills = SCHEDA_SKILLS.filter(s => document.getElementById(`mSkillRow_${s.key}`)?.classList.contains('proficient')).map(s => s.key);
     const resistenze = window._monsterResistenze || [];
     const immunita = window._monsterImmunita || [];
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
@@ -1156,7 +1188,7 @@ window.saveMonster = async function() {
 
     const azLeggMaxVal = parseInt(document.getElementById('mAzLeggMax')?.value) || 0;
 
-    const carInc = document.getElementById('mCarInc')?.value || null;
+    const carInc = document.getElementById('mCarInc')?.dataset?.value || null;
     let slotInc = null;
     if (carInc) {
         slotInc = {};

@@ -361,11 +361,11 @@ body.user-logged-in .header-username {
 }
 
 /* ============================================
-   BACK BUTTON FLOATING
+   BACK BUTTON FLOATING (bottom-left)
    ============================================ */
 .back-button-floating {
     position: fixed;
-    top: 78px;
+    bottom: 74px;
     left: 14px;
     background: var(--surface);
     color: var(--text-secondary);
@@ -391,11 +391,43 @@ body.user-logged-in .header-username {
 .back-button-floating svg { width: 20px; height: 20px; }
 
 /* ============================================
+   FAB (Floating Action Button) - bottom-right
+   ============================================ */
+.btn-fab {
+    position: fixed;
+    bottom: 74px;
+    right: 14px;
+    width: 48px; height: 48px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 400;
+    border-radius: var(--radius-full);
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    z-index: 101;
+    transition: var(--transition-fast);
+}
+
+.btn-fab:hover {
+    background: var(--accent-dark);
+    box-shadow: var(--shadow-lg);
+}
+
+.page:not(.active) .btn-fab,
+.page:not(.active) .back-button-floating { display: none; }
+
+/* ============================================
    PAGE HEADER
    ============================================ */
 .page-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: var(--spacing-lg);
     gap: var(--spacing-md);
@@ -404,6 +436,7 @@ body.user-logged-in .header-username {
 .page-header h1 {
     margin: 0;
     font-size: 1.5rem;
+    text-align: center;
 }
 
 .page-header .btn-primary {
@@ -413,26 +446,7 @@ body.user-logged-in .header-username {
 }
 
 .page-header .btn-icon {
-    width: 36px; height: 36px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: 400;
-    border-radius: var(--radius-full);
-    min-width: 36px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    box-shadow: var(--shadow-sm);
-}
-
-.page-header .btn-icon:hover {
-    background: var(--accent-dark);
-    box-shadow: var(--shadow-md);
+    display: none;
 }
 
 /* ============================================
@@ -549,11 +563,11 @@ body.user-logged-in .header-username {
     .header { padding: 0 var(--spacing-md); height: 58px; }
     .d20-logo { width: 42px; height: 42px; }
 
-    .page-header { padding: 0; gap: var(--spacing-sm); }
-    .page-header h1 { font-size: 1.2rem; }
+    .page-header { padding: 0; gap: var(--spacing-sm); justify-content: center; }
+    .page-header h1 { font-size: 1.2rem; text-align: center; }
     .page-content h1 { font-size: 1.2rem; margin-bottom: var(--spacing-md); }
 
-    .page-header .btn-icon { width: 34px; height: 34px; min-width: 34px; font-size: 1.2rem; }
+    .page-header .btn-icon { display: none; }
 
     .filters-bar { gap: 6px; margin-bottom: var(--spacing-md); }
     .filter-search { padding: 8px 10px 8px 32px; font-size: 0.85rem; }
@@ -670,9 +684,10 @@ body.user-logged-in .header-username {
     .toolbar-btn svg { width: 20px; height: 20px; }
     .toolbar-btn span { font-size: 0.6rem; }
 
-    .back-button-floating { width: 36px; height: 36px; top: 68px; left: 10px; }
+    .back-button-floating { width: 36px; height: 36px; bottom: 68px; left: 10px; }
     .back-button-floating svg { width: 18px; height: 18px; }
-    #combattimentoPage .combat-back.back-button-floating { top: 50%; transform: translateY(-50%); }
+    .btn-fab { width: 42px; height: 42px; bottom: 68px; right: 10px; font-size: 1.3rem; }
+    #combattimentoPage .combat-back.back-button-floating { bottom: auto; top: 50%; transform: translateY(-50%); }
 
     .in-app-notifications { max-width: calc(100vw - 2rem); right: var(--spacing-sm); top: 60px; }
     .in-app-notification { padding: 10px 12px; }

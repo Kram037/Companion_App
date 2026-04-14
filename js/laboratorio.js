@@ -151,18 +151,19 @@ async function loadLabContent() {
 
 function labRenderCard(item, cat) {
     const detail = labGetCardDetail(item, _labCurrentTab);
+    const clickAction = _labCurrentTab === 'nemici' ? `onclick="labViewNemico('${item.id}')"` : '';
     return `
-    <div class="lab-card" data-id="${item.id}">
+    <div class="lab-card" data-id="${item.id}" ${clickAction} style="${clickAction ? 'cursor:pointer' : ''}">
         <div class="lab-card-icon">${cat.icon}</div>
         <div class="lab-card-info">
             <p class="lab-card-name">${escapeHtml(item.nome)}</p>
             ${detail ? `<p class="lab-card-detail">${escapeHtml(detail)}</p>` : ''}
         </div>
         <div class="lab-card-actions">
-            <button onclick="labEditItem('${item.id}')" title="Modifica">
+            <button onclick="event.stopPropagation();labEditItem('${item.id}')" title="Modifica">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </button>
-            <button class="lab-delete" onclick="labDeleteItem('${item.id}')" title="Elimina">
+            <button class="lab-delete" onclick="event.stopPropagation();labDeleteItem('${item.id}')" title="Elimina">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
         </div>
@@ -431,8 +432,14 @@ function _openLabNemiciWizard(data) {
             <div class="wizard-page" id="hbNStep3">
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
-                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => `
-                        <label class="pg-skill-check-item"><input type="checkbox" id="hbSkill_${sk.key}" ${pSkills.includes(sk.key)?'checked':''}> ${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></label>`).join('')}
+                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
+                        const isProf = pSkills.includes(sk.key);
+                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''}" id="hbSkillRow_${sk.key}">
+                            <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="labToggleSkill('${sk.key}')" title="Competenza">●</span>
+                            <span class="pg-skill-name">${sk.label}</span>
+                            <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
+                        </div>`;
+                    }).join('')}
                     </div>
                 </div>
                 <div class="form-actions">
@@ -481,10 +488,7 @@ function _openLabNemiciWizard(data) {
                 <div class="wizard-page-scroll">
                     <div class="form-group">
                         <label>Caratteristica da incantatore</label>
-                        <select id="hbCarInc">
-                            <option value="">Nessuna (non incantatore)</option>
-                            ${SPELL_ABILITIES.map(a => `<option value="${a}" ${p.caratteristica_incantatore===a?'selected':''}>${SPELL_AB_LABELS[a]}</option>`).join('')}
-                        </select>
+                        <button type="button" class="custom-select-trigger" id="hbCarInc" data-value="${p.caratteristica_incantatore || ''}" onclick="openSpellAbilitySelect('hbCarInc')">${p.caratteristica_incantatore ? SPELL_AB_LABELS[p.caratteristica_incantatore] : 'Nessuna'}</button>
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm);">Slot per livello</div>
                     <div class="hb-stats-grid">
@@ -589,6 +593,14 @@ window.labToggleAtkUsi = function(cb) {
     if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
 };
 
+window.labToggleSkill = function(skillKey) {
+    const row = document.getElementById(`hbSkillRow_${skillKey}`);
+    if (!row) return;
+    const dot = row.querySelector('.pg-skill-dot');
+    const isActive = dot?.classList.toggle('active');
+    row.classList.toggle('proficient', isActive);
+};
+
 function labRenderResImmGrid() {
     const container = document.getElementById('hbResImmGrid');
     if (!container) return;
@@ -624,13 +636,13 @@ window.saveLabNemico = async function() {
         saggezza: parseInt(document.getElementById('hbsaggezza')?.value) || 10,
         carisma: parseInt(document.getElementById('hbcarisma')?.value) || 10,
         tiri_salvezza: SCHEDA_ABILITIES.filter(a => document.getElementById(`hbSave_${a.key}`)?.checked).map(a => a.key),
-        competenze_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key),
+        competenze_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('proficient')).map(sk => sk.key),
         resistenze: window._labNemResistenze || [],
         immunita: window._labNemImmunita || [],
         mod_iniziativa: parseInt(document.getElementById('hbInitMod')?.value) || null,
         resistenze_leggendarie: parseInt(document.getElementById('hbResLegg')?.value) || 0,
         azioni_legg_max: parseInt(document.getElementById('hbAzLeggMax')?.value) || 0,
-        caratteristica_incantatore: document.getElementById('hbCarInc')?.value || null,
+        caratteristica_incantatore: document.getElementById('hbCarInc')?.dataset?.value || null,
     };
 
     record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
@@ -869,7 +881,7 @@ async function handleSaveHomebrew(e) {
             record.tiri_salvezza = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma']
                 .filter(s => document.getElementById(`hbSave_${s}`)?.checked);
             record.competenze_abilita = SCHEDA_SKILLS
-                .filter(sk => document.getElementById(`hbSkill_${sk.key}`)?.checked).map(sk => sk.key);
+                .filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('proficient')).map(sk => sk.key);
             record.resistenze = window._labNemResistenze || [];
             record.immunita = window._labNemImmunita || [];
             record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
@@ -888,7 +900,7 @@ async function handleSaveHomebrew(e) {
                 nome: row.querySelector('.hbLeggNome')?.value || '',
                 descrizione: row.querySelector('.hbLeggDesc')?.value || ''
             })).filter(a => a.nome);
-            record.caratteristica_incantatore = document.getElementById('hbCarInc')?.value || null;
+            record.caratteristica_incantatore = document.getElementById('hbCarInc')?.dataset?.value || null;
             {
                 const carInc = record.caratteristica_incantatore;
                 let slotInc = null;
@@ -1017,6 +1029,106 @@ window.labToggleFriendHb = async function(cb) {
     }
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
+};
+
+// ============================================================================
+// VIEW NEMICO (scheda read-only in modal)
+// ============================================================================
+
+window.labViewNemico = async function(id) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('homebrew_nemici').select('*').eq('id', id).single();
+    if (!m) return;
+
+    const fMod = (v) => { const mod = Math.floor(((v||10)-10)/2); return mod >= 0 ? `+${mod}` : `${mod}`; };
+    const bonusComp = Math.max(2, Math.floor(((parseInt(m.grado_sfida)||0)-1)/4)+2);
+    const saves = m.tiri_salvezza || [];
+    const skills = m.competenze_abilita || [];
+
+    const resistenzeHtml = (m.resistenze?.length) ? m.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r)}</span>`).join('') : '';
+    const immunitaHtml = (m.immunita?.length) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
+
+    const attacks = m.attacchi || [];
+    const attacksHtml = attacks.length > 0 ? attacks.map(a => {
+        const hasUsi = a.usi_max > 0;
+        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, () =>
+            `<span class="monster-action-use-pip filled"></span>`).join('')}</span>` : '';
+        return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
+    }).join('') : '';
+
+    const leggActions = m.azioni_leggendarie || [];
+    const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${escapeHtml(a.descrizione || '')}</span></div>`
+    ).join('') : '';
+
+    const resLeggMax = m.resistenze_leggendarie || 0;
+    const azLeggMax = m.azioni_legg_max || 0;
+
+    const skillsHtml = skills.length > 0 ? SCHEDA_SKILLS.filter(sk => skills.includes(sk.key)).map(sk => {
+        const abilityMod = Math.floor(((m[sk.ability]||10)-10)/2);
+        const total = abilityMod + bonusComp;
+        return `<span class="scheda-tag">${sk.label} ${total >= 0 ? '+' + total : total}</span>`;
+    }).join('') : '';
+
+    let spellHtml = '';
+    const slots = m.slot_incantesimo;
+    const hasSpells = slots && typeof slots === 'object' && Object.keys(slots).length > 0;
+    if (hasSpells) {
+        const carInc = m.caratteristica_incantatore;
+        const incVal = m[carInc] || 10;
+        const incMod = Math.floor((incVal - 10) / 2);
+        const atkBonus = incMod + bonusComp;
+        const dc = 8 + bonusComp + incMod;
+        const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const pips = Array.from({length: s.max}, () => `<span class="scheda-slot-pip filled"></span>`).join('');
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${s.max}/${s.max}</span></div>`;
+        }).join('');
+        spellHtml = `
+            <div class="combat-section-label">Incantesimi</div>
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">
+                <div class="scheda-box"><div class="scheda-box-val">${incMod >= 0 ? '+'+incMod : incMod}</div><div class="scheda-box-label">${(carInc||'').substring(0,3).toUpperCase()}</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>
+            </div>
+            <div class="scheda-slots-table">${slotsHtml}</div>`;
+    }
+
+    const modal = document.getElementById('homebrewModal');
+    const content = modal?.querySelector('.modal-content-lg');
+    if (!content) return;
+
+    content.innerHTML = `
+        <h2 style="flex-shrink:0;">${escapeHtml(m.nome)} <button class="modal-close" onclick="closeHomebrewModal()">&times;</button></h2>
+        <div style="flex:1;overflow-y:auto;padding:0 2px;">
+            <p style="color:var(--text-secondary);margin:0 0 12px;font-size:0.85rem;">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</p>
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.punti_vita_max||10}</div><div class="scheda-box-label">PV</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
+            </div>
+            ${m.mod_iniziativa != null ? `<p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin:6px 0;">Mod. Iniziativa: ${m.mod_iniziativa >= 0 ? '+' + m.mod_iniziativa : m.mod_iniziativa}</p>` : ''}
+            <div class="combat-abilities-grid" style="margin:12px 0;">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${skillsHtml ? `<div class="combat-section-label">Competenze</div><div class="scheda-tags">${skillsHtml}</div>` : ''}
+            ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+            ${resLeggMax > 0 ? `<div class="combat-section-label">Resistenze Leggendarie</div><div class="monster-res-legg-counter">${Array.from({length: resLeggMax}, () => `<span class="monster-res-legg-pip filled"></span>`).join('')}<span class="monster-res-legg-label">${resLeggMax}/${resLeggMax}</span></div>` : ''}
+            ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie${azLeggMax > 0 ? ` (${azLeggMax}/turno)` : ''}</div>` : ''}
+            ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+            ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
+            ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
+            ${spellHtml}
+        </div>`;
+
+    modal.style.display = 'flex';
 };
 
 // ============================================================================
