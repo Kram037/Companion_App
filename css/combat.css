@@ -171,6 +171,14 @@
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .form-row .form-group { margin-bottom: 8px; }
 
+.monster-hp-formula {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 4px 0 0;
+    font-style: italic;
+}
+
 /* Monster sheet scrollable */
 .combat-monster-sheet {
     display: flex;

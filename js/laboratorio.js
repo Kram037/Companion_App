@@ -353,6 +353,7 @@ function _openLabNemiciWizard(data) {
     const p = data || {};
     const pSaves = p.tiri_salvezza || [];
     const pSkills = p.competenze_abilita || [];
+    const pExpert = p.maestrie_abilita || [];
     const pSlots = p.slot_incantesimo || {};
     const SPELL_ABILITIES = ['intelligenza','saggezza','carisma'];
     const SPELL_AB_LABELS = { intelligenza:'Intelligenza', saggezza:'Saggezza', carisma:'Carisma' };
@@ -422,7 +423,13 @@ function _openLabNemiciWizard(data) {
                         <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(p.velocita || '9')}"></div>
                         <div class="form-group"><label for="hbInitMod">Mod. Iniz.</label><input type="number" id="hbInitMod" value="${p.mod_iniziativa ?? ''}"></div>
                     </div>
-                    <div class="form-group"><label for="hbPV">PV Max</label><input type="number" id="hbPV" value="${p.punti_vita_max || 10}"></div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label>N° Dadi</label><input type="number" id="hbDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" onchange="labRecalcHP()"></div>
+                        <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="hbDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openLabHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
+                        <div class="form-group"><label>PV Max</label><input type="number" id="hbPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                    </div>
+                    <p class="monster-hp-formula" id="hbHPFormula"></p>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="labNemWizardNav(-1)">Indietro</button>
@@ -434,8 +441,10 @@ function _openLabNemiciWizard(data) {
                 <div class="wizard-page-scroll">
                     <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
                         const isProf = pSkills.includes(sk.key);
-                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''}" id="hbSkillRow_${sk.key}">
+                        const isExp = pExpert.includes(sk.key);
+                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExp ? 'expert' : ''}" id="hbSkillRow_${sk.key}">
                             <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="labToggleSkill('${sk.key}')" title="Competenza">●</span>
+                            <span class="pg-skill-dot expert ${isExp ? 'active' : ''}" onclick="labToggleSkillExpert('${sk.key}')" title="Maestria">★</span>
                             <span class="pg-skill-name">${sk.label}</span>
                             <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
                         </div>`;
@@ -520,6 +529,7 @@ window.labNemWizardNav = function(dir) {
         const page = document.getElementById(`hbNStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
+    if (step === 2) labAutoCompileStats();
     if (step === 4) labRenderResImmGrid();
     const modal = document.getElementById('homebrewModal');
     if (modal) modal.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
@@ -593,12 +603,75 @@ window.labToggleAtkUsi = function(cb) {
     if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
 };
 
+window.openLabHitDieSelect = function() {
+    const dieOptions = [4,6,8,10,12,20].map(d => ({ value: String(d), label: 'd' + d }));
+    openCustomSelect(dieOptions, (value) => {
+        const btn = document.getElementById('hbDadoVita');
+        if (btn) { btn.dataset.value = value; btn.textContent = 'd' + value; }
+        labRecalcHP();
+    }, 'Dado Vita');
+};
+
+window.labRecalcHP = function() {
+    const numDice = parseInt(document.getElementById('hbDadiVitaNum')?.value) || 1;
+    const die = parseInt(document.getElementById('hbDadoVita')?.dataset?.value) || 8;
+    const con = parseInt(document.getElementById('hbcostituzione')?.value) || 10;
+    const conMod = Math.floor((con - 10) / 2);
+    const avgDie = (die + 1) / 2;
+    const hp = Math.floor(numDice * avgDie + numDice * conMod);
+    const pvInput = document.getElementById('hbPV');
+    if (pvInput) pvInput.value = Math.max(1, hp);
+    const formula = document.getElementById('hbHPFormula');
+    if (formula) {
+        const conPart = conMod !== 0 ? ` ${conMod > 0 ? '+' : '−'} ${Math.abs(numDice * conMod)}` : '';
+        formula.textContent = `${numDice}d${die}${conPart} = ${Math.max(1, hp)} PV`;
+    }
+};
+
+window.labAutoCompileStats = function() {
+    const dex = parseInt(document.getElementById('hbdestrezza')?.value) || 10;
+    const initInput = document.getElementById('hbInitMod');
+    if (initInput && !initInput.dataset.userEdited) initInput.value = Math.floor((dex - 10) / 2);
+
+    const taglia = document.getElementById('hbTaglia')?.dataset?.value || 'Media';
+    const dieBtn = document.getElementById('hbDadoVita');
+    if (dieBtn && !dieBtn.dataset.userEdited) {
+        const die = _monsterSizeHitDie(taglia);
+        dieBtn.dataset.value = die;
+        dieBtn.textContent = 'd' + die;
+    }
+
+    const gs = parseInt(document.getElementById('hbGS')?.value) || 1;
+    const numInput = document.getElementById('hbDadiVitaNum');
+    if (numInput && !numInput.dataset.userEdited) numInput.value = Math.max(1, gs);
+
+    labRecalcHP();
+};
+
 window.labToggleSkill = function(skillKey) {
     const row = document.getElementById(`hbSkillRow_${skillKey}`);
     if (!row) return;
-    const dot = row.querySelector('.pg-skill-dot');
+    const dot = row.querySelector('.pg-skill-dot:not(.expert)');
     const isActive = dot?.classList.toggle('active');
     row.classList.toggle('proficient', isActive);
+    if (!isActive) {
+        const star = row.querySelector('.pg-skill-dot.expert');
+        if (star) star.classList.remove('active');
+        row.classList.remove('expert');
+    }
+};
+
+window.labToggleSkillExpert = function(skillKey) {
+    const row = document.getElementById(`hbSkillRow_${skillKey}`);
+    if (!row) return;
+    const dot = row.querySelector('.pg-skill-dot:not(.expert)');
+    if (!dot?.classList.contains('active')) {
+        dot?.classList.add('active');
+        row.classList.add('proficient');
+    }
+    const star = row.querySelector('.pg-skill-dot.expert');
+    const isActive = star?.classList.toggle('active');
+    row.classList.toggle('expert', isActive);
 };
 
 function labRenderResImmGrid() {
@@ -637,6 +710,9 @@ window.saveLabNemico = async function() {
         carisma: parseInt(document.getElementById('hbcarisma')?.value) || 10,
         tiri_salvezza: SCHEDA_ABILITIES.filter(a => document.getElementById(`hbSave_${a.key}`)?.checked).map(a => a.key),
         competenze_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('proficient')).map(sk => sk.key),
+        maestrie_abilita: SCHEDA_SKILLS.filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('expert')).map(sk => sk.key),
+        dadi_vita_num: parseInt(document.getElementById('hbDadiVitaNum')?.value) || 1,
+        dado_vita: parseInt(document.getElementById('hbDadoVita')?.dataset?.value) || 8,
         resistenze: window._labNemResistenze || [],
         immunita: window._labNemImmunita || [],
         mod_iniziativa: parseInt(document.getElementById('hbInitMod')?.value) || null,
@@ -882,6 +958,8 @@ async function handleSaveHomebrew(e) {
                 .filter(s => document.getElementById(`hbSave_${s}`)?.checked);
             record.competenze_abilita = SCHEDA_SKILLS
                 .filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('proficient')).map(sk => sk.key);
+            record.maestrie_abilita = SCHEDA_SKILLS
+                .filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('expert')).map(sk => sk.key);
             record.resistenze = window._labNemResistenze || [];
             record.immunita = window._labNemImmunita || [];
             record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
@@ -1065,10 +1143,13 @@ window.labViewNemico = async function(id) {
     const resLeggMax = m.resistenze_leggendarie || 0;
     const azLeggMax = m.azioni_legg_max || 0;
 
+    const expert = m.maestrie_abilita || [];
     const skillsHtml = skills.length > 0 ? SCHEDA_SKILLS.filter(sk => skills.includes(sk.key)).map(sk => {
         const abilityMod = Math.floor(((m[sk.ability]||10)-10)/2);
-        const total = abilityMod + bonusComp;
-        return `<span class="scheda-tag">${sk.label} ${total >= 0 ? '+' + total : total}</span>`;
+        const isExp = expert.includes(sk.key);
+        const total = abilityMod + bonusComp + (isExp ? bonusComp : 0);
+        const expLabel = isExp ? ' ★' : '';
+        return `<span class="scheda-tag">${sk.label} ${total >= 0 ? '+' + total : total}${expLabel}</span>`;
     }).join('') : '';
 
     let spellHtml = '';

@@ -651,11 +651,14 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
         carisma: original.carisma,
         punti_vita_max: original.punti_vita_max,
         pv_attuali: original.punti_vita_max,
+        dadi_vita_num: original.dadi_vita_num,
+        dado_vita: original.dado_vita,
         classe_armatura: original.classe_armatura,
         velocita: original.velocita,
         iniziativa: (() => { const dexMod = Math.floor(((original.destrezza || 10) - 10) / 2); return Math.floor(Math.random() * 20) + 1 + dexMod; })(),
         tiri_salvezza: original.tiri_salvezza,
         competenze_abilita: original.competenze_abilita,
+        maestrie_abilita: original.maestrie_abilita,
         resistenze: original.resistenze,
         immunita: original.immunita,
         attacchi: (original.attacchi || []).map(a => ({...a, usi_attuali: a.usi_max || 0})),
@@ -850,6 +853,57 @@ window.monsterSelectHomebrew = function(nemiciId, campagnaId, sessioneId) {
     });
 };
 
+const MONSTER_SIZE_DIE = { 'Minuscola': 4, 'Piccola': 6, 'Media': 8, 'Grande': 10, 'Enorme': 12, 'Mastodontica': 20 };
+
+window._monsterSizeHitDie = function(taglia) {
+    return MONSTER_SIZE_DIE[taglia] || 8;
+};
+
+window.openMonsterHitDieSelect = function() {
+    const dieOptions = [4,6,8,10,12,20].map(d => ({ value: String(d), label: 'd' + d }));
+    openCustomSelect(dieOptions, (value) => {
+        const btn = document.getElementById('mDadoVita');
+        if (btn) { btn.dataset.value = value; btn.textContent = 'd' + value; }
+        monsterRecalcHP();
+    }, 'Dado Vita');
+};
+
+window.monsterRecalcHP = function() {
+    const numDice = parseInt(document.getElementById('mDadiVitaNum')?.value) || 1;
+    const die = parseInt(document.getElementById('mDadoVita')?.dataset?.value) || 8;
+    const con = parseInt(document.getElementById('mcostituzione')?.value) || 10;
+    const conMod = Math.floor((con - 10) / 2);
+    const avgDie = (die + 1) / 2;
+    const hp = Math.floor(numDice * avgDie + numDice * conMod);
+    const pvInput = document.getElementById('mPV');
+    if (pvInput) pvInput.value = Math.max(1, hp);
+    const formula = document.getElementById('mHPFormula');
+    if (formula) {
+        const conPart = conMod !== 0 ? ` ${conMod > 0 ? '+' : '−'} ${Math.abs(numDice * conMod)}` : '';
+        formula.textContent = `${numDice}d${die}${conPart} = ${Math.max(1, hp)} PV`;
+    }
+};
+
+window.monsterAutoCompileStats = function() {
+    const dex = parseInt(document.getElementById('mdestrezza')?.value) || 10;
+    const initInput = document.getElementById('mInitMod');
+    if (initInput && !initInput.dataset.userEdited) initInput.value = Math.floor((dex - 10) / 2);
+
+    const taglia = document.getElementById('mTaglia')?.dataset?.value || 'Media';
+    const dieBtn = document.getElementById('mDadoVita');
+    if (dieBtn && !dieBtn.dataset.userEdited) {
+        const die = _monsterSizeHitDie(taglia);
+        dieBtn.dataset.value = die;
+        dieBtn.textContent = 'd' + die;
+    }
+
+    const gs = parseInt(document.getElementById('mGS')?.value) || 1;
+    const numInput = document.getElementById('mDadiVitaNum');
+    if (numInput && !numInput.dataset.userEdited) numInput.value = Math.max(1, gs);
+
+    monsterRecalcHP();
+};
+
 function _showMonsterWizard(campagnaId, sessioneId, prefill) {
     const p = prefill || {};
     const choicePage = document.getElementById('monsterChoicePage');
@@ -865,6 +919,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
 
     const pSaves = p.tiri_salvezza || [];
     const pSkills = p.competenze_abilita || [];
+    const pExpert = p.maestrie_abilita || [];
     const pSlots = p.slot_incantesimo || {};
     const SPELL_ABILITIES = ['intelligenza','saggezza','carisma'];
     const SPELL_AB_LABELS = { intelligenza:'Intelligenza', saggezza:'Saggezza', carisma:'Carisma' };
@@ -925,7 +980,13 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                         <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
                         <div class="form-group"><label for="mInitMod">Mod. Iniz.</label><input type="number" id="mInitMod" value="${p.mod_iniziativa ?? ''}"></div>
                     </div>
-                    <div class="form-group"><label for="mPV">PV Massimi</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
+                    <div class="pg-stats-row-3">
+                        <div class="form-group"><label>N° Dadi</label><input type="number" id="mDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" onchange="monsterRecalcHP()"></div>
+                        <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="mDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openMonsterHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
+                        <div class="form-group"><label>PV Max</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                    </div>
+                    <p class="monster-hp-formula" id="mHPFormula"></p>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="monsterWizardNav(-1)">Indietro</button>
@@ -937,8 +998,10 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="wizard-page-scroll">
                     <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
                         const isProf = pSkills.includes(sk.key);
-                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''}" id="mSkillRow_${sk.key}">
+                        const isExp = pExpert.includes(sk.key);
+                        return `<div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExp ? 'expert' : ''}" id="mSkillRow_${sk.key}">
                             <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="monsterToggleSkill('${sk.key}')" title="Competenza">●</span>
+                            <span class="pg-skill-dot expert ${isExp ? 'active' : ''}" onclick="monsterToggleSkillExpert('${sk.key}')" title="Maestria">★</span>
                             <span class="pg-skill-name">${sk.label}</span>
                             <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
                         </div>`;
@@ -1079,9 +1142,27 @@ window.openMonsterFieldSelect = function(fieldId, options, title) {
 window.monsterToggleSkill = function(skillKey) {
     const row = document.getElementById(`mSkillRow_${skillKey}`);
     if (!row) return;
-    const dot = row.querySelector('.pg-skill-dot');
+    const dot = row.querySelector('.pg-skill-dot:not(.expert)');
     const isActive = dot?.classList.toggle('active');
     row.classList.toggle('proficient', isActive);
+    if (!isActive) {
+        const star = row.querySelector('.pg-skill-dot.expert');
+        if (star) star.classList.remove('active');
+        row.classList.remove('expert');
+    }
+};
+
+window.monsterToggleSkillExpert = function(skillKey) {
+    const row = document.getElementById(`mSkillRow_${skillKey}`);
+    if (!row) return;
+    const dot = row.querySelector('.pg-skill-dot:not(.expert)');
+    if (!dot?.classList.contains('active')) {
+        dot?.classList.add('active');
+        row.classList.add('proficient');
+    }
+    const star = row.querySelector('.pg-skill-dot.expert');
+    const isActive = star?.classList.toggle('active');
+    row.classList.toggle('expert', isActive);
 };
 
 window.openSpellAbilitySelect = function(fieldId) {
@@ -1146,6 +1227,7 @@ window.monsterWizardNav = function(dir) {
         const page = document.getElementById(`mStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
+    if (step === 2) monsterAutoCompileStats();
     if (step === 4) monsterRenderResImmGrid();
     const stepsBar = document.getElementById('monsterWizardSteps');
     if (stepsBar) {
@@ -1164,6 +1246,7 @@ window.saveMonster = async function() {
 
     const saves = SCHEDA_ABILITIES.filter(a => document.getElementById(`mSave_${a.key}`)?.checked).map(a => a.key);
     const skills = SCHEDA_SKILLS.filter(s => document.getElementById(`mSkillRow_${s.key}`)?.classList.contains('proficient')).map(s => s.key);
+    const skillExpert = SCHEDA_SKILLS.filter(s => document.getElementById(`mSkillRow_${s.key}`)?.classList.contains('expert')).map(s => s.key);
     const resistenze = window._monsterResistenze || [];
     const immunita = window._monsterImmunita || [];
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
@@ -1215,11 +1298,14 @@ window.saveMonster = async function() {
         carisma: parseInt(document.getElementById('mcarisma')?.value) || 10,
         punti_vita_max: pvMax,
         pv_attuali: pvMax,
+        dadi_vita_num: parseInt(document.getElementById('mDadiVitaNum')?.value) || 1,
+        dado_vita: parseInt(document.getElementById('mDadoVita')?.dataset?.value) || 8,
         classe_armatura: parseInt(document.getElementById('mCA')?.value) || 10,
         velocita: parseFloat(document.getElementById('mVel')?.value) || 9,
         iniziativa: (() => { const mod = parseInt(document.getElementById('mInitMod')?.value); const dexMod = Math.floor(((parseInt(document.getElementById('mdestrezza')?.value) || 10) - 10) / 2); const finalMod = isNaN(mod) ? dexMod : mod; return Math.floor(Math.random() * 20) + 1 + finalMod; })(),
         tiri_salvezza: saves,
         competenze_abilita: skills,
+        maestrie_abilita: skillExpert,
         resistenze,
         immunita,
         attacchi,
