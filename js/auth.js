@@ -9,10 +9,12 @@ function setupSupabaseAuth() {
 
     try {
         // Listen for auth state changes
+        let _authInitDone = false;
         supabase.auth.onAuthStateChange((event, session) => {
             console.log('🔄 Auth state changed:', event, session?.user?.email || 'null');
             
             if (session?.user) {
+                const alreadyLoggedSameUser = AppState.isLoggedIn && AppState.currentUser?.uid === session.user.id;
                 const prevName = AppState.currentUser?.displayName;
                 AppState.currentUser = {
                     uid: session.user.id,
@@ -21,6 +23,9 @@ function setupSupabaseAuth() {
                 };
                 AppState.isLoggedIn = true;
                 updateUIForLoggedIn();
+
+                if (alreadyLoggedSameUser && _authInitDone && event === 'TOKEN_REFRESHED') return;
+                _authInitDone = true;
                 
                 initializeUserDocument(session.user).then(() => {
                     loadRazzeBackground();

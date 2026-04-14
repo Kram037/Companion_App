@@ -3,6 +3,7 @@
 // ============================================
 
 let campagneChannel = null;
+let _campagneLoading = false;
 let editingCampagnaId = null;
 
 async function openCampagnaModal(campagnaId = null) {
@@ -115,13 +116,15 @@ async function loadCampagne(userId, options = {}) {
 
     if (!supabase || !userId) return;
 
+    if (_campagneLoading && silent) return;
+    _campagneLoading = true;
+
     if (!silent && elements.campagneList) {
         elements.campagneList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>';
     }
     
-    // Disconnetti da eventuali subscription precedenti
     if (!skipRealtimeSetup && campagneChannel) {
-        supabase.removeChannel(campagneChannel);
+        try { supabase.removeChannel(campagneChannel); } catch (_) {}
         campagneChannel = null;
     }
 
@@ -183,11 +186,12 @@ async function loadCampagne(userId, options = {}) {
         if (!skipRealtimeSetup) {
             try {
                 if (campagneChannel) {
-                    supabase.removeChannel(campagneChannel);
+                    try { supabase.removeChannel(campagneChannel); } catch (_) {}
                     campagneChannel = null;
                 }
+                const channelName = 'campagne-ch-' + Date.now();
                 campagneChannel = supabase
-                    .channel('campagne-changes')
+                    .channel(channelName)
                     .on('postgres_changes',
                         {
                             event: '*',
@@ -212,6 +216,8 @@ async function loadCampagne(userId, options = {}) {
         console.error('❌ Errore nel caricamento campagne:', error);
         showNotification('Errore nel caricamento delle campagne: ' + error.message);
         renderCampagne([], false);
+    } finally {
+        _campagneLoading = false;
     }
 }
 
