@@ -180,24 +180,32 @@ async function loadCampagne(userId, options = {}) {
         const campagneFiltrate = applyCampagneFilters(AppState.cachedCampagne, AppState.campagneFilters, utente.id);
         renderCampagne(campagneFiltrate, true, invitiRicevuti);
 
-        // Setup real-time subscription
         if (!skipRealtimeSetup) {
-            campagneChannel = supabase
-                .channel('campagne-changes')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'campagne',
-                        filter: `id_dm=eq.${utente.id}`
-                    }, 
-                    async (payload) => {
-                        console.log('🔄 Cambio rilevato nelle campagne:', payload);
-                        // Ricarica campagne preservando inviti, preferiti e filtri
-                        await loadCampagne(userId, { skipRealtimeSetup: true });
-                    }
-                )
-                .subscribe();
+            try {
+                if (campagneChannel) {
+                    supabase.removeChannel(campagneChannel);
+                    campagneChannel = null;
+                }
+                campagneChannel = supabase
+                    .channel('campagne-changes')
+                    .on('postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'campagne',
+                            filter: `id_dm=eq.${utente.id}`
+                        },
+                        async (payload) => {
+                            console.log('🔄 Cambio rilevato nelle campagne:', payload);
+                            await loadCampagne(userId, { skipRealtimeSetup: true });
+                        }
+                    )
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') console.log('✅ Realtime campagne attivo');
+                    });
+            } catch (rtErr) {
+                console.warn('⚠️ Realtime campagne non disponibile:', rtErr.message);
+            }
         }
 
     } catch (error) {

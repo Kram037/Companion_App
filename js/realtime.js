@@ -493,7 +493,7 @@ async function refreshCurrentPageData() {
     const page = AppState.currentPage;
     try {
         if (page === 'campagne' && AppState.currentUser?.uid) {
-            await loadCampagne(AppState.currentUser.uid, { silent: true });
+            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
         } else if (page === 'personaggi') {
             await loadPersonaggi({ silent: true });
         } else if (page === 'amici') {
