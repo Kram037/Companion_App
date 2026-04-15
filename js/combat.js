@@ -1016,7 +1016,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                             return `
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
-                            <div class="pg-ability-row"><input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" onchange="monsterUpdateMods()"><span class="pg-ability-mod" id="mMod_${a.key}">${fmod}</span></div>
+                            <div class="pg-ability-row"><input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="monsterUpdateMods()"><span class="pg-ability-mod" id="mMod_${a.key}">${fmod}</span></div>
                             <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}" ${pSaves.includes(a.key)?'checked':''} onchange="monsterUpdateMods()"> <span class="pg-save-val" id="mSaveVal_${a.key}">${fmod}</span></label>
                         </div>`;
                         }).join('')}
@@ -1031,15 +1031,15 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="form-section-label">Statistiche</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-stats-row-3">
-                        <div class="form-group"><label for="mCA">CA</label><input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}"></div>
-                        <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}"></div>
-                        <div class="form-group"><label for="mInitMod">Mod. Iniz.</label><input type="number" id="mInitMod" value="${p.mod_iniziativa ?? ''}"></div>
+                        <div class="form-group"><label for="mCA">CA</label><input type="number" id="mCA" min="1" value="${p.classe_armatura || 10}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                        <div class="form-group"><label for="mVel">Velocità</label><input type="number" id="mVel" min="0" step="1.5" value="${parseFloat(p.velocita) || 9}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                        <div class="form-group"><label for="mInitMod">Mod. Iniz.</label><input type="number" id="mInitMod" value="${p.mod_iniziativa ?? ''}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
                     <div class="pg-stats-row-3">
                         <div class="form-group"><label>N° Dadi</label><input type="number" id="mDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="monsterRecalcHP()"></div>
                         <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="mDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openMonsterHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
-                        <div class="form-group"><label>PV Max</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                        <div class="form-group"><label>PV Max</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     </div>
                     <p class="monster-hp-formula" id="mHPFormula"></p>
                 </div>

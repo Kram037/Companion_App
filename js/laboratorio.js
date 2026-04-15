@@ -275,7 +275,7 @@ window.labAddRisorsa = function() {
 };
 
 let _labRazzeWizardStep = 0;
-const _LAB_RAZZE_STEPS = ['Identità', 'Resistenze e Competenze', 'Linguaggi', 'Abilità Speciali'];
+const _LAB_RAZZE_STEPS = ['Identità', 'Resistenze', 'Competenze', 'Linguaggi', 'Abilità Speciali'];
 
 function _openLabRazzeWizard(editData) {
     _labEditingId = editData?.id || null;
@@ -328,7 +328,15 @@ function _openLabRazzeWizard(editData) {
                     <div class="hb-checkbox-grid" id="hbRazzeResGrid">
                         ${DAMAGE_TYPES.map(dt => `<label class="scheda-checkbox-item"><input type="checkbox" value="${dt.value}" ${pRes.includes(dt.value) ? 'checked' : ''}><span>${dt.label}</span></label>`).join('')}
                     </div>
-                    <div class="form-section-label">Competenze Abilità</div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labRazzeWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbRStep2">
+                <div class="form-section-label">Competenze Abilità</div>
+                <div class="wizard-page-scroll">
                     <div class="hb-checkbox-grid" id="hbRazzeSkillGrid">
                         ${SCHEDA_SKILLS.map(sk => `<label class="scheda-checkbox-item"><input type="checkbox" value="${sk.key}" ${pSkills.includes(sk.key) ? 'checked' : ''}><span>${sk.label}</span></label>`).join('')}
                     </div>
@@ -338,7 +346,7 @@ function _openLabRazzeWizard(editData) {
                     <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="hbRStep2">
+            <div class="wizard-page" id="hbRStep3">
                 <div class="form-section-label">Linguaggi</div>
                 <div class="wizard-page-scroll">
                     <div class="hb-checkbox-grid" id="hbRazzeLangGrid">
@@ -350,7 +358,7 @@ function _openLabRazzeWizard(editData) {
                     <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
                 </div>
             </div>
-            <div class="wizard-page" id="hbRStep3">
+            <div class="wizard-page" id="hbRStep4">
                 <div class="form-section-label">Abilità Speciali <button type="button" class="btn-icon" onclick="labRazzeAddAbilita()" title="Aggiungi abilità">＋</button></div>
                 <div class="wizard-page-scroll">
                     <div id="hbRazzeAbilitaList">
@@ -609,7 +617,7 @@ function _openLabNemiciWizard(data) {
                             return `
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
-                            <div class="pg-ability-row"><input type="number" id="hb${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" onchange="labUpdateMods()"><span class="pg-ability-mod" id="hbMod_${a.key}">${fmod}</span></div>
+                            <div class="pg-ability-row"><input type="number" id="hb${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="labUpdateMods()"><span class="pg-ability-mod" id="hbMod_${a.key}">${fmod}</span></div>
                             <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${pSaves.includes(a.key)?'checked':''} onchange="labUpdateMods()"> <span class="pg-save-val" id="hbSaveVal_${a.key}">${fmod}</span></label>
                         </div>`;
                         }).join('')}
@@ -624,15 +632,15 @@ function _openLabNemiciWizard(data) {
                 <div class="form-section-label">Statistiche</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-stats-row-3">
-                        <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${p.classe_armatura || 10}"></div>
-                        <div class="form-group"><label for="hbVelocita">Velocità</label><input type="text" id="hbVelocita" placeholder="9" value="${escapeHtml(p.velocita || '9')}"></div>
-                        <div class="form-group"><label for="hbInitMod">Mod. Iniz.</label><input type="number" id="hbInitMod" value="${p.mod_iniziativa ?? ''}"></div>
+                        <div class="form-group"><label for="hbCA">CA</label><input type="number" id="hbCA" value="${p.classe_armatura || 10}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                        <div class="form-group"><label for="hbVelocita">Velocità</label><input type="number" id="hbVelocita" value="${parseFloat(p.velocita) || 9}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                        <div class="form-group"><label for="hbInitMod">Mod. Iniz.</label><input type="number" id="hbInitMod" value="${p.mod_iniziativa ?? ''}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
                     <div class="pg-stats-row-3">
                         <div class="form-group"><label>N° Dadi</label><input type="number" id="hbDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="labRecalcHP()"></div>
                         <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="hbDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openLabHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
-                        <div class="form-group"><label>PV Max</label><input type="number" id="hbPV" min="1" value="${p.punti_vita_max || 10}"></div>
+                        <div class="form-group"><label>PV Max</label><input type="number" id="hbPV" min="1" value="${p.punti_vita_max || 10}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     </div>
                     <p class="monster-hp-formula" id="hbHPFormula"></p>
                 </div>
