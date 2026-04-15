@@ -575,6 +575,59 @@
         height: calc(100svh - 58px - 72px - 1.5rem);
     }
 }
+.hb-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 12px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.hb-race-ability-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    margin-bottom: 6px;
+}
+
+.hb-race-ability-header {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.hb-race-ability-header input[type="text"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.hb-race-ability-header input[type="number"] {
+    flex-shrink: 0;
+}
+
+.hb-race-ability-header button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px 4px;
+    flex-shrink: 0;
+}
+
+.hb-race-ability-row textarea {
+    width: 100%;
+    margin-top: 6px;
+    resize: vertical;
+    font-size: 0.85rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 8px;
+    color: var(--text);
+    font-family: inherit;
+}
+
 @media (max-width: 480px) {
     .tipo-scheda-options { flex-direction: column; }
     .micro-slots-grid { grid-template-columns: repeat(3, 1fr); }

@@ -178,7 +178,14 @@ function labGetCardDetail(item, tab) {
             if (item.tipo_caster) parts.push(item.tipo_caster);
             return parts.join(' · ');
         }
-        case 'razze': return `${item.taglia || ''} · ${item.velocita || 9}m`;
+        case 'razze': {
+            const parts = [`${item.taglia || 'Media'}`, `${item.velocita || 9}m`];
+            const nRes = (item.resistenze || []).length;
+            if (nRes > 0) parts.push(`${nRes} res.`);
+            const nLang = (item.linguaggi || []).length;
+            if (nLang > 0) parts.push(`${nLang} ling.`);
+            return parts.join(' · ');
+        }
         case 'background': return '';
         case 'incantesimi': {
             const lvl = item.livello === 0 ? 'Trucchetto' : `Livello ${item.livello}`;
@@ -268,6 +275,13 @@ window.labAddRisorsa = function() {
 };
 
 function labFieldsRazze(data) {
+    const pRes = data?.resistenze || [];
+    const pSkills = data?.competenze_abilita || [];
+    const pLangs = data?.linguaggi || [];
+    const pAbil = data?.abilita_speciali || [];
+    const langOptions = [...DND_LINGUAGGI, 'A scelta'];
+    const genericAbil = pAbil.filter(a => a.tipo !== 'incantesimo');
+    const innateSpells = pAbil.filter(a => a.tipo === 'incantesimo');
     return `
     <div class="form-group">
         <label for="hbNome">Nome</label>
@@ -284,8 +298,64 @@ function labFieldsRazze(data) {
             <label for="hbVelocita">Velocità (m)</label>
             <input type="number" id="hbVelocita" step="1.5" value="${data?.velocita || 9}">
         </div>
+    </div>
+    <div class="form-section-label">Resistenze</div>
+    <div class="hb-checkbox-grid" id="hbRazzeResGrid">
+        ${DAMAGE_TYPES.map(dt => `<label class="scheda-checkbox-item"><input type="checkbox" value="${dt.value}" ${pRes.includes(dt.value) ? 'checked' : ''}><span>${dt.label}</span></label>`).join('')}
+    </div>
+    <div class="form-section-label">Competenze Abilità</div>
+    <div class="hb-checkbox-grid" id="hbRazzeSkillGrid">
+        ${SCHEDA_SKILLS.map(sk => `<label class="scheda-checkbox-item"><input type="checkbox" value="${sk.key}" ${pSkills.includes(sk.key) ? 'checked' : ''}><span>${sk.label}</span></label>`).join('')}
+    </div>
+    <div class="form-section-label">Linguaggi</div>
+    <div class="hb-checkbox-grid" id="hbRazzeLangGrid">
+        ${langOptions.map(l => `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(l)}" ${pLangs.includes(l) ? 'checked' : ''}><span>${escapeHtml(l)}</span></label>`).join('')}
+    </div>
+    <div class="form-section-label">Abilità Speciali <button type="button" class="btn-icon" onclick="labRazzeAddAbilita()" title="Aggiungi abilità">＋</button></div>
+    <div id="hbRazzeAbilitaList">
+        ${genericAbil.map((a, i) => _labRazzeAbilitaRow(a)).join('')}
+    </div>
+    <div class="form-section-label">Incantesimi Innati <button type="button" class="btn-icon" onclick="labRazzeAddInnato()" title="Aggiungi incantesimo innato">＋</button></div>
+    <div id="hbRazzeInnatiList">
+        ${innateSpells.map((a, i) => _labRazzeInnatoRow(a)).join('')}
     </div>`;
 }
+
+function _labRazzeAbilitaRow(data) {
+    data = data || {};
+    return `<div class="hb-race-ability-row">
+        <div class="hb-race-ability-header">
+            <input type="text" class="hbRAbilNome" placeholder="Nome abilità" value="${escapeHtml(data.nome || '')}">
+            <input type="number" class="hbRAbilUsi" placeholder="Usi" min="0" value="${data.usi ?? ''}" title="Usi (vuoto = illimitati)" style="width:60px">
+            <button type="button" onclick="this.closest('.hb-race-ability-row').remove()">✕</button>
+        </div>
+        <textarea class="hbRAbilDesc" placeholder="Descrizione dell'abilità..." rows="2">${escapeHtml(data.descrizione || '')}</textarea>
+    </div>`;
+}
+
+function _labRazzeInnatoRow(data) {
+    data = data || {};
+    return `<div class="hb-race-ability-row hb-race-innato-row">
+        <div class="hb-race-ability-header">
+            <input type="text" class="hbRInnNome" placeholder="Nome incantesimo" value="${escapeHtml(data.nome || '')}">
+            <input type="number" class="hbRInnLvl" placeholder="Lv" min="0" max="9" value="${data.livello ?? 0}" title="Livello incantesimo" style="width:50px">
+            <input type="number" class="hbRInnUsi" placeholder="Usi" min="0" value="${data.usi ?? ''}" title="Usi per riposo" style="width:60px">
+            <button type="button" onclick="this.closest('.hb-race-ability-row').remove()">✕</button>
+        </div>
+    </div>`;
+}
+
+window.labRazzeAddAbilita = function() {
+    const list = document.getElementById('hbRazzeAbilitaList');
+    if (!list) return;
+    list.insertAdjacentHTML('beforeend', _labRazzeAbilitaRow());
+};
+
+window.labRazzeAddInnato = function() {
+    const list = document.getElementById('hbRazzeInnatiList');
+    if (!list) return;
+    list.insertAdjacentHTML('beforeend', _labRazzeInnatoRow());
+};
 
 function labFieldsBackground(data) {
     return `
@@ -402,12 +472,17 @@ function _openLabNemiciWizard(data) {
                 <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-abilities-grid">
-                        ${SCHEDA_ABILITIES.map(a => `
+                        ${SCHEDA_ABILITIES.map(a => {
+                            const val = p[a.key] || 10;
+                            const mod = Math.floor((val - 10) / 2);
+                            const fmod = mod >= 0 ? '+' + mod : '' + mod;
+                            return `
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
-                            <div class="pg-ability-row"><input type="number" id="hb${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}"></div>
-                            <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
-                        </div>`).join('')}
+                            <div class="pg-ability-row"><input type="number" id="hb${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" onchange="labUpdateMods()"><span class="pg-ability-mod" id="hbMod_${a.key}">${fmod}</span></div>
+                            <label class="pg-save-item"><input type="checkbox" id="hbSave_${a.key}" ${pSaves.includes(a.key)?'checked':''} onchange="labUpdateMods()"> <span class="pg-save-val" id="hbSaveVal_${a.key}">${fmod}</span></label>
+                        </div>`;
+                        }).join('')}
                     </div>
                 </div>
                 <div class="form-actions">
@@ -439,12 +514,17 @@ function _openLabNemiciWizard(data) {
             <div class="wizard-page" id="hbNStep3">
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
-                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
+                    <div class="pg-skills-list" id="hbSkillsList">${SCHEDA_SKILLS.map(sk => {
                         const isProf = pSkills.includes(sk.key);
                         const isExp = pExpert.includes(sk.key);
+                        const abilMod = Math.floor(((p[sk.ability]||10)-10)/2);
+                        const bonus = _monsterProfBonus(p.grado_sfida);
+                        const total = abilMod + (isProf ? bonus : 0) + (isExp ? bonus : 0);
+                        const fval = total >= 0 ? '+' + total : '' + total;
                         return `<div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExp ? 'expert' : ''}" id="hbSkillRow_${sk.key}">
                             <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="labToggleSkill('${sk.key}')" title="Competenza">●</span>
                             <span class="pg-skill-dot expert ${isExp ? 'active' : ''}" onclick="labToggleSkillExpert('${sk.key}')" title="Maestria">★</span>
+                            <span class="pg-skill-value" id="hbSkillVal_${sk.key}">${fval}</span>
                             <span class="pg-skill-name">${sk.label}</span>
                             <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
                         </div>`;
@@ -529,7 +609,9 @@ window.labNemWizardNav = function(dir) {
         const page = document.getElementById(`hbNStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
+    if (step === 1) labUpdateMods();
     if (step === 2) labAutoCompileStats();
+    if (step === 3) labUpdateSkillValues();
     if (step === 4) labRenderResImmGrid();
     const modal = document.getElementById('homebrewModal');
     if (modal) modal.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
@@ -648,6 +730,44 @@ window.labAutoCompileStats = function() {
     labRecalcHP();
 };
 
+window.labUpdateMods = function() {
+    const gs = document.getElementById('hbGS')?.value || '0';
+    const bonus = _monsterProfBonus(gs);
+    SCHEDA_ABILITIES.forEach(a => {
+        const val = parseInt(document.getElementById(`hb${a.key}`)?.value) || 10;
+        const mod = Math.floor((val - 10) / 2);
+        const fmod = mod >= 0 ? '+' + mod : '' + mod;
+        const modEl = document.getElementById(`hbMod_${a.key}`);
+        if (modEl) {
+            modEl.textContent = fmod;
+            modEl.className = 'pg-ability-mod ' + (mod > 0 ? 'positive' : mod < 0 ? 'negative' : 'zero');
+        }
+        const cb = document.getElementById(`hbSave_${a.key}`);
+        const saveEl = document.getElementById(`hbSaveVal_${a.key}`);
+        if (saveEl) {
+            const saveTot = mod + (cb?.checked ? bonus : 0);
+            saveEl.textContent = saveTot >= 0 ? '+' + saveTot : '' + saveTot;
+        }
+    });
+    labUpdateSkillValues();
+};
+
+window.labUpdateSkillValues = function() {
+    const gs = document.getElementById('hbGS')?.value || '0';
+    const bonus = _monsterProfBonus(gs);
+    SCHEDA_SKILLS.forEach(sk => {
+        const row = document.getElementById(`hbSkillRow_${sk.key}`);
+        if (!row) return;
+        const abilVal = parseInt(document.getElementById(`hb${sk.ability}`)?.value) || 10;
+        const abilMod = Math.floor((abilVal - 10) / 2);
+        const isProf = row.classList.contains('proficient');
+        const isExp = row.classList.contains('expert');
+        const total = abilMod + (isProf ? bonus : 0) + (isExp ? bonus : 0);
+        const valEl = document.getElementById(`hbSkillVal_${sk.key}`);
+        if (valEl) valEl.textContent = total >= 0 ? '+' + total : '' + total;
+    });
+};
+
 window.labToggleSkill = function(skillKey) {
     const row = document.getElementById(`hbSkillRow_${skillKey}`);
     if (!row) return;
@@ -659,6 +779,7 @@ window.labToggleSkill = function(skillKey) {
         if (star) star.classList.remove('active');
         row.classList.remove('expert');
     }
+    labUpdateSkillValues();
 };
 
 window.labToggleSkillExpert = function(skillKey) {
@@ -672,6 +793,7 @@ window.labToggleSkillExpert = function(skillKey) {
     const star = row.querySelector('.pg-skill-dot.expert');
     const isActive = star?.classList.toggle('active');
     row.classList.toggle('expert', isActive);
+    labUpdateSkillValues();
 };
 
 function labRenderResImmGrid() {
@@ -928,6 +1050,35 @@ async function handleSaveHomebrew(e) {
         case 'razze':
             record.taglia = document.getElementById('hbTaglia')?.value || 'Media';
             record.velocita = parseFloat(document.getElementById('hbVelocita')?.value) || 9;
+            record.resistenze = Array.from(document.querySelectorAll('#hbRazzeResGrid input:checked')).map(cb => cb.value);
+            record.competenze_abilita = Array.from(document.querySelectorAll('#hbRazzeSkillGrid input:checked')).map(cb => cb.value);
+            record.linguaggi = Array.from(document.querySelectorAll('#hbRazzeLangGrid input:checked')).map(cb => cb.value);
+            {
+                const abilita = [];
+                document.querySelectorAll('#hbRazzeAbilitaList .hb-race-ability-row').forEach(row => {
+                    const nome = row.querySelector('.hbRAbilNome')?.value?.trim();
+                    if (!nome) return;
+                    const usi = row.querySelector('.hbRAbilUsi')?.value;
+                    abilita.push({
+                        tipo: 'abilita',
+                        nome,
+                        descrizione: row.querySelector('.hbRAbilDesc')?.value?.trim() || '',
+                        usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
+                    });
+                });
+                document.querySelectorAll('#hbRazzeInnatiList .hb-race-ability-row').forEach(row => {
+                    const nome = row.querySelector('.hbRInnNome')?.value?.trim();
+                    if (!nome) return;
+                    const usi = row.querySelector('.hbRInnUsi')?.value;
+                    abilita.push({
+                        tipo: 'incantesimo',
+                        nome,
+                        livello: parseInt(row.querySelector('.hbRInnLvl')?.value) || 0,
+                        usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
+                    });
+                });
+                record.abilita_speciali = abilita;
+            }
             break;
         case 'background':
             break;

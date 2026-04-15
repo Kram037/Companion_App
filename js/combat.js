@@ -859,6 +859,56 @@ window._monsterSizeHitDie = function(taglia) {
     return MONSTER_SIZE_DIE[taglia] || 8;
 };
 
+window._monsterProfBonus = function(gs) {
+    const cr = parseFloat(gs) || 0;
+    if (cr < 5) return 2;
+    if (cr < 9) return 3;
+    if (cr < 13) return 4;
+    if (cr < 17) return 5;
+    if (cr < 21) return 6;
+    if (cr < 25) return 7;
+    if (cr < 29) return 8;
+    return 9;
+};
+
+window.monsterUpdateMods = function() {
+    const gs = document.getElementById('mGS')?.value || '0';
+    const bonus = _monsterProfBonus(gs);
+    SCHEDA_ABILITIES.forEach(a => {
+        const val = parseInt(document.getElementById(`m${a.key}`)?.value) || 10;
+        const mod = Math.floor((val - 10) / 2);
+        const fmod = mod >= 0 ? '+' + mod : '' + mod;
+        const modEl = document.getElementById(`mMod_${a.key}`);
+        if (modEl) {
+            modEl.textContent = fmod;
+            modEl.className = 'pg-ability-mod ' + (mod > 0 ? 'positive' : mod < 0 ? 'negative' : 'zero');
+        }
+        const cb = document.getElementById(`mSave_${a.key}`);
+        const saveEl = document.getElementById(`mSaveVal_${a.key}`);
+        if (saveEl) {
+            const saveTot = mod + (cb?.checked ? bonus : 0);
+            saveEl.textContent = saveTot >= 0 ? '+' + saveTot : '' + saveTot;
+        }
+    });
+    monsterUpdateSkillValues();
+};
+
+window.monsterUpdateSkillValues = function() {
+    const gs = document.getElementById('mGS')?.value || '0';
+    const bonus = _monsterProfBonus(gs);
+    SCHEDA_SKILLS.forEach(sk => {
+        const row = document.getElementById(`mSkillRow_${sk.key}`);
+        if (!row) return;
+        const abilVal = parseInt(document.getElementById(`m${sk.ability}`)?.value) || 10;
+        const abilMod = Math.floor((abilVal - 10) / 2);
+        const isProf = row.classList.contains('proficient');
+        const isExp = row.classList.contains('expert');
+        const total = abilMod + (isProf ? bonus : 0) + (isExp ? bonus : 0);
+        const valEl = document.getElementById(`mSkillVal_${sk.key}`);
+        if (valEl) valEl.textContent = total >= 0 ? '+' + total : '' + total;
+    });
+};
+
 window.openMonsterHitDieSelect = function() {
     const dieOptions = [4,6,8,10,12,20].map(d => ({ value: String(d), label: 'd' + d }));
     openCustomSelect(dieOptions, (value) => {
@@ -959,12 +1009,17 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                 <div class="form-section-label">Caratteristiche e Tiri Salvezza</div>
                 <div class="wizard-page-scroll">
                     <div class="pg-abilities-grid">
-                        ${SCHEDA_ABILITIES.map(a => `
+                        ${SCHEDA_ABILITIES.map(a => {
+                            const val = p[a.key] || 10;
+                            const mod = Math.floor((val - 10) / 2);
+                            const fmod = mod >= 0 ? '+' + mod : '' + mod;
+                            return `
                         <div class="pg-ability-block">
                             <label>${a.full}</label>
-                            <div class="pg-ability-row"><input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${p[a.key] || 10}"></div>
-                            <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}" ${pSaves.includes(a.key)?'checked':''}> <span>TS</span></label>
-                        </div>`).join('')}
+                            <div class="pg-ability-row"><input type="number" id="m${a.key}" class="pg-ability-input" min="1" max="30" value="${val}" onchange="monsterUpdateMods()"><span class="pg-ability-mod" id="mMod_${a.key}">${fmod}</span></div>
+                            <label class="pg-save-item"><input type="checkbox" id="mSave_${a.key}" ${pSaves.includes(a.key)?'checked':''} onchange="monsterUpdateMods()"> <span class="pg-save-val" id="mSaveVal_${a.key}">${fmod}</span></label>
+                        </div>`;
+                        }).join('')}
                     </div>
                 </div>
                 <div class="form-actions">
@@ -996,12 +1051,17 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
             <div class="wizard-page" id="mStep3">
                 <div class="form-section-label">Abilità</div>
                 <div class="wizard-page-scroll">
-                    <div class="pg-skills-list">${SCHEDA_SKILLS.map(sk => {
+                    <div class="pg-skills-list" id="mSkillsList">${SCHEDA_SKILLS.map(sk => {
                         const isProf = pSkills.includes(sk.key);
                         const isExp = pExpert.includes(sk.key);
+                        const abilMod = Math.floor(((p[sk.ability]||10)-10)/2);
+                        const bonus = _monsterProfBonus(p.grado_sfida);
+                        const total = abilMod + (isProf ? bonus : 0) + (isExp ? bonus : 0);
+                        const fval = total >= 0 ? '+' + total : '' + total;
                         return `<div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExp ? 'expert' : ''}" id="mSkillRow_${sk.key}">
                             <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="monsterToggleSkill('${sk.key}')" title="Competenza">●</span>
                             <span class="pg-skill-dot expert ${isExp ? 'active' : ''}" onclick="monsterToggleSkillExpert('${sk.key}')" title="Maestria">★</span>
+                            <span class="pg-skill-value" id="mSkillVal_${sk.key}">${fval}</span>
                             <span class="pg-skill-name">${sk.label}</span>
                             <span class="pg-skill-ability">(${sk.ability.substring(0, 3).toUpperCase()})</span>
                         </div>`;
@@ -1150,6 +1210,7 @@ window.monsterToggleSkill = function(skillKey) {
         if (star) star.classList.remove('active');
         row.classList.remove('expert');
     }
+    monsterUpdateSkillValues();
 };
 
 window.monsterToggleSkillExpert = function(skillKey) {
@@ -1163,6 +1224,7 @@ window.monsterToggleSkillExpert = function(skillKey) {
     const star = row.querySelector('.pg-skill-dot.expert');
     const isActive = star?.classList.toggle('active');
     row.classList.toggle('expert', isActive);
+    monsterUpdateSkillValues();
 };
 
 window.openSpellAbilitySelect = function(fieldId) {
@@ -1227,7 +1289,9 @@ window.monsterWizardNav = function(dir) {
         const page = document.getElementById(`mStep${i}`);
         if (page) page.classList.toggle('active', i === step);
     }
+    if (step === 1) monsterUpdateMods();
     if (step === 2) monsterAutoCompileStats();
+    if (step === 3) monsterUpdateSkillValues();
     if (step === 4) monsterRenderResImmGrid();
     const stepsBar = document.getElementById('monsterWizardSteps');
     if (stepsBar) {
