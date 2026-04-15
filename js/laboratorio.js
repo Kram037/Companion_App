@@ -297,7 +297,6 @@ function _openLabRazzeWizard(editData) {
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
         <h2>${_labEditingId ? 'Modifica Razza' : 'Nuova Razza'}</h2>
         <div class="wizard-steps" id="razzeWizardSteps">${_LAB_RAZZE_STEPS.map((s,i) => `<span class="wizard-step ${i===0?'active':''}" title="${s}"></span>`).join('')}</div>
-        <div class="wizard-container">
             <div class="wizard-page active" id="hbRStep0">
                 <div class="form-section-label">Identità</div>
                 <div class="wizard-page-scroll">
@@ -366,8 +365,7 @@ function _openLabRazzeWizard(editData) {
                     <button type="button" class="btn-secondary" onclick="labRazzeWizardNav(-1)">Indietro</button>
                     <button type="button" class="btn-primary" onclick="labSaveRazza()">Salva</button>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
