@@ -18,7 +18,7 @@ const LAB_CATEGORIES = {
         label: 'Razza',
         labelPlural: 'Razze',
         icon: '🧬',
-        fields: () => labFieldsRazze()
+        fields: () => ''
     },
     background: {
         table: 'homebrew_background',
@@ -274,73 +274,205 @@ window.labAddRisorsa = function() {
     list.appendChild(row);
 };
 
-function labFieldsRazze(data) {
-    const pRes = data?.resistenze || [];
-    const pSkills = data?.competenze_abilita || [];
-    const pLangs = data?.linguaggi || [];
-    const pAbil = data?.abilita_speciali || [];
+let _labRazzeWizardStep = 0;
+const _LAB_RAZZE_STEPS = ['Identità', 'Resistenze e Competenze', 'Linguaggi', 'Abilità Speciali'];
+
+function _openLabRazzeWizard(editData) {
+    _labEditingId = editData?.id || null;
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    const mlg = modal.querySelector('.modal-content-lg');
+    if (!mlg) return;
+    const p = editData || {};
+    const pRes = p.resistenze || [];
+    const pSkills = p.competenze_abilita || [];
+    const pLangs = p.linguaggi || [];
+    const pAbil = p.abilita_speciali || [];
     const langOptions = [...DND_LINGUAGGI, 'A scelta'];
     const genericAbil = pAbil.filter(a => a.tipo !== 'incantesimo');
     const innateSpells = pAbil.filter(a => a.tipo === 'incantesimo');
-    return `
-    <div class="form-group">
-        <label for="hbNome">Nome</label>
-        <input type="text" id="hbNome" required placeholder="Nome della razza" value="${escapeHtml(data?.nome || '')}">
-    </div>
-    <div class="form-row form-row-2">
-        <div class="form-group">
-            <label for="hbTaglia">Taglia</label>
-            <select id="hbTaglia">
-                ${['Piccola','Media','Grande'].map(t => `<option value="${t}" ${(data?.taglia || 'Media') === t ? 'selected' : ''}>${t}</option>`).join('')}
-            </select>
+
+    _labRazzeWizardStep = 0;
+    mlg.innerHTML = `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${_labEditingId ? 'Modifica Razza' : 'Nuova Razza'}</h2>
+        <div class="wizard-steps" id="razzeWizardSteps">${_LAB_RAZZE_STEPS.map((s,i) => `<span class="wizard-step ${i===0?'active':''}" title="${s}"></span>`).join('')}</div>
+        <div class="wizard-container">
+            <div class="wizard-page active" id="hbRStep0">
+                <div class="form-section-label">Identità</div>
+                <div class="wizard-page-scroll">
+                    <div class="form-group">
+                        <label for="hbNome">Nome</label>
+                        <input type="text" id="hbNome" required placeholder="Nome della razza" value="${escapeHtml(p.nome || '')}">
+                    </div>
+                    <div class="form-row form-row-2">
+                        <div class="form-group">
+                            <label for="hbTaglia">Taglia</label>
+                            <select id="hbTaglia">
+                                ${['Piccola','Media','Grande'].map(t => `<option value="${t}" ${(p.taglia || 'Media') === t ? 'selected' : ''}>${t}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hbVelocita">Velocità (m)</label>
+                            <input type="number" id="hbVelocita" step="1.5" value="${p.velocita || 9}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
+                    <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbRStep1">
+                <div class="form-section-label">Resistenze</div>
+                <div class="wizard-page-scroll">
+                    <div class="hb-checkbox-grid" id="hbRazzeResGrid">
+                        ${DAMAGE_TYPES.map(dt => `<label class="scheda-checkbox-item"><input type="checkbox" value="${dt.value}" ${pRes.includes(dt.value) ? 'checked' : ''}><span>${dt.label}</span></label>`).join('')}
+                    </div>
+                    <div class="form-section-label">Competenze Abilità</div>
+                    <div class="hb-checkbox-grid" id="hbRazzeSkillGrid">
+                        ${SCHEDA_SKILLS.map(sk => `<label class="scheda-checkbox-item"><input type="checkbox" value="${sk.key}" ${pSkills.includes(sk.key) ? 'checked' : ''}><span>${sk.label}</span></label>`).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labRazzeWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbRStep2">
+                <div class="form-section-label">Linguaggi</div>
+                <div class="wizard-page-scroll">
+                    <div class="hb-checkbox-grid" id="hbRazzeLangGrid">
+                        ${langOptions.map(l => `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(l)}" ${pLangs.includes(l) ? 'checked' : ''}><span>${escapeHtml(l)}</span></label>`).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labRazzeWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labRazzeWizardNav(1)">Successivo</button>
+                </div>
+            </div>
+            <div class="wizard-page" id="hbRStep3">
+                <div class="form-section-label">Abilità Speciali <button type="button" class="btn-icon" onclick="labRazzeAddAbilita()" title="Aggiungi abilità">＋</button></div>
+                <div class="wizard-page-scroll">
+                    <div id="hbRazzeAbilitaList">
+                        ${genericAbil.map(a => _labRazzeAbilitaRow(a)).join('')}
+                    </div>
+                    <div class="form-section-label" style="margin-top:var(--spacing-sm)">Incantesimi Innati <button type="button" class="btn-icon" onclick="labRazzeAddInnato()" title="Aggiungi incantesimo innato">＋</button></div>
+                    <div id="hbRazzeInnatiList">
+                        ${innateSpells.map(a => _labRazzeInnatoRow(a)).join('')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="labRazzeWizardNav(-1)">Indietro</button>
+                    <button type="button" class="btn-primary" onclick="labSaveRazza()">Salva</button>
+                </div>
+            </div>
+        </div>`;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+window.labRazzeWizardNav = function(dir) {
+    const step = Math.max(0, Math.min(_LAB_RAZZE_STEPS.length - 1, _labRazzeWizardStep + dir));
+    if (step === _labRazzeWizardStep) return;
+    if (dir > 0 && _labRazzeWizardStep === 0) {
+        const nome = document.getElementById('hbNome')?.value?.trim();
+        if (!nome) { showNotification('Inserisci il nome della razza'); return; }
+    }
+    document.getElementById(`hbRStep${_labRazzeWizardStep}`)?.classList.remove('active');
+    _labRazzeWizardStep = step;
+    document.getElementById(`hbRStep${step}`)?.classList.add('active');
+    const stepsBar = document.getElementById('razzeWizardSteps');
+    if (stepsBar) stepsBar.querySelectorAll('.wizard-step').forEach((dot, i) => dot.classList.toggle('active', i <= step));
+};
+
+window.labSaveRazza = async function() {
+    const record = {
+        nome: document.getElementById('hbNome')?.value?.trim(),
+        taglia: document.getElementById('hbTaglia')?.value || 'Media',
+        velocita: parseFloat(document.getElementById('hbVelocita')?.value) || 9,
+        resistenze: Array.from(document.querySelectorAll('#hbRazzeResGrid input:checked')).map(cb => cb.value),
+        competenze_abilita: Array.from(document.querySelectorAll('#hbRazzeSkillGrid input:checked')).map(cb => cb.value),
+        linguaggi: Array.from(document.querySelectorAll('#hbRazzeLangGrid input:checked')).map(cb => cb.value)
+    };
+    if (!record.nome) { showNotification('Inserisci il nome della razza'); return; }
+    const abilita = [];
+    document.querySelectorAll('#hbRazzeAbilitaList .hb-action-card').forEach(card => {
+        const nome = card.querySelector('.hbRAbilNome')?.value?.trim();
+        if (!nome) return;
+        const usi = card.querySelector('.hbRAbilUsi')?.value;
+        abilita.push({
+            tipo: 'abilita',
+            nome,
+            descrizione: card.querySelector('.hbRAbilDesc')?.value?.trim() || '',
+            bonus: card.querySelector('.hbRAbilHit')?.value?.trim() || '',
+            usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
+        });
+    });
+    document.querySelectorAll('#hbRazzeInnatiList .hb-action-card').forEach(card => {
+        const nome = card.querySelector('.hbRInnNome')?.value?.trim();
+        if (!nome) return;
+        const usi = card.querySelector('.hbRInnUsi')?.value;
+        abilita.push({
+            tipo: 'incantesimo',
+            nome,
+            livello: parseInt(card.querySelector('.hbRInnLvl')?.value) || 0,
+            usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
+        });
+    });
+    record.abilita_speciali = abilita;
+    if (!_labEditingId) record.user_id = AppState.currentUser.id;
+    try {
+        if (_labEditingId) {
+            const { error } = await supabase.from('homebrew_razze').update(record).eq('id', _labEditingId);
+            if (error) throw error;
+            showNotification('Razza aggiornata!');
+        } else {
+            const { error } = await supabase.from('homebrew_razze').insert(record);
+            if (error) throw error;
+            showNotification('Razza creata!');
+        }
+        closeHomebrewModal();
+        loadLabContent();
+    } catch (e) { showNotification('Errore: ' + e.message); }
+};
+
+function _labActionCard(data, prefix, hasDesc) {
+    data = data || {};
+    const nome = data.nome || '';
+    const bonus = data.bonus || '';
+    const usi = data.usi ?? '';
+    const desc = data.descrizione || '';
+    return `<div class="hb-action-card">
+        <div class="hb-action-card-row">
+            <input type="text" class="${prefix}Nome" placeholder="Nome" value="${escapeHtml(nome)}">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
         </div>
-        <div class="form-group">
-            <label for="hbVelocita">Velocità (m)</label>
-            <input type="number" id="hbVelocita" step="1.5" value="${data?.velocita || 9}">
+        <div class="hb-action-card-row">
+            <div class="form-group" style="flex:1"><label>Tiro</label><input type="text" class="${prefix}Hit" placeholder="+5" value="${escapeHtml(bonus)}"></div>
+            <div class="form-group" style="width:70px"><label>Usi</label><input type="number" class="${prefix}Usi" min="0" value="${usi}" placeholder="∞" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
         </div>
-    </div>
-    <div class="form-section-label">Resistenze</div>
-    <div class="hb-checkbox-grid" id="hbRazzeResGrid">
-        ${DAMAGE_TYPES.map(dt => `<label class="scheda-checkbox-item"><input type="checkbox" value="${dt.value}" ${pRes.includes(dt.value) ? 'checked' : ''}><span>${dt.label}</span></label>`).join('')}
-    </div>
-    <div class="form-section-label">Competenze Abilità</div>
-    <div class="hb-checkbox-grid" id="hbRazzeSkillGrid">
-        ${SCHEDA_SKILLS.map(sk => `<label class="scheda-checkbox-item"><input type="checkbox" value="${sk.key}" ${pSkills.includes(sk.key) ? 'checked' : ''}><span>${sk.label}</span></label>`).join('')}
-    </div>
-    <div class="form-section-label">Linguaggi</div>
-    <div class="hb-checkbox-grid" id="hbRazzeLangGrid">
-        ${langOptions.map(l => `<label class="scheda-checkbox-item"><input type="checkbox" value="${escapeHtml(l)}" ${pLangs.includes(l) ? 'checked' : ''}><span>${escapeHtml(l)}</span></label>`).join('')}
-    </div>
-    <div class="form-section-label">Abilità Speciali <button type="button" class="btn-icon" onclick="labRazzeAddAbilita()" title="Aggiungi abilità">＋</button></div>
-    <div id="hbRazzeAbilitaList">
-        ${genericAbil.map((a, i) => _labRazzeAbilitaRow(a)).join('')}
-    </div>
-    <div class="form-section-label">Incantesimi Innati <button type="button" class="btn-icon" onclick="labRazzeAddInnato()" title="Aggiungi incantesimo innato">＋</button></div>
-    <div id="hbRazzeInnatiList">
-        ${innateSpells.map((a, i) => _labRazzeInnatoRow(a)).join('')}
+        ${hasDesc ? `<textarea class="${prefix}Desc" placeholder="Descrizione..." rows="2">${escapeHtml(desc)}</textarea>` : ''}
     </div>`;
 }
 
 function _labRazzeAbilitaRow(data) {
-    data = data || {};
-    return `<div class="hb-race-ability-row">
-        <div class="hb-race-ability-header">
-            <input type="text" class="hbRAbilNome" placeholder="Nome abilità" value="${escapeHtml(data.nome || '')}">
-            <input type="number" class="hbRAbilUsi" placeholder="Usi" min="0" value="${data.usi ?? ''}" title="Usi (vuoto = illimitati)" style="width:60px">
-            <button type="button" onclick="this.closest('.hb-race-ability-row').remove()">✕</button>
-        </div>
-        <textarea class="hbRAbilDesc" placeholder="Descrizione dell'abilità..." rows="2">${escapeHtml(data.descrizione || '')}</textarea>
-    </div>`;
+    return _labActionCard(data, 'hbRAbil', true);
 }
 
 function _labRazzeInnatoRow(data) {
     data = data || {};
-    return `<div class="hb-race-ability-row hb-race-innato-row">
-        <div class="hb-race-ability-header">
-            <input type="text" class="hbRInnNome" placeholder="Nome incantesimo" value="${escapeHtml(data.nome || '')}">
-            <input type="number" class="hbRInnLvl" placeholder="Lv" min="0" max="9" value="${data.livello ?? 0}" title="Livello incantesimo" style="width:50px">
-            <input type="number" class="hbRInnUsi" placeholder="Usi" min="0" value="${data.usi ?? ''}" title="Usi per riposo" style="width:60px">
-            <button type="button" onclick="this.closest('.hb-race-ability-row').remove()">✕</button>
+    const nome = data.nome || '';
+    const livello = data.livello ?? 0;
+    const usi = data.usi ?? '';
+    return `<div class="hb-action-card">
+        <div class="hb-action-card-row">
+            <input type="text" class="hbRInnNome" placeholder="Nome incantesimo" value="${escapeHtml(nome)}">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <div class="hb-action-card-row">
+            <div class="form-group" style="flex:1"><label>Livello</label><input type="number" class="hbRInnLvl" min="0" max="9" value="${livello}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+            <div class="form-group" style="width:70px"><label>Usi</label><input type="number" class="hbRInnUsi" min="0" value="${usi}" placeholder="∞" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
         </div>
     </div>`;
 }
@@ -500,7 +632,7 @@ function _openLabNemiciWizard(data) {
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
                     <div class="pg-stats-row-3">
-                        <div class="form-group"><label>N° Dadi</label><input type="number" id="hbDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" onchange="labRecalcHP()"></div>
+                        <div class="form-group"><label>N° Dadi</label><input type="number" id="hbDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="labRecalcHP()"></div>
                         <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="hbDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openLabHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
                         <div class="form-group"><label>PV Max</label><input type="number" id="hbPV" min="1" value="${p.punti_vita_max || 10}"></div>
                     </div>
@@ -559,8 +691,8 @@ function _openLabNemiciWizard(data) {
             <div class="wizard-page" id="hbNStep6">
                 <div class="form-section-label">Leggendario</div>
                 <div class="wizard-page-scroll">
-                    <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
-                    <div class="form-group"><label for="hbAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="hbAzLeggMax" min="0" value="${p.azioni_legg_max || 0}"></div>
+                    <div class="form-group"><label for="hbResLegg">Resistenze Leggendarie</label><input type="number" id="hbResLegg" min="0" value="${p.resistenze_leggendarie || 0}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                    <div class="form-group"><label for="hbAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="hbAzLeggMax" min="0" value="${p.azioni_legg_max || 0}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     <div class="form-group" style="margin-top:var(--spacing-sm);">
                         <label>Azioni Leggendarie</label>
                         <div id="hbAzioniLeggList">${labRenderAzioniLegg(p.azioni_leggendarie || [])}</div>
@@ -630,59 +762,37 @@ window.labNemToggleImm = function(val, checked) {
 
 function labRenderAttacchi(attacchi) {
     if (!attacchi.length) return '';
-    return attacchi.map((a, i) => {
-        const hasUsi = (a.usi_max || 0) > 0;
-        return `
-    <div class="hb-attack-row" data-idx="${i}">
-        <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="hbAtkNome">
-        <input type="text" placeholder="+Hit" value="${escapeHtml(a.bonus || '')}" class="hbAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="hbAtkDanno" style="width:60px">
-        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="hbAtkHasUsi" ${hasUsi ? 'checked' : ''} onchange="labToggleAtkUsi(this)"><span>Usi</span></label>
-        <input type="number" class="hbAtkUsiMax" placeholder="N" min="1" value="${a.usi_max || ''}" style="width:40px;${hasUsi ? '' : 'display:none'}">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`;
-    }).join('');
+    return attacchi.map((a, i) => _monsterActionCard(a, i, 'hb')).join('');
 }
 
 function labRenderAzioniLegg(azioni) {
     if (!azioni || !azioni.length) return '';
-    return azioni.map((a, i) => `
-    <div class="hb-attack-row" data-idx="${i}">
-        <input type="text" placeholder="Nome azione" value="${escapeHtml(a.nome || '')}" class="hbLeggNome">
-        <input type="text" placeholder="Descrizione" value="${escapeHtml(a.descrizione || '')}" class="hbLeggDesc" style="flex:2">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    return azioni.map((a, i) => `<div class="hb-action-card" data-idx="${i}">
+        <div class="hb-action-card-row">
+            <input type="text" placeholder="Nome azione" value="${escapeHtml(a.nome || '')}" class="hbLeggNome">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <textarea class="hbLeggDesc" placeholder="Descrizione..." rows="2">${escapeHtml(a.descrizione || '')}</textarea>
     </div>`).join('');
 }
 
 window.labAddAzioneLegg = function() {
     const list = document.getElementById('hbAzioniLeggList');
     if (!list) return;
-    const idx = list.querySelectorAll('.hb-attack-row').length;
-    list.insertAdjacentHTML('beforeend', `
-    <div class="hb-attack-row" data-idx="${idx}">
-        <input type="text" placeholder="Nome azione" class="hbLeggNome">
-        <input type="text" placeholder="Descrizione" class="hbLeggDesc" style="flex:2">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    list.insertAdjacentHTML('beforeend', `<div class="hb-action-card">
+        <div class="hb-action-card-row">
+            <input type="text" placeholder="Nome azione" class="hbLeggNome">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <textarea class="hbLeggDesc" placeholder="Descrizione..." rows="2"></textarea>
     </div>`);
 };
 
 window.labAddAttacco = function() {
     const list = document.getElementById('hbAttacchiList');
     if (!list) return;
-    const row = document.createElement('div');
-    row.className = 'hb-attack-row';
-    row.innerHTML = `
-        <input type="text" placeholder="Nome" class="hbAtkNome">
-        <input type="text" placeholder="+Hit" class="hbAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" class="hbAtkDanno" style="width:60px">
-        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="hbAtkHasUsi" onchange="labToggleAtkUsi(this)"><span>Usi</span></label>
-        <input type="number" class="hbAtkUsiMax" placeholder="N" min="1" style="width:40px;display:none">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>`;
-    list.appendChild(row);
-};
-window.labToggleAtkUsi = function(cb) {
-    const usiInput = cb.closest('.hb-attack-row')?.querySelector('.hbAtkUsiMax');
-    if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
+    const idx = list.querySelectorAll('.hb-action-card').length;
+    list.insertAdjacentHTML('beforeend', _monsterActionCard({}, idx, 'hb'));
 };
 
 window.openLabHitDieSelect = function() {
@@ -843,20 +953,21 @@ window.saveLabNemico = async function() {
         caratteristica_incantatore: document.getElementById('hbCarInc')?.dataset?.value || null,
     };
 
-    record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
-        const hasUsi = row.querySelector('.hbAtkHasUsi')?.checked;
-        const usiMax = hasUsi ? (parseInt(row.querySelector('.hbAtkUsiMax')?.value) || 0) : 0;
+    record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-action-card')].map(card => {
+        const usiVal = card.querySelector('.hbAtkUsiMax')?.value;
+        const usiMax = usiVal !== '' && usiVal !== undefined ? (parseInt(usiVal) || 0) : 0;
         return {
-            nome: row.querySelector('.hbAtkNome')?.value || '',
-            bonus: row.querySelector('.hbAtkBonus')?.value || '',
-            danno: row.querySelector('.hbAtkDanno')?.value || '',
+            nome: card.querySelector('.hbAtkNome')?.value || '',
+            bonus: card.querySelector('.hbAtkBonus')?.value || '',
+            danno: card.querySelector('.hbAtkDanno')?.value || '',
+            descrizione: card.querySelector('.hbAtkDesc')?.value || '',
             usi_max: usiMax
         };
     }).filter(a => a.nome);
 
-    record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-attack-row')].map(row => ({
-        nome: row.querySelector('.hbLeggNome')?.value || '',
-        descrizione: row.querySelector('.hbLeggDesc')?.value || ''
+    record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-action-card')].map(card => ({
+        nome: card.querySelector('.hbLeggNome')?.value || '',
+        descrizione: card.querySelector('.hbLeggDesc')?.value || ''
     })).filter(a => a.nome);
 
     const carInc = record.caratteristica_incantatore;
@@ -946,6 +1057,10 @@ window.openHomebrewModal = function(editData) {
 
     if (_labCurrentTab === 'nemici') {
         _openLabNemiciWizard(editData);
+        return;
+    }
+    if (_labCurrentTab === 'razze') {
+        _openLabRazzeWizard(editData);
         return;
     }
 
@@ -1048,37 +1163,6 @@ async function handleSaveHomebrew(e) {
             })).filter(r => r.nome);
             break;
         case 'razze':
-            record.taglia = document.getElementById('hbTaglia')?.value || 'Media';
-            record.velocita = parseFloat(document.getElementById('hbVelocita')?.value) || 9;
-            record.resistenze = Array.from(document.querySelectorAll('#hbRazzeResGrid input:checked')).map(cb => cb.value);
-            record.competenze_abilita = Array.from(document.querySelectorAll('#hbRazzeSkillGrid input:checked')).map(cb => cb.value);
-            record.linguaggi = Array.from(document.querySelectorAll('#hbRazzeLangGrid input:checked')).map(cb => cb.value);
-            {
-                const abilita = [];
-                document.querySelectorAll('#hbRazzeAbilitaList .hb-race-ability-row').forEach(row => {
-                    const nome = row.querySelector('.hbRAbilNome')?.value?.trim();
-                    if (!nome) return;
-                    const usi = row.querySelector('.hbRAbilUsi')?.value;
-                    abilita.push({
-                        tipo: 'abilita',
-                        nome,
-                        descrizione: row.querySelector('.hbRAbilDesc')?.value?.trim() || '',
-                        usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
-                    });
-                });
-                document.querySelectorAll('#hbRazzeInnatiList .hb-race-ability-row').forEach(row => {
-                    const nome = row.querySelector('.hbRInnNome')?.value?.trim();
-                    if (!nome) return;
-                    const usi = row.querySelector('.hbRInnUsi')?.value;
-                    abilita.push({
-                        tipo: 'incantesimo',
-                        nome,
-                        livello: parseInt(row.querySelector('.hbRInnLvl')?.value) || 0,
-                        usi: usi !== '' && usi !== undefined ? parseInt(usi) : null
-                    });
-                });
-                record.abilita_speciali = abilita;
-            }
             break;
         case 'background':
             break;
@@ -1113,21 +1197,22 @@ async function handleSaveHomebrew(e) {
                 .filter(sk => document.getElementById(`hbSkillRow_${sk.key}`)?.classList.contains('expert')).map(sk => sk.key);
             record.resistenze = window._labNemResistenze || [];
             record.immunita = window._labNemImmunita || [];
-            record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-attack-row')].map(row => {
-                const hasUsi = row.querySelector('.hbAtkHasUsi')?.checked;
-                const usiMax = hasUsi ? (parseInt(row.querySelector('.hbAtkUsiMax')?.value) || 0) : 0;
+            record.attacchi = [...document.querySelectorAll('#hbAttacchiList .hb-action-card')].map(card => {
+                const usiVal = card.querySelector('.hbAtkUsiMax')?.value;
+                const usiMax = usiVal !== '' && usiVal !== undefined ? (parseInt(usiVal) || 0) : 0;
                 return {
-                    nome: row.querySelector('.hbAtkNome')?.value || '',
-                    bonus: row.querySelector('.hbAtkBonus')?.value || '',
-                    danno: row.querySelector('.hbAtkDanno')?.value || '',
+                    nome: card.querySelector('.hbAtkNome')?.value || '',
+                    bonus: card.querySelector('.hbAtkBonus')?.value || '',
+                    danno: card.querySelector('.hbAtkDanno')?.value || '',
+                    descrizione: card.querySelector('.hbAtkDesc')?.value || '',
                     usi_max: usiMax
                 };
             }).filter(a => a.nome);
             record.resistenze_leggendarie = parseInt(document.getElementById('hbResLegg')?.value) || 0;
             record.azioni_legg_max = parseInt(document.getElementById('hbAzLeggMax')?.value) || 0;
-            record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-attack-row')].map(row => ({
-                nome: row.querySelector('.hbLeggNome')?.value || '',
-                descrizione: row.querySelector('.hbLeggDesc')?.value || ''
+            record.azioni_leggendarie = [...document.querySelectorAll('#hbAzioniLeggList .hb-action-card')].map(card => ({
+                nome: card.querySelector('.hbLeggNome')?.value || '',
+                descrizione: card.querySelector('.hbLeggDesc')?.value || ''
             })).filter(a => a.nome);
             record.caratteristica_incantatore = document.getElementById('hbCarInc')?.dataset?.value || null;
             {

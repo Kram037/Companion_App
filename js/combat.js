@@ -1037,7 +1037,7 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
                     </div>
                     <div class="form-section-label" style="margin-top:var(--spacing-sm)">Punti Vita</div>
                     <div class="pg-stats-row-3">
-                        <div class="form-group"><label>N° Dadi</label><input type="number" id="mDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" onchange="monsterRecalcHP()"></div>
+                        <div class="form-group"><label>N° Dadi</label><input type="number" id="mDadiVitaNum" min="1" value="${p.dadi_vita_num || Math.max(1, parseInt(p.grado_sfida)||1)}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)" onchange="monsterRecalcHP()"></div>
                         <div class="form-group"><label>Dado</label><button type="button" class="custom-select-trigger" id="mDadoVita" data-value="${p.dado_vita || _monsterSizeHitDie(p.taglia)}" onclick="openMonsterHitDieSelect()">${p.dado_vita ? 'd'+p.dado_vita : 'd'+_monsterSizeHitDie(p.taglia)}</button></div>
                         <div class="form-group"><label>PV Max</label><input type="number" id="mPV" min="1" value="${p.punti_vita_max || 10}"></div>
                     </div>
@@ -1096,8 +1096,8 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
             <div class="wizard-page" id="mStep6">
                 <div class="form-section-label">Leggendario</div>
                 <div class="wizard-page-scroll">
-                    <div class="form-group"><label for="mResLegg">Resistenze Leggendarie</label><input type="number" id="mResLegg" min="0" value="${p.resistenze_leggendarie || 0}"></div>
-                    <div class="form-group"><label for="mAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="mAzLeggMax" min="0" value="${p.azioni_legg_max || 0}"></div>
+                    <div class="form-group"><label for="mResLegg">Resistenze Leggendarie</label><input type="number" id="mResLegg" min="0" value="${p.resistenze_leggendarie || 0}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+                    <div class="form-group"><label for="mAzLeggMax">Azioni Leggendarie per turno</label><input type="number" id="mAzLeggMax" min="0" value="${p.azioni_legg_max || 0}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
                     <div class="form-group" style="margin-top:var(--spacing-sm);">
                         <label>Azioni Leggendarie</label>
                         <div id="mAzioniLeggList">${_renderMonsterLeggActions(p.azioni_leggendarie || [])}</div>
@@ -1135,51 +1135,52 @@ function _showMonsterWizard(campagnaId, sessioneId, prefill) {
 
 function _renderMonsterAttacks(attacks) {
     if (!attacks || !attacks.length) return '';
-    return attacks.map((a, i) => {
-        const hasUsi = (a.usi_max || 0) > 0;
-        return `<div class="hb-attack-row" data-idx="${i}">
-        <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="mAtkNome">
-        <input type="text" placeholder="+Hit" value="${escapeHtml(a.bonus || '')}" class="mAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" value="${escapeHtml(a.danno || '')}" class="mAtkDanno" style="width:60px">
-        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="mAtkHasUsi" ${hasUsi ? 'checked' : ''} onchange="monsterToggleAtkUsi(this)"><span>Usi</span></label>
-        <input type="number" class="mAtkUsiMax" placeholder="N" min="1" value="${a.usi_max || ''}" style="width:40px;${hasUsi ? '' : 'display:none'}">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`;
-    }).join('');
+    return attacks.map((a, i) => _monsterActionCard(a, i, 'm')).join('');
 }
+
+function _monsterActionCard(a, idx, prefix) {
+    a = a || {};
+    const usi = a.usi_max ?? '';
+    return `<div class="hb-action-card" data-idx="${idx}">
+        <div class="hb-action-card-row">
+            <input type="text" placeholder="Nome azione" value="${escapeHtml(a.nome || '')}" class="${prefix}AtkNome">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <div class="hb-action-card-row">
+            <div class="form-group" style="flex:1"><label>Tiro / Bonus</label><input type="text" placeholder="+5" value="${escapeHtml(a.bonus || '')}" class="${prefix}AtkBonus"></div>
+            <div class="form-group" style="flex:1"><label>Danno</label><input type="text" placeholder="1d8+3" value="${escapeHtml(a.danno || '')}" class="${prefix}AtkDanno"></div>
+            <div class="form-group" style="width:70px"><label>Usi</label><input type="number" class="${prefix}AtkUsiMax" min="0" value="${usi}" placeholder="∞" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)"></div>
+        </div>
+        <textarea class="${prefix}AtkDesc" placeholder="Descrizione..." rows="2">${escapeHtml(a.descrizione || '')}</textarea>
+    </div>`;
+}
+
 window.monsterAddAttack = function() {
     const list = document.getElementById('mAttacchiList');
     if (!list) return;
-    const idx = list.querySelectorAll('.hb-attack-row').length;
-    list.insertAdjacentHTML('beforeend', `<div class="hb-attack-row" data-idx="${idx}">
-        <input type="text" placeholder="Nome" class="mAtkNome">
-        <input type="text" placeholder="+Hit" class="mAtkBonus" style="width:50px">
-        <input type="text" placeholder="Danno" class="mAtkDanno" style="width:60px">
-        <label class="mAtkUsiLabel" title="Usi limitati"><input type="checkbox" class="mAtkHasUsi" onchange="monsterToggleAtkUsi(this)"><span>Usi</span></label>
-        <input type="number" class="mAtkUsiMax" placeholder="N" min="1" style="width:40px;display:none">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`);
-};
-window.monsterToggleAtkUsi = function(cb) {
-    const usiInput = cb.closest('.hb-attack-row')?.querySelector('.mAtkUsiMax');
-    if (usiInput) usiInput.style.display = cb.checked ? '' : 'none';
+    const idx = list.querySelectorAll('.hb-action-card').length;
+    list.insertAdjacentHTML('beforeend', _monsterActionCard({}, idx, 'm'));
 };
 
 function _renderMonsterLeggActions(actions) {
     if (!actions || !actions.length) return '';
-    return actions.map((a, i) => `<div class="hb-attack-row" data-idx="${i}">
-        <input type="text" placeholder="Nome" value="${escapeHtml(a.nome || '')}" class="mLeggNome">
-        <input type="text" placeholder="Descrizione" value="${escapeHtml(a.descrizione || '')}" class="mLeggDesc" style="flex:2">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    return actions.map((a, i) => `<div class="hb-action-card" data-idx="${i}">
+        <div class="hb-action-card-row">
+            <input type="text" placeholder="Nome azione" value="${escapeHtml(a.nome || '')}" class="mLeggNome">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <textarea class="mLeggDesc" placeholder="Descrizione..." rows="2">${escapeHtml(a.descrizione || '')}</textarea>
     </div>`).join('');
 }
 window.monsterAddLeggAction = function() {
     const list = document.getElementById('mAzioniLeggList');
     if (!list) return;
-    list.insertAdjacentHTML('beforeend', `<div class="hb-attack-row">
-        <input type="text" placeholder="Nome" class="mLeggNome">
-        <input type="text" placeholder="Descrizione" class="mLeggDesc" style="flex:2">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
+    list.insertAdjacentHTML('beforeend', `<div class="hb-action-card">
+        <div class="hb-action-card-row">
+            <input type="text" placeholder="Nome azione" class="mLeggNome">
+            <button type="button" class="hb-action-remove" onclick="this.closest('.hb-action-card').remove()">✕</button>
+        </div>
+        <textarea class="mLeggDesc" placeholder="Descrizione..." rows="2"></textarea>
     </div>`);
 };
 
@@ -1316,21 +1317,22 @@ window.saveMonster = async function() {
     const pvMax = parseInt(document.getElementById('mPV')?.value) || 10;
     const resLegg = parseInt(document.getElementById('mResLegg')?.value) || 0;
 
-    const attacchi = [...document.querySelectorAll('#mAttacchiList .hb-attack-row')].map(row => {
-        const hasUsi = row.querySelector('.mAtkHasUsi')?.checked;
-        const usiMax = hasUsi ? (parseInt(row.querySelector('.mAtkUsiMax')?.value) || 0) : 0;
+    const attacchi = [...document.querySelectorAll('#mAttacchiList .hb-action-card')].map(card => {
+        const usiVal = card.querySelector('.mAtkUsiMax')?.value;
+        const usiMax = usiVal !== '' && usiVal !== undefined ? (parseInt(usiVal) || 0) : 0;
         return {
-            nome: row.querySelector('.mAtkNome')?.value || '',
-            bonus: row.querySelector('.mAtkBonus')?.value || '',
-            danno: row.querySelector('.mAtkDanno')?.value || '',
+            nome: card.querySelector('.mAtkNome')?.value || '',
+            bonus: card.querySelector('.mAtkBonus')?.value || '',
+            danno: card.querySelector('.mAtkDanno')?.value || '',
+            descrizione: card.querySelector('.mAtkDesc')?.value || '',
             usi_max: usiMax,
             usi_attuali: usiMax
         };
     }).filter(a => a.nome);
 
-    const azioniLegg = [...document.querySelectorAll('#mAzioniLeggList .hb-attack-row')].map(row => ({
-        nome: row.querySelector('.mLeggNome')?.value || '',
-        descrizione: row.querySelector('.mLeggDesc')?.value || ''
+    const azioniLegg = [...document.querySelectorAll('#mAzioniLeggList .hb-action-card')].map(card => ({
+        nome: card.querySelector('.mLeggNome')?.value || '',
+        descrizione: card.querySelector('.mLeggDesc')?.value || ''
     })).filter(a => a.nome);
 
     const azLeggMaxVal = parseInt(document.getElementById('mAzLeggMax')?.value) || 0;

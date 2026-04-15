@@ -582,42 +582,54 @@
     margin-bottom: var(--spacing-sm);
 }
 
-.hb-race-ability-row {
+.hb-action-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
-.hb-race-ability-header {
+.hb-action-card-row {
     display: flex;
     gap: 6px;
     align-items: center;
+    margin-bottom: 6px;
 }
 
-.hb-race-ability-header input[type="text"] {
+.hb-action-card-row:last-child { margin-bottom: 0; }
+
+.hb-action-card-row input[type="text"] {
     flex: 1;
     min-width: 0;
 }
 
-.hb-race-ability-header input[type="number"] {
-    flex-shrink: 0;
+.hb-action-card-row .form-group {
+    margin-bottom: 0;
 }
 
-.hb-race-ability-header button {
+.hb-action-card-row .form-group label {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    margin-bottom: 2px;
+    display: block;
+}
+
+.hb-action-remove {
     background: none;
     border: none;
     color: var(--text-light);
     font-size: 1rem;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: 2px 6px;
     flex-shrink: 0;
+    line-height: 1;
 }
 
-.hb-race-ability-row textarea {
+.hb-action-remove:hover { color: #e53935; }
+
+.hb-action-card textarea {
     width: 100%;
-    margin-top: 6px;
     resize: vertical;
     font-size: 0.85rem;
     background: var(--background);
