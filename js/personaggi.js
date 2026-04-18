@@ -1519,10 +1519,12 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>`);
         });
         classResourcesHtml = `<div class="scheda-section">
-            <div class="scheda-section-title">Risorse di Classe
-                <button class="scheda-edit-btn" onclick="schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Risorse di Classe
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
             </div>
+            <div class="scheda-section-body">
             ${resItems.length > 0 ? `<div class="scheda-hd-table">${resItems.join('')}</div>` : '<span class="scheda-empty">Nessuna risorsa</span>'}
+            </div>
         </div>`;
 
         // Resistenze & Immunità
@@ -1551,92 +1553,104 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Caratteristiche e Tiri Salvezza</div>
-            <div class="scheda-abilities">${abilitiesHtml}</div>
-        </div>
-
-        <div class="scheda-three-boxes">
-            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura')">
-                <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
-                <div class="scheda-box-label">CA</div>
-            </div>
-            <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa')">
-                <div class="scheda-box-val" id="schedaInit">${initDisplay >= 0 ? '+' + initDisplay : initDisplay}</div>
-                <div class="scheda-box-label">Iniziativa</div>
-            </div>
-            <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}')">
-                <div class="scheda-box-val" id="schedaSpeed">${pg.velocita || 9}</div>
-                <div class="scheda-box-label">Velocità</div>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
+            <div class="scheda-section-body">
+                <div class="scheda-abilities">${abilitiesHtml}</div>
             </div>
         </div>
 
-        <div class="scheda-hp-section">
-            <div class="scheda-hp-left">
-                <div class="scheda-hp-pair">
+        <div class="scheda-section">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche</div>
+            <div class="scheda-section-body">
+                <div class="scheda-three-boxes">
+                    <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura')">
+                        <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
+                        <div class="scheda-box-label">CA</div>
+                    </div>
+                    <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa')">
+                        <div class="scheda-box-val" id="schedaInit">${initDisplay >= 0 ? '+' + initDisplay : initDisplay}</div>
+                        <div class="scheda-box-label">Iniziativa</div>
+                    </div>
+                    <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}')">
+                        <div class="scheda-box-val" id="schedaSpeed">${pg.velocita || 9}</div>
+                        <div class="scheda-box-label">Velocità</div>
+                    </div>
+                </div>
+                <div class="scheda-hp-section">
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
                         <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
-                        <div class="scheda-hp-label">PV Massimi</div>
+                        <div class="scheda-hp-label">PV Max</div>
                     </div>
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_attuali')">
                         <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
                         <div class="scheda-hp-label">PV Attuali</div>
                     </div>
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
+                        <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
+                        <div class="scheda-hp-label">PV Temp</div>
+                    </div>
                 </div>
             </div>
-            <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
-                <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
-                <div class="scheda-hp-label">PV Temporanei</div>
+        </div>
+
+        <div class="scheda-section">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Abilità</div>
+            <div class="scheda-section-body">
+                <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
+                <div class="scheda-perc-passiva">
+                    <span class="scheda-perc-val" id="sPercPassiva">${percPassiva}</span>
+                    <span class="scheda-perc-label">Percezione Passiva</span>
+                </div>
             </div>
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Abilità</div>
-            <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
-            <div class="scheda-perc-passiva">
-                <span class="scheda-perc-val" id="sPercPassiva">${percPassiva}</span>
-                <span class="scheda-perc-label">Percezione Passiva</span>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita</div>
+            <div class="scheda-section-body">
+                ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
             </div>
-        </div>
-
-        <div class="scheda-section">
-            <div class="scheda-section-title">Dadi Vita</div>
-            ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
         </div>
 
         ${classResourcesHtml}
 
         <div class="scheda-section">
-            <div class="scheda-section-title">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">
                 Resistenze e Immunità
-                <button class="scheda-edit-btn" onclick="schedaOpenResImmEdit('${pg.id}')" title="Modifica">&#9998;</button>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenResImmEdit('${pg.id}')" title="Modifica">&#9998;</button>
             </div>
-            <div class="scheda-res-imm-display" id="schedaResImmDisplay">
-                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenzeHtml}</div></div>
-                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunitaHtml}</div></div>
+            <div class="scheda-section-body">
+                <div class="scheda-res-imm-display" id="schedaResImmDisplay">
+                    <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenzeHtml}</div></div>
+                    <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunitaHtml}</div></div>
+                </div>
+                <div id="schedaResImmEditGrid" style="display:none;"></div>
             </div>
-            <div id="schedaResImmEditGrid" style="display:none;"></div>
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">Condizioni</div>
-            <div class="scheda-concentrazione-row">
-                <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Condizioni</div>
+            <div class="scheda-section-body">
+                <div class="scheda-concentrazione-row">
+                    <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
+                </div>
+                <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
+                <div class="scheda-condition-extra">
+                    <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
+                </div>
+                <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
             </div>
-            <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
-            <div class="scheda-condition-extra">
-                <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
-            </div>
-            <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">
                 Talenti
-                <button class="scheda-edit-btn" onclick="schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
             </div>
-            <div class="scheda-tags" id="schedaTalentiDisplay">${(pg.talenti && pg.talenti.length > 0) ?
-                pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
-                '<span class="scheda-empty">Nessun talento</span>'}</div>
+            <div class="scheda-section-body">
+                <div class="scheda-tags" id="schedaTalentiDisplay">${(pg.talenti && pg.talenti.length > 0) ?
+                    pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
+                    '<span class="scheda-empty">Nessun talento</span>'}</div>
+            </div>
         </div>
 
         ${buildEquipSection(pg)}
@@ -1869,18 +1883,302 @@ window.schedaOpenSpellPage = async function(pgId) {
     schedaWireTabBar(pgId);
 }
 
+window.schedaToggleSection = function(titleEl) {
+    const section = titleEl.closest('.scheda-section');
+    if (section) section.classList.toggle('collapsed');
+};
+
+/* ── Inventario Tab ── */
+const COIN_TYPES = [
+    { key: 'pp', label: 'Platino (PP)', icon: '◆' },
+    { key: 'mo', label: 'Oro (MO)', icon: '●' },
+    { key: 'ma', label: 'Argento (MA)', icon: '○' },
+    { key: 'mr', label: 'Rame (MR)', icon: '·' },
+    { key: 'me', label: 'Electrum (ME)', icon: '◇' }
+];
+
+window.schedaOpenInventoryPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+
+    const monete = pg.monete || {};
+    const coinsHtml = COIN_TYPES.map(c => {
+        const val = monete[c.key] || 0;
+        return `<div class="inv-coin-cell">
+            <div class="inv-coin-icon inv-coin-${c.key}">${c.icon}</div>
+            <div class="inv-coin-val" id="invCoin_${c.key}" onclick="invEditCoinDirect('${pgId}','${c.key}')">${val}</div>
+            <div class="inv-coin-label">${c.label}</div>
+            <div class="inv-coin-controls">
+                <button class="scheda-hd-btn" onclick="invCoinChange('${pgId}','${c.key}',-1)">−</button>
+                <button class="scheda-hd-btn" onclick="invCoinChange('${pgId}','${c.key}',1)">+</button>
+            </div>
+        </div>`;
+    }).join('');
+
+    const oggetti = pg.inventario || [];
+    const oggettiRows = oggetti.length > 0 ? oggetti.map((o, i) => {
+        return `<div class="inv-item-row">
+            <div class="inv-item-name">${escapeHtml(o.nome || 'Oggetto')}${o.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}</div>
+            <div class="inv-item-qty">×${o.quantita || 1}</div>
+            <div class="inv-item-actions">
+                <button class="scheda-hd-btn" onclick="invEditItem('${pgId}',${i})">✎</button>
+                <button class="scheda-custom-res-del" onclick="invRemoveItem('${pgId}',${i})">✕</button>
+            </div>
+        </div>`;
+    }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
+
+    const sintonia = pg.sintonia || [];
+    const maxSintonia = 3;
+    let sintoniaHtml = '';
+    for (let i = 0; i < maxSintonia; i++) {
+        const item = sintonia[i] || null;
+        sintoniaHtml += `<div class="inv-attune-slot ${item ? 'filled' : 'empty'}" onclick="invEditAttune('${pgId}',${i})">
+            <span class="inv-attune-icon">◈</span>
+            <span class="inv-attune-name">${item ? escapeHtml(item) : 'Slot vuoto'}</span>
+            ${item ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();invRemoveAttune('${pgId}',${i})">✕</button>` : ''}
+        </div>`;
+    }
+
+    content.innerHTML = `
+    <div class="scheda-identity">
+        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+        <div class="scheda-subtitle-sm">Inventario</div>
+    </div>
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Monete</div>
+        <div class="scheda-section-body">
+            <div class="inv-coins-grid">${coinsHtml}</div>
+        </div>
+    </div>
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Oggetti
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">+</button>
+        </div>
+        <div class="scheda-section-body">
+            <div id="invItemsList">${oggettiRows}</div>
+        </div>
+    </div>
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sintonia</div>
+        <div class="scheda-section-body">
+            <div class="inv-attune-grid">${sintoniaHtml}</div>
+        </div>
+    </div>
+    `;
+
+    schedaSetActiveTab('inventario');
+    schedaWireTabBar(pgId);
+};
+
+window.invCoinChange = async function(pgId, coinKey, delta) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const monete = pg.monete ? { ...pg.monete } : {};
+    monete[coinKey] = Math.max(0, (monete[coinKey] || 0) + delta);
+    pg.monete = monete;
+    const el = document.getElementById('invCoin_' + coinKey);
+    if (el) el.textContent = monete[coinKey];
+    await supabase.from('personaggi').update({ monete }).eq('id', pgId);
+};
+
+window.invEditCoinDirect = function(pgId, coinKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = (pg.monete || {})[coinKey] || 0;
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const coinLabel = COIN_TYPES.find(c => c.key === coinKey)?.label || coinKey;
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:260px;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">${coinLabel}</h3>
+        <input type="number" id="invCoinInput" class="hp-calc-input" value="${current}" min="0" inputmode="numeric">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-primary" onclick="invSaveCoinDirect('${pgId}','${coinKey}')">Salva</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => { const inp = document.getElementById('invCoinInput'); if (inp) { inp.focus(); inp.select(); } }, 100);
+};
+
+window.invSaveCoinDirect = async function(pgId, coinKey) {
+    const val = Math.max(0, parseInt(document.getElementById('invCoinInput')?.value) || 0);
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const monete = pg.monete ? { ...pg.monete } : {};
+    monete[coinKey] = val;
+    pg.monete = monete;
+    const el = document.getElementById('invCoin_' + coinKey);
+    if (el) el.textContent = val;
+    await supabase.from('personaggi').update({ monete }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+};
+
+window.invAddItem = function(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:320px;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">Nuovo Oggetto</h3>
+        <input type="text" id="invItemNome" class="hp-calc-input" placeholder="Nome oggetto" style="margin-bottom:8px;">
+        <input type="text" id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (opzionale)" style="margin-bottom:8px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="number" id="invItemQty" class="hp-calc-input" value="1" min="1" style="flex:1;">
+            <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
+                <input type="checkbox" id="invItemMagic"> Magico
+            </label>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-primary" onclick="invSaveNewItem('${pgId}')">Aggiungi</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => document.getElementById('invItemNome')?.focus(), 100);
+};
+
+window.invSaveNewItem = async function(pgId) {
+    const nome = document.getElementById('invItemNome')?.value?.trim();
+    if (!nome) return;
+    const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
+    const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
+    const magico = document.getElementById('invItemMagic')?.checked || false;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    inventario.push({ nome, descrizione: desc, quantita: qty, magico });
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+window.invEditItem = function(pgId, idx) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const item = (pg.inventario || [])[idx];
+    if (!item) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:320px;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">Modifica Oggetto</h3>
+        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;">
+        <input type="text" id="invItemDesc" class="hp-calc-input" value="${escapeHtml(item.descrizione || '')}" placeholder="Descrizione" style="margin-bottom:8px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;">
+            <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
+                <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
+            </label>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-primary" onclick="invUpdateItem('${pgId}',${idx})">Salva</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+};
+
+window.invUpdateItem = async function(pgId, idx) {
+    const nome = document.getElementById('invItemNome')?.value?.trim();
+    if (!nome) return;
+    const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
+    const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
+    const magico = document.getElementById('invItemMagic')?.checked || false;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    inventario[idx] = { nome, descrizione: desc, quantita: qty, magico };
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+window.invRemoveItem = async function(pgId, idx) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    inventario.splice(idx, 1);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    schedaOpenInventoryPage(pgId);
+};
+
+window.invEditAttune = function(pgId, idx) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = (pg.sintonia || [])[idx] || '';
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:300px;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
+        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current)}" placeholder="Nome oggetto a sintonia">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-primary" onclick="invSaveAttune('${pgId}',${idx})">Salva</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => document.getElementById('invAttuneName')?.focus(), 100);
+};
+
+window.invSaveAttune = async function(pgId, idx) {
+    const nome = document.getElementById('invAttuneName')?.value?.trim() || '';
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const sintonia = pg.sintonia ? [...pg.sintonia] : [null, null, null];
+    while (sintonia.length < 3) sintonia.push(null);
+    sintonia[idx] = nome || null;
+    pg.sintonia = sintonia;
+    await supabase.from('personaggi').update({ sintonia }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+window.invRemoveAttune = async function(pgId, idx) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const sintonia = pg.sintonia ? [...pg.sintonia] : [null, null, null];
+    sintonia[idx] = null;
+    pg.sintonia = sintonia;
+    await supabase.from('personaggi').update({ sintonia }).eq('id', pgId);
+    schedaOpenInventoryPage(pgId);
+};
+
 function schedaSetActiveTab(tab) {
     const mainTab = document.getElementById('schedaTabMain');
     const spellTab = document.getElementById('schedaTabSpell');
+    const invTab = document.getElementById('schedaTabInventory');
     if (mainTab) mainTab.classList.toggle('active', tab === 'scheda');
     if (spellTab) spellTab.classList.toggle('active', tab === 'incantesimi');
+    if (invTab) invTab.classList.toggle('active', tab === 'inventario');
 }
 
 function schedaWireTabBar(pgId) {
     const mainTab = document.getElementById('schedaTabMain');
     const spellTab = document.getElementById('schedaTabSpell');
+    const invTab = document.getElementById('schedaTabInventory');
     if (mainTab) mainTab.onclick = () => renderSchedaPersonaggio(pgId);
     if (spellTab) spellTab.onclick = () => schedaOpenSpellPage(pgId);
+    if (invTab) invTab.onclick = () => schedaOpenInventoryPage(pgId);
 }
 
 function schedaSlotToggleInline(pgId, level, index) {
@@ -2655,9 +2953,10 @@ function buildEquipSection(pg) {
         </tr>`;
     }).join('');
     return `<div class="scheda-section">
-        <div class="scheda-section-title">Equipaggiamento
-            <button class="scheda-edit-btn" onclick="schedaOpenAddEquip('${pg.id}')" title="Aggiungi">+</button>
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Equipaggiamento
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddEquip('${pg.id}')" title="Aggiungi">+</button>
         </div>
+        <div class="scheda-section-body">
         ${armiRows ? `<table class="scheda-equip-table">
             <thead><tr><th>Arma</th><th>Colpire</th><th>Danno</th><th></th></tr></thead>
             <tbody>${armiRows}</tbody>
@@ -2667,6 +2966,7 @@ function buildEquipSection(pg) {
             <tbody>${armaturaRows}</tbody>
         </table>` : ''}
         ${!armiRows && !armaturaRows ? '<span class="scheda-empty">Nessun equipaggiamento</span>' : ''}
+        </div>
     </div>`;
 }
 
@@ -2947,12 +3247,14 @@ function buildLangProfSection(pg) {
     }
 
     return `<div class="scheda-section">
-        <div class="scheda-section-title">Linguaggi e Competenze
-            <button class="scheda-edit-btn" onclick="schedaOpenLangProfEdit('${pg.id}')" title="Modifica">&#9998;</button>
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Linguaggi e Competenze
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenLangProfEdit('${pg.id}')" title="Modifica">&#9998;</button>
         </div>
-        <div class="scheda-res-imm-display" id="schedaLangProfDisplay">
-            <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Linguaggi</span><div class="scheda-tags" id="schedaLangDisplay">${langHtml}</div></div>
-            ${toolSectionsHtml}
+        <div class="scheda-section-body">
+            <div class="scheda-res-imm-display" id="schedaLangProfDisplay">
+                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Linguaggi</span><div class="scheda-tags" id="schedaLangDisplay">${langHtml}</div></div>
+                ${toolSectionsHtml}
+            </div>
         </div>
     </div>`;
 }
