@@ -445,6 +445,22 @@
     color: var(--text);
 }
 
+/* Dialog action row: paired buttons, equal width */
+.dialog-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: var(--spacing-md);
+}
+.dialog-actions > .btn-primary,
+.dialog-actions > .btn-secondary {
+    flex: 1 1 0;
+    width: auto;
+    margin: 0;
+    min-height: 40px;
+    padding: 10px 14px;
+    box-sizing: border-box;
+}
+
 .modal-footer-text {
     text-align: center;
     margin-top: var(--spacing-lg);
@@ -527,14 +543,17 @@
 
 .form-actions .btn-secondary,
 .form-actions .btn-primary {
-    height: 38px;
-    min-height: 38px;
+    height: 40px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 0;
     padding: 0 var(--spacing-lg);
     font-size: 0.85rem;
+    flex: 1 1 0;
+    width: auto;
+    box-sizing: border-box;
 }
 
 /* Form styles (general) */

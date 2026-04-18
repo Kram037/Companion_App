@@ -1909,14 +1909,16 @@ window.schedaOpenInventoryPage = async function(pgId) {
     const monete = pg.monete || {};
     const coinsHtml = COIN_TYPES.map(c => {
         const val = monete[c.key] || 0;
-        return `<div class="inv-coin-cell">
-            <div class="inv-coin-icon inv-coin-${c.key}">${c.icon}</div>
-            <div class="inv-coin-val" id="invCoin_${c.key}" onclick="invEditCoinDirect('${pgId}','${c.key}')">${val}</div>
-            <div class="inv-coin-label">${c.label}</div>
-            <div class="inv-coin-controls">
-                <button class="scheda-hd-btn" onclick="invCoinChange('${pgId}','${c.key}',-1)">−</button>
-                <button class="scheda-hd-btn" onclick="invCoinChange('${pgId}','${c.key}',1)">+</button>
-            </div>
+        return `<div class="inv-coin-cell inv-coin-${c.key}">
+            <div class="inv-coin-abbr">${c.key.toUpperCase()}</div>
+            <input type="text" inputmode="none" readonly
+                class="inv-coin-input"
+                id="invCoin_${c.key}"
+                value="${val}"
+                data-coin="${c.key}"
+                data-pgid="${pgId}"
+                onclick="invOpenCoinKeypad(this)">
+            <div class="inv-coin-name">${c.label.split(' ')[0]}</div>
         </div>`;
     }).join('');
 
@@ -1991,38 +1993,24 @@ window.invCoinChange = async function(pgId, coinKey, delta) {
     await supabase.from('personaggi').update({ monete }).eq('id', pgId);
 };
 
-window.invEditCoinDirect = function(pgId, coinKey) {
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const current = (pg.monete || {})[coinKey] || 0;
-    const overlay = document.createElement('div');
-    overlay.className = 'hp-calc-overlay';
-    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    const coinLabel = COIN_TYPES.find(c => c.key === coinKey)?.label || coinKey;
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:260px;">
-        <h3 style="margin-bottom:12px;font-size:1rem;">${coinLabel}</h3>
-        <input type="number" id="invCoinInput" class="hp-calc-input" value="${current}" min="0" inputmode="numeric">
-        <div style="display:flex;gap:8px;margin-top:8px;">
-            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
-            <button class="btn-primary" onclick="invSaveCoinDirect('${pgId}','${coinKey}')">Salva</button>
-        </div>
-    </div>`;
-    document.body.appendChild(overlay);
-    setTimeout(() => { const inp = document.getElementById('invCoinInput'); if (inp) { inp.focus(); inp.select(); } }, 100);
-};
-
-window.invSaveCoinDirect = async function(pgId, coinKey) {
-    const val = Math.max(0, parseInt(document.getElementById('invCoinInput')?.value) || 0);
-    const supabase = getSupabaseClient();
-    const pg = _schedaPgCache;
-    if (!supabase || !pg) return;
-    const monete = pg.monete ? { ...pg.monete } : {};
-    monete[coinKey] = val;
-    pg.monete = monete;
-    const el = document.getElementById('invCoin_' + coinKey);
-    if (el) el.textContent = val;
-    await supabase.from('personaggi').update({ monete }).eq('id', pgId);
-    document.querySelector('.hp-calc-overlay')?.remove();
+window.invOpenCoinKeypad = function(inputEl) {
+    if (!inputEl) return;
+    const coinKey = inputEl.dataset.coin;
+    const pgId = inputEl.dataset.pgid;
+    pgOpenAbilityKeypad(inputEl);
+    const onChange = async () => {
+        const val = Math.max(0, parseInt(inputEl.value) || 0);
+        inputEl.value = val;
+        const supabase = getSupabaseClient();
+        const pg = _schedaPgCache;
+        if (!supabase || !pg) return;
+        const monete = pg.monete ? { ...pg.monete } : {};
+        monete[coinKey] = val;
+        pg.monete = monete;
+        await supabase.from('personaggi').update({ monete }).eq('id', pgId);
+        inputEl.removeEventListener('change', onChange);
+    };
+    inputEl.addEventListener('change', onChange);
 };
 
 window.invAddItem = function(pgId) {
@@ -2039,7 +2027,7 @@ window.invAddItem = function(pgId) {
                 <input type="checkbox" id="invItemMagic"> Magico
             </label>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invSaveNewItem('${pgId}')">Aggiungi</button>
         </div>
@@ -2083,7 +2071,7 @@ window.invEditItem = function(pgId, idx) {
                 <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
             </label>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invUpdateItem('${pgId}',${idx})">Salva</button>
         </div>
@@ -2129,7 +2117,7 @@ window.invEditAttune = function(pgId, idx) {
     overlay.innerHTML = `<div class="hp-calc-modal" style="width:300px;">
         <h3 style="margin-bottom:12px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
         <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current)}" placeholder="Nome oggetto a sintonia">
-        <div style="display:flex;gap:8px;margin-top:8px;">
+        <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invSaveAttune('${pgId}',${idx})">Salva</button>
         </div>

@@ -620,7 +620,7 @@ body.user-logged-in .header-username {
 
     .form-actions { gap: 6px; margin-top: var(--spacing-md); padding-top: var(--spacing-md); }
     .form-actions .btn-primary,
-    .form-actions .btn-secondary { font-size: 0.82rem; height: 36px; padding: 0 var(--spacing-md); }
+    .form-actions .btn-secondary { font-size: 0.82rem; height: 38px; min-height: 38px; padding: 0 var(--spacing-md); flex: 1 1 0; width: auto; }
 
     .user-info { padding: var(--spacing-md); gap: var(--spacing-md); }
     .user-avatar { width: 40px; height: 40px; }
