@@ -1852,7 +1852,21 @@ window.schedaOpenSpellPage = async function(pgId) {
 
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
-    const cantripsHtml = buildCantripsSection(pg);
+    // Determina quali livelli mostrare: trucchetti sempre + ogni livello con slot
+    // o con almeno un incantesimo conosciuto
+    const ALL_DATA = _spellsData();
+    const knownLevels = new Set();
+    (pg.incantesimi_conosciuti || []).forEach(n => {
+        const sp = _resolveSpell(n);
+        if (sp) knownLevels.add(sp.level);
+    });
+    const levelsToShow = new Set([0, ...levels, ...knownLevels]);
+    // Mostra fino al massimo livello disponibile nel dataset
+    const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
+    const orderedLevels = Array.from(levelsToShow)
+        .filter(l => l <= maxAvail)
+        .sort((a, b) => a - b);
+    const spellSectionsHtml = orderedLevels.map(l => buildSpellLevelSection(pg, l)).join('');
 
     content.innerHTML = `
     <div class="scheda-identity">
@@ -1870,7 +1884,7 @@ window.schedaOpenSpellPage = async function(pgId) {
             <div class="scheda-slots-table">${slotsHtml}</div>
         </div>
     </div>
-    ${cantripsHtml}
+    ${spellSectionsHtml}
     `;
 
     content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
@@ -1910,21 +1924,50 @@ function _spellMatchesPg(spell, pgClasses) {
     return false;
 }
 
-function buildCantripsSection(pg) {
+/**
+ * Risolve un nome incantesimo (italiano o legacy inglese) in dati spell.
+ * Supporta backward compatibility con eventuali record salvati col nome inglese.
+ */
+function _resolveSpell(name) {
     const all = _spellsData();
-    const known = (pg.incantesimi_conosciuti || []).filter(n => all[n] && all[n].level === 0);
-    const cards = known.length > 0 ? known.map(n => {
-        const sp = all[n];
-        return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(n)}')">
+    if (all[name]) return all[name];
+    for (const k of Object.keys(all)) {
+        if (all[k].name_en === name) return all[k];
+    }
+    return null;
+}
+
+const SPELL_LEVEL_LABELS = {
+    0: 'Trucchetti',
+    1: 'Incantesimi di Livello 1',
+    2: 'Incantesimi di Livello 2',
+    3: 'Incantesimi di Livello 3',
+    4: 'Incantesimi di Livello 4',
+    5: 'Incantesimi di Livello 5',
+    6: 'Incantesimi di Livello 6',
+    7: 'Incantesimi di Livello 7',
+    8: 'Incantesimi di Livello 8',
+    9: 'Incantesimi di Livello 9'
+};
+
+function buildSpellLevelSection(pg, level) {
+    const known = (pg.incantesimi_conosciuti || [])
+        .map(n => ({ raw: n, sp: _resolveSpell(n) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const cards = known.length > 0 ? known.map(({ sp }) => {
+        const id = sp.name;
+        return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
             <div class="spell-card-name">${escapeHtml(sp.name)}</div>
             <div class="spell-card-meta">${escapeHtml(sp.school_it || sp.school)} · ${escapeHtml(sp.casting_time)} · ${escapeHtml(sp.range)}</div>
         </div>`;
-    }).join('') : '<span class="scheda-empty">Nessun trucchetto scelto</span>';
+    }).join('') : `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
 
+    const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
+    const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
     return `<div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">
-            Trucchetti
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenCantripsPicker('${pg.id}')" title="Scegli trucchetti">+</button>
+            ${escapeHtml(label)}
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">+</button>
         </div>
         <div class="scheda-section-body">
             <div class="spell-cards-grid">${cards}</div>
@@ -1932,10 +1975,13 @@ function buildCantripsSection(pg) {
     </div>`;
 }
 
+// Backward compat (mantiene il nome storico)
+function buildCantripsSection(pg) { return buildSpellLevelSection(pg, 0); }
+
 function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
 window.schedaShowSpellDetail = function(spellName) {
-    const sp = _spellsData()[spellName];
+    const sp = _resolveSpell(spellName);
     if (!sp) return;
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
@@ -1958,21 +2004,25 @@ window.schedaShowSpellDetail = function(spellName) {
     document.body.appendChild(overlay);
 };
 
-window.schedaOpenCantripsPicker = function(pgId) {
+window.schedaOpenSpellPicker = function(pgId, level) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const all = _spellsData();
     const pgClasses = _pgSpellClasses(pg);
-    const known = new Set(pg.incantesimi_conosciuti || []);
+    // Conserva l'unione di tutti i conosciuti (di ogni livello), normalizzati a nome IT
+    const knownAll = new Set((pg.incantesimi_conosciuti || []).map(n => {
+        const sp = _resolveSpell(n);
+        return sp ? sp.name : n;
+    }));
 
-    const cantrips = Object.values(all).filter(s => s.level === 0);
-    cantrips.sort((a, b) => a.name.localeCompare(b.name));
+    const list = Object.values(all).filter(s => s.level === level);
+    list.sort((a, b) => a.name.localeCompare(b.name, 'it'));
 
-    const matching = cantrips.filter(s => _spellMatchesPg(s, pgClasses));
-    const others = cantrips.filter(s => !_spellMatchesPg(s, pgClasses));
+    const matching = list.filter(s => _spellMatchesPg(s, pgClasses));
+    const others = list.filter(s => !_spellMatchesPg(s, pgClasses));
 
     const renderRow = (sp) => {
-        const isKnown = known.has(sp.name);
+        const isKnown = knownAll.has(sp.name);
         const safeName = escapeAttr(sp.name);
         return `<label class="spell-pick-row">
             <input type="checkbox" class="spell-pick-cb" data-name="${safeName}" ${isKnown ? 'checked' : ''}>
@@ -1983,21 +2033,23 @@ window.schedaOpenCantripsPicker = function(pgId) {
         </label>`;
     };
 
+    const titleLabel = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
+
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     overlay.innerHTML = `<div class="hp-calc-modal spell-picker-modal">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-        <h3 style="margin-bottom:6px;">Trucchetti</h3>
+        <h3 style="margin-bottom:6px;">${escapeHtml(titleLabel)}</h3>
         <input type="text" id="spellPickerSearch" class="hp-calc-input" placeholder="Cerca…" style="margin-bottom:10px;">
         <div class="spell-picker-list" id="spellPickerList">
             ${matching.length > 0 ? `<div class="spell-pick-group-title">Disponibili per la tua classe</div>${matching.map(renderRow).join('')}` : ''}
             ${others.length > 0 ? `<div class="spell-pick-group-title">Altri</div>${others.map(renderRow).join('')}` : ''}
-            ${cantrips.length === 0 ? '<p class="scheda-empty">Nessun trucchetto disponibile</p>' : ''}
+            ${list.length === 0 ? '<p class="scheda-empty">Nessun incantesimo disponibile</p>' : ''}
         </div>
         <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
-            <button class="btn-primary" onclick="schedaSaveCantrips('${pgId}')">Salva</button>
+            <button class="btn-primary" onclick="schedaSaveSpellsForLevel('${pgId}', ${level})">Salva</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
@@ -2014,16 +2066,32 @@ window.schedaOpenCantripsPicker = function(pgId) {
     }
 };
 
-window.schedaSaveCantrips = async function(pgId) {
+// Alias storico
+window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };
+
+window.schedaSaveSpellsForLevel = async function(pgId, level) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
+    // Mantieni i conosciuti di altri livelli, sostituisci solo il livello corrente
+    const all = _spellsData();
+    const others = (pg.incantesimi_conosciuti || []).filter(n => {
+        const sp = _resolveSpell(n);
+        return !sp || sp.level !== level;
+    }).map(n => {
+        const sp = _resolveSpell(n);
+        return sp ? sp.name : n;
+    });
     const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked')).map(cb => cb.dataset.name);
-    pg.incantesimi_conosciuti = checked;
-    await supabase.from('personaggi').update({ incantesimi_conosciuti: checked }).eq('id', pgId);
+    const merged = Array.from(new Set([...others, ...checked]));
+    pg.incantesimi_conosciuti = merged;
+    await supabase.from('personaggi').update({ incantesimi_conosciuti: merged }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenSpellPage(pgId);
 };
+
+// Alias storico
+window.schedaSaveCantrips = function(pgId) { return window.schedaSaveSpellsForLevel(pgId, 0); };
 
 /* ── Inventario Tab ── */
 const COIN_TYPES = [

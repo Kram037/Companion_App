@@ -1,0 +1,317 @@
+{
+  "Acid Splash": {
+    "description": "Lanci una bolla d'acido. Scegli una creatura entro gittata che puoi vedere, oppure due creature entro gittata che puoi vedere e che si trovino entro 1,5 metri l'una dall'altra. Il bersaglio deve effettuare un tiro salvezza su Destrezza o subire 1d6 danni da acido. I danni dell'incantesimo aumentano di 1d6 al 5° livello (2d6), all'11° livello (3d6) e al 17° livello (4d6)."
+  },
+  "Blade Ward": {
+    "description": "Estendi la mano e tracci nell'aria un simbolo di guardia. Fino alla fine del tuo prossimo turno hai resistenza ai danni contundenti, perforanti e taglienti inflitti da attacchi con armi."
+  },
+  "Booming Blade": {
+    "description": "Brandisci l'arma corpo a corpo usata per l'evocazione contro un bersaglio entro gittata. Altrimenti l'incantesimo fallisce. In caso di successo il bersaglio subisce gli effetti normali dell'attacco e viene avvolto da un'energia tonante fino all'inizio del tuo prossimo turno. Se il bersaglio si muove volontariamente di propria iniziativa prima di allora, subisce immediatamente 1d8 danni da tuono e l'incantesimo termina. Al 5° livello l'attacco infligge 1d8 danni da tuono extra al bersaglio in caso di colpo, e i danni subiti per il movimento aumentano a 2d8. I danni aumentano ulteriormente all'11° livello (2d8 e 3d8) e al 17° livello (3d8 e 4d8)."
+  },
+  "Chill Touch": {
+    "description": "Crei una mano scheletrica e spettrale nello spazio di una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro la creatura per assalirla con la presa gelida della tomba. Se colpisci, il bersaglio subisce 1d8 danni necrotici e non può recuperare punti ferita fino all'inizio del tuo prossimo turno. Fino ad allora la mano resta aggrappata al bersaglio. Se colpisci un non morto, esso ha anche svantaggio agli attacchi contro di te fino alla fine del tuo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Control Flames": {
+    "description": "Scegli una fiamma non magica che puoi vedere entro gittata e che riempia un cubo di 1,5 metri di lato. Modifichi il fuoco in uno dei seguenti modi: l'estendi fino al doppio o lo riduci alla metà del suo raggio luminoso (durata fino a 1 ora); estingui le fiamme nell'area; raddoppi o dimezzi l'area illuminata o resa coperta di luce dal fuoco; fai sì che le fiamme assumano forme semplici (un animale, una pianta o una creatura, con effetto fino a 1 ora). Se lanci di nuovo l'incantesimo su uno stesso fuoco prima della scadenza, puoi modificare gli stessi effetti."
+  },
+  "Create Bonfire": {
+    "description": "Crei un falò in uno spazio libero che puoi vedere entro gittata, che occupa un cubo di 1,5 metri di lato e dura per la durata. Una creatura nello spazio del falò quando viene lanciato l'incantesimo deve effettuare un tiro salvezza su Destrezza o subire 1d8 danni da fuoco. Una creatura deve fare il medesimo tiro salvezza la prima volta che entra nello spazio del falò nel proprio turno o termina il proprio turno lì. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Dancing Lights": {
+    "description": "Crei fino a quattro luci delle dimensioni di una torcia entro gittata, che appaiono come torce, lanterne o globi luminosi e fluttuano nell'aria per la durata. Puoi anche combinare le quattro luci in una forma vagamente umanoide e luminosa di taglia Media. In ogni caso ciascuna luce emette luce fioca in un raggio di 3 metri. Come azione bonus nei tuoi turni puoi spostare le luci fino a 18 metri verso un nuovo punto entro gittata. Una nuova luce deve trovarsi entro 6 metri da un'altra creata da questo incantesimo, e una luce si spegne se esce dalla gittata."
+  },
+  "Druidcraft": {
+    "description": "Sussurri agli spiriti della natura, creando uno dei seguenti effetti entro gittata: prevedi il tempo nelle prossime 24 ore nel raggio di 1,5 km; fai sbocciare istantaneamente un fiore o aprire un seme/baccello; crei un effetto sensoriale innocuo e istantaneo (cadere foglie, una folata di vento, il suono di un piccolo animale, il debole odore di una puzzola...); accendi o spegni una piccola fiamma (candela, torcia, falò)."
+  },
+  "Eldritch Blast": {
+    "description": "Un raggio di energia crepitante sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo il bersaglio subisce 1d10 danni da forza. L'incantesimo crea più di un raggio quando raggiungi livelli più alti: due raggi al 5° livello, tre al 11° e quattro al 17°. Puoi dirigere i raggi sullo stesso bersaglio o su bersagli differenti. Per ogni raggio effettua un tiro per colpire separato."
+  },
+  "Fire Bolt": {
+    "description": "Scagli un dardo infuocato verso una creatura o un oggetto entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo il bersaglio subisce 1d10 danni da fuoco. Se l'oggetto bersaglio non è indossato né trasportato si infiamma. I danni aumentano di 1d10 al 5° (2d10), 11° (3d10) e 17° livello (4d10)."
+  },
+  "Friends": {
+    "description": "Per la durata hai vantaggio a tutte le prove di Carisma effettuate contro una creatura di tua scelta che non sia ostile nei tuoi confronti. Quando l'incantesimo termina, la creatura comprende di essere stata influenzata magicamente e diventa ostile nei tuoi confronti. Una creatura incline alla violenza potrebbe attaccarti; un'altra potrebbe cercare vendetta in modi diversi (a discrezione del DM), a seconda della natura della tua interazione."
+  },
+  "Frostbite": {
+    "description": "Causi un freddo gelante e debilitante in una creatura che puoi vedere entro gittata. Il bersaglio deve effettuare un tiro salvezza su Costituzione. Se fallisce subisce 1d6 danni da freddo e ha svantaggio al prossimo tiro per colpire con arma effettuato prima della fine del suo prossimo turno. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Green-Flame Blade": {
+    "description": "Brandisci l'arma corpo a corpo usata per l'evocazione contro un bersaglio entro gittata. Altrimenti l'incantesimo fallisce. In caso di colpo il bersaglio subisce gli effetti normali dell'attacco e fiamme verdi balzano dal bersaglio verso una creatura diversa di tua scelta entro 1,5 metri da esso. La seconda creatura subisce danni da fuoco pari al tuo modificatore di caratteristica da incantatore. Al 5° livello l'attacco principale infligge 1d8 danni da fuoco extra e i danni alla creatura secondaria salgono a 1d8 + il tuo modificatore. I danni aumentano all'11° livello (2d8 e 2d8 + mod.) e al 17° livello (3d8 e 3d8 + mod.)."
+  },
+  "Guidance": {
+    "description": "Tocchi una creatura consenziente. Una volta prima che l'incantesimo termini il bersaglio può tirare un d4 e aggiungere il risultato a una prova di caratteristica a sua scelta. Può tirare il dado prima o dopo aver effettuato la prova. L'incantesimo termina."
+  },
+  "Gust": {
+    "description": "Manipoli l'aria per creare uno dei seguenti effetti entro gittata: una creatura Media o più piccola che scegli deve riuscire in un tiro salvezza su Forza o essere spinta di 1,5 metri lontano da te; crei una piccola raffica d'aria che spinge un oggetto non fissato e non trasportato di peso fino a 2,5 kg, fino a 3 metri lontano da te; crei un innocuo effetto sensoriale a base di vento (sventolare di stendardi, fruscio di foglie, candele tremolanti)."
+  },
+  "Infestation": {
+    "description": "Provochi la comparsa di una nube di acari, pulci e altri parassiti su una creatura che puoi vedere entro gittata. Il bersaglio deve effettuare un tiro salvezza su Costituzione, o subire 1d6 danni da veleno e muoversi di 1,5 metri in una direzione casuale, se può, e il suo movimento si riduce di 1,5 metri. Tira un d4 per la direzione: 1 nord, 2 sud, 3 est, 4 ovest. Il bersaglio non si muove in spazi pericolosi (fuoco, dirupo). I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Light": {
+    "description": "Tocchi un oggetto non più grande di 3 metri in qualsiasi dimensione. Fino al termine dell'incantesimo l'oggetto emette luce intensa nel raggio di 6 metri e luce fioca per altri 6 metri. La luce può essere del colore che desideri. Coprire completamente l'oggetto con qualcosa di opaco blocca la luce. L'incantesimo termina se lo lanci di nuovo o lo dissolvi come azione. Se prendi di mira un oggetto trasportato o indossato da una creatura ostile, essa deve riuscire in un tiro salvezza su Destrezza per evitare l'incantesimo."
+  },
+  "Lightning Lure": {
+    "description": "Crei un fulmine che si avventa verso una creatura di tua scelta che puoi vedere entro 4,5 metri da te. La creatura deve riuscire in un tiro salvezza su Forza o essere trascinata fino a 3 metri in linea retta verso di te, e subire 1d8 danni da fulmine se finisce entro 1,5 metri da te. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Mage Hand": {
+    "description": "Una mano spettrale e fluttuante appare in un punto a tua scelta entro gittata. La mano dura per la durata o finché la dissolvi come azione. La mano svanisce se va oltre 9 metri da te o se lanci nuovamente l'incantesimo. Puoi usare un'azione per controllare la mano: spostare un oggetto non fissato, aprire una porta o un contenitore non chiusi, riporre/estrarre un oggetto da un contenitore aperto, versare il contenuto di una fiala. Puoi spostare la mano fino a 9 metri ogni volta che la usi. La mano non può attaccare, attivare oggetti magici o trasportare più di 4,5 kg."
+  },
+  "Magic Stone": {
+    "description": "Tocchi da uno a tre sassolini e li imbevi di magia. Tu o qualcun altro potete effettuare un attacco con arma a distanza con uno dei sassolini lanciandolo o usando una fionda. Se lanciato, esso ha gittata di 18 metri. Chi compie l'attacco usa il tuo modificatore d'incantesimo per il tiro per colpire e per i danni. In caso di colpo il bersaglio subisce danni contundenti pari a 1d6 + il tuo modificatore di caratteristica da incantatore. Sia che colpisca o meno, l'incantesimo termina sulla pietra. Se non sono stati lanciati entro 1 minuto, la magia svanisce."
+  },
+  "Mending": {
+    "description": "L'incantesimo ripara una singola frattura o lacerazione di un oggetto toccato, come un anello di catena spezzato, due pezzi di una chiave rotta, un mantello strappato o una sacca di cuoio bucata. Finché la rottura non è più grande di 30 cm in qualsiasi dimensione, la ripari senza lasciare alcuna traccia. L'incantesimo può riparare fisicamente un oggetto magico o un costrutto, ma non può ripristinarne la magia."
+  },
+  "Message": {
+    "description": "Punti il dito verso una creatura entro gittata e sussurri un messaggio. Il bersaglio (e solo lui) sente il messaggio e può risponderti con un sussurro che solo tu puoi udire. Puoi lanciare l'incantesimo attraverso oggetti solidi se conosci il bersaglio e sai che si trova oltre la barriera. La copertura magica blocca l'incantesimo, e deve esserci un percorso libero tra te e il bersaglio (anche piccolissimo). Il bersaglio non deve necessariamente comprenderti."
+  },
+  "Mind Sliver": {
+    "description": "Spari una scheggia di energia psichica in una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Intelligenza o subire 1d6 danni psichici, e sottrarre 1d4 dal prossimo tiro salvezza che effettuerà prima della fine del tuo prossimo turno. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Minor Illusion": {
+    "description": "Crei un suono o l'immagine di un oggetto entro gittata che dura per la durata. L'illusione termina se la dissolvi come azione o se lanci di nuovo l'incantesimo. Se crei un suono, il volume può variare da un sussurro al grido di una creatura. Può essere la tua voce, quella di un'altra creatura, il ruggito di un leone, il rullo di un tamburo o qualsiasi altro suono. Il suono continua immutato per tutta la durata, oppure puoi creare suoni distinti con inizio e fine. Se crei l'immagine di un oggetto (sedia, impronte, baule), questa deve stare in un cubo di 1,5 metri. L'immagine non può creare suoni, luci, odori o altri effetti sensoriali. L'esame fisico la rivela come un'illusione: l'oggetto non oppone resistenza al tatto. Una creatura che usa un'azione per esaminare il suono o l'immagine può determinarne la natura illusoria con una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo. Se la riconosce, l'illusione diventa svanita per quella creatura."
+  },
+  "Mold Earth": {
+    "description": "Scegli una porzione di terra o pietra che puoi vedere entro gittata e che occupi un cubo di 1,5 metri di lato. La manipoli con uno dei seguenti effetti: scavi o sposti la terra/pietra nella direzione che indichi (a velocità di andatura ridotta), creando o eliminando difficoltà del terreno; modifichi forme, motivi o colori dell'area scelta per riprodurre testo, immagini o forme; trasformi l'area in terreno difficile (o lo elimini). Se scegli la terza opzione, l'effetto dura 1 ora; gli altri effetti sono istantanei."
+  },
+  "Poison Spray": {
+    "description": "Tendi la mano verso una creatura che puoi vedere entro gittata e proietti una nube di gas nocivo dal palmo. La creatura deve riuscire in un tiro salvezza su Costituzione o subire 1d12 danni da veleno. I danni aumentano di 1d12 al 5° (2d12), 11° (3d12) e 17° livello (4d12)."
+  },
+  "Prestidigitation": {
+    "description": "Compi un piccolo trucco magico che gli incantatori principianti usano per esercitarsi. Crei uno dei seguenti effetti magici entro gittata: un effetto sensoriale innocuo e istantaneo (pioggia di scintille, folata di vento, note musicali, odore strano); accendi o spegni istantaneamente una candela, una torcia o un piccolo falò; pulisci o sporchi istantaneamente un oggetto non più grande di un cubo di 30 cm; raffreddi, riscaldi o aromatizzi fino a 0,5 kg di materiale non vivente per 1 ora; crei un colore, un piccolo segno o un simbolo su un oggetto o su una superficie per 1 ora; crei una sciocchezza non magica e priva di valore (fiore di carta, candela accesa) che entra nella tua mano e dura fino alla fine del tuo prossimo turno. Puoi avere fino a tre effetti dell'incantesimo attivi alla volta, e puoi dissolverne uno come azione."
+  },
+  "Primal Savagery": {
+    "description": "Convogli energia primordiale: i tuoi denti o le tue unghie diventano armi affilate per il tempo necessario a effettuare l'attacco. Effettua un attacco con incantesimo in mischia contro una creatura entro 1,5 metri da te. In caso di colpo il bersaglio subisce 1d10 danni da acido. Dopo l'attacco i denti o le unghie tornano normali. I danni aumentano di 1d10 al 5° (2d10), 11° (3d10) e 17° livello (4d10)."
+  },
+  "Produce Flame": {
+    "description": "Una fiamma tremolante appare nella tua mano. La fiamma resta lì per la durata e non danneggia te o ciò che indossi. Emette luce intensa nel raggio di 3 metri e luce fioca per altri 3 metri. L'incantesimo termina se lo dissolvi come azione o se lo lanci di nuovo. Puoi anche attaccare lanciandola su una creatura entro 9 metri. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 1d8 danni da fuoco. Dopo aver attaccato, l'incantesimo termina. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Ray of Frost": {
+    "description": "Un raggio gelido e azzurrognolo sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 1d8 danni da freddo, e la sua velocità è ridotta di 3 metri fino all'inizio del tuo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Resistance": {
+    "description": "Tocchi una creatura consenziente. Una volta prima che l'incantesimo termini il bersaglio può tirare un d4 e aggiungere il risultato a un tiro salvezza a sua scelta. Può tirare il dado prima o dopo aver effettuato il tiro salvezza. L'incantesimo termina."
+  },
+  "Sacred Flame": {
+    "description": "Una luce simile a una fiamma scende sopra una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Destrezza o subire 1d8 danni radiosi. Per il tiro salvezza il bersaglio non beneficia di copertura. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Shape Water": {
+    "description": "Scegli un'area d'acqua che puoi vedere entro gittata e che occupi un cubo di 1,5 metri di lato. Manipolala con uno dei seguenti effetti: la sposti o ne fai mutare la forma (a velocità di andatura ridotta) creando o eliminando flussi e correnti; le fai assumere forme semplici (animaletto, pianta) per 1 ora; cambi il suo colore o la sua opacità per 1 ora; congeli l'acqua, purché non vi sia immersa una creatura. Il ghiaccio dura 1 ora. Puoi avere fino a due effetti non istantanei attivi contemporaneamente; puoi dissolverne uno come azione."
+  },
+  "Shillelagh": {
+    "description": "La pietra o il legno di un bastone ferrato o di una mazza che impugni viene infusa di potere naturale. Per la durata puoi usare il tuo modificatore di caratteristica da incantatore al posto di Forza per i tiri per colpire e i danni in mischia effettuati con quell'arma, e l'arma infligge 1d8 danni (al posto del suo dado normale). L'arma diventa anche magica, se non lo era già. L'incantesimo termina se lo lanci di nuovo o se l'arma esce dalla tua mano."
+  },
+  "Shocking Grasp": {
+    "description": "Un fulmine balza dalla tua mano per consegnare una scarica a una creatura che cerchi di toccare. Effettua un attacco con incantesimo in mischia contro il bersaglio. Hai vantaggio al tiro per colpire se il bersaglio indossa armatura di metallo. In caso di colpo subisce 1d8 danni da fulmine e non può effettuare reazioni fino all'inizio del suo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8)."
+  },
+  "Spare the Dying": {
+    "description": "Tocchi una creatura vivente con 0 punti ferita. La creatura si stabilizza. L'incantesimo non ha effetto sui non morti o sui costrutti."
+  },
+  "Sword Burst": {
+    "description": "Crei un breve istante di lame magiche e fantasma che ti vorticano intorno. Ogni creatura a tua scelta entro 1,5 metri da te deve riuscire in un tiro salvezza su Destrezza o subire 1d6 danni da forza. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Thaumaturgy": {
+    "description": "Manifesti un piccolo prodigio, segno di potere soprannaturale, entro gittata. Crei uno dei seguenti effetti magici: la tua voce risuona fino a tre volte il volume normale per 1 minuto; fai tremolare, illuminare di più, oscurare o cambiare colore brevemente le fiamme entro gittata per 1 minuto; provochi tremori innocui per 1 minuto; crei un suono istantaneo entro gittata (rombo di tuono, gracchio di corvo, sussurri sinistri); fai aprire o chiudere istantaneamente una porta o una finestra non bloccate; alteri l'aspetto dei tuoi occhi per 1 minuto. Se lanci più volte questo incantesimo, puoi avere fino a tre effetti di 1 minuto attivi contemporaneamente, e puoi dissolverne uno come azione."
+  },
+  "Thorn Whip": {
+    "description": "Crei una lunga frusta simile a una liana, ricoperta di spine, che brandisci nei confronti di una creatura entro gittata. Effettua un attacco con incantesimo in mischia contro il bersaglio. In caso di colpo il bersaglio subisce 1d6 danni perforanti e, se è di taglia Grande o più piccola, lo trascini fino a 3 metri verso di te. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Thunderclap": {
+    "description": "Provochi un'esplosione di suono fragoroso udibile fino a 30 metri di distanza. Ogni creatura entro gittata diversa da te deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni da tuono. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Toll the Dead": {
+    "description": "Punti il dito verso una creatura che puoi vedere entro gittata. Il suono di una funebre campana che rintocca riempie l'aria intorno a essa per un istante. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o subire 1d8 danni necrotici. Se al bersaglio mancano dei punti ferita, subisce invece 1d12 danni necrotici. I danni aumentano di un dado al 5° (2d8 o 2d12), 11° (3d8 o 3d12) e 17° livello (4d8 o 4d12)."
+  },
+  "True Strike": {
+    "description": "Tendi la mano e punti il dito verso un bersaglio entro gittata. La tua magia ti garantisce una breve visione delle difese del bersaglio. Al tuo prossimo turno hai vantaggio al primo tiro per colpire contro quel bersaglio, purché l'incantesimo non sia terminato."
+  },
+  "Vicious Mockery": {
+    "description": "Pronunci insulti taglienti e infusi di magia sottile contro una creatura che puoi vedere entro gittata. Se il bersaglio può sentirti (anche se non comprende le tue parole), deve riuscire in un tiro salvezza su Saggezza o subire 1d4 danni psichici e avere svantaggio al prossimo tiro per colpire effettuato prima della fine del suo prossimo turno. I danni aumentano di 1d4 al 5° (2d4), 11° (3d4) e 17° livello (4d4)."
+  },
+  "Word of Radiance": {
+    "description": "Pronunci una parola divina ed esplodi di luce in tutte le direzioni. Ogni creatura a tua scelta che puoi vedere entro gittata deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni radiosi. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6)."
+  },
+  "Absorb Elements": {
+    "description": "L'incantesimo cattura parte dell'energia in arrivo, riducendone gli effetti su di te e immagazzinandola per il tuo prossimo attacco con arma in mischia. Hai resistenza al tipo di danno innescante fino all'inizio del tuo prossimo turno. Inoltre, la prima volta che colpisci con un attacco con arma in mischia nel tuo prossimo turno, l'arma infligge 1d6 danni extra del tipo innescante e l'incantesimo termina. Se lanci l'incantesimo a un livello di slot pari o superiore al 2°, i danni extra aumentano di 1d6 per ogni livello sopra il 1°."
+  },
+  "Animal Friendship": {
+    "description": "Questo incantesimo ti consente di convincere una bestia che non intendi farle del male. Scegli una bestia che puoi vedere entro gittata. Deve poterti vedere e udire. Se l'Intelligenza della bestia è 4 o superiore, l'incantesimo fallisce. Altrimenti la bestia deve riuscire in un tiro salvezza su Saggezza o essere ammaliata da te per la durata. Se tu o uno dei tuoi compagni danneggiate la bestia, l'incantesimo termina. Se lanciato a livello 2° o superiore, puoi prendere di mira una bestia in più per ogni livello di slot sopra il 1°."
+  },
+  "Armor of Agathys": {
+    "description": "Una forza protettiva e magica ti circonda, manifestandosi come una scintillante patina di gelo che ricopre te e i tuoi indumenti. Guadagni 5 punti ferita temporanei per la durata. Se una creatura ti colpisce con un attacco in mischia mentre hai questi punti ferita, essa subisce 5 danni da freddo. Se lanciato a livello 2° o superiore, sia i punti ferita temporanei sia i danni aumentano di 5 per ogni livello di slot sopra il 1°."
+  },
+  "Arms of Hadar": {
+    "description": "Invochi il potere di Hadar, l'Oscurità Affamata. Tentacoli di energia nera erompono da te e battono tutte le creature entro 3 metri da te. Ogni creatura in quell'area deve effettuare un tiro salvezza su Forza. In caso di fallimento subisce 2d6 danni necrotici e non può effettuare reazioni fino al suo prossimo turno. In caso di successo subisce metà dei danni e nessun altro effetto. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Bane": {
+    "description": "Fino a tre creature di tua scelta che puoi vedere entro gittata devono effettuare un tiro salvezza su Carisma. Per la durata, ogni volta che un bersaglio fallito effettua un tiro per colpire o un tiro salvezza prima del termine dell'incantesimo, il bersaglio deve tirare un d4 e sottrarre il risultato al tiro. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°."
+  },
+  "Beast Bond": {
+    "description": "Stabilisci un legame telepatico con una bestia che tocchi e sia amichevole nei tuoi confronti, o ammaliata da te. L'incantesimo fallisce se l'Intelligenza della bestia è 4 o superiore. Finché dura puoi percepire ciò che essa percepisce, e comunicarvi telepaticamente. La bestia ottiene vantaggio ai tiri per colpire contro qualsiasi creatura entro 1,5 metri da te che sia visibile a entrambi. Il legame si interrompe se vi separate di oltre 18 metri."
+  },
+  "Bless": {
+    "description": "Benedici fino a tre creature di tua scelta entro gittata. Quando una creatura bersaglio effettua un tiro per colpire o un tiro salvezza prima del termine dell'incantesimo, può tirare un d4 e aggiungere il risultato. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°."
+  },
+  "Burning Hands": {
+    "description": "Tendi le mani avanti con i pollici uniti e le dita aperte: uno strato sottile di fiamme erompe dalle dita aperte. Ogni creatura entro un cono di 4,5 metri deve effettuare un tiro salvezza su Destrezza. Subisce 3d6 danni da fuoco se fallisce, o metà se ha successo. Il fuoco incendia gli oggetti nell'area che non sono indossati né trasportati. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Catapult": {
+    "description": "Scegli un oggetto che pesi tra 0,5 e 2,5 kg entro gittata, che non sia indossato né trasportato. L'oggetto schizza in linea retta fino a 27 metri in una direzione che scegli prima di arrestarsi. Se l'oggetto colpisce una creatura solida, l'oggetto smette di muoversi e la creatura deve effettuare un tiro salvezza su Destrezza. Se fallisce, l'oggetto colpisce il bersaglio infliggendo 3d8 danni contundenti. Se ha successo, l'oggetto manca il bersaglio. Se lanciato a livello 2° o superiore, peso massimo aumenta di 2,5 kg e i danni di 1d8 per ogni livello di slot sopra il 1°."
+  },
+  "Cause Fear": {
+    "description": "Sussurri di morte raggiungono una creatura a tua scelta entro gittata che puoi vedere. Se non è un costrutto né un non morto, deve riuscire in un tiro salvezza su Saggezza o essere spaventata da te fino al termine dell'incantesimo. Può ripetere il tiro salvezza alla fine di ogni suo turno; in caso di successo, l'incantesimo termina su di essa. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra."
+  },
+  "Chaos Bolt": {
+    "description": "Lanci una freccia rotolante e fluttuante di energia magica verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo, tira 2d8 e un d8: il bersaglio subisce 2d8 danni di un tipo determinato dal d8 (1 acido, 2 freddo, 3 fuoco, 4 forza, 5 fulmine, 6 veleno, 7 psichici, 8 tuono). Se i 2d8 mostrano lo stesso risultato, l'energia caotica scocca dal bersaglio verso una creatura diversa entro 9 metri. Effettua un nuovo attacco contro la nuova creatura usando lo stesso tiro per colpire e ripeti la procedura. Una creatura può essere bersagliata solo una volta. Se lanciato a livello 2° o superiore, ogni bersaglio subisce 1d6 danni in più per ogni livello sopra il 1°."
+  },
+  "Charm Person": {
+    "description": "Tenti di ammaliare un umanoide che puoi vedere entro gittata. Deve effettuare un tiro salvezza su Saggezza, con vantaggio se tu o i tuoi compagni state combattendo contro di lui. Se fallisce, è ammaliato da te finché l'incantesimo non termina o tu o i tuoi compagni gli arrecate danno. Una volta terminato l'incantesimo, la creatura sa di essere stata ammaliata. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra."
+  },
+  "Chromatic Orb": {
+    "description": "Lanci una sfera di energia di 10 cm di diametro verso una creatura entro gittata. Scegli acido, freddo, fuoco, fulmine, veleno o tuono per il tipo di sfera, poi effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 3d8 danni del tipo scelto. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°."
+  },
+  "Color Spray": {
+    "description": "Una palette abbagliante di luci colorate sgorga dalla tua mano. Tira 6d10: il totale è il numero di punti ferita di creature che questo incantesimo può accecare. Le creature in un cono di 4,5 metri davanti a te sono interessate in ordine crescente di punti ferita attuali (esclusi inconsce). Partendo dalla creatura con meno punti ferita, le creature interessate sono accecate fino al termine del tuo prossimo turno. Sottrai i punti ferita di ogni creatura dal totale prima di passare a quella successiva. I punti ferita di una creatura devono essere uguali o inferiori al totale rimanente per essere interessati. Se lanciato a livello 2° o superiore, tira 2d10 in più per ogni livello sopra il 1°."
+  },
+  "Command": {
+    "description": "Pronunci una parola di comando a una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o seguire l'ordine al suo prossimo turno. L'incantesimo non ha effetto se il bersaglio è non morto, se non comprende la tua lingua o se l'ordine è direttamente dannoso. Comandi tipici: Avvicinati, Lascia, Fuggi, Stenditi, Fermo. Comandi diversi sono possibili ma a discrezione del DM. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra."
+  },
+  "Compelled Duel": {
+    "description": "Tenti di costringere una creatura a duellare con te. Una creatura che puoi vedere entro gittata deve effettuare un tiro salvezza su Saggezza. Se fallisce è attratta da un'aura divina, ottiene svantaggio ai tiri per colpire contro creature diverse da te, e deve effettuare un tiro salvezza su Saggezza ogni volta che tenta di muoversi in uno spazio a più di 9 metri da te (in caso di successo, l'incantesimo non la limita). L'incantesimo termina se attacchi un'altra creatura, lanci un incantesimo che bersagli una creatura ostile diversa da quella, una creatura amica danneggia il bersaglio, o se finisci il tuo turno a più di 9 metri dal bersaglio."
+  },
+  "Create or Destroy Water": {
+    "description": "Crei o distruggi acqua. Crei: scegli un'opzione: fino a 40 litri di pioggia che cade in un cilindro di 9 metri di altezza e 9 metri di raggio entro gittata, o 40 litri di acqua pulita in un contenitore aperto entro gittata. Distruggi: distruggi fino a 40 litri di acqua in un cubo di 9 metri di lato, o disperdi nebbia in un cubo di 9 metri di lato. Se lanciato a livello 2° o superiore, crei o distruggi 40 litri in più per ogni livello di slot sopra il 1°."
+  },
+  "Cure Wounds": {
+    "description": "Una creatura toccata recupera punti ferita pari a 1d8 + il tuo modificatore di caratteristica da incantatore. L'incantesimo non ha effetto su non morti o costrutti. Se lanciato a livello 2° o superiore, la cura aumenta di 1d8 per ogni livello di slot sopra il 1°."
+  },
+  "Detect Evil and Good": {
+    "description": "Per la durata percepisci la presenza, entro 9 metri da te, di celestiali, elementali, fatati, immondi o non morti. Percepisci anche se un luogo o un oggetto entro 9 metri è stato consacrato o profanato. L'incantesimo può essere bloccato dalla maggior parte delle barriere: 30 cm di pietra, 2,5 cm di metallo comune, una sottile lamina di piombo o 90 cm di legno o terra."
+  },
+  "Disguise Self": {
+    "description": "Fai apparire te stesso (inclusi vestiti, armatura, armi e oggetti) diverso fino al termine dell'incantesimo o finché non lo dissolvi come azione. Puoi sembrare 30 cm più alto o più basso e magro, grasso o intermedio. Non puoi cambiare la tua forma corporea generale. La differenza è solo visiva: chi tocca rivela la natura illusoria. Per riconoscere l'illusione una creatura può effettuare un'azione per esaminarti, riuscendo a una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo."
+  },
+  "Dissonant Whispers": {
+    "description": "Sussurri una melodia discordante che solo una creatura a tua scelta entro gittata può sentire, lacerando la sua mente con un dolore atroce. Il bersaglio deve effettuare un tiro salvezza su Saggezza. In caso di fallimento subisce 3d6 danni psichici e deve immediatamente usare la sua reazione, se possibile, per muoversi fino alla velocità più lontano possibile da te. La creatura non si muove in spazi pericolosi. In caso di successo subisce metà danni e non si muove. Una creatura sorda riesce automaticamente al tiro salvezza. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Divine Favor": {
+    "description": "La tua preghiera ti infonde di potere divino. Finché l'incantesimo non termina, gli attacchi con arma infliggono 1d4 danni radiosi extra in caso di colpo."
+  },
+  "Earth Tremor": {
+    "description": "Causi un tremore del terreno entro gittata. Ogni creatura diversa da te entro 3 metri da te deve effettuare un tiro salvezza su Destrezza. In caso di fallimento subisce 1d6 danni contundenti e cade prona. Se il terreno è terra o pietra sciolta, diventa terreno difficile fino a quando non viene ripulito (a velocità di andatura ridotta da una creatura). Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Ensnaring Strike": {
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma prima del termine dell'incantesimo, una massa di viti spinose appare nel punto del colpo e il bersaglio deve riuscire in un tiro salvezza su Forza o essere intrappolato dalle viti magiche fino al termine dell'incantesimo. Le creature di taglia Enorme o superiore hanno vantaggio al tiro salvezza. Mentre è intrappolato il bersaglio subisce 1d6 danni perforanti all'inizio di ogni suo turno. Una creatura può effettuare una prova di Forza nel suo turno per liberarsi. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Entangle": {
+    "description": "Erbe contorte e intrecciate erompono in un quadrato di 6 metri di lato a partire da un punto entro gittata. Per la durata, le piante trasformano l'area in terreno difficile. Una creatura nell'area al momento del lancio deve riuscire in un tiro salvezza su Forza o essere intrappolata dalle piante. Una creatura intrappolata può usare la sua azione per fare una prova di Forza contro la CD del tuo incantesimo. Al termine dell'incantesimo le piante svaniscono."
+  },
+  "Expeditious Retreat": {
+    "description": "Questo incantesimo ti permette di muoverti a velocità incredibile. Quando lo lanci, e come azione bonus in ogni turno successivo finché dura, puoi compiere un'azione di Scatto."
+  },
+  "Faerie Fire": {
+    "description": "Ogni oggetto in un cubo di 6 metri di lato entro gittata viene delineato da una luce blu, verde o viola (a tua scelta). Anche le creature nell'area sono delineate, se non riescono in un tiro salvezza su Destrezza. Per la durata gli oggetti e le creature interessate emettono luce fioca in un raggio di 3 metri. Tutti i tiri per colpire contro una creatura o un oggetto interessati hanno vantaggio se l'attaccante può vederli, e quelli interessati non possono beneficiare dell'invisibilità."
+  },
+  "False Life": {
+    "description": "Rinforzando te stesso con una somiglianza necromantica della vita, ottieni 1d4+4 punti ferita temporanei per la durata. Se lanciato a livello 2° o superiore, ottieni 5 punti ferita temporanei in più per ogni livello di slot sopra il 1°."
+  },
+  "Feather Fall": {
+    "description": "Scegli fino a cinque creature in caduta entro gittata. La velocità di caduta di ciascun bersaglio si riduce a 18 metri al secondo fino al termine dell'incantesimo. Se un bersaglio atterra prima della fine dell'incantesimo, non subisce danni da caduta e può atterrare in piedi, e l'incantesimo termina per quel bersaglio."
+  },
+  "Fog Cloud": {
+    "description": "Crei una sfera di nebbia con un raggio di 6 metri centrata su un punto entro gittata. La sfera si espande attorno agli angoli, e l'area è pesantemente oscurata. Dura per la durata o finché un vento moderato (16 km/h almeno) la disperde. Se lanciato a livello 2° o superiore, il raggio aumenta di 6 metri per ogni livello di slot sopra il 1°."
+  },
+  "Goodberry": {
+    "description": "Fino a dieci bacche compaiono nella tua mano e sono infuse di magia per la durata. Una creatura può usare la sua azione per mangiare una bacca, ripristinando 1 punto ferita; la bacca fornisce nutrimento sufficiente per un giorno. Le bacche perdono il loro potere se non vengono consumate entro 24 ore dal lancio."
+  },
+  "Grease": {
+    "description": "Grasso viscoso ricopre il terreno in un quadrato di 3 metri di lato centrato su un punto entro gittata e diventa terreno difficile per la durata. Quando il grasso compare, ogni creatura che si trova nell'area deve riuscire in un tiro salvezza su Destrezza o cadere prona. Una creatura che entra nell'area o termina lì il proprio turno deve riuscire in un tiro salvezza su Destrezza o cadere prona."
+  },
+  "Guiding Bolt": {
+    "description": "Un fulmine di luce sfreccia verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 4d6 danni radiosi e il prossimo attacco effettuato contro di esso prima della fine del tuo prossimo turno ha vantaggio, grazie alla luce mistica che lo segna fino ad allora. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Hail of Thorns": {
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma a distanza prima del termine dell'incantesimo, l'incantesimo crea una pioggia di spine che esplode dal bersaglio. Oltre agli effetti normali dell'attacco, il bersaglio e ogni creatura entro 1,5 metri da esso devono effettuare un tiro salvezza su Destrezza. Una creatura subisce 1d10 danni perforanti se fallisce, o metà se ha successo. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1° (massimo 6d10)."
+  },
+  "Healing Word": {
+    "description": "Una creatura a tua scelta che puoi vedere entro gittata recupera punti ferita pari a 1d4 + il tuo modificatore di caratteristica da incantatore. L'incantesimo non ha effetto su non morti o costrutti. Se lanciato a livello 2° o superiore, la cura aumenta di 1d4 per ogni livello di slot sopra il 1°."
+  },
+  "Hellish Rebuke": {
+    "description": "Punti il dito e la creatura che ti ha danneggiato è momentaneamente avvolta da fiamme infernali. La creatura deve effettuare un tiro salvezza su Destrezza. Subisce 2d10 danni da fuoco se fallisce, o metà se ha successo. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1°."
+  },
+  "Heroism": {
+    "description": "Una creatura consenziente toccata viene infusa di coraggio. Finché dura l'incantesimo, la creatura è immune all'essere spaventata e ottiene punti ferita temporanei pari al tuo modificatore di caratteristica da incantatore all'inizio di ognuno dei suoi turni. Quando l'incantesimo termina, il bersaglio perde tutti i punti ferita temporanei rimanenti. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°."
+  },
+  "Hex": {
+    "description": "Imponi una maledizione a una creatura che puoi vedere entro gittata. Finché dura l'incantesimo, infliggi 1d6 danni necrotici extra al bersaglio ogni volta che lo colpisci con un attacco. Inoltre, scegli una caratteristica al momento del lancio: il bersaglio ha svantaggio alle prove di caratteristica effettuate con essa. Se il bersaglio scende a 0 punti ferita prima del termine dell'incantesimo, puoi usare un'azione bonus in un tuo turno successivo per maledire una nuova creatura. Una remove curse lanciato sul bersaglio termina l'incantesimo. Se lanciato a livello 3° o 4°, dura fino a 8 ore. A livello 5° o superiore, dura fino a 24 ore."
+  },
+  "Hunter's Mark": {
+    "description": "Scegli una creatura entro gittata e marchiala mistica come tua preda. Finché dura l'incantesimo, infliggi 1d6 danni extra al bersaglio ogni volta che lo colpisci con un attacco con arma, e hai vantaggio alle prove di Saggezza (Percezione) o Saggezza (Sopravvivenza) effettuate per trovarlo. Se il bersaglio scende a 0 punti ferita prima del termine dell'incantesimo, puoi usare un'azione bonus in un tuo turno successivo per marchiare una nuova creatura. Se lanciato a livello 3° o 4°, dura fino a 8 ore. A livello 5° o superiore, dura fino a 24 ore."
+  },
+  "Ice Knife": {
+    "description": "Crei un pugnale di ghiaccio e lo scagli verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 1d10 danni perforanti. Sia che colpisca o meno, il pugnale esplode poi. Il bersaglio e ogni creatura entro 1,5 metri da esso devono riuscire in un tiro salvezza su Destrezza o subire 2d6 danni da freddo. Se lanciato a livello 2° o superiore, i danni di entrambi gli effetti aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Inflict Wounds": {
+    "description": "Effettua un attacco con incantesimo in mischia contro una creatura che puoi raggiungere. In caso di colpo il bersaglio subisce 3d10 danni necrotici. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1°."
+  },
+  "Jump": {
+    "description": "Tocchi una creatura. La sua distanza di salto viene triplicata fino al termine dell'incantesimo."
+  },
+  "Longstrider": {
+    "description": "Tocchi una creatura. La sua velocità aumenta di 3 metri fino al termine dell'incantesimo. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°."
+  },
+  "Mage Armor": {
+    "description": "Tocchi una creatura consenziente che non indossa un'armatura, e una forza protettiva e magica la circonda fino al termine dell'incantesimo. La CA di base del bersaglio diventa 13 + il suo modificatore di Destrezza. L'incantesimo termina se il bersaglio indossa un'armatura o se lo dissolvi come azione."
+  },
+  "Magic Missile": {
+    "description": "Crei tre dardi luccicanti di forza magica. Ogni dardo colpisce una creatura a tua scelta che puoi vedere entro gittata. Un dardo infligge 1d4+1 danni da forza al suo bersaglio. I dardi colpiscono tutti contemporaneamente, e puoi dirigerli contro un'unica creatura o creature diverse. Se lanciato a livello 2° o superiore, l'incantesimo crea un dardo in più per ogni livello di slot sopra il 1°."
+  },
+  "Protection from Evil and Good": {
+    "description": "Finché l'incantesimo non termina, una creatura consenziente toccata è protetta da certi tipi di creature: aberrazioni, celestiali, elementali, fatati, immondi e non morti. La protezione conferisce: nessuna delle creature elencate può attaccare il bersaglio o ammaliarlo, spaventarlo o possederlo. Le creature elencate hanno svantaggio ai tiri per colpire contro il bersaglio, e il bersaglio è immune all'essere ammaliato, spaventato o posseduto da loro. Se il bersaglio è già stato ammaliato, spaventato o posseduto, ottiene vantaggio a qualsiasi nuovo tiro salvezza contro l'effetto pertinente."
+  },
+  "Ray of Sickness": {
+    "description": "Un raggio di energia nauseante e verdastra sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 2d8 danni da veleno e deve riuscire in un tiro salvezza su Costituzione o essere avvelenato fino alla fine del tuo prossimo turno. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°."
+  },
+  "Sanctuary": {
+    "description": "Proteggi una creatura entro gittata dagli attacchi. Finché l'incantesimo non termina, ogni creatura che bersaglia la creatura protetta con un attacco o un incantesimo dannoso deve prima effettuare un tiro salvezza su Saggezza. In caso di fallimento deve scegliere un nuovo bersaglio o perdere l'attacco/incantesimo. L'incantesimo non protegge dagli effetti ad area. Se la creatura protetta effettua un attacco, lancia un incantesimo che bersaglia una creatura ostile o infligge danni a un'altra creatura, l'incantesimo termina."
+  },
+  "Searing Smite": {
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma in mischia prima del termine dell'incantesimo, l'arma rifulge di luce ardente, e l'attacco infligge 1d6 danni da fuoco extra al bersaglio e lo incendia. All'inizio di ogni suo turno fino al termine dell'incantesimo, il bersaglio deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni da fuoco. In caso di successo l'incantesimo termina. Se il bersaglio o una creatura entro 1,5 metri usano un'azione per spegnere le fiamme, l'incantesimo termina. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d6 per ogni livello di slot sopra il 1°."
+  },
+  "Shield": {
+    "description": "Una barriera invisibile di forza magica appare e ti protegge. Fino all'inizio del tuo prossimo turno hai un bonus +5 alla CA, anche contro l'attacco innescante, e non subisci danni dal magic missile."
+  },
+  "Shield of Faith": {
+    "description": "Un campo scintillante appare e circonda una creatura a tua scelta entro gittata, conferendole un bonus +2 alla CA per la durata."
+  },
+  "Silent Image": {
+    "description": "Crei l'immagine di un oggetto, di una creatura o di un altro fenomeno visibile non più grande di un cubo di 4,5 metri di lato. L'immagine appare in un punto entro gittata e dura per la durata. È puramente visiva (niente suoni, odori o altri effetti sensoriali). Puoi usare la tua azione per spostare l'immagine in un altro punto entro gittata. Mentre si sposta puoi alterarne l'aspetto. Per riconoscere l'illusione, una creatura può usare la sua azione per esaminarla, riuscendo a una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo. Se la riconosce, l'illusione diventa svanita per quella creatura."
+  },
+  "Sleep": {
+    "description": "Questo incantesimo addormenta le creature. Tira 5d8: il totale è il numero di punti ferita di creature che questo incantesimo può colpire. Le creature entro 6 metri da un punto a tua scelta entro gittata sono interessate in ordine crescente di punti ferita attuali (esclusi inconsce). Partendo dalla creatura con meno punti ferita, ognuna interessata cade priva di sensi finché l'incantesimo non termina, il dormiente subisce danno o qualcuno usa un'azione per scuoterla o schiaffeggiarla. Sottrai i punti ferita di ogni creatura dal totale prima di passare a quella successiva. Non interessati: non morti e creature immuni all'essere ammaliate. Se lanciato a livello 2° o superiore, tira 2d8 in più per ogni livello sopra il 1°."
+  },
+  "Snare": {
+    "description": "Mentre lanci l'incantesimo intrecci con corda o filo l'incantesimo che genera una trappola magica nascosta. Posizioni la corda su una superficie piatta (terreno o pavimento). L'incantesimo richiede 1 minuto per essere lanciato. Al termine la corda diventa indistinguibile dall'ambiente. La trappola si attiva quando una creatura Piccola, Media o Grande si muove sulla corda. La creatura deve riuscire in un tiro salvezza su Destrezza o essere magicamente sollevata in aria, restando appesa a testa in giù 90 cm sopra il suolo. È trattenuta. La creatura può usare la sua azione per fare una prova di Destrezza contro la CD dell'incantesimo. In caso di successo l'incantesimo termina. La trappola dura finché non si attiva o per 8 ore."
+  },
+  "Tasha's Caustic Brew": {
+    "description": "Un fiotto di liquido acido sgorga da te in una linea di 9 metri di lunghezza e 1,5 metri di larghezza in una direzione che scegli. Ogni creatura nella linea deve riuscire in un tiro salvezza su Destrezza o essere coperta di acido per la durata o finché una creatura non usa la sua azione per pulire l'acido. Una creatura coperta di acido subisce 2d4 danni da acido all'inizio di ognuno dei suoi turni. Se lanciato a livello 2° o superiore, i danni aumentano di 2d4 per ogni livello di slot sopra il 1°."
+  },
+  "Tasha's Hideous Laughter": {
+    "description": "Una creatura a tua scelta che puoi vedere entro gittata percepisce tutto come incredibilmente divertente e cade in preda a una risata isterica se l'incantesimo la colpisce. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o essere prono, incapace di alzarsi e indebolito dalla risata per la durata. Una creatura con Intelligenza 4 o inferiore non è interessata. Alla fine di ognuno dei suoi turni, e ogni volta che subisce danno, il bersaglio può effettuare un nuovo tiro salvezza su Saggezza, con vantaggio se viene attivato dal danno. In caso di successo l'incantesimo termina."
+  },
+  "Thunderous Smite": {
+    "description": "La prima volta che colpisci con un attacco con arma in mischia prima del termine dell'incantesimo, l'arma esplode di tuono che si ode fino a 90 metri, e l'attacco infligge 2d6 danni da tuono extra al bersaglio. Inoltre, se il bersaglio è una creatura, deve riuscire in un tiro salvezza su Forza o essere spinto di 3 metri lontano da te e cadere prono."
+  },
+  "Thunderwave": {
+    "description": "Un'onda di forza tonante si diparte da te. Ogni creatura in un cubo di 4,5 metri di lato originato da te deve effettuare un tiro salvezza su Costituzione. In caso di fallimento subisce 2d8 danni da tuono ed è spinta 3 metri lontano da te. In caso di successo subisce metà danni e non viene spinta. Inoltre, oggetti non fissati interamente nell'area dell'incantesimo vengono automaticamente spinti 3 metri lontano da te per effetto dell'incantesimo, e l'incantesimo emette un boato di tuono udibile fino a 90 metri. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°."
+  },
+  "Witch Bolt": {
+    "description": "Un raggio di energia blu scoppiettante si dirige verso una creatura entro gittata, formando un legame mistico tra te e il bersaglio fino al termine dell'incantesimo. Effettua un attacco con incantesimo a distanza contro la creatura. In caso di colpo subisce 1d12 danni da fulmine, e nei tuoi turni successivi puoi usare la tua azione per infliggere automaticamente 1d12 danni da fulmine al bersaglio. L'incantesimo termina se usi la tua azione per qualsiasi altra cosa. L'incantesimo termina anche se il bersaglio supera la gittata o se ottiene copertura totale da te. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d12 per ogni livello di slot sopra il 1°."
+  },
+  "Wrathful Smite": {
+    "description": "La prossima volta che colpisci con un attacco con arma in mischia prima del termine dell'incantesimo, l'attacco infligge 1d6 danni psichici extra. Inoltre, se il bersaglio è una creatura, deve riuscire in un tiro salvezza su Saggezza o essere spaventato da te fino al termine dell'incantesimo. Come azione, la creatura può effettuare una prova di Saggezza contro la CD del tuo incantesimo per riprendersi. In caso di successo l'incantesimo termina."
+  },
+  "Zephyr Strike": {
+    "description": "Ti muovi come il vento. Finché l'incantesimo non termina, il tuo movimento non provoca attacchi di opportunità. Una volta prima del termine dell'incantesimo, puoi dare a te stesso vantaggio a un singolo tiro per colpire con arma effettuato in quel turno. Quel tiro infligge 1d8 danni da forza extra in caso di colpo, e finché l'incantesimo non termina hai un bonus +3 metri alla velocità di camminata."
+  }
+}

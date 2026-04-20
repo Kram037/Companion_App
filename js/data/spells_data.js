@@ -1,0 +1,2918 @@
+/* Auto-generato da risorse/parse_spells.py - non modificare a mano */
+window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
+  "Spruzzo Acido": {
+    "name": "Spruzzo Acido",
+    "name_en": "Acid Splash",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Lanci una bolla d'acido. Scegli una creatura entro gittata che puoi vedere, oppure due creature entro gittata che puoi vedere e che si trovino entro 1,5 metri l'una dall'altra. Il bersaglio deve effettuare un tiro salvezza su Destrezza o subire 1d6 danni da acido. I danni dell'incantesimo aumentano di 1d6 al 5° livello (2d6), all'11° livello (3d6) e al 17° livello (4d6).",
+    "description_en": "You hurl a bubble of acid. Choose one creature you can see within range, or choose two creatures you can see within range that are within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d6 acid damage. This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Custodia della Lama": {
+    "name": "Custodia della Lama",
+    "name_en": "Blade Ward",
+    "level": 0,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Estendi la mano e tracci nell'aria un simbolo di guardia. Fino alla fine del tuo prossimo turno hai resistenza ai danni contundenti, perforanti e taglienti inflitti da attacchi con armi.",
+    "description_en": "You extend your hand and trace a sigil of warding in the air. Until the end of your next turn, you have resistance against bludgeoning, piercing, and slashing damage dealt by weapon attacks.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Lama Tonante": {
+    "name": "Lama Tonante",
+    "name_en": "Booming Blade",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (raggio di 1,5 metri)",
+    "range_en": "Self (5-foot radius)",
+    "components": "V, M (a melee weapon del valore di almeno 1 ma)",
+    "components_en": "V, M (a melee weapon worth at least 1 sp)",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Brandisci l'arma corpo a corpo usata per l'evocazione contro un bersaglio entro gittata. Altrimenti l'incantesimo fallisce. In caso di successo il bersaglio subisce gli effetti normali dell'attacco e viene avvolto da un'energia tonante fino all'inizio del tuo prossimo turno. Se il bersaglio si muove volontariamente di propria iniziativa prima di allora, subisce immediatamente 1d8 danni da tuono e l'incantesimo termina. Al 5° livello l'attacco infligge 1d8 danni da tuono extra al bersaglio in caso di colpo, e i danni subiti per il movimento aumentano a 2d8. I danni aumentano ulteriormente all'11° livello (2d8 e 3d8) e al 17° livello (3d8 e 4d8).",
+    "description_en": "You brandish the weapon used in the spell's casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack's normal effects and then becomes sheathed in booming energy until the start of your next turn. If the target willingly moves 5 feet or more before then, the target takes 1d8 thunder damage, and the spell ends. This spell's damage increases when you reach certain levels. At 5th level, the melee attack deals an extra 1d8 thunder damage to the target on a hit, and the damage the target takes for moving increases to 2d8. Both damage rolls increase by 1d8 at 11th level (2d8 and 3d8) and again at 17th level (3d8 and 4d8).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Tocco Gelido": {
+    "name": "Tocco Gelido",
+    "name_en": "Chill Touch",
+    "level": 0,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Crei una mano scheletrica e spettrale nello spazio di una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro la creatura per assalirla con la presa gelida della tomba. Se colpisci, il bersaglio subisce 1d8 danni necrotici e non può recuperare punti ferita fino all'inizio del tuo prossimo turno. Fino ad allora la mano resta aggrappata al bersaglio. Se colpisci un non morto, esso ha anche svantaggio agli attacchi contro di te fino alla fine del tuo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack against the creature to assail it with the chill of the grave. On a hit, the target takes 1d8 necrotic damage, and it can't regain hit points until the start of your next turn. Until then, the hand clings to the target. If you hit an undead target, it also has disadvantage on attack rolls against you until the end of your next turn. This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Controllare Fiamme": {
+    "name": "Controllare Fiamme",
+    "name_en": "Control Flames",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Instantaneous or 1 hour (see below)",
+    "duration_en": "Instantaneous or 1 hour (see below)",
+    "description": "Scegli una fiamma non magica che puoi vedere entro gittata e che riempia un cubo di 1,5 metri di lato. Modifichi il fuoco in uno dei seguenti modi: l'estendi fino al doppio o lo riduci alla metà del suo raggio luminoso (durata fino a 1 ora); estingui le fiamme nell'area; raddoppi o dimezzi l'area illuminata o resa coperta di luce dal fuoco; fai sì che le fiamme assumano forme semplici (un animale, una pianta o una creatura, con effetto fino a 1 ora). Se lanci di nuovo l'incantesimo su uno stesso fuoco prima della scadenza, puoi modificare gli stessi effetti.",
+    "description_en": "You choose a nonmagical flame that you can see within range and that fits within a 5-foot cube. You affect it in one of the following ways:\n• You instantaneously expand the flame 5 feet in one direction, provided that wood or other fuel is present in the new location.\n• You instantaneously extinguish the flames within the cube.\n• You double or halve the area of bright light and dim light cast by the flame, change its color, or both. The change lasts for 1 hour.\n• You cause simple shapes—such as the vague form of a creature, an inanimate object, or a location—to appear within the flames and animate as you like. The shapes last for 1 hour. If you cast this spell multiple times, you can have up to three non- instantaneous effects created by it active at a time, and you can dismiss such an effect as an action.",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Creare Falò": {
+    "name": "Creare Falò",
+    "name_en": "Create Bonfire",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Crei un falò in uno spazio libero che puoi vedere entro gittata, che occupa un cubo di 1,5 metri di lato e dura per la durata. Una creatura nello spazio del falò quando viene lanciato l'incantesimo deve effettuare un tiro salvezza su Destrezza o subire 1d8 danni da fuoco. Una creatura deve fare il medesimo tiro salvezza la prima volta che entra nello spazio del falò nel proprio turno o termina il proprio turno lì. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "You create a bonfire on ground that you can see within range. Until the spells ends, the magic bonfire fills a 5-foot cube. Any creature in the bonfire's space when you cast the spell must succeed on a Dexterity saving throw or take 1d8 fire damage. A creature must also make the saving throw when it move into the bonfire's space for the first time on a turn or ends its turn there. The bonfire ignites flammable objects in its area that aren't being worn or carried. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Luci Danzanti": {
+    "name": "Luci Danzanti",
+    "name_en": "Dancing Lights",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S, M (un pizzico di fosforo o wychwood, o a verme luminoso)",
+    "components_en": "V, S, M (a bit of phosphorus or wychwood, or a glowworm)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Crei fino a quattro luci delle dimensioni di una torcia entro gittata, che appaiono come torce, lanterne o globi luminosi e fluttuano nell'aria per la durata. Puoi anche combinare le quattro luci in una forma vagamente umanoide e luminosa di taglia Media. In ogni caso ciascuna luce emette luce fioca in un raggio di 3 metri. Come azione bonus nei tuoi turni puoi spostare le luci fino a 18 metri verso un nuovo punto entro gittata. Una nuova luce deve trovarsi entro 6 metri da un'altra creata da questo incantesimo, e una luce si spegne se esce dalla gittata.",
+    "description_en": "You create up to four torch-sized lights within range, making them appear as torches, lanterns, or glowing orbs that hover in the air for the duration. You can also combine the four lights into one glowing vaguely humanoid form of Medium size. Whichever form you choose, each light sheds dim light in a 10-foot radius. As a bonus action on your turn, you can move the lights up to 60 feet to a new spot within range. A light must be within 20 feet of another light created by this spell, and a light winks out if it exceeds the spell's range.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Druidismo": {
+    "name": "Druidismo",
+    "name_en": "Druidcraft",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Sussurri agli spiriti della natura, creando uno dei seguenti effetti entro gittata: prevedi il tempo nelle prossime 24 ore nel raggio di 1,5 km; fai sbocciare istantaneamente un fiore o aprire un seme/baccello; crei un effetto sensoriale innocuo e istantaneo (cadere foglie, una folata di vento, il suono di un piccolo animale, il debole odore di una puzzola...); accendi o spegni una piccola fiamma (candela, torcia, falò).",
+    "description_en": "Whispering to the spirits of nature, you create one of the following effects within range:\n• You create a tiny, harmless sensory effect that predicts what the weather will be at your location for the next 24 hours. The effect might manifest as a golden orb for clear skies, a cloud for rain, falling snowflakes for snow, and so on. This effect persists for 1 round.\n• You instantly make a flower blossom, a seed pod open, or a leaf bud bloom.\n• You create an instantaneous, harmless sensory effect, such as falling leaves, a puff of wind, the sound of a small animal, or the faint odor of skunk. The effect must fit in a 5-foot cube.\n• You instantly light or snuff out a candle, a torch, or a small campfire.",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Colpo Occulto": {
+    "name": "Colpo Occulto",
+    "name_en": "Eldritch Blast",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un raggio di energia crepitante sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo il bersaglio subisce 1d10 danni da forza. L'incantesimo crea più di un raggio quando raggiungi livelli più alti: due raggi al 5° livello, tre al 11° e quattro al 17°. Puoi dirigere i raggi sullo stesso bersaglio o su bersagli differenti. Per ogni raggio effettua un tiro per colpire separato.",
+    "description_en": "A beam of crackling energy streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 force damage. The spell creates more than one beam when you reach higher levels: two beams at 5th level, three beams at 11th level, and four beams at 17th level. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.",
+    "classes": [
+      "Warlock"
+    ],
+    "classes_en": [
+      "Warlock"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Dardo Infuocato": {
+    "name": "Dardo Infuocato",
+    "name_en": "Fire Bolt",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Scagli un dardo infuocato verso una creatura o un oggetto entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo il bersaglio subisce 1d10 danni da fuoco. Se l'oggetto bersaglio non è indossato né trasportato si infiamma. I danni aumentano di 1d10 al 5° (2d10), 11° (3d10) e 17° livello (4d10).",
+    "description_en": "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried. This spell's damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10).",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Amicizia": {
+    "name": "Amicizia",
+    "name_en": "Friends",
+    "level": 0,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "S, M (a small amount of makeup applied to the face as this spell is cast)",
+    "components_en": "S, M (a small amount of makeup applied to the face as this spell is cast)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Per la durata hai vantaggio a tutte le prove di Carisma effettuate contro una creatura di tua scelta che non sia ostile nei tuoi confronti. Quando l'incantesimo termina, la creatura comprende di essere stata influenzata magicamente e diventa ostile nei tuoi confronti. Una creatura incline alla violenza potrebbe attaccarti; un'altra potrebbe cercare vendetta in modi diversi (a discrezione del DM), a seconda della natura della tua interazione.",
+    "description_en": "For the duration, you have advantage on all Charisma checks directed at one creature of your choice that isn't hostile toward you. When the spell ends, the creature realizes that you used magic to influence its mood and becomes hostile toward you. A creature prone to violence might attack you. Another creature might seek retribution in other ways (at the DM's discretion), depending on the nature of your interaction with it.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Gelo": {
+    "name": "Gelo",
+    "name_en": "Frostbite",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Causi un freddo gelante e debilitante in una creatura che puoi vedere entro gittata. Il bersaglio deve effettuare un tiro salvezza su Costituzione. Se fallisce subisce 1d6 danni da freddo e ha svantaggio al prossimo tiro per colpire con arma effettuato prima della fine del suo prossimo turno. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You cause numbing frost to form on one creature that you can see within range. The target must make a Constitution saving throw. On a failed save, the target takes 1d6 cold damage, and it has disadvantage on the next weapon attack roll it makes before the end of its next turn. The spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Lama di Fiamma Verde": {
+    "name": "Lama di Fiamma Verde",
+    "name_en": "Green-Flame Blade",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (raggio di 1,5 metri)",
+    "range_en": "Self (5-foot radius)",
+    "components": "S, M (a melee weapon del valore di almeno 1 ma)",
+    "components_en": "S, M (a melee weapon worth at least 1 sp)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Brandisci l'arma corpo a corpo usata per l'evocazione contro un bersaglio entro gittata. Altrimenti l'incantesimo fallisce. In caso di colpo il bersaglio subisce gli effetti normali dell'attacco e fiamme verdi balzano dal bersaglio verso una creatura diversa di tua scelta entro 1,5 metri da esso. La seconda creatura subisce danni da fuoco pari al tuo modificatore di caratteristica da incantatore. Al 5° livello l'attacco principale infligge 1d8 danni da fuoco extra e i danni alla creatura secondaria salgono a 1d8 + il tuo modificatore. I danni aumentano all'11° livello (2d8 e 2d8 + mod.) e al 17° livello (3d8 e 3d8 + mod.).",
+    "description_en": "You brandish the weapon used in the spell's casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack's normal effects, and you can cause green fire to leap from the target to a different creature of your choice that you can see within 5 feet of it. The second creature takes fire damage equal to your spellcasting ability modifier. This spell's damage increases when you reach certain levels. At 5th level, the melee attack deals an extra 1d8 fire damage to the target on a hit, and the fire damage to the second creature increases to 1d8 + your spellcasting ability modifier. Both damage rolls increase by 1d8 at 11th level (2d8 and 2d8) and 17th level (3d8 and 3d8).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Guida": {
+    "name": "Guida",
+    "name_en": "Guidance",
+    "level": 0,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Tocchi una creatura consenziente. Una volta prima che l'incantesimo termini il bersaglio può tirare un d4 e aggiungere il risultato a una prova di caratteristica a sua scelta. Può tirare il dado prima o dopo aver effettuato la prova. L'incantesimo termina.",
+    "description_en": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends.",
+    "classes": [
+      "Chierico",
+      "Druido"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Folata di Vento": {
+    "name": "Folata di Vento",
+    "name_en": "Gust",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Manipoli l'aria per creare uno dei seguenti effetti entro gittata: una creatura Media o più piccola che scegli deve riuscire in un tiro salvezza su Forza o essere spinta di 1,5 metri lontano da te; crei una piccola raffica d'aria che spinge un oggetto non fissato e non trasportato di peso fino a 2,5 kg, fino a 3 metri lontano da te; crei un innocuo effetto sensoriale a base di vento (sventolare di stendardi, fruscio di foglie, candele tremolanti).",
+    "description_en": "You seize the air and compel it to create one of the following effects at a point you can see within range:\n• One Medium or smaller creature that you choose must succeed on a Strength saving throw or be pushed up to 5 feet away from you.\n• You create a small blast of air capable of moving one object that is neither held nor carried and that weighs no more than 5 pounds. The object is pushed up to 10 feet away from you. It isn't pushed with enough force to cause damage.\n• You create a harmless sensory affect using air, such as causing leaves to rustle, wind to slam shutters shut, or your clothing to ripple in a breeze.",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Infestazione": {
+    "name": "Infestazione",
+    "name_en": "Infestation",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (a living flea)",
+    "components_en": "V, S, M (a living flea)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Provochi la comparsa di una nube di acari, pulci e altri parassiti su una creatura che puoi vedere entro gittata. Il bersaglio deve effettuare un tiro salvezza su Costituzione, o subire 1d6 danni da veleno e muoversi di 1,5 metri in una direzione casuale, se può, e il suo movimento si riduce di 1,5 metri. Tira un d4 per la direzione: 1 nord, 2 sud, 3 est, 4 ovest. Il bersaglio non si muove in spazi pericolosi (fuoco, dirupo). I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You cause a cloud of mites, fleas, and other parasites to appear momentarily on one creature you can see within range. The target must succeed on a Constitution saving throw, or it takes 1d6 poison damage and moves 5 feet in a random direction if it can move and its speed is at least 5 feet. Roll a d4 for the direction: 1, north; 2, south; 3, east; or 4, west. This movement doesn't provoke opportunity attacks, and if the direction rolled is blocked, the target doesn't move. The spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Luce": {
+    "name": "Luce",
+    "name_en": "Light",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, M (una lucciola o phosphorescent moss)",
+    "components_en": "V, M (a firefly or phosphorescent moss)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Tocchi un oggetto non più grande di 3 metri in qualsiasi dimensione. Fino al termine dell'incantesimo l'oggetto emette luce intensa nel raggio di 6 metri e luce fioca per altri 6 metri. La luce può essere del colore che desideri. Coprire completamente l'oggetto con qualcosa di opaco blocca la luce. L'incantesimo termina se lo lanci di nuovo o lo dissolvi come azione. Se prendi di mira un oggetto trasportato o indossato da una creatura ostile, essa deve riuscire in un tiro salvezza su Destrezza per evitare l'incantesimo.",
+    "description_en": "You touch one object that is no larger than 10 feet in any dimension. Until the spell ends, the object sheds bright light in a 20-foot radius and dim light for an additional 20 feet. The light can be colored as you like. Completely covering the object with something opaque blocks the light. The spell ends if you cast it again or dismiss it as an action. If you target an object held or worn by a hostile creature, that creature must succeed on a Dexterity saving throw to avoid the spell.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Frusta Folgorante": {
+    "name": "Frusta Folgorante",
+    "name_en": "Lightning Lure",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (raggio di 4,5 metri)",
+    "range_en": "Self (15-foot radius)",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei un fulmine che si avventa verso una creatura di tua scelta che puoi vedere entro 4,5 metri da te. La creatura deve riuscire in un tiro salvezza su Forza o essere trascinata fino a 3 metri in linea retta verso di te, e subire 1d8 danni da fulmine se finisce entro 1,5 metri da te. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "You create a lash of lightning energy that strikes at one creature of your choice that you can see within 15 feet of you. The target must succeed on a Strength saving throw or be pulled up to 10 feet in a straight line toward you and then take 1d8 lightning damage if it is within 5 feet of you. This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Mano Magica": {
+    "name": "Mano Magica",
+    "name_en": "Mage Hand",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Una mano spettrale e fluttuante appare in un punto a tua scelta entro gittata. La mano dura per la durata o finché la dissolvi come azione. La mano svanisce se va oltre 9 metri da te o se lanci nuovamente l'incantesimo. Puoi usare un'azione per controllare la mano: spostare un oggetto non fissato, aprire una porta o un contenitore non chiusi, riporre/estrarre un oggetto da un contenitore aperto, versare il contenuto di una fiala. Puoi spostare la mano fino a 9 metri ogni volta che la usi. La mano non può attaccare, attivare oggetti magici o trasportare più di 4,5 kg.",
+    "description_en": "A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration or until you dismiss it as an action. The hand vanishes if it is ever more than 30 feet away from you or if you cast this spell again. You can use your action to control the hand. You can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it. The hand can't attack, activate magic items, or carry more than 10 pounds.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Pietra Magica": {
+    "name": "Pietra Magica",
+    "name_en": "Magic Stone",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Tocchi da uno a tre sassolini e li imbevi di magia. Tu o qualcun altro potete effettuare un attacco con arma a distanza con uno dei sassolini lanciandolo o usando una fionda. Se lanciato, esso ha gittata di 18 metri. Chi compie l'attacco usa il tuo modificatore d'incantesimo per il tiro per colpire e per i danni. In caso di colpo il bersaglio subisce danni contundenti pari a 1d6 + il tuo modificatore di caratteristica da incantatore. Sia che colpisca o meno, l'incantesimo termina sulla pietra. Se non sono stati lanciati entro 1 minuto, la magia svanisce.",
+    "description_en": "You touch one to three pebbles and imbue them with magic. You or someone else can make a ranged spell attack with one of the pebbles by throwing it or hurling it with a sling. If thrown, it has a range of 60 feet. If someone else attacks with the pebble, that attacker adds your spellcasting ability modifier, not the attacker's, to the attack roll. On a hit, the target takes bludgeoning damage equal to 1d6 + your spellcasting ability modifier. Whether the attack hits or misses, the spell then ends on the stone. If you cast this spell again, the spell ends on any pebbles still affected by your previous casting.",
+    "classes": [
+      "Druido",
+      "Warlock"
+    ],
+    "classes_en": [
+      "Druid",
+      "Warlock"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Riparare": {
+    "name": "Riparare",
+    "name_en": "Mending",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (two lodestones)",
+    "components_en": "V, S, M (two lodestones)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "L'incantesimo ripara una singola frattura o lacerazione di un oggetto toccato, come un anello di catena spezzato, due pezzi di una chiave rotta, un mantello strappato o una sacca di cuoio bucata. Finché la rottura non è più grande di 30 cm in qualsiasi dimensione, la ripari senza lasciare alcuna traccia. L'incantesimo può riparare fisicamente un oggetto magico o un costrutto, ma non può ripristinarne la magia.",
+    "description_en": "This spell repairs a single break or tear in an object you touch, such as a broken chain link, two halves of a broken key, a torn cloak, or a leaking wineskin. As long as the break or tear is no larger than 1 foot in any dimension, you mend it, leaving no trace of the former damage. This spell can physically repair a magic item or construct, but the spell can't restore magic to such an object.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Messaggio": {
+    "name": "Messaggio",
+    "name_en": "Message",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S, M (a short piece of rame wire)",
+    "components_en": "V, S, M (a short piece of copper wire)",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Punti il dito verso una creatura entro gittata e sussurri un messaggio. Il bersaglio (e solo lui) sente il messaggio e può risponderti con un sussurro che solo tu puoi udire. Puoi lanciare l'incantesimo attraverso oggetti solidi se conosci il bersaglio e sai che si trova oltre la barriera. La copertura magica blocca l'incantesimo, e deve esserci un percorso libero tra te e il bersaglio (anche piccolissimo). Il bersaglio non deve necessariamente comprenderti.",
+    "description_en": "You point your finger toward a creature within range and whisper a message. The target (and only the target) hears the message and can reply in a whisper that only you can hear. You can cast this spell through solid objects if you re familiar with the target and know it is beyond the barrier. Magical silence, 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood blocks the spell. The spell doesn't have to follow a straight line and can travel freely around corners or through openings.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Scheggia Mentale": {
+    "name": "Scheggia Mentale",
+    "name_en": "Mind Sliver",
+    "level": 0,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Spari una scheggia di energia psichica in una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Intelligenza o subire 1d6 danni psichici, e sottrarre 1d4 dal prossimo tiro salvezza che effettuerà prima della fine del tuo prossimo turno. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You drive a disorienting spike of psychic energy into the mind of one creature you can see within range. The target must succeed on an Intelligence saving throw or take 1d6 psychic damage and subtract 1d4 from the next saving throw it makes before the end of your next turn. This spell's damage increases by 1d6 when you reach certain levels: 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Illusione Minore": {
+    "name": "Illusione Minore",
+    "name_en": "Minor Illusion",
+    "level": 0,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "S, M (un pizzico di fleece)",
+    "components_en": "S, M (a bit of fleece)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Crei un suono o l'immagine di un oggetto entro gittata che dura per la durata. L'illusione termina se la dissolvi come azione o se lanci di nuovo l'incantesimo. Se crei un suono, il volume può variare da un sussurro al grido di una creatura. Può essere la tua voce, quella di un'altra creatura, il ruggito di un leone, il rullo di un tamburo o qualsiasi altro suono. Il suono continua immutato per tutta la durata, oppure puoi creare suoni distinti con inizio e fine. Se crei l'immagine di un oggetto (sedia, impronte, baule), questa deve stare in un cubo di 1,5 metri. L'immagine non può creare suoni, luci, odori o altri effetti sensoriali. L'esame fisico la rivela come un'illusione: l'oggetto non oppone resistenza al tatto. Una creatura che usa un'azione per esaminare il suono o l'immagine può determinarne la natura illusoria con una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo. Se la riconosce, l'illusione diventa svanita per quella creatura.",
+    "description_en": "You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again. If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends. If you create an image of an object—such as a chair, muddy footprints, or a small chest—it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it. If a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Modellare la Terra": {
+    "name": "Modellare la Terra",
+    "name_en": "Mold Earth",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Instantaneous or 1 hour (see below)",
+    "duration_en": "Instantaneous or 1 hour (see below)",
+    "description": "Scegli una porzione di terra o pietra che puoi vedere entro gittata e che occupi un cubo di 1,5 metri di lato. La manipoli con uno dei seguenti effetti: scavi o sposti la terra/pietra nella direzione che indichi (a velocità di andatura ridotta), creando o eliminando difficoltà del terreno; modifichi forme, motivi o colori dell'area scelta per riprodurre testo, immagini o forme; trasformi l'area in terreno difficile (o lo elimini). Se scegli la terza opzione, l'effetto dura 1 ora; gli altri effetti sono istantanei.",
+    "description_en": "You choose a portion of dirt or stone that you can see within range and that fits within a 5-foot cube. You manipulate it in one of the following ways:\n• If you target an area of loose earth, you can instantaneously excavate it, move it along the ground, and deposit it up to 5 feet away. This movement doesn't have enough force to cause damage.\n• You cause shapes, colors, or both to appear on the dirt or stone, spelling out words, creating images, or shaping patterns. The changes last for 1 hour.\n• If the dirt or stone you target is on the ground, you cause it to become difficult terrain. Alternatively, you can cause the ground to become normal terrain if it is already difficult terrain. This change lasts for 1 hour. If you cast this spell multiple times, you can have no more than two of its non-instantaneous effects active at a time, and you can dismiss such an effect as an action.",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Spruzzo Velenoso": {
+    "name": "Spruzzo Velenoso",
+    "name_en": "Poison Spray",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tendi la mano verso una creatura che puoi vedere entro gittata e proietti una nube di gas nocivo dal palmo. La creatura deve riuscire in un tiro salvezza su Costituzione o subire 1d12 danni da veleno. I danni aumentano di 1d12 al 5° (2d12), 11° (3d12) e 17° livello (4d12).",
+    "description_en": "You extend your hand toward a creature you can see within range and project a puff of noxious gas from your palm. The creature must succeed on a Constitution saving throw or take 1d12 poison damage. This spell's damage increases by 1d12 when you reach 5th level (2d12), 11th level (3d12), and 17th level (4d12).",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Prestidigitazione": {
+    "name": "Prestidigitazione",
+    "name_en": "Prestidigitation",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Fino a 1 ora",
+    "duration_en": "Up to 1 hour",
+    "description": "Compi un piccolo trucco magico che gli incantatori principianti usano per esercitarsi. Crei uno dei seguenti effetti magici entro gittata: un effetto sensoriale innocuo e istantaneo (pioggia di scintille, folata di vento, note musicali, odore strano); accendi o spegni istantaneamente una candela, una torcia o un piccolo falò; pulisci o sporchi istantaneamente un oggetto non più grande di un cubo di 30 cm; raffreddi, riscaldi o aromatizzi fino a 0,5 kg di materiale non vivente per 1 ora; crei un colore, un piccolo segno o un simbolo su un oggetto o su una superficie per 1 ora; crei una sciocchezza non magica e priva di valore (fiore di carta, candela accesa) che entra nella tua mano e dura fino alla fine del tuo prossimo turno. Puoi avere fino a tre effetti dell'incantesimo attivi alla volta, e puoi dissolverne uno come azione.",
+    "description_en": "This spell is a minor magical trick that novice spellcasters use for practice. You create one of the following magical effects within range:\n• You create an instantaneous, harmless sensory effect, such as a shower of sparks, a puff of wind, faint musical notes, or an odd odor.\n• You instantaneously light or snuff out a candle, a torch, or a small campfire.\n• You instantaneously clean or soil an object no larger than 1 cubic foot.\n• You chill, warm, or flavor up to 1 cubic foot of nonliving material for 1 hour.\n• You make a color, a small mark, or a symbol appear on an object or a surface for 1 hour.\n• You create a nonmagical trinket or an illusory image that can fit in your hand and that lasts until the end of your next turn. If you cast this spell multiple times, you can have up to three of its non-instantaneous effects active at a time, and you can dismiss such an effect as an action.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Ferocia Primordiale": {
+    "name": "Ferocia Primordiale",
+    "name_en": "Primal Savagery",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Convogli energia primordiale: i tuoi denti o le tue unghie diventano armi affilate per il tempo necessario a effettuare l'attacco. Effettua un attacco con incantesimo in mischia contro una creatura entro 1,5 metri da te. In caso di colpo il bersaglio subisce 1d10 danni da acido. Dopo l'attacco i denti o le unghie tornano normali. I danni aumentano di 1d10 al 5° (2d10), 11° (3d10) e 17° livello (4d10).",
+    "description_en": "You channel primal magic to cause your teeth or fingernails to sharpen, ready to deliver a corrosive attack. Make a melee spell attack against one creature within 5 feet of you. On a hit, the target takes 1d10 acid damage. After you make the attack, your teeth or fingernails return to normal. The spell's damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10).",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Produrre Fiamma": {
+    "name": "Produrre Fiamma",
+    "name_en": "Produce Flame",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "10 minuti",
+    "duration_en": "10 minutes",
+    "description": "Una fiamma tremolante appare nella tua mano. La fiamma resta lì per la durata e non danneggia te o ciò che indossi. Emette luce intensa nel raggio di 3 metri e luce fioca per altri 3 metri. L'incantesimo termina se lo dissolvi come azione o se lo lanci di nuovo. Puoi anche attaccare lanciandola su una creatura entro 9 metri. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 1d8 danni da fuoco. Dopo aver attaccato, l'incantesimo termina. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "A flickering flame appears in your hand. The flame remains there for the duration and harms neither you nor your equipment. The flame sheds bright light in a 10-foot radius and dim light for an additional 10 feet. The spell ends if you dismiss it as an action or if you cast it again. You can also attack with the flame, although doing so ends the spell. When you cast this spell, or as an action on a later turn, you can hurl the flame at a creature within 30 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 fire damage. This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Raggio di Gelo": {
+    "name": "Raggio di Gelo",
+    "name_en": "Ray of Frost",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un raggio gelido e azzurrognolo sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 1d8 danni da freddo, e la sua velocità è ridotta di 3 metri fino all'inizio del tuo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 cold damage, and its speed is reduced by 10 feet until the start of your next turn. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Resistenza": {
+    "name": "Resistenza",
+    "name_en": "Resistance",
+    "level": 0,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (a miniature cloak)",
+    "components_en": "V, S, M (a miniature cloak)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Tocchi una creatura consenziente. Una volta prima che l'incantesimo termini il bersaglio può tirare un d4 e aggiungere il risultato a un tiro salvezza a sua scelta. Può tirare il dado prima o dopo aver effettuato il tiro salvezza. L'incantesimo termina.",
+    "description_en": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one saving throw of its choice. It can roll the die before or after making the saving throw. The spell then ends.",
+    "classes": [
+      "Chierico",
+      "Druido"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Fiamma Sacra": {
+    "name": "Fiamma Sacra",
+    "name_en": "Sacred Flame",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Una luce simile a una fiamma scende sopra una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Destrezza o subire 1d8 danni radiosi. Per il tiro salvezza il bersaglio non beneficia di copertura. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "Flame like radiance descends on a creature that you can see within range. The target must succeed on a Dexterity saving throw or take 1d8 radiant damage. The target gains no benefit from cover for this saving throw. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Modellare Acqua": {
+    "name": "Modellare Acqua",
+    "name_en": "Shape Water",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Instantaneous or 1 hour (see below)",
+    "duration_en": "Instantaneous or 1 hour (see below)",
+    "description": "Scegli un'area d'acqua che puoi vedere entro gittata e che occupi un cubo di 1,5 metri di lato. Manipolala con uno dei seguenti effetti: la sposti o ne fai mutare la forma (a velocità di andatura ridotta) creando o eliminando flussi e correnti; le fai assumere forme semplici (animaletto, pianta) per 1 ora; cambi il suo colore o la sua opacità per 1 ora; congeli l'acqua, purché non vi sia immersa una creatura. Il ghiaccio dura 1 ora. Puoi avere fino a due effetti non istantanei attivi contemporaneamente; puoi dissolverne uno come azione.",
+    "description_en": "You choose an area of water that you can see within range and that fits within a 5-foot cube. You manipulate it in one of the following ways:\n• You instantaneously move or otherwise change the flow of the water as you direct, up to 5 feet in any direction. This movement doesn't have enough force to cause damage.\n• You cause the water to form into simple shapes and animate at your direction. This change lasts for 1 hour.\n• You change the water's color or opacity. The water must be changed in the same way throughout. This change lasts for 1 hour.\n• You freeze the water, provided that there are no creatures in it. The water unfreezes in 1 hour. If you cast this spell multiple times, you can have no more than two of its non-instantaneous effects active at a time, and you can dismiss such an effect as an action.",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Shillelagh": {
+    "name": "Shillelagh",
+    "name_en": "Shillelagh",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (vischio, a shamrock leaf, e a mazza o bastone ferrato)",
+    "components_en": "V, S, M (mistletoe, a shamrock leaf, and a club or quarterstaff)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "La pietra o il legno di un bastone ferrato o di una mazza che impugni viene infusa di potere naturale. Per la durata puoi usare il tuo modificatore di caratteristica da incantatore al posto di Forza per i tiri per colpire e i danni in mischia effettuati con quell'arma, e l'arma infligge 1d8 danni (al posto del suo dado normale). L'arma diventa anche magica, se non lo era già. L'incantesimo termina se lo lanci di nuovo o se l'arma esce dalla tua mano.",
+    "description_en": "The wood of a club or quarterstaff you are holding is imbued with nature's power. For the duration, you can use your spellcasting ability instead of Strength for the attack and damage rolls of melee attacks using that weapon, and the weapon's damage die becomes a d8. The weapon also becomes magical, if it isn't already. The spell ends if you cast it again or if you let go of the weapon.",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Folgorare": {
+    "name": "Folgorare",
+    "name_en": "Shocking Grasp",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un fulmine balza dalla tua mano per consegnare una scarica a una creatura che cerchi di toccare. Effettua un attacco con incantesimo in mischia contro il bersaglio. Hai vantaggio al tiro per colpire se il bersaglio indossa armatura di metallo. In caso di colpo subisce 1d8 danni da fulmine e non può effettuare reazioni fino all'inizio del suo prossimo turno. I danni aumentano di 1d8 al 5° (2d8), 11° (3d8) e 17° livello (4d8).",
+    "description_en": "Lightning springs from your hand to deliver a shock to a creature you try to touch. Make a melee spell attack against the target. You have advantage on the attack roll if the target is wearing armor made of metal. On a hit, the target takes 1d8 lightning damage, and it can't take reactions until the start of its next turn. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Risparmiare i Morenti": {
+    "name": "Risparmiare i Morenti",
+    "name_en": "Spare the Dying",
+    "level": 0,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tocchi una creatura vivente con 0 punti ferita. La creatura si stabilizza. L'incantesimo non ha effetto sui non morti o sui costrutti.",
+    "description_en": "You touch a living creature that has 0 hit points. The creature becomes stable. This spell has no effect on undead or constructs.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Esplosione di Spade": {
+    "name": "Esplosione di Spade",
+    "name_en": "Sword Burst",
+    "level": 0,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (raggio di 1,5 metri)",
+    "range_en": "Self (5-foot radius)",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei un breve istante di lame magiche e fantasma che ti vorticano intorno. Ogni creatura a tua scelta entro 1,5 metri da te deve riuscire in un tiro salvezza su Destrezza o subire 1d6 danni da forza. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You create a momentary circle of spectral blades that sweep around you. All other creatures within 5 feet of you must succeed on a Dexterity saving throw or take 1d6 force damage. This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Taumaturgia": {
+    "name": "Taumaturgia",
+    "name_en": "Thaumaturgy",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Fino a 1 minuto",
+    "duration_en": "Up to 1 minute",
+    "description": "Manifesti un piccolo prodigio, segno di potere soprannaturale, entro gittata. Crei uno dei seguenti effetti magici: la tua voce risuona fino a tre volte il volume normale per 1 minuto; fai tremolare, illuminare di più, oscurare o cambiare colore brevemente le fiamme entro gittata per 1 minuto; provochi tremori innocui per 1 minuto; crei un suono istantaneo entro gittata (rombo di tuono, gracchio di corvo, sussurri sinistri); fai aprire o chiudere istantaneamente una porta o una finestra non bloccate; alteri l'aspetto dei tuoi occhi per 1 minuto. Se lanci più volte questo incantesimo, puoi avere fino a tre effetti di 1 minuto attivi contemporaneamente, e puoi dissolverne uno come azione.",
+    "description_en": "You manifest a minor wonder, a sign of supernatural power, within range. You create one of the following magical effects within range:\n• Your voice booms up to three times as loud as normal for 1 minute.\n• You cause flames to flicker, brighten, dim, or change color for 1 minute.\n• You cause harmless tremors in the ground for 1 minute.\n• You create an instantaneous sound that originates from a point of your choice within range, such as a rumble of thunder, the cry of a raven, or ominous whispers.\n• You instantaneously cause an unlocked door or window to fly open or slam shut.\n• You alter the appearance of your eyes for 1 minute. If you cast this spell multiple times, you can have up to three of its 1- minute effects active at a time, and you can dismiss such an effect as an action.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Frusta di Spine": {
+    "name": "Frusta di Spine",
+    "name_en": "Thorn Whip",
+    "level": 0,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (the stem of a plant with thorns)",
+    "components_en": "V, S, M (the stem of a plant with thorns)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei una lunga frusta simile a una liana, ricoperta di spine, che brandisci nei confronti di una creatura entro gittata. Effettua un attacco con incantesimo in mischia contro il bersaglio. In caso di colpo il bersaglio subisce 1d6 danni perforanti e, se è di taglia Grande o più piccola, lo trascini fino a 3 metri verso di te. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You create a long, vine-like whip covered in thorns that lashes out at your command toward a creature in range. Make a melee spell attack against the target. If the attack hits, the creature takes 1d6 piercing damage, and if the creature is Large or smaller, you pull the creature up to 10 feet closer to you. This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Tuono Fragoroso": {
+    "name": "Tuono Fragoroso",
+    "name_en": "Thunderclap",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "1,5 metri",
+    "range_en": "5 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Provochi un'esplosione di suono fragoroso udibile fino a 30 metri di distanza. Ogni creatura entro gittata diversa da te deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni da tuono. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You create a burst of thunderous sound that can be heard up to 100 feet away. Each creature within range, other than you, must succeed on a Constitution saving throw or take 1d6 thunder damage. The spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Rintocco dei Morti": {
+    "name": "Rintocco dei Morti",
+    "name_en": "Toll the Dead",
+    "level": 0,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Punti il dito verso una creatura che puoi vedere entro gittata. Il suono di una funebre campana che rintocca riempie l'aria intorno a essa per un istante. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o subire 1d8 danni necrotici. Se al bersaglio mancano dei punti ferita, subisce invece 1d12 danni necrotici. I danni aumentano di un dado al 5° (2d8 o 2d12), 11° (3d8 o 3d12) e 17° livello (4d8 o 4d12).",
+    "description_en": "You point at one creature you can see within range, and the sound of a dolorous bell fills the air around it for a moment. The target must succeed on a Wisdom saving throw or take 1d8 necrotic damage. If the target is missing any of its hit points, it instead takes 1d12 necrotic damage. The spell's damage increases by one die when you reach 5th level (2d8 or 2d12), 11th level (3d8 or 3d12), and 17th level (4d8 or 4d12).",
+    "classes": [
+      "Chierico",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Colpo Accurato": {
+    "name": "Colpo Accurato",
+    "name_en": "True Strike",
+    "level": 0,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Concentrazione, fino a 1 round",
+    "duration_en": "Concentration, up to 1 round",
+    "description": "Tendi la mano e punti il dito verso un bersaglio entro gittata. La tua magia ti garantisce una breve visione delle difese del bersaglio. Al tuo prossimo turno hai vantaggio al primo tiro per colpire contro quel bersaglio, purché l'incantesimo non sia terminato.",
+    "description_en": "You extend your hand and point a finger at a target in range. Your magic grants you a brief insight into the target's defenses. On your next turn, you gain advantage on your first attack roll against the target, provided that this spell hasn't ended.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Schernire": {
+    "name": "Schernire",
+    "name_en": "Vicious Mockery",
+    "level": 0,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Pronunci insulti taglienti e infusi di magia sottile contro una creatura che puoi vedere entro gittata. Se il bersaglio può sentirti (anche se non comprende le tue parole), deve riuscire in un tiro salvezza su Saggezza o subire 1d4 danni psichici e avere svantaggio al prossimo tiro per colpire effettuato prima della fine del suo prossimo turno. I danni aumentano di 1d4 al 5° (2d4), 11° (3d4) e 17° livello (4d4).",
+    "description_en": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range. If the target can hear you (though it need not understand you), it must succeed on a Wisdom saving throw or take 1d4 psychic damage and have disadvantage on the next attack roll it makes before the end of its next turn. This spell's damage increases by 1d4 when you reach 5th level (2d4), 11th level (3d4), and 17th level (4d4).",
+    "classes": [
+      "Bardo"
+    ],
+    "classes_en": [
+      "Bard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Parola della Luce": {
+    "name": "Parola della Luce",
+    "name_en": "Word of Radiance",
+    "level": 0,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "1,5 metri",
+    "range_en": "5 feet",
+    "components": "V, M (a holy symbol)",
+    "components_en": "V, M (a holy symbol)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Pronunci una parola divina ed esplodi di luce in tutte le direzioni. Ogni creatura a tua scelta che puoi vedere entro gittata deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni radiosi. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
+    "description_en": "You utter a divine word, and burning radiance erupts from you. Each creature of your choice that you can see within range must succeed on a Constitution saving throw or take 1d6 radiant damage. The spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Assorbire Elementi": {
+    "name": "Assorbire Elementi",
+    "name_en": "Absorb Elements",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 reazione, che si compie quando you take acid, cold, fire, lightning, or thunder damage",
+    "casting_time_en": "1 reaction, which you take when you take acid, cold, fire, lightning, or thunder damage",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "S",
+    "components_en": "S",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "L'incantesimo cattura parte dell'energia in arrivo, riducendone gli effetti su di te e immagazzinandola per il tuo prossimo attacco con arma in mischia. Hai resistenza al tipo di danno innescante fino all'inizio del tuo prossimo turno. Inoltre, la prima volta che colpisci con un attacco con arma in mischia nel tuo prossimo turno, l'arma infligge 1d6 danni extra del tipo innescante e l'incantesimo termina. Se lanci l'incantesimo a un livello di slot pari o superiore al 2°, i danni extra aumentano di 1d6 per ogni livello sopra il 1°.",
+    "description_en": "The spell captures some of the incoming energy, lessening its effect on you and storing it for your next melee attack. You have resistance to the triggering damage type until the start of your next turn. Also, the first time you hit with a melee attack on your next turn, the target takes an extra 1d6 damage of the triggering type, and the spell ends. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the extra damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Amicizia con gli Animali": {
+    "name": "Amicizia con gli Animali",
+    "name_en": "Animal Friendship",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (a morsel of food)",
+    "components_en": "V, S, M (a morsel of food)",
+    "duration": "24 ore",
+    "duration_en": "24 hours",
+    "description": "Questo incantesimo ti consente di convincere una bestia che non intendi farle del male. Scegli una bestia che puoi vedere entro gittata. Deve poterti vedere e udire. Se l'Intelligenza della bestia è 4 o superiore, l'incantesimo fallisce. Altrimenti la bestia deve riuscire in un tiro salvezza su Saggezza o essere ammaliata da te per la durata. Se tu o uno dei tuoi compagni danneggiate la bestia, l'incantesimo termina. Se lanciato a livello 2° o superiore, puoi prendere di mira una bestia in più per ogni livello di slot sopra il 1°.",
+    "description_en": "This spell lets you convince a beast that you mean it no harm. Choose a beast that you can see within range. It must see and hear you. If the beast's Intelligence is 4 or higher, the spell fails. Otherwise, the beast must succeed on a Wisdom saving throw or be charmed by you for the spell's duration. If you or one of your companions harms the target, the spell ends. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can affect one additional beast for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Ranger"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Armatura di Agathys": {
+    "name": "Armatura di Agathys",
+    "name_en": "Armor of Agathys",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (a cup of water)",
+    "components_en": "V, S, M (a cup of water)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Una forza protettiva e magica ti circonda, manifestandosi come una scintillante patina di gelo che ricopre te e i tuoi indumenti. Guadagni 5 punti ferita temporanei per la durata. Se una creatura ti colpisce con un attacco in mischia mentre hai questi punti ferita, essa subisce 5 danni da freddo. Se lanciato a livello 2° o superiore, sia i punti ferita temporanei sia i danni aumentano di 5 per ogni livello di slot sopra il 1°.",
+    "description_en": "A protective magical force surrounds you, manifesting as a spectral frost that covers you and your gear. You gain 5 temporary hit points for the duration. If a creature hits you with a melee attack while you have these hit points, the creature takes 5 cold damage. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, both the temporary hit points and the cold damage increase by 5 for each slot level above 1st.",
+    "classes": [
+      "Warlock"
+    ],
+    "classes_en": [
+      "Warlock"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Braccia di Hadar": {
+    "name": "Braccia di Hadar",
+    "name_en": "Arms of Hadar",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (raggio di 3 metri)",
+    "range_en": "Self (10-foot radius)",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Invochi il potere di Hadar, l'Oscurità Affamata. Tentacoli di energia nera erompono da te e battono tutte le creature entro 3 metri da te. Ogni creatura in quell'area deve effettuare un tiro salvezza su Forza. In caso di fallimento subisce 2d6 danni necrotici e non può effettuare reazioni fino al suo prossimo turno. In caso di successo subisce metà dei danni e nessun altro effetto. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "You invoke the power of Hadar, the Dark Hunger. Tendrils of dark energy erupt from you and batter all creatures within 10 feet of you. Each creature in that area must make a Strength saving throw. On a failed save, a target takes 2d6 necrotic damage and can't take reactions until its next turn. On a successful save, the creature takes half damage, but suffers no other effect. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Warlock"
+    ],
+    "classes_en": [
+      "Warlock"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Rovina": {
+    "name": "Rovina",
+    "name_en": "Bane",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (una goccia di blood)",
+    "components_en": "V, S, M (a drop of blood)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Fino a tre creature di tua scelta che puoi vedere entro gittata devono effettuare un tiro salvezza su Carisma. Per la durata, ogni volta che un bersaglio fallito effettua un tiro per colpire o un tiro salvezza prima del termine dell'incantesimo, il bersaglio deve tirare un d4 e sottrarre il risultato al tiro. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°.",
+    "description_en": "Up to three creatures of your choice that you can see within range must make Charisma saving throws. Whenever a target that fails this saving throw makes an attack roll or a saving throw before the spell ends, the target must roll a d4 and subtract the number rolled from the attack roll or saving throw. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Chierico"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Legame con la Bestia": {
+    "name": "Legame con la Bestia",
+    "name_en": "Beast Bond",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un pizzico di pelliccia wrapped in a cloth)",
+    "components_en": "V, S, M (a bit of fur wrapped in a cloth)",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Stabilisci un legame telepatico con una bestia che tocchi e sia amichevole nei tuoi confronti, o ammaliata da te. L'incantesimo fallisce se l'Intelligenza della bestia è 4 o superiore. Finché dura puoi percepire ciò che essa percepisce, e comunicarvi telepaticamente. La bestia ottiene vantaggio ai tiri per colpire contro qualsiasi creatura entro 1,5 metri da te che sia visibile a entrambi. Il legame si interrompe se vi separate di oltre 18 metri.",
+    "description_en": "You establish a telepathic link with one beast you touch that is friendly to you or charmed by you. The spell fails if the beast's Intelligence is 4 or higher. Until the spell ends, the link is active while you and the beast are within line of sight of each other. Through the link, the beast can understand your telepathic messages to it, and it can telepathically communicate simple emotions and concepts back to you. While the link is active, the beast gains advantage on attack rolls against any creature within 5 feet of you that you can see.",
+    "classes": [
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Benedizione": {
+    "name": "Benedizione",
+    "name_en": "Bless",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (a sprinkling of holy water)",
+    "components_en": "V, S, M (a sprinkling of holy water)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Benedici fino a tre creature di tua scelta entro gittata. Quando una creatura bersaglio effettua un tiro per colpire o un tiro salvezza prima del termine dell'incantesimo, può tirare un d4 e aggiungere il risultato. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°.",
+    "description_en": "You bless up to three creatures of your choice within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target can roll a d4 and add the number rolled to the attack roll or saving throw. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.",
+    "classes": [
+      "Chierico",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Mani Brucianti": {
+    "name": "Mani Brucianti",
+    "name_en": "Burning Hands",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (cono di 4,5 metri)",
+    "range_en": "Self (15-foot cone)",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tendi le mani avanti con i pollici uniti e le dita aperte: uno strato sottile di fiamme erompe dalle dita aperte. Ogni creatura entro un cono di 4,5 metri deve effettuare un tiro salvezza su Destrezza. Subisce 3d6 danni da fuoco se fallisce, o metà se ha successo. Il fuoco incendia gli oggetti nell'area che non sono indossati né trasportati. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a Dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one. The fire ignites any flammable objects in the area that aren't being worn or carried. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Catapulta": {
+    "name": "Catapulta",
+    "name_en": "Catapult",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Scegli un oggetto che pesi tra 0,5 e 2,5 kg entro gittata, che non sia indossato né trasportato. L'oggetto schizza in linea retta fino a 27 metri in una direzione che scegli prima di arrestarsi. Se l'oggetto colpisce una creatura solida, l'oggetto smette di muoversi e la creatura deve effettuare un tiro salvezza su Destrezza. Se fallisce, l'oggetto colpisce il bersaglio infliggendo 3d8 danni contundenti. Se ha successo, l'oggetto manca il bersaglio. Se lanciato a livello 2° o superiore, peso massimo aumenta di 2,5 kg e i danni di 1d8 per ogni livello di slot sopra il 1°.",
+    "description_en": "Choose one object weighing 1 to 5 pounds within range that isn't being worn or carried. The object flies in a straight line up to 90 feet in a direction you choose before falling to the ground, stopping early if it impacts against a solid surface. If the object would strike a creature, that creature must make a Dexterity saving throw. On a failed save, the object strikes the target and stops moving. When the object strikes something, the object and what it strikes each take 3d8 bludgeoning damage. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the maximum weight of objects that you can target with this spell increases by 5 pounds, and the damage increases by 1d8, for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Provocare Paura": {
+    "name": "Provocare Paura",
+    "name_en": "Cause Fear",
+    "level": 1,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Sussurri di morte raggiungono una creatura a tua scelta entro gittata che puoi vedere. Se non è un costrutto né un non morto, deve riuscire in un tiro salvezza su Saggezza o essere spaventata da te fino al termine dell'incantesimo. Può ripetere il tiro salvezza alla fine di ogni suo turno; in caso di successo, l'incantesimo termina su di essa. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra.",
+    "description_en": "You awaken the sense of mortality in one creature you can see within range. A construct or an undead is immune to this effect. The target must succeed on a Wisdom saving throw or become frightened of you until the spell ends. The frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them.",
+    "classes": [
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Dardo del Caos": {
+    "name": "Dardo del Caos",
+    "name_en": "Chaos Bolt",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Lanci una freccia rotolante e fluttuante di energia magica verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo, tira 2d8 e un d8: il bersaglio subisce 2d8 danni di un tipo determinato dal d8 (1 acido, 2 freddo, 3 fuoco, 4 forza, 5 fulmine, 6 veleno, 7 psichici, 8 tuono). Se i 2d8 mostrano lo stesso risultato, l'energia caotica scocca dal bersaglio verso una creatura diversa entro 9 metri. Effettua un nuovo attacco contro la nuova creatura usando lo stesso tiro per colpire e ripeti la procedura. Una creatura può essere bersagliata solo una volta. Se lanciato a livello 2° o superiore, ogni bersaglio subisce 1d6 danni in più per ogni livello sopra il 1°.",
+    "description_en": "You hurl an undulating, warbling mass of chaotic energy at one creature in range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 + 1d6 damage. Choose one of the d8s. The number rolled on that die determines the attack's damage type, as shown below. d8 Damage Type 1 Acid 2 Cold 3 Fire 4 Force 5 Lightning 6 Poison 7 Psychic 8 Thunder If you roll the same number on both d8s, the chaotic energy leaps from the target to a different creature of your choice within 30 feet of it. Make a new attack roll against the new target, and make a new damage roll, which could cause the chaotic energy to leap again. A creature can be targeted only once by each casting of this spell. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, each target takes 1d6 extra damage of the type rolled for each slot level above 1st.",
+    "classes": [
+      "Stregone"
+    ],
+    "classes_en": [
+      "Sorcerer"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Charme su Persona": {
+    "name": "Charme su Persona",
+    "name_en": "Charm Person",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Tenti di ammaliare un umanoide che puoi vedere entro gittata. Deve effettuare un tiro salvezza su Saggezza, con vantaggio se tu o i tuoi compagni state combattendo contro di lui. Se fallisce, è ammaliato da te finché l'incantesimo non termina o tu o i tuoi compagni gli arrecate danno. Una volta terminato l'incantesimo, la creatura sa di essere stata ammaliata. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra.",
+    "description_en": "You attempt to charm a humanoid you can see within range. It must make a Wisdom saving throw, and does so with advantage if you or your companions are fighting it. If it fails the saving throw, it is charmed by you until the spell ends or until you or your companions do anything harmful to it. The charmed creature regards you as a friendly acquaintance. When the spell ends, the creature knows it was charmed by you. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Sfera Cromatica": {
+    "name": "Sfera Cromatica",
+    "name_en": "Chromatic Orb",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "27 metri",
+    "range_en": "90 feet",
+    "components": "V, S, M (a diamante del valore di almeno 50 mo)",
+    "components_en": "V, S, M (a diamond worth at least 50 gp)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Lanci una sfera di energia di 10 cm di diametro verso una creatura entro gittata. Scegli acido, freddo, fuoco, fulmine, veleno o tuono per il tipo di sfera, poi effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 3d8 danni del tipo scelto. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°.",
+    "description_en": "You hurl a 4-inch-diameter sphere of energy at a creature that you can see within range. You choose acid, cold, fire, lightning, poison, or thunder for the type of orb you create, and then make a ranged spell attack against the target. If the attack hits, the creature takes 3d8 damage of the type you chose. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Spruzzo Colorato": {
+    "name": "Spruzzo Colorato",
+    "name_en": "Color Spray",
+    "level": 1,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (cono di 4,5 metri)",
+    "range_en": "Self (15-foot cone)",
+    "components": "V, S, M (un pizzico di powder o sand that is colored red, yellow, e blue)",
+    "components_en": "V, S, M (a pinch of powder or sand that is colored red, yellow, and blue)",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Una palette abbagliante di luci colorate sgorga dalla tua mano. Tira 6d10: il totale è il numero di punti ferita di creature che questo incantesimo può accecare. Le creature in un cono di 4,5 metri davanti a te sono interessate in ordine crescente di punti ferita attuali (esclusi inconsce). Partendo dalla creatura con meno punti ferita, le creature interessate sono accecate fino al termine del tuo prossimo turno. Sottrai i punti ferita di ogni creatura dal totale prima di passare a quella successiva. I punti ferita di una creatura devono essere uguali o inferiori al totale rimanente per essere interessati. Se lanciato a livello 2° o superiore, tira 2d10 in più per ogni livello sopra il 1°.",
+    "description_en": "A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can affect. Creatures in a 15-foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can't see). Starting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the end of your next turn. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d10 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Bard [TCoE]",
+    "translated": true
+  },
+  "Ordine": {
+    "name": "Ordine",
+    "name_en": "Command",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Pronunci una parola di comando a una creatura che puoi vedere entro gittata. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o seguire l'ordine al suo prossimo turno. L'incantesimo non ha effetto se il bersaglio è non morto, se non comprende la tua lingua o se l'ordine è direttamente dannoso. Comandi tipici: Avvicinati, Lascia, Fuggi, Stenditi, Fermo. Comandi diversi sono possibili ma a discrezione del DM. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°. Le creature devono trovarsi entro 9 metri l'una dall'altra.",
+    "description_en": "You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom saving throw or follow the command on its next turn. The spell has no effect if the target is undead, if it doesn't understand your language, or if your command is directly harmful to it. Some typical commands and their effects follow. You might issue a command other than one described here. If you do so, the DM determines how the target behaves. If the target is prevented from following your command, the spell ends. Approach. The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you. Drop. The target drops whatever it is holding and then ends its turn. Flee. The target spends its turn moving away from you by the fastest available means. Grovel. The target falls prone and then ends its turn. Halt. The target stays where it is and takes no actions. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can affect one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them.",
+    "classes": [
+      "Chierico",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin"
+    ],
+    "source": "Bard [TCoE]",
+    "translated": true
+  },
+  "Duello Forzato": {
+    "name": "Duello Forzato",
+    "name_en": "Compelled Duel",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Tenti di costringere una creatura a duellare con te. Una creatura che puoi vedere entro gittata deve effettuare un tiro salvezza su Saggezza. Se fallisce è attratta da un'aura divina, ottiene svantaggio ai tiri per colpire contro creature diverse da te, e deve effettuare un tiro salvezza su Saggezza ogni volta che tenta di muoversi in uno spazio a più di 9 metri da te (in caso di successo, l'incantesimo non la limita). L'incantesimo termina se attacchi un'altra creatura, lanci un incantesimo che bersagli una creatura ostile diversa da quella, una creatura amica danneggia il bersaglio, o se finisci il tuo turno a più di 9 metri dal bersaglio.",
+    "description_en": "You attempt to compel a creature into a duel. One creature that you can see within range must make a Wisdom saving throw. On a failed save, the creature is drawn to you, compelled by your divine demand. For the duration, it has disadvantage on attack rolls against creatures other than you, and must make a Wisdom saving throw each time it attempts to move to a space that is more than 30 feet away from you; if it succeeds on this saving throw, this spell doesn't restrict the target's movement for that turn. The spell ends if you attack any other creature, if you cast a spell that targets a hostile creature other than the target, if a creature friendly to you damages the target or casts a harmful spell on it, or if you end your turn more than 30 feet away from the target.",
+    "classes": [
+      "Paladino"
+    ],
+    "classes_en": [
+      "Paladin"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Creare o Distruggere Acqua": {
+    "name": "Creare o Distruggere Acqua",
+    "name_en": "Create or Destroy Water",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (una goccia di water if creating water o a few grains of sand if destroying it)",
+    "components_en": "V, S, M (a drop of water if creating water or a few grains of sand if destroying it)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei o distruggi acqua. Crei: scegli un'opzione: fino a 40 litri di pioggia che cade in un cilindro di 9 metri di altezza e 9 metri di raggio entro gittata, o 40 litri di acqua pulita in un contenitore aperto entro gittata. Distruggi: distruggi fino a 40 litri di acqua in un cubo di 9 metri di lato, o disperdi nebbia in un cubo di 9 metri di lato. Se lanciato a livello 2° o superiore, crei o distruggi 40 litri in più per ogni livello di slot sopra il 1°.",
+    "description_en": "You either create or destroy water. Create Water. You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot cube within range, extinguishing exposed flames in the area. Destroy Water. You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot cube within range. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you create or destroy 10 additional gallons of water, or the size of the cube increases by 5 feet, for each slot level above 1st.",
+    "classes": [
+      "Chierico",
+      "Druido"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Cura Ferite": {
+    "name": "Cura Ferite",
+    "name_en": "Cure Wounds",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Una creatura toccata recupera punti ferita pari a 1d8 + il tuo modificatore di caratteristica da incantatore. L'incantesimo non ha effetto su non morti o costrutti. Se lanciato a livello 2° o superiore, la cura aumenta di 1d8 per ogni livello di slot sopra il 1°.",
+    "description_en": "A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido",
+      "Paladino",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Paladin",
+      "Ranger"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Individuazione del Bene e del Male": {
+    "name": "Individuazione del Bene e del Male",
+    "name_en": "Detect Evil and Good",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Per la durata percepisci la presenza, entro 9 metri da te, di celestiali, elementali, fatati, immondi o non morti. Percepisci anche se un luogo o un oggetto entro 9 metri è stato consacrato o profanato. L'incantesimo può essere bloccato dalla maggior parte delle barriere: 30 cm di pietra, 2,5 cm di metallo comune, una sottile lamina di piombo o 90 cm di legno o terra.",
+    "description_en": "For the duration, you know if there is an aberration, celestial, elemental, fey, fiend, or undead within 30 feet of you, as well as where the creature is located. Similarly, you know if there is a place or object within 30 feet of you that has been magically consecrated or desecrated. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
+    "classes": [
+      "Chierico",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Camuffarsi": {
+    "name": "Camuffarsi",
+    "name_en": "Disguise Self",
+    "level": 1,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Fai apparire te stesso (inclusi vestiti, armatura, armi e oggetti) diverso fino al termine dell'incantesimo o finché non lo dissolvi come azione. Puoi sembrare 30 cm più alto o più basso e magro, grasso o intermedio. Non puoi cambiare la tua forma corporea generale. La differenza è solo visiva: chi tocca rivela la natura illusoria. Per riconoscere l'illusione una creatura può effettuare un'azione per esaminarti, riuscendo a una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo.",
+    "description_en": "You make yourself—including your clothing, armor, weapons, and other belongings on your person—look different until the spell ends or until you use your action to dismiss it. You can seem 1 foot shorter or taller and can appear thin, fat, or in between. You can't change your body type, so you must adopt a form that has the same basic arrangement of limbs. Otherwise, the extent of the illusion is up to you. The changes wrought by this spell fail to hold up to physical inspection. For example, if you use this spell to add a hat to your outfit, objects pass through the hat, and anyone who touches it would feel nothing or would feel your head and hair. If you use this spell to appear thinner than you are, the hand of someone who reaches out to touch you would bump into you while it was seemingly still in midair. To discern that you are disguised, a creature can use its action to inspect your appearance and must succeed on an Intelligence (Investigation) check against your spell save DC.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Sussurri Dissonanti": {
+    "name": "Sussurri Dissonanti",
+    "name_en": "Dissonant Whispers",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Sussurri una melodia discordante che solo una creatura a tua scelta entro gittata può sentire, lacerando la sua mente con un dolore atroce. Il bersaglio deve effettuare un tiro salvezza su Saggezza. In caso di fallimento subisce 3d6 danni psichici e deve immediatamente usare la sua reazione, se possibile, per muoversi fino alla velocità più lontano possibile da te. La creatura non si muove in spazi pericolosi. In caso di successo subisce metà danni e non si muove. Una creatura sorda riesce automaticamente al tiro salvezza. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "You whisper a discordant melody that only one creature of your choice within range can hear, wracking it with terrible pain. The target must make a Wisdom saving throw. On a failed save, it takes 3d6 psychic damage and must immediately use its reaction, if available, to move as far as its speed allows away from you. The creature doesn't move into obviously dangerous ground, such as a fire or a pit. On a successful save, the target takes half as much damage and doesn't have to move away. A deafened creature automatically succeeds on the save. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Bardo"
+    ],
+    "classes_en": [
+      "Bard"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Favore Divino": {
+    "name": "Favore Divino",
+    "name_en": "Divine Favor",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La tua preghiera ti infonde di potere divino. Finché l'incantesimo non termina, gli attacchi con arma infliggono 1d4 danni radiosi extra in caso di colpo.",
+    "description_en": "Your prayer empowers you with divine radiance. Until the spell ends, your weapon attacks deal an extra 1d4 radiant damage on a hit.",
+    "classes": [
+      "Paladino"
+    ],
+    "classes_en": [
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Tremito di Terra": {
+    "name": "Tremito di Terra",
+    "name_en": "Earth Tremor",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Causi un tremore del terreno entro gittata. Ogni creatura diversa da te entro 3 metri da te deve effettuare un tiro salvezza su Destrezza. In caso di fallimento subisce 1d6 danni contundenti e cade prona. Se il terreno è terra o pietra sciolta, diventa terreno difficile fino a quando non viene ripulito (a velocità di andatura ridotta da una creatura). Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "You cause a tremor in the ground within range. Each creature other than you in that area must make a Dexterity saving throw. On a failed save, a creature takes 1d6 bludgeoning damage and is knocked prone. If the ground in that area is loose earth or stone, it becomes difficult terrain until cleared, with each 5-foot-diameter portion requiring at least 1 minute to clear by hand. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Colpo Intrappolante": {
+    "name": "Colpo Intrappolante",
+    "name_en": "Ensnaring Strike",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma prima del termine dell'incantesimo, una massa di viti spinose appare nel punto del colpo e il bersaglio deve riuscire in un tiro salvezza su Forza o essere intrappolato dalle viti magiche fino al termine dell'incantesimo. Le creature di taglia Enorme o superiore hanno vantaggio al tiro salvezza. Mentre è intrappolato il bersaglio subisce 1d6 danni perforanti all'inizio di ogni suo turno. Una creatura può effettuare una prova di Forza nel suo turno per liberarsi. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "The next time you hit a creature with a weapon attack before this spell ends, a writhing mass of thorny vines appears at the point of impact, and the target must succeed on a Strength saving throw or be restrained by the magical vines until the spell ends. A Large or larger creature has advantage on this saving throw. If the target succeeds on the save, the vines shrivel away. While restrained by this spell, the target takes 1d6 piercing damage at the start of each of its turns. A creature restrained by the vines or one that can touch the creature can use its action to make a Strength check against your spell save DC. On a success, the target is freed. At Higher Levels. If you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Ranger"
+    ],
+    "classes_en": [
+      "Ranger"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Intralciare": {
+    "name": "Intralciare",
+    "name_en": "Entangle",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "27 metri",
+    "range_en": "90 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Erbe contorte e intrecciate erompono in un quadrato di 6 metri di lato a partire da un punto entro gittata. Per la durata, le piante trasformano l'area in terreno difficile. Una creatura nell'area al momento del lancio deve riuscire in un tiro salvezza su Forza o essere intrappolata dalle piante. Una creatura intrappolata può usare la sua azione per fare una prova di Forza contro la CD del tuo incantesimo. Al termine dell'incantesimo le piante svaniscono.",
+    "description_en": "Grasping weeds and vines sprout from the ground in a 20-foot square starting from a point within range. For the duration, these plants turn the ground in the area into difficult terrain. A creature in the area when you cast the spell must succeed on a Strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself. When the spell ends, the conjured plants wilt away.",
+    "classes": [
+      "Druido"
+    ],
+    "classes_en": [
+      "Druid"
+    ],
+    "source": "Ranger [TCoE]",
+    "translated": true
+  },
+  "Ritirata Veloce": {
+    "name": "Ritirata Veloce",
+    "name_en": "Expeditious Retreat",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Questo incantesimo ti permette di muoverti a velocità incredibile. Quando lo lanci, e come azione bonus in ogni turno successivo finché dura, puoi compiere un'azione di Scatto.",
+    "description_en": "This spell allows you to move at an incredible pace. When you cast this spell, and then as a bonus action on each of your turns until the spell ends, you can take the Dash action.",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Fuoco Fatato": {
+    "name": "Fuoco Fatato",
+    "name_en": "Faerie Fire",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Ogni oggetto in un cubo di 6 metri di lato entro gittata viene delineato da una luce blu, verde o viola (a tua scelta). Anche le creature nell'area sono delineate, se non riescono in un tiro salvezza su Destrezza. Per la durata gli oggetti e le creature interessate emettono luce fioca in un raggio di 3 metri. Tutti i tiri per colpire contro una creatura o un oggetto interessati hanno vantaggio se l'attaccante può vederli, e quelli interessati non possono beneficiare dell'invisibilità.",
+    "description_en": "Each object in a 20-foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10-foot radius. Any attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible.",
+    "classes": [
+      "Bardo",
+      "Druido"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Falsa Vita": {
+    "name": "Falsa Vita",
+    "name_en": "False Life",
+    "level": 1,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (a small amount of alcohol o distilled spirits)",
+    "components_en": "V, S, M (a small amount of alcohol or distilled spirits)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Rinforzando te stesso con una somiglianza necromantica della vita, ottieni 1d4+4 punti ferita temporanei per la durata. Se lanciato a livello 2° o superiore, ottieni 5 punti ferita temporanei in più per ogni livello di slot sopra il 1°.",
+    "description_en": "Bolstering yourself with a necromantic facsimile of life, you gain 1d4 + 4 temporary hit points for the duration. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you gain 5 additional temporary hit points for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Caduta Morbida": {
+    "name": "Caduta Morbida",
+    "name_en": "Feather Fall",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 reazione, che si compie quando you or a creature within 60 feet of you falls",
+    "casting_time_en": "1 reaction, which you take when you or a creature within 60 feet of you falls",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, M (a piccola piuma o piece of down)",
+    "components_en": "V, M (a small feather or piece of down)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Scegli fino a cinque creature in caduta entro gittata. La velocità di caduta di ciascun bersaglio si riduce a 18 metri al secondo fino al termine dell'incantesimo. Se un bersaglio atterra prima della fine dell'incantesimo, non subisce danni da caduta e può atterrare in piedi, e l'incantesimo termina per quel bersaglio.",
+    "description_en": "Choose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends. If the creature lands before the spell ends, it takes no falling damage and can land on its feet, and the spell ends for that creature.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Nube di Nebbia": {
+    "name": "Nube di Nebbia",
+    "name_en": "Fog Cloud",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Crei una sfera di nebbia con un raggio di 6 metri centrata su un punto entro gittata. La sfera si espande attorno agli angoli, e l'area è pesantemente oscurata. Dura per la durata o finché un vento moderato (16 km/h almeno) la disperde. Se lanciato a livello 2° o superiore, il raggio aumenta di 6 metri per ogni livello di slot sopra il 1°.",
+    "description_en": "You create a 20-foot-radius sphere of fog centered on a point within range. The sphere spreads around corners, and its area is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the radius of the fog increases by 20 feet for each slot level above 1st.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Bacche Magiche": {
+    "name": "Bacche Magiche",
+    "name_en": "Goodberry",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un rametto di vischio)",
+    "components_en": "V, S, M (a sprig of mistletoe)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Fino a dieci bacche compaiono nella tua mano e sono infuse di magia per la durata. Una creatura può usare la sua azione per mangiare una bacca, ripristinando 1 punto ferita; la bacca fornisce nutrimento sufficiente per un giorno. Le bacche perdono il loro potere se non vengono consumate entro 24 ore dal lancio.",
+    "description_en": "Up to ten berries appear in your hand and are infused with magic for the duration. A creature can use its action to eat one berry. Eating a berry restores 1 hit point, and the berry provides enough nourishment to sustain a creature for one day. The berries lose their potency if they have not been consumed within 24 hours of the casting of this spell.",
+    "classes": [
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Grasso": {
+    "name": "Grasso",
+    "name_en": "Grease",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (un pizzico di pork rind o butter)",
+    "components_en": "V, S, M (a bit of pork rind or butter)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Grasso viscoso ricopre il terreno in un quadrato di 3 metri di lato centrato su un punto entro gittata e diventa terreno difficile per la durata. Quando il grasso compare, ogni creatura che si trova nell'area deve riuscire in un tiro salvezza su Destrezza o cadere prona. Una creatura che entra nell'area o termina lì il proprio turno deve riuscire in un tiro salvezza su Destrezza o cadere prona.",
+    "description_en": "Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration. When the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "source": "Sorcerer [TCoE]",
+    "translated": true
+  },
+  "Dardo Guida": {
+    "name": "Dardo Guida",
+    "name_en": "Guiding Bolt",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Un fulmine di luce sfreccia verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 4d6 danni radiosi e il prossimo attacco effettuato contro di esso prima della fine del tuo prossimo turno ha vantaggio, grazie alla luce mistica che lo segna fino ad allora. Se lanciato a livello 2° o superiore, i danni aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "A flash of light streaks toward a creature of your choice within range. Make a ranged spell attack against the target. On a hit, the target takes 4d6 radiant damage, and the next attack roll made against this target before the end of your next turn has advantage, thanks to the mystical dim light glittering on the target until then. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Pioggia di Spine": {
+    "name": "Pioggia di Spine",
+    "name_en": "Hail of Thorns",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma a distanza prima del termine dell'incantesimo, l'incantesimo crea una pioggia di spine che esplode dal bersaglio. Oltre agli effetti normali dell'attacco, il bersaglio e ogni creatura entro 1,5 metri da esso devono effettuare un tiro salvezza su Destrezza. Una creatura subisce 1d10 danni perforanti se fallisce, o metà se ha successo. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1° (massimo 6d10).",
+    "description_en": "The next time you hit a creature with a ranged weapon attack before the spell ends, this spell creates a rain of thorns that sprouts from your ranged weapon or ammunition. In addition to the normal effect of the attack, the target of the attack and each creature within 5 feet of it must make a Dexterity saving throw. A creature takes 1d10 piercing damage on a failed save, or half as much damage on a successful one. At Higher Levels. If you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d10 for each slot level above 1st (to a maximum of 6d10).",
+    "classes": [
+      "Ranger"
+    ],
+    "classes_en": [
+      "Ranger"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Parola Guaritrice": {
+    "name": "Parola Guaritrice",
+    "name_en": "Healing Word",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Una creatura a tua scelta che puoi vedere entro gittata recupera punti ferita pari a 1d4 + il tuo modificatore di caratteristica da incantatore. L'incantesimo non ha effetto su non morti o costrutti. Se lanciato a livello 2° o superiore, la cura aumenta di 1d4 per ogni livello di slot sopra il 1°.",
+    "description_en": "A creature of your choice that you can see within range regains hit points equal to 1d4 + your spellcasting ability modifier. This spell has no effect on undead or constructs. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d4 for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Rimprovero Infernale": {
+    "name": "Rimprovero Infernale",
+    "name_en": "Hellish Rebuke",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 reazione, which you take in response to being damaged by a creature within 60 feet of you that you can see",
+    "casting_time_en": "1 reaction, which you take in response to being damaged by a creature within 60 feet of you that you can see",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Punti il dito e la creatura che ti ha danneggiato è momentaneamente avvolta da fiamme infernali. La creatura deve effettuare un tiro salvezza su Destrezza. Subisce 2d10 danni da fuoco se fallisce, o metà se ha successo. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1°.",
+    "description_en": "You point your finger, and the creature that damaged you is momentarily surrounded by hellish flames. The creature must make a Dexterity saving throw. It takes 2d10 fire damage on a failed save, or half as much damage on a successful one. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d10 for each slot level above 1st.",
+    "classes": [
+      "Warlock"
+    ],
+    "classes_en": [
+      "Warlock"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Eroismo": {
+    "name": "Eroismo",
+    "name_en": "Heroism",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Una creatura consenziente toccata viene infusa di coraggio. Finché dura l'incantesimo, la creatura è immune all'essere spaventata e ottiene punti ferita temporanei pari al tuo modificatore di caratteristica da incantatore all'inizio di ognuno dei suoi turni. Quando l'incantesimo termina, il bersaglio perde tutti i punti ferita temporanei rimanenti. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°.",
+    "description_en": "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to being frightened and gains temporary hit points equal to your spellcasting ability modifier at the start of each of its turns. When the spell ends, the target loses any remaining temporary hit points from this spell. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Bard",
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Maledire": {
+    "name": "Maledire",
+    "name_en": "Hex",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "27 metri",
+    "range_en": "90 feet",
+    "components": "V, S, M (l'occhio pietrificato di un tritone)",
+    "components_en": "V, S, M (the petrified eye of a newt)",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Imponi una maledizione a una creatura che puoi vedere entro gittata. Finché dura l'incantesimo, infliggi 1d6 danni necrotici extra al bersaglio ogni volta che lo colpisci con un attacco. Inoltre, scegli una caratteristica al momento del lancio: il bersaglio ha svantaggio alle prove di caratteristica effettuate con essa. Se il bersaglio scende a 0 punti ferita prima del termine dell'incantesimo, puoi usare un'azione bonus in un tuo turno successivo per maledire una nuova creatura. Una remove curse lanciato sul bersaglio termina l'incantesimo. Se lanciato a livello 3° o 4°, dura fino a 8 ore. A livello 5° o superiore, dura fino a 24 ore.",
+    "description_en": "You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 necrotic damage to the target whenever you hit it with an attack. Also, choose one ability when you cast the spell. The target has disadvantage on ability checks made with the chosen ability. If the target drops to 0 hit points before this spell ends, you can use a bonus action on a subsequent turn of yours to curse a new creature. A remove curse cast on the target ends this spell early. At Higher Levels. When you cast this spell using a spell slot of 3rd or 4th level, you can maintain your concentration on the spell for up to 8 hours. When you use a spell slot of 5th level or higher, you can maintain your concentration on the spell for up to 24 hours.",
+    "classes": [
+      "Warlock"
+    ],
+    "classes_en": [
+      "Warlock"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Marchio del Cacciatore": {
+    "name": "Marchio del Cacciatore",
+    "name_en": "Hunter's Mark",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "27 metri",
+    "range_en": "90 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Scegli una creatura entro gittata e marchiala mistica come tua preda. Finché dura l'incantesimo, infliggi 1d6 danni extra al bersaglio ogni volta che lo colpisci con un attacco con arma, e hai vantaggio alle prove di Saggezza (Percezione) o Saggezza (Sopravvivenza) effettuate per trovarlo. Se il bersaglio scende a 0 punti ferita prima del termine dell'incantesimo, puoi usare un'azione bonus in un tuo turno successivo per marchiare una nuova creatura. Se lanciato a livello 3° o 4°, dura fino a 8 ore. A livello 5° o superiore, dura fino a 24 ore.",
+    "description_en": "You choose a creature you can see within range and mystically mark it as your quarry. Until the spell ends, you deal an extra 1d6 damage to the target whenever you hit it with a weapon attack, and you have advantage on any Wisdom (Perception) or Wisdom (Survival) check you make to find it. If the target drops to 0 hit points before this spell ends, you can use a bonus action on a subsequent turn of yours to mark a new creature. At Higher Levels. When you cast this spell using a spell slot of 3rd or 4th level, you can maintain your concentration on the spell for up to 8 hours. When you use a spell slot of 5th level or higher, you can maintain your concentration on the spell for up to 24 hours.",
+    "classes": [
+      "Ranger"
+    ],
+    "classes_en": [
+      "Ranger"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Lama di Ghiaccio": {
+    "name": "Lama di Ghiaccio",
+    "name_en": "Ice Knife",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "S, M (una goccia di water o un pezzo di ice)",
+    "components_en": "S, M (a drop of water or a piece of ice)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei un pugnale di ghiaccio e lo scagli verso una creatura a tua scelta entro gittata. Effettua un attacco con incantesimo a distanza contro il bersaglio. In caso di colpo subisce 1d10 danni perforanti. Sia che colpisca o meno, il pugnale esplode poi. Il bersaglio e ogni creatura entro 1,5 metri da esso devono riuscire in un tiro salvezza su Destrezza o subire 2d6 danni da freddo. Se lanciato a livello 2° o superiore, i danni di entrambi gli effetti aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "You create a shard of ice and fling it at one creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 piercing damage. Hit or miss, the shard then explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving throw or take 2d6 cold damage. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the cold damage increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Infliggere Ferite": {
+    "name": "Infliggere Ferite",
+    "name_en": "Inflict Wounds",
+    "level": 1,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Effettua un attacco con incantesimo in mischia contro una creatura che puoi raggiungere. In caso di colpo il bersaglio subisce 3d10 danni necrotici. Se lanciato a livello 2° o superiore, i danni aumentano di 1d10 per ogni livello di slot sopra il 1°.",
+    "description_en": "Make a melee spell attack against a creature you can reach. On a hit, the target takes 3d10 necrotic damage. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d10 for each slot level above 1st.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Saltare": {
+    "name": "Saltare",
+    "name_en": "Jump",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (a grasshopper's hind leg)",
+    "components_en": "V, S, M (a grasshopper's hind leg)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Tocchi una creatura. La sua distanza di salto viene triplicata fino al termine dell'incantesimo.",
+    "description_en": "You touch a creature. The creature's jump distance is tripled until the spell ends.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Falcata": {
+    "name": "Falcata",
+    "name_en": "Longstrider",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un pizzico di dirt)",
+    "components_en": "V, S, M (a pinch of dirt)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Tocchi una creatura. La sua velocità aumenta di 3 metri fino al termine dell'incantesimo. Se lanciato a livello 2° o superiore, puoi prendere di mira una creatura in più per ogni livello di slot sopra il 1°.",
+    "description_en": "You touch a creature. The target's speed increases by 10 feet until the spell ends. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Ranger",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Ranger",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Armatura del Mago": {
+    "name": "Armatura del Mago",
+    "name_en": "Mage Armor",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un pezzo di cured cuoio)",
+    "components_en": "V, S, M (a piece of cured leather)",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Tocchi una creatura consenziente che non indossa un'armatura, e una forza protettiva e magica la circonda fino al termine dell'incantesimo. La CA di base del bersaglio diventa 13 + il suo modificatore di Destrezza. L'incantesimo termina se il bersaglio indossa un'armatura o se lo dissolvi come azione.",
+    "description_en": "You touch a willing creature who isn't wearing armor, and a protective magical force surrounds it until the spell ends. The target's base AC becomes 13 + its Dexterity modifier. The spell ends if the target dons armor or if you dismiss the spell as an action.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Dardo Incantato": {
+    "name": "Dardo Incantato",
+    "name_en": "Magic Missile",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Crei tre dardi luccicanti di forza magica. Ogni dardo colpisce una creatura a tua scelta che puoi vedere entro gittata. Un dardo infligge 1d4+1 danni da forza al suo bersaglio. I dardi colpiscono tutti contemporaneamente, e puoi dirigerli contro un'unica creatura o creature diverse. Se lanciato a livello 2° o superiore, l'incantesimo crea un dardo in più per ogni livello di slot sopra il 1°.",
+    "description_en": "You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the spell creates one more dart for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Protezione dal Bene e dal Male": {
+    "name": "Protezione dal Bene e dal Male",
+    "name_en": "Protection from Evil and Good",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (holy water o powdered argento e ferro, which l'incantesimo consuma)",
+    "components_en": "V, S, M (holy water or powdered silver and iron, which the spell consumes)",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Finché l'incantesimo non termina, una creatura consenziente toccata è protetta da certi tipi di creature: aberrazioni, celestiali, elementali, fatati, immondi e non morti. La protezione conferisce: nessuna delle creature elencate può attaccare il bersaglio o ammaliarlo, spaventarlo o possederlo. Le creature elencate hanno svantaggio ai tiri per colpire contro il bersaglio, e il bersaglio è immune all'essere ammaliato, spaventato o posseduto da loro. Se il bersaglio è già stato ammaliato, spaventato o posseduto, ottiene vantaggio a qualsiasi nuovo tiro salvezza contro l'effetto pertinente.",
+    "description_en": "Until the spell ends, one willing creature you touch is protected against certain types of creatures: aberrations, celestials, elementals, fey, fiends, and undead. The protection grants several benefits. Creatures of those types have disadvantage on attack rolls against the target. The target also can't be charmed, frightened, or possessed by them. If the target is already charmed, frightened, or possessed by such a creature, the target has advantage on any new saving throw against the relevant effect.",
+    "classes": [
+      "Chierico",
+      "Paladino",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Druid [TCoE]",
+    "translated": true
+  },
+  "Raggio della Malattia": {
+    "name": "Raggio della Malattia",
+    "name_en": "Ray of Sickness",
+    "level": 1,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un raggio di energia nauseante e verdastra sfreccia verso una creatura entro gittata. Effettua un attacco con incantesimo a distanza. In caso di colpo il bersaglio subisce 2d8 danni da veleno e deve riuscire in un tiro salvezza su Costituzione o essere avvelenato fino alla fine del tuo prossimo turno. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°.",
+    "description_en": "A ray of sickening greenish energy lashes out toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 2d8 poison damage and must make a Constitution saving throw. On a failed save, it is also poisoned until the end of your next turn. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Santuario": {
+    "name": "Santuario",
+    "name_en": "Sanctuary",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (a small argento mirror)",
+    "components_en": "V, S, M (a small silver mirror)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Proteggi una creatura entro gittata dagli attacchi. Finché l'incantesimo non termina, ogni creatura che bersaglia la creatura protetta con un attacco o un incantesimo dannoso deve prima effettuare un tiro salvezza su Saggezza. In caso di fallimento deve scegliere un nuovo bersaglio o perdere l'attacco/incantesimo. L'incantesimo non protegge dagli effetti ad area. Se la creatura protetta effettua un attacco, lancia un incantesimo che bersaglia una creatura ostile o infligge danni a un'altra creatura, l'incantesimo termina.",
+    "description_en": "You ward a creature within range against attack. Until the spell ends, any creature who targets the warded creature with an attack or a harmful spell must first make a Wisdom saving throw. On a failed save, the creature must choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from area effects, such as the explosion of a fireball. If the warded creature makes an attack, casts a spell that affects an enemy creature, or deal dommage to another creature, this spell ends.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Castigo Cocente": {
+    "name": "Castigo Cocente",
+    "name_en": "Searing Smite",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La prossima volta che colpisci una creatura con un attacco con arma in mischia prima del termine dell'incantesimo, l'arma rifulge di luce ardente, e l'attacco infligge 1d6 danni da fuoco extra al bersaglio e lo incendia. All'inizio di ogni suo turno fino al termine dell'incantesimo, il bersaglio deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni da fuoco. In caso di successo l'incantesimo termina. Se il bersaglio o una creatura entro 1,5 metri usano un'azione per spegnere le fiamme, l'incantesimo termina. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d6 per ogni livello di slot sopra il 1°.",
+    "description_en": "The next time you hit a creature with a melee weapon attack during the spell's duration, your weapon flares with white-hot intensity, and the attack deals an extra 1d6 fire damage to the target and causes the target to ignite in flames. At the start of each of its turns until the spell ends, the target must make a Constitution saving throw. On a failed save, it takes 1d6 fire damage. On a successful save, the spell ends. If the target or a creature within 5 feet of it uses an action to put out the flames, or if some other effect douses the flames (such as the target being submerged in water), the spell ends. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the initial extra damage dealt by the attack increases by 1d6 for each slot level above 1st.",
+    "classes": [
+      "Paladino"
+    ],
+    "classes_en": [
+      "Paladin"
+    ],
+    "source": "Ranger [TCoE]",
+    "translated": true
+  },
+  "Scudo": {
+    "name": "Scudo",
+    "name_en": "Shield",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 reazione, che si compie quando you are hit by an attack or targeted by the magic missile spell",
+    "casting_time_en": "1 reaction, which you take when you are hit by an attack or targeted by the magic missile spell",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 round",
+    "duration_en": "1 round",
+    "description": "Una barriera invisibile di forza magica appare e ti protegge. Fino all'inizio del tuo prossimo turno hai un bonus +5 alla CA, anche contro l'attacco innescante, e non subisci danni dal magic missile.",
+    "description_en": "An invisible barrier of magical force appears and protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from magic missile.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Scudo della Fede": {
+    "name": "Scudo della Fede",
+    "name_en": "Shield of Faith",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (a small parchment with un pizzico di holy text written on it)",
+    "components_en": "V, S, M (a small parchment with a bit of holy text written on it)",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Un campo scintillante appare e circonda una creatura a tua scelta entro gittata, conferendole un bonus +2 alla CA per la durata.",
+    "description_en": "A shimmering field appears and surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
+    "classes": [
+      "Chierico",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Immagine Silente": {
+    "name": "Immagine Silente",
+    "name_en": "Silent Image",
+    "level": 1,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (un pizzico di fleece)",
+    "components_en": "V, S, M (a bit of fleece)",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Crei l'immagine di un oggetto, di una creatura o di un altro fenomeno visibile non più grande di un cubo di 4,5 metri di lato. L'immagine appare in un punto entro gittata e dura per la durata. È puramente visiva (niente suoni, odori o altri effetti sensoriali). Puoi usare la tua azione per spostare l'immagine in un altro punto entro gittata. Mentre si sposta puoi alterarne l'aspetto. Per riconoscere l'illusione, una creatura può usare la sua azione per esaminarla, riuscendo a una prova di Intelligenza (Indagare) contro la CD del tuo incantesimo. Se la riconosce, l'illusione diventa svanita per quella creatura.",
+    "description_en": "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking. Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Sonno": {
+    "name": "Sonno",
+    "name_en": "Sleep",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "27 metri",
+    "range_en": "90 feet",
+    "components": "V, S, M (un pizzico di sabbia fine, petali di rosa, o un grillo)",
+    "components_en": "V, S, M (a pinch of fine sand, rose petals, or a cricket)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Questo incantesimo addormenta le creature. Tira 5d8: il totale è il numero di punti ferita di creature che questo incantesimo può colpire. Le creature entro 6 metri da un punto a tua scelta entro gittata sono interessate in ordine crescente di punti ferita attuali (esclusi inconsce). Partendo dalla creatura con meno punti ferita, ognuna interessata cade priva di sensi finché l'incantesimo non termina, il dormiente subisce danno o qualcuno usa un'azione per scuoterla o schiaffeggiarla. Sottrai i punti ferita di ogni creatura dal totale prima di passare a quella successiva. Non interessati: non morti e creature immuni all'essere ammaliate. Se lanciato a livello 2° o superiore, tira 2d8 in più per ogni livello sopra il 1°.",
+    "description_en": "This spell sends creatures into a magical slumber. Roll 5d8; the total is how many hit points of creatures this spell can affect. Creatures within 20 feet of a point you choose within range are affected in ascending order of their current hit points (ignoring unconscious creatures). Starting with the creature that has the lowest current hit points, each creature affected by this spell falls unconscious until the spell ends, the sleeper takes damage, or someone uses an action to shake or slap the sleeper awake. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected. Undead and creatures immune to being charmed aren't affected by this spell. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d8 for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Trappola": {
+    "name": "Trappola",
+    "name_en": "Snare",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "S, M (7,5 metri of corda, which l'incantesimo consuma)",
+    "components_en": "S, M (25 feet of rope, which the spell consumes)",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Mentre lanci l'incantesimo intrecci con corda o filo l'incantesimo che genera una trappola magica nascosta. Posizioni la corda su una superficie piatta (terreno o pavimento). L'incantesimo richiede 1 minuto per essere lanciato. Al termine la corda diventa indistinguibile dall'ambiente. La trappola si attiva quando una creatura Piccola, Media o Grande si muove sulla corda. La creatura deve riuscire in un tiro salvezza su Destrezza o essere magicamente sollevata in aria, restando appesa a testa in giù 90 cm sopra il suolo. È trattenuta. La creatura può usare la sua azione per fare una prova di Destrezza contro la CD dell'incantesimo. In caso di successo l'incantesimo termina. La trappola dura finché non si attiva o per 8 ore.",
+    "description_en": "As you cast this spell, you use the rope to create a circle with a 5- foot radius on the ground or the floor. When you finish casting, the rope disappears and the circle becomes a magic trap. This trap is nearly invisible, requiring a successful Intelligence (Investigation) check against your spell save DC to be discerned. The trap triggers when a Small, Medium, or Large creature moves onto the ground or the floor in the spell's radius. That creature must succeed on a Dexterity saving throw or be magically hoisted into the air, leaving it hanging upside down 3 feet above the ground or the floor. The creature is restrained there until the spell ends. A restrained creature can make a Dexterity saving throw at the end of each of its turns, ending the effect on itself on a success. Alternatively, the creature or someone else who can reach it can use an action to make an Intelligence (Arcana) check against your spell save DC. On a success, the restrained effect ends. After the trap is triggered, the spell ends when no creature is restrained by it.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  },
+  "Intruglio Caustico di Tasha": {
+    "name": "Intruglio Caustico di Tasha",
+    "name_en": "Tasha's Caustic Brew",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (linea di 9 metri)",
+    "range_en": "Self (30-foot line)",
+    "components": "V, S, M (un pizzico di rotten food)",
+    "components_en": "V, S, M (a bit of rotten food)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Un fiotto di liquido acido sgorga da te in una linea di 9 metri di lunghezza e 1,5 metri di larghezza in una direzione che scegli. Ogni creatura nella linea deve riuscire in un tiro salvezza su Destrezza o essere coperta di acido per la durata o finché una creatura non usa la sua azione per pulire l'acido. Una creatura coperta di acido subisce 2d4 danni da acido all'inizio di ognuno dei suoi turni. Se lanciato a livello 2° o superiore, i danni aumentano di 2d4 per ogni livello di slot sopra il 1°.",
+    "description_en": "A stream of acid emanates from you in a line 30 feet long and 5 feet wide in a direction you choose. Each creature in the line must succeed on a Dexterity saving throw or be covered in acid for the spell's duration or until a creature uses its action to scrape or wash the acid off itself or another creature. A creature covered in the acid takes 2d4 acid damage at the start of each of its turns. At Higher Levels. When you cast this spell using a spell slot 2nd level or higher, the damage increases by 2d4 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Tasha's Cauldron of Everything",
+    "translated": true
+  },
+  "Risata Atroce di Tasha": {
+    "name": "Risata Atroce di Tasha",
+    "name_en": "Tasha's Hideous Laughter",
+    "level": 1,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (tiny tarts e a piuma that is waved in the air)",
+    "components_en": "V, S, M (tiny tarts and a feather that is waved in the air)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Una creatura a tua scelta che puoi vedere entro gittata percepisce tutto come incredibilmente divertente e cade in preda a una risata isterica se l'incantesimo la colpisce. Il bersaglio deve riuscire in un tiro salvezza su Saggezza o essere prono, incapace di alzarsi e indebolito dalla risata per la durata. Una creatura con Intelligenza 4 o inferiore non è interessata. Alla fine di ognuno dei suoi turni, e ogni volta che subisce danno, il bersaglio può effettuare un nuovo tiro salvezza su Saggezza, con vantaggio se viene attivato dal danno. In caso di successo l'incantesimo termina.",
+    "description_en": "A creature of your choice that you can see within range perceives everything as hilariously funny and falls into fits of laughter if this spell affects it. The target must succeed on a Wisdom saving throw or fall prone, becoming incapacitated and unable to stand up for the duration. A creature with an Intelligence score of 4 or less isn't affected. At the end of each of its turns, and each time it takes damage, the target can make another Wisdom saving throw. The target has advantage on the saving throw if it's triggered by damage. On a success, the spell ends.",
+    "classes": [
+      "Bardo",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Castigo Tonante": {
+    "name": "Castigo Tonante",
+    "name_en": "Thunderous Smite",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La prima volta che colpisci con un attacco con arma in mischia prima del termine dell'incantesimo, l'arma esplode di tuono che si ode fino a 90 metri, e l'attacco infligge 2d6 danni da tuono extra al bersaglio. Inoltre, se il bersaglio è una creatura, deve riuscire in un tiro salvezza su Forza o essere spinto di 3 metri lontano da te e cadere prono.",
+    "description_en": "The first time you hit with a melee weapon attack during this spell's duration, your weapon rings with thunder that is audible within 300 feet of you, and the attack deals an extra 2d6 thunder damage to the target. Additionally, if the target is a creature, it must succeed on a Strength saving throw or be pushed 10 feet away from you and knocked prone.",
+    "classes": [
+      "Paladino"
+    ],
+    "classes_en": [
+      "Paladin"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Onda Tonante": {
+    "name": "Onda Tonante",
+    "name_en": "Thunderwave",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (cubo di 4,5 metri di lato)",
+    "range_en": "Self (15-foot cube)",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un'onda di forza tonante si diparte da te. Ogni creatura in un cubo di 4,5 metri di lato originato da te deve effettuare un tiro salvezza su Costituzione. In caso di fallimento subisce 2d8 danni da tuono ed è spinta 3 metri lontano da te. In caso di successo subisce metà danni e non viene spinta. Inoltre, oggetti non fissati interamente nell'area dell'incantesimo vengono automaticamente spinti 3 metri lontano da te per effetto dell'incantesimo, e l'incantesimo emette un boato di tuono udibile fino a 90 metri. Se lanciato a livello 2° o superiore, i danni aumentano di 1d8 per ogni livello di slot sopra il 1°.",
+    "description_en": "A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a Constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. In addition, unsecured objects that are completely within the area of effect are automatically pushed 10 feet away from you by the spell's effect, and the spell emits a thunderous boom audible out to 300 feet. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "translated": true
+  },
+  "Dardo Stregato": {
+    "name": "Dardo Stregato",
+    "name_en": "Witch Bolt",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (a twig from a tree that has been struck by lightning)",
+    "components_en": "V, S, M (a twig from a tree that has been struck by lightning)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Un raggio di energia blu scoppiettante si dirige verso una creatura entro gittata, formando un legame mistico tra te e il bersaglio fino al termine dell'incantesimo. Effettua un attacco con incantesimo a distanza contro la creatura. In caso di colpo subisce 1d12 danni da fulmine, e nei tuoi turni successivi puoi usare la tua azione per infliggere automaticamente 1d12 danni da fulmine al bersaglio. L'incantesimo termina se usi la tua azione per qualsiasi altra cosa. L'incantesimo termina anche se il bersaglio supera la gittata o se ottiene copertura totale da te. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d12 per ogni livello di slot sopra il 1°.",
+    "description_en": "A beam of crackling, blue energy lances out toward a creature within range, forming a sustained arc of lightning between you and the target. Make a ranged spell attack against that creature. On a hit, the target takes 1d12 lightning damage, and on each of your turns for the duration, you can use your action to deal 1d12 lightning damage to the target automatically. The spell ends if you use your action to do anything else. The spell also ends if the target is ever outside the spell's range or if it has total cover from you. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the initial damage increases by 1d12 for each slot level above 1st.",
+    "classes": [
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (BR+)",
+    "translated": true
+  },
+  "Castigo Iracondo": {
+    "name": "Castigo Iracondo",
+    "name_en": "Wrathful Smite",
+    "level": 1,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La prossima volta che colpisci con un attacco con arma in mischia prima del termine dell'incantesimo, l'attacco infligge 1d6 danni psichici extra. Inoltre, se il bersaglio è una creatura, deve riuscire in un tiro salvezza su Saggezza o essere spaventato da te fino al termine dell'incantesimo. Come azione, la creatura può effettuare una prova di Saggezza contro la CD del tuo incantesimo per riprendersi. In caso di successo l'incantesimo termina.",
+    "description_en": "The next time you hit with a melee weapon attack during this spell's duration, your attack deals an extra 1d6 psychic damage. Additionally, if the target is a creature, it must make a Wisdom saving throw or be frightened of you until the spell ends. As an action, the creature can make a Wisdom check against your spell save DC to steel its resolve and end this spell.",
+    "classes": [
+      "Paladino"
+    ],
+    "classes_en": [
+      "Paladin"
+    ],
+    "source": "Player's Handbook",
+    "translated": true
+  },
+  "Colpo dello Zefiro": {
+    "name": "Colpo dello Zefiro",
+    "name_en": "Zephyr Strike",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Ti muovi come il vento. Finché l'incantesimo non termina, il tuo movimento non provoca attacchi di opportunità. Una volta prima del termine dell'incantesimo, puoi dare a te stesso vantaggio a un singolo tiro per colpire con arma effettuato in quel turno. Quel tiro infligge 1d8 danni da forza extra in caso di colpo, e finché l'incantesimo non termina hai un bonus +3 metri alla velocità di camminata.",
+    "description_en": "You move like the wind. For the duration, your movement doesn't provoke opportunity attacks. Once before the spell ends, you can give yourself advantage on one weapon attack roll on your turn. That attack deals an extra 1d8 force damage on a hit. Whether you hit or miss, your walking speed increases by 30 feet until the end of that turn.",
+    "classes": [
+      "Ranger"
+    ],
+    "classes_en": [
+      "Ranger"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "translated": true
+  }
+});
