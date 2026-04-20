@@ -1,5 +1,4 @@
-/* Auto-generato da risorse/parse_spells.py - non modificare a mano */
-window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
+{
   "Fiotto Acido": {
     "name": "Fiotto Acido",
     "name_en": "Acid Splash",
@@ -12820,4 +12819,4 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": false
   }
-});
+}

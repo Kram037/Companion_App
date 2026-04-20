@@ -1978,14 +1978,19 @@ function _spellMatchesPg(spell, pgClasses) {
 }
 
 /**
- * Risolve un nome incantesimo (italiano o legacy inglese) in dati spell.
- * Supporta backward compatibility con eventuali record salvati col nome inglese.
+ * Risolve un nome incantesimo (italiano corrente, vecchio italiano o inglese)
+ * nei dati dell'incantesimo. Supporta backward compatibility per eventuali
+ * record salvati nel DB con nomi obsoleti.
  */
 function _resolveSpell(name) {
+    if (!name) return null;
     const all = _spellsData();
     if (all[name]) return all[name];
+    // Fallback: scorri tutti gli spell e confronta con name_en o legacy_names_it
     for (const k of Object.keys(all)) {
-        if (all[k].name_en === name) return all[k];
+        const sp = all[k];
+        if (sp.name_en === name) return sp;
+        if (Array.isArray(sp.aliases) && sp.aliases.includes(name)) return sp;
     }
     return null;
 }

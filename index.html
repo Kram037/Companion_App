@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/components.css?v=1767940000">
     <link rel="stylesheet" href="css/modals.css?v=1767903000">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
-    <link rel="stylesheet" href="css/personaggi.css?v=1768050000">
+    <link rel="stylesheet" href="css/personaggi.css?v=1768070000">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767920000">
     <link rel="stylesheet" href="css/laboratorio.css?v=1767920400">
@@ -189,7 +189,7 @@
                     <h1 id="sessioneCampagnaTitle" class="sessione-title">Sessione</h1>
                 </div>
                 <div id="sessioneContent">
-                    <!-- Il contenuto verrà popolato dinamicamente -->
+                    <!-- Il contenuto verrÃ  popolato dinamicamente -->
                 </div>
             </div>
             <button class="back-button-floating" id="backToDettagliBtn" aria-label="Torna ai dettagli">
@@ -225,7 +225,7 @@
             <div class="page-content dettagli-content">
                 <div class="dettagli-header">
                     <div class="dettagli-icon-container" id="dettagliIconContainer">
-                        <!-- L'icona verrà popolata dinamicamente -->
+                        <!-- L'icona verrÃ  popolata dinamicamente -->
                     </div>
                     <h1 id="dettagliCampagnaTitle" class="dettagli-title">Dettagli Campagna</h1>
                     <div class="dettagli-actions" id="dettagliActions">
@@ -233,7 +233,7 @@
                     </div>
                 </div>
                 <div id="dettagliCampagnaContent">
-                    <!-- Il contenuto verrà popolato dinamicamente -->
+                    <!-- Il contenuto verrÃ  popolato dinamicamente -->
                 </div>
             </div>
             <!-- Bottone indietro in basso a sinistra sopra la toolbar -->
@@ -548,9 +548,9 @@
                 <div class="wizard-step" data-step="7"></div>
             </div>
             <form id="personaggioForm">
-                <!-- Step 0: Identità -->
+                <!-- Step 0: IdentitÃ  -->
                 <div class="wizard-page active" id="pgStep0">
-                    <div class="form-section-label">Identità</div>
+                    <div class="form-section-label">IdentitÃ </div>
                     <div class="form-group">
                         <label for="pgNome">Nome</label>
                         <input type="text" id="pgNome" required placeholder="Nome del personaggio">
@@ -651,9 +651,9 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 3: Abilità -->
+                <!-- Step 3: AbilitÃ  -->
                 <div class="wizard-page" id="pgStep3">
-                    <div class="form-section-label">Abilità</div>
+                    <div class="form-section-label">AbilitÃ </div>
                     <div class="wizard-page-scroll">
                         <div class="pg-skills-list" id="pgSkillsList"></div>
                     </div>
@@ -662,9 +662,9 @@
                         <button type="button" class="btn-primary" onclick="pgWizardNext()">Successivo</button>
                     </div>
                 </div>
-                <!-- Step 4: Resistenze e Immunità -->
+                <!-- Step 4: Resistenze e ImmunitÃ  -->
                 <div class="wizard-page" id="pgStep4">
-                    <div class="form-section-label">Resistenze e Immunità</div>
+                    <div class="form-section-label">Resistenze e ImmunitÃ </div>
                     <div class="pg-res-header">
                         <span></span><span class="pg-res-col-label">Res</span><span class="pg-res-col-label">Imm</span>
                     </div>
@@ -716,7 +716,7 @@
                                 <span class="pg-stat-hint" id="hintIniziativa">(des)</span>
                             </div>
                             <div class="form-group">
-                                <label for="pgVelocita">Velocità</label>
+                                <label for="pgVelocita">VelocitÃ </label>
                                 <input type="number" id="pgVelocita" min="0" step="1.5" value="9" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                             </div>
                         </div>
@@ -844,7 +844,7 @@
                     <label>Tipo di tiro</label>
                     <select id="tipoTiroSelect">
                         <option value="salvezza">Tiro Salvezza</option>
-                        <option value="abilita">Tiro di Abilità</option>
+                        <option value="abilita">Tiro di AbilitÃ </option>
                         <option value="caratteristica">Prova di Caratteristica</option>
                     </select>
                 </div>
@@ -877,7 +877,7 @@
                 <div class="form-group">
                     <label for="amicoCID">CID</label>
                     <input type="number" id="amicoCID" name="amicoCID" required placeholder="Inserisci il CID (4 cifre)" min="1000" max="9999" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
-                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Il CID è il codice identificativo a 4 cifre dell'utente</small>
+                    <small style="color: var(--text-secondary); font-size: 0.85rem;">Il CID Ã¨ il codice identificativo a 4 cifre dell'utente</small>
                 </div>
                 <div id="searchUserResult" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius-md);">
                     <div id="searchUserInfo"></div>
@@ -913,9 +913,9 @@
         
         // Crea il client e rendilo disponibile globalmente
         window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        window.supabaseCreateClient = createClient; // Per compatibilità
+        window.supabaseCreateClient = createClient; // Per compatibilitÃ 
         
-        console.log('✅ Supabase caricato e inizializzato (ES Module)');
+        console.log('âœ… Supabase caricato e inizializzato (ES Module)');
     </script>
     <script src="js/supabase.js?v=1767900400"></script>
     <script src="js/state.js?v=1767900400"></script>
@@ -926,8 +926,8 @@
     <script src="js/users.js?v=1767900400"></script>
     <script src="js/amici.js?v=1767900400"></script>
     <script src="js/campagne.js?v=1767900400"></script>
-    <script src="js/data/spells_data.js?v=1768050000"></script>
-    <script src="js/personaggi.js?v=1768050000"></script>
+    <script src="js/data/spells_data.js?v=1768070000"></script>
+    <script src="js/personaggi.js?v=1768070000"></script>
     <script src="js/sessions.js?v=1767900400"></script>
     <script src="js/combat.js?v=1767920600"></script>
     <script src="js/laboratorio.js?v=1767920600"></script>
@@ -950,4 +950,6 @@
     </script>
 </body>
 </html>
+
+
 
