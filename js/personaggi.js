@@ -1868,12 +1868,24 @@ window.schedaOpenSpellPage = async function(pgId) {
         .sort((a, b) => a - b);
     const spellSectionsHtml = orderedLevels.map(l => buildSpellLevelSection(pg, l)).join('');
 
+    // Memorizza tab/personaggio corrente per il rerender al cambio lingua
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'incantesimi';
+
+    const lang = _spellLang();
+    const langSwitcherHtml = `
+    <div class="spell-lang-switcher" role="tablist" aria-label="Lingua incantesimi">
+        <button class="spell-lang-btn ${lang === 'it' ? 'active' : ''}" onclick="schedaSetSpellLang('it')">IT</button>
+        <button class="spell-lang-btn ${lang === 'en' ? 'active' : ''}" onclick="schedaSetSpellLang('en')">EN</button>
+    </div>`;
+
     content.innerHTML = `
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
         <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
     </div>
+    ${langSwitcherHtml}
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
         <div class="scheda-section-body">${spellStatsHtml}</div>
@@ -1910,6 +1922,44 @@ window.schedaToggleSection = function(titleEl) {
 /* ── Spells / Trucchetti ── */
 function _spellsData() { return window.SPELLS_DATA || {}; }
 
+/** Lingua corrente per la visualizzazione degli incantesimi: 'it' | 'en' */
+function _spellLang() {
+    try { return localStorage.getItem('spellLang') === 'en' ? 'en' : 'it'; }
+    catch { return 'it'; }
+}
+function _setSpellLang(lang) {
+    try { localStorage.setItem('spellLang', lang === 'en' ? 'en' : 'it'); } catch {}
+}
+
+/** Estrae il campo localizzato di un incantesimo, con fallback all'altra lingua. */
+function _spellField(sp, key) {
+    if (!sp) return '';
+    const lang = _spellLang();
+    if (lang === 'en') {
+        switch (key) {
+            case 'name': return sp.name_en || sp.name || '';
+            case 'school': return (sp.school || '').replace(/^./, c => c.toUpperCase());
+            case 'casting_time': return sp.casting_time_en || sp.casting_time || '';
+            case 'range': return sp.range_en || sp.range || '';
+            case 'components': return sp.components_en || sp.components || '';
+            case 'duration': return sp.duration_en || sp.duration || '';
+            case 'description': return sp.description_en || sp.description || '';
+            case 'classes': return sp.classes_en || sp.classes || [];
+        }
+    }
+    switch (key) {
+        case 'name': return sp.name || sp.name_en || '';
+        case 'school': return sp.school_it || (sp.school || '').replace(/^./, c => c.toUpperCase());
+        case 'casting_time': return sp.casting_time || sp.casting_time_en || '';
+        case 'range': return sp.range || sp.range_en || '';
+        case 'components': return sp.components || sp.components_en || '';
+        case 'duration': return sp.duration || sp.duration_en || '';
+        case 'description': return sp.description || sp.description_en || '';
+        case 'classes': return sp.classes || sp.classes_en || [];
+    }
+    return '';
+}
+
 function _pgSpellClasses(pg) {
     const out = new Set();
     (pg.classi || []).forEach(c => { if (c?.nome) out.add(c.nome); });
@@ -1919,8 +1969,11 @@ function _pgSpellClasses(pg) {
 
 function _spellMatchesPg(spell, pgClasses) {
     if (!pgClasses.size) return true;
-    const list = spell.classes || [];
-    for (const c of list) if (pgClasses.has(c)) return true;
+    // Confronta sia con classes IT che EN per matching robusto
+    const lists = [spell.classes || [], spell.classes_en || []];
+    for (const list of lists) {
+        for (const c of list) if (pgClasses.has(c)) return true;
+    }
     return false;
 }
 
@@ -1955,10 +2008,11 @@ function buildSpellLevelSection(pg, level) {
         .map(n => ({ raw: n, sp: _resolveSpell(n) }))
         .filter(x => x.sp && x.sp.level === level);
     const cards = known.length > 0 ? known.map(({ sp }) => {
+        // Salviamo sempre il nome italiano (chiave canonica) come id
         const id = sp.name;
         return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(sp.name)}</div>
-            <div class="spell-card-meta">${escapeHtml(sp.school_it || sp.school)} · ${escapeHtml(sp.casting_time)} · ${escapeHtml(sp.range)}</div>
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
         </div>`;
     }).join('') : `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
 
@@ -1986,22 +2040,54 @@ window.schedaShowSpellDetail = function(spellName) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    const lvlText = sp.level === 0 ? 'Trucchetto' : `Livello ${sp.level}`;
-    overlay.innerHTML = `<div class="hp-calc-modal spell-detail-modal">
-        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-        <h3 class="spell-detail-name">${escapeHtml(sp.name)}</h3>
-        <div class="spell-detail-sub">${lvlText} · ${escapeHtml(sp.school_it || sp.school)}</div>
-        <div class="spell-detail-meta">
-            <div><span class="spell-meta-label">Tempo</span><span>${escapeHtml(sp.casting_time)}</span></div>
-            <div><span class="spell-meta-label">Gittata</span><span>${escapeHtml(sp.range)}</span></div>
-            <div><span class="spell-meta-label">Componenti</span><span>${escapeHtml(sp.components)}</span></div>
-            <div><span class="spell-meta-label">Durata</span><span>${escapeHtml(sp.duration)}</span></div>
-        </div>
-        <div class="spell-detail-desc">${escapeHtml(sp.description).replace(/\n/g,'<br>')}</div>
-        <div class="spell-detail-classes">${(sp.classes || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
-        ${sp.source ? `<div class="spell-detail-source">${escapeHtml(sp.source)}</div>` : ''}
-    </div>`;
+    overlay.dataset.spellId = sp.name;
+    const renderBody = () => {
+        const lang = _spellLang();
+        const lvlText = sp.level === 0
+            ? (lang === 'en' ? 'Cantrip' : 'Trucchetto')
+            : (lang === 'en' ? `Level ${sp.level}` : `Livello ${sp.level}`);
+        const lbl = lang === 'en'
+            ? { time: 'Casting Time', range: 'Range', comp: 'Components', dur: 'Duration' }
+            : { time: 'Tempo', range: 'Gittata', comp: 'Componenti', dur: 'Durata' };
+        const otherLang = lang === 'en' ? 'IT' : 'EN';
+        return `<div class="hp-calc-modal spell-detail-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <button class="spell-lang-toggle" onclick="schedaToggleSpellLang(this)" title="Cambia lingua">${otherLang}</button>
+            <h3 class="spell-detail-name">${escapeHtml(_spellField(sp, 'name'))}</h3>
+            <div class="spell-detail-sub">${lvlText} · ${escapeHtml(_spellField(sp, 'school'))}</div>
+            <div class="spell-detail-meta">
+                <div><span class="spell-meta-label">${lbl.time}</span><span>${escapeHtml(_spellField(sp, 'casting_time'))}</span></div>
+                <div><span class="spell-meta-label">${lbl.range}</span><span>${escapeHtml(_spellField(sp, 'range'))}</span></div>
+                <div><span class="spell-meta-label">${lbl.comp}</span><span>${escapeHtml(_spellField(sp, 'components'))}</span></div>
+                <div><span class="spell-meta-label">${lbl.dur}</span><span>${escapeHtml(_spellField(sp, 'duration'))}</span></div>
+            </div>
+            <div class="spell-detail-desc">${escapeHtml(_spellField(sp, 'description')).replace(/\n/g,'<br>')}</div>
+            <div class="spell-detail-classes">${(_spellField(sp, 'classes') || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
+            ${sp.source ? `<div class="spell-detail-source">${escapeHtml(sp.source)}</div>` : ''}
+        </div>`;
+    };
+    overlay.innerHTML = renderBody();
+    overlay._rerender = () => { overlay.innerHTML = renderBody(); };
     document.body.appendChild(overlay);
+};
+
+window.schedaToggleSpellLang = function(el) {
+    const next = _spellLang() === 'en' ? 'it' : 'en';
+    _setSpellLang(next);
+    const overlay = el.closest('.hp-calc-overlay');
+    if (overlay && typeof overlay._rerender === 'function') overlay._rerender();
+    if (typeof window._schedaCurrentPgId === 'string' && window._schedaCurrentTab === 'incantesimi') {
+        schedaOpenSpellPage(window._schedaCurrentPgId);
+    }
+};
+
+window.schedaSetSpellLang = function(lang) {
+    if (lang !== 'it' && lang !== 'en') return;
+    if (_spellLang() === lang) return;
+    _setSpellLang(lang);
+    if (typeof window._schedaCurrentPgId === 'string' && window._schedaCurrentTab === 'incantesimi') {
+        schedaOpenSpellPage(window._schedaCurrentPgId);
+    }
 };
 
 window.schedaOpenSpellPicker = function(pgId, level) {
@@ -2015,25 +2101,36 @@ window.schedaOpenSpellPicker = function(pgId, level) {
         return sp ? sp.name : n;
     }));
 
+    const lang = _spellLang();
     const list = Object.values(all).filter(s => s.level === level);
-    list.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+    list.sort((a, b) => _spellField(a, 'name').localeCompare(_spellField(b, 'name'), lang));
 
     const matching = list.filter(s => _spellMatchesPg(s, pgClasses));
     const others = list.filter(s => !_spellMatchesPg(s, pgClasses));
 
     const renderRow = (sp) => {
-        const isKnown = knownAll.has(sp.name);
-        const safeName = escapeAttr(sp.name);
+        // L'id resta sempre il nome italiano (chiave canonica)
+        const id = sp.name;
+        const isKnown = knownAll.has(id);
+        const safeId = escapeAttr(id);
         return `<label class="spell-pick-row">
-            <input type="checkbox" class="spell-pick-cb" data-name="${safeName}" ${isKnown ? 'checked' : ''}>
-            <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeName}')">
-                <div class="spell-pick-name">${escapeHtml(sp.name)}</div>
-                <div class="spell-pick-meta">${escapeHtml(sp.school_it || sp.school)} · ${(sp.classes || []).join(', ')}</div>
+            <input type="checkbox" class="spell-pick-cb" data-name="${safeId}" ${isKnown ? 'checked' : ''}>
+            <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeId}')">
+                <div class="spell-pick-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+                <div class="spell-pick-meta">${escapeHtml(_spellField(sp, 'school'))} · ${(_spellField(sp, 'classes') || []).join(', ')}</div>
             </div>
         </label>`;
     };
 
-    const titleLabel = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
+    const titleLabel = lang === 'en'
+        ? (level === 0 ? 'Cantrips' : `Level ${level} Spells`)
+        : (SPELL_LEVEL_LABELS[level] || `Livello ${level}`);
+    const grpMatch = lang === 'en' ? 'Available for your class' : 'Disponibili per la tua classe';
+    const grpOther = lang === 'en' ? 'Others' : 'Altri';
+    const emptyMsg = lang === 'en' ? 'No spells available' : 'Nessun incantesimo disponibile';
+    const placeholder = lang === 'en' ? 'Search…' : 'Cerca…';
+    const cancelLbl = lang === 'en' ? 'Cancel' : 'Annulla';
+    const saveLbl = lang === 'en' ? 'Save' : 'Salva';
 
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
@@ -2041,15 +2138,15 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     overlay.innerHTML = `<div class="hp-calc-modal spell-picker-modal">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 style="margin-bottom:6px;">${escapeHtml(titleLabel)}</h3>
-        <input type="text" id="spellPickerSearch" class="hp-calc-input" placeholder="Cerca…" style="margin-bottom:10px;">
+        <input type="text" id="spellPickerSearch" class="hp-calc-input" placeholder="${placeholder}" style="margin-bottom:10px;">
         <div class="spell-picker-list" id="spellPickerList">
-            ${matching.length > 0 ? `<div class="spell-pick-group-title">Disponibili per la tua classe</div>${matching.map(renderRow).join('')}` : ''}
-            ${others.length > 0 ? `<div class="spell-pick-group-title">Altri</div>${others.map(renderRow).join('')}` : ''}
-            ${list.length === 0 ? '<p class="scheda-empty">Nessun incantesimo disponibile</p>' : ''}
+            ${matching.length > 0 ? `<div class="spell-pick-group-title">${grpMatch}</div>${matching.map(renderRow).join('')}` : ''}
+            ${others.length > 0 ? `<div class="spell-pick-group-title">${grpOther}</div>${others.map(renderRow).join('')}` : ''}
+            ${list.length === 0 ? `<p class="scheda-empty">${emptyMsg}</p>` : ''}
         </div>
         <div class="dialog-actions">
-            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
-            <button class="btn-primary" onclick="schedaSaveSpellsForLevel('${pgId}', ${level})">Salva</button>
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">${cancelLbl}</button>
+            <button class="btn-primary" onclick="schedaSaveSpellsForLevel('${pgId}', ${level})">${saveLbl}</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
