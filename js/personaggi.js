@@ -1852,6 +1852,8 @@ window.schedaOpenSpellPage = async function(pgId) {
 
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
+    const cantripsHtml = buildCantripsSection(pg);
+
     content.innerHTML = `
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
@@ -1859,13 +1861,16 @@ window.schedaOpenSpellPage = async function(pgId) {
         <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
     </div>
     <div class="scheda-section">
-        <div class="scheda-section-title">Statistiche Incantatore</div>
-        ${spellStatsHtml}
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
+        <div class="scheda-section-body">${spellStatsHtml}</div>
     </div>
     <div class="scheda-section">
-        <div class="scheda-section-title">Slot Incantesimo</div>
-        <div class="scheda-slots-table">${slotsHtml}</div>
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot Incantesimo</div>
+        <div class="scheda-section-body">
+            <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>
     </div>
+    ${cantripsHtml}
     `;
 
     content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
@@ -1886,6 +1891,138 @@ window.schedaOpenSpellPage = async function(pgId) {
 window.schedaToggleSection = function(titleEl) {
     const section = titleEl.closest('.scheda-section');
     if (section) section.classList.toggle('collapsed');
+};
+
+/* ── Spells / Trucchetti ── */
+function _spellsData() { return window.SPELLS_DATA || {}; }
+
+function _pgSpellClasses(pg) {
+    const out = new Set();
+    (pg.classi || []).forEach(c => { if (c?.nome) out.add(c.nome); });
+    if (pg.classe) out.add(pg.classe);
+    return out;
+}
+
+function _spellMatchesPg(spell, pgClasses) {
+    if (!pgClasses.size) return true;
+    const list = spell.classes || [];
+    for (const c of list) if (pgClasses.has(c)) return true;
+    return false;
+}
+
+function buildCantripsSection(pg) {
+    const all = _spellsData();
+    const known = (pg.incantesimi_conosciuti || []).filter(n => all[n] && all[n].level === 0);
+    const cards = known.length > 0 ? known.map(n => {
+        const sp = all[n];
+        return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(n)}')">
+            <div class="spell-card-name">${escapeHtml(sp.name)}</div>
+            <div class="spell-card-meta">${escapeHtml(sp.school_it || sp.school)} · ${escapeHtml(sp.casting_time)} · ${escapeHtml(sp.range)}</div>
+        </div>`;
+    }).join('') : '<span class="scheda-empty">Nessun trucchetto scelto</span>';
+
+    return `<div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">
+            Trucchetti
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenCantripsPicker('${pg.id}')" title="Scegli trucchetti">+</button>
+        </div>
+        <div class="scheda-section-body">
+            <div class="spell-cards-grid">${cards}</div>
+        </div>
+    </div>`;
+}
+
+function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+window.schedaShowSpellDetail = function(spellName) {
+    const sp = _spellsData()[spellName];
+    if (!sp) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const lvlText = sp.level === 0 ? 'Trucchetto' : `Livello ${sp.level}`;
+    overlay.innerHTML = `<div class="hp-calc-modal spell-detail-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="spell-detail-name">${escapeHtml(sp.name)}</h3>
+        <div class="spell-detail-sub">${lvlText} · ${escapeHtml(sp.school_it || sp.school)}</div>
+        <div class="spell-detail-meta">
+            <div><span class="spell-meta-label">Tempo</span><span>${escapeHtml(sp.casting_time)}</span></div>
+            <div><span class="spell-meta-label">Gittata</span><span>${escapeHtml(sp.range)}</span></div>
+            <div><span class="spell-meta-label">Componenti</span><span>${escapeHtml(sp.components)}</span></div>
+            <div><span class="spell-meta-label">Durata</span><span>${escapeHtml(sp.duration)}</span></div>
+        </div>
+        <div class="spell-detail-desc">${escapeHtml(sp.description).replace(/\n/g,'<br>')}</div>
+        <div class="spell-detail-classes">${(sp.classes || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
+        ${sp.source ? `<div class="spell-detail-source">${escapeHtml(sp.source)}</div>` : ''}
+    </div>`;
+    document.body.appendChild(overlay);
+};
+
+window.schedaOpenCantripsPicker = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const all = _spellsData();
+    const pgClasses = _pgSpellClasses(pg);
+    const known = new Set(pg.incantesimi_conosciuti || []);
+
+    const cantrips = Object.values(all).filter(s => s.level === 0);
+    cantrips.sort((a, b) => a.name.localeCompare(b.name));
+
+    const matching = cantrips.filter(s => _spellMatchesPg(s, pgClasses));
+    const others = cantrips.filter(s => !_spellMatchesPg(s, pgClasses));
+
+    const renderRow = (sp) => {
+        const isKnown = known.has(sp.name);
+        const safeName = escapeAttr(sp.name);
+        return `<label class="spell-pick-row">
+            <input type="checkbox" class="spell-pick-cb" data-name="${safeName}" ${isKnown ? 'checked' : ''}>
+            <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeName}')">
+                <div class="spell-pick-name">${escapeHtml(sp.name)}</div>
+                <div class="spell-pick-meta">${escapeHtml(sp.school_it || sp.school)} · ${(sp.classes || []).join(', ')}</div>
+            </div>
+        </label>`;
+    };
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal spell-picker-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 style="margin-bottom:6px;">Trucchetti</h3>
+        <input type="text" id="spellPickerSearch" class="hp-calc-input" placeholder="Cerca…" style="margin-bottom:10px;">
+        <div class="spell-picker-list" id="spellPickerList">
+            ${matching.length > 0 ? `<div class="spell-pick-group-title">Disponibili per la tua classe</div>${matching.map(renderRow).join('')}` : ''}
+            ${others.length > 0 ? `<div class="spell-pick-group-title">Altri</div>${others.map(renderRow).join('')}` : ''}
+            ${cantrips.length === 0 ? '<p class="scheda-empty">Nessun trucchetto disponibile</p>' : ''}
+        </div>
+        <div class="dialog-actions">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-primary" onclick="schedaSaveCantrips('${pgId}')">Salva</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    const search = document.getElementById('spellPickerSearch');
+    if (search) {
+        search.addEventListener('input', () => {
+            const q = search.value.toLowerCase().trim();
+            overlay.querySelectorAll('.spell-pick-row').forEach(r => {
+                const txt = r.textContent.toLowerCase();
+                r.style.display = !q || txt.includes(q) ? '' : 'none';
+            });
+        });
+    }
+};
+
+window.schedaSaveCantrips = async function(pgId) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked')).map(cb => cb.dataset.name);
+    pg.incantesimi_conosciuti = checked;
+    await supabase.from('personaggi').update({ incantesimi_conosciuti: checked }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenSpellPage(pgId);
 };
 
 /* ── Inventario Tab ── */

@@ -1245,3 +1245,32 @@
 .inv-attune-icon { font-size: 1.1rem; color: #A855F7; }
 .inv-attune-name { flex: 1; font-size: 0.9rem; color: var(--text); }
 .inv-attune-slot.empty .inv-attune-name { color: var(--text-muted); font-style: italic; }
+
+/* ── Incantesimi / Trucchetti ── */
+.spell-cards-grid { display: flex; flex-direction: column; gap: 6px; }
+.spell-card { padding: 10px 12px; background: var(--bg); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.spell-card:hover { background: var(--surface-hover); }
+.spell-card:active { transform: scale(0.99); }
+.spell-card-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.spell-card-meta { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+
+.spell-detail-modal { width: 360px; max-width: calc(100vw - 32px); max-height: 80vh; overflow-y: auto; text-align: left; padding: 20px 18px; position: relative; }
+.spell-detail-name { font-size: 1.1rem; font-weight: 800; color: var(--accent); margin: 0 0 2px; padding-right: 28px; }
+.spell-detail-sub { font-size: 0.78rem; color: var(--text-light); font-style: italic; margin-bottom: 10px; }
+.spell-detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-bottom: 10px; padding: 10px; background: var(--bg); border-radius: var(--radius-sm); }
+.spell-detail-meta > div { display: flex; flex-direction: column; }
+.spell-meta-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
+.spell-detail-meta > div > span:last-child { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+.spell-detail-desc { font-size: 0.85rem; color: var(--text); line-height: 1.45; margin-bottom: 12px; }
+.spell-detail-classes { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.spell-detail-source { font-size: 0.7rem; color: var(--text-muted); font-style: italic; text-align: right; }
+
+.spell-picker-modal { width: 380px; max-width: calc(100vw - 32px); max-height: 85vh; padding: 20px 18px; text-align: left; display: flex; flex-direction: column; position: relative; }
+.spell-picker-list { flex: 1 1 auto; overflow-y: auto; min-height: 200px; max-height: 50vh; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; background: var(--bg); }
+.spell-pick-group-title { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--accent); padding: 8px 8px 4px; letter-spacing: 0.05em; }
+.spell-pick-row { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s; }
+.spell-pick-row:hover { background: var(--surface-hover); }
+.spell-pick-cb { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; }
+.spell-pick-info { flex: 1; min-width: 0; cursor: pointer; }
+.spell-pick-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.spell-pick-meta { font-size: 0.72rem; color: var(--text-light); margin-top: 1px; }
