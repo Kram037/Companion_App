@@ -1714,7 +1714,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 </div>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
-                        <span>Resistenze, Immunità e Vulnerabilità</span>
+                        <span>Difese</span>
                         <span class="scheda-subsection-meta" id="sResImmCount">${resImmCount > 0 ? resImmCount : ''}</span>
                         <span class="scheda-subsection-arrow">▾</span>
                     </div>
