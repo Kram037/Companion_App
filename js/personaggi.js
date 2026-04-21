@@ -1597,7 +1597,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>`);
         });
         classResourcesHtml = `<div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Risorse di Classe
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Risorse
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
             </div>
             <div class="scheda-section-body">
@@ -1605,13 +1605,27 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>
         </div>`;
 
-        // Resistenze & Immunità
-        const resistenzeHtml = (pg.resistenze && pg.resistenze.length > 0) ?
-            pg.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
-            '<span class="scheda-empty">Nessuna</span>';
-        const immunitaHtml = (pg.immunita && pg.immunita.length > 0) ?
-            pg.immunita.map(r => `<span class="scheda-tag scheda-tag-imm">${escapeHtml(r.charAt(0).toUpperCase() + r.slice(1))}</span>`).join('') :
-            '<span class="scheda-empty">Nessuna</span>';
+        // Resistenze & Immunità (inline, stile abilità: due segnalini ●/★ con mutua esclusione)
+        const curRes = Array.isArray(pg.resistenze) ? pg.resistenze : [];
+        const curImm = Array.isArray(pg.immunita) ? pg.immunita : [];
+        const nRes = curRes.length, nImm = curImm.length;
+        const resImmInlineHtml = `<div class="scheda-resimm-grid">${DAMAGE_TYPES.map(dt => {
+            const isRes = curRes.includes(dt.value);
+            const isImm = curImm.includes(dt.value);
+            return `<div class="scheda-resimm-row" id="sResImmRow_${dt.value}">
+                <span class="scheda-skill-dot ${isRes ? 'active' : ''}" tabindex="-1"
+                      onmousedown="event.preventDefault();schedaToggleResInline('${pg.id}','${dt.value}')"
+                      ontouchend="event.preventDefault();schedaToggleResInline('${pg.id}','${dt.value}')"
+                      title="Resistenza">●</span>
+                <span class="scheda-skill-dot expert ${isImm ? 'active' : ''}" tabindex="-1"
+                      onmousedown="event.preventDefault();schedaToggleImmInline('${pg.id}','${dt.value}')"
+                      ontouchend="event.preventDefault();schedaToggleImmInline('${pg.id}','${dt.value}')"
+                      title="Immunità">★</span>
+                <span class="scheda-resimm-name">${escapeHtml(dt.label)}</span>
+            </div>`;
+        }).join('')}</div>
+        <div class="scheda-resimm-legend"><span><span class="scheda-skill-dot active">●</span> Resistenza</span><span><span class="scheda-skill-dot expert active">★</span> Immunità</span></div>`;
+        const resImmCount = nRes + nImm;
 
         // Conditions (excluding concentrazione which is shown separately)
         const conditionsActive = ALL_CONDITIONS.filter(c => c.key !== 'concentrazione' && pg[c.key]);
@@ -1624,14 +1638,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         const hasSpellSlots = pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object' && Object.keys(pg.slot_incantesimo).length > 0;
 
         content.innerHTML = `
-        <div class="scheda-identity">
-            <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-            <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
-            <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
-            ${(pg.classi && pg.classi.length > 0)
-                ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
-                : ''}
-        </div>
+        ${buildSchedaHeader(pg)}
 
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
@@ -1639,6 +1646,21 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <div class="scheda-abilities">${abilitiesHtml}</div>
             </div>
         </div>
+
+        <div class="scheda-section">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Abilità</div>
+            <div class="scheda-section-body">
+                <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
+                <div class="scheda-perc-passiva">
+                    <span class="scheda-perc-val" id="sPercPassiva">${percPassiva}</span>
+                    <span class="scheda-perc-label">Percezione Passiva</span>
+                </div>
+            </div>
+        </div>
+
+        ${buildLangProfSection(pg)}
+
+        <hr class="scheda-divider">
 
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche</div>
@@ -1671,27 +1693,30 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PV Temp</div>
                     </div>
                 </div>
-                <div class="scheda-isp-row">
-                    <div class="scheda-isp-info">
-                        <span class="scheda-isp-icon" aria-hidden="true">★</span>
-                        <span class="scheda-isp-label">Ispirazione</span>
+                <div class="scheda-subsection">
+                    <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
+                        <span>Resistenze e Immunità</span>
+                        <span class="scheda-subsection-meta" id="sResImmCount">${resImmCount > 0 ? resImmCount : ''}</span>
+                        <span class="scheda-subsection-arrow">▾</span>
                     </div>
-                    <div class="scheda-hd-avail">
-                        <button class="scheda-hd-btn" onclick="schedaIspChange('${pg.id}',-1)">−</button>
-                        <span class="scheda-hd-val" id="sIsp">${pg.ispirazione || 0}</span>
-                        <button class="scheda-hd-btn" onclick="schedaIspChange('${pg.id}',1)">+</button>
-                    </div>
+                    <div class="scheda-subsection-body">${resImmInlineHtml}</div>
                 </div>
-            </div>
-        </div>
-
-        <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Abilità</div>
-            <div class="scheda-section-body">
-                <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
-                <div class="scheda-perc-passiva">
-                    <span class="scheda-perc-val" id="sPercPassiva">${percPassiva}</span>
-                    <span class="scheda-perc-label">Percezione Passiva</span>
+                <div class="scheda-subsection">
+                    <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
+                        <span>Condizioni</span>
+                        <span class="scheda-subsection-meta">${conditionsActive.length > 0 ? conditionsActive.length : ''}${isConcentrating ? ' • C' : ''}</span>
+                        <span class="scheda-subsection-arrow">▾</span>
+                    </div>
+                    <div class="scheda-subsection-body">
+                        <div class="scheda-concentrazione-row">
+                            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
+                        </div>
+                        <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
+                        <div class="scheda-condition-extra">
+                            <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
+                        </div>
+                        <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1703,52 +1728,9 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>
         </div>
 
-        ${classResourcesHtml}
-
-        <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">
-                Resistenze e Immunità
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenResImmEdit('${pg.id}')" title="Modifica">&#9998;</button>
-            </div>
-            <div class="scheda-section-body">
-                <div class="scheda-res-imm-display" id="schedaResImmDisplay">
-                    <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Resistenze</span><div class="scheda-tags">${resistenzeHtml}</div></div>
-                    <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Immunità</span><div class="scheda-tags">${immunitaHtml}</div></div>
-                </div>
-                <div id="schedaResImmEditGrid" style="display:none;"></div>
-            </div>
-        </div>
-
-        <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Condizioni</div>
-            <div class="scheda-section-body">
-                <div class="scheda-concentrazione-row">
-                    <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
-                </div>
-                <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
-                <div class="scheda-condition-extra">
-                    <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>
-                </div>
-                <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openConditionsModal('${pg.id}')">Modifica stato</button>
-            </div>
-        </div>
-
-        <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">
-                Talenti
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
-            </div>
-            <div class="scheda-section-body">
-                <div class="scheda-tags" id="schedaTalentiDisplay">${(pg.talenti && pg.talenti.length > 0) ?
-                    pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('') :
-                    '<span class="scheda-empty">Nessun talento</span>'}</div>
-            </div>
-        </div>
-
         ${buildEquipSection(pg)}
 
-        ${buildLangProfSection(pg)}
-
+        ${classResourcesHtml}
         `;
 
         // Wire up editable inputs
@@ -1965,14 +1947,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     window._schedaCurrentTab = 'incantesimi';
 
     content.innerHTML = `
-    <div class="scheda-identity">
-        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-        <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
-        <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
-        ${(pg.classi && pg.classi.length > 0)
-            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
-            : ''}
-    </div>
+    ${buildSchedaHeader(pg, 'Incantesimi')}
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
         <div class="scheda-section-body">${spellStatsHtml}</div>
@@ -2004,6 +1979,126 @@ window.schedaOpenSpellPage = async function(pgId) {
 window.schedaToggleSection = function(titleEl) {
     const section = titleEl.closest('.scheda-section');
     if (section) section.classList.toggle('collapsed');
+};
+
+window.schedaToggleSubsection = function(titleEl) {
+    const sub = titleEl.closest('.scheda-subsection');
+    if (sub) sub.classList.toggle('collapsed');
+};
+
+window.schedaToggleResInline = async function(pgId, dmgType) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
+    let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
+    const wasRes = res.includes(dmgType);
+    if (wasRes) res = res.filter(x => x !== dmgType);
+    else { res.push(dmgType); imm = imm.filter(x => x !== dmgType); }
+    pg.resistenze = res;
+    pg.immunita = imm;
+    _refreshResImmInlineRow(dmgType);
+    if (supabase) await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
+};
+
+window.schedaToggleImmInline = async function(pgId, dmgType) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
+    let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
+    const wasImm = imm.includes(dmgType);
+    if (wasImm) imm = imm.filter(x => x !== dmgType);
+    else { imm.push(dmgType); res = res.filter(x => x !== dmgType); }
+    pg.resistenze = res;
+    pg.immunita = imm;
+    _refreshResImmInlineRow(dmgType);
+    if (supabase) await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
+};
+
+function _refreshResImmInlineRow(dmgType) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const isRes = (pg.resistenze || []).includes(dmgType);
+    const isImm = (pg.immunita || []).includes(dmgType);
+    const row = document.getElementById('sResImmRow_' + dmgType);
+    if (row) {
+        const dots = row.querySelectorAll('.scheda-skill-dot');
+        if (dots[0]) dots[0].classList.toggle('active', isRes);
+        if (dots[1]) dots[1].classList.toggle('active', isImm);
+    }
+    const badge = document.getElementById('sResImmCount');
+    if (badge) {
+        const tot = (pg.resistenze || []).length + (pg.immunita || []).length;
+        badge.textContent = tot > 0 ? tot : '';
+    }
+}
+
+/* ── Header scheda condiviso (foto a sx, identità a sx, level-up + ispirazione a dx) ── */
+function buildSchedaHeader(pg, pageLabel) {
+    if (!pg) return '';
+    const initials = (pg.nome || '?').trim().split(/\s+/).slice(0, 2).map(s => s.charAt(0).toUpperCase()).join('') || '?';
+    const imgUrl = pg.immagine_url || '';
+    const avatarInner = imgUrl
+        ? `<img src="${escapeAttr(imgUrl)}" alt="${escapeAttr(pg.nome || '')}" class="scheda-avatar-img">`
+        : `<span class="scheda-avatar-initials">${escapeHtml(initials)}</span>`;
+    const subtitle = (() => {
+        if (pageLabel) return escapeHtml(pageLabel);
+        if (pg.classi && pg.classi.length > 0) {
+            return pg.classi.map(c => `${escapeHtml(c.nome)} ${parseInt(c.livello) || 1}`).join(' / ');
+        }
+        return escapeHtml(pg.classe || '');
+    })();
+    const subtitleSm = pageLabel ? '' : escapeHtml(pg.razza || '');
+    const hasClasses = pg.classi && pg.classi.length > 0;
+    const levelUpBtn = hasClasses
+        ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+        : '';
+    const ispVal = pg.ispirazione || 0;
+    const ispBox = `<div class="scheda-isp-box" title="Ispirazione">
+        <button class="scheda-isp-btn" onclick="schedaIspChange('${pg.id}',-1)" aria-label="Diminuisci ispirazione">−</button>
+        <div class="scheda-isp-display"><span class="scheda-isp-star" aria-hidden="true">★</span><span id="sIsp">${ispVal}</span></div>
+        <button class="scheda-isp-btn" onclick="schedaIspChange('${pg.id}',1)" aria-label="Aumenta ispirazione">+</button>
+    </div>`;
+    return `
+    <div class="scheda-identity">
+        <button type="button" class="scheda-avatar" onclick="schedaEditAvatar('${pg.id}')" title="Cambia immagine">
+            ${avatarInner}
+        </button>
+        <div class="scheda-identity-info">
+            <div class="scheda-name">${escapeHtml(pg.nome || '')}</div>
+            <div class="scheda-subtitle">${subtitle}</div>
+            ${subtitleSm ? `<div class="scheda-subtitle-sm">${subtitleSm}</div>` : ''}
+        </div>
+        <div class="scheda-identity-actions">
+            ${levelUpBtn}
+            ${ispBox}
+        </div>
+    </div>`;
+}
+
+window.schedaEditAvatar = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = pg.immagine_url || '';
+    const url = prompt('URL immagine personaggio (lascia vuoto per rimuovere):', current);
+    if (url === null) return;
+    const trimmed = (url || '').trim();
+    pg.immagine_url = trimmed || null;
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        const { error } = await supabase.from('personaggi').update({ immagine_url: trimmed || null }).eq('id', pgId);
+        if (error) {
+            console.warn('Salvataggio immagine fallito:', error.message);
+            showNotification && showNotification('Impossibile salvare l\'immagine (manca colonna immagine_url?)');
+        }
+    }
+    // Re-render della tab corrente
+    const tab = window._schedaCurrentTab;
+    if (tab === 'incantesimi') schedaOpenSpellPage(pgId);
+    else if (tab === 'inventario') schedaOpenInventoryPage(pgId);
+    else if (tab === 'privilegi') schedaOpenPrivilegesPage(pgId);
+    else renderSchedaPersonaggio(pgId);
 };
 
 /* ── Spells / Trucchetti ── */
@@ -2177,11 +2272,105 @@ document.addEventListener('appLangChanged', () => {
     }
 });
 
+// ── Helper per filtri spell picker ──────────────────────────────────
+function _spellSchoolKey(sp) {
+    return (sp.school || sp.school_it || '').toLowerCase();
+}
+function _spellHasComponent(sp, c) {
+    const txt = (sp.components || sp.components_en || '').toUpperCase();
+    // Componenti separate da virgola: estraggo i token prima di parentesi e match esatti
+    const tokens = txt.replace(/\(.*?\)/g, '').split(/[,\s]+/).filter(Boolean);
+    return tokens.includes(c);
+}
+function _spellIsConcentration(sp) {
+    const d = (sp.duration || sp.duration_en || '').toLowerCase();
+    return d.startsWith('concentr');
+}
+function _spellIsRitual(sp) {
+    if (sp.ritual === true) return true;
+    const ct = (sp.casting_time || sp.casting_time_en || '').toLowerCase();
+    return /\(\s*rit/.test(ct) || /ritual/.test(ct);
+}
+function _spellSourceShort(sp) {
+    const src = sp.source || '';
+    if (!src) return '';
+    if (/Player.{0,3}s Handbook/i.test(src)) return 'PHB';
+    if (/Xanathar/i.test(src)) return 'XGtE';
+    if (/Tasha/i.test(src)) return 'TCoE';
+    if (/Sword Coast/i.test(src)) return 'SCAG';
+    if (/Eberron/i.test(src)) return 'EBR';
+    if (/Mordenkainen.*Multiverse/i.test(src)) return 'MMM';
+    if (/Strixhaven/i.test(src)) return 'SCC';
+    return src.split(/[\s(]/)[0].slice(0, 6);
+}
+function _normCastingTime(ct) {
+    const t = (ct || '').toLowerCase();
+    if (/azione bonus/.test(t)) return 'Azione Bonus';
+    if (/reazione/.test(t)) return 'Reazione';
+    if (/^1 azione/.test(t)) return 'Azione';
+    if (/minut/.test(t)) return 'Minuti';
+    if (/\bor[ae]\b/.test(t)) return 'Ore';
+    return 'Altro';
+}
+const _SPELL_SCHOOLS = [
+    ['abjuration','Abiurazione'],['conjuration','Evocazione'],['divination','Divinazione'],
+    ['enchantment','Ammaliamento'],['evocation','Invocazione'],['illusion','Illusione'],
+    ['necromancy','Necromanzia'],['transmutation','Trasmutazione']
+];
+const _SPELL_CASTING_TIMES = ['Azione','Azione Bonus','Reazione','Minuti','Ore','Altro'];
+const _SPELL_SOURCES_KNOWN = ['PHB','XGtE','TCoE','SCAG','EBR','MMM','SCC'];
+
+function _defaultSpellFilters(pg) {
+    const pgClasses = Array.from(_pgSpellClasses(pg));
+    return {
+        schools: [],            // array di chiavi school (es. 'evocation'); vuoto = tutte
+        castingTimes: [],       // 'Azione','Azione Bonus','Reazione','Minuti','Ore','Altro'
+        components: [],         // ['V','S','M']
+        concentration: 'any',   // 'any' | 'yes' | 'no'
+        ritual: 'any',          // 'any' | 'yes' | 'no'
+        classes: [...pgClasses],// default: classi del PG (vuoto = tutte)
+        sources: []             // codici source (vuoto = tutti)
+    };
+}
+
+function _applySpellPickerFilters(spell, f) {
+    if (!f) return true;
+    // Scuola
+    if (f.schools && f.schools.length > 0) {
+        if (!f.schools.includes(_spellSchoolKey(spell))) return false;
+    }
+    // Casting time
+    if (f.castingTimes && f.castingTimes.length > 0) {
+        if (!f.castingTimes.includes(_normCastingTime(spell.casting_time || spell.casting_time_en))) return false;
+    }
+    // Componenti (richiesti tutti i selezionati)
+    if (f.components && f.components.length > 0) {
+        for (const c of f.components) if (!_spellHasComponent(spell, c)) return false;
+    }
+    // Concentrazione
+    if (f.concentration === 'yes' && !_spellIsConcentration(spell)) return false;
+    if (f.concentration === 'no' && _spellIsConcentration(spell)) return false;
+    // Rituale
+    if (f.ritual === 'yes' && !_spellIsRitual(spell)) return false;
+    if (f.ritual === 'no' && _spellIsRitual(spell)) return false;
+    // Classi
+    if (f.classes && f.classes.length > 0) {
+        const lists = [spell.classes || [], spell.classes_en || []];
+        let ok = false;
+        outer: for (const list of lists) for (const c of list) if (f.classes.includes(c)) { ok = true; break outer; }
+        if (!ok) return false;
+    }
+    // Manuale (source)
+    if (f.sources && f.sources.length > 0) {
+        if (!f.sources.includes(_spellSourceShort(spell))) return false;
+    }
+    return true;
+}
+
 window.schedaOpenSpellPicker = function(pgId, level) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const all = _spellsData();
-    const pgClasses = _pgSpellClasses(pg);
     // Conserva l'unione di tutti i conosciuti (di ogni livello), normalizzati a nome IT
     const knownAll = new Set((pg.incantesimi_conosciuti || []).map(n => {
         const sp = _resolveSpell(n);
@@ -2192,18 +2381,21 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     const list = Object.values(all).filter(s => s.level === level);
     list.sort((a, b) => _spellField(a, 'name').localeCompare(_spellField(b, 'name'), lang));
 
-    const matching = list.filter(s => _spellMatchesPg(s, pgClasses));
-    const others = list.filter(s => !_spellMatchesPg(s, pgClasses));
+    // Inizializza i filtri di default (con classi del PG preselezionate)
+    window._spellPickerFilters = _defaultSpellFilters(pg);
+    window._spellPickerSearchQ = '';
 
     const renderRow = (sp) => {
-        // L'id resta sempre il nome italiano (chiave canonica)
         const id = sp.name;
         const isKnown = knownAll.has(id);
         const safeId = escapeAttr(id);
-        return `<label class="spell-pick-row">
+        const tags = [];
+        if (_spellIsConcentration(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-c" title="Concentrazione">C</span>');
+        if (_spellIsRitual(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-r" title="Rituale">R</span>');
+        return `<label class="spell-pick-row" data-spell-id="${safeId}">
             <input type="checkbox" class="spell-pick-cb" data-name="${safeId}" ${isKnown ? 'checked' : ''}>
             <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeId}')">
-                <div class="spell-pick-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+                <div class="spell-pick-name">${escapeHtml(_spellField(sp, 'name'))} ${tags.join('')}</div>
                 <div class="spell-pick-meta">${escapeHtml(_spellField(sp, 'school'))} · ${(_spellField(sp, 'classes') || []).join(', ')}</div>
             </div>
         </label>`;
@@ -2212,12 +2404,70 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     const titleLabel = lang === 'en'
         ? (level === 0 ? 'Cantrips' : `Level ${level} Spells`)
         : (SPELL_LEVEL_LABELS[level] || `Livello ${level}`);
-    const grpMatch = lang === 'en' ? 'Available for your class' : 'Disponibili per la tua classe';
-    const grpOther = lang === 'en' ? 'Others' : 'Altri';
-    const emptyMsg = lang === 'en' ? 'No spells available' : 'Nessun incantesimo disponibile';
+    const emptyMsg = lang === 'en' ? 'No spells match the filters' : 'Nessun incantesimo corrisponde ai filtri';
     const placeholder = lang === 'en' ? 'Search…' : 'Cerca…';
     const cancelLbl = lang === 'en' ? 'Cancel' : 'Annulla';
     const saveLbl = lang === 'en' ? 'Save' : 'Salva';
+
+    // Pannello filtri
+    const f = window._spellPickerFilters;
+    const allClassesSet = new Set();
+    Object.values(all).forEach(sp => (sp.classes || []).forEach(c => allClassesSet.add(c)));
+    const allClasses = Array.from(allClassesSet).sort((a, b) => a.localeCompare(b, lang));
+    const allSourcesSet = new Set();
+    Object.values(all).forEach(sp => { const s = _spellSourceShort(sp); if (s) allSourcesSet.add(s); });
+    const allSources = Array.from(allSourcesSet).sort();
+
+    const chip = (label, active, onclick) =>
+        `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
+
+    const filtersPanelHtml = `<div class="spell-filter-panel" id="spellFilterPanel" style="display:none;">
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Scuola</div>
+            <div class="spell-filter-chips">
+                ${_SPELL_SCHOOLS.map(([k, lab]) => chip(lab, f.schools.includes(k), `spellFilterToggle('schools','${k}')`)).join('')}
+            </div>
+        </div>
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Tempo di lancio</div>
+            <div class="spell-filter-chips">
+                ${_SPELL_CASTING_TIMES.map(t => chip(t, f.castingTimes.includes(t), `spellFilterToggle('castingTimes','${t}')`)).join('')}
+            </div>
+        </div>
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Componenti</div>
+            <div class="spell-filter-chips">
+                ${['V','S','M'].map(c => chip(c, f.components.includes(c), `spellFilterToggle('components','${c}')`)).join('')}
+            </div>
+        </div>
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Concentrazione</div>
+            <div class="spell-filter-chips">
+                ${[['any','Tutti'],['yes','Sì'],['no','No']].map(([v, lab]) => chip(lab, f.concentration === v, `spellFilterSet('concentration','${v}')`)).join('')}
+            </div>
+        </div>
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Rituale</div>
+            <div class="spell-filter-chips">
+                ${[['any','Tutti'],['yes','Sì'],['no','No']].map(([v, lab]) => chip(lab, f.ritual === v, `spellFilterSet('ritual','${v}')`)).join('')}
+            </div>
+        </div>
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Classi <small style="color:var(--text-light);">(default: classi del PG)</small></div>
+            <div class="spell-filter-chips">
+                ${allClasses.map(c => chip(c, f.classes.includes(c), `spellFilterToggle('classes',\`${c.replace(/`/g, '\\`')}\`)`)).join('')}
+            </div>
+        </div>
+        ${allSources.length > 0 ? `<div class="spell-filter-group">
+            <div class="spell-filter-label">Manuale</div>
+            <div class="spell-filter-chips">
+                ${allSources.map(s => chip(s, f.sources.includes(s), `spellFilterToggle('sources','${s}')`)).join('')}
+            </div>
+        </div>` : ''}
+        <div class="spell-filter-actions">
+            <button type="button" class="btn-secondary btn-small" onclick="spellFilterReset()">Reimposta</button>
+        </div>
+    </div>`;
 
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
@@ -2225,12 +2475,17 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     overlay.innerHTML = `<div class="hp-calc-modal spell-picker-modal">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 style="margin-bottom:6px;">${escapeHtml(titleLabel)}</h3>
-        <input type="text" id="spellPickerSearch" class="hp-calc-input" placeholder="${placeholder}" style="margin-bottom:10px;">
-        <div class="spell-picker-list" id="spellPickerList">
-            ${matching.length > 0 ? `<div class="spell-pick-group-title">${grpMatch}</div>${matching.map(renderRow).join('')}` : ''}
-            ${others.length > 0 ? `<div class="spell-pick-group-title">${grpOther}</div>${others.map(renderRow).join('')}` : ''}
-            ${list.length === 0 ? `<p class="scheda-empty">${emptyMsg}</p>` : ''}
+        <div class="spell-picker-search-row">
+            <input type="text" id="spellPickerSearch" class="hp-calc-input spell-picker-search" placeholder="${placeholder}">
+            <button type="button" class="spell-picker-filter-btn" id="spellPickerFilterBtn" onclick="spellFilterTogglePanel()" title="Filtri" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span class="spell-picker-filter-badge" id="spellFilterBadge" style="display:none;">0</span>
+            </button>
         </div>
+        ${filtersPanelHtml}
+        <div class="spell-picker-list" id="spellPickerList"></div>
         <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">${cancelLbl}</button>
             <button class="btn-primary" onclick="schedaSaveSpellsForLevel('${pgId}', ${level})">${saveLbl}</button>
@@ -2238,17 +2493,119 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     </div>`;
     document.body.appendChild(overlay);
 
+    // Stato condiviso per re-render lista
+    window._spellPickerList = list;
+    window._spellPickerRenderRow = renderRow;
+    window._spellPickerEmptyMsg = emptyMsg;
+    _spellPickerRefresh();
+
     const search = document.getElementById('spellPickerSearch');
     if (search) {
         search.addEventListener('input', () => {
-            const q = search.value.toLowerCase().trim();
-            overlay.querySelectorAll('.spell-pick-row').forEach(r => {
-                const txt = r.textContent.toLowerCase();
-                r.style.display = !q || txt.includes(q) ? '' : 'none';
-            });
+            window._spellPickerSearchQ = search.value.toLowerCase().trim();
+            _spellPickerRefresh();
         });
     }
 };
+
+function _spellPickerRefresh() {
+    const list = window._spellPickerList || [];
+    const renderRow = window._spellPickerRenderRow;
+    const emptyMsg = window._spellPickerEmptyMsg || '';
+    const f = window._spellPickerFilters;
+    const q = window._spellPickerSearchQ || '';
+    const lang = _spellLang();
+    const pg = _schedaPgCache;
+    const pgClasses = pg ? _pgSpellClasses(pg) : new Set();
+
+    const filtered = list.filter(sp => _applySpellPickerFilters(sp, f)).filter(sp => {
+        if (!q) return true;
+        const name = (_spellField(sp, 'name') || '').toLowerCase();
+        const sch = (_spellField(sp, 'school') || '').toLowerCase();
+        return name.includes(q) || sch.includes(q);
+    });
+
+    const matching = filtered.filter(s => _spellMatchesPg(s, pgClasses));
+    const others = filtered.filter(s => !_spellMatchesPg(s, pgClasses));
+    const grpMatch = lang === 'en' ? 'Available for your class' : 'Disponibili per la tua classe';
+    const grpOther = lang === 'en' ? 'Others' : 'Altri';
+
+    const listEl = document.getElementById('spellPickerList');
+    if (!listEl) return;
+    let html = '';
+    if (matching.length > 0) html += `<div class="spell-pick-group-title">${grpMatch}</div>${matching.map(renderRow).join('')}`;
+    if (others.length > 0) html += `<div class="spell-pick-group-title">${grpOther}</div>${others.map(renderRow).join('')}`;
+    if (filtered.length === 0) html = `<p class="scheda-empty">${emptyMsg}</p>`;
+    listEl.innerHTML = html;
+
+    // Aggiorna badge contatore filtri attivi
+    const badge = document.getElementById('spellFilterBadge');
+    if (badge && f) {
+        const def = pg ? _defaultSpellFilters(pg) : null;
+        let n = 0;
+        n += f.schools.length;
+        n += f.castingTimes.length;
+        n += f.components.length;
+        if (f.concentration !== 'any') n += 1;
+        if (f.ritual !== 'any') n += 1;
+        // Considero "modificato" il filtro classi solo se differisce dal default (classi del PG)
+        if (def && (f.classes.length !== def.classes.length || f.classes.some(c => !def.classes.includes(c)))) n += 1;
+        n += f.sources.length;
+        if (n > 0) { badge.textContent = n; badge.style.display = ''; }
+        else badge.style.display = 'none';
+    }
+}
+
+window.spellFilterTogglePanel = function() {
+    const panel = document.getElementById('spellFilterPanel');
+    const btn = document.getElementById('spellPickerFilterBtn');
+    if (!panel) return;
+    const visible = panel.style.display !== 'none';
+    panel.style.display = visible ? 'none' : '';
+    if (btn) btn.classList.toggle('active', !visible);
+};
+
+window.spellFilterToggle = function(field, value) {
+    const f = window._spellPickerFilters;
+    if (!f || !Array.isArray(f[field])) return;
+    const i = f[field].indexOf(value);
+    if (i >= 0) f[field].splice(i, 1); else f[field].push(value);
+    // Aggiorna lo stato visivo del chip
+    _refreshSpellFilterChips();
+    _spellPickerRefresh();
+};
+
+window.spellFilterSet = function(field, value) {
+    const f = window._spellPickerFilters;
+    if (!f) return;
+    f[field] = value;
+    _refreshSpellFilterChips();
+    _spellPickerRefresh();
+};
+
+window.spellFilterReset = function() {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    window._spellPickerFilters = _defaultSpellFilters(pg);
+    _refreshSpellFilterChips();
+    _spellPickerRefresh();
+};
+
+function _refreshSpellFilterChips() {
+    const panel = document.getElementById('spellFilterPanel');
+    if (!panel) return;
+    const f = window._spellPickerFilters;
+    panel.querySelectorAll('.spell-filter-chip').forEach(btn => {
+        const oc = btn.getAttribute('onclick') || '';
+        const m = oc.match(/spellFilter(Toggle|Set)\('([^']+)',\s*[`']([^`']+)[`']\)/);
+        if (!m) return;
+        const action = m[1], field = m[2], value = m[3];
+        let active = false;
+        if (action === 'Toggle' && Array.isArray(f[field])) active = f[field].includes(value);
+        else if (action === 'Set') active = f[field] === value;
+        btn.classList.toggle('active', active);
+    });
+}
 
 // Alias storico
 window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };
@@ -2278,13 +2635,27 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
 window.schedaSaveCantrips = function(pgId) { return window.schedaSaveSpellsForLevel(pgId, 0); };
 
 /* ── Inventario Tab ── */
+// Monete D&D 5e con tasso di conversione in MO (oro) e ordine 2x3 (riga1: MR/MA, riga2: ME/MO, riga3: MP/Totale)
 const COIN_TYPES = [
-    { key: 'pp', label: 'Platino (PP)', icon: '◆' },
-    { key: 'mo', label: 'Oro (MO)', icon: '●' },
-    { key: 'ma', label: 'Argento (MA)', icon: '○' },
-    { key: 'mr', label: 'Rame (MR)', icon: '·' },
-    { key: 'me', label: 'Electrum (ME)', icon: '◇' }
+    { key: 'mr', label: 'Rame (MR)', short: 'MR', goldRatio: 0.01 },
+    { key: 'ma', label: 'Argento (MA)', short: 'MA', goldRatio: 0.1 },
+    { key: 'me', label: 'Electrum (ME)', short: 'ME', goldRatio: 0.5 },
+    { key: 'mo', label: 'Oro (MO)', short: 'MO', goldRatio: 1 },
+    { key: 'mp', label: 'Platino (MP)', short: 'MP', goldRatio: 10 }
 ];
+
+function _calcCoinsTotalGold(monete) {
+    if (!monete) return 0;
+    let tot = 0;
+    COIN_TYPES.forEach(c => { tot += (parseInt(monete[c.key]) || 0) * c.goldRatio; });
+    return tot;
+}
+
+function _formatGoldTotal(g) {
+    if (g === 0) return '0';
+    if (g >= 100 || Number.isInteger(g)) return String(Math.round(g));
+    return g.toFixed(2).replace(/\.?0+$/, '');
+}
 
 window.schedaOpenInventoryPage = async function(pgId) {
     const content = document.getElementById('schedaContent');
@@ -2296,10 +2667,10 @@ window.schedaOpenInventoryPage = async function(pgId) {
     _schedaPgCache = pg;
 
     const monete = pg.monete || {};
-    const coinsHtml = COIN_TYPES.map(c => {
+    const coinCellHtml = (c) => {
         const val = monete[c.key] || 0;
         return `<div class="inv-coin-cell inv-coin-${c.key}">
-            <div class="inv-coin-abbr">${c.key.toUpperCase()}</div>
+            <div class="inv-coin-abbr">${c.short}</div>
             <input type="text" inputmode="none" readonly
                 class="inv-coin-input"
                 id="invCoin_${c.key}"
@@ -2309,7 +2680,19 @@ window.schedaOpenInventoryPage = async function(pgId) {
                 onclick="invOpenCoinKeypad(this)">
             <div class="inv-coin-name">${c.label.split(' ')[0]}</div>
         </div>`;
-    }).join('');
+    };
+    const totalGold = _calcCoinsTotalGold(monete);
+    const totalCellHtml = `<div class="inv-coin-cell inv-coin-total" id="invCoinTotalCell">
+        <div class="inv-coin-abbr">TOT</div>
+        <div class="inv-coin-input inv-coin-total-val" id="invCoinTotal">${_formatGoldTotal(totalGold)}</div>
+        <div class="inv-coin-name">in MO</div>
+    </div>`;
+    // Riga 1: MR / MA · Riga 2: ME / MO · Riga 3: MP / Totale
+    const coinsHtml = `<div class="inv-coins-grid inv-coins-grid-2x3">
+        ${coinCellHtml(COIN_TYPES[0])}${coinCellHtml(COIN_TYPES[1])}
+        ${coinCellHtml(COIN_TYPES[2])}${coinCellHtml(COIN_TYPES[3])}
+        ${coinCellHtml(COIN_TYPES[4])}${totalCellHtml}
+    </div>`;
 
     const oggetti = pg.inventario || [];
     const oggettiRows = oggetti.length > 0 ? oggetti.map((o, i) => {
@@ -2336,23 +2719,19 @@ window.schedaOpenInventoryPage = async function(pgId) {
     }
 
     content.innerHTML = `
-    <div class="scheda-identity">
-        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-        <div class="scheda-subtitle-sm">Inventario</div>
-        ${(pg.classi && pg.classi.length > 0)
-            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
-            : ''}
-    </div>
+    ${buildSchedaHeader(pg, 'Inventario')}
 
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Monete</div>
         <div class="scheda-section-body">
-            <div class="inv-coins-grid">${coinsHtml}</div>
+            ${coinsHtml}
         </div>
     </div>
 
+    <hr class="scheda-divider">
+
     <div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Oggetti
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Tesoro
             <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">+</button>
         </div>
         <div class="scheda-section-body">
@@ -2399,6 +2778,8 @@ window.invOpenCoinKeypad = function(inputEl) {
         const monete = pg.monete ? { ...pg.monete } : {};
         monete[coinKey] = val;
         pg.monete = monete;
+        const totEl = document.getElementById('invCoinTotal');
+        if (totEl) totEl.textContent = _formatGoldTotal(_calcCoinsTotalGold(monete));
         await supabase.from('personaggi').update({ monete }).eq('id', pgId);
         inputEl.removeEventListener('change', onChange);
     };
@@ -2553,7 +2934,9 @@ window.invRemoveAttune = async function(pgId, idx) {
    }
    ────────────────────────────────────────────────────────────────────── */
 
-const PRIV_DEFAULT_CUSTOM_TABS = ['Razza', 'Background'];
+// Tabelle custom presenti di default nella pagina Privilegi.
+// Nota: "Talenti" non e' qui perche' viene gestito come sezione speciale legata a pg.talenti.
+const PRIV_DEFAULT_CUSTOM_TABS = ['Razza'];
 
 function _classesData() { return window.CLASSES_DATA || []; }
 
@@ -2568,13 +2951,17 @@ function _getClassData(slug) {
 
 function _normalizePrivilegi(pg) {
     const p = pg.privilegi || {};
+    let order = Array.isArray(p.custom_tabs_order)
+        ? [...p.custom_tabs_order]
+        : [...PRIV_DEFAULT_CUSTOM_TABS];
+    // Migrazione: rimuovi "Background" dalle tabelle visibili (i dati restano in custom_features se serviranno).
+    order = order.filter(t => t !== 'Background');
+    if (!order.includes('Razza')) order.unshift('Razza');
     return {
         hidden_auto: Array.isArray(p.hidden_auto) ? [...p.hidden_auto] : [],
         custom_features: (p.custom_features && typeof p.custom_features === 'object')
             ? { ...p.custom_features } : {},
-        custom_tabs_order: Array.isArray(p.custom_tabs_order)
-            ? [...p.custom_tabs_order]
-            : [...PRIV_DEFAULT_CUSTOM_TABS],
+        custom_tabs_order: order,
     };
 }
 
@@ -2782,14 +3169,21 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         </div>`;
     });
 
+    // Sezione Talenti (gestita separatamente: si appoggia a pg.talenti, non a custom_features)
+    const talentiList = (pg.talenti && pg.talenti.length > 0)
+        ? pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')
+        : '<span class="scheda-empty">Nessun talento</span>';
+    const talentiSectionHtml = `<div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Talenti
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
+        </div>
+        <div class="scheda-section-body">
+            <div class="scheda-tags" id="schedaTalentiDisplay">${talentiList}</div>
+        </div>
+    </div>`;
+
     content.innerHTML = `
-    <div class="scheda-identity">
-        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
-        <div class="scheda-subtitle-sm">Privilegi</div>
-        ${(pg.classi && pg.classi.length > 0)
-            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
-            : ''}
-    </div>
+    ${buildSchedaHeader(pg, 'Pagina 2 · Privilegi')}
 
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Classe</div>
@@ -2801,7 +3195,11 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         <div class="scheda-section-body">${subclassBlocks}</div>
     </div>` : ''}
 
+    <hr class="scheda-divider">
+
     ${customSectionsHtml}
+
+    ${talentiSectionHtml}
 
     <div class="priv-add-tab-wrap">
         <button class="btn-secondary priv-add-tab-btn" onclick="privAddTab()">
