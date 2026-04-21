@@ -1668,6 +1668,17 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PV Temp</div>
                     </div>
                 </div>
+                <div class="scheda-isp-row">
+                    <div class="scheda-isp-info">
+                        <span class="scheda-isp-icon" aria-hidden="true">★</span>
+                        <span class="scheda-isp-label">Ispirazione</span>
+                    </div>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaIspChange('${pg.id}',-1)">−</button>
+                        <span class="scheda-hd-val" id="sIsp">${pg.ispirazione || 0}</span>
+                        <button class="scheda-hd-btn" onclick="schedaIspChange('${pg.id}',1)">+</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1683,7 +1694,11 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita</div>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita
+                ${(pg.classi && pg.classi.length > 0)
+                    ? `<button class="scheda-edit-btn scheda-levelup-btn" onclick="event.stopPropagation();schedaLevelUp('${pg.id}')" title="Level up">▲</button>`
+                    : ''}
+            </div>
             <div class="scheda-section-body">
                 ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
             </div>
@@ -3469,6 +3484,142 @@ window.schedaToggleConcentrazione = async function(pgId, el) {
     el.classList.toggle('active');
     if (_schedaPgCache) _schedaPgCache.concentrazione = !isActive;
 };
+
+/* ── Ispirazione (contatore semplice, illimitato, >= 0) ── */
+window.schedaIspChange = function(pgId, delta) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = parseInt(pg.ispirazione || 0) || 0;
+    const newVal = Math.max(0, current + delta);
+    if (newVal === current && delta < 0) return;
+    pg.ispirazione = newVal;
+    const el = document.getElementById('sIsp');
+    if (el) el.textContent = newVal;
+    schedaInstantSave(pgId, { ispirazione: newVal });
+};
+
+/* ── Level Up ────────────────────────────────────────────────────────────────
+   Aumenta di 1 il livello di una classe del PG, ricalcola PV (media del dado
+   vita + modificatore di Costituzione), aggiunge un dado vita disponibile e
+   aggiorna automaticamente livello totale, risorse di classe e privilegi
+   (entrambi calcolati dinamicamente in fase di render).
+   ────────────────────────────────────────────────────────────────────────── */
+const CLASS_HIT_DIE = {
+    'Artefice': 8, 'Bardo': 8, 'Chierico': 8, 'Druido': 8, 'Ladro': 8,
+    'Monaco': 8, 'Warlock': 8, 'Barbaro': 12, 'Mago': 6, 'Stregone': 6,
+    'Guerriero': 10, 'Paladino': 10, 'Ranger': 10
+};
+
+function _hitDieAverage(die) {
+    // Valore medio "fisso" usato in 5e per i livelli successivi al primo.
+    return Math.floor(die / 2) + 1;
+}
+
+window.schedaLevelUp = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const classi = Array.isArray(pg.classi) ? pg.classi : [];
+    if (classi.length === 0) {
+        showNotification('Nessuna classe configurata');
+        return;
+    }
+    // PG con livello totale gia' al massimo (20).
+    const totLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
+    if (totLevel >= 20) {
+        showNotification('Livello massimo raggiunto (20)');
+        return;
+    }
+
+    if (classi.length === 1) {
+        const c = classi[0];
+        if ((parseInt(c.livello) || 0) >= 20) {
+            showNotification('Livello massimo raggiunto (20)');
+            return;
+        }
+        const ok = await showConfirm(
+            `Aumentare ${c.nome} dal livello ${c.livello || 1} al livello ${(c.livello || 1) + 1}? Verranno aggiornati PV, dadi vita e risorse di classe.`,
+            'Level Up'
+        );
+        if (ok) await _doLevelUp(pgId, 0);
+        return;
+    }
+
+    _showLevelUpPicker(pgId, classi);
+};
+
+function _showLevelUpPicker(pgId, classi) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const rows = classi.map((c, i) => {
+        const lvl = parseInt(c.livello) || 1;
+        const disabled = lvl >= 20;
+        return `<button class="levelup-pick-row${disabled ? ' disabled' : ''}" ${disabled ? 'disabled' : ''} data-idx="${i}">
+            <span class="levelup-pick-name">${escapeHtml(c.nome)}</span>
+            <span class="levelup-pick-arrow">${lvl} → ${disabled ? lvl : lvl + 1}</span>
+        </button>`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal levelup-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="levelup-title">Level Up</h3>
+        <p class="levelup-sub">Quale classe vuoi aumentare di livello?</p>
+        <div class="levelup-pick-list">${rows}</div>
+    </div>`;
+    overlay.querySelectorAll('.levelup-pick-row').forEach(btn => {
+        btn.onclick = async () => {
+            const idx = parseInt(btn.dataset.idx);
+            overlay.remove();
+            await _doLevelUp(pgId, idx);
+        };
+    });
+    document.body.appendChild(overlay);
+}
+
+async function _doLevelUp(pgId, classIdx) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const classi = (pg.classi || []).map(c => ({ ...c }));
+    const cls = classi[classIdx];
+    if (!cls) return;
+
+    const newLvl = (parseInt(cls.livello) || 0) + 1;
+    if (newLvl > 20) { showNotification('Livello massimo raggiunto (20)'); return; }
+    cls.livello = newLvl;
+    classi[classIdx] = cls;
+
+    const die = CLASS_HIT_DIE[cls.nome] || 8;
+    const conMod = Math.floor((((pg.costituzione) || 10) - 10) / 2);
+    const pvGain = Math.max(1, _hitDieAverage(die) + conMod);
+
+    const newPvMax = (parseInt(pg.punti_vita_max) || 0) + pvGain;
+    const newPvAttuali = (pg.pv_attuali != null ? parseInt(pg.pv_attuali) : (parseInt(pg.punti_vita_max) || 0)) + pvGain;
+
+    const dadi = { ...(pg.dadi_vita_disponibili || {}) };
+    const totalForClass = newLvl;
+    const currentDadi = dadi[cls.nome] != null ? parseInt(dadi[cls.nome]) : (newLvl - 1);
+    dadi[cls.nome] = Math.min(totalForClass, currentDadi + 1);
+
+    const totalLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
+
+    const updates = {
+        classi,
+        livello: totalLevel,
+        punti_vita_max: newPvMax,
+        pv_attuali: newPvAttuali,
+        dadi_vita_disponibili: dadi
+    };
+
+    pg.classi = classi;
+    pg.livello = totalLevel;
+    pg.punti_vita_max = newPvMax;
+    pg.pv_attuali = newPvAttuali;
+    pg.dadi_vita_disponibili = dadi;
+
+    await schedaInstantSave(pgId, updates);
+    showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV)`);
+    // Re-render della scheda: privilegi e risorse di classe ricalcolano automaticamente in base al livello.
+    renderSchedaPersonaggio(pgId);
+}
 
 window.schedaHdChange = function(pgId, className, current, delta, max) {
     const pg = _schedaPgCache;
