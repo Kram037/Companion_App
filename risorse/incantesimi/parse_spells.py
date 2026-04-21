@@ -574,6 +574,7 @@ CASTING_TIME_IT = {
     "8 hours": "8 ore",
     "12 hours": "12 ore",
     "24 hours": "24 ore",
+    "1 action or 8 hours": "1 azione o 8 ore",
 }
 
 # Range fissi
@@ -592,6 +593,8 @@ DURATION_FIXED_IT = {
     "Until dispelled": "Finché non dissolto",
     "Until dispelled or triggered": "Finché non dissolto o attivato",
     "Permanent": "Permanente",
+    "Instantaneous or 1 hour (see below)": "Istantanea o 1 ora (vedi sotto)",
+    "Instantaneous or 8 hours (see below)": "Istantanea o 8 ore (vedi sotto)",
 }
 
 DURATION_UNIT_IT = {
@@ -637,7 +640,8 @@ _FOOT_HYPHEN_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*-\s*foot\b", re.IGNORECASE)
 # Pattern come "60 feet", "5 feet"
 _FEET_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s+feet\b", re.IGNORECASE)
 _FOOT_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s+foot\b", re.IGNORECASE)
-# Pattern miglia
+# Pattern miglia (con e senza trattino: "5-mile" / "5 miles")
+_MILE_HYPHEN_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*-\s*miles?\b", re.IGNORECASE)
 _MILES_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s+miles?\b", re.IGNORECASE)
 # "1 inch" -> "2,5 cm" (raro ma capita)
 _INCHES_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s+inch(?:es)?\b", re.IGNORECASE)
@@ -652,7 +656,8 @@ def convert_distances(text: str) -> str:
     text = _FEET_RE.sub(lambda m: f"{feet_to_meters(float(m.group(1)))} metri", text)
     # "X foot" residui
     text = _FOOT_RE.sub(lambda m: f"{feet_to_meters(float(m.group(1)))} metri", text)
-    # "X miles" / "X mile"
+    # "X-mile" (con trattino) e "X miles" / "X mile"
+    text = _MILE_HYPHEN_RE.sub(lambda m: f"{miles_to_km(float(m.group(1)))} km", text)
     text = _MILES_RE.sub(lambda m: f"{miles_to_km(float(m.group(1)))} km", text)
     # "X inches"
     text = _INCHES_RE.sub(lambda m: f"{int(round(float(m.group(1)) * 2.54))} cm", text)
@@ -662,6 +667,87 @@ def convert_distances(text: str) -> str:
 # ---------------------------------------------------------------------------
 # Traduttori metadati
 # ---------------------------------------------------------------------------
+
+def _translate_reaction_extra(text: str) -> str:
+    """Traduce la parte 'extra' di un casting time di reazione.
+
+    Le reazioni complesse contengono una clausola che descrive il trigger
+    (es. 'which you take when you take fire damage'). Mappiamo i pattern
+    noti alla loro traduzione italiana, convertendo le distanze in metri.
+    """
+    s = text
+
+    # Traduce un elenco di tipi di danno EN -> IT (preserva le virgole/or).
+    def _dmg(types_str: str) -> str:
+        mapping = {
+            "acid": "acidi",
+            "cold": "da freddo",
+            "fire": "da fuoco",
+            "lightning": "da fulmine",
+            "thunder": "tonanti",
+            "necrotic": "necrotici",
+            "radiant": "radiosi",
+            "force": "da forza",
+            "psychic": "psichici",
+            "poison": "da veleno",
+            "bludgeoning": "contundenti",
+            "piercing": "perforanti",
+            "slashing": "taglienti",
+        }
+        # Normalizza separatori
+        text = re.sub(r"\bor\b", "o", types_str, flags=re.IGNORECASE)
+        for en, it in mapping.items():
+            text = re.sub(rf"\b{en}\b", it, text, flags=re.IGNORECASE)
+        return text.strip()
+
+    def _feet(n: str) -> str:
+        try:
+            return feet_to_meters(float(n))
+        except ValueError:
+            return n
+
+    # Prefissi più lunghi prima.
+    s = re.sub(
+        r"^which you take in response to being damaged by ",
+        "che si compie in risposta a un danno inflitto da ",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(r"^which you take when ", "che si compie quando ", s, flags=re.IGNORECASE)
+    s = re.sub(r"^see below$", "vedi sotto", s, flags=re.IGNORECASE)
+
+    # Sotto-frasi note (ordine importa: più specifiche prima).
+    s = re.sub(
+        r"\byou or a creature within (\d+) feet of you falls\b",
+        lambda m: f"tu o una creatura entro {_feet(m.group(1))} metri da te cade",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(
+        r"\byou see a creature within (\d+) feet of you casting a spell\b",
+        lambda m: f"vedi una creatura entro {_feet(m.group(1))} metri da te lanciare un incantesimo",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(
+        r"\ba humanoid you can see within (\d+) feet of you dies\b",
+        lambda m: f"un umanoide che riesci a vedere entro {_feet(m.group(1))} metri da te muore",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(
+        r"\ba creature within (\d+) feet of you that you can see\b",
+        lambda m: f"una creatura entro {_feet(m.group(1))} metri da te che riesci a vedere",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(
+        r"\byou are hit by an attack or targeted by the magic missile spell\b",
+        "vieni colpito da un attacco o sei bersaglio dell'incantesimo dardo incantato",
+        s, flags=re.IGNORECASE,
+    )
+    s = re.sub(
+        r"\byou take ([a-z, ]+?) damage\b",
+        lambda m: f"subisci danni {_dmg(m.group(1))}",
+        s, flags=re.IGNORECASE,
+    )
+    return s
+
 
 def translate_casting_time(s: str) -> str:
     if not s:
@@ -675,10 +761,7 @@ def translate_casting_time(s: str) -> str:
     base_l = base.lower()
     base_it = CASTING_TIME_IT.get(base_l, base)
     if extra:
-        # es. "which you take when ..." -> proviamo a tradurre frasi comuni
-        extra_it = extra
-        extra_it = re.sub(r"^which you take when ", "che si compie quando ", extra_it, flags=re.IGNORECASE)
-        extra_it = re.sub(r"^see below", "vedi sotto", extra_it, flags=re.IGNORECASE)
+        extra_it = _translate_reaction_extra(extra)
         return f"{base_it}, {extra_it}"
     return base_it
 
@@ -689,12 +772,27 @@ def translate_range(s: str) -> str:
     s_strip = s.strip()
     if s_strip in RANGE_FIXED_IT:
         return RANGE_FIXED_IT[s_strip]
-    # "Self (X-foot ...)" o "Self (X-foot cone)"
+    # "Self (X-foot ...)" o "Self (X-foot cone)" o "Self (X-mile radius)"
     m = re.match(r"^Self\s*\((.+)\)$", s_strip, re.IGNORECASE)
     if m:
         inner = m.group(1)
         inner = convert_distances(inner)
-        # Pattern del tipo "<num> metri <forma>" -> "<forma> di <num> metri[ di lato]"
+        # Forme con "radius" + shape esplicita: es. "X metri radius sphere"
+        # Mappiamo in "<shape> di X <unita> di raggio".
+        radius_shapes = {
+            "sphere": "sfera",
+            "hemisphere": "emisfera",
+            "cube": "cubo",
+            "cylinder": "cilindro",
+        }
+        for en, it in radius_shapes.items():
+            inner = re.sub(
+                rf"(\d[\d,]*)\s*(km|metri)\s*[-\s]\s*radius\s+{en}",
+                lambda mo, it=it: f"{it} di {mo.group(1)} {mo.group(2)} di raggio",
+                inner,
+                flags=re.IGNORECASE,
+            )
+        # Forme: "<num> metri[-]<forma>" o "<num> metri <forma>" -> "<forma> di <num> metri[ di lato]"
         shape_map = {
             "cone": ("cono", ""),
             "cube": ("cubo", " di lato"),
@@ -705,11 +803,14 @@ def translate_range(s: str) -> str:
         }
         for en, (it, suffix) in shape_map.items():
             inner = re.sub(
-                rf"(\d[\d,]*)\s*metri\s+{en}",
-                lambda mo, it=it, suffix=suffix: f"{it} di {mo.group(1)} metri{suffix}",
+                rf"(\d[\d,]*)\s*(km|metri)\s*-?\s*{en}",
+                lambda mo, it=it, suffix=suffix:
+                    f"{it} di {mo.group(1)} {mo.group(2)}{suffix}",
                 inner,
                 flags=re.IGNORECASE,
             )
+        # Strip eventuali residui inglesi
+        inner = re.sub(r"\bradius\b", "raggio", inner, flags=re.IGNORECASE)
         return f"Incantatore ({inner})"
     # Distanze pure tipo "60 feet"
     return convert_distances(s_strip)
@@ -745,11 +846,503 @@ def translate_duration(s: str) -> str:
     return s_strip
 
 
+# Lista di sostituzioni per il testo dei materiali. ORDINE IMPORTANTE:
+# - frasi multi-parola PRIMA delle parole singole
+# - articoli/preposizioni inglesi alla fine (per non sporcare frasi piu' lunghe)
+_MAT_REPLACEMENTS = [
+    # Frasi composite (quantitativi)
+    (r"\ba (?:tiny )?bit of\b", "un pezzetto di"),
+    (r"\ba bit of\b", "un pezzetto di"),
+    (r"\ba pinch of\b", "un pizzico di"),
+    (r"\bpinch of\b", "pizzico di"),
+    (r"\ba small piece of\b", "un piccolo pezzo di"),
+    (r"\ba short piece of\b", "un breve pezzo di"),
+    (r"\ba piece of\b", "un pezzo di"),
+    (r"\bpiece of\b", "pezzo di"),
+    (r"\ba lump of\b", "una zolla di"),
+    (r"\ba dollop of\b", "una cucchiaiata di"),
+    (r"\ba handful of\b", "una manciata di"),
+    (r"\ba few grains of\b", "alcuni granelli di"),
+    (r"\ba few\b", "alcuni"),
+    (r"\ba drop of\b", "una goccia di"),
+    (r"\ba wisp of\b", "un filo di"),
+    (r"\ba sprig of\b", "un rametto di"),
+    (r"\ba tuft of\b", "un ciuffo di"),
+    (r"\ba scrap of\b", "un brandello di"),
+    (r"\ba sliver of\b", "una scheggia di"),
+    (r"\ba strand of\b", "un filamento di"),
+    (r"\ba small amount of\b", "una piccola quantita' di"),
+    (r"\ba small measure of\b", "una piccola misura di"),
+    (r"\bsome\b", "un po' di"),
+
+    # Frasi di valore / consumo
+    (r"\bworth at least\b", "del valore di almeno"),
+    (r"\bworth\b", "del valore di"),
+    (r"\beach item worth\b", "ciascuno del valore di"),
+    (r"\beach worth\b", "ciascuno del valore di"),
+    (r"\bthe spell consumes\b", "l'incantesimo consuma"),
+    (r"\bconsumed by the spell\b", "consumato dall'incantesimo"),
+    (r"\bwhich the spell consumes\b", "che l'incantesimo consuma"),
+    (r"\bthat (?:the spell )?consumes\b", "che l'incantesimo consuma"),
+    (r"\bgp\b", "mo"),
+    (r"\bsp\b", "ma"),
+    (r"\bcp\b", "mr"),
+
+    # ==== COMBINAZIONI agg+sost INVERTITE (DEVONO precedere i singoli) ====
+    (r"\bpowdered iron\b", "ferro in polvere"),
+    (r"\bpowdered diamond\b", "diamante in polvere"),
+    (r"\bpowdered silver\b", "argento in polvere"),
+    (r"\bpowdered ruby\b", "rubino in polvere"),
+    (r"\bdiamond dust\b", "polvere di diamante"),
+    (r"\bdiamond powder\b", "polvere di diamante"),
+    (r"\biron filings\b", "limatura di ferro"),
+    (r"\bsilver filings\b", "limatura d'argento"),
+    (r"\bgem-encrusted bowl\b", "ciotola tempestata di gemme"),
+    (r"\bjewel-encrusted dagger\b", "pugnale tempestato di gemme"),
+    (r"\bgem-encrusted\b", "tempestato di gemme"),
+    (r"\bjewel-encrusted\b", "tempestato di gemme"),
+    (r"\bminiature portal\b", "portale in miniatura"),
+    (r"\bpolished marble\b", "marmo lucidato"),
+    (r"\btiny silver\b", "minuscolo d'argento"),
+    (r"\btiny statuette\b", "statuetta minuscola"),
+    (r"\btiny reliquary\b", "minuscolo reliquiario"),
+    (r"\btiny gem\b", "gemma minuscola"),
+    (r"\btiny vial\b", "fiala minuscola"),
+    (r"\bsmall, straight piece of iron\b", "piccolo pezzo dritto di ferro"),
+    (r"\bstraight\b", "dritto"),
+    (r"\bsilver cage\b", "gabbia d'argento"),
+    (r"\bsilver whistle\b", "fischietto d'argento"),
+    (r"\bsilver wire\b", "filo d'argento"),
+    (r"\bsilver pin\b", "spillo d'argento"),
+    (r"\bsilver pins\b", "spilli d'argento"),
+    (r"\bsilver spoon\b", "cucchiaio d'argento"),
+    (r"\bsilver rod\b", "bacchetta d'argento"),
+    (r"\bsilver bell\b", "campana d'argento"),
+    (r"\bcopper wire\b", "filo di rame"),
+    (r"\bcopper piece\b", "moneta di rame"),
+    (r"\bcopper coin\b", "moneta di rame"),
+    (r"\bcopper rod\b", "bacchetta di rame"),
+    (r"\bgolden wire\b", "filo d'oro"),
+    (r"\bgolden flower\b", "fiore d'oro"),
+    (r"\bgolden sickle\b", "falcetto d'oro"),
+    (r"\bgolden reliquary\b", "reliquiario d'oro"),
+    (r"\bgolden skull\b", "teschio d'oro"),
+    (r"\bgolden horn\b", "corno d'oro"),
+    (r"\bgilded flower\b", "fiore dorato"),
+    (r"\bgilded acorn\b", "ghianda dorata"),
+    (r"\bgilded skull\b", "teschio dorato"),
+    (r"\bjeweled horn\b", "corno ingioiellato"),
+    (r"\bmetal rod\b", "bacchetta di metallo"),
+    (r"\bmetal lockbox\b", "cassetta di metallo"),
+    (r"\bglass cone\b", "cono di vetro"),
+    (r"\bglass eye\b", "occhio di vetro"),
+    (r"\bcrystal rod\b", "bacchetta di cristallo"),
+    (r"\bcrystal vial\b", "fiala di cristallo"),
+    (r"\bcrystal bead\b", "perlina di cristallo"),
+    (r"\bivory dagger\b", "pugnale d'avorio"),
+    (r"\bivory portal\b", "portale d'avorio"),
+    (r"\bblack pearl\b", "perla nera"),
+    (r"\bbrown pearl\b", "perla marrone"),
+    (r"\bsmall feather\b", "piccola piuma"),
+    (r"\bbat guano\b", "guano di pipistrello"),
+    (r"\beye of a newt\b", "occhio di tritone"),
+    (r"\bthe petrified eye of a newt\b", "l'occhio pietrificato di un tritone"),
+    (r"\bsnake's tongue\b", "lingua di serpente"),
+    (r"\bumber hulk blood\b", "sangue di umber hulk"),
+    (r"\bmandrake root\b", "radice di mandragora"),
+    (r"\brose petals\b", "petali di rosa"),
+    (r"\bfish tail\b", "coda di pesce"),
+    (r"\bsalt water\b", "acqua salata"),
+    (r"\bfine sand\b", "sabbia fine"),
+    (r"\bfull moon\b", "luna piena"),
+    (r"\bmelee weapon\b", "arma da mischia"),
+    (r"\bholy water\b", "acqua santa"),
+    (r"\bholy symbol\b", "simbolo sacro"),
+    (r"\bsacred relic\b", "reliquia sacra"),
+    (r"\bsaint's robe\b", "veste di un santo"),
+    (r"\breligious text\b", "testo religioso"),
+    (r"\bplane of existence\b", "piano di esistenza"),
+    (r"\bgum arabic\b", "gomma arabica"),
+    (r"\bcubic inch\b", "pollice cubico"),
+    (r"\bcircular bronze brazier\b", "braciere circolare di bronzo"),
+    (r"\bbronze brazier\b", "braciere di bronzo"),
+    (r"\bvellum depiction\b", "raffigurazione di cartapecora"),
+    (r"\bcarved statuette\b", "statuetta intagliata"),
+    (r"\bsealable lid\b", "coperchio sigillabile"),
+    (r"\bgem-encrusted bowl\b", "ciotola tempestata di gemme"),
+    (r"\bcubic inch of flesh\b", "pollice cubico di carne"),
+
+    # Materiali rituali/religiosi (singoli)
+    (r"\bholy\b", "sacro"),
+    (r"\bsacred relic\b", "reliquia sacra"),
+    (r"\breliquary\b", "reliquiario"),
+    (r"\bincense\b", "incenso"),
+    (r"\bburning incense\b", "incenso che brucia"),
+    (r"\bbrimstone\b", "zolfo nero"),
+    (r"\bfrankincense\b", "incenso"),
+    (r"\bsaint's robe\b", "veste di un santo"),
+    (r"\breligious text\b", "testo religioso"),
+    (r"\bparchment\b", "pergamena"),
+    (r"\bvellum\b", "cartapecora"),
+
+    # Pietre / metalli / gemme (singole parole)
+    (r"\bsulfur\b", "zolfo"),
+    (r"\bphosphorus\b", "fosforo"),
+    (r"\bmistletoe\b", "vischio"),
+    (r"\bholly\b", "agrifoglio"),
+    (r"\boak\b", "quercia"),
+    (r"\bsilver\b", "argento"),
+    (r"\bgold\b", "oro"),
+    (r"\bgolden\b", "dorato"),
+    (r"\bgilded\b", "dorato"),
+    (r"\bcopper\b", "rame"),
+    (r"\biron\b", "ferro"),
+    (r"\bsteel\b", "acciaio"),
+    (r"\bbronze\b", "bronzo"),
+    (r"\bplatinum\b", "platino"),
+    (r"\bcrystal\b", "cristallo"),
+    (r"\bdiamond\b", "diamante"),
+    (r"\bjade\b", "giada"),
+    (r"\bquartz\b", "quarzo"),
+    (r"\bruby\b", "rubino"),
+    (r"\bemerald\b", "smeraldo"),
+    (r"\bsapphire\b", "zaffiro"),
+    (r"\bamber\b", "ambra"),
+    (r"\bonyx\b", "onice"),
+    (r"\bpearl\b", "perla"),
+    (r"\bblack pearl\b", "perla nera"),
+    (r"\bgem\b", "gemma"),
+    (r"\bgems\b", "gemme"),
+    (r"\bgemstones?\b", "gemme"),
+    (r"\bgem-encrusted\b", "tempestato di gemme"),
+    (r"\bjewel-encrusted\b", "tempestato di gemme"),
+    (r"\bjeweled\b", "ingioiellato"),
+    (r"\bivory\b", "avorio"),
+    (r"\bmarble\b", "marmo"),
+    (r"\bstone\b", "pietra"),
+    (r"\blodestone\b", "calamita"),
+    (r"\blead\b", "piombo"),
+    (r"\bmercury\b", "mercurio"),
+    (r"\bquicksilver\b", "mercurio"),
+
+    # Sabbia / polvere / cenere / liquidi
+    (r"\bfine sand\b", "sabbia fine"),
+    (r"\bsand\b", "sabbia"),
+    (r"\bdust\b", "polvere"),
+    (r"\bpowdered\b", "in polvere"),
+    (r"\bpowder\b", "polvere"),
+    (r"\bash\b", "cenere"),
+    (r"\bash(es)?\b", "cenere"),
+    (r"\bclay\b", "argilla"),
+    (r"\bdirt\b", "terra"),
+    (r"\bearth\b", "terra"),
+    (r"\bwater\b", "acqua"),
+    (r"\bsalt water\b", "acqua salata"),
+    (r"\boil\b", "olio"),
+    (r"\bwax\b", "cera"),
+    (r"\bcandle\b", "candela"),
+    (r"\bvinegar\b", "aceto"),
+    (r"\bhoney\b", "miele"),
+    (r"\balum\b", "allume"),
+    (r"\bgum arabic\b", "gomma arabica"),
+    (r"\bsmoke\b", "fumo"),
+    (r"\bbitumen\b", "bitume"),
+    (r"\bink\b", "inchiostro"),
+    (r"\binks\b", "inchiostri"),
+    (r"\bchalks?\b", "gessetti"),
+
+    # Animali e parti
+    (r"\bbat guano\b", "guano di pipistrello"),
+    (r"\ba firefly\b", "una lucciola"),
+    (r"\bfirefly\b", "lucciola"),
+    (r"\bglowworm\b", "verme luminoso"),
+    (r"\bsmall feather\b", "piccola piuma"),
+    (r"\bfeather\b", "piuma"),
+    (r"\bfur\b", "pelliccia"),
+    (r"\bfleece\b", "vello"),
+    (r"\bfrom an animal\b", "di un animale"),
+    (r"\bof leather\b", "di cuoio"),
+    (r"\bleather\b", "cuoio"),
+    (r"\bwool\b", "lana"),
+    (r"\bcloth\b", "stoffa"),
+    (r"\bsilk\b", "seta"),
+    (r"\bgauze\b", "garza"),
+    (r"\ba cricket\b", "un grillo"),
+    (r"\bcricket\b", "grillo"),
+    (r"\bthe petrified eye of a newt\b", "l'occhio pietrificato di un tritone"),
+    (r"\beye of a newt\b", "occhio di tritone"),
+    (r"\bpetrified\b", "pietrificato"),
+    (r"\bsnake's tongue\b", "lingua di serpente"),
+    (r"\bspider\b", "ragno"),
+    (r"\btentacle\b", "tentacolo"),
+    (r"\beyeball\b", "bulbo oculare"),
+    (r"\bpickled\b", "in salamoia"),
+    (r"\bblood\b", "sangue"),
+    (r"\bhumanoid blood\b", "sangue di umanoide"),
+    (r"\btears\b", "lacrime"),
+    (r"\bbone\b", "osso"),
+    (r"\bskull\b", "teschio"),
+    (r"\bheart\b", "cuore"),
+    (r"\btail\b", "coda"),
+    (r"\bfish tail\b", "coda di pesce"),
+    (r"\bacorn\b", "ghianda"),
+    (r"\bberry\b", "bacca"),
+    (r"\bberries\b", "bacche"),
+    (r"\bleaf\b", "foglia"),
+    (r"\bleaves\b", "foglie"),
+    (r"\btwig\b", "ramoscello"),
+    (r"\bplant\b", "pianta"),
+    (r"\bmandrake root\b", "radice di mandragora"),
+    (r"\bumber hulk blood\b", "sangue di umber hulk"),
+    (r"\bmoon\b", "luna"),
+    (r"\bsun\b", "sole"),
+    (r"\bfull moon\b", "luna piena"),
+    (r"\bice\b", "ghiaccio"),
+    (r"\bair\b", "aria"),
+    (r"\bfire\b", "fuoco"),
+    (r"\brose petals\b", "petali di rosa"),
+    (r"\bpetals?\b", "petali"),
+    (r"\brose\b", "rosa"),
+    (r"\bthorns?\b", "spina"),
+    (r"\bstring\b", "spago"),
+    (r"\brope\b", "corda"),
+
+    # Oggetti / contenitori / strumenti
+    (r"\bvial\b", "fiala"),
+    (r"\bbowl\b", "ciotola"),
+    (r"\bcup\b", "tazza"),
+    (r"\bcontainer\b", "contenitore"),
+    (r"\bvessel\b", "vasca"),
+    (r"\burn\b", "urna"),
+    (r"\bcoffin\b", "bara"),
+    (r"\bcyst\b", "cisti"),
+    (r"\bgilded\b", "dorato"),
+    (r"\bspoon\b", "cucchiaio"),
+    (r"\bbell\b", "campana"),
+    (r"\bwhistle\b", "fischietto"),
+    (r"\brod\b", "bacchetta"),
+    (r"\bforked\b", "biforcuta"),
+    (r"\bmetal rod\b", "bacchetta di metallo"),
+    (r"\bcage\b", "gabbia"),
+    (r"\blockbox\b", "cassetta chiusa"),
+    (r"\bdagger\b", "pugnale"),
+    (r"\bsickle\b", "falcetto"),
+    (r"\bhorn\b", "corno"),
+    (r"\bstatuette\b", "statuetta"),
+    (r"\bmirror\b", "specchio"),
+    (r"\bbrazier\b", "braciere"),
+    (r"\bbead\b", "perlina"),
+    (r"\bball\b", "palla"),
+    (r"\bpins?\b", "spilli"),
+    (r"\bwire\b", "filo"),
+    (r"\bcopper wire\b", "filo di rame"),
+    (r"\bsilver wire\b", "filo d'argento"),
+    (r"\bgolden wire\b", "filo dorato"),
+    (r"\bportal\b", "portale"),
+    (r"\bcarved\b", "intagliato"),
+    (r"\bengraved\b", "inciso"),
+    (r"\bdecorated\b", "decorato"),
+    (r"\bencrusted\b", "incrostato"),
+    (r"\bpolished\b", "lucidato"),
+    (r"\bminiature\b", "in miniatura"),
+    (r"\binfused\b", "infuso"),
+    (r"\battuned\b", "in sintonia"),
+    (r"\binlaid\b", "intarsiato"),
+    (r"\bplatinum-inlaid\b", "intarsiato di platino"),
+    (r"\bgold-inlaid\b", "intarsiato d'oro"),
+    (r"\bbeaded\b", "perlato"),
+    (r"\bsymbol\b", "simbolo"),
+    (r"\bdepiction\b", "raffigurazione"),
+    (r"\blikeness\b", "fattezze"),
+    (r"\bcomponent\b", "componente"),
+    (r"\bversion\b", "versione"),
+    (r"\bobject\b", "oggetto"),
+    (r"\bitem\b", "oggetto"),
+    (r"\bitems\b", "oggetti"),
+    (r"\bmaterials?\b", "materiali"),
+    (r"\bweapon\b", "arma"),
+    (r"\bmelee weapon\b", "arma da mischia"),
+    (r"\bmelee\b", "mischia"),
+    (r"\bammunition\b", "munizioni"),
+    (r"\barrow\b", "freccia"),
+    (r"\bsword\b", "spada"),
+    (r"\bclub\b", "mazza"),
+    (r"\bquarterstaff\b", "bastone ferrato"),
+    (r"\bspecial\b", "speciale"),
+
+    # Soggetti / azioni
+    (r"\bcreature\b", "creatura"),
+    (r"\bcreatures\b", "creature"),
+    (r"\bhumanoid\b", "umanoide"),
+    (r"\bgiant\b", "gigante"),
+    (r"\btarget\b", "bersaglio"),
+    (r"\bsoaked in\b", "imbevuto in"),
+    (r"\bwrapped in\b", "avvolto in"),
+    (r"\bfilled with\b", "riempito di"),
+    (r"\bfilled\b", "riempito"),
+    (r"\bsprinkled over\b", "sparso su"),
+    (r"\bsprinkled\b", "sparso"),
+    (r"\bharvested with\b", "raccolto con"),
+    (r"\bharvested\b", "raccolto"),
+    (r"\bunder the light of\b", "sotto la luce di"),
+    (r"\bcontaining\b", "contenente"),
+    (r"\bcontains\b", "che contiene"),
+    (r"\bbent into\b", "piegato a forma di"),
+    (r"\bbound around\b", "legato attorno a"),
+    (r"\bcomposed of\b", "composto di"),
+    (r"\bmade of\b", "fatto di"),
+    (r"\bmade\b", "fatto"),
+    (r"\bcrushed\b", "frantumato"),
+    (r"\bground\b", "macinato"),
+    (r"\bdistilled\b", "distillato"),
+    (r"\bcubic inch\b", "pollice cubico"),
+    (r"\bplane of existence\b", "piano di esistenza"),
+    (r"\bplane\b", "piano"),
+    (r"\bexistence\b", "esistenza"),
+    (r"\bspell\b", "incantesimo"),
+    (r"\bsuch as\b", "come"),
+    (r"\bvaries\b", "varia"),
+    (r"\bchoose\b", "scegli"),
+    (r"\beither\b", "o"),
+    (r"\bof course\b", ""),
+    (r"\bfor the antipathy effect\b", "per l'effetto di antipatia"),
+    (r"\bfor the sympathy effect\b", "per l'effetto di simpatia"),
+    (r"\bfor hearing\b", "per l'udito"),
+    (r"\bfor seeing\b", "per la vista"),
+
+    # Aggettivi di dimensione
+    (r"\btiny\b", "minuscolo"),
+    (r"\bsmall\b", "piccolo"),
+    (r"\blarge\b", "grande"),
+    (r"\bhuge\b", "enorme"),
+    (r"\bshort\b", "corto"),
+    (r"\bfine\b", "fine"),
+    (r"\bblack\b", "nero"),
+    (r"\bwhite\b", "bianco"),
+    (r"\bred\b", "rosso"),
+    (r"\bgreen\b", "verde"),
+    (r"\bgold\b", "oro"),
+    (r"\brare\b", "raro"),
+    (r"\bprecious\b", "prezioso"),
+    (r"\bhit die\b", "Dado vita"),
+    (r"\bHit Die\b", "Dado vita"),
+
+    # Verbi/aux/articoli (alla fine)
+    (r"\bcan see\b", "puo' vedere"),
+    (r"\bmust\b", "deve"),
+    (r"\beach\b", "ciascun"),
+    (r"\bone\b", "uno"),
+    (r"\btwo\b", "due"),
+    (r"\bthree\b", "tre"),
+    (r"\bfour\b", "quattro"),
+    (r"\bfive\b", "cinque"),
+    (r"\bper\b", "per"),
+    (r"\bfor\b", "per"),
+    (r"\binside\b", "all'interno di"),
+    (r"\binto\b", "in"),
+    (r"\bin\b", "in"),
+    (r"\bat least\b", "almeno"),
+    (r"\bof\b", "di"),
+    (r"\bfrom\b", "da"),
+    (r"\bwith\b", "con"),
+    (r"\band\b", "e"),
+    (r"\bor\b", "o"),
+    (r"\bthe\b", ""),
+    (r"\bthat\b", "che"),
+    (r"\bwhich\b", "che"),
+    (r"\bsuch\b", "tale"),
+    (r"\byou\b", "tu"),
+    (r"\byour\b", "tuo"),
+
+    # Combinazioni aggettivo-sostantivo (in italiano si invertono)
+    (r"\bpowdered iron\b", "ferro in polvere"),
+    (r"\bpowdered diamond\b", "diamante in polvere"),
+    (r"\bpowdered silver\b", "argento in polvere"),
+    (r"\bpowdered ruby\b", "rubino in polvere"),
+    (r"\biron filings\b", "limatura di ferro"),
+    (r"\bsilver filings\b", "limatura d'argento"),
+    (r"\bfilings\b", "limatura"),
+    (r"\bsilver cage\b", "gabbia d'argento"),
+    (r"\bsilver whistle\b", "fischietto d'argento"),
+    (r"\bsilver wire\b", "filo d'argento"),
+    (r"\bsilver pin\b", "spillo d'argento"),
+    (r"\bsilver pins\b", "spilli d'argento"),
+    (r"\bsilver spoon\b", "cucchiaio d'argento"),
+    (r"\bsilver rod\b", "bacchetta d'argento"),
+    (r"\bcopper wire\b", "filo di rame"),
+    (r"\bcopper piece\b", "moneta di rame"),
+    (r"\bgolden wire\b", "filo d'oro"),
+    (r"\bgolden flower\b", "fiore d'oro"),
+    (r"\bgolden sickle\b", "falcetto d'oro"),
+    (r"\bgolden reliquary\b", "reliquiario d'oro"),
+    (r"\bgolden skull\b", "teschio d'oro"),
+    (r"\bgolden horn\b", "corno d'oro"),
+    (r"\bjeweled horn\b", "corno ingioiellato"),
+    (r"\bmetal rod\b", "bacchetta di metallo"),
+    (r"\bmetal lockbox\b", "cassetta di metallo"),
+    (r"\bglass cone\b", "cono di vetro"),
+    (r"\bglass eye\b", "occhio di vetro"),
+    (r"\bcrystal rod\b", "bacchetta di cristallo"),
+    (r"\bivory dagger\b", "pugnale d'avorio"),
+    (r"\bcandle\b", "candela"),
+
+    # Termini residui
+    (r"\bwood\b", "legno"),
+    (r"\bwooden\b", "di legno"),
+    (r"\bdown\b", "piumino"),
+    (r"\bbits of\b", "frammenti di"),
+    (r"\bbits\b", "frammenti"),
+    (r"\bmixed in\b", "mescolato in"),
+    (r"\bmixed\b", "mescolato"),
+    (r"\bburning\b", "che brucia"),
+    (r"\bglass\b", "vetro"),
+    (r"\bflesh\b", "carne"),
+    (r"\bcubic\b", "cubico"),
+    (r"\bcubic inch\b", "pollice cubico"),
+    (r"\bsealable lid\b", "coperchio sigillabile"),
+    (r"\bsealable\b", "sigillabile"),
+    (r"\blid\b", "coperchio"),
+    (r"\blarge enough to hold\b", "abbastanza grande da contenere"),
+    (r"\blong shank\b", "lungo gambo"),
+    (r"\bshank\b", "gambo"),
+    (r"\bend\b", "estremita'"),
+    (r"\bring\b", "anello"),
+    (r"\bbeing cloned\b", "che viene clonato"),
+    (r"\bcloned\b", "clonato"),
+    (r"\bcrystals?\b", "cristallo"),
+    (r"\bsphere\b", "sfera"),
+    (r"\bcone\b", "cono"),
+    (r"\bcube\b", "cubo"),
+    (r"\bline\b", "linea"),
+    (r"\bcircle\b", "cerchio"),
+    (r"\bdrop\b", "goccia"),
+    (r"\bsoap\b", "sapone"),
+
+    # Articoli inglesi residui (alla fine, dopo tutto il resto)
+    (r"\b[Aa]n\b", "un"),
+    (r"\b[Aa]\b", "un"),
+
+    # Pulizia: doppi spazi
+    (r"\s{2,}", " "),
+]
+
+
+def _translate_material_text(materials: str) -> str:
+    """Applica la pipeline di sostituzioni a una stringa di materiali."""
+    out = materials
+    for patt, repl in _MAT_REPLACEMENTS:
+        out = re.sub(patt, repl, out, flags=re.IGNORECASE)
+    out = convert_distances(out)
+    out = re.sub(r"\s+([,;.])", r"\1", out)
+    out = re.sub(r"\(\s+", "(", out)
+    out = re.sub(r"\s+\)", ")", out)
+    return out.strip()
+
+
 def translate_components(s: str) -> str:
     """Mantiene V/S/M e traduce i materiali tra parentesi quando possibile."""
     if not s:
         return s
-    # Estrai parte materiali
     m = re.match(r"^([VSM,\s]+)(?:\s*\((.+)\))?\s*$", s.strip())
     if not m:
         return s
@@ -757,74 +1350,7 @@ def translate_components(s: str) -> str:
     materials = m.group(2)
     out = letters
     if materials:
-        # Traduzioni comuni di parole-chiave nei componenti materiali
-        mat_it = materials
-        replacements = [
-            (r"\ba (?:tiny )?bit of\b", "un pizzico di"),
-            (r"\ba pinch of\b", "un pizzico di"),
-            (r"\ba small piece of\b", "un piccolo pezzo di"),
-            (r"\ba piece of\b", "un pezzo di"),
-            (r"\ba drop of\b", "una goccia di"),
-            (r"\ba bit of\b", "un pezzetto di"),
-            (r"\bsulfur\b", "zolfo"),
-            (r"\bbat guano\b", "guano di pipistrello"),
-            (r"\bphosphorus\b", "fosforo"),
-            (r"\ba firefly\b", "una lucciola"),
-            (r"\bglowworm\b", "verme luminoso"),
-            (r"\bmistletoe\b", "vischio"),
-            (r"\ba sprig of\b", "un rametto di"),
-            (r"\bholly\b", "agrifoglio"),
-            (r"\boak\b", "quercia"),
-            (r"\bclub\b", "mazza"),
-            (r"\bquarterstaff\b", "bastone ferrato"),
-            (r"\bsmall feather\b", "piccola piuma"),
-            (r"\bfeather\b", "piuma"),
-            (r"\bfur\b", "pelliccia"),
-            (r"\bfrom an animal\b", "di un animale"),
-            (r"\bof leather\b", "di cuoio"),
-            (r"\bleather\b", "cuoio"),
-            (r"\bwool\b", "lana"),
-            (r"\bsilver\b", "argento"),
-            (r"\bgold\b", "oro"),
-            (r"\bcopper\b", "rame"),
-            (r"\biron\b", "ferro"),
-            (r"\bsteel\b", "acciaio"),
-            (r"\bcrystal\b", "cristallo"),
-            (r"\bdiamond\b", "diamante"),
-            (r"\bfine sand\b", "sabbia fine"),
-            (r"\brose petals\b", "petali di rosa"),
-            (r"\ba cricket\b", "un grillo"),
-            (r"\bcricket\b", "grillo"),
-            (r"\bthe petrified eye of a newt\b", "l'occhio pietrificato di un tritone"),
-            (r"\beye of a newt\b", "occhio di tritone"),
-            (r"\bpetrified\b", "pietrificato"),
-            (r"\bjade\b", "giada"),
-            (r"\bquartz\b", "quarzo"),
-            (r"\bruby\b", "rubino"),
-            (r"\bemerald\b", "smeraldo"),
-            (r"\bsapphire\b", "zaffiro"),
-            (r"\bdust\b", "polvere"),
-            (r"\bash\b", "cenere"),
-            (r"\bthorn\b", "spina"),
-            (r"\bstring\b", "spago"),
-            (r"\brope\b", "corda"),
-            (r"\bwax\b", "cera"),
-            (r"\bcandle\b", "candela"),
-            (r"\bworth at least\b", "del valore di almeno"),
-            (r"\bworth\b", "del valore di"),
-            (r"\bthe spell consumes\b", "l'incantesimo consuma"),
-            (r"\bconsumed by the spell\b", "consumato dall'incantesimo"),
-            (r"\bwhich the spell consumes\b", "che l'incantesimo consuma"),
-            (r"\bgp\b", "mo"),
-            (r"\bsp\b", "ma"),
-            (r"\bcp\b", "mr"),
-            (r"\band\b", "e"),
-            (r"\bor\b", "o"),
-        ]
-        for patt, repl in replacements:
-            mat_it = re.sub(patt, repl, mat_it, flags=re.IGNORECASE)
-        # converti distanze anche nei materiali
-        mat_it = convert_distances(mat_it)
+        mat_it = _translate_material_text(materials)
         out += f" ({mat_it})"
     return out
 
@@ -988,19 +1514,27 @@ def localize(spell_raw: dict, translations: dict) -> dict:
         # fallback: stessa descrizione (inglese metricata) con note
         description_it = description_metric_en
 
+    # Gli override vengono applicati a tutti i campi metadati. Il regex
+    # generico copre la maggior parte dei casi, gli override servono per
+    # le frasi piu' complesse (reazioni, materiali rari).
+    casting_time_it = override.get("casting_time") or translate_casting_time(spell_raw["_casting_time_en"])
+    range_it = override.get("range") or translate_range(spell_raw["_range_en"])
+    components_it = override.get("components") or translate_components(spell_raw["_components_en"])
+    duration_it = override.get("duration") or translate_duration(spell_raw["_duration_en"])
+
     return {
         "name": name_it,
         "name_en": name_en,
         "level": spell_raw["_level"],
         "school": spell_raw["_school"],
         "school_it": SCHOOL_IT.get(spell_raw["_school"], spell_raw["_school"].capitalize()),
-        "casting_time": translate_casting_time(spell_raw["_casting_time_en"]),
+        "casting_time": casting_time_it,
         "casting_time_en": spell_raw["_casting_time_en"],
-        "range": translate_range(spell_raw["_range_en"]),
+        "range": range_it,
         "range_en": spell_raw["_range_en"],
-        "components": translate_components(spell_raw["_components_en"]),
+        "components": components_it,
         "components_en": spell_raw["_components_en"],
-        "duration": translate_duration(spell_raw["_duration_en"]),
+        "duration": duration_it,
         "duration_en": spell_raw["_duration_en"],
         "description": description_it,
         "description_en": description_en,
