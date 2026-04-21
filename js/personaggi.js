@@ -958,6 +958,15 @@ function _computeSpellSlots(classi) {
             const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
             const pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
             slots[pactSlotLevel] = (slots[pactSlotLevel] || 0) + pactSlotCount;
+
+            // Mystic Arcanum: 1 incantesimo conoscibile per ciascuno dei livelli
+            // 6/7/8/9 sbloccati a livello Warlock 11/13/15/17 (lanciabile 1/giorno).
+            // Lo modelliamo come 1 slot dedicato per ogni livello sbloccato,
+            // additivo agli eventuali slot multiclass dello stesso livello.
+            if (pactLevel >= 11) slots[6] = (slots[6] || 0) + 1;
+            if (pactLevel >= 13) slots[7] = (slots[7] || 0) + 1;
+            if (pactLevel >= 15) slots[8] = (slots[8] || 0) + 1;
+            if (pactLevel >= 17) slots[9] = (slots[9] || 0) + 1;
         }
     }
 
@@ -1993,6 +2002,28 @@ window.schedaOpenSpellPage = async function(pgId) {
             <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD Inc.</div></div>
         </div>`;
     }).join('') : '<p class="scheda-empty">Nessuna classe incantatrice</p>';
+
+    // Sincronizza gli slot salvati con quelli calcolati dalle classi correnti.
+    // Necessario per allineare PG esistenti dopo modifiche alle regole di calcolo
+    // (es. aggiunta Mystic Arcanum del Warlock o tabelle half/third caster fixate).
+    // Preserva "used" clampato al nuovo max e salva solo se ci sono differenze.
+    const expectedSlots = calcSpellSlotsFromClassi(classi);
+    const prevSlots = (pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object') ? pg.slot_incantesimo : {};
+    const reconciled = {};
+    let needsSync = false;
+    Object.keys(expectedSlots).forEach(lvKey => {
+        const lv = String(lvKey);
+        const max = expectedSlots[lvKey];
+        const prev = prevSlots[lv] || prevSlots[parseInt(lv)] || null;
+        const prevUsed = prev && Number.isFinite(parseInt(prev.used)) ? Math.min(parseInt(prev.used), max) : 0;
+        reconciled[lv] = { max, current: Math.max(0, max - prevUsed), used: prevUsed };
+        if (!prev || parseInt(prev.max) !== max) needsSync = true;
+    });
+    Object.keys(prevSlots).forEach(lv => { if (!(lv in reconciled)) needsSync = true; });
+    if (needsSync) {
+        pg.slot_incantesimo = reconciled;
+        schedaInstantSave(pgId, { slot_incantesimo: reconciled });
+    }
 
     const slots = pg.slot_incantesimo || {};
     const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
