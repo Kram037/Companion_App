@@ -10,11 +10,11 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
     <link rel="apple-touch-icon" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/base.css?v=1771800000">
+    <link rel="stylesheet" href="css/base.css?v=1772400000">
     <link rel="stylesheet" href="css/components.css?v=1767940000">
-    <link rel="stylesheet" href="css/modals.css?v=1771800000">
+    <link rel="stylesheet" href="css/modals.css?v=1772400000">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
-    <link rel="stylesheet" href="css/personaggi.css?v=1772310000">
+    <link rel="stylesheet" href="css/personaggi.css?v=1772400000">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767920000">
     <link rel="stylesheet" href="css/laboratorio.css?v=1767920400">
@@ -497,16 +497,38 @@
                 <div class="settings-item">
                     <span>Lingua</span>
                     <div class="lang-selector">
-                        <button class="lang-btn" data-lang="it" id="langIt">
+                        <button class="lang-btn" data-lang="it" id="langIt" title="Italiano" aria-label="Italiano">
                             <span class="lang-flag" aria-hidden="true">IT</span>
                             <span>Italiano</span>
                         </button>
-                        <button class="lang-btn" data-lang="en" id="langEn">
+                        <button class="lang-btn" data-lang="en" id="langEn" title="English" aria-label="English">
                             <span class="lang-flag" aria-hidden="true">EN</span>
                             <span>English</span>
                         </button>
                     </div>
                 </div>
+                <div class="settings-item">
+                    <span>App</span>
+                    <button type="button" class="btn-secondary btn-small pwa-install-btn" id="installPwaBtn" disabled title="Installa Companion App sul tuo dispositivo">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span id="installPwaBtnLabel">Scarica app</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Instructions Modal (iOS / browser senza beforeinstallprompt) -->
+    <div class="modal" id="pwaInstructionsModal">
+        <div class="modal-content" style="max-width:420px;">
+            <button class="modal-close" id="closePwaInstructionsModal">&times;</button>
+            <h2>Installa Companion App</h2>
+            <div id="pwaInstructionsBody" style="margin-top:8px;color:var(--text);font-size:0.92rem;line-height:1.5;">
+                <!-- Contenuto popolato da setupPwaInstall in base alla piattaforma -->
             </div>
         </div>
     </div>
@@ -949,13 +971,13 @@
     <script src="js/campagne.js?v=1767900400"></script>
     <script src="js/data/spells_data.js?v=1768080000"></script>
     <script src="js/data/classes_data.js?v=1771800000"></script>
-    <script src="js/personaggi.js?v=1772300000"></script>
-    <script src="js/sessions.js?v=1767900400"></script>
+    <script src="js/personaggi.js?v=1772400000"></script>
+    <script src="js/sessions.js?v=1772400000"></script>
     <script src="js/combat.js?v=1767920600"></script>
     <script src="js/laboratorio.js?v=1767920600"></script>
     <script src="js/realtime.js?v=1767900400"></script>
-    <script src="js/initiative.js?v=1767900400"></script>
-    <script src="js/init.js?v=1771800000"></script>
+    <script src="js/initiative.js?v=1772400000"></script>
+    <script src="js/init.js?v=1772400000"></script>
     
     <!-- Cache busting script for development -->
     <script>

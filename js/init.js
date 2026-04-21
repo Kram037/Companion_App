@@ -232,9 +232,17 @@ async function init() {
         console.error('❌ Errore nell\'attesa Supabase:', error);
     });
 
-    if (localStorage.getItem('notificheEnabled') === 'true') {
-        registerServiceWorker();
+    // Registra il Service Worker sempre (necessario per PWA install + future cache offline).
+    // La sottoscrizione push avviene solo se le notifiche sono abilitate.
+    if ('serviceWorker' in navigator) {
+        if (localStorage.getItem('notificheEnabled') === 'true') {
+            registerServiceWorker();
+        } else {
+            navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW registration:', e));
+        }
     }
+
+    setupPwaInstall();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', (event) => {
@@ -943,6 +951,131 @@ function startApp() {
         console.error('❌ Errore critico durante l\'inizializzazione:', error);
         console.error('Stack:', error.stack);
     }
+}
+
+/* ============================================
+   PWA install (Add to Home Screen)
+   ============================================ */
+let __deferredInstallPrompt = null;
+
+function _isPwaInstalled() {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+    if (window.navigator.standalone === true) return true; // iOS Safari
+    return false;
+}
+
+function _isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function _setPwaBtnState(state) {
+    // state: 'installed' | 'available' | 'unavailable' | 'manual'
+    const btn = document.getElementById('installPwaBtn');
+    const label = document.getElementById('installPwaBtnLabel');
+    if (!btn || !label) return;
+    btn.classList.remove('pwa-installed');
+    if (state === 'installed') {
+        btn.disabled = true;
+        btn.classList.add('pwa-installed');
+        label.textContent = 'App installata';
+        btn.title = 'Companion App e\u0300 gia\u0300 installata su questo dispositivo';
+    } else if (state === 'available') {
+        btn.disabled = false;
+        label.textContent = 'Scarica app';
+        btn.title = 'Installa Companion App sul tuo dispositivo';
+    } else if (state === 'manual') {
+        btn.disabled = false;
+        label.textContent = 'Come installare';
+        btn.title = 'Mostra le istruzioni per installare l\u0027app';
+    } else {
+        btn.disabled = true;
+        label.textContent = 'Non disponibile';
+        btn.title = 'Installazione non supportata da questo browser';
+    }
+}
+
+function _showPwaInstructions() {
+    const modal = document.getElementById('pwaInstructionsModal');
+    const body = document.getElementById('pwaInstructionsBody');
+    if (!modal || !body) return;
+    if (_isIOS()) {
+        body.innerHTML = `
+            <p>Per installare <b>Companion App</b> su iPhone/iPad:</p>
+            <ol style="padding-left:18px;margin:8px 0;">
+                <li>Apri questa pagina in <b>Safari</b>.</li>
+                <li>Tocca l'icona <b>Condividi</b> (quadrato con freccia in su) in basso.</li>
+                <li>Scorri e seleziona <b>Aggiungi alla schermata Home</b>.</li>
+                <li>Conferma con <b>Aggiungi</b>.</li>
+            </ol>`;
+    } else {
+        body.innerHTML = `
+            <p>Per installare <b>Companion App</b>:</p>
+            <ol style="padding-left:18px;margin:8px 0;">
+                <li>Apri il menu del browser (<b>⋮</b> in alto a destra).</li>
+                <li>Seleziona <b>Installa app</b> oppure <b>Aggiungi alla schermata Home</b>.</li>
+                <li>Conferma per installare.</li>
+            </ol>
+            <p style="font-size:0.85rem;color:var(--text-light);">Se non vedi l'opzione, il tuo browser potrebbe non supportare l'installazione PWA.</p>`;
+    }
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function _closePwaInstructions() {
+    const modal = document.getElementById('pwaInstructionsModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function setupPwaInstall() {
+    const btn = document.getElementById('installPwaBtn');
+    const closeBtn = document.getElementById('closePwaInstructionsModal');
+    const instrModal = document.getElementById('pwaInstructionsModal');
+    if (!btn) return;
+
+    if (_isPwaInstalled()) {
+        _setPwaBtnState('installed');
+    } else if (_isIOS()) {
+        // iOS Safari non supporta beforeinstallprompt: mostra solo le istruzioni
+        _setPwaBtnState('manual');
+    } else {
+        _setPwaBtnState('unavailable');
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        __deferredInstallPrompt = e;
+        if (!_isPwaInstalled()) _setPwaBtnState('available');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        __deferredInstallPrompt = null;
+        _setPwaBtnState('installed');
+    });
+
+    btn.addEventListener('click', async () => {
+        if (btn.disabled) return;
+        if (__deferredInstallPrompt) {
+            try {
+                __deferredInstallPrompt.prompt();
+                const { outcome } = await __deferredInstallPrompt.userChoice;
+                __deferredInstallPrompt = null;
+                if (outcome === 'accepted') _setPwaBtnState('installed');
+                else _setPwaBtnState('manual');
+            } catch (err) {
+                console.warn('PWA install prompt fallito:', err);
+                _showPwaInstructions();
+            }
+        } else {
+            _showPwaInstructions();
+        }
+    });
+
+    if (closeBtn) closeBtn.onclick = _closePwaInstructions;
+    if (instrModal) instrModal.addEventListener('click', (e) => {
+        if (e.target === instrModal) _closePwaInstructions();
+    });
 }
 
 // Wait for DOM to be ready

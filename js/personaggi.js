@@ -1654,6 +1654,9 @@ async function renderSchedaPersonaggio(personaggioId) {
         content.innerHTML = `
         ${buildSchedaHeader(pg)}
 
+        <div class="scheda-page-grid">
+        <div class="scheda-col scheda-col-left">
+
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
             <div class="scheda-section-body">
@@ -1674,7 +1677,9 @@ async function renderSchedaPersonaggio(personaggioId) {
 
         ${buildLangProfSection(pg)}
 
+        </div><!-- /scheda-col-left -->
         <hr class="scheda-divider">
+        <div class="scheda-col scheda-col-right">
 
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche</div>
@@ -1748,6 +1753,9 @@ async function renderSchedaPersonaggio(personaggioId) {
         ${buildEquipSection(pg)}
 
         ${classResourcesHtml}
+
+        </div><!-- /scheda-col-right -->
+        </div><!-- /scheda-page-grid -->
         `;
 
         // Wire up editable inputs
@@ -1957,7 +1965,13 @@ window.schedaOpenSpellPage = async function(pgId) {
     const orderedLevels = Array.from(levelsToShow)
         .filter(l => l <= maxAvail)
         .sort((a, b) => a - b);
-    const spellSectionsHtml = orderedLevels.map(l => buildSpellLevelSection(pg, l)).join('');
+    // Split per layout 2-colonne su tablet/desktop:
+    //   colonna sinistra = trucchetti + livelli 1..4
+    //   colonna destra   = livelli 5..9 (+ eventuali successivi)
+    const leftLevels = orderedLevels.filter(l => l <= 4);
+    const rightLevels = orderedLevels.filter(l => l > 4);
+    const spellsLeftHtml = leftLevels.map(l => buildSpellLevelSection(pg, l)).join('');
+    const spellsRightHtml = rightLevels.map(l => buildSpellLevelSection(pg, l)).join('');
 
     // Memorizza tab/personaggio corrente per il rerender al cambio lingua
     window._schedaCurrentPgId = pgId;
@@ -1978,7 +1992,10 @@ window.schedaOpenSpellPage = async function(pgId) {
 
     <hr class="scheda-divider">
 
-    ${spellSectionsHtml}
+    <div class="scheda-spells-grid">
+        <div class="scheda-spells-col scheda-spells-col-left">${spellsLeftHtml}</div>
+        <div class="scheda-spells-col scheda-spells-col-right">${spellsRightHtml || ''}</div>
+    </div>
     `;
 
     content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
@@ -2823,7 +2840,7 @@ window.schedaOpenInventoryPage = async function(pgId) {
             <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">+</button>
         </div>
         <div class="scheda-section-body">
-            <div id="invItemsList">${oggettiRows}</div>
+            <div id="invItemsList" class="inv-items-grid">${oggettiRows}</div>
         </div>
     </div>
     `;

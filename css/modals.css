@@ -457,22 +457,28 @@
 
 .theme-btn span { font-size: 0.78rem; color: var(--text-secondary); font-weight: 500; }
 
-.lang-selector { display: flex; gap: 6px; }
+.lang-selector { display: flex; gap: 6px; flex-shrink: 0; }
 
 .lang-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
+    justify-content: center;
+    padding: 5px 9px;
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: var(--transition-fast);
     color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.85rem;
+    font-weight: 700;
+    font-size: 0.78rem;
+    line-height: 1;
+    min-width: 42px;
 }
+
+/* Mostra solo la sigla bandiera (IT/EN), nascondendo l'etichetta testuale lunga
+   per non far esplodere il container .settings-item su schermi stretti. */
+.lang-btn > span:not(.lang-flag) { display: none; }
 
 .lang-btn:hover { border-color: var(--accent-light); }
 
@@ -485,23 +491,30 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 28px;
-    height: 22px;
-    padding: 0 4px;
-    border-radius: 4px;
-    background: var(--background);
-    border: 1px solid var(--border);
-    font-size: 0.72rem;
-    font-weight: 700;
+    height: 20px;
+    padding: 0 2px;
+    font-size: 0.78rem;
+    font-weight: 800;
     letter-spacing: 0.5px;
     color: var(--text);
 }
 
 .lang-btn.active .lang-flag {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+    color: var(--accent);
 }
+
+/* Bottone "Installa app" (PWA) nel settings */
+.pwa-install-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+}
+.pwa-install-btn svg { flex-shrink: 0; }
+.pwa-install-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.pwa-install-btn.pwa-installed { opacity: 0.7; }
 
 .theme-preview {
     width: 52px; height: 36px;

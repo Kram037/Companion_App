@@ -386,10 +386,26 @@ window.finisciSessione = async function(sessioneId, campagnaId) {
 
         const { error } = await supabase
             .from('sessioni')
-            .update({ data_fine: dataFine })
+            .update({ data_fine: dataFine, combat_round: 1, combat_turn_index: 0 })
             .eq('id', sessioneId);
 
         if (error) throw error;
+
+        // Pulisci eventuali richieste/strutture di combattimento ancora pending,
+        // cosi' i giocatori che si ricollegano dopo non vedono dialog "fantasma".
+        try {
+            await Promise.all([
+                supabase.from('richieste_tiro_iniziativa').delete().eq('sessione_id', sessioneId),
+                supabase.from('richieste_tiro_generico').delete().eq('sessione_id', sessioneId),
+                supabase.from('mostri_combattimento').delete().eq('sessione_id', sessioneId),
+                supabase.from('iniziativa').delete().eq('sessione_id', sessioneId)
+            ]);
+            await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId, campagnaId });
+            await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'delete', sessioneId, campagnaId });
+        } catch (cleanupErr) {
+            console.warn('⚠️ Cleanup richieste a fine sessione fallito:', cleanupErr);
+        }
+
         await sendAppEventBroadcast({ table: 'sessioni', action: 'update', campagnaId, sessioneId });
 
         stopSessioneTimer();

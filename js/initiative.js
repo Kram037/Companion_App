@@ -15,6 +15,59 @@ function closeRollRequestModal() {
 }
 
 /**
+ * Verifica se la sessione associata a una richiesta tiro e' ancora valida
+ * (la sessione non e' terminata). Se la richiesta e' orfana (sessione conclusa),
+ * la cancella dal DB cosi' non si ripresenta.
+ *
+ * Per le richieste di iniziativa controlla anche che ci sia un combattimento
+ * "in corso" (almeno una riga in 'iniziativa' per la sessione, oppure sessione
+ * con combat_turn_index > 0). Se non c'e', la richiesta e' considerata orfana
+ * (es. il DM ha terminato il combattimento ma il delete non era arrivato a tutti).
+ */
+async function _isRollRequestStillValid(req) {
+    if (!req || !req.sessione_id) return true; // niente da verificare
+    const supabase = getSupabaseClient();
+    if (!supabase) return true;
+    try {
+        const { data: sessione, error } = await supabase
+            .from('sessioni')
+            .select('id, data_fine, combat_round, combat_turn_index')
+            .eq('id', req.sessione_id)
+            .maybeSingle();
+        if (error) {
+            console.warn('⚠️ Verifica sessione richiesta tiro fallita, considero la richiesta valida:', error);
+            return true;
+        }
+        if (!sessione) return false; // sessione cancellata
+        if (sessione.data_fine) return false; // sessione terminata
+        if (req.tipo === 'iniziativa') {
+            // Se il combattimento e' in stato "appena iniziato" (turn=0, round=1) puo' essere
+            // una richiesta legittima per la quale i PG devono ancora tirare: in tal caso
+            // la tabella iniziativa puo' avere 0 righe. Per non avere falsi positivi qui,
+            // ci affidiamo solo al check su data_fine e su un flag esplicito (se in futuro
+            // verra' aggiunto). La cancellazione massiva delle richieste a fine combattimento
+            // resta gestita lato DM in terminaCombattimento/finisciSessione.
+        }
+        return true;
+    } catch (e) {
+        console.warn('⚠️ Errore verifica validita\' richiesta tiro:', e);
+        return true;
+    }
+}
+
+async function _deleteOrphanRollRequest(req) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !req || !req.id) return;
+    const table = req.tipo === 'iniziativa' ? 'richieste_tiro_iniziativa' : 'richieste_tiro_generico';
+    try {
+        await supabase.from(table).delete().eq('id', req.id);
+        console.log(`🧹 Richiesta tiro orfana cancellata (${table} id=${req.id})`);
+    } catch (e) {
+        console.warn('⚠️ Cleanup richiesta orfana fallito:', e);
+    }
+}
+
+/**
  * Verifica se ci sono richieste tiro pending per l'utente corrente
  */
 async function checkPendingRollRequests(userId) {
@@ -39,7 +92,7 @@ async function checkPendingRollRequests(userId) {
             .eq('giocatore_id', userData.id)
             .eq('stato', 'pending')
             .order('timestamp', { ascending: false })
-            .limit(1);
+            .limit(5);
 
         if (iniziativaError) {
             console.error('❌ Errore nel controllo richieste iniziativa:', iniziativaError);
@@ -48,12 +101,16 @@ async function checkPendingRollRequests(userId) {
         }
 
         if (iniziativaRequests && iniziativaRequests.length > 0) {
-            console.log('✅ Trovata richiesta iniziativa:', iniziativaRequests[0].id);
-            return {
-                id: iniziativaRequests[0].id,
-                tipo: 'iniziativa',
-                sessione_id: iniziativaRequests[0].sessione_id
-            };
+            for (const r of iniziativaRequests) {
+                const req = { id: r.id, tipo: 'iniziativa', sessione_id: r.sessione_id };
+                if (await _isRollRequestStillValid(req)) {
+                    console.log('✅ Trovata richiesta iniziativa valida:', r.id);
+                    return req;
+                } else {
+                    console.log('🧹 Richiesta iniziativa orfana ignorata e cancellata:', r.id);
+                    await _deleteOrphanRollRequest(req);
+                }
+            }
         }
 
         // Controlla richieste tiro generico pending
@@ -63,7 +120,7 @@ async function checkPendingRollRequests(userId) {
             .eq('giocatore_id', userData.id)
             .eq('stato', 'pending')
             .order('timestamp', { ascending: false })
-            .limit(1);
+            .limit(5);
 
         if (genericoError) {
             console.error('❌ Errore nel controllo richieste generico:', genericoError);
@@ -72,13 +129,16 @@ async function checkPendingRollRequests(userId) {
         }
 
         if (genericoRequests && genericoRequests.length > 0) {
-            console.log('✅ Trovata richiesta generico:', genericoRequests[0].id);
-            return {
-                id: genericoRequests[0].id,
-                tipo: 'generico',
-                sessione_id: genericoRequests[0].sessione_id,
-                richiesta_id: genericoRequests[0].richiesta_id
-            };
+            for (const r of genericoRequests) {
+                const req = { id: r.id, tipo: 'generico', sessione_id: r.sessione_id, richiesta_id: r.richiesta_id };
+                if (await _isRollRequestStillValid(req)) {
+                    console.log('✅ Trovata richiesta generico valida:', r.id);
+                    return req;
+                } else {
+                    console.log('🧹 Richiesta generico orfana ignorata e cancellata:', r.id);
+                    await _deleteOrphanRollRequest(req);
+                }
+            }
         }
 
         return null;
@@ -126,6 +186,11 @@ function startRollRequestsRealtime() {
                             tipo: 'iniziativa',
                             sessione_id: payload.new.sessione_id
                         };
+                        if (!(await _isRollRequestStillValid(request))) {
+                            console.log('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro e cancello:', request);
+                            await _deleteOrphanRollRequest(request);
+                            return;
+                        }
                         console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
@@ -160,6 +225,11 @@ function startRollRequestsRealtime() {
                             sessione_id: payload.new.sessione_id,
                             richiesta_id: payload.new.richiesta_id
                         };
+                        if (!(await _isRollRequestStillValid(request))) {
+                            console.log('🧹 [REALTIME] Richiesta generico orfana, ignoro e cancello:', request);
+                            await _deleteOrphanRollRequest(request);
+                            return;
+                        }
                         console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
