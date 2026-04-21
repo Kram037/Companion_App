@@ -961,7 +961,7 @@ _add_race("Dragonide", {
     "asi_text": "+2 Forza, +1 Carisma",
     "age": "I giovani dragonidi crescono rapidamente. Camminano poche ore dopo la schiusa, raggiungono le dimensioni e lo sviluppo di un bambino umano di 10 anni a tre anni di eta', e diventano adulti a 15. Vivono fino a 80 anni.",
     "alignment": "I dragonidi tendono agli estremi, scegliendo coscientemente da un lato o dall'altro della guerra cosmica tra bene e male. Molti dragonidi sono buoni, ma quelli che si schierano con i draghi cromatici possono essere terribilmente malvagi.",
-    "description": "Nati dai draghi, come dichiara il loro nome, i dragonidi sono originati per la prima volta in regni distanti, dove ancora si trovano in massima concentrazione. La loro chiamata era a essere guerrieri grandi, e molti tornano a quella chiamata.",
+    "description": "Nati dai draghi, come dichiara il loro nome, i dragonidi sono originati per la prima volta in regni distanti, dove ancora si trovano in massima concentrazione. La loro chiamata era a essere guerrieri grandi, e molti tornano a quella chiamata. La sottorazza determina la tua discendenza draconica (il tipo di danno e la forma della tua arma del soffio).",
     "languages": ["Comune", "Draconico"],
     "languages_extra": 0,
     "skill_proficiencies": [],
@@ -971,26 +971,71 @@ _add_race("Dragonide", {
     "resistances": [],
     "darkvision": 0,
     "creature_type": "Umanoide",
-    "traits": [
+    "traits": [],  # I tratti effettivi (Discendenza, Arma del Soffio,
+    # Resistenza) dipendono dalla discendenza scelta come sottorazza.
+    "subraces": [],  # popolate sotto via _add_subrace
+})
+
+
+# === Dragonide (PHB) – 10 discendenze come sottorazze ===
+# Ogni sottorazza fissa: tipo di danno, forma dell'arma del soffio (linea o
+# cono) e relativa resistenza. La meccanica dei danni scala col livello PG
+# (1d6 1-5, 2d6 6-10, 3d6 11-15, 4d6 16+).
+
+def _dragonborn_traits(damage_it, breath_shape, breath_dist_m, save):
+    """Costruisce i 3 tratti standard di un dragonide (Discendenza,
+    Arma del Soffio, Resistenza) per una specifica discendenza."""
+    if breath_shape == "linea":
+        breath_geom = f"linea di {breath_dist_m} metri lunga e 1,5 metri larga"
+    else:  # cono
+        breath_geom = f"cono di {breath_dist_m} metri"
+    return [
         T({
             "name": "Discendenza Draconica",
             "name_en": "Draconic Ancestry",
-            "description": "Hai discendenza draconica. Scegli un tipo di drago dalla lista (Nero/acido, Azzurro/fulmine, Bianco/freddo, Rame/acido, Bronzo/fulmine, Argento/freddo, Oro/fuoco, Ottone/fuoco, Rosso/fuoco, Verde/veleno). Il tipo di danno e la forma dell'arma del soffio dipendono dalla tua discendenza.",
+            "description": f"Hai discendenza draconica e sei imparentato con questa stirpe specifica. La tua arma del soffio infligge danni da {damage_it} e ottieni resistenza a quel tipo di danno.",
         }),
         T({
             "name": "Arma del Soffio",
             "name_en": "Breath Weapon",
-            "description": "Puoi usare la tua azione per esalare energia distruttiva. La tua discendenza draconica determina la dimensione, forma e tipo di danno dell'esalazione. Quando usi l'arma del soffio, ogni creatura nell'area dell'esalazione deve effettuare un tiro salvezza, di tipo determinato dalla tua discendenza draconica. Il TS DC e' 8 + il tuo modificatore di Costituzione + il tuo bonus di competenza. Una creatura subisce 2d6 danni in caso di TS fallito (1d6 al 1-5 livello, 2d6 al 6-10, 3d6 al 11-15, 4d6 al 16+) e meta' in caso di successo. Devi finire un riposo breve o lungo per usare di nuovo l'arma del soffio.",
+            "description": f"Puoi usare la tua azione per esalare energia distruttiva. La tua discendenza determina forma e tipo di danno: una {breath_geom}. Ogni creatura nell'area deve effettuare un tiro salvezza su {save} (CD = 8 + il tuo modificatore di Costituzione + il tuo bonus di competenza). In caso di TS fallito subisce 2d6 danni da {damage_it} (1d6 al 1-5 livello, 2d6 al 6-10, 3d6 al 11-15, 4d6 al 16+ livello), o meta' con un TS riuscito. Devi finire un riposo breve o lungo per usare di nuovo l'arma del soffio.",
             "uses": {"amount": 1, "recharge": "short_rest"},
         }),
         T({
             "name": "Resistenza ai Danni",
             "name_en": "Damage Resistance",
-            "description": "Hai resistenza al tipo di danno associato alla tua discendenza draconica.",
+            "description": f"Hai resistenza ai danni da {damage_it} grazie alla tua discendenza draconica.",
         }),
-    ],
-    "subraces": [],
-})
+    ]
+
+
+# Cromatici (drow malvagi)
+_DRAGONBORN_CHROMATIC = [
+    ("Dragonide Nero",   "Black Dragonborn",   "acido",   "linea", 9, "Destrezza", "acido"),
+    ("Dragonide Azzurro","Blue Dragonborn",    "fulmine", "linea", 9, "Destrezza", "fulmine"),
+    ("Dragonide Verde",  "Green Dragonborn",   "veleno",  "cono",  4.5, "Costituzione", "veleno"),
+    ("Dragonide Rosso",  "Red Dragonborn",     "fuoco",   "cono",  4.5, "Destrezza", "fuoco"),
+    ("Dragonide Bianco", "White Dragonborn",   "freddo",  "cono",  4.5, "Costituzione", "freddo"),
+]
+# Metallici (buoni)
+_DRAGONBORN_METALLIC = [
+    ("Dragonide d'Ottone", "Brass Dragonborn",  "fuoco",   "linea", 9, "Destrezza", "fuoco"),
+    ("Dragonide di Bronzo","Bronze Dragonborn", "fulmine", "linea", 9, "Destrezza", "fulmine"),
+    ("Dragonide di Rame",  "Copper Dragonborn", "acido",   "linea", 9, "Destrezza", "acido"),
+    ("Dragonide d'Oro",    "Gold Dragonborn",   "fuoco",   "cono",  4.5, "Destrezza", "fuoco"),
+    ("Dragonide d'Argento","Silver Dragonborn", "freddo",  "cono",  4.5, "Costituzione", "freddo"),
+]
+
+for name_it, name_en, dmg, shape, dist, save, res in _DRAGONBORN_CHROMATIC + _DRAGONBORN_METALLIC:
+    _add_subrace("Dragonide", {
+        "name": name_it,
+        "name_en": name_en,
+        "description": f"Discendi da un drago {name_it.replace('Dragonide ', '').lower()}. La tua arma del soffio e' una {('linea di ' + str(dist) + ' metri') if shape == 'linea' else ('cono di ' + str(dist) + ' metri')} di danni da {dmg} e hai resistenza a quel tipo di danno.",
+        "ability_score_increase": {},
+        "asi_text": "",
+        "resistances": [res],
+        "traits": _dragonborn_traits(dmg, shape, dist, save),
+    })
 
 # --- Gnomo (Gnome, PHB) ---
 _add_race("Gnomo", {
@@ -1145,18 +1190,165 @@ _add_race("Tiefling", {
     "traits": [
         T("darkvision_60"),
         T("hellish_resistance"),
+    ],
+    # I tiefling scelgono una stirpe (lineage) come sottorazza che determina
+    # i loro incantesimi razziali. La default storica del PHB e' Asmodeus.
+    "subraces": [],  # popolate sotto via _add_subrace
+})
+
+
+# === Tiefling – Stirpi infernali (Asmodeus PHB + 8 stirpi MToF + 3 varianti SCAG) ===
+
+def _tiefling_lineage_trait(name_it, name_en, ability_it, spells_desc, spells_list):
+    return T({
+        "name": name_it,
+        "name_en": name_en,
+        "description": spells_desc,
+        "innate_spells": spells_list,
+    })
+
+
+# --- Asmodeus (default PHB, anche elencata in MToF) ---
+_add_subrace("Tiefling", {
+    "name": "Stirpe di Asmodeus",
+    "name_en": "Bloodline of Asmodeus",
+    "source_short": "PHB",
+    "description": "La stirpe piu' diffusa: il tuo lignaggio risale al Signore dei Nove Inferi. Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello una volta per riposo lungo. Al 5 livello puoi lanciare oscurita' una volta per riposo lungo.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        _tiefling_lineage_trait(
+            "Eredita' Infernale", "Infernal Legacy", "Carisma",
+            "Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare oscurita' (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            [
+                {"name_en": "Thaumaturgy",     "name": "Taumaturgia",          "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Carisma"},
+                {"name_en": "Hellish Rebuke",  "name": "Rimprovero Infernale", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Darkness",        "name": "Oscurità",             "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+            ],
+        ),
+    ],
+})
+
+# --- MToF lineages (8) ---
+_TIEFLING_MTOF = [
+    ("Stirpe di Baalzebul",       "Bloodline of Baalzebul",
+        [("Thaumaturgy", "Taumaturgia", 0, 0, 1, "at_will"),
+         ("Ray of Sickness", "Raggio Indebolente", 1, 1, 3, "long_rest"),
+         ("Crown of Madness", "Corona della Follia", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Dispater",        "Bloodline of Dispater",
+        [("Thaumaturgy", "Taumaturgia", 0, 0, 1, "at_will"),
+         ("Disguise Self", "Camuffare Sé Stesso", 1, 1, 3, "long_rest"),
+         ("Detect Thoughts", "Individuazione del Pensiero", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Fierna",          "Bloodline of Fierna",
+        [("Friends", "Amicizia", 0, 0, 1, "at_will"),
+         ("Charm Person", "Charme su Persone", 1, 1, 3, "long_rest"),
+         ("Suggestion", "Suggestione", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Glasya",          "Bloodline of Glasya",
+        [("Minor Illusion", "Illusione Minore", 0, 0, 1, "at_will"),
+         ("Disguise Self", "Camuffare Sé Stesso", 1, 1, 3, "long_rest"),
+         ("Invisibility", "Invisibilità", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Levistus",        "Bloodline of Levistus",
+        [("Ray of Frost", "Raggio di Gelo", 0, 0, 1, "at_will"),
+         ("Armor of Agathys", "Armatura di Agathys", 1, 1, 3, "long_rest"),
+         ("Darkness", "Oscurità", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Mammon",          "Bloodline of Mammon",
+        [("Mage Hand", "Mano Magica", 0, 0, 1, "at_will"),
+         ("Tenser's Floating Disk", "Disco Fluttuante di Tenser", 1, 1, 3, "long_rest"),
+         ("Arcane Lock", "Chiusura Arcana", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Mefistofele",     "Bloodline of Mephistopheles",
+        [("Mage Hand", "Mano Magica", 0, 0, 1, "at_will"),
+         ("Burning Hands", "Mani Brucianti", 1, 1, 3, "long_rest"),
+         ("Flame Blade", "Lama Infuocata", 2, 2, 5, "long_rest")]),
+    ("Stirpe di Zariel",          "Bloodline of Zariel",
+        [("Thaumaturgy", "Taumaturgia", 0, 0, 1, "at_will"),
+         ("Searing Smite", "Castigo Bruciante", 1, 1, 3, "long_rest"),
+         ("Branding Smite", "Castigo Marchiante", 2, 2, 5, "long_rest")]),
+]
+for name_it, name_en, spells in _TIEFLING_MTOF:
+    spell_objs = [
+        {"name_en": s[0], "name": s[1], "level": s[2], "level_cast": s[3], "min_pg_level": s[4], "recharge": s[5], "ability": "Carisma"}
+        for s in spells
+    ]
+    desc_parts = []
+    for s in spells:
+        if s[4] == 1 and s[5] == "at_will":
+            desc_parts.append(f"conosci il trucchetto {s[1].lower()}")
+        else:
+            rest = "riposo lungo" if s[5] == "long_rest" else "riposo breve"
+            desc_parts.append(f"al {s[4]} livello puoi lanciare {s[1].lower()} (1/{rest})")
+    desc = "Stirpe MToF: " + "; ".join(desc_parts) + ". Il Carisma e' la tua caratteristica da incantatore."
+    _add_subrace("Tiefling", {
+        "name": name_it,
+        "name_en": name_en,
+        "source_short": "MToF",
+        "description": desc,
+        "ability_score_increase": {},
+        "asi_text": "",
+        "traits": [
+            _tiefling_lineage_trait(
+                name_it.replace("Stirpe di ", "Eredita' "), name_en.replace("Bloodline of ", "Legacy of "),
+                "Carisma", desc, spell_objs,
+            ),
+        ],
+    })
+
+# --- Varianti SCAG (sostituiscono Eredita' Infernale invece di aggiungersi) ---
+_add_subrace("Tiefling", {
+    "name": "Tiefling Lingua di Diavolo",
+    "name_en": "Devil's Tongue Tiefling",
+    "source_short": "SCAG",
+    "description": "Variante SCAG: rinunci a Eredita' Infernale per ottenere altri incantesimi di influenza. Conosci il trucchetto motteggio crudele. Al 3 livello puoi lanciare charme su persone come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare ammaliare (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
         T({
-            "name": "Eredita' Infernale",
-            "name_en": "Infernal Legacy",
-            "description": "Conosci il trucchetto taumaturgia. Quando raggiungi il 3 livello, puoi lanciare l'incantesimo rimprovero infernale come un incantesimo di 2 livello una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Quando raggiungi il 5 livello, puoi lanciare l'incantesimo oscurita' una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per questi incantesimi.",
+            "name": "Lingua del Diavolo",
+            "name_en": "Devil's Tongue",
+            "description": "Variante che sostituisce Eredita' Infernale.",
             "innate_spells": [
-                {"name_en": "Thaumaturgy", "name": "Taumaturgia", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
-                {"name_en": "Hellish Rebuke", "name": "Rimprovero Infernale", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
-                {"name_en": "Darkness", "name": "Oscurità", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Vicious Mockery", "name": "Beffa Crudele", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Carisma"},
+                {"name_en": "Charm Person",    "name": "Charme su Persone", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Enthrall",        "name": "Ammaliare",         "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
             ],
         }),
     ],
-    "subraces": [],
+})
+
+_add_subrace("Tiefling", {
+    "name": "Tiefling Fuoco Infernale",
+    "name_en": "Hellfire Tiefling",
+    "source_short": "SCAG",
+    "description": "Variante SCAG: sostituisci oscurita' con mani brucianti. Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare mani brucianti come incantesimo di 2 livello (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Fuoco Infernale",
+            "name_en": "Hellfire",
+            "description": "Variante che sostituisce l'incantesimo di 2 livello di Eredita' Infernale.",
+            "innate_spells": [
+                {"name_en": "Thaumaturgy",    "name": "Taumaturgia",          "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Carisma"},
+                {"name_en": "Hellish Rebuke", "name": "Rimprovero Infernale", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Burning Hands",  "name": "Mani Brucianti",       "level": 1, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+            ],
+        }),
+    ],
+})
+
+_add_subrace("Tiefling", {
+    "name": "Tiefling Alato",
+    "name_en": "Winged Tiefling",
+    "source_short": "SCAG",
+    "description": "Variante SCAG: rinunci a Eredita' Infernale per ottenere ali ricurve. Hai una velocita' di volo di 9 metri quando non indossi armature pesanti.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Ali",
+            "name_en": "Wings",
+            "description": "Hai ali ricurve simili a quelle di un pipistrello che spuntano dalle scapole. Hai una velocita' di volo di 9 metri quando non indossi armature pesanti.",
+        }),
+    ],
 })
 
 
@@ -1880,6 +2072,438 @@ _add_race("Satiro", {
     ],
     "subraces": [],
 })
+
+# === Mordenkainen presents: Monsters of the Multiverse ===
+# Le razze MMM/MOTM aggiungono nuove razze che non erano presenti nei manuali
+# precedenti. Le razze esistenti (Aasimar, Goliath, Triton, Tabaxi, ecc.)
+# hanno una versione MMM modernizzata, ma per evitare duplicati nel picker
+# manteniamo qui SOLO le razze veramente mancanti dal dataset corrente.
+
+# --- Aarakocra (MMM) ---
+_add_race("Aarakocra", {
+    "name_en": "Aarakocra",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Media",
+    "speed": 7.5,
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "age": "Gli aarakocra raggiungono la maturita' a 3 anni e vivono fino a 30.",
+    "alignment": "Spesso caotici buoni: amano la liberta' e detestano la schiavitu'.",
+    "description": "Aviari delle nubi, gli aarakocra hanno corpi simili a uomini-uccello con ali piumate, occhi di rapace e becchi affilati. Migrano per il Piano dell'Aria e per i picchi piu' alti del Multiverso.",
+    "languages": ["Comune", "Auran"],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+        T({
+            "name": "Volo",
+            "name_en": "Flight",
+            "description": "Hai una velocita' di volo di 15 metri. Per usarla, non puoi indossare armature mediane o pesanti.",
+        }),
+        T({
+            "name": "Artigli",
+            "name_en": "Talons",
+            "description": "Hai artigli affilati come armi naturali, con cui puoi effettuare attacchi senz'armi senza essere disarmato. Quando colpisci con essi, infliggi 1d6 + il tuo modificatore di Forza danni taglienti, invece dei normali danni contundenti.",
+        }),
+        T({
+            "name": "Vento Folgorante (Wind Caller)",
+            "name_en": "Wind Caller",
+            "description": "A partire dal 3 livello, puoi lanciare l'incantesimo folata di vento con questo tratto, senza richiedere componenti materiali. Una volta lanciato, non puoi farlo di nuovo finche' non termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore (a tua scelta) per esso.",
+            "uses": {"amount": 1, "recharge": "long_rest"},
+            "innate_spells": [
+                {"name_en": "Gust of Wind", "name": "Folata di Vento", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Saggezza"},
+            ],
+        }),
+    ],
+    "subraces": [],
+})
+
+# --- Changeling (MMM) ---
+_add_race("Mutamorfo", {
+    "name_en": "Changeling",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
+    "age": "Gli changeling raggiungono la maturita' a 20 anni e vivono fino a 100.",
+    "alignment": "Variano ampiamente; spesso assumono identita' diverse a seconda della situazione.",
+    "description": "Mutaforma silenziosi e adattabili, gli changeling possono modificare il proprio aspetto a piacimento. Molti vivono come spie, attori o mediatori tra culture diverse.",
+    "languages": ["Comune"],
+    "languages_extra": 2,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+        T({
+            "name": "Istinto Mutaforma",
+            "name_en": "Changeling Instincts",
+            "description": "Hai competenza in due delle seguenti abilita' a tua scelta: Inganno, Intuizione, Intimidire, Persuasione.",
+        }),
+        T({
+            "name": "Mutaforma",
+            "name_en": "Shapechanger",
+            "description": "Come azione, puoi cambiare il tuo aspetto e la tua voce. Determini i dettagli del nuovo aspetto, inclusi sesso, altezza e peso (entro un metro o due dalla tua altezza/peso normale). Puoi farti sembrare un membro di un'altra razza, anche se nessuno dei tuoi statistiche cambia. Non puoi assumere le sembianze di una creatura di taglia diversa dalla tua, e la tua forma base e' sempre umanoide. Mantieni la nuova forma finche' non usi un'azione per tornare alla tua vera forma o finche' non muori.",
+        }),
+        T({
+            "name": "Versatilita' Linguistica",
+            "name_en": "Changeling Linguist",
+            "description": "Conosci due linguaggi a tua scelta oltre al Comune.",
+        }),
+    ],
+    "subraces": [],
+})
+
+# --- Fairy (MMM) ---
+_add_race("Fata", {
+    "name_en": "Fairy",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Piccola",
+    "speed": 9,
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
+    "age": "Le fate raggiungono la maturita' a 20 anni e vivono fino a circa 200.",
+    "alignment": "Le fate tendono al caotico buono; aborrono la rigidita' e amano la liberta' e l'umorismo.",
+    "description": "Piccole creature fatate dalle ali iridescenti, le fate vagano tra i piani in cerca di meraviglia e malizia. Bench'e' minute, posseggono potenti incantesimi innati.",
+    "languages": ["Comune", "Silvano"],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Fata",
+    "traits": [
+        T("fey_creature_type"),
+        T({
+            "name": "Volo",
+            "name_en": "Flight",
+            "description": "Hai una velocita' di volo di 9 metri grazie alle tue ali. Per usarla, non puoi indossare armature mediane o pesanti.",
+        }),
+        T({
+            "name": "Magia Fatata",
+            "name_en": "Fairy Magic",
+            "description": "Conosci il trucchetto luci danzanti. A partire dal 3 livello, puoi lanciare ingrandire/ridurre (solo la versione 'ridurre' su te stesso). A partire dal 5 livello, puoi lanciare invisibilita'. Una volta lanciato uno di questi due incantesimi con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
+            "innate_spells": [
+                {"name_en": "Druidcraft",       "name": "Pratica Druidica", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Carisma"},
+                {"name_en": "Faerie Fire",      "name": "Luminescenza",     "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Enlarge/Reduce",   "name": "Ingrandire/Ridurre", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Invisibility",     "name": "Invisibilità",     "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+            ],
+        }),
+    ],
+    "subraces": [],
+})
+
+# --- Harengon (MMM) ---
+_add_race("Harengon", {
+    "name_en": "Harengon",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Piccola o Media",
+    "speed": 9,
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
+    "age": "Gli harengon raggiungono la maturita' a 20 anni e vivono fino a 100.",
+    "alignment": "Spesso caotici neutrali o caotici buoni; vagabondi per natura.",
+    "description": "Lepri umanoidi influenzate dal tocco del Reame Fatato, gli harengon possiedono lunghe orecchie sensibili, riflessi fulminei e una notevole abilita' nel salto.",
+    "languages": ["Comune", "Silvano"],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+        T({
+            "name": "Salto Possente",
+            "name_en": "Hare-Trigger",
+            "description": "Puoi aggiungere il tuo bonus di competenza ai tiri di iniziativa.",
+        }),
+        T({
+            "name": "Saltatore",
+            "name_en": "Leporine Senses",
+            "description": "Hai competenza nell'abilita' Percezione.",
+        }),
+        T({
+            "name": "Lunga Falcata",
+            "name_en": "Lucky Footwork",
+            "description": "Quando fallisci un tiro salvezza su Destrezza, puoi usare la tua reazione per tirare 1d4 e aggiungere il numero ottenuto al risultato del tiro, potenzialmente trasformandolo in un successo. Non puoi usare questo tratto se sei inabile o ridotto a velocita' 0.",
+        }),
+        T({
+            "name": "Salto Naturale",
+            "name_en": "Rabbit Hop",
+            "description": "Come azione bonus, puoi saltare con un balzo fino a una distanza in metri pari a 1,5 + 1,5 metri x il tuo bonus di competenza, senza provocare attacchi di opportunita'. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza, riacquistando tutti gli usi al termine di un riposo lungo.",
+            "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        }),
+    ],
+    "subraces": [],
+})
+
+# --- Genasi (EEPC/MMM) ---
+# Genasi e' un'unica razza con 4 sottorazze elementali (aria, terra, fuoco, acqua).
+_add_race("Genasi", {
+    "name_en": "Genasi",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {"Costituzione": 2},
+    "asi_text": "+2 Costituzione (PHB/MMM); la sottorazza determina l'aumento ulteriore.",
+    "age": "I genasi maturano alla stessa velocita' degli umani e raggiungono l'eta' adulta a 20 anni. Vivono leggermente piu' a lungo, fino a 120 anni.",
+    "alignment": "I genasi tendono ad essere indipendenti e impulsivi, riflettendo il loro retaggio elementale.",
+    "description": "I genasi sono i discendenti di unioni tra mortali e creature degli Elementali Interni. Ogni genasi reca in se' la traccia di uno dei quattro elementi: aria, terra, fuoco o acqua.",
+    "languages": ["Comune", "Primordiale"],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [],
+    "subraces": [],  # popolate sotto via _add_subrace
+})
+
+_add_subrace("Genasi", {
+    "name": "Genasi dell'Aria",
+    "name_en": "Air Genasi",
+    "source_short": "MMM",
+    "description": "Discendi dai jinn dell'aria. Sei sempre circondato da una brezza leggera. Hai competenza con il trucchetto modellare l'aria e impari nuovi incantesimi di levitazione e folata di vento crescendo di livello.",
+    "ability_score_increase": {"Destrezza": 1},
+    "asi_text": "+1 Destrezza",
+    "traits": [
+        T({
+            "name": "Respiro Indipendente",
+            "name_en": "Unending Breath",
+            "description": "Puoi trattenere il respiro indefinitamente quando non sei inabile.",
+        }),
+        T({
+            "name": "Magia dell'Aria",
+            "name_en": "Mingle with the Wind",
+            "description": "Conosci il trucchetto modellare l'aria. A partire dal 3 livello, puoi lanciare levitazione una volta con questo tratto, e riacquisti la capacita' di farlo quando termini un riposo lungo. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "innate_spells": [
+                {"name_en": "Shocking Grasp", "name": "Tocco Folgorante", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Costituzione"},
+                {"name_en": "Feather Fall",   "name": "Caduta Morbida",   "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Costituzione"},
+                {"name_en": "Levitate",       "name": "Levitazione",      "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Costituzione"},
+            ],
+        }),
+        T({
+            "name": "Anima dell'Aria",
+            "name_en": "Lightning Resistance",
+            "description": "Hai resistenza ai danni da fulmine.",
+        }),
+    ],
+    "resistances": ["fulmine"],
+})
+
+_add_subrace("Genasi", {
+    "name": "Genasi della Terra",
+    "name_en": "Earth Genasi",
+    "source_short": "MMM",
+    "description": "Discendi dai dao della terra. La tua pelle ha venature simili al marmo e i tuoi capelli ricordano l'erba o l'argento. Puoi attraversare terreno difficile naturale senza penalita'.",
+    "ability_score_increase": {"Forza": 1},
+    "asi_text": "+1 Forza",
+    "traits": [
+        T({
+            "name": "Sentiero della Terra",
+            "name_en": "Earth Walk",
+            "description": "Puoi muoverti attraverso il terreno difficile fatto di terra o pietra senza spendere movimento aggiuntivo.",
+        }),
+        T({
+            "name": "Fusione con la Pietra",
+            "name_en": "Merge with Stone",
+            "description": "Puoi lanciare l'incantesimo passare senza traccia con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per esso.",
+            "innate_spells": [
+                {"name_en": "Blade Ward",     "name": "Difesa dalle Lame", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Costituzione"},
+                {"name_en": "Pass without Trace", "name": "Passare senza Traccia", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Costituzione"},
+            ],
+        }),
+    ],
+})
+
+_add_subrace("Genasi", {
+    "name": "Genasi del Fuoco",
+    "name_en": "Fire Genasi",
+    "source_short": "MMM",
+    "description": "Discendi dagli efreet del fuoco. La tua pelle ha sfumature rosse o cinerine, e i tuoi capelli somigliano a fiamme guizzanti. Hai resistenza al danno da fuoco e impari incantesimi a tema fiamma.",
+    "ability_score_increase": {"Intelligenza": 1},
+    "asi_text": "+1 Intelligenza",
+    "traits": [
+        T({
+            "name": "Vista del Fuoco",
+            "name_en": "Darkvision",
+            "description": "Hai scurovisione fino a 18 metri.",
+        }),
+        T({
+            "name": "Resistenza al Fuoco",
+            "name_en": "Fire Resistance",
+            "description": "Hai resistenza ai danni da fuoco.",
+        }),
+        T({
+            "name": "Stirpe del Fuoco",
+            "name_en": "Reach to the Blaze",
+            "description": "Conosci il trucchetto produrre fiamme. A partire dal 3 livello, puoi lanciare mani brucianti una volta con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "innate_spells": [
+                {"name_en": "Produce Flame", "name": "Produrre Fiamme", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Costituzione"},
+                {"name_en": "Burning Hands", "name": "Mani Brucianti",  "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Costituzione"},
+            ],
+        }),
+    ],
+    "resistances": ["fuoco"],
+    "darkvision": 18,
+})
+
+_add_subrace("Genasi", {
+    "name": "Genasi dell'Acqua",
+    "name_en": "Water Genasi",
+    "source_short": "MMM",
+    "description": "Discendi dai marid dell'acqua. La tua pelle ha sfumature blu o verdi, e ti muovi con la grazia delle correnti marine. Puoi nuotare e respirare sott'acqua.",
+    "ability_score_increase": {"Saggezza": 1},
+    "asi_text": "+1 Saggezza",
+    "traits": [
+        T({
+            "name": "Acclimatamento Acquatico",
+            "name_en": "Acid Resistance",
+            "description": "Hai resistenza ai danni da acido.",
+        }),
+        T({
+            "name": "Respiro Acquatico",
+            "name_en": "Amphibious",
+            "description": "Puoi respirare sia aria che acqua.",
+        }),
+        T({
+            "name": "Nuotatore",
+            "name_en": "Swim",
+            "description": "Hai una velocita' di nuoto di 9 metri.",
+        }),
+        T({
+            "name": "Magia dell'Acqua",
+            "name_en": "Call to the Wave",
+            "description": "Conosci il trucchetto modellare l'acqua. A partire dal 3 livello, puoi lanciare creare/distruggere acqua come incantesimo di 2 livello una volta con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "innate_spells": [
+                {"name_en": "Shape Water", "name": "Modellare l'Acqua", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Costituzione"},
+                {"name_en": "Create or Destroy Water", "name": "Creare o Distruggere Acqua", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Costituzione"},
+            ],
+        }),
+    ],
+    "resistances": ["acido"],
+})
+
+# --- Shifter (MMM) ---
+# Shifter e' un'unica razza con 4 "Shifting Forms" come sottorazze.
+_add_race("Shifter", {
+    "name_en": "Shifter",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
+    "age": "Gli shifter maturano a 10 anni e raramente vivono oltre i 70.",
+    "alignment": "Spesso neutrali; le diverse stirpi tirano lo shifter in direzioni differenti.",
+    "description": "Discendenti di mortali e creature licantrope, gli shifter possono attingere brevemente alla loro natura bestiale per ottenere caratteristiche animalesche. La sottorazza determina il tipo di trasformazione (Shifting Feature).",
+    "languages": ["Comune"],
+    "languages_extra": 1,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 18,
+    "creature_type": "Umanoide",
+    "traits": [
+        T("darkvision_60"),
+        T({
+            "name": "Trasformazione (Shifting)",
+            "name_en": "Shifting",
+            "description": "Come azione bonus, puoi assumere una forma piu' bestiale. Questa trasformazione dura 1 minuto, finche' non muori, finche' non sei inabile o finche' non termini la trasformazione come azione bonus. Quando ti trasformi, ottieni un numero di punti ferita temporanei pari al tuo livello + il tuo modificatore di Costituzione (minimo 1). Puoi trasformarti un numero di volte pari al tuo bonus di competenza, riacquistando tutti gli usi al termine di un riposo lungo. La sottorazza determina i benefici aggiuntivi della trasformazione.",
+            "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        }),
+    ],
+    "subraces": [],  # popolate sotto via _add_subrace
+})
+
+_add_subrace("Shifter", {
+    "name": "Pellebestia (Beasthide)",
+    "name_en": "Beasthide Shifter",
+    "source_short": "MMM",
+    "description": "Quando ti trasformi, ottieni 1d6 punti ferita temporanei aggiuntivi e gli attacchi senz'armi infliggono 1d6 danni contundenti.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Caratteristica di Trasformazione: Pellebestia",
+            "name_en": "Shifting Feature: Beasthide",
+            "description": "Quando attivi Trasformazione, ottieni 1d6 punti ferita temporanei extra. Mentre sei trasformato, ottieni una velocita' di scalata di 9 metri e gli attacchi senz'armi infliggono 1d6 + il tuo modificatore di Forza danni contundenti.",
+        }),
+    ],
+})
+
+_add_subrace("Shifter", {
+    "name": "Zannalunga (Longtooth)",
+    "name_en": "Longtooth Shifter",
+    "source_short": "MMM",
+    "description": "Mentre sei trasformato, le tue zanne diventano armi naturali con cui puoi infliggere 1d6 + Forza danni perforanti.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Caratteristica di Trasformazione: Zannalunga",
+            "name_en": "Shifting Feature: Longtooth",
+            "description": "Mentre sei trasformato, puoi effettuare un attacco senz'armi con i tuoi denti come azione bonus, infliggendo 1d6 + il tuo modificatore di Forza danni perforanti. La Forza e' la tua caratteristica per questo attacco.",
+        }),
+    ],
+})
+
+_add_subrace("Shifter", {
+    "name": "Falcatasvelta (Swiftstride)",
+    "name_en": "Swiftstride Shifter",
+    "source_short": "MMM",
+    "description": "Quando ti trasformi, la tua velocita' aumenta di 3 metri e puoi muoverti senza provocare attacchi di opportunita' come reazione.",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Caratteristica di Trasformazione: Falcatasvelta",
+            "name_en": "Shifting Feature: Swiftstride",
+            "description": "Mentre sei trasformato, la tua velocita' a piedi aumenta di 3 metri. Inoltre, quando una creatura entro 1,5 metri da te effettua un attacco contro di te, puoi usare la tua reazione per muoverti fino a 3 metri senza provocare attacchi di opportunita'.",
+        }),
+    ],
+})
+
+_add_subrace("Shifter", {
+    "name": "Cacciatore Selvatico (Wildhunt)",
+    "name_en": "Wildhunt Shifter",
+    "source_short": "MMM",
+    "description": "Mentre sei trasformato, hai vantaggio ai tiri salvezza su Saggezza e nessuna creatura entro 9 metri da te puo' effettuare attacchi con vantaggio (a meno che non sia inabile).",
+    "ability_score_increase": {},
+    "asi_text": "",
+    "traits": [
+        T({
+            "name": "Caratteristica di Trasformazione: Cacciatore Selvatico",
+            "name_en": "Shifting Feature: Wildhunt",
+            "description": "Mentre sei trasformato, hai vantaggio ai tiri salvezza su Saggezza e nessuna creatura entro 9 metri da te puo' effettuare un tiro per colpire con vantaggio contro di te (a meno che non sia inabile).",
+        }),
+    ],
+})
+
 
 # === Tomb of Annihilation ===
 
