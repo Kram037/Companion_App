@@ -967,6 +967,48 @@ function _computeSpellSlots(classi) {
 function calcSpellSlotsFromClassi(classi) { return _computeSpellSlots(classi); }
 function pgCalcSpellSlots() { return _computeSpellSlots(pgSelectedClasses); }
 
+/**
+ * Restituisce il massimo livello di incantesimo a cui il PG ha accesso
+ * (per visualizzare la lista incantesimi conoscibili, anche se non ha slot).
+ *
+ * Particolarmente importante per il Warlock: pur avendo solo slot di livello
+ * fino a 5, ottiene il Mystic Arcanum a lv 11/13/15/17 che gli permette di
+ * conoscere e lanciare un incantesimo di livello 6/7/8/9. La lista degli
+ * incantesimi accessibili deve quindi includere tutti i livelli da 0 al
+ * massimo conoscibile, indipendentemente dalla presenza di slot.
+ */
+function _maxSpellLevelForClass(cls) {
+    const type = CLASS_CASTER_TYPE[cls.nome];
+    const lv = parseInt(cls.livello) || 0;
+    if (lv <= 0) return 0;
+    if (type === 'full') {
+        const t = CLASS_SPELL_SLOTS.full[Math.min(lv, 20)];
+        return t ? Math.max(...Object.keys(t).map(Number)) : 0;
+    }
+    if (type === 'half') {
+        const t = CLASS_SPELL_SLOTS.half[Math.min(lv, 20)];
+        return t ? Math.max(...Object.keys(t).map(Number)) : 0;
+    }
+    if (type === 'pact') {
+        // Slot Pact (max 5) + Mystic Arcanum (lv 11/13/15/17 -> 6/7/8/9)
+        let max = Math.min(Math.ceil(lv / 2), 5);
+        if (lv >= 11) max = Math.max(max, 6);
+        if (lv >= 13) max = Math.max(max, 7);
+        if (lv >= 15) max = Math.max(max, 8);
+        if (lv >= 17) max = Math.max(max, 9);
+        return max;
+    }
+    if (type === null && cls.thirdCaster) {
+        const t = CLASS_SPELL_SLOTS.third[Math.min(lv, 20)];
+        return t ? Math.max(...Object.keys(t).map(Number)) : 0;
+    }
+    return 0;
+}
+
+function _maxKnownSpellLevel(classi) {
+    return (classi || []).reduce((m, c) => Math.max(m, _maxSpellLevelForClass(c)), 0);
+}
+
 function pgBuildSlotIncantesimo() {
     const defaultSlots = pgCalcSpellSlots();
     const levels = Object.keys(defaultSlots).map(Number).sort((a, b) => a - b);
@@ -1970,15 +2012,23 @@ window.schedaOpenSpellPage = async function(pgId) {
 
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
-    // Determina quali livelli mostrare: trucchetti sempre + ogni livello con slot
-    // o con almeno un incantesimo conosciuto
+    // Determina quali livelli mostrare:
+    //   - trucchetti sempre,
+    //   - ogni livello con slot,
+    //   - ogni livello con almeno un incantesimo conosciuto,
+    //   - tutti i livelli da 0 al massimo conoscibile per le classi del PG
+    //     (fondamentale per il Warlock: ha solo slot di liv 5 ma conosce
+    //     incantesimi 1-5, e con il Mystic Arcanum 6/7/8/9 a partire da lv 11).
     const ALL_DATA = _spellsData();
     const knownLevels = new Set();
     (pg.incantesimi_conosciuti || []).forEach(n => {
         const sp = _resolveSpell(n);
         if (sp) knownLevels.add(sp.level);
     });
-    const levelsToShow = new Set([0, ...levels, ...knownLevels]);
+    const maxKnowableLevel = _maxKnownSpellLevel(classi);
+    const knowableLevels = [];
+    for (let l = 0; l <= maxKnowableLevel; l++) knowableLevels.push(l);
+    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels]);
     // Mostra fino al massimo livello disponibile nel dataset
     const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
     const orderedLevels = Array.from(levelsToShow)
