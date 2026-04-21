@@ -318,13 +318,65 @@
     .scheda-isp-display { min-width: 30px; font-size: 0.85rem; }
 }
 
-/* Divisore orizzontale tra blocchi di sezioni della scheda */
+/* Divisore orizzontale tra blocchi di sezioni della scheda
+   Usato anche come ancora di scroll per il bottone "Vai a Statistiche" (icona spada). */
 .scheda-divider {
     border: none;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--border) 15%, var(--border) 85%, transparent);
-    margin: var(--spacing-md) 0 var(--spacing-sm);
-    opacity: 0.9;
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--accent) 12%,
+        var(--accent) 88%,
+        transparent 100%);
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15), 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent);
+    position: relative;
+    /* Offset per scrollIntoView che tiene conto della tab bar fissa in alto. */
+    scroll-margin-top: 60px;
+}
+.scheda-divider::before,
+.scheda-divider::after {
+    content: '◆';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 0.7rem;
+    background: var(--bg);
+    padding: 0 6px;
+    line-height: 1;
+}
+.scheda-divider::before { left: 18%; }
+.scheda-divider::after { right: 18%; }
+
+/* Bottone "Vai a Statistiche" (icona spada), in basso a destra come la freccia "torna indietro" */
+.btn-scroll-stats {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.15s, opacity 0.15s, background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+.btn-scroll-stats.visible { display: inline-flex; }
+.btn-scroll-stats:hover { transform: scale(1.06); background: var(--accent-hover, var(--accent)); }
+.btn-scroll-stats:active { transform: scale(0.96); }
+.btn-scroll-stats svg { width: 26px; height: 26px; display: block; }
+@media (max-width: 480px) {
+    .btn-scroll-stats { width: 46px; height: 46px; bottom: 14px; right: 14px; }
+    .btn-scroll-stats svg { width: 22px; height: 22px; }
 }
 
 /* Sotto-sezioni collapsabili (es. Resistenze/Immunità e Condizioni dentro Statistiche) */

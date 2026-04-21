@@ -14,6 +14,18 @@ function updateReturnToSessionBtn() {
     btn.style.display = show ? 'flex' : 'none';
 }
 
+function updateScrollStatsBtn() {
+    const btn = document.getElementById('btnScrollStats');
+    if (!btn) return;
+    const show = AppState.currentPage === 'scheda';
+    btn.classList.toggle('visible', !!show);
+    if (show && typeof window.schedaScrollToStats === 'function') {
+        btn.onclick = window.schedaScrollToStats;
+    } else {
+        btn.onclick = null;
+    }
+}
+
 // Navigation
 function navigateToPage(pageName, { pushHistory = true } = {}) {
     const previousPage = AppState.currentPage;
@@ -111,6 +123,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
     }
 
     updateReturnToSessionBtn();
+    updateScrollStatsBtn();
 }
 
 // Modal Functions

@@ -1455,6 +1455,10 @@ async function renderSchedaPersonaggio(personaggioId) {
     const tabBar = document.getElementById('schedaTabBar');
     if (tabBar) tabBar.style.display = '';
 
+    window._schedaCurrentPgId = personaggioId;
+    window._schedaCurrentTab = 'scheda';
+    if (typeof updateScrollStatsBtn === 'function') updateScrollStatsBtn();
+
     if (!_schedaPgCache || _schedaPgCache.id !== personaggioId) {
         content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
     }
@@ -1981,6 +1985,42 @@ window.schedaToggleSection = function(titleEl) {
     if (section) section.classList.toggle('collapsed');
 };
 
+/* ── Bottone "Vai a Statistiche" (icona spada) ─────────────────────────
+   - Visibile mentre si e' nella scheda di un PG (gestito in navigation.js).
+   - Click: porta alla Pagina 1 e scrolla al divisore appena prima della sezione Statistiche.
+   - Su Pagina 2/Inventario/Incantesimi: prima naviga a Pagina 1 e poi scrolla. */
+function _scrollSchedaDividerIntoView() {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    // Il primo divisore di Pagina 1 e' quello prima della sezione "Statistiche".
+    const divider = content.querySelector('.scheda-divider');
+    if (divider) {
+        divider.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        // Fallback: scrolla in cima alla sezione Statistiche cercando per testo del titolo.
+        const titles = content.querySelectorAll('.scheda-section-title');
+        for (const t of titles) {
+            if (t.textContent.trim().startsWith('Statistiche')) {
+                t.closest('.scheda-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
+            }
+        }
+    }
+}
+
+window.schedaScrollToStats = function() {
+    const pgId = window._schedaCurrentPgId;
+    const tab = window._schedaCurrentTab;
+    if (tab && tab !== 'scheda' && pgId) {
+        // Naviga a Pagina 1 e attende il render prima di scrollare.
+        renderSchedaPersonaggio(pgId).then(() => {
+            setTimeout(_scrollSchedaDividerIntoView, 80);
+        });
+        return;
+    }
+    _scrollSchedaDividerIntoView();
+};
+
 window.schedaToggleSubsection = function(titleEl) {
     const sub = titleEl.closest('.scheda-subsection');
     if (sub) sub.classList.toggle('collapsed');
@@ -2294,14 +2334,30 @@ function _spellIsRitual(sp) {
 function _spellSourceShort(sp) {
     const src = sp.source || '';
     if (!src) return '';
+    // Match abbreviazioni TRA PARENTESI QUADRE/TONDE PRIMA dei pattern testuali,
+    // cosi' fonti tipo "Bard [TCoE]", "Wizard [TCoE]" finiscono in TCoE e non in "Bard".
+    const bracket = src.match(/[\[(]\s*([A-Za-z+]{2,8})\s*[\])]/);
+    if (bracket) {
+        const code = bracket[1].toUpperCase();
+        if (code === 'PHB' || code === 'BR+' || code === 'SRD') return 'PHB';
+        if (code === 'XGTE') return 'XGtE';
+        if (code === 'TCOE') return 'TCoE';
+        if (code === 'SCAG') return 'SCAG';
+        if (code === 'EBR' || code === 'ERLW') return 'EBR';
+        if (code === 'MMM' || code === 'MOTM') return 'MMM';
+        if (code === 'SCC') return 'SCC';
+        if (code === 'BGG' || code === 'GOTG') return 'BGG';
+    }
     if (/Player.{0,3}s Handbook/i.test(src)) return 'PHB';
     if (/Xanathar/i.test(src)) return 'XGtE';
-    if (/Tasha/i.test(src)) return 'TCoE';
+    if (/Tasha|TCoE/i.test(src)) return 'TCoE';
     if (/Sword Coast/i.test(src)) return 'SCAG';
     if (/Eberron/i.test(src)) return 'EBR';
     if (/Mordenkainen.*Multiverse/i.test(src)) return 'MMM';
     if (/Strixhaven/i.test(src)) return 'SCC';
-    return src.split(/[\s(]/)[0].slice(0, 6);
+    if (/Bigby|Glory of (the )?Giants/i.test(src)) return 'BGG';
+    // Fallback: niente abbreviazioni "improvvisate" - meglio "Altro" che un nome di classe scambiato per manuale.
+    return 'Altro';
 }
 function _normCastingTime(ct) {
     const t = (ct || '').toLowerCase();
@@ -5529,6 +5585,10 @@ async function renderMicroScheda(personaggioId) {
 
     const tabBar = document.getElementById('schedaTabBar');
     if (tabBar) tabBar.style.display = 'none';
+
+    // La micro-scheda non ha la struttura con il divisore "Statistiche": nascondi il bottone spada.
+    const scrollBtn = document.getElementById('btnScrollStats');
+    if (scrollBtn) scrollBtn.classList.remove('visible');
 
     content.innerHTML = `
     <div class="scheda-identity">
