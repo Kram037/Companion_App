@@ -1628,6 +1628,9 @@ async function renderSchedaPersonaggio(personaggioId) {
             <div class="scheda-name">${escapeHtml(pg.nome)}</div>
             <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
             <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
+            ${(pg.classi && pg.classi.length > 0)
+                ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+                : ''}
         </div>
 
         <div class="scheda-section">
@@ -1694,11 +1697,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita
-                ${(pg.classi && pg.classi.length > 0)
-                    ? `<button class="scheda-edit-btn scheda-levelup-btn" onclick="event.stopPropagation();schedaLevelUp('${pg.id}')" title="Level up">▲</button>`
-                    : ''}
-            </div>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita</div>
             <div class="scheda-section-body">
                 ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
             </div>
@@ -1970,6 +1969,9 @@ window.schedaOpenSpellPage = async function(pgId) {
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
         <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
+        ${(pg.classi && pg.classi.length > 0)
+            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+            : ''}
     </div>
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
@@ -2337,6 +2339,9 @@ window.schedaOpenInventoryPage = async function(pgId) {
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle-sm">Inventario</div>
+        ${(pg.classi && pg.classi.length > 0)
+            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+            : ''}
     </div>
 
     <div class="scheda-section">
@@ -2781,6 +2786,9 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle-sm">Privilegi</div>
+        ${(pg.classi && pg.classi.length > 0)
+            ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+            : ''}
     </div>
 
     <div class="scheda-section">
@@ -3506,8 +3514,17 @@ window.schedaIspChange = function(pgId, delta) {
    ────────────────────────────────────────────────────────────────────────── */
 window.schedaLevelUp = async function(pgId) {
     const pg = _schedaPgCache;
-    if (!pg) return;
-    const classi = Array.isArray(pg.classi) ? pg.classi : [];
+    if (!pg || pg.id !== pgId) {
+        // Carica il PG se non e' in cache (es. clic dalla tab Inventario senza prima aver caricato la scheda).
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            const { data } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+            if (data) _schedaPgCache = data;
+        }
+    }
+    const cur = _schedaPgCache;
+    if (!cur) return;
+    const classi = Array.isArray(cur.classi) ? cur.classi : [];
     if (classi.length === 0) {
         showNotification('Nessuna classe configurata');
         return;
@@ -3519,14 +3536,20 @@ window.schedaLevelUp = async function(pgId) {
     }
 
     if (classi.length === 1) {
-        if ((parseInt(classi[0].livello) || 0) >= 20) {
+        const c = classi[0];
+        if ((parseInt(c.livello) || 0) >= 20) {
             showNotification('Livello massimo raggiunto (20)');
             return;
         }
-        _showLevelUpHpChoice(pgId, 0);
+        const ok = await showConfirm(
+            `Aumentare ${c.nome} dal livello ${c.livello || 1} al livello ${(c.livello || 1) + 1}?`,
+            'Level Up'
+        );
+        if (ok) _showLevelUpHpChoice(pgId, 0);
         return;
     }
 
+    // Multiclasse: scegli prima quale classe far salire (la scelta funge anche da conferma).
     _showLevelUpPicker(pgId, classi);
 };
 
@@ -3566,46 +3589,68 @@ function _showLevelUpHpChoice(pgId, classIdx) {
 
     const die = CLASS_HIT_DIE[cls.nome] || 8;
     const conMod = Math.floor((((pg.costituzione) || 10) - 10) / 2);
-    const avg = dieAvg(die);
-    const avgGain = Math.max(1, avg + conMod);
+    const avgGain = Math.max(1, dieAvg(die) + conMod);
     const conSign = conMod >= 0 ? '+' : '';
+    const conLabel = `${conSign}${conMod}`;
     const newLvl = (parseInt(cls.livello) || 0) + 1;
 
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal levelup-modal">
+    overlay.innerHTML = `<div class="hp-calc-modal levelup-pf-modal">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-        <h3 class="levelup-title">${escapeHtml(cls.nome)}: Liv ${cls.livello || 1} → ${newLvl}</h3>
-        <p class="levelup-sub">Come vuoi calcolare i PV ottenuti?<br><small>Dado: d${die} · COS ${conSign}${conMod}</small></p>
-        <div class="levelup-pick-list">
-            <button class="levelup-pick-row" data-mode="avg">
-                <span class="levelup-pick-name">Valore medio</span>
-                <span class="levelup-pick-arrow">+${avgGain} PV</span>
-            </button>
-            <button class="levelup-pick-row" data-mode="roll">
-                <span class="levelup-pick-name">Tira il dado (1d${die})</span>
-                <span class="levelup-pick-arrow">+? PV</span>
-            </button>
+        <h3 class="levelup-title">Punti Ferita</h3>
+        <p class="levelup-sub">${escapeHtml(cls.nome)}: Liv ${cls.livello || 1} → ${newLvl}<br><small>Dado: 1d${die} · COS ${conLabel}</small></p>
+        <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (+${avgGain})</button>
+        <div class="levelup-pf-roll-row">
+            <input type="number" class="levelup-pf-input" id="lupfInput" placeholder="—" min="1" inputmode="numeric">
+            <button type="button" class="levelup-pf-roll-btn" id="lupfRollBtn">Tira il dado</button>
+        </div>
+        <div class="levelup-pf-detail" id="lupfDetail"></div>
+        <div class="levelup-pf-actions">
+            <button type="button" class="levelup-pf-cancel" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button type="button" class="levelup-pf-confirm" id="lupfConfirmBtn" disabled>Conferma</button>
         </div>
     </div>`;
-    overlay.querySelectorAll('.levelup-pick-row').forEach(btn => {
-        btn.onclick = async () => {
-            const mode = btn.dataset.mode;
-            let pvGain;
-            let extraMsg = '';
-            if (mode === 'roll') {
-                const roll = 1 + Math.floor(Math.random() * die);
-                pvGain = Math.max(1, roll + conMod);
-                extraMsg = ` (1d${die}=${roll}${conSign}${conMod})`;
-            } else {
-                pvGain = avgGain;
-            }
-            overlay.remove();
-            await _doLevelUp(pgId, classIdx, pvGain, extraMsg);
-        };
+
+    const input = overlay.querySelector('#lupfInput');
+    const detail = overlay.querySelector('#lupfDetail');
+    const avgBtn = overlay.querySelector('#lupfAvgBtn');
+    const rollBtn = overlay.querySelector('#lupfRollBtn');
+    const confirmBtn = overlay.querySelector('#lupfConfirmBtn');
+
+    const refreshConfirm = () => {
+        const v = parseInt(input.value);
+        confirmBtn.disabled = !(Number.isFinite(v) && v >= 1);
+    };
+
+    avgBtn.onclick = () => {
+        input.value = avgGain;
+        detail.textContent = `Tiro medio: ${dieAvg(die)} ${conLabel} COS = ${avgGain} PV`;
+        refreshConfirm();
+    };
+    rollBtn.onclick = () => {
+        const roll = 1 + Math.floor(Math.random() * die);
+        const total = Math.max(1, roll + conMod);
+        input.value = total;
+        detail.textContent = `1d${die} = ${roll} ${conLabel} COS = ${total} PV`;
+        refreshConfirm();
+    };
+    input.addEventListener('input', () => {
+        // Se l'utente edita a mano, rimuovi il dettaglio (non corrisponde piu' al calcolo automatico).
+        if (detail.textContent && !detail.dataset.locked) detail.textContent = '';
+        refreshConfirm();
     });
+    confirmBtn.onclick = async () => {
+        const pvGain = parseInt(input.value);
+        if (!Number.isFinite(pvGain) || pvGain < 1) return;
+        const extra = detail.textContent ? ` (${detail.textContent})` : '';
+        overlay.remove();
+        await _doLevelUp(pgId, classIdx, pvGain, extra);
+    };
+
     document.body.appendChild(overlay);
+    setTimeout(() => input.focus(), 50);
 }
 
 async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
