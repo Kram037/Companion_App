@@ -828,6 +828,47 @@ function _pgRaceInnateSpells(pg) {
     return out;
 }
 
+// Chiave stabile per tracciare gli usi di un incantesimo innato a slot.
+// Basata su nome inglese (canonico) + ricarica, evitando collisioni quando
+// piu' tratti danno lo stesso spell con ricariche diverse.
+function _pgInnateSpellKey(sp) {
+    const base = sp.name_en || sp.name || '';
+    const rec = sp.recharge || 'long_rest';
+    return (base + '_' + rec).replace(/[^A-Za-z0-9]+/g, '_');
+}
+
+// Risorse "Slot magia innata": una per ogni incantesimo innato non a volonta'
+// e non trucchetto. Persistite in pg.risorse_classe._innate[key] = current.
+function _pgRaceInnateSlots(pg) {
+    const list = _pgRaceInnateSpells(pg);
+    const stored = (pg.risorse_classe && pg.risorse_classe._innate) || {};
+    const out = [];
+    list.forEach(sp => {
+        if (sp.recharge === 'at_will') return;
+        if ((sp.level || 0) === 0) return;
+        const key = _pgInnateSpellKey(sp);
+        const max = 1;
+        const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+        let rechargeLabel = '';
+        if (sp.recharge === 'long_rest') rechargeLabel = 'r. lungo';
+        else if (sp.recharge === 'short_rest') rechargeLabel = 'r. breve';
+        else if (sp.recharge === 'dawn') rechargeLabel = "all'alba";
+        out.push({
+            key,
+            name: sp.name,
+            name_en: sp.name_en,
+            level: sp.level,
+            level_cast: sp.level_cast || sp.level,
+            ability: sp.ability,
+            trait: sp.trait,
+            recharge: rechargeLabel,
+            max,
+            current,
+        });
+    });
+    return out;
+}
+
 function getBackgroundData(nome) {
     if (!AppState.cachedBackground) return null;
     return AppState.cachedBackground.find(b => b.nome === nome) || null;
@@ -2415,6 +2456,33 @@ window.schedaOpenSpellPage = async function(pgId) {
         </div>`;
     }).join('') : '<p class="scheda-empty">Nessuno slot disponibile</p>';
 
+    // Sezione "Slot magia innata" (solo se la razza fornisce incantesimi
+    // innati con ricarica, esclusi i trucchetti / a volonta').
+    const innateSlots = _pgRaceInnateSlots(pg);
+    let innateSlotsBlock = '';
+    if (innateSlots.length > 0) {
+        const rows = innateSlots.map(is => {
+            const lvlLabel = `Lv ${is.level_cast}`;
+            const sub = is.recharge ? ` <small>(${is.recharge})</small>` : '';
+            return `<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${lvlLabel}</small>${sub}</span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaInnateSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                    <span class="scheda-hd-val" id="sInnSlot_${is.key}">${is.current}</span>
+                    <span class="scheda-hd-max">/ ${is.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaInnateSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        innateSlotsBlock = `
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot magia innata</div>
+        <div class="scheda-section-body">
+            <div class="scheda-hd-list">${rows}</div>
+        </div>
+    </div>`;
+    }
+
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
     // Determina quali livelli mostrare:
@@ -2430,10 +2498,17 @@ window.schedaOpenSpellPage = async function(pgId) {
         const sp = _resolveSpell(n);
         if (sp) knownLevels.add(sp.level);
     });
+    // Livelli con incantesimi razziali innati (devono apparire anche se la
+    // classe del PG non darebbe accesso a quel livello).
+    const innateLevels = new Set();
+    _pgRaceInnateSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name) || _resolveSpell(s.name_en);
+        if (sp) innateLevels.add(sp.level);
+    });
     const maxKnowableLevel = _maxKnownSpellLevel(classi);
     const knowableLevels = [];
     for (let l = 0; l <= maxKnowableLevel; l++) knowableLevels.push(l);
-    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels]);
+    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels]);
     // Mostra fino al massimo livello disponibile nel dataset
     const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
     const orderedLevels = Array.from(levelsToShow)
@@ -2463,6 +2538,7 @@ window.schedaOpenSpellPage = async function(pgId) {
             <div class="scheda-slots-table">${slotsHtml}</div>
         </div>
     </div>
+    ${innateSlotsBlock}
 
     <hr class="scheda-divider">
 
@@ -2750,14 +2826,43 @@ function buildSpellLevelSection(pg, level) {
     const known = (pg.incantesimi_conosciuti || [])
         .map(n => ({ raw: n, sp: _resolveSpell(n) }))
         .filter(x => x.sp && x.sp.level === level);
-    const cards = known.length > 0 ? known.map(({ sp }) => {
-        // Salviamo sempre il nome italiano (chiave canonica) come id
+    const knownNames = new Set(known.map(x => x.sp.name));
+
+    // Incantesimi razziali innati per questo livello, deduplicati e non
+    // sovrapposti agli "incantesimi conosciuti" (in tal caso prevale
+    // l'entry razziale che e' read-only).
+    const innate = _pgRaceInnateSpells(pg)
+        .map(s => ({ src: s, sp: _resolveSpell(s.name) || _resolveSpell(s.name_en) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenInnate = new Set();
+    const innateUnique = [];
+    innate.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key)) return;
+        seenInnate.add(key);
+        innateUnique.push(x);
+    });
+
+    const knownCards = known
+        .filter(({ sp }) => !seenInnate.has(sp.name))
+        .map(({ sp }) => {
+            const id = sp.name;
+            return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+                <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+                <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+            </div>`;
+        }).join('');
+
+    const innateCards = innateUnique.map(({ src, sp }) => {
         const id = sp.name;
-        return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+        const tag = src.recharge === 'at_will' ? 'a volontà' : (sp.level === 0 ? 'razza' : `razza · ${src.ability}`);
+        return `<div class="spell-card spell-card-innate" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag">${escapeHtml(tag)}</span></div>
             <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
         </div>`;
-    }).join('') : `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
+    }).join('');
+
+    const cardsHtml = (knownCards + innateCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
 
     const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
     const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
@@ -2767,7 +2872,7 @@ function buildSpellLevelSection(pg, level) {
             <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">&#9998;</button>
         </div>
         <div class="scheda-section-body">
-            <div class="spell-cards-grid">${cards}</div>
+            <div class="spell-cards-grid">${cardsHtml}</div>
         </div>
     </div>`;
 }
@@ -4841,6 +4946,25 @@ window.schedaRaceResChange = function(pgId, key, current, delta, max) {
         const btns = row.querySelectorAll('.scheda-hd-btn');
         if (btns[0]) btns[0].setAttribute('onclick', `schedaRaceResChange('${pgId}','${key}',${newVal},-1,${max})`);
         if (btns[1]) btns[1].setAttribute('onclick', `schedaRaceResChange('${pgId}','${key}',${newVal},1,${max})`);
+    }
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+};
+
+window.schedaInnateSlotChange = function(pgId, key, current, delta, max) {
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    if (newVal === current) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._innate) pg.risorse_classe._innate = {};
+    pg.risorse_classe._innate[key] = newVal;
+    const el = document.getElementById(`sInnSlot_${key}`);
+    if (el) el.textContent = newVal;
+    const row = el ? el.closest('.scheda-hd-row') : null;
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaInnateSlotChange('${pgId}','${key}',${newVal},-1,${max})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaInnateSlotChange('${pgId}','${key}',${newVal},1,${max})`);
     }
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 };

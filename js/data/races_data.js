@@ -155,7 +155,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
               },
               {
                 "name_en": "Invisibility",
-                "name": "Invisibilita'",
+                "name": "Invisibilità",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -351,7 +351,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
               },
               {
                 "name_en": "Faerie Fire",
-                "name": "Charme su Persone",
+                "name": "Luminescenza",
                 "level": 1,
                 "level_cast": 1,
                 "min_pg_level": 3,
@@ -360,7 +360,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
               },
               {
                 "name_en": "Darkness",
-                "name": "Oscurita'",
+                "name": "Oscurità",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -753,7 +753,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "innate_spells": [
               {
                 "name_en": "Minor Illusion",
-                "name": "Immagine Minore",
+                "name": "Illusione Minore",
                 "level": 0,
                 "level_cast": 0,
                 "min_pg_level": 1,
@@ -1011,7 +1011,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Darkness",
-            "name": "Oscurita'",
+            "name": "Oscurità",
             "level": 2,
             "level_cast": 2,
             "min_pg_level": 5,
@@ -1209,7 +1209,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Disguise Self",
-            "name": "Mascherarsi",
+            "name": "Camuffare Sé Stesso",
             "level": 1,
             "level_cast": 1,
             "min_pg_level": 1,
@@ -1540,7 +1540,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": [
           {
             "name_en": "Fog Cloud",
-            "name": "Nebbia",
+            "name": "Nube di Nebbia",
             "level": 1,
             "level_cast": 1,
             "min_pg_level": 3,
@@ -1558,7 +1558,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Wall of Water",
-            "name": "Camminare sull'Acqua",
+            "name": "Muro d'Acqua",
             "level": 3,
             "level_cast": 3,
             "min_pg_level": 5,
@@ -1933,7 +1933,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": [
           {
             "name_en": "Poison Spray",
-            "name": "Velenare",
+            "name": "Spruzzo Velenoso",
             "level": 0,
             "level_cast": 0,
             "min_pg_level": 1,
@@ -1942,11 +1942,11 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Animal Friendship",
-            "name": "Charme su Persone",
+            "name": "Amicizia con gli Animali",
             "level": 1,
-            "level_cast": 2,
+            "level_cast": 1,
             "min_pg_level": 1,
-            "recharge": "long_rest",
+            "recharge": "at_will",
             "ability": "Carisma"
           },
           {
@@ -2042,7 +2042,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Jump",
-            "name": "Salto",
+            "name": "Saltare",
             "level": 1,
             "level_cast": 1,
             "min_pg_level": 3,
@@ -2051,7 +2051,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Misty Step",
-            "name": "Nebbia Mistificante",
+            "name": "Passo Velato",
             "level": 2,
             "level_cast": 2,
             "min_pg_level": 5,
@@ -2125,7 +2125,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           },
           {
             "name_en": "Detect Thoughts",
-            "name": "Detezione del Pensiero",
+            "name": "Individuazione del Pensiero",
             "level": 2,
             "level_cast": 2,
             "min_pg_level": 5,

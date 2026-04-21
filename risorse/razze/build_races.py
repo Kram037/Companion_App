@@ -262,7 +262,7 @@ COMMON_TRAITS = {
         "uses": {"amount": 1, "recharge": "short_rest"},
         "innate_spells": [
             {"name_en": "Detect Magic", "name": "Individuazione del Magico", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "short_rest", "ability": "Saggezza"},
-            {"name_en": "Disguise Self", "name": "Mascherarsi", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "short_rest", "ability": "Saggezza"},
+            {"name_en": "Disguise Self", "name": "Camuffare Sé Stesso", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "short_rest", "ability": "Saggezza"},
         ],
     },
     "hidden_step": {
@@ -296,9 +296,9 @@ COMMON_TRAITS = {
         "name_en": "Control Air and Water",
         "description": "Da un giovane triton, sai influenzare gli elementi. Conosci il trucchetto folata di vento. Quando raggiungi il 3 livello, puoi lanciare nebbia. Quando raggiungi il 5 livello, puoi lanciare camminare sull'acqua. Una volta lanciato un incantesimo con questo tratto, non puoi lanciarlo di nuovo finche' non termini un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per essi.",
         "innate_spells": [
-            {"name_en": "Fog Cloud", "name": "Nebbia", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+            {"name_en": "Fog Cloud", "name": "Nube di Nebbia", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
             {"name_en": "Gust of Wind", "name": "Folata di Vento", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
-            {"name_en": "Wall of Water", "name": "Camminare sull'Acqua", "level": 3, "level_cast": 3, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+            {"name_en": "Wall of Water", "name": "Muro d'Acqua", "level": 3, "level_cast": 3, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
         ],
     },
     "emissary_of_the_sea": {
@@ -425,8 +425,8 @@ COMMON_TRAITS = {
         "name_en": "Innate Spellcasting",
         "description": "Conosci il trucchetto velenare. Puoi lanciare charme su persone come incantesimo di livello 2 con questo tratto, e a partire dal 3 livello puoi lanciare anche scrutare il pensiero. Devi terminare un riposo lungo per lanciare di nuovo questi incantesimi con questo tratto. Il Carisma e' la tua caratteristica da incantatore per essi.",
         "innate_spells": [
-            {"name_en": "Poison Spray", "name": "Velenare", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
-            {"name_en": "Animal Friendship", "name": "Charme su Persone", "level": 1, "level_cast": 2, "min_pg_level": 1, "recharge": "long_rest", "ability": "Carisma"},
+            {"name_en": "Poison Spray", "name": "Spruzzo Velenoso", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
+            {"name_en": "Animal Friendship", "name": "Amicizia con gli Animali", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
             {"name_en": "Suggestion", "name": "Suggestione", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
         ],
     },
@@ -479,7 +479,7 @@ COMMON_TRAITS = {
         "description": "Quando raggiungi il 3 livello, puoi lanciare ingrandire/ridurre su te stesso una volta con questo tratto, usando solo la versione 'ingrandire' dell'incantesimo. Quando raggiungi il 5 livello, puoi lanciare invisibilita' su te stesso una volta con questo tratto. Non hai bisogno di componenti materiali per questi incantesimi e non puoi lanciarli mentre sei alla luce solare diretta. Una volta lanciato uno dei due incantesimi, devi finire un riposo lungo prima di poterlo lanciare di nuovo. La Forza e' la tua caratteristica da incantatore per essi.",
         "innate_spells": [
             {"name_en": "Enlarge/Reduce", "name": "Ingrandire/Ridurre", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Forza"},
-            {"name_en": "Invisibility", "name": "Invisibilita'", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Forza"},
+            {"name_en": "Invisibility", "name": "Invisibilità", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Forza"},
         ],
     },
     "stone_camouflage": {
@@ -493,8 +493,8 @@ COMMON_TRAITS = {
         "description": "Conosci il trucchetto mano magica, e la mano e' invisibile quando lo lanci con questo tratto. Quando raggiungi il 3 livello, puoi lanciare salto una volta con questo tratto, e riacquisti la capacita' di lanciarlo cosi' quando termini un riposo lungo. Quando raggiungi il 5 livello, puoi lanciare nebbia mistificante una volta con questo tratto, e riacquisti la capacita' di lanciarlo cosi' quando termini un riposo lungo. L'Intelligenza e' la tua caratteristica da incantatore per essi.",
         "innate_spells": [
             {"name_en": "Mage Hand", "name": "Mano Magica", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Intelligenza"},
-            {"name_en": "Jump", "name": "Salto", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Intelligenza"},
-            {"name_en": "Misty Step", "name": "Nebbia Mistificante", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Intelligenza"},
+            {"name_en": "Jump", "name": "Saltare", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Intelligenza"},
+            {"name_en": "Misty Step", "name": "Passo Velato", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Intelligenza"},
         ],
     },
     "decadent_mastery": {
@@ -514,7 +514,7 @@ COMMON_TRAITS = {
         "innate_spells": [
             {"name_en": "Mage Hand", "name": "Mano Magica", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Saggezza"},
             {"name_en": "Shield", "name": "Scudo", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Saggezza"},
-            {"name_en": "Detect Thoughts", "name": "Detezione del Pensiero", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Saggezza"},
+            {"name_en": "Detect Thoughts", "name": "Individuazione del Pensiero", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Saggezza"},
         ],
     },
     "mental_discipline": {
@@ -824,8 +824,8 @@ _add_race("Elfo", {
                     "description": "Conosci il trucchetto luci danzanti. Quando raggiungi il 3 livello, puoi lanciare l'incantesimo charme su persone una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Quando raggiungi il 5 livello, puoi lanciare l'incantesimo oscurita' una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per questi incantesimi.",
                     "innate_spells": [
                         {"name_en": "Dancing Lights", "name": "Luci Danzanti", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
-                        {"name_en": "Faerie Fire", "name": "Charme su Persone", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
-                        {"name_en": "Darkness", "name": "Oscurita'", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+                        {"name_en": "Faerie Fire", "name": "Luminescenza", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+                        {"name_en": "Darkness", "name": "Oscurità", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
                     ],
                 }),
             ],
@@ -1030,7 +1030,7 @@ _add_race("Gnomo", {
                     "name_en": "Natural Illusionist",
                     "description": "Conosci il trucchetto immagine minore. L'Intelligenza e' la tua caratteristica da incantatore per esso.",
                     "innate_spells": [
-                        {"name_en": "Minor Illusion", "name": "Immagine Minore", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Intelligenza"},
+                        {"name_en": "Minor Illusion", "name": "Illusione Minore", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Intelligenza"},
                     ],
                 }),
                 T({
@@ -1152,7 +1152,7 @@ _add_race("Tiefling", {
             "innate_spells": [
                 {"name_en": "Thaumaturgy", "name": "Taumaturgia", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
                 {"name_en": "Hellish Rebuke", "name": "Rimprovero Infernale", "level": 1, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
-                {"name_en": "Darkness", "name": "Oscurita'", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+                {"name_en": "Darkness", "name": "Oscurità", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
             ],
         }),
     ],
