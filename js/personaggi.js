@@ -1497,9 +1497,8 @@ const CLASS_RESOURCES = {
     'Stregone': [
         { nome: 'Punti Stregoneria', perLivello: [0,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], fromLevel: 2 }
     ],
-    'Warlock': [
-        { nome: 'Slot del Patto', perLivello: [0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 1 }
-    ],
+    // Warlock: gli "Slot del Patto" sono gestiti come slot incantesimo nella
+    // pagina Incantesimi (non come risorsa di classe), per evitare duplicazione.
 };
 
 const CLASS_SPELL_ABILITY = {
