@@ -4530,18 +4530,24 @@ window.schedaOpenAddEquip = function(pgId) {
                 <span class="option-source">${a.danni} ${a.tipo_danno}</span>
             </div>`
         ).join('');
-        return `<div class="form-section-label">${label}</div>${items}`;
+        return `<div class="scheda-picker-cat">${label}</div>${items}`;
     }).join('');
 
+    const ARMATURA_LABELS = {
+        'leggera': 'Armature Leggere',
+        'media': 'Armature Medie',
+        'pesante': 'Armature Pesanti',
+        'scudo': 'Scudi'
+    };
     const armatureHtml = ['leggera','media','pesante','scudo'].map(cat => {
-        const label = cat === 'scudo' ? 'Scudi' : `Armature ${cat.charAt(0).toUpperCase() + cat.slice(1)}${cat === 'leggera' ? '' : cat === 'media' ? '' : ''}`;
+        const label = ARMATURA_LABELS[cat];
         const items = DND_ARMATURE.filter(a => a.cat === cat).map(a =>
             `<div class="pg-talento-item" onclick="schedaAddArmatura('${pgId}','${escapeHtml(a.nome)}')">
                 <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
                 <span class="option-source">CA ${a.ca_base}</span>
             </div>`
         ).join('');
-        return `<div class="form-section-label">${label}</div>${items}`;
+        return `<div class="scheda-picker-cat">${label}</div>${items}`;
     }).join('');
 
     const modalHtml = `
@@ -4549,11 +4555,13 @@ window.schedaOpenAddEquip = function(pgId) {
         <div class="modal-content modal-content-lg">
             <button class="modal-close" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">&times;</button>
             <h2>Aggiungi Equipaggiamento</h2>
+            <div class="picker-tabs">
+                <button type="button" class="picker-tab active" data-panel="armi" onclick="schedaPickerSwitchTab(this,'armi')">Armi</button>
+                <button type="button" class="picker-tab" data-panel="armature" onclick="schedaPickerSwitchTab(this,'armature')">Armature</button>
+            </div>
             <div class="wizard-page-scroll">
-                <div class="form-section-label" style="font-size:1.1rem;margin-bottom:4px;">Armi</div>
-                ${armiHtml}
-                <div class="form-section-label" style="font-size:1.1rem;margin-top:16px;margin-bottom:4px;">Armature</div>
-                ${armatureHtml}
+                <div class="picker-tab-panel active" data-panel="armi">${armiHtml}</div>
+                <div class="picker-tab-panel" data-panel="armature">${armatureHtml}</div>
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
@@ -4563,6 +4571,14 @@ window.schedaOpenAddEquip = function(pgId) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     document.body.style.overflow = 'hidden';
 }
+
+// Helper condiviso per i picker della scheda con tab a 2 vie (Armi/Armature, Linguaggi/Strumenti, ...)
+window.schedaPickerSwitchTab = function(btn, panelId) {
+    const modal = btn.closest('.modal-content');
+    if (!modal) return;
+    modal.querySelectorAll('.picker-tab').forEach(b => b.classList.toggle('active', b === btn));
+    modal.querySelectorAll('.picker-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === panelId));
+};
 
 window.schedaAddArma = async function(pgId, nome) {
     const arma = DND_ARMI.find(a => a.nome === nome);
@@ -4762,7 +4778,7 @@ window.schedaOpenLangProfEdit = function(pgId) {
             html += `</label>`;
             return html;
         }).join('');
-        toolSectionsHtml += `<div class="form-section-label" style="margin-top:16px;">${escapeHtml(groupName)}</div><div class="scheda-checkbox-grid">${items}</div>`;
+        toolSectionsHtml += `<div class="scheda-picker-cat">${escapeHtml(groupName)}</div><div class="scheda-checkbox-grid">${items}</div>`;
     }
 
     const modalHtml = `
@@ -4770,10 +4786,17 @@ window.schedaOpenLangProfEdit = function(pgId) {
         <div class="modal-content modal-content-lg">
             <button class="modal-close" onclick="schedaCloseLangProfEdit()">&times;</button>
             <h2>Linguaggi e Competenze</h2>
+            <div class="picker-tabs">
+                <button type="button" class="picker-tab active" data-panel="linguaggi" onclick="schedaPickerSwitchTab(this,'linguaggi')">Linguaggi</button>
+                <button type="button" class="picker-tab" data-panel="competenze" onclick="schedaPickerSwitchTab(this,'competenze')">Competenze</button>
+            </div>
             <div class="wizard-page-scroll">
-                <div class="form-section-label">Linguaggi</div>
-                <div class="scheda-checkbox-grid">${langCheckboxes}</div>
-                ${toolSectionsHtml}
+                <div class="picker-tab-panel active" data-panel="linguaggi">
+                    <div class="scheda-checkbox-grid">${langCheckboxes}</div>
+                </div>
+                <div class="picker-tab-panel" data-panel="competenze">
+                    ${toolSectionsHtml}
+                </div>
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseLangProfEdit()">Chiudi</button>
