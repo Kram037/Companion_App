@@ -1608,6 +1608,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
             resItems.push(`<div class="scheda-hd-row">
                 <span class="scheda-hd-total">${label}
+                    <button class="scheda-custom-res-edit" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica">&#9998;</button>
                     <button class="scheda-custom-res-del" onclick="schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
                 </span>
                 <div class="scheda-hd-avail">
@@ -4292,45 +4293,59 @@ window.schedaCustomResChange = function(pgId, index, current, delta, max) {
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 }
 
-window.schedaOpenAddCustomRes = function(pgId) {
+window.schedaOpenAddCustomRes = function(pgId, editIndex) {
+    // editIndex opzionale: se passato, modifica una risorsa custom esistente
+    const pg = _schedaPgCache;
+    const editing = (editIndex != null && editIndex >= 0);
+    const existing = editing ? (pg?.risorse_classe?._custom?.[editIndex] || null) : null;
+
+    const initialType = (existing && existing.tipo === 'dadi') ? 'dadi' : 'punti';
+    const initialDado = (existing && existing.dado) ? existing.dado : 'd8';
+    const initialNome = existing ? (existing.nome || '') : '';
+    const initialMax  = existing && Number.isFinite(parseInt(existing.max)) ? parseInt(existing.max) : 1;
+
+    const dadiBtns = ['d4','d6','d8','d10','d12','d20'].map(d =>
+        `<button type="button" class="btn-secondary custom-res-dice-btn ${d === initialDado ? 'active' : ''}" onclick="schedaCrDadoSelect('${d}')">${d}</button>`
+    ).join('');
+
+    const confirmFn = editing
+        ? `schedaConfirmCustomRes('${pgId}', ${editIndex})`
+        : `schedaConfirmCustomRes('${pgId}')`;
+
     const modalHtml = `
     <div class="modal active" id="customResModal">
         <div class="modal-content">
             <button class="modal-close" onclick="schedaCloseCustomResModal()">&times;</button>
-            <h2>Aggiungi Risorsa</h2>
+            <h2>${editing ? 'Modifica Risorsa' : 'Aggiungi Risorsa'}</h2>
             <div class="form-group">
                 <label class="form-label">Nome della risorsa</label>
-                <input type="text" id="customResNome" class="form-input" placeholder="Es. Dadi di Superiorità">
+                <input type="text" id="customResNome" class="form-input" placeholder="Es. Dadi di Superiorità" value="${escapeHtml(initialNome)}">
             </div>
             <div class="form-group">
                 <label class="form-label">Tipo</label>
                 <div class="custom-res-type-row">
-                    <button type="button" class="btn-secondary custom-res-type-btn active" id="crTypePunti" onclick="schedaCrTypeSelect('punti')">Punti</button>
-                    <button type="button" class="btn-secondary custom-res-type-btn" id="crTypeDadi" onclick="schedaCrTypeSelect('dadi')">Dadi</button>
+                    <button type="button" class="btn-secondary custom-res-type-btn ${initialType === 'punti' ? 'active' : ''}" id="crTypePunti" onclick="schedaCrTypeSelect('punti')">Punti</button>
+                    <button type="button" class="btn-secondary custom-res-type-btn ${initialType === 'dadi'  ? 'active' : ''}" id="crTypeDadi" onclick="schedaCrTypeSelect('dadi')">Dadi</button>
                 </div>
             </div>
-            <div class="form-group" id="crDadoGroup" style="display:none;">
+            <div class="form-group" id="crDadoGroup" style="display:${initialType === 'dadi' ? '' : 'none'};">
                 <label class="form-label">Tipo di dado</label>
-                <div class="custom-res-dice-row">
-                    ${['d4','d6','d8','d10','d12','d20'].map(d =>
-                        `<button type="button" class="btn-secondary custom-res-dice-btn ${d === 'd8' ? 'active' : ''}" onclick="schedaCrDadoSelect('${d}')">${d}</button>`
-                    ).join('')}
-                </div>
+                <div class="custom-res-dice-row">${dadiBtns}</div>
             </div>
             <div class="form-group">
                 <label class="form-label">Utilizzi massimi</label>
-                <input type="number" id="customResMax" class="form-input" min="1" value="1" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
+                <input type="number" id="customResMax" class="form-input" min="1" value="${initialMax}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseCustomResModal()">Annulla</button>
-                <button type="button" class="btn-primary" onclick="schedaConfirmCustomRes('${pgId}')">Aggiungi</button>
+                <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
             </div>
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     document.body.style.overflow = 'hidden';
-    window._crType = 'punti';
-    window._crDado = 'd8';
+    window._crType = initialType;
+    window._crDado = initialDado;
 }
 
 window.schedaCrTypeSelect = function(tipo) {
@@ -4345,19 +4360,30 @@ window.schedaCrDadoSelect = function(dado) {
     document.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.toggle('active', b.textContent === dado));
 }
 
-window.schedaConfirmCustomRes = async function(pgId) {
+window.schedaConfirmCustomRes = async function(pgId, editIndex) {
     const nome = document.getElementById('customResNome')?.value?.trim();
     if (!nome) { showNotification('Inserisci un nome', 'error'); return; }
     const max = parseInt(document.getElementById('customResMax')?.value) || 1;
     const tipo = window._crType || 'punti';
-    const newRes = { nome, tipo, max, current: max };
-    if (tipo === 'dadi') newRes.dado = window._crDado || 'd8';
 
     const pg = _schedaPgCache;
     if (!pg) return;
     if (!pg.risorse_classe) pg.risorse_classe = {};
     if (!pg.risorse_classe._custom) pg.risorse_classe._custom = [];
-    pg.risorse_classe._custom.push(newRes);
+
+    const editing = (editIndex != null && editIndex >= 0 && pg.risorse_classe._custom[editIndex]);
+    if (editing) {
+        // Modifica preservando il "current" (clampato al nuovo max).
+        const prev = pg.risorse_classe._custom[editIndex];
+        const prevCurrent = Number.isFinite(parseInt(prev.current)) ? parseInt(prev.current) : max;
+        const updated = { nome, tipo, max, current: Math.max(0, Math.min(prevCurrent, max)) };
+        if (tipo === 'dadi') updated.dado = window._crDado || 'd8';
+        pg.risorse_classe._custom[editIndex] = updated;
+    } else {
+        const newRes = { nome, tipo, max, current: max };
+        if (tipo === 'dadi') newRes.dado = window._crDado || 'd8';
+        pg.risorse_classe._custom.push(newRes);
+    }
 
     await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
     schedaCloseCustomResModal();
@@ -4367,7 +4393,7 @@ window.schedaConfirmCustomRes = async function(pgId) {
     } else {
         renderSchedaPersonaggio(pgId);
     }
-    showNotification('Risorsa aggiunta');
+    showNotification(editing ? 'Risorsa aggiornata' : 'Risorsa aggiunta');
 }
 
 window.schedaDeleteCustomRes = async function(pgId, index) {

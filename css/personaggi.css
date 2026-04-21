@@ -1748,18 +1748,21 @@
     color: var(--accent);
 }
 
-.scheda-custom-res-del {
+.scheda-custom-res-del,
+.scheda-custom-res-edit {
     background: none;
     border: none;
     color: var(--text-light);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     cursor: pointer;
     padding: 0 4px;
-    margin-left: 6px;
-    opacity: 0.6;
+    margin-left: 4px;
+    opacity: 0.7;
     vertical-align: middle;
+    transition: var(--transition-fast);
 }
 .scheda-custom-res-del:hover { opacity: 1; color: #ef4444; }
+.scheda-custom-res-edit:hover { opacity: 1; color: var(--accent); }
 
 .custom-res-type-row,
 .custom-res-dice-row {
