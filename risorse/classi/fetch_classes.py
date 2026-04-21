@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent  # repo root
 OUT_JSON = ROOT / "risorse" / "classi" / "classes.json"
 OUT_JS = ROOT / "js" / "data" / "classes_data.js"
 TRANSLATIONS = ROOT / "risorse" / "classi" / "class_translations.json"
+EXTRA_CLASSES = ROOT / "risorse" / "classi" / "extra_classes.json"
 
 # ─────────────────────────────────────────────────────────────────────────
 # Fetch
@@ -281,6 +282,32 @@ def guess_level_from_text(desc: str) -> int | None:
     return None
 
 
+def load_extra_classes() -> dict:
+    """Carica classi/sottoclassi extra non presenti nel SRD Open5e."""
+    if not EXTRA_CLASSES.exists():
+        return {"classes": [], "extra_subclasses": {}}
+    return json.loads(EXTRA_CLASSES.read_text(encoding="utf-8"))
+
+
+def merge_extras(parsed: list[dict], extras: dict) -> list[dict]:
+    """Aggiunge le classi extra (es. Artefice) e fonde le sottoclassi extra
+    nelle classi gia' presenti."""
+    extra_subs = extras.get("extra_subclasses", {}) or {}
+    for cls in parsed:
+        slug = cls["slug"]
+        for sub in extra_subs.get(slug, []) or []:
+            cls["subclasses"].append(sub)
+
+    out = list(parsed)
+    existing_slugs = {c["slug"] for c in parsed}
+    for extra_cls in extras.get("classes", []) or []:
+        if extra_cls["slug"] in existing_slugs:
+            continue
+        out.append(extra_cls)
+    out.sort(key=lambda c: c.get("name", c["slug"]).lower())
+    return out
+
+
 def main() -> int:
     raw_classes = fetch_classes()
     tr = load_translations()
@@ -289,6 +316,11 @@ def main() -> int:
         cls = parse_class(raw)
         cls = apply_translations(cls, tr)
         parsed.append(cls)
+
+    extras = load_extra_classes()
+    parsed = merge_extras(parsed, extras)
+
+    for cls in parsed:
         translated = sum(1 for f in cls["features"] if f.get("translated"))
         print(
             f"  {cls['slug']:<14} - {len(cls['features']):>3} feat "
