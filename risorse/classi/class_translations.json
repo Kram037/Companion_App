@@ -1,0 +1,411 @@
+{
+  "_doc": "Override traduzioni IT per classi e sottoclassi. Verra' fuso da fetch_classes.py durante il build.",
+  "classes": {
+    "barbarian": {
+      "name": "Barbaro",
+      "hit_dice": "1d12",
+      "prof_armor": "Armature leggere, armature medie, scudi",
+      "prof_weapons": "Armi semplici, armi da guerra",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Forza, Costituzione",
+      "prof_skills": "Scegline due tra Addestrare Animali, Atletica, Intimidire, Natura, Percezione e Sopravvivenza",
+      "features": {
+        "Rage": {"name": "Ira"},
+        "Unarmored Defense": {"name": "Difesa Senza Armatura"},
+        "Reckless Attack": {"name": "Attacco Spericolato"},
+        "Danger Sense": {"name": "Senso del Pericolo"},
+        "Primal Path": {"name": "Cammino Primordiale"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Extra Attack": {"name": "Attacco Extra"},
+        "Fast Movement": {"name": "Movimento Rapido"},
+        "Feral Instinct": {"name": "Istinto Ferino"},
+        "Brutal Critical": {"name": "Critico Brutale"},
+        "Relentless Rage": {"name": "Ira Implacabile"},
+        "Persistent Rage": {"name": "Ira Persistente"},
+        "Indomitable Might": {"name": "Potenza Indomabile"},
+        "Primal Champion": {"name": "Campione Primordiale"}
+      },
+      "subclasses": {
+        "path-of-the-berserker": {
+          "name": "Cammino del Berserker",
+          "features": {
+            "Frenzy": {"name": "Frenesia"},
+            "Mindless Rage": {"name": "Ira Insensata"},
+            "Intimidating Presence": {"name": "Presenza Intimidatoria"},
+            "Retaliation": {"name": "Rappresaglia"}
+          }
+        }
+      }
+    },
+    "bard": {
+      "name": "Bardo",
+      "hit_dice": "1d8",
+      "prof_armor": "Armature leggere",
+      "prof_weapons": "Armi semplici, balestre leggere, spade lunghe, stocchi, spade corte",
+      "prof_tools": "Tre strumenti musicali a tua scelta",
+      "prof_saving_throws": "Destrezza, Carisma",
+      "prof_skills": "Tre a tua scelta",
+      "spellcasting_ability": "Carisma",
+      "features": {
+        "Spellcasting": {"name": "Incantesimi"},
+        "Bardic Inspiration": {"name": "Ispirazione Bardica"},
+        "Jack of All Trades": {"name": "Esperto in Tutto"},
+        "Song of Rest": {"name": "Canto del Riposo"},
+        "Bard College": {"name": "Collegio Bardico"},
+        "Expertise": {"name": "Competenza"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Font of Inspiration": {"name": "Sorgente d'Ispirazione"},
+        "Countercharm": {"name": "Controincanto"},
+        "Magical Secrets": {"name": "Segreti Magici"},
+        "Superior Inspiration": {"name": "Ispirazione Superiore"}
+      },
+      "subclasses": {
+        "college-of-lore": {
+          "name": "Collegio del Sapere",
+          "features": {
+            "Bonus Proficiencies": {"name": "Competenze Aggiuntive"},
+            "Cutting Words": {"name": "Parole Taglienti"},
+            "Additional Magical Secrets": {"name": "Segreti Magici Aggiuntivi"},
+            "Peerless Skill": {"name": "Abilità Senza Pari"}
+          }
+        }
+      }
+    },
+    "cleric": {
+      "name": "Chierico",
+      "hit_dice": "1d8",
+      "prof_armor": "Armature leggere, armature medie, scudi",
+      "prof_weapons": "Tutte le armi semplici",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Saggezza, Carisma",
+      "prof_skills": "Scegline due tra Storia, Intuizione, Medicina, Persuasione e Religione",
+      "spellcasting_ability": "Saggezza",
+      "features": {
+        "Spellcasting": {"name": "Incantesimi"},
+        "Divine Domain": {"name": "Dominio Divino"},
+        "Channel Divinity": {"name": "Incanalare Divinità"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Destroy Undead": {"name": "Distruggere Non Morti"},
+        "Divine Intervention": {"name": "Intervento Divino"}
+      },
+      "subclasses": {
+        "life-domain": {
+          "name": "Dominio della Vita",
+          "features": {
+            "Bonus Proficiency": {"name": "Competenza Aggiuntiva"},
+            "Disciple of Life": {"name": "Discepolo della Vita"},
+            "Channel Divinity: Preserve Life": {"name": "Incanalare Divinità: Preservare la Vita"},
+            "Blessed Healer": {"name": "Guaritore Benedetto"},
+            "Divine Strike": {"name": "Colpo Divino"},
+            "Supreme Healing": {"name": "Guarigione Suprema"}
+          }
+        }
+      }
+    },
+    "druid": {
+      "name": "Druido",
+      "hit_dice": "1d8",
+      "prof_armor": "Armature leggere, armature medie, scudi (i druidi non indossano armature o scudi di metallo)",
+      "prof_weapons": "Mazze, dardi, giavellotti, mazzafrusti, bastoni ferrati, falcetti, fionde, lance, pugnali, bastoni, scimitarre",
+      "prof_tools": "Kit dell'erborista",
+      "prof_saving_throws": "Intelligenza, Saggezza",
+      "prof_skills": "Scegline due tra Arcano, Addestrare Animali, Intuizione, Medicina, Natura, Percezione, Religione e Sopravvivenza",
+      "spellcasting_ability": "Saggezza",
+      "features": {
+        "Druidic": {"name": "Druidico"},
+        "Spellcasting": {"name": "Incantesimi"},
+        "Wild Shape": {"name": "Forma Selvatica"},
+        "Druid Circle": {"name": "Circolo Druidico"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Timeless Body": {"name": "Corpo Senza Tempo"},
+        "Beast Spells": {"name": "Incantesimi Bestia"},
+        "Archdruid": {"name": "Arcidruido"}
+      },
+      "subclasses": {
+        "circle-of-the-land": {
+          "name": "Circolo della Terra",
+          "features": {
+            "Bonus Cantrip": {"name": "Trucchetto Aggiuntivo"},
+            "Natural Recovery": {"name": "Recupero Naturale"},
+            "Circle Spells": {"name": "Incantesimi del Circolo"},
+            "Land's Stride": {"name": "Falcata Naturale"},
+            "Nature's Ward": {"name": "Custode della Natura"},
+            "Nature's Sanctuary": {"name": "Santuario della Natura"}
+          }
+        }
+      }
+    },
+    "fighter": {
+      "name": "Guerriero",
+      "hit_dice": "1d10",
+      "prof_armor": "Tutte le armature, scudi",
+      "prof_weapons": "Armi semplici, armi da guerra",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Forza, Costituzione",
+      "prof_skills": "Scegline due tra Acrobazia, Addestrare Animali, Atletica, Storia, Intuizione, Intimidire, Percezione e Sopravvivenza",
+      "features": {
+        "Fighting Style": {"name": "Stile di Combattimento"},
+        "Second Wind": {"name": "Riprendere Fiato"},
+        "Action Surge": {"name": "Azione Impetuosa"},
+        "Martial Archetype": {"name": "Archetipo Marziale"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Extra Attack": {"name": "Attacco Extra"},
+        "Indomitable": {"name": "Indomabile"}
+      },
+      "subclasses": {
+        "champion": {
+          "name": "Campione",
+          "features": {
+            "Improved Critical": {"name": "Critico Migliorato"},
+            "Remarkable Athlete": {"name": "Atleta Eccezionale"},
+            "Additional Fighting Style": {"name": "Stile di Combattimento Aggiuntivo"},
+            "Superior Critical": {"name": "Critico Superiore"},
+            "Survivor": {"name": "Sopravvissuto"}
+          }
+        }
+      }
+    },
+    "monk": {
+      "name": "Monaco",
+      "hit_dice": "1d8",
+      "prof_armor": "Nessuna",
+      "prof_weapons": "Armi semplici, spade corte",
+      "prof_tools": "Tipo di strumento musicale o di artigiano a tua scelta",
+      "prof_saving_throws": "Forza, Destrezza",
+      "prof_skills": "Scegline due tra Acrobazia, Atletica, Storia, Intuizione, Religione e Furtività",
+      "features": {
+        "Unarmored Defense": {"name": "Difesa Senza Armatura"},
+        "Martial Arts": {"name": "Arti Marziali"},
+        "Ki": {"name": "Ki"},
+        "Unarmored Movement": {"name": "Movimento Senza Armatura"},
+        "Monastic Tradition": {"name": "Tradizione Monastica"},
+        "Deflect Missiles": {"name": "Deviare Proiettili"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Slow Fall": {"name": "Caduta Lenta"},
+        "Extra Attack": {"name": "Attacco Extra"},
+        "Stunning Strike": {"name": "Colpo Stordente"},
+        "Ki-Empowered Strikes": {"name": "Colpi Potenziati dal Ki"},
+        "Evasion": {"name": "Elusione"},
+        "Stillness of Mind": {"name": "Quiete della Mente"},
+        "Purity of Body": {"name": "Purezza del Corpo"},
+        "Tongue of the Sun and Moon": {"name": "Lingua del Sole e della Luna"},
+        "Diamond Soul": {"name": "Anima di Diamante"},
+        "Timeless Body": {"name": "Corpo Senza Tempo"},
+        "Empty Body": {"name": "Corpo Vuoto"},
+        "Perfect Self": {"name": "Sé Perfetto"}
+      },
+      "subclasses": {
+        "way-of-the-open-hand": {
+          "name": "Via della Mano Aperta",
+          "features": {
+            "Open Hand Technique": {"name": "Tecnica della Mano Aperta"},
+            "Wholeness of Body": {"name": "Pienezza del Corpo"},
+            "Tranquility": {"name": "Tranquillità"},
+            "Quivering Palm": {"name": "Palmo Tremante"}
+          }
+        }
+      }
+    },
+    "paladin": {
+      "name": "Paladino",
+      "hit_dice": "1d10",
+      "prof_armor": "Tutte le armature, scudi",
+      "prof_weapons": "Armi semplici, armi da guerra",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Saggezza, Carisma",
+      "prof_skills": "Scegline due tra Atletica, Intuizione, Intimidire, Medicina, Persuasione e Religione",
+      "spellcasting_ability": "Carisma",
+      "features": {
+        "Divine Sense": {"name": "Senso Divino"},
+        "Lay on Hands": {"name": "Imposizione delle Mani"},
+        "Fighting Style": {"name": "Stile di Combattimento"},
+        "Spellcasting": {"name": "Incantesimi"},
+        "Divine Smite": {"name": "Punizione Divina"},
+        "Divine Health": {"name": "Salute Divina"},
+        "Sacred Oath": {"name": "Giuramento Sacro"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Extra Attack": {"name": "Attacco Extra"},
+        "Aura of Protection": {"name": "Aura della Protezione"},
+        "Aura of Courage": {"name": "Aura del Coraggio"},
+        "Improved Divine Smite": {"name": "Punizione Divina Migliorata"},
+        "Cleansing Touch": {"name": "Tocco Purificatore"}
+      },
+      "subclasses": {
+        "oath-of-devotion": {
+          "name": "Giuramento di Devozione",
+          "features": {
+            "Tenets of Devotion": {"name": "Principi della Devozione"},
+            "Oath Spells": {"name": "Incantesimi del Giuramento"},
+            "Channel Divinity": {"name": "Incanalare Divinità"},
+            "Aura of Devotion": {"name": "Aura della Devozione"},
+            "Purity of Spirit": {"name": "Purezza dello Spirito"},
+            "Holy Nimbus": {"name": "Nimbo Sacro"}
+          }
+        }
+      }
+    },
+    "ranger": {
+      "name": "Ranger",
+      "hit_dice": "1d10",
+      "prof_armor": "Armature leggere, armature medie, scudi",
+      "prof_weapons": "Armi semplici, armi da guerra",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Forza, Destrezza",
+      "prof_skills": "Scegline tre tra Addestrare Animali, Atletica, Intuizione, Investigare, Natura, Percezione, Furtività e Sopravvivenza",
+      "spellcasting_ability": "Saggezza",
+      "features": {
+        "Favored Enemy": {"name": "Nemico Prescelto"},
+        "Natural Explorer": {"name": "Esploratore Naturale"},
+        "Fighting Style": {"name": "Stile di Combattimento"},
+        "Spellcasting": {"name": "Incantesimi"},
+        "Ranger Archetype": {"name": "Archetipo del Ranger"},
+        "Primeval Awareness": {"name": "Consapevolezza Primordiale"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Extra Attack": {"name": "Attacco Extra"},
+        "Land's Stride": {"name": "Falcata Naturale"},
+        "Hide in Plain Sight": {"name": "Nascondersi in Piena Vista"},
+        "Vanish": {"name": "Svanire"},
+        "Feral Senses": {"name": "Sensi Ferini"},
+        "Foe Slayer": {"name": "Sterminatore di Nemici"}
+      },
+      "subclasses": {
+        "hunter": {
+          "name": "Cacciatore",
+          "features": {
+            "Hunter's Prey": {"name": "Preda del Cacciatore"},
+            "Defensive Tactics": {"name": "Tattiche Difensive"},
+            "Multiattack": {"name": "Attacco Multiplo"},
+            "Superior Hunter's Defense": {"name": "Difesa Superiore del Cacciatore"}
+          }
+        }
+      }
+    },
+    "rogue": {
+      "name": "Ladro",
+      "hit_dice": "1d8",
+      "prof_armor": "Armature leggere",
+      "prof_weapons": "Armi semplici, balestre a mano, spade lunghe, stocchi, spade corte",
+      "prof_tools": "Arnesi da scasso",
+      "prof_saving_throws": "Destrezza, Intelligenza",
+      "prof_skills": "Scegline quattro tra Acrobazia, Atletica, Inganno, Intuizione, Intimidire, Investigare, Percezione, Rappresentazione, Persuasione, Rapidità di Mano e Furtività",
+      "features": {
+        "Expertise": {"name": "Competenza"},
+        "Sneak Attack": {"name": "Attacco Furtivo"},
+        "Thieves' Cant": {"name": "Gergo dei Ladri"},
+        "Cunning Action": {"name": "Azione Scaltra"},
+        "Roguish Archetype": {"name": "Archetipo del Ladro"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Uncanny Dodge": {"name": "Schivata Prodigiosa"},
+        "Evasion": {"name": "Elusione"},
+        "Reliable Talent": {"name": "Talento Affidabile"},
+        "Blindsense": {"name": "Percezione Cieca"},
+        "Slippery Mind": {"name": "Mente Sfuggente"},
+        "Elusive": {"name": "Elusivo"},
+        "Stroke of Luck": {"name": "Colpo di Fortuna"}
+      },
+      "subclasses": {
+        "thief": {
+          "name": "Ladro Acrobata",
+          "features": {
+            "Fast Hands": {"name": "Mani Veloci"},
+            "Second-Story Work": {"name": "Lavoro al Secondo Piano"},
+            "Supreme Sneak": {"name": "Furtività Suprema"},
+            "Use Magic Device": {"name": "Usare Oggetti Magici"},
+            "Thief's Reflexes": {"name": "Riflessi del Ladro"}
+          }
+        }
+      }
+    },
+    "sorcerer": {
+      "name": "Stregone",
+      "hit_dice": "1d6",
+      "prof_armor": "Nessuna",
+      "prof_weapons": "Pugnali, dardi, fionde, bastoni, balestre leggere",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Costituzione, Carisma",
+      "prof_skills": "Scegline due tra Arcano, Inganno, Intuizione, Intimidire, Persuasione e Religione",
+      "spellcasting_ability": "Carisma",
+      "features": {
+        "Spellcasting": {"name": "Incantesimi"},
+        "Sorcerous Origin": {"name": "Origine Stregonesca"},
+        "Font of Magic": {"name": "Sorgente di Magia"},
+        "Metamagic": {"name": "Metamagia"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Sorcerous Restoration": {"name": "Ristoro Stregonesco"}
+      },
+      "subclasses": {
+        "draconic-bloodline": {
+          "name": "Stirpe Draconica",
+          "features": {
+            "Dragon Ancestor": {"name": "Antenato Drago"},
+            "Draconic Resilience": {"name": "Resilienza Draconica"},
+            "Elemental Affinity": {"name": "Affinità Elementale"},
+            "Dragon Wings": {"name": "Ali di Drago"},
+            "Draconic Presence": {"name": "Presenza Draconica"}
+          }
+        }
+      }
+    },
+    "warlock": {
+      "name": "Warlock",
+      "hit_dice": "1d8",
+      "prof_armor": "Armature leggere",
+      "prof_weapons": "Armi semplici",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Saggezza, Carisma",
+      "prof_skills": "Scegline due tra Arcano, Inganno, Storia, Intimidire, Investigare, Natura e Religione",
+      "spellcasting_ability": "Carisma",
+      "features": {
+        "Otherworldly Patron": {"name": "Patrono Ultraterreno"},
+        "Pact Magic": {"name": "Magia del Patto"},
+        "Eldritch Invocations": {"name": "Invocazioni Mistiche"},
+        "Pact Boon": {"name": "Dono del Patto"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Mystic Arcanum": {"name": "Arcanum Mistico"},
+        "Eldritch Master": {"name": "Maestro Mistico"}
+      },
+      "subclasses": {
+        "the-fiend": {
+          "name": "L'Immondo",
+          "features": {
+            "Expanded Spell List": {"name": "Lista Incantesimi Estesa"},
+            "Dark One's Blessing": {"name": "Benedizione dell'Oscuro"},
+            "Dark One's Own Luck": {"name": "Fortuna dell'Oscuro"},
+            "Fiendish Resilience": {"name": "Resilienza Immonda"},
+            "Hurl Through Hell": {"name": "Scagliare nell'Inferno"}
+          }
+        }
+      }
+    },
+    "wizard": {
+      "name": "Mago",
+      "hit_dice": "1d6",
+      "prof_armor": "Nessuna",
+      "prof_weapons": "Pugnali, dardi, fionde, bastoni, balestre leggere",
+      "prof_tools": "Nessuno",
+      "prof_saving_throws": "Intelligenza, Saggezza",
+      "prof_skills": "Scegline due tra Arcano, Storia, Intuizione, Investigare, Medicina e Religione",
+      "spellcasting_ability": "Intelligenza",
+      "features": {
+        "Spellcasting": {"name": "Incantesimi"},
+        "Arcane Recovery": {"name": "Recupero Arcano"},
+        "Arcane Tradition": {"name": "Tradizione Arcana"},
+        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
+        "Spell Mastery": {"name": "Maestria degli Incantesimi"},
+        "Signature Spells": {"name": "Incantesimi Marchiati"}
+      },
+      "subclasses": {
+        "school-of-evocation": {
+          "name": "Scuola di Evocazione",
+          "features": {
+            "Evocation Savant": {"name": "Esperto di Evocazione"},
+            "Sculpt Spells": {"name": "Modellare Incantesimi"},
+            "Potent Cantrip": {"name": "Trucchetto Potente"},
+            "Empowered Evocation": {"name": "Evocazione Potenziata"},
+            "Overchannel": {"name": "Sovraccaricare"}
+          }
+        }
+      }
+    }
+  }
+}

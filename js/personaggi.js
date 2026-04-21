@@ -2458,22 +2458,396 @@ window.invRemoveAttune = async function(pgId, idx) {
     schedaOpenInventoryPage(pgId);
 };
 
+/* ──────────────────────────────────────────────────────────────────────
+   Privilegi Tab
+   Schema dati pg.privilegi:
+   {
+     hidden_auto: ['<class_slug>:<feature_name_en>', ...],   // privilegi auto-popolati nascosti
+     custom_features: { '<TabName>': [{name, level, description}] },
+     custom_tabs_order: ['Razza','Background', ...]          // ordine + presenza tabelle custom
+   }
+   ────────────────────────────────────────────────────────────────────── */
+
+const PRIV_DEFAULT_CUSTOM_TABS = ['Razza', 'Background'];
+
+function _classesData() { return window.CLASSES_DATA || []; }
+
+function _getClassData(slug) {
+    if (!slug) return null;
+    return _classesData().find(c =>
+        c.slug === slug ||
+        (c.name_en || '').toLowerCase() === String(slug).toLowerCase() ||
+        (c.name || '').toLowerCase() === String(slug).toLowerCase()
+    ) || null;
+}
+
+function _normalizePrivilegi(pg) {
+    const p = pg.privilegi || {};
+    return {
+        hidden_auto: Array.isArray(p.hidden_auto) ? [...p.hidden_auto] : [],
+        custom_features: (p.custom_features && typeof p.custom_features === 'object')
+            ? { ...p.custom_features } : {},
+        custom_tabs_order: Array.isArray(p.custom_tabs_order)
+            ? [...p.custom_tabs_order]
+            : [...PRIV_DEFAULT_CUSTOM_TABS],
+    };
+}
+
+function _autoFeaturesForClass(clsEntry, pgClassLevel) {
+    const cls = _getClassData(clsEntry.nome);
+    if (!cls) return { className: clsEntry.nome, features: [], subclassName: null, subFeatures: [] };
+    const lvl = parseInt(pgClassLevel || clsEntry.livello || 1) || 1;
+    const features = (cls.features || [])
+        .filter(f => !f.level || f.level <= lvl)
+        .map(f => ({
+            source: cls.slug,
+            source_label: cls.name || cls.name_en,
+            name_en: f.name_en,
+            name: f.name || f.name_en,
+            level: f.level,
+            description: f.description || '',
+            description_en: f.description_en || '',
+            translated: !!f.translated,
+        }));
+    // sottoclasse: prendiamo la prima (SRD ufficiale) se il PG ha una sottoclasse selezionata o se ha raggiunto il livello in cui si sceglie
+    let subclassName = null;
+    let subFeatures = [];
+    if (cls.subclasses && cls.subclasses.length > 0) {
+        const sub = cls.subclasses[0];
+        // Mostriamo solo se il PG ha raggiunto il livello in cui si ottiene una sottoclasse
+        const minSubLevel = Math.min(...(sub.features.map(f => f.level || 99)));
+        if (lvl >= (minSubLevel || 3)) {
+            subclassName = sub.name || sub.name_en;
+            subFeatures = sub.features
+                .filter(f => !f.level || f.level <= lvl)
+                .map(f => ({
+                    source: cls.slug + ':' + sub.slug,
+                    source_label: subclassName,
+                    name_en: f.name_en,
+                    name: f.name || f.name_en,
+                    level: f.level,
+                    description: f.description || '',
+                    description_en: f.description_en || '',
+                    translated: !!f.translated,
+                }));
+        }
+    }
+    return { className: cls.name || cls.name_en, features, subclassName, subFeatures };
+}
+
+function _privFeatureKey(source, nameEn) {
+    return `${source}:${nameEn}`;
+}
+
+function _renderPrivFeatureRow(f, opts = {}) {
+    const isHidden = !!opts.hidden;
+    const isCustom = !!opts.custom;
+    const desc = (f.description || f.description_en || '').trim();
+    const hasDesc = desc.length > 0;
+    const lvlBadge = f.level
+        ? `<span class="priv-feat-level">Lv ${f.level}</span>`
+        : `<span class="priv-feat-level priv-feat-level-empty">—</span>`;
+    const langWarn = (!f.translated && !isCustom && f.description_en && !f.description)
+        ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
+        : '';
+    const actionBtn = isCustom
+        ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();privRemoveCustom('${escapeHtml(opts.tabName)}',${opts.index})" title="Rimuovi">✕</button>`
+        : '';
+    const headerClass = `priv-feat-header${hasDesc ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
+    const onclick = hasDesc ? `onclick="privToggleFeatureBody(this)"` : '';
+    return `<div class="priv-feat-row${isHidden ? ' priv-feat-row-hidden' : ''}">
+        <div class="${headerClass}" ${onclick}>
+            ${lvlBadge}
+            <span class="priv-feat-name">${escapeHtml(f.name)}${langWarn}</span>
+            ${hasDesc ? '<span class="priv-feat-arrow">▾</span>' : ''}
+            ${actionBtn}
+        </div>
+        ${hasDesc ? `<div class="priv-feat-body" style="display:none;">${_privDescToHtml(desc)}</div>` : ''}
+    </div>`;
+}
+
+function _privDescToHtml(desc) {
+    // Conversione minimale markdown -> HTML (paragrafi, bullet list, bold)
+    const escaped = escapeHtml(desc)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    const lines = escaped.split('\n');
+    let html = '';
+    let inList = false;
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) {
+            if (inList) { html += '</ul>'; inList = false; }
+            continue;
+        }
+        if (/^[*-]\s+/.test(line)) {
+            if (!inList) { html += '<ul class="priv-feat-list">'; inList = true; }
+            html += `<li>${line.replace(/^[*-]\s+/, '')}</li>`;
+        } else {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += `<p>${line}</p>`;
+        }
+    }
+    if (inList) html += '</ul>';
+    return html;
+}
+
+window.privToggleFeatureBody = function(headerEl) {
+    if (!headerEl) return;
+    const row = headerEl.closest('.priv-feat-row');
+    if (!row) return;
+    const body = row.querySelector('.priv-feat-body');
+    const arrow = headerEl.querySelector('.priv-feat-arrow');
+    if (!body) return;
+    const open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : '';
+    if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+};
+
+window.schedaOpenPrivilegesPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+
+    const priv = _normalizePrivilegi(pg);
+    const classi = pg.classi || [];
+
+    // ── Sezione Classe (per ogni classe del multiclass) ──
+    let classBlocks = '';
+    let subclassBlocks = '';
+    if (classi.length === 0) {
+        classBlocks = '<span class="scheda-empty">Nessuna classe selezionata</span>';
+    } else {
+        classi.forEach(c => {
+            const data = _autoFeaturesForClass(c, c.livello);
+            const classTitle = `${escapeHtml(data.className)} - Livello ${c.livello || 1}`;
+            const rows = data.features.length > 0
+                ? data.features.map(f => {
+                    const key = _privFeatureKey(f.source, f.name_en);
+                    return _renderPrivFeatureRow(f, { hidden: priv.hidden_auto.includes(key), featKey: key });
+                  }).join('')
+                : '<span class="scheda-empty">Nessun privilegio disponibile a questo livello</span>';
+            classBlocks += `<div class="priv-subblock">
+                <div class="priv-subblock-title">${classTitle}</div>
+                <div class="priv-feat-list-wrap">${rows}</div>
+            </div>`;
+
+            if (data.subclassName) {
+                const subRows = data.subFeatures.length > 0
+                    ? data.subFeatures.map(f => {
+                        const key = _privFeatureKey(f.source, f.name_en);
+                        return _renderPrivFeatureRow(f, { hidden: priv.hidden_auto.includes(key), featKey: key });
+                      }).join('')
+                    : '<span class="scheda-empty">Nessun privilegio di sottoclasse a questo livello</span>';
+                subclassBlocks += `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${escapeHtml(data.subclassName)} (${escapeHtml(data.className)})</div>
+                    <div class="priv-feat-list-wrap">${subRows}</div>
+                </div>`;
+            }
+        });
+    }
+
+    // ── Sezioni custom (Razza, Background, e personalizzate) ──
+    let customSectionsHtml = '';
+    priv.custom_tabs_order.forEach(tabName => {
+        const items = priv.custom_features[tabName] || [];
+        const rows = items.length > 0
+            ? items.map((f, i) => _renderPrivFeatureRow(f, { custom: true, tabName, index: i })).join('')
+            : '<span class="scheda-empty">Nessun privilegio aggiunto</span>';
+        const isDefault = PRIV_DEFAULT_CUSTOM_TABS.includes(tabName);
+        const removeTabBtn = isDefault ? '' :
+            `<button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();privRemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>`;
+        customSectionsHtml += `<div class="scheda-section">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">+</button>
+                ${removeTabBtn}
+            </div>
+            <div class="scheda-section-body">${rows}</div>
+        </div>`;
+    });
+
+    content.innerHTML = `
+    <div class="scheda-identity">
+        <div class="scheda-name">${escapeHtml(pg.nome)}</div>
+        <div class="scheda-subtitle-sm">Privilegi</div>
+    </div>
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Classe</div>
+        <div class="scheda-section-body">${classBlocks}</div>
+    </div>
+
+    ${subclassBlocks ? `<div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sottoclasse</div>
+        <div class="scheda-section-body">${subclassBlocks}</div>
+    </div>` : ''}
+
+    ${customSectionsHtml}
+
+    <div class="priv-add-tab-wrap">
+        <button class="btn-secondary priv-add-tab-btn" onclick="privAddTab()">
+            <span class="priv-add-tab-plus">+</span> Nuova tabella
+        </button>
+    </div>
+    `;
+
+    schedaSetActiveTab('privilegi');
+    schedaWireTabBar(pgId);
+};
+
+async function _privSave(pgId, priv) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    if (_schedaPgCache) _schedaPgCache.privilegi = priv;
+    await supabase.from('personaggi').update({ privilegi: priv }).eq('id', pgId);
+}
+
+window.privToggleAutoFeature = async function(featKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    const i = priv.hidden_auto.indexOf(featKey);
+    if (i >= 0) priv.hidden_auto.splice(i, 1);
+    else priv.hidden_auto.push(featKey);
+    await _privSave(pg.id, priv);
+    schedaOpenPrivilegesPage(pg.id);
+};
+
+window.privAddCustom = function(tabName) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    _privOpenEditDialog({ tabName, mode: 'add' });
+};
+
+window.privEditCustom = function(tabName, index) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    const item = (priv.custom_features[tabName] || [])[index];
+    if (!item) return;
+    _privOpenEditDialog({ tabName, mode: 'edit', index, item });
+};
+
+window.privRemoveCustom = async function(tabName, index) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.custom_features[tabName]) return;
+    priv.custom_features[tabName].splice(index, 1);
+    await _privSave(pg.id, priv);
+    schedaOpenPrivilegesPage(pg.id);
+};
+
+window.privAddTab = function() {
+    const name = prompt('Nome della nuova tabella (es. "Talenti", "Doni divini"):');
+    if (!name) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (priv.custom_tabs_order.includes(trimmed)) {
+        showNotification && showNotification('Esiste già una tabella con questo nome');
+        return;
+    }
+    priv.custom_tabs_order.push(trimmed);
+    priv.custom_features[trimmed] = [];
+    _privSave(pg.id, priv).then(() => schedaOpenPrivilegesPage(pg.id));
+};
+
+window.privRemoveTab = function(tabName) {
+    if (PRIV_DEFAULT_CUSTOM_TABS.includes(tabName)) return;
+    if (!confirm(`Rimuovere la tabella "${tabName}" e tutti i suoi privilegi?`)) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    priv.custom_tabs_order = priv.custom_tabs_order.filter(t => t !== tabName);
+    delete priv.custom_features[tabName];
+    _privSave(pg.id, priv).then(() => schedaOpenPrivilegesPage(pg.id));
+};
+
+function _privOpenEditDialog({ tabName, mode, index, item }) {
+    let modal = document.getElementById('privEditModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'privEditModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+    const it = item || { name: '', level: '', description: '' };
+    const title = mode === 'edit' ? 'Modifica privilegio' : `Aggiungi a ${tabName}`;
+    modal.innerHTML = `
+    <div class="modal-content priv-edit-card">
+        <button class="modal-close" onclick="privCloseEdit()" aria-label="Chiudi">×</button>
+        <h2 style="margin:0 0 12px;font-size:1.05rem;">${escapeHtml(title)}</h2>
+        <label class="priv-edit-label">Nome
+            <input type="text" id="privEditName" class="priv-edit-input" value="${escapeHtml(it.name)}" placeholder="Es. Visione del Buio">
+        </label>
+        <label class="priv-edit-label">Livello (opzionale)
+            <input type="number" id="privEditLevel" class="priv-edit-input priv-edit-input-num" value="${it.level || ''}" min="1" max="20" placeholder="—">
+        </label>
+        <label class="priv-edit-label">Descrizione
+            <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione del privilegio">${escapeHtml(it.description || '')}</textarea>
+        </label>
+        <div class="priv-edit-actions">
+            <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
+            <button class="btn-primary" onclick="privConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
+        </div>
+    </div>`;
+    modal.classList.add('active');
+    setTimeout(() => document.getElementById('privEditName')?.focus(), 50);
+}
+
+window.privCloseEdit = function() {
+    const modal = document.getElementById('privEditModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.privConfirmEdit = async function(tabName, mode, index) {
+    const name = (document.getElementById('privEditName')?.value || '').trim();
+    const lvlRaw = (document.getElementById('privEditLevel')?.value || '').trim();
+    const desc = (document.getElementById('privEditDesc')?.value || '').trim();
+    if (!name) {
+        showNotification && showNotification('Inserisci almeno il nome');
+        return;
+    }
+    const level = lvlRaw ? Math.max(1, Math.min(20, parseInt(lvlRaw) || 0)) : null;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.custom_features[tabName]) priv.custom_features[tabName] = [];
+    const newItem = { name, level, description: desc };
+    if (mode === 'edit' && index >= 0) priv.custom_features[tabName][index] = newItem;
+    else priv.custom_features[tabName].push(newItem);
+    await _privSave(pg.id, priv);
+    privCloseEdit();
+    schedaOpenPrivilegesPage(pg.id);
+};
+
 function schedaSetActiveTab(tab) {
     const mainTab = document.getElementById('schedaTabMain');
     const spellTab = document.getElementById('schedaTabSpell');
     const invTab = document.getElementById('schedaTabInventory');
+    const privTab = document.getElementById('schedaTabPrivileges');
     if (mainTab) mainTab.classList.toggle('active', tab === 'scheda');
     if (spellTab) spellTab.classList.toggle('active', tab === 'incantesimi');
     if (invTab) invTab.classList.toggle('active', tab === 'inventario');
+    if (privTab) privTab.classList.toggle('active', tab === 'privilegi');
 }
 
 function schedaWireTabBar(pgId) {
     const mainTab = document.getElementById('schedaTabMain');
     const spellTab = document.getElementById('schedaTabSpell');
     const invTab = document.getElementById('schedaTabInventory');
+    const privTab = document.getElementById('schedaTabPrivileges');
     if (mainTab) mainTab.onclick = () => renderSchedaPersonaggio(pgId);
     if (spellTab) spellTab.onclick = () => schedaOpenSpellPage(pgId);
     if (invTab) invTab.onclick = () => schedaOpenInventoryPage(pgId);
+    if (privTab) privTab.onclick = () => schedaOpenPrivilegesPage(pgId);
 }
 
 function schedaSlotToggleInline(pgId, level, index) {
