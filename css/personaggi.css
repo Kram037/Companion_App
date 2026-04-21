@@ -345,7 +345,7 @@
 .scheda-page-grid { display: block; }
 .scheda-col { display: block; }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
     .scheda-page-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -366,7 +366,7 @@
 .scheda-spells-grid { display: block; }
 .scheda-spells-col { display: block; }
 .scheda-spells-col:empty { display: none; }
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
     .scheda-spells-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
