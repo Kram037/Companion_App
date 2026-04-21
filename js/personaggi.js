@@ -649,22 +649,61 @@ function updateAllSaveValues() {
 }
 
 // --- Race/Background selects ---
-function buildRaceOptionsFromDB() {
-    const razze = AppState.cachedRazze;
-    if (!razze || razze.length === 0) {
+
+// Mappa nome IT abilita' -> chiave usata in DND_SKILLS
+function _normSkillKey(n) {
+    if (!n) return '';
+    return String(n).toLowerCase()
+        .replace(/[àá]/g, 'a').replace(/[èé]/g, 'e').replace(/[ìí]/g, 'i')
+        .replace(/[òó]/g, 'o').replace(/[ùú]/g, 'u')
+        .replace(/'/g, '').replace(/\s+/g, '_');
+}
+
+// Restituisce la lista delle razze locali (window.RACES_DATA) ordinata
+// alfabeticamente, con divider per fonte.
+function buildRaceOptionsLocal() {
+    const RD = window.RACES_DATA || {};
+    const names = Object.keys(RD);
+    if (names.length === 0) {
+        // Fallback al vecchio elenco hardcoded (no auto-populate)
         return DND_RACES_GROUPED.map(r => typeof r === 'object' ? r : { value: r, label: r });
     }
+    // Raggruppa per fonte (source_short), poi alfabetico per nome IT
+    const bySource = {};
+    names.forEach(n => {
+        const r = RD[n];
+        const src = r.source_short || 'Altro';
+        if (!bySource[src]) bySource[src] = [];
+        bySource[src].push(n);
+    });
+    const sourceOrder = ['PHB', 'VGtM', 'MToF', 'MOoT', 'ToA'];
+    const remaining = Object.keys(bySource).filter(s => !sourceOrder.includes(s)).sort();
+    const ordered = [...sourceOrder.filter(s => bySource[s]), ...remaining];
     const options = [];
-    let lastGruppo = '__init__';
-    razze.forEach(r => {
-        const g = r.gruppo || null;
-        if (g !== lastGruppo) {
-            options.push({ type: 'divider', label: g || '' });
-            lastGruppo = g;
-        }
-        options.push({ value: r.nome, label: r.nome, source: r.fonte || '' });
+    ordered.forEach(src => {
+        options.push({ type: 'divider', label: src });
+        bySource[src].sort((a, b) => a.localeCompare(b, 'it'));
+        bySource[src].forEach(name => {
+            const r = RD[name];
+            options.push({ value: name, label: name, source: r.source_short || '' });
+        });
     });
     return options;
+}
+
+function buildSubraceOptionsLocal(raceName) {
+    const RD = window.RACES_DATA || {};
+    const race = RD[raceName];
+    if (!race || !Array.isArray(race.subraces) || race.subraces.length === 0) return [];
+    const opts = race.subraces
+        .slice()
+        .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it'))
+        .map(sr => ({
+            value: sr.name,
+            label: sr.name,
+            source: sr.source_short || race.source_short || ''
+        }));
+    return opts;
 }
 
 function buildBackgroundOptionsFromDB() {
@@ -675,9 +714,66 @@ function buildBackgroundOptionsFromDB() {
     return bgs.map(b => ({ value: b.nome, label: b.nome, source: b.fonte || '' }));
 }
 
+// Lookup razza nel dataset locale. Restituisce la struttura completa
+// (vedere risorse/razze/build_races.py per lo schema).
+function getRaceLocal(nome) {
+    const RD = window.RACES_DATA || {};
+    return RD[nome] || null;
+}
+
+function getSubraceLocal(raceName, subraceName) {
+    const r = getRaceLocal(raceName);
+    if (!r || !subraceName) return null;
+    return (r.subraces || []).find(s => s.name === subraceName) || null;
+}
+
+// Ritorna un oggetto normalizzato con i campi che il wizard si aspetta
+// (velocita, resistenze, competenze_abilita, linguaggi, ...) combinando
+// razza + sottorazza. Mantiene il formato compatibile con cachedRazze.
+function buildMergedRaceData(raceName, subraceName) {
+    const race = getRaceLocal(raceName);
+    if (!race) return null;
+    const sub = subraceName ? getSubraceLocal(raceName, subraceName) : null;
+    const allTraits = [
+        ...(race.traits || []),
+        ...((sub && sub.traits) || []),
+    ];
+    const merged = {
+        nome: race.name || raceName,
+        sottorazza: sub ? sub.name : null,
+        fonte: race.source_short || '',
+        velocita: race.speed || 9,
+        resistenze: [...(race.resistances || []), ...((sub && sub.resistances) || [])],
+        competenze_abilita: [
+            ...((race.skill_proficiencies || []).map(_normSkillKey)),
+            ...((sub && (sub.skill_proficiencies || []).map(_normSkillKey)) || []),
+        ],
+        linguaggi: [...(race.languages || []), ...((sub && sub.languages) || [])],
+        darkvision: (sub && sub.darkvision != null) ? sub.darkvision : (race.darkvision || 0),
+        creature_type: (sub && sub.creature_type) || race.creature_type || 'Umanoide',
+        asi_text: race.asi_text || '',
+        subrace_asi_text: sub ? (sub.asi_text || '') : null,
+        traits: allTraits,
+        innate_spells: allTraits.flatMap(t => t.innate_spells || []),
+        race_resources: allTraits.filter(t => t.uses).map(t => ({
+            name: t.name,
+            uses: t.uses,
+        })),
+        size: race.size,
+    };
+    return merged;
+}
+
+// Compat: getRaceData consultato dal codice esistente. Prima tenta dataset
+// locale (window.RACES_DATA), poi fallback al cache DB.
 function getRaceData(nome) {
-    if (!AppState.cachedRazze) return null;
-    return AppState.cachedRazze.find(r => r.nome === nome) || null;
+    if (!nome) return null;
+    const local = buildMergedRaceData(nome, null);
+    if (local) return local;
+    if (AppState.cachedRazze) {
+        return AppState.cachedRazze.find(r => r.nome === nome) || null;
+    }
+    return null;
 }
 
 function getBackgroundData(nome) {
@@ -685,34 +781,92 @@ function getBackgroundData(nome) {
     return AppState.cachedBackground.find(b => b.nome === nome) || null;
 }
 
+// Applica/rimuove l'auto-popolamento (skills, resistenze, velocita') in base
+// alla razza+sottorazza correntemente selezionate. Richiamato dopo qualsiasi
+// modifica.
+function _pgApplyRaceAutoPopulate() {
+    // Rimuove i contributi della precedente selezione
+    _pgRaceSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
+    _pgRaceResistances.forEach(r => {
+        const i = pgCurrentResistenze.indexOf(r);
+        if (i >= 0) pgCurrentResistenze.splice(i, 1);
+    });
+    _pgRaceSkills = [];
+    _pgRaceResistances = [];
+    const raceName = document.getElementById('pgRazza').value || '';
+    const subName = document.getElementById('pgSottorazza').value || '';
+    if (!raceName) return;
+    const merged = buildMergedRaceData(raceName, subName) || getRaceData(raceName);
+    if (!merged) return;
+    const velField = document.getElementById('pgVelocita');
+    if (velField) velField.value = merged.velocita || 9;
+    if (Array.isArray(merged.resistenze) && merged.resistenze.length > 0) {
+        _pgRaceResistances = [...merged.resistenze];
+        merged.resistenze.forEach(r => { if (!pgCurrentResistenze.includes(r)) pgCurrentResistenze.push(r); });
+    }
+    if (Array.isArray(merged.competenze_abilita) && merged.competenze_abilita.length > 0) {
+        _pgRaceSkills = [...merged.competenze_abilita];
+        merged.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
+    }
+}
+
+// Mostra/nasconde il selettore sottorazza in base alla razza scelta.
+function _pgUpdateSottorazzaUI() {
+    const raceName = document.getElementById('pgRazza').value || '';
+    const group = document.getElementById('pgSottorazzaGroup');
+    const btn = document.getElementById('pgSottorazzaBtn');
+    const subInput = document.getElementById('pgSottorazza');
+    if (!group) return;
+    const subOpts = raceName ? buildSubraceOptionsLocal(raceName) : [];
+    if (subOpts.length === 0) {
+        group.style.display = 'none';
+        if (subInput) subInput.value = '';
+        if (btn) btn.textContent = 'Seleziona sottorazza...';
+        return;
+    }
+    group.style.display = '';
+    const currentSub = subInput ? subInput.value : '';
+    const exists = currentSub && subOpts.some(o => o.value === currentSub);
+    if (!exists && subInput) subInput.value = '';
+    if (btn) btn.textContent = exists ? currentSub : 'Seleziona sottorazza...';
+}
+
 window.pgOpenRazzaSelect = function() {
     openCustomSelect(
-        buildRaceOptionsFromDB(),
+        buildRaceOptionsLocal(),
         (value) => {
             document.getElementById('pgRazza').value = value;
             const btn = document.getElementById('pgRazzaBtn');
             if (btn) btn.textContent = value;
-
-            _pgRaceSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
-            _pgRaceResistances.forEach(r => { const i = pgCurrentResistenze.indexOf(r); if (i >= 0) pgCurrentResistenze.splice(i, 1); });
-            _pgRaceSkills = [];
-            _pgRaceResistances = [];
-
-            const data = getRaceData(value);
-            if (data) {
-                const velField = document.getElementById('pgVelocita');
-                if (velField) velField.value = data.velocita || 9;
-                if (data.resistenze && data.resistenze.length > 0) {
-                    _pgRaceResistances = [...data.resistenze];
-                    data.resistenze.forEach(r => { if (!pgCurrentResistenze.includes(r)) pgCurrentResistenze.push(r); });
-                }
-                if (data.competenze_abilita && data.competenze_abilita.length > 0) {
-                    _pgRaceSkills = [...data.competenze_abilita];
-                    data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
-                }
+            // Reset sottorazza se si cambia razza
+            const subInput = document.getElementById('pgSottorazza');
+            if (subInput) subInput.value = '';
+            _pgUpdateSottorazzaUI();
+            _pgApplyRaceAutoPopulate();
+            // Se ci sono sottorazze, apri subito il selettore
+            const subOpts = buildSubraceOptionsLocal(value);
+            if (subOpts.length > 0) {
+                setTimeout(() => window.pgOpenSottorazzaSelect(), 100);
             }
         },
         'Seleziona Razza'
+    );
+}
+
+window.pgOpenSottorazzaSelect = function() {
+    const raceName = document.getElementById('pgRazza').value || '';
+    if (!raceName) return;
+    const opts = buildSubraceOptionsLocal(raceName);
+    if (opts.length === 0) return;
+    openCustomSelect(
+        opts,
+        (value) => {
+            document.getElementById('pgSottorazza').value = value;
+            const btn = document.getElementById('pgSottorazzaBtn');
+            if (btn) btn.textContent = value;
+            _pgApplyRaceAutoPopulate();
+        },
+        'Seleziona Sottorazza'
     );
 }
 
@@ -5264,7 +5418,11 @@ window.schedaCloseLangProfEdit = function() {
 // =====================================================
 // AUTO-POPULATE LINGUAGGI FROM RACE
 // =====================================================
-function autoPopulateLinguaggi(razzaNome) {
+function autoPopulateLinguaggi(razzaNome, sottorazzaNome) {
+    const merged = razzaNome ? buildMergedRaceData(razzaNome, sottorazzaNome || null) : null;
+    if (merged && merged.linguaggi && merged.linguaggi.length > 0) {
+        return [...merged.linguaggi];
+    }
     const raceData = getRaceData(razzaNome);
     if (!raceData) return ['Comune'];
     return raceData.linguaggi && raceData.linguaggi.length > 0 ? [...raceData.linguaggi] : ['Comune'];
@@ -5296,6 +5454,12 @@ window.openPersonaggioModal = function(personaggioId) {
     const razzaInput = document.getElementById('pgRazza');
     if (razzaBtn) razzaBtn.textContent = 'Seleziona razza...';
     if (razzaInput) razzaInput.value = '';
+    const sottoBtn = document.getElementById('pgSottorazzaBtn');
+    const sottoInput = document.getElementById('pgSottorazza');
+    if (sottoBtn) sottoBtn.textContent = 'Seleziona sottorazza...';
+    if (sottoInput) sottoInput.value = '';
+    const sottoGroup = document.getElementById('pgSottorazzaGroup');
+    if (sottoGroup) sottoGroup.style.display = 'none';
     const bgBtn = document.getElementById('pgBackgroundBtn');
     const bgInput = document.getElementById('pgBackground');
     if (bgBtn) bgBtn.textContent = 'Seleziona background...';
@@ -5320,6 +5484,10 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgRazza').value = razzaVal;
                     const rBtn = document.getElementById('pgRazzaBtn');
                     if (rBtn) rBtn.textContent = razzaVal || 'Seleziona razza...';
+                    const sottoVal = data.sottorazza || '';
+                    const sottoInputEl = document.getElementById('pgSottorazza');
+                    if (sottoInputEl) sottoInputEl.value = sottoVal;
+                    _pgUpdateSottorazzaUI();
                     const bgVal = data.background || '';
                     document.getElementById('pgBackground').value = bgVal;
                     const bBtn = document.getElementById('pgBackgroundBtn');
@@ -5448,6 +5616,7 @@ async function handleSavePersonaggio(e) {
     const pgData = {
         nome: document.getElementById('pgNome').value.trim(),
         razza: document.getElementById('pgRazza').value || null,
+        sottorazza: document.getElementById('pgSottorazza').value || null,
         background: document.getElementById('pgBackground').value || null,
         classe: classeDisplay || null,
         classi: pgSelectedClasses,
@@ -5464,7 +5633,7 @@ async function handleSavePersonaggio(e) {
         talenti: pgCurrentTalenti,
         resistenze: pgCurrentResistenze,
         immunita: pgCurrentImmunita,
-        linguaggi: autoPopulateLinguaggi(document.getElementById('pgRazza').value),
+        linguaggi: autoPopulateLinguaggi(document.getElementById('pgRazza').value, document.getElementById('pgSottorazza').value),
         equipaggiamento: pgSelectedEquipment.map(e => {
             if (e.tipo === 'arma') {
                 const forza = clamp(parseInt(document.getElementById('pgForza').value) || 10, 1, 30);
