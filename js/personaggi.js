@@ -3499,22 +3499,11 @@ window.schedaIspChange = function(pgId, delta) {
 };
 
 /* ── Level Up ────────────────────────────────────────────────────────────────
-   Aumenta di 1 il livello di una classe del PG, ricalcola PV (media del dado
-   vita + modificatore di Costituzione), aggiunge un dado vita disponibile e
-   aggiorna automaticamente livello totale, risorse di classe e privilegi
-   (entrambi calcolati dinamicamente in fase di render).
+   Aumenta di 1 il livello di una classe del PG. Per i PV chiede al giocatore
+   se usare il valore medio (fisso) oppure tirare il dado vita. Aggiorna anche
+   dadi vita disponibili, livello totale, e indirettamente risorse di classe
+   e privilegi (calcolati dinamicamente in fase di render in base al livello).
    ────────────────────────────────────────────────────────────────────────── */
-const CLASS_HIT_DIE = {
-    'Artefice': 8, 'Bardo': 8, 'Chierico': 8, 'Druido': 8, 'Ladro': 8,
-    'Monaco': 8, 'Warlock': 8, 'Barbaro': 12, 'Mago': 6, 'Stregone': 6,
-    'Guerriero': 10, 'Paladino': 10, 'Ranger': 10
-};
-
-function _hitDieAverage(die) {
-    // Valore medio "fisso" usato in 5e per i livelli successivi al primo.
-    return Math.floor(die / 2) + 1;
-}
-
 window.schedaLevelUp = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
@@ -3523,7 +3512,6 @@ window.schedaLevelUp = async function(pgId) {
         showNotification('Nessuna classe configurata');
         return;
     }
-    // PG con livello totale gia' al massimo (20).
     const totLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
     if (totLevel >= 20) {
         showNotification('Livello massimo raggiunto (20)');
@@ -3531,16 +3519,11 @@ window.schedaLevelUp = async function(pgId) {
     }
 
     if (classi.length === 1) {
-        const c = classi[0];
-        if ((parseInt(c.livello) || 0) >= 20) {
+        if ((parseInt(classi[0].livello) || 0) >= 20) {
             showNotification('Livello massimo raggiunto (20)');
             return;
         }
-        const ok = await showConfirm(
-            `Aumentare ${c.nome} dal livello ${c.livello || 1} al livello ${(c.livello || 1) + 1}? Verranno aggiornati PV, dadi vita e risorse di classe.`,
-            'Level Up'
-        );
-        if (ok) await _doLevelUp(pgId, 0);
+        _showLevelUpHpChoice(pgId, 0);
         return;
     }
 
@@ -3566,16 +3549,66 @@ function _showLevelUpPicker(pgId, classi) {
         <div class="levelup-pick-list">${rows}</div>
     </div>`;
     overlay.querySelectorAll('.levelup-pick-row').forEach(btn => {
-        btn.onclick = async () => {
+        btn.onclick = () => {
             const idx = parseInt(btn.dataset.idx);
             overlay.remove();
-            await _doLevelUp(pgId, idx);
+            _showLevelUpHpChoice(pgId, idx);
         };
     });
     document.body.appendChild(overlay);
 }
 
-async function _doLevelUp(pgId, classIdx) {
+function _showLevelUpHpChoice(pgId, classIdx) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const cls = (pg.classi || [])[classIdx];
+    if (!cls) return;
+
+    const die = CLASS_HIT_DIE[cls.nome] || 8;
+    const conMod = Math.floor((((pg.costituzione) || 10) - 10) / 2);
+    const avg = dieAvg(die);
+    const avgGain = Math.max(1, avg + conMod);
+    const conSign = conMod >= 0 ? '+' : '';
+    const newLvl = (parseInt(cls.livello) || 0) + 1;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal levelup-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="levelup-title">${escapeHtml(cls.nome)}: Liv ${cls.livello || 1} → ${newLvl}</h3>
+        <p class="levelup-sub">Come vuoi calcolare i PV ottenuti?<br><small>Dado: d${die} · COS ${conSign}${conMod}</small></p>
+        <div class="levelup-pick-list">
+            <button class="levelup-pick-row" data-mode="avg">
+                <span class="levelup-pick-name">Valore medio</span>
+                <span class="levelup-pick-arrow">+${avgGain} PV</span>
+            </button>
+            <button class="levelup-pick-row" data-mode="roll">
+                <span class="levelup-pick-name">Tira il dado (1d${die})</span>
+                <span class="levelup-pick-arrow">+? PV</span>
+            </button>
+        </div>
+    </div>`;
+    overlay.querySelectorAll('.levelup-pick-row').forEach(btn => {
+        btn.onclick = async () => {
+            const mode = btn.dataset.mode;
+            let pvGain;
+            let extraMsg = '';
+            if (mode === 'roll') {
+                const roll = 1 + Math.floor(Math.random() * die);
+                pvGain = Math.max(1, roll + conMod);
+                extraMsg = ` (1d${die}=${roll}${conSign}${conMod})`;
+            } else {
+                pvGain = avgGain;
+            }
+            overlay.remove();
+            await _doLevelUp(pgId, classIdx, pvGain, extraMsg);
+        };
+    });
+    document.body.appendChild(overlay);
+}
+
+async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
     const pg = _schedaPgCache;
     if (!pg) return;
     const classi = (pg.classi || []).map(c => ({ ...c }));
@@ -3587,17 +3620,12 @@ async function _doLevelUp(pgId, classIdx) {
     cls.livello = newLvl;
     classi[classIdx] = cls;
 
-    const die = CLASS_HIT_DIE[cls.nome] || 8;
-    const conMod = Math.floor((((pg.costituzione) || 10) - 10) / 2);
-    const pvGain = Math.max(1, _hitDieAverage(die) + conMod);
-
     const newPvMax = (parseInt(pg.punti_vita_max) || 0) + pvGain;
     const newPvAttuali = (pg.pv_attuali != null ? parseInt(pg.pv_attuali) : (parseInt(pg.punti_vita_max) || 0)) + pvGain;
 
     const dadi = { ...(pg.dadi_vita_disponibili || {}) };
-    const totalForClass = newLvl;
     const currentDadi = dadi[cls.nome] != null ? parseInt(dadi[cls.nome]) : (newLvl - 1);
-    dadi[cls.nome] = Math.min(totalForClass, currentDadi + 1);
+    dadi[cls.nome] = Math.min(newLvl, currentDadi + 1);
 
     const totalLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
 
@@ -3616,8 +3644,7 @@ async function _doLevelUp(pgId, classIdx) {
     pg.dadi_vita_disponibili = dadi;
 
     await schedaInstantSave(pgId, updates);
-    showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV)`);
-    // Re-render della scheda: privilegi e risorse di classe ricalcolano automaticamente in base al livello.
+    showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
     renderSchedaPersonaggio(pgId);
 }
 
