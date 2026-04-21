@@ -668,27 +668,15 @@ function buildRaceOptionsLocal() {
         // Fallback al vecchio elenco hardcoded (no auto-populate)
         return DND_RACES_GROUPED.map(r => typeof r === 'object' ? r : { value: r, label: r });
     }
-    // Raggruppa per fonte (source_short), poi alfabetico per nome IT
-    const bySource = {};
-    names.forEach(n => {
-        const r = RD[n];
-        const src = r.source_short || 'Altro';
-        if (!bySource[src]) bySource[src] = [];
-        bySource[src].push(n);
-    });
-    const sourceOrder = ['PHB', 'VGtM', 'MToF', 'MOoT', 'ToA'];
-    const remaining = Object.keys(bySource).filter(s => !sourceOrder.includes(s)).sort();
-    const ordered = [...sourceOrder.filter(s => bySource[s]), ...remaining];
-    const options = [];
-    ordered.forEach(src => {
-        options.push({ type: 'divider', label: src });
-        bySource[src].sort((a, b) => a.localeCompare(b, 'it'));
-        bySource[src].forEach(name => {
+    // Lista flat in ordine alfabetico italiano. La fonte rimane come metadato
+    // sull'option per il filtro/badge.
+    return names
+        .slice()
+        .sort((a, b) => a.localeCompare(b, 'it'))
+        .map(name => {
             const r = RD[name];
-            options.push({ value: name, label: name, source: r.source_short || '' });
+            return { value: name, label: name, source: r.source_short || '' };
         });
-    });
-    return options;
 }
 
 function buildSubraceOptionsLocal(raceName) {
@@ -924,9 +912,16 @@ function _pgUpdateSottorazzaUI() {
     if (btn) btn.textContent = exists ? currentSub : 'Seleziona sottorazza...';
 }
 
+// Stato persistente del filtro per il picker razza (per non resettarsi tra
+// aperture successive nella stessa sessione di creazione PG).
+window._pgRazzaSearch = window._pgRazzaSearch || '';
+window._pgRazzaSelectedSources = window._pgRazzaSelectedSources || new Set();
+window._pgRazzaShowFilters = window._pgRazzaShowFilters || false;
+
 window.pgOpenRazzaSelect = function() {
-    openCustomSelect(
+    openRazzaPicker(
         buildRaceOptionsLocal(),
+        'Seleziona Razza',
         (value) => {
             document.getElementById('pgRazza').value = value;
             const btn = document.getElementById('pgRazzaBtn');
@@ -941,8 +936,7 @@ window.pgOpenRazzaSelect = function() {
             if (subOpts.length > 0) {
                 setTimeout(() => window.pgOpenSottorazzaSelect(), 100);
             }
-        },
-        'Seleziona Razza'
+        }
     );
 }
 
@@ -951,16 +945,168 @@ window.pgOpenSottorazzaSelect = function() {
     if (!raceName) return;
     const opts = buildSubraceOptionsLocal(raceName);
     if (opts.length === 0) return;
-    openCustomSelect(
+    // Picker con sola ricerca (niente filtro fonte: tutte le sottorazze
+    // appartengono comunque a un'unica razza ed e' utile vederle insieme).
+    openRazzaPicker(
         opts,
+        'Seleziona Sottorazza',
         (value) => {
             document.getElementById('pgSottorazza').value = value;
             const btn = document.getElementById('pgSottorazzaBtn');
             if (btn) btn.textContent = value;
             _pgApplyRaceAutoPopulate();
         },
-        'Seleziona Sottorazza'
+        { hideSourceFilter: opts.every(o => !o.source || o.source === opts[0].source) }
     );
+}
+
+// Picker razze/sottorazze con barra di ricerca + filtri per fonte (manuale).
+// Le opzioni devono essere flat (no divider): ogni option ha { value, label,
+// source }. Lo stato di ricerca/filtro e' globale (window._pgRazza*) per
+// preservare l'ultima selezione tra aperture nella stessa sessione.
+function openRazzaPicker(options, title, onSelect, opts = {}) {
+    closeCustomSelect();
+    const flat = options.filter(o => o.type !== 'divider');
+    const allSources = Array.from(new Set(flat.map(o => o.source).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b, 'it'));
+    const hideFilters = !!opts.hideSourceFilter || allSources.length <= 1;
+    if (hideFilters) {
+        // Reset selezione fonti se non mostriamo il filtro
+        window._pgRazzaSelectedSources = new Set();
+    } else {
+        // Mantieni solo le fonti effettivamente disponibili (nel caso il
+        // dataset sia cambiato dopo un reload).
+        const valid = new Set(allSources);
+        window._pgRazzaSelectedSources = new Set(
+            Array.from(window._pgRazzaSelectedSources).filter(s => valid.has(s))
+        );
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'customSelectOverlay';
+    overlay.className = 'custom-select-overlay';
+    overlay.innerHTML = `
+        <div class="custom-select-panel">
+            <div class="custom-select-header">
+                <span>${escapeHtml(title || 'Seleziona')}</span>
+                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+            </div>
+            <div class="razza-picker-body">
+                <div class="spell-picker-search-row">
+                    <input type="text" id="razzaPickerSearch" class="form-control spell-picker-search" placeholder="Cerca per nome..." autocomplete="off">
+                    ${hideFilters ? '' : `<button type="button" class="spell-picker-filter-btn" id="razzaPickerFilterBtn" title="Filtri">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        <span class="spell-picker-filter-badge" id="razzaPickerFilterBadge" style="display:none;">0</span>
+                    </button>`}
+                </div>
+                <div class="spell-filter-panel" id="razzaPickerFilterPanel" style="display:none;">
+                    <div class="spell-filter-group">
+                        <div class="spell-filter-label">Manuale</div>
+                        <div class="spell-filter-chips" id="razzaPickerSourceChips"></div>
+                    </div>
+                    <div class="spell-filter-actions">
+                        <button type="button" class="btn-secondary btn-small" id="razzaPickerResetBtn">Reset</button>
+                    </div>
+                </div>
+                <div class="custom-select-list" id="razzaPickerList"></div>
+                <div class="razza-picker-empty" id="razzaPickerEmpty" style="display:none;">Nessuna razza corrisponde ai filtri.</div>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+
+    const searchInput = overlay.querySelector('#razzaPickerSearch');
+    const listEl = overlay.querySelector('#razzaPickerList');
+    const emptyEl = overlay.querySelector('#razzaPickerEmpty');
+    const filterBtn = overlay.querySelector('#razzaPickerFilterBtn');
+    const filterPanel = overlay.querySelector('#razzaPickerFilterPanel');
+    const filterBadge = overlay.querySelector('#razzaPickerFilterBadge');
+    const sourceChipsEl = overlay.querySelector('#razzaPickerSourceChips');
+    const resetBtn = overlay.querySelector('#razzaPickerResetBtn');
+
+    if (window._pgRazzaSearch) searchInput.value = window._pgRazzaSearch;
+
+    function renderSourceChips() {
+        if (!sourceChipsEl) return;
+        sourceChipsEl.innerHTML = allSources.map(src => {
+            const active = window._pgRazzaSelectedSources.has(src);
+            return `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" data-src="${escapeAttr(src)}">${escapeHtml(src)}</button>`;
+        }).join('');
+        sourceChipsEl.querySelectorAll('.spell-filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const src = chip.dataset.src;
+                if (window._pgRazzaSelectedSources.has(src)) window._pgRazzaSelectedSources.delete(src);
+                else window._pgRazzaSelectedSources.add(src);
+                chip.classList.toggle('active');
+                renderList();
+                updateFilterBadge();
+            });
+        });
+    }
+
+    function updateFilterBadge() {
+        if (!filterBadge) return;
+        const n = window._pgRazzaSelectedSources.size;
+        if (n > 0) {
+            filterBadge.style.display = '';
+            filterBadge.textContent = n;
+            filterBtn.classList.add('active');
+        } else {
+            filterBadge.style.display = 'none';
+            filterBtn.classList.remove('active');
+        }
+    }
+
+    function renderList() {
+        const q = (searchInput.value || '').trim().toLowerCase();
+        window._pgRazzaSearch = searchInput.value || '';
+        const selSrc = window._pgRazzaSelectedSources;
+        const filtered = flat.filter(o => {
+            if (q && !(o.label || '').toLowerCase().includes(q)) return false;
+            if (selSrc.size > 0 && !selSrc.has(o.source)) return false;
+            return true;
+        });
+        if (filtered.length === 0) {
+            listEl.innerHTML = '';
+            emptyEl.style.display = '';
+            return;
+        }
+        emptyEl.style.display = 'none';
+        listEl.innerHTML = filtered.map(o => {
+            const srcHtml = o.source ? ` <span class="option-source">(${escapeHtml(o.source)})</span>` : '';
+            return `<button type="button" class="custom-select-item" data-val="${escapeAttr(o.value)}">${escapeHtml(o.label)}${srcHtml}</button>`;
+        }).join('');
+        listEl.querySelectorAll('.custom-select-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.dataset.val;
+                closeCustomSelect();
+                if (typeof onSelect === 'function') onSelect(val);
+            });
+        });
+    }
+
+    if (filterBtn) {
+        filterBtn.addEventListener('click', () => {
+            window._pgRazzaShowFilters = !window._pgRazzaShowFilters;
+            filterPanel.style.display = window._pgRazzaShowFilters ? '' : 'none';
+        });
+        if (window._pgRazzaShowFilters) filterPanel.style.display = '';
+    }
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            window._pgRazzaSelectedSources = new Set();
+            renderSourceChips();
+            updateFilterBadge();
+            renderList();
+        });
+    }
+
+    searchInput.addEventListener('input', () => renderList());
+    renderSourceChips();
+    updateFilterBadge();
+    renderList();
+    // Auto-focus della search per partire subito a digitare.
+    setTimeout(() => searchInput && searchInput.focus(), 50);
 }
 
 window.pgOpenBackgroundSelect = function() {
