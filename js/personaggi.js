@@ -1620,7 +1620,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         });
         classResourcesHtml = `<div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Risorse
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">&#9998;</button>
             </div>
             <div class="scheda-section-body">
             ${resItems.length > 0 ? `<div class="scheda-hd-table">${resItems.join('')}</div>` : '<span class="scheda-empty">Nessuna risorsa</span>'}
@@ -2308,7 +2308,7 @@ function buildSpellLevelSection(pg, level) {
     return `<div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">
             ${escapeHtml(label)}
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">+</button>
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">&#9998;</button>
         </div>
         <div class="scheda-section-body">
             <div class="spell-cards-grid">${cards}</div>
@@ -2855,7 +2855,7 @@ window.schedaOpenInventoryPage = async function(pgId) {
 
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Tesoro
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">+</button>
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">&#9998;</button>
         </div>
         <div class="scheda-section-body">
             <div id="invItemsList" class="inv-items-grid">${oggettiRows}</div>
@@ -3278,7 +3278,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
             `<button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();privRemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>`;
         customSectionsHtml += `<div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">+</button>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>
                 ${removeTabBtn}
             </div>
             <div class="scheda-section-body">${rows}</div>
@@ -4186,12 +4186,25 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
 
     const totalLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
 
+    // Ricalcola gli slot incantesimo in base al nuovo livello, preservando "used".
+    const newAutoSlots = calcSpellSlotsFromClassi(classi);
+    const prevSlots = (pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object') ? pg.slot_incantesimo : {};
+    const newSlotIncantesimo = {};
+    Object.keys(newAutoSlots).forEach(lvKey => {
+        const lv = String(lvKey);
+        const max = newAutoSlots[lvKey];
+        const prev = prevSlots[lv] || prevSlots[parseInt(lv)] || null;
+        const prevUsed = prev && Number.isFinite(parseInt(prev.used)) ? Math.min(parseInt(prev.used), max) : 0;
+        newSlotIncantesimo[lv] = { max, current: Math.max(0, max - prevUsed), used: prevUsed };
+    });
+
     const updates = {
         classi,
         livello: totalLevel,
         punti_vita_max: newPvMax,
         pv_attuali: newPvAttuali,
-        dadi_vita_disponibili: dadi
+        dadi_vita_disponibili: dadi,
+        slot_incantesimo: newSlotIncantesimo
     };
 
     pg.classi = classi;
@@ -4199,6 +4212,7 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
     pg.punti_vita_max = newPvMax;
     pg.pv_attuali = newPvAttuali;
     pg.dadi_vita_disponibili = dadi;
+    pg.slot_incantesimo = newSlotIncantesimo;
 
     await schedaInstantSave(pgId, updates);
     showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
@@ -4450,7 +4464,7 @@ function buildEquipSection(pg) {
     }).join('');
     return `<div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Equipaggiamento
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddEquip('${pg.id}')" title="Aggiungi">+</button>
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddEquip('${pg.id}')" title="Aggiungi">&#9998;</button>
         </div>
         <div class="scheda-section-body">
         ${armiRows ? `<table class="scheda-equip-table">
@@ -5611,7 +5625,7 @@ async function renderMicroScheda(personaggioId) {
     });
     const microClassResHtml = `<div class="scheda-section">
         <div class="scheda-section-title">Risorse di Classe
-            <button class="scheda-edit-btn" onclick="schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">+</button>
+            <button class="scheda-edit-btn" onclick="schedaOpenAddCustomRes('${pg.id}')" title="Aggiungi risorsa">&#9998;</button>
         </div>
         ${microResItems.length > 0 ? `<div class="scheda-hd-table">${microResItems.join('')}</div>` : '<span class="scheda-empty">Nessuna risorsa</span>'}
     </div>`;
