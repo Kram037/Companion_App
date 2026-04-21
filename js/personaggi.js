@@ -4129,21 +4129,7 @@ window.schedaLevelUp = async function(pgId) {
         return;
     }
 
-    if (classi.length === 1) {
-        const c = classi[0];
-        if ((parseInt(c.livello) || 0) >= 20) {
-            showNotification('Livello massimo raggiunto (20)');
-            return;
-        }
-        const ok = await showConfirm(
-            `Aumentare ${c.nome} dal livello ${c.livello || 1} al livello ${(c.livello || 1) + 1}?`,
-            'Level Up'
-        );
-        if (ok) _showLevelUpHpChoice(pgId, 0);
-        return;
-    }
-
-    // Multiclasse: scegli prima quale classe far salire (la scelta funge anche da conferma).
+    // Sempre picker: scegli quale classe far salire oppure aggiungi multiclasse.
     _showLevelUpPicker(pgId, classi);
 };
 
@@ -4164,21 +4150,90 @@ function _showLevelUpPicker(pgId, classi) {
         <h3 class="levelup-title">Level Up</h3>
         <p class="levelup-sub">Quale classe vuoi aumentare di livello?</p>
         <div class="levelup-pick-list">${rows}</div>
+        <div class="levelup-multiclass-divider"></div>
+        <button class="levelup-pick-row levelup-pick-multiclass" id="luMulticlassBtn">
+            <span class="levelup-pick-name">+ Multiclasse</span>
+            <span class="levelup-pick-arrow">aggiungi nuova classe</span>
+        </button>
     </div>`;
-    overlay.querySelectorAll('.levelup-pick-row').forEach(btn => {
+    overlay.querySelectorAll('.levelup-pick-row[data-idx]').forEach(btn => {
         btn.onclick = () => {
             const idx = parseInt(btn.dataset.idx);
             overlay.remove();
             _showLevelUpHpChoice(pgId, idx);
         };
     });
+    overlay.querySelector('#luMulticlassBtn').onclick = () => {
+        overlay.remove();
+        _showMulticlassPicker(pgId, classi);
+    };
     document.body.appendChild(overlay);
 }
 
-function _showLevelUpHpChoice(pgId, classIdx) {
+function _showMulticlassPicker(pgId, classi) {
+    const owned = new Set(classi.map(c => c.nome));
+    const all = Object.keys(CLASS_HIT_DIE).sort((a, b) => a.localeCompare(b));
+    const available = all.filter(n => !owned.has(n));
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    if (available.length === 0) {
+        overlay.innerHTML = `<div class="hp-calc-modal levelup-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h3 class="levelup-title">Multiclasse</h3>
+            <p class="levelup-sub">Hai gia' tutte le classi disponibili.</p>
+            <div class="levelup-pf-actions">
+                <button type="button" class="levelup-pf-cancel" onclick="this.closest('.hp-calc-overlay').remove()">Chiudi</button>
+                <button type="button" class="levelup-pf-confirm" onclick="this.closest('.hp-calc-overlay').remove();_showLevelUpPicker('${pgId}', ${JSON.stringify(classi).replace(/'/g, '&#39;')});">Indietro</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        return;
+    }
+
+    const rows = available.map(nome => {
+        const die = CLASS_HIT_DIE[nome] || 8;
+        return `<button class="levelup-pick-row" data-nome="${escapeHtml(nome)}">
+            <span class="levelup-pick-name">${escapeHtml(nome)}</span>
+            <span class="levelup-pick-arrow">d${die} · liv 1</span>
+        </button>`;
+    }).join('');
+
+    overlay.innerHTML = `<div class="hp-calc-modal levelup-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="levelup-title">Multiclasse</h3>
+        <p class="levelup-sub">Quale classe vuoi aggiungere al livello 1?</p>
+        <div class="levelup-pick-list">${rows}</div>
+        <div class="levelup-multiclass-divider"></div>
+        <button class="levelup-pick-row levelup-pick-back" id="luBackBtn">
+            <span class="levelup-pick-name">← Indietro</span>
+            <span class="levelup-pick-arrow">scegli classe esistente</span>
+        </button>
+    </div>`;
+
+    overlay.querySelectorAll('.levelup-pick-row[data-nome]').forEach(btn => {
+        btn.onclick = () => {
+            const nome = btn.dataset.nome;
+            overlay.remove();
+            _showLevelUpHpChoice(pgId, -1, { newClassName: nome });
+        };
+    });
+    overlay.querySelector('#luBackBtn').onclick = () => {
+        overlay.remove();
+        _showLevelUpPicker(pgId, classi);
+    };
+    document.body.appendChild(overlay);
+}
+
+function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    const cls = (pg.classi || [])[classIdx];
+    const isNewClass = !!opts.newClassName;
+    const cls = isNewClass
+        ? { nome: opts.newClassName, livello: 0 }
+        : (pg.classi || [])[classIdx];
     if (!cls) return;
 
     const die = CLASS_HIT_DIE[cls.nome] || 8;
@@ -4240,19 +4295,34 @@ function _showLevelUpHpChoice(pgId, classIdx) {
         if (!Number.isFinite(pvGain) || pvGain < 1) return;
         const extra = detail.textContent ? ` (${detail.textContent})` : '';
         overlay.remove();
-        await _doLevelUp(pgId, classIdx, pvGain, extra);
+        await _doLevelUp(pgId, classIdx, pvGain, extra, opts);
     };
 
     document.body.appendChild(overlay);
     setTimeout(() => input.focus(), 50);
 }
 
-async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
+async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const classi = (pg.classi || []).map(c => ({ ...c }));
-    const cls = classi[classIdx];
-    if (!cls) return;
+
+    let cls;
+    let isNewClass = false;
+    if (opts && opts.newClassName) {
+        // Multiclasse: aggiungo la nuova classe a livello 0 (verra' portata a 1 sotto).
+        if (classi.some(c => c.nome === opts.newClassName)) {
+            showNotification(`${opts.newClassName} e' gia' una classe del personaggio`);
+            return;
+        }
+        cls = { nome: opts.newClassName, livello: 0 };
+        classi.push(cls);
+        classIdx = classi.length - 1;
+        isNewClass = true;
+    } else {
+        cls = classi[classIdx];
+        if (!cls) return;
+    }
 
     const newLvl = (parseInt(cls.livello) || 0) + 1;
     if (newLvl > 20) { showNotification('Livello massimo raggiunto (20)'); return; }
@@ -4280,8 +4350,12 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
         newSlotIncantesimo[lv] = { max, current: Math.max(0, max - prevUsed), used: prevUsed };
     });
 
+    // Aggiorna anche il display "classe" per coerenza con la stringa multiclasse.
+    const classeDisplay = classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
+
     const updates = {
         classi,
+        classe: classeDisplay,
         livello: totalLevel,
         punti_vita_max: newPvMax,
         pv_attuali: newPvAttuali,
@@ -4290,6 +4364,7 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
     };
 
     pg.classi = classi;
+    pg.classe = classeDisplay;
     pg.livello = totalLevel;
     pg.punti_vita_max = newPvMax;
     pg.pv_attuali = newPvAttuali;
@@ -4297,7 +4372,11 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '') {
     pg.slot_incantesimo = newSlotIncantesimo;
 
     await schedaInstantSave(pgId, updates);
-    showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
+    if (isNewClass) {
+        showNotification(`Aggiunto ${cls.nome} (multiclasse, liv 1) +${pvGain} PV${extraMsg}`);
+    } else {
+        showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
+    }
     renderSchedaPersonaggio(pgId);
 }
 

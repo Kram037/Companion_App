@@ -609,6 +609,21 @@
 .levelup-pick-name { color: var(--text); }
 .levelup-pick-arrow { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
 
+/* Divisore tra "scegli classe esistente" e "+ Multiclasse" nel level up. */
+.levelup-multiclass-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+    opacity: 0.6;
+}
+.levelup-pick-multiclass {
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    width: 100%;
+}
+.levelup-pick-multiclass:hover { background: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
+.levelup-pick-back { background: var(--bg); width: 100%; }
+
 /* Dialog "Punti Ferita" del level up */
 .levelup-pf-modal { width: 320px; max-width: calc(100vw - 32px); text-align: left; padding: 22px 22px 18px; }
 .levelup-pf-avg-btn {
