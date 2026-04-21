@@ -1609,27 +1609,37 @@ async function renderSchedaPersonaggio(personaggioId) {
             </div>
         </div>`;
 
-        // Resistenze & Immunità (inline, stile abilità: due segnalini ●/★ con mutua esclusione)
+        // Resistenze, Immunita', Vulnerabilita' (inline: 3 segnalini R/I/V con mutua esclusione fra loro)
         const curRes = Array.isArray(pg.resistenze) ? pg.resistenze : [];
         const curImm = Array.isArray(pg.immunita) ? pg.immunita : [];
-        const nRes = curRes.length, nImm = curImm.length;
+        const curVul = Array.isArray(pg.vulnerabilita) ? pg.vulnerabilita : [];
+        const nRes = curRes.length, nImm = curImm.length, nVul = curVul.length;
         const resImmInlineHtml = `<div class="scheda-resimm-grid">${DAMAGE_TYPES.map(dt => {
             const isRes = curRes.includes(dt.value);
             const isImm = curImm.includes(dt.value);
+            const isVul = curVul.includes(dt.value);
             return `<div class="scheda-resimm-row" id="sResImmRow_${dt.value}">
-                <span class="scheda-skill-dot ${isRes ? 'active' : ''}" tabindex="-1"
+                <span class="scheda-resimm-marker res ${isRes ? 'active' : ''}" tabindex="-1"
                       onmousedown="event.preventDefault();schedaToggleResInline('${pg.id}','${dt.value}')"
                       ontouchend="event.preventDefault();schedaToggleResInline('${pg.id}','${dt.value}')"
-                      title="Resistenza">●</span>
-                <span class="scheda-skill-dot expert ${isImm ? 'active' : ''}" tabindex="-1"
+                      title="Resistenza">R</span>
+                <span class="scheda-resimm-marker imm ${isImm ? 'active' : ''}" tabindex="-1"
                       onmousedown="event.preventDefault();schedaToggleImmInline('${pg.id}','${dt.value}')"
                       ontouchend="event.preventDefault();schedaToggleImmInline('${pg.id}','${dt.value}')"
-                      title="Immunità">★</span>
+                      title="Immunità">I</span>
+                <span class="scheda-resimm-marker vul ${isVul ? 'active' : ''}" tabindex="-1"
+                      onmousedown="event.preventDefault();schedaToggleVulInline('${pg.id}','${dt.value}')"
+                      ontouchend="event.preventDefault();schedaToggleVulInline('${pg.id}','${dt.value}')"
+                      title="Vulnerabilità">V</span>
                 <span class="scheda-resimm-name">${escapeHtml(dt.label)}</span>
             </div>`;
         }).join('')}</div>
-        <div class="scheda-resimm-legend"><span><span class="scheda-skill-dot active">●</span> Resistenza</span><span><span class="scheda-skill-dot expert active">★</span> Immunità</span></div>`;
-        const resImmCount = nRes + nImm;
+        <div class="scheda-resimm-legend">
+            <span><span class="scheda-resimm-marker res active">R</span> Resistenza</span>
+            <span><span class="scheda-resimm-marker imm active">I</span> Immunità</span>
+            <span><span class="scheda-resimm-marker vul active">V</span> Vulnerabilità</span>
+        </div>`;
+        const resImmCount = nRes + nImm + nVul;
 
         // Conditions (excluding concentrazione which is shown separately)
         const conditionsActive = ALL_CONDITIONS.filter(c => c.key !== 'concentrazione' && pg[c.key]);
@@ -1962,6 +1972,9 @@ window.schedaOpenSpellPage = async function(pgId) {
             <div class="scheda-slots-table">${slotsHtml}</div>
         </div>
     </div>
+
+    <hr class="scheda-divider">
+
     ${spellSectionsHtml}
     `;
 
@@ -2026,50 +2039,61 @@ window.schedaToggleSubsection = function(titleEl) {
     if (sub) sub.classList.toggle('collapsed');
 };
 
-window.schedaToggleResInline = async function(pgId, dmgType) {
+async function _schedaApplyResImmVulChange(pgId, kind, dmgType) {
+    // kind: 'res' | 'imm' | 'vul'  – tre liste mutuamente esclusive sul singolo dmgType.
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!pg) return;
     let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
     let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
-    const wasRes = res.includes(dmgType);
-    if (wasRes) res = res.filter(x => x !== dmgType);
-    else { res.push(dmgType); imm = imm.filter(x => x !== dmgType); }
+    let vul = Array.isArray(pg.vulnerabilita) ? [...pg.vulnerabilita] : [];
+    const isOn = (kind === 'res' && res.includes(dmgType))
+              || (kind === 'imm' && imm.includes(dmgType))
+              || (kind === 'vul' && vul.includes(dmgType));
+    res = res.filter(x => x !== dmgType);
+    imm = imm.filter(x => x !== dmgType);
+    vul = vul.filter(x => x !== dmgType);
+    if (!isOn) {
+        if (kind === 'res') res.push(dmgType);
+        else if (kind === 'imm') imm.push(dmgType);
+        else if (kind === 'vul') vul.push(dmgType);
+    }
     pg.resistenze = res;
     pg.immunita = imm;
+    pg.vulnerabilita = vul;
     _refreshResImmInlineRow(dmgType);
-    if (supabase) await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
-};
+    if (!supabase) return;
+    // Salva tutto insieme; se la colonna 'vulnerabilita' non esiste ancora a DB, fallback senza di essa.
+    const { error } = await supabase.from('personaggi')
+        .update({ resistenze: res, immunita: imm, vulnerabilita: vul }).eq('id', pgId);
+    if (error && /vulnerabilita/i.test(error.message || '')) {
+        await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
+        console.warn('[scheda] Colonna "vulnerabilita" mancante a DB: esegui sql/add-vulnerabilita.sql');
+    }
+}
 
-window.schedaToggleImmInline = async function(pgId, dmgType) {
-    const supabase = getSupabaseClient();
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
-    let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
-    const wasImm = imm.includes(dmgType);
-    if (wasImm) imm = imm.filter(x => x !== dmgType);
-    else { imm.push(dmgType); res = res.filter(x => x !== dmgType); }
-    pg.resistenze = res;
-    pg.immunita = imm;
-    _refreshResImmInlineRow(dmgType);
-    if (supabase) await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
-};
+window.schedaToggleResInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'res', dmgType); };
+window.schedaToggleImmInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'imm', dmgType); };
+window.schedaToggleVulInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'vul', dmgType); };
 
 function _refreshResImmInlineRow(dmgType) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const isRes = (pg.resistenze || []).includes(dmgType);
     const isImm = (pg.immunita || []).includes(dmgType);
+    const isVul = (pg.vulnerabilita || []).includes(dmgType);
     const row = document.getElementById('sResImmRow_' + dmgType);
     if (row) {
-        const dots = row.querySelectorAll('.scheda-skill-dot');
-        if (dots[0]) dots[0].classList.toggle('active', isRes);
-        if (dots[1]) dots[1].classList.toggle('active', isImm);
+        const r = row.querySelector('.scheda-resimm-marker.res');
+        const i = row.querySelector('.scheda-resimm-marker.imm');
+        const v = row.querySelector('.scheda-resimm-marker.vul');
+        if (r) r.classList.toggle('active', isRes);
+        if (i) i.classList.toggle('active', isImm);
+        if (v) v.classList.toggle('active', isVul);
     }
     const badge = document.getElementById('sResImmCount');
     if (badge) {
-        const tot = (pg.resistenze || []).length + (pg.immunita || []).length;
+        const tot = (pg.resistenze || []).length + (pg.immunita || []).length + (pg.vulnerabilita || []).length;
         badge.textContent = tot > 0 ? tot : '';
     }
 }
@@ -2784,7 +2808,12 @@ window.schedaOpenInventoryPage = async function(pgId) {
         </div>
     </div>
 
-    <hr class="scheda-divider">
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sintonia</div>
+        <div class="scheda-section-body">
+            <div class="inv-attune-grid">${sintoniaHtml}</div>
+        </div>
+    </div>
 
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Tesoro
@@ -2792,13 +2821,6 @@ window.schedaOpenInventoryPage = async function(pgId) {
         </div>
         <div class="scheda-section-body">
             <div id="invItemsList">${oggettiRows}</div>
-        </div>
-    </div>
-
-    <div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sintonia</div>
-        <div class="scheda-section-body">
-            <div class="inv-attune-grid">${sintoniaHtml}</div>
         </div>
     </div>
     `;
@@ -3250,8 +3272,6 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sottoclasse</div>
         <div class="scheda-section-body">${subclassBlocks}</div>
     </div>` : ''}
-
-    <hr class="scheda-divider">
 
     ${customSectionsHtml}
 
@@ -5588,7 +5608,7 @@ async function renderMicroScheda(personaggioId) {
 
     // La micro-scheda non ha la struttura con il divisore "Statistiche": nascondi il bottone spada.
     const scrollBtn = document.getElementById('btnScrollStats');
-    if (scrollBtn) scrollBtn.classList.remove('visible');
+    if (scrollBtn) scrollBtn.style.display = 'none';
 
     content.innerHTML = `
     <div class="scheda-identity">

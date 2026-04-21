@@ -18,7 +18,7 @@ function updateScrollStatsBtn() {
     const btn = document.getElementById('btnScrollStats');
     if (!btn) return;
     const show = AppState.currentPage === 'scheda';
-    btn.classList.toggle('visible', !!show);
+    btn.style.display = show ? 'inline-flex' : 'none';
     if (show && typeof window.schedaScrollToStats === 'function') {
         btn.onclick = window.schedaScrollToStats;
     } else {

@@ -350,10 +350,11 @@
 .scheda-divider::before { left: 18%; }
 .scheda-divider::after { right: 18%; }
 
-/* Bottone "Vai a Statistiche" (icona spada), in basso a destra come la freccia "torna indietro" */
+/* Bottone "Vai a Statistiche" (icona spada), in basso a destra come la freccia "torna indietro".
+   La visibilita' e' controllata via style.display da updateScrollStatsBtn() in navigation.js. */
 .btn-scroll-stats {
     position: fixed;
-    bottom: 18px;
+    bottom: 90px;
     right: 18px;
     width: 52px;
     height: 52px;
@@ -362,20 +363,19 @@
     color: #fff;
     border: none;
     box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-    display: none;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 90;
+    z-index: 1000;
     transition: transform 0.15s, opacity 0.15s, background 0.15s;
     -webkit-tap-highlight-color: transparent;
+    padding: 0;
 }
-.btn-scroll-stats.visible { display: inline-flex; }
-.btn-scroll-stats:hover { transform: scale(1.06); background: var(--accent-hover, var(--accent)); }
+.btn-scroll-stats:hover { transform: scale(1.06); }
 .btn-scroll-stats:active { transform: scale(0.96); }
 .btn-scroll-stats svg { width: 26px; height: 26px; display: block; }
 @media (max-width: 480px) {
-    .btn-scroll-stats { width: 46px; height: 46px; bottom: 14px; right: 14px; }
+    .btn-scroll-stats { width: 46px; height: 46px; bottom: 80px; right: 14px; }
     .btn-scroll-stats svg { width: 22px; height: 22px; }
 }
 
@@ -422,15 +422,16 @@
 @media (max-width: 380px) { .scheda-resimm-grid { grid-template-columns: 1fr; } }
 .scheda-resimm-row {
     display: grid;
-    grid-template-columns: 22px 22px 1fr;
+    grid-template-columns: 24px 24px 24px 1fr;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     padding: 3px 0;
 }
 .scheda-resimm-name { font-size: 0.85rem; color: var(--text); }
 .scheda-resimm-legend {
     display: flex;
-    gap: 14px;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-top: 8px;
     padding-top: 6px;
     border-top: 1px dashed var(--border);
@@ -438,6 +439,32 @@
     color: var(--text-light);
 }
 .scheda-resimm-legend > span { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Marker R/I/V per resistenze, immunita', vulnerabilita' (segnalini distinti da quelli delle abilita') */
+.scheda-resimm-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    color: var(--text-light);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.08s;
+    line-height: 1;
+}
+.scheda-resimm-marker:hover { transform: scale(1.08); }
+.scheda-resimm-marker:active { transform: scale(0.92); }
+.scheda-resimm-marker.res.active { background: #2f8f5d; border-color: #2f8f5d; color: #fff; }
+.scheda-resimm-marker.imm.active { background: #2f6dbf; border-color: #2f6dbf; color: #fff; }
+.scheda-resimm-marker.vul.active { background: #b73e3e; border-color: #b73e3e; color: #fff; }
 
 .scheda-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: var(--spacing-sm); overflow: hidden; }
 .scheda-section-title { font-size: 0.85rem; text-transform: uppercase; font-weight: 800; color: var(--accent); letter-spacing: 0.06em; padding: 11px 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.15s; }

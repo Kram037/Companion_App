@@ -7,6 +7,7 @@ ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS competenze_abilita JSONB DEFAULT
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS maestrie_abilita JSONB DEFAULT '[]';
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS resistenze JSONB DEFAULT '[]';
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS immunita JSONB DEFAULT '[]';
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS vulnerabilita JSONB DEFAULT '[]';
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS slot_incantesimo JSONB DEFAULT '{}';
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS risorse_classe JSONB DEFAULT '{}';
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS dadi_vita_disponibili JSONB DEFAULT '{}';
