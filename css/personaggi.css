@@ -2022,6 +2022,14 @@
     border-bottom: 1px dashed var(--border);
     margin-bottom: 6px;
 }
+.priv-subblock-title-sub {
+    text-transform: none;
+    font-weight: 500;
+    color: var(--text-light);
+    opacity: 0.85;
+    font-size: 0.85em;
+    letter-spacing: 0;
+}
 .priv-feat-list-wrap { display: flex; flex-direction: column; gap: 4px; }
 
 .priv-feat-row {

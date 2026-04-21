@@ -776,6 +776,58 @@ function getRaceData(nome) {
     return null;
 }
 
+// Tratti di razza+sottorazza per un PG salvato (oggetto pg dal DB).
+function _pgRaceMergedTraits(pg) {
+    if (!pg || !pg.razza) return [];
+    const merged = buildMergedRaceData(pg.razza, pg.sottorazza || null);
+    return merged ? (merged.traits || []) : [];
+}
+
+// Risorse derivate dai tratti razziali con `uses`. Persistite in
+// pg.risorse_classe._race[key] = current.
+// Chiave: name_en o name slugificato.
+function _pgRaceResourceKey(trait) {
+    const base = trait.name_en || trait.name || '';
+    return base.replace(/[^A-Za-z0-9]+/g, '_');
+}
+
+function _pgRaceResources(pg) {
+    const traits = _pgRaceMergedTraits(pg);
+    const lvl = pg.livello || 1;
+    const profBonus = calcBonusCompetenza(lvl);
+    const stored = (pg.risorse_classe && pg.risorse_classe._race) || {};
+    const out = [];
+    traits.forEach(t => {
+        if (!t.uses) return;
+        let max = t.uses.amount;
+        if (max === 'prof_bonus') max = profBonus;
+        max = parseInt(max) || 1;
+        if (max <= 0) return;
+        const key = _pgRaceResourceKey(t);
+        const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+        let rechargeLabel = '';
+        if (t.uses.recharge === 'long_rest') rechargeLabel = 'r. lungo';
+        else if (t.uses.recharge === 'short_rest') rechargeLabel = 'r. breve';
+        else if (t.uses.recharge === 'dawn') rechargeLabel = "all'alba";
+        out.push({ key, name: t.name, max, current, recharge: rechargeLabel });
+    });
+    return out;
+}
+
+// Incantesimi innati razziali disponibili al livello PG.
+function _pgRaceInnateSpells(pg) {
+    const traits = _pgRaceMergedTraits(pg);
+    const lvl = pg.livello || 1;
+    const out = [];
+    traits.forEach(t => {
+        (t.innate_spells || []).forEach(sp => {
+            const minLvl = sp.min_pg_level || 1;
+            if (lvl >= minLvl) out.push({ ...sp, trait: t.name });
+        });
+    });
+    return out;
+}
+
 function getBackgroundData(nome) {
     if (!AppState.cachedBackground) return null;
     return AppState.cachedBackground.find(b => b.nome === nome) || null;
@@ -1962,6 +2014,19 @@ async function renderSchedaPersonaggio(personaggioId) {
                 });
             });
         }
+        // Risorse razziali (auto-derivate dai tratti con `uses`)
+        _pgRaceResources(pg).forEach(rr => {
+            const sub = rr.recharge ? ` <small>(razza, ${rr.recharge})</small>` : ` <small>(razza)</small>`;
+            resItems.push(`<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${escapeHtml(rr.name)}${sub}</span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},-1,${rr.max})">−</button>
+                    <span class="scheda-hd-val" id="sRRes_${rr.key}">${rr.current}</span>
+                    <span class="scheda-hd-max">/ ${rr.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},1,${rr.max})">+</button>
+                </div>
+            </div>`);
+        });
         const customRes = classResources._custom || [];
         customRes.forEach((cr, i) => {
             const current = cr.current != null ? cr.current : cr.max;
@@ -3661,9 +3726,32 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     let customSectionsHtml = '';
     priv.custom_tabs_order.forEach(tabName => {
         const items = priv.custom_features[tabName] || [];
+        let autoRows = '';
+        // Per la tabella "Razza" auto-popola con i tratti dal dataset locale
+        // (window.RACES_DATA), poi aggiunge le voci custom dell'utente.
+        if (tabName === 'Razza') {
+            const raceTraits = _pgRaceMergedTraits(pg);
+            if (raceTraits.length > 0) {
+                const merged = buildMergedRaceData(pg.razza, pg.sottorazza || null);
+                const subraceLabel = merged && merged.sottorazza
+                    ? ` <span class="priv-subblock-title-sub">(${escapeHtml(merged.sottorazza)})</span>`
+                    : '';
+                const headerLabel = `${escapeHtml(pg.razza || '')}${subraceLabel}`;
+                const traitRows = raceTraits.map(t => _renderPrivFeatureRow({
+                    name: t.name,
+                    name_en: t.name_en,
+                    description: t.description || '',
+                    translated: true,
+                }, {})).join('');
+                autoRows = `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${headerLabel}</div>
+                    <div class="priv-feat-list-wrap">${traitRows}</div>
+                </div>`;
+            }
+        }
         const rows = items.length > 0
             ? items.map((f, i) => _renderPrivFeatureRow(f, { custom: true, tabName, index: i })).join('')
-            : '<span class="scheda-empty">Nessun privilegio aggiunto</span>';
+            : (autoRows ? '' : '<span class="scheda-empty">Nessun privilegio aggiunto</span>');
         const isDefault = PRIV_DEFAULT_CUSTOM_TABS.includes(tabName);
         const removeTabBtn = isDefault ? '' :
             `<button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();privRemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>`;
@@ -3672,7 +3760,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>
                 ${removeTabBtn}
             </div>
-            <div class="scheda-section-body">${rows}</div>
+            <div class="scheda-section-body">${autoRows}${rows}</div>
         </div>`;
     });
 
@@ -4737,6 +4825,25 @@ window.schedaClassResChange = function(pgId, key, current, delta, max) {
 
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 }
+
+window.schedaRaceResChange = function(pgId, key, current, delta, max) {
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    if (newVal === current) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._race) pg.risorse_classe._race = {};
+    pg.risorse_classe._race[key] = newVal;
+    const el = document.getElementById(`sRRes_${key}`);
+    if (el) el.textContent = newVal;
+    const row = el ? el.closest('.scheda-hd-row') : null;
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaRaceResChange('${pgId}','${key}',${newVal},-1,${max})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaRaceResChange('${pgId}','${key}',${newVal},1,${max})`);
+    }
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+};
 
 window.schedaCustomResChange = function(pgId, index, current, delta, max) {
     const newVal = Math.max(0, Math.min(max, current + delta));
@@ -6120,6 +6227,18 @@ async function renderMicroScheda(personaggioId) {
             });
         });
     }
+    _pgRaceResources(pg).forEach(rr => {
+        const sub = rr.recharge ? ` <small>(razza, ${rr.recharge})</small>` : ` <small>(razza)</small>`;
+        microResItems.push(`<div class="scheda-hd-row">
+            <span class="scheda-hd-total">${escapeHtml(rr.name)}${sub}</span>
+            <div class="scheda-hd-avail">
+                <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},-1,${rr.max})">−</button>
+                <span class="scheda-hd-val" id="sRRes_${rr.key}">${rr.current}</span>
+                <span class="scheda-hd-max">/ ${rr.max}</span>
+                <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},1,${rr.max})">+</button>
+            </div>
+        </div>`);
+    });
     const microCustomRes = microClassRes._custom || [];
     microCustomRes.forEach((cr, i) => {
         const current = cr.current != null ? cr.current : cr.max;
