@@ -874,6 +874,14 @@ const CLASS_SPELL_SLOTS = {
         11: {1:4,2:3,3:3}, 12: {1:4,2:3,3:3}, 13: {1:4,2:3,3:3,4:1}, 14: {1:4,2:3,3:3,4:1},
         15: {1:4,2:3,3:3,4:2}, 16: {1:4,2:3,3:3,4:2}, 17: {1:4,2:3,3:3,4:3,5:1}, 18: {1:4,2:3,3:3,4:3,5:1},
         19: {1:4,2:3,3:3,4:3,5:2}, 20: {1:4,2:3,3:3,4:3,5:2}
+    },
+    'third': {
+        3: {1:2}, 4: {1:3}, 5: {1:3}, 6: {1:3},
+        7: {1:4,2:2}, 8: {1:4,2:2}, 9: {1:4,2:2},
+        10: {1:4,2:3}, 11: {1:4,2:3}, 12: {1:4,2:3},
+        13: {1:4,2:3,3:2}, 14: {1:4,2:3,3:2}, 15: {1:4,2:3,3:2},
+        16: {1:4,2:3,3:3}, 17: {1:4,2:3,3:3}, 18: {1:4,2:3,3:3},
+        19: {1:4,2:3,3:3,4:1}, 20: {1:4,2:3,3:3,4:1}
     }
 };
 
@@ -885,69 +893,79 @@ const CLASS_CASTER_TYPE = {
     'Barbaro': null, 'Guerriero': null, 'Ladro': null, 'Monaco': null
 };
 
-function calcSpellSlotsFromClassi(classi) {
-    let totalCasterLevel = 0;
-    let hasPactMagic = false;
-    let pactLevel = 0;
+/**
+ * Calcola gli slot incantesimo dato un array di classi del PG.
+ *
+ * Regole D&D 5e:
+ *  - Single-class full caster (Bardo/Chierico/Druido/Mago/Stregone): tabella 'full' al livello reale.
+ *  - Single-class half caster (Paladino/Ranger/Artefice): tabella 'half' al livello reale.
+ *  - Single-class third caster (Eldritch Knight, Arcane Trickster): tabella 'third' al livello reale.
+ *  - Multiclass: somma "effective caster level" = livelli full + floor(livelli half / 2)
+ *    + floor(livelli third / 3) e si consulta SEMPRE la tabella 'full' (tabella Multiclass Spellcaster).
+ *  - Pact Magic (Warlock): slot dedicati che si AGGIUNGONO sopra agli altri (se warlock multiclassato)
+ *    o sostituiscono (se single-class warlock).
+ */
+function _computeSpellSlots(classi) {
+    if (!Array.isArray(classi) || classi.length === 0) return {};
 
+    // Categorizza ogni classe per tipo caster
+    const fullClasses = [];
+    const halfClasses = [];
+    const thirdClasses = [];
+    const pactClasses = [];
+    const nonCasters = [];
     classi.forEach(cls => {
         const type = CLASS_CASTER_TYPE[cls.nome];
-        if (type === 'full') totalCasterLevel += cls.livello;
-        else if (type === 'half') totalCasterLevel += Math.floor(cls.livello / 2);
-        else if (type === 'pact') { hasPactMagic = true; pactLevel += cls.livello; }
-        else if (type === null && cls.thirdCaster) {
-            totalCasterLevel += Math.floor(cls.livello / 3);
-        }
+        if (type === 'full') fullClasses.push(cls);
+        else if (type === 'half') halfClasses.push(cls);
+        else if (type === 'pact') pactClasses.push(cls);
+        else if (type === null && cls.thirdCaster) thirdClasses.push(cls);
+        else nonCasters.push(cls);
     });
 
+    const casterClassesCount = fullClasses.length + halfClasses.length + thirdClasses.length;
+    const isMulticlass = casterClassesCount > 1;
+
     let slots = {};
-    if (totalCasterLevel > 0) {
-        const table = CLASS_SPELL_SLOTS['full'];
-        const level = Math.min(totalCasterLevel, 20);
-        slots = table[level] ? { ...table[level] } : {};
+
+    if (!isMulticlass && casterClassesCount === 1) {
+        // SINGLE-CLASS caster: usa la tabella dedicata sul livello reale.
+        let table = null, lv = 0;
+        if (fullClasses.length === 1) { table = CLASS_SPELL_SLOTS.full;  lv = fullClasses[0].livello; }
+        else if (halfClasses.length === 1) { table = CLASS_SPELL_SLOTS.half;  lv = halfClasses[0].livello; }
+        else if (thirdClasses.length === 1) { table = CLASS_SPELL_SLOTS.third; lv = thirdClasses[0].livello; }
+        if (table) {
+            const level = Math.min(Math.max(lv, 0), 20);
+            slots = table[level] ? { ...table[level] } : {};
+        }
+    } else if (isMulticlass) {
+        // MULTICLASS: regola PHB - tabella 'full' sul livello effettivo.
+        let effectiveLevel = 0;
+        fullClasses.forEach(c => { effectiveLevel += c.livello; });
+        halfClasses.forEach(c => { effectiveLevel += Math.floor(c.livello / 2); });
+        thirdClasses.forEach(c => { effectiveLevel += Math.floor(c.livello / 3); });
+        if (effectiveLevel > 0) {
+            const level = Math.min(effectiveLevel, 20);
+            const table = CLASS_SPELL_SLOTS.full;
+            slots = table[level] ? { ...table[level] } : {};
+        }
     }
 
-    if (hasPactMagic) {
-        const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
-        let pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
-        const current = slots[pactSlotLevel] || 0;
-        slots[pactSlotLevel] = current + pactSlotCount;
+    // Pact Magic (Warlock) - sempre additivo.
+    if (pactClasses.length > 0) {
+        const pactLevel = pactClasses.reduce((s, c) => s + c.livello, 0);
+        if (pactLevel > 0) {
+            const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
+            const pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
+            slots[pactSlotLevel] = (slots[pactSlotLevel] || 0) + pactSlotCount;
+        }
     }
 
     return slots;
 }
 
-function pgCalcSpellSlots() {
-    let totalCasterLevel = 0;
-    let hasPactMagic = false;
-    let pactLevel = 0;
-
-    pgSelectedClasses.forEach(cls => {
-        const type = CLASS_CASTER_TYPE[cls.nome];
-        if (type === 'full') totalCasterLevel += cls.livello;
-        else if (type === 'half') totalCasterLevel += Math.floor(cls.livello / 2);
-        else if (type === 'pact') { hasPactMagic = true; pactLevel += cls.livello; }
-        else if (type === null && cls.thirdCaster) {
-            totalCasterLevel += Math.floor(cls.livello / 3);
-        }
-    });
-
-    let slots = {};
-    if (totalCasterLevel > 0) {
-        const table = CLASS_SPELL_SLOTS['full'];
-        const level = Math.min(totalCasterLevel, 20);
-        slots = table[level] ? { ...table[level] } : {};
-    }
-
-    if (hasPactMagic) {
-        const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
-        let pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
-        const current = slots[pactSlotLevel] || 0;
-        slots[pactSlotLevel] = current + pactSlotCount;
-    }
-
-    return slots;
-}
+function calcSpellSlotsFromClassi(classi) { return _computeSpellSlots(classi); }
+function pgCalcSpellSlots() { return _computeSpellSlots(pgSelectedClasses); }
 
 function pgBuildSlotIncantesimo() {
     const defaultSlots = pgCalcSpellSlots();

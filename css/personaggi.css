@@ -349,9 +349,7 @@
    oltre 1fr, allargando TUTTA la pagina quando apro "Difese". min-width:0
    vincola il figlio al suo share di 1fr e delega il wrap al contenuto interno. */
 .scheda-col { min-width: 0; }
-/* Garantisco che i nomi dei tipi di danno possano andare a capo invece di
-   forzare la larghezza della riga/colonna. */
-.scheda-resimm-name { word-break: break-word; overflow-wrap: anywhere; min-width: 0; }
+/* (i nomi dei tipi di danno sono gestiti con ellipsis nel selettore principale) */
 
 @media (min-width: 768px) {
     .scheda-page-grid {
@@ -481,22 +479,28 @@
 /* Resistenze e Immunità inline (stile abilità con due segnalini ●/★) */
 .scheda-resimm-grid {
     display: grid;
-    /* minmax(0, 1fr) invece di 1fr: evita che il min-content intrinseco
-       delle righe (marker fissi + etichetta) forzi la colonna a crescere
-       oltre la sua quota, allargando tutta la pagina quando si apre la tenda. */
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px 16px;
+    /* auto-fit + minmax fa collassare automaticamente a 1 colonna se lo spazio
+       e' poco (es. dentro una colonna scheda-page-grid su tablet portrait),
+       e a 2 colonne se c'e' spazio sufficiente. Cosi' i nomi non vanno mai a capo. */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 4px 14px;
 }
-@media (max-width: 380px) { .scheda-resimm-grid { grid-template-columns: minmax(0, 1fr); } }
 .scheda-resimm-row {
     display: grid;
-    grid-template-columns: 24px 24px 24px minmax(0, 1fr);
+    /* Marker piu' compatti (16px) per lasciare spazio al nome del tipo di danno. */
+    grid-template-columns: 16px 16px 16px minmax(0, 1fr);
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     padding: 3px 0;
     min-width: 0;
 }
-.scheda-resimm-name { font-size: 0.85rem; color: var(--text); }
+.scheda-resimm-name {
+    font-size: 0.82rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .scheda-resimm-legend {
     display: flex;
     flex-wrap: wrap;
@@ -514,12 +518,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 1.5px solid var(--border);
+    border: 1.25px solid var(--border);
     color: var(--text-light);
-    font-size: 0.72rem;
+    font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 0;
     background: transparent;
