@@ -1927,6 +1927,30 @@
     overflow: visible;
 }
 
+/* Riepilogo background (pagina 2): info auto-popolate (skill, strumenti,
+   linguaggi, equipaggiamento, oro). Compatte e leggibili sotto al titolo. */
+.bg-info-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    margin: 6px 0 8px;
+    font-size: 0.82rem;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.bg-info-line { line-height: 1.35; }
+.bg-info-line strong { color: var(--accent); margin-right: 4px; font-weight: 700; }
+.bg-info-eq {
+    margin: 4px 0 0 18px;
+    padding: 0;
+    color: var(--text);
+    font-size: 0.8rem;
+}
+.bg-info-eq li { margin: 1px 0; }
+
 .spell-detail-modal { width: 360px; max-width: calc(100vw - 32px); max-height: 80vh; overflow-y: auto; text-align: left; padding: 20px 18px; position: relative; }
 .spell-detail-name { font-size: 1.1rem; font-weight: 800; color: var(--accent); margin: 0 0 2px; padding-right: 28px; }
 .spell-detail-sub { font-size: 0.78rem; color: var(--text-light); font-style: italic; margin-bottom: 10px; }

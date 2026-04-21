@@ -1,0 +1,980 @@
+# -*- coding: utf-8 -*-
+"""
+Costruisce il dataset locale dei background (D&D 5e) gia' tradotto in italiano,
+emettendo:
+  - risorse/background/backgrounds.json (consultabile/diffabile)
+  - js/data/backgrounds_data.js          (window.BACKGROUNDS_DATA per il front-end)
+
+Schema per singolo background:
+    {
+      "id": "<slug>",
+      "name": "<IT>",
+      "name_en": "<EN>",
+      "source_short": "PHB|SCAG|ToA|EBR|EGtW|MOoT|...",
+      "skill_proficiencies":   [<chiavi DND_SKILLS>],   # auto-popolate
+      "tool_proficiencies":    [<stringhe IT>],          # auto-popolate (fisse)
+      "languages_specific":    [<stringhe IT>],          # auto-popolate (fisse)
+      "languages_choice":      <int>,                    # n. linguaggi a scelta
+      "skill_choices_text":    "...",                    # info, non auto-popolate
+      "tool_choices_text":     "...",
+      "languages_text":        "...",
+      "starting_equipment":    [<stringhe IT>],
+      "starting_gold":         <int gp>,
+      "feature": { "name": "...", "description": "..." },
+      "description":           "..."                     # flavor opzionale
+    }
+
+Le scelte (skill/strumenti/lingue lasciate al giocatore) sono descritte nei
+campi `*_text` come info: l'utente puo' poi aggiungerle manualmente nel wizard.
+Le voci "fisse" sono auto-popolate dal client al momento della selezione.
+
+Manuali coperti (solo "core" come da policy razze):
+    PHB, SCAG, ToA, EBR, EGtW (Wildemount), MOoT (Theros).
+"""
+
+import json
+import os
+import re
+
+OUT_DIR = os.path.dirname(__file__)
+JSON_OUT = os.path.join(OUT_DIR, "backgrounds.json")
+JS_OUT = os.path.normpath(os.path.join(OUT_DIR, "..", "..", "js", "data", "backgrounds_data.js"))
+
+
+def _slug(name: str) -> str:
+    s = name.lower()
+    s = (s.replace("à", "a").replace("á", "a")
+           .replace("è", "e").replace("é", "e")
+           .replace("ì", "i").replace("í", "i")
+           .replace("ò", "o").replace("ó", "o")
+           .replace("ù", "u").replace("ú", "u")
+           .replace("'", "").replace("’", ""))
+    s = re.sub(r"[^a-z0-9]+", "_", s).strip("_")
+    return s
+
+
+def _bg(name, name_en, source, *,
+        skills=None, tools=None,
+        langs_specific=None, langs_choice=0,
+        skills_text="", tools_text="", langs_text="",
+        equipment=None, gold=0,
+        feature_name="", feature_desc="",
+        description=""):
+    return {
+        "id": _slug(name),
+        "name": name,
+        "name_en": name_en,
+        "source_short": source,
+        "skill_proficiencies": list(skills or []),
+        "tool_proficiencies": list(tools or []),
+        "languages_specific": list(langs_specific or []),
+        "languages_choice": int(langs_choice or 0),
+        "skill_choices_text": skills_text,
+        "tool_choices_text": tools_text,
+        "languages_text": langs_text,
+        "starting_equipment": list(equipment or []),
+        "starting_gold": int(gold or 0),
+        "feature": {"name": feature_name, "description": feature_desc},
+        "description": description,
+    }
+
+
+# ---------------------------------------------------------------------------
+# PHB - 13 background base + 5 varianti
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS = []
+
+BACKGROUNDS.append(_bg(
+    "Accolito", "Acolyte", "PHB",
+    skills=["intuizione", "religione"],
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un simbolo sacro (regalo ricevuto al momento di entrare nel chiericato)",
+        "Un libro delle preghiere o una ruota delle preghiere",
+        "5 bastoncini d'incenso",
+        "Vesti da cerimonia",
+        "Un set di abiti comuni",
+    ],
+    gold=15,
+    feature_name="Rifugio dei Fedeli",
+    feature_desc=(
+        "Tu e i tuoi compagni d'avventura potete aspettarvi di ricevere cure e "
+        "assistenza gratuite presso un tempio, un santuario o un'altra presenza "
+        "consacrata della tua fede, anche se dovete fornire i materiali necessari "
+        "per i tiri salvezza contro malattie. Coloro che condividono la tua "
+        "religione si prenderanno cura di te (ma non dei tuoi compagni) e "
+        "forniranno un tenore di vita modesto. Potresti inoltre avere contatti "
+        "presso un tempio specifico dedicato alla tua divinita' o pantheon, ed "
+        "e' spesso possibile trovarvi rifugio gratuito, sebbene tu non possa "
+        "rimanervi se la tua presenza causa o causerebbe disagio."
+    ),
+    description=(
+        "Hai trascorso la tua vita al servizio di un tempio dedicato a una "
+        "divinita' o un pantheon specifico. Sei tramite tra il mondo dei mortali "
+        "e i piani superiori, eseguendo riti sacri e offrendo sacrifici per "
+        "guidare i fedeli al cospetto del divino."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Artigiano di Gilda", "Guild Artisan", "PHB",
+    skills=["intuizione", "persuasione"],
+    tools_text="Un set di attrezzi da artigiano (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un set di attrezzi da artigiano (a scelta)",
+        "Una lettera di presentazione della tua gilda",
+        "Un set di abiti da viaggio",
+    ],
+    gold=15,
+    feature_name="Appartenenza alla Gilda",
+    feature_desc=(
+        "Come membro stimato di una gilda, puoi contare sull'aiuto e sull'ospitalita' "
+        "dei tuoi compagni di gilda quando ne hai bisogno: ti offriranno alloggio "
+        "e cibo se necessario, e pagheranno la tua sepoltura se occorre. In alcune "
+        "citta' e in altri insediamenti, una sala di gilda offre un luogo dove "
+        "incontrare altri membri della professione, che possono diventare fonti "
+        "di informazioni sui posti di lavoro o di altre opportunita'. Le gilde "
+        "spesso esercitano notevole potere politico. Se sei accusato di un "
+        "crimine, la tua gilda ti sostiene se e' possibile dimostrare un caso "
+        "ragionevole della tua innocenza o pagare un'opportuna multa. Puoi anche "
+        "trovare facilmente nuovi alleati o complici fra i confratelli della gilda. "
+        "Devi pagare 5 mo al mese alla tua gilda per mantenere la tua appartenenza."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Ciarlatano", "Charlatan", "PHB",
+    skills=["inganno", "rapidita_di_mano"],
+    tools=["Kit da travestimento", "Kit da falsificatore"],
+    equipment=[
+        "Un set di abiti raffinati",
+        "Un kit da travestimento",
+        "Strumenti del mestiere a scelta (dadi truccati, mazzo segnato, anello con sigillo di un duca immaginario, ecc.)",
+    ],
+    gold=15,
+    feature_name="Identita' False",
+    feature_desc=(
+        "Ti sei creato una seconda identita' che include documenti, conoscenti "
+        "fidati e travestimenti che ti permettono di assumere quella personalita'. "
+        "Inoltre, sei in grado di falsificare documenti, comprese cose come "
+        "documenti ufficiali e lettere personali, purche' tu abbia visto un "
+        "esempio del tipo di documento o della firma che stai cercando di "
+        "imitare."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Criminale", "Criminal", "PHB",
+    skills=["inganno", "furtivita"],
+    tools=["Attrezzi da scasso"],
+    tools_text="Un set di strumenti da gioco (a scelta) + attrezzi da scasso.",
+    equipment=[
+        "Un piede di porco",
+        "Un set di abiti scuri comuni con cappuccio",
+        "Un set di strumenti da gioco a scelta",
+    ],
+    gold=15,
+    feature_name="Contatto Criminale",
+    feature_desc=(
+        "Hai un contatto affidabile e degno di fiducia che agisce da "
+        "intermediario fra te e altri criminali. Conosci le modalita' per "
+        "scambiarvi messaggi anche su grandi distanze: nello specifico, sai "
+        "individuare i corrieri, i mercanti corrotti e i piccoli messaggeri "
+        "che recapitano i tuoi messaggi al tuo contatto."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Eremita", "Hermit", "PHB",
+    skills=["medicina", "religione"],
+    tools=["Kit da erborista"],
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un cofanetto contenente note dei tuoi studi o delle tue preghiere",
+        "Una coperta invernale",
+        "Un set di abiti comuni",
+        "Un kit da erborista",
+        "5 mo",
+    ],
+    gold=5,
+    feature_name="Scoperta",
+    feature_desc=(
+        "Il silenzio della tua reclusione ti ha portato a una scoperta unica e "
+        "potente. La natura esatta di questa rivelazione dipende dalla natura "
+        "del tuo isolamento. Potrebbe essere una grande verita' sul cosmo, sugli "
+        "dei, sui poteri ultraterreni o sulle forze della natura. Potrebbe "
+        "trattarsi di un sito mai contemplato da nessuno per secoli. Forse hai "
+        "scoperto qualcosa che e' stato dimenticato, o forse hai recuperato "
+        "qualcosa che non era mai stato conosciuto. La verita' della tua "
+        "scoperta potrebbe spronarti ad abbandonare il tuo isolamento. Sta a "
+        "te e al DM determinare la natura della rivelazione e il suo impatto "
+        "sulla campagna."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Eroe Popolare", "Folk Hero", "PHB",
+    skills=["addestrare_animali", "sopravvivenza"],
+    tools=["Veicoli (terrestri)"],
+    tools_text="Un set di attrezzi da artigiano (a scelta) + veicoli (terrestri).",
+    equipment=[
+        "Un set di attrezzi da artigiano (a scelta)",
+        "Una pala",
+        "Una pentola di ferro",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Ospitalita' Rustica",
+    feature_desc=(
+        "Considerato che provieni dalla gente comune, ti trovi a casa fra loro. "
+        "Puoi trovare un posto dove nascondersi, riposare o riprenderti fra la "
+        "gente comune, a meno che tu non abbia mostrato di essere un pericolo "
+        "per loro. La gente ti nascondera' alle autorita', ma non rischiera' la "
+        "vita per te."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Forestiero", "Outlander", "PHB",
+    skills=["atletica", "sopravvivenza"],
+    tools_text="Un strumento musicale a scelta.",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un bastone",
+        "Una trappola da caccia",
+        "Un trofeo di un animale che hai ucciso",
+        "Un set di abiti da viaggio",
+    ],
+    gold=10,
+    feature_name="Vagabondo",
+    feature_desc=(
+        "Possiedi un'eccellente memoria per le mappe e la geografia, e riesci "
+        "sempre a ricordare la disposizione generale del territorio, "
+        "insediamenti e altre caratteristiche del paesaggio circostante. "
+        "Inoltre, puoi trovare cibo e acqua fresca per te e per altre cinque "
+        "persone ogni giorno, purche' nel territorio circostante siano disponibili."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Intrattenitore", "Entertainer", "PHB",
+    skills=["acrobazia", "intrattenere"],
+    tools=["Kit da travestimento"],
+    tools_text="Kit da travestimento + uno strumento musicale a scelta.",
+    equipment=[
+        "Uno strumento musicale a scelta",
+        "Il regalo di un ammiratore (lettera d'amore, ciocca di capelli, gioiello)",
+        "Un costume",
+    ],
+    gold=15,
+    feature_name="Per Acclamazione Popolare",
+    feature_desc=(
+        "Puoi sempre trovare un posto dove esibirti, di solito in una taverna o "
+        "una locanda, ma potenzialmente in un circo, in un teatro o anche presso "
+        "un palazzo nobiliare. In luoghi simili, ricevi vitto e alloggio gratuiti "
+        "(in genere di tenore di vita modesto o agiato) per tutto il tempo in "
+        "cui ti esibisci ogni notte. Inoltre, le tue esibizioni ti rendono "
+        "famoso fra la gente del posto. Se gli sconosciuti riconoscono in te "
+        "il proprio idolo, in genere ti mostrano un certo livello di rispetto "
+        "e ammirazione."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Marinaio", "Sailor", "PHB",
+    skills=["atletica", "percezione"],
+    tools=["Strumenti da navigatore", "Veicoli (acquatici)"],
+    equipment=[
+        "Una caviglia di legno",
+        "15 metri di corda di seta",
+        "Un talismano portafortuna o un fischietto",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Passaggio sulla Nave",
+    feature_desc=(
+        "Quando ne hai bisogno, puoi trovare un passaggio gratuito sulla nave "
+        "per te stesso e per i tuoi compagni d'avventura. Puoi viaggiare gratis, "
+        "ma non puoi controllare la rotta o il programma. I tuoi compagni "
+        "potrebbero dover prestare servizio come membri dell'equipaggio. "
+        "Naturalmente, dovrai ripagare quel favore quando lo richiederanno: "
+        "consegnare un messaggio, dare una mano in una situazione difficile, "
+        "scortare un passeggero o simili."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Monello", "Urchin", "PHB",
+    skills=["furtivita", "rapidita_di_mano"],
+    tools=["Kit da travestimento", "Attrezzi da scasso"],
+    equipment=[
+        "Un piccolo coltello",
+        "Una mappa della citta' in cui sei cresciuto",
+        "Un topolino domestico",
+        "Un ricordino dei tuoi genitori",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Vie della Citta'",
+    feature_desc=(
+        "Conosci i passaggi segreti e i sentieri delle citta', e puoi viaggiare "
+        "fra due punti qualsiasi al doppio della tua velocita' normale, purche' "
+        "ti trovi all'interno di una citta' che conosci."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Nobile", "Noble", "PHB",
+    skills=["storia", "persuasione"],
+    tools_text="Un set di strumenti da gioco a scelta.",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un set di abiti raffinati",
+        "Un anello con sigillo",
+        "Una pergamena di nascita che attesta la tua nobilta'",
+        "Una borsa con 25 mo",
+    ],
+    gold=25,
+    feature_name="Posizione Privilegiata",
+    feature_desc=(
+        "Grazie alla tua nascita nobile, le persone tendono a pensare bene di "
+        "te. Sei il benvenuto nell'alta societa' e tutti danno per scontato che "
+        "tu abbia il diritto di trovarti laddove ti trovi. Puoi inoltre ottenere "
+        "udienza presso un nobile locale se ne hai bisogno."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Ricercatore", "Sage", "PHB",
+    skills=["arcano", "storia"],
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Una boccetta di inchiostro nero",
+        "Una penna d'oca",
+        "Un coltellino",
+        "Una lettera di un collega defunto contenente una domanda alla quale non sei stato in grado di rispondere",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Ricercatore",
+    feature_desc=(
+        "Quando tenti di apprendere o ricordare un'informazione, se non conosci "
+        "quell'informazione, sai dove e da chi puoi ottenerla, di solito da una "
+        "biblioteca, uno scriptorium, un'universita', un saggio o un altro "
+        "ricercatore. Il DM potrebbe stabilire che le conoscenze cercate siano "
+        "custodite in un luogo quasi inaccessibile, o che semplicemente non "
+        "possano essere trovate. Per portare alla luce informazioni molto "
+        "ricercate potrebbero essere necessari un viaggio o altre vicissitudini."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Soldato", "Soldier", "PHB",
+    skills=["atletica", "intimidire"],
+    tools=["Veicoli (terrestri)"],
+    tools_text="Un set di strumenti da gioco a scelta + veicoli (terrestri).",
+    equipment=[
+        "Un'insegna del tuo grado",
+        "Un trofeo prelevato a un nemico caduto (un pugnale, un emblema spezzato o un vessillo strappato)",
+        "Un set di strumenti da gioco a scelta",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Grado Militare",
+    feature_desc=(
+        "Possiedi un grado militare derivante dalla tua carriera passata da "
+        "soldato. Soldati fedeli al tuo precedente esercito riconoscono ancora "
+        "la tua autorita' e influenza, e si rimettono a te in caso di necessita' "
+        "se sono di grado inferiore al tuo. Puoi sfruttare il tuo grado militare "
+        "per esercitare influenza sugli altri soldati e per requisire "
+        "equipaggiamento o cavalcature semplici per uso temporaneo. Puoi inoltre "
+        "trovare di solito accesso ad accampamenti e fortezze amici dove e' "
+        "riconosciuto il tuo grado."
+    ),
+))
+
+# --- Varianti PHB ---------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Cavaliere", "Knight (Variant of Noble)", "PHB",
+    skills=["storia", "persuasione"],
+    tools_text="Un set di strumenti da gioco a scelta.",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un set di abiti raffinati",
+        "Un anello con sigillo",
+        "Una pergamena di nobilta'",
+        "Una borsa con 25 mo",
+    ],
+    gold=25,
+    feature_name="Rispetto del Popolo Comune",
+    feature_desc=(
+        "Per via del tuo status di cavaliere, la gente comune ti tratta sempre "
+        "con grande rispetto. Spendi gran parte del tuo tempo coadiuvando "
+        "questo tipo di gente, sia agendo come patrocinatore in tribunali o "
+        "luoghi pubblici, sia chiedendo aiuto solo per favori semplici. Le "
+        "persone comuni faranno per te qualunque cosa nei limiti delle loro "
+        "possibilita', a corto di gettare la propria vita nel rischio: "
+        "condividono il vitto e l'alloggio, ti aiutano nella ricerca, e "
+        "perfino prenderanno le armi al tuo fianco se in difficolta'."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Gladiatore", "Gladiator (Variant of Entertainer)", "PHB",
+    skills=["acrobazia", "intrattenere"],
+    tools=["Kit da travestimento"],
+    tools_text="Kit da travestimento + uno strumento musicale a scelta.",
+    equipment=[
+        "Un'arma economica ma vistosa adatta a esibizioni nell'arena",
+        "Il regalo di un ammiratore",
+        "Un costume",
+    ],
+    gold=15,
+    feature_name="Per Acclamazione Popolare",
+    feature_desc=(
+        "Puoi sempre trovare un posto in cui esibirti per uno spettacolo come "
+        "gladiatore. In tali luoghi, ricevi vitto e alloggio gratuiti (di "
+        "tenore modesto o agiato) per tutto il tempo in cui ti esibisci ogni "
+        "notte. La tua fama nelle arene ti garantisce inoltre rispetto e "
+        "ammirazione fra il popolo locale."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Mercante di Gilda", "Guild Merchant (Variant of Guild Artisan)", "PHB",
+    skills=["intuizione", "persuasione"],
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta (in alternativa a un set di attrezzi da artigiano).",
+    equipment=[
+        "Una mula e un carro (in alternativa, un piccolo battello fluviale)",
+        "Una lettera di presentazione della tua gilda",
+        "Un set di abiti da viaggio",
+    ],
+    gold=15,
+    feature_name="Appartenenza alla Gilda",
+    feature_desc=(
+        "Stesso privilegio di Artigiano di Gilda: come membro stimato della "
+        "gilda mercantile puoi contare su appoggio politico, alloggio fra i "
+        "confratelli e accesso ai mercati e alle informazioni della gilda. "
+        "Devi pagare 5 mo al mese alla tua gilda per mantenere la membership."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Pirata", "Pirate (Variant of Sailor)", "PHB",
+    skills=["atletica", "percezione"],
+    tools=["Strumenti da navigatore", "Veicoli (acquatici)"],
+    equipment=[
+        "Una caviglia di legno",
+        "15 metri di corda di seta",
+        "Un talismano portafortuna o un fischietto",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Mala Reputazione",
+    feature_desc=(
+        "Quando sei ai porti, puoi commettere crimini minori (come rifiutarsi "
+        "di pagare per cibo o bevande, scassinare porte ed entrare in proprieta' "
+        "private) senza temere di venire arrestato dalle autorita' locali, che "
+        "preferiscono guardare dall'altra parte invece di affrontarti."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Spia", "Spy (Variant of Criminal)", "PHB",
+    skills=["inganno", "furtivita"],
+    tools=["Attrezzi da scasso"],
+    tools_text="Un set di strumenti da gioco a scelta + attrezzi da scasso.",
+    equipment=[
+        "Un piede di porco",
+        "Un set di abiti scuri comuni con cappuccio",
+        "Un set di strumenti da gioco a scelta",
+    ],
+    gold=15,
+    feature_name="Contatto Criminale",
+    feature_desc=(
+        "Stesso privilegio di Criminale: hai un contatto affidabile presso una "
+        "rete clandestina, in grado di portarti messaggi a distanza e di "
+        "metterti in comunicazione con altri operativi della tua organizzazione."
+    ),
+))
+
+# ---------------------------------------------------------------------------
+# SCAG - Sword Coast Adventurer's Guide
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Guardia Cittadina", "City Watch", "SCAG",
+    skills=["atletica", "intuizione"],
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un'insegna del tuo grado o un distintivo",
+        "Una bandoliera contenente nomi noti o ricercati",
+        "Un set di manette",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Statura della Guardia",
+    feature_desc=(
+        "Le tue divise di guardia cittadina e la conoscenza del lavoro delle "
+        "guardie locali ti permettono di capire le abitudini della guardia in "
+        "qualsiasi insediamento abitato. Puoi facilmente trovare la stazione "
+        "delle guardie, la caserma, le carceri e i tribunali, e sai come "
+        "presentare reclami, denunciare crimini, sporgere accuse e fare "
+        "domande di routine senza destare sospetti."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Artigiano di Clan", "Clan Crafter", "SCAG",
+    skills=["storia", "intuizione"],
+    tools_text="Un set di attrezzi da artigiano (escluso cuoco e organi musicali).",
+    langs_specific=["Nanico"],
+    langs_text="Nanico.",
+    equipment=[
+        "Un set di attrezzi da artigiano (a scelta)",
+        "Un dono di benvenuto del tuo clan (un gioiello del valore di 10 mo)",
+        "Un set di abiti da viaggio",
+    ],
+    gold=5,
+    feature_name="Conoscenza dei Clan e dell'Artigianato",
+    feature_desc=(
+        "I parenti nani ti forniscono i beni di artigianato a meta' del prezzo "
+        "di mercato (dovuto al rapporto preferenziale, non al furto). Inoltre, "
+        "sei rispettato dai nani, che ti riconoscono come compagno di clan e "
+        "alleato per nascita. Puoi consumare un pasto e ottenere un alloggio "
+        "modesto presso qualsiasi insediamento nano."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Studioso del Chiostro", "Cloistered Scholar", "SCAG",
+    skills=["storia"],
+    skills_text="Storia + 1 a scelta tra Arcano, Natura, Religione.",
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un cofanetto contenente le tue lettere di accreditamento",
+        "Una pergamena con il sigillo del tuo chiostro o della tua biblioteca",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Accesso al Chiostro",
+    feature_desc=(
+        "Anche se non vivi piu' presso la biblioteca, l'archivio o il chiostro "
+        "in cui ti sei formato, mantieni un accesso libero alle sue installazioni "
+        "non ristrette. Sebbene ti possano essere precluse le sezioni piu' "
+        "riservate, hai libero accesso ai libri, alle pergamene e altre "
+        "informazioni conservate al suo interno. Potresti inoltre ottenere "
+        "accesso ad altre biblioteche o chiostri di natura simile."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Cortigiano", "Courtier", "SCAG",
+    skills=["intuizione", "persuasione"],
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un set di abiti raffinati",
+    ],
+    gold=5,
+    feature_name="Conoscenze di Corte",
+    feature_desc=(
+        "Hai un fiuto sicuro per individuare i flussi del potere politico e "
+        "intrigo. Riesci facilmente a identificare le figure piu' influenti in "
+        "una situazione data, capire chi puoi contattare per ottenere udienza "
+        "e quali leve premere per fare scivolare le ruote di una trattativa. "
+        "Sai dove sono le vie di servizio, le porte segrete e simili."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Agente di Fazione", "Faction Agent", "SCAG",
+    skills=["intuizione"],
+    skills_text="Intuizione + 1 a scelta tra Arcano, Inganno, Storia, Indagare, Intuizione, Medicina, Natura, Percezione, Religione, Sopravvivenza.",
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un'insegna o un emblema della tua fazione",
+        "Una copia di un testo seminale per la dottrina della tua fazione (o un libro di preghiere comune se la tua fazione ha radici religiose)",
+        "Un set di abiti comuni",
+    ],
+    gold=15,
+    feature_name="Sicuro Rifugio",
+    feature_desc=(
+        "Come membro fidato e riconosciuto di una fazione, puoi acquisire "
+        "informazioni gratuite (anche se non oggetti) da altri membri della "
+        "fazione, ovunque essi si trovino. Tali membri ti forniranno cibo e "
+        "alloggio gratuiti se necessario, e pagheranno la tua sepoltura se "
+        "occorre. Le fazioni piu' potenti potrebbero anche fornire assistenza "
+        "legale o magica per affari urgenti."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Viaggiatore Distante", "Far Traveler", "SCAG",
+    skills=["intuizione", "percezione"],
+    tools_text="Un set di strumenti da gioco o uno strumento musicale (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un set di strumenti da gioco o uno strumento musicale a scelta",
+        "Un piccolo cimelio o una statuetta del valore di 10 mo",
+        "Un set di abiti da viaggio",
+    ],
+    gold=5,
+    feature_name="All'Estero",
+    feature_desc=(
+        "Sei un visitatore che proviene da una terra lontana e dunque rara "
+        "nelle parti del mondo che stai esplorando. Questo, combinato con il "
+        "tuo aspetto esotico (e magari i tuoi modi insoliti) ti rende una "
+        "personalita' di un certo interesse, oggetto di richieste di racconti "
+        "su una terra straniera. Quando incontri una persona influente, "
+        "soggetti come governanti locali e nobili che mirano alle conoscenze "
+        "del mondo esterno potrebbero offrirti udienza per scambiare "
+        "informazioni sulle terre lontane in cambio di vitto e alloggio."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Erede", "Inheritor", "SCAG",
+    skills=["sopravvivenza"],
+    skills_text="Sopravvivenza + 1 a scelta tra Arcano, Religione, Storia.",
+    tools_text="Un set di strumenti da gioco o uno strumento musicale (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "La tua eredita' (un gioiello, un'arma, un libro, una mappa, una pergamena, un oggetto magico minore o un mistero)",
+        "Un set di strumenti da gioco o uno strumento musicale a scelta",
+        "Un set di abiti da viaggio",
+    ],
+    gold=15,
+    feature_name="Eredita'",
+    feature_desc=(
+        "Decidi la natura precisa dell'eredita' assieme al DM. La sua importanza "
+        "puo' essere puramente sentimentale o puo' avere un valore reale o "
+        "magico. Quando l'eredita' viene messa in evidenza in modo appropriato "
+        "(ad esempio, presentata in una sala riunioni adeguata), puo' aiutarti "
+        "in incontri sociali con persone affini al suo simbolismo, e potrebbero "
+        "essere disposte ad assisterti se cio' non comporta grossi rischi."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Cavaliere dell'Ordine", "Knight of the Order", "SCAG",
+    skills=["persuasione"],
+    skills_text="Persuasione + 1 a scelta tra Arcano, Storia, Natura, Religione.",
+    tools_text="Un set di strumenti da gioco o uno strumento musicale (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un'insegna del tuo grado",
+        "Un set di strumenti da gioco o uno strumento musicale a scelta",
+        "Un set di abiti da viaggio",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="L'Ordine al Tuo Fianco",
+    feature_desc=(
+        "Compagni cavalieri del tuo ordine ti riconoscono come confratello e "
+        "ti offriranno cibo e alloggio modesti se necessario. In molti centri "
+        "urbani sono presenti capitoli del tuo ordine in cui puoi soggiornare. "
+        "Inoltre, godi della reputazione del tuo ordine, e puoi sfruttarla per "
+        "perorare la tua causa fra coloro che lo riveriscono."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Veterano Mercenario", "Mercenary Veteran", "SCAG",
+    skills=["atletica", "persuasione"],
+    tools=["Veicoli (terrestri)"],
+    tools_text="Un set di strumenti da gioco a scelta + veicoli (terrestri).",
+    equipment=[
+        "Un'insegna della tua compagnia mercenaria",
+        "Una macchia distintiva su un'arma o uno scudo",
+        "Un set di strumenti da gioco a scelta",
+        "Un set di abiti comuni",
+    ],
+    gold=10,
+    feature_name="Vita da Mercenario",
+    feature_desc=(
+        "Sai dove cercare per trovare il prossimo lavoro come mercenario. Puoi "
+        "facilmente trovare il prezzo che paga la tua compagnia o un'altra "
+        "compagnia mercenaria locale per i suoi servizi, e con un giorno di "
+        "ricerca puoi trovare un possibile contratto se nelle vicinanze ne "
+        "esistono. Conosci inoltre il modo di muoverti negli ambienti che "
+        "frequentano i veterani: bettole, magazzini, corti d'onore."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Cacciatore di Taglie Urbano", "Urban Bounty Hunter", "SCAG",
+    skills_text="Due a scelta tra Inganno, Intuizione, Persuasione, Furtivita'.",
+    tools_text="Due a scelta tra strumenti da gioco, strumenti musicali e attrezzi da artigiano.",
+    equipment=[
+        "Un set di abiti adatto al tuo lavoro",
+    ],
+    gold=20,
+    feature_name="Contatti in Citta'",
+    feature_desc=(
+        "Hai contatti in qualunque citta' tu visiti, anche minori. Sai come "
+        "rintracciare le persone giuste, raccogliere voci e fare le domande "
+        "giuste alle persone giuste, anche se la tua reputazione precede a "
+        "volte i tuoi sforzi. Riesci sempre a trovare almeno un modo per "
+        "ottenere informazioni preziose su una persona che stai cercando di "
+        "rintracciare in un insediamento."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Membro della Tribu' Uthgardt", "Uthgardt Tribe Member", "SCAG",
+    skills=["atletica", "sopravvivenza"],
+    tools_text="Un set di attrezzi da artigiano o uno strumento musicale (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Una collana di ossa decorata o un coltello cerimoniale",
+        "Un set di attrezzi da artigiano o uno strumento musicale a scelta",
+        "Un set di abiti da viaggio",
+    ],
+    gold=10,
+    feature_name="Diritto di Nascita degli Uthgardt",
+    feature_desc=(
+        "Hai una conoscenza approfondita delle terre selvagge del Nord, "
+        "consentendoti di ricordare la disposizione generale di citta' e "
+        "insediamenti, oltre alla geografia delle terre selvagge della regione. "
+        "Inoltre, sei in grado di trovare cibo e acqua fresca per te stesso e "
+        "per altre cinque persone ogni giorno, purche' la terra circostante "
+        "li offra. La tua conoscenza dei costumi degli Uthgardt ti permette di "
+        "comportarti in modo accettabile fra le tribu', e le tribu' a te non "
+        "ostili ti tratteranno come membro a tutti gli effetti."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Nobile di Waterdeep", "Waterdhavian Noble", "SCAG",
+    skills=["storia", "persuasione"],
+    tools_text="Un set di strumenti da gioco o uno strumento musicale (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un set di abiti raffinati",
+        "Un anello con sigillo della tua casata",
+        "Una pergamena di nobilta'",
+        "Una borsa con 20 mo",
+    ],
+    gold=20,
+    feature_name="Privilegio dei Nati a Waterdeep",
+    feature_desc=(
+        "Mentre sei a Waterdeep o ovunque la tua famiglia abbia influenza, "
+        "puoi accedere a tenore di vita aristocratico gratuitamente, dato che "
+        "le persone che fungono da accoglienza per la tua famiglia ti "
+        "ospitano. Inoltre, la famiglia paga le piccole spese di routine. Hai "
+        "udienza con il sovrano, un nobile o altre persone di rango quando "
+        "ne hai bisogno per affari della tua casata."
+    ),
+))
+
+# ---------------------------------------------------------------------------
+# ToA - Tomb of Annihilation
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Antropologo", "Anthropologist", "ToA",
+    skills=["intuizione", "religione"],
+    langs_choice=2,
+    langs_text="Due linguaggi a scelta.",
+    equipment=[
+        "Un diario di viaggio",
+        "Una bussola",
+        "Una lente d'ingrandimento",
+        "Un set di abiti da viaggio",
+    ],
+    gold=10,
+    feature_name="Adattabile",
+    feature_desc=(
+        "Dopo aver passato un breve periodo di tempo (almeno una settimana) "
+        "fra una nuova tribu', cultura o societa', puoi imparare i fondamenti "
+        "delle loro abitudini sociali, in modo che ti accettino come parte "
+        "della loro societa' senza alcun pregiudizio. Le persone con buone "
+        "intenzioni nei tuoi confronti ti accolgono nelle loro case, e si "
+        "fidano della tua presenza. Puoi inoltre identificare facilmente i "
+        "rituali importanti, le persone influenti e le strutture sociali della "
+        "comunita' osservata."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Archeologo", "Archaeologist", "ToA",
+    skills=["storia", "sopravvivenza"],
+    tools_text="Strumenti da cartografo o strumenti da navigatore (a scelta).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un piccone, una pala, una lanterna a olio, due fiaschette d'olio, gli strumenti scelti",
+        "Un set di abiti da viaggio",
+        "Un cofanetto contenente i tuoi appunti",
+    ],
+    gold=25,
+    feature_name="Esperto Esploratore di Rovine",
+    feature_desc=(
+        "Quando hai a disposizione un'accurata mappa di un complesso di "
+        "rovine, puoi memorizzarla con un breve studio. Inoltre hai familiari "
+        "con i comuni schemi architettonici e le trappole tipiche di tali "
+        "luoghi, e puoi sempre trovare un percorso ragionevole all'interno "
+        "delle rovine; i compagni con cui condividi questa conoscenza non si "
+        "perdono mai."
+    ),
+))
+
+# ---------------------------------------------------------------------------
+# EBR - Eberron: Rising from the Last War
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Agente di Casata", "House Agent", "EBR",
+    skills=["indagare", "persuasione"],
+    tools_text="Un set di strumenti associati alla tua casata (es. attrezzi da artigiano, kit alchemico, strumenti da scasso).",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un'insegna della tua casata dragonmarcata",
+        "Un set di strumenti del mestiere a scelta",
+        "Una piccola borsa di documenti commerciali",
+        "Un set di abiti da viaggio",
+    ],
+    gold=20,
+    feature_name="Risorse della Casata",
+    feature_desc=(
+        "La tua casata ti fornira' supporto e copertura entro determinati "
+        "limiti. Puoi ottenere accesso ad enclavi della tua casata in qualsiasi "
+        "citta' importante, riceverne vitto e alloggio modesti, e contare "
+        "sulla rete di contatti e su informazioni rilevanti per i tuoi compiti. "
+        "I servizi della casata (come messaggi rapidi tramite la Casa Sivis, "
+        "viaggi tramite la Casa Lyrandar o l'Orien) sono spesso resi a un "
+        "costo ridotto o gratuiti per missioni concordate."
+    ),
+))
+
+# ---------------------------------------------------------------------------
+# EGtW - Explorer's Guide to Wildemount (Critical Role)
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Sorridente", "Grinner", "EGtW",
+    skills=["inganno", "intrattenere"],
+    tools=["Strumento musicale"],
+    tools_text="Uno strumento musicale + kit da travestimento o falsificatore (a scelta).",
+    langs_specific=["Linguaggio dei Sorridenti"],
+    langs_text="Linguaggio dei Sorridenti.",
+    equipment=[
+        "Uno strumento musicale (a scelta)",
+        "Una moneta d'oro a doppia faccia",
+        "Un set di abiti raffinati",
+        "Un kit a scelta tra travestimento e falsificatore",
+    ],
+    gold=15,
+    feature_name="Ladro di Volti",
+    feature_desc=(
+        "Tu e i tuoi alleati Sorridenti potete usare il vostro linguaggio "
+        "segreto e i vostri canali per riconoscervi e per ottenere informazioni "
+        "in tutta Wildemount. Quando ti dichiari un Sorridente o esibisci i "
+        "segnali di riconoscimento, puoi ottenere aiuto da altri Sorridenti "
+        "in qualsiasi insediamento dove sono presenti, sotto forma di vitto, "
+        "alloggio, informazioni e talvolta favori discreti."
+    ),
+))
+
+BACKGROUNDS.append(_bg(
+    "Agente Volstrucker", "Volstrucker Agent", "EGtW",
+    skills=["inganno", "furtivita"],
+    tools=["Kit da avvelenatore"],
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un kit da avvelenatore",
+        "Un anello con sigillo dei Volstrucker (un piccolo simbolo nascosto)",
+        "Un set di abiti scuri comuni con cappuccio",
+        "Una piccola fiala di inchiostro nero",
+    ],
+    gold=15,
+    feature_name="Sicuro Asilo",
+    feature_desc=(
+        "Quando ne hai bisogno, puoi attivare un canale di comunicazione "
+        "sicuro per inviare un messaggio a un altro Volstrucker o a una "
+        "casa sicura della rete. Casa sicura affidabili in tutta Wildemount "
+        "ti accolgono per breve tempo, fornendoti vitto, alloggio e talvolta "
+        "supporto materiale per portare a termine la tua missione."
+    ),
+))
+
+# ---------------------------------------------------------------------------
+# MOoT - Mythic Odysseys of Theros
+# ---------------------------------------------------------------------------
+
+BACKGROUNDS.append(_bg(
+    "Atleta", "Athlete", "MOoT",
+    skills=["acrobazia", "atletica"],
+    tools_text="Uno strumento musicale a scelta o un set di strumenti da gioco a scelta.",
+    langs_choice=1,
+    langs_text="Un linguaggio a scelta.",
+    equipment=[
+        "Un'insegna o un trofeo che attesta una passata vittoria",
+        "Uno strumento musicale o un set di strumenti da gioco a scelta",
+        "Un set di abiti da viaggio",
+    ],
+    gold=10,
+    feature_name="Festeggiato",
+    feature_desc=(
+        "La tua reputazione come atleta ti rende ben noto agli organizzatori "
+        "di eventi, il che significa che puoi sempre trovare alloggio "
+        "rispettoso e accesso preferenziale alle competizioni atletiche. Gli "
+        "atleti rivali ti riconoscono come pari e gli spettatori ammirano le "
+        "tue gesta. Inoltre, mentre viaggi, puoi solitamente trovare un "
+        "ammiratore generoso disposto a sponsorizzare un pasto o un letto "
+        "in cambio di una storia delle tue avventure."
+    ),
+))
+
+
+# ---------------------------------------------------------------------------
+# Output
+# ---------------------------------------------------------------------------
+
+def _emit() -> None:
+    BACKGROUNDS.sort(key=lambda b: b["name"].lower())
+    by_name = {b["name"]: b for b in BACKGROUNDS}
+
+    with open(JSON_OUT, "w", encoding="utf-8") as f:
+        json.dump(by_name, f, ensure_ascii=False, indent=2)
+
+    js_payload = json.dumps(by_name, ensure_ascii=False, indent=2)
+    js = (
+        "// Auto-generato da risorse/background/build_backgrounds.py\n"
+        "// Non modificare a mano. Rigenera con:\n"
+        "//   python risorse/background/build_backgrounds.py\n"
+        "window.BACKGROUNDS_DATA = " + js_payload + ";\n"
+    )
+    os.makedirs(os.path.dirname(JS_OUT), exist_ok=True)
+    with open(JS_OUT, "w", encoding="utf-8") as f:
+        f.write(js)
+
+    print(f"OK - {len(BACKGROUNDS)} background scritti")
+    print(f"  - {JSON_OUT}")
+    print(f"  - {JS_OUT}")
+
+
+if __name__ == "__main__":
+    _emit()

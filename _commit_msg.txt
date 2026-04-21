@@ -1,0 +1,36 @@
+feat(background): migrazione dataset locale + picker e auto-populate
+
+Stessa architettura usata per le razze: i background diventano dati immutabili
+locali nel client, lasciando il DB Supabase libero di occuparsi solo dei dati
+mutevoli/homebrew.
+
+Nuovi file:
+- risorse/background/build_backgrounds.py: 36 background hardcoded in italiano
+  (PHB 13 + 5 varianti, SCAG 12, ToA 2, EBR 1, EGtW 2, MOoT 1) con schema
+  ricco (skill/strumenti/lingue auto-popolate o a scelta, equipaggiamento
+  iniziale, oro iniziale, privilegio, descrizione di flavor).
+- risorse/background/backgrounds.json: output diff-friendly.
+- js/data/backgrounds_data.js: window.BACKGROUNDS_DATA per il front-end.
+
+Front-end (js/personaggi.js):
+- buildBackgroundOptionsLocal + getBackgroundLocal: lookup dataset locale.
+- getBackgroundData: prioritizza locale, fallback al cache DB; mappa lo
+  schema locale ai campi gia' usati dal codice esistente.
+- pgOpenBackgroundSelect: usa il nuovo picker (search + filtro per manuale)
+  con stato indipendente da quello della razza.
+- _pgApplyBackgroundAutoPopulate: applica/rimuove skill/strumenti/lingue
+  fissi del bg, idempotente; chiamato anche al load di un PG esistente.
+- Pagina 2 'Background' rientra fra le tabelle predefinite e mostra il
+  privilegio (read-only) + un riepilogo info (skill, strumenti, lingue,
+  equipaggiamento iniziale, oro iniziale).
+
+Picker generalizzato (openRazzaPicker):
+- Ora accetta opts.stateKey (razza/sottorazza/background): search/filtri
+  non si mescolano fra picker diversi.
+- Placeholder e empty text personalizzabili via opts.
+
+CSS (css/personaggi.css):
+- .bg-info-block / .bg-info-line / .bg-info-eq per il riepilogo background
+  in pagina 2.
+
+Bump cache busting per index.html (CSS/JS + nuovo backgrounds_data.js).

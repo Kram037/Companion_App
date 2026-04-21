@@ -8,6 +8,13 @@ let pgSelectedClasses = [];
 let pgSelectedEquipment = [];
 let _pgRaceSkills = [];
 let _pgBgSkills = [];
+// Strumenti e linguaggi auto-popolati dal background, per poterli rimuovere
+// se l'utente cambia bg.
+let _pgBgTools = [];
+let _pgBgLangs = [];
+// Linguaggi/strumenti aggiunti tramite background (set, di soli "fissi").
+let pgCurrentBgLanguages = new Set();
+let pgCurrentBgTools = new Set();
 let _pgRaceResistances = [];
 
 // =====================================================
@@ -702,6 +709,26 @@ function buildBackgroundOptionsFromDB() {
     return bgs.map(b => ({ value: b.nome, label: b.nome, source: b.fonte || '' }));
 }
 
+// Lista dei background dal dataset locale (window.BACKGROUNDS_DATA),
+// in ordine alfabetico italiano. Fallback al cache DB / hardcoded.
+function buildBackgroundOptionsLocal() {
+    const BG = window.BACKGROUNDS_DATA || {};
+    const names = Object.keys(BG);
+    if (names.length === 0) return buildBackgroundOptionsFromDB();
+    return names
+        .slice()
+        .sort((a, b) => a.localeCompare(b, 'it'))
+        .map(name => {
+            const b = BG[name];
+            return { value: name, label: name, source: b.source_short || '' };
+        });
+}
+
+function getBackgroundLocal(nome) {
+    const BG = window.BACKGROUNDS_DATA || {};
+    return BG[nome] || null;
+}
+
 // Lookup razza nel dataset locale. Restituisce la struttura completa
 // (vedere risorse/razze/build_races.py per lo schema).
 function getRaceLocal(nome) {
@@ -858,8 +885,34 @@ function _pgRaceInnateSlots(pg) {
 }
 
 function getBackgroundData(nome) {
-    if (!AppState.cachedBackground) return null;
-    return AppState.cachedBackground.find(b => b.nome === nome) || null;
+    if (!nome) return null;
+    // Prima il dataset locale (window.BACKGROUNDS_DATA): mappa lo schema
+    // hardcoded (build_backgrounds.py) ai campi attesi dal codice esistente
+    // (nome, fonte, competenze_abilita, competenze_strumenti, ...).
+    const local = getBackgroundLocal(nome);
+    if (local) {
+        return {
+            nome: local.name,
+            fonte: local.source_short || '',
+            competenze_abilita: local.skill_proficiencies || [],
+            competenze_strumenti: local.tool_proficiencies || [],
+            linguaggi_specifici: local.languages_specific || [],
+            linguaggi_a_scelta: local.languages_choice || 0,
+            scelte_abilita_testo: local.skill_choices_text || '',
+            scelte_strumenti_testo: local.tool_choices_text || '',
+            linguaggi_testo: local.languages_text || '',
+            equipaggiamento_iniziale: local.starting_equipment || [],
+            oro_iniziale: local.starting_gold || 0,
+            privilegio_nome: (local.feature && local.feature.name) || '',
+            privilegio_descrizione: (local.feature && local.feature.description) || '',
+            descrizione: local.description || '',
+            _local: true,
+        };
+    }
+    if (AppState.cachedBackground) {
+        return AppState.cachedBackground.find(b => b.nome === nome) || null;
+    }
+    return null;
 }
 
 // Applica/rimuove l'auto-popolamento (skills, resistenze, velocita') in base
@@ -912,11 +965,9 @@ function _pgUpdateSottorazzaUI() {
     if (btn) btn.textContent = exists ? currentSub : 'Seleziona sottorazza...';
 }
 
-// Stato persistente del filtro per il picker razza (per non resettarsi tra
-// aperture successive nella stessa sessione di creazione PG).
-window._pgRazzaSearch = window._pgRazzaSearch || '';
-window._pgRazzaSelectedSources = window._pgRazzaSelectedSources || new Set();
-window._pgRazzaShowFilters = window._pgRazzaShowFilters || false;
+// Stato persistente per i picker (razza/sottorazza/background) e' inizializzato
+// on-demand in openRazzaPicker, basato su stateKey: window._pgPickerSearch_<key>,
+// window._pgPickerSources_<key>, window._pgPickerShow_<key>.
 
 window.pgOpenRazzaSelect = function() {
     openRazzaPicker(
@@ -936,6 +987,11 @@ window.pgOpenRazzaSelect = function() {
             if (subOpts.length > 0) {
                 setTimeout(() => window.pgOpenSottorazzaSelect(), 100);
             }
+        },
+        {
+            stateKey: 'razza',
+            placeholder: 'Cerca razza...',
+            emptyText: 'Nessuna razza corrisponde ai filtri.',
         }
     );
 }
@@ -956,7 +1012,12 @@ window.pgOpenSottorazzaSelect = function() {
             if (btn) btn.textContent = value;
             _pgApplyRaceAutoPopulate();
         },
-        { hideSourceFilter: opts.every(o => !o.source || o.source === opts[0].source) }
+        {
+            stateKey: 'sottorazza',
+            placeholder: 'Cerca sottorazza...',
+            emptyText: 'Nessuna sottorazza corrisponde alla ricerca.',
+            hideSourceFilter: opts.every(o => !o.source || o.source === opts[0].source),
+        }
     );
 }
 
@@ -966,19 +1027,25 @@ window.pgOpenSottorazzaSelect = function() {
 // preservare l'ultima selezione tra aperture nella stessa sessione.
 function openRazzaPicker(options, title, onSelect, opts = {}) {
     closeCustomSelect();
+    // Stato indipendente per contesto: razza, sottorazza, background, ...
+    // Cosi' search/filtri non si mescolano fra picker diversi.
+    const stateKey = opts.stateKey || 'razza';
+    const SK_SEARCH = '_pgPickerSearch_' + stateKey;
+    const SK_SOURCES = '_pgPickerSources_' + stateKey;
+    const SK_SHOW = '_pgPickerShow_' + stateKey;
+    if (!window[SK_SOURCES]) window[SK_SOURCES] = new Set();
+    const placeholder = opts.placeholder || 'Cerca per nome...';
+    const emptyText = opts.emptyText || 'Nessuna voce corrisponde ai filtri.';
     const flat = options.filter(o => o.type !== 'divider');
     const allSources = Array.from(new Set(flat.map(o => o.source).filter(Boolean)))
         .sort((a, b) => a.localeCompare(b, 'it'));
     const hideFilters = !!opts.hideSourceFilter || allSources.length <= 1;
     if (hideFilters) {
-        // Reset selezione fonti se non mostriamo il filtro
-        window._pgRazzaSelectedSources = new Set();
+        window[SK_SOURCES] = new Set();
     } else {
-        // Mantieni solo le fonti effettivamente disponibili (nel caso il
-        // dataset sia cambiato dopo un reload).
         const valid = new Set(allSources);
-        window._pgRazzaSelectedSources = new Set(
-            Array.from(window._pgRazzaSelectedSources).filter(s => valid.has(s))
+        window[SK_SOURCES] = new Set(
+            Array.from(window[SK_SOURCES]).filter(s => valid.has(s))
         );
     }
 
@@ -993,7 +1060,7 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
             </div>
             <div class="razza-picker-body">
                 <div class="spell-picker-search-row">
-                    <input type="text" id="razzaPickerSearch" class="hp-calc-input spell-picker-search" placeholder="Cerca per nome..." autocomplete="off">
+                    <input type="text" id="razzaPickerSearch" class="hp-calc-input spell-picker-search" placeholder="${escapeAttr(placeholder)}" autocomplete="off">
                     ${hideFilters ? '' : `<button type="button" class="spell-picker-filter-btn" id="razzaPickerFilterBtn" title="Filtri">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                         <span class="spell-picker-filter-badge" id="razzaPickerFilterBadge" style="display:none;">0</span>
@@ -1009,7 +1076,7 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
                     </div>
                 </div>
                 <div class="custom-select-list" id="razzaPickerList"></div>
-                <div class="razza-picker-empty" id="razzaPickerEmpty" style="display:none;">Nessuna razza corrisponde ai filtri.</div>
+                <div class="razza-picker-empty" id="razzaPickerEmpty" style="display:none;">${escapeHtml(emptyText)}</div>
             </div>
         </div>`;
     document.body.appendChild(overlay);
@@ -1024,19 +1091,19 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
     const sourceChipsEl = overlay.querySelector('#razzaPickerSourceChips');
     const resetBtn = overlay.querySelector('#razzaPickerResetBtn');
 
-    if (window._pgRazzaSearch) searchInput.value = window._pgRazzaSearch;
+    if (window[SK_SEARCH]) searchInput.value = window[SK_SEARCH];
 
     function renderSourceChips() {
         if (!sourceChipsEl) return;
         sourceChipsEl.innerHTML = allSources.map(src => {
-            const active = window._pgRazzaSelectedSources.has(src);
+            const active = window[SK_SOURCES].has(src);
             return `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" data-src="${escapeAttr(src)}">${escapeHtml(src)}</button>`;
         }).join('');
         sourceChipsEl.querySelectorAll('.spell-filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 const src = chip.dataset.src;
-                if (window._pgRazzaSelectedSources.has(src)) window._pgRazzaSelectedSources.delete(src);
-                else window._pgRazzaSelectedSources.add(src);
+                if (window[SK_SOURCES].has(src)) window[SK_SOURCES].delete(src);
+                else window[SK_SOURCES].add(src);
                 chip.classList.toggle('active');
                 renderList();
                 updateFilterBadge();
@@ -1046,7 +1113,7 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 
     function updateFilterBadge() {
         if (!filterBadge) return;
-        const n = window._pgRazzaSelectedSources.size;
+        const n = window[SK_SOURCES].size;
         if (n > 0) {
             filterBadge.style.display = '';
             filterBadge.textContent = n;
@@ -1059,8 +1126,8 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 
     function renderList() {
         const q = (searchInput.value || '').trim().toLowerCase();
-        window._pgRazzaSearch = searchInput.value || '';
-        const selSrc = window._pgRazzaSelectedSources;
+        window[SK_SEARCH] = searchInput.value || '';
+        const selSrc = window[SK_SOURCES];
         const filtered = flat.filter(o => {
             if (q && !(o.label || '').toLowerCase().includes(q)) return false;
             if (selSrc.size > 0 && !selSrc.has(o.source)) return false;
@@ -1087,14 +1154,14 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 
     if (filterBtn) {
         filterBtn.addEventListener('click', () => {
-            window._pgRazzaShowFilters = !window._pgRazzaShowFilters;
-            filterPanel.style.display = window._pgRazzaShowFilters ? '' : 'none';
+            window[SK_SHOW] = !window[SK_SHOW];
+            filterPanel.style.display = window[SK_SHOW] ? '' : 'none';
         });
-        if (window._pgRazzaShowFilters) filterPanel.style.display = '';
+        if (window[SK_SHOW]) filterPanel.style.display = '';
     }
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
-            window._pgRazzaSelectedSources = new Set();
+            window[SK_SOURCES] = new Set();
             renderSourceChips();
             updateFilterBadge();
             renderList();
@@ -1110,24 +1177,50 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 }
 
 window.pgOpenBackgroundSelect = function() {
-    openCustomSelect(
-        buildBackgroundOptionsFromDB(),
+    openRazzaPicker(
+        buildBackgroundOptionsLocal(),
+        'Seleziona Background',
         (value) => {
             document.getElementById('pgBackground').value = value;
             const btn = document.getElementById('pgBackgroundBtn');
             if (btn) btn.textContent = value;
-
-            _pgBgSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
-            _pgBgSkills = [];
-
-            const data = getBackgroundData(value);
-            if (data && data.competenze_abilita && data.competenze_abilita.length > 0) {
-                _pgBgSkills = [...data.competenze_abilita];
-                data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
-            }
+            _pgApplyBackgroundAutoPopulate();
         },
-        'Seleziona Background'
+        {
+            stateKey: 'background',
+            placeholder: 'Cerca background...',
+            emptyText: 'Nessun background corrisponde ai filtri.',
+        }
     );
+}
+
+// Applica/rimuove l'auto-popolamento (skills, tools, languages) in base al
+// background correntemente selezionato. Idempotente: rimuove sempre prima
+// i contributi della precedente selezione.
+function _pgApplyBackgroundAutoPopulate() {
+    _pgBgSkills.forEach(s => pgCurrentSkillProficiencies.delete(s));
+    _pgBgTools.forEach(t => pgCurrentBgTools.delete(t));
+    _pgBgLangs.forEach(l => pgCurrentBgLanguages.delete(l));
+    _pgBgSkills = [];
+    _pgBgTools = [];
+    _pgBgLangs = [];
+
+    const value = document.getElementById('pgBackground').value || '';
+    if (!value) return;
+    const data = getBackgroundData(value);
+    if (!data) return;
+    if (Array.isArray(data.competenze_abilita) && data.competenze_abilita.length > 0) {
+        _pgBgSkills = [...data.competenze_abilita];
+        data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
+    }
+    if (Array.isArray(data.competenze_strumenti) && data.competenze_strumenti.length > 0) {
+        _pgBgTools = [...data.competenze_strumenti];
+        data.competenze_strumenti.forEach(t => pgCurrentBgTools.add(t));
+    }
+    if (Array.isArray(data.linguaggi_specifici) && data.linguaggi_specifici.length > 0) {
+        _pgBgLangs = [...data.linguaggi_specifici];
+        data.linguaggi_specifici.forEach(l => pgCurrentBgLanguages.add(l));
+    }
 }
 
 window.pgOpenClassDropdown = function() {
@@ -3759,7 +3852,7 @@ window.invRemoveAttune = async function(pgId, idx) {
 
 // Tabelle custom presenti di default nella pagina Privilegi.
 // Nota: "Talenti" non e' qui perche' viene gestito come sezione speciale legata a pg.talenti.
-const PRIV_DEFAULT_CUSTOM_TABS = ['Razza'];
+const PRIV_DEFAULT_CUSTOM_TABS = ['Razza', 'Background'];
 
 function _classesData() { return window.CLASSES_DATA || []; }
 
@@ -3777,9 +3870,13 @@ function _normalizePrivilegi(pg) {
     let order = Array.isArray(p.custom_tabs_order)
         ? [...p.custom_tabs_order]
         : [...PRIV_DEFAULT_CUSTOM_TABS];
-    // Migrazione: rimuovi "Background" dalle tabelle visibili (i dati restano in custom_features se serviranno).
-    order = order.filter(t => t !== 'Background');
     if (!order.includes('Razza')) order.unshift('Razza');
+    // Riporta "Background" tra le tabelle predefinite (auto-popola dal dataset locale).
+    if (!order.includes('Background')) {
+        const i = order.indexOf('Razza');
+        if (i >= 0) order.splice(i + 1, 0, 'Background');
+        else order.push('Background');
+    }
     return {
         hidden_auto: Array.isArray(p.hidden_auto) ? [...p.hidden_auto] : [],
         custom_features: (p.custom_features && typeof p.custom_features === 'object')
@@ -3997,6 +4094,58 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                 autoRows = `<div class="priv-subblock">
                     <div class="priv-subblock-title">${headerLabel}</div>
                     <div class="priv-feat-list-wrap">${traitRows}</div>
+                </div>`;
+            }
+        }
+        // Per la tabella "Background" auto-popola il privilegio dal dataset
+        // locale (window.BACKGROUNDS_DATA). Mostra anche un riepilogo di
+        // skills/strumenti/lingue/equipaggiamento iniziale + oro come info.
+        if (tabName === 'Background' && pg.background) {
+            const bg = getBackgroundData(pg.background);
+            if (bg && bg._local) {
+                const featRows = bg.privilegio_nome
+                    ? _renderPrivFeatureRow({
+                        name: bg.privilegio_nome,
+                        description: bg.privilegio_descrizione || '',
+                        translated: true,
+                    }, {})
+                    : '';
+                const infoLines = [];
+                if (bg.competenze_abilita && bg.competenze_abilita.length) {
+                    const skillNames = bg.competenze_abilita.map(k => {
+                        const s = DND_SKILLS.find(x => x.key === k);
+                        return s ? s.nome : k;
+                    });
+                    infoLines.push(`<div class="bg-info-line"><strong>Abilita':</strong> ${escapeHtml(skillNames.join(', '))}</div>`);
+                }
+                if (bg.scelte_abilita_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Abilita' (a scelta):</strong> ${escapeHtml(bg.scelte_abilita_testo)}</div>`);
+                }
+                if (bg.competenze_strumenti && bg.competenze_strumenti.length) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Strumenti:</strong> ${escapeHtml(bg.competenze_strumenti.join(', '))}</div>`);
+                }
+                if (bg.scelte_strumenti_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Strumenti (a scelta):</strong> ${escapeHtml(bg.scelte_strumenti_testo)}</div>`);
+                }
+                if (bg.linguaggi_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Linguaggi:</strong> ${escapeHtml(bg.linguaggi_testo)}</div>`);
+                } else if (bg.linguaggi_specifici && bg.linguaggi_specifici.length) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Linguaggi:</strong> ${escapeHtml(bg.linguaggi_specifici.join(', '))}</div>`);
+                }
+                if (bg.equipaggiamento_iniziale && bg.equipaggiamento_iniziale.length) {
+                    const eqHtml = bg.equipaggiamento_iniziale.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+                    infoLines.push(`<div class="bg-info-line"><strong>Equipaggiamento iniziale:</strong><ul class="bg-info-eq">${eqHtml}</ul></div>`);
+                }
+                if (bg.oro_iniziale) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Oro iniziale:</strong> ${bg.oro_iniziale} mo</div>`);
+                }
+                const infoBlock = infoLines.length
+                    ? `<div class="bg-info-block">${infoLines.join('')}</div>`
+                    : '';
+                autoRows = `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${escapeHtml(pg.background)} <span class="priv-subblock-title-sub">(${escapeHtml(bg.fonte || '')})</span></div>
+                    ${infoBlock}
+                    <div class="priv-feat-list-wrap">${featRows}</div>
                 </div>`;
             }
         }
@@ -5823,6 +5972,10 @@ window.openPersonaggioModal = function(personaggioId) {
     pgSelectedEquipment = [];
     _pgRaceSkills = [];
     _pgBgSkills = [];
+    _pgBgTools = [];
+    _pgBgLangs = [];
+    pgCurrentBgTools = new Set();
+    pgCurrentBgLanguages = new Set();
     _pgRaceResistances = [];
     pgRenderClassi();
     pgWizardGoTo(0);
@@ -5869,6 +6022,9 @@ window.openPersonaggioModal = function(personaggioId) {
                     document.getElementById('pgBackground').value = bgVal;
                     const bBtn = document.getElementById('pgBackgroundBtn');
                     if (bBtn) bBtn.textContent = bgVal || 'Seleziona background...';
+                    // Inizializza tracking del bg corrente (cosi' se l'utente lo cambia
+                    // nel wizard, le competenze auto-popolate vengono rimosse correttamente).
+                    _pgApplyBackgroundAutoPopulate();
 
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
                         pgSelectedClasses = data.classi.map(c => ({
