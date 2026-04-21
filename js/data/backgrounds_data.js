@@ -95,7 +95,7 @@ window.BACKGROUNDS_DATA = {
       "furtivita"
     ],
     "tool_proficiencies": [
-      "Kit da avvelenatore"
+      "Sostanze da Avvelenatore"
     ],
     "languages_specific": [],
     "languages_choice": 1,
@@ -340,8 +340,8 @@ window.BACKGROUNDS_DATA = {
       "rapidita_di_mano"
     ],
     "tool_proficiencies": [
-      "Kit da travestimento",
-      "Kit da falsificatore"
+      "Trucchi per il Camuffamento",
+      "Arnesi da Falsario"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -395,7 +395,7 @@ window.BACKGROUNDS_DATA = {
       "furtivita"
     ],
     "tool_proficiencies": [
-      "Attrezzi da scasso"
+      "Arnesi da Scasso"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -450,7 +450,7 @@ window.BACKGROUNDS_DATA = {
       "religione"
     ],
     "tool_proficiencies": [
-      "Kit da erborista"
+      "Borsa da Erborista"
     ],
     "languages_specific": [],
     "languages_choice": 1,
@@ -481,7 +481,7 @@ window.BACKGROUNDS_DATA = {
       "sopravvivenza"
     ],
     "tool_proficiencies": [
-      "Veicoli (terrestri)"
+      "Veicoli Terrestri"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -539,7 +539,7 @@ window.BACKGROUNDS_DATA = {
       "intrattenere"
     ],
     "tool_proficiencies": [
-      "Kit da travestimento"
+      "Trucchi per il Camuffamento"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -596,7 +596,7 @@ window.BACKGROUNDS_DATA = {
       "intrattenere"
     ],
     "tool_proficiencies": [
-      "Kit da travestimento"
+      "Trucchi per il Camuffamento"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -625,8 +625,8 @@ window.BACKGROUNDS_DATA = {
       "percezione"
     ],
     "tool_proficiencies": [
-      "Strumenti da navigatore",
-      "Veicoli (acquatici)"
+      "Strumenti da Navigatore",
+      "Veicoli Acquatici"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -710,8 +710,8 @@ window.BACKGROUNDS_DATA = {
       "rapidita_di_mano"
     ],
     "tool_proficiencies": [
-      "Kit da travestimento",
-      "Attrezzi da scasso"
+      "Trucchi per il Camuffamento",
+      "Arnesi da Scasso"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -798,8 +798,8 @@ window.BACKGROUNDS_DATA = {
       "percezione"
     ],
     "tool_proficiencies": [
-      "Strumenti da navigatore",
-      "Veicoli (acquatici)"
+      "Strumenti da Navigatore",
+      "Veicoli Acquatici"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -858,7 +858,7 @@ window.BACKGROUNDS_DATA = {
       "intimidire"
     ],
     "tool_proficiencies": [
-      "Veicoli (terrestri)"
+      "Veicoli Terrestri"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -887,15 +887,13 @@ window.BACKGROUNDS_DATA = {
       "inganno",
       "intrattenere"
     ],
-    "tool_proficiencies": [
-      "Strumento musicale"
-    ],
+    "tool_proficiencies": [],
     "languages_specific": [
       "Linguaggio dei Sorridenti"
     ],
     "languages_choice": 0,
     "skill_choices_text": "",
-    "tool_choices_text": "Uno strumento musicale + kit da travestimento o falsificatore (a scelta).",
+    "tool_choices_text": "Uno strumento musicale a scelta + kit da travestimento o falsificatore (a scelta).",
     "languages_text": "Linguaggio dei Sorridenti.",
     "starting_equipment": [
       "Uno strumento musicale (a scelta)",
@@ -920,7 +918,7 @@ window.BACKGROUNDS_DATA = {
       "furtivita"
     ],
     "tool_proficiencies": [
-      "Attrezzi da scasso"
+      "Arnesi da Scasso"
     ],
     "languages_specific": [],
     "languages_choice": 0,
@@ -975,7 +973,7 @@ window.BACKGROUNDS_DATA = {
       "persuasione"
     ],
     "tool_proficiencies": [
-      "Veicoli (terrestri)"
+      "Veicoli Terrestri"
     ],
     "languages_specific": [],
     "languages_choice": 0,

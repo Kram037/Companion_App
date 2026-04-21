@@ -1840,29 +1840,28 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
   },
   "Aasimar": {
     "name_en": "Aasimar",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
     "ability_score_increase": {
-      "Carisma": 2
+      "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "+2 Carisma",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Gli aasimar maturano alla stessa velocita' degli umani ma vivono fino a 160 anni.",
     "alignment": "Per via della loro discendenza celestiale, gli aasimar tendono al bene. La maggior parte sono buoni, eppure alcuni cadono nel male, rifiutando il loro destino superiore.",
     "description": "Gli aasimar portano dentro di se' la luce divina di un essere celeste. Sono guidati spesso dall'idea di sconfiggere il male, agendo come un faro contro l'oscurita'.",
     "languages": [
-      "Comune",
-      "Celestiale"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
     "resistances": [
       "necrotico",
-      "radioso"
+      "radiante"
     ],
     "darkvision": 18,
     "creature_type": "Umanoide",
@@ -1884,7 +1883,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       {
         "name": "Mani Curatrici",
         "name_en": "Healing Hands",
-        "description": "Come azione, puoi toccare una creatura e farla recuperare un numero di punti ferita pari al tuo livello. Una volta usata questa abilita', non puoi usarla di nuovo finche' non termini un riposo lungo.",
+        "description": "Come azione, puoi toccare una creatura e fluire energia divina nel suo corpo, curando un numero di punti ferita pari al tuo livello e moltiplicandolo per 1d4. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
         "uses": {
           "amount": 1,
           "recharge": "long_rest"
@@ -1907,73 +1906,19 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           }
         ],
         "uses": null
+      },
+      {
+        "name": "Rivelazione Celestiale",
+        "name_en": "Celestial Revelation",
+        "description": "Quando raggiungi il 3 livello, puoi trasformarti per rivelare la tua natura celestiale. Come azione bonus, puoi assumere la tua forma celestiale per 1 minuto o finche' non la annulli (sempre con un'azione bonus). Quando ti trasformi, scegli una delle tre opzioni qui sotto: una volta scelta, la forma e' definitiva e ottieni gli effetti relativi ogni volta che ti trasformi.\n\nIndipendentemente dalla forma scelta, mentre sei trasformato godi dei seguenti benefici: la tua forma emette luce intensa in un raggio di 3 metri e luce fioca per ulteriori 3 metri.\n\n**Anima Necrotica.** Aure spettrali emanano dalle tue spalle: hai una velocita' di volo pari alla tua velocita' di camminata e, una volta in ogni tuo turno, puoi infliggere danni necrotici extra a un bersaglio quando gli infliggi danni con un attacco o un incantesimo. Tali danni extra sono pari al tuo bonus di competenza.\n\n**Consumo Radioso.** Energia radiante divampa dal tuo corpo: alla fine di ognuno dei tuoi turni, ogni creatura entro 3 metri da te subisce danni radiosi pari al tuo bonus di competenza, e una volta in ogni tuo turno puoi infliggere danni radiosi extra (pari al tuo bonus di competenza) a un bersaglio quando gli infliggi danni con un attacco o un incantesimo.\n\n**Anima Radiosa.** Ali spettrali emergono dalla tua schiena: hai una velocita' di volo pari alla tua velocita' di camminata e, una volta in ogni tuo turno, puoi infliggere danni radiosi extra a un bersaglio quando gli infliggi danni con un attacco o un incantesimo. Tali danni extra sono pari al tuo bonus di competenza.",
+        "uses": {
+          "amount": "prof_bonus",
+          "recharge": "long_rest"
+        },
+        "innate_spells": null
       }
     ],
-    "subraces": [
-      {
-        "name": "Aasimar Protettore",
-        "name_en": "Protector Aasimar",
-        "ability_score_increase": {
-          "Saggezza": 1
-        },
-        "asi_text": "+1 Saggezza",
-        "description": "Gli aasimar protettori sono incaricati dai poteri del bene di proteggere i deboli, sconfiggere il male e sostenere le cause della giustizia. Al 3 livello sviluppano un'anima radiosa che li benedice con due ali spettrali e capacita' radiose.",
-        "traits": [
-          {
-            "name": "Anima Radiosa",
-            "name_en": "Radiant Soul",
-            "description": "A partire dal 3 livello, puoi usare la tua azione per scatenare l'energia divina dentro di te, facendo emergere ali spettrali dalla tua schiena. Per 1 minuto, ottieni una velocita' di volo di 9 metri e una volta in ogni tuo turno puoi infliggere danni radiosi extra a un bersaglio quando gli infliggi danni con un attacco o un incantesimo. I danni extra sono pari al tuo livello. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
-            "uses": {
-              "amount": 1,
-              "recharge": "long_rest"
-            },
-            "innate_spells": null
-          }
-        ]
-      },
-      {
-        "name": "Aasimar Sferzante",
-        "name_en": "Scourge Aasimar",
-        "ability_score_increase": {
-          "Costituzione": 1
-        },
-        "asi_text": "+1 Costituzione",
-        "description": "Gli aasimar sferzanti sono mossi da un fuoco interiore che desidera bruciare il male. Quel fuoco e' difficile da controllare e gli appiccia letteralmente fuoco quando viene scatenato.",
-        "traits": [
-          {
-            "name": "Consumo Radioso",
-            "name_en": "Radiant Consumption",
-            "description": "A partire dal 3 livello, puoi usare la tua azione per scatenare l'energia divina dentro di te, facendola fluttuare sulla tua pelle. Per 1 minuto, emani luce intensa in un raggio di 3 metri e luce fioca per ulteriori 3 metri. Inoltre, alla fine di ognuno dei tuoi turni, tu e ogni creatura entro 3 metri da te subite danni radiosi pari a meta' del tuo livello (arrotondato per eccesso). Inoltre, una volta in ogni tuo turno, quando infliggi danni a un bersaglio con un attacco o incantesimo, puoi infliggere danni radiosi extra al bersaglio pari al tuo livello. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
-            "uses": {
-              "amount": 1,
-              "recharge": "long_rest"
-            },
-            "innate_spells": null
-          }
-        ]
-      },
-      {
-        "name": "Aasimar Caduto",
-        "name_en": "Fallen Aasimar",
-        "ability_score_increase": {
-          "Forza": 1
-        },
-        "asi_text": "+1 Forza",
-        "description": "Un aasimar che era stato toccato dall'oscurita' nei primi anni di vita o ha rinunciato all'influenza del suo guida diventa uno degli abbattuti, segnati da grigia, oscurita' tra le forze del male.",
-        "traits": [
-          {
-            "name": "Anima Necrotica",
-            "name_en": "Necrotic Shroud",
-            "description": "A partire dal 3 livello, puoi usare la tua azione per scatenare l'energia divina dentro di te, facendoti apparire un'aura terrificante. Per 1 minuto, le creature che possono vederti entro 3 metri devono effettuare un tiro salvezza su Carisma (CD 8 + bonus competenza + mod Carisma) o essere spaventate fino alla fine del minuto. Inoltre, una volta in ogni tuo turno, quando infliggi danni a un bersaglio con un attacco o incantesimo, puoi infliggere danni necrotici extra al bersaglio pari al tuo livello. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
-            "uses": {
-              "amount": 1,
-              "recharge": "long_rest"
-            },
-            "innate_spells": null
-          }
-        ]
-      }
-    ]
+    "subraces": []
   },
   "Firbolg": {
     "name_en": "Firbolg",

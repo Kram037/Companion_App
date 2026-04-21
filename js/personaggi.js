@@ -6166,7 +6166,6 @@ async function handleSavePersonaggio(e) {
         talenti: pgCurrentTalenti,
         resistenze: pgCurrentResistenze,
         immunita: pgCurrentImmunita,
-        linguaggi: autoPopulateLinguaggi(document.getElementById('pgRazza').value, document.getElementById('pgSottorazza').value),
         equipaggiamento: pgSelectedEquipment.map(e => {
             if (e.tipo === 'arma') {
                 const forza = clamp(parseInt(document.getElementById('pgForza').value) || 10, 1, 30);
@@ -6193,6 +6192,43 @@ async function handleSavePersonaggio(e) {
     if (!pgData.nome) {
         showNotification('Inserisci un nome per il personaggio');
         return;
+    }
+
+    // Auto-popola dati derivati da razza/background SOLO IN CREAZIONE: in
+    // modifica non li tocchiamo per non sovrascrivere quanto l'utente ha
+    // gia' personalizzato in scheda (lingue aggiunte, strumenti, oggetti,
+    // monete spese). Cosi' i background del dataset locale spingono
+    // direttamente al PG strumenti, linguaggi specifici, oggetti iniziali e
+    // oro di partenza.
+    if (!editingPersonaggioId) {
+        const _razzaVal = document.getElementById('pgRazza').value || '';
+        const _sottoVal = document.getElementById('pgSottorazza').value || '';
+        pgData.linguaggi = autoPopulateLinguaggi(_razzaVal, _sottoVal);
+
+        const _bgVal = document.getElementById('pgBackground').value || '';
+        const _bgData = _bgVal ? getBackgroundData(_bgVal) : null;
+        if (_bgData) {
+            const _bgTools = (_bgData.competenze_strumenti || [])
+                .map(t => ({ nome: t, maestria: false }));
+            if (_bgTools.length > 0) pgData.competenze_strumenti = _bgTools;
+            if (_bgData.linguaggi_specifici && _bgData.linguaggi_specifici.length > 0) {
+                pgData.linguaggi = Array.from(new Set([
+                    ...(pgData.linguaggi || []),
+                    ..._bgData.linguaggi_specifici,
+                ]));
+            }
+            if (_bgData.equipaggiamento_iniziale && _bgData.equipaggiamento_iniziale.length > 0) {
+                pgData.inventario = _bgData.equipaggiamento_iniziale.map(name => ({
+                    nome: name,
+                    descrizione: 'Equipaggiamento iniziale del background',
+                    quantita: 1,
+                    magico: false,
+                }));
+            }
+            if (_bgData.oro_iniziale) {
+                pgData.monete = { mr: 0, ma: 0, me: 0, mo: _bgData.oro_iniziale, mp: 0 };
+            }
+        }
     }
 
     // Helper: alcune colonne (es. 'sottorazza') potrebbero non esistere

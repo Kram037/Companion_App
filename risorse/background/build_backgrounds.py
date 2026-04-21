@@ -53,6 +53,32 @@ def _slug(name: str) -> str:
     return s
 
 
+# Mappa nomi "comuni" degli strumenti -> nomi canonici usati dal client
+# (cfr. DND_COMPETENZE_STRUMENTI_GROUPED in js/personaggi.js). Senza questa
+# normalizzazione il raggruppamento "Linguaggi e Competenze" della scheda
+# (_toolsByGroup) non riconoscerebbe gli strumenti auto-popolati dai
+# background e li ometterebbe dal pannello.
+_TOOL_NAME_MAP = {
+    "attrezzi da scasso": "Arnesi da Scasso",
+    "kit da scasso": "Arnesi da Scasso",
+    "kit da avvelenatore": "Sostanze da Avvelenatore",
+    "kit da travestimento": "Trucchi per il Camuffamento",
+    "kit da falsificatore": "Arnesi da Falsario",
+    "kit da erborista": "Borsa da Erborista",
+    "strumenti da navigatore": "Strumenti da Navigatore",
+    "veicoli (terrestri)": "Veicoli Terrestri",
+    "veicoli terrestri": "Veicoli Terrestri",
+    "veicoli (acquatici)": "Veicoli Acquatici",
+    "veicoli acquatici": "Veicoli Acquatici",
+}
+
+
+def _norm_tool(t: str) -> str:
+    if not t:
+        return t
+    return _TOOL_NAME_MAP.get(t.strip().lower(), t)
+
+
 def _bg(name, name_en, source, *,
         skills=None, tools=None,
         langs_specific=None, langs_choice=0,
@@ -66,7 +92,7 @@ def _bg(name, name_en, source, *,
         "name_en": name_en,
         "source_short": source,
         "skill_proficiencies": list(skills or []),
-        "tool_proficiencies": list(tools or []),
+        "tool_proficiencies": [_norm_tool(t) for t in (tools or [])],
         "languages_specific": list(langs_specific or []),
         "languages_choice": int(langs_choice or 0),
         "skill_choices_text": skills_text,
@@ -875,8 +901,7 @@ BACKGROUNDS.append(_bg(
 BACKGROUNDS.append(_bg(
     "Sorridente", "Grinner", "EGtW",
     skills=["inganno", "intrattenere"],
-    tools=["Strumento musicale"],
-    tools_text="Uno strumento musicale + kit da travestimento o falsificatore (a scelta).",
+    tools_text="Uno strumento musicale a scelta + kit da travestimento o falsificatore (a scelta).",
     langs_specific=["Linguaggio dei Sorridenti"],
     langs_text="Linguaggio dei Sorridenti.",
     equipment=[
