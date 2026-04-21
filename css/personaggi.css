@@ -1336,58 +1336,6 @@
 .spell-pick-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
 .spell-pick-meta { font-size: 0.72rem; color: var(--text-light); margin-top: 1px; }
 
-/* ── Selettore lingua incantesimi ── */
-.spell-lang-switcher {
-    display: inline-flex;
-    align-items: center;
-    gap: 0;
-    margin: 8px 0 14px;
-    padding: 3px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-}
-.spell-lang-btn {
-    appearance: none;
-    border: 0;
-    background: transparent;
-    color: var(--text-light);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 5px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    min-width: 38px;
-}
-.spell-lang-btn:hover { color: var(--text); }
-.spell-lang-btn.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 1px 4px rgba(var(--accent-rgb), 0.35);
-}
-
-/* Pulsante toggle lingua dentro la modal di dettaglio */
-.spell-lang-toggle {
-    position: absolute;
-    top: 12px;
-    right: 44px;
-    appearance: none;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--accent);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 999px;
-    cursor: pointer;
-    line-height: 1.2;
-    transition: background 0.15s;
-}
-.spell-lang-toggle:hover { background: var(--surface-hover); }
-
 /* ──────────────────────────────────────────────
    Privilegi (Tab Privilegi della scheda PG)
    ────────────────────────────────────────────── */

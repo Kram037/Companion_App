@@ -42,6 +42,8 @@ async function init() {
         cancelEditUserNameBtn: document.getElementById('cancelEditUserNameBtn'),
         themeLight: document.getElementById('themeLight'),
         themeDark: document.getElementById('themeDark'),
+        langIt: document.getElementById('langIt'),
+        langEn: document.getElementById('langEn'),
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
@@ -362,6 +364,22 @@ function setupEventListeners() {
             setTheme('dark');
         };
     }
+
+    if (elements.langIt) {
+        elements.langIt.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setAppLang('it');
+        };
+    }
+    if (elements.langEn) {
+        elements.langEn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setAppLang('en');
+        };
+    }
+    if (typeof loadAppLang === 'function') loadAppLang();
 
     // Login form submission
     if (elements.loginForm) {

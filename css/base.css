@@ -634,6 +634,10 @@ body.user-logged-in .header-username {
     .theme-btn span { font-size: 0.72rem; }
     .theme-preview { width: 40px; height: 28px; }
 
+    .lang-selector { gap: 4px; }
+    .lang-btn { padding: 4px 8px; font-size: 0.78rem; gap: 4px; }
+    .lang-btn .lang-flag { min-width: 24px; height: 18px; font-size: 0.65rem; }
+
     .icon-selector-container { gap: var(--spacing-sm) !important; }
     .icon-preview-large { width: 72px !important; height: 72px !important; }
     .icon-preview-large svg { width: 40px !important; height: 40px !important; }

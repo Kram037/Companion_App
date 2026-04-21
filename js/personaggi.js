@@ -1950,20 +1950,12 @@ window.schedaOpenSpellPage = async function(pgId) {
     window._schedaCurrentPgId = pgId;
     window._schedaCurrentTab = 'incantesimi';
 
-    const lang = _spellLang();
-    const langSwitcherHtml = `
-    <div class="spell-lang-switcher" role="tablist" aria-label="Lingua incantesimi">
-        <button class="spell-lang-btn ${lang === 'it' ? 'active' : ''}" onclick="schedaSetSpellLang('it')">IT</button>
-        <button class="spell-lang-btn ${lang === 'en' ? 'active' : ''}" onclick="schedaSetSpellLang('en')">EN</button>
-    </div>`;
-
     content.innerHTML = `
     <div class="scheda-identity">
         <div class="scheda-name">${escapeHtml(pg.nome)}</div>
         <div class="scheda-subtitle">${escapeHtml(classeDisplay)}</div>
         <div class="scheda-subtitle-sm">${[pg.razza, pg.background].filter(Boolean).map(s => escapeHtml(s)).join(' · ')}</div>
     </div>
-    ${langSwitcherHtml}
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
         <div class="scheda-section-body">${spellStatsHtml}</div>
@@ -2000,13 +1992,11 @@ window.schedaToggleSection = function(titleEl) {
 /* ── Spells / Trucchetti ── */
 function _spellsData() { return window.SPELLS_DATA || {}; }
 
-/** Lingua corrente per la visualizzazione degli incantesimi: 'it' | 'en' */
+/** Lingua corrente per i contenuti tradotti (incantesimi/privilegi): 'it' | 'en'.
+ *  Centralizzata: leggi sempre da window.getAppLang() (impostazione globale dell'app). */
 function _spellLang() {
-    try { return localStorage.getItem('spellLang') === 'en' ? 'en' : 'it'; }
+    try { return (typeof getAppLang === 'function' ? getAppLang() : 'it'); }
     catch { return 'it'; }
-}
-function _setSpellLang(lang) {
-    try { localStorage.setItem('spellLang', lang === 'en' ? 'en' : 'it'); } catch {}
 }
 
 /** Estrae il campo localizzato di un incantesimo, con fallback all'altra lingua. */
@@ -2132,10 +2122,8 @@ window.schedaShowSpellDetail = function(spellName) {
         const lbl = lang === 'en'
             ? { time: 'Casting Time', range: 'Range', comp: 'Components', dur: 'Duration' }
             : { time: 'Tempo', range: 'Gittata', comp: 'Componenti', dur: 'Durata' };
-        const otherLang = lang === 'en' ? 'IT' : 'EN';
         return `<div class="hp-calc-modal spell-detail-modal">
             <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-            <button class="spell-lang-toggle" onclick="schedaToggleSpellLang(this)" title="Cambia lingua">${otherLang}</button>
             <h3 class="spell-detail-name">${escapeHtml(_spellField(sp, 'name'))}</h3>
             <div class="spell-detail-sub">${lvlText} · ${escapeHtml(_spellField(sp, 'school'))}</div>
             <div class="spell-detail-meta">
@@ -2154,24 +2142,23 @@ window.schedaShowSpellDetail = function(spellName) {
     document.body.appendChild(overlay);
 };
 
-window.schedaToggleSpellLang = function(el) {
-    const next = _spellLang() === 'en' ? 'it' : 'en';
-    _setSpellLang(next);
-    const overlay = el.closest('.hp-calc-overlay');
-    if (overlay && typeof overlay._rerender === 'function') overlay._rerender();
-    if (typeof window._schedaCurrentPgId === 'string' && window._schedaCurrentTab === 'incantesimi') {
-        schedaOpenSpellPage(window._schedaCurrentPgId);
+// Re-render automatico della pagina corrente quando l'utente cambia la lingua
+// dell'app dalle Impostazioni (evento globale `appLangChanged`).
+document.addEventListener('appLangChanged', () => {
+    // Rerenderizza eventuali overlay di dettaglio incantesimo aperti.
+    document.querySelectorAll('.hp-calc-overlay').forEach(ov => {
+        if (typeof ov._rerender === 'function') ov._rerender();
+    });
+    // Rerenderizza la tab corrente della scheda personaggio se rilevante.
+    const pgId = window._schedaCurrentPgId;
+    if (typeof pgId !== 'string') return;
+    const tab = window._schedaCurrentTab;
+    if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
+        schedaOpenSpellPage(pgId);
+    } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
+        schedaOpenPrivilegesPage(pgId);
     }
-};
-
-window.schedaSetSpellLang = function(lang) {
-    if (lang !== 'it' && lang !== 'en') return;
-    if (_spellLang() === lang) return;
-    _setSpellLang(lang);
-    if (typeof window._schedaCurrentPgId === 'string' && window._schedaCurrentTab === 'incantesimi') {
-        schedaOpenSpellPage(window._schedaCurrentPgId);
-    }
-};
+});
 
 window.schedaOpenSpellPicker = function(pgId, level) {
     const pg = _schedaPgCache;
@@ -2571,6 +2558,14 @@ function _normalizePrivilegi(pg) {
     };
 }
 
+/** Sceglie il nome localizzato (IT/EN) di una classe/sottoclasse in base alla lingua corrente. */
+function _localizedClassName(entry) {
+    if (!entry) return '';
+    const lang = _spellLang();
+    if (lang === 'en') return entry.name_en || entry.name || '';
+    return entry.name || entry.name_en || '';
+}
+
 function _autoFeaturesForClass(clsEntry, pgClassLevel) {
     const cls = _getClassData(clsEntry.nome);
     if (!cls) return { className: clsEntry.nome, features: [], subclassName: null, subFeatures: [] };
@@ -2579,7 +2574,7 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
         .filter(f => !f.level || f.level <= lvl)
         .map(f => ({
             source: cls.slug,
-            source_label: cls.name || cls.name_en,
+            source_label: _localizedClassName(cls),
             name_en: f.name_en,
             name: f.name || f.name_en,
             level: f.level,
@@ -2587,13 +2582,12 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
             description_en: f.description_en || '',
             translated: !!f.translated,
         }));
-    // sottoclasse: usiamo quella scelta dal giocatore (clsEntry.sottoclasseSlug)
     let subclassName = null;
     let subFeatures = [];
     if (cls.subclasses && cls.subclasses.length > 0 && clsEntry.sottoclasseSlug) {
         const sub = cls.subclasses.find(s => s.slug === clsEntry.sottoclasseSlug);
         if (sub) {
-            subclassName = sub.name || sub.name_en;
+            subclassName = _localizedClassName(sub);
             subFeatures = (sub.features || [])
                 .filter(f => !f.level || f.level <= lvl)
                 .map(f => ({
@@ -2608,7 +2602,22 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
                 }));
         }
     }
-    return { className: cls.name || cls.name_en, features, subclassName, subFeatures };
+    return { className: _localizedClassName(cls), features, subclassName, subFeatures };
+}
+
+/** Estrae nome/descrizione localizzati di un privilegio (auto o custom) in base alla lingua corrente. */
+function _privFeatField(f, key) {
+    if (!f) return '';
+    const lang = _spellLang();
+    if (key === 'name') {
+        if (lang === 'en') return f.name_en || f.name || '';
+        return f.name || f.name_en || '';
+    }
+    if (key === 'description') {
+        if (lang === 'en') return f.description_en || f.description || '';
+        return f.description || f.description_en || '';
+    }
+    return '';
 }
 
 function _privFeatureKey(source, nameEn) {
@@ -2618,12 +2627,16 @@ function _privFeatureKey(source, nameEn) {
 function _renderPrivFeatureRow(f, opts = {}) {
     const isHidden = !!opts.hidden;
     const isCustom = !!opts.custom;
-    const desc = (f.description || f.description_en || '').trim();
+    const name = _privFeatField(f, 'name');
+    const desc = _privFeatField(f, 'description').trim();
     const hasDesc = desc.length > 0;
     const lvlBadge = f.level
         ? `<span class="priv-feat-level">Lv ${f.level}</span>`
         : `<span class="priv-feat-level priv-feat-level-empty">—</span>`;
-    const langWarn = (!f.translated && !isCustom && f.description_en && !f.description)
+    // Mostra il badge "EN" solo quando la lingua corrente e' italiano ma esiste solo la versione inglese.
+    const lang = _spellLang();
+    const showEnWarn = lang === 'it' && !f.translated && !isCustom && f.description_en && !f.description;
+    const langWarn = showEnWarn
         ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
         : '';
     const actionBtn = isCustom
@@ -2634,7 +2647,7 @@ function _renderPrivFeatureRow(f, opts = {}) {
     return `<div class="priv-feat-row${isHidden ? ' priv-feat-row-hidden' : ''}">
         <div class="${headerClass}" ${onclick}>
             ${lvlBadge}
-            <span class="priv-feat-name">${escapeHtml(f.name)}${langWarn}</span>
+            <span class="priv-feat-name">${escapeHtml(name)}${langWarn}</span>
             ${hasDesc ? '<span class="priv-feat-arrow">▾</span>' : ''}
             ${actionBtn}
         </div>
@@ -2688,6 +2701,9 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
     if (!pg) return;
     _schedaPgCache = pg;
+
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'privilegi';
 
     const priv = _normalizePrivilegi(pg);
     const classi = pg.classi || [];

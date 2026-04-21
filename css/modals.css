@@ -457,6 +457,52 @@
 
 .theme-btn span { font-size: 0.78rem; color: var(--text-secondary); font-weight: 500; }
 
+.lang-selector { display: flex; gap: 6px; }
+
+.lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.lang-btn:hover { border-color: var(--accent-light); }
+
+.lang-btn.active {
+    border-color: var(--accent);
+    color: var(--text);
+}
+
+.lang-btn .lang-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 22px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text);
+}
+
+.lang-btn.active .lang-flag {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
 .theme-preview {
     width: 52px; height: 36px;
     border-radius: 4px;
