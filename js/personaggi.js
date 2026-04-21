@@ -986,14 +986,14 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
     overlay.id = 'customSelectOverlay';
     overlay.className = 'custom-select-overlay';
     overlay.innerHTML = `
-        <div class="custom-select-panel">
+        <div class="custom-select-panel razza-picker-panel">
             <div class="custom-select-header">
                 <span>${escapeHtml(title || 'Seleziona')}</span>
                 <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
             </div>
             <div class="razza-picker-body">
                 <div class="spell-picker-search-row">
-                    <input type="text" id="razzaPickerSearch" class="form-control spell-picker-search" placeholder="Cerca per nome..." autocomplete="off">
+                    <input type="text" id="razzaPickerSearch" class="hp-calc-input spell-picker-search" placeholder="Cerca per nome..." autocomplete="off">
                     ${hideFilters ? '' : `<button type="button" class="spell-picker-filter-btn" id="razzaPickerFilterBtn" title="Filtri">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                         <span class="spell-picker-filter-badge" id="razzaPickerFilterBadge" style="display:none;">0</span>

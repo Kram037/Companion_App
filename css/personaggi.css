@@ -1888,8 +1888,20 @@
 .scheda-innate-lvl { color: var(--text-muted); font-weight: 600; margin-left: 2px; }
 
 /* Picker razza/sottorazza con search + filtro fonte */
+/* Pannello dedicato piu' largo per ospitare bene chip dei filtri e voci */
+.custom-select-panel.razza-picker-panel {
+    width: 460px;
+    max-width: calc(100vw - 32px);
+    max-height: 82vh;
+}
 .razza-picker-body { display: flex; flex-direction: column; gap: 0; padding: 10px 12px 12px; flex: 1; min-height: 0; }
-.razza-picker-body .custom-select-list { padding: 0; }
+.razza-picker-body .custom-select-list {
+    padding: 0;
+    flex: 1;
+    min-height: 0;
+    max-height: 56vh;
+    overflow-y: auto;
+}
 .razza-picker-body .custom-select-item {
     display: flex;
     align-items: center;
@@ -1908,6 +1920,12 @@
 .razza-picker-body .custom-select-item:hover { background: var(--surface-hover); }
 .razza-picker-body .option-source { color: var(--text-muted); font-size: 0.78em; font-weight: 500; opacity: 0.85; margin-left: 8px; flex-shrink: 0; }
 .razza-picker-empty { padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
+/* Pannello filtri all'interno del picker razza: niente scroll interno, si
+   espande quanto basta. Il contenitore esterno gestisce eventuali overflow. */
+.razza-picker-body .spell-filter-panel {
+    max-height: none;
+    overflow: visible;
+}
 
 .spell-detail-modal { width: 360px; max-width: calc(100vw - 32px); max-height: 80vh; overflow-y: auto; text-align: left; padding: 20px 18px; position: relative; }
 .spell-detail-name { font-size: 1.1rem; font-weight: 800; color: var(--accent); margin: 0 0 2px; padding-right: 28px; }
