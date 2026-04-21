@@ -356,8 +356,8 @@
     position: fixed;
     bottom: 90px;
     right: 18px;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--accent);
     color: #fff;
@@ -374,18 +374,20 @@
 }
 .btn-scroll-stats:hover { transform: scale(1.08); }
 .btn-scroll-stats:active { transform: scale(0.94); }
+/* L'icona PNG ha molta area trasparente attorno alla silhouette: la portiamo
+   quasi a riempire il bottone cosi' la spada e' effettivamente visibile. */
 .btn-scroll-stats-icon {
-    width: 26px;
-    height: 26px;
+    width: 38px;
+    height: 38px;
     display: block;
     object-fit: contain;
-    /* Forza l'icona in bianco mantenendo la silhouette PNG (filtro alfa-mask in CSS puro) */
+    /* Forza la silhouette PNG (originariamente nera) in bianco. */
     filter: brightness(0) invert(1);
     pointer-events: none;
 }
 @media (max-width: 480px) {
-    .btn-scroll-stats { width: 38px; height: 38px; bottom: 80px; right: 14px; }
-    .btn-scroll-stats-icon { width: 22px; height: 22px; }
+    .btn-scroll-stats { width: 40px; height: 40px; bottom: 80px; right: 14px; }
+    .btn-scroll-stats-icon { width: 34px; height: 34px; }
 }
 
 /* Sotto-sezioni collapsabili (es. Resistenze/Immunità e Condizioni dentro Statistiche) */
