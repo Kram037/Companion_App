@@ -1707,24 +1707,27 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PV Temp</div>
                     </div>
                 </div>
-                <div class="scheda-subsection">
+                <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
-                        <span>Resistenze e Immunità</span>
+                        <span>Resistenze, Immunità e Vulnerabilità</span>
                         <span class="scheda-subsection-meta" id="sResImmCount">${resImmCount > 0 ? resImmCount : ''}</span>
                         <span class="scheda-subsection-arrow">▾</span>
                     </div>
                     <div class="scheda-subsection-body">${resImmInlineHtml}</div>
                 </div>
-                <div class="scheda-subsection">
+                <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Condizioni</span>
                         <span class="scheda-subsection-meta">${conditionsActive.length > 0 ? conditionsActive.length : ''}${isConcentrating ? ' • C' : ''}</span>
                         <span class="scheda-subsection-arrow">▾</span>
                     </div>
-                    <div class="scheda-subsection-body">
+                    <!-- Pinned: sempre visibile e interagibile anche con la tendina chiusa -->
+                    <div class="scheda-subsection-pinned">
                         <div class="scheda-concentrazione-row">
-                            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
+                            <button type="button" class="scheda-concentrazione-btn ${isConcentrating ? 'active' : ''}" onclick="event.stopPropagation();schedaToggleConcentrazione('${pg.id}',this)">Concentrazione</button>
                         </div>
+                    </div>
+                    <div class="scheda-subsection-body">
                         <div class="scheda-tags" style="margin-top:8px;">${conditionsHtml}</div>
                         <div class="scheda-condition-extra">
                             <span>Esaustione: <strong>${pg.esaustione || 0}</strong>/6</span>

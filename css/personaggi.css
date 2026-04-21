@@ -350,14 +350,14 @@
 .scheda-divider::before { left: 18%; }
 .scheda-divider::after { right: 18%; }
 
-/* Bottone "Vai a Statistiche" (icona spada), in basso a destra come la freccia "torna indietro".
+/* Bottone "Vai a Statistiche" (icona scheda combattimento), in basso a destra.
    La visibilita' e' controllata via style.display da updateScrollStatsBtn() in navigation.js. */
 .btn-scroll-stats {
     position: fixed;
     bottom: 90px;
     right: 18px;
-    width: 52px;
-    height: 52px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background: var(--accent);
     color: #fff;
@@ -370,13 +370,22 @@
     transition: transform 0.15s, opacity 0.15s, background 0.15s;
     -webkit-tap-highlight-color: transparent;
     padding: 0;
+    overflow: hidden;
 }
-.btn-scroll-stats:hover { transform: scale(1.06); }
-.btn-scroll-stats:active { transform: scale(0.96); }
-.btn-scroll-stats svg { width: 26px; height: 26px; display: block; }
+.btn-scroll-stats:hover { transform: scale(1.08); }
+.btn-scroll-stats:active { transform: scale(0.94); }
+.btn-scroll-stats-icon {
+    width: 26px;
+    height: 26px;
+    display: block;
+    object-fit: contain;
+    /* Forza l'icona in bianco mantenendo la silhouette PNG (filtro alfa-mask in CSS puro) */
+    filter: brightness(0) invert(1);
+    pointer-events: none;
+}
 @media (max-width: 480px) {
-    .btn-scroll-stats { width: 46px; height: 46px; bottom: 80px; right: 14px; }
-    .btn-scroll-stats svg { width: 22px; height: 22px; }
+    .btn-scroll-stats { width: 38px; height: 38px; bottom: 80px; right: 14px; }
+    .btn-scroll-stats-icon { width: 22px; height: 22px; }
 }
 
 /* Sotto-sezioni collapsabili (es. Resistenze/Immunità e Condizioni dentro Statistiche) */
@@ -412,6 +421,8 @@
 .scheda-subsection.collapsed .scheda-subsection-arrow { transform: rotate(-90deg); }
 .scheda-subsection-body { padding-top: 6px; }
 .scheda-subsection.collapsed .scheda-subsection-body { display: none; }
+/* Contenuto "pinned": resta visibile anche quando la subsection e' collassata */
+.scheda-subsection-pinned { padding-top: 6px; }
 
 /* Resistenze e Immunità inline (stile abilità con due segnalini ●/★) */
 .scheda-resimm-grid {
