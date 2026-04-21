@@ -619,10 +619,19 @@ function pgResetAutoHP() {
     pgRenderDadiVita();
 }
 
-const THIRD_CASTER_SUBCLASSES = {
-    'Guerriero': 'Cavaliere Mistico',
-    'Ladro': 'Mistificatore Arcano'
-};
+// Sottoclassi "third caster" (1/3 incantatore): l'attributo thirdCaster
+// di una classe del PG viene derivato automaticamente quando il giocatore
+// seleziona una di queste sottoclassi nel dropdown.
+const THIRD_CASTER_SUBCLASS_KEYS = new Set([
+    'eldritch-knight', 'arcane-trickster',
+    'eldritch knight', 'arcane trickster',
+    'cavaliere mistico', 'mistificatore arcano',
+]);
+
+function isThirdCasterSubclass(slug, name) {
+    return THIRD_CASTER_SUBCLASS_KEYS.has(String(slug || '').toLowerCase()) ||
+           THIRD_CASTER_SUBCLASS_KEYS.has(String(name || '').toLowerCase());
+}
 
 // Restituisce le sottoclassi disponibili nei dati per una data classe (per nome IT/EN)
 function pgGetSubclassOptions(className) {
@@ -664,12 +673,6 @@ function pgRenderClassi() {
     const container = document.getElementById('pgClassiList');
     if (!container) return;
     const chipsHtml = pgSelectedClasses.map((c, i) => {
-        const subLabel = THIRD_CASTER_SUBCLASSES[c.nome];
-        const subCheck = subLabel ? `
-            <label class="pg-subclass-check">
-                <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="pgToggleThirdCaster(${i}, this.checked)">
-                <span>${subLabel}</span>
-            </label>` : '';
         const subSelector = _renderSubclassSelector(c, i, 'pgOpenSubclassDropdown');
         return `
         <div class="pg-classe-chip">
@@ -684,7 +687,6 @@ function pgRenderClassi() {
                 <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
             </div>
             ${subSelector}
-            ${subCheck}
         </div>`;
     }).join('');
 
@@ -713,14 +715,17 @@ window.pgOpenSubclassDropdown = function(index) {
         if (value === '__none__') {
             delete c.sottoclasse;
             delete c.sottoclasseSlug;
+            c.thirdCaster = false;
         } else {
             const sel = opts.find(o => o.slug === value);
             if (sel) {
                 c.sottoclasse = sel.name;
                 c.sottoclasseSlug = sel.slug;
+                c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
             }
         }
         pgRenderClassi();
+        pgResetAutoHP();
     }, `Sottoclasse di ${c.nome}`);
 };
 
@@ -729,7 +734,9 @@ window.pgClearSubclass = function(index) {
     if (!c) return;
     delete c.sottoclasse;
     delete c.sottoclasseSlug;
+    c.thirdCaster = false;
     pgRenderClassi();
+    pgResetAutoHP();
 };
 
 window.pgClassLevelChange = function(index, delta) {
@@ -738,11 +745,6 @@ window.pgClassLevelChange = function(index, delta) {
     c.livello = Math.max(1, Math.min(20, c.livello + delta));
     pgRenderClassi();
     pgUpdateTotalLevel();
-    pgResetAutoHP();
-}
-
-window.pgToggleThirdCaster = function(index, checked) {
-    pgSelectedClasses[index].thirdCaster = checked;
     pgResetAutoHP();
 }
 
@@ -4536,12 +4538,6 @@ function microRenderClassi() {
     const container = document.getElementById('microClassiList');
     if (!container) return;
     const chipsHtml = _microSelectedClasses.map((c, i) => {
-        const subLabel = THIRD_CASTER_SUBCLASSES[c.nome];
-        const subCheck = subLabel ? `
-            <label class="pg-subclass-check">
-                <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="microToggleThirdCaster(${i}, this.checked)">
-                <span>${subLabel}</span>
-            </label>` : '';
         const subSelector = _renderSubclassSelector(c, i, 'microOpenSubclassDropdown');
         return `
         <div class="pg-classe-chip">
@@ -4556,7 +4552,6 @@ function microRenderClassi() {
                 <button type="button" class="pg-classe-remove" onclick="microRemoveClass(${i})">&times;</button>
             </div>
             ${subSelector}
-            ${subCheck}
         </div>`;
     }).join('');
 
@@ -4586,11 +4581,13 @@ window.microOpenSubclassDropdown = function(index) {
         if (value === '__none__') {
             delete c.sottoclasse;
             delete c.sottoclasseSlug;
+            c.thirdCaster = false;
         } else {
             const sel = opts.find(o => o.slug === value);
             if (sel) {
                 c.sottoclasse = sel.name;
                 c.sottoclasseSlug = sel.slug;
+                c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
             }
         }
         microRenderClassi();
@@ -4602,6 +4599,7 @@ window.microClearSubclass = function(index) {
     if (!c) return;
     delete c.sottoclasse;
     delete c.sottoclasseSlug;
+    c.thirdCaster = false;
     microRenderClassi();
 };
 
@@ -4630,10 +4628,6 @@ window.microClassLevelChange = function(i, delta) {
     if (!c) return;
     c.livello = Math.max(1, Math.min(20, c.livello + delta));
     microRenderClassi();
-};
-
-window.microToggleThirdCaster = function(index, checked) {
-    _microSelectedClasses[index].thirdCaster = checked;
 };
 
 window.openMicroSchedaModal = function(personaggioId) {

@@ -327,22 +327,25 @@
 .scheda-res-imm-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); min-width: 70px; padding-top: 2px; }
 .scheda-condition-extra { margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary); }
 
-/* Scheda Tab Bar - compatta, integra il back button */
+/* Scheda Tab Bar - compatta, lascia spazio al back button floating a sinistra */
 .scheda-tab-bar {
     position: fixed;
     bottom: 68px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 70px;
+    right: 14px;
     display: flex;
     align-items: stretch;
+    justify-content: center;
     gap: 0;
-    max-width: calc(100vw - 16px);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     overflow: hidden;
     z-index: 50;
     box-shadow: var(--shadow-md);
+    width: fit-content;
+    max-width: calc(100vw - 84px);
+    margin: 0 auto;
 }
 .page:not(.active) .back-button-floating,
 .page:not(.active) .scheda-tab-bar,
@@ -363,23 +366,12 @@
 .scheda-tab.active { background: var(--accent); color: white; }
 .scheda-tab:not(.active):hover { background: var(--surface-hover); }
 
-.scheda-tab-back {
-    padding: 0 12px;
-    color: var(--text-light);
-    border-right: 1px solid var(--border);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+@media (max-width: 480px) {
+    .scheda-tab-bar { left: 60px; right: 10px; max-width: calc(100vw - 70px); }
+    .scheda-tab { padding: 8px 10px; font-size: 0.72rem; letter-spacing: -0.01em; }
 }
-.scheda-tab-back:hover { background: var(--surface-hover); color: var(--accent); }
-.scheda-tab-back svg { width: 16px; height: 16px; }
-
-@media (max-width: 420px) {
-    .scheda-tab { padding: 8px 9px; font-size: 0.72rem; letter-spacing: -0.01em; }
-    .scheda-tab-back { padding: 0 9px; }
-    .scheda-tab-back svg { width: 15px; height: 15px; }
-}
-@media (max-width: 360px) {
+@media (max-width: 380px) {
+    .scheda-tab-bar { left: 56px; right: 8px; max-width: calc(100vw - 64px); }
     .scheda-tab { padding: 7px 7px; font-size: 0.68rem; }
 }
 
@@ -774,28 +766,6 @@
     align-items: center;
     gap: var(--spacing-xs);
     width: 100%;
-}
-
-.pg-subclass-check {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding-left: 2px;
-    flex-wrap: nowrap;
-    margin-top: 4px;
-}
-
-.pg-subclass-check input[type="checkbox"] {
-    accent-color: var(--accent);
-    flex-shrink: 0;
-}
-
-.pg-subclass-check span {
-    font-style: italic;
-    white-space: nowrap;
 }
 
 /* Selettore di sottoclasse nel form di creazione PG */
