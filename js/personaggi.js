@@ -624,6 +624,42 @@ const THIRD_CASTER_SUBCLASSES = {
     'Ladro': 'Mistificatore Arcano'
 };
 
+// Restituisce le sottoclassi disponibili nei dati per una data classe (per nome IT/EN)
+function pgGetSubclassOptions(className) {
+    const data = window.CLASSES_DATA || [];
+    const cls = data.find(c =>
+        (c.name || '').toLowerCase() === String(className).toLowerCase() ||
+        (c.name_en || '').toLowerCase() === String(className).toLowerCase() ||
+        (c.slug || '').toLowerCase() === String(className).toLowerCase()
+    );
+    if (!cls || !Array.isArray(cls.subclasses)) return [];
+    return cls.subclasses.map(s => {
+        const lvls = (s.features || []).map(f => f.level || 99);
+        const minLevel = lvls.length ? Math.min(...lvls) : 3;
+        return {
+            slug: s.slug,
+            name: s.name || s.name_en,
+            minLevel: minLevel || 3,
+        };
+    });
+}
+
+function _renderSubclassSelector(c, index, onclickFn) {
+    const opts = pgGetSubclassOptions(c.nome);
+    if (opts.length === 0) return '';
+    const label = c.sottoclasse
+        ? escapeHtml(c.sottoclasse)
+        : '<span class="pg-subclass-trigger-empty">Sottoclasse…</span>';
+    const clearBtn = c.sottoclasse
+        ? `<button type="button" class="pg-subclass-clear" onclick="event.stopPropagation();${onclickFn.replace('pgOpenSubclassDropdown','pgClearSubclass').replace('microOpenSubclassDropdown','microClearSubclass')}(${index})" title="Rimuovi sottoclasse">×</button>`
+        : '';
+    return `
+        <button type="button" class="pg-subclass-trigger" onclick="${onclickFn}(${index})">
+            ${label}
+            ${clearBtn}
+        </button>`;
+}
+
 function pgRenderClassi() {
     const container = document.getElementById('pgClassiList');
     if (!container) return;
@@ -634,6 +670,7 @@ function pgRenderClassi() {
                 <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="pgToggleThirdCaster(${i}, this.checked)">
                 <span>${subLabel}</span>
             </label>` : '';
+        const subSelector = _renderSubclassSelector(c, i, 'pgOpenSubclassDropdown');
         return `
         <div class="pg-classe-chip">
             <div class="pg-classe-chip-top">
@@ -646,6 +683,7 @@ function pgRenderClassi() {
                 </div>
                 <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
             </div>
+            ${subSelector}
             ${subCheck}
         </div>`;
     }).join('');
@@ -655,6 +693,44 @@ function pgRenderClassi() {
     </button>`;
     container.innerHTML = chipsHtml + addBtn;
 }
+
+window.pgOpenSubclassDropdown = function(index) {
+    const c = pgSelectedClasses[index];
+    if (!c) return;
+    const opts = pgGetSubclassOptions(c.nome);
+    if (opts.length === 0) {
+        showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const items = [
+        { value: '__none__', label: 'Nessuna sottoclasse' },
+        ...opts.map(o => ({
+            value: o.slug,
+            label: o.name + (c.livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : '')
+        }))
+    ];
+    openCustomSelect(items, (value) => {
+        if (value === '__none__') {
+            delete c.sottoclasse;
+            delete c.sottoclasseSlug;
+        } else {
+            const sel = opts.find(o => o.slug === value);
+            if (sel) {
+                c.sottoclasse = sel.name;
+                c.sottoclasseSlug = sel.slug;
+            }
+        }
+        pgRenderClassi();
+    }, `Sottoclasse di ${c.nome}`);
+};
+
+window.pgClearSubclass = function(index) {
+    const c = pgSelectedClasses[index];
+    if (!c) return;
+    delete c.sottoclasse;
+    delete c.sottoclasseSlug;
+    pgRenderClassi();
+};
 
 window.pgClassLevelChange = function(index, delta) {
     const c = pgSelectedClasses[index];
@@ -2509,16 +2585,14 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
             description_en: f.description_en || '',
             translated: !!f.translated,
         }));
-    // sottoclasse: prendiamo la prima (SRD ufficiale) se il PG ha una sottoclasse selezionata o se ha raggiunto il livello in cui si sceglie
+    // sottoclasse: usiamo quella scelta dal giocatore (clsEntry.sottoclasseSlug)
     let subclassName = null;
     let subFeatures = [];
-    if (cls.subclasses && cls.subclasses.length > 0) {
-        const sub = cls.subclasses[0];
-        // Mostriamo solo se il PG ha raggiunto il livello in cui si ottiene una sottoclasse
-        const minSubLevel = Math.min(...(sub.features.map(f => f.level || 99)));
-        if (lvl >= (minSubLevel || 3)) {
+    if (cls.subclasses && cls.subclasses.length > 0 && clsEntry.sottoclasseSlug) {
+        const sub = cls.subclasses.find(s => s.slug === clsEntry.sottoclasseSlug);
+        if (sub) {
             subclassName = sub.name || sub.name_en;
-            subFeatures = sub.features
+            subFeatures = (sub.features || [])
                 .filter(f => !f.level || f.level <= lvl)
                 .map(f => ({
                     source: cls.slug + ':' + sub.slug,
@@ -4118,7 +4192,13 @@ window.openPersonaggioModal = function(personaggioId) {
                     if (bBtn) bBtn.textContent = bgVal || 'Seleziona background...';
 
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
-                        pgSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1, thirdCaster: !!c.thirdCaster }));
+                        pgSelectedClasses = data.classi.map(c => ({
+                            nome: c.nome,
+                            livello: c.livello || 1,
+                            thirdCaster: !!c.thirdCaster,
+                            ...(c.sottoclasse ? { sottoclasse: c.sottoclasse } : {}),
+                            ...(c.sottoclasseSlug ? { sottoclasseSlug: c.sottoclasseSlug } : {}),
+                        }));
                     } else if (data.classe) {
                         pgSelectedClasses = [{ nome: data.classe, livello: data.livello || 1 }];
                     }
@@ -4462,6 +4542,7 @@ function microRenderClassi() {
                 <input type="checkbox" ${c.thirdCaster ? 'checked' : ''} onchange="microToggleThirdCaster(${i}, this.checked)">
                 <span>${subLabel}</span>
             </label>` : '';
+        const subSelector = _renderSubclassSelector(c, i, 'microOpenSubclassDropdown');
         return `
         <div class="pg-classe-chip">
             <div class="pg-classe-chip-top">
@@ -4474,6 +4555,7 @@ function microRenderClassi() {
                 </div>
                 <button type="button" class="pg-classe-remove" onclick="microRemoveClass(${i})">&times;</button>
             </div>
+            ${subSelector}
             ${subCheck}
         </div>`;
     }).join('');
@@ -4484,6 +4566,44 @@ function microRenderClassi() {
     container.innerHTML = chipsHtml + addBtn;
     microUpdateTotalLevel();
 }
+
+window.microOpenSubclassDropdown = function(index) {
+    const c = _microSelectedClasses[index];
+    if (!c) return;
+    const opts = pgGetSubclassOptions(c.nome);
+    if (opts.length === 0) {
+        showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const items = [
+        { value: '__none__', label: 'Nessuna sottoclasse' },
+        ...opts.map(o => ({
+            value: o.slug,
+            label: o.name + (c.livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : '')
+        }))
+    ];
+    openCustomSelect(items, (value) => {
+        if (value === '__none__') {
+            delete c.sottoclasse;
+            delete c.sottoclasseSlug;
+        } else {
+            const sel = opts.find(o => o.slug === value);
+            if (sel) {
+                c.sottoclasse = sel.name;
+                c.sottoclasseSlug = sel.slug;
+            }
+        }
+        microRenderClassi();
+    }, `Sottoclasse di ${c.nome}`);
+};
+
+window.microClearSubclass = function(index) {
+    const c = _microSelectedClasses[index];
+    if (!c) return;
+    delete c.sottoclasse;
+    delete c.sottoclasseSlug;
+    microRenderClassi();
+};
 
 function microUpdateTotalLevel() {
     const total = _microSelectedClasses.reduce((s, c) => s + c.livello, 0);
@@ -4534,7 +4654,13 @@ window.openMicroSchedaModal = function(personaggioId) {
                     document.getElementById('microNome').value = data.nome || '';
                     document.getElementById('microPVMax').value = data.punti_vita_max || 10;
                     if (data.classi && Array.isArray(data.classi) && data.classi.length > 0) {
-                        _microSelectedClasses = data.classi.map(c => ({ nome: c.nome, livello: c.livello || 1, thirdCaster: !!c.thirdCaster }));
+                        _microSelectedClasses = data.classi.map(c => ({
+                            nome: c.nome,
+                            livello: c.livello || 1,
+                            thirdCaster: !!c.thirdCaster,
+                            ...(c.sottoclasse ? { sottoclasse: c.sottoclasse } : {}),
+                            ...(c.sottoclasseSlug ? { sottoclasseSlug: c.sottoclasseSlug } : {}),
+                        }));
                     } else if (data.classe) {
                         _microSelectedClasses = [{ nome: data.classe, livello: data.livello || 1, thirdCaster: false }];
                     }

@@ -327,14 +327,61 @@
 .scheda-res-imm-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); min-width: 70px; padding-top: 2px; }
 .scheda-condition-extra { margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary); }
 
-/* Scheda Tab Bar */
-.scheda-tab-bar { position: fixed; bottom: 68px; left: 50%; transform: translateX(-50%); display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); overflow: hidden; z-index: 50; box-shadow: var(--shadow-md); }
+/* Scheda Tab Bar - compatta, integra il back button */
+.scheda-tab-bar {
+    position: fixed;
+    bottom: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    max-width: calc(100vw - 16px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    z-index: 50;
+    box-shadow: var(--shadow-md);
+}
 .page:not(.active) .back-button-floating,
 .page:not(.active) .scheda-tab-bar,
 .page:not(.active) .combat-toolbar { display: none !important; visibility: hidden !important; }
-.scheda-tab { padding: 10px 20px; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; cursor: pointer; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+
+.scheda-tab {
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    line-height: 1.1;
+}
 .scheda-tab.active { background: var(--accent); color: white; }
 .scheda-tab:not(.active):hover { background: var(--surface-hover); }
+
+.scheda-tab-back {
+    padding: 0 12px;
+    color: var(--text-light);
+    border-right: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.scheda-tab-back:hover { background: var(--surface-hover); color: var(--accent); }
+.scheda-tab-back svg { width: 16px; height: 16px; }
+
+@media (max-width: 420px) {
+    .scheda-tab { padding: 8px 9px; font-size: 0.72rem; letter-spacing: -0.01em; }
+    .scheda-tab-back { padding: 0 9px; }
+    .scheda-tab-back svg { width: 15px; height: 15px; }
+}
+@media (max-width: 360px) {
+    .scheda-tab { padding: 7px 7px; font-size: 0.68rem; }
+}
 
 /* Spell Page */
 .scheda-spell-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -749,6 +796,50 @@
 .pg-subclass-check span {
     font-style: italic;
     white-space: nowrap;
+}
+
+/* Selettore di sottoclasse nel form di creazione PG */
+.pg-subclass-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+}
+.pg-subclass-trigger:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent-light);
+}
+.pg-subclass-trigger-empty {
+    color: var(--text-light);
+    font-style: italic;
+    font-weight: 400;
+}
+.pg-subclass-clear {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 4px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s, background 0.15s;
+}
+.pg-subclass-clear:hover {
+    color: var(--accent);
+    background: var(--surface-hover);
 }
 
 .pg-classe-name {

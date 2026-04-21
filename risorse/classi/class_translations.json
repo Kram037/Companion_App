@@ -10,29 +10,83 @@
       "prof_saving_throws": "Forza, Costituzione",
       "prof_skills": "Scegline due tra Addestrare Animali, Atletica, Intimidire, Natura, Percezione e Sopravvivenza",
       "features": {
-        "Rage": {"name": "Ira"},
-        "Unarmored Defense": {"name": "Difesa Senza Armatura"},
-        "Reckless Attack": {"name": "Attacco Spericolato"},
-        "Danger Sense": {"name": "Senso del Pericolo"},
-        "Primal Path": {"name": "Cammino Primordiale"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Extra Attack": {"name": "Attacco Extra"},
-        "Fast Movement": {"name": "Movimento Rapido"},
-        "Feral Instinct": {"name": "Istinto Ferino"},
-        "Brutal Critical": {"name": "Critico Brutale"},
-        "Relentless Rage": {"name": "Ira Implacabile"},
-        "Persistent Rage": {"name": "Ira Persistente"},
-        "Indomitable Might": {"name": "Potenza Indomabile"},
-        "Primal Champion": {"name": "Campione Primordiale"}
+        "Rage": {
+          "name": "Ira",
+          "description": "In battaglia, combatti con ferocia primordiale. Nel tuo turno, puoi entrare in stato d'ira con un'azione bonus.\nMentre sei in ira, ottieni i seguenti benefici se non indossi un'armatura pesante:\n* Hai vantaggio alle prove di Forza e ai tiri salvezza su Forza.\n* Quando effettui un attacco con arma da mischia usando la Forza, ottieni un bonus al tiro per i danni che aumenta man mano che acquisisci livelli da barbaro, come mostrato nella colonna Danni dell'Ira della tabella del Barbaro.\n* Hai resistenza ai danni contundenti, perforanti e taglienti.\nSe sei in grado di lanciare incantesimi, non puoi lanciarli o concentrarti su di essi mentre sei in ira.\nLa tua ira dura 1 minuto. Termina anticipatamente se vieni reso privo di sensi o se il tuo turno termina e non hai attaccato una creatura ostile dal tuo ultimo turno o subito danni da allora. Puoi anche terminare la tua ira nel tuo turno con un'azione bonus.\nUna volta che hai usato l'ira il numero di volte indicato per il tuo livello da barbaro nella colonna Ire della tabella del Barbaro, devi completare un riposo lungo prima di poterla usare di nuovo."
+        },
+        "Unarmored Defense": {
+          "name": "Difesa Senza Armatura",
+          "description": "A partire dal 1° livello, mentre non indossi un'armatura, la tua Classe Armatura è pari a 10 + il tuo modificatore di Destrezza + il tuo modificatore di Costituzione. Puoi usare uno scudo e ottenere comunque questo beneficio."
+        },
+        "Reckless Attack": {
+          "name": "Attacco Spericolato",
+          "description": "A partire dal 2° livello, puoi rinunciare a ogni cautela durante un attacco. Quando effettui il tuo primo attacco nel tuo turno, puoi decidere di attaccare in maniera spericolata. Così facendo, ottieni vantaggio ai tiri per colpire in mischia con armi che usano la Forza durante questo turno, ma anche i tiri per colpire contro di te ottengono vantaggio fino al tuo prossimo turno."
+        },
+        "Danger Sense": {
+          "name": "Senso del Pericolo",
+          "description": "Al 2° livello, ottieni una sensazione preternaturale di pericolo, che ti aiuta a evitare il rischio. Hai vantaggio ai tiri salvezza su Destrezza contro effetti che puoi vedere, come trappole e incantesimi. Per ottenere questo beneficio, non devi essere accecato, assordato o incapacitato."
+        },
+        "Primal Path": {
+          "name": "Cammino Primordiale",
+          "description": "Al 3° livello, scegli un cammino che plasma la natura della tua ira. Scegli il Cammino del Berserker o il Cammino del Guerriero Totemico, entrambi descritti alla fine della descrizione della classe. La tua scelta ti garantisce privilegi al 3° livello e di nuovo al 6°, 10° e 14° livello."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Extra Attack": {
+          "name": "Attacco Extra",
+          "description": "A partire dal 5° livello, puoi attaccare due volte invece di una, ogni volta che esegui l'azione di Attacco nel tuo turno."
+        },
+        "Fast Movement": {
+          "name": "Movimento Rapido",
+          "description": "A partire dal 5° livello, la tua velocità aumenta di 3 metri mentre non indossi un'armatura pesante."
+        },
+        "Feral Instinct": {
+          "name": "Istinto Ferino",
+          "description": "Al 7° livello, i tuoi istinti diventano così affilati che ottieni vantaggio ai tiri di iniziativa.\nInoltre, se sei sorpreso all'inizio del combattimento e non sei incapacitato, puoi agire normalmente nel tuo primo turno, ma solo se entri in ira prima di fare qualsiasi altra cosa in quel turno."
+        },
+        "Brutal Critical": {
+          "name": "Critico Brutale",
+          "description": "A partire dal 9° livello, puoi tirare un dado di danno aggiuntivo dell'arma quando determini i danni extra di un colpo critico in mischia con un'arma.\nQuesto aumenta a due dadi extra al 13° livello e a tre dadi extra al 17° livello."
+        },
+        "Relentless Rage": {
+          "name": "Ira Implacabile",
+          "description": "A partire dall'11° livello, la tua ira ti aiuta a continuare a combattere nonostante le ferite gravi. Se scendi a 0 punti ferita mentre sei in ira e non muori sul colpo, puoi effettuare un tiro salvezza su Costituzione con CD 10. Se lo superi, scendi invece a 1 punto ferita.\nOgni volta che usi questo privilegio dopo la prima, la CD aumenta di 5. Quando completi un riposo breve o lungo, la CD si azzera a 10."
+        },
+        "Persistent Rage": {
+          "name": "Ira Persistente",
+          "description": "A partire dal 15° livello, la tua ira è così implacabile che termina anticipatamente solo se cadi privo di sensi o se decidi di farla terminare."
+        },
+        "Indomitable Might": {
+          "name": "Potenza Indomabile",
+          "description": "A partire dal 18° livello, se il totale di una tua prova di Forza è inferiore al tuo punteggio di Forza, puoi usare quel punteggio al posto del totale."
+        },
+        "Primal Champion": {
+          "name": "Campione Primordiale",
+          "description": "Al 20° livello, incarni il potere della selva. I tuoi punteggi di Forza e Costituzione aumentano di 4. Il tuo massimo per quei punteggi è ora 24."
+        }
       },
       "subclasses": {
         "path-of-the-berserker": {
           "name": "Cammino del Berserker",
           "features": {
-            "Frenzy": {"name": "Frenesia"},
-            "Mindless Rage": {"name": "Ira Insensata"},
-            "Intimidating Presence": {"name": "Presenza Intimidatoria"},
-            "Retaliation": {"name": "Rappresaglia"}
+            "Frenzy": {
+              "name": "Frenesia",
+              "description": "A partire da quando scegli questo cammino al 3° livello, puoi entrare in frenesia quando vai in ira. Se lo fai, per la durata della tua ira puoi effettuare un singolo attacco con arma da mischia come azione bonus in ognuno dei tuoi turni successivi a questo. Quando la tua ira termina, subisci un livello di indebolimento (come descritto nell'appendice A)."
+            },
+            "Mindless Rage": {
+              "name": "Ira Insensata",
+              "description": "A partire dal 6° livello, non puoi essere ammaliato o spaventato mentre sei in ira. Se sei ammaliato o spaventato quando entri in ira, l'effetto è sospeso per la durata dell'ira."
+            },
+            "Intimidating Presence": {
+              "name": "Presenza Intimidatoria",
+              "description": "A partire dal 10° livello, puoi usare la tua azione per spaventare qualcuno con la tua presenza minacciosa. Quando lo fai, scegli una creatura che puoi vedere entro 9 metri da te. Se la creatura può vederti o sentirti, deve superare un tiro salvezza su Saggezza (CD pari a 8 + il tuo bonus di competenza + il tuo modificatore di Carisma) o sarà spaventata da te fino alla fine del tuo prossimo turno. Nei turni successivi, puoi usare la tua azione per estendere la durata di questo effetto sulla creatura spaventata fino alla fine del tuo prossimo turno. Questo effetto termina se la creatura termina il proprio turno fuori dalla tua linea di vista o a più di 18 metri da te.\nSe la creatura supera il tiro salvezza, non puoi più usare questo privilegio su di essa per 24 ore."
+            },
+            "Retaliation": {
+              "name": "Rappresaglia",
+              "description": "A partire dal 14° livello, quando subisci danni da una creatura che si trova entro 1,5 metri da te, puoi usare la tua reazione per effettuare un attacco con arma da mischia contro quella creatura."
+            }
           }
         }
       }
@@ -47,26 +101,71 @@
       "prof_skills": "Tre a tua scelta",
       "spellcasting_ability": "Carisma",
       "features": {
-        "Spellcasting": {"name": "Incantesimi"},
-        "Bardic Inspiration": {"name": "Ispirazione Bardica"},
-        "Jack of All Trades": {"name": "Esperto in Tutto"},
-        "Song of Rest": {"name": "Canto del Riposo"},
-        "Bard College": {"name": "Collegio Bardico"},
-        "Expertise": {"name": "Competenza"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Font of Inspiration": {"name": "Sorgente d'Ispirazione"},
-        "Countercharm": {"name": "Controincanto"},
-        "Magical Secrets": {"name": "Segreti Magici"},
-        "Superior Inspiration": {"name": "Ispirazione Superiore"}
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Hai imparato a separare e ricucire le note della realtà attraverso la musica e la parlantina, ottenendo la capacità di lanciare incantesimi. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del bardo.\nTrucchetti: Conosci due trucchetti a tua scelta dalla lista degli incantesimi del bardo. Impari trucchetti aggiuntivi dalla lista del bardo a livelli successivi, come mostrato nella colonna Trucchetti Conosciuti della tabella del Bardo.\nSlot Incantesimo: La tabella del Bardo mostra quanti slot incantesimo possiedi per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nIncantesimi Conosciuti del 1° Livello e Superiori: Conosci quattro incantesimi del 1° livello a tua scelta dalla lista degli incantesimi del bardo.\nLa colonna Incantesimi Conosciuti della tabella del Bardo mostra quando impari altri incantesimi del bardo a tua scelta. Ognuno di questi incantesimi deve essere di un livello per il quale possiedi slot incantesimo, come mostrato sulla tabella. Per esempio, quando raggiungi il 3° livello in questa classe, puoi imparare un nuovo incantesimo del 1° o del 2° livello.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere uno degli incantesimi del bardo che conosci e sostituirlo con un altro incantesimo dalla lista del bardo, anch'esso di un livello per il quale possiedi slot incantesimo.\nCaratteristica da Incantatore: Carisma è la tua caratteristica da incantatore per i tuoi incantesimi del bardo. La magia delle tue parole sgorga dal cuore della tua personalità. Usi il Carisma ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Carisma quando determini la CD dei tiri salvezza per un incantesimo del bardo che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Carisma\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Carisma\nLanciare Rituali: Puoi lanciare qualsiasi incantesimo del bardo che conosci come rituale se l'incantesimo possiede il descrittore di rituale.\nFocus per Incantesimi: Puoi usare uno strumento musicale (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del bardo."
+        },
+        "Bardic Inspiration": {
+          "name": "Ispirazione Bardica",
+          "description": "Puoi ispirare gli altri attraverso parole o musica scintillanti. Per farlo, usi un'azione bonus nel tuo turno per scegliere una creatura diversa da te entro 18 metri da te che possa sentirti. Quella creatura ottiene un d6 di Ispirazione Bardica.\nUna volta nei prossimi 10 minuti, la creatura può tirare il dado e aggiungere il numero ottenuto a una prova di caratteristica, tiro per colpire o tiro salvezza che effettua. La creatura può aspettare a tirare il dado di Ispirazione Bardica finché dopo aver tirato il d20 prima di effettuare la prova di caratteristica, tiro per colpire o tiro salvezza, ma deve decidere prima che il DM dica se il tiro abbia successo o fallisca. Una volta tirato, il dado di Ispirazione Bardica è perso. Una creatura può avere un solo dado di Ispirazione Bardica alla volta.\nPuoi usare questo privilegio un numero di volte pari al tuo modificatore di Carisma (un minimo di una volta). Recuperi tutti gli usi consumati quando completi un riposo lungo.\nIl tuo dado di Ispirazione Bardica cambia quando raggiungi alcuni livelli di questa classe. Il dado diventa un d8 al 5° livello, un d10 al 10° livello e un d12 al 15° livello."
+        },
+        "Jack of All Trades": {
+          "name": "Esperto in Tutto",
+          "description": "A partire dal 2° livello, puoi aggiungere metà del tuo bonus di competenza, arrotondato per difetto, a qualsiasi prova di caratteristica che effettui che non includa già il tuo bonus di competenza."
+        },
+        "Song of Rest": {
+          "name": "Canto del Riposo",
+          "description": "A partire dal 2° livello, puoi usare musica o parlantina rilassante per aiutare i tuoi compagni feriti a recuperare le forze durante un riposo breve. Se tu o ogni creatura amichevole che può sentire la tua esibizione recupera punti ferita alla fine del riposo breve consumando uno o più Dadi Vita, ognuna di queste creature recupera 1d6 punti ferita aggiuntivi.\nI punti ferita extra aumentano quando raggiungi alcuni livelli di questa classe: a 1d8 al 9° livello, a 1d10 al 13° livello e a 1d12 al 17° livello."
+        },
+        "Bard College": {
+          "name": "Collegio Bardico",
+          "description": "Al 3° livello, ti immergi nelle tradizioni avanzate di un collegio bardico a tua scelta: il Collegio del Sapere o il Collegio del Valore, entrambi descritti alla fine della descrizione della classe. La tua scelta ti garantisce privilegi al 3° livello e di nuovo al 6° e 14° livello."
+        },
+        "Expertise": {
+          "name": "Competenza",
+          "description": "Al 3° livello, scegli due delle tue competenze in abilità. Il tuo bonus di competenza è raddoppiato per ogni prova di caratteristica che effettui che usi una di queste due competenze prescelte.\nAl 10° livello, puoi scegliere altre due competenze in abilità per ottenere il beneficio di questo privilegio."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Font of Inspiration": {
+          "name": "Sorgente d'Ispirazione",
+          "description": "A partire dal 5° livello, recuperi tutti i tuoi usi consumati di Ispirazione Bardica quando completi un riposo breve o lungo."
+        },
+        "Countercharm": {
+          "name": "Controincanto",
+          "description": "Al 6° livello, ottieni la capacità di usare note musicali o parole di potere per disturbare gli effetti di influsso mentale. Come azione, puoi iniziare un'esibizione che dura fino alla fine del tuo prossimo turno. Durante quel tempo, tu e qualsiasi creatura amichevole entro 9 metri da te avete vantaggio ai tiri salvezza contro essere spaventati o ammaliati. Una creatura deve poterti sentire per ottenere questo beneficio. L'esibizione termina anticipatamente se sei incapacitato o messo a tacere o se decidi volontariamente di farla terminare (non è richiesta alcuna azione)."
+        },
+        "Magical Secrets": {
+          "name": "Segreti Magici",
+          "description": "Al 10° livello, hai sbirciato la conoscenza arcana di vasta portata. Scegli due incantesimi da qualsiasi classe, incluso questa. Un incantesimo che scegli deve essere di un livello che puoi lanciare, come mostrato sulla tabella del Bardo, o un trucchetto.\nGli incantesimi prescelti contano come incantesimi del bardo per te e sono inclusi nel numero della colonna Incantesimi Conosciuti della tabella del Bardo.\nImpari due incantesimi aggiuntivi da qualsiasi classe al 14° e di nuovo al 18° livello."
+        },
+        "Superior Inspiration": {
+          "name": "Ispirazione Superiore",
+          "description": "Al 20° livello, quando tiri l'iniziativa e non hai usi di Ispirazione Bardica rimanenti, recuperi un uso."
+        }
       },
       "subclasses": {
         "college-of-lore": {
           "name": "Collegio del Sapere",
           "features": {
-            "Bonus Proficiencies": {"name": "Competenze Aggiuntive"},
-            "Cutting Words": {"name": "Parole Taglienti"},
-            "Additional Magical Secrets": {"name": "Segreti Magici Aggiuntivi"},
-            "Peerless Skill": {"name": "Abilità Senza Pari"}
+            "Bonus Proficiencies": {
+              "name": "Competenze Aggiuntive",
+              "description": "Quando ti unisci al Collegio del Sapere al 3° livello, ottieni la competenza in tre abilità a tua scelta."
+            },
+            "Cutting Words": {
+              "name": "Parole Taglienti",
+              "description": "Anche al 3° livello, impari a usare l'arguzia per distrarre, confondere e in altro modo minare la fiducia e la competenza degli altri. Quando una creatura che puoi vedere entro 18 metri da te effettua un tiro per colpire, una prova di caratteristica o un tiro per i danni, puoi usare la tua reazione per spendere uno dei tuoi usi di Ispirazione Bardica, sottraendo il numero ottenuto sul dado di Ispirazione Bardica dal tiro della creatura. Puoi scegliere di usare questo privilegio dopo che la creatura ha tirato, ma prima che il DM determini se il tiro per colpire o la prova di caratteristica abbia successo o fallisca, o prima che la creatura infligga i suoi danni. La creatura è immune se non può sentirti o se è immune all'essere ammaliata."
+            },
+            "Additional Magical Secrets": {
+              "name": "Segreti Magici Aggiuntivi",
+              "description": "Al 6° livello, impari due incantesimi a tua scelta da qualsiasi classe. Un incantesimo che scegli deve essere di un livello che puoi lanciare, come mostrato sulla tabella del Bardo, o un trucchetto. Gli incantesimi prescelti contano come incantesimi del bardo per te ma non vengono conteggiati nel numero degli incantesimi del bardo che conosci."
+            },
+            "Peerless Skill": {
+              "name": "Abilità Senza Pari",
+              "description": "A partire dal 14° livello, quando effettui una prova di caratteristica, puoi spendere un uso di Ispirazione Bardica. Tira un dado di Ispirazione Bardica e aggiungi il numero ottenuto alla tua prova di caratteristica. Puoi scegliere di farlo dopo aver tirato il d20 per la prova di caratteristica, ma prima che il DM dica se hai successo o no."
+            }
           }
         }
       }
@@ -81,23 +180,59 @@
       "prof_skills": "Scegline due tra Storia, Intuizione, Medicina, Persuasione e Religione",
       "spellcasting_ability": "Saggezza",
       "features": {
-        "Spellcasting": {"name": "Incantesimi"},
-        "Divine Domain": {"name": "Dominio Divino"},
-        "Channel Divinity": {"name": "Incanalare Divinità"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Destroy Undead": {"name": "Distruggere Non Morti"},
-        "Divine Intervention": {"name": "Intervento Divino"}
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Come condotto del potere divino, puoi lanciare incantesimi da chierico. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del chierico.\nTrucchetti: Al 1° livello, conosci tre trucchetti a tua scelta dalla lista degli incantesimi del chierico. Impari trucchetti aggiuntivi a livelli superiori, come mostrato nella colonna Trucchetti Conosciuti della tabella del Chierico.\nPreparare e Lanciare Incantesimi: La tabella del Chierico mostra quanti slot incantesimo hai per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nPrepari la lista degli incantesimi del chierico che ti sono disponibili da lanciare, scegliendoli dalla lista degli incantesimi del chierico. Quando lo fai, scegli un numero di incantesimi del chierico pari al tuo modificatore di Saggezza + il tuo livello da chierico (minimo un incantesimo). Gli incantesimi devono essere di un livello per il quale possiedi slot incantesimo.\nPer esempio, se sei un chierico di 3° livello, hai quattro slot incantesimo del 1° livello e due del 2° livello. Con una Saggezza di 16, la tua lista di incantesimi preparati può includere sei incantesimi del 1° o 2° livello, in qualsiasi combinazione. Se prepari l'incantesimo di 1° livello cura ferite, puoi lanciarlo usando uno slot del 1° o del 2° livello. Lanciare l'incantesimo non lo rimuove dalla lista degli incantesimi preparati.\nPuoi cambiare la tua lista di incantesimi preparati al termine di un riposo lungo. Preparare una nuova lista di incantesimi del chierico richiede tempo speso a pregare e meditare: almeno 1 minuto per livello dell'incantesimo per ogni incantesimo nella tua lista.\nCaratteristica da Incantatore: Saggezza è la tua caratteristica da incantatore per i tuoi incantesimi del chierico. Il potere dei tuoi incantesimi proviene dalla tua devozione al tuo dio. Usi la Saggezza ogni volta che un incantesimo del chierico si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Saggezza quando determini la CD dei tiri salvezza per un incantesimo del chierico che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Saggezza\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Saggezza\nLanciare Rituali: Puoi lanciare un incantesimo del chierico come rituale se quell'incantesimo possiede il descrittore di rituale e lo hai preparato.\nFocus per Incantesimi: Puoi usare un simbolo sacro (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del chierico."
+        },
+        "Divine Domain": {
+          "name": "Dominio Divino",
+          "description": "Scegli un dominio collegato alla tua divinità: Conoscenza, Vita, Luce, Natura, Tempesta, Inganno o Guerra, ognuno descritto alla fine della descrizione della classe. La tua scelta ti garantisce incantesimi di dominio e altri privilegi quando la scegli al 1° livello. Inoltre, ti garantisce modi aggiuntivi per usare Incanalare Divinità quando ottieni quel privilegio al 2° livello, e ulteriori privilegi al 6°, 8° e 17° livello.\nIncantesimi del Dominio: Ogni dominio ha una lista di incantesimi - i suoi incantesimi del dominio - che ottieni a determinati livelli del chierico. Una volta che ottieni un incantesimo del dominio, lo hai sempre preparato e non conta contro il numero di incantesimi che puoi preparare ogni giorno.\nSe possiedi un incantesimo del dominio che non appare nella lista degli incantesimi del chierico, l'incantesimo è comunque per te un incantesimo del chierico."
+        },
+        "Channel Divinity": {
+          "name": "Incanalare Divinità",
+          "description": "Al 2° livello, ottieni la capacità di canalizzare l'energia divina direttamente dalla tua divinità, usando quell'energia per alimentare effetti magici. Inizi con due di questi effetti: Scacciare Non Morti e un effetto determinato dal tuo dominio. Alcuni domini ti garantiscono effetti aggiuntivi man mano che avanzi di livello, come indicato nella descrizione del dominio.\nQuando usi il tuo Incanalare Divinità, scegli quale effetto creare. Devi quindi completare un riposo breve o lungo per usare di nuovo il tuo Incanalare Divinità.\nAlcuni effetti di Incanalare Divinità richiedono tiri salvezza. Quando usi tale effetto da questa classe, la CD è pari alla tua CD del tiro salvezza dell'incantesimo del chierico.\nA partire dal 6° livello, puoi usare il tuo Incanalare Divinità due volte tra i riposi, e tre volte tra i riposi a partire dal 18° livello. Quando completi un riposo breve o lungo, recuperi i tuoi usi consumati."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Destroy Undead": {
+          "name": "Distruggere Non Morti",
+          "description": "A partire dal 5° livello, quando un non morto fallisce il proprio tiro salvezza contro il tuo privilegio Scacciare Non Morti, la creatura viene istantaneamente distrutta se il suo grado di sfida è uguale o inferiore a una determinata soglia, come mostrato nella tabella Distruggere Non Morti."
+        },
+        "Divine Intervention": {
+          "name": "Intervento Divino",
+          "description": "A partire dal 10° livello, puoi invocare l'aiuto della tua divinità quando ne hai un bisogno particolare.\nImplorare l'aiuto della tua divinità richiede l'uso della tua azione. Descrivi l'aiuto che cerchi e tira un d100 percentuale. Se ottieni un numero pari o inferiore al tuo livello da chierico, la tua divinità interviene. Il DM sceglie la natura dell'intervento; può essere appropriato l'effetto di qualsiasi incantesimo del chierico o di qualsiasi incantesimo di dominio del chierico.\nSe la tua divinità interviene, non puoi usare di nuovo questo privilegio per 7 giorni. Altrimenti, puoi usarlo di nuovo dopo aver completato un riposo lungo.\nAl 20° livello, l'invocazione del tuo intervento ha automaticamente successo, senza dover tirare alcun dado."
+        }
       },
       "subclasses": {
         "life-domain": {
           "name": "Dominio della Vita",
           "features": {
-            "Bonus Proficiency": {"name": "Competenza Aggiuntiva"},
-            "Disciple of Life": {"name": "Discepolo della Vita"},
-            "Channel Divinity: Preserve Life": {"name": "Incanalare Divinità: Preservare la Vita"},
-            "Blessed Healer": {"name": "Guaritore Benedetto"},
-            "Divine Strike": {"name": "Colpo Divino"},
-            "Supreme Healing": {"name": "Guarigione Suprema"}
+            "Bonus Proficiency": {
+              "name": "Competenza Aggiuntiva",
+              "description": "Quando scegli questo dominio al 1° livello, ottieni la competenza nelle armature pesanti."
+            },
+            "Disciple of Life": {
+              "name": "Discepolo della Vita",
+              "description": "Inoltre, a partire dal 1° livello, i tuoi incantesimi curativi sono più potenti. Ogni volta che usi un incantesimo del 1° livello o superiore per ripristinare punti ferita a una creatura, la creatura recupera punti ferita aggiuntivi pari a 2 + il livello dell'incantesimo."
+            },
+            "Channel Divinity: Preserve Life": {
+              "name": "Incanalare Divinità: Preservare la Vita",
+              "description": "A partire dal 2° livello, puoi usare il tuo Incanalare Divinità per curare i feriti gravi.\nCome azione, presenti il tuo simbolo sacro ed evochi energia curativa che può ripristinare un numero di punti ferita pari a cinque volte il tuo livello da chierico. Scegli qualsiasi creatura che puoi vedere entro 9 metri da te e dividi quei punti ferita tra di esse. Questo privilegio può ripristinare a una creatura non più della metà dei suoi punti ferita massimi. Non puoi usare questo privilegio sui non morti o sui costrutti."
+            },
+            "Blessed Healer": {
+              "name": "Guaritore Benedetto",
+              "description": "A partire dal 6° livello, gli incantesimi curativi che lanci sugli altri ti curano anche. Quando lanci un incantesimo del 1° livello o superiore che ripristina punti ferita a una creatura diversa da te, recuperi punti ferita pari a 2 + il livello dell'incantesimo."
+            },
+            "Divine Strike": {
+              "name": "Colpo Divino",
+              "description": "All'8° livello, ottieni la capacità di infondere i tuoi colpi con energia divina. Una volta in ognuno dei tuoi turni quando colpisci una creatura con un'arma, puoi far sì che l'arma infligga 1d8 danni radianti aggiuntivi al bersaglio. Quando raggiungi il 14° livello, i danni extra aumentano a 2d8."
+            },
+            "Supreme Healing": {
+              "name": "Guarigione Suprema",
+              "description": "A partire dal 17° livello, quando normalmente tireresti uno o più dadi per ripristinare punti ferita con un incantesimo, ottieni invece il numero massimo possibile per ogni dado. Per esempio, invece di ripristinare 2d6 punti ferita a una creatura, ne ripristini 12."
+            }
           }
         }
       }
@@ -112,25 +247,67 @@
       "prof_skills": "Scegline due tra Arcano, Addestrare Animali, Intuizione, Medicina, Natura, Percezione, Religione e Sopravvivenza",
       "spellcasting_ability": "Saggezza",
       "features": {
-        "Druidic": {"name": "Druidico"},
-        "Spellcasting": {"name": "Incantesimi"},
-        "Wild Shape": {"name": "Forma Selvatica"},
-        "Druid Circle": {"name": "Circolo Druidico"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Timeless Body": {"name": "Corpo Senza Tempo"},
-        "Beast Spells": {"name": "Incantesimi Bestia"},
-        "Archdruid": {"name": "Arcidruido"}
+        "Druidic": {
+          "name": "Druidico",
+          "description": "Conosci il Druidico, il linguaggio segreto dei druidi. Puoi parlarlo e usarlo per lasciare messaggi nascosti. Tu e altri che conoscono questa lingua riconoscete automaticamente questi messaggi. Gli altri sospettano la presenza di un messaggio da un'osservazione superficiale, ma non possono identificarlo se non con un incantesimo magico."
+        },
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Attingendo all'essenza divina della natura stessa, puoi lanciare incantesimi per modellare quell'essenza secondo la tua volontà. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del druido.\nTrucchetti: Al 1° livello, conosci due trucchetti a tua scelta dalla lista degli incantesimi del druido. Impari trucchetti aggiuntivi a livelli superiori, come mostrato nella colonna Trucchetti Conosciuti della tabella del Druido.\nPreparare e Lanciare Incantesimi: La tabella del Druido mostra quanti slot incantesimo possiedi per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nPrepari la lista degli incantesimi del druido che ti sono disponibili da lanciare, scegliendoli dalla lista degli incantesimi del druido. Quando lo fai, scegli un numero di incantesimi del druido pari al tuo modificatore di Saggezza + il tuo livello da druido (minimo un incantesimo). Gli incantesimi devono essere di un livello per il quale possiedi slot incantesimo.\nPer esempio, se sei un druido di 3° livello, hai quattro slot incantesimo del 1° livello e due del 2° livello. Con una Saggezza di 16, la tua lista di incantesimi preparati può includere sei incantesimi del 1° o 2° livello, in qualsiasi combinazione. Se prepari l'incantesimo di 1° livello cura ferite, puoi lanciarlo usando uno slot del 1° o del 2° livello. Lanciare l'incantesimo non lo rimuove dalla lista degli incantesimi preparati.\nPuoi cambiare la tua lista di incantesimi preparati al termine di un riposo lungo. Preparare una nuova lista di incantesimi del druido richiede tempo speso a pregare e meditare con la natura: almeno 1 minuto per livello dell'incantesimo per ogni incantesimo nella tua lista.\nCaratteristica da Incantatore: Saggezza è la tua caratteristica da incantatore per i tuoi incantesimi del druido, dato che la tua magia attinge alla tua devozione e armonia con la natura. Usi la Saggezza ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Saggezza quando determini la CD dei tiri salvezza per un incantesimo del druido che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Saggezza\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Saggezza\nLanciare Rituali: Puoi lanciare un incantesimo del druido come rituale se quell'incantesimo possiede il descrittore di rituale e lo hai preparato.\nFocus per Incantesimi: Puoi usare un focus druidico (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del druido."
+        },
+        "Wild Shape": {
+          "name": "Forma Selvatica",
+          "description": "A partire dal 2° livello, puoi usare la tua azione per assumere magicamente la forma di una bestia che hai visto prima. Puoi usare questo privilegio due volte. Recuperi gli usi consumati quando termini un riposo breve o lungo.\nIl tuo livello da druido determina le bestie in cui puoi trasformarti, come mostrato nella tabella Forme delle Bestie. Al 2° livello, per esempio, puoi trasformarti in qualsiasi bestia che abbia un grado di sfida pari o inferiore a 1/4 e che non abbia velocità di volo o di nuoto.\nPuoi rimanere in forma di bestia per un numero di ore pari a metà del tuo livello da druido (arrotondato per difetto). Poi ritorni alla tua forma normale a meno che non spendi un altro uso di questo privilegio. Puoi ritornare alla tua forma normale anticipatamente usando un'azione bonus nel tuo turno. Ritorni automaticamente se cadi privo di sensi, scendi a 0 punti ferita o muori.\nMentre sei trasformato, valgono le seguenti regole:\n* Le tue statistiche di gioco sono sostituite dalle statistiche della bestia, ma mantieni il tuo allineamento, personalità e i punteggi di Intelligenza, Saggezza e Carisma. Mantieni anche tutte le tue competenze in abilità e tiri salvezza, in aggiunta a guadagnare quelle della creatura. Se la creatura ha la stessa competenza di te e il bonus elencato nelle sue statistiche è più alto del tuo, usa il bonus della creatura al posto del tuo. Se la creatura ha qualsiasi azione leggendaria o di tana, non puoi usarle.\n* Quando ti trasformi, assumi i punti ferita e i Dadi Vita della bestia. Quando ritorni alla tua forma normale, ritorni al numero di punti ferita che avevi prima di trasformarti. Tuttavia, se ritorni alla tua forma normale come risultato di scendere a 0 punti ferita, qualsiasi danno in eccesso si trasferisce alla tua forma normale. Per esempio, se subisci 10 danni in forma animale e hai solo 1 punto ferita rimanente, ritorni alla tua forma normale e subisci 9 danni. Finché il danno in eccesso non riduce la tua forma normale a 0 punti ferita, non vieni reso privo di sensi.\n* Non puoi lanciare incantesimi e la tua capacità di parlare o di compiere qualsiasi azione che richieda mani è limitata alle capacità della tua forma di bestia. Trasformarti non interrompe la tua concentrazione su un incantesimo che hai già lanciato, comunque, o ti impedisce di compiere azioni che fanno parte di un incantesimo, come invocare, che hai già lanciato.\n* Mantieni il beneficio di qualsiasi privilegio della tua classe, razza o altre fonti e puoi usarlo, se la nuova forma è fisicamente in grado di farlo. Tuttavia, non puoi usare alcun senso speciale che hai (per esempio, scurovisione) a meno che la nuova forma non abbia anche quel senso.\n* Scegli se il tuo equipaggiamento cade a terra nel tuo spazio, si fonde nella tua nuova forma o è indossato da essa. L'equipaggiamento indossato funziona normalmente, ma il DM decide se è pratico per la nuova forma indossare un pezzo di equipaggiamento, in base alla forma e alla taglia della creatura. Il tuo equipaggiamento non cambia di taglia o forma per adattarsi alla nuova forma, e qualsiasi equipaggiamento che la nuova forma non può indossare deve cadere a terra o fondersi con essa. L'equipaggiamento che si fonde con la forma non ha effetto finché non lasci la forma."
+        },
+        "Druid Circle": {
+          "name": "Circolo Druidico",
+          "description": "Al 2° livello, scegli di identificarti con un circolo di druidi: il Circolo della Terra o il Circolo della Luna, entrambi descritti alla fine della descrizione della classe. La tua scelta ti garantisce privilegi al 2° livello e di nuovo al 6°, 10° e 14° livello."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Timeless Body": {
+          "name": "Corpo Senza Tempo",
+          "description": "A partire dal 18° livello, l'antica magia druidica fa sì che tu invecchi più lentamente. Per ogni 10 anni che passano, il tuo corpo invecchia di solo 1 anno."
+        },
+        "Beast Spells": {
+          "name": "Incantesimi Bestia",
+          "description": "A partire dal 18° livello, puoi lanciare molti dei tuoi incantesimi del druido in qualsiasi forma assumi usando la Forma Selvatica. Puoi eseguire le componenti somatiche e verbali di un incantesimo del druido mentre sei in forma di bestia, ma non puoi fornire componenti materiali."
+        },
+        "Archdruid": {
+          "name": "Arcidruido",
+          "description": "Al 20° livello, puoi usare la tua Forma Selvatica un numero di volte illimitato.\nInoltre, puoi ignorare le componenti verbali e somatiche dei tuoi incantesimi del druido, così come qualsiasi componente materiale che non abbia un costo e non sia consumato da un incantesimo. Ottieni questo beneficio sia nella tua forma normale sia nella tua forma di bestia da Forma Selvatica."
+        }
       },
       "subclasses": {
         "circle-of-the-land": {
           "name": "Circolo della Terra",
           "features": {
-            "Bonus Cantrip": {"name": "Trucchetto Aggiuntivo"},
-            "Natural Recovery": {"name": "Recupero Naturale"},
-            "Circle Spells": {"name": "Incantesimi del Circolo"},
-            "Land's Stride": {"name": "Falcata Naturale"},
-            "Nature's Ward": {"name": "Custode della Natura"},
-            "Nature's Sanctuary": {"name": "Santuario della Natura"}
+            "Bonus Cantrip": {
+              "name": "Trucchetto Aggiuntivo",
+              "description": "Quando scegli questo circolo al 2° livello, impari un trucchetto aggiuntivo del druido a tua scelta. Questo trucchetto non conta nel numero di trucchetti del druido che conosci."
+            },
+            "Natural Recovery": {
+              "name": "Recupero Naturale",
+              "description": "A partire dal 2° livello, puoi attingere alla riserva di energia mistica della natura per recuperare gli slot incantesimo consumati. Durante un riposo breve, scegli gli slot incantesimo da recuperare. Gli slot possono avere un livello combinato pari o inferiore a metà del tuo livello da druido (arrotondato per eccesso), e nessuno degli slot può essere del 6° livello o superiore. Non puoi usare questo privilegio di nuovo finché non termini un riposo lungo.\nPer esempio, quando sei un druido del 4° livello, puoi recuperare fino a due livelli di slot incantesimo. Puoi recuperare uno slot del 2° livello o due slot del 1° livello."
+            },
+            "Circle Spells": {
+              "name": "Incantesimi del Circolo",
+              "description": "La tua mistica connessione con la terra ti concede la capacità di lanciare determinati incantesimi. Al 3°, 5°, 7° e 9° livello ottieni accesso agli incantesimi del circolo connessi alla terra dove sei diventato un druido. Scegli quella terra - artico, costa, deserto, foresta, prateria, montagna, palude o Underdark - e consulta la lista degli incantesimi associati.\nUna volta che ottieni accesso a un incantesimo del circolo, lo hai sempre preparato, e non conta contro il numero di incantesimi che puoi preparare ogni giorno. Se ottieni accesso a un incantesimo che non appare nella lista degli incantesimi del druido, l'incantesimo è comunque per te un incantesimo del druido."
+            },
+            "Land's Stride": {
+              "name": "Falcata Naturale",
+              "description": "A partire dal 6° livello, muoversi attraverso terreni difficili non magici non ti costa movimento extra. Puoi anche attraversare piante non magiche senza essere rallentato da esse e senza subire danni se hanno spine, aculei o simili pericoli.\nInoltre, hai vantaggio ai tiri salvezza contro piante create magicamente o manipolate per impedire il movimento, come quelle create dall'incantesimo intralciare."
+            },
+            "Nature's Ward": {
+              "name": "Custode della Natura",
+              "description": "Quando raggiungi il 10° livello, non puoi essere ammaliato o spaventato da elementali o folletti, e sei immune al veleno e alle malattie."
+            },
+            "Nature's Sanctuary": {
+              "name": "Santuario della Natura",
+              "description": "Quando raggiungi il 14° livello, le creature del mondo naturale percepiscono la tua connessione con la natura e diventano riluttanti ad attaccarti. Quando una bestia o una pianta ti attacca, quella creatura deve effettuare un tiro salvezza su Saggezza con CD pari alla tua CD del tiro salvezza dell'incantesimo del druido. Se fallisce, la creatura deve scegliere un bersaglio diverso, oppure il suo attacco automaticamente fallisce. Se lo supera, la creatura è immune a questo privilegio per 24 ore.\nLa creatura è consapevole di questo privilegio prima di effettuare il suo attacco contro di te."
+            }
           }
         }
       }
@@ -144,23 +321,59 @@
       "prof_saving_throws": "Forza, Costituzione",
       "prof_skills": "Scegline due tra Acrobazia, Addestrare Animali, Atletica, Storia, Intuizione, Intimidire, Percezione e Sopravvivenza",
       "features": {
-        "Fighting Style": {"name": "Stile di Combattimento"},
-        "Second Wind": {"name": "Riprendere Fiato"},
-        "Action Surge": {"name": "Azione Impetuosa"},
-        "Martial Archetype": {"name": "Archetipo Marziale"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Extra Attack": {"name": "Attacco Extra"},
-        "Indomitable": {"name": "Indomabile"}
+        "Fighting Style": {
+          "name": "Stile di Combattimento",
+          "description": "Al 1° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere una Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Armi Grandi: Quando ottieni 1 o 2 sui dadi per i danni di un attacco effettuato con un'arma da mischia che brandisci a due mani, puoi ritirare il dado e devi usare il nuovo tiro, anche se il nuovo tiro è un 1 o un 2. L'arma deve avere la proprietà a due mani o versatile per ottenere questo beneficio.\nProtezione: Quando una creatura che puoi vedere attacca un bersaglio diverso da te entro 1,5 metri da te, puoi usare la tua reazione per imporre svantaggio al tiro per colpire. Devi brandire uno scudo.\nCombattere con Due Armi: Quando combatti con due armi, puoi aggiungere il tuo modificatore di caratteristica ai danni del secondo attacco.\nTiro: Ottieni un bonus di +2 ai tiri per colpire con armi da fuoco che effettui con armi a distanza."
+        },
+        "Second Wind": {
+          "name": "Riprendere Fiato",
+          "description": "Hai una limitata fonte di stamina a cui puoi attingere per proteggerti dai danni. Nel tuo turno, puoi usare un'azione bonus per recuperare punti ferita pari a 1d10 + il tuo livello da guerriero. Una volta usato questo privilegio, devi terminare un riposo breve o lungo prima di poterlo usare di nuovo."
+        },
+        "Action Surge": {
+          "name": "Azione Impetuosa",
+          "description": "A partire dal 2° livello, puoi spingere te stesso oltre il tuo limite normale per un istante. Nel tuo turno, puoi compiere un'azione aggiuntiva.\nUna volta usato questo privilegio, devi terminare un riposo breve o lungo prima di poterlo usare di nuovo. A partire dal 17° livello, puoi usarlo due volte prima di un riposo, ma solo una volta nello stesso turno."
+        },
+        "Martial Archetype": {
+          "name": "Archetipo Marziale",
+          "description": "Al 3° livello, scegli un archetipo che ti sforzi di emulare nei tuoi metodi e tecniche di combattimento. Scegli il Campione, il Maestro di Battaglia o il Cavaliere Mistico, tutti dettagliati alla fine della descrizione della classe. L'archetipo che scegli ti garantisce privilegi al 3° livello e di nuovo al 7°, 10°, 15° e 18° livello."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo al 6°, 8°, 12°, 14°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Extra Attack": {
+          "name": "Attacco Extra",
+          "description": "A partire dal 5° livello, puoi attaccare due volte, invece di una, ogni volta che esegui l'azione di Attacco nel tuo turno.\nIl numero di attacchi aumenta a tre quando raggiungi l'11° livello in questa classe e a quattro quando raggiungi il 20° livello in questa classe."
+        },
+        "Indomitable": {
+          "name": "Indomabile",
+          "description": "A partire dal 9° livello, puoi ritirare un tiro salvezza che fallisci. Se lo fai, devi usare il nuovo tiro, e non puoi usare questo privilegio di nuovo finché non termini un riposo lungo.\nPuoi usare questo privilegio due volte tra i riposi lunghi a partire dal 13° livello e tre volte tra i riposi lunghi a partire dal 17° livello."
+        }
       },
       "subclasses": {
         "champion": {
           "name": "Campione",
           "features": {
-            "Improved Critical": {"name": "Critico Migliorato"},
-            "Remarkable Athlete": {"name": "Atleta Eccezionale"},
-            "Additional Fighting Style": {"name": "Stile di Combattimento Aggiuntivo"},
-            "Superior Critical": {"name": "Critico Superiore"},
-            "Survivor": {"name": "Sopravvissuto"}
+            "Improved Critical": {
+              "name": "Critico Migliorato",
+              "description": "A partire da quando scegli questo archetipo al 3° livello, i tuoi attacchi con le armi segnano un colpo critico con un tiro di 19 o 20."
+            },
+            "Remarkable Athlete": {
+              "name": "Atleta Eccezionale",
+              "description": "A partire dal 7° livello, puoi aggiungere metà del tuo bonus di competenza (arrotondato per eccesso) a qualsiasi prova di Forza, Destrezza o Costituzione che effettui che non includa già il tuo bonus di competenza.\nInoltre, quando effettui un salto in lungo da fermo, la distanza che puoi coprire aumenta di un numero di metri pari al tuo modificatore di Forza."
+            },
+            "Additional Fighting Style": {
+              "name": "Stile di Combattimento Aggiuntivo",
+              "description": "Al 10° livello, puoi scegliere una seconda opzione dal privilegio Stile di Combattimento."
+            },
+            "Superior Critical": {
+              "name": "Critico Superiore",
+              "description": "A partire dal 15° livello, i tuoi attacchi con le armi segnano un colpo critico con un tiro di 18-20."
+            },
+            "Survivor": {
+              "name": "Sopravvissuto",
+              "description": "Al 18° livello, raggiungi l'apice della resilienza in battaglia. All'inizio di ognuno dei tuoi turni, recuperi punti ferita pari a 5 + il tuo modificatore di Costituzione se non hai più di metà dei tuoi punti ferita rimanenti. Non ottieni questo beneficio se hai 0 punti ferita."
+            }
           }
         }
       }
@@ -174,34 +387,103 @@
       "prof_saving_throws": "Forza, Destrezza",
       "prof_skills": "Scegline due tra Acrobazia, Atletica, Storia, Intuizione, Religione e Furtività",
       "features": {
-        "Unarmored Defense": {"name": "Difesa Senza Armatura"},
-        "Martial Arts": {"name": "Arti Marziali"},
-        "Ki": {"name": "Ki"},
-        "Unarmored Movement": {"name": "Movimento Senza Armatura"},
-        "Monastic Tradition": {"name": "Tradizione Monastica"},
-        "Deflect Missiles": {"name": "Deviare Proiettili"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Slow Fall": {"name": "Caduta Lenta"},
-        "Extra Attack": {"name": "Attacco Extra"},
-        "Stunning Strike": {"name": "Colpo Stordente"},
-        "Ki-Empowered Strikes": {"name": "Colpi Potenziati dal Ki"},
-        "Evasion": {"name": "Elusione"},
-        "Stillness of Mind": {"name": "Quiete della Mente"},
-        "Purity of Body": {"name": "Purezza del Corpo"},
-        "Tongue of the Sun and Moon": {"name": "Lingua del Sole e della Luna"},
-        "Diamond Soul": {"name": "Anima di Diamante"},
-        "Timeless Body": {"name": "Corpo Senza Tempo"},
-        "Empty Body": {"name": "Corpo Vuoto"},
-        "Perfect Self": {"name": "Sé Perfetto"}
+        "Unarmored Defense": {
+          "name": "Difesa Senza Armatura",
+          "description": "A partire dal 1° livello, mentre non indossi armatura e non brandisci uno scudo, la tua CA è pari a 10 + il tuo modificatore di Destrezza + il tuo modificatore di Saggezza."
+        },
+        "Martial Arts": {
+          "name": "Arti Marziali",
+          "description": "Al 1° livello, la tua pratica delle arti marziali ti dà la padronanza degli stili di combattimento che usano colpi senz'armi e armi da monaco, che sono spade corte e qualsiasi arma semplice da mischia che non abbia la proprietà a due mani o pesante.\nOttieni i seguenti benefici mentre sei disarmato o brandisci solo armi da monaco e non stai indossando armatura o brandendo uno scudo:\n* Puoi usare la Destrezza al posto della Forza per il tiro per colpire e per i danni dei tuoi attacchi senz'armi e con armi da monaco.\n* Puoi tirare un d4 al posto del normale danno del tuo attacco senz'armi o con un'arma da monaco. Questo dado cambia man mano che acquisisci livelli da monaco, come mostrato nella colonna Arti Marziali della tabella del Monaco.\n* Quando usi l'azione di Attacco con un attacco senz'armi o con un'arma da monaco nel tuo turno, puoi effettuare un attacco senz'armi come azione bonus. Per esempio, se esegui l'azione di Attacco e attacchi con un bastone ferrato, puoi anche effettuare un attacco senz'armi come azione bonus, supponendo che tu non abbia già effettuato un'azione bonus in questo turno.\nDeterminate sottoclassi e razze conferiscono colpi naturali, come gli artigli, che contano come attacchi senz'armi e possono essere usati con i benefici delle Arti Marziali."
+        },
+        "Ki": {
+          "name": "Ki",
+          "description": "A partire dal 2° livello, il tuo allenamento ti consente di sfruttare la mistica energia del ki. Il tuo accesso a questa energia è rappresentato da un numero di punti ki. Il tuo livello da monaco determina il numero di punti che hai, come mostrato nella colonna Punti Ki della tabella del Monaco.\nPuoi spendere questi punti per alimentare vari privilegi del ki. Inizi con tre privilegi: Raffica di Colpi, Difesa Pattuita e Passo Veloce. Impari più privilegi del ki man mano che acquisisci livelli in questa classe.\nQuando spendi un punto ki, è indisponibile finché non termini un riposo breve o lungo, alla fine del quale recuperi tutti i tuoi punti ki spesi. Devi spendere almeno 30 minuti del riposo a meditare per recuperare i tuoi punti ki.\nAlcuni dei tuoi privilegi del ki richiedono al tuo bersaglio di effettuare un tiro salvezza per resistere agli effetti del privilegio. La CD del tiro salvezza è calcolata come segue:\nCD del Tiro Salvezza del Ki = 8 + il tuo bonus di competenza + il tuo modificatore di Saggezza\nRaffica di Colpi: Immediatamente dopo aver effettuato l'azione di Attacco nel tuo turno, puoi spendere 1 punto ki per effettuare due attacchi senz'armi come azione bonus.\nDifesa Pattuita: Puoi spendere 1 punto ki per effettuare l'azione di Disimpegno o di Scatto come azione bonus nel tuo turno, e la tua distanza di salto è raddoppiata per il turno.\nPasso Veloce: Puoi spendere 1 punto ki per effettuare l'azione di Schivata come azione bonus nel tuo turno."
+        },
+        "Unarmored Movement": {
+          "name": "Movimento Senza Armatura",
+          "description": "A partire dal 2° livello, la tua velocità aumenta di 3 metri mentre non indossi armatura o brandisci uno scudo. Questo bonus aumenta quando raggiungi alcuni livelli di monaco, come mostrato nella tabella del Monaco.\nAl 9° livello, ottieni la capacità di muoverti su superfici verticali e attraverso liquidi nel tuo turno senza cadere durante il movimento."
+        },
+        "Monastic Tradition": {
+          "name": "Tradizione Monastica",
+          "description": "Quando raggiungi il 3° livello, ti impegni a una tradizione monastica: la Via della Mano Aperta, la Via dell'Ombra o la Via dei Quattro Elementi, tutte dettagliate alla fine della descrizione della classe. La tua tradizione ti garantisce privilegi al 3° livello e di nuovo al 6°, 11° e 17° livello."
+        },
+        "Deflect Missiles": {
+          "name": "Deviare Proiettili",
+          "description": "A partire dal 3° livello, puoi usare la tua reazione per deviare o catturare il proiettile quando vieni colpito da un attacco con arma a distanza. Quando lo fai, i danni che subisci dall'attacco sono ridotti di 1d10 + il tuo modificatore di Destrezza + il tuo livello da monaco.\nSe riduci i danni a 0, puoi catturare il proiettile se è abbastanza piccolo da impugnare in una mano e hai almeno una mano libera. Se cattura un proiettile in questo modo, puoi spendere 1 punto ki per effettuare un attacco con arma a distanza con l'arma o il pezzo di munizione che hai appena catturato, come parte della stessa reazione. Effettui questo attacco con competenza, indipendentemente dalle tue competenze in armi, e il proiettile conta come un'arma da monaco per l'attacco, che ha una gittata normale di 6 metri e una gittata massima di 18 metri."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Slow Fall": {
+          "name": "Caduta Lenta",
+          "description": "A partire dal 4° livello, puoi usare la tua reazione quando cadi per ridurre qualsiasi danno da caduta che subisci di una quantità pari a cinque volte il tuo livello da monaco."
+        },
+        "Extra Attack": {
+          "name": "Attacco Extra",
+          "description": "A partire dal 5° livello, puoi attaccare due volte, invece di una, ogni volta che esegui l'azione di Attacco nel tuo turno."
+        },
+        "Stunning Strike": {
+          "name": "Colpo Stordente",
+          "description": "A partire dal 5° livello, puoi interferire con il flusso del ki nel corpo di un avversario. Quando colpisci un'altra creatura con un attacco con arma da mischia, puoi spendere 1 punto ki per tentare un colpo stordente. Il bersaglio deve superare un tiro salvezza su Costituzione o essere stordito fino alla fine del tuo prossimo turno."
+        },
+        "Ki-Empowered Strikes": {
+          "name": "Colpi Potenziati dal Ki",
+          "description": "A partire dal 6° livello, i tuoi attacchi senz'armi contano come magici per superare la resistenza e l'immunità ad attacchi e danni non magici."
+        },
+        "Evasion": {
+          "name": "Elusione",
+          "description": "Al 7° livello, la tua agilità istintiva ti permette di sgusciare via dagli effetti pericolosi. Quando sei sottoposto a un effetto, come il soffio infuocato di un drago rosso o un incantesimo palla di fuoco, che permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisci danni se superi il tiro salvezza, e solo metà dei danni se lo fallisci."
+        },
+        "Stillness of Mind": {
+          "name": "Quiete della Mente",
+          "description": "A partire dal 7° livello, puoi usare la tua azione per terminare un effetto su di te che ti sta ammaliando o spaventando."
+        },
+        "Purity of Body": {
+          "name": "Purezza del Corpo",
+          "description": "Al 10° livello, la tua maestria del ki che scorre attraverso di te ti rende immune al veleno e alle malattie."
+        },
+        "Tongue of the Sun and Moon": {
+          "name": "Lingua del Sole e della Luna",
+          "description": "A partire dal 13° livello, impari a toccare il ki di altre menti in modo da capire qualsiasi linguaggio parlato. Inoltre, qualsiasi creatura che possa capire una lingua può capire ciò che dici."
+        },
+        "Diamond Soul": {
+          "name": "Anima di Diamante",
+          "description": "A partire dal 14° livello, la tua padronanza del ki ti garantisce competenza in tutti i tiri salvezza.\nInoltre, ogni volta che effettui un tiro salvezza e fallisci, puoi spendere 1 punto ki per ritirarlo e usare il nuovo tiro."
+        },
+        "Timeless Body": {
+          "name": "Corpo Senza Tempo",
+          "description": "Al 15° livello, il tuo ki ti sostiene in modo che non subisci alcuna penalità all'età e non puoi essere invecchiato magicamente. Tuttavia, puoi ancora morire di vecchiaia. Inoltre, non hai più bisogno di cibo o acqua."
+        },
+        "Empty Body": {
+          "name": "Corpo Vuoto",
+          "description": "A partire dal 18° livello, puoi usare la tua azione per spendere 4 punti ki per diventare invisibile per 1 minuto. Durante quel tempo, hai anche resistenza a tutti i danni tranne i danni da forza.\nInoltre, puoi spendere 8 punti ki per lanciare l'incantesimo proiezione astrale, senza bisogno di componenti materiali. Quando lo fai, non puoi portare alcuna altra creatura con te."
+        },
+        "Perfect Self": {
+          "name": "Sé Perfetto",
+          "description": "Al 20° livello, quando tiri l'iniziativa e non hai punti ki rimanenti, recuperi 4 punti ki."
+        }
       },
       "subclasses": {
         "way-of-the-open-hand": {
           "name": "Via della Mano Aperta",
           "features": {
-            "Open Hand Technique": {"name": "Tecnica della Mano Aperta"},
-            "Wholeness of Body": {"name": "Pienezza del Corpo"},
-            "Tranquility": {"name": "Tranquillità"},
-            "Quivering Palm": {"name": "Palmo Tremante"}
+            "Open Hand Technique": {
+              "name": "Tecnica della Mano Aperta",
+              "description": "A partire da quando scegli questa tradizione al 3° livello, puoi manipolare il ki del tuo nemico quando sfrutti il tuo flusso di energia. Ogni volta che colpisci una creatura con uno degli attacchi concessi dalla tua Raffica di Colpi, puoi imporle uno dei seguenti effetti:\n* Deve superare un tiro salvezza su Destrezza o essere atterrata.\n* Deve effettuare un tiro salvezza su Forza. Se lo fallisce, puoi spingerla via fino a 4,5 metri da te.\n* Non può effettuare reazioni fino alla fine del tuo prossimo turno."
+            },
+            "Wholeness of Body": {
+              "name": "Pienezza del Corpo",
+              "description": "Al 6° livello, ottieni la capacità di curare te stesso. Come azione, puoi recuperare punti ferita pari a tre volte il tuo livello da monaco. Devi terminare un riposo lungo prima di poter usare questo privilegio di nuovo."
+            },
+            "Tranquility": {
+              "name": "Tranquillità",
+              "description": "A partire dall'11° livello, puoi entrare in una speciale meditazione che ti circonda di un'aura di pace. Alla fine di un riposo lungo, ottieni l'effetto dell'incantesimo santuario che dura fino all'inizio del tuo prossimo riposo lungo (l'incantesimo può terminare anticipatamente come al solito). La CD del tiro salvezza per l'incantesimo è pari a 8 + il tuo modificatore di Saggezza + il tuo bonus di competenza."
+            },
+            "Quivering Palm": {
+              "name": "Palmo Tremante",
+              "description": "Al 17° livello, ottieni la capacità di mettere vibrazioni letali nel corpo di qualcuno. Quando colpisci una creatura con un attacco senz'armi, puoi spendere 3 punti ki per iniziare queste vibrazioni impercettibili, che durano per un numero di giorni pari al tuo livello da monaco. Le vibrazioni sono innocue finché non usi la tua azione per terminarle. Per farlo, tu e il bersaglio dovete essere sullo stesso piano di esistenza. Quando usi questa azione, la creatura deve effettuare un tiro salvezza su Costituzione. Se fallisce, è ridotta a 0 punti ferita. Se lo supera, subisce 10d10 danni necrotici.\nPuoi avere solo una creatura soggetta a questo effetto alla volta. Puoi scegliere di terminare le vibrazioni in modo innocuo senza usare un'azione."
+            }
           }
         }
       }
@@ -216,30 +498,91 @@
       "prof_skills": "Scegline due tra Atletica, Intuizione, Intimidire, Medicina, Persuasione e Religione",
       "spellcasting_ability": "Carisma",
       "features": {
-        "Divine Sense": {"name": "Senso Divino"},
-        "Lay on Hands": {"name": "Imposizione delle Mani"},
-        "Fighting Style": {"name": "Stile di Combattimento"},
-        "Spellcasting": {"name": "Incantesimi"},
-        "Divine Smite": {"name": "Punizione Divina"},
-        "Divine Health": {"name": "Salute Divina"},
-        "Sacred Oath": {"name": "Giuramento Sacro"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Extra Attack": {"name": "Attacco Extra"},
-        "Aura of Protection": {"name": "Aura della Protezione"},
-        "Aura of Courage": {"name": "Aura del Coraggio"},
-        "Improved Divine Smite": {"name": "Punizione Divina Migliorata"},
-        "Cleansing Touch": {"name": "Tocco Purificatore"}
+        "Sacred Oaths": {
+          "name": "Giuramento Sacro",
+          "description": "Quando raggiungi il 3° livello, fai voto che ti collega a un giuramento sacro come paladino. Fino a questo punto, sei stato in uno stadio preparatorio, impegnato sul cammino ma non ancora vincolato. Ora scegli il Giuramento di Devozione, il Giuramento degli Antichi o il Giuramento della Vendetta, tutti dettagliati alla fine della descrizione della classe.\nLa tua scelta ti garantisce privilegi al 3° livello e di nuovo al 7°, 15° e 20° livello. Quei privilegi includono incantesimi del giuramento e il privilegio Incanalare Divinità."
+        },
+        "Divine Sense": {
+          "name": "Senso Divino",
+          "description": "La presenza di un male potente si registra sui tuoi sensi come un odore nauseante, e una potente bontà suona come musica celeste alle tue orecchie. Come azione, puoi aprire la tua consapevolezza per percepire tali forze. Fino alla fine del tuo prossimo turno, conosci la posizione di qualsiasi celestiale, immondo o non morto entro 18 metri da te che non sia dietro copertura totale. Conosci il tipo (celestiale, immondo o non morto) di qualsiasi essere la cui presenza percepisci, ma non la sua identità (per esempio, il vampiro Lord Conte Strahd von Zarovich). Entro la stessa gittata, percepisci anche la presenza di qualsiasi luogo o oggetto che è stato consacrato o sconsacrato, come con l'incantesimo santificare.\nPuoi usare questo privilegio un numero di volte pari a 1 + il tuo modificatore di Carisma. Quando termini un riposo lungo, recuperi tutti gli usi consumati."
+        },
+        "Lay on Hands": {
+          "name": "Imposizione delle Mani",
+          "description": "Le tue mani benedette possono curare le ferite. Hai un pool di potere curativo che si reintegra quando ti riposi. Con quel pool, puoi ripristinare un numero totale di punti ferita pari al tuo livello da paladino × 5.\nCome azione, puoi toccare una creatura ed estrarre potere dal pool per ripristinare un numero di punti ferita a quella creatura, fino al massimo rimanente nel tuo pool.\nIn alternativa, puoi spendere 5 punti ferita dal tuo pool di potere curativo per curare il bersaglio da una malattia o neutralizzare un veleno che lo affligge. Puoi curare più malattie e neutralizzare più veleni con un singolo uso di Imposizione delle Mani, spendendo punti ferita separatamente per ognuno.\nQuesto privilegio non ha effetto su non morti e costrutti."
+        },
+        "Fighting Style": {
+          "name": "Stile di Combattimento",
+          "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere uno Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Armi Grandi: Quando ottieni 1 o 2 sui dadi per i danni di un attacco effettuato con un'arma da mischia che brandisci a due mani, puoi ritirare il dado e devi usare il nuovo tiro. L'arma deve avere la proprietà a due mani o versatile per ottenere questo beneficio.\nProtezione: Quando una creatura che puoi vedere attacca un bersaglio diverso da te entro 1,5 metri da te, puoi usare la tua reazione per imporre svantaggio al tiro per colpire. Devi brandire uno scudo."
+        },
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Al 2° livello, hai imparato ad attingere magia divina attraverso meditazione e preghiera per lanciare incantesimi come un chierico. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del paladino.\nPreparare e Lanciare Incantesimi: La tabella del Paladino mostra quanti slot incantesimo possiedi per lanciare i tuoi incantesimi. Per lanciare uno dei tuoi incantesimi del paladino del 1° livello o superiore, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nPrepari la lista degli incantesimi del paladino che ti sono disponibili da lanciare, scegliendoli dalla lista degli incantesimi del paladino. Quando lo fai, scegli un numero di incantesimi del paladino pari al tuo modificatore di Carisma + metà del tuo livello da paladino, arrotondato per difetto (minimo un incantesimo). Gli incantesimi devono essere di un livello per il quale possiedi slot incantesimo.\nPer esempio, se sei un paladino del 5° livello, hai quattro slot incantesimo del 1° livello e due del 2° livello. Con un Carisma di 14, la tua lista di incantesimi preparati può includere quattro incantesimi del 1° o 2° livello, in qualsiasi combinazione. Se prepari l'incantesimo di 1° livello cura ferite, puoi lanciarlo usando uno slot del 1° o del 2° livello. Lanciare l'incantesimo non lo rimuove dalla lista degli incantesimi preparati.\nPuoi cambiare la tua lista di incantesimi preparati al termine di un riposo lungo. Preparare una nuova lista di incantesimi del paladino richiede tempo speso a pregare e meditare: almeno 1 minuto per livello dell'incantesimo per ogni incantesimo nella tua lista.\nCaratteristica da Incantatore: Carisma è la tua caratteristica da incantatore per i tuoi incantesimi del paladino, dato che il loro potere proviene dalla forza delle tue convinzioni. Usi il Carisma ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Carisma quando determini la CD dei tiri salvezza per un incantesimo del paladino che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Carisma\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Carisma\nFocus per Incantesimi: Puoi usare un simbolo sacro (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del paladino."
+        },
+        "Divine Smite": {
+          "name": "Punizione Divina",
+          "description": "A partire dal 2° livello, quando colpisci una creatura con un attacco con arma da mischia, puoi spendere uno slot incantesimo per infliggere danni radianti al bersaglio, in aggiunta ai danni dell'arma. I danni extra sono 2d8 per uno slot incantesimo del 1° livello, più 1d8 per ogni livello dell'incantesimo superiore al 1° fino a un massimo di 5d8. I danni aumentano di 1d8 se il bersaglio è un non morto o un immondo, fino a un massimo di 6d8."
+        },
+        "Divine Health": {
+          "name": "Salute Divina",
+          "description": "Al 3° livello, la magia divina che scorre attraverso di te ti rende immune alle malattie."
+        },
+        "Sacred Oath": {
+          "name": "Giuramento Sacro",
+          "description": "Quando raggiungi il 3° livello, fai voto che ti collega a un giuramento sacro come paladino. Fino a questo punto, sei stato in uno stadio preparatorio, impegnato sul cammino ma non ancora vincolato. Ora scegli il Giuramento di Devozione, il Giuramento degli Antichi o il Giuramento della Vendetta, tutti dettagliati alla fine della descrizione della classe.\nLa tua scelta ti garantisce privilegi al 3° livello e di nuovo al 7°, 15° e 20° livello. Quei privilegi includono incantesimi del giuramento e il privilegio Incanalare Divinità."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Extra Attack": {
+          "name": "Attacco Extra",
+          "description": "A partire dal 5° livello, puoi attaccare due volte, invece di una, ogni volta che esegui l'azione di Attacco nel tuo turno."
+        },
+        "Aura of Protection": {
+          "name": "Aura della Protezione",
+          "description": "A partire dal 6° livello, ogni volta che tu o una creatura amichevole entro 3 metri da te dovete effettuare un tiro salvezza, la creatura ottiene un bonus al tiro salvezza pari al tuo modificatore di Carisma (con un bonus minimo di +1). Devi essere cosciente per concedere questo bonus.\nAl 18° livello, la gittata di questa aura aumenta a 9 metri."
+        },
+        "Aura of Courage": {
+          "name": "Aura del Coraggio",
+          "description": "A partire dal 10° livello, tu e le creature amichevoli entro 3 metri da te non potete essere spaventati mentre sei cosciente.\nAl 18° livello, la gittata di questa aura aumenta a 9 metri."
+        },
+        "Improved Divine Smite": {
+          "name": "Punizione Divina Migliorata",
+          "description": "Per il 11° livello, sei così imbevuto di potere giusto che tutti i tuoi colpi in mischia trasportano potere divino con sé. Ogni volta che colpisci una creatura con un'arma da mischia, la creatura subisce 1d8 danni radianti aggiuntivi."
+        },
+        "Cleansing Touch": {
+          "name": "Tocco Purificatore",
+          "description": "A partire dal 14° livello, puoi usare la tua azione per terminare un incantesimo su di te o su una creatura consenziente che tocchi.\nPuoi usare questo privilegio un numero di volte pari al tuo modificatore di Carisma (un minimo di una volta). Recuperi gli usi consumati quando termini un riposo lungo."
+        }
       },
       "subclasses": {
         "oath-of-devotion": {
           "name": "Giuramento di Devozione",
           "features": {
-            "Tenets of Devotion": {"name": "Principi della Devozione"},
-            "Oath Spells": {"name": "Incantesimi del Giuramento"},
-            "Channel Divinity": {"name": "Incanalare Divinità"},
-            "Aura of Devotion": {"name": "Aura della Devozione"},
-            "Purity of Spirit": {"name": "Purezza dello Spirito"},
-            "Holy Nimbus": {"name": "Nimbo Sacro"}
+            "Tenets of Devotion": {
+              "name": "Principi della Devozione",
+              "description": "Sebbene la formulazione esatta e i precetti del Giuramento di Devozione possano variare, i paladini di questo giuramento condividono questi principi.\nOnestà. Non mentire né ingannare. Lascia che la tua parola sia la tua promessa.\nCoraggio. Non aver mai paura di agire, sebbene la cautela sia saggia.\nCompassione. Aiuta gli altri, proteggi i deboli e punisci coloro che li minacciano. Mostra clemenza ai tuoi nemici, ma temperala con saggezza.\nOnore. Tratta gli altri con equità, e lascia che le tue azioni onorevoli siano un esempio per loro. Fai il maggior bene possibile, causando il minor danno possibile.\nDovere. Sii responsabile delle tue azioni e delle loro conseguenze, proteggi quelli affidati alla tua cura e obbedisci a coloro che hanno una giusta autorità su di te."
+            },
+            "Oath Spells": {
+              "name": "Incantesimi del Giuramento",
+              "description": "Ottieni gli incantesimi del giuramento ai livelli da paladino indicati.\n3° livello: protezione dal male e dal bene, santuario\n5° livello: zona di verità, fascino su persone\n9° livello: fiamma vendicatrice, dissolvi magie\n13° livello: scudo della fede, libertà di movimento\n17° livello: comando superiore, ristorare superiore"
+            },
+            "Channel Divinity": {
+              "name": "Incanalare Divinità",
+              "description": "Quando prendi questo giuramento al 3° livello, ottieni le seguenti due opzioni di Incanalare Divinità.\nArma Sacra. Come azione, imbui un'arma che brandisci con energia positiva, usando il tuo Incanalare Divinità. Per 1 minuto, aggiungi il tuo modificatore di Carisma ai tiri per colpire effettuati con quell'arma (con un bonus minimo di +1). L'arma emette anche luce intensa in un raggio di 6 metri e luce fioca per altri 6 metri. Se l'arma non è già magica, diventa magica per la durata.\nPuoi terminare questo effetto nel tuo turno come parte di qualsiasi altra azione. Se non sei più in grado di brandire l'arma, l'effetto termina.\nScacciare l'Empio. Come azione, presenti il tuo simbolo sacro e pronunci una preghiera che condanna immondi e non morti, usando il tuo Incanalare Divinità. Ogni immondo o non morto che può vederti o sentirti entro 9 metri da te deve effettuare un tiro salvezza su Saggezza. Se la creatura fallisce il tiro salvezza, è scacciata per 1 minuto o finché non subisce danni.\nUna creatura scacciata deve spendere i suoi turni per cercare di allontanarsi il più possibile da te, e non può muoversi volontariamente in uno spazio entro 9 metri da te. Inoltre, non può effettuare reazioni. Per la sua azione, può usare solo l'azione di Scatto o cercare di sfuggire da un effetto che le impedisce di muoversi. Se non c'è nessun posto dove muoversi, la creatura può usare l'azione di Schivata."
+            },
+            "Aura of Devotion": {
+              "name": "Aura della Devozione",
+              "description": "A partire dal 7° livello, tu e le creature amichevoli entro 3 metri da te non potete essere ammaliati mentre sei cosciente.\nAl 18° livello, la gittata di questa aura aumenta a 9 metri."
+            },
+            "Purity of Spirit": {
+              "name": "Purezza dello Spirito",
+              "description": "A partire dal 15° livello, sei sempre sotto gli effetti di un incantesimo protezione dal male e dal bene."
+            },
+            "Holy Nimbus": {
+              "name": "Nimbo Sacro",
+              "description": "Al 20° livello, come azione, puoi emanare un'aura di luce solare. Per 1 minuto, una luce solare intensa risplende da te in un raggio di 9 metri, e luce fioca splende a 18 metri oltre.\nOgni volta che una creatura nemica inizia il proprio turno nella luce intensa, la creatura subisce 10 danni radianti.\nInoltre, per la durata, hai vantaggio ai tiri salvezza contro gli incantesimi lanciati da immondi o non morti.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo lungo."
+            }
           }
         }
       }
@@ -254,28 +597,79 @@
       "prof_skills": "Scegline tre tra Addestrare Animali, Atletica, Intuizione, Investigare, Natura, Percezione, Furtività e Sopravvivenza",
       "spellcasting_ability": "Saggezza",
       "features": {
-        "Favored Enemy": {"name": "Nemico Prescelto"},
-        "Natural Explorer": {"name": "Esploratore Naturale"},
-        "Fighting Style": {"name": "Stile di Combattimento"},
-        "Spellcasting": {"name": "Incantesimi"},
-        "Ranger Archetype": {"name": "Archetipo del Ranger"},
-        "Primeval Awareness": {"name": "Consapevolezza Primordiale"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Extra Attack": {"name": "Attacco Extra"},
-        "Land's Stride": {"name": "Falcata Naturale"},
-        "Hide in Plain Sight": {"name": "Nascondersi in Piena Vista"},
-        "Vanish": {"name": "Svanire"},
-        "Feral Senses": {"name": "Sensi Ferini"},
-        "Foe Slayer": {"name": "Sterminatore di Nemici"}
+        "Favored Enemy": {
+          "name": "Nemico Prescelto",
+          "description": "A partire dal 1° livello, hai una significativa esperienza nello studio, tracciamento, caccia e perfino conversazione con un certo tipo di nemico.\nScegli un tipo di nemico prescelto: aberrazioni, bestie, celestiali, costrutti, draghi, elementali, immondi, folletti, giganti, melme, non morti o piante. In alternativa, puoi selezionare due razze di umanoide (come gnoll e orchi) come tuoi nemici prescelti.\nHai vantaggio alle prove di Saggezza (Sopravvivenza) per tracciare i tuoi nemici prescelti, oltre che alle prove di Intelligenza per ricordare informazioni su di essi.\nQuando ottieni questo privilegio, impari anche una lingua a tua scelta che parla il tuo nemico prescelto, se ne parla una.\nScegli un nemico prescelto aggiuntivo, oltre a una lingua associata, al 6° e al 14° livello. Mentre acquisisci livelli, le tue scelte dovrebbero riflettere i tipi di mostri che hai incontrato nelle tue avventure."
+        },
+        "Natural Explorer": {
+          "name": "Esploratore Naturale",
+          "description": "Sei particolarmente abile nel viaggiare e sopravvivere in certi tipi di terreno. Scegli un tipo di terreno preferito: artico, costa, deserto, foresta, prateria, montagna, palude o Underdark. Quando effettui una prova di Intelligenza o Saggezza relativa al tuo terreno preferito, il tuo bonus di competenza è raddoppiato se stai usando un'abilità in cui sei competente.\nMentre viaggi per un'ora o più nel tuo terreno preferito, ottieni i seguenti benefici:\n* Il terreno difficile non rallenta il viaggio del tuo gruppo.\n* Il tuo gruppo non può essere perso, salvo per mezzi magici.\n* Anche quando sei impegnato in altre attività mentre viaggi (come cercare cibo, navigare o tracciare), rimani comunque in allerta per il pericolo.\n* Se viaggi da solo, puoi muoverti furtivamente a un ritmo normale.\n* Quando cerchi cibo, trovi il doppio del cibo che troveresti normalmente.\n* Mentre tracci altre creature, impari anche il loro numero esatto, le loro taglie e da quanto tempo sono passate per l'area.\nScegli un terreno preferito aggiuntivo al 6° e al 10° livello."
+        },
+        "Fighting Style": {
+          "name": "Stile di Combattimento",
+          "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere uno Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nArcheria: Ottieni un bonus di +2 ai tiri per colpire effettuati con armi a distanza.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Due Armi: Quando combatti con due armi, puoi aggiungere il tuo modificatore di caratteristica ai danni del secondo attacco."
+        },
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Quando raggiungi il 2° livello, hai imparato ad usare l'essenza magica della natura per lanciare incantesimi, in modo simile a un druido. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del ranger.\nSlot Incantesimo: La tabella del Ranger mostra quanti slot incantesimo possiedi per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nPer esempio, se conosci l'incantesimo di 1° livello dardo animale e hai un slot del 1° livello e uno del 2° livello disponibili, puoi lanciare dardo animale usando entrambi.\nIncantesimi Conosciuti del 1° Livello e Superiori: Conosci due incantesimi del 1° livello a tua scelta dalla lista degli incantesimi del ranger.\nLa colonna Incantesimi Conosciuti della tabella del Ranger mostra quando impari altri incantesimi del ranger a tua scelta. Ognuno di questi incantesimi deve essere di un livello per il quale possiedi slot incantesimo. Per esempio, quando raggiungi il 5° livello in questa classe, puoi imparare un nuovo incantesimo del 1° o del 2° livello.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere uno degli incantesimi del ranger che conosci e sostituirlo con un altro incantesimo dalla lista del ranger, anch'esso di un livello per il quale possiedi slot incantesimo.\nCaratteristica da Incantatore: Saggezza è la tua caratteristica da incantatore per i tuoi incantesimi del ranger, dato che la tua magia attinge alla tua sintonia con la natura. Usi la Saggezza ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Saggezza quando determini la CD dei tiri salvezza per un incantesimo del ranger che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Saggezza\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Saggezza"
+        },
+        "Ranger Archetype": {
+          "name": "Archetipo del Ranger",
+          "description": "Al 3° livello, scegli un archetipo che ti sforzi di emulare: il Cacciatore o il Maestro delle Bestie, entrambi dettagliati alla fine della descrizione della classe. La tua scelta ti garantisce privilegi al 3° livello e di nuovo al 7°, 11° e 15° livello."
+        },
+        "Primeval Awareness": {
+          "name": "Consapevolezza Primordiale",
+          "description": "A partire dal 3° livello, puoi usare la tua azione e spendere uno slot incantesimo del ranger per concentrarti sul mondo naturale intorno a te ed apprendere alcune informazioni. Per 1 minuto per livello dello slot incantesimo che spendi, puoi percepire se i seguenti tipi di creature sono presenti entro 1,5 km da te (o entro 9 km se sei nel tuo terreno preferito): aberrazioni, celestiali, draghi, elementali, immondi, folletti, non morti. Questo privilegio non rivela la posizione delle creature o il loro numero."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Extra Attack": {
+          "name": "Attacco Extra",
+          "description": "A partire dal 5° livello, puoi attaccare due volte, invece di una, ogni volta che esegui l'azione di Attacco nel tuo turno."
+        },
+        "Land's Stride": {
+          "name": "Falcata Naturale",
+          "description": "A partire dall'8° livello, muoversi attraverso terreni difficili non magici non ti costa movimento extra. Puoi anche attraversare piante non magiche senza essere rallentato da esse e senza subire danni se hanno spine, aculei o simili pericoli.\nInoltre, hai vantaggio ai tiri salvezza contro piante create magicamente o manipolate per impedire il movimento, come quelle create dall'incantesimo intralciare."
+        },
+        "Hide in Plain Sight": {
+          "name": "Nascondersi in Piena Vista",
+          "description": "A partire dal 10° livello, puoi spendere 1 minuto creando una mimetizzazione per te stesso. Devi avere accesso a fango, sporco, piante, fuliggine e altri materiali naturali con cui creare la mimetizzazione.\nUna volta mimetizzato in questo modo, puoi cercare di nasconderti premendoti contro una superficie solida, come un albero o una parete, almeno alta e larga quanto te. Ottieni un bonus di +10 alle prove di Destrezza (Furtività) finché rimani lì senza muoverti o effettuare azioni. Una volta che ti muovi o effettui un'azione o una reazione, devi mimetizzarti di nuovo per ottenere questo beneficio."
+        },
+        "Vanish": {
+          "name": "Svanire",
+          "description": "A partire dal 14° livello, puoi usare l'azione di Nascondersi come azione bonus nel tuo turno. Inoltre, non puoi essere tracciato con mezzi non magici, a meno che tu non scelga di lasciare una traccia."
+        },
+        "Feral Senses": {
+          "name": "Sensi Ferini",
+          "description": "Al 18° livello, ottieni sensibilità preternaturali che ti aiutano a combattere creature che non puoi vedere. Quando attacchi una creatura che non puoi vedere, la tua incapacità di vederla non impone svantaggio ai tuoi tiri per colpire contro di essa.\nSei anche consapevole della posizione di qualsiasi creatura invisibile entro 9 metri da te, a condizione che la creatura non sia nascosta da te e tu non sia accecato o assordato."
+        },
+        "Foe Slayer": {
+          "name": "Sterminatore di Nemici",
+          "description": "Al 20° livello, diventi un cacciatore senza pari dei tuoi nemici. Una volta in ognuno dei tuoi turni, puoi aggiungere il tuo modificatore di Saggezza al tiro per colpire o al tiro per i danni di un attacco effettuato contro uno dei tuoi nemici prescelti. Puoi scegliere di usare questo privilegio prima o dopo il tiro, ma prima di sapere se il tiro abbia successo o no."
+        }
       },
       "subclasses": {
         "hunter": {
           "name": "Cacciatore",
           "features": {
-            "Hunter's Prey": {"name": "Preda del Cacciatore"},
-            "Defensive Tactics": {"name": "Tattiche Difensive"},
-            "Multiattack": {"name": "Attacco Multiplo"},
-            "Superior Hunter's Defense": {"name": "Difesa Superiore del Cacciatore"}
+            "Hunter's Prey": {
+              "name": "Preda del Cacciatore",
+              "description": "Al 3° livello, ottieni uno dei seguenti privilegi a tua scelta.\nUccisore di Colossi. La tua tenacia ti permette di smantellare gli avversari più potenti. Quando colpisci una creatura con un attacco con un'arma, la creatura subisce 1d8 danni extra se è al di sotto del suo punteggio di punti ferita massimo. Puoi infliggere questi danni extra una sola volta per turno.\nDifesa Gigante. Quando viene colpito da una creatura Grande o più grande di te entro 1,5 metri, puoi usare la tua reazione per dimezzare i danni dell'attacco contro di te.\nUccisore di Sciami. Sei abile nel combattere contro molti avversari. Una volta in ognuno dei tuoi turni quando colpisci una creatura con un'arma, la creatura subisce 1d8 danni extra se è entro 1,5 metri da un'altra creatura non incapacitata che non sia tua compagna."
+            },
+            "Defensive Tactics": {
+              "name": "Tattiche Difensive",
+              "description": "Al 7° livello, ottieni uno dei seguenti privilegi a tua scelta.\nFurtività dei Sensi. Le creature non hanno vantaggio ai tiri per colpire contro di te come risultato dell'essere nascoste da te.\nDifesa Multiattacco. Quando una creatura ti colpisce con un attacco, ottieni un bonus di +4 alla CA contro tutti i successivi attacchi effettuati da quella creatura per il resto del turno.\nDifensore della Fauna. Hai vantaggio ai tiri salvezza contro effetti di ammaliamento e spavento di bestie e piante."
+            },
+            "Multiattack": {
+              "name": "Attacco Multiplo",
+              "description": "All'11° livello, ottieni uno dei seguenti privilegi a tua scelta.\nRaffica. Puoi usare la tua azione per attaccare due volte ogni creatura entro 3 metri da un punto che puoi vedere entro la gittata della tua arma con un attacco a distanza.\nAttacco Roteante. Puoi usare la tua azione per effettuare un attacco con arma da mischia contro qualsiasi numero di creature entro 1,5 metri da te, con un attacco separato per ognuna di esse."
+            },
+            "Superior Hunter's Defense": {
+              "name": "Difesa Superiore del Cacciatore",
+              "description": "Al 15° livello, ottieni uno dei seguenti privilegi a tua scelta.\nElusione. Quando sei sottoposto a un effetto, come il soffio infuocato di un drago rosso o un incantesimo palla di fuoco, che permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisci danni se superi il tiro salvezza, e solo metà dei danni se lo fallisci.\nRappresaglia. Quando subisci danni da una creatura entro 1,5 metri da te, puoi usare la tua reazione per effettuare un attacco in mischia contro la creatura.\nResistenza dello Sterminatore di Sciami. Quando subisci danni da una creatura, ottieni resistenza a tutti i danni inflitti dalle altre creature fino all'inizio del tuo prossimo turno."
+            }
           }
         }
       }
@@ -289,29 +683,83 @@
       "prof_saving_throws": "Destrezza, Intelligenza",
       "prof_skills": "Scegline quattro tra Acrobazia, Atletica, Inganno, Intuizione, Intimidire, Investigare, Percezione, Rappresentazione, Persuasione, Rapidità di Mano e Furtività",
       "features": {
-        "Expertise": {"name": "Competenza"},
-        "Sneak Attack": {"name": "Attacco Furtivo"},
-        "Thieves' Cant": {"name": "Gergo dei Ladri"},
-        "Cunning Action": {"name": "Azione Scaltra"},
-        "Roguish Archetype": {"name": "Archetipo del Ladro"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Uncanny Dodge": {"name": "Schivata Prodigiosa"},
-        "Evasion": {"name": "Elusione"},
-        "Reliable Talent": {"name": "Talento Affidabile"},
-        "Blindsense": {"name": "Percezione Cieca"},
-        "Slippery Mind": {"name": "Mente Sfuggente"},
-        "Elusive": {"name": "Elusivo"},
-        "Stroke of Luck": {"name": "Colpo di Fortuna"}
+        "Expertise": {
+          "name": "Competenza",
+          "description": "Al 1° livello, scegli due delle tue competenze in abilità, o una delle tue competenze in abilità e la tua competenza con gli arnesi da scasso. Il tuo bonus di competenza è raddoppiato per ogni prova di caratteristica che effettui che usi una di queste competenze prescelte.\nAl 6° livello, puoi scegliere altre due competenze (in abilità o con gli arnesi da scasso) per ottenere il beneficio di questo privilegio."
+        },
+        "Sneak Attack": {
+          "name": "Attacco Furtivo",
+          "description": "A partire dal 1° livello, sai come colpire sottilmente e sfruttare la distrazione di un nemico. Una volta per turno, puoi infliggere 1d6 danni extra a una creatura che colpisci con un attacco se hai vantaggio al tiro per colpire. L'attacco deve usare un'arma da finezza o a distanza.\nNon hai bisogno di vantaggio al tiro per colpire se un'altra nemica del bersaglio è entro 1,5 metri da esso, quella creatura non è incapacitata e tu non hai svantaggio al tiro per colpire.\nL'ammontare dei danni extra aumenta man mano che acquisisci livelli in questa classe, come mostrato nella colonna Attacco Furtivo della tabella del Ladro."
+        },
+        "Thieves' Cant": {
+          "name": "Gergo dei Ladri",
+          "description": "Durante il tuo allenamento da ladro, hai imparato il gergo dei ladri, una mistura segreta di dialetto, gergo e codice che ti permette di nascondere messaggi in conversazioni apparentemente normali. Solo un'altra creatura che conosce il gergo dei ladri capisce tali messaggi. Ci vogliono quattro volte tanto a comunicare un tale messaggio rispetto a un linguaggio normale.\nInoltre, comprendi un set di simboli e segni segreti usati per trasmettere messaggi brevi e semplici, come ad esempio se un'area è pericolosa o il territorio di una corporazione di ladri, se il bottino è vicino o se le persone in un'area sono creduloni o forze dell'ordine."
+        },
+        "Cunning Action": {
+          "name": "Azione Scaltra",
+          "description": "A partire dal 2° livello, la tua agilità mentale e fisica veloce ti permette di muoverti e agire rapidamente. Puoi compiere un'azione bonus in ognuno dei tuoi turni in combattimento. Quell'azione può essere usata solo per effettuare l'azione di Scatto, Disimpegnarsi o Nascondersi."
+        },
+        "Roguish Archetype": {
+          "name": "Archetipo del Ladro",
+          "description": "Al 3° livello, scegli un archetipo che illustra il tuo metodo di lavoro: Ladro, Assassino o Stregone Arcano, tutti dettagliati alla fine della descrizione della classe. La tua scelta archetipale ti garantisce privilegi al 3° livello e di nuovo al 9°, 13° e 17° livello."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 10°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Uncanny Dodge": {
+          "name": "Schivata Prodigiosa",
+          "description": "A partire dal 5° livello, quando un attaccante che puoi vedere ti colpisce con un attacco, puoi usare la tua reazione per dimezzare i danni dell'attacco contro di te."
+        },
+        "Evasion": {
+          "name": "Elusione",
+          "description": "A partire dal 7° livello, puoi sgusciare via dagli effetti di area, come il soffio infuocato di un drago rosso o un incantesimo fulmine. Quando sei sottoposto a un effetto che permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisci danni se superi il tiro salvezza, e solo metà dei danni se lo fallisci."
+        },
+        "Reliable Talent": {
+          "name": "Talento Affidabile",
+          "description": "Per l'11° livello, hai affinato le tue abilità prescelte fino a raggiungere la perfezione. Ogni volta che effettui una prova di caratteristica che ti permette di aggiungere il tuo bonus di competenza, puoi trattare un tiro di 9 o inferiore sul d20 come 10."
+        },
+        "Blindsense": {
+          "name": "Percezione Cieca",
+          "description": "A partire dal 14° livello, se sei in grado di sentire, sei consapevole della posizione di qualsiasi creatura nascosta o invisibile entro 3 metri da te."
+        },
+        "Slippery Mind": {
+          "name": "Mente Sfuggente",
+          "description": "Per il 15° livello, hai acquisito una resilienza mentale superiore. Ottieni la competenza nei tiri salvezza su Saggezza."
+        },
+        "Elusive": {
+          "name": "Elusivo",
+          "description": "A partire dal 18° livello, sei così sfuggente che gli attaccanti raramente ottengono il sopravvento contro di te. Nessun tiro per colpire ha vantaggio contro di te mentre non sei incapacitato."
+        },
+        "Stroke of Luck": {
+          "name": "Colpo di Fortuna",
+          "description": "Al 20° livello, hai un'abilità incomparabile nel cogliere il successo dal fallimento. Se il tuo attacco fallisce contro un bersaglio entro la tua gittata, puoi trasformare il fallimento in un successo. In alternativa, se fallisci una prova di caratteristica, puoi trattare il d20 come se avessi ottenuto un 20.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo breve o lungo."
+        }
       },
       "subclasses": {
         "thief": {
           "name": "Ladro Acrobata",
           "features": {
-            "Fast Hands": {"name": "Mani Veloci"},
-            "Second-Story Work": {"name": "Lavoro al Secondo Piano"},
-            "Supreme Sneak": {"name": "Furtività Suprema"},
-            "Use Magic Device": {"name": "Usare Oggetti Magici"},
-            "Thief's Reflexes": {"name": "Riflessi del Ladro"}
+            "Fast Hands": {
+              "name": "Mani Veloci",
+              "description": "A partire dal 3° livello, puoi usare l'azione bonus concessa dalla tua Azione Scaltra per effettuare una prova di Destrezza (Rapidità di Mano), usare i tuoi arnesi da scasso per disinnescare una trappola o aprire una serratura, o effettuare l'azione di Usare un Oggetto."
+            },
+            "Second-Story Work": {
+              "name": "Lavoro al Secondo Piano",
+              "description": "Quando scegli questo archetipo al 3° livello, ottieni la capacità di arrampicarti più velocemente del normale; arrampicarsi non ti costa più movimento extra.\nInoltre, quando effettui un salto in lungo da fermo, la distanza che puoi coprire aumenta di un numero di metri pari al tuo modificatore di Destrezza."
+            },
+            "Supreme Sneak": {
+              "name": "Furtività Suprema",
+              "description": "A partire dal 9° livello, hai vantaggio a una prova di Destrezza (Furtività) se ti muovi a non più della metà della tua velocità nello stesso turno."
+            },
+            "Use Magic Device": {
+              "name": "Usare Oggetti Magici",
+              "description": "Per il 13° livello, hai imparato abbastanza sul funzionamento della magia da poter improvvisare l'uso di oggetti anche quando non sono destinati a te. Ignori tutte le restrizioni di classe, razza e livello sull'uso di oggetti magici."
+            },
+            "Thief's Reflexes": {
+              "name": "Riflessi del Ladro",
+              "description": "Quando raggiungi il 17° livello, sei diventato abile nel colpire prima e sgusciare via prima che gli avversari riescano ad agire. Puoi effettuare due turni durante il primo round di qualsiasi combattimento. Effettui il tuo primo turno con la tua iniziativa normale e il tuo secondo turno con la tua iniziativa meno 10. Non puoi usare questo privilegio quando sei sorpreso."
+            }
           }
         }
       }
@@ -326,22 +774,55 @@
       "prof_skills": "Scegline due tra Arcano, Inganno, Intuizione, Intimidire, Persuasione e Religione",
       "spellcasting_ability": "Carisma",
       "features": {
-        "Spellcasting": {"name": "Incantesimi"},
-        "Sorcerous Origin": {"name": "Origine Stregonesca"},
-        "Font of Magic": {"name": "Sorgente di Magia"},
-        "Metamagic": {"name": "Metamagia"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Sorcerous Restoration": {"name": "Ristoro Stregonesco"}
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Un evento nel tuo passato, o nella vita di un genitore o antenato, ti ha lasciato un'impronta indelebile su di te, infondendo magia in te. Questo pozzo di magia, di qualunque sua fonte, alimenta i tuoi incantesimi. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi dello stregone.\nTrucchetti: Al 1° livello, conosci quattro trucchetti a tua scelta dalla lista degli incantesimi dello stregone. Impari trucchetti aggiuntivi dello stregone a livelli successivi, come mostrato nella colonna Trucchetti Conosciuti della tabella dello Stregone.\nSlot Incantesimo: La tabella dello Stregone mostra quanti slot incantesimo possiedi per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nIncantesimi Conosciuti del 1° Livello e Superiori: Conosci due incantesimi del 1° livello a tua scelta dalla lista degli incantesimi dello stregone.\nLa colonna Incantesimi Conosciuti della tabella dello Stregone mostra quando impari altri incantesimi dello stregone a tua scelta. Ognuno di questi incantesimi deve essere di un livello per il quale possiedi slot incantesimo.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere uno degli incantesimi dello stregone che conosci e sostituirlo con un altro incantesimo dalla lista dello stregone, anch'esso di un livello per il quale possiedi slot incantesimo.\nCaratteristica da Incantatore: Carisma è la tua caratteristica da incantatore per i tuoi incantesimi dello stregone, dato che la potenza della tua magia si basa sulla tua capacità di proiettare la tua volontà nel mondo. Usi il Carisma ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Carisma quando determini la CD dei tiri salvezza per un incantesimo dello stregone che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Carisma\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Carisma\nFocus per Incantesimi: Puoi usare un focus arcano (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi dello stregone."
+        },
+        "Sorcerous Origin": {
+          "name": "Origine Stregonesca",
+          "description": "Scegli un'origine stregonesca, che descrive la fonte del tuo potere magico innato: Stirpe Draconica o Magia Selvaggia, entrambe dettagliate alla fine della descrizione della classe.\nLa tua scelta ti garantisce privilegi quando la scegli al 1° livello e di nuovo al 6°, 14° e 18° livello."
+        },
+        "Font of Magic": {
+          "name": "Sorgente di Magia",
+          "description": "Al 2° livello, attingi a un pozzo profondo di magia interna. Questo pozzo è rappresentato da Punti Stregoneria, che ti permettono di creare una varietà di effetti magici.\nPunti Stregoneria. Hai 2 punti stregoneria, e ne ottieni di più man mano che raggiungi i livelli più alti, come mostrato nella colonna Punti Stregoneria della tabella dello Stregone. Non puoi mai avere più punti stregoneria di quelli mostrati sulla tabella per il tuo livello. Recuperi tutti i punti stregoneria consumati quando completi un riposo lungo.\nMetamagia Flessibile. Puoi usare i tuoi punti stregoneria per ottenere slot incantesimo aggiuntivi, o sacrificare slot incantesimo per ottenere punti stregoneria aggiuntivi. Impari altri modi per usare i tuoi punti stregoneria man mano che raggiungi i livelli più alti.\nCreare Slot Incantesimo. Puoi trasformare i punti stregoneria che hai consumato in slot incantesimo come azione bonus nel tuo turno. La Tabella di Creazione degli Slot Incantesimo mostra il costo di creare uno slot incantesimo di un dato livello. Puoi creare slot incantesimo non più alti del 5° livello.\nQualsiasi slot incantesimo crei con questo privilegio scompare alla fine di un riposo lungo.\nConvertire uno Slot Incantesimo in Punti Stregoneria. Come azione bonus nel tuo turno, puoi spendere uno slot incantesimo e ottenere un numero di punti stregoneria pari al livello dello slot."
+        },
+        "Metamagic": {
+          "name": "Metamagia",
+          "description": "Al 3° livello, ottieni la capacità di influenzare e plasmare gli incantesimi. Scegli due delle seguenti opzioni di Metamagia a tua scelta. Ne ottieni un'altra al 10° e al 17° livello.\nPuoi usare solo un'opzione di Metamagia su un incantesimo quando lo lanci, a meno che non sia indicato diversamente.\n[L'elenco completo delle opzioni di Metamagia segue nelle regole]"
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Sorcerous Restoration": {
+          "name": "Ristoro Stregonesco",
+          "description": "Al 20° livello, recuperi 4 punti stregoneria consumati ogni volta che termini un riposo breve."
+        }
       },
       "subclasses": {
         "draconic-bloodline": {
           "name": "Stirpe Draconica",
           "features": {
-            "Dragon Ancestor": {"name": "Antenato Drago"},
-            "Draconic Resilience": {"name": "Resilienza Draconica"},
-            "Elemental Affinity": {"name": "Affinità Elementale"},
-            "Dragon Wings": {"name": "Ali di Drago"},
-            "Draconic Presence": {"name": "Presenza Draconica"}
+            "Dragon Ancestor": {
+              "name": "Antenato Drago",
+              "description": "Al 1° livello, scegli un tipo di drago come tuo antenato. I danni del tipo associato al tuo antenato sono usati dai privilegi che ottieni successivamente.\nPuoi parlare, leggere e scrivere il Draconico. Inoltre, ogni volta che effettui una prova di Carisma quando interagisci con i draghi, il tuo bonus di competenza è raddoppiato se applicabile alla prova."
+            },
+            "Draconic Resilience": {
+              "name": "Resilienza Draconica",
+              "description": "A partire dal 1° livello, mentre la magia scorre attraverso il tuo corpo, manifesta tratti del tuo antenato draconico. I tuoi punti ferita massimi aumentano di 1 e aumentano di 1 ogni volta che ottieni un livello in questa classe.\nInoltre, parti della tua pelle sono coperte da un sottile strato di squame simili a quelle dei draghi. Quando non indossi un'armatura, la tua CA è pari a 13 + il tuo modificatore di Destrezza."
+            },
+            "Elemental Affinity": {
+              "name": "Affinità Elementale",
+              "description": "A partire dal 6° livello, quando lanci un incantesimo che infligge danni del tipo associato al tuo antenato draconico, puoi aggiungere il tuo modificatore di Carisma a un tiro per i danni di quell'incantesimo. Allo stesso tempo, puoi spendere 1 punto stregoneria per ottenere resistenza a quel tipo di danno per 1 ora."
+            },
+            "Dragon Wings": {
+              "name": "Ali di Drago",
+              "description": "Al 14° livello, ottieni la capacità di far germogliare un paio di ali di drago dalla tua schiena, ottenendo una velocità di volo pari alla tua velocità attuale. Puoi creare queste ali come azione bonus nel tuo turno. Rimangono finché non le congediti come azione bonus nel tuo turno.\nNon puoi manifestare le tue ali mentre indossi un'armatura, a meno che l'armatura non sia stata creata per accomodarle, e gli abiti non destinati a accomodare le ali potrebbero essere rovinati quando emergi."
+            },
+            "Draconic Presence": {
+              "name": "Presenza Draconica",
+              "description": "A partire dal 18° livello, puoi sfruttare la potenza imponente del tuo antenato draconico, facendo sì che gli altri sentano il timore. Come azione, puoi spendere 5 punti stregoneria per emanare un'aura di tremore o di paura (a tua scelta) fino a una distanza di 18 metri. Per 1 minuto o finché non perdi la concentrazione (come se ti stessi concentrando su un incantesimo), ogni creatura ostile che inizia il proprio turno in questa aura deve superare un tiro salvezza su Saggezza o essere ammaliata (se hai scelto tremore) o spaventata (se hai scelto paura) finché l'aura termina. Una creatura che supera il tiro salvezza è immune alla tua aura per 24 ore."
+            }
           }
         }
       }
@@ -356,23 +837,59 @@
       "prof_skills": "Scegline due tra Arcano, Inganno, Storia, Intimidire, Investigare, Natura e Religione",
       "spellcasting_ability": "Carisma",
       "features": {
-        "Otherworldly Patron": {"name": "Patrono Ultraterreno"},
-        "Pact Magic": {"name": "Magia del Patto"},
-        "Eldritch Invocations": {"name": "Invocazioni Mistiche"},
-        "Pact Boon": {"name": "Dono del Patto"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Mystic Arcanum": {"name": "Arcanum Mistico"},
-        "Eldritch Master": {"name": "Maestro Mistico"}
+        "Otherworldly Patron": {
+          "name": "Patrono Ultraterreno",
+          "description": "Al 1° livello, hai stretto un patto con un essere ultraterreno a tua scelta: l'Arcifolletto, l'Immondo o il Grande Antico, ognuno dei quali è dettagliato alla fine della descrizione della classe. La tua scelta ti garantisce privilegi al 1° livello e di nuovo al 6°, 10° e 14° livello."
+        },
+        "Pact Magic": {
+          "name": "Magia del Patto",
+          "description": "Le tue ricerche arcane e la magia conferita dal tuo patrono ti concedono la facilità con gli incantesimi. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del warlock.\nTrucchetti: Conosci due trucchetti a tua scelta dalla lista degli incantesimi del warlock. Impari trucchetti aggiuntivi a livelli superiori, come mostrato nella colonna Trucchetti Conosciuti della tabella del Warlock.\nSlot Incantesimo: La tabella del Warlock mostra quanti slot incantesimo hai. La tabella mostra anche qual è il livello di quegli slot; tutti i tuoi slot incantesimo sono dello stesso livello. Per lanciare uno dei tuoi incantesimi del warlock del 1° livello o superiori, devi consumare uno slot incantesimo. Recuperi tutti gli slot incantesimo consumati quando termini un riposo breve o lungo.\nPer esempio, quando sei un warlock del 5° livello, hai due slot incantesimo del 3° livello. Per lanciare l'incantesimo del 1° livello dardo incantato, devi consumare uno di quegli slot, e lo lanci come incantesimo del 3° livello.\nIncantesimi Conosciuti del 1° Livello e Superiori: Al 1° livello, conosci due incantesimi del 1° livello a tua scelta dalla lista degli incantesimi del warlock.\nLa colonna Incantesimi Conosciuti della tabella del Warlock mostra quando impari altri incantesimi del warlock a tua scelta del 1° livello e superiori. Un incantesimo che scegli deve essere di un livello pari o inferiore a quello mostrato nella colonna Livello degli Slot della tabella per il tuo livello. Quando raggiungi il 6° livello, per esempio, impari un nuovo incantesimo del warlock, che può essere del 1°, 2° o 3° livello.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere uno degli incantesimi del warlock che conosci e sostituirlo con un altro incantesimo dalla lista del warlock, anch'esso di un livello per il quale possiedi slot incantesimo.\nCaratteristica da Incantatore: Carisma è la tua caratteristica da incantatore per i tuoi incantesimi del warlock, dato che impari i tuoi incantesimi attraverso lo studio dedicato e la memorizzazione, ma li lanci per pura forza di personalità. Usi il Carisma ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Carisma quando determini la CD dei tiri salvezza per un incantesimo del warlock che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Carisma\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Carisma\nFocus per Incantesimi: Puoi usare un focus arcano (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del warlock."
+        },
+        "Eldritch Invocations": {
+          "name": "Invocazioni Mistiche",
+          "description": "Nei tuoi studi della tradizione occulta, hai dissotterrato invocazioni mistiche, frammenti di conoscenza proibita che ti imbevono di una capacità magica permanente.\nAl 2° livello, ottieni due invocazioni mistiche a tua scelta. Le tue opzioni di invocazione sono dettagliate alla fine della descrizione della classe. Quando ottieni alcuni livelli da warlock, ottieni invocazioni mistiche aggiuntive a tua scelta, come mostrato nella colonna Invocazioni Conosciute della tabella del Warlock.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere una delle invocazioni che conosci e sostituirla con un'altra invocazione che potresti imparare a quel livello."
+        },
+        "Pact Boon": {
+          "name": "Dono del Patto",
+          "description": "Al 3° livello, il tuo patrono ultraterreno ti concede un dono per il tuo fedele servizio. Ottieni una delle seguenti opzioni a tua scelta.\nDono della Catena. Impari l'incantesimo trova famiglio e puoi lanciarlo come rituale. L'incantesimo non conta nel numero degli incantesimi che conosci.\nDono della Lama. Puoi usare la tua azione per creare un'arma da patto nella tua mano vuota. Puoi scegliere la forma che assume questa arma da mischia ogni volta che la crei. Sei competente con essa mentre la brandisci. Quest'arma conta come magica per superare la resistenza e l'immunità ad attacchi e danni non magici.\nDono del Tomo. Il tuo patrono ti dà un grimorio chiamato Libro delle Ombre. Quando ottieni questo privilegio, scegli tre trucchetti da qualsiasi lista di incantesimi delle altre classi. Mentre il libro è su di te, puoi lanciare quei trucchetti a piacimento. Non contano nel tuo numero di trucchetti conosciuti."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Mystic Arcanum": {
+          "name": "Arcanum Mistico",
+          "description": "All'11° livello, il tuo patrono ti garantisce un segreto magico chiamato un arcanum. Scegli un incantesimo del 6° livello dalla lista degli incantesimi del warlock come questo arcanum.\nPuoi lanciare il tuo incantesimo arcanum una volta senza spendere uno slot incantesimo. Devi terminare un riposo lungo prima di poterlo lanciare di nuovo.\nA livelli superiori, ottieni più incantesimi del warlock a tua scelta che possono essere lanciati in questo modo: uno del 7° livello al 13° livello, uno dell'8° livello al 15° livello e uno del 9° livello al 17° livello. Recuperi tutti gli usi del tuo Arcanum Mistico quando termini un riposo lungo."
+        },
+        "Eldritch Master": {
+          "name": "Maestro Mistico",
+          "description": "Al 20° livello, puoi attingere alla tua riserva di potere mistico mentre implori favori dal tuo patrono. Spendi 1 minuto a implorare l'assistenza del tuo patrono per recuperare tutti i tuoi slot incantesimo consumati dal tuo privilegio Magia del Patto. Una volta usato questo privilegio, devi terminare un riposo lungo prima di poterlo usare di nuovo."
+        }
       },
       "subclasses": {
         "the-fiend": {
           "name": "L'Immondo",
           "features": {
-            "Expanded Spell List": {"name": "Lista Incantesimi Estesa"},
-            "Dark One's Blessing": {"name": "Benedizione dell'Oscuro"},
-            "Dark One's Own Luck": {"name": "Fortuna dell'Oscuro"},
-            "Fiendish Resilience": {"name": "Resilienza Immonda"},
-            "Hurl Through Hell": {"name": "Scagliare nell'Inferno"}
+            "Expanded Spell List": {
+              "name": "Lista Incantesimi Estesa",
+              "description": "L'Immondo ti permette di scegliere tra un elenco esteso di incantesimi quando impari un incantesimo del warlock. I seguenti incantesimi sono aggiunti alla lista degli incantesimi del warlock per te.\n1° livello: comando, gocce di fuoco\n2° livello: cecità/sordità, scurire\n3° livello: dono dell'incoscienza, palla di fuoco\n4° livello: muro di fuoco, peste degli insetti\n5° livello: emanazione tossica, riempire"
+            },
+            "Dark One's Blessing": {
+              "name": "Benedizione dell'Oscuro",
+              "description": "A partire dal 1° livello, quando riduci una creatura ostile a 0 punti ferita, ottieni punti ferita temporanei pari al tuo modificatore di Carisma + il tuo livello da warlock (minimo 1)."
+            },
+            "Dark One's Own Luck": {
+              "name": "Fortuna dell'Oscuro",
+              "description": "A partire dal 6° livello, puoi attingere alla fortuna oscura del tuo patrono quando ne hai più bisogno. Quando effettui una prova di caratteristica o un tiro salvezza, puoi usare questo privilegio per aggiungere un d10 al tuo tiro. Puoi farlo dopo aver visto il tiro iniziale ma prima che siano applicate le sue conseguenze.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo breve o lungo."
+            },
+            "Fiendish Resilience": {
+              "name": "Resilienza Immonda",
+              "description": "A partire dal 10° livello, puoi scegliere un tipo di danno quando termini un riposo breve o lungo. Ottieni resistenza a quel tipo di danno finché non scegli un tipo diverso con questo privilegio. I danni di armi magiche o argento ignorano questa resistenza."
+            },
+            "Hurl Through Hell": {
+              "name": "Scagliare nell'Inferno",
+              "description": "A partire dal 14° livello, quando colpisci una creatura con un attacco, puoi usare questo privilegio per inviare istantaneamente il bersaglio attraverso i piani inferiori. La creatura scompare e attraversa un incubo paesaggio.\nAlla fine del tuo prossimo turno, il bersaglio ritorna nello spazio che precedentemente occupava, o nello spazio libero più vicino. Se il bersaglio non è un immondo, subisce 10d10 danni psichici dato che riemerge tormentata dalle sue esperienze.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo lungo."
+            }
           }
         }
       }
@@ -387,22 +904,55 @@
       "prof_skills": "Scegline due tra Arcano, Storia, Intuizione, Investigare, Medicina e Religione",
       "spellcasting_ability": "Intelligenza",
       "features": {
-        "Spellcasting": {"name": "Incantesimi"},
-        "Arcane Recovery": {"name": "Recupero Arcano"},
-        "Arcane Tradition": {"name": "Tradizione Arcana"},
-        "Ability Score Improvement": {"name": "Aumento dei Punteggi di Caratteristica"},
-        "Spell Mastery": {"name": "Maestria degli Incantesimi"},
-        "Signature Spells": {"name": "Incantesimi Marchiati"}
+        "Spellcasting": {
+          "name": "Incantesimi",
+          "description": "Come studente di magia arcana, hai un grimorio contenente incantesimi che mostrano i primi accenni del tuo vero potere. Vedi il capitolo 10 per le regole generali sull'uso degli incantesimi e il capitolo 11 per la lista degli incantesimi del mago.\nTrucchetti: Al 1° livello, conosci tre trucchetti a tua scelta dalla lista degli incantesimi del mago. Impari trucchetti aggiuntivi a livelli superiori, come mostrato nella colonna Trucchetti Conosciuti della tabella del Mago.\nGrimorio: Al 1° livello, hai un grimorio contenente sei incantesimi del 1° livello a tua scelta dalla lista degli incantesimi del mago.\nPreparare e Lanciare Incantesimi: La tabella del Mago mostra quanti slot incantesimo hai per lanciare i tuoi incantesimi del 1° livello e superiori. Per lanciare uno di questi incantesimi, devi consumare uno slot del livello dell'incantesimo o di livello superiore. Recuperi tutti gli slot incantesimo consumati quando completi un riposo lungo.\nPrepari la lista degli incantesimi del mago che ti sono disponibili da lanciare. Per farlo, scegli un numero di incantesimi del mago dal tuo grimorio pari al tuo modificatore di Intelligenza + il tuo livello da mago (minimo un incantesimo). Gli incantesimi devono essere di un livello per il quale possiedi slot incantesimo.\nPer esempio, se sei un mago del 3° livello, hai quattro slot incantesimo del 1° livello e due del 2° livello. Con un'Intelligenza di 16, la tua lista di incantesimi preparati può includere sei incantesimi del 1° o 2° livello, in qualsiasi combinazione, scelti dal tuo grimorio. Se prepari l'incantesimo di 1° livello dardo incantato, puoi lanciarlo usando uno slot del 1° o del 2° livello. Lanciare l'incantesimo non lo rimuove dalla tua lista degli incantesimi preparati.\nPuoi cambiare la tua lista di incantesimi preparati al termine di un riposo lungo. Preparare una nuova lista di incantesimi del mago richiede tempo speso a studiare il tuo grimorio e memorizzare gli incantesimi: almeno 1 minuto per livello dell'incantesimo per ogni incantesimo nella tua lista.\nCaratteristica da Incantatore: Intelligenza è la tua caratteristica da incantatore per i tuoi incantesimi del mago, dato che impari i tuoi incantesimi attraverso lo studio dedicato e la memorizzazione. Usi l'Intelligenza ogni volta che un incantesimo si riferisce alla tua caratteristica da incantatore. Inoltre, usi il modificatore di Intelligenza quando determini la CD dei tiri salvezza per un incantesimo del mago che lanci e quando effettui un tiro per colpire con un incantesimo.\nCD del Tiro Salvezza dell'Incantesimo = 8 + il tuo bonus di competenza + il tuo modificatore di Intelligenza\nModificatore di Attacco dell'Incantesimo = il tuo bonus di competenza + il tuo modificatore di Intelligenza\nLanciare Rituali: Puoi lanciare un incantesimo del mago come rituale se quell'incantesimo possiede il descrittore di rituale e lo hai nel tuo grimorio. Non hai bisogno di avere l'incantesimo preparato.\nFocus per Incantesimi: Puoi usare un focus arcano (vedi capitolo 5, \"Equipaggiamento\") come focus per incantesimi per i tuoi incantesimi del mago."
+        },
+        "Arcane Recovery": {
+          "name": "Recupero Arcano",
+          "description": "Hai imparato a recuperare parte della tua energia magica studiando il tuo grimorio. Una volta al giorno quando termini un riposo breve, puoi scegliere gli slot incantesimo consumati da recuperare. Gli slot incantesimo possono avere un livello combinato pari o inferiore alla metà del tuo livello da mago (arrotondato per eccesso), e nessuno degli slot può essere del 6° livello o superiore.\nPer esempio, se sei un mago del 4° livello, puoi recuperare fino a due livelli di slot incantesimo. Puoi recuperare uno slot del 2° livello o due slot del 1° livello."
+        },
+        "Arcane Tradition": {
+          "name": "Tradizione Arcana",
+          "description": "Quando raggiungi il 2° livello, scegli una tradizione arcana, modellando la tua pratica della magia attraverso una di otto scuole: Abiurazione, Ammaliamento, Divinazione, Evocazione, Illusione, Invocazione, Necromanzia o Trasmutazione. La tradizione che scegli ti garantisce privilegi al 2° livello e di nuovo al 6°, 10° e 14° livello."
+        },
+        "Ability Score Improvement": {
+          "name": "Aumento dei Punteggi di Caratteristica",
+          "description": "Quando raggiungi il 4° livello, e di nuovo all'8°, 12°, 16° e 19° livello, puoi aumentare di 2 un punteggio di caratteristica a tua scelta o aumentare di 1 due punteggi di caratteristica a tua scelta. Come al solito, non puoi aumentare un punteggio di caratteristica oltre il 20 utilizzando questo privilegio."
+        },
+        "Spell Mastery": {
+          "name": "Maestria degli Incantesimi",
+          "description": "Al 18° livello, hai raggiunto una tale maestria su determinati incantesimi che puoi lanciarli a piacimento. Scegli un incantesimo del 1° livello e un incantesimo del 2° livello che siano nel tuo grimorio. Puoi lanciare quegli incantesimi al loro livello più basso senza spendere uno slot incantesimo quando li hai preparati. Se vuoi lanciare uno di essi a un livello superiore, devi spendere uno slot incantesimo come al solito.\nLanciando uno studio di 8 ore puoi cambiare uno o entrambi questi incantesimi con incantesimi diversi degli stessi livelli."
+        },
+        "Signature Spells": {
+          "name": "Incantesimi Marchiati",
+          "description": "Quando raggiungi il 20° livello, ottieni la maestria di due potenti incantesimi e puoi lanciarli con poco sforzo. Scegli due incantesimi del 3° livello nel tuo grimorio come tuoi incantesimi marchiati. Hai sempre questi incantesimi preparati, non contano nel numero degli incantesimi che hai preparato, e puoi lanciarne ognuno una volta al loro livello più basso senza spendere uno slot incantesimo. Quando lo fai, non puoi farlo di nuovo finché non termini un riposo breve o lungo.\nSe vuoi lanciare uno degli incantesimi a un livello superiore, devi spendere uno slot incantesimo come al solito."
+        }
       },
       "subclasses": {
         "school-of-evocation": {
           "name": "Scuola di Evocazione",
           "features": {
-            "Evocation Savant": {"name": "Esperto di Evocazione"},
-            "Sculpt Spells": {"name": "Modellare Incantesimi"},
-            "Potent Cantrip": {"name": "Trucchetto Potente"},
-            "Empowered Evocation": {"name": "Evocazione Potenziata"},
-            "Overchannel": {"name": "Sovraccaricare"}
+            "Evocation Savant": {
+              "name": "Esperto di Evocazione",
+              "description": "A partire da quando scegli questa scuola al 2° livello, l'oro e il tempo che devi spendere per copiare un incantesimo di evocazione nel tuo grimorio sono dimezzati."
+            },
+            "Sculpt Spells": {
+              "name": "Modellare Incantesimi",
+              "description": "A partire dal 2° livello, puoi creare tasche di sicurezza relativa all'interno degli effetti dei tuoi incantesimi di evocazione. Quando lanci un incantesimo di evocazione che influenza altre creature che puoi vedere, puoi scegliere un numero di esse pari a 1 + il livello dell'incantesimo. Le creature scelte superano automaticamente i tiri salvezza contro l'incantesimo, e non subiscono danni se normalmente subirebbero la metà dei danni con un tiro salvezza riuscito."
+            },
+            "Potent Cantrip": {
+              "name": "Trucchetto Potente",
+              "description": "A partire dal 6° livello, i tuoi trucchetti danneggianti influenzano anche le creature che eludono il danno. Quando una creatura supera un tiro salvezza contro il tuo trucchetto, la creatura subisce metà dei danni dell'incantesimo (se applicabile) ma non subisce ulteriori effetti dal trucchetto."
+            },
+            "Empowered Evocation": {
+              "name": "Evocazione Potenziata",
+              "description": "A partire dal 10° livello, puoi aggiungere il tuo modificatore di Intelligenza a un tiro per i danni di qualsiasi incantesimo di evocazione del mago che lanci."
+            },
+            "Overchannel": {
+              "name": "Sovraccaricare",
+              "description": "A partire dal 14° livello, puoi aumentare la potenza dei tuoi incantesimi più semplici. Quando lanci un incantesimo del mago del 1° al 5° livello che infligge danni, puoi infliggere il massimo dei danni con quell'incantesimo.\nLa prima volta che lo fai, non subisci alcun effetto avverso. Se usi questo privilegio di nuovo prima di terminare un riposo lungo, subisci 2d12 danni necrotici per ognuno dei livelli dell'incantesimo, immediatamente dopo aver lanciato l'incantesimo. Ogni volta che usi questo privilegio di nuovo prima di terminare un riposo lungo, i danni necrotici per livello dell'incantesimo aumentano di 1d12. Questi danni ignorano resistenza e immunità."
+            }
           }
         }
       }

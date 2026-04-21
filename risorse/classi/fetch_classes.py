@@ -189,10 +189,41 @@ def apply_translations(cls: dict, tr: dict) -> dict:
 # ─────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────
+# Nomi di "sezioni separatrici" che non sono vere feature, ma intestazioni
+# che introducono l'elenco delle sottoclassi (plurali) oppure sotto-sezioni
+# della Spellcasting che vengono indebitamente promosse al livello h3
+_FAKE_FEATURE_NAMES = {
+    "Spellcasting Ability", "Ritual Casting", "Spellcasting Focus",
+    "Cantrips",
+}
+
+
+def _filter_fake_features(features: list[dict]) -> list[dict]:
+    """Rimuove le features che sono in realta' sezioni separatrici (plurali
+    di un'altra feature, es. 'Martial Archetypes' quando esiste 'Martial
+    Archetype'), sotto-sezioni note della Spellcasting, o duplicati (stessa
+    feature ripetuta come sezione 'Prerequisites' o simili)."""
+    names = {f["name_en"] for f in features}
+    out = []
+    seen_names: set[str] = set()
+    for f in features:
+        n = f["name_en"]
+        if n in _FAKE_FEATURE_NAMES:
+            continue
+        if n.endswith("s") and n[:-1] in names:
+            continue
+        if n in seen_names:
+            continue
+        seen_names.add(n)
+        out.append(f)
+    return out
+
+
 def parse_class(raw: dict) -> dict:
     table = parse_level_table(raw.get("table", ""))
     features = split_features(raw.get("desc", ""))
     feats_with_lvl = assign_levels(features, table)
+    feats_with_lvl = _filter_fake_features(feats_with_lvl)
 
     subclasses = []
     for arc in raw.get("archetypes", []) or []:
