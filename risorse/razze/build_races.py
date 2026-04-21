@@ -630,6 +630,243 @@ COMMON_TRAITS = {
         "name_en": "Survival Instinct",
         "description": "Hai competenza nell'abilita' Sopravvivenza. Questo riflette il fatto che i tortle sono spesso eremiti e cacciatori esperti dell'isola di Anchorome.",
     },
+    # ---------------------------------------------------------------------
+    # --- MMM (Mordenkainen presenta: Mostri del Multiverso) ---
+    # Tratti aggiornati o introdotti dall'edizione MMM, che rimpiazza VGtM,
+    # MToF, parti di MOoT/EGtW/ToA/Tasha. Per le razze ripubblicate l'ASI e'
+    # flottante (gestito dal client) e molti tratti scalano col bonus
+    # competenza.
+    # ---------------------------------------------------------------------
+    "fey_ancestry_bugbear": {
+        "name": "Discendenza Fatata",
+        "name_en": "Fey Ancestry",
+        "description": "Hai vantaggio ai tiri salvezza che effettui per evitare di essere ammaliato.",
+    },
+    "powerful_build_mmm": {
+        "name": "Costituzione Potente",
+        "name_en": "Powerful Build",
+        "description": "Sei considerato di una taglia piu' grande quando si determina la tua capacita' di carico e il peso che puoi spingere, trascinare o sollevare.",
+    },
+    "sneaky_mmm": {
+        "name": "Furtivo",
+        "name_en": "Sneaky",
+        "description": "Hai competenza nell'abilita' Furtivita'. Inoltre, puoi muoverti attraverso lo spazio di qualunque creatura piu' grande di te, ma non puoi terminare il tuo turno nel suo spazio.",
+    },
+    "surprise_attack_mmm": {
+        "name": "Attacco a Sorpresa",
+        "name_en": "Surprise Attack",
+        "description": "Se sorprendi una creatura e la colpisci con un attacco durante il primo turno di combattimento, il bersaglio subisce 2d6 danni extra dall'attacco. Puoi usare questo tratto solo una volta per ogni combattimento.",
+    },
+    "fury_of_the_small_mmm": {
+        "name": "Furia dei Piccoli",
+        "name_en": "Fury of the Small",
+        "description": "Quando colpisci con un attacco una creatura di taglia piu' grande della tua, puoi infliggere danni extra al bersaglio pari al tuo livello del personaggio. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "fey_gift": {
+        "name": "Dono Fatato",
+        "name_en": "Fey Gift",
+        "description": "Puoi effettuare l'azione di Aiuto come azione bonus. Quando raggiungi il 3 livello, ogni volta che dai aiuto a una creatura tramite questo tratto la creatura ottiene anche un numero di punti ferita temporanei pari al tuo bonus di competenza. Quando raggiungi il 5 livello, una creatura aiutata da te ottiene vantaggio anche al primo tiro per colpire o tiro salvezza che effettua prima dell'inizio del tuo prossimo turno. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "fortune_from_the_many": {
+        "name": "Fortuna dei Molti",
+        "name_en": "Fortune from the Many",
+        "description": "Quando manchi un tiro per colpire o fallisci una prova di abilita' o un tiro salvezza, puoi ottenere un bonus al tiro pari al numero di alleati a 9 metri da te (massimo +3). Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+        "uses": {"amount": 1, "recharge": "long_rest"},
+    },
+    "draconic_cry": {
+        "name": "Grido Draconico",
+        "name_en": "Draconic Cry",
+        "description": "Come azione bonus, puoi lanciare un grido di guerra a una distanza di 3 metri. Fino all'inizio del tuo prossimo turno, hai vantaggio ai tiri per colpire contro un nemico in quel raggio. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "kobold_legacy": {
+        "name": "Eredita' Coboldica",
+        "name_en": "Kobold Legacy",
+        "description": "I tuoi antenati hanno benedetto la tua linea di sangue con un'eredita' specifica. Scegli una delle seguenti opzioni: Sfida (competenza in un tipo di tiro salvezza a tua scelta), Stregoneria Draconica (un trucchetto a tua scelta dalla lista del mago, con il Carisma come caratteristica da incantatore) o Astuzia (competenza in un'abilita' a tua scelta).",
+    },
+    "adrenaline_rush": {
+        "name": "Scarica di Adrenalina",
+        "name_en": "Adrenaline Rush",
+        "description": "Come azione bonus puoi effettuare l'azione di Scattare. Quando lo fai, ottieni un numero di punti ferita temporanei pari al tuo bonus di competenza. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo breve o lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "short_rest"},
+    },
+    "relentless_endurance_mmm": {
+        "name": "Resistenza Inesorabile",
+        "name_en": "Relentless Endurance",
+        "description": "Quando vieni ridotto a 0 punti ferita ma non ucciso direttamente, puoi scendere a 1 punto ferita invece. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+        "uses": {"amount": 1, "recharge": "long_rest"},
+    },
+    "yuanti_innate_spellcasting_mmm": {
+        "name": "Incantesimi Innati Yuan-ti",
+        "name_en": "Innate Spellcasting",
+        "description": "Conosci il trucchetto velenare. Quando raggiungi il 3 livello, puoi lanciare suggestione una volta con questo tratto. Quando raggiungi il 5 livello, puoi lanciare amicizia con gli animali un numero illimitato di volte ma solo a serpenti, e suggestione una volta con questo tratto. Devi terminare un riposo lungo per lanciare di nuovo suggestione con questo tratto. Il Carisma e' la tua caratteristica da incantatore per essi.",
+        "innate_spells": [
+            {"name_en": "Poison Spray", "name": "Spruzzo Velenoso", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
+            {"name_en": "Animal Friendship", "name": "Amicizia con gli Animali", "level": 1, "level_cast": 1, "min_pg_level": 5, "recharge": "at_will", "ability": "Carisma"},
+            {"name_en": "Suggestion", "name": "Suggestione", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+        ],
+    },
+    "firbolg_magic_mmm": {
+        "name": "Magia Firbolg",
+        "name_en": "Firbolg Magic",
+        "description": "Puoi lanciare individuazione del magico e camuffare se' stesso con questo tratto. A partire dal 3 livello, puoi anche lanciare comprendere linguaggi. Puoi lanciare ognuno di questi incantesimi un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore per essi (a tua scelta).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Detect Magic",   "name": "Individuazione del Magico", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "long_rest", "ability": "Saggezza"},
+            {"name_en": "Disguise Self",  "name": "Camuffare Sé Stesso",       "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "long_rest", "ability": "Saggezza"},
+            {"name_en": "Comprehend Languages", "name": "Comprendere Linguaggi", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Saggezza"},
+        ],
+    },
+    "hidden_step_mmm": {
+        "name": "Passo Nascosto",
+        "name_en": "Hidden Step",
+        "description": "Come azione bonus, puoi diventare invisibile fino all'inizio del tuo prossimo turno o fino a quando attacchi, infliggi danni o costringi qualcuno a effettuare un tiro salvezza. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "kenku_recall": {
+        "name": "Memoria Kenku",
+        "name_en": "Kenku Recall",
+        "description": "Hai competenza in due delle seguenti abilita' a tua scelta: Acrobazia, Inganno, Intuizione, Indagare, Atletica, Furtivita'. Quando effettui una prova di queste abilita', puoi tirare 1d4 e aggiungerne il risultato. Puoi usare questa proprieta' un numero di volte pari al tuo bonus di competenza, e riacquisti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "mimicry_kenku_mmm": {
+        "name": "Mimetismo",
+        "name_en": "Mimicry",
+        "description": "Puoi imitare suoni che hai sentito, inclusi voci. Una creatura che li sente puo' capire che e' un'imitazione effettuando con successo una prova di Saggezza (Intuizione) contro la tua prova di Carisma (Inganno).",
+    },
+    "bite_lizardfolk_mmm": {
+        "name": "Morso",
+        "name_en": "Bite",
+        "description": "I tuoi denti aguzzi sono armi naturali, che puoi usare per effettuare attacchi senza armi. Se colpisci con essi, infliggi danni perforanti pari a 1d6 + il tuo modificatore di Forza, invece del normale danno contundente.",
+    },
+    "natural_armor_lizardfolk_mmm": {
+        "name": "Armatura Naturale",
+        "name_en": "Natural Armor",
+        "description": "Hai dure scaglie. Se non indossi alcuna armatura, la tua CA e' 13 + il tuo modificatore di Destrezza. Puoi usare la tua armatura naturale per determinare la CA se l'armatura che indossi ti garantirebbe una CA inferiore.",
+    },
+    "hungry_jaws_mmm": {
+        "name": "Mascelle Affamate",
+        "name_en": "Hungry Jaws",
+        "description": "Come azione bonus, puoi effettuare un attacco speciale con il tuo morso. Se colpisci, l'attacco infligge i suoi normali danni e ottieni temporaneamente un numero di punti ferita pari al tuo bonus di competenza. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "hunters_lore_mmm": {
+        "name": "Sapere del Cacciatore",
+        "name_en": "Hunter's Lore",
+        "description": "Sei competente in due delle seguenti abilita' a tua scelta: Addestrare Animali, Natura, Percezione, Sopravvivenza, Furtivita'.",
+    },
+    "feline_agility_mmm": {
+        "name": "Agilita' Felina",
+        "name_en": "Feline Agility",
+        "description": "Quando ti muovi nel tuo turno in combattimento, puoi raddoppiare la tua velocita' fino alla fine del turno. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non rimani fermo per 1 turno.",
+    },
+    "control_air_and_water_mmm": {
+        "name": "Controllo dell'Aria e dell'Acqua",
+        "name_en": "Control Air and Water",
+        "description": "Puoi lanciare nube di nebbia con questo tratto. A partire dal 3 livello, puoi lanciare anche folata di vento. A partire dal 5 livello, puoi lanciare muro d'acqua. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza, e riacquisti gli usi quando termini un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per essi.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Fog Cloud",     "name": "Nube di Nebbia", "level": 1, "level_cast": 1, "min_pg_level": 1, "recharge": "long_rest", "ability": "Carisma"},
+            {"name_en": "Gust of Wind",  "name": "Folata di Vento", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Carisma"},
+            {"name_en": "Wall of Water", "name": "Muro d'Acqua",   "level": 3, "level_cast": 3, "min_pg_level": 5, "recharge": "long_rest", "ability": "Carisma"},
+        ],
+    },
+    "githyanki_psionics_mmm": {
+        "name": "Psionica Githyanki",
+        "name_en": "Githyanki Psionics",
+        "description": "Conosci il trucchetto mano magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare salto. A partire dal 5 livello, puoi lanciare passo velato. Puoi lanciare ognuno di salto e passo velato un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Mage Hand",  "name": "Mano Magica",  "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Intelligenza"},
+            {"name_en": "Jump",       "name": "Saltare",      "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Intelligenza"},
+            {"name_en": "Misty Step", "name": "Passo Velato", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Intelligenza"},
+        ],
+    },
+    "astral_knowledge": {
+        "name": "Conoscenza Astrale",
+        "name_en": "Astral Knowledge",
+        "description": "Quando termini un riposo lungo, puoi vagare astralmente per acquisire competenza in un'abilita' o in uno strumento a tua scelta. La competenza dura fino al successivo riposo lungo.",
+    },
+    "githzerai_psionics_mmm": {
+        "name": "Psionica Githzerai",
+        "name_en": "Githzerai Psionics",
+        "description": "Conosci il trucchetto mano magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare scudo. A partire dal 5 livello, puoi lanciare detezione del pensiero. Puoi lanciare ognuno di scudo e detezione del pensiero un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Mage Hand",        "name": "Mano Magica",            "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will",   "ability": "Saggezza"},
+            {"name_en": "Shield",           "name": "Scudo",                  "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Saggezza"},
+            {"name_en": "Detect Thoughts",  "name": "Individuazione del Pensiero", "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Saggezza"},
+        ],
+    },
+    # Centauro / Leonino / Minotauro / Satiro / Tortle in MMM mantengono in
+    # gran parte i tratti di MOoT/ToA: dove diversi, rimandiamo al singolo
+    # tratto inline o si riusa il base.
+    "stones_endurance_mmm": {
+        "name": "Resistenza della Pietra",
+        "name_en": "Stone's Endurance",
+        "description": "Puoi concentrarti per resistere a un danno. Quando subisci danni, puoi usare la tua reazione per tirare 1d12 e sommare il tuo modificatore di Costituzione, riducendo i danni di quel valore. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "daunting_roar_mmm": {
+        "name": "Ruggito Spaventoso",
+        "name_en": "Daunting Roar",
+        "description": "Come azione bonus, puoi ruggire ferocemente. Ogni creatura entro 3 metri da te che puoi vedere deve effettuare un tiro salvezza su Saggezza (CD 8 + bonus competenza + mod Costituzione) o essere spaventata da te fino alla fine del tuo prossimo turno. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "magic_resistance_satyr_mmm": {
+        "name": "Resistenza Magica",
+        "name_en": "Magic Resistance",
+        "description": "Hai vantaggio ai tiri salvezza contro incantesimi.",
+    },
+    "shell_defense_mmm": {
+        "name": "Difesa del Guscio",
+        "name_en": "Shell Defense",
+        "description": "Puoi ritirarti nel tuo guscio come azione. Fino a quando non emergi, ottieni +4 alla CA e hai vantaggio ai tiri salvezza su Forza e Costituzione. Mentre sei nel tuo guscio, sei prono, la tua velocita' e' 0 e non puoi aumentarla, hai svantaggio ai tiri salvezza su Destrezza, non puoi reagire e l'unica azione che puoi effettuare e' un'azione bonus per uscire dal guscio (utilizzabile a partire dal tuo prossimo turno).",
+    },
+    "blessing_of_raven_queen_mmm": {
+        "name": "Benedizione della Regina Corvo",
+        "name_en": "Blessing of the Raven Queen",
+        "description": "Come azione bonus, puoi teletrasportarti fino a 9 metri in uno spazio non occupato che puoi vedere. Una volta usato questo tratto, ottieni resistenza a tutti i danni fino all'inizio del tuo prossimo turno. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo.",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "duergar_magic_mmm": {
+        "name": "Magia Duergar",
+        "name_en": "Duergar Magic",
+        "description": "A partire dal 3 livello puoi lanciare ingrandire/ridurre su te stesso (solo la versione 'ingrandire'). A partire dal 5 livello puoi lanciare invisibilita' su te stesso. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Enlarge/Reduce", "name": "Ingrandire/Ridurre", "level": 2, "level_cast": 2, "min_pg_level": 3, "recharge": "long_rest", "ability": "Intelligenza"},
+            {"name_en": "Invisibility",   "name": "Invisibilità",       "level": 2, "level_cast": 2, "min_pg_level": 5, "recharge": "long_rest", "ability": "Intelligenza"},
+        ],
+    },
+    "psionic_fortitude": {
+        "name": "Fortitudine Psionica",
+        "name_en": "Psionic Fortitude",
+        "description": "Hai vantaggio ai tiri salvezza che effettui per evitare di essere ammaliato o stordito.",
+    },
+    "fey_step_mmm": {
+        "name": "Passo Fatato",
+        "name_en": "Fey Step",
+        "description": "Come azione bonus, puoi teletrasportarti magicamente fino a 9 metri in uno spazio non occupato che puoi vedere. Puoi usare questo tratto un numero di volte pari al tuo bonus di competenza e riacquisti tutti gli usi quando termini un riposo lungo. Quando raggiungi il 3 livello, la tua stagione conferisce un effetto extra al teletrasporto: Estate (modificatore di CAR fuoco a creature entro 1,5m), Inverno (creatura entro 1,5m TS Saggezza o spaventata), Primavera (porta con te una creatura volontaria entro 1,5m), Autunno (charme creatura entro 3m fino al fine prossimo turno).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+    },
+    "deep_gnome_magic": {
+        "name": "Magia degli Gnomi delle Profondita'",
+        "name_en": "Gift of the Svirfneblin",
+        "description": "A partire dal 3 livello, puoi lanciare camuffare se' stesso. A partire dal 5 livello, puoi lanciare antidetezione (solo su te stesso). Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "uses": {"amount": "prof_bonus", "recharge": "long_rest"},
+        "innate_spells": [
+            {"name_en": "Disguise Self",  "name": "Camuffare Sé Stesso", "level": 1, "level_cast": 1, "min_pg_level": 3, "recharge": "long_rest", "ability": "Intelligenza"},
+            {"name_en": "Nondetection",   "name": "Antidetezione",        "level": 3, "level_cast": 3, "min_pg_level": 5, "recharge": "long_rest", "ability": "Intelligenza"},
+        ],
+    },
+    "gnomish_cunning_svirfneblin": {
+        "name": "Astuzia Gnomesca",
+        "name_en": "Gnomish Cunning",
+        "description": "Hai vantaggio a tutti i tiri salvezza di Intelligenza, Saggezza e Carisma contro la magia.",
+    },
 }
 
 
@@ -1430,14 +1667,14 @@ _add_race("Aasimar", {
 # --- Firbolg (VGtM) ---
 _add_race("Firbolg", {
     "name_en": "Firbolg",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Saggezza": 2, "Forza": 1},
-    "asi_text": "+2 Saggezza, +1 Forza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Come gli umani, i firbolg raggiungono la maturita' nei loro tardi adolescenti. Vivono notevolmente piu' a lungo degli umani, fino a 500 anni.",
-    "alignment": "I firbolg, come la maggior parte delle creature fatate, hanno valori legali, neutrali o caotici buoni. La maggior parte di loro sono devoti al loro clan e alla loro foresta.",
+    "alignment": "Spesso devoti al loro clan e alla loro foresta; tendenzialmente neutrali buoni.",
     "description": "I firbolg sono custodi della foresta che preferiscono inscenare elaborate frodi per spingere gli intrusi via dai loro boschi piuttosto che ricorrere alla violenza diretta.",
     "languages": ["Comune", "Elfico", "Gigante"],
     "languages_extra": 0,
@@ -1449,29 +1686,31 @@ _add_race("Firbolg", {
     "darkvision": 0,
     "creature_type": "Umanoide",
     "traits": [
-        T("firbolg_magic"),
-        T("hidden_step"),
-        T("powerful_build"),
+        T("firbolg_magic_mmm"),
+        T("hidden_step_mmm"),
+        T("powerful_build_mmm"),
         T("speech_of_beast_and_leaf"),
     ],
     "subraces": [],
 })
 
-# --- Goliath (VGtM) ---
+# --- Goliath (MMM) ---
+# Resistenza della Pietra ora scala col bonus competenza (PB usi/RL),
+# Atleta Nato non e' piu' una skill auto: in MMM e' rimosso. ASI flottante.
 _add_race("Goliath", {
     "name_en": "Goliath",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 2, "Costituzione": 1},
-    "asi_text": "+2 Forza, +1 Costituzione",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I goliath hanno durate di vita simili agli umani. Entrano nell'eta' adulta a tarda adolescenza e di solito vivono meno di un secolo.",
-    "alignment": "La societa' goliath, con la sua precisione delle posizioni e doveri all'interno della tribu', si propende fortemente al legale. Una forte tradizione di equita' guida i goliath verso il bene.",
+    "alignment": "La cultura goliath e' fortemente comunitaria; spesso pendono al legale ma MMM lascia liberta' al giocatore.",
     "description": "I goliath vagano in un mondo solitario e selvaggio. Vivendo sui pendii ventosi delle piu' alte cime montuose, lontani dagli affari di mortali e divini, conoscono solo difficolta' e fatica.",
     "languages": ["Comune", "Gigante"],
     "languages_extra": 0,
-    "skill_proficiencies": ["Atletica"],
+    "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
@@ -1479,26 +1718,28 @@ _add_race("Goliath", {
     "darkvision": 0,
     "creature_type": "Umanoide",
     "traits": [
-        T("natural_athlete"),
-        T("stones_endurance"),
-        T("powerful_build"),
+        T("stones_endurance_mmm"),
+        T("powerful_build_mmm"),
         T("mountain_born"),
     ],
     "subraces": [],
 })
 
-# --- Kenku (VGtM) ---
+# --- Kenku (MMM) ---
+# In MMM i kenku possono parlare normalmente (la maledizione e' sciolta).
+# "Kenku Training" diventa "Kenku Recall" (2 skill a scelta + 1d4 PB
+# usi/RL). Resta Mimetismo. ASI flottante.
 _add_race("Kenku", {
     "name_en": "Kenku",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Destrezza": 2, "Saggezza": 1},
-    "asi_text": "+2 Destrezza, +1 Saggezza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I kenku hanno una durata di vita simile a quella degli umani.",
-    "alignment": "I kenku sono solitamente caotici neutrali, vivendo le loro vite in modo opportunistico, sognando un giorno di poter volare di nuovo.",
-    "description": "I kenku sono umanoidi simili a uccelli che vagano per il mondo come maledetti vagabondi e impostori. Una volta servitori di un dio dimenticato che li tradi', persero le loro ali e la capacita' di volare.",
+    "alignment": "Spesso opportunisti; tendono al caotico neutrale, ma MMM lascia liberta' al giocatore.",
+    "description": "I kenku sono umanoidi simili a uccelli, vagabondi che hanno perso da tempo la capacita' di volare. In MMM possono parlare e mimano suoni e voci con disinvoltura.",
     "languages": ["Comune", "Aurano"],
     "languages_extra": 0,
     "skill_proficiencies": [],
@@ -1510,23 +1751,26 @@ _add_race("Kenku", {
     "creature_type": "Umanoide",
     "traits": [
         T("expert_forgery"),
-        T("kenku_training"),
-        T("mimicry_kenku"),
+        T("kenku_recall"),
+        T("mimicry_kenku_mmm"),
     ],
     "subraces": [],
 })
 
-# --- Lizardfolk (VGtM) ---
+# --- Lizardfolk (MMM) ---
+# Mascelle Affamate ora usa PB volte/RL e i temp HP scalano col bonus
+# competenza (non piu' modificatore di Costituzione). Armatura Naturale
+# resta 13+DEX. ASI flottante.
 _add_race("Uomo Lucertola", {
     "name_en": "Lizardfolk",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Costituzione": 2, "Saggezza": 1},
-    "asi_text": "+2 Costituzione, +1 Saggezza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Gli uomini lucertola raggiungono la maturita' intorno ai 14 anni e di rado vivono piu' di 60 anni.",
-    "alignment": "Gli uomini lucertola sono fortemente neutrali. Vedono il mondo come un luogo dove preda e predatore vanno e vengono, dove uno fa cio' che si deve fare per sopravvivere.",
+    "alignment": "Pragmatici e tribali, tendenzialmente neutrali; MMM lascia liberta' al giocatore.",
     "description": "Gli uomini lucertola sono praticamente alieni alle altre razze umanoidi. Vivono nelle paludi e seguono valori tribali con una visione molto pratica e priva di emozioni.",
     "languages": ["Comune", "Draconico"],
     "languages_extra": 0,
@@ -1538,31 +1782,31 @@ _add_race("Uomo Lucertola", {
     "darkvision": 0,
     "creature_type": "Umanoide",
     "traits": [
-        T("bite_lizardfolk"),
+        T("bite_lizardfolk_mmm"),
         T("cunning_artisan"),
         T("hold_breath_lizardfolk"),
-        T("hunters_lore"),
-        T("natural_armor_lizardfolk"),
-        T("hungry_jaws"),
+        T("hunters_lore_mmm"),
+        T("natural_armor_lizardfolk_mmm"),
+        T("hungry_jaws_mmm"),
     ],
     "subraces": [],
 })
 
-# --- Tabaxi (VGtM) ---
+# --- Tabaxi (MMM) ---
 _add_race("Tabaxi", {
     "name_en": "Tabaxi",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Destrezza": 2, "Carisma": 1},
-    "asi_text": "+2 Destrezza, +1 Carisma",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I tabaxi hanno durata di vita comparabile agli umani.",
-    "alignment": "I tabaxi tendono al caotico, vagando sempre in cerca di novita', e raramente sono malvagi. La maggior parte si interessa solo all'intrigo e alla scoperta.",
+    "alignment": "Curiosi e irrequieti, raramente malvagi; MMM lascia liberta' al giocatore.",
     "description": "I tabaxi sono umanoidi felini, esploratori curiosi nati da terre tropicali distanti. La loro insaziabile curiosita' li porta a girovagare il mondo in cerca di reliquie, conoscenza e storie.",
     "languages": ["Comune"],
     "languages_extra": 1,
-    "skill_proficiencies": ["Percezione", "Furtivita'"],
+    "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
@@ -1571,24 +1815,26 @@ _add_race("Tabaxi", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("feline_agility"),
+        T("feline_agility_mmm"),
         T("cats_claws"),
         T("cats_talents"),
     ],
     "subraces": [],
 })
 
-# --- Triton (VGtM) ---
+# --- Triton (MMM) ---
+# Controllo dell'Aria e dell'Acqua scala col PB (PB usi/RL per ognuno
+# dei tre incantesimi). ASI flottante.
 _add_race("Triton", {
     "name_en": "Triton",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 1, "Costituzione": 1, "Carisma": 1},
-    "asi_text": "+1 Forza, +1 Costituzione, +1 Carisma",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I triton hanno durata di vita simile agli umani.",
-    "alignment": "I triton tendono al legale buono. Sono guardiani delle profondita' degli oceani.",
+    "alignment": "Spesso fieri custodi degli oceani; tendenzialmente legali buoni.",
     "description": "I triton sono custodi delle profondita' oceaniche, recentemente emersi dai loro mondi sottomarini per affrontare nuove minacce in superficie.",
     "languages": ["Comune", "Primordiale"],
     "languages_extra": 0,
@@ -1601,7 +1847,7 @@ _add_race("Triton", {
     "creature_type": "Umanoide",
     "traits": [
         T("amphibious"),
-        T("control_air_and_water"),
+        T("control_air_and_water_mmm"),
         T("emissary_of_the_sea"),
         T("guardians_of_the_depths"),
         T("swim_speed_30"),
@@ -1609,21 +1855,24 @@ _add_race("Triton", {
     "subraces": [],
 })
 
-# --- Bugbear (VGtM) ---
+# --- Bugbear (MMM) ---
+# In MMM viene rimosso il tratto "Long-Limbed" (portata +1,5m) e aggiunta
+# Discendenza Fatata (vantaggio vs ammaliato). Sneaky concede anche di
+# muoversi attraverso lo spazio di creature piu' grandi. ASI flottante.
 _add_race("Bugbear", {
     "name_en": "Bugbear",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 2, "Destrezza": 1},
-    "asi_text": "+2 Forza, +1 Destrezza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I bugbear hanno durata di vita comparabile agli umani.",
-    "alignment": "I bugbear sono caotici malvagi tipicamente, ma alcuni si liberano dal pugno di Hruggek, il loro dio.",
+    "alignment": "I bugbear sono spesso caotici malvagi, ma alcuni si liberano dal pugno di Hruggek, il loro dio.",
     "description": "I bugbear sono i piu' grandi e forti dei goblinoidi. La loro furtivita' a dispetto della loro stazza li rende cacciatori e razziatori formidabili.",
     "languages": ["Comune", "Goblin"],
     "languages_extra": 0,
-    "skill_proficiencies": ["Furtivita'"],
+    "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
@@ -1632,25 +1881,27 @@ _add_race("Bugbear", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("long_limbed"),
-        T("powerful_build"),
-        T("sneaky_bugbear"),
-        T("surprise_attack"),
+        T("fey_ancestry_bugbear"),
+        T("powerful_build_mmm"),
+        T("sneaky_mmm"),
+        T("surprise_attack_mmm"),
     ],
     "subraces": [],
 })
 
-# --- Goblin (VGtM) ---
+# --- Goblin (MMM) ---
+# Furia dei Piccoli ora scala col livello (livello danni extra) ed e'
+# usabile PB volte/riposo lungo. ASI flottante.
 _add_race("Goblin", {
     "name_en": "Goblin",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Piccola",
     "speed": 9,
-    "ability_score_increase": {"Destrezza": 2, "Costituzione": 1},
-    "asi_text": "+2 Destrezza, +1 Costituzione",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I goblin raggiungono l'eta' adulta a 8 anni e vivono fino a 60.",
-    "alignment": "I goblin sono caotici malvagi nella maggior parte dei casi.",
+    "alignment": "Variano: la maggior parte e' opportunista, ma alcuni rinnegano la lealta' al loro signore.",
     "description": "I goblin sono creature aggressive, irascibili e codarde che vivono in colonie sotterranee, sempre in cerca di un capo piu' forte.",
     "languages": ["Comune", "Goblin"],
     "languages_extra": 0,
@@ -1663,52 +1914,59 @@ _add_race("Goblin", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("fury_of_the_small"),
+        T("fury_of_the_small_mmm"),
         T("nimble_escape"),
     ],
     "subraces": [],
 })
 
-# --- Hobgoblin (VGtM) ---
+# --- Hobgoblin (MMM) ---
+# In MMM "Saving Face" e' rimpiazzato da "Fortuna dei Molti", e
+# "Martial Training" e' rimpiazzato da "Dono Fatato" (azione bonus Aiuto
+# scalabile col PB). ASI flottante.
 _add_race("Hobgoblin", {
     "name_en": "Hobgoblin",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Costituzione": 2, "Intelligenza": 1},
-    "asi_text": "+2 Costituzione, +1 Intelligenza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Gli hobgoblin maturano alla stessa velocita' degli umani e hanno la stessa durata di vita.",
-    "alignment": "Gli hobgoblin sono normalmente legali malvagi. Apprezzano l'ordine militare, la disciplina, la conquista.",
+    "alignment": "Spesso disciplinati: apprezzano ordine, addestramento e onore in battaglia.",
     "description": "Gli hobgoblin sono goblinoidi grandi, marziali, organizzati in legioni rigidamente disciplinate. Apprezzano forza, abilita' e onore in battaglia.",
     "languages": ["Comune", "Goblin"],
     "languages_extra": 0,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
-    "armor_proficiencies": ["Armature leggere"],
+    "armor_proficiencies": [],
     "resistances": [],
     "darkvision": 18,
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("martial_training"),
-        T("saving_face"),
+        T("fey_gift"),
+        T("fortune_from_the_many"),
     ],
     "subraces": [],
 })
 
-# --- Kobold (VGtM) ---
+# --- Kobold (MMM) ---
+# In MMM si rimuovono Sensibilita' alla Luce Solare, Tattica del Branco e
+# Inchinarsi/Acquattarsi/Implorare. Si introducono "Grido Draconico" (PB
+# usi/LR) e "Eredita' Coboldica" (1 di 3 opzioni). Niente piu' malus a
+# Forza: ASI flottante MMM.
 _add_race("Coboldo", {
     "name_en": "Kobold",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Piccola",
     "speed": 9,
-    "ability_score_increase": {"Destrezza": 2, "Forza": -2},
-    "asi_text": "+2 Destrezza, -2 Forza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I coboldi raggiungono la maturita' a 6 anni e vivono fino a 120 anni.",
-    "alignment": "I coboldi sono legali malvagi, mostrando lealta' al loro signore drago e al loro clan.",
+    "alignment": "Spesso astuti e leali al clan; molti restano devoti ai draghi venerati come divinita'.",
     "description": "I coboldi sono umanoidi rettiliani, ingegnosi nei loro modi sleali, e venerano i draghi come divinita'.",
     "languages": ["Comune", "Draconico"],
     "languages_extra": 0,
@@ -1721,28 +1979,31 @@ _add_race("Coboldo", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("grovel_cower_and_beg"),
-        T("pack_tactics"),
-        T("sunlight_sensitivity"),
+        T("draconic_cry"),
+        T("kobold_legacy"),
     ],
     "subraces": [],
 })
 
-# --- Orc (VGtM) ---
+# --- Orc (MMM) ---
+# In MMM gli orchi diventano una razza giocabile a se' stante, senza piu'
+# malus a Intelligenza, con ASI flottante. "Aggressivo" e "Minaccioso"
+# vengono rimossi: arrivano "Scarica di Adrenalina" (PB usi/RB), "Resistenza
+# Inesorabile" (1/RL) e "Costituzione Potente".
 _add_race("Orco", {
     "name_en": "Orc",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 2, "Costituzione": 1, "Intelligenza": -2},
-    "asi_text": "+2 Forza, +1 Costituzione, -2 Intelligenza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Gli orchi raggiungono l'eta' adulta a 12 anni e vivono fino a 50 anni.",
-    "alignment": "Gli orchi sono caotici malvagi, devoti al loro dio Gruumsh.",
-    "description": "Gli orchi sono creature feroci e brutali, ferventi devoti a Gruumsh, dio della distruzione. Vivono per il combattimento.",
+    "alignment": "Gli orchi MMM hanno temperamenti molto vari: l'allineamento dipende dall'individuo e dalla cultura.",
+    "description": "Gli orchi sono creature feroci e fiere, vincolate da forti legami tribali. La tradizione di MMM li presenta come popolo ricco e variegato che migra tra i piani.",
     "languages": ["Comune", "Orchesco"],
     "languages_extra": 0,
-    "skill_proficiencies": ["Intimidire"],
+    "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
@@ -1751,25 +2012,29 @@ _add_race("Orco", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("aggressive"),
-        T("powerful_build_orc"),
-        T("menacing"),
+        T("adrenaline_rush"),
+        T("powerful_build_mmm"),
+        T("relentless_endurance_mmm"),
     ],
     "subraces": [],
 })
 
-# --- Yuan-ti Pureblood (VGtM) ---
+# --- Yuan-ti (MMM) ---
+# In MMM la razza si chiama semplicemente "Yuan-ti" (non piu' "Pureblood")
+# e l'incantesimi innati sono cambiati: trucchetto Spruzzo Velenoso,
+# Suggestione 1/LR al 3 livello, Amicizia con gli Animali at-will (solo
+# serpenti) al 5 livello. ASI flottante MMM.
 _add_race("Yuan-ti Purosangue", {
-    "name_en": "Yuan-ti Pureblood",
-    "source": "Guida di Volo ai Mostri",
-    "source_short": "VGtM",
+    "name_en": "Yuan-ti",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Carisma": 2, "Intelligenza": 1},
-    "asi_text": "+2 Carisma, +1 Intelligenza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "Gli yuan-ti maturano alla stessa velocita' degli umani e hanno la stessa durata di vita.",
-    "alignment": "Gli yuan-ti sono creature di pura malizia. Sono neutrali malvagi, perseguono i loro fini con fredda logica.",
-    "description": "Gli yuan-ti purosangue sono i piu' simili agli umani tra le tre castae yuan-ti. Possono passare per umani con un mantello e cappuccio.",
+    "alignment": "Tipicamente freddi e calcolatori. MMM lascia liberta' al giocatore.",
+    "description": "Gli yuan-ti sono umanoidi serpentini imbevuti di magia primordiale. In MMM la razza giocabile rappresenta gli yuan-ti che hanno mantenuto un aspetto piu' simile a quello umano.",
     "languages": ["Comune", "Abissale", "Draconico"],
     "languages_extra": 0,
     "skill_proficiencies": [],
@@ -1781,7 +2046,7 @@ _add_race("Yuan-ti Purosangue", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("innate_spellcasting_yuanti"),
+        T("yuanti_innate_spellcasting_mmm"),
         T("magic_resistance_yuanti"),
         T("poison_immunity"),
     ],
@@ -1792,32 +2057,36 @@ _add_race("Yuan-ti Purosangue", {
 # === Mordenkainen's Tome of Foes ===
 # Sottorazze MToF aggiunte alle razze parent del PHB
 
-# --- Eladrin (sottorazza Elfo, MToF) ---
+# --- Eladrin (sottorazza Elfo, ora MMM) ---
+# In MMM Eladrin / Sea Elf / Shadar-kai sono razze a se' stanti. Per non
+# rompere i PG salvati le manteniamo come sottorazze dell'Elfo (parent
+# PHB) ma aggiorniamo i tratti alla versione MMM (Passo Fatato scala col
+# PB con effetto-stagione al 3 livello).
 _add_subrace("Elfo", {
     "name": "Eladrin",
     "name_en": "Eladrin",
-    "source_short": "MToF",
+    "source_short": "MMM",
     "ability_score_increase": {"Carisma": 1},
     "asi_text": "+1 Carisma",
-    "description": "Da eladrin, sei un elfo nativo del Reame Fatato. Esprimi una stagione associata al tuo umore, che puoi cambiare ogni volta che termini un riposo lungo.",
+    "description": "Da eladrin, sei un elfo nativo del Reame Fatato. Esprimi una stagione associata al tuo umore, che puoi cambiare ogni volta che termini un riposo lungo. Versione MMM: Passo Fatato scalabile col bonus competenza.",
     "traits": [
-        T("fey_step"),
+        T("fey_step_mmm"),
         T({
             "name": "Stagione",
             "name_en": "Season",
-            "description": "Sei associato a una delle quattro stagioni: primavera (gioia), estate (audacia), autunno (pace) o inverno (malinconia). Puoi cambiare la tua stagione ogni volta che termini un riposo lungo. La tua stagione modifica gli effetti aggiuntivi del Passo Fatato (vedere MToF p.62).",
+            "description": "Sei associato a una delle quattro stagioni: primavera (gioia), estate (audacia), autunno (pace) o inverno (malinconia). Puoi cambiare la tua stagione ogni volta che termini un riposo lungo. La stagione determina l'effetto extra del Passo Fatato a partire dal 3 livello.",
         }),
     ],
 })
 
-# --- Sea Elf (sottorazza Elfo, MToF) ---
+# --- Sea Elf (sottorazza Elfo, ora MMM) ---
 _add_subrace("Elfo", {
     "name": "Elfo del Mare",
     "name_en": "Sea Elf",
-    "source_short": "MToF",
+    "source_short": "MMM",
     "ability_score_increase": {"Costituzione": 1},
     "asi_text": "+1 Costituzione",
-    "description": "Da elfo del mare, sei un elfo che vive nelle profondita' dell'oceano. Hai forte affinita' con la natura acquatica.",
+    "description": "Da elfo del mare, sei un elfo che vive nelle profondita' dell'oceano. Hai forte affinita' con la natura acquatica. Versione MMM: respiri sia aria che acqua e nuoti a 9m.",
     "traits": [
         T("child_of_the_sea"),
         T("friend_of_the_sea"),
@@ -1827,40 +2096,44 @@ _add_subrace("Elfo", {
             "description": "Hai competenza con lancia, tridente, rete e balestra leggera.",
         }),
         T({
-            "name": "Lingua Acquana",
-            "name_en": "Aquan Language",
-            "description": "Sai parlare, leggere e scrivere Acquano oltre alle altre lingue elfiche.",
+            "name": "Lingua Primordiale (dialetto Acquano)",
+            "name_en": "Primordial Language (Aquan)",
+            "description": "Sai parlare, leggere e scrivere il dialetto Acquano della lingua Primordiale, oltre alle altre lingue elfiche.",
         }),
     ],
 })
 
-# --- Shadar-kai (sottorazza Elfo, MToF) ---
+# --- Shadar-kai (sottorazza Elfo, ora MMM) ---
+# Benedizione della Regina Corvo ora scala col PB e da resistenza a tutti
+# i danni fino all'inizio del prossimo turno dopo il teletrasporto.
 _add_subrace("Elfo", {
     "name": "Shadar-kai",
     "name_en": "Shadar-kai",
-    "source_short": "MToF",
+    "source_short": "MMM",
     "ability_score_increase": {"Costituzione": 1},
     "asi_text": "+1 Costituzione",
     "description": "Da shadar-kai, sei un elfo legato al Piano dell'Ombra, servitore della Regina Corvo. Sei pallido, scuro come un cadavere e dotato di forte legame con la morte.",
     "traits": [
         T("necrotic_resistance"),
-        T("blessing_of_raven_queen"),
+        T("blessing_of_raven_queen_mmm"),
     ],
 })
 
-# --- Duergar (sottorazza Nano, MToF) ---
+# --- Duergar (sottorazza Nano, ora MMM) ---
+# In MMM Duergar e' una razza standalone: la teniamo come sottorazza per
+# compatibilita', ma con tratti MMM (Magia Duergar PB usi/RL, Fortitudine
+# Psionica al posto di Resilienza, niente Sensibilita' alla Luce Solare).
 _add_subrace("Nano", {
     "name": "Duergar",
     "name_en": "Duergar",
-    "source_short": "MToF",
+    "source_short": "MMM",
     "ability_score_increase": {"Forza": 1},
     "asi_text": "+1 Forza",
-    "description": "Da duergar, sei un nano grigio dell'Underdark. La tua mente e' temprata dalla sofferenza, e sei abituato all'oscurita'.",
+    "description": "Da duergar, sei un nano grigio dell'Underdark. La tua mente e' temprata dalla sofferenza, e sei abituato all'oscurita'. Versione MMM: piu' magia psionica, niente piu' debolezza alla luce solare.",
     "traits": [
         T("darkvision_120"),
-        T("duergar_resilience"),
-        T("duergar_magic"),
-        T("sunlight_sensitivity"),
+        T("psionic_fortitude"),
+        T("duergar_magic_mmm"),
         T({
             "name": "Lingue Duergar",
             "name_en": "Duergar Languages",
@@ -1869,17 +2142,19 @@ _add_subrace("Nano", {
     ],
 })
 
-# --- Svirfneblin (sottorazza Gnomo, MToF/SCAG) ---
+# --- Svirfneblin / Deep Gnome (sottorazza Gnomo, ora MMM) ---
 _add_subrace("Gnomo", {
     "name": "Gnomo Svirfneblin",
     "name_en": "Deep Gnome (Svirfneblin)",
-    "source_short": "MToF",
+    "source_short": "MMM",
     "ability_score_increase": {"Destrezza": 1},
     "asi_text": "+1 Destrezza",
-    "description": "Da svirfneblin (gnomo profondo), vivi nell'Underdark e sei piu' magro e duro dei tuoi cugini di superficie. La tua pelle e' del colore della pietra, ottima per nasconderti tra le rocce.",
+    "description": "Da svirfneblin (gnomo profondo), vivi nell'Underdark e sei piu' magro e duro dei tuoi cugini di superficie. Versione MMM: Astuzia Gnomesca + Magia degli Gnomi delle Profondita'.",
     "traits": [
         T("darkvision_120"),
         T("stone_camouflage"),
+        T("gnomish_cunning_svirfneblin"),
+        T("deep_gnome_magic"),
         T({
             "name": "Lingue Svirfneblin",
             "name_en": "Svirfneblin Languages",
@@ -1889,45 +2164,51 @@ _add_subrace("Gnomo", {
 })
 
 # --- Githyanki (MToF) ---
+# --- Githyanki (MMM) ---
+# In MMM "Decadent Mastery" e "Martial Prodigy" sono rimpiazzati da
+# "Conoscenza Astrale" (skill/strumento a scelta dopo riposo lungo).
+# Psionica: scala col PB e si sceglie l'abilita' (INT/SAG/CAR). ASI
+# flottante.
 _add_race("Githyanki", {
     "name_en": "Githyanki",
-    "source": "Tomo dei Nemici di Mordenkainen",
-    "source_short": "MToF",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 2, "Intelligenza": 1},
-    "asi_text": "+2 Forza, +1 Intelligenza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I githyanki invecchiano molto lentamente; potrebbero vivere per secoli a meno di non essere uccisi.",
-    "alignment": "I githyanki sono spesso legali malvagi. Vedono se' stessi come una razza superiore, e tutte le altre come carne da macello o schiavi.",
+    "alignment": "Spesso militaristi e fieri; MMM lascia liberta' al giocatore.",
     "description": "I githyanki, predoni psionici dell'Astrale, conducono incursioni a cavallo di draghi rossi attraverso i piani per saccheggiare ricchezze e schiavi.",
     "languages": ["Comune", "Gith"],
     "languages_extra": 0,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
-    "weapon_proficiencies": ["Spada corta", "Spada lunga", "Spada bastarda"],
-    "armor_proficiencies": ["Armature leggere", "Armature medie"],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
     "resistances": [],
     "darkvision": 0,
     "creature_type": "Umanoide",
     "traits": [
-        T("decadent_mastery"),
-        T("martial_prodigy_githyanki"),
-        T("githyanki_psionics"),
+        T("astral_knowledge"),
+        T("githyanki_psionics_mmm"),
     ],
     "subraces": [],
 })
 
-# --- Githzerai (MToF) ---
+# --- Githzerai (MMM) ---
+# Mantiene Disciplina Mentale; Psionica scala col PB e l'abilita' e' a
+# scelta. ASI flottante.
 _add_race("Githzerai", {
     "name_en": "Githzerai",
-    "source": "Tomo dei Nemici di Mordenkainen",
-    "source_short": "MToF",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Saggezza": 2, "Intelligenza": 1},
-    "asi_text": "+2 Saggezza, +1 Intelligenza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I githzerai possono vivere oltre il secolo. Maturano alla stessa velocita' degli umani.",
-    "alignment": "I githzerai sono tipicamente legali neutrali. Le loro vite sono dedicate alla disciplina mentale e al perfezionamento spirituale.",
+    "alignment": "Spesso disciplinati e meditativi; MMM lascia liberta' al giocatore.",
     "description": "I githzerai sono asceti monastici dei piani caotici, opposti ai loro cugini githyanki. Vivono in monasteri nel Limbo dove perfezionano corpo e mente.",
     "languages": ["Comune", "Gith"],
     "languages_extra": 0,
@@ -1940,25 +2221,27 @@ _add_race("Githzerai", {
     "creature_type": "Umanoide",
     "traits": [
         T("mental_discipline"),
-        T("githzerai_psionics"),
+        T("githzerai_psionics_mmm"),
     ],
     "subraces": [],
 })
 
 
-# === Mythic Odysseys of Theros ===
+# === Mordenkainen presents: Monsters of the Multiverse (ex-MOoT/ToA) ===
+# Centauro, Leonino, Minotauro, Satiro e Tortle vengono ripubblicati in
+# MMM con ASI flottante e tratti scalati col PB dove sensato.
 
-# --- Centaur (MOoT) ---
+# --- Centaur (MMM, originariamente MOoT/GGtR) ---
 _add_race("Centauro", {
     "name_en": "Centaur",
-    "source": "Odissee Mitiche di Theros",
-    "source_short": "MOoT",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 12,
-    "ability_score_increase": {"Forza": 2, "Saggezza": 1},
-    "asi_text": "+2 Forza, +1 Saggezza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I centauri maturano alla stessa velocita' degli umani e di solito vivono fino a un secolo.",
-    "alignment": "Devoti alle tradizioni del proprio clan, i centauri tendono al neutrale buono.",
+    "alignment": "Devoti alle tradizioni del proprio clan; MMM lascia liberta' al giocatore.",
     "description": "Esseri robusti e selvaggi, i centauri sono mezzi cavalli e mezzi umanoidi che vagano per pianure e foreste in branchi tribali, fieri della loro liberta'.",
     "languages": ["Comune", "Silvano"],
     "languages_extra": 0,
@@ -1979,17 +2262,17 @@ _add_race("Centauro", {
     "subraces": [],
 })
 
-# --- Leonin (MOoT) ---
+# --- Leonin (MMM, originariamente MOoT) ---
 _add_race("Leonino", {
     "name_en": "Leonin",
-    "source": "Odissee Mitiche di Theros",
-    "source_short": "MOoT",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 10.5,
-    "ability_score_increase": {"Forza": 2, "Costituzione": 1},
-    "asi_text": "+2 Forza, +1 Costituzione",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I leonini maturano piu' velocemente degli umani, raggiungendo la maturita' a 16 anni. Vivono fino a 95 anni.",
-    "alignment": "I leonini tendono al caotico buono. Apprezzano la liberta', l'audacia e la difesa di chi non ha voce.",
+    "alignment": "Spesso fieri e protettivi della loro tribu'; MMM lascia liberta' al giocatore.",
     "description": "Una razza umanoide felina nobile e fiera, i leonini vivono in tribu' nomadi nelle praterie sotto cieli aperti, dedicandosi alla protezione delle terre selvagge.",
     "languages": ["Comune", "Leonino"],
     "languages_extra": 0,
@@ -2002,28 +2285,28 @@ _add_race("Leonino", {
     "creature_type": "Umanoide",
     "traits": [
         T("darkvision_60"),
-        T("daunting_roar"),
+        T("daunting_roar_mmm"),
         T("hunters_instincts"),
         T("claws_leonin"),
     ],
     "subraces": [],
 })
 
-# --- Minotaur (MOoT) ---
+# --- Minotaur (MMM, originariamente MOoT) ---
 _add_race("Minotauro", {
     "name_en": "Minotaur",
-    "source": "Odissee Mitiche di Theros",
-    "source_short": "MOoT",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 9,
-    "ability_score_increase": {"Forza": 2, "Costituzione": 1},
-    "asi_text": "+2 Forza, +1 Costituzione",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I minotauri maturano alla stessa velocita' degli umani e hanno una durata di vita simile.",
-    "alignment": "I minotauri di Theros tendono al legale neutrale. Sono guerrieri orgogliosi e codici d'onore guidano le loro azioni.",
+    "alignment": "Spesso orgogliosi guerrieri devoti a codici d'onore; MMM lascia liberta' al giocatore.",
     "description": "Robusti, alti e cornuti, i minotauri sono guerrieri che vivono in tribu' guidate da forti tradizioni. Combinano forza fisica e abilita' tattica.",
     "languages": ["Comune", "Minotaurico"],
     "languages_extra": 0,
-    "skill_proficiencies": ["Intimidire", "Persuasione"],
+    "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
     "armor_proficiencies": [],
@@ -2039,17 +2322,17 @@ _add_race("Minotauro", {
     "subraces": [],
 })
 
-# --- Satyr (MOoT) ---
+# --- Satyr (MMM, originariamente MOoT) ---
 _add_race("Satiro", {
     "name_en": "Satyr",
-    "source": "Odissee Mitiche di Theros",
-    "source_short": "MOoT",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
     "size": "Media",
     "speed": 10.5,
-    "ability_score_increase": {"Carisma": 2, "Destrezza": 1},
-    "asi_text": "+2 Carisma, +1 Destrezza",
+    "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
     "age": "I satiri maturano alla stessa velocita' degli umani ma vivono molto piu' a lungo, fino a 200 anni.",
-    "alignment": "I satiri tendono al caotico buono. Apprezzano la liberta' personale, le feste, la musica e la natura.",
+    "alignment": "Spesso allegri e festosi; MMM lascia liberta' al giocatore.",
     "description": "I satiri sono creature fatate gioiose e festose, mezzi umanoidi e mezze capre, che vivono nei boschi godendo della musica, del vino e dei piaceri della natura.",
     "languages": ["Comune", "Silvano"],
     "languages_extra": 0,
@@ -2062,7 +2345,7 @@ _add_race("Satiro", {
     "creature_type": "Fatato",
     "traits": [
         T("fey_creature_type"),
-        T("magic_resistance_satyr"),
+        T("magic_resistance_satyr_mmm"),
         T("mirthful_leaps"),
         T("reveler_satyr"),
         T("ram_satyr"),

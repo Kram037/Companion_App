@@ -1,0 +1,21 @@
+Razze: aggiornamento MMM per sottorazze Elfo, Nano e Gnomo
+
+- Eladrin: source MMM, Passo Fatato scalato col bonus competenza
+  (effetto-stagione al 3 livello).
+- Elfo del Mare: source MMM, lingua Primordiale (dialetto Acquano)
+  e descrizione aggiornata.
+- Shadar-kai: source MMM, Benedizione della Regina Corvo ora con
+  PB usi/RL e resistenza a tutti i danni dopo il teletrasporto.
+- Duergar (sottorazza Nano): source MMM, niente piu' Sensibilita'
+  alla Luce Solare, Resilienza Duergar sostituita da Fortitudine
+  Psionica, Magia Duergar (ingrandire/invisibilita') con PB usi/RL.
+- Svirfneblin (sottorazza Gnomo): source MMM, aggiunti Astuzia
+  Gnomesca e Magia degli Gnomi delle Profondita' (camuffare se'
+  stesso, antidetezione) con PB usi/RL.
+- Aggiunti tratti MMM al COMMON_TRAITS:
+  blessing_of_raven_queen_mmm, duergar_magic_mmm, psionic_fortitude,
+  fey_step_mmm, deep_gnome_magic, gnomish_cunning_svirfneblin.
+- Bump cache busting di races_data.js.
+
+Mantenute come sottorazze (in MMM sono standalone) per non rompere
+i PG salvati con sottorazza non null.
