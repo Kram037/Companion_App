@@ -327,12 +327,12 @@
 .scheda-res-imm-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); min-width: 70px; padding-top: 2px; }
 .scheda-condition-extra { margin-top: 8px; font-size: 0.82rem; color: var(--text-secondary); }
 
-/* Scheda Tab Bar - compatta, lascia spazio al back button floating a sinistra */
+/* Scheda Tab Bar - centrata rispetto alla viewport (back button floating a sinistra) */
 .scheda-tab-bar {
     position: fixed;
     bottom: 68px;
-    left: 70px;
-    right: 14px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -344,8 +344,7 @@
     z-index: 50;
     box-shadow: var(--shadow-md);
     width: fit-content;
-    max-width: calc(100vw - 84px);
-    margin: 0 auto;
+    max-width: calc(100vw - 28px);
 }
 .page:not(.active) .back-button-floating,
 .page:not(.active) .scheda-tab-bar,
@@ -367,12 +366,12 @@
 .scheda-tab:not(.active):hover { background: var(--surface-hover); }
 
 @media (max-width: 480px) {
-    .scheda-tab-bar { left: 60px; right: 10px; max-width: calc(100vw - 70px); }
+    .scheda-tab-bar { max-width: calc(100vw - 20px); }
     .scheda-tab { padding: 8px 10px; font-size: 0.72rem; letter-spacing: -0.01em; }
 }
 @media (max-width: 380px) {
-    .scheda-tab-bar { left: 56px; right: 8px; max-width: calc(100vw - 64px); }
-    .scheda-tab { padding: 7px 7px; font-size: 0.68rem; }
+    .scheda-tab-bar { max-width: calc(100vw - 16px); }
+    .scheda-tab { padding: 7px 7px; font-size: 0.66rem; }
 }
 
 /* Spell Page */
