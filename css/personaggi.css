@@ -1532,8 +1532,7 @@
 .pg-talenti-selected { margin-bottom: var(--spacing-sm); }
 .pg-talento-item {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+    flex-direction: column;
     padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -1548,12 +1547,37 @@
     background: rgba(139, 0, 0, 0.08);
     cursor: default;
 }
+.pg-talento-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
 .pg-talento-name { flex: 1; font-size: 0.88em; color: var(--text); }
 .pg-talento-remove {
     background: none; border: none; color: var(--text-muted); cursor: pointer;
     font-size: 1em; padding: 2px 6px; border-radius: 50%;
 }
 .pg-talento-remove:hover { color: #e53935; }
+.pg-talento-info {
+    background: none; border: 1px solid var(--border); color: var(--text-muted);
+    cursor: pointer; font-size: 0.85em; padding: 2px 8px; border-radius: 999px;
+    line-height: 1; transition: color 0.15s, border-color 0.15s;
+}
+.pg-talento-info:hover { color: var(--accent); border-color: var(--accent); }
+.pg-talento-detail {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: var(--card-bg, rgba(0,0,0,0.04));
+    border-left: 2px solid var(--accent);
+    border-radius: 4px;
+    font-size: 0.82em;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+.pg-talento-prereq { margin-bottom: 6px; color: var(--text); font-size: 0.85em; }
+.pg-talento-prereq strong { color: var(--accent); }
+.pg-talento-desc { white-space: pre-line; }
 .pg-talenti-available { max-height: none; }
 
 /* Concentrazione button */

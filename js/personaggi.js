@@ -223,105 +223,90 @@ const DND_COMPETENZE_STRUMENTI_GROUPED = {
 };
 const DND_COMPETENZE_STRUMENTI = Object.values(DND_COMPETENZE_STRUMENTI_GROUPED).flatMap(g => g.items);
 
-// Talenti from PHB, XGtE, TCoE
-const DND_TALENTI = [
-    // PHB
-    { nome: 'Abile', fonte: 'PHB' },
-    { nome: 'Adepto Elementale', fonte: 'PHB' },
-    { nome: 'Adepto Marziale', fonte: 'PHB' },
-    { nome: 'Aggressore Selvaggio', fonte: 'PHB' },
-    { nome: 'Allerta', fonte: 'PHB' },
-    { nome: 'Appostato', fonte: 'PHB' },
-    { nome: 'Atleta', fonte: 'PHB' },
-    { nome: 'Attore', fonte: 'PHB' },
-    { nome: 'Carica', fonte: 'PHB' },
-    { nome: 'Cecchino Magico', fonte: 'PHB' },
-    { nome: 'Combattente a Due Armi', fonte: 'PHB' },
-    { nome: 'Combattente in Sella', fonte: 'PHB' },
-    { nome: 'Condottiero Ispiratore', fonte: 'PHB' },
-    { nome: 'Corazze Leggere', fonte: 'PHB' },
-    { nome: 'Corazze Medie', fonte: 'PHB' },
-    { nome: 'Corazze Pesanti', fonte: 'PHB' },
-    { nome: 'Duellante Difensivo', fonte: 'PHB' },
-    { nome: 'Esperto di Balestre', fonte: 'PHB' },
-    { nome: 'Esperto di Dungeon', fonte: 'PHB' },
-    { nome: 'Fortunato', fonte: 'PHB' },
-    { nome: 'Guaritore', fonte: 'PHB' },
-    { nome: 'Incantatore da Guerra', fonte: 'PHB' },
-    { nome: 'Incantatore Rituale', fonte: 'PHB' },
-    { nome: 'Iniziato alla Magia', fonte: 'PHB' },
-    { nome: 'Linguista', fonte: 'PHB' },
-    { nome: 'Lottatore', fonte: 'PHB' },
-    { nome: 'Lottatore da Taverna', fonte: 'PHB' },
-    { nome: 'Maestro d\'Armi', fonte: 'PHB' },
-    { nome: 'Maestro d\'Armi Possenti', fonte: 'PHB' },
-    { nome: 'Maestro degli Scudi', fonte: 'PHB' },
-    { nome: 'Maestro delle Armature Medie', fonte: 'PHB' },
-    { nome: 'Maestro delle Armature Pesanti', fonte: 'PHB' },
-    { nome: 'Maestro delle Armi su Asta', fonte: 'PHB' },
-    { nome: 'Mente Acuta', fonte: 'PHB' },
-    { nome: 'Mobilità', fonte: 'PHB' },
-    { nome: 'Osservatore', fonte: 'PHB' },
-    { nome: 'Resiliente', fonte: 'PHB' },
-    { nome: 'Robusto', fonte: 'PHB' },
-    { nome: 'Sentinella', fonte: 'PHB' },
-    { nome: 'Sterminatore di Maghi', fonte: 'PHB' },
-    { nome: 'Tenace', fonte: 'PHB' },
-    { nome: 'Tiratore Scelto', fonte: 'PHB' },
-    // XGtE
-    { nome: 'Agilità Tarchiata', fonte: 'XGtE' },
-    { nome: 'Alta Magia Drow', fonte: 'XGtE' },
-    { nome: 'Costituzione Infernale', fonte: 'XGtE' },
-    { nome: 'Fiamme di Flegesto', fonte: 'XGtE' },
-    { nome: 'Fortuna Generosa', fonte: 'XGtE' },
-    { nome: 'Furia Orchesca', fonte: 'XGtE' },
-    { nome: 'Magia degli Elfi dei Boschi', fonte: 'XGtE' },
-    { nome: 'Paura Draconica', fonte: 'XGtE' },
-    { nome: 'Pelle di Drago', fonte: 'XGtE' },
-    { nome: 'Precisione Elfica', fonte: 'XGtE' },
-    { nome: 'Prodigio', fonte: 'XGtE' },
-    { nome: 'Scomparire', fonte: 'XGtE' },
-    { nome: 'Seconda Possibilità', fonte: 'XGtE' },
-    { nome: 'Teletrasporto Fatato', fonte: 'XGtE' },
-    { nome: 'Tempra Nanica', fonte: 'XGtE' },
-    // TCoE
-    { nome: 'Abilità Impeccabile', fonte: 'TCoE' },
-    { nome: 'Adepto di Metamagia', fonte: 'TCoE' },
-    { nome: 'Adepto Occulto', fonte: 'TCoE' },
-    { nome: 'Bisturi da Battaglia', fonte: 'TCoE' },
-    { nome: 'Contaminazione Fatata', fonte: 'TCoE' },
-    { nome: 'Contaminazione Ombrosa', fonte: 'TCoE' },
-    { nome: 'Cuoco', fonte: 'TCoE' },
-    { nome: 'Maestria dei Veleni', fonte: 'TCoE' },
-    { nome: 'Martello Vivente', fonte: 'TCoE' },
-    { nome: 'Pistolero', fonte: 'TCoE' },
-    { nome: 'Rudimenti da Artefice', fonte: 'TCoE' },
-    { nome: 'Rudimenti da Guerriero', fonte: 'TCoE' },
-    { nome: 'Stile Penetrante', fonte: 'TCoE' },
-    { nome: 'Telecinesi', fonte: 'TCoE' },
-    { nome: 'Telepatia', fonte: 'TCoE' }
-];
+// Talenti: dataset locale caricato da js/data/feats_data.js (window.FEATS_DATA).
+// Sorgente: PDF aidedd.org parsato in risorse/talenti/parse_feats.py.
+// Solo i NOMI ITALIANI sono puntatori salvati nel DB (pg.talenti = [string, ...]),
+// l'app risolve descrizione/prerequisiti/fonte localmente.
+function _featsData() { return window.FEATS_DATA || {}; }
+
+// Lista talenti (compat: array di {nome, fonte}) generata dal dataset locale.
+// Restituisce un array ordinato alfabeticamente per nome IT.
+function _featsList() {
+    const data = _featsData();
+    const out = Object.values(data).map(f => ({
+        nome: f.name,
+        nome_en: f.name_en,
+        fonte: f.source_short || f.source || '',
+        prerequisites: f.prerequisites || '',
+        description: f.description || ''
+    }));
+    out.sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
+    return out;
+}
+
+function _featInfo(nomeIt) {
+    const data = _featsData();
+    return data[nomeIt] || null;
+}
 
 let pgCurrentTalenti = [];
+
+function _featPickerItemHtml(t, opts) {
+    const onClick = opts.onClick ? `onclick="${opts.onClick}"` : '';
+    const removeBtn = opts.removeOnClick
+        ? `<button type="button" class="pg-talento-remove" onclick="event.stopPropagation();${opts.removeOnClick}">✕</button>`
+        : '';
+    const infoBtn = `<button type="button" class="pg-talento-info" title="Dettagli" onclick="event.stopPropagation();_featTogglePickerDetail(this)">ⓘ</button>`;
+    const cls = opts.selected ? 'pg-talento-item selected' : 'pg-talento-item';
+    const prereqHtml = t.prerequisites
+        ? `<div class="pg-talento-prereq"><strong>Prerequisito:</strong> ${escapeHtml(t.prerequisites)}</div>`
+        : '';
+    const descHtml = t.description
+        ? `<div class="pg-talento-desc">${escapeHtml(t.description).replace(/\n/g, '<br>')}</div>`
+        : '';
+    return `
+        <div class="${cls}" ${onClick}>
+            <div class="pg-talento-row">
+                <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
+                <span class="option-source">(${escapeHtml(t.fonte || '')})</span>
+                ${infoBtn}
+                ${removeBtn}
+            </div>
+            <div class="pg-talento-detail" style="display:none;">
+                ${prereqHtml}
+                ${descHtml || '<div class="pg-talento-desc"><em>Nessuna descrizione disponibile.</em></div>'}
+            </div>
+        </div>
+    `;
+}
+
+window._featTogglePickerDetail = function(btn) {
+    const item = btn.closest('.pg-talento-item');
+    if (!item) return;
+    const detail = item.querySelector('.pg-talento-detail');
+    if (!detail) return;
+    detail.style.display = detail.style.display === 'none' ? '' : 'none';
+};
 
 function pgRenderTalenti() {
     const container = document.getElementById('pgTalentiList');
     if (!container) return;
 
-    const selectedHtml = pgCurrentTalenti.map((t, i) => `
-        <div class="pg-talento-item selected">
-            <span class="pg-talento-name">${escapeHtml(t)}</span>
-            <button type="button" class="pg-talento-remove" onclick="pgRemoveTalento(${i})">✕</button>
-        </div>
-    `).join('');
+    const selectedHtml = pgCurrentTalenti.map((nome, i) => {
+        const info = _featInfo(nome) || { name: nome, source_short: '?' };
+        const t = {
+            nome,
+            fonte: info.source_short || '',
+            prerequisites: info.prerequisites || '',
+            description: info.description || ''
+        };
+        return _featPickerItemHtml(t, { selected: true, removeOnClick: `pgRemoveTalento(${i})` });
+    }).join('');
 
-    const available = DND_TALENTI.filter(t => !pgCurrentTalenti.includes(t.nome));
-    const listHtml = available.map(t => `
-        <div class="pg-talento-item" onclick="pgAddTalento('${escapeHtml(t.nome)}')">
-            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
-            <span class="option-source">(${t.fonte})</span>
-        </div>
-    `).join('');
+    const available = _featsList().filter(t => !pgCurrentTalenti.includes(t.nome));
+    const listHtml = available.map(t =>
+        _featPickerItemHtml(t, { onClick: `pgAddTalento('${escapeHtml(t.nome).replace(/'/g, "\\'")}')` })
+    ).join('');
 
     container.innerHTML = `
         ${selectedHtml ? `<div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
@@ -3657,25 +3642,48 @@ window.schedaOpenResImmEdit = function(pgId) {
     });
 }
 
-// Talenti Edit on Scheda
+function _schedaTalentiContentHtml(currentTalenti, search) {
+    const q = (search || '').trim().toLowerCase();
+    const selectedHtml = currentTalenti.map((nome, i) => {
+        const info = _featInfo(nome) || { source_short: '?' };
+        const t = {
+            nome,
+            fonte: info.source_short || '',
+            prerequisites: info.prerequisites || '',
+            description: info.description || ''
+        };
+        return _featPickerItemHtml(t, { selected: true, removeOnClick: `schedaTalentoRemove(${i})` });
+    }).join('');
+
+    let available = _featsList().filter(t => !currentTalenti.includes(t.nome));
+    if (q) {
+        available = available.filter(t =>
+            t.nome.toLowerCase().includes(q) ||
+            (t.nome_en && t.nome_en.toLowerCase().includes(q)) ||
+            (t.fonte || '').toLowerCase().includes(q)
+        );
+    }
+    const listHtml = available.map(t =>
+        _featPickerItemHtml(t, { onClick: `schedaTalentoAdd('${escapeHtml(t.nome).replace(/'/g, "\\'")}')` })
+    ).join('') || '<div class="scheda-empty" style="padding:12px;">Nessun talento corrisponde alla ricerca.</div>';
+
+    return `
+        <input type="text" id="schedaTalentiSearch" class="hp-calc-input" placeholder="Cerca talento (IT/EN/fonte)..."
+               value="${escapeHtml(q)}" oninput="_schedaTalentiOnSearch(this.value)" style="margin-bottom:12px;">
+        ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        <div class="form-section-label">Disponibili (${available.length})</div>
+        <div class="pg-talenti-available">${listHtml}</div>
+    `;
+}
+
+window._schedaTalentiOnSearch = function(value) {
+    window._schedaTalentiSearch = value;
+    _schedaTalentiRefreshModal();
+};
+
 window.schedaOpenTalentiEdit = function(pgId) {
     const pg = _schedaPgCache;
     const currentTalenti = pg?.talenti ? [...pg.talenti] : [];
-
-    const selectedHtml = currentTalenti.map((t, i) => `
-        <div class="pg-talento-item selected">
-            <span class="pg-talento-name">${escapeHtml(t)}</span>
-            <button type="button" class="pg-talento-remove" onclick="schedaTalentoRemove(${i})">✕</button>
-        </div>
-    `).join('');
-
-    const available = DND_TALENTI.filter(t => !currentTalenti.includes(t.nome));
-    const listHtml = available.map(t => `
-        <div class="pg-talento-item" onclick="schedaTalentoAdd('${escapeHtml(t.nome)}')">
-            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
-            <span class="option-source">(${t.fonte})</span>
-        </div>
-    `).join('');
 
     const modalHtml = `
     <div class="modal active" id="schedaTalentiModal">
@@ -3683,9 +3691,7 @@ window.schedaOpenTalentiEdit = function(pgId) {
             <button class="modal-close" onclick="schedaCloseTalentiEdit()">&times;</button>
             <h2>Modifica Talenti</h2>
             <div class="wizard-page-scroll" id="schedaTalentiContent">
-                ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
-                <div class="form-section-label">Disponibili</div>
-                <div class="pg-talenti-available">${listHtml}</div>
+                ${_schedaTalentiContentHtml(currentTalenti, '')}
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseTalentiEdit()">Chiudi</button>
@@ -3697,6 +3703,7 @@ window.schedaOpenTalentiEdit = function(pgId) {
     document.body.style.overflow = 'hidden';
     window._schedaTalentiEditPgId = pgId;
     window._schedaTalentiEditList = currentTalenti;
+    window._schedaTalentiSearch = '';
 };
 
 window.schedaTalentoAdd = async function(nome) {
@@ -3739,27 +3746,15 @@ function _schedaTalentiRefreshModal() {
     const container = document.getElementById('schedaTalentiContent');
     if (!container) return;
     const talenti = window._schedaTalentiEditList || [];
-
-    const selectedHtml = talenti.map((t, i) => `
-        <div class="pg-talento-item selected">
-            <span class="pg-talento-name">${escapeHtml(t)}</span>
-            <button type="button" class="pg-talento-remove" onclick="schedaTalentoRemove(${i})">✕</button>
-        </div>
-    `).join('');
-
-    const available = DND_TALENTI.filter(t => !talenti.includes(t.nome));
-    const listHtml = available.map(t => `
-        <div class="pg-talento-item" onclick="schedaTalentoAdd('${escapeHtml(t.nome)}')">
-            <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
-            <span class="option-source">(${t.fonte})</span>
-        </div>
-    `).join('');
-
-    container.innerHTML = `
-        ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
-        <div class="form-section-label">Disponibili</div>
-        <div class="pg-talenti-available">${listHtml}</div>
-    `;
+    const search = window._schedaTalentiSearch || '';
+    container.innerHTML = _schedaTalentiContentHtml(talenti, search);
+    // Re-focus sulla ricerca dopo il re-render.
+    const input = document.getElementById('schedaTalentiSearch');
+    if (input) {
+        input.focus();
+        const v = input.value;
+        input.setSelectionRange(v.length, v.length);
+    }
 }
 
 window.schedaCloseTalentiEdit = function() {

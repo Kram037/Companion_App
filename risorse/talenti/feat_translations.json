@@ -1,0 +1,224 @@
+{
+  "_comment": "Override IT per i talenti. La chiave e' il nome inglese (come trovato nel PDF). I campi sono opzionali: name (nome IT), description (testo IT), prerequisites (prerequisiti IT). Se mancano, lo script usa il nome inglese e la descrizione inglese del PDF / wikidot.",
+
+  "Actor": {
+    "name": "Attore",
+    "description": "Esperto in mimica e recitazione, ottieni i seguenti benefici:\n• Aumenti il tuo Carisma di 1, fino a un massimo di 20.\n• Hai vantaggio alle prove di Carisma (Inganno) e Carisma (Intrattenere) quando cerchi di farti passare per un'altra persona.\n• Puoi imitare la voce di un'altra persona o i versi di altre creature. Devi aver sentito la persona parlare o la creatura emettere il verso per almeno 1 minuto. Una prova di Saggezza (Intuizione) riuscita contrapposta alla tua prova di Carisma (Inganno) permette a chi ascolta di stabilire che l'effetto e' simulato."
+  },
+  "Alert": {
+    "name": "Allerta",
+    "description": "Sempre vigile e attento al pericolo, ottieni i seguenti benefici:\n• Ottieni un bonus di +5 ai tiri di iniziativa.\n• Non puoi essere colto di sorpresa mentre sei cosciente.\n• Le altre creature non ottengono vantaggio ai tiri per colpire contro di te a causa del fatto che non le vedi."
+  },
+  "Artificer Initiate": {
+    "name": "Rudimenti da Artefice",
+    "description": "Apprendi un trucchetto a tua scelta dalla lista degli incantesimi da artefice. Apprendi anche un incantesimo di 1° livello a tua scelta dalla stessa lista. Puoi lanciare quell'incantesimo senza usare uno slot incantesimo, una volta a tua scelta, e devi completare un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi lanciare l'incantesimo anche utilizzando qualsiasi slot incantesimo che possiedi del livello appropriato. La caratteristica da incantatore per questi incantesimi dipende dall'abilita' usata: Intelligenza. Inoltre, ottieni competenza in un tipo di strumenti da artigiano a tua scelta."
+  },
+  "Athlete": {
+    "name": "Atleta",
+    "description": "Hai sostenuto un intenso allenamento fisico per ottenere i seguenti benefici:\n• Aumenti la tua Forza o Destrezza di 1, fino a un massimo di 20.\n• Quando sei prono, alzarti ti costa solo 1,5 metri di movimento.\n• Scalare non ti costa movimento extra.\n• Puoi effettuare un salto in lungo o in alto con rincorsa dopo esserti mosso solo per 1,5 metri a piedi, invece dei 3 metri normali."
+  },
+  "Bountiful Luck": {
+    "name": "Fortuna Generosa",
+    "prerequisites": "Halfling",
+    "description": "I tuoi compagni traggono beneficio dalla tua incredibile fortuna. Quando un alleato che puoi vedere entro 9 metri da te ottiene 1 a un tiro per colpire, a una prova di caratteristica o a un tiro salvezza, puoi usare la tua reazione per permettere all'alleato di ritirare il dado. L'alleato deve usare il nuovo risultato. Quando usi questa capacita', non puoi usare il tuo tratto Fortunato (Halfling) prima dell'inizio del tuo prossimo turno."
+  },
+  "Charger": {
+    "name": "Carica",
+    "description": "Quando usi la tua azione per Scattare, puoi usare un'azione bonus per effettuare un attacco con un'arma da mischia o per spingere una creatura.\nSe ti sei mosso di almeno 3 metri in linea retta immediatamente prima di compiere quest'azione bonus, ottieni un bonus di +5 al tiro per i danni dell'attacco (se hai scelto di effettuare un attacco in mischia e hai colpito) oppure puoi spingere il bersaglio fino a 3 metri di distanza da te (se hai scelto di spingere e ci sei riuscito)."
+  },
+  "Chef": {
+    "name": "Cuoco",
+    "description": "Il tempo che hai trascorso a perfezionare le tue arti culinarie ti garantisce i seguenti benefici:\n• Aumenti la tua Costituzione o Saggezza di 1, fino a un massimo di 20.\n• Ottieni la competenza con gli utensili da cuoco se non l'hai gia'.\n• In quanto parte di un riposo breve, puoi cucinare cibo speciale, a patto che tu abbia ingredienti e utensili da cuoco a portata di mano. Puoi nutrire un numero di creature pari al tuo modificatore di competenza, e una creatura che mangia il cibo e fa un riposo breve recupera 1d8 punti ferita aggiuntivi.\n• Mentre fai un riposo lungo, puoi cucinare dolci speciali che provvedono al benessere altrui. Dopo il riposo lungo, fino a un numero di creature pari al tuo modificatore di competenza possono mangiare i dolcetti e ottenere un numero di punti ferita temporanei pari al tuo modificatore di competenza. I dolcetti perdono ogni efficacia se non vengono consumati entro 8 ore dalla preparazione."
+  },
+  "Crossbow Expert": {
+    "name": "Esperto di Balestre",
+    "description": "Grazie all'intenso esercizio con la balestra, ottieni i seguenti benefici:\n• Ignori la qualita' di caricamento delle balestre con cui sei competente.\n• Trovarsi entro 1,5 metri da una creatura ostile non impone svantaggio ai tuoi tiri per colpire a distanza.\n• Quando usi l'azione di Attaccare e attacchi con un'arma a una mano, puoi usare un'azione bonus per attaccare con una balestra a mano che impugni."
+  },
+  "Crusher": { "name": "Martello Vivente" },
+  "Defensive Duelist": {
+    "name": "Duellante Difensivo",
+    "prerequisites": "Destrezza 13 o superiore",
+    "description": "Quando impugni un'arma di finezza con cui sei competente e un'altra creatura ti colpisce con un attacco in mischia, puoi usare la tua reazione per ottenere un bonus alla CA pari al tuo bonus di competenza contro quell'attacco, potenzialmente facendo si' che l'attacco manchi."
+  },
+  "Dual Wielder": {
+    "name": "Combattente a Due Armi",
+    "description": "Brandire un'arma in ogni mano ti garantisce i seguenti benefici:\n• Ottieni un bonus di +1 alla CA mentre impugni un'arma da mischia in ciascuna mano.\n• Puoi combattere con due armi anche quando le armi a una mano che impugni non hanno la proprieta' leggera.\n• Puoi sguainare o riporre due armi a una mano quando normalmente potresti sguainare o riporne una sola."
+  },
+  "Dungeon Delver": {
+    "name": "Esperto di Dungeon",
+    "description": "Sei in grado di individuare i pericoli piu' insidiosi:\n• Hai vantaggio alle prove di Saggezza (Percezione) e Intelligenza (Indagare) effettuate per individuare la presenza di porte segrete.\n• Hai vantaggio ai tiri salvezza effettuati per evitare o resistere alle trappole.\n• Hai resistenza ai danni inflitti dalle trappole.\n• Mentre viaggi a passo veloce, non subisci la normale penalita' di -5 alla tua Saggezza (Percezione) passiva."
+  },
+  "Durable": {
+    "name": "Tenace",
+    "description": "Robusto, ottieni i seguenti benefici:\n• Aumenti la tua Costituzione di 1, fino a un massimo di 20.\n• Quando tiri un Dado Vita per recuperare punti ferita, il minimo di punti ferita recuperati con il tiro e' pari al doppio del tuo modificatore di Costituzione (minimo 2)."
+  },
+  "Elemental Adept": {
+    "name": "Adepto Elementale",
+    "prerequisites": "Capacita' di lanciare almeno un incantesimo",
+    "description": "Quando ottieni questo talento, scegli uno tra i seguenti tipi di danno: acido, freddo, fuoco, fulmine o tuono.\nGli incantesimi che lanci ignorano la resistenza ai danni del tipo scelto. Inoltre, quando tiri i danni di un incantesimo che infligge danni di quel tipo, puoi trattare ciascun 1 sui dadi di danno come un 2.\nPuoi scegliere questo talento piu' volte. Ogni volta che lo fai, devi scegliere un tipo di danno diverso."
+  },
+  "Fey Touched": { "name": "Contaminazione Fatata" },
+  "Fighting Initiate": { "name": "Rudimenti da Guerriero" },
+  "Grappler": {
+    "name": "Lottatore",
+    "prerequisites": "Forza 13 o superiore",
+    "description": "Hai sviluppato le tecniche necessarie per afferrare gli avversari, ottenendo i seguenti benefici:\n• Hai vantaggio ai tiri per colpire contro una creatura che hai afferrato.\n• Puoi usare la tua azione per cercare di trattenere una creatura che hai afferrato. Per farlo, effettui un'altra prova di Forza (Atletica). In caso di successo, sia tu che la creatura siete trattenuti finche' non interrompi la presa."
+  },
+  "Great Weapon Master": {
+    "name": "Maestro d'Armi Possenti",
+    "description": "Hai imparato a usare il peso di un'arma a tuo vantaggio, sferrando colpi che hanno una potenza superiore al normale. Ottieni i seguenti benefici:\n• Quando ottieni un colpo critico o riduci a 0 punti ferita una creatura con un attacco in mischia, puoi effettuare un attacco con un'arma da mischia come azione bonus.\n• Prima di effettuare un attacco con un'arma da mischia con cui sei competente e che possiede la qualita' pesante, puoi scegliere di subire una penalita' di -5 al tiro per colpire dell'attacco. Se l'attacco va a segno, infliggi un bonus di +10 al tiro per i danni dell'attacco."
+  },
+  "Gunner": { "name": "Pistolero" },
+  "Healer": {
+    "name": "Guaritore",
+    "description": "Sei un guaritore esperto, in grado di aiutare con rapidita' chi e' ferito. Ottieni i seguenti benefici:\n• Quando usi un kit del guaritore per stabilizzare una creatura morente, questa recupera anche 1 punto ferita.\n• Come azione, puoi consumare un utilizzo di un kit del guaritore per curare una creatura, facendole recuperare 1d6 + 4 punti ferita, piu' un numero di punti ferita pari al numero massimo di Dadi Vita della creatura. La creatura non puo' recuperare ulteriormente punti ferita in questo modo finche' non termina un riposo breve o lungo."
+  },
+  "Heavily Armored": { "name": "Corazze Pesanti" },
+  "Heavy Armor Master": {
+    "name": "Maestro delle Armature Pesanti",
+    "prerequisites": "Competenza nelle armature pesanti",
+    "description": "Hai imparato a sfruttare al meglio la tua armatura, ottenendo i seguenti benefici:\n• Aumenti la tua Forza di 1, fino a un massimo di 20.\n• Mentre indossi un'armatura pesante, i danni contundenti, perforanti e taglienti che subisci dagli attacchi con armi non magiche vengono ridotti di 3."
+  },
+  "Inspiring Leader": {
+    "name": "Condottiero Ispiratore",
+    "prerequisites": "Carisma 13 o superiore",
+    "description": "Puoi spendere 10 minuti a ispirare i tuoi compagni, rinvigorendoli per le sfide future. Quando lo fai, scegli fino a sei creature amichevoli (puoi includere te stesso) entro 9 metri da te che siano in grado di vedere o sentire la tua orazione di rincuoramento. Ogni creatura puo' ottenere un numero di punti ferita temporanei pari al tuo livello + il tuo modificatore di Carisma. Una creatura non puo' ottenere punti ferita temporanei da questo talento di nuovo, finche' non completa un riposo breve o lungo."
+  },
+  "Keen Mind": {
+    "name": "Mente Acuta",
+    "description": "Hai una mente in grado di tenere traccia del tempo, della direzione e dei dettagli con un'enorme precisione. Ottieni i seguenti benefici:\n• Aumenti la tua Intelligenza di 1, fino a un massimo di 20.\n• Sai sempre in che direzione si trova il nord.\n• Sai sempre quante ore mancano al prossimo tramonto e alla prossima alba.\n• Sai sempre richiamare alla mente con precisione qualsiasi cosa tu abbia visto o sentito nell'ultimo mese."
+  },
+  "Lightly Armored": { "name": "Corazze Leggere" },
+  "Linguist": {
+    "name": "Linguista",
+    "description": "Hai studiato lingue e codici, ottenendo i seguenti benefici:\n• Aumenti la tua Intelligenza di 1, fino a un massimo di 20.\n• Apprendi tre lingue a tua scelta.\n• Puoi creare in modo capace cifre scritte. Gli altri non possono decifrare un codice da te realizzato a meno che non glielo insegni, riescano in una prova di Intelligenza (DC pari a 10 + il tuo punteggio di Intelligenza) o usino la magia per decifrarlo."
+  },
+  "Lucky": {
+    "name": "Fortunato",
+    "description": "Hai una fortuna inspiegabile che sembra accenderti nei momenti giusti.\nHai 3 punti fortuna. Ogni volta che effettui un tiro per colpire, una prova di caratteristica o un tiro salvezza, puoi spendere un punto fortuna per tirare un d20 aggiuntivo. Puoi scegliere di spendere uno dei tuoi punti fortuna dopo aver tirato il dado, ma prima che venga determinato l'esito. Scegli quale dei d20 utilizzare per il tiro per colpire, la prova di caratteristica o il tiro salvezza.\nPuoi anche spendere 1 punto fortuna quando una creatura attaccante effettua un tiro per colpire contro di te. Tira un d20 e scegli se l'attacco usa il tuo tiro o il suo.\nSe piu' di una creatura spende 1 punto fortuna per influenzare lo stesso tiro, i punti si annullano e nessun dado aggiuntivo viene tirato.\nRecuperi i tuoi punti fortuna spesi quando completi un riposo lungo."
+  },
+  "Mage Slayer": {
+    "name": "Sterminatore di Maghi",
+    "description": "Hai esperienza nel combattere gli incantatori. Ottieni i seguenti benefici:\n• Quando una creatura entro 1,5 metri da te lancia un incantesimo, puoi usare la tua reazione per effettuare un attacco con un'arma da mischia contro tale creatura.\n• Quando infliggi danni a una creatura che sta mantenendo la concentrazione su un incantesimo, quella creatura ha svantaggio al tiro salvezza che effettua per mantenere la concentrazione.\n• Hai vantaggio ai tiri salvezza che effettui contro gli incantesimi lanciati da creature entro 1,5 metri da te."
+  },
+  "Magic Initiate": {
+    "name": "Iniziato alla Magia",
+    "description": "Scegli una classe: bardo, chierico, druido, mago, stregone o warlock. Apprendi due trucchetti a tua scelta dalla lista degli incantesimi di quella classe.\nInoltre, scegli un incantesimo di 1° livello dalla stessa lista. Apprendi quell'incantesimo e puoi lanciarlo al suo livello piu' basso. Una volta lanciato, devi completare un riposo lungo prima di poterlo lanciare di nuovo con questo talento.\nLa caratteristica da incantatore per questi incantesimi dipende dalla classe scelta: Carisma per bardo, stregone o warlock; Saggezza per chierico o druido; Intelligenza per mago."
+  },
+  "Martial Adept": {
+    "name": "Adepto Marziale",
+    "description": "Hai una formazione marziale che ti permette di eseguire manovre speciali e ottenere i seguenti benefici:\n• Apprendi due manovre a tua scelta tra quelle disponibili per l'archetipo Maestro di Battaglia del guerriero. Se una manovra che usi richiede al bersaglio di effettuare un tiro salvezza per resistere ai suoi effetti, la CD del tiro salvezza e' pari a 8 + il tuo bonus di competenza + il tuo modificatore di Forza o Destrezza (a tua scelta).\n• Se hai gia' dadi di superiorita', ne ottieni uno in piu'; altrimenti ottieni un dado di superiorita' (un d6). Questo dado viene usato per alimentare le tue manovre. Recuperi il dado di superiorita' speso quando finisci un riposo breve o lungo."
+  },
+  "Medium Armor Master": { "name": "Maestro delle Armature Medie" },
+  "Metamagic Adept": { "name": "Adepto di Metamagia" },
+  "Mobile": {
+    "name": "Mobilita'",
+    "description": "Sei eccezionalmente veloce e agile. Ottieni i seguenti benefici:\n• La tua velocita' aumenta di 3 metri.\n• Quando usi l'azione di Scattare, il terreno difficile non ti costa movimento extra in quel turno.\n• Quando effettui un attacco in mischia contro una creatura, non subisci attacchi di opportunita' da quella creatura per il resto del turno, sia che tu la colpisca o meno."
+  },
+  "Moderately Armored": { "name": "Corazze Medie" },
+  "Mounted Combatant": {
+    "name": "Combattente in Sella",
+    "description": "Sei un temibile guerriero a cavallo. Mentre sei in groppa a una cavalcatura e non sei incapacitato, ottieni i seguenti benefici:\n• Hai vantaggio ai tiri per colpire effettuati contro una creatura non in groppa di taglia inferiore alla tua cavalcatura.\n• Puoi obbligare un attacco diretto alla tua cavalcatura a essere diretto a te.\n• Se la tua cavalcatura e' soggetta a un effetto che gli permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisce danni in caso di successo e dimezza i danni in caso di fallimento."
+  },
+  "Observant": {
+    "name": "Osservatore",
+    "description": "Veloce nel notare i dettagli del tuo ambiente, ottieni i seguenti benefici:\n• Aumenti la tua Intelligenza o Saggezza di 1, fino a un massimo di 20.\n• Se vedi la bocca di una creatura mentre parla una lingua che comprendi, puoi capire le sue parole leggendole sul labiale.\n• Ottieni un bonus di +5 ai punteggi di Saggezza (Percezione) passiva e Intelligenza (Indagare) passiva."
+  },
+  "Piercer": { "name": "Stile Penetrante" },
+  "Polearm Master": {
+    "name": "Maestro delle Armi su Asta",
+    "description": "Sai usare le armi inastate per tenere a bada gli avversari, ottenendo i seguenti benefici:\n• Quando esegui l'azione di Attacco e attacchi solo con un'arma su asta semplice (ascia battaglia, alabarda o lancia da fante), puoi usare un'azione bonus per effettuare un attacco in mischia con l'altra estremita' dell'arma. L'attacco usa lo stesso modificatore di caratteristica dell'attacco principale. L'arma infligge 1d4 danni contundenti.\n• Mentre stai impugnando un'arma su asta semplice o lunga (ascia battaglia, alabarda, lancia da fante o quarterstaff), gli altri reagiranno con il tuo attacco di opportunita' quando entrano nel raggio di portata della tua arma."
+  },
+  "Poisoner": { "name": "Maestria dei Veleni" },
+  "Resilient": {
+    "name": "Resiliente",
+    "description": "Scegli una caratteristica. Ottieni i seguenti benefici:\n• Aumenti il punteggio della caratteristica scelta di 1, fino a un massimo di 20.\n• Ottieni la competenza nei tiri salvezza con la caratteristica scelta."
+  },
+  "Ritual Caster": {
+    "name": "Incantatore Rituale",
+    "prerequisites": "Intelligenza o Saggezza 13 o superiore",
+    "description": "Hai studiato in profondita' la magia, imparando a lanciare alcuni incantesimi sotto forma di rituali. Acquisisci un libro di rituali contenente due incantesimi di 1° livello a tua scelta. La classe degli incantesimi disponibili dipende dalla caratteristica usata. La materia componente per gli incantesimi e' inclusa nel libro.\nPer lanciare gli incantesimi, devi tenere il libro in mano. Puoi lanciare un incantesimo soltanto come rituale, se l'incantesimo ha la proprieta' rituale. Puoi anche aggiungere altri incantesimi al libro. Quando ne trovi uno, puoi aggiungerlo se l'incantesimo e' del giusto tipo per quella lista d'incantesimi e se hai abbastanza tempo per copiarlo: 2 ore e 50 mo per livello dell'incantesimo."
+  },
+  "Savage Attacker": {
+    "name": "Aggressore Selvaggio",
+    "description": "Una volta a turno, quando tiri i danni per un attacco con un'arma da mischia, puoi tirare di nuovo i dadi di danno dell'arma e usare uno dei due risultati."
+  },
+  "Sentinel": {
+    "name": "Sentinella",
+    "description": "Hai padroneggiato le tecniche per cogliere ogni momento di vantaggio in battaglia, ottenendo i seguenti benefici:\n• Quando colpisci una creatura con un attacco di opportunita', la velocita' della creatura diventa 0 per il resto del turno.\n• Le creature subiscono attacchi di opportunita' anche se eseguono l'azione di Disimpegno prima di lasciare la tua portata.\n• Quando una creatura entro 1,5 metri da te effettua un attacco contro un bersaglio diverso da te (e quel bersaglio non possiede il talento), puoi usare la tua reazione per effettuare un attacco con un'arma da mischia contro la creatura attaccante."
+  },
+  "Sharpshooter": {
+    "name": "Tiratore Scelto",
+    "description": "Hai padroneggiato le armi a distanza e sai trarne il massimo vantaggio, ottenendo i seguenti benefici:\n• Gli attacchi che effettui con armi a distanza non subiscono svantaggio quando il bersaglio e' a gittata lunga.\n• I tuoi attacchi a distanza ignorano coperture leggere e tre quarti.\n• Prima di effettuare un attacco con un'arma a distanza con cui sei competente, puoi scegliere di subire una penalita' di -5 al tiro per colpire dell'attacco. Se l'attacco va a segno, infliggi un bonus di +10 al tiro per i danni dell'attacco."
+  },
+  "Shield Master": {
+    "name": "Maestro degli Scudi",
+    "description": "Usi gli scudi non solo per la protezione ma anche come arma offensiva. Mentre impugni uno scudo, ottieni i seguenti benefici:\n• Se esegui l'azione di Attacco nel tuo turno, puoi usare un'azione bonus per cercare di spingere a terra una creatura entro 1,5 metri da te con il tuo scudo.\n• Se non sei incapacitato, puoi aggiungere il tuo bonus alla CA dello scudo a qualsiasi tiro salvezza su Destrezza che effettui contro un incantesimo o un altro effetto nocivo che colpisce solo te.\n• Se sei sottoposto a un effetto che ti permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, puoi usare la tua reazione per non subire danni se il tiro ha successo, interponendo lo scudo tra te e l'origine dell'effetto."
+  },
+  "Skill Expert": { "name": "Abilita' Impeccabile" },
+  "Skilled": {
+    "name": "Abile",
+    "description": "Ottieni la competenza in tre abilita' o strumenti a tua scelta, in qualsiasi combinazione."
+  },
+  "Skulker": { "name": "Appostato" },
+  "Slasher": { "name": "Lacerante" },
+  "Spell Sniper": {
+    "name": "Cecchino Magico",
+    "prerequisites": "Capacita' di lanciare almeno un incantesimo",
+    "description": "Hai imparato delle tecniche per migliorare gli attacchi con determinati tipi di incantesimi. Ottieni i seguenti benefici:\n• Quando lanci un incantesimo che richiede un tiro per colpire, la gittata dell'incantesimo viene raddoppiata.\n• I tuoi attacchi con incantesimo a distanza ignorano coperture leggere e tre quarti.\n• Apprendi un trucchetto che richiede un tiro per colpire. Scegli il trucchetto dalla lista degli incantesimi del bardo, chierico, druido, stregone, warlock o mago. La caratteristica da incantatore per questo trucchetto dipende dalla classe scelta."
+  },
+  "Tavern Brawler": {
+    "name": "Lottatore da Taverna",
+    "description": "Avvezzo all'uso di armi improvvisate nelle baruffe, ottieni i seguenti benefici:\n• Aumenti la tua Forza o Costituzione di 1, fino a un massimo di 20.\n• Sei competente con le armi improvvisate.\n• I tuoi colpi a mani nude usano un d4 per il tiro dei danni.\n• Quando colpisci una creatura con un attacco con armi improvvisate o a mani nude nel tuo turno, puoi usare un'azione bonus per cercare di afferrarla."
+  },
+  "Telekinetic": { "name": "Telecinesi" },
+  "Telepathic": { "name": "Telepatia" },
+  "Tough": {
+    "name": "Robusto",
+    "description": "Il tuo punteggio massimo di punti ferita aumenta di un valore pari al doppio del tuo livello quando ottieni questo talento. Ogni volta che sali di livello successivamente, il tuo punteggio massimo di punti ferita aumenta di 2 punti ferita aggiuntivi."
+  },
+  "War Caster": {
+    "name": "Incantatore da Guerra",
+    "prerequisites": "Capacita' di lanciare almeno un incantesimo",
+    "description": "Hai esperienza nel lanciare incantesimi nel mezzo del combattimento, conoscendo tecniche che ti danno i seguenti benefici:\n• Hai vantaggio ai tiri salvezza su Costituzione effettuati per mantenere la concentrazione su un incantesimo quando subisci danni.\n• Puoi eseguire le componenti somatiche degli incantesimi anche se hai armi o uno scudo in una o entrambe le mani.\n• Quando il movimento di una creatura ostile provoca un attacco di opportunita' da parte tua, puoi usare la tua reazione per lanciare un incantesimo contro la creatura, invece di effettuare un attacco di opportunita'. L'incantesimo deve avere un tempo di lancio di 1 azione e deve avere come bersaglio solo quella creatura."
+  },
+  "Weapon Master": {
+    "name": "Maestro d'Armi",
+    "description": "Hai un'estesa pratica con varie armi, ottenendo i seguenti benefici:\n• Aumenti la tua Forza o Destrezza di 1, fino a un massimo di 20.\n• Ottieni la competenza con quattro armi a tua scelta. Ognuna deve essere un'arma semplice o un'arma da guerra."
+  },
+
+  "Dragon Fear": { "name": "Paura Draconica", "prerequisites": "Dragonborn" },
+  "Dragon Hide": { "name": "Pelle di Drago", "prerequisites": "Dragonborn" },
+  "Drow High Magic": { "name": "Alta Magia Drow", "prerequisites": "Elfo (drow)" },
+  "Dwarven Fortitude": { "name": "Tempra Nanica", "prerequisites": "Nano" },
+  "Dwarf Fortitude":   { "name": "Tempra Nanica", "prerequisites": "Nano" },
+  "Strike of the Giants": { "name": "Colpo dei Giganti" },
+  "Soul of the Storm Giant": { "name": "Anima del Gigante delle Tempeste" },
+  "Vigor of the Hill Giant": { "name": "Vigore del Gigante delle Colline" },
+  "Keenness of the Stone Giant": { "name": "Acutezza del Gigante di Pietra" },
+  "Rune Shaper": { "name": "Maestro delle Rune" },
+  "Savage Attacker": { "name": "Aggressore Selvaggio" },
+  "Shadow Touched": { "name": "Contaminazione Ombrosa" },
+  "Elven Accuracy": { "name": "Precisione Elfica", "prerequisites": "Elfo o mezzelfo" },
+  "Fade Away": { "name": "Scomparire", "prerequisites": "Gnomo" },
+  "Fade away": { "name": "Scomparire", "prerequisites": "Gnomo" },
+  "Gift of the Chromatic Dragon": { "name": "Dono del Drago Cromatico" },
+  "Gift of the Metallic Dragon":  { "name": "Dono del Drago Metallico" },
+  "Fey Teleportation": { "name": "Teletrasporto Fatato", "prerequisites": "Elfo (alto)" },
+  "Flames of Phlegethos": { "name": "Fiamme di Flegesto", "prerequisites": "Tiefling" },
+  "Infernal Constitution": { "name": "Costituzione Infernale", "prerequisites": "Tiefling" },
+  "Orcish Fury": { "name": "Furia Orchesca", "prerequisites": "Mezzorco" },
+  "Prodigy": { "name": "Prodigio", "prerequisites": "Mezzelfo, mezzorco o umano" },
+  "Second Chance": { "name": "Seconda Possibilita'", "prerequisites": "Halfling" },
+  "Squat Nimbleness": { "name": "Agilita' Tarchiata", "prerequisites": "Nano o piccola taglia" },
+  "Wood Elf Magic": { "name": "Magia degli Elfi dei Boschi", "prerequisites": "Elfo (dei boschi)" },
+
+  "Eldritch Adept": { "name": "Adepto Occulto", "prerequisites": "Capacita' di incantare o di Pact Magic" },
+  "Cartomancer": { "name": "Cartomante" },
+  "Ember of the Fire Giant": { "name": "Brace del Gigante del Fuoco" },
+  "Fury of the Frost Giant": { "name": "Furia del Gigante del Gelo" },
+  "Guile of the Cloud Giant": { "name": "Astuzia del Gigante delle Nuvole" },
+  "Gift of the Chromatic Dragon": { "name": "Dono del Drago Cromatico" },
+  "Gift of the Gem Dragon": { "name": "Dono del Drago di Gemma" },
+  "Gift of the Metallic Dragon": { "name": "Dono del Drago Metallico" }
+}
