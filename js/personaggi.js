@@ -249,6 +249,167 @@ function _featInfo(nomeIt) {
     return data[nomeIt] || null;
 }
 
+// Elenco di tutti i `source_short` distinti presenti nel dataset talenti.
+function _featAllSources() {
+    const set = new Set();
+    Object.values(_featsData()).forEach(f => {
+        const s = f.source_short || f.source || '';
+        if (s) set.add(s);
+    });
+    return Array.from(set).sort();
+}
+
+function _defaultFeatFilters() {
+    return { prereq: 'any', sources: [] };
+}
+
+// Stato filtri/ricerca per ciascun "contesto" del picker (wizard, scheda).
+window._featPickerFilters = window._featPickerFilters || {};
+window._featPickerSearch = window._featPickerSearch || {};
+
+function _featMatchesFilters(t, f) {
+    if (!f) return true;
+    if (f.prereq === 'yes' && !t.prerequisites) return false;
+    if (f.prereq === 'no' && t.prerequisites) return false;
+    if (f.sources && f.sources.length > 0 && !f.sources.includes(t.fonte)) return false;
+    return true;
+}
+
+function _featMatchesSearch(t, q) {
+    if (!q) return true;
+    return (
+        t.nome.toLowerCase().includes(q) ||
+        (t.nome_en && t.nome_en.toLowerCase().includes(q)) ||
+        (t.fonte || '').toLowerCase().includes(q)
+    );
+}
+
+function _featPickerHeaderHtml(ctx) {
+    const f = window._featPickerFilters[ctx] || _defaultFeatFilters();
+    const q = window._featPickerSearch[ctx] || '';
+    const allSources = _featAllSources();
+
+    const chip = (label, active, onclick) =>
+        `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
+
+    const prereqChips = [['any','Tutti'],['yes','Sì'],['no','No']]
+        .map(([v, lab]) => chip(lab, f.prereq === v, `_featFilterSet('${ctx}','prereq','${v}')`)).join('');
+
+    const sourceChips = allSources
+        .map(s => chip(s, f.sources.includes(s), `_featFilterToggle('${ctx}','sources','${escapeHtml(s)}')`)).join('');
+
+    const filtersPanel = `<div class="spell-filter-panel" id="featFilterPanel_${ctx}" style="display:none;">
+        <div class="spell-filter-group">
+            <div class="spell-filter-label">Prerequisiti</div>
+            <div class="spell-filter-chips">${prereqChips}</div>
+        </div>
+        ${allSources.length > 0 ? `<div class="spell-filter-group">
+            <div class="spell-filter-label">Manuale</div>
+            <div class="spell-filter-chips">${sourceChips}</div>
+        </div>` : ''}
+        <div class="spell-filter-actions">
+            <button type="button" class="btn-secondary btn-small" onclick="_featFilterReset('${ctx}')">Reimposta</button>
+        </div>
+    </div>`;
+
+    return `
+        <div class="spell-picker-search-row">
+            <input type="text" id="featPickerSearch_${ctx}" class="hp-calc-input spell-picker-search"
+                   placeholder="Cerca talento (IT/EN/fonte)..."
+                   value="${escapeHtml(q)}" oninput="_featPickerOnSearch('${ctx}', this.value)">
+            <button type="button" class="spell-picker-filter-btn" id="featPickerFilterBtn_${ctx}"
+                    onclick="_featFilterTogglePanel('${ctx}')" title="Filtri" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span class="spell-picker-filter-badge" id="featFilterBadge_${ctx}" style="display:none;">0</span>
+            </button>
+        </div>
+        ${filtersPanel}
+    `;
+}
+
+function _featPickerActiveFilterCount(ctx) {
+    const f = window._featPickerFilters[ctx];
+    if (!f) return 0;
+    let n = 0;
+    if (f.prereq && f.prereq !== 'any') n += 1;
+    n += (f.sources || []).length;
+    return n;
+}
+
+window._featPickerOnSearch = function(ctx, value) {
+    window._featPickerSearch[ctx] = value;
+    _featPickerRefresh(ctx);
+};
+
+window._featFilterTogglePanel = function(ctx) {
+    const panel = document.getElementById(`featFilterPanel_${ctx}`);
+    const btn = document.getElementById(`featPickerFilterBtn_${ctx}`);
+    if (!panel) return;
+    const visible = panel.style.display !== 'none';
+    panel.style.display = visible ? 'none' : '';
+    if (btn) btn.classList.toggle('active', !visible);
+};
+
+window._featFilterToggle = function(ctx, field, value) {
+    const f = window._featPickerFilters[ctx];
+    if (!f || !Array.isArray(f[field])) return;
+    const i = f[field].indexOf(value);
+    if (i >= 0) f[field].splice(i, 1); else f[field].push(value);
+    _featPickerRefresh(ctx, { keepPanelOpen: true });
+};
+
+window._featFilterSet = function(ctx, field, value) {
+    const f = window._featPickerFilters[ctx];
+    if (!f) return;
+    f[field] = value;
+    _featPickerRefresh(ctx, { keepPanelOpen: true });
+};
+
+window._featFilterReset = function(ctx) {
+    window._featPickerFilters[ctx] = _defaultFeatFilters();
+    _featPickerRefresh(ctx, { keepPanelOpen: true });
+};
+
+// Re-render del contesto richiamando il renderer dedicato di quel contesto.
+function _featPickerRefresh(ctx, opts) {
+    opts = opts || {};
+    const panelOpen = (() => {
+        const p = document.getElementById(`featFilterPanel_${ctx}`);
+        return p ? p.style.display !== 'none' : false;
+    })();
+
+    if (ctx === 'wizard') {
+        pgRenderTalenti();
+    } else if (ctx === 'scheda') {
+        _schedaTalentiRefreshModal();
+    }
+
+    if (opts.keepPanelOpen && panelOpen) {
+        const p = document.getElementById(`featFilterPanel_${ctx}`);
+        const b = document.getElementById(`featPickerFilterBtn_${ctx}`);
+        if (p) p.style.display = '';
+        if (b) b.classList.add('active');
+    }
+    // Re-focus sulla barra di ricerca dopo il re-render (mantiene il cursore in coda).
+    const input = document.getElementById(`featPickerSearch_${ctx}`);
+    if (input && document.activeElement !== input) {
+        input.focus();
+        const v = input.value;
+        try { input.setSelectionRange(v.length, v.length); } catch (_) { /* ignore */ }
+    }
+    _featPickerUpdateBadge(ctx);
+}
+
+function _featPickerUpdateBadge(ctx) {
+    const badge = document.getElementById(`featFilterBadge_${ctx}`);
+    if (!badge) return;
+    const n = _featPickerActiveFilterCount(ctx);
+    if (n > 0) { badge.textContent = n; badge.style.display = ''; }
+    else badge.style.display = 'none';
+}
+
 let pgCurrentTalenti = [];
 
 function _featPickerItemHtml(t, opts) {
@@ -291,6 +452,10 @@ window._featTogglePickerDetail = function(btn) {
 function pgRenderTalenti() {
     const container = document.getElementById('pgTalentiList');
     if (!container) return;
+    const ctx = 'wizard';
+    if (!window._featPickerFilters[ctx]) window._featPickerFilters[ctx] = _defaultFeatFilters();
+    const f = window._featPickerFilters[ctx];
+    const q = (window._featPickerSearch[ctx] || '').trim().toLowerCase();
 
     const selectedHtml = pgCurrentTalenti.map((nome, i) => {
         const info = _featInfo(nome) || { name: nome, source_short: '?' };
@@ -303,15 +468,21 @@ function pgRenderTalenti() {
         return _featPickerItemHtml(t, { selected: true, removeOnClick: `pgRemoveTalento(${i})` });
     }).join('');
 
-    const available = _featsList().filter(t => !pgCurrentTalenti.includes(t.nome));
+    const available = _featsList()
+        .filter(t => !pgCurrentTalenti.includes(t.nome))
+        .filter(t => _featMatchesFilters(t, f))
+        .filter(t => _featMatchesSearch(t, q));
     const listHtml = available.map(t =>
         _featPickerItemHtml(t, { onClick: `pgAddTalento('${escapeHtml(t.nome).replace(/'/g, "\\'")}')` })
-    ).join('');
+    ).join('') || '<div class="scheda-empty" style="padding:12px;">Nessun talento corrisponde ai filtri.</div>';
 
     container.innerHTML = `
-        ${selectedHtml ? `<div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        ${_featPickerHeaderHtml(ctx)}
+        ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        <div class="form-section-label">Disponibili (${available.length})</div>
         <div class="pg-talenti-available">${listHtml}</div>
     `;
+    _featPickerUpdateBadge(ctx);
 }
 
 window.pgAddTalento = function(nome) {
@@ -3642,8 +3813,12 @@ window.schedaOpenResImmEdit = function(pgId) {
     });
 }
 
-function _schedaTalentiContentHtml(currentTalenti, search) {
-    const q = (search || '').trim().toLowerCase();
+function _schedaTalentiContentHtml(currentTalenti) {
+    const ctx = 'scheda';
+    if (!window._featPickerFilters[ctx]) window._featPickerFilters[ctx] = _defaultFeatFilters();
+    const f = window._featPickerFilters[ctx];
+    const q = (window._featPickerSearch[ctx] || '').trim().toLowerCase();
+
     const selectedHtml = currentTalenti.map((nome, i) => {
         const info = _featInfo(nome) || { source_short: '?' };
         const t = {
@@ -3655,35 +3830,30 @@ function _schedaTalentiContentHtml(currentTalenti, search) {
         return _featPickerItemHtml(t, { selected: true, removeOnClick: `schedaTalentoRemove(${i})` });
     }).join('');
 
-    let available = _featsList().filter(t => !currentTalenti.includes(t.nome));
-    if (q) {
-        available = available.filter(t =>
-            t.nome.toLowerCase().includes(q) ||
-            (t.nome_en && t.nome_en.toLowerCase().includes(q)) ||
-            (t.fonte || '').toLowerCase().includes(q)
-        );
-    }
+    const available = _featsList()
+        .filter(t => !currentTalenti.includes(t.nome))
+        .filter(t => _featMatchesFilters(t, f))
+        .filter(t => _featMatchesSearch(t, q));
+
     const listHtml = available.map(t =>
         _featPickerItemHtml(t, { onClick: `schedaTalentoAdd('${escapeHtml(t.nome).replace(/'/g, "\\'")}')` })
-    ).join('') || '<div class="scheda-empty" style="padding:12px;">Nessun talento corrisponde alla ricerca.</div>';
+    ).join('') || '<div class="scheda-empty" style="padding:12px;">Nessun talento corrisponde ai filtri.</div>';
 
     return `
-        <input type="text" id="schedaTalentiSearch" class="hp-calc-input" placeholder="Cerca talento (IT/EN/fonte)..."
-               value="${escapeHtml(q)}" oninput="_schedaTalentiOnSearch(this.value)" style="margin-bottom:12px;">
+        ${_featPickerHeaderHtml(ctx)}
         ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
         <div class="form-section-label">Disponibili (${available.length})</div>
         <div class="pg-talenti-available">${listHtml}</div>
     `;
 }
 
-window._schedaTalentiOnSearch = function(value) {
-    window._schedaTalentiSearch = value;
-    _schedaTalentiRefreshModal();
-};
-
 window.schedaOpenTalentiEdit = function(pgId) {
     const pg = _schedaPgCache;
     const currentTalenti = pg?.talenti ? [...pg.talenti] : [];
+
+    // Reset stato filtri/ricerca per il contesto scheda ad ogni apertura.
+    window._featPickerFilters['scheda'] = _defaultFeatFilters();
+    window._featPickerSearch['scheda'] = '';
 
     const modalHtml = `
     <div class="modal active" id="schedaTalentiModal">
@@ -3691,7 +3861,7 @@ window.schedaOpenTalentiEdit = function(pgId) {
             <button class="modal-close" onclick="schedaCloseTalentiEdit()">&times;</button>
             <h2>Modifica Talenti</h2>
             <div class="wizard-page-scroll" id="schedaTalentiContent">
-                ${_schedaTalentiContentHtml(currentTalenti, '')}
+                ${_schedaTalentiContentHtml(currentTalenti)}
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="schedaCloseTalentiEdit()">Chiudi</button>
@@ -3703,7 +3873,6 @@ window.schedaOpenTalentiEdit = function(pgId) {
     document.body.style.overflow = 'hidden';
     window._schedaTalentiEditPgId = pgId;
     window._schedaTalentiEditList = currentTalenti;
-    window._schedaTalentiSearch = '';
 };
 
 window.schedaTalentoAdd = async function(nome) {
@@ -3746,15 +3915,8 @@ function _schedaTalentiRefreshModal() {
     const container = document.getElementById('schedaTalentiContent');
     if (!container) return;
     const talenti = window._schedaTalentiEditList || [];
-    const search = window._schedaTalentiSearch || '';
-    container.innerHTML = _schedaTalentiContentHtml(talenti, search);
-    // Re-focus sulla ricerca dopo il re-render.
-    const input = document.getElementById('schedaTalentiSearch');
-    if (input) {
-        input.focus();
-        const v = input.value;
-        input.setSelectionRange(v.length, v.length);
-    }
+    container.innerHTML = _schedaTalentiContentHtml(talenti);
+    // Il re-focus della ricerca è gestito da _featPickerRefresh().
 }
 
 window.schedaCloseTalentiEdit = function() {
@@ -5121,6 +5283,8 @@ window.openPersonaggioModal = function(personaggioId) {
     pgCurrentImmunita = [];
     pgCurrentSlotIncantesimo = {};
     pgCurrentTalenti = [];
+    window._featPickerFilters['wizard'] = _defaultFeatFilters();
+    window._featPickerSearch['wizard'] = '';
     pgSelectedEquipment = [];
     _pgRaceSkills = [];
     _pgBgSkills = [];
