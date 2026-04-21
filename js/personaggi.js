@@ -5990,7 +5990,7 @@ async function handleSavePersonaggio(e) {
     const classeDisplay = pgSelectedClasses.map(c => `${c.nome} ${c.livello}`).join(' / ');
     const totalLevel = pgGetTotalLevel();
 
-    const pgData = {
+    let pgData = {
         nome: document.getElementById('pgNome').value.trim(),
         razza: document.getElementById('pgRazza').value || null,
         sottorazza: document.getElementById('pgSottorazza').value || null,
@@ -6039,19 +6039,48 @@ async function handleSavePersonaggio(e) {
         return;
     }
 
+    // Helper: alcune colonne (es. 'sottorazza') potrebbero non esistere
+    // ancora a DB se l'utente non ha eseguito sql/add-sottorazza.sql.
+    // Riproviamo senza la colonna problematica per non bloccare il salvataggio.
+    const _stripMissingColumns = (data, errMsg) => {
+        const m = (errMsg || '').match(/'?([a-z_]+)'? column/i)
+              || (errMsg || '').match(/find ['"]?([a-z_]+)['"]? column/i)
+              || (errMsg || '').match(/column ['"]?([a-z_]+)['"]?/i);
+        if (!m) return null;
+        const col = m[1];
+        if (!(col in data)) return null;
+        const cleaned = { ...data };
+        delete cleaned[col];
+        console.warn(`[pg save] Colonna '${col}' mancante a DB: salvo senza. Esegui sql/add-${col.replace(/_/g, '-')}.sql per abilitarla.`);
+        return cleaned;
+    };
+
     try {
         if (editingPersonaggioId) {
-            const { error } = await supabase
+            let { error } = await supabase
                 .from('personaggi')
                 .update(pgData)
                 .eq('id', editingPersonaggioId);
+            // Retry escludendo colonne mancanti a DB
+            for (let i = 0; i < 4 && error; i++) {
+                const cleaned = _stripMissingColumns(pgData, error.message);
+                if (!cleaned) break;
+                pgData = cleaned;
+                ({ error } = await supabase.from('personaggi').update(pgData).eq('id', editingPersonaggioId));
+            }
             if (error) throw error;
             showNotification('Personaggio aggiornato');
         } else {
             pgData.user_id = userData.id;
-            const { error } = await supabase
+            let { error } = await supabase
                 .from('personaggi')
                 .insert(pgData);
+            for (let i = 0; i < 4 && error; i++) {
+                const cleaned = _stripMissingColumns(pgData, error.message);
+                if (!cleaned) break;
+                pgData = cleaned;
+                ({ error } = await supabase.from('personaggi').insert(pgData));
+            }
             if (error) throw error;
             showNotification('Personaggio creato');
         }
