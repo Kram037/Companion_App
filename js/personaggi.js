@@ -2617,9 +2617,13 @@ async function renderSchedaPersonaggio(personaggioId) {
                     } else { return; }
                     if (maxVal <= 0) return;
                     const key = rIdx === 0 ? `${c.nome}_res` : `${c.nome}_res_${rIdx}`;
+                    // Applica eventuali override utente (nome / max).
+                    const overrides = (classResources._overrides && classResources._overrides[key]) || {};
+                    const dispNome = overrides.nome || res.nome;
+                    if (typeof overrides.max === 'number' && overrides.max > 0) maxVal = overrides.max;
                     const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
                     resItems.push(`<div class="scheda-hd-row">
-                        <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
+                        <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenEditClassRes('${pg.id}','${key}','${escapeHtml(res.nome).replace(/'/g, '&#39;')}',${maxVal})" title="Modifica">${escapeHtml(dispNome)} <small>(${escapeHtml(c.nome)})</small></span>
                         <div class="scheda-hd-avail">
                             <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
                             <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
@@ -4567,8 +4571,11 @@ async function _p1Save(pgId, priv) {
     }
 }
 
-window.p1AddTab = function() {
-    const name = prompt('Nome della nuova tabella (es. "Note", "Trofei"):');
+window.p1AddTab = async function() {
+    const name = await _schedaShowInputDialog({
+        title: 'Nuova tabella (Pagina 1)',
+        placeholder: 'Es. Note, Trofei',
+    });
     if (!name) return;
     const trimmed = name.trim();
     if (!trimmed) return;
@@ -4946,8 +4953,44 @@ window.privRemoveCustom = async function(tabName, index) {
     schedaOpenPrivilegesPage(pg.id);
 };
 
-window.privAddTab = function() {
-    const name = prompt('Nome della nuova tabella (es. "Talenti", "Doni divini"):');
+// Mini modal di input (sostituisce prompt() che in alcuni contesti
+// Electron viene bloccato e ritorna null silenziosamente).
+function _schedaShowInputDialog(opts) {
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.className = 'hp-calc-overlay';
+        overlay.onclick = e => {
+            if (e.target === overlay) { overlay.remove(); resolve(null); }
+        };
+        const title = (opts && opts.title) || 'Inserisci un valore';
+        const placeholder = (opts && opts.placeholder) || '';
+        const initial = (opts && opts.initial) || '';
+        overlay.innerHTML = `<div class="hp-calc-modal" style="width:340px;text-align:left;">
+            <h3 style="margin-bottom:12px;font-size:1rem;">${escapeHtml(title)}</h3>
+            <input type="text" id="schedaInputDlgVal" class="hp-calc-input" value="${escapeHtml(initial)}" placeholder="${escapeHtml(placeholder)}">
+            <div class="dialog-actions" style="display:flex;gap:8px;justify-content:flex-end;">
+                <button class="btn-secondary" id="schedaInputDlgCancel">Annulla</button>
+                <button class="btn-primary" id="schedaInputDlgOk">OK</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        const input = document.getElementById('schedaInputDlgVal');
+        const finish = (val) => { overlay.remove(); resolve(val); };
+        document.getElementById('schedaInputDlgCancel').onclick = () => finish(null);
+        document.getElementById('schedaInputDlgOk').onclick = () => finish(input.value);
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); finish(input.value); }
+            if (e.key === 'Escape') { e.preventDefault(); finish(null); }
+        };
+        setTimeout(() => { input.focus(); input.select(); }, 50);
+    });
+}
+
+window.privAddTab = async function() {
+    const name = await _schedaShowInputDialog({
+        title: 'Nuova tabella',
+        placeholder: 'Es. Talenti, Doni divini',
+    });
     if (!name) return;
     const trimmed = name.trim();
     if (!trimmed) return;
@@ -6233,6 +6276,70 @@ window.schedaClassResChange = function(pgId, key, current, delta, max) {
 
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 }
+
+// Apre l'editor per una risorsa di classe (auto-derivata): permette di
+// sovrascrivere il nome e il valore massimo. Gli override sono
+// memorizzati in pg.risorse_classe._overrides[key] e applicati al
+// rendering. "Reset" li rimuove riportando i valori di default.
+window.schedaOpenEditClassRes = function(pgId, key, defaultName, defaultMax) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const overrides = (pg.risorse_classe && pg.risorse_classe._overrides && pg.risorse_classe._overrides[key]) || {};
+    const curNome = overrides.nome || defaultName || '';
+    const curMax = (typeof overrides.max === 'number' && overrides.max > 0) ? overrides.max : defaultMax;
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:340px;text-align:left;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">Modifica risorsa</h3>
+        <label style="display:block;font-size:0.78rem;color:var(--text-light);margin-bottom:4px;">Nome (opzionale)</label>
+        <input type="text" id="schedaCResNome" class="hp-calc-input" value="${escapeHtml(curNome)}" placeholder="${escapeHtml(defaultName || '')}">
+        <label style="display:block;font-size:0.78rem;color:var(--text-light);margin-bottom:4px;">Massimo</label>
+        <input type="number" id="schedaCResMax" class="hp-calc-input" value="${curMax}" min="1" max="99">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;">Default: ${escapeHtml(defaultName || '')} / ${defaultMax}</div>
+        <div class="dialog-actions" style="display:flex;gap:8px;justify-content:space-between;">
+            <button class="btn-secondary" id="schedaCResReset" style="background:#a55;color:#fff;">Reset</button>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" id="schedaCResCancel">Annulla</button>
+                <button class="btn-primary" id="schedaCResSave">Salva</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const close = () => overlay.remove();
+    document.getElementById('schedaCResCancel').onclick = close;
+    document.getElementById('schedaCResReset').onclick = async () => {
+        if (!pg.risorse_classe) pg.risorse_classe = {};
+        if (!pg.risorse_classe._overrides) pg.risorse_classe._overrides = {};
+        delete pg.risorse_classe._overrides[key];
+        await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+        close();
+        openSchedaPersonaggio(pgId);
+    };
+    document.getElementById('schedaCResSave').onclick = async () => {
+        const nome = (document.getElementById('schedaCResNome').value || '').trim();
+        const maxRaw = parseInt(document.getElementById('schedaCResMax').value, 10);
+        const maxVal = Number.isFinite(maxRaw) && maxRaw > 0 ? maxRaw : null;
+        if (!pg.risorse_classe) pg.risorse_classe = {};
+        if (!pg.risorse_classe._overrides) pg.risorse_classe._overrides = {};
+        const ov = {};
+        if (nome && nome !== defaultName) ov.nome = nome;
+        if (maxVal && maxVal !== defaultMax) ov.max = maxVal;
+        if (Object.keys(ov).length === 0) {
+            delete pg.risorse_classe._overrides[key];
+        } else {
+            pg.risorse_classe._overrides[key] = ov;
+        }
+        // Se il max e' cambiato, clamp del current
+        if (maxVal && pg.risorse_classe[key] != null && pg.risorse_classe[key] > maxVal) {
+            pg.risorse_classe[key] = maxVal;
+        }
+        await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+        close();
+        openSchedaPersonaggio(pgId);
+    };
+    setTimeout(() => document.getElementById('schedaCResNome')?.focus(), 50);
+};
 
 window.schedaRaceResChange = function(pgId, key, current, delta, max) {
     const newVal = Math.max(0, Math.min(max, current + delta));
