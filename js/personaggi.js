@@ -3290,9 +3290,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             const current = cr.current != null ? cr.current : cr.max;
             const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
             resItems.push(`<div class="scheda-hd-row">
-                <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica">${label}
-                    <button class="scheda-custom-res-del" onclick="event.stopPropagation();schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
-                </span>
+                <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica / elimina">${label}</span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
                     <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
@@ -5083,13 +5081,12 @@ function _renderPrivFeatureRow(f, opts = {}) {
     const langWarn = showEnWarn
         ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
         : '';
-    const removeFn = opts.removeFn || `privRemoveCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`;
     const editFn = opts.editFn || (isCustom
         ? `privEditCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`
         : '');
-    const actionBtn = isCustom
-        ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();${removeFn}" title="Rimuovi">✕</button>`
-        : '';
+    // La cancellazione di una riga custom avviene dall'editor (pulsante
+    // rosso "Elimina"), non da una X affiancata al nome: evita misclick.
+    const actionBtn = '';
     // Per le righe custom: il click sul nome apre l'editor. Se c'e'
     // anche una descrizione, la freccia separata toggla il body.
     // Per le righe non custom: comportamento legacy (header clickable
@@ -5172,9 +5169,7 @@ function _buildP1CustomTablesHtml(pg) {
                     : escapeHtml(r.nome);
                 const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
                 return `<div class="scheda-hd-row">
-                    <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenP1TabRes('${pg.id}',${tabKey},${i})" title="Modifica">${label}
-                        <button class="scheda-custom-res-del" onclick="event.stopPropagation();schedaP1TabResDelete('${pg.id}',${tabKey},${i})" title="Rimuovi">✕</button>
-                    </span>
+                    <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenP1TabRes('${pg.id}',${tabKey},${i})" title="Modifica / elimina">${label}</span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},-1,${max})">−</button>
                         <span class="scheda-hd-val">${current}</span>
@@ -5298,6 +5293,9 @@ window.schedaOpenP1TabRes = function(pgId, tabName, editIndex) {
     const confirmFn = editing
         ? `schedaConfirmP1TabRes('${pgId}',${tabKey},${editIndex})`
         : `schedaConfirmP1TabRes('${pgId}',${tabKey})`;
+    const deleteBtn = editing
+        ? `<button type="button" class="btn-danger" onclick="schedaP1TabResDeleteFromEdit('${pgId}',${tabKey},${editIndex})">Elimina</button>`
+        : '';
 
     document.getElementById('p1TabResModal')?.remove();
     const modalHtml = `
@@ -5324,9 +5322,12 @@ window.schedaOpenP1TabRes = function(pgId, tabName, editIndex) {
                 <label class="form-label">Utilizzi massimi</label>
                 <input type="number" id="p1TabResMax" class="form-input" min="1" value="${initialMax}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
             </div>
-            <div class="form-actions" style="margin-top:var(--spacing-md);">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('p1TabResModal')?.remove();document.body.style.overflow='';">Annulla</button>
-                <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
+            <div class="form-actions" style="margin-top:var(--spacing-md);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div>${deleteBtn}</div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('p1TabResModal')?.remove();document.body.style.overflow='';">Annulla</button>
+                    <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
+                </div>
             </div>
         </div>
     </div>`;
@@ -5363,6 +5364,13 @@ window.schedaConfirmP1TabRes = async function(pgId, tabName, editIndex) {
     document.body.style.overflow = '';
     openSchedaPersonaggio(pgId);
     showNotification && showNotification(editing ? 'Risorsa aggiornata' : 'Risorsa aggiunta');
+};
+
+window.schedaP1TabResDeleteFromEdit = async function(pgId, tabName, index) {
+    if (!confirm('Eliminare definitivamente questa risorsa?')) return;
+    document.getElementById('p1TabResModal')?.remove();
+    document.body.style.overflow = '';
+    await schedaP1TabResDelete(pgId, tabName, index);
 };
 
 window.schedaP1TabResDelete = async function(pgId, tabName, index) {
@@ -5897,6 +5905,10 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
     }
     const it = item || { name: '', level: '', description: '' };
     const title = mode === 'edit' ? 'Modifica privilegio' : `Aggiungi a ${tabName}`;
+    const isEdit = mode === 'edit' && index != null && index >= 0;
+    const deleteBtn = isEdit
+        ? `<button class="btn-danger" onclick="privDeleteFromEdit('${escapeHtml(tabName)}',${index})">Elimina</button>`
+        : '';
     modal.innerHTML = `
     <div class="modal-content priv-edit-card">
         <button class="modal-close" onclick="privCloseEdit()" aria-label="Chiudi">×</button>
@@ -5910,14 +5922,25 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
         <label class="priv-edit-label">Descrizione
             <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione del privilegio">${escapeHtml(it.description || '')}</textarea>
         </label>
-        <div class="priv-edit-actions">
-            <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
-            <button class="btn-primary" onclick="privConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
+        <div class="priv-edit-actions" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div>${deleteBtn}</div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
+                <button class="btn-primary" onclick="privConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
+            </div>
         </div>
     </div>`;
     modal.classList.add('active');
     setTimeout(() => document.getElementById('privEditName')?.focus(), 50);
 }
+
+window.privDeleteFromEdit = async function(tabName, index) {
+    if (!confirm('Eliminare definitivamente questa voce?')) return;
+    privCloseEdit();
+    if (typeof window.privRemoveCustom === 'function') {
+        await window.privRemoveCustom(tabName, index);
+    }
+};
 
 window.privCloseEdit = function() {
     const modal = document.getElementById('privEditModal');
@@ -6430,11 +6453,12 @@ function _fsPickerHeaderHtml() {
     const chip = (label, active, onclick) =>
         `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
 
+    const jsArg = s => JSON.stringify(s).replace(/"/g, '&quot;');
     const slotChips = [chip('Tutte', state.slot === 'all', `schedaFsSetSlotFilter('all')`)]
-        .concat(slotKeys.map(k => chip(k, state.slot === k, `schedaFsSetSlotFilter(${JSON.stringify(k)})`)))
+        .concat(slotKeys.map(k => chip(k, state.slot === k, `schedaFsSetSlotFilter(${jsArg(k)})`)))
         .join('');
     const sourceChips = [chip('Tutti', state.source === 'all', `schedaFsSetSourceFilter('all')`)]
-        .concat(sources.map(s => chip(s, state.source === s, `schedaFsSetSourceFilter('${escapeHtml(s)}')`)))
+        .concat(sources.map(s => chip(s, state.source === s, `schedaFsSetSourceFilter(${jsArg(s)})`)))
         .join('');
 
     let activeCount = 0;
@@ -7745,6 +7769,9 @@ window.schedaOpenAddCustomRes = function(pgId, editIndex) {
     const confirmFn = editing
         ? `schedaConfirmCustomRes('${pgId}', ${editIndex})`
         : `schedaConfirmCustomRes('${pgId}')`;
+    const deleteBtn = editing
+        ? `<button type="button" class="btn-danger" onclick="schedaDeleteCustomResFromEdit('${pgId}',${editIndex})">Elimina</button>`
+        : '';
 
     const modalHtml = `
     <div class="modal active" id="customResModal">
@@ -7770,9 +7797,12 @@ window.schedaOpenAddCustomRes = function(pgId, editIndex) {
                 <label class="form-label">Utilizzi massimi</label>
                 <input type="number" id="customResMax" class="form-input" min="1" value="${initialMax}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
             </div>
-            <div class="form-actions" style="margin-top:var(--spacing-md);">
-                <button type="button" class="btn-secondary" onclick="schedaCloseCustomResModal()">Annulla</button>
-                <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
+            <div class="form-actions" style="margin-top:var(--spacing-md);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div>${deleteBtn}</div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="btn-secondary" onclick="schedaCloseCustomResModal()">Annulla</button>
+                    <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
+                </div>
             </div>
         </div>
     </div>`;
@@ -7829,6 +7859,12 @@ window.schedaConfirmCustomRes = async function(pgId, editIndex) {
     }
     showNotification(editing ? 'Risorsa aggiornata' : 'Risorsa aggiunta');
 }
+
+window.schedaDeleteCustomResFromEdit = async function(pgId, index) {
+    if (!confirm('Eliminare definitivamente questa risorsa?')) return;
+    schedaCloseCustomResModal();
+    await schedaDeleteCustomRes(pgId, index);
+};
 
 window.schedaDeleteCustomRes = async function(pgId, index) {
     const pg = _schedaPgCache;
@@ -9173,9 +9209,7 @@ async function renderMicroScheda(personaggioId) {
         const current = cr.current != null ? cr.current : cr.max;
         const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
         microResItems.push(`<div class="scheda-hd-row">
-            <span class="scheda-hd-total">${label}
-                <button class="scheda-custom-res-del" onclick="schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
-            </span>
+            <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica / elimina">${label}</span>
             <div class="scheda-hd-avail">
                 <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
                 <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
