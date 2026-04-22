@@ -1,0 +1,975 @@
+{
+  "cleric": {
+    "life-domain": {
+      "1": [
+        "Benedizione",
+        "Cura Ferite"
+      ],
+      "3": [
+        "Ristorare Inferiore",
+        "Arma Spirituale"
+      ],
+      "5": [
+        "Faro di Speranza",
+        "Rivivificare"
+      ],
+      "7": [
+        "Protezione dalla Morte",
+        "Guardiano della Fede"
+      ],
+      "9": [
+        "Cura Ferite di Massa",
+        "Resuscitare Morti"
+      ]
+    },
+    "knowledge-domain": {
+      "1": [
+        "Comando"
+      ],
+      "3": [
+        "Suggestione"
+      ],
+      "5": [
+        "Anti-Individuazione",
+        "Parlare con i Morti"
+      ],
+      "7": [
+        "Occhio Arcano",
+        "Confusione"
+      ],
+      "9": [
+        "Sapere Leggendario",
+        "Scrutare"
+      ]
+    },
+    "light-domain": {
+      "1": [
+        "Mani Brucianti",
+        "Luminescenza"
+      ],
+      "3": [
+        "Sfera Infuocata",
+        "Raggio Cocente"
+      ],
+      "5": [
+        "Luce del Giorno",
+        "Palla di Fuoco"
+      ],
+      "7": [
+        "Guardiano della Fede",
+        "Muro di Fuoco"
+      ],
+      "9": [
+        "Colonna di Fuoco",
+        "Scrutare"
+      ]
+    },
+    "nature-domain": {
+      "1": [
+        "Amicizia con gli Animali"
+      ],
+      "3": [
+        "Pelle di Corteccia",
+        "Crescita di Spuntoni"
+      ],
+      "5": [
+        "Crescita Vegetale",
+        "Muro di Vento"
+      ],
+      "7": [
+        "Dominare Bestia",
+        "Vite Avvinghiante"
+      ],
+      "9": [
+        "Piaga d'Insetti",
+        "Passo dell'Albero"
+      ]
+    },
+    "tempest-domain": {
+      "1": [
+        "Nube di Nebbia",
+        "Onda Tonante"
+      ],
+      "3": [
+        "Folata di Vento",
+        "Frantumare"
+      ],
+      "5": [
+        "Evocare Fulmini",
+        "Tempesta di Nevischio"
+      ],
+      "7": [
+        "Controllare Acque",
+        "Tempesta di Ghiaccio"
+      ],
+      "9": [
+        "Onda Distruttiva",
+        "Piaga d'Insetti"
+      ]
+    },
+    "trickery-domain": {
+      "1": [
+        "Charme su Persone",
+        "Camuffare Sé Stesso"
+      ],
+      "3": [
+        "Immagini Speculari",
+        "Passare senza Tracce"
+      ],
+      "5": [
+        "Lampeggiare",
+        "Dissolvi Magie"
+      ],
+      "7": [
+        "Porta Dimensionale",
+        "Metamorfosi"
+      ],
+      "9": [
+        "Dominare Persona",
+        "Modificare Memoria"
+      ]
+    },
+    "war-domain": {
+      "1": [
+        "Favore Divino",
+        "Scudo della Fede"
+      ],
+      "3": [
+        "Arma Magica",
+        "Arma Spirituale"
+      ],
+      "5": [
+        "Manto del Crociato",
+        "Spiriti Guardiani"
+      ],
+      "7": [
+        "Libertà di Movimento",
+        "Pelle di Pietra"
+      ],
+      "9": [
+        "Colonna di Fuoco",
+        "Bloccare Mostri"
+      ]
+    },
+    "death-domain": {
+      "1": [
+        "Vita Falsata",
+        "Raggio della Malattia"
+      ],
+      "3": [
+        "Cecità/Sordità",
+        "Raggio Indebolente"
+      ],
+      "5": [
+        "Animare Morti",
+        "Tocco del Vampiro"
+      ],
+      "7": [
+        "Avvizzimento",
+        "Protezione dalla Morte"
+      ],
+      "9": [
+        "Guscio Antivita",
+        "Nube Mortale"
+      ]
+    },
+    "forge-domain": {
+      "1": [
+        "Punizione Cocente"
+      ],
+      "3": [
+        "Riscaldare Metallo",
+        "Arma Magica"
+      ],
+      "5": [
+        "Arma Elementale",
+        "Protezione dall'Energia"
+      ],
+      "7": [
+        "Fabbricare",
+        "Muro di Fuoco"
+      ],
+      "9": [
+        "Animare Oggetti",
+        "Creazione"
+      ]
+    },
+    "grave-domain": {
+      "1": [
+        "Anatema",
+        "Vita Falsata"
+      ],
+      "3": [
+        "Raggio Indebolente"
+      ],
+      "5": [
+        "Rivivificare",
+        "Tocco del Vampiro"
+      ],
+      "7": [
+        "Avvizzimento",
+        "Protezione dalla Morte"
+      ],
+      "9": [
+        "Guscio Antivita",
+        "Resuscitare Morti"
+      ]
+    },
+    "order-domain": {
+      "1": [
+        "Comando",
+        "Eroismo"
+      ],
+      "3": [
+        "Bloccare Persone",
+        "Zona di Verità"
+      ],
+      "5": [
+        "Parola Guaritrice di Massa",
+        "Rallentare"
+      ],
+      "7": [
+        "Costrizione",
+        "Localizza Creatura"
+      ],
+      "9": [
+        "Dominare Persona"
+      ]
+    },
+    "peace-domain": {
+      "1": [
+        "Eroismo",
+        "Santuario"
+      ],
+      "3": [
+        "Aiuto",
+        "Vincolo Protettore"
+      ],
+      "5": [
+        "Faro di Speranza",
+        "Inviare Messaggio"
+      ],
+      "7": [
+        "Aura di Purezza",
+        "Sfera Elastica di Otiluke"
+      ],
+      "9": [
+        "Ristorare Superiore"
+      ]
+    },
+    "twilight-domain": {
+      "1": [
+        "Luminescenza",
+        "Sonno"
+      ],
+      "3": [
+        "Raggio Lunare",
+        "Vedere Invisibilità"
+      ],
+      "5": [
+        "Aura di Vitalità"
+      ],
+      "7": [
+        "Aura di Vita",
+        "Invisibilità Superiore"
+      ],
+      "9": [
+        "Cerchio del Potere",
+        "Inganno"
+      ]
+    },
+    "arcana-domain": {
+      "1": [
+        "Dardo Incantato"
+      ],
+      "3": [
+        "Arma Magica",
+        "Aura Magica di Nystul"
+      ],
+      "5": [
+        "Dissolvi Magie",
+        "Cerchio Magico"
+      ],
+      "7": [
+        "Occhio Arcano",
+        "Scrigno Segreto di Leomund"
+      ],
+      "9": [
+        "Vincolo Planare",
+        "Cerchio di Teletrasporto"
+      ]
+    }
+  },
+  "paladin": {
+    "oath-of-devotion": {
+      "3": [
+        "Protezione dal Bene e dal Male",
+        "Santuario"
+      ],
+      "5": [
+        "Ristorare Inferiore",
+        "Zona di Verità"
+      ],
+      "9": [
+        "Faro di Speranza",
+        "Dissolvi Magie"
+      ],
+      "13": [
+        "Libertà di Movimento",
+        "Guardiano della Fede"
+      ],
+      "17": [
+        "Colonna di Fuoco"
+      ]
+    },
+    "oath-of-the-ancients": {
+      "3": [
+        "Colpo Intrappolante"
+      ],
+      "5": [
+        "Passo Velato",
+        "Raggio Lunare"
+      ],
+      "9": [
+        "Crescita Vegetale",
+        "Protezione dall'Energia"
+      ],
+      "13": [
+        "Tempesta di Ghiaccio",
+        "Pelle di Pietra"
+      ],
+      "17": [
+        "Passo dell'Albero"
+      ]
+    },
+    "oath-of-vengeance": {
+      "3": [
+        "Anatema",
+        "Marchio del Cacciatore"
+      ],
+      "5": [
+        "Bloccare Persone",
+        "Passo Velato"
+      ],
+      "9": [
+        "Velocità",
+        "Protezione dall'Energia"
+      ],
+      "13": [
+        "Bandire",
+        "Porta Dimensionale"
+      ],
+      "17": [
+        "Bloccare Mostri",
+        "Scrutare"
+      ]
+    },
+    "oath-of-conquest": {
+      "3": [
+        "Armatura di Agathys",
+        "Comando"
+      ],
+      "5": [
+        "Bloccare Persone",
+        "Arma Spirituale"
+      ],
+      "9": [
+        "Scagliare Maledizione",
+        "Paura"
+      ],
+      "13": [
+        "Dominare Bestia",
+        "Pelle di Pietra"
+      ],
+      "17": [
+        "Nube Mortale",
+        "Dominare Persona"
+      ]
+    },
+    "oath-of-redemption": {
+      "3": [
+        "Santuario",
+        "Sonno"
+      ],
+      "5": [
+        "Bloccare Persone",
+        "Raggio Indebolente"
+      ],
+      "9": [
+        "Controincantesimo",
+        "Disegno Ipnotico"
+      ],
+      "13": [
+        "Sfera Elastica di Otiluke",
+        "Pelle di Pietra"
+      ],
+      "17": [
+        "Bloccare Mostri",
+        "Muro di Forza"
+      ]
+    },
+    "oath-of-glory": {
+      "3": [
+        "Dardo Tracciante",
+        "Eroismo"
+      ],
+      "5": [
+        "Potenziare Caratteristica",
+        "Arma Magica"
+      ],
+      "9": [
+        "Velocità",
+        "Protezione dall'Energia"
+      ],
+      "13": [
+        "Costrizione",
+        "Libertà di Movimento"
+      ],
+      "17": [
+        "Colonna di Fuoco"
+      ]
+    },
+    "oath-of-the-watchers": {
+      "3": [],
+      "5": [
+        "Raggio Lunare",
+        "Vedere Invisibilità"
+      ],
+      "9": [
+        "Controincantesimo",
+        "Anti-Individuazione"
+      ],
+      "13": [
+        "Aura di Purezza",
+        "Bandire"
+      ],
+      "17": [
+        "Bloccare Mostri",
+        "Scrutare"
+      ]
+    },
+    "oath-of-the-crown": {
+      "3": [
+        "Comando",
+        "Duello Obbligato"
+      ],
+      "5": [
+        "Vincolo Protettore",
+        "Zona di Verità"
+      ],
+      "9": [
+        "Aura di Vitalità",
+        "Spiriti Guardiani"
+      ],
+      "13": [
+        "Bandire",
+        "Guardiano della Fede"
+      ],
+      "17": [
+        "Cerchio del Potere",
+        "Geas"
+      ]
+    },
+    "oathbreaker": {
+      "3": [
+        "Rimprovero Infernale",
+        "Infliggere Ferite"
+      ],
+      "5": [
+        "Corona di Follia",
+        "Oscurità"
+      ],
+      "9": [
+        "Animare Morti",
+        "Scagliare Maledizione"
+      ],
+      "13": [
+        "Avvizzimento",
+        "Confusione"
+      ],
+      "17": [
+        "Contagio",
+        "Dominare Persona"
+      ]
+    }
+  },
+  "warlock": {
+    "archfey": {
+      "1": [
+        "Luminescenza",
+        "Sonno"
+      ],
+      "3": [
+        "Placare le Emozioni",
+        "Forza Fantasma"
+      ],
+      "5": [
+        "Lampeggiare",
+        "Crescita Vegetale"
+      ],
+      "7": [
+        "Dominare Bestia",
+        "Invisibilità Superiore"
+      ],
+      "9": [
+        "Dominare Persona",
+        "Sembrare"
+      ]
+    },
+    "the-fiend": {
+      "1": [
+        "Mani Brucianti",
+        "Comando"
+      ],
+      "3": [
+        "Cecità/Sordità",
+        "Raggio Cocente"
+      ],
+      "5": [
+        "Palla di Fuoco",
+        "Nube Pestilenziale"
+      ],
+      "7": [
+        "Scudo di Fuoco",
+        "Muro di Fuoco"
+      ],
+      "9": [
+        "Colonna di Fuoco",
+        "Consacrare"
+      ]
+    },
+    "great-old-one": {
+      "1": [
+        "Sussurri Dissonanti",
+        "Risata Atroce di Tasha"
+      ],
+      "3": [
+        "Individuazione del Pensiero",
+        "Forza Fantasma"
+      ],
+      "5": [
+        "Chiaroveggenza",
+        "Inviare Messaggio"
+      ],
+      "7": [
+        "Dominare Bestia",
+        "Tentacoli Neri di Evard"
+      ],
+      "9": [
+        "Dominare Persona",
+        "Telecinesi"
+      ]
+    },
+    "hexblade": {
+      "1": [
+        "Scudo",
+        "Punizione Collerica"
+      ],
+      "3": [
+        "Vista Offuscata",
+        "Punizione Marchiante"
+      ],
+      "5": [
+        "Lampeggiare",
+        "Arma Elementale"
+      ],
+      "7": [
+        "Assassino Fantasma",
+        "Punizione Stordente"
+      ],
+      "9": [
+        "Punizione Bandente",
+        "Cono di Freddo"
+      ]
+    },
+    "celestial": {
+      "1": [
+        "Cura Ferite",
+        "Dardo Tracciante"
+      ],
+      "3": [
+        "Sfera Infuocata",
+        "Ristorare Inferiore"
+      ],
+      "5": [
+        "Luce del Giorno",
+        "Rivivificare"
+      ],
+      "7": [
+        "Guardiano della Fede",
+        "Muro di Fuoco"
+      ],
+      "9": [
+        "Ristorare Superiore",
+        "Colonna di Fuoco"
+      ]
+    },
+    "fathomless": {
+      "1": [
+        "Creare o Distruggere Acqua",
+        "Onda Tonante"
+      ],
+      "3": [
+        "Folata di Vento"
+      ],
+      "5": [
+        "Fulmine",
+        "Tempesta di Nevischio"
+      ],
+      "7": [
+        "Controllare Acque",
+        "Evocare Elementale"
+      ],
+      "9": [
+        "Mano di Bigby",
+        "Cono di Freddo"
+      ]
+    },
+    "genie": {
+      "1": [
+        "Individuazione del Bene e del Male",
+        "Forza Fantasma"
+      ],
+      "3": [
+        "Protezione dal Bene e dal Male"
+      ],
+      "5": [
+        "Creare Cibo e Acqua",
+        "Linguaggi"
+      ],
+      "7": [
+        "Assassino Fantasma",
+        "Pelle di Pietra"
+      ],
+      "9": [
+        "Creazione",
+        "Muro di Pietra"
+      ]
+    },
+    "undead": {
+      "1": [
+        "Anatema",
+        "Vita Falsata"
+      ],
+      "3": [
+        "Cecità/Sordità",
+        "Forza Fantasma"
+      ],
+      "5": [
+        "Parlare con i Morti"
+      ],
+      "7": [
+        "Protezione dalla Morte",
+        "Invisibilità Superiore"
+      ],
+      "9": [
+        "Guscio Antivita",
+        "Nube Mortale"
+      ]
+    },
+    "undying": {
+      "1": [
+        "Vita Falsata",
+        "Raggio della Malattia"
+      ],
+      "3": [
+        "Cecità/Sordità"
+      ],
+      "5": [
+        "Parlare con i Morti"
+      ],
+      "7": [
+        "Aura di Vita",
+        "Protezione dalla Morte"
+      ],
+      "9": [
+        "Contagio",
+        "Sapere Leggendario"
+      ]
+    }
+  },
+  "sorcerer": {
+    "aberrant-mind": {
+      "1": [
+        "Braccia di Hadar",
+        "Sussurri Dissonanti",
+        "Scheggia Mentale"
+      ],
+      "3": [
+        "Placare le Emozioni",
+        "Individuazione del Pensiero"
+      ],
+      "5": [
+        "Fame di Hadar",
+        "Inviare Messaggio"
+      ],
+      "7": [
+        "Tentacoli Neri di Evard",
+        "Evocare Aberrazione"
+      ],
+      "9": [
+        "Telecinesi"
+      ]
+    },
+    "clockwork-soul": {
+      "1": [
+        "Protezione dal Bene e dal Male"
+      ],
+      "3": [
+        "Aiuto",
+        "Ristorare Inferiore"
+      ],
+      "5": [
+        "Dissolvi Magie",
+        "Protezione dall'Energia"
+      ],
+      "7": [
+        "Libertà di Movimento",
+        "Evocare Costrutto"
+      ],
+      "9": [
+        "Mano di Bigby",
+        "Vincolo Planare"
+      ]
+    }
+  },
+  "druid": {
+    "circle-of-spores": {
+      "3": [
+        "Tocco Gelido",
+        "Causare Paura",
+        "Infliggere Ferite"
+      ],
+      "5": [
+        "Cecità/Sordità"
+      ],
+      "7": [
+        "Animare Morti",
+        "Forma Gassosa"
+      ],
+      "9": [
+        "Avvizzimento",
+        "Confusione"
+      ],
+      "11": [
+        "Nube Mortale",
+        "Contagio"
+      ]
+    },
+    "circle-of-wildfire": {
+      "2": [
+        "Mani Brucianti",
+        "Cura Ferite"
+      ],
+      "3": [
+        "Sfera Infuocata",
+        "Raggio Cocente"
+      ],
+      "5": [
+        "Crescita Vegetale",
+        "Rivivificare"
+      ],
+      "7": [
+        "Aura di Vita",
+        "Scudo di Fuoco"
+      ],
+      "9": [
+        "Colonna di Fuoco",
+        "Cura Ferite di Massa"
+      ]
+    }
+  },
+  "ranger": {
+    "gloom-stalker": {
+      "3": [
+        "Camuffare Sé Stesso"
+      ],
+      "5": [
+        "Trucco della Corda"
+      ],
+      "9": [
+        "Paura"
+      ],
+      "13": [
+        "Invisibilità Superiore"
+      ],
+      "17": [
+        "Sembrare"
+      ]
+    },
+    "horizon-walker": {
+      "3": [
+        "Protezione dal Bene e dal Male"
+      ],
+      "5": [
+        "Passo Velato"
+      ],
+      "9": [
+        "Velocità"
+      ],
+      "13": [
+        "Bandire"
+      ],
+      "17": [
+        "Teletrasporto"
+      ]
+    },
+    "monster-slayer": {
+      "3": [
+        "Protezione dal Bene e dal Male"
+      ],
+      "5": [
+        "Zona di Verità"
+      ],
+      "9": [
+        "Cerchio Magico"
+      ],
+      "13": [
+        "Bandire"
+      ],
+      "17": [
+        "Bloccare Mostri"
+      ]
+    },
+    "fey-wanderer": {
+      "3": [
+        "Charme su Persone"
+      ],
+      "5": [
+        "Passo Velato"
+      ],
+      "9": [
+        "Crescita Vegetale"
+      ],
+      "13": [
+        "Dominare Bestia"
+      ],
+      "17": [
+        "Inganno"
+      ]
+    },
+    "swarmkeeper": {
+      "3": [
+        "Mano Magica",
+        "Luminescenza"
+      ],
+      "5": [
+        "Ragnatela"
+      ],
+      "9": [
+        "Forma Gassosa"
+      ],
+      "13": [
+        "Occhio Arcano"
+      ],
+      "17": [
+        "Piaga d'Insetti"
+      ]
+    },
+    "drakewarden": {
+      "3": [
+        "Comando"
+      ],
+      "5": [
+        "Soffio del Drago"
+      ],
+      "9": [
+        "Parlare con i Vegetali"
+      ],
+      "13": [
+        "Localizza Creatura"
+      ],
+      "17": []
+    }
+  },
+  "artificer": {
+    "alchemist": {
+      "3": [
+        "Parola Guaritrice",
+        "Raggio della Malattia"
+      ],
+      "5": [
+        "Sfera Infuocata",
+        "Freccia Acida di Melf"
+      ],
+      "9": [
+        "Forma Gassosa",
+        "Parola Guaritrice di Massa"
+      ],
+      "13": [
+        "Avvizzimento",
+        "Protezione dalla Morte"
+      ],
+      "17": [
+        "Nube Mortale",
+        "Resuscitare Morti"
+      ]
+    },
+    "armorer": {
+      "3": [
+        "Dardo Incantato",
+        "Onda Tonante"
+      ],
+      "5": [
+        "Immagini Speculari",
+        "Frantumare"
+      ],
+      "9": [
+        "Disegno Ipnotico",
+        "Fulmine"
+      ],
+      "13": [
+        "Scudo di Fuoco",
+        "Invisibilità Superiore"
+      ],
+      "17": [
+        "Passamuri",
+        "Muro di Forza"
+      ]
+    },
+    "artillerist": {
+      "3": [
+        "Scudo",
+        "Onda Tonante"
+      ],
+      "5": [
+        "Raggio Cocente",
+        "Frantumare"
+      ],
+      "9": [
+        "Palla di Fuoco",
+        "Muro di Vento"
+      ],
+      "13": [
+        "Tempesta di Ghiaccio",
+        "Muro di Fuoco"
+      ],
+      "17": [
+        "Cono di Freddo",
+        "Muro di Forza"
+      ]
+    },
+    "battle-smith": {
+      "3": [
+        "Eroismo",
+        "Scudo"
+      ],
+      "5": [
+        "Punizione Marchiante",
+        "Vincolo Protettore"
+      ],
+      "9": [
+        "Aura di Vitalità",
+        "Evocare Sbarramento"
+      ],
+      "13": [
+        "Aura di Purezza",
+        "Scudo di Fuoco"
+      ],
+      "17": [
+        "Punizione Bandente",
+        "Cura Ferite di Massa"
+      ]
+    }
+  }
+}

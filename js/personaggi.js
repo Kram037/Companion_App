@@ -884,6 +884,57 @@ function _pgRaceInnateSlots(pg) {
     return out;
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Incantesimi auto-garantiti da sottoclasse (Chierico Domini, Paladino
+// Giuramenti, Warlock Patroni con Lista Espansa, Stregone Aberrant Mind /
+// Clockwork Soul, Druido Cerchi, Ranger Conclavi, Artefice specialisti...).
+// I dati vivono in window.SUBCLASS_SPELLS_DATA e sono generati da
+// risorse/classi/build_subclass_spells.py.
+//
+// Schema (vedi script):
+//   { class_slug: { subclass_slug: { pgLvlMin: ["Nome IT", ...] } } }
+//
+// Il PG ottiene una voce quando livello_classe >= pgLvlMin. La funzione
+// restituisce { name, source, source_label, sub_label } per ogni
+// incantesimo, deduplicando se lo stesso spell appare in piu' classi.
+// ─────────────────────────────────────────────────────────────────────────
+function _pgSubclassGrantedSpells(pg) {
+    const data = window.SUBCLASS_SPELLS_DATA || {};
+    if (!pg || !Array.isArray(pg.classi)) return [];
+    const seen = new Set();
+    const out = [];
+    pg.classi.forEach(c => {
+        if (!c || !c.nome) return;
+        const cls = _getClassData(c.nome);
+        if (!cls) return;
+        const subSlug = c.sottoclasseSlug || '';
+        if (!subSlug) return;
+        const subData = (data[cls.slug] || {})[subSlug];
+        if (!subData) return;
+        const lvl = parseInt(c.livello) || 1;
+        // Etichetta: "Dominio della Vita", "Giuramento di Devozione",
+        // "Patrono del Demonio", ecc. — usa il nome IT della sottoclasse
+        // se disponibile, altrimenti il name_en.
+        const sub = (cls.subclasses || []).find(x => x.slug === subSlug);
+        const subLabel = sub ? (sub.name || sub.name_en || c.sottoclasse) : (c.sottoclasse || subSlug);
+        Object.entries(subData).forEach(([reqLvlStr, spellNames]) => {
+            const reqLvl = parseInt(reqLvlStr);
+            if (lvl < reqLvl) return;
+            (spellNames || []).forEach(name => {
+                const key = (name || '').toLowerCase();
+                if (seen.has(key)) return;
+                seen.add(key);
+                out.push({
+                    name,
+                    source: cls.slug + ':' + subSlug,
+                    source_label: subLabel,
+                });
+            });
+        });
+    });
+    return out;
+}
+
 function getBackgroundData(nome) {
     if (!nome) return null;
     // Prima il dataset locale (window.BACKGROUNDS_DATA): mappa lo schema
@@ -2744,10 +2795,17 @@ window.schedaOpenSpellPage = async function(pgId) {
         const sp = _resolveSpell(s.name) || _resolveSpell(s.name_en);
         if (sp) innateLevels.add(sp.level);
     });
+    // Livelli con incantesimi auto-garantiti da sottoclasse (Domini,
+    // Giuramenti, Patroni con lista espansa, ecc.).
+    const subclassLevels = new Set();
+    _pgSubclassGrantedSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name);
+        if (sp) subclassLevels.add(sp.level);
+    });
     const maxKnowableLevel = _maxKnownSpellLevel(classi);
     const knowableLevels = [];
     for (let l = 0; l <= maxKnowableLevel; l++) knowableLevels.push(l);
-    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels]);
+    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels, ...subclassLevels]);
     // Mostra fino al massimo livello disponibile nel dataset
     const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
     const orderedLevels = Array.from(levelsToShow)
@@ -3082,8 +3140,25 @@ function buildSpellLevelSection(pg, level) {
         innateUnique.push(x);
     });
 
+    // Incantesimi auto-garantiti da sottoclasse (Dominio Vita, Giuramento
+    // di Devozione, Patrono Demonio, ecc.). Anche questi sono "locked":
+    // non si possono rimuovere dal picker ma compaiono in lista come carte
+    // con tag della sottoclasse.
+    const subclassGranted = _pgSubclassGrantedSpells(pg)
+        .map(g => ({ src: g, sp: _resolveSpell(g.name) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenSubclass = new Set();
+    const subclassUnique = [];
+    subclassGranted.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key)) return; // razza ha priorita'
+        if (seenSubclass.has(key)) return;
+        seenSubclass.add(key);
+        subclassUnique.push(x);
+    });
+
     const knownCards = known
-        .filter(({ sp }) => !seenInnate.has(sp.name))
+        .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name))
         .map(({ sp }) => {
             const id = sp.name;
             return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
@@ -3101,7 +3176,16 @@ function buildSpellLevelSection(pg, level) {
         </div>`;
     }).join('');
 
-    const cardsHtml = (knownCards + innateCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
+    const subclassCards = subclassUnique.map(({ src, sp }) => {
+        const id = sp.name;
+        const label = src.source_label || 'sottoclasse';
+        return `<div class="spell-card spell-card-subclass" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag spell-card-tag-subclass" title="Garantito da: ${escapeHtml(label)}">${escapeHtml(label)}</span></div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+        </div>`;
+    }).join('');
+
+    const cardsHtml = (knownCards + innateCards + subclassCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
 
     const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
     const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
@@ -3303,15 +3387,26 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     window._spellPickerFilters = _defaultSpellFilters(pg);
     window._spellPickerSearchQ = '';
 
+    // Mappa incantesimi auto-garantiti da sottoclasse (sempre presenti):
+    // selected + disabled nel picker, con badge "garantito".
+    const grantedByName = new Map();
+    _pgSubclassGrantedSpells(pg).forEach(g => {
+        const sp = _resolveSpell(g.name);
+        if (sp) grantedByName.set(sp.name, g.source_label || 'sottoclasse');
+    });
+
     const renderRow = (sp) => {
         const id = sp.name;
         const isKnown = knownAll.has(id);
+        const grantedLabel = grantedByName.get(id);
+        const isGranted = !!grantedLabel;
         const safeId = escapeAttr(id);
         const tags = [];
         if (_spellIsConcentration(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-c" title="Concentrazione">C</span>');
         if (_spellIsRitual(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-r" title="Rituale">R</span>');
-        return `<label class="spell-pick-row" data-spell-id="${safeId}">
-            <input type="checkbox" class="spell-pick-cb" data-name="${safeId}" ${isKnown ? 'checked' : ''}>
+        if (isGranted) tags.push(`<span class="spell-pick-tag spell-pick-tag-granted" title="Garantito da: ${escapeHtml(grantedLabel)}">${escapeHtml(grantedLabel)}</span>`);
+        return `<label class="spell-pick-row${isGranted ? ' spell-pick-row-granted' : ''}" data-spell-id="${safeId}">
+            <input type="checkbox" class="spell-pick-cb" data-name="${safeId}" ${(isKnown || isGranted) ? 'checked' : ''} ${isGranted ? 'disabled' : ''}>
             <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeId}')">
                 <div class="spell-pick-name">${escapeHtml(_spellField(sp, 'name'))} ${tags.join('')}</div>
                 <div class="spell-pick-meta">${escapeHtml(_spellField(sp, 'school'))} · ${(_spellField(sp, 'classes') || []).join(', ')}</div>
@@ -3541,7 +3636,16 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
         const sp = _resolveSpell(n);
         return sp ? sp.name : n;
     });
-    const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked')).map(cb => cb.dataset.name);
+    // Escludi dal salvataggio gli incantesimi auto-garantiti dalla
+    // sottoclasse: sono derivati e verranno re-iniettati a runtime.
+    const grantedSet = new Set();
+    _pgSubclassGrantedSpells(pg).forEach(g => {
+        const sp = _resolveSpell(g.name);
+        if (sp) grantedSet.add(sp.name);
+    });
+    const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked'))
+        .map(cb => cb.dataset.name)
+        .filter(n => !grantedSet.has(n));
     const merged = Array.from(new Set([...others, ...checked]));
     pg.incantesimi_conosciuti = merged;
     await supabase.from('personaggi').update({ incantesimi_conosciuti: merged }).eq('id', pgId);

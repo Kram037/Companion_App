@@ -1887,6 +1887,20 @@
 .spell-card-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--warning, #d29c2a); border: 1px solid currentColor; border-radius: 999px; vertical-align: middle; }
 .scheda-innate-lvl { color: var(--text-muted); font-weight: 600; margin-left: 2px; }
 
+/* Incantesimi auto-garantiti da sottoclasse (Domini, Giuramenti, ...) */
+.spell-card-subclass {
+    border-left-color: var(--accent, #6c5ce7);
+    background: linear-gradient(90deg, rgba(108,92,231,0.10), transparent 60%);
+}
+.spell-card-tag-subclass {
+    color: var(--accent, #6c5ce7);
+    border-color: currentColor;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.66rem;
+    font-weight: 600;
+}
+
 /* Picker razza/sottorazza con search + filtro fonte */
 /* Pannello dedicato piu' largo per ospitare bene chip dei filtri e voci */
 .custom-select-panel.razza-picker-panel {
@@ -1984,6 +1998,20 @@
 }
 .spell-pick-tag-c { background: #6366F1; }
 .spell-pick-tag-r { background: #10B981; }
+.spell-pick-tag-granted {
+    background: var(--accent, #6c5ce7);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 1px 7px;
+}
+.spell-pick-row-granted {
+    background: rgba(108, 92, 231, 0.06);
+    cursor: default;
+}
+.spell-pick-row-granted .spell-pick-cb { cursor: not-allowed; opacity: 0.7; }
+.spell-pick-row-granted:hover { background: rgba(108, 92, 231, 0.10); }
 
 /* Search row con icona filtri */
 .spell-picker-search-row {
