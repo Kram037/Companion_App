@@ -1807,6 +1807,34 @@
 .scheda-hd-total-clickable { cursor: pointer; transition: color var(--transition-fast); }
 .scheda-hd-total-clickable:hover { color: var(--accent); }
 
+/* Picker Stili di Combattimento */
+.fs-picker-modal { width: 600px; max-width: 95vw; max-height: 85vh; display: flex; flex-direction: column; }
+.fs-pick-class { margin-bottom: 14px; }
+.fs-pick-class-title { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.fs-pick-class-title small { font-weight: 600; color: var(--text-muted); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+.fs-pick-list { display: flex; flex-direction: column; gap: 4px; }
+.fs-pick-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.fs-pick-row:hover { border-color: var(--accent); }
+.fs-pick-row-selected { background: rgba(108,92,231,0.12); border-color: var(--accent); }
+.fs-pick-row-disabled { opacity: 0.45; cursor: not-allowed; }
+.fs-pick-row-disabled:hover { border-color: var(--border); }
+.fs-pick-head { display: flex; align-items: center; gap: 8px; }
+.fs-pick-checkbox { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px; font-size: 0.85rem; color: var(--accent); font-weight: 800; }
+.fs-pick-row-selected .fs-pick-checkbox { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fs-pick-name { flex: 1; font-weight: 700; font-size: 0.92rem; color: var(--text); }
+.fs-pick-source { font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); }
+.fs-pick-arrow { padding: 0 4px; cursor: pointer; color: var(--text-muted); transition: transform var(--transition-fast); user-select: none; }
+.fs-pick-row.fs-pick-open .fs-pick-arrow { transform: rotate(180deg); }
+.fs-pick-desc { display: none; padding: 8px 4px 2px 26px; font-size: 0.82rem; color: var(--text-light); line-height: 1.45; white-space: pre-wrap; }
+.fs-pick-row.fs-pick-open .fs-pick-desc { display: block; }
+
 /* Slot Portento (Mago Divinazione): chips con valore 1-20 salvato */
 .scheda-hd-row-portent { flex-wrap: wrap; }
 .scheda-portent-slots { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }

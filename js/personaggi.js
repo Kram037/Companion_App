@@ -1028,6 +1028,40 @@ function _invocationById(id) {
     return _invocationsAll().find(i => i.id === id) || null;
 }
 
+// ─── Stili di Combattimento (Fighting Styles) ───────────────────────────
+function _fightingStylesData() { return window.FIGHTING_STYLES_DATA || {}; }
+function _fightingStyleById(slug) {
+    if (!slug) return null;
+    return _fightingStylesData()[slug] || null;
+}
+// Quante stili di combattimento puo' selezionare il PG per ciascuna delle
+// sue classi, in base al livello e (per il combattente) all'archetipo
+// Champion che ne sblocca un secondo al livello 10.
+function _pgFightingStylesAllowance(pg) {
+    const out = {};
+    if (!pg || !Array.isArray(pg.classi)) return out;
+    pg.classi.forEach(c => {
+        const lvl = parseInt(c.livello) || 0;
+        if (c.nome === 'Combattente') {
+            let n = lvl >= 1 ? 1 : 0;
+            if (lvl >= 10 && c.sottoclasseSlug === 'champion') n += 1;
+            if (n > 0) out[c.nome] = n;
+        } else if (c.nome === 'Paladino') {
+            if (lvl >= 2) out[c.nome] = 1;
+        } else if (c.nome === 'Ranger') {
+            if (lvl >= 2) out[c.nome] = 1;
+        }
+    });
+    return out;
+}
+// Slug degli stili disponibili per una classe specifica.
+function _fightingStylesForClass(className) {
+    const data = _fightingStylesData();
+    return Object.values(data)
+        .filter(fs => Array.isArray(fs.classes) && fs.classes.includes(className))
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+}
+
 // Numero massimo di invocazioni che un Warlock conosce in base al livello,
 // come da PHB pag. 110 (tabella Warlock).
 function _pgWarlockLevel(pg) {
@@ -5064,14 +5098,27 @@ function _buildP1CustomTablesHtml(pg) {
 
 async function _p1Save(pgId, priv) {
     const supabase = getSupabaseClient();
-    if (!supabase) return;
+    if (!supabase) return false;
     if (_schedaPgCache) _schedaPgCache.privilegi = priv;
     try {
-        await supabase.from('personaggi')
+        const { error } = await supabase.from('personaggi')
             .update({ privilegi: priv, updated_at: new Date().toISOString() })
             .eq('id', pgId);
+        if (error) {
+            console.error('[p1 custom tabs] save failed', error);
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes("'privilegi'") || msg.includes('"privilegi"') || msg.includes('column')) {
+                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui sql/add-all-missing-columns.sql');
+            } else {
+                showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
+            }
+            return false;
+        }
+        return true;
     } catch (e) {
         console.warn('[p1 custom tabs] save failed', e);
+        showNotification && showNotification('Salvataggio fallito: ' + (e.message || 'errore'));
+        return false;
     }
 }
 
@@ -5328,14 +5375,34 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     // Sezione Talenti: come tendine espandibili coerenti con le altre
     // tabelle di Pagina 2 (header con nome, dropdown con descrizione).
     const talentiData = _featsData();
+    // Indici secondari per matching robusto (per name_en, per slug, e
+    // ignorando apostrofi/accenti).
+    const _normFeat = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['\u2019\s]/g, '');
+    const featByEn = {};
+    const featBySlug = {};
+    const featByNorm = {};
+    Object.values(talentiData).forEach(f => {
+        if (f.name_en) featByEn[f.name_en] = f;
+        if (f.slug) featBySlug[f.slug] = f;
+        if (f.name) featByNorm[_normFeat(f.name)] = f;
+        if (f.name_en) featByNorm[_normFeat(f.name_en)] = f;
+    });
     const talentiRows = (pg.talenti && pg.talenti.length > 0)
         ? pg.talenti.map(t => {
             const nome = typeof t === 'string' ? t : (t && t.name) || '';
-            const feat = talentiData[nome] || null;
+            const feat = talentiData[nome]
+                || featByEn[nome]
+                || featByNorm[_normFeat(nome)]
+                || (t && t.slug && featBySlug[t.slug])
+                || null;
+            const dispName = (feat && feat.name) || nome;
+            const desc = feat
+                ? (feat.description || feat.description_en || '')
+                : (typeof t === 'object' && t.description) || '(descrizione non disponibile)';
             return _renderPrivFeatureRow({
-                name: nome,
+                name: dispName,
                 name_en: feat ? feat.name_en : '',
-                description: feat ? (feat.description || feat.description_en || '') : '',
+                description: desc,
                 description_en: feat ? feat.description_en : '',
                 translated: feat ? !!feat.translated : true,
                 level: null,
@@ -5351,6 +5418,46 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
             ${talentiRows}
         </div>
     </div>`;
+
+    // ─── Sezione Stili di Combattimento ───────────────────────────────
+    let fightingStylesSectionHtml = '';
+    const fsAllowance = _pgFightingStylesAllowance(pg);
+    const fsKeys = Object.keys(fsAllowance);
+    if (fsKeys.length > 0) {
+        const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
+            ? pg.stile_combattimento : {};
+        let totalSelected = 0;
+        let totalMax = 0;
+        const blocks = fsKeys.map(cn => {
+            const max = fsAllowance[cn];
+            totalMax += max;
+            const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
+            totalSelected += slugs.length;
+            const rows = slugs.length > 0
+                ? slugs.map(slug => {
+                    const fs = _fightingStyleById(slug);
+                    return _renderPrivFeatureRow({
+                        name: fs ? fs.name : slug,
+                        name_en: fs ? fs.name_en : '',
+                        description: fs ? fs.description : '',
+                        translated: true,
+                        level: null,
+                    }, {});
+                }).join('')
+                : '<span class="scheda-empty">Nessuno stile selezionato</span>';
+            return `<div class="priv-feat-row" style="background:transparent;border:none;padding:0;">
+                <div style="font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin:6px 0 4px;">${escapeHtml(cn)} <small style="font-weight:500;text-transform:none;">(${slugs.length}/${max})</small></div>
+                ${rows}
+            </div>`;
+        }).join('');
+        fightingStylesSectionHtml = `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Stili di Combattimento
+                <small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenFightingStylesEdit('${pg.id}')" title="Scegli stili">&#9998;</button>
+            </div>
+            <div class="scheda-section-body" id="schedaFightingStylesDisplay">${blocks}</div>
+        </div>`;
+    }
 
     // Sezione Invocazioni Occulte (solo per Warlock).
     let invocationsSectionHtml = '';
@@ -5397,6 +5504,8 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         <div class="scheda-section-body">${subclassBlocks}</div>
     </div>` : ''}
 
+    ${fightingStylesSectionHtml}
+
     ${invocationsSectionHtml}
 
     ${customSectionsHtml}
@@ -5416,9 +5525,26 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
 
 async function _privSave(pgId, priv) {
     const supabase = getSupabaseClient();
-    if (!supabase) return;
+    if (!supabase) return false;
     if (_schedaPgCache) _schedaPgCache.privilegi = priv;
-    await supabase.from('personaggi').update({ privilegi: priv }).eq('id', pgId);
+    try {
+        const { error } = await supabase.from('personaggi').update({ privilegi: priv }).eq('id', pgId);
+        if (error) {
+            console.error('[priv tabs] save failed', error);
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes("'privilegi'") || msg.includes('"privilegi"') || msg.includes('column')) {
+                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui sql/add-all-missing-columns.sql');
+            } else {
+                showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
+            }
+            return false;
+        }
+        return true;
+    } catch (e) {
+        console.warn('[priv tabs] save failed', e);
+        showNotification && showNotification('Salvataggio fallito: ' + (e.message || 'errore'));
+        return false;
+    }
 }
 
 window.privToggleAutoFeature = async function(featKey) {
@@ -5978,6 +6104,141 @@ function _schedaInvocationsContentHtml(currentInvIds) {
         <div class="pg-talenti-available">${listHtml}</div>
     `;
 }
+
+// ─── Picker Stili di Combattimento ─────────────────────────────────────
+window.schedaOpenFightingStylesEdit = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const allowance = _pgFightingStylesAllowance(pg);
+    const classes = Object.keys(allowance);
+    if (classes.length === 0) {
+        showNotification && showNotification('Nessuna classe ti permette di scegliere uno stile di combattimento');
+        return;
+    }
+    // Stato locale di selezione: { className: [slug, slug, ...] }
+    const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
+        ? pg.stile_combattimento : {};
+    const sel = {};
+    classes.forEach(cn => { sel[cn] = Array.isArray(stored[cn]) ? [...stored[cn]] : []; });
+
+    let modal = document.getElementById('fsPickerModal');
+    if (modal) modal.remove();
+    modal = document.createElement('div');
+    modal.id = 'fsPickerModal';
+    modal.className = 'spell-modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+
+    const renderBody = () => {
+        const sections = classes.map(cn => {
+            const max = allowance[cn];
+            const list = _fightingStylesForClass(cn);
+            const items = list.map(fs => {
+                const isSelected = sel[cn].includes(fs.slug);
+                const reachedMax = !isSelected && sel[cn].length >= max;
+                return `<div class="fs-pick-row${isSelected ? ' fs-pick-row-selected' : ''}${reachedMax ? ' fs-pick-row-disabled' : ''}"
+                    onclick="schedaFsTogglePick(this,'${escapeHtml(cn).replace(/'/g, '&#39;')}','${fs.slug}',${max})">
+                    <div class="fs-pick-head">
+                        <span class="fs-pick-checkbox">${isSelected ? '✔' : ''}</span>
+                        <span class="fs-pick-name">${escapeHtml(fs.name)}</span>
+                        <span class="fs-pick-source">${escapeHtml(fs.source_short || '')}</span>
+                        <span class="fs-pick-arrow" onclick="event.stopPropagation();this.closest('.fs-pick-row').classList.toggle('fs-pick-open');">▾</span>
+                    </div>
+                    <div class="fs-pick-desc">${escapeHtml(fs.description || '')}</div>
+                </div>`;
+            }).join('');
+            return `<div class="fs-pick-class">
+                <div class="fs-pick-class-title">${escapeHtml(cn)} <small id="fsCntr_${escapeHtml(cn).replace(/[^a-zA-Z0-9]/g,'')}">${sel[cn].length}/${max}</small></div>
+                <div class="fs-pick-list">${items}</div>
+            </div>`;
+        }).join('');
+        return `<div class="spell-modal-content fs-picker-modal" onclick="event.stopPropagation();">
+            <div class="spell-modal-header">
+                <h3>Scegli Stili di Combattimento</h3>
+                <button class="spell-modal-close" onclick="document.getElementById('fsPickerModal')?.remove();">×</button>
+            </div>
+            <div class="spell-modal-body" style="padding:12px 16px;">
+                ${sections}
+            </div>
+            <div class="spell-modal-footer">
+                <button class="btn-secondary" onclick="document.getElementById('fsPickerModal')?.remove();">Annulla</button>
+                <button class="btn-primary" onclick="schedaSaveFightingStyles('${pgId}')">Salva</button>
+            </div>
+        </div>`;
+    };
+    modal.innerHTML = renderBody();
+    document.body.appendChild(modal);
+
+    // Espone lo stato locale per gli handler.
+    window._fsPickerSel = sel;
+    window._fsPickerAllowance = allowance;
+};
+
+window.schedaFsTogglePick = function(rowEl, className, slug, max) {
+    const sel = window._fsPickerSel || {};
+    if (!sel[className]) sel[className] = [];
+    const arr = sel[className];
+    const i = arr.indexOf(slug);
+    if (i >= 0) {
+        arr.splice(i, 1);
+    } else {
+        if (arr.length >= max) {
+            showNotification && showNotification(`Hai gia' raggiunto il massimo di stili per ${className}`);
+            return;
+        }
+        arr.push(slug);
+    }
+    // Ri-renderizza il body per aggiornare contatori e stati.
+    const modal = document.getElementById('fsPickerModal');
+    if (!modal) return;
+    const reopener = window.schedaOpenFightingStylesEdit;
+    // Aggiorna in place: ri-tira la riga e l'intestazione.
+    rowEl.classList.toggle('fs-pick-row-selected');
+    const checkbox = rowEl.querySelector('.fs-pick-checkbox');
+    if (checkbox) checkbox.textContent = arr.includes(slug) ? '✔' : '';
+    const cntrId = 'fsCntr_' + className.replace(/[^a-zA-Z0-9]/g, '');
+    const cntr = document.getElementById(cntrId);
+    if (cntr) {
+        const allowance = (window._fsPickerAllowance && window._fsPickerAllowance[className]) || max;
+        cntr.textContent = `${arr.length}/${allowance}`;
+    }
+    // Aggiorna lo stato disabled delle altre righe della stessa classe.
+    const allRows = rowEl.parentElement.querySelectorAll('.fs-pick-row');
+    allRows.forEach(r => {
+        const isSel = r.classList.contains('fs-pick-row-selected');
+        if (!isSel && arr.length >= max) r.classList.add('fs-pick-row-disabled');
+        else r.classList.remove('fs-pick-row-disabled');
+    });
+};
+
+window.schedaSaveFightingStyles = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const sel = window._fsPickerSel || {};
+    pg.stile_combattimento = sel;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    try {
+        const { error } = await supabase.from('personaggi')
+            .update({ stile_combattimento: sel, updated_at: new Date().toISOString() })
+            .eq('id', pgId);
+        if (error) {
+            console.error('[fighting styles] save failed', error);
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('stile_combattimento') || msg.includes('column')) {
+                showNotification && showNotification('Manca la colonna "stile_combattimento" sul DB. Esegui sql/add-all-missing-columns.sql');
+            } else {
+                showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
+            }
+            return;
+        }
+    } catch (e) {
+        console.warn('[fighting styles] save failed', e);
+        showNotification && showNotification('Salvataggio fallito: ' + (e.message || 'errore'));
+        return;
+    }
+    document.getElementById('fsPickerModal')?.remove();
+    schedaOpenPrivilegesPage(pgId);
+};
 
 window.schedaOpenInvocationsEdit = function(pgId) {
     const pg = _schedaPgCache;
