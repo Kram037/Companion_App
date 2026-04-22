@@ -1054,35 +1054,65 @@ const FIGHTING_STYLES_SUBCLASS_RULES = {
     },
 };
 
+// Chiave della "slot custom" sempre presente: permette a qualsiasi PG di
+// scegliere stili anche se la sua classe non glielo concederebbe, e di
+// aumentare liberamente quanti stili possiede.
+const FS_CUSTOM_SLOT_KEY = 'Personalizzato';
+
 // Quanti stili di combattimento puo' selezionare il PG per ciascuna delle
 // sue classi/sottoclassi. Restituisce un oggetto:
-//   { 'Guerriero': { max: 1, allowedSlugs: null }, ... }
+//   { 'Guerriero': { max: 1, baseMax: 1, allowedSlugs: null, baseClass: 'Guerriero' }, ... }
 // allowedSlugs === null significa "tutti gli stili della classe base".
+// La slot 'Personalizzato' e' sempre presente: di default permette 0 stili,
+// ma se il PG non ha alcuna allowance concessa dalle classi parte da 1,
+// e il giocatore puo' modificare il massimo a piacere via override.
 function _pgFightingStylesAllowance(pg) {
     const out = {};
-    if (!pg || !Array.isArray(pg.classi)) return out;
-    pg.classi.forEach(c => {
-        const lvl = parseInt(c.livello) || 0;
-        const subSlug = c.sottoclasseSlug || '';
-        if (c.nome === 'Guerriero') {
-            let n = lvl >= 1 ? 1 : 0;
-            if (lvl >= 10 && subSlug === 'champion') n += 1;
-            if (n > 0) out[c.nome] = { max: n, allowedSlugs: null, baseClass: 'Guerriero' };
-        } else if (c.nome === 'Paladino') {
-            if (lvl >= 2) out[c.nome] = { max: 1, allowedSlugs: null, baseClass: 'Paladino' };
-        } else if (c.nome === 'Ranger') {
-            if (lvl >= 2) out[c.nome] = { max: 1, allowedSlugs: null, baseClass: 'Ranger' };
-        }
-        // Sottoclassi che concedono stili limitati.
-        const rule = FIGHTING_STYLES_SUBCLASS_RULES[subSlug];
-        if (rule && lvl >= (rule.from_level || 1)) {
-            out[rule.className] = {
-                max: rule.count || 1,
-                allowedSlugs: rule.allowedSlugs ? [...rule.allowedSlugs] : null,
-                baseClass: c.nome,
-            };
-        }
-    });
+    if (!pg) return out;
+    const overrides = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object'
+        && pg.stile_combattimento._maxOverrides && typeof pg.stile_combattimento._maxOverrides === 'object')
+        ? pg.stile_combattimento._maxOverrides : {};
+    const applyOverride = (key, baseMax) => {
+        const ov = Number.isFinite(overrides[key]) ? overrides[key] : 0;
+        return Math.max(0, baseMax + ov);
+    };
+    if (Array.isArray(pg.classi)) {
+        pg.classi.forEach(c => {
+            const lvl = parseInt(c.livello) || 0;
+            const subSlug = c.sottoclasseSlug || '';
+            if (c.nome === 'Guerriero') {
+                let n = lvl >= 1 ? 1 : 0;
+                if (lvl >= 10 && subSlug === 'champion') n += 1;
+                if (n > 0) out[c.nome] = { baseMax: n, max: applyOverride(c.nome, n), allowedSlugs: null, baseClass: 'Guerriero' };
+            } else if (c.nome === 'Paladino') {
+                if (lvl >= 2) out[c.nome] = { baseMax: 1, max: applyOverride(c.nome, 1), allowedSlugs: null, baseClass: 'Paladino' };
+            } else if (c.nome === 'Ranger') {
+                if (lvl >= 2) out[c.nome] = { baseMax: 1, max: applyOverride(c.nome, 1), allowedSlugs: null, baseClass: 'Ranger' };
+            }
+            // Sottoclassi che concedono stili limitati.
+            const rule = FIGHTING_STYLES_SUBCLASS_RULES[subSlug];
+            if (rule && lvl >= (rule.from_level || 1)) {
+                const cnt = rule.count || 1;
+                out[rule.className] = {
+                    baseMax: cnt,
+                    max: applyOverride(rule.className, cnt),
+                    allowedSlugs: rule.allowedSlugs ? [...rule.allowedSlugs] : null,
+                    baseClass: c.nome,
+                };
+            }
+        });
+    }
+    // Slot 'Personalizzato' sempre presente: garantisce che qualsiasi PG
+    // possa scegliere uno stile e che l'utente possa estendere il numero.
+    const hasClassAllowance = Object.keys(out).length > 0;
+    const customBase = hasClassAllowance ? 0 : 1;
+    out[FS_CUSTOM_SLOT_KEY] = {
+        baseMax: customBase,
+        max: applyOverride(FS_CUSTOM_SLOT_KEY, customBase),
+        allowedSlugs: null,
+        baseClass: null, // null = qualsiasi stile da qualsiasi classe.
+        custom: true,
+    };
     return out;
 }
 // Slug degli stili disponibili per una classe specifica (filtrabili poi da
@@ -1093,16 +1123,28 @@ function _fightingStylesForClass(className) {
         .filter(fs => Array.isArray(fs.classes) && fs.classes.includes(className))
         .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 }
-// Stili effettivamente selezionabili per una "voce di allowance" del PG,
-// applicando l'eventuale restrizione di sottoclasse.
+// Stili effettivamente selezionabili per una "voce di allowance" del PG.
+// Regole:
+//   - Se l'allowance ha allowedSlugs (lista esplicita), si usa SEMPRE quella
+//     lista (lookup diretto sui dati globali). Questo evita il problema in
+//     cui la classe base non e' tra le classes degli stili (es. Bardo
+//     Collegio delle Spade: i suoi stili "Duellare" e "Combattere con due
+//     armi" non hanno 'Bardo' tra le loro classes).
+//   - Se baseClass e' null (slot Personalizzato) si elencano TUTTI gli stili.
+//   - Altrimenti si filtra per la classe base.
 function _fightingStylesForSlot(slotKey, allowanceEntry) {
-    const baseClass = (allowanceEntry && allowanceEntry.baseClass) || slotKey;
-    let list = _fightingStylesForClass(baseClass);
+    const data = _fightingStylesData();
     if (allowanceEntry && Array.isArray(allowanceEntry.allowedSlugs)) {
         const allowed = new Set(allowanceEntry.allowedSlugs);
-        list = list.filter(fs => allowed.has(fs.slug));
+        return Object.values(data)
+            .filter(fs => allowed.has(fs.slug))
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }
-    return list;
+    if (!allowanceEntry || allowanceEntry.baseClass == null) {
+        return Object.values(data)
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+    return _fightingStylesForClass(allowanceEntry.baseClass);
 }
 
 // Numero massimo di invocazioni che un Warlock conosce in base al livello,
@@ -5473,9 +5515,18 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
             ? pg.stile_combattimento : {};
         let totalSelected = 0;
         let totalMax = 0;
+        // Includi nel display solo gli slot rilevanti: o hanno max > 0,
+        // oppure hanno gia' degli stili selezionati. La slot
+        // 'Personalizzato' viene cosi' nascosta finche' l'utente non ne
+        // alza il massimo o ne assegna manualmente uno.
+        const visibleKeys = fsKeys.filter(cn => {
+            const entry = fsAllowance[cn];
+            const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
+            return (entry && entry.max > 0) || slugs.length > 0;
+        });
         let blocks = '';
-        if (fsKeys.length > 0) {
-            blocks = fsKeys.map(cn => {
+        if (visibleKeys.length > 0) {
+            blocks = visibleKeys.map(cn => {
                 const entry = fsAllowance[cn];
                 const max = entry.max;
                 totalMax += max;
@@ -5499,9 +5550,9 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                 </div>`;
             }).join('');
         } else {
-            blocks = '<div class="scheda-empty" style="padding:6px 4px;">Nessuna classe ti permette di scegliere uno stile di combattimento al livello attuale.</div>';
+            blocks = '<div class="scheda-empty" style="padding:6px 4px;">Nessuno stile di combattimento. Premi la matita per modificare il massimo o sceglierne uno.</div>';
         }
-        const counterTxt = fsKeys.length > 0 ? `<small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>` : '';
+        const counterTxt = visibleKeys.length > 0 ? `<small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>` : '';
         fightingStylesSectionHtml = `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Stili di Combattimento
                 ${counterTxt}
@@ -5665,6 +5716,79 @@ function _schedaShowInputDialog(opts) {
             if (e.key === 'Escape') { e.preventDefault(); finish(null); }
         };
         setTimeout(() => { input.focus(); input.select(); }, 50);
+    });
+}
+
+// Tastierino numerico custom (stesso stile di pgOpenAbilityKeypad) per
+// dialog promise-based. Evita la tastiera nativa del telefono.
+// opts: { title, initial, min, max }
+function _schedaShowNumpadDialog(opts) {
+    return new Promise(resolve => {
+        const title = (opts && opts.title) || 'Inserisci un valore';
+        const initial = (opts && opts.initial != null) ? String(opts.initial) : '';
+        const min = (opts && opts.min != null) ? Number(opts.min) : null;
+        const max = (opts && opts.max != null) ? Number(opts.max) : null;
+        const id = 'schedaNumpadOverlay';
+        document.getElementById(id)?.remove();
+        const buf = { v: initial && /^\d+$/.test(initial) ? initial : '' };
+        const overlay = document.createElement('div');
+        overlay.id = id;
+        overlay.className = 'hp-calc-overlay';
+        overlay.onclick = e => { if (e.target === overlay) { cleanup(); resolve(null); } };
+        const rangeHint = (min != null && max != null) ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;text-align:center;">Valore tra ${min} e ${max}</div>` : '';
+        overlay.innerHTML = `
+            <div class="hp-calc-modal" style="width:300px;">
+                <button class="hp-calc-close" id="schedaNumpadClose">&times;</button>
+                <div class="hp-calc-title">${escapeHtml(title)}</div>
+                ${rangeHint}
+                <div class="hp-calc-input-display" id="schedaNumpadDisp">${escapeHtml(buf.v || '0')}</div>
+                <div class="hp-calc-numpad">
+                    ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" data-k="${n}">${n}</button>`).join('')}
+                    <button class="hp-calc-numpad-btn" data-k="C">C</button>
+                    <button class="hp-calc-numpad-btn" data-k="0">0</button>
+                    <button class="hp-calc-numpad-btn" data-k="BS">⌫</button>
+                </div>
+                <div class="hp-calc-buttons" style="display:flex;gap:8px;">
+                    <button class="hp-calc-btn" id="schedaNumpadCancel" style="flex:1;background:var(--surface);color:var(--text);">Annulla</button>
+                    <button class="hp-calc-btn heal" id="schedaNumpadOk" style="flex:1;">Conferma</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        const disp = document.getElementById('schedaNumpadDisp');
+        const refresh = () => { disp.textContent = buf.v || '0'; };
+        const press = (k) => {
+            if (k === 'C') buf.v = '';
+            else if (k === 'BS') buf.v = buf.v.slice(0, -1);
+            else if (/^\d$/.test(k)) {
+                if (buf.v === '0') buf.v = k;
+                else buf.v = (buf.v + k).slice(0, 4);
+            }
+            refresh();
+        };
+        overlay.querySelectorAll('.hp-calc-numpad-btn').forEach(btn => {
+            btn.onclick = () => press(btn.getAttribute('data-k'));
+        });
+        const cleanup = () => { overlay.remove(); };
+        const validate = () => {
+            if (!buf.v) return null;
+            const n = parseInt(buf.v, 10);
+            if (!Number.isFinite(n)) return null;
+            if (min != null && n < min) return null;
+            if (max != null && n > max) return null;
+            return n;
+        };
+        document.getElementById('schedaNumpadOk').onclick = () => {
+            const n = validate();
+            if (n == null) {
+                showNotification && showNotification(min != null && max != null
+                    ? `Valore non valido (${min}-${max})`
+                    : 'Valore non valido');
+                return;
+            }
+            cleanup(); resolve(n);
+        };
+        document.getElementById('schedaNumpadCancel').onclick = () => { cleanup(); resolve(null); };
+        document.getElementById('schedaNumpadClose').onclick = () => { cleanup(); resolve(null); };
     });
 }
 
@@ -6168,11 +6292,7 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) return;
     const allowance = _pgFightingStylesAllowance(pg);
-    const slotKeys = Object.keys(allowance);
-    if (slotKeys.length === 0) {
-        showNotification && showNotification('Nessuna delle tue classi/sottoclassi ti permette di scegliere uno stile di combattimento al livello attuale.');
-        return;
-    }
+    const slotKeys = Object.keys(allowance); // include sempre 'Personalizzato'
     // Stato locale di selezione: { slotKey: [slug, ...] }
     const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
         ? pg.stile_combattimento : {};
@@ -6183,6 +6303,9 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
         const allowed = _fightingStylesForSlot(k, allowance[k]).map(fs => fs.slug);
         sel[k] = sel[k].filter(s => allowed.includes(s));
     });
+    // Stato locale degli override del massimo per slot.
+    const initOverrides = (stored._maxOverrides && typeof stored._maxOverrides === 'object')
+        ? Object.assign({}, stored._maxOverrides) : {};
 
     // Costruisci una mappa flat: per ogni stile, in quali "slot" del PG
     // puo' essere assegnato (rispettando le restrizioni di sottoclasse).
@@ -6203,6 +6326,8 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     window._fsPickerAllowance = allowance;
     window._fsPickerSlotKeys = slotKeys;
     window._fsPickerAllStyles = allStyles;
+    window._fsPickerOverrides = initOverrides;
+    window._fsPickerPgId = pgId;
 
     let modal = document.getElementById('fsPickerModal');
     if (modal) modal.remove();
@@ -6284,6 +6409,7 @@ function _fsPickerHeaderHtml() {
 }
 
 // Banner contatori "selezionati / max" per ciascuna classe/sottoclasse.
+// Ogni contatore include due pulsanti +/- per modificare liberamente il max.
 function _fsPickerCountersHtml() {
     const slotKeys = window._fsPickerSlotKeys || [];
     const allowance = window._fsPickerAllowance || {};
@@ -6292,12 +6418,43 @@ function _fsPickerCountersHtml() {
     return slotKeys.map(k => {
         const cnt = (sel[k] || []).length;
         const max = allowance[k] ? allowance[k].max : 0;
-        const reached = cnt >= max;
-        return `<span class="fs-pick-counter ${reached ? 'reached' : ''}" data-slot="${escapeHtml(k)}">
+        const reached = cnt > 0 && cnt >= max;
+        const labelKey = JSON.stringify(k).replace(/"/g, '&quot;');
+        return `<span class="fs-pick-counter ${reached ? 'reached' : ''} ${max === 0 ? 'is-empty' : ''}" data-slot="${escapeHtml(k)}">
             <strong>${escapeHtml(k)}:</strong> ${cnt}/${max}
+            <button type="button" class="fs-pick-counter-btn" title="Riduci massimo"
+                onclick="event.stopPropagation();schedaFsBumpSlotMax(${labelKey}, -1)">−</button>
+            <button type="button" class="fs-pick-counter-btn" title="Aumenta massimo"
+                onclick="event.stopPropagation();schedaFsBumpSlotMax(${labelKey}, 1)">+</button>
         </span>`;
     }).join('');
 }
+
+// Modifica il massimo di stili per uno slot di +/- delta.
+window.schedaFsBumpSlotMax = function(slotKey, delta) {
+    const allowance = window._fsPickerAllowance || {};
+    const overrides = window._fsPickerOverrides || (window._fsPickerOverrides = {});
+    const sel = window._fsPickerSel || {};
+    const entry = allowance[slotKey];
+    if (!entry) return;
+    const baseMax = Number.isFinite(entry.baseMax) ? entry.baseMax : entry.max;
+    const curMax = entry.max;
+    const newMax = Math.max(0, curMax + delta);
+    const newOverride = newMax - baseMax;
+    if (newOverride === 0) {
+        delete overrides[slotKey];
+    } else {
+        overrides[slotKey] = newOverride;
+    }
+    entry.max = newMax;
+    // Se ho ridotto sotto al numero di selezioni correnti, taglia la lista.
+    if (Array.isArray(sel[slotKey]) && sel[slotKey].length > newMax) {
+        sel[slotKey] = sel[slotKey].slice(0, newMax);
+    }
+    const counters = document.getElementById('fsPickerCounters');
+    if (counters) counters.innerHTML = _fsPickerCountersHtml();
+    schedaFsRenderList();
+};
 
 window.schedaFsToggleFilterPanel = function() {
     const state = window._fsPickerState;
@@ -6376,22 +6533,32 @@ window.schedaFsRenderList = function() {
     listEl.innerHTML = filtered.map(({ fs, slots }) => {
         const assignedTo = slots.filter(k => (sel[k] || []).includes(fs.slug));
         const isSelected = assignedTo.length > 0;
-        const slotBadges = slots.map(k => {
-            const reachedMax = (sel[k] || []).length >= allowance[k].max;
+        // Mostra le slot solo se hanno almeno 1 max o c'e' gia' una
+        // selezione su quella slot per questo stile (per consentire la
+        // rimozione anche dopo aver azzerato il max).
+        const visibleSlots = slots.filter(k => {
+            const max = allowance[k] ? allowance[k].max : 0;
+            const here = (sel[k] || []).includes(fs.slug);
+            return max > 0 || here;
+        });
+        const slotBadges = visibleSlots.map(k => {
+            const max = allowance[k] ? allowance[k].max : 0;
+            const reachedMax = (sel[k] || []).length >= max;
             const here = (sel[k] || []).includes(fs.slug);
             return `<button type="button" class="fs-pick-slot-btn ${here ? 'is-on' : ''} ${reachedMax && !here ? 'is-full' : ''}"
                 onclick="event.stopPropagation();schedaFsToggleAssign('${fs.slug}', ${JSON.stringify(k).replace(/"/g, '&quot;')})"
                 title="${here ? 'Assegnato a ' + escapeHtml(k) : 'Assegna a ' + escapeHtml(k)}">
-                ${here ? '✔ ' : '+ '}${escapeHtml(k)} <small>(${(sel[k] || []).length}/${allowance[k].max})</small>
+                ${here ? '✔ ' : '+ '}${escapeHtml(k)} <small>(${(sel[k] || []).length}/${max})</small>
             </button>`;
         }).join('');
+        const slotBadgesHtml = slotBadges || '<span class="scheda-empty" style="font-size:0.78rem;padding:4px 8px;">Aumenta il massimo "Personalizzato" sopra per assegnare questo stile.</span>';
         return `<div class="fs-pick-row ${isSelected ? 'fs-pick-row-selected' : ''}">
             <div class="fs-pick-head" onclick="this.closest('.fs-pick-row').classList.toggle('fs-pick-open');">
                 <span class="fs-pick-name">${escapeHtml(fs.name)}</span>
                 <span class="fs-pick-source">${escapeHtml(fs.source_short || '')}</span>
                 <span class="fs-pick-arrow">▾</span>
             </div>
-            <div class="fs-pick-slots">${slotBadges}</div>
+            <div class="fs-pick-slots">${slotBadgesHtml}</div>
             <div class="fs-pick-desc">${escapeHtml(fs.description || '')}</div>
         </div>`;
     }).join('');
@@ -6433,12 +6600,23 @@ window.schedaSaveFightingStyles = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) return;
     const sel = window._fsPickerSel || {};
-    pg.stile_combattimento = sel;
+    const overrides = window._fsPickerOverrides || {};
+    // Costruisci il payload finale: copia delle selezioni + override del max.
+    const payload = {};
+    Object.keys(sel).forEach(k => { payload[k] = Array.isArray(sel[k]) ? [...sel[k]] : []; });
+    // Persiste solo le voci di override realmente non-zero.
+    const cleanOverrides = {};
+    Object.keys(overrides).forEach(k => {
+        const v = overrides[k];
+        if (Number.isFinite(v) && v !== 0) cleanOverrides[k] = v;
+    });
+    if (Object.keys(cleanOverrides).length > 0) payload._maxOverrides = cleanOverrides;
+    pg.stile_combattimento = payload;
     const supabase = getSupabaseClient();
     if (!supabase) return;
     try {
         const { error } = await supabase.from('personaggi')
-            .update({ stile_combattimento: sel, updated_at: new Date().toISOString() })
+            .update({ stile_combattimento: payload, updated_at: new Date().toISOString() })
             .eq('id', pgId);
         if (error) {
             console.error('[fighting styles] save failed', error);
@@ -7304,18 +7482,14 @@ window.schedaPortentSlotClick = async function(pgId, key, idx, max) {
             openSchedaPersonaggio(pgId);
         }
     } else {
-        // Vuoto → input valore
-        const val = await _schedaShowInputDialog({
-            title: `Portento – Slot ${idx + 1}`,
-            placeholder: 'Valore tirato (1-20)',
+        // Vuoto → input valore (tastierino numerico custom, niente keyboard nativa).
+        const n = await _schedaShowNumpadDialog({
+            title: `Portento - Slot ${idx + 1}`,
             initial: '',
+            min: 1,
+            max: 20,
         });
-        if (val == null) return;
-        const n = parseInt(val, 10);
-        if (!Number.isFinite(n) || n < 1 || n > 20) {
-            showNotification && showNotification('Valore non valido (1-20)');
-            return;
-        }
+        if (n == null) return;
         arr[idx] = n;
         await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
         openSchedaPersonaggio(pgId);
