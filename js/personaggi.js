@@ -2663,9 +2663,8 @@ async function renderSchedaPersonaggio(personaggioId) {
             const current = cr.current != null ? cr.current : cr.max;
             const label = cr.tipo === 'dadi' ? `${escapeHtml(cr.nome)} <small>(${cr.dado})</small>` : escapeHtml(cr.nome);
             resItems.push(`<div class="scheda-hd-row">
-                <span class="scheda-hd-total">${label}
-                    <button class="scheda-custom-res-edit" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica">&#9998;</button>
-                    <button class="scheda-custom-res-del" onclick="schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
+                <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica">${label}
+                    <button class="scheda-custom-res-del" onclick="event.stopPropagation();schedaDeleteCustomRes('${pg.id}',${i})" title="Rimuovi">✕</button>
                 </span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
@@ -4458,16 +4457,30 @@ function _renderPrivFeatureRow(f, opts = {}) {
         ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
         : '';
     const removeFn = opts.removeFn || `privRemoveCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`;
+    const editFn = opts.editFn || (isCustom
+        ? `privEditCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`
+        : '');
     const actionBtn = isCustom
         ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();${removeFn}" title="Rimuovi">✕</button>`
         : '';
-    const headerClass = `priv-feat-header${hasDesc ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
-    const onclick = hasDesc ? `onclick="privToggleFeatureBody(this)"` : '';
+    // Per le righe custom: il click sul nome apre l'editor. Se c'e'
+    // anche una descrizione, la freccia separata toggla il body.
+    // Per le righe non custom: comportamento legacy (header clickable
+    // per togglare il body se c'e' descrizione).
+    const headerClass = `priv-feat-header${(!isCustom && hasDesc) ? ' priv-feat-clickable' : ''}${isCustom ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
+    const headerOnclick = isCustom
+        ? (editFn ? `onclick="${editFn}"` : '')
+        : (hasDesc ? `onclick="privToggleFeatureBody(this)"` : '');
+    const arrowHtml = hasDesc
+        ? (isCustom
+            ? `<span class="priv-feat-arrow priv-feat-arrow-btn" onclick="event.stopPropagation();privToggleFeatureBody(this.parentNode)" title="Mostra/nascondi">▾</span>`
+            : '<span class="priv-feat-arrow">▾</span>')
+        : '';
     return `<div class="priv-feat-row${isHidden ? ' priv-feat-row-hidden' : ''}">
-        <div class="${headerClass}" ${onclick}>
+        <div class="${headerClass}" ${headerOnclick}>
             ${lvlBadge}
             <span class="priv-feat-name">${escapeHtml(name)}${langWarn}</span>
-            ${hasDesc ? '<span class="priv-feat-arrow">▾</span>' : ''}
+            ${arrowHtml}
             ${actionBtn}
         </div>
         ${hasDesc ? `<div class="priv-feat-body" style="display:none;">${_privDescToHtml(desc)}</div>` : ''}
@@ -4528,6 +4541,7 @@ function _buildP1CustomTablesHtml(pg) {
                 tabName,
                 index: i,
                 removeFn: `p1RemoveCustom('${escapeHtml(tabName)}',${i})`,
+                editFn: `p1EditCustom('${escapeHtml(tabName)}',${i})`,
             })).join('')
             : '<span class="scheda-empty">Nessuna voce</span>';
         return `<div class="scheda-section collapsed">

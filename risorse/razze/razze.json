@@ -1914,7 +1914,7 @@
       {
         "name": "Mani Curatrici",
         "name_en": "Healing Hands",
-        "description": "Come azione, puoi toccare una creatura e fluire energia divina nel suo corpo, curando un numero di punti ferita pari al tuo livello e moltiplicandolo per 1d4. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+        "description": "Come azione, puoi toccare una creatura e tirare un numero di d4 pari al tuo bonus di competenza. La creatura recupera un numero di punti ferita pari al totale ottenuto. Una volta usata questa abilita', non puoi usarla di nuovo finche' non termini un riposo lungo.",
         "uses": {
           "amount": 1,
           "recharge": "long_rest"
