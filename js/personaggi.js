@@ -201,6 +201,25 @@ const DND_ARMATURE = [
     { nome:'Scudo', cat:'scudo', ca_base:2, mod_des:false, max_des:0, forza:0, furtivita:null },
 ];
 
+// Focus da incantatore: oggetti che servono come componente per lanciare
+// incantesimi. Non hanno tiri per colpire ne' danni; possono essere
+// magici (+1, +2, +3) come item rari.
+const DND_FOCUS = [
+    { nome: 'Bacchetta',                 cat: 'arcano' },
+    { nome: 'Bastone',                   cat: 'arcano' },
+    { nome: 'Cristallo',                 cat: 'arcano' },
+    { nome: 'Sfera',                     cat: 'arcano' },
+    { nome: 'Verga',                     cat: 'arcano' },
+    { nome: 'Ramoscello di Vischio',     cat: 'druidico' },
+    { nome: 'Totem',                     cat: 'druidico' },
+    { nome: 'Bastone di Legno',          cat: 'druidico' },
+    { nome: 'Bacchetta di Tasso',        cat: 'druidico' },
+    { nome: 'Amuleto',                   cat: 'sacro' },
+    { nome: 'Emblema',                   cat: 'sacro' },
+    { nome: 'Reliquiario',               cat: 'sacro' },
+    { nome: 'Borsa con Componenti',      cat: 'componenti' },
+];
+
 const DND_COMPETENZE_STRUMENTI_GROUPED = {
     'Arnesi e Strumenti': {
         items: [
@@ -4724,25 +4743,33 @@ window.schedaOpenInventoryPage = async function(pgId) {
 
     const oggetti = pg.inventario || [];
     const oggettiRows = oggetti.length > 0 ? oggetti.map((o, i) => {
+        const magicStr = o.magic_bonus ? ` <span class="inv-magic-badge">+${o.magic_bonus}</span>` : '';
         return `<div class="inv-item-row">
-            <div class="inv-item-name">${escapeHtml(o.nome || 'Oggetto')}${o.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}</div>
+            <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(o.nome || 'Oggetto')}${o.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}</div>
             <div class="inv-item-qty">×${o.quantita || 1}</div>
-            <div class="inv-item-actions">
-                <button class="scheda-hd-btn" onclick="invEditItem('${pgId}',${i})">✎</button>
-                <button class="scheda-custom-res-del" onclick="invRemoveItem('${pgId}',${i})">✕</button>
-            </div>
         </div>`;
     }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
 
     const sintonia = pg.sintonia || [];
     const maxSintonia = 3;
+    const _attuneNameOf = (it) => {
+        if (!it) return '';
+        if (typeof it === 'string') return it;
+        return it.nome || '';
+    };
+    const _attuneBonusOf = (it) => {
+        if (!it || typeof it === 'string') return 0;
+        return it.magic_bonus || 0;
+    };
     let sintoniaHtml = '';
     for (let i = 0; i < maxSintonia; i++) {
         const item = sintonia[i] || null;
+        const itemName = _attuneNameOf(item);
+        const itemBonus = _attuneBonusOf(item);
+        const bonusStr = itemBonus ? ` +${itemBonus}` : '';
         sintoniaHtml += `<div class="inv-attune-slot ${item ? 'filled' : 'empty'}" onclick="invEditAttune('${pgId}',${i})">
             <span class="inv-attune-icon">◈</span>
-            <span class="inv-attune-name">${item ? escapeHtml(item) : 'Slot vuoto'}</span>
-            ${item ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();invRemoveAttune('${pgId}',${i})">✕</button>` : ''}
+            <span class="inv-attune-name">${item ? escapeHtml(itemName) + bonusStr : 'Slot vuoto'}</span>
         </div>`;
     }
 
@@ -4857,25 +4884,45 @@ window.invEditItem = function(pgId, idx) {
     if (!pg) return;
     const item = (pg.inventario || [])[idx];
     if (!item) return;
+    const currentBonus = item.magic_bonus || 0;
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:320px;">
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;max-width:95vw;">
         <h3 style="margin-bottom:12px;font-size:1rem;">Modifica Oggetto</h3>
         <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;">
-        <input type="text" id="invItemDesc" class="hp-calc-input" value="${escapeHtml(item.descrizione || '')}" placeholder="Descrizione" style="margin-bottom:8px;">
-        <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
             <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;">
             <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
                 <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
             </label>
         </div>
+        <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
+            <div class="custom-res-dice-row">
+                ${[0,1,2,3].map(b =>
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                ).join('')}
+            </div>
+            <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
+        </div>
+        <textarea id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (effetti magici, note...)" rows="6" style="margin-bottom:8px;resize:vertical;min-height:120px;">${escapeHtml(item.descrizione || '')}</textarea>
         <div class="dialog-actions">
+            <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invUpdateItem('${pgId}',${idx})">Salva</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
+};
+
+window.invSelectMagicBonus = function(btn, bonus) {
+    const row = btn.parentElement;
+    if (!row) return;
+    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('invItemMagicBonus');
+    if (hidden) hidden.value = String(bonus);
 };
 
 window.invUpdateItem = async function(pgId, idx) {
@@ -4884,15 +4931,24 @@ window.invUpdateItem = async function(pgId, idx) {
     const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
     const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
     const magico = document.getElementById('invItemMagic')?.checked || false;
+    const magicBonus = parseInt(document.getElementById('invItemMagicBonus')?.value) || 0;
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
-    inventario[idx] = { nome, descrizione: desc, quantita: qty, magico };
+    const updated = { nome, descrizione: desc, quantita: qty, magico };
+    if (magicBonus > 0) updated.magic_bonus = magicBonus;
+    inventario[idx] = updated;
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
+};
+
+window.invDeleteFromEdit = async function(pgId, idx) {
+    if (!confirm('Eliminare questo oggetto?')) return;
+    document.querySelector('.hp-calc-overlay')?.remove();
+    await window.invRemoveItem(pgId, idx);
 };
 
 window.invRemoveItem = async function(pgId, idx) {
@@ -4909,14 +4965,27 @@ window.invRemoveItem = async function(pgId, idx) {
 window.invEditAttune = function(pgId, idx) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    const current = (pg.sintonia || [])[idx] || '';
+    const raw = (pg.sintonia || [])[idx] || null;
+    const current = (raw && typeof raw === 'object') ? raw : { nome: (typeof raw === 'string' ? raw : ''), descrizione: '', magic_bonus: 0 };
+    const currentBonus = current.magic_bonus || 0;
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:300px;">
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;max-width:95vw;">
         <h3 style="margin-bottom:12px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
-        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current)}" placeholder="Nome oggetto a sintonia">
+        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:8px;">
+        <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
+            <div class="custom-res-dice-row">
+                ${[0,1,2,3].map(b =>
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                ).join('')}
+            </div>
+            <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
+        </div>
+        <textarea id="invAttuneDesc" class="hp-calc-input" placeholder="Descrizione (effetti magici, note...)" rows="6" style="margin-bottom:8px;resize:vertical;min-height:120px;">${escapeHtml(current.descrizione || '')}</textarea>
         <div class="dialog-actions">
+            ${raw ? `<button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Elimina</button>` : ''}
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invSaveAttune('${pgId}',${idx})">Salva</button>
         </div>
@@ -4925,18 +4994,42 @@ window.invEditAttune = function(pgId, idx) {
     setTimeout(() => document.getElementById('invAttuneName')?.focus(), 100);
 };
 
+window.invSelectAttuneBonus = function(btn, bonus) {
+    const row = btn.parentElement;
+    if (!row) return;
+    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('invAttuneBonus');
+    if (hidden) hidden.value = String(bonus);
+};
+
 window.invSaveAttune = async function(pgId, idx) {
     const nome = document.getElementById('invAttuneName')?.value?.trim() || '';
+    const desc = document.getElementById('invAttuneDesc')?.value?.trim() || '';
+    const bonus = parseInt(document.getElementById('invAttuneBonus')?.value) || 0;
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const sintonia = pg.sintonia ? [...pg.sintonia] : [null, null, null];
     while (sintonia.length < 3) sintonia.push(null);
-    sintonia[idx] = nome || null;
+    if (!nome) {
+        sintonia[idx] = null;
+    } else {
+        const slot = { nome };
+        if (desc) slot.descrizione = desc;
+        if (bonus > 0) slot.magic_bonus = bonus;
+        sintonia[idx] = slot;
+    }
     pg.sintonia = sintonia;
     await supabase.from('personaggi').update({ sintonia }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
+};
+
+window.invDeleteAttuneFromEdit = async function(pgId, idx) {
+    if (!confirm('Eliminare questo oggetto dalla sintonia?')) return;
+    document.querySelector('.hp-calc-overlay')?.remove();
+    await window.invRemoveAttune(pgId, idx);
 };
 
 window.invRemoveAttune = async function(pgId, idx) {
@@ -7958,6 +8051,22 @@ function buildEquipSection(pg) {
             <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
         </tr>`;
     }).join('');
+    const FOCUS_LABELS_SHORT = {
+        'arcano': 'Arcano',
+        'druidico': 'Druidico',
+        'sacro': 'Sacro',
+        'componenti': 'Componenti',
+    };
+    const focusItems = equip.filter(e => e.tipo === 'focus');
+    const focusRows = focusItems.map(e => {
+        const idx = equip.indexOf(e);
+        const tipoLabel = FOCUS_LABELS_SHORT[e.categoria] || '-';
+        return `<tr>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
+            <td class="text-center">${tipoLabel}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
+        </tr>`;
+    }).join('');
     return `<div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Equipaggiamento
             <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddEquip('${pg.id}')" title="Aggiungi">&#9998;</button>
@@ -7971,7 +8080,11 @@ function buildEquipSection(pg) {
             <thead><tr><th>Armatura</th><th>CA</th><th>Tipo</th><th></th></tr></thead>
             <tbody>${armaturaRows}</tbody>
         </table>` : ''}
-        ${!armiRows && !armaturaRows ? '<span class="scheda-empty">Nessun equipaggiamento</span>' : ''}
+        ${focusRows ? `<table class="scheda-equip-table" style="margin-top:8px;">
+            <thead><tr><th>Focus</th><th>Tipo</th><th></th></tr></thead>
+            <tbody>${focusRows}</tbody>
+        </table>` : ''}
+        ${!armiRows && !armaturaRows && !focusRows ? '<span class="scheda-empty">Nessun equipaggiamento</span>' : ''}
         </div>
     </div>`;
 }
@@ -8078,6 +8191,23 @@ window.schedaOpenAddEquip = function(pgId) {
         return `<div class="scheda-picker-cat">${label}</div>${items}`;
     }).join('');
 
+    const FOCUS_LABELS = {
+        'arcano': 'Focus Arcano',
+        'druidico': 'Focus Druidico',
+        'sacro': 'Simbolo Sacro',
+        'componenti': 'Borsa con Componenti',
+    };
+    const focusHtml = ['arcano','druidico','sacro','componenti'].map(cat => {
+        const label = FOCUS_LABELS[cat];
+        const items = DND_FOCUS.filter(f => f.cat === cat).map(f =>
+            `<div class="pg-talento-item" onclick="schedaAddFocus('${pgId}','${escapeHtml(f.nome)}')">
+                <span class="pg-talento-name">${escapeHtml(f.nome)}</span>
+                <span class="option-source">${escapeHtml(label)}</span>
+            </div>`
+        ).join('');
+        return `<div class="scheda-picker-cat">${label}</div>${items}`;
+    }).join('');
+
     const modalHtml = `
     <div class="modal active" id="equipModal">
         <div class="modal-content modal-content-lg">
@@ -8086,10 +8216,12 @@ window.schedaOpenAddEquip = function(pgId) {
             <div class="picker-tabs">
                 <button type="button" class="picker-tab active" data-panel="armi" onclick="schedaPickerSwitchTab(this,'armi')">Armi</button>
                 <button type="button" class="picker-tab" data-panel="armature" onclick="schedaPickerSwitchTab(this,'armature')">Armature</button>
+                <button type="button" class="picker-tab" data-panel="focus" onclick="schedaPickerSwitchTab(this,'focus')">Focus</button>
             </div>
             <div class="wizard-page-scroll">
                 <div class="picker-tab-panel active" data-panel="armi">${armiHtml}</div>
                 <div class="picker-tab-panel" data-panel="armature">${armatureHtml}</div>
+                <div class="picker-tab-panel" data-panel="focus">${focusHtml}</div>
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('equipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
@@ -8098,6 +8230,24 @@ window.schedaOpenAddEquip = function(pgId) {
     </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     document.body.style.overflow = 'hidden';
+}
+
+window.schedaAddFocus = async function(pgId, nome) {
+    const focus = DND_FOCUS.find(f => f.nome === nome);
+    if (!focus) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    pg.equipaggiamento.push({
+        nome: focus.nome,
+        tipo: 'focus',
+        categoria: focus.cat,
+    });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${focus.nome} aggiunto`);
 }
 
 // Helper condiviso per i picker della scheda con tab a 2 vie (Armi/Armature, Linguaggi/Strumenti, ...)
@@ -8178,7 +8328,7 @@ window.schedaEditEquip = function(pgId, index) {
     if (!pg?.equipaggiamento?.[index]) return;
     const e = pg.equipaggiamento[index];
     const currentBonus = e.magic_bonus || 0;
-    const isArma = e.tipo === 'arma';
+    const currentDesc = e.descrizione || '';
 
     const modalHtml = `
     <div class="modal active" id="editEquipModal">
@@ -8194,8 +8344,13 @@ window.schedaEditEquip = function(pgId, index) {
                     ).join('')}
                 </div>
             </div>
+            <div class="form-group">
+                <label class="form-label" for="editEquipDesc">Descrizione</label>
+                <textarea id="editEquipDesc" class="form-input" rows="6" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
+            </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Chiudi</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Annulla</button>
+                <button type="button" class="btn-primary" onclick="schedaSaveEquipDesc('${pgId}',${index})">Salva</button>
             </div>
         </div>
     </div>`;
@@ -8203,11 +8358,25 @@ window.schedaEditEquip = function(pgId, index) {
     document.body.style.overflow = 'hidden';
 }
 
+window.schedaSaveEquipDesc = async function(pgId, index) {
+    const pg = _schedaPgCache;
+    if (!pg?.equipaggiamento?.[index]) return;
+    const e = pg.equipaggiamento[index];
+    const ta = document.getElementById('editEquipDesc');
+    e.descrizione = ta?.value || '';
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    document.getElementById('editEquipModal')?.remove();
+    document.body.style.overflow = '';
+    renderSchedaPersonaggio(pgId);
+    showNotification('Descrizione aggiornata');
+}
+
 window.schedaSetMagicBonus = async function(pgId, index, bonus) {
     const pg = _schedaPgCache;
     if (!pg?.equipaggiamento?.[index]) return;
     const e = pg.equipaggiamento[index];
     const oldBonus = e.magic_bonus || 0;
+    if (oldBonus === bonus) return;
     e.magic_bonus = bonus;
 
     if (e.tipo === 'arma') {
@@ -8223,9 +8392,18 @@ window.schedaSetMagicBonus = async function(pgId, index, bonus) {
     }
 
     await schedaInstantSave(pgId, updates);
-    document.getElementById('editEquipModal')?.remove();
-    document.body.style.overflow = '';
-    renderSchedaPersonaggio(pgId);
+    // Aggiorna lo stato visivo dei pulsanti senza chiudere il dialog,
+    // cosi' l'utente puo' continuare a modificare la descrizione.
+    const modal = document.getElementById('editEquipModal');
+    if (modal) {
+        modal.querySelectorAll('.custom-res-dice-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const btns = modal.querySelectorAll('.custom-res-dice-btn');
+        if (btns[bonus]) btns[bonus].classList.add('active');
+        const titleEl = modal.querySelector('h2');
+        if (titleEl) titleEl.innerHTML = formatEquipName(e);
+    }
     showNotification(`${e.nome} ${bonus > 0 ? '+' + bonus : ''} aggiornato`);
 }
 

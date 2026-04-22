@@ -1979,6 +1979,8 @@
     .inv-items-grid > .inv-item-row:nth-last-child(-n+2) { border-bottom: none; }
 }
 .inv-item-name { flex: 1; font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.inv-item-name-clickable { cursor: pointer; transition: color 0.15s; }
+.inv-item-name-clickable:hover { color: var(--primary); text-decoration: underline; }
 .inv-magic-badge { color: #A855F7; font-size: 0.8rem; }
 .inv-item-qty { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; min-width: 28px; text-align: center; }
 .inv-item-actions { display: flex; gap: 4px; align-items: center; }
