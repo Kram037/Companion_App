@@ -9,7 +9,7 @@ Fonti incluse:
 
 Per ogni invocazione abbiamo:
   id          slug stabile (es. "agonizing-blast")
-  name        nome IT (es. "Esplosione Agonizzante")
+  name        nome IT (es. "Deflagrazione Agonizzante")
   name_en     nome originale EN
   source      manuale (testo lungo)
   source_short fonte breve (PHB, XGtE, TCoE)
@@ -101,11 +101,11 @@ def HEX() -> dict: return {"type": "feature_or_curse", "value": "hex spell or wa
 # PHB (Player's Handbook)
 # ============================================================================
 _inv(
-    name_it="Esplosione Agonizzante",
+    name_it="Deflagrazione Agonizzante",
     name_en="Agonizing Blast",
     source_short="PHB",
     prereqs=[SP("Eldritch Blast")],
-    description="Quando lanci raggio occulto, aggiungi il tuo modificatore di Carisma ai danni inflitti su un colpo a segno.",
+    description="Quando lanci deflagrazione occulta, aggiungi il tuo modificatore di Carisma ai danni inflitti su un colpo a segno.",
     effect="modifies_eldritch_blast",
     effect_data={"add_cha_to_damage": True},
 )
@@ -208,7 +208,7 @@ _inv(
     name_en="Eldritch Spear",
     source_short="PHB",
     prereqs=[SP("Eldritch Blast")],
-    description="Quando lanci raggio occulto, la sua gittata e' di 90 metri.",
+    description="Quando lanci deflagrazione occulta, la sua gittata e' di 90 metri.",
     effect="modifies_eldritch_blast",
     effect_data={"range_ft": 300},
 )
@@ -306,11 +306,11 @@ _inv(
 )
 
 _inv(
-    name_it="Esplosione Repulsiva",
+    name_it="Deflagrazione Repulsiva",
     name_en="Repelling Blast",
     source_short="PHB",
     prereqs=[SP("Eldritch Blast")],
-    description="Quando colpisci una creatura con raggio occulto, puoi spingerla fino a 3 metri lontano da te in linea retta.",
+    description="Quando colpisci una creatura con deflagrazione occulta, puoi spingerla fino a 3 metri lontano da te in linea retta.",
     effect="modifies_eldritch_blast",
     effect_data={"push_ft": 10},
 )
@@ -467,7 +467,7 @@ _inv(
     name_en="Grasp of Hadar",
     source_short="XGtE",
     prereqs=[SP("Eldritch Blast")],
-    description="Una volta in ognuno dei tuoi turni, quando colpisci una creatura con il tuo raggio occulto, puoi muovere quella creatura in linea retta di 3 metri piu' vicino a te.",
+    description="Una volta in ognuno dei tuoi turni, quando colpisci una creatura con la tua deflagrazione occulta, puoi muovere quella creatura in linea retta di 3 metri piu' vicino a te.",
     effect="modifies_eldritch_blast",
     effect_data={"pull_ft": 10},
 )
@@ -486,7 +486,7 @@ _inv(
     name_en="Lance of Lethargy",
     source_short="XGtE",
     prereqs=[SP("Eldritch Blast")],
-    description="Una volta in ognuno dei tuoi turni, quando colpisci una creatura con il tuo raggio occulto, puoi ridurre la velocita' di quella creatura di 3 metri fino alla fine del tuo prossimo turno.",
+    description="Una volta in ognuno dei tuoi turni, quando colpisci una creatura con la tua deflagrazione occulta, puoi ridurre la velocita' di quella creatura di 3 metri fino alla fine del tuo prossimo turno.",
     effect="modifies_eldritch_blast",
     effect_data={"slow_ft": 10},
 )

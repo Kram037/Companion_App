@@ -96,6 +96,44 @@
     }
   },
   {
+    "id": "agonizing-blast",
+    "name": "Deflagrazione Agonizzante",
+    "name_en": "Agonizing Blast",
+    "source": "Player's Handbook",
+    "source_short": "PHB",
+    "prerequisites": [
+      {
+        "type": "spell",
+        "value": "Eldritch Blast",
+        "value_it": "Deflagrazione Occulta"
+      }
+    ],
+    "description": "Quando lanci deflagrazione occulta, aggiungi il tuo modificatore di Carisma ai danni inflitti su un colpo a segno.",
+    "effect": "modifies_eldritch_blast",
+    "effect_data": {
+      "add_cha_to_damage": true
+    }
+  },
+  {
+    "id": "repelling-blast",
+    "name": "Deflagrazione Repulsiva",
+    "name_en": "Repelling Blast",
+    "source": "Player's Handbook",
+    "source_short": "PHB",
+    "prerequisites": [
+      {
+        "type": "spell",
+        "value": "Eldritch Blast",
+        "value_it": "Deflagrazione Occulta"
+      }
+    ],
+    "description": "Quando colpisci una creatura con deflagrazione occulta, puoi spingerla fino a 3 metri lontano da te in linea retta.",
+    "effect": "modifies_eldritch_blast",
+    "effect_data": {
+      "push_ft": 10
+    }
+  },
+  {
     "id": "gift-of-the-protectors",
     "name": "Dono dei Protettori",
     "name_en": "Gift of the Protectors",
@@ -152,44 +190,6 @@
       "spell_it": null,
       "level_cast": 3,
       "passive_extra": "Respirazione subacquea + nuoto = velocita' camminata"
-    }
-  },
-  {
-    "id": "agonizing-blast",
-    "name": "Esplosione Agonizzante",
-    "name_en": "Agonizing Blast",
-    "source": "Player's Handbook",
-    "source_short": "PHB",
-    "prerequisites": [
-      {
-        "type": "spell",
-        "value": "Eldritch Blast",
-        "value_it": "Deflagrazione Occulta"
-      }
-    ],
-    "description": "Quando lanci raggio occulto, aggiungi il tuo modificatore di Carisma ai danni inflitti su un colpo a segno.",
-    "effect": "modifies_eldritch_blast",
-    "effect_data": {
-      "add_cha_to_damage": true
-    }
-  },
-  {
-    "id": "repelling-blast",
-    "name": "Esplosione Repulsiva",
-    "name_en": "Repelling Blast",
-    "source": "Player's Handbook",
-    "source_short": "PHB",
-    "prerequisites": [
-      {
-        "type": "spell",
-        "value": "Eldritch Blast",
-        "value_it": "Deflagrazione Occulta"
-      }
-    ],
-    "description": "Quando colpisci una creatura con raggio occulto, puoi spingerla fino a 3 metri lontano da te in linea retta.",
-    "effect": "modifies_eldritch_blast",
-    "effect_data": {
-      "push_ft": 10
     }
   },
   {
@@ -295,7 +295,7 @@
         "value_it": "Deflagrazione Occulta"
       }
     ],
-    "description": "Una volta in ognuno dei tuoi turni, quando colpisci una creatura con il tuo raggio occulto, puoi ridurre la velocita' di quella creatura di 3 metri fino alla fine del tuo prossimo turno.",
+    "description": "Una volta in ognuno dei tuoi turni, quando colpisci una creatura con la tua deflagrazione occulta, puoi ridurre la velocita' di quella creatura di 3 metri fino alla fine del tuo prossimo turno.",
     "effect": "modifies_eldritch_blast",
     "effect_data": {
       "slow_ft": 10
@@ -314,7 +314,7 @@
         "value_it": "Deflagrazione Occulta"
       }
     ],
-    "description": "Quando lanci raggio occulto, la sua gittata e' di 90 metri.",
+    "description": "Quando lanci deflagrazione occulta, la sua gittata e' di 90 metri.",
     "effect": "modifies_eldritch_blast",
     "effect_data": {
       "range_ft": 300
@@ -584,7 +584,7 @@
         "value_it": "Deflagrazione Occulta"
       }
     ],
-    "description": "Una volta in ognuno dei tuoi turni, quando colpisci una creatura con il tuo raggio occulto, puoi muovere quella creatura in linea retta di 3 metri piu' vicino a te.",
+    "description": "Una volta in ognuno dei tuoi turni, quando colpisci una creatura con la tua deflagrazione occulta, puoi muovere quella creatura in linea retta di 3 metri piu' vicino a te.",
     "effect": "modifies_eldritch_blast",
     "effect_data": {
       "pull_ft": 10
