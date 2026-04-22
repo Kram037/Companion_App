@@ -1672,8 +1672,8 @@
             "name_en": "Fighting Style",
             "name": "Stile di Combattimento",
             "level": 3,
-            "description_en": "At 3rd level, choose a Fighting Style. Dueling: +2 damage with a one-handed melee weapon when no other weapons are wielded. Two-Weapon Fighting: add ability mod to off-hand damage.",
-            "description": "Al 3° livello adotti uno stile di combattimento particolare come tua specialita'. Scegli una delle seguenti opzioni; non puoi scegliere lo stesso piu' di una volta. **Duello**: quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma. **Combattere con Due Armi**: quando combatti con due armi, puoi aggiungere il tuo modificatore di caratteristica ai danni del secondo attacco.",
+            "description_en": "At 3rd level, choose a Fighting Style. Choose from the Fighting Styles table on Page 2 (limited to: Dueling, Two-Weapon Fighting).",
+            "description": "Al 3° livello adotti uno stile di combattimento particolare come tua specialita'. Scegli il tuo Stile di Combattimento dalla tabella dedicata in Pagina 2 (limitato a: Duellare o Combattere con Due Armi).",
             "translated": true
           },
           {
@@ -3872,9 +3872,9 @@
       {
         "name_en": "Fighting Style",
         "level": 1,
-        "description_en": "You adopt a particular style of fighting as your specialty. Choose one of the following options. You can't take a Fighting Style option more than once, even if you later get to choose again. \n \n#### Archery \n \nYou gain a +2 bonus to attack rolls you make with ranged weapons. \n \n#### Defense \n \nWhile you are wearing armor, you gain a +1 bonus to AC. \n \n#### Dueling \n \nWhen you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon. \n \n#### Great Weapon Fighting \n \nWhen you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2. The weapon must have the two-handed or versatile property for you to gain this benefit. \n \n#### Protection \n \nWhen a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield. \n \n#### Two-Weapon Fighting \n \nWhen you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.",
+        "description_en": "At 1st level, you adopt a particular style of fighting as your specialty. Choose your Fighting Style from the dedicated table on Page 2.",
         "name": "Stile di Combattimento",
-        "description": "Al 1° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere una Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Armi Grandi: Quando ottieni 1 o 2 sui dadi per i danni di un attacco effettuato con un'arma da mischia che brandisci a due mani, puoi ritirare il dado e devi usare il nuovo tiro, anche se il nuovo tiro è un 1 o un 2. L'arma deve avere la proprietà a due mani o versatile per ottenere questo beneficio.\nProtezione: Quando una creatura che puoi vedere attacca un bersaglio diverso da te entro 1,5 metri da te, puoi usare la tua reazione per imporre svantaggio al tiro per colpire. Devi brandire uno scudo.\nCombattere con Due Armi: Quando combatti con due armi, puoi aggiungere il tuo modificatore di caratteristica ai danni del secondo attacco.\nTiro: Ottieni un bonus di +2 ai tiri per colpire con armi da fuoco che effettui con armi a distanza.",
+        "description": "Al 1° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli il tuo Stile di Combattimento dalla tabella dedicata in Pagina 2.",
         "translated": true
       },
       {
@@ -7166,9 +7166,9 @@
       {
         "name_en": "Fighting Style",
         "level": 2,
-        "description_en": "At 2nd level, you adopt a style of fighting as your specialty. Choose one of the following options. You can't take a Fighting Style option more than once, even if you later get to choose again. \n \n#### Defense \n \nWhile you are wearing armor, you gain a +1 bonus to AC. \n \n#### Dueling \n \nWhen you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon. \n \n#### Great Weapon Fighting \n \nWhen you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll. The weapon must have the two-handed or versatile property for you to gain this benefit. \n \n#### Protection \n \nWhen a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.",
+        "description_en": "At 2nd level, you adopt a style of fighting as your specialty. Choose your Fighting Style from the dedicated table on Page 2.",
         "name": "Stile di Combattimento",
-        "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere uno Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Armi Grandi: Quando ottieni 1 o 2 sui dadi per i danni di un attacco effettuato con un'arma da mischia che brandisci a due mani, puoi ritirare il dado e devi usare il nuovo tiro. L'arma deve avere la proprietà a due mani o versatile per ottenere questo beneficio.\nProtezione: Quando una creatura che puoi vedere attacca un bersaglio diverso da te entro 1,5 metri da te, puoi usare la tua reazione per imporre svantaggio al tiro per colpire. Devi brandire uno scudo.",
+        "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli il tuo Stile di Combattimento dalla tabella dedicata in Pagina 2.",
         "translated": true
       },
       {
@@ -7968,9 +7968,9 @@
       {
         "name_en": "Fighting Style",
         "level": 2,
-        "description_en": "At 2nd level, you adopt a particular style of fighting as your specialty. Choose one of the following options. You can't take a Fighting Style option more than once, even if you later get to choose again. \n \n#### Archery \n \nYou gain a +2 bonus to attack rolls you make with ranged weapons. \n \n#### Defense \n \nWhile you are wearing armor, you gain a +1 bonus to AC. \n \n#### Dueling \n \nWhen you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon. \n \n#### Two-Weapon Fighting \n \nWhen you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.",
+        "description_en": "At 2nd level, you adopt a particular style of fighting as your specialty. Choose your Fighting Style from the dedicated table on Page 2.",
         "name": "Stile di Combattimento",
-        "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli una delle seguenti opzioni. Non puoi prendere uno Stile di Combattimento più di una volta, anche se in seguito ottieni la possibilità di scegliere di nuovo.\nArcheria: Ottieni un bonus di +2 ai tiri per colpire effettuati con armi a distanza.\nDifesa: Mentre indossi un'armatura, ottieni un bonus di +1 alla CA.\nDuellare: Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri per i danni con quell'arma.\nCombattere con Due Armi: Quando combatti con due armi, puoi aggiungere il tuo modificatore di caratteristica ai danni del secondo attacco.",
+        "description": "Al 2° livello, adotti uno stile particolare di combattimento come tua specialità. Scegli il tuo Stile di Combattimento dalla tabella dedicata in Pagina 2.",
         "translated": true
       },
       {

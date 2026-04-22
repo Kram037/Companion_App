@@ -13,20 +13,6 @@
     "wikidot_filled": false,
     "translated": true
   },
-  "Abilita' Impeccabile": {
-    "name": "Abilita' Impeccabile",
-    "name_en": "Skill Expert",
-    "slug": "skill_expert",
-    "source": "Tasha's Cauldron of Everything",
-    "source_short": "TCoE",
-    "prerequisites": null,
-    "prerequisites_en": null,
-    "description": "You have honed your proficiency with particular skills, granting you the following benefits: Increase one ability score of your choice by 1, to a maximum of 20. You gain proficiency in one skill of your choice. Choose one skill in which you have proficiency. You gain expertise with that skill, which means your proficiency bonus is doubled for any ability check you make with it. The skill you choose must be one that isn't already benefiting from a feature, such as Expertise, that doubles your proficiency bonus.",
-    "description_en": "You have honed your proficiency with particular skills, granting you the following benefits: Increase one ability score of your choice by 1, to a maximum of 20. You gain proficiency in one skill of your choice. Choose one skill in which you have proficiency. You gain expertise with that skill, which means your proficiency bonus is doubled for any ability check you make with it. The skill you choose must be one that isn't already benefiting from a feature, such as Expertise, that doubles your proficiency bonus.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
-  },
   "Acutezza del Gigante di Pietra": {
     "name": "Acutezza del Gigante di Pietra",
     "name_en": "Keenness of the Stone Giant",
@@ -35,25 +21,25 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Stone Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Stone Strike) feat",
-    "description": "You've manifested the physical talents emblematic of stone giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Cavernous Sight. You gain darkvision with a range of 60 feet. If you already have darkvision from another source, its range increases by 60 feet.\n- Stone Throw. As a bonus action, you can take a rock and make a magical attack with it. The attack is a ranged spell attack with a range of 60 feet that uses the ability score you increased with this feat as the spellcasting ability. On a hit, the rock deals 1d10 force damage, and the target must succeed on a Strength saving throw (DC equals 8 + your proficiency bonus + the spellcasting ability modifier) or have the prone condition. You can use this bonus action a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Sei addestrato a colpire con precisione mortale, come i giganti di pietra. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza o Saggezza, fino a un massimo di 20.\n• Quando ottieni un colpo critico con un attacco con un'arma, puoi spingere il bersaglio fino a 3 metri lontano da te se e' di taglia Enorme o inferiore.\n• Come azione bonus, puoi usare la tua sensibilita' alle vibrazioni per ottenere percezione tellurica con una portata di 3 metri fino alla fine del tuo turno successivo.",
     "description_en": "You've manifested the physical talents emblematic of stone giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Cavernous Sight. You gain darkvision with a range of 60 feet. If you already have darkvision from another source, its range increases by 60 feet.\n- Stone Throw. As a bonus action, you can take a rock and make a magical attack with it. The attack is a ranged spell attack with a range of 60 feet that uses the ability score you increased with this feat as the spellcasting ability. On a hit, the rock deals 1d10 force damage, and the target must succeed on a Strength saving throw (DC equals 8 + your proficiency bonus + the spellcasting ability modifier) or have the prone condition. You can use this bonus action a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
-  "Adepto di Metamagia": {
-    "name": "Adepto di Metamagia",
-    "name_en": "Metamagic Adept",
-    "slug": "metamagic_adept",
+  "Adepto al Combattimento": {
+    "name": "Adepto al Combattimento",
+    "name_en": "Fighting Initiate",
+    "slug": "fighting_initiate",
     "source": "Tasha's Cauldron of Everything",
     "source_short": "TCoE",
-    "prerequisites": "Spellcasting or Pact Magic feature",
-    "prerequisites_en": "Spellcasting or Pact Magic feature",
-    "description": "You've learned how to exert your will on your spells to alter how they function:\n- You learn two Metamagic options of your choice from the sorcerer class. You can use only one Metamagic option on a spell when you cast it, unless the option says otherwise. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace one of these Metamagic options with another one from the sorcerer class.\n- You gain 2 sorcery points to spend on Metamagic (these points are added to any sorcery points you have from another source but can be used only on Metamagic). You regain all spent sorcery points when you finish a long rest.",
-    "description_en": "You've learned how to exert your will on your spells to alter how they function:\n- You learn two Metamagic options of your choice from the sorcerer class. You can use only one Metamagic option on a spell when you cast it, unless the option says otherwise. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace one of these Metamagic options with another one from the sorcerer class.\n- You gain 2 sorcery points to spend on Metamagic (these points are added to any sorcery points you have from another source but can be used only on Metamagic). You regain all spent sorcery points when you finish a long rest.",
-    "not_ogl": true,
-    "wikidot_filled": true,
-    "translated": false
+    "prerequisites": "Competenza in un'arma marziale",
+    "prerequisites_en": "Proficiency with a martial weapon",
+    "description": "I tuoi allenamenti marziali ti hanno preparato all'uso di stili di combattimento dei combattenti. Apprendi uno Stile di Combattimento a tua scelta dalla lista del combattente. Ogni volta che ottieni un livello, puoi sostituire questo Stile di Combattimento con un altro della lista del combattente che non possiedi gia'.",
+    "description_en": "Your martial training has helped you develop a particular style of fighting. As a result, you learn one Fighting Style option of your choice from the fighter class. If you already have a style, the one you choose must be different. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace this feat's fighting style with another one from the fighter class that you don't have.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
   },
   "Adepto Elementale": {
     "name": "Adepto Elementale",
@@ -83,6 +69,20 @@
     "wikidot_filled": false,
     "translated": true
   },
+  "Adepto Metamagico": {
+    "name": "Adepto Metamagico",
+    "name_en": "Metamagic Adept",
+    "slug": "metamagic_adept",
+    "source": "Tasha's Cauldron of Everything",
+    "source_short": "TCoE",
+    "prerequisites": "Capacita' di incantare",
+    "prerequisites_en": "Spellcasting or Pact Magic feature",
+    "description": "Studi le sottigliezze della magia, ottenendo i seguenti benefici:\n• Apprendi due opzioni di Metamagia a tua scelta tra quelle dello stregone. Se in seguito apprendi un'opzione di Metamagia, puoi sostituire una delle opzioni che hai appreso da questo talento.\n• Ottieni 2 punti stregoneria per spendere le opzioni di Metamagia (questi punti si sommano ad eventuali altri punti stregoneria che possiedi). Recuperi tutti i punti stregoneria spesi quando termini un riposo lungo.",
+    "description_en": "You've learned how to exert your will on your spells to alter how they function:\n- You learn two Metamagic options of your choice from the sorcerer class. You can use only one Metamagic option on a spell when you cast it, unless the option says otherwise. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace one of these Metamagic options with another one from the sorcerer class.\n- You gain 2 sorcery points to spend on Metamagic (these points are added to any sorcery points you have from another source but can be used only on Metamagic). You regain all spent sorcery points when you finish a long rest.",
+    "not_ogl": true,
+    "wikidot_filled": true,
+    "translated": true
+  },
   "Adepto Occulto": {
     "name": "Adepto Occulto",
     "name_en": "Eldritch Adept",
@@ -91,11 +91,11 @@
     "source_short": "TCoE",
     "prerequisites": "Capacita' di incantare o di Pact Magic",
     "prerequisites_en": "Spellcasting or Pact Magic feature",
-    "description": "Studying occult lore, you have unlocked eldritch power within yourself: you learn one Eldritch Invocation option of your choice from the warlock class. If the invocation has a prerequisite of any kind, you can choose that invocation only if you're a warlock who meets the prerequisite. Whenever you gain a level, you can replace the invocation with another one from the warlock class.",
+    "description": "Studiando arcani occulti, hai imparato un'invocazione occulta a tua scelta tra quelle disponibili al warlock. La tua caratteristica da incantatore per l'invocazione e' Intelligenza, Saggezza o Carisma (a tua scelta). Se l'invocazione ha un prerequisito, puoi sceglierla solo se sei un warlock e solo se soddisfi il prerequisito.\nOgni volta che ottieni un livello, puoi sostituire l'invocazione con un'altra invocazione che soddisfi i requisiti.",
     "description_en": "Studying occult lore, you have unlocked eldritch power within yourself: you learn one Eldritch Invocation option of your choice from the warlock class. If the invocation has a prerequisite of any kind, you can choose that invocation only if you're a warlock who meets the prerequisite. Whenever you gain a level, you can replace the invocation with another one from the warlock class.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Aggressore Selvaggio": {
     "name": "Aggressore Selvaggio",
@@ -105,11 +105,11 @@
     "source_short": "PHB",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "Once per turn when you roll damage for a melee weapon attack, you can reroll the weapon's damage dice and use either total.",
+    "description": "Una volta per turno, quando tiri i danni di un attacco con un'arma in mischia, puoi ritirare i dadi dei danni dell'arma e usare il risultato che preferisci.",
     "description_en": "Once per turn when you roll damage for a melee weapon attack, you can reroll the weapon's damage dice and use either total.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Agilita' Tarchiata": {
     "name": "Agilita' Tarchiata",
@@ -119,11 +119,11 @@
     "source_short": "XGtE",
     "prerequisites": "Nano o piccola taglia",
     "prerequisites_en": "Dwarf or a Small race",
-    "description": "You are uncommonly nimble for your race. You gain the following benefits:\n- Increase your Strength or Dexterity score by 1, to a maximum of 20.\n- Increase your walking speed by 5 feet.\n- You gain proficiency in the Acrobatics or Athletics skill (your choice).\n- You have advantage on any Strength (Athletics) or Dexterity (Acrobatics) check you make to escape from being grappled.",
+    "description": "Sei insolitamente agile per la tua razza. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• La tua velocita' aumenta di 1,5 metri.\n• Ottieni competenza in Acrobazia o Atletica (a tua scelta).\n• Hai vantaggio a qualsiasi prova di Forza (Atletica) o Destrezza (Acrobazia) che effettui per liberarti dalla condizione afferrato.",
     "description_en": "You are uncommonly nimble for your race. You gain the following benefits:\n- Increase your Strength or Dexterity score by 1, to a maximum of 20.\n- Increase your walking speed by 5 feet.\n- You gain proficiency in the Acrobatics or Athletics skill (your choice).\n- You have advantage on any Strength (Athletics) or Dexterity (Acrobatics) check you make to escape from being grappled.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Allerta": {
     "name": "Allerta",
@@ -147,11 +147,11 @@
     "source_short": "XGtE",
     "prerequisites": "Elfo (drow)",
     "prerequisites_en": "Elf (drow)",
-    "description": "You learn more of the magic typical of dark elves. You learn the Detect Magic spell and can cast it at will, without expending a spell slot. You also learn Levitate and Dispel Magic, each of which you can cast once without expending a spell slot. You regain the ability to cast the spell in this way when you finish a long rest. Charisma is your spellcasting ability for these spells.",
+    "description": "Apprendi altri incantesimi grazie alla tua eredita' drow. Apprendi l'incantesimo dardo incantato. Apprendi anche gli incantesimi levitazione e dissolvi magie, ognuno dei quali puoi lanciare una volta senza usare uno slot incantesimo. Recuperi la capacita' di lanciare gli incantesimi in questo modo dopo aver completato un riposo lungo. Carisma e' la tua caratteristica da incantatore per questi incantesimi.",
     "description_en": "You learn more of the magic typical of dark elves. You learn the Detect Magic spell and can cast it at will, without expending a spell slot. You also learn Levitate and Dispel Magic, each of which you can cast once without expending a spell slot. You regain the ability to cast the spell in this way when you finish a long rest. Charisma is your spellcasting ability for these spells.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Anima del Gigante delle Tempeste": {
     "name": "Anima del Gigante delle Tempeste",
@@ -161,11 +161,11 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Storm Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Storm Strike) feat",
-    "description": "You've manifested the tempest magic emblematic of storm giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Wisdom, or Charisma score by 1, to a maximum of 20.\n- Maelstrom Aura. As a bonus action, you surround yourself with an aura of magical wind and lightning that extends 10 feet from you in every direction but not through total cover. The aura lasts until the start of your next turn or until you are incapacitated. While the aura is active, you have resistance to lightning and thunder damage. In addition, attack rolls against you have disadvantage, and whenever another creature starts its turn within the aura, you can force the creature to make a Strength saving throw (DC equals 8 + your proficiency bonus + the ability modifier of the score increased by this feat). On a failed save, the creature's speed is halved until the start of its next turn. You can use this bonus action a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Senti il temibile potere delle tempeste, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da freddo, fulmine o tuono (a tua scelta quando ottieni questo talento).\n• Una volta in ogni dei tuoi turni, quando una creatura entro 1,5 metri da te effettua un tiro per colpire contro di te, puoi forzare un disavantaggio sul tiro come reazione, e la creatura non puo' avvicinarsi a te per il resto del turno.\n• Come azione bonus, finche' non sei incapacitato, puoi imporre svantaggio ai tiri per colpire effettuati a una distanza superiore a 1,5 metri da te fino all'inizio del tuo turno successivo.",
     "description_en": "You've manifested the tempest magic emblematic of storm giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Wisdom, or Charisma score by 1, to a maximum of 20.\n- Maelstrom Aura. As a bonus action, you surround yourself with an aura of magical wind and lightning that extends 10 feet from you in every direction but not through total cover. The aura lasts until the start of your next turn or until you are incapacitated. While the aura is active, you have resistance to lightning and thunder damage. In addition, attack rolls against you have disadvantage, and whenever another creature starts its turn within the aura, you can force the creature to make a Strength saving throw (DC equals 8 + your proficiency bonus + the ability modifier of the score increased by this feat). On a failed save, the creature's speed is halved until the start of its next turn. You can use this bonus action a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Appostato": {
     "name": "Appostato",
@@ -173,13 +173,69 @@
     "slug": "skulker",
     "source": "Player's Handbook",
     "source_short": "PHB",
-    "prerequisites": "Dexterity 13 or higher",
+    "prerequisites": "Destrezza 13 o superiore",
     "prerequisites_en": "Dexterity 13 or higher",
-    "description": "You are an expert at slinking through shadows. You gain the following benefits: You can try to hide when you are lightly obscured from the creature from which you are hiding. When you are hidden from a creature and miss it with a ranged weapon attack, making the attack doesn't reveal your position. Dim light doesn't impose disadvantage on your Wisdom (Perception) checks relying on sight.",
+    "description": "Sei un esperto nell'eludere lo sguardo altrui, ottenendo i seguenti benefici:\n• Puoi tentare di nasconderti se sei oscurato per metta' dalla creatura da cui ti nascondi.\n• Quando sei nascosto e manchi un bersaglio con un attacco a distanza, l'attacco non rivela la tua posizione.\n• In condizioni di luce fioca non subisci svantaggio alle prove di Saggezza (Percezione) basate sulla vista.",
     "description_en": "You are an expert at slinking through shadows. You gain the following benefits: You can try to hide when you are lightly obscured from the creature from which you are hiding. When you are hidden from a creature and miss it with a ranged weapon attack, making the attack doesn't reveal your position. Dim light doesn't impose disadvantage on your Wisdom (Perception) checks relying on sight.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
+  },
+  "Armatura Leggera": {
+    "name": "Armatura Leggera",
+    "name_en": "Lightly Armored",
+    "slug": "lightly_armored",
+    "source": "Player's Handbook",
+    "source_short": "PHB",
+    "prerequisites": null,
+    "prerequisites_en": null,
+    "description": "Hai allenato il tuo corpo per indossare armature leggere, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature leggere.",
+    "description_en": "You have trained to master the use of light armor, gaining the following benefits. Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with light armor.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
+  },
+  "Armatura Media": {
+    "name": "Armatura Media",
+    "name_en": "Moderately Armored",
+    "slug": "moderately_armored",
+    "source": "Player's Handbook",
+    "source_short": "PHB",
+    "prerequisites": "Competenza nelle armature leggere",
+    "prerequisites_en": "Proficiency with light armor",
+    "description": "Hai allenato il tuo corpo per indossare armature piu' pesanti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature medie e con gli scudi.",
+    "description_en": "You have trained to master the use of medium armor and shields, gaining the following benefits: Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with medium armor and shields.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
+  },
+  "Armatura Pesante": {
+    "name": "Armatura Pesante",
+    "name_en": "Heavily Armored",
+    "slug": "heavily_armored",
+    "source": "Player's Handbook",
+    "source_short": "PHB",
+    "prerequisites": "Competenza nelle armature medie",
+    "prerequisites_en": "Proficiency with medium armor",
+    "description": "Hai allenato il tuo corpo per sopportare il peso delle armature pesanti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature pesanti.",
+    "description_en": "You have trained to master the use of heavy armor, gaining the following benefits: Increase your Strength score by 1, to a maximum of 20. You gain proficiency with heavy armor.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
+  },
+  "Artigliere": {
+    "name": "Artigliere",
+    "name_en": "Gunner",
+    "slug": "gunner",
+    "source": "Tasha's Cauldron of Everything",
+    "source_short": "TCoE",
+    "prerequisites": null,
+    "prerequisites_en": null,
+    "description": "Hai un'estesa pratica con armi da fuoco, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, fino a un massimo di 20.\n• Ottieni la competenza con le armi da fuoco.\n• Ignori la qualita' di caricamento delle armi da fuoco con cui sei competente.\n• Trovarsi entro 1,5 metri da una creatura ostile non impone svantaggio ai tuoi tiri per colpire a distanza.",
+    "description_en": "You have a quick hand and keen eye when employing firearms, granting you the following benefits:\n- Increase your Dexterity score by 1, to a maximum of 20.\n- You gain proficiency with firearms (see \"Firearms\" in the Dungeon Master's Guide).\n- You ignore the loading property of firearms.\n- Being within 5 feet of a hostile creature doesn't impose disadvantage on your ranged attack rolls.",
+    "not_ogl": true,
+    "wikidot_filled": true,
+    "translated": true
   },
   "Astuzia del Gigante delle Nuvole": {
     "name": "Astuzia del Gigante delle Nuvole",
@@ -189,11 +245,11 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Cloud Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Cloud Strike) feat",
-    "description": "You've manifested the confounding magic emblematic of cloud giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Charisma score by 1, to a maximum of 20.\n- Cloudy Escape. When a creature you can see hits you with an attack roll, you can use your reaction to give yourself resistance to that attack's damage. You then teleport to an unoccupied space that you can see within 30 feet of yourself. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Possiedi l'astuzia ingannevole dei giganti delle nuvole, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Quando una creatura che puoi vedere effettua un tiro per colpire contro di te, puoi usare la tua reazione per teletrasportarti fino a 9 metri in uno spazio non occupato che puoi vedere. Se ti trovi a piu' di 1,5 metri dalla creatura attaccante dopo essere stato teletrasportato, l'attacco subisce svantaggio. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested the confounding magic emblematic of cloud giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Charisma score by 1, to a maximum of 20.\n- Cloudy Escape. When a creature you can see hits you with an attack roll, you can use your reaction to give yourself resistance to that attack's damage. You then teleport to an unoccupied space that you can see within 30 feet of yourself. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Atleta": {
     "name": "Atleta",
@@ -223,6 +279,20 @@
     "wikidot_filled": false,
     "translated": true
   },
+  "Avvelenatore": {
+    "name": "Avvelenatore",
+    "name_en": "Poisoner",
+    "slug": "poisoner",
+    "source": "Tasha's Cauldron of Everything",
+    "source_short": "TCoE",
+    "prerequisites": null,
+    "prerequisites_en": null,
+    "description": "Sei in grado di infliggere veleni devastanti, ottenendo i seguenti benefici:\n• Quando effettui un attacco con un'arma che infligge danni da veleno, ignori la resistenza ai danni da veleno.\n• Puoi usare un'azione bonus per applicare il veleno (incluse le armi disponibili dal Cap. 5 del PHB) a un'arma o fino a tre frecce/proiettili. Il veleno aggiunge 2d8 danni da veleno e impone un tiro salvezza su Costituzione (CD 14): in caso di fallimento il bersaglio e' avvelenato per 1 minuto, con la possibilita' di ripetere il tiro alla fine di ognuno dei suoi turni.\n• Sei competente con il kit dell'avvelenatore. Con un'ora di lavoro e usando il kit, puoi creare un'unita' del veleno descritto sopra spendendo 50 mo di componenti.",
+    "description_en": "You can prepare and deliver deadly poisons, gaining the following benefits:\n- When you make a damage roll, you ignore resistance to poison damage.\n- You can coat a weapon in poison as a bonus action, instead of an action.\n- You gain proficiency with the poisoner's kit if you don't already have it. With one hour of work using a poisoner's kit and expending 50 gp worth of materials, you can create a number of doses of potent poison equal to your proficiency bonus. Once applied to a weapon or piece of ammunition, the poison retains its potency for 1 minute or until you hit with the weapon or ammunition. When a creature takes damage from the coated weapon or ammunition, that creature must succeed on a DC 14 Constitution saving throw or take 2d8 poison damage and become poisoned until the end of your next turn.",
+    "not_ogl": true,
+    "wikidot_filled": true,
+    "translated": true
+  },
   "Brace del Gigante del Fuoco": {
     "name": "Brace del Gigante del Fuoco",
     "name_en": "Ember of the Fire Giant",
@@ -231,11 +301,11 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Fire Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Fire Strike) feat",
-    "description": "You've manifested the fiery combat emblematic of fire giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Born of Flame. You have resistance to fire damage.\n- Searing Ignition. When you take the Attack action on your turn, you can replace a single attack with a magical burst of flame. Each creature of your choice in a 15-foot-radius sphere centered on you must make a Dexterity saving throw (DC equals 8 + your proficiency bonus + the modifier of the ability increased by this feat). On a failed save, a creature takes fire damage equal to 1d8 + your proficiency bonus, and it has the blinded condition until the start of your next turn. On a successful save, the creature takes half as much damage only. You can use your Searing Ignition a number of times equal to your proficiency bonus (but no more than once per turn), and you regain all expended uses when you finish a long rest.",
+    "description": "Senti la forza purificante del fuoco, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da fuoco.\n• Come azione bonus, magicamente fai apparire ardenti braci attorno a una creatura ostile che puoi vedere entro 18 metri da te. La creatura deve effettuare un tiro salvezza su Destrezza (CD = 8 + il tuo bonus di competenza + il tuo modificatore di Forza, Costituzione o Saggezza, a tua scelta), subendo danni da fuoco pari a 1d8 + il tuo bonus di competenza in caso di fallimento o la meta' in caso di successo. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested the fiery combat emblematic of fire giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Born of Flame. You have resistance to fire damage.\n- Searing Ignition. When you take the Attack action on your turn, you can replace a single attack with a magical burst of flame. Each creature of your choice in a 15-foot-radius sphere centered on you must make a Dexterity saving throw (DC equals 8 + your proficiency bonus + the modifier of the ability increased by this feat). On a failed save, a creature takes fire damage equal to 1d8 + your proficiency bonus, and it has the blinded condition until the start of your next turn. On a successful save, the creature takes half as much damage only. You can use your Searing Ignition a number of times equal to your proficiency bonus (but no more than once per turn), and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Carica": {
     "name": "Carica",
@@ -271,13 +341,13 @@
     "slug": "strike_of_the_giants",
     "source": "Bigby Presents: Glory of the Giants",
     "source_short": "BGG",
-    "prerequisites": "Proficiency with a martial weapon or Giant",
+    "prerequisites": "Forza o Costituzione 13 o superiore",
     "prerequisites_en": "Proficiency with a martial weapon or Giant",
-    "description": "You have absorbed primeval magic that gives you an echo of the might of giants. When you take this feat, choose one of the benefits listed below. Once per turn, when you hit a target with a melee weapon attack or a ranged weapon attack using a thrown weapon, you can imbue the attack with an additional effect depending on the benefit you chose:\n- Cloud Strike. The target takes an extra 1d4 thunder damage. If the target is a creature, it must succeed on a Wisdom saving throw, or you become invisible to it until the start of your next turn or until immediately after you make an attack roll or cast a spell.\n- Fire Strike. The target takes an extra 1d10 fire damage.\n- Frost Strike. The target takes an extra 1d6 cold damage. If the target is a creature, it must succeed on a Constitution saving throw, or its speed is reduced to 0 until the start of your next turn.\n- Hill Strike. The target takes an extra 1d6 damage of the weapon's type. If the target is a creature, it must succeed on a Strength saving throw or have the prone condition.\n- Stone Strike. The target takes an extra 1d6 force damage. If the target is a creature, it must succeed on a Strength saving throw or be pushed 10 feet from you in a straight line.\n- Storm Strike. The target takes an extra 1d6 lightning damage. If the target is a creature, it must succeed on a Constitution saving throw, or it has disadvantage on attack rolls until the start of your next turn.\nThe saving throw DC for these effects equals 8 + your proficiency bonus + your Strength or Constitution modifier.\nYou can use this feat a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Imitando le tecniche di combattimento dei giganti, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Ottieni accesso a un Colpo dei Giganti a tua scelta tra le opzioni elencate (Colpo del Gigante delle Nuvole, del Fuoco, del Gelo, della Tempesta, di Pietra, delle Colline). Una volta per turno, quando colpisci con un attacco con un'arma, puoi attivare il colpo, che impone effetti aggiuntivi alla creatura colpita. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You have absorbed primeval magic that gives you an echo of the might of giants. When you take this feat, choose one of the benefits listed below. Once per turn, when you hit a target with a melee weapon attack or a ranged weapon attack using a thrown weapon, you can imbue the attack with an additional effect depending on the benefit you chose:\n- Cloud Strike. The target takes an extra 1d4 thunder damage. If the target is a creature, it must succeed on a Wisdom saving throw, or you become invisible to it until the start of your next turn or until immediately after you make an attack roll or cast a spell.\n- Fire Strike. The target takes an extra 1d10 fire damage.\n- Frost Strike. The target takes an extra 1d6 cold damage. If the target is a creature, it must succeed on a Constitution saving throw, or its speed is reduced to 0 until the start of your next turn.\n- Hill Strike. The target takes an extra 1d6 damage of the weapon's type. If the target is a creature, it must succeed on a Strength saving throw or have the prone condition.\n- Stone Strike. The target takes an extra 1d6 force damage. If the target is a creature, it must succeed on a Strength saving throw or be pushed 10 feet from you in a straight line.\n- Storm Strike. The target takes an extra 1d6 lightning damage. If the target is a creature, it must succeed on a Constitution saving throw, or it has disadvantage on attack rolls until the start of your next turn.\nThe saving throw DC for these effects equals 8 + your proficiency bonus + your Strength or Constitution modifier.\nYou can use this feat a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Combattente a Due Armi": {
     "name": "Combattente a Due Armi",
@@ -329,11 +399,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "Your exposure to the Feywild's magic has changed you, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the misty step spell and one 1st-level spell of your choice. The 1st-level spell must be from the divination or enchantment school of magic. You can cast each of these spells without expending a spell slot. Once you cast either of these spells in this way, you can't cast that spell in this way again until you finish a long rest. You can also cast these spells using spell slots you have of the appropriate level. The spells' spellcasting ability is the ability increased by this feat.",
+    "description": "La tua mistica esposizione alle Terre Fatate ti ha conferito potere magico, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi gli incantesimi salto a misteriosa scomparsa e un incantesimo del 1° livello a tua scelta della scuola di Divinazione o Invocazione. Puoi lanciare ognuno una volta senza usare uno slot incantesimo, e recuperi la capacita' di lanciarli in questo modo quando termini un riposo lungo. Puoi anche lanciare questi incantesimi usando slot incantesimo che possiedi del livello appropriato. La caratteristica da incantatore per questi incantesimi e' la stessa caratteristica che hai aumentato con questo talento.",
     "description_en": "Your exposure to the Feywild's magic has changed you, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the misty step spell and one 1st-level spell of your choice. The 1st-level spell must be from the divination or enchantment school of magic. You can cast each of these spells without expending a spell slot. Once you cast either of these spells in this way, you can't cast that spell in this way again until you finish a long rest. You can also cast these spells using spell slots you have of the appropriate level. The spells' spellcasting ability is the ability increased by this feat.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Contaminazione Ombrosa": {
     "name": "Contaminazione Ombrosa",
@@ -343,53 +413,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "Your exposure to the Shadowfell's magic has changed you, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the invisibility spell and one 1st-level spell of your choice. The 1st-level spell must be from the illusion or necromancy school of magic. You can cast each of these spells without expending a spell slot. Once you cast either of these spells in this way, you can't cast that spell in this way again until you finish a long rest. You can also cast these spells using spell slots you have of the appropriate level. The spells' spellcasting ability is the ability increased by this feat.",
+    "description": "L'esposizione mistica al Reame delle Ombre ti ha conferito potere magico, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi gli incantesimi invisibilita' e un incantesimo del 1° livello a tua scelta della scuola di Illusione o Necromanzia. Puoi lanciare ognuno una volta senza usare uno slot incantesimo, e recuperi la capacita' di lanciarli in questo modo quando termini un riposo lungo. Puoi anche lanciare questi incantesimi usando slot incantesimo che possiedi del livello appropriato. La caratteristica da incantatore per questi incantesimi e' la stessa caratteristica che hai aumentato con questo talento.",
     "description_en": "Your exposure to the Shadowfell's magic has changed you, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the invisibility spell and one 1st-level spell of your choice. The 1st-level spell must be from the illusion or necromancy school of magic. You can cast each of these spells without expending a spell slot. Once you cast either of these spells in this way, you can't cast that spell in this way again until you finish a long rest. You can also cast these spells using spell slots you have of the appropriate level. The spells' spellcasting ability is the ability increased by this feat.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
-  },
-  "Corazze Leggere": {
-    "name": "Corazze Leggere",
-    "name_en": "Lightly Armored",
-    "slug": "lightly_armored",
-    "source": "Player's Handbook",
-    "source_short": "PHB",
-    "prerequisites": null,
-    "prerequisites_en": null,
-    "description": "You have trained to master the use of light armor, gaining the following benefits. Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with light armor.",
-    "description_en": "You have trained to master the use of light armor, gaining the following benefits. Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with light armor.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
-  },
-  "Corazze Medie": {
-    "name": "Corazze Medie",
-    "name_en": "Moderately Armored",
-    "slug": "moderately_armored",
-    "source": "Player's Handbook",
-    "source_short": "PHB",
-    "prerequisites": "Proficiency with light armor",
-    "prerequisites_en": "Proficiency with light armor",
-    "description": "You have trained to master the use of medium armor and shields, gaining the following benefits: Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with medium armor and shields.",
-    "description_en": "You have trained to master the use of medium armor and shields, gaining the following benefits: Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with medium armor and shields.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
-  },
-  "Corazze Pesanti": {
-    "name": "Corazze Pesanti",
-    "name_en": "Heavily Armored",
-    "slug": "heavily_armored",
-    "source": "Player's Handbook",
-    "source_short": "PHB",
-    "prerequisites": "Proficiency with medium armor",
-    "prerequisites_en": "Proficiency with medium armor",
-    "description": "You have trained to master the use of heavy armor, gaining the following benefits: Increase your Strength score by 1, to a maximum of 20. You gain proficiency with heavy armor.",
-    "description_en": "You have trained to master the use of heavy armor, gaining the following benefits: Increase your Strength score by 1, to a maximum of 20. You gain proficiency with heavy armor.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Costituzione Infernale": {
     "name": "Costituzione Infernale",
@@ -399,11 +427,11 @@
     "source_short": "XGtE",
     "prerequisites": "Tiefling",
     "prerequisites_en": "Tiefling",
-    "description": "Fiendish blood runs strong in you, unlocking a resilience akin to that possessed by some fiends. You gain the following benefits:\n- Increase your Constitution score by 1, up to a maximum of 20.\n- You have resistance to cold damage and poison damage.\n- You have advantage on saving throws against being poisoned.",
+    "description": "La tua eredita' diabolica si manifesta in una resistenza fisica innata. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione, fino a un massimo di 20.\n• Hai resistenza ai danni da freddo e da veleno.\n• Hai vantaggio ai tiri salvezza per evitare o terminare la condizione avvelenato.",
     "description_en": "Fiendish blood runs strong in you, unlocking a resilience akin to that possessed by some fiends. You gain the following benefits:\n- Increase your Constitution score by 1, up to a maximum of 20.\n- You have resistance to cold damage and poison damage.\n- You have advantage on saving throws against being poisoned.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Cuoco": {
     "name": "Cuoco",
@@ -427,11 +455,11 @@
     "source_short": "FToD",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You've manifested some of the power of chromatic dragons, granting you the following benefits: Chromatic Infusion. As a bonus action, you can touch a simple or martial weapon and infuse it with one of the following damage types: acid, cold, fire, lightning, or poison. For the next minute, the weapon deals an extra 1d4 damage of the chosen type when it hits. After you use this bonus action, you can't do so again until you finish a long rest. Reactive Resistance. When you take acid, cold, fire, lightning, or poison damage, you can use your reaction to give yourself resistance to that instance of damage. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Sei toccato dal potere dei draghi cromatici. Ottieni i seguenti benefici:\n• Riserva Cromatica. Come azione bonus, puoi toccare un'arma semplice o da guerra che impugni e infonderle un'energia: scegli acido, freddo, fuoco, fulmine o veleno. Per il prossimo minuto, l'arma infligge 1d4 danni di quel tipo in piu' quando colpisce. Puoi usare questa azione bonus un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.\n• Resistenza Reattiva. Quando subisci danni di tipo acido, freddo, fuoco, fulmine o veleno, puoi usare la tua reazione per ottenere resistenza a quel tipo di danno per quell'istanza. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested some of the power of chromatic dragons, granting you the following benefits: Chromatic Infusion. As a bonus action, you can touch a simple or martial weapon and infuse it with one of the following damage types: acid, cold, fire, lightning, or poison. For the next minute, the weapon deals an extra 1d4 damage of the chosen type when it hits. After you use this bonus action, you can't do so again until you finish a long rest. Reactive Resistance. When you take acid, cold, fire, lightning, or poison damage, you can use your reaction to give yourself resistance to that instance of damage. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Dono del Drago di Gemma": {
     "name": "Dono del Drago di Gemma",
@@ -439,13 +467,13 @@
     "slug": "gift_of_the_gem_dragon",
     "source": "Fizban's Treasury of Dragons",
     "source_short": "FToD",
-    "prerequisites": null,
+    "prerequisites": "Punteggio di Intelligenza, Saggezza o Carisma 13 o superiore",
     "prerequisites_en": null,
-    "description": "You've manifested some of the power of gem dragons, granting you the following benefits:\n- Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20.\n- Telekinetic Reprisal. When you take damage from a creature that is within 10 feet of you, you can use your reaction to emanate telekinetic energy. The creature that dealt damage to you must make a Strength saving throw (DC equals 8 + your proficiency bonus + the ability modifier of the score increased by this feat). On a failed save, the creature takes 2d8 force damage and is pushed up to 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Senti il potere psionico dei draghi di gemma, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Spostamento Telecinetico. Come azione bonus, prendi di mira un oggetto pesante non piu' di 5 chili o una creatura che puoi vedere entro 9 metri da te. La creatura deve effettuare un tiro salvezza su Forza, oppure tu (o lui) viene spinta o tirata fino a 1,5 metri orizzontalmente o verticalmente. Puoi usarlo un numero di volte pari al tuo bonus di competenza per riposo lungo.\n• Manifestazione Psionica. Quando una creatura che puoi vedere entro 18 metri infligge danni a te o a un alleato entro 1,5 metri, puoi usare la tua reazione per ridurre i danni di 1d8 + il tuo bonus di competenza.",
     "description_en": "You've manifested some of the power of gem dragons, granting you the following benefits:\n- Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20.\n- Telekinetic Reprisal. When you take damage from a creature that is within 10 feet of you, you can use your reaction to emanate telekinetic energy. The creature that dealt damage to you must make a Strength saving throw (DC equals 8 + your proficiency bonus + the ability modifier of the score increased by this feat). On a failed save, the creature takes 2d8 force damage and is pushed up to 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Dono del Drago Metallico": {
     "name": "Dono del Drago Metallico",
@@ -455,11 +483,11 @@
     "source_short": "FToD",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You've manifested some of the power of metallic dragons, granting you the following benefits:\n- Draconic Healing. You learn the Cure Wounds spell. You can cast this spell without expending a spell slot. Once you cast this spell in this way, you can't do so again until you finish a long rest. You can also cast this spell using spell slots you have. The spell's spellcasting ability is Intelligence, Wisdom, or Charisma when you cast it with this feat (choose when you gain the feat).\n- Protective Wings. You can manifest protective wings that can shield you or others. When you or another creature you can see within 5 feet of you is hit by an attack roll, you can use your reaction to manifest spectral wings from your back for a moment. You grant a bonus to the target's AC equal to your proficiency bonus against that attack roll, potentially causing it to miss. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Sei toccato dal potere protettivo dei draghi metallici. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo cura ferite e puoi lanciarlo senza usare uno slot incantesimo un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo. Puoi anche lanciarlo usando slot incantesimo del livello appropriato.\n• Ali Protettive. Quando tu o una creatura entro 1,5 metri da te viene colpita da un attacco, puoi usare la tua reazione per fare apparire spettrali ali draconiche dietro di te, ottenendo un bonus di +2 alla CA contro quell'attacco. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested some of the power of metallic dragons, granting you the following benefits:\n- Draconic Healing. You learn the Cure Wounds spell. You can cast this spell without expending a spell slot. Once you cast this spell in this way, you can't do so again until you finish a long rest. You can also cast this spell using spell slots you have. The spell's spellcasting ability is Intelligence, Wisdom, or Charisma when you cast it with this feat (choose when you gain the feat).\n- Protective Wings. You can manifest protective wings that can shield you or others. When you or another creature you can see within 5 feet of you is hit by an attack roll, you can use your reaction to manifest spectral wings from your back for a moment. You grant a bonus to the target's AC equal to your proficiency bonus against that attack roll, potentially causing it to miss. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Duellante Difensivo": {
     "name": "Duellante Difensivo",
@@ -503,6 +531,20 @@
     "wikidot_filled": false,
     "translated": true
   },
+  "Esperto in Abilita'": {
+    "name": "Esperto in Abilita'",
+    "name_en": "Skill Expert",
+    "slug": "skill_expert",
+    "source": "Tasha's Cauldron of Everything",
+    "source_short": "TCoE",
+    "prerequisites": null,
+    "prerequisites_en": null,
+    "description": "Hai sviluppato una particolare esperienza in alcune abilita', ottenendo i seguenti benefici:\n• Aumenti di 1 un punteggio di caratteristica a tua scelta, fino a un massimo di 20.\n• Ottieni competenza in un'abilita' a tua scelta.\n• Scegli un'abilita' in cui hai competenza. Ottieni esperienza in quell'abilita', il che significa che il tuo bonus di competenza viene raddoppiato per ogni prova di caratteristica che effettui che la utilizzi. L'abilita' che scegli non deve essere una in cui hai gia' esperienza.",
+    "description_en": "You have honed your proficiency with particular skills, granting you the following benefits: Increase one ability score of your choice by 1, to a maximum of 20. You gain proficiency in one skill of your choice. Choose one skill in which you have proficiency. You gain expertise with that skill, which means your proficiency bonus is doubled for any ability check you make with it. The skill you choose must be one that isn't already benefiting from a feature, such as Expertise, that doubles your proficiency bonus.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
+  },
   "Fiamme di Flegesto": {
     "name": "Fiamme di Flegesto",
     "name_en": "Flames of Phlegethos",
@@ -511,11 +553,11 @@
     "source_short": "XGtE",
     "prerequisites": "Tiefling",
     "prerequisites_en": "Tiefling",
-    "description": "You learn to call on hellfire to serve your commands. You gain the following benefits:\n- Increase your Intelligence or Charisma score by 1, to a maximum of 20.\n- When you roll fire damage for a spell you cast, you can reroll any roll of 1 on the fire damage dice, but you must use the new roll, even if it is another 1.\n- Whenever you cast a spell that deals fire damage, you can cause flames to wreathe you until the end of your next turn. The flames don't harm you or your possessions, and they shed bright light out to 30 feet and dim light for an additional 30 feet. While the flames are present, any creature within 5 feet of you that hits you with a melee attack takes 1d4 fire damage.",
+    "description": "Apprendi a usare l'eredita' infernale per attingere al fuoco demoniaco. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza o Carisma, fino a un massimo di 20.\n• Quando tiri i danni da fuoco di un incantesimo che lanci, puoi ritirare ogni 1 sui dadi dei danni da fuoco, ma devi usare il nuovo risultato anche se e' di nuovo 1.\n• Ogni volta che lanci un incantesimo che infligge danni da fuoco, puoi farti avvolgere da fiamme infernali fino alla fine del tuo prossimo turno. Le fiamme non ti danneggiano, ma illuminano l'area di luce intensa entro 9 metri e luce fioca per altri 9 metri. Mentre sei avvolto dalle fiamme, ogni creatura che ti colpisce con un attacco in mischia entro 1,5 metri subisce 1d4 danni da fuoco.",
     "description_en": "You learn to call on hellfire to serve your commands. You gain the following benefits:\n- Increase your Intelligence or Charisma score by 1, to a maximum of 20.\n- When you roll fire damage for a spell you cast, you can reroll any roll of 1 on the fire damage dice, but you must use the new roll, even if it is another 1.\n- Whenever you cast a spell that deals fire damage, you can cause flames to wreathe you until the end of your next turn. The flames don't harm you or your possessions, and they shed bright light out to 30 feet and dim light for an additional 30 feet. While the flames are present, any creature within 5 feet of you that hits you with a melee attack takes 1d4 fire damage.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Fortuna Generosa": {
     "name": "Fortuna Generosa",
@@ -553,11 +595,11 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Frost Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Frost Strike) feat",
-    "description": "You've manifested the icy might emblematic of frost giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Born of Ice. You have resistance to cold damage.\n- Frigid Retaliation. Immediately after a creature you can see within 30 feet of you hits you with an attack roll and deals damage, you can use your reaction to retaliate with a conjured blast of ice. The creature must make a Constitution saving throw (DC equals 8 + your proficiency bonus + the modifier of the ability increased by this feat). On a failed save, the creature takes cold damage equal to 1d8 + your proficiency bonus, and its speed is reduced to 0 until the end of its next turn. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
+    "description": "Possiedi la furia gelida dei giganti del gelo, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da freddo.\n• Quando una creatura che puoi vedere entro 9 metri da te ti colpisce con un attacco, puoi usare la tua reazione per infliggerle danni da freddo pari a 1d8 + il tuo bonus di competenza, e ridurre la sua velocita' di 3 metri fino all'inizio del tuo prossimo turno. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested the icy might emblematic of frost giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Born of Ice. You have resistance to cold damage.\n- Frigid Retaliation. Immediately after a creature you can see within 30 feet of you hits you with an attack roll and deals damage, you can use your reaction to retaliate with a conjured blast of ice. The creature must make a Constitution saving throw (DC equals 8 + your proficiency bonus + the modifier of the ability increased by this feat). On a failed save, the creature takes cold damage equal to 1d8 + your proficiency bonus, and its speed is reduced to 0 until the end of its next turn. You can use this reaction a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Furia Orchesca": {
     "name": "Furia Orchesca",
@@ -567,11 +609,11 @@
     "source_short": "XGtE",
     "prerequisites": "Mezzorco",
     "prerequisites_en": "Half-orc",
-    "description": "Your fury burns tirelessly. You gain the following benefits:\n- Increase your Strength or Constitution score by 1, up to a maximum of 20.\n- When you hit with an attack made with a simple or martial weapon, you can roll one of the weapon's damage dice an additional time and add it as extra damage of the weapon's damage type. Once you use this ability, you can't use it again until you finish a short or long rest.\n- Immediately after you use your Relentless Endurance trait, you can use your reaction to make one weapon attack.",
+    "description": "La tua furia non conosce limiti. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Quando colpisci con un'arma in cui sei competente in un attacco con un'arma e tiri i danni dell'arma, puoi tirare il dado dei danni dell'arma una volta in piu' come danno aggiuntivo dello stesso tipo. Una volta usata questa capacita', non puoi usarla di nuovo finche' non termini un riposo breve o lungo.\n• Subito dopo aver usato il tuo tratto razziale Insistenza Implacabile, puoi usare la tua reazione per effettuare un attacco con un'arma.",
     "description_en": "Your fury burns tirelessly. You gain the following benefits:\n- Increase your Strength or Constitution score by 1, up to a maximum of 20.\n- When you hit with an attack made with a simple or martial weapon, you can roll one of the weapon's damage dice an additional time and add it as extra damage of the weapon's damage type. Once you use this ability, you can't use it again until you finish a short or long rest.\n- Immediately after you use your Relentless Endurance trait, you can use your reaction to make one weapon attack.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Guaritore": {
     "name": "Guaritore",
@@ -637,11 +679,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You've learned where to cut to have the greatest results, granting you the following benefits: Increase your Strength or Dexterity by 1, to a maximum of 20. Once per turn when you hit a creature with an attack that deals slashing damage, you can reduce the speed of the target by 10 feet until the start of your next turn. When you score a critical hit that deals slashing damage to a creature, you grievously wound it. Until the start of your next turn, the target has disadvantage on all attack rolls.",
+    "description": "Hai imparato a infliggere ferite devastanti con armi taglienti. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Una volta per turno, quando colpisci con un'arma che infligge danni taglienti, puoi ridurre la velocita' del bersaglio di 3 metri fino all'inizio del tuo prossimo turno.\n• Quando ottieni un colpo critico con un'arma che infligge danni taglienti, il bersaglio subisce svantaggio ai tiri per colpire fino all'inizio del tuo prossimo turno.",
     "description_en": "You've learned where to cut to have the greatest results, granting you the following benefits: Increase your Strength or Dexterity by 1, to a maximum of 20. Once per turn when you hit a creature with an attack that deals slashing damage, you can reduce the speed of the target by 10 feet until the start of your next turn. When you score a critical hit that deals slashing damage to a creature, you grievously wound it. Until the start of your next turn, the target has disadvantage on all attack rolls.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Linguista": {
     "name": "Linguista",
@@ -684,20 +726,6 @@
     "not_ogl": false,
     "wikidot_filled": false,
     "translated": true
-  },
-  "Maestria dei Veleni": {
-    "name": "Maestria dei Veleni",
-    "name_en": "Poisoner",
-    "slug": "poisoner",
-    "source": "Tasha's Cauldron of Everything",
-    "source_short": "TCoE",
-    "prerequisites": null,
-    "prerequisites_en": null,
-    "description": "You can prepare and deliver deadly poisons, gaining the following benefits:\n- When you make a damage roll, you ignore resistance to poison damage.\n- You can coat a weapon in poison as a bonus action, instead of an action.\n- You gain proficiency with the poisoner's kit if you don't already have it. With one hour of work using a poisoner's kit and expending 50 gp worth of materials, you can create a number of doses of potent poison equal to your proficiency bonus. Once applied to a weapon or piece of ammunition, the poison retains its potency for 1 minute or until you hit with the weapon or ammunition. When a creature takes damage from the coated weapon or ammunition, that creature must succeed on a DC 14 Constitution saving throw or take 2d8 poison damage and become poisoned until the end of your next turn.",
-    "description_en": "You can prepare and deliver deadly poisons, gaining the following benefits:\n- When you make a damage roll, you ignore resistance to poison damage.\n- You can coat a weapon in poison as a bonus action, instead of an action.\n- You gain proficiency with the poisoner's kit if you don't already have it. With one hour of work using a poisoner's kit and expending 50 gp worth of materials, you can create a number of doses of potent poison equal to your proficiency bonus. Once applied to a weapon or piece of ammunition, the poison retains its potency for 1 minute or until you hit with the weapon or ammunition. When a creature takes damage from the coated weapon or ammunition, that creature must succeed on a DC 14 Constitution saving throw or take 2d8 poison damage and become poisoned until the end of your next turn.",
-    "not_ogl": true,
-    "wikidot_filled": true,
-    "translated": false
   },
   "Maestro d'Armi": {
     "name": "Maestro d'Armi",
@@ -747,13 +775,13 @@
     "slug": "medium_armor_master",
     "source": "Player's Handbook",
     "source_short": "PHB",
-    "prerequisites": "Proficiency with medium armor",
+    "prerequisites": "Competenza nelle armature medie",
     "prerequisites_en": "Proficiency with medium armor",
-    "description": "You have practiced moving in medium armor to gain the following benefits: Wearing medium armor doesn't impose disadvantage on your Dexterity (Stealth) checks. When you wear medium armor, you can add 3, rather than 2, to your AC if you have a Dexterity of 16 or higher.",
+    "description": "Hai praticato il movimento in armatura media per ottenere i seguenti benefici:\n• Indossare armature medie non ti impone svantaggio nelle prove di Destrezza (Furtivita').\n• Quando indossi un'armatura media, puoi sommare 3 (anziche' 2) al tuo modificatore di Destrezza per determinare la tua Classe Armatura, se il tuo modificatore di Destrezza e' di almeno +3.",
     "description_en": "You have practiced moving in medium armor to gain the following benefits: Wearing medium armor doesn't impose disadvantage on your Dexterity (Stealth) checks. When you wear medium armor, you can add 3, rather than 2, to your AC if you have a Dexterity of 16 or higher.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Maestro delle Armature Pesanti": {
     "name": "Maestro delle Armature Pesanti",
@@ -791,11 +819,11 @@
     "source_short": "BGG",
     "prerequisites": "Spellcasting feature or Rune Carver background",
     "prerequisites_en": "Spellcasting feature or Rune Carver background",
-    "description": "You've studied the magic of Giant runes, granting you the following benefits:\n- Comprehend Languages. You learn the comprehend languages spell. You can cast this spell without expending a spell slot, and you must finish a long rest before you can cast it in this way again. You can also cast this spell using any spell slots you have.\n- Rune Magic. You know a number of runes equal to half your proficiency bonus (rounded down), chosen from the Rune Spells table. Whenever you finish a long rest, you can inscribe each rune you know onto one nonmagical weapon, armor, piece of clothing, or other object you touch. You temporarily learn the 1st-level spells that correspond to the runes you inscribed, as specified on the Rune Spells table, and you know those spells until you finish a long rest, when the runes fade. While you are wearing or carrying any rune-marked object, you can cast the spells associated with those runes using any spell slots you have.\nYou can also invoke a rune inscribed on an object you are wearing or carrying and cast its associated spell without expending a spell slot or using material components. Once you cast the spell in this way, you can't do so again until you finish a long rest. Your spellcasting ability for this feat is Intelligence, Wisdom, or Charisma (choose when you select this feat).\nEach time you gain a level, you can replace one of the runes you know with another one from the Rune Spells table.",
+    "description": "Apprendi a tracciare semplici rune magiche per attingere a poteri arcani, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo trucco prestigiatore. Inoltre, scegli un incantesimo del 1° livello da una qualsiasi lista di incantesimi: lo apprendi e puoi lanciarlo senza usare uno slot un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo. La caratteristica da incantatore per questi incantesimi e' la stessa che hai aumentato con questo talento.",
     "description_en": "You've studied the magic of Giant runes, granting you the following benefits:\n- Comprehend Languages. You learn the comprehend languages spell. You can cast this spell without expending a spell slot, and you must finish a long rest before you can cast it in this way again. You can also cast this spell using any spell slots you have.\n- Rune Magic. You know a number of runes equal to half your proficiency bonus (rounded down), chosen from the Rune Spells table. Whenever you finish a long rest, you can inscribe each rune you know onto one nonmagical weapon, armor, piece of clothing, or other object you touch. You temporarily learn the 1st-level spells that correspond to the runes you inscribed, as specified on the Rune Spells table, and you know those spells until you finish a long rest, when the runes fade. While you are wearing or carrying any rune-marked object, you can cast the spells associated with those runes using any spell slots you have.\nYou can also invoke a rune inscribed on an object you are wearing or carrying and cast its associated spell without expending a spell slot or using material components. Once you cast the spell in this way, you can't do so again until you finish a long rest. Your spellcasting ability for this feat is Intelligence, Wisdom, or Charisma (choose when you select this feat).\nEach time you gain a level, you can replace one of the runes you know with another one from the Rune Spells table.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Magia degli Elfi dei Boschi": {
     "name": "Magia degli Elfi dei Boschi",
@@ -805,11 +833,11 @@
     "source_short": "XGtE",
     "prerequisites": "Elfo (dei boschi)",
     "prerequisites_en": "Elf (wood)",
-    "description": "You learn the magic of the primeval woods, which are revered and protected by your people. You learn one Druid cantrip of your choice. You also learn the Longstrider and Pass Without Trace spells, each of which you can cast once without expending a spell slot. You regain the ability to cast these two spells in this way when you finish a long rest. Wisdom is your spellcasting ability for all three spells.",
+    "description": "Hai imparato la magia degli antichi elfi dei boschi. Apprendi un trucchetto a tua scelta dalla lista degli incantesimi del druido. Apprendi anche l'incantesimo passare senza tracce e l'incantesimo parlare con gli animali, ognuno dei quali puoi lanciare una volta senza usare uno slot incantesimo. Recuperi la capacita' di lanciare gli incantesimi in questo modo dopo aver completato un riposo lungo. Saggezza e' la tua caratteristica da incantatore per questi incantesimi.",
     "description_en": "You learn the magic of the primeval woods, which are revered and protected by your people. You learn one Druid cantrip of your choice. You also learn the Longstrider and Pass Without Trace spells, each of which you can cast once without expending a spell slot. You regain the ability to cast these two spells in this way when you finish a long rest. Wisdom is your spellcasting ability for all three spells.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Martello Vivente": {
     "name": "Martello Vivente",
@@ -819,11 +847,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You are practiced in the art of crushing your enemies, granting you the following benefits: Increase your Strength or Constitution by 1, to a maximum of 20. Once per turn, when you hit a creature with an attack that deals bludgeoning damage, you can move it 5 feet to an unoccupied space, provided the target is no more than one size larger than you. When you score a critical hit that deals bludgeoning damage to a creature, attack rolls against that creature are made with advantage until the start of your next turn.",
+    "description": "Sei un esperto a infliggere colpi schiaccianti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Una volta per turno, quando colpisci una creatura con un attacco che infligge danni contundenti, puoi spostarla di 1,5 metri in uno spazio libero, se non e' di taglia piu' grande della Grande.\n• Quando ottieni un colpo critico con un attacco che infligge danni contundenti, i tiri per colpire contro il bersaglio sono effettuati con vantaggio fino all'inizio del tuo prossimo turno.",
     "description_en": "You are practiced in the art of crushing your enemies, granting you the following benefits: Increase your Strength or Constitution by 1, to a maximum of 20. Once per turn, when you hit a creature with an attack that deals bludgeoning damage, you can move it 5 feet to an unoccupied space, provided the target is no more than one size larger than you. When you score a critical hit that deals bludgeoning damage to a creature, attack rolls against that creature are made with advantage until the start of your next turn.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Mente Acuta": {
     "name": "Mente Acuta",
@@ -875,11 +903,11 @@
     "source_short": "XGtE",
     "prerequisites": "Dragonborn",
     "prerequisites_en": "Dragonborn",
-    "description": "When angered, you radiate menace. You gain the following benefits:\n- Increase your Strength, Constitution, or Charisma score by 1, to a maximum of 20.\n- Instead of exhaling destructive energy, you can expend a use of your Breath Weapon trait to roar, forcing each creature of your choice within 30 feet of you to make a Wisdom saving throw (DC 8 + your proficiency bonus + your Charisma modifier). A target automatically succeeds on the save if it can't hear or see you. On a failed save, a target becomes frightened for 1 minute. If the frightened target takes any damage, it can repeat the saving throw, ending the effect on itself on a success.",
+    "description": "Quando attingi a discendenza draconica, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Carisma, fino a un massimo di 20.\n• Invece di esalare un'arma a soffio devastante, puoi usare la tua azione per emettere un ruggito che instilla terrore. Tutte le creature di tua scelta entro 9 metri da te devono superare un tiro salvezza su Saggezza (CD 8 + il tuo bonus di competenza + il tuo modificatore di Carisma) o essere spaventate per 1 minuto. Una creatura spaventata puo' ripetere il tiro alla fine di ognuno dei suoi turni, terminando l'effetto in caso di successo. Una volta usata questa capacita', devi terminare un riposo breve o lungo prima di poterla usare di nuovo.",
     "description_en": "When angered, you radiate menace. You gain the following benefits:\n- Increase your Strength, Constitution, or Charisma score by 1, to a maximum of 20.\n- Instead of exhaling destructive energy, you can expend a use of your Breath Weapon trait to roar, forcing each creature of your choice within 30 feet of you to make a Wisdom saving throw (DC 8 + your proficiency bonus + your Charisma modifier). A target automatically succeeds on the save if it can't hear or see you. On a failed save, a target becomes frightened for 1 minute. If the frightened target takes any damage, it can repeat the saving throw, ending the effect on itself on a success.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Pelle di Drago": {
     "name": "Pelle di Drago",
@@ -889,25 +917,25 @@
     "source_short": "XGtE",
     "prerequisites": "Dragonborn",
     "prerequisites_en": "Dragonborn",
-    "description": "You manifest scales and claws reminiscent of your draconic ancestors. You gain the following benefits:\n- Increase your Strength, Constitution, or Charisma score by 1, up to a maximum of 20.\n- Your scales harden. While you aren't wearing armor, you can calculate your AC as 13 + your Dexterity modifier. You can use a shield and still gain this benefit.\n- You can grow retractable claws from the tips of your fingers. Extending or retracting the claws requires no action. The claws are natural weapons, which you can use to make unarmed strikes. If you hit with them, you deal slashing damage equal to 1d4 + your Strength modifier, instead of the normal bludgeoning damage for an unarmed strike.",
+    "description": "Attingi al patrimonio draconico per attivare poteri innati, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Carisma, fino a un massimo di 20.\n• La tua pelle si ispessisce con scaglie. Quando non indossi un'armatura, la tua CA e' pari a 13 + il tuo modificatore di Destrezza. Puoi usare uno scudo e mantenere comunque il beneficio.\n• Cresci artigli affilati. Sono armi da mischia naturali che puoi usare per fare attacchi senz'armi. Se colpisci con essi, infliggi danni taglienti pari a 1d4 + il tuo modificatore di Forza, invece dei danni contundenti normali per gli attacchi senz'armi.",
     "description_en": "You manifest scales and claws reminiscent of your draconic ancestors. You gain the following benefits:\n- Increase your Strength, Constitution, or Charisma score by 1, up to a maximum of 20.\n- Your scales harden. While you aren't wearing armor, you can calculate your AC as 13 + your Dexterity modifier. You can use a shield and still gain this benefit.\n- You can grow retractable claws from the tips of your fingers. Extending or retracting the claws requires no action. The claws are natural weapons, which you can use to make unarmed strikes. If you hit with them, you deal slashing damage equal to 1d4 + your Strength modifier, instead of the normal bludgeoning damage for an unarmed strike.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
-  "Pistolero": {
-    "name": "Pistolero",
-    "name_en": "Gunner",
-    "slug": "gunner",
+  "Penetrante": {
+    "name": "Penetrante",
+    "name_en": "Piercer",
+    "slug": "piercer",
     "source": "Tasha's Cauldron of Everything",
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You have a quick hand and keen eye when employing firearms, granting you the following benefits:\n- Increase your Dexterity score by 1, to a maximum of 20.\n- You gain proficiency with firearms (see \"Firearms\" in the Dungeon Master's Guide).\n- You ignore the loading property of firearms.\n- Being within 5 feet of a hostile creature doesn't impose disadvantage on your ranged attack rolls.",
-    "description_en": "You have a quick hand and keen eye when employing firearms, granting you the following benefits:\n- Increase your Dexterity score by 1, to a maximum of 20.\n- You gain proficiency with firearms (see \"Firearms\" in the Dungeon Master's Guide).\n- You ignore the loading property of firearms.\n- Being within 5 feet of a hostile creature doesn't impose disadvantage on your ranged attack rolls.",
-    "not_ogl": true,
-    "wikidot_filled": true,
-    "translated": false
+    "description": "Hai raggiunto un livello di expertise nell'uso di armi penetranti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Una volta per turno, quando ottieni i danni di un attacco con un'arma che infligge danni perforanti, puoi ritirare uno dei dadi danni dell'arma e devi usare il nuovo risultato.\n• Quando ottieni un colpo critico con un'arma che infligge danni perforanti, puoi tirare un dado di danno aggiuntivo determinando i danni perforanti aggiuntivi del bersaglio.",
+    "description_en": "You have achieved a penetrating precision in combat, granting you the following benefits: Increase your Strength or Dexterity by 1, to a maximum of 20. Once per turn, when you hit a creature with an attack that deals piercing damage, you can re-roll one of the attack's damage dice, and you must use the new roll. When you score a critical hit that deals piercing damage to a creature, you can roll one additional damage die when determining the extra piercing damage the target takes.",
+    "not_ogl": false,
+    "wikidot_filled": false,
+    "translated": true
   },
   "Precisione Elfica": {
     "name": "Precisione Elfica",
@@ -917,11 +945,11 @@
     "source_short": "XGtE",
     "prerequisites": "Elfo o mezzelfo",
     "prerequisites_en": "Elf or half-elf",
-    "description": "The accuracy of elves is legendary, especially that of elf archers and spellcasters. You have uncanny aim with attacks that rely on precision rather than brute force. You gain the following benefits: Increase your Dexterity, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Whenever you have advantage on an attack roll using Dexterity, Intelligence, Wisdom, or Charisma, you can reroll one of the dice once.",
+    "description": "L'accuratezza degli elfi e' rinomata, soprattutto fra gli arcieri elfici e gli incantatori. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Quando hai vantaggio a un tiro per colpire effettuato con un'arma usando Destrezza, Intelligenza, Saggezza o Carisma, puoi ritirare uno dei dadi una volta.",
     "description_en": "The accuracy of elves is legendary, especially that of elf archers and spellcasters. You have uncanny aim with attacks that rely on precision rather than brute force. You gain the following benefits: Increase your Dexterity, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Whenever you have advantage on an attack roll using Dexterity, Intelligence, Wisdom, or Charisma, you can reroll one of the dice once.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Prodigio": {
     "name": "Prodigio",
@@ -931,11 +959,11 @@
     "source_short": "XGtE",
     "prerequisites": "Mezzelfo, mezzorco o umano",
     "prerequisites_en": "Half-elf, half-orc, or human",
-    "description": "You have a knack for learning new things. You gain the following benefits: You gain one skill proficiency of your choice, one tool proficiency of your choice, and fluency in one language of your choice. Choose one skill in which you have proficiency. You gain expertise with that skill, which means your proficiency bonus is doubled for any ability check you make with it. The skill you choose must be one that isn't already benefiting from a feature, such as Expertise, that doubles your proficiency bonus.",
+    "description": "Hai talento naturale per varie attivita'. Ottieni i seguenti benefici:\n• Ottieni la competenza in un'abilita' a tua scelta, in un tipo di strumento da artigiano a tua scelta e la fluenza in una lingua a tua scelta.\n• Scegli un'abilita' in cui hai competenza. Ottieni esperienza in quell'abilita', il che significa che il tuo bonus di competenza viene raddoppiato per ogni prova di caratteristica che effettui che la utilizzi.",
     "description_en": "You have a knack for learning new things. You gain the following benefits: You gain one skill proficiency of your choice, one tool proficiency of your choice, and fluency in one language of your choice. Choose one skill in which you have proficiency. You gain expertise with that skill, which means your proficiency bonus is doubled for any ability check you make with it. The skill you choose must be one that isn't already benefiting from a feature, such as Expertise, that doubles your proficiency bonus.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Resiliente": {
     "name": "Resiliente",
@@ -979,20 +1007,6 @@
     "wikidot_filled": true,
     "translated": true
   },
-  "Rudimenti da Guerriero": {
-    "name": "Rudimenti da Guerriero",
-    "name_en": "Fighting Initiate",
-    "slug": "fighting_initiate",
-    "source": "Tasha's Cauldron of Everything",
-    "source_short": "TCoE",
-    "prerequisites": "Proficiency with a martial weapon",
-    "prerequisites_en": "Proficiency with a martial weapon",
-    "description": "Your martial training has helped you develop a particular style of fighting. As a result, you learn one Fighting Style option of your choice from the fighter class. If you already have a style, the one you choose must be different. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace this feat's fighting style with another one from the fighter class that you don't have.",
-    "description_en": "Your martial training has helped you develop a particular style of fighting. As a result, you learn one Fighting Style option of your choice from the fighter class. If you already have a style, the one you choose must be different. Whenever you reach a level that grants the Ability Score Improvement feature, you can replace this feat's fighting style with another one from the fighter class that you don't have.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
-  },
   "Scomparire": {
     "name": "Scomparire",
     "name_en": "Fade away",
@@ -1001,11 +1015,11 @@
     "source_short": "XGtE",
     "prerequisites": "Gnomo",
     "prerequisites_en": "Gnome",
-    "description": "Your people are clever, with a knack for illusion magic. You have learned a magical trick for fading away when you suffer harm. You gain the following benefits:\n- Increase your Dexterity or Intelligence score by 1, to a maximum of 20.\n- Immediately after you take damage, you can use a reaction to magically become invisible until the end of your next turn or until you attack, deal damage, or force someone to make a saving throw. Once you use this ability, you can't do so again until you finish a short or long rest.",
+    "description": "L'ingegnosita' tipica della tua razza ti ha permesso di affinare le tue capacita' magiche di occultamento. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza o Intelligenza, fino a un massimo di 20.\n• Subito dopo aver subito danni, puoi usare la tua reazione per diventare magicamente invisibile fino alla fine del tuo prossimo turno o finche' non effettui un attacco, infliggi danni o forzi un altro a un tiro salvezza. Una volta usata questa capacita', non puoi usarla di nuovo finche' non termini un riposo breve o lungo.",
     "description_en": "Your people are clever, with a knack for illusion magic. You have learned a magical trick for fading away when you suffer harm. You gain the following benefits:\n- Increase your Dexterity or Intelligence score by 1, to a maximum of 20.\n- Immediately after you take damage, you can use a reaction to magically become invisible until the end of your next turn or until you attack, deal damage, or force someone to make a saving throw. Once you use this ability, you can't do so again until you finish a short or long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Seconda Possibilita'": {
     "name": "Seconda Possibilita'",
@@ -1015,11 +1029,11 @@
     "source_short": "XGtE",
     "prerequisites": "Halfling",
     "prerequisites_en": "Halfling",
-    "description": "Fortune favors you when someone tries to strike you. You gain the following benefits:\n- Increase your Dexterity, Constitution, or Charisma score by 1, to a maximum of 20.\n- When a creature you can see hits you with an attack roll, you can use your reaction to force that creature to reroll. Once you use this ability, you can't use it again until you roll initiative at the start of combat or until you finish a short or long rest.",
+    "description": "La fortuna ti favorisce. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, Costituzione o Carisma, fino a un massimo di 20.\n• Quando una creatura che puoi vedere ti colpisce con un attacco, puoi usare la tua reazione per costringerla a ritirare il tiro. Se la creatura ti colpisce di nuovo, l'attacco la colpisce. Una volta usata questa capacita', non puoi usarla di nuovo fino all'inizio del tuo prossimo turno o finche' non termini un riposo breve o lungo.",
     "description_en": "Fortune favors you when someone tries to strike you. You gain the following benefits:\n- Increase your Dexterity, Constitution, or Charisma score by 1, to a maximum of 20.\n- When a creature you can see hits you with an attack roll, you can use your reaction to force that creature to reroll. Once you use this ability, you can't use it again until you roll initiative at the start of combat or until you finish a short or long rest.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Sentinella": {
     "name": "Sentinella",
@@ -1049,20 +1063,6 @@
     "wikidot_filled": false,
     "translated": true
   },
-  "Stile Penetrante": {
-    "name": "Stile Penetrante",
-    "name_en": "Piercer",
-    "slug": "piercer",
-    "source": "Tasha's Cauldron of Everything",
-    "source_short": "TCoE",
-    "prerequisites": null,
-    "prerequisites_en": null,
-    "description": "You have achieved a penetrating precision in combat, granting you the following benefits: Increase your Strength or Dexterity by 1, to a maximum of 20. Once per turn, when you hit a creature with an attack that deals piercing damage, you can re-roll one of the attack's damage dice, and you must use the new roll. When you score a critical hit that deals piercing damage to a creature, you can roll one additional damage die when determining the extra piercing damage the target takes.",
-    "description_en": "You have achieved a penetrating precision in combat, granting you the following benefits: Increase your Strength or Dexterity by 1, to a maximum of 20. Once per turn, when you hit a creature with an attack that deals piercing damage, you can re-roll one of the attack's damage dice, and you must use the new roll. When you score a critical hit that deals piercing damage to a creature, you can roll one additional damage die when determining the extra piercing damage the target takes.",
-    "not_ogl": false,
-    "wikidot_filled": false,
-    "translated": false
-  },
   "Telecinesi": {
     "name": "Telecinesi",
     "name_en": "Telekinetic",
@@ -1071,11 +1071,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You learn to move things with your mind, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the mage hand cantrip. You can cast it without verbal or somatic components, and you can make the spectral hand invisible. If you already know this spell, its range increases by 30 feet when you cast it. Its spellcasting ability is the ability increased by this feat. As a bonus action, you can try to telekinetically shove one creature you can see within 30 feet of you. When you do so, the target must succeed on a Strength saving throw (DC 8 + your proficiency bonus + the ability modifier of the score increased by this feat) or be moved 5 feet toward or away from you. A creature can willingly fail this save.",
+    "description": "Apprendi a spostare oggetti e creature con la mente. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo mano magica. Puoi lanciarlo senza componenti verbali o somatiche e puoi rendere la mano invisibile. Se hai gia' questo trucchetto, la sua portata aumenta di 9 metri quando lo lanci. Inoltre, puoi effettuare il compito addizionale di mano magica come azione bonus.\n• Come azione bonus puoi cercare di telecineticamente spingere una creatura che puoi vedere entro 9 metri. La creatura deve superare un tiro salvezza su Forza (CD 8 + il tuo bonus di competenza + il modificatore della caratteristica scelta), oppure viene spinta di 1,5 metri lontano da te o vicino a te.",
     "description_en": "You learn to move things with your mind, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You learn the mage hand cantrip. You can cast it without verbal or somatic components, and you can make the spectral hand invisible. If you already know this spell, its range increases by 30 feet when you cast it. Its spellcasting ability is the ability increased by this feat. As a bonus action, you can try to telekinetically shove one creature you can see within 30 feet of you. When you do so, the target must succeed on a Strength saving throw (DC 8 + your proficiency bonus + the ability modifier of the score increased by this feat) or be moved 5 feet toward or away from you. A creature can willingly fail this save.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Telepatia": {
     "name": "Telepatia",
@@ -1085,11 +1085,11 @@
     "source_short": "TCoE",
     "prerequisites": null,
     "prerequisites_en": null,
-    "description": "You awaken the ability to mentally connect with others, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You can speak telepathically to any creature you can see within 60 feet of you. Your telepathic utterances are in a language you know, and the creature understands you only if it knows that language. Your communication doesn't give the creature the ability to respond to you telepathically. You can cast the Detect Thoughts spell, requiring no spell slot or components, and you must finish a long rest before you can cast it this way again. Your spellcasting ability for the spell is the ability increased by this feat. If you have spell slots of 2nd level or higher, you can cast this spell with them.",
+    "description": "Senti l'inizio del potere mentale, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Puoi parlare telepaticamente con qualsiasi creatura che vedi entro 18 metri. Non e' necessario condividere una lingua, ma la creatura deve essere in grado di comprenderne almeno una.\n• Puoi lanciare l'incantesimo individuazione del pensiero, senza usare uno slot incantesimo o componenti materiali. Una volta lanciato in questo modo, non puoi piu' farlo finche' non termini un riposo lungo. Puoi anche lanciarlo usando uno slot incantesimo che possiedi. La caratteristica da incantatore e' la stessa che hai aumentato con questo talento.",
     "description_en": "You awaken the ability to mentally connect with others, granting you the following benefits: Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. You can speak telepathically to any creature you can see within 60 feet of you. Your telepathic utterances are in a language you know, and the creature understands you only if it knows that language. Your communication doesn't give the creature the ability to respond to you telepathically. You can cast the Detect Thoughts spell, requiring no spell slot or components, and you must finish a long rest before you can cast it this way again. Your spellcasting ability for the spell is the ability increased by this feat. If you have spell slots of 2nd level or higher, you can cast this spell with them.",
     "not_ogl": false,
     "wikidot_filled": false,
-    "translated": false
+    "translated": true
   },
   "Teletrasporto Fatato": {
     "name": "Teletrasporto Fatato",
@@ -1099,11 +1099,11 @@
     "source_short": "XGtE",
     "prerequisites": "Elfo (alto)",
     "prerequisites_en": "Elf (high)",
-    "description": "Your study of high elven lore has unlocked fey power that few other elves possess, except your eladrin cousins. Drawing on your fey ancestry, you can momentarily stride through the Feywild to shorten your path from one place to another. You gain the following benefits:\n- Increase your Intelligence or Charisma score by 1, to a maximum of 20.\n- You learn to speak, read, and write Sylvan\n- You learn the Misty Step spell and can cast it once without expending a spell slot. You regain the ability to cast it in this way when you finish a short or long rest. Intelligence is your spellcasting ability for this spell.",
+    "description": "Studiando un raro metodo per teletrasportarsi sviluppato nelle Terre Fatate, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza o Carisma, fino a un massimo di 20.\n• Apprendi a parlare, leggere e scrivere il silvano.\n• Apprendi il trucchetto suono illusorio. Inoltre, apprendi l'incantesimo passo velato che puoi lanciare senza usare uno slot incantesimo. Recuperi la capacita' di lanciarlo in questo modo dopo aver terminato un riposo breve o lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi del livello appropriato. Intelligenza e' la tua caratteristica da incantatore per questi incantesimi.",
     "description_en": "Your study of high elven lore has unlocked fey power that few other elves possess, except your eladrin cousins. Drawing on your fey ancestry, you can momentarily stride through the Feywild to shorten your path from one place to another. You gain the following benefits:\n- Increase your Intelligence or Charisma score by 1, to a maximum of 20.\n- You learn to speak, read, and write Sylvan\n- You learn the Misty Step spell and can cast it once without expending a spell slot. You regain the ability to cast it in this way when you finish a short or long rest. Intelligence is your spellcasting ability for this spell.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Tempra Nanica": {
     "name": "Tempra Nanica",
@@ -1113,11 +1113,11 @@
     "source_short": "XGtE",
     "prerequisites": "Nano",
     "prerequisites_en": "Dwarf",
-    "description": "You have the blood of dwarf heroes flowing through your veins. You gain the following benefits:\n- Increase your Constitution score by 1, to a maximum of 20.\n- Whenever you take the Dodge action in combat, you can spend one Hit Die to heal yourself. Roll the die, add your Constitution modifier, and regain a number of hit points equal to the total (minimum of 1).",
+    "description": "Possiedi la leggendaria tempra dei tuoi antenati, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione, fino a un massimo di 20.\n• Quando effettui l'azione di Disimpegno o Scattare, puoi usare un'azione bonus per spendere un dado vita, tirarlo e aggiungerci il tuo modificatore di Costituzione, e recuperare un numero di punti ferita pari al risultato (minimo 1).",
     "description_en": "You have the blood of dwarf heroes flowing through your veins. You gain the following benefits:\n- Increase your Constitution score by 1, to a maximum of 20.\n- Whenever you take the Dodge action in combat, you can spend one Hit Die to heal yourself. Roll the die, add your Constitution modifier, and regain a number of hit points equal to the total (minimum of 1).",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   },
   "Tenace": {
     "name": "Tenace",
@@ -1155,10 +1155,10 @@
     "source_short": "BGG",
     "prerequisites": "4th Level, Strike of the Giants (Hill Strike) feat",
     "prerequisites_en": "4th Level, Strike of the Giants (Hill Strike) feat",
-    "description": "You've manifested the resilience emblematic of hill giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Bulwark. When you are subjected to an effect that would move you at least 5 feet or give you the prone condition, you can use your reaction to steady yourself. You aren't moved and don't have the prone condition.\n- Iron Stomach. Whenever you eat food as part of a short rest and spend one or more Hit Dice to regain hit points, you regain additional hit points equal to your Constitution modifier + your proficiency bonus.",
+    "description": "Possiedi la straordinaria robustezza dei giganti delle colline, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione o Saggezza, fino a un massimo di 20.\n• Quando un effetto ti costringerebbe a muoverti contro la tua volonta' o a finire prono, puoi usare la tua reazione per non subire l'effetto. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.",
     "description_en": "You've manifested the resilience emblematic of hill giants, granting you the following benefits:\n- Ability Score Increase. Increase your Strength, Constitution, or Wisdom score by 1, to a maximum of 20.\n- Bulwark. When you are subjected to an effect that would move you at least 5 feet or give you the prone condition, you can use your reaction to steady yourself. You aren't moved and don't have the prone condition.\n- Iron Stomach. Whenever you eat food as part of a short rest and spend one or more Hit Dice to regain hit points, you regain additional hit points equal to your Constitution modifier + your proficiency bonus.",
     "not_ogl": true,
     "wikidot_filled": true,
-    "translated": false
+    "translated": true
   }
 }

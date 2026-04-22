@@ -1808,10 +1808,22 @@
 .scheda-hd-total-clickable:hover { color: var(--accent); }
 
 /* Picker Stili di Combattimento */
-.fs-picker-modal { width: 600px; max-width: 95vw; max-height: 85vh; display: flex; flex-direction: column; }
+.fs-picker-modal { width: 720px; max-width: 95vw; max-height: 90vh; display: flex; flex-direction: column; }
+.fs-pick-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.fs-pick-filter-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.fs-pick-filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.fs-pick-filter-pills .filter-pill { font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--text); transition: all var(--transition-fast); }
+.fs-pick-filter-pills .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+.fs-pick-filter-pills .filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fs-pick-filter-pills .filter-pill small { opacity: 0.85; margin-left: 3px; font-weight: 500; }
 .fs-pick-class { margin-bottom: 14px; }
 .fs-pick-class-title { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
 .fs-pick-class-title small { font-weight: 600; color: var(--text-muted); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+.fs-pick-slots { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 4px 0 4px; }
+.fs-pick-slot-btn { font-size: 0.74rem; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--text-muted); transition: all var(--transition-fast); }
+.fs-pick-slot-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fs-pick-slot-btn.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.fs-pick-slot-btn.is-full { opacity: 0.4; cursor: not-allowed; }
 .fs-pick-list { display: flex; flex-direction: column; gap: 4px; }
 .fs-pick-row {
     background: var(--bg);

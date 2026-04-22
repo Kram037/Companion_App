@@ -7,7 +7,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Archery',
         source_short: 'PHB',
         description: "Ottieni un bonus di +2 ai tiri per colpire effettuati con le armi a distanza.",
-        classes: ['Combattente', 'Ranger'],
+        classes: ['Guerriero', 'Ranger'],
     },
     'blind-fighting': {
         slug: 'blind-fighting',
@@ -15,7 +15,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Blind Fighting',
         source_short: 'TCoE',
         description: "Hai vista cieca con una portata di 3 metri. Entro questa portata, puoi vedere efficacemente tutto cio' che non e' dietro a copertura totale, anche se sei accecato o nell'oscurita'. Inoltre, puoi vedere una creatura invisibile entro questa portata, a meno che non riesca a nascondersi da te.",
-        classes: ['Combattente', 'Paladino', 'Ranger'],
+        classes: ['Guerriero', 'Paladino', 'Ranger'],
     },
     'defense': {
         slug: 'defense',
@@ -23,7 +23,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Defense',
         source_short: 'PHB',
         description: "Quando indossi un'armatura, ottieni un bonus di +1 alla CA.",
-        classes: ['Combattente', 'Paladino', 'Ranger'],
+        classes: ['Guerriero', 'Paladino', 'Ranger'],
     },
     'dueling': {
         slug: 'dueling',
@@ -31,7 +31,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Dueling',
         source_short: 'PHB',
         description: "Quando impugni un'arma da mischia in una mano e nessun'altra arma, ottieni un bonus di +2 ai tiri dei danni con quell'arma.",
-        classes: ['Combattente', 'Paladino', 'Ranger'],
+        classes: ['Guerriero', 'Paladino', 'Ranger'],
     },
     'great-weapon-fighting': {
         slug: 'great-weapon-fighting',
@@ -39,7 +39,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Great Weapon Fighting',
         source_short: 'PHB',
         description: "Quando ottieni 1 o 2 su un dado di danno per un attacco effettuato con un'arma da mischia che impugni con due mani, puoi ritirare il dado e devi usare il nuovo risultato, anche se questo e' di nuovo 1 o 2. L'arma deve avere la proprieta' due mani o versatile per ottenere questo beneficio.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
     'interception': {
         slug: 'interception',
@@ -47,7 +47,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Interception',
         source_short: 'TCoE',
         description: "Quando una creatura che puoi vedere colpisce un bersaglio, diverso da te, entro 1,5 metri da te con un attacco, puoi usare la tua reazione per ridurre i danni che il bersaglio subisce di 1d10 + il tuo bonus di competenza (fino a un minimo di 0 danni). Devi impugnare uno scudo o un'arma semplice o da guerra per usare questa reazione.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
     'protection': {
         slug: 'protection',
@@ -55,7 +55,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Protection',
         source_short: 'PHB',
         description: "Quando una creatura che puoi vedere attacca un bersaglio diverso da te entro 1,5 metri da te, puoi usare la tua reazione per imporre svantaggio al tiro per colpire. Devi impugnare uno scudo.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
     'two-weapon-fighting': {
         slug: 'two-weapon-fighting',
@@ -63,7 +63,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Two-Weapon Fighting',
         source_short: 'PHB',
         description: "Quando ti impegni in combattimento con due armi, puoi sommare il tuo modificatore di caratteristica al danno del secondo attacco.",
-        classes: ['Combattente', 'Ranger'],
+        classes: ['Guerriero', 'Ranger'],
     },
     'thrown-weapon-fighting': {
         slug: 'thrown-weapon-fighting',
@@ -71,15 +71,15 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Thrown Weapon Fighting',
         source_short: 'TCoE',
         description: "Puoi estrarre un'arma con la proprieta' lanciare come parte dell'attacco che effettui con essa. Inoltre, quando colpisci con un attacco a distanza usando un'arma da lancio, ottieni un bonus di +2 al tiro dei danni (Paladino: +1).",
-        classes: ['Combattente', 'Paladino', 'Ranger'],
+        classes: ['Guerriero', 'Paladino', 'Ranger'],
     },
     'unarmed-fighting': {
         slug: 'unarmed-fighting',
         name: 'Combattere Disarmato',
         name_en: 'Unarmed Fighting',
         source_short: 'TCoE',
-        description: "I tuoi attacchi senz'armi possono infliggere danni contundenti pari a 1d6 + il tuo modificatore di Forza in caso di colpo. Se non impugni armi ne uno scudo (Combattente) o se colpisci con due mani libere (Paladino), il d6 diventa un d8.\nAll'inizio di ognuno dei tuoi turni puoi infliggere 1d4 danni contundenti a una creatura che hai afferrato.",
-        classes: ['Combattente', 'Paladino'],
+        description: "I tuoi attacchi senz'armi possono infliggere danni contundenti pari a 1d6 + il tuo modificatore di Forza in caso di colpo. Se non impugni armi ne uno scudo (Guerriero) o se colpisci con due mani libere (Paladino), il d6 diventa un d8.\nAll'inizio di ognuno dei tuoi turni puoi infliggere 1d4 danni contundenti a una creatura che hai afferrato.",
+        classes: ['Guerriero', 'Paladino'],
     },
     'superior-technique': {
         slug: 'superior-technique',
@@ -87,7 +87,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Superior Technique',
         source_short: 'TCoE',
         description: "Impari una manovra a tua scelta tra quelle disponibili per l'archetipo Maestro di Battaglia. Se una manovra che usi richiede al tuo bersaglio di effettuare un tiro salvezza, la CD del tiro salvezza e' pari a 8 + il tuo bonus di competenza + il tuo modificatore di Forza o Destrezza (a tua scelta).\nOttieni un dado di superiorita', un d6 (questo dado si somma a qualsiasi dado di superiorita' tu abbia da un'altra fonte). Questo dado alimenta le tue manovre. Un dado di superiorita' viene speso quando lo usi. Recuperi i dadi di superiorita' spesi quando termini un riposo breve o lungo.",
-        classes: ['Combattente'],
+        classes: ['Guerriero'],
     },
     'blessed-warrior': {
         slug: 'blessed-warrior',
@@ -112,7 +112,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Close Quarters Shooter',
         source_short: 'UA',
         description: "Quando effettui un attacco a distanza mentre ti trovi entro 1,5 metri da una creatura ostile, non subisci svantaggio al tiro per colpire. I tuoi attacchi a distanza ignorano la copertura parziale e i tre quarti di copertura contro bersagli entro 9 metri da te. Ottieni un bonus di +1 ai tiri per colpire negli attacchi a distanza.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
     'mariner': {
         slug: 'mariner',
@@ -120,7 +120,7 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Mariner',
         source_short: 'UA',
         description: "Finche' non indossi armatura pesante e non usi uno scudo, hai una velocita' di nuoto e una velocita' di scalata pari alla tua velocita' normale, e ottieni un bonus di +1 alla classe armatura.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
     'tunnel-fighter': {
         slug: 'tunnel-fighter',
@@ -128,6 +128,6 @@ window.FIGHTING_STYLES_DATA = Object.assign(window.FIGHTING_STYLES_DATA || {}, {
         name_en: 'Tunnel Fighter',
         source_short: 'UA',
         description: "Come azione bonus, puoi entrare in una postura difensiva che dura fino all'inizio del tuo prossimo turno. Mentre sei nella postura difensiva, puoi effettuare attacchi di opportunita' senza usare la tua reazione, e puoi usare la tua reazione per effettuare un attacco in mischia contro una creatura che si muove di piu' di 1,5 metri mentre e' a tua portata.",
-        classes: ['Combattente', 'Paladino'],
+        classes: ['Guerriero', 'Paladino'],
     },
 });

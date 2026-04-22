@@ -1,6 +1,5 @@
 {
   "_comment": "Override IT per i talenti. La chiave e' il nome inglese (come trovato nel PDF). I campi sono opzionali: name (nome IT), description (testo IT), prerequisites (prerequisiti IT). Se mancano, lo script usa il nome inglese e la descrizione inglese del PDF / wikidot.",
-
   "Actor": {
     "name": "Attore",
     "description": "Esperto in mimica e recitazione, ottieni i seguenti benefici:\n• Aumenti il tuo Carisma di 1, fino a un massimo di 20.\n• Hai vantaggio alle prove di Carisma (Inganno) e Carisma (Intrattenere) quando cerchi di farti passare per un'altra persona.\n• Puoi imitare la voce di un'altra persona o i versi di altre creature. Devi aver sentito la persona parlare o la creatura emettere il verso per almeno 1 minuto. Una prova di Saggezza (Intuizione) riuscita contrapposta alla tua prova di Carisma (Inganno) permette a chi ascolta di stabilire che l'effetto e' simulato."
@@ -34,7 +33,10 @@
     "name": "Esperto di Balestre",
     "description": "Grazie all'intenso esercizio con la balestra, ottieni i seguenti benefici:\n• Ignori la qualita' di caricamento delle balestre con cui sei competente.\n• Trovarsi entro 1,5 metri da una creatura ostile non impone svantaggio ai tuoi tiri per colpire a distanza.\n• Quando usi l'azione di Attaccare e attacchi con un'arma a una mano, puoi usare un'azione bonus per attaccare con una balestra a mano che impugni."
   },
-  "Crusher": { "name": "Martello Vivente" },
+  "Crusher": {
+    "name": "Martello Vivente",
+    "description": "Sei un esperto a infliggere colpi schiaccianti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Una volta per turno, quando colpisci una creatura con un attacco che infligge danni contundenti, puoi spostarla di 1,5 metri in uno spazio libero, se non e' di taglia piu' grande della Grande.\n• Quando ottieni un colpo critico con un attacco che infligge danni contundenti, i tiri per colpire contro il bersaglio sono effettuati con vantaggio fino all'inizio del tuo prossimo turno."
+  },
   "Defensive Duelist": {
     "name": "Duellante Difensivo",
     "prerequisites": "Destrezza 13 o superiore",
@@ -57,8 +59,15 @@
     "prerequisites": "Capacita' di lanciare almeno un incantesimo",
     "description": "Quando ottieni questo talento, scegli uno tra i seguenti tipi di danno: acido, freddo, fuoco, fulmine o tuono.\nGli incantesimi che lanci ignorano la resistenza ai danni del tipo scelto. Inoltre, quando tiri i danni di un incantesimo che infligge danni di quel tipo, puoi trattare ciascun 1 sui dadi di danno come un 2.\nPuoi scegliere questo talento piu' volte. Ogni volta che lo fai, devi scegliere un tipo di danno diverso."
   },
-  "Fey Touched": { "name": "Contaminazione Fatata" },
-  "Fighting Initiate": { "name": "Rudimenti da Guerriero" },
+  "Fey Touched": {
+    "name": "Contaminazione Fatata",
+    "description": "La tua mistica esposizione alle Terre Fatate ti ha conferito potere magico, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi gli incantesimi salto a misteriosa scomparsa e un incantesimo del 1° livello a tua scelta della scuola di Divinazione o Invocazione. Puoi lanciare ognuno una volta senza usare uno slot incantesimo, e recuperi la capacita' di lanciarli in questo modo quando termini un riposo lungo. Puoi anche lanciare questi incantesimi usando slot incantesimo che possiedi del livello appropriato. La caratteristica da incantatore per questi incantesimi e' la stessa caratteristica che hai aumentato con questo talento."
+  },
+  "Fighting Initiate": {
+    "name": "Adepto al Combattimento",
+    "prerequisites": "Competenza in un'arma marziale",
+    "description": "I tuoi allenamenti marziali ti hanno preparato all'uso di stili di combattimento dei combattenti. Apprendi uno Stile di Combattimento a tua scelta dalla lista del combattente. Ogni volta che ottieni un livello, puoi sostituire questo Stile di Combattimento con un altro della lista del combattente che non possiedi gia'."
+  },
   "Grappler": {
     "name": "Lottatore",
     "prerequisites": "Forza 13 o superiore",
@@ -68,12 +77,19 @@
     "name": "Maestro d'Armi Possenti",
     "description": "Hai imparato a usare il peso di un'arma a tuo vantaggio, sferrando colpi che hanno una potenza superiore al normale. Ottieni i seguenti benefici:\n• Quando ottieni un colpo critico o riduci a 0 punti ferita una creatura con un attacco in mischia, puoi effettuare un attacco con un'arma da mischia come azione bonus.\n• Prima di effettuare un attacco con un'arma da mischia con cui sei competente e che possiede la qualita' pesante, puoi scegliere di subire una penalita' di -5 al tiro per colpire dell'attacco. Se l'attacco va a segno, infliggi un bonus di +10 al tiro per i danni dell'attacco."
   },
-  "Gunner": { "name": "Pistolero" },
+  "Gunner": {
+    "name": "Artigliere",
+    "description": "Hai un'estesa pratica con armi da fuoco, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, fino a un massimo di 20.\n• Ottieni la competenza con le armi da fuoco.\n• Ignori la qualita' di caricamento delle armi da fuoco con cui sei competente.\n• Trovarsi entro 1,5 metri da una creatura ostile non impone svantaggio ai tuoi tiri per colpire a distanza."
+  },
   "Healer": {
     "name": "Guaritore",
     "description": "Sei un guaritore esperto, in grado di aiutare con rapidita' chi e' ferito. Ottieni i seguenti benefici:\n• Quando usi un kit del guaritore per stabilizzare una creatura morente, questa recupera anche 1 punto ferita.\n• Come azione, puoi consumare un utilizzo di un kit del guaritore per curare una creatura, facendole recuperare 1d6 + 4 punti ferita, piu' un numero di punti ferita pari al numero massimo di Dadi Vita della creatura. La creatura non puo' recuperare ulteriormente punti ferita in questo modo finche' non termina un riposo breve o lungo."
   },
-  "Heavily Armored": { "name": "Corazze Pesanti" },
+  "Heavily Armored": {
+    "name": "Armatura Pesante",
+    "prerequisites": "Competenza nelle armature medie",
+    "description": "Hai allenato il tuo corpo per sopportare il peso delle armature pesanti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature pesanti."
+  },
   "Heavy Armor Master": {
     "name": "Maestro delle Armature Pesanti",
     "prerequisites": "Competenza nelle armature pesanti",
@@ -88,7 +104,10 @@
     "name": "Mente Acuta",
     "description": "Hai una mente in grado di tenere traccia del tempo, della direzione e dei dettagli con un'enorme precisione. Ottieni i seguenti benefici:\n• Aumenti la tua Intelligenza di 1, fino a un massimo di 20.\n• Sai sempre in che direzione si trova il nord.\n• Sai sempre quante ore mancano al prossimo tramonto e alla prossima alba.\n• Sai sempre richiamare alla mente con precisione qualsiasi cosa tu abbia visto o sentito nell'ultimo mese."
   },
-  "Lightly Armored": { "name": "Corazze Leggere" },
+  "Lightly Armored": {
+    "name": "Armatura Leggera",
+    "description": "Hai allenato il tuo corpo per indossare armature leggere, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature leggere."
+  },
   "Linguist": {
     "name": "Linguista",
     "description": "Hai studiato lingue e codici, ottenendo i seguenti benefici:\n• Aumenti la tua Intelligenza di 1, fino a un massimo di 20.\n• Apprendi tre lingue a tua scelta.\n• Puoi creare in modo capace cifre scritte. Gli altri non possono decifrare un codice da te realizzato a meno che non glielo insegni, riescano in una prova di Intelligenza (DC pari a 10 + il tuo punteggio di Intelligenza) o usino la magia per decifrarlo."
@@ -109,13 +128,25 @@
     "name": "Adepto Marziale",
     "description": "Hai una formazione marziale che ti permette di eseguire manovre speciali e ottenere i seguenti benefici:\n• Apprendi due manovre a tua scelta tra quelle disponibili per l'archetipo Maestro di Battaglia del guerriero. Se una manovra che usi richiede al bersaglio di effettuare un tiro salvezza per resistere ai suoi effetti, la CD del tiro salvezza e' pari a 8 + il tuo bonus di competenza + il tuo modificatore di Forza o Destrezza (a tua scelta).\n• Se hai gia' dadi di superiorita', ne ottieni uno in piu'; altrimenti ottieni un dado di superiorita' (un d6). Questo dado viene usato per alimentare le tue manovre. Recuperi il dado di superiorita' speso quando finisci un riposo breve o lungo."
   },
-  "Medium Armor Master": { "name": "Maestro delle Armature Medie" },
-  "Metamagic Adept": { "name": "Adepto di Metamagia" },
+  "Medium Armor Master": {
+    "name": "Maestro delle Armature Medie",
+    "prerequisites": "Competenza nelle armature medie",
+    "description": "Hai praticato il movimento in armatura media per ottenere i seguenti benefici:\n• Indossare armature medie non ti impone svantaggio nelle prove di Destrezza (Furtivita').\n• Quando indossi un'armatura media, puoi sommare 3 (anziche' 2) al tuo modificatore di Destrezza per determinare la tua Classe Armatura, se il tuo modificatore di Destrezza e' di almeno +3."
+  },
+  "Metamagic Adept": {
+    "name": "Adepto Metamagico",
+    "prerequisites": "Capacita' di incantare",
+    "description": "Studi le sottigliezze della magia, ottenendo i seguenti benefici:\n• Apprendi due opzioni di Metamagia a tua scelta tra quelle dello stregone. Se in seguito apprendi un'opzione di Metamagia, puoi sostituire una delle opzioni che hai appreso da questo talento.\n• Ottieni 2 punti stregoneria per spendere le opzioni di Metamagia (questi punti si sommano ad eventuali altri punti stregoneria che possiedi). Recuperi tutti i punti stregoneria spesi quando termini un riposo lungo."
+  },
   "Mobile": {
     "name": "Mobilita'",
     "description": "Sei eccezionalmente veloce e agile. Ottieni i seguenti benefici:\n• La tua velocita' aumenta di 3 metri.\n• Quando usi l'azione di Scattare, il terreno difficile non ti costa movimento extra in quel turno.\n• Quando effettui un attacco in mischia contro una creatura, non subisci attacchi di opportunita' da quella creatura per il resto del turno, sia che tu la colpisca o meno."
   },
-  "Moderately Armored": { "name": "Corazze Medie" },
+  "Moderately Armored": {
+    "name": "Armatura Media",
+    "prerequisites": "Competenza nelle armature leggere",
+    "description": "Hai allenato il tuo corpo per indossare armature piu' pesanti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Ottieni la competenza nelle armature medie e con gli scudi."
+  },
   "Mounted Combatant": {
     "name": "Combattente in Sella",
     "description": "Sei un temibile guerriero a cavallo. Mentre sei in groppa a una cavalcatura e non sei incapacitato, ottieni i seguenti benefici:\n• Hai vantaggio ai tiri per colpire effettuati contro una creatura non in groppa di taglia inferiore alla tua cavalcatura.\n• Puoi obbligare un attacco diretto alla tua cavalcatura a essere diretto a te.\n• Se la tua cavalcatura e' soggetta a un effetto che gli permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, non subisce danni in caso di successo e dimezza i danni in caso di fallimento."
@@ -124,12 +155,18 @@
     "name": "Osservatore",
     "description": "Veloce nel notare i dettagli del tuo ambiente, ottieni i seguenti benefici:\n• Aumenti la tua Intelligenza o Saggezza di 1, fino a un massimo di 20.\n• Se vedi la bocca di una creatura mentre parla una lingua che comprendi, puoi capire le sue parole leggendole sul labiale.\n• Ottieni un bonus di +5 ai punteggi di Saggezza (Percezione) passiva e Intelligenza (Indagare) passiva."
   },
-  "Piercer": { "name": "Stile Penetrante" },
+  "Piercer": {
+    "name": "Penetrante",
+    "description": "Hai raggiunto un livello di expertise nell'uso di armi penetranti, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Una volta per turno, quando ottieni i danni di un attacco con un'arma che infligge danni perforanti, puoi ritirare uno dei dadi danni dell'arma e devi usare il nuovo risultato.\n• Quando ottieni un colpo critico con un'arma che infligge danni perforanti, puoi tirare un dado di danno aggiuntivo determinando i danni perforanti aggiuntivi del bersaglio."
+  },
   "Polearm Master": {
     "name": "Maestro delle Armi su Asta",
     "description": "Sai usare le armi inastate per tenere a bada gli avversari, ottenendo i seguenti benefici:\n• Quando esegui l'azione di Attacco e attacchi solo con un'arma su asta semplice (ascia battaglia, alabarda o lancia da fante), puoi usare un'azione bonus per effettuare un attacco in mischia con l'altra estremita' dell'arma. L'attacco usa lo stesso modificatore di caratteristica dell'attacco principale. L'arma infligge 1d4 danni contundenti.\n• Mentre stai impugnando un'arma su asta semplice o lunga (ascia battaglia, alabarda, lancia da fante o quarterstaff), gli altri reagiranno con il tuo attacco di opportunita' quando entrano nel raggio di portata della tua arma."
   },
-  "Poisoner": { "name": "Maestria dei Veleni" },
+  "Poisoner": {
+    "name": "Avvelenatore",
+    "description": "Sei in grado di infliggere veleni devastanti, ottenendo i seguenti benefici:\n• Quando effettui un attacco con un'arma che infligge danni da veleno, ignori la resistenza ai danni da veleno.\n• Puoi usare un'azione bonus per applicare il veleno (incluse le armi disponibili dal Cap. 5 del PHB) a un'arma o fino a tre frecce/proiettili. Il veleno aggiunge 2d8 danni da veleno e impone un tiro salvezza su Costituzione (CD 14): in caso di fallimento il bersaglio e' avvelenato per 1 minuto, con la possibilita' di ripetere il tiro alla fine di ognuno dei suoi turni.\n• Sei competente con il kit dell'avvelenatore. Con un'ora di lavoro e usando il kit, puoi creare un'unita' del veleno descritto sopra spendendo 50 mo di componenti."
+  },
   "Resilient": {
     "name": "Resiliente",
     "description": "Scegli una caratteristica. Ottieni i seguenti benefici:\n• Aumenti il punteggio della caratteristica scelta di 1, fino a un massimo di 20.\n• Ottieni la competenza nei tiri salvezza con la caratteristica scelta."
@@ -141,7 +178,7 @@
   },
   "Savage Attacker": {
     "name": "Aggressore Selvaggio",
-    "description": "Una volta a turno, quando tiri i danni per un attacco con un'arma da mischia, puoi tirare di nuovo i dadi di danno dell'arma e usare uno dei due risultati."
+    "description": "Una volta per turno, quando tiri i danni di un attacco con un'arma in mischia, puoi ritirare i dadi dei danni dell'arma e usare il risultato che preferisci."
   },
   "Sentinel": {
     "name": "Sentinella",
@@ -155,13 +192,23 @@
     "name": "Maestro degli Scudi",
     "description": "Usi gli scudi non solo per la protezione ma anche come arma offensiva. Mentre impugni uno scudo, ottieni i seguenti benefici:\n• Se esegui l'azione di Attacco nel tuo turno, puoi usare un'azione bonus per cercare di spingere a terra una creatura entro 1,5 metri da te con il tuo scudo.\n• Se non sei incapacitato, puoi aggiungere il tuo bonus alla CA dello scudo a qualsiasi tiro salvezza su Destrezza che effettui contro un incantesimo o un altro effetto nocivo che colpisce solo te.\n• Se sei sottoposto a un effetto che ti permette di effettuare un tiro salvezza su Destrezza per dimezzare i danni, puoi usare la tua reazione per non subire danni se il tiro ha successo, interponendo lo scudo tra te e l'origine dell'effetto."
   },
-  "Skill Expert": { "name": "Abilita' Impeccabile" },
+  "Skill Expert": {
+    "name": "Esperto in Abilita'",
+    "description": "Hai sviluppato una particolare esperienza in alcune abilita', ottenendo i seguenti benefici:\n• Aumenti di 1 un punteggio di caratteristica a tua scelta, fino a un massimo di 20.\n• Ottieni competenza in un'abilita' a tua scelta.\n• Scegli un'abilita' in cui hai competenza. Ottieni esperienza in quell'abilita', il che significa che il tuo bonus di competenza viene raddoppiato per ogni prova di caratteristica che effettui che la utilizzi. L'abilita' che scegli non deve essere una in cui hai gia' esperienza."
+  },
   "Skilled": {
     "name": "Abile",
     "description": "Ottieni la competenza in tre abilita' o strumenti a tua scelta, in qualsiasi combinazione."
   },
-  "Skulker": { "name": "Appostato" },
-  "Slasher": { "name": "Lacerante" },
+  "Skulker": {
+    "name": "Appostato",
+    "prerequisites": "Destrezza 13 o superiore",
+    "description": "Sei un esperto nell'eludere lo sguardo altrui, ottenendo i seguenti benefici:\n• Puoi tentare di nasconderti se sei oscurato per metta' dalla creatura da cui ti nascondi.\n• Quando sei nascosto e manchi un bersaglio con un attacco a distanza, l'attacco non rivela la tua posizione.\n• In condizioni di luce fioca non subisci svantaggio alle prove di Saggezza (Percezione) basate sulla vista."
+  },
+  "Slasher": {
+    "name": "Lacerante",
+    "description": "Hai imparato a infliggere ferite devastanti con armi taglienti. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• Una volta per turno, quando colpisci con un'arma che infligge danni taglienti, puoi ridurre la velocita' del bersaglio di 3 metri fino all'inizio del tuo prossimo turno.\n• Quando ottieni un colpo critico con un'arma che infligge danni taglienti, il bersaglio subisce svantaggio ai tiri per colpire fino all'inizio del tuo prossimo turno."
+  },
   "Spell Sniper": {
     "name": "Cecchino Magico",
     "prerequisites": "Capacita' di lanciare almeno un incantesimo",
@@ -171,8 +218,14 @@
     "name": "Lottatore da Taverna",
     "description": "Avvezzo all'uso di armi improvvisate nelle baruffe, ottieni i seguenti benefici:\n• Aumenti la tua Forza o Costituzione di 1, fino a un massimo di 20.\n• Sei competente con le armi improvvisate.\n• I tuoi colpi a mani nude usano un d4 per il tiro dei danni.\n• Quando colpisci una creatura con un attacco con armi improvvisate o a mani nude nel tuo turno, puoi usare un'azione bonus per cercare di afferrarla."
   },
-  "Telekinetic": { "name": "Telecinesi" },
-  "Telepathic": { "name": "Telepatia" },
+  "Telekinetic": {
+    "name": "Telecinesi",
+    "description": "Apprendi a spostare oggetti e creature con la mente. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo mano magica. Puoi lanciarlo senza componenti verbali o somatiche e puoi rendere la mano invisibile. Se hai gia' questo trucchetto, la sua portata aumenta di 9 metri quando lo lanci. Inoltre, puoi effettuare il compito addizionale di mano magica come azione bonus.\n• Come azione bonus puoi cercare di telecineticamente spingere una creatura che puoi vedere entro 9 metri. La creatura deve superare un tiro salvezza su Forza (CD 8 + il tuo bonus di competenza + il modificatore della caratteristica scelta), oppure viene spinta di 1,5 metri lontano da te o vicino a te."
+  },
+  "Telepathic": {
+    "name": "Telepatia",
+    "description": "Senti l'inizio del potere mentale, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Puoi parlare telepaticamente con qualsiasi creatura che vedi entro 18 metri. Non e' necessario condividere una lingua, ma la creatura deve essere in grado di comprenderne almeno una.\n• Puoi lanciare l'incantesimo individuazione del pensiero, senza usare uno slot incantesimo o componenti materiali. Una volta lanciato in questo modo, non puoi piu' farlo finche' non termini un riposo lungo. Puoi anche lanciarlo usando uno slot incantesimo che possiedi. La caratteristica da incantatore e' la stessa che hai aumentato con questo talento."
+  },
   "Tough": {
     "name": "Robusto",
     "description": "Il tuo punteggio massimo di punti ferita aumenta di un valore pari al doppio del tuo livello quando ottieni questo talento. Ogni volta che sali di livello successivamente, il tuo punteggio massimo di punti ferita aumenta di 2 punti ferita aggiuntivi."
@@ -186,39 +239,140 @@
     "name": "Maestro d'Armi",
     "description": "Hai un'estesa pratica con varie armi, ottenendo i seguenti benefici:\n• Aumenti la tua Forza o Destrezza di 1, fino a un massimo di 20.\n• Ottieni la competenza con quattro armi a tua scelta. Ognuna deve essere un'arma semplice o un'arma da guerra."
   },
-
-  "Dragon Fear": { "name": "Paura Draconica", "prerequisites": "Dragonborn" },
-  "Dragon Hide": { "name": "Pelle di Drago", "prerequisites": "Dragonborn" },
-  "Drow High Magic": { "name": "Alta Magia Drow", "prerequisites": "Elfo (drow)" },
-  "Dwarven Fortitude": { "name": "Tempra Nanica", "prerequisites": "Nano" },
-  "Dwarf Fortitude":   { "name": "Tempra Nanica", "prerequisites": "Nano" },
-  "Strike of the Giants": { "name": "Colpo dei Giganti" },
-  "Soul of the Storm Giant": { "name": "Anima del Gigante delle Tempeste" },
-  "Vigor of the Hill Giant": { "name": "Vigore del Gigante delle Colline" },
-  "Keenness of the Stone Giant": { "name": "Acutezza del Gigante di Pietra" },
-  "Rune Shaper": { "name": "Maestro delle Rune" },
-  "Savage Attacker": { "name": "Aggressore Selvaggio" },
-  "Shadow Touched": { "name": "Contaminazione Ombrosa" },
-  "Elven Accuracy": { "name": "Precisione Elfica", "prerequisites": "Elfo o mezzelfo" },
-  "Fade Away": { "name": "Scomparire", "prerequisites": "Gnomo" },
-  "Fade away": { "name": "Scomparire", "prerequisites": "Gnomo" },
-  "Gift of the Chromatic Dragon": { "name": "Dono del Drago Cromatico" },
-  "Gift of the Metallic Dragon":  { "name": "Dono del Drago Metallico" },
-  "Fey Teleportation": { "name": "Teletrasporto Fatato", "prerequisites": "Elfo (alto)" },
-  "Flames of Phlegethos": { "name": "Fiamme di Flegesto", "prerequisites": "Tiefling" },
-  "Infernal Constitution": { "name": "Costituzione Infernale", "prerequisites": "Tiefling" },
-  "Orcish Fury": { "name": "Furia Orchesca", "prerequisites": "Mezzorco" },
-  "Prodigy": { "name": "Prodigio", "prerequisites": "Mezzelfo, mezzorco o umano" },
-  "Second Chance": { "name": "Seconda Possibilita'", "prerequisites": "Halfling" },
-  "Squat Nimbleness": { "name": "Agilita' Tarchiata", "prerequisites": "Nano o piccola taglia" },
-  "Wood Elf Magic": { "name": "Magia degli Elfi dei Boschi", "prerequisites": "Elfo (dei boschi)" },
-
-  "Eldritch Adept": { "name": "Adepto Occulto", "prerequisites": "Capacita' di incantare o di Pact Magic" },
-  "Cartomancer": { "name": "Cartomante" },
-  "Ember of the Fire Giant": { "name": "Brace del Gigante del Fuoco" },
-  "Fury of the Frost Giant": { "name": "Furia del Gigante del Gelo" },
-  "Guile of the Cloud Giant": { "name": "Astuzia del Gigante delle Nuvole" },
-  "Gift of the Chromatic Dragon": { "name": "Dono del Drago Cromatico" },
-  "Gift of the Gem Dragon": { "name": "Dono del Drago di Gemma" },
-  "Gift of the Metallic Dragon": { "name": "Dono del Drago Metallico" }
+  "Dragon Fear": {
+    "name": "Paura Draconica",
+    "prerequisites": "Dragonborn",
+    "description": "Quando attingi a discendenza draconica, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Carisma, fino a un massimo di 20.\n• Invece di esalare un'arma a soffio devastante, puoi usare la tua azione per emettere un ruggito che instilla terrore. Tutte le creature di tua scelta entro 9 metri da te devono superare un tiro salvezza su Saggezza (CD 8 + il tuo bonus di competenza + il tuo modificatore di Carisma) o essere spaventate per 1 minuto. Una creatura spaventata puo' ripetere il tiro alla fine di ognuno dei suoi turni, terminando l'effetto in caso di successo. Una volta usata questa capacita', devi terminare un riposo breve o lungo prima di poterla usare di nuovo."
+  },
+  "Dragon Hide": {
+    "name": "Pelle di Drago",
+    "prerequisites": "Dragonborn",
+    "description": "Attingi al patrimonio draconico per attivare poteri innati, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Carisma, fino a un massimo di 20.\n• La tua pelle si ispessisce con scaglie. Quando non indossi un'armatura, la tua CA e' pari a 13 + il tuo modificatore di Destrezza. Puoi usare uno scudo e mantenere comunque il beneficio.\n• Cresci artigli affilati. Sono armi da mischia naturali che puoi usare per fare attacchi senz'armi. Se colpisci con essi, infliggi danni taglienti pari a 1d4 + il tuo modificatore di Forza, invece dei danni contundenti normali per gli attacchi senz'armi."
+  },
+  "Drow High Magic": {
+    "name": "Alta Magia Drow",
+    "prerequisites": "Elfo (drow)",
+    "description": "Apprendi altri incantesimi grazie alla tua eredita' drow. Apprendi l'incantesimo dardo incantato. Apprendi anche gli incantesimi levitazione e dissolvi magie, ognuno dei quali puoi lanciare una volta senza usare uno slot incantesimo. Recuperi la capacita' di lanciare gli incantesimi in questo modo dopo aver completato un riposo lungo. Carisma e' la tua caratteristica da incantatore per questi incantesimi."
+  },
+  "Dwarven Fortitude": {
+    "name": "Tempra Nanica",
+    "prerequisites": "Nano"
+  },
+  "Dwarf Fortitude": {
+    "name": "Tempra Nanica",
+    "prerequisites": "Nano",
+    "description": "Possiedi la leggendaria tempra dei tuoi antenati, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione, fino a un massimo di 20.\n• Quando effettui l'azione di Disimpegno o Scattare, puoi usare un'azione bonus per spendere un dado vita, tirarlo e aggiungerci il tuo modificatore di Costituzione, e recuperare un numero di punti ferita pari al risultato (minimo 1)."
+  },
+  "Strike of the Giants": {
+    "name": "Colpo dei Giganti",
+    "prerequisites": "Forza o Costituzione 13 o superiore",
+    "description": "Imitando le tecniche di combattimento dei giganti, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Ottieni accesso a un Colpo dei Giganti a tua scelta tra le opzioni elencate (Colpo del Gigante delle Nuvole, del Fuoco, del Gelo, della Tempesta, di Pietra, delle Colline). Una volta per turno, quando colpisci con un attacco con un'arma, puoi attivare il colpo, che impone effetti aggiuntivi alla creatura colpita. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Soul of the Storm Giant": {
+    "name": "Anima del Gigante delle Tempeste",
+    "description": "Senti il temibile potere delle tempeste, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da freddo, fulmine o tuono (a tua scelta quando ottieni questo talento).\n• Una volta in ogni dei tuoi turni, quando una creatura entro 1,5 metri da te effettua un tiro per colpire contro di te, puoi forzare un disavantaggio sul tiro come reazione, e la creatura non puo' avvicinarsi a te per il resto del turno.\n• Come azione bonus, finche' non sei incapacitato, puoi imporre svantaggio ai tiri per colpire effettuati a una distanza superiore a 1,5 metri da te fino all'inizio del tuo turno successivo."
+  },
+  "Vigor of the Hill Giant": {
+    "name": "Vigore del Gigante delle Colline",
+    "description": "Possiedi la straordinaria robustezza dei giganti delle colline, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione o Saggezza, fino a un massimo di 20.\n• Quando un effetto ti costringerebbe a muoverti contro la tua volonta' o a finire prono, puoi usare la tua reazione per non subire l'effetto. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Keenness of the Stone Giant": {
+    "name": "Acutezza del Gigante di Pietra",
+    "description": "Sei addestrato a colpire con precisione mortale, come i giganti di pietra. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza o Saggezza, fino a un massimo di 20.\n• Quando ottieni un colpo critico con un attacco con un'arma, puoi spingere il bersaglio fino a 3 metri lontano da te se e' di taglia Enorme o inferiore.\n• Come azione bonus, puoi usare la tua sensibilita' alle vibrazioni per ottenere percezione tellurica con una portata di 3 metri fino alla fine del tuo turno successivo."
+  },
+  "Rune Shaper": {
+    "name": "Maestro delle Rune",
+    "description": "Apprendi a tracciare semplici rune magiche per attingere a poteri arcani, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo trucco prestigiatore. Inoltre, scegli un incantesimo del 1° livello da una qualsiasi lista di incantesimi: lo apprendi e puoi lanciarlo senza usare uno slot un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo. La caratteristica da incantatore per questi incantesimi e' la stessa che hai aumentato con questo talento."
+  },
+  "Shadow Touched": {
+    "name": "Contaminazione Ombrosa",
+    "description": "L'esposizione mistica al Reame delle Ombre ti ha conferito potere magico, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi gli incantesimi invisibilita' e un incantesimo del 1° livello a tua scelta della scuola di Illusione o Necromanzia. Puoi lanciare ognuno una volta senza usare uno slot incantesimo, e recuperi la capacita' di lanciarli in questo modo quando termini un riposo lungo. Puoi anche lanciare questi incantesimi usando slot incantesimo che possiedi del livello appropriato. La caratteristica da incantatore per questi incantesimi e' la stessa caratteristica che hai aumentato con questo talento."
+  },
+  "Elven Accuracy": {
+    "name": "Precisione Elfica",
+    "prerequisites": "Elfo o mezzelfo",
+    "description": "L'accuratezza degli elfi e' rinomata, soprattutto fra gli arcieri elfici e gli incantatori. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Quando hai vantaggio a un tiro per colpire effettuato con un'arma usando Destrezza, Intelligenza, Saggezza o Carisma, puoi ritirare uno dei dadi una volta."
+  },
+  "Fade Away": {
+    "name": "Scomparire",
+    "prerequisites": "Gnomo"
+  },
+  "Fade away": {
+    "name": "Scomparire",
+    "prerequisites": "Gnomo",
+    "description": "L'ingegnosita' tipica della tua razza ti ha permesso di affinare le tue capacita' magiche di occultamento. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza o Intelligenza, fino a un massimo di 20.\n• Subito dopo aver subito danni, puoi usare la tua reazione per diventare magicamente invisibile fino alla fine del tuo prossimo turno o finche' non effettui un attacco, infliggi danni o forzi un altro a un tiro salvezza. Una volta usata questa capacita', non puoi usarla di nuovo finche' non termini un riposo breve o lungo."
+  },
+  "Gift of the Chromatic Dragon": {
+    "name": "Dono del Drago Cromatico",
+    "description": "Sei toccato dal potere dei draghi cromatici. Ottieni i seguenti benefici:\n• Riserva Cromatica. Come azione bonus, puoi toccare un'arma semplice o da guerra che impugni e infonderle un'energia: scegli acido, freddo, fuoco, fulmine o veleno. Per il prossimo minuto, l'arma infligge 1d4 danni di quel tipo in piu' quando colpisce. Puoi usare questa azione bonus un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo.\n• Resistenza Reattiva. Quando subisci danni di tipo acido, freddo, fuoco, fulmine o veleno, puoi usare la tua reazione per ottenere resistenza a quel tipo di danno per quell'istanza. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Gift of the Metallic Dragon": {
+    "name": "Dono del Drago Metallico",
+    "description": "Sei toccato dal potere protettivo dei draghi metallici. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione, Saggezza o Carisma, fino a un massimo di 20.\n• Apprendi l'incantesimo cura ferite e puoi lanciarlo senza usare uno slot incantesimo un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo. Puoi anche lanciarlo usando slot incantesimo del livello appropriato.\n• Ali Protettive. Quando tu o una creatura entro 1,5 metri da te viene colpita da un attacco, puoi usare la tua reazione per fare apparire spettrali ali draconiche dietro di te, ottenendo un bonus di +2 alla CA contro quell'attacco. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Fey Teleportation": {
+    "name": "Teletrasporto Fatato",
+    "prerequisites": "Elfo (alto)",
+    "description": "Studiando un raro metodo per teletrasportarsi sviluppato nelle Terre Fatate, ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza o Carisma, fino a un massimo di 20.\n• Apprendi a parlare, leggere e scrivere il silvano.\n• Apprendi il trucchetto suono illusorio. Inoltre, apprendi l'incantesimo passo velato che puoi lanciare senza usare uno slot incantesimo. Recuperi la capacita' di lanciarlo in questo modo dopo aver terminato un riposo breve o lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi del livello appropriato. Intelligenza e' la tua caratteristica da incantatore per questi incantesimi."
+  },
+  "Flames of Phlegethos": {
+    "name": "Fiamme di Flegesto",
+    "prerequisites": "Tiefling",
+    "description": "Apprendi a usare l'eredita' infernale per attingere al fuoco demoniaco. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza o Carisma, fino a un massimo di 20.\n• Quando tiri i danni da fuoco di un incantesimo che lanci, puoi ritirare ogni 1 sui dadi dei danni da fuoco, ma devi usare il nuovo risultato anche se e' di nuovo 1.\n• Ogni volta che lanci un incantesimo che infligge danni da fuoco, puoi farti avvolgere da fiamme infernali fino alla fine del tuo prossimo turno. Le fiamme non ti danneggiano, ma illuminano l'area di luce intensa entro 9 metri e luce fioca per altri 9 metri. Mentre sei avvolto dalle fiamme, ogni creatura che ti colpisce con un attacco in mischia entro 1,5 metri subisce 1d4 danni da fuoco."
+  },
+  "Infernal Constitution": {
+    "name": "Costituzione Infernale",
+    "prerequisites": "Tiefling",
+    "description": "La tua eredita' diabolica si manifesta in una resistenza fisica innata. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Costituzione, fino a un massimo di 20.\n• Hai resistenza ai danni da freddo e da veleno.\n• Hai vantaggio ai tiri salvezza per evitare o terminare la condizione avvelenato."
+  },
+  "Orcish Fury": {
+    "name": "Furia Orchesca",
+    "prerequisites": "Mezzorco",
+    "description": "La tua furia non conosce limiti. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Costituzione, fino a un massimo di 20.\n• Quando colpisci con un'arma in cui sei competente in un attacco con un'arma e tiri i danni dell'arma, puoi tirare il dado dei danni dell'arma una volta in piu' come danno aggiuntivo dello stesso tipo. Una volta usata questa capacita', non puoi usarla di nuovo finche' non termini un riposo breve o lungo.\n• Subito dopo aver usato il tuo tratto razziale Insistenza Implacabile, puoi usare la tua reazione per effettuare un attacco con un'arma."
+  },
+  "Prodigy": {
+    "name": "Prodigio",
+    "prerequisites": "Mezzelfo, mezzorco o umano",
+    "description": "Hai talento naturale per varie attivita'. Ottieni i seguenti benefici:\n• Ottieni la competenza in un'abilita' a tua scelta, in un tipo di strumento da artigiano a tua scelta e la fluenza in una lingua a tua scelta.\n• Scegli un'abilita' in cui hai competenza. Ottieni esperienza in quell'abilita', il che significa che il tuo bonus di competenza viene raddoppiato per ogni prova di caratteristica che effettui che la utilizzi."
+  },
+  "Second Chance": {
+    "name": "Seconda Possibilita'",
+    "prerequisites": "Halfling",
+    "description": "La fortuna ti favorisce. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Destrezza, Costituzione o Carisma, fino a un massimo di 20.\n• Quando una creatura che puoi vedere ti colpisce con un attacco, puoi usare la tua reazione per costringerla a ritirare il tiro. Se la creatura ti colpisce di nuovo, l'attacco la colpisce. Una volta usata questa capacita', non puoi usarla di nuovo fino all'inizio del tuo prossimo turno o finche' non termini un riposo breve o lungo."
+  },
+  "Squat Nimbleness": {
+    "name": "Agilita' Tarchiata",
+    "prerequisites": "Nano o piccola taglia",
+    "description": "Sei insolitamente agile per la tua razza. Ottieni i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza o Destrezza, fino a un massimo di 20.\n• La tua velocita' aumenta di 1,5 metri.\n• Ottieni competenza in Acrobazia o Atletica (a tua scelta).\n• Hai vantaggio a qualsiasi prova di Forza (Atletica) o Destrezza (Acrobazia) che effettui per liberarti dalla condizione afferrato."
+  },
+  "Wood Elf Magic": {
+    "name": "Magia degli Elfi dei Boschi",
+    "prerequisites": "Elfo (dei boschi)",
+    "description": "Hai imparato la magia degli antichi elfi dei boschi. Apprendi un trucchetto a tua scelta dalla lista degli incantesimi del druido. Apprendi anche l'incantesimo passare senza tracce e l'incantesimo parlare con gli animali, ognuno dei quali puoi lanciare una volta senza usare uno slot incantesimo. Recuperi la capacita' di lanciare gli incantesimi in questo modo dopo aver completato un riposo lungo. Saggezza e' la tua caratteristica da incantatore per questi incantesimi."
+  },
+  "Eldritch Adept": {
+    "name": "Adepto Occulto",
+    "prerequisites": "Capacita' di incantare o di Pact Magic",
+    "description": "Studiando arcani occulti, hai imparato un'invocazione occulta a tua scelta tra quelle disponibili al warlock. La tua caratteristica da incantatore per l'invocazione e' Intelligenza, Saggezza o Carisma (a tua scelta). Se l'invocazione ha un prerequisito, puoi sceglierla solo se sei un warlock e solo se soddisfi il prerequisito.\nOgni volta che ottieni un livello, puoi sostituire l'invocazione con un'altra invocazione che soddisfi i requisiti."
+  },
+  "Cartomancer": {
+    "name": "Cartomante"
+  },
+  "Ember of the Fire Giant": {
+    "name": "Brace del Gigante del Fuoco",
+    "description": "Senti la forza purificante del fuoco, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da fuoco.\n• Come azione bonus, magicamente fai apparire ardenti braci attorno a una creatura ostile che puoi vedere entro 18 metri da te. La creatura deve effettuare un tiro salvezza su Destrezza (CD = 8 + il tuo bonus di competenza + il tuo modificatore di Forza, Costituzione o Saggezza, a tua scelta), subendo danni da fuoco pari a 1d8 + il tuo bonus di competenza in caso di fallimento o la meta' in caso di successo. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Fury of the Frost Giant": {
+    "name": "Furia del Gigante del Gelo",
+    "description": "Possiedi la furia gelida dei giganti del gelo, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Forza, Costituzione o Saggezza, fino a un massimo di 20.\n• Ottieni resistenza ai danni da freddo.\n• Quando una creatura che puoi vedere entro 9 metri da te ti colpisce con un attacco, puoi usare la tua reazione per infliggerle danni da freddo pari a 1d8 + il tuo bonus di competenza, e ridurre la sua velocita' di 3 metri fino all'inizio del tuo prossimo turno. Puoi usare questa reazione un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Guile of the Cloud Giant": {
+    "name": "Astuzia del Gigante delle Nuvole",
+    "description": "Possiedi l'astuzia ingannevole dei giganti delle nuvole, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Quando una creatura che puoi vedere effettua un tiro per colpire contro di te, puoi usare la tua reazione per teletrasportarti fino a 9 metri in uno spazio non occupato che puoi vedere. Se ti trovi a piu' di 1,5 metri dalla creatura attaccante dopo essere stato teletrasportato, l'attacco subisce svantaggio. Puoi usare questa capacita' un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi al termine di un riposo lungo."
+  },
+  "Gift of the Gem Dragon": {
+    "name": "Dono del Drago di Gemma",
+    "prerequisites": "Punteggio di Intelligenza, Saggezza o Carisma 13 o superiore",
+    "description": "Senti il potere psionico dei draghi di gemma, ottenendo i seguenti benefici:\n• Aumenti di 1 il tuo punteggio di Intelligenza, Saggezza o Carisma, fino a un massimo di 20.\n• Spostamento Telecinetico. Come azione bonus, prendi di mira un oggetto pesante non piu' di 5 chili o una creatura che puoi vedere entro 9 metri da te. La creatura deve effettuare un tiro salvezza su Forza, oppure tu (o lui) viene spinta o tirata fino a 1,5 metri orizzontalmente o verticalmente. Puoi usarlo un numero di volte pari al tuo bonus di competenza per riposo lungo.\n• Manifestazione Psionica. Quando una creatura che puoi vedere entro 18 metri infligge danni a te o a un alleato entro 1,5 metri, puoi usare la tua reazione per ridurre i danni di 1d8 + il tuo bonus di competenza."
+  }
 }

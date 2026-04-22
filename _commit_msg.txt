@@ -1,0 +1,18 @@
+﻿fix: stili di combattimento sempre visibili + traduzioni IT talenti
+
+- Sezione "Stili di Combattimento" su Pagina 2 sempre presente (anche se la
+  classe non ha allowance), con messaggio esplicativo. Bug: classe era
+  cercata come "Combattente", ma nel codebase e' "Guerriero" -> non veniva
+  mostrata per i guerrieri.
+- Picker stili di combattimento riprogettato come dialog di ricerca in
+  stile incantesimi/talenti: barra di ricerca, filtri per Classe/Sottoclasse
+  e Manuale, lista flat con badge per slot di assegnazione (lo stesso stile
+  puo' essere assegnato a una sola classe per evitare doppioni).
+- Supporto sottoclassi con liste limitate: Bardo del Collegio delle Spade
+  (level 3) puo' scegliere 1 stile fra Duellare e Combattere con Due Armi.
+- Descrizioni "Stile di Combattimento" delle classi (Guerriero, Paladino,
+  Ranger, Bardo Spade) ripulite: rimossa la lista degli stili in linea -
+  ora rimanda alla tabella dedicata in Pagina 2.
+- Talenti: aggiunte 44 traduzioni IT mancanti (descrizioni complete) in
+  feat_translations.json. Rigenerato js/data/feats_data.js (83/83 IT).
+  Risolve la visualizzazione delle descrizioni in inglese nelle tendine.

@@ -1034,32 +1034,75 @@ function _fightingStyleById(slug) {
     if (!slug) return null;
     return _fightingStylesData()[slug] || null;
 }
-// Quante stili di combattimento puo' selezionare il PG per ciascuna delle
-// sue classi, in base al livello e (per il combattente) all'archetipo
-// Champion che ne sblocca un secondo al livello 10.
+// Restrizioni di stili di combattimento per sottoclasse: alcune sottoclassi
+// (es. Bardo del Collegio delle Spade) consentono di scegliere uno stile da
+// una lista limitata. La chiave e' lo slug della sottoclasse; il valore
+// definisce sotto quale "etichetta classe" salvare la scelta, da quale
+// livello e quanti stili, oltre all'elenco di slug disponibili.
+const FIGHTING_STYLES_SUBCLASS_RULES = {
+    'college-of-swords': {
+        className: 'Bardo (Collegio delle Spade)',
+        from_level: 3,
+        count: 1,
+        allowedSlugs: ['dueling', 'two-weapon-fighting'],
+    },
+    'sword-bard': {
+        className: 'Bardo (Collegio delle Spade)',
+        from_level: 3,
+        count: 1,
+        allowedSlugs: ['dueling', 'two-weapon-fighting'],
+    },
+};
+
+// Quanti stili di combattimento puo' selezionare il PG per ciascuna delle
+// sue classi/sottoclassi. Restituisce un oggetto:
+//   { 'Guerriero': { max: 1, allowedSlugs: null }, ... }
+// allowedSlugs === null significa "tutti gli stili della classe base".
 function _pgFightingStylesAllowance(pg) {
     const out = {};
     if (!pg || !Array.isArray(pg.classi)) return out;
     pg.classi.forEach(c => {
         const lvl = parseInt(c.livello) || 0;
-        if (c.nome === 'Combattente') {
+        const subSlug = c.sottoclasseSlug || '';
+        if (c.nome === 'Guerriero') {
             let n = lvl >= 1 ? 1 : 0;
-            if (lvl >= 10 && c.sottoclasseSlug === 'champion') n += 1;
-            if (n > 0) out[c.nome] = n;
+            if (lvl >= 10 && subSlug === 'champion') n += 1;
+            if (n > 0) out[c.nome] = { max: n, allowedSlugs: null, baseClass: 'Guerriero' };
         } else if (c.nome === 'Paladino') {
-            if (lvl >= 2) out[c.nome] = 1;
+            if (lvl >= 2) out[c.nome] = { max: 1, allowedSlugs: null, baseClass: 'Paladino' };
         } else if (c.nome === 'Ranger') {
-            if (lvl >= 2) out[c.nome] = 1;
+            if (lvl >= 2) out[c.nome] = { max: 1, allowedSlugs: null, baseClass: 'Ranger' };
+        }
+        // Sottoclassi che concedono stili limitati.
+        const rule = FIGHTING_STYLES_SUBCLASS_RULES[subSlug];
+        if (rule && lvl >= (rule.from_level || 1)) {
+            out[rule.className] = {
+                max: rule.count || 1,
+                allowedSlugs: rule.allowedSlugs ? [...rule.allowedSlugs] : null,
+                baseClass: c.nome,
+            };
         }
     });
     return out;
 }
-// Slug degli stili disponibili per una classe specifica.
+// Slug degli stili disponibili per una classe specifica (filtrabili poi da
+// allowedSlugs della sottoclasse).
 function _fightingStylesForClass(className) {
     const data = _fightingStylesData();
     return Object.values(data)
         .filter(fs => Array.isArray(fs.classes) && fs.classes.includes(className))
         .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+}
+// Stili effettivamente selezionabili per una "voce di allowance" del PG,
+// applicando l'eventuale restrizione di sottoclasse.
+function _fightingStylesForSlot(slotKey, allowanceEntry) {
+    const baseClass = (allowanceEntry && allowanceEntry.baseClass) || slotKey;
+    let list = _fightingStylesForClass(baseClass);
+    if (allowanceEntry && Array.isArray(allowanceEntry.allowedSlugs)) {
+        const allowed = new Set(allowanceEntry.allowedSlugs);
+        list = list.filter(fs => allowed.has(fs.slug));
+    }
+    return list;
 }
 
 // Numero massimo di invocazioni che un Warlock conosce in base al livello,
@@ -5420,39 +5463,48 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     </div>`;
 
     // ─── Sezione Stili di Combattimento ───────────────────────────────
-    let fightingStylesSectionHtml = '';
+    // Sempre visibile: anche se il PG non ha allowance, mostra un messaggio
+    // esplicativo. Cosi' il giocatore puo' sempre aprire il picker.
     const fsAllowance = _pgFightingStylesAllowance(pg);
     const fsKeys = Object.keys(fsAllowance);
-    if (fsKeys.length > 0) {
+    let fightingStylesSectionHtml = '';
+    {
         const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
             ? pg.stile_combattimento : {};
         let totalSelected = 0;
         let totalMax = 0;
-        const blocks = fsKeys.map(cn => {
-            const max = fsAllowance[cn];
-            totalMax += max;
-            const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
-            totalSelected += slugs.length;
-            const rows = slugs.length > 0
-                ? slugs.map(slug => {
-                    const fs = _fightingStyleById(slug);
-                    return _renderPrivFeatureRow({
-                        name: fs ? fs.name : slug,
-                        name_en: fs ? fs.name_en : '',
-                        description: fs ? fs.description : '',
-                        translated: true,
-                        level: null,
-                    }, {});
-                }).join('')
-                : '<span class="scheda-empty">Nessuno stile selezionato</span>';
-            return `<div class="priv-feat-row" style="background:transparent;border:none;padding:0;">
-                <div style="font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin:6px 0 4px;">${escapeHtml(cn)} <small style="font-weight:500;text-transform:none;">(${slugs.length}/${max})</small></div>
-                ${rows}
-            </div>`;
-        }).join('');
+        let blocks = '';
+        if (fsKeys.length > 0) {
+            blocks = fsKeys.map(cn => {
+                const entry = fsAllowance[cn];
+                const max = entry.max;
+                totalMax += max;
+                const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
+                totalSelected += slugs.length;
+                const rows = slugs.length > 0
+                    ? slugs.map(slug => {
+                        const fs = _fightingStyleById(slug);
+                        return _renderPrivFeatureRow({
+                            name: fs ? fs.name : slug,
+                            name_en: fs ? fs.name_en : '',
+                            description: fs ? fs.description : '',
+                            translated: true,
+                            level: null,
+                        }, {});
+                    }).join('')
+                    : '<span class="scheda-empty">Nessuno stile selezionato</span>';
+                return `<div class="priv-feat-row" style="background:transparent;border:none;padding:0;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin:6px 0 4px;">${escapeHtml(cn)} <small style="font-weight:500;text-transform:none;">(${slugs.length}/${max})</small></div>
+                    ${rows}
+                </div>`;
+            }).join('');
+        } else {
+            blocks = '<div class="scheda-empty" style="padding:6px 4px;">Nessuna classe ti permette di scegliere uno stile di combattimento al livello attuale.</div>';
+        }
+        const counterTxt = fsKeys.length > 0 ? `<small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>` : '';
         fightingStylesSectionHtml = `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Stili di Combattimento
-                <small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>
+                ${counterTxt}
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenFightingStylesEdit('${pg.id}')" title="Scegli stili">&#9998;</button>
             </div>
             <div class="scheda-section-body" id="schedaFightingStylesDisplay">${blocks}</div>
@@ -6106,108 +6158,193 @@ function _schedaInvocationsContentHtml(currentInvIds) {
 }
 
 // ─── Picker Stili di Combattimento ─────────────────────────────────────
+// Dialog stile "scelta talenti/incantesimi" con barra di ricerca e filtri
+// per classe/sottoclasse e manuale. Gli stili disponibili sono determinati
+// dalle classi/sottoclassi del PG.
 window.schedaOpenFightingStylesEdit = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) return;
     const allowance = _pgFightingStylesAllowance(pg);
-    const classes = Object.keys(allowance);
-    if (classes.length === 0) {
-        showNotification && showNotification('Nessuna classe ti permette di scegliere uno stile di combattimento');
+    const slotKeys = Object.keys(allowance);
+    if (slotKeys.length === 0) {
+        showNotification && showNotification('Nessuna delle tue classi/sottoclassi ti permette di scegliere uno stile di combattimento al livello attuale.');
         return;
     }
-    // Stato locale di selezione: { className: [slug, slug, ...] }
+    // Stato locale di selezione: { slotKey: [slug, ...] }
     const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
         ? pg.stile_combattimento : {};
     const sel = {};
-    classes.forEach(cn => { sel[cn] = Array.isArray(stored[cn]) ? [...stored[cn]] : []; });
+    slotKeys.forEach(k => { sel[k] = Array.isArray(stored[k]) ? [...stored[k]] : []; });
+    // Pulisci selezioni con slug non piu' validi (es. dopo cambio sottoclasse).
+    slotKeys.forEach(k => {
+        const allowed = _fightingStylesForSlot(k, allowance[k]).map(fs => fs.slug);
+        sel[k] = sel[k].filter(s => allowed.includes(s));
+    });
+
+    // Costruisci una mappa flat: per ogni stile, in quali "slot" del PG
+    // puo' essere assegnato (rispettando le restrizioni di sottoclasse).
+    const flatStyles = {}; // slug -> { fs, slots: [slotKey, ...] }
+    slotKeys.forEach(k => {
+        const list = _fightingStylesForSlot(k, allowance[k]);
+        list.forEach(fs => {
+            if (!flatStyles[fs.slug]) flatStyles[fs.slug] = { fs, slots: [] };
+            flatStyles[fs.slug].slots.push(k);
+        });
+    });
+    const allStyles = Object.values(flatStyles)
+        .sort((a, b) => (a.fs.name || '').localeCompare(b.fs.name || ''));
+
+    // Stato del filtro e ricerca.
+    const sources = Array.from(new Set(allStyles.map(s => s.fs.source_short).filter(Boolean))).sort();
+    if (!window._fsPickerState) window._fsPickerState = {};
+    window._fsPickerState = {
+        search: '',
+        source: 'all',
+        slot: 'all',
+    };
+    window._fsPickerSel = sel;
+    window._fsPickerAllowance = allowance;
+    window._fsPickerSlotKeys = slotKeys;
+    window._fsPickerAllStyles = allStyles;
 
     let modal = document.getElementById('fsPickerModal');
     if (modal) modal.remove();
     modal = document.createElement('div');
     modal.id = 'fsPickerModal';
-    modal.className = 'spell-modal-overlay';
+    modal.className = 'modal active';
     modal.onclick = e => { if (e.target === modal) modal.remove(); };
 
-    const renderBody = () => {
-        const sections = classes.map(cn => {
-            const max = allowance[cn];
-            const list = _fightingStylesForClass(cn);
-            const items = list.map(fs => {
-                const isSelected = sel[cn].includes(fs.slug);
-                const reachedMax = !isSelected && sel[cn].length >= max;
-                return `<div class="fs-pick-row${isSelected ? ' fs-pick-row-selected' : ''}${reachedMax ? ' fs-pick-row-disabled' : ''}"
-                    onclick="schedaFsTogglePick(this,'${escapeHtml(cn).replace(/'/g, '&#39;')}','${fs.slug}',${max})">
-                    <div class="fs-pick-head">
-                        <span class="fs-pick-checkbox">${isSelected ? '✔' : ''}</span>
-                        <span class="fs-pick-name">${escapeHtml(fs.name)}</span>
-                        <span class="fs-pick-source">${escapeHtml(fs.source_short || '')}</span>
-                        <span class="fs-pick-arrow" onclick="event.stopPropagation();this.closest('.fs-pick-row').classList.toggle('fs-pick-open');">▾</span>
-                    </div>
-                    <div class="fs-pick-desc">${escapeHtml(fs.description || '')}</div>
-                </div>`;
-            }).join('');
-            return `<div class="fs-pick-class">
-                <div class="fs-pick-class-title">${escapeHtml(cn)} <small id="fsCntr_${escapeHtml(cn).replace(/[^a-zA-Z0-9]/g,'')}">${sel[cn].length}/${max}</small></div>
-                <div class="fs-pick-list">${items}</div>
-            </div>`;
-        }).join('');
-        return `<div class="spell-modal-content fs-picker-modal" onclick="event.stopPropagation();">
-            <div class="spell-modal-header">
-                <h3>Scegli Stili di Combattimento</h3>
-                <button class="spell-modal-close" onclick="document.getElementById('fsPickerModal')?.remove();">×</button>
-            </div>
-            <div class="spell-modal-body" style="padding:12px 16px;">
-                ${sections}
-            </div>
-            <div class="spell-modal-footer">
-                <button class="btn-secondary" onclick="document.getElementById('fsPickerModal')?.remove();">Annulla</button>
-                <button class="btn-primary" onclick="schedaSaveFightingStyles('${pgId}')">Salva</button>
-            </div>
-        </div>`;
-    };
-    modal.innerHTML = renderBody();
-    document.body.appendChild(modal);
+    const slotChips = `<button class="filter-pill ${window._fsPickerState.slot === 'all' ? 'active' : ''}" data-slot="all" onclick="schedaFsSetSlotFilter('all')">Tutte</button>` +
+        slotKeys.map(k => `<button class="filter-pill ${window._fsPickerState.slot === k ? 'active' : ''}" data-slot="${escapeHtml(k)}" onclick="schedaFsSetSlotFilter(${JSON.stringify(k).replace(/"/g, '&quot;')})">${escapeHtml(k)} <small>(${sel[k].length}/${allowance[k].max})</small></button>`).join('');
+    const sourceChips = `<button class="filter-pill ${window._fsPickerState.source === 'all' ? 'active' : ''}" onclick="schedaFsSetSourceFilter('all')">Tutti</button>` +
+        sources.map(src => `<button class="filter-pill ${window._fsPickerState.source === src ? 'active' : ''}" onclick="schedaFsSetSourceFilter('${escapeHtml(src)}')">${escapeHtml(src)}</button>`).join('');
 
-    // Espone lo stato locale per gli handler.
-    window._fsPickerSel = sel;
-    window._fsPickerAllowance = allowance;
+    modal.innerHTML = `<div class="modal-content modal-content-lg fs-picker-modal" onclick="event.stopPropagation();">
+        <button class="modal-close" onclick="document.getElementById('fsPickerModal')?.remove();">&times;</button>
+        <h2 style="margin-top:0;">Scegli Stili di Combattimento</h2>
+        <div class="wizard-page-scroll" style="padding:6px 4px;">
+            <div class="spell-picker-search-row" style="margin-bottom:10px;">
+                <input type="text" id="fsPickerSearch" class="hp-calc-input spell-picker-search" placeholder="Cerca stile..." oninput="schedaFsSetSearch(this.value)" autocomplete="off" />
+            </div>
+            <div class="fs-pick-filter-row">
+                <div class="fs-pick-filter-label">Classe / Sottoclasse:</div>
+                <div class="fs-pick-filter-pills" id="fsPickerSlotChips">${slotChips}</div>
+            </div>
+            <div class="fs-pick-filter-row">
+                <div class="fs-pick-filter-label">Manuale:</div>
+                <div class="fs-pick-filter-pills" id="fsPickerSourceChips">${sourceChips}</div>
+            </div>
+            <div id="fsPickerList" class="fs-pick-list"></div>
+        </div>
+        <div class="form-actions" style="margin-top:var(--spacing-md);display:flex;justify-content:flex-end;gap:8px;">
+            <button class="btn-secondary" onclick="document.getElementById('fsPickerModal')?.remove();">Annulla</button>
+            <button class="btn-primary" onclick="schedaSaveFightingStyles('${pgId}')">Salva</button>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+    schedaFsRenderList();
 };
 
-window.schedaFsTogglePick = function(rowEl, className, slug, max) {
+window.schedaFsSetSearch = function(v) {
+    window._fsPickerState.search = (v || '').toLowerCase();
+    schedaFsRenderList();
+};
+window.schedaFsSetSourceFilter = function(src) {
+    window._fsPickerState.source = src;
+    document.querySelectorAll('#fsPickerSourceChips .filter-pill').forEach(b => {
+        b.classList.toggle('active', b.textContent.trim() === (src === 'all' ? 'Tutti' : src));
+    });
+    schedaFsRenderList();
+};
+window.schedaFsSetSlotFilter = function(slot) {
+    window._fsPickerState.slot = slot;
+    document.querySelectorAll('#fsPickerSlotChips .filter-pill').forEach(b => {
+        const ds = b.getAttribute('data-slot');
+        b.classList.toggle('active', ds === slot);
+    });
+    schedaFsRenderList();
+};
+
+window.schedaFsRenderList = function() {
+    const state = window._fsPickerState || { search: '', source: 'all', slot: 'all' };
+    const allStyles = window._fsPickerAllStyles || [];
+    const allowance = window._fsPickerAllowance || {};
     const sel = window._fsPickerSel || {};
-    if (!sel[className]) sel[className] = [];
-    const arr = sel[className];
+    const listEl = document.getElementById('fsPickerList');
+    if (!listEl) return;
+    const search = (state.search || '').trim();
+    const filtered = allStyles.filter(({ fs, slots }) => {
+        if (state.source !== 'all' && fs.source_short !== state.source) return false;
+        if (state.slot !== 'all' && !slots.includes(state.slot)) return false;
+        if (search) {
+            const txt = `${fs.name || ''} ${fs.name_en || ''} ${fs.description || ''}`.toLowerCase();
+            if (!txt.includes(search)) return false;
+        }
+        return true;
+    });
+    if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="scheda-empty" style="padding:14px;text-align:center;">Nessuno stile corrisponde ai filtri.</div>';
+        return;
+    }
+    listEl.innerHTML = filtered.map(({ fs, slots }) => {
+        // Trova in quali slot del PG e' attualmente assegnato.
+        const assignedTo = slots.filter(k => (sel[k] || []).includes(fs.slug));
+        const isSelected = assignedTo.length > 0;
+        const slotBadges = slots.map(k => {
+            const reachedMax = (sel[k] || []).length >= allowance[k].max;
+            const here = (sel[k] || []).includes(fs.slug);
+            return `<button class="fs-pick-slot-btn ${here ? 'is-on' : ''} ${reachedMax && !here ? 'is-full' : ''}" 
+                onclick="event.stopPropagation();schedaFsToggleAssign('${fs.slug}', ${JSON.stringify(k).replace(/"/g, '&quot;')})"
+                title="${here ? 'Assegnato a ' + escapeHtml(k) : 'Assegna a ' + escapeHtml(k)}">
+                ${here ? '✔ ' : '+ '}${escapeHtml(k)} <small>(${(sel[k] || []).length}/${allowance[k].max})</small>
+            </button>`;
+        }).join('');
+        return `<div class="fs-pick-row ${isSelected ? 'fs-pick-row-selected' : ''}">
+            <div class="fs-pick-head" onclick="this.closest('.fs-pick-row').classList.toggle('fs-pick-open');">
+                <span class="fs-pick-name">${escapeHtml(fs.name)}</span>
+                <span class="fs-pick-source">${escapeHtml(fs.source_short || '')}</span>
+                <span class="fs-pick-arrow">▾</span>
+            </div>
+            <div class="fs-pick-slots">${slotBadges}</div>
+            <div class="fs-pick-desc">${escapeHtml(fs.description || '')}</div>
+        </div>`;
+    }).join('');
+};
+
+// Toggle assegnazione di uno stile a uno slot specifico (classe/sottoclasse).
+window.schedaFsToggleAssign = function(slug, slotKey) {
+    const sel = window._fsPickerSel || {};
+    const allowance = window._fsPickerAllowance || {};
+    if (!sel[slotKey]) sel[slotKey] = [];
+    const arr = sel[slotKey];
     const i = arr.indexOf(slug);
     if (i >= 0) {
         arr.splice(i, 1);
     } else {
-        if (arr.length >= max) {
-            showNotification && showNotification(`Hai gia' raggiunto il massimo di stili per ${className}`);
+        if (arr.length >= allowance[slotKey].max) {
+            showNotification && showNotification(`Hai gia' raggiunto il massimo di stili per ${slotKey}`);
             return;
         }
+        // Per evitare duplicati tra slot dello stesso PG (uno stile per slot e' la regola).
+        Object.keys(sel).forEach(k => {
+            if (k !== slotKey) {
+                const j = sel[k].indexOf(slug);
+                if (j >= 0) sel[k].splice(j, 1);
+            }
+        });
         arr.push(slug);
     }
-    // Ri-renderizza il body per aggiornare contatori e stati.
-    const modal = document.getElementById('fsPickerModal');
-    if (!modal) return;
-    const reopener = window.schedaOpenFightingStylesEdit;
-    // Aggiorna in place: ri-tira la riga e l'intestazione.
-    rowEl.classList.toggle('fs-pick-row-selected');
-    const checkbox = rowEl.querySelector('.fs-pick-checkbox');
-    if (checkbox) checkbox.textContent = arr.includes(slug) ? '✔' : '';
-    const cntrId = 'fsCntr_' + className.replace(/[^a-zA-Z0-9]/g, '');
-    const cntr = document.getElementById(cntrId);
-    if (cntr) {
-        const allowance = (window._fsPickerAllowance && window._fsPickerAllowance[className]) || max;
-        cntr.textContent = `${arr.length}/${allowance}`;
-    }
-    // Aggiorna lo stato disabled delle altre righe della stessa classe.
-    const allRows = rowEl.parentElement.querySelectorAll('.fs-pick-row');
-    allRows.forEach(r => {
-        const isSel = r.classList.contains('fs-pick-row-selected');
-        if (!isSel && arr.length >= max) r.classList.add('fs-pick-row-disabled');
-        else r.classList.remove('fs-pick-row-disabled');
+    // Aggiorna i contatori nelle pills.
+    const slotKeys = window._fsPickerSlotKeys || [];
+    slotKeys.forEach(k => {
+        const pill = document.querySelector(`#fsPickerSlotChips .filter-pill[data-slot="${k.replace(/"/g, '\\"')}"]`);
+        if (pill) {
+            const cnt = (sel[k] || []).length;
+            const max = allowance[k].max;
+            pill.innerHTML = `${escapeHtml(k)} <small>(${cnt}/${max})</small>`;
+        }
     });
+    schedaFsRenderList();
 };
 
 window.schedaSaveFightingStyles = async function(pgId) {
