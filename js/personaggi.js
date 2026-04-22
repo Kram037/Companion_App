@@ -936,7 +936,82 @@ function _pgSubclassGrantedSpells(pg) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Invocazioni Demoniache (Eldritch Invocations) del Warlock.
+// Auto-effetti dei privilegi di sottoclasse (resistenze, immunita',
+// ecc.) che dovrebbero essere applicati automaticamente al PG quando
+// raggiunge il livello richiesto.
+//
+// Mappa: classe slug -> sottoclasse slug -> array di
+//   { level, resistances?: [...], immunities?: [...] }
+const SUBCLASS_AUTO_EFFECTS = {
+    sorcerer: {
+        'aberrant-mind': [
+            { level: 6, resistances: ['psichico'] },  // Difese Psichiche
+        ],
+        'storm-sorcery': [
+            { level: 6, resistances: ['fulmine', 'tuono'] },  // Heart of the Storm
+        ],
+        'divine-soul': [],
+    },
+    barbarian: {
+        'path-of-the-totem-warrior': [
+            { level: 3, resistances: [] }, // Spirit Seeker - resistance only while raging (gestito separatamente)
+        ],
+    },
+    monk: {
+        'way-of-the-sun-soul': [],
+    },
+    paladin: {
+        'oath-of-the-ancients': [
+            { level: 7, resistances: [] }, // Aura of Warding - aura, gestita separatamente
+        ],
+    },
+};
+
+// Restituisce i tipi di danno a cui il PG ottiene resistenza
+// automaticamente in base ai privilegi delle sue sottoclassi e al
+// livello attuale.
+function _pgSubclassAutoResistances(pg) {
+    const out = new Set();
+    if (!pg || !Array.isArray(pg.classi)) return [];
+    pg.classi.forEach(c => {
+        const cls = _getClassData(c?.nome || '');
+        if (!cls) return;
+        const subSlug = c.sottoclasseSlug;
+        if (!subSlug) return;
+        const map = SUBCLASS_AUTO_EFFECTS[cls.slug];
+        if (!map) return;
+        const entries = map[subSlug];
+        if (!entries) return;
+        const lvl = parseInt(c.livello) || 0;
+        entries.forEach(e => {
+            if (lvl >= (e.level || 0)) {
+                (e.resistances || []).forEach(r => out.add(r));
+            }
+        });
+    });
+    return Array.from(out);
+}
+
+// Inietta in pg.resistenze (e analogamente immunita') eventuali
+// resistenze auto-derivate da privilegi di sottoclasse mancanti.
+// Idempotente: aggiunge solo cio' che manca.
+function _ensureSubclassAutoEffectsApplied(pg) {
+    if (!pg) return false;
+    const auto = _pgSubclassAutoResistances(pg);
+    if (auto.length === 0) return false;
+    if (!Array.isArray(pg.resistenze)) pg.resistenze = [];
+    let changed = false;
+    auto.forEach(r => {
+        if (!pg.resistenze.includes(r)) {
+            pg.resistenze.push(r);
+            changed = true;
+        }
+    });
+    return changed;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Invocazioni Occulte (Eldritch Invocations) del Warlock.
 // Dataset in window.INVOCATIONS_DATA generato da
 // risorse/invocazioni/build_invocations.py.
 //
@@ -1055,23 +1130,66 @@ function _pgInvocationGrantedSpells(pg) {
     return out;
 }
 
-// Slot d'uso (1/lungo) per le invocazioni con effect spell_per_long_rest.
+// Risorse limitate derivate dalle invocazioni: include sia gli spell
+// "1/lungo" sia le invocazioni con uso limitato (es. cloak-of-flies,
+// gift-of-the-protectors, bond-of-the-talisman). Restituisce una lista di
+// "slot" tracciabili nella pagina incantesimi (Slot invocazioni) e nella
+// pagina 1 (Risorse).
 function _pgInvocationSlots(pg) {
-    const list = _pgInvocationGrantedSpells(pg).filter(s => s.recharge === 'long_rest');
-    const stored = (pg.risorse_classe && pg.risorse_classe._invocations) || {};
+    const stored = (pg && pg.risorse_classe && pg.risorse_classe._invocations) || {};
+    const ids = (pg && pg.invocazioni) || [];
+    const pb = (typeof getProficiencyBonus === 'function') ? (getProficiencyBonus(pg) || 2) : 2;
     const out = [];
-    list.forEach(sp => {
-        const key = (sp.name_en || sp.invocation_id).replace(/[^A-Za-z0-9]+/g, '_');
-        const max = 1;
+
+    ids.forEach(id => {
+        const inv = _invocationById(id);
+        if (!inv) return;
+        const d = inv.effect_data || {};
+        const eff = inv.effect;
+
+        let recharge = null;
+        let displayRecharge = '';
+        let max = 1;
+        let isSpell = false;
+        let displayName = inv.name;
+        let displayLevel = '';
+        let key = id.replace(/[^A-Za-z0-9]+/g, '_');
+
+        if (eff === 'spell_per_long_rest') {
+            recharge = 'long_rest';
+            displayRecharge = 'r. lungo';
+            isSpell = true;
+            displayName = d.spell_it || d.spell_en || inv.name;
+            displayLevel = `Lv ${d.level_cast || 1}`;
+            max = 1;
+            key = (d.spell_en || id).replace(/[^A-Za-z0-9]+/g, '_');
+        } else if (d.recharge === 'long_rest' || d.recharge === 'short_rest') {
+            recharge = d.recharge;
+            displayRecharge = d.recharge === 'short_rest' ? 'r. breve/lungo' : 'r. lungo';
+            const usesSpec = d.uses;
+            if (usesSpec === 'prof_bonus') max = pb;
+            else if (typeof usesSpec === 'number') max = usesSpec;
+            else max = 1;
+        } else {
+            return;
+        }
+
         const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
         out.push({
-            key, name: sp.name, name_en: sp.name_en,
-            level_cast: sp.level_cast,
-            invocation_name: sp.invocation_name,
-            recharge: 'r. lungo',
-            max, current,
+            key,
+            name: displayName,
+            name_en: isSpell ? d.spell_en : null,
+            level_cast: isSpell ? (d.level_cast || 1) : null,
+            level_label: displayLevel,
+            invocation_name: inv.name,
+            invocation_id: id,
+            is_spell: isSpell,
+            recharge: displayRecharge,
+            max,
+            current,
         });
     });
+
     return out;
 }
 
@@ -2385,6 +2503,20 @@ async function renderSchedaPersonaggio(personaggioId) {
         }
         _schedaPgCache = pg;
 
+        // Auto-injection di resistenze derivate da privilegi di sottoclasse
+        // (es. Difese Psichiche dello Stregone Mente Aberrante a liv 6).
+        // Persistite a DB se mancanti, in modo che siano visibili anche da
+        // altri dispositivi.
+        if (_ensureSubclassAutoEffectsApplied(pg)) {
+            try {
+                await supabase.from('personaggi')
+                    .update({ resistenze: pg.resistenze, updated_at: new Date().toISOString() })
+                    .eq('id', personaggioId);
+            } catch (e) {
+                console.warn('[auto-resistance] save failed', e);
+            }
+        }
+
         const fMod = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
         const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
         const saves = pg.tiri_salvezza || [];
@@ -2508,6 +2640,21 @@ async function renderSchedaPersonaggio(personaggioId) {
                     <span class="scheda-hd-val" id="sRRes_${rr.key}">${rr.current}</span>
                     <span class="scheda-hd-max">/ ${rr.max}</span>
                     <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},1,${rr.max})">+</button>
+                </div>
+            </div>`);
+        });
+        // Risorse derivate dalle invocazioni occulte (non-spell): es. Cloak
+        // of Flies (1/breve), Tomb of Levistus, Bond of the Talisman
+        // (prof_bonus/lungo), Gift of the Protectors, Protection of the
+        // Talisman, ecc.
+        _pgInvocationSlots(pg).filter(is => !is.is_spell).forEach(is => {
+            resItems.push(`<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${escapeHtml(is.name)} <small>(invocazione, ${escapeHtml(is.recharge)})</small></span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                    <span class="scheda-hd-val" id="sInvRes_${is.key}">${is.current}</span>
+                    <span class="scheda-hd-max">/ ${is.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
                 </div>
             </div>`);
         });
@@ -2681,6 +2828,14 @@ async function renderSchedaPersonaggio(personaggioId) {
         ${buildEquipSection(pg)}
 
         ${classResourcesHtml}
+
+        ${_buildP1CustomTablesHtml(pg)}
+
+        <div class="priv-add-tab-wrap">
+            <button class="btn-secondary priv-add-tab-btn" onclick="p1AddTab()">
+                <span class="priv-add-tab-plus">+</span> Nuova tabella
+            </button>
+        </div>
 
         </div><!-- /scheda-col-right -->
         </div><!-- /scheda-page-grid -->
@@ -2930,25 +3085,31 @@ window.schedaOpenSpellPage = async function(pgId) {
     const invocationSlots = _pgInvocationSlots(pg);
     let invocationSlotsBlock = '';
     if (invocationSlots.length > 0) {
-        const rows = invocationSlots.map(is => {
-            const lvlLabel = `Lv ${is.level_cast}`;
-            return `<div class="scheda-hd-row">
-                <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${lvlLabel}</small> <small>(${is.recharge})</small></span>
-                <div class="scheda-hd-avail">
-                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
-                    <span class="scheda-hd-val" id="sInvSlot_${is.key}">${is.current}</span>
-                    <span class="scheda-hd-max">/ ${is.max}</span>
-                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
-                </div>
-            </div>`;
-        }).join('');
-        invocationSlotsBlock = `
+        // Sulla pagina incantesimi mostra solo gli "slot invocazione"
+        // che corrispondono a un incantesimo (1/lungo). Le altre risorse
+        // limitate (es. Cloak of Flies, Tomb of Levistus) sono trattate
+        // come "risorse" e mostrate sulla pagina 1.
+        const spellInvSlots = invocationSlots.filter(is => is.is_spell);
+        if (spellInvSlots.length > 0) {
+            const rows = spellInvSlots.map(is => {
+                return `<div class="scheda-hd-row">
+                    <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${escapeHtml(is.level_label)}</small> <small>(${escapeHtml(is.recharge)})</small></span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                        <span class="scheda-hd-val" id="sInvSlot_${is.key}">${is.current}</span>
+                        <span class="scheda-hd-max">/ ${is.max}</span>
+                        <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+            invocationSlotsBlock = `
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot invocazioni</div>
         <div class="scheda-section-body">
             <div class="scheda-hd-list">${rows}</div>
         </div>
     </div>`;
+        }
     }
 
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
@@ -4207,6 +4368,11 @@ function _normalizePrivilegi(pg) {
         custom_features: (p.custom_features && typeof p.custom_features === 'object')
             ? { ...p.custom_features } : {},
         custom_tabs_order: order,
+        // Tabelle custom della pagina 1 (Statistiche). Stesso schema delle
+        // tabelle custom della pagina 2.
+        p1_tabs_order: Array.isArray(p.p1_tabs_order) ? [...p.p1_tabs_order] : [],
+        p1_features: (p.p1_features && typeof p.p1_features === 'object')
+            ? { ...p.p1_features } : {},
     };
 }
 
@@ -4291,8 +4457,9 @@ function _renderPrivFeatureRow(f, opts = {}) {
     const langWarn = showEnWarn
         ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
         : '';
+    const removeFn = opts.removeFn || `privRemoveCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`;
     const actionBtn = isCustom
-        ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();privRemoveCustom('${escapeHtml(opts.tabName)}',${opts.index})" title="Rimuovi">✕</button>`
+        ? `<button class="scheda-custom-res-del" onclick="event.stopPropagation();${removeFn}" title="Rimuovi">✕</button>`
         : '';
     const headerClass = `priv-feat-header${hasDesc ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
     const onclick = hasDesc ? `onclick="privToggleFeatureBody(this)"` : '';
@@ -4343,6 +4510,150 @@ window.privToggleFeatureBody = function(headerEl) {
     const open = body.style.display !== 'none';
     body.style.display = open ? 'none' : '';
     if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+};
+
+// ============================================================
+// Tabelle custom della pagina 1 (sotto Risorse)
+// Stesso schema delle tabelle custom di pagina 2, ma persistite in
+// pg.privilegi.p1_tabs_order / p1_features.
+// ============================================================
+function _buildP1CustomTablesHtml(pg) {
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.p1_tabs_order || priv.p1_tabs_order.length === 0) return '';
+    return priv.p1_tabs_order.map(tabName => {
+        const items = priv.p1_features[tabName] || [];
+        const rows = items.length > 0
+            ? items.map((f, i) => _renderPrivFeatureRow(f, {
+                custom: true,
+                tabName,
+                index: i,
+                removeFn: `p1RemoveCustom('${escapeHtml(tabName)}',${i})`,
+            })).join('')
+            : '<span class="scheda-empty">Nessuna voce</span>';
+        return `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();p1AddCustom('${escapeHtml(tabName)}')" title="Aggiungi voce">&#9998;</button>
+                <button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();p1RemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>
+            </div>
+            <div class="scheda-section-body">${rows}</div>
+        </div>`;
+    }).join('');
+}
+
+async function _p1Save(pgId, priv) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    if (_schedaPgCache) _schedaPgCache.privilegi = priv;
+    try {
+        await supabase.from('personaggi')
+            .update({ privilegi: priv, updated_at: new Date().toISOString() })
+            .eq('id', pgId);
+    } catch (e) {
+        console.warn('[p1 custom tabs] save failed', e);
+    }
+}
+
+window.p1AddTab = function() {
+    const name = prompt('Nome della nuova tabella (es. "Note", "Trofei"):');
+    if (!name) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (priv.p1_tabs_order.includes(trimmed)) {
+        showNotification && showNotification('Esiste già una tabella con questo nome');
+        return;
+    }
+    priv.p1_tabs_order.push(trimmed);
+    priv.p1_features[trimmed] = [];
+    _p1Save(pg.id, priv).then(() => openSchedaPersonaggio(pg.id));
+};
+
+window.p1RemoveTab = function(tabName) {
+    if (!confirm(`Rimuovere la tabella "${tabName}" e tutte le sue voci?`)) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    priv.p1_tabs_order = priv.p1_tabs_order.filter(t => t !== tabName);
+    delete priv.p1_features[tabName];
+    _p1Save(pg.id, priv).then(() => openSchedaPersonaggio(pg.id));
+};
+
+window.p1AddCustom = function(tabName) {
+    _privOpenP1EditDialog({ tabName, mode: 'add' });
+};
+
+window.p1EditCustom = function(tabName, index) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    const item = (priv.p1_features[tabName] || [])[index];
+    if (!item) return;
+    _privOpenP1EditDialog({ tabName, mode: 'edit', index, item });
+};
+
+window.p1RemoveCustom = async function(tabName, index) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.p1_features[tabName]) return;
+    priv.p1_features[tabName].splice(index, 1);
+    await _p1Save(pg.id, priv);
+    openSchedaPersonaggio(pg.id);
+};
+
+function _privOpenP1EditDialog({ tabName, mode, index, item }) {
+    let modal = document.getElementById('privEditModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'privEditModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+    const it = item || { name: '', level: '', description: '' };
+    const title = mode === 'edit' ? 'Modifica voce' : `Aggiungi a ${tabName}`;
+    modal.innerHTML = `
+    <div class="modal-content priv-edit-card">
+        <button class="modal-close" onclick="privCloseEdit()" aria-label="Chiudi">×</button>
+        <h2 style="margin:0 0 12px;font-size:1.05rem;">${escapeHtml(title)}</h2>
+        <label class="priv-edit-label">Nome
+            <input type="text" id="privEditName" class="priv-edit-input" value="${escapeHtml(it.name)}" placeholder="Es. Nota, Trofeo, ...">
+        </label>
+        <label class="priv-edit-label">Livello (opzionale)
+            <input type="number" id="privEditLevel" class="priv-edit-input priv-edit-input-num" value="${it.level || ''}" min="1" max="20" placeholder="—">
+        </label>
+        <label class="priv-edit-label">Descrizione
+            <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione">${escapeHtml(it.description || '')}</textarea>
+        </label>
+        <div class="priv-edit-actions">
+            <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
+            <button class="btn-primary" onclick="p1ConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
+        </div>
+    </div>`;
+    modal.classList.add('active');
+    setTimeout(() => document.getElementById('privEditName')?.focus(), 50);
+}
+
+window.p1ConfirmEdit = async function(tabName, mode, index) {
+    const name = (document.getElementById('privEditName')?.value || '').trim();
+    const lvlRaw = (document.getElementById('privEditLevel')?.value || '').trim();
+    const desc = (document.getElementById('privEditDesc')?.value || '').trim();
+    if (!name) {
+        showNotification && showNotification('Inserisci almeno il nome');
+        return;
+    }
+    const level = lvlRaw ? Math.max(1, Math.min(20, parseInt(lvlRaw) || 0)) : null;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.p1_features[tabName]) priv.p1_features[tabName] = [];
+    const newItem = { name, level, description: desc };
+    if (mode === 'edit' && index >= 0) priv.p1_features[tabName][index] = newItem;
+    else priv.p1_features[tabName].push(newItem);
+    await _p1Save(pg.id, priv);
+    privCloseEdit();
+    openSchedaPersonaggio(pg.id);
 };
 
 window.schedaOpenPrivilegesPage = async function(pgId) {
@@ -4480,7 +4791,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         const isDefault = PRIV_DEFAULT_CUSTOM_TABS.includes(tabName);
         const removeTabBtn = isDefault ? '' :
             `<button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();privRemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>`;
-        customSectionsHtml += `<div class="scheda-section">
+        customSectionsHtml += `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>
                 ${removeTabBtn}
@@ -4493,7 +4804,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     const talentiList = (pg.talenti && pg.talenti.length > 0)
         ? pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')
         : '<span class="scheda-empty">Nessun talento</span>';
-    const talentiSectionHtml = `<div class="scheda-section">
+    const talentiSectionHtml = `<div class="scheda-section collapsed">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Talenti
             <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
         </div>
@@ -4502,7 +4813,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         </div>
     </div>`;
 
-    // Sezione Invocazioni Demoniache (solo per Warlock).
+    // Sezione Invocazioni Occulte (solo per Warlock).
     let invocationsSectionHtml = '';
     const wlvl = _pgWarlockLevel(pg);
     if (wlvl >= 2) {
@@ -4519,15 +4830,15 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                         <span class="priv-feat-name">${escapeHtml(inv.name)}</span>
                         <span class="priv-feat-arrow">&#9662;</span>
                     </div>
-                    <div class="priv-feat-body">
+                    <div class="priv-feat-body" style="display:none;">
                         ${prereqLine}
                         <div class="priv-feat-desc">${escapeHtml(desc)}</div>
                     </div>
                 </div>`;
             }).join('')
             : '<span class="scheda-empty">Nessuna invocazione selezionata</span>';
-        invocationsSectionHtml = `<div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Invocazioni Demoniache <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
+        invocationsSectionHtml = `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Invocazioni Occulte <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenInvocationsEdit('${pg.id}')" title="Modifica invocazioni">&#9998;</button>
             </div>
             <div class="scheda-section-body" id="schedaInvocationsDisplay">${itemsHtml}</div>
@@ -4537,19 +4848,19 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     content.innerHTML = `
     ${buildSchedaHeader(pg, 'Pagina 2 · Privilegi')}
 
-    <div class="scheda-section">
+    <div class="scheda-section collapsed">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Classe</div>
         <div class="scheda-section-body">${classBlocks}</div>
     </div>
 
-    ${subclassBlocks ? `<div class="scheda-section">
+    ${subclassBlocks ? `<div class="scheda-section collapsed">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sottoclasse</div>
         <div class="scheda-section-body">${subclassBlocks}</div>
     </div>` : ''}
 
-    ${customSectionsHtml}
-
     ${invocationsSectionHtml}
+
+    ${customSectionsHtml}
 
     ${talentiSectionHtml}
 
@@ -5105,7 +5416,7 @@ window.schedaOpenInvocationsEdit = function(pgId) {
     <div class="modal active" id="schedaInvocationsModal">
         <div class="modal-content modal-content-lg">
             <button class="modal-close" onclick="schedaCloseInvocationsEdit()">&times;</button>
-            <h2>Modifica Invocazioni Demoniache</h2>
+            <h2>Modifica Invocazioni Occulte</h2>
             <div class="wizard-page-scroll" id="schedaInvocationsContent">
                 ${_schedaInvocationsContentHtml(current)}
             </div>
@@ -5941,14 +6252,20 @@ window.schedaInvocationSlotChange = function(pgId, key, current, delta, max) {
     if (!pg.risorse_classe) pg.risorse_classe = {};
     if (!pg.risorse_classe._invocations) pg.risorse_classe._invocations = {};
     pg.risorse_classe._invocations[key] = newVal;
-    const el = document.getElementById(`sInvSlot_${key}`);
-    if (el) el.textContent = newVal;
-    const row = el ? el.closest('.scheda-hd-row') : null;
-    if (row) {
-        const btns = row.querySelectorAll('.scheda-hd-btn');
-        if (btns[0]) btns[0].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},-1,${max})`);
-        if (btns[1]) btns[1].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},1,${max})`);
-    }
+    // Lo stesso slot puo' essere mostrato sia in pagina incantesimi
+    // (sInvSlot_) sia nelle risorse di pagina 1 (sInvRes_): aggiorniamo
+    // entrambe le viste.
+    [`sInvSlot_${key}`, `sInvRes_${key}`].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = newVal;
+        const row = el.closest('.scheda-hd-row');
+        if (row) {
+            const btns = row.querySelectorAll('.scheda-hd-btn');
+            if (btns[0]) btns[0].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},-1,${max})`);
+            if (btns[1]) btns[1].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},1,${max})`);
+        }
+    });
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 };
 
