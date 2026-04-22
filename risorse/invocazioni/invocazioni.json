@@ -187,7 +187,7 @@
     "effect": "spell_per_long_rest",
     "effect_data": {
       "spell_en": "Water Breathing",
-      "spell_it": null,
+      "spell_it": "Respirare sott'Acqua",
       "level_cast": 3,
       "passive_extra": "Respirazione subacquea + nuoto = velocita' camminata"
     }
@@ -370,7 +370,7 @@
     "effect": "spell_at_will",
     "effect_data": {
       "spell_en": "Speak with Animals",
-      "spell_it": null,
+      "spell_it": "Parlare con gli Animali",
       "level_cast": 1
     }
   },
@@ -967,7 +967,7 @@
     "effect": "spell_at_will",
     "effect_data": {
       "spell_en": "Detect Magic",
-      "spell_it": null,
+      "spell_it": "Individuazione del Magico",
       "level_cast": 1
     }
   },

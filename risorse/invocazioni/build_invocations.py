@@ -46,6 +46,44 @@ OUT_JS = ROOT / "js" / "data" / "invocations_data.js"
 SPELLS = json.loads(SPELLS_JSON.read_text(encoding="utf-8"))
 EN_TO_IT: dict[str, str] = {sp.get("name_en", ""): k for k, sp in SPELLS.items() if sp.get("name_en")}
 
+# Override per incantesimi che il dataset spells.json non contiene (ancora).
+# Mappiamo manualmente nome EN -> nome IT canonico in modo che gli slot
+# invocazioni e la pagina degli incantesimi mostrino il nome italiano.
+SPELL_IT_OVERRIDE: dict[str, str] = {
+    "Speak with Animals": "Parlare con gli Animali",
+    "Detect Magic": "Individuazione del Magico",
+    "Water Breathing": "Respirare sott'Acqua",
+    "Detect Thoughts": "Individuazione dei Pensieri",
+    "Detect Evil and Good": "Individuazione del Male e del Bene",
+    "Mage Hand": "Mano Magica",
+    "Find Familiar": "Trova Famiglio",
+    "Comprehend Languages": "Comprensione dei Linguaggi",
+    "False Life": "Vita Falsata",
+    "Identify": "Identificare",
+    "Speak with Dead": "Parlare con i Morti",
+    "Augury": "Augurio",
+    "Tongues": "Linguaggi",
+    "Sending": "Inviare Messaggio",
+    "Arcane Eye": "Occhio Arcano",
+    "Silent Image": "Immagine Silente",
+    "Disguise Self": "Camuffare Se' Stesso",
+    "Alter Self": "Alterare Se' Stesso",
+    "Levitate": "Levitazione",
+    "Jump": "Saltare",
+    "Confusion": "Confusione",
+    "Slow": "Rallentare",
+    "Bestow Curse": "Scagliare Maledizione",
+    "Polymorph": "Metamorfosi",
+    "Hold Monster": "Bloccare Mostri",
+    "Mage Armor": "Armatura Magica",
+    "Animate Dead": "Animare Morti",
+    "Compulsion": "Costrizione",
+    "Conjure Elemental": "Convocare Elementale",
+    "Hex": "Anatema",
+    "Invisibility": "Invisibilita'",
+    "Freedom of Movement": "Liberta' di Movimento",
+}
+
 
 def _slug(name: str) -> str:
     s = unicodedata.normalize("NFKD", name)
@@ -55,7 +93,12 @@ def _slug(name: str) -> str:
 
 
 def _resolve_spell_it(en: str) -> str | None:
-    return EN_TO_IT.get(en)
+    """Risolve il nome IT di un incantesimo EN: prima cerca in
+    spells.json, poi negli override manuali."""
+    it = EN_TO_IT.get(en)
+    if it:
+        return it
+    return SPELL_IT_OVERRIDE.get(en)
 
 
 INVOCATIONS: list[dict] = []

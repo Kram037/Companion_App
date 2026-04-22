@@ -4814,16 +4814,30 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         </div>`;
     });
 
-    // Sezione Talenti (gestita separatamente: si appoggia a pg.talenti, non a custom_features)
-    const talentiList = (pg.talenti && pg.talenti.length > 0)
-        ? pg.talenti.map(t => `<span class="scheda-tag">${escapeHtml(t)}</span>`).join('')
+    // Sezione Talenti: come tendine espandibili coerenti con le altre
+    // tabelle di Pagina 2 (header con nome, dropdown con descrizione).
+    const talentiData = _featsData();
+    const talentiRows = (pg.talenti && pg.talenti.length > 0)
+        ? pg.talenti.map(t => {
+            const nome = typeof t === 'string' ? t : (t && t.name) || '';
+            const feat = talentiData[nome] || null;
+            return _renderPrivFeatureRow({
+                name: nome,
+                name_en: feat ? feat.name_en : '',
+                description: feat ? (feat.description || feat.description_en || '') : '',
+                description_en: feat ? feat.description_en : '',
+                translated: feat ? !!feat.translated : true,
+                level: null,
+            }, {});
+        }).join('')
         : '<span class="scheda-empty">Nessun talento</span>';
     const talentiSectionHtml = `<div class="scheda-section collapsed">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Talenti
+            <small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${pg.talenti ? pg.talenti.length : 0})</small>
             <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
         </div>
-        <div class="scheda-section-body">
-            <div class="scheda-tags" id="schedaTalentiDisplay">${talentiList}</div>
+        <div class="scheda-section-body" id="schedaTalentiDisplay">
+            ${talentiRows}
         </div>
     </div>`;
 
