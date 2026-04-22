@@ -2465,6 +2465,254 @@ const CLASS_RESOURCES = {
     // pagina Incantesimi (non come risorsa di classe), per evitare duplicazione.
 };
 
+// ─────────────────────────────────────────────────────────────────────────
+// SUBCLASS_RESOURCES: risorse consumabili specifiche di sottoclasse.
+// Mappa subclassSlug -> array di risorse, ognuna con:
+//   nome           etichetta IT
+//   fromLevel      livello minimo nella classe da cui appare
+//   tipo (opt)     'counter' (default), 'portent', 'dice_pool'
+//   perLivello?    array indicizzato dal livello (max in base al livello classe)
+//   max?           numero fisso o 'prof_bonus' o 'usaMod:<carat>'
+//   usaMod?        nome caratteristica per max = mod min 1 (es. 'intelligenza')
+//   minMod         min per usaMod (default 1)
+//   recharge?      'long_rest' | 'short_rest' | 'short_or_long' | ...
+//   dado?          es. 'd6' (per dice_pool, viene mostrato come info)
+//   dadoPerLivello? array di dadi (per dice_pool che scala)
+//   note?          breve nota visualizzata accanto
+// ─────────────────────────────────────────────────────────────────────────
+const SUBCLASS_RESOURCES = {
+    // ── MAGO ───────────────────────────────────────────────────────────
+    'school-of-divination': [
+        { nome: 'Portento', tipo: 'portent', perLivello: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3], fromLevel: 2, recharge: 'long_rest' },
+    ],
+    'school-of-abjuration': [
+        { nome: 'Distorsione Arcana', tipo: 'ward_pool', fromLevel: 2, recharge: 'long_rest' },
+    ],
+    'war-magic': [
+        { nome: 'Sovraccarico Magico', usaMod: 'intelligenza', minMod: 1, fromLevel: 2, recharge: 'long_rest', note: 'recupera 1 al r. lungo, +1 a critico/TS riuscito' },
+    ],
+    'bladesinging': [
+        { nome: 'Canto della Lama', max: 'prof_bonus', fromLevel: 2, recharge: 'short_or_long' },
+    ],
+    'chronurgy-magic': [
+        { nome: 'Spostamento Cronologico', max: 2, fromLevel: 2, recharge: 'long_rest' },
+        { nome: 'Anello Temporale', max: 1, fromLevel: 14, recharge: 'long_rest' },
+    ],
+    'graviturgy-magic': [
+        { nome: 'Regolare Densità', max: 'prof_bonus', fromLevel: 2, recharge: 'long_rest' },
+    ],
+    'order-of-scribes': [
+        { nome: 'Mente Manifesta', max: 'prof_bonus', fromLevel: 2, recharge: 'long_rest' },
+    ],
+
+    // ── LADRO ──────────────────────────────────────────────────────────
+    'soulknife': [
+        { nome: 'Dadi di Energia Psionica',
+          tipo: 'dice_pool',
+          perLivello: [0,0,0,4,4,6,6,6,6,6,6,8,8,8,8,8,8,12,12,12,12],
+          dadoPerLivello: ['d6','d6','d6','d6','d6','d8','d8','d8','d8','d8','d8','d10','d10','d10','d10','d10','d10','d12','d12','d12','d12'],
+          fromLevel: 3, recharge: 'long_rest_or_bonus' },
+    ],
+    'phantom': [
+        { nome: 'Lamenti dalla Tomba', max: 'prof_bonus', fromLevel: 9, recharge: 'long_rest' },
+    ],
+
+    // ── COMBATTENTE ────────────────────────────────────────────────────
+    'battle-master': [
+        { nome: 'Dadi di Superiorità',
+          tipo: 'dice_pool',
+          perLivello: [0,0,0,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6],
+          dadoPerLivello: ['d8','d8','d8','d8','d8','d8','d8','d8','d8','d10','d10','d10','d10','d10','d10','d10','d10','d12','d12','d12','d12'],
+          fromLevel: 3, recharge: 'short_or_long' },
+    ],
+    'psi-warrior': [
+        { nome: 'Dadi di Energia Psionica',
+          tipo: 'dice_pool',
+          perLivello: [0,0,0,4,4,6,6,6,6,6,6,8,8,8,8,8,8,12,12,12,12],
+          dadoPerLivello: ['d6','d6','d6','d6','d6','d8','d8','d8','d8','d8','d8','d10','d10','d10','d10','d10','d10','d12','d12','d12','d12'],
+          fromLevel: 3, recharge: 'long_rest_or_bonus' },
+    ],
+    'echo-knight': [
+        { nome: 'Liberare l\'Incarnazione', max: 'prof_bonus', fromLevel: 3, recharge: 'long_rest' },
+    ],
+    'samurai': [
+        { nome: 'Spirito Combattivo', max: 3, fromLevel: 3, recharge: 'long_rest', note: 'usi recuperano al r. lungo' },
+    ],
+    'arcane-archer': [
+        { nome: 'Tiri Arcani', perLivello: [0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], fromLevel: 3, recharge: 'short_or_long' },
+    ],
+    'banneret': [
+        { nome: 'Carica Ispiratrice', perLivello: [0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2], fromLevel: 7, recharge: 'short_or_long' },
+    ],
+    'rune-knight': [
+        { nome: 'Forma del Gigante', max: 'prof_bonus', fromLevel: 3, recharge: 'short_or_long' },
+    ],
+
+    // ── BARBARO (alcune utilità) ──────────────────────────────────────
+    'path-of-the-zealot': [
+        { nome: 'Presenza Fanatica', max: 1, fromLevel: 10, recharge: 'long_rest' },
+    ],
+
+    // ── MONACO ─────────────────────────────────────────────────────────
+    'way-of-the-open-hand': [
+        { nome: 'Pienezza del Corpo', max: 1, fromLevel: 6, recharge: 'long_rest', note: 'cura 3 × livello monaco PF' },
+    ],
+    'way-of-the-ascendant-dragon': [
+        { nome: 'Soffio del Drago', max: 'prof_bonus', fromLevel: 3, recharge: 'long_rest' },
+    ],
+
+    // ── PALADINO (oltre al Channel Divinity di classe) ────────────────
+    // Tutte le opzioni di Channel Divinity di sottoclasse condividono il
+    // pool di Incanalare Divinità della classe → niente da aggiungere.
+
+    // ── DRUIDO ─────────────────────────────────────────────────────────
+    // La maggior parte usa Forma Selvatica (gestita a livello classe).
+
+    // ── RANGER ─────────────────────────────────────────────────────────
+    'horizon-walker': [
+        { nome: 'Individuazione Portali', max: 1, fromLevel: 3, recharge: 'short_or_long' },
+    ],
+    'fey-wanderer': [
+        { nome: 'Distorsione Affascinante', max: 'prof_bonus', fromLevel: 7, recharge: 'long_rest' },
+    ],
+
+    // ── BARDO ──────────────────────────────────────────────────────────
+    'college-of-glamour': [
+        { nome: 'Esibizione Ammaliante', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+    ],
+    'college-of-whispers': [
+        { nome: 'Manto dei Sussurri', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+    ],
+    'college-of-creation': [
+        { nome: 'Esibizione della Creazione', max: 1, fromLevel: 6, recharge: 'long_rest' },
+    ],
+
+    // ── STREGONE ───────────────────────────────────────────────────────
+    // Wild Magic
+    'wild-magic': [
+        { nome: 'Maree del Caos', max: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'clockwork-soul': [
+        { nome: 'Ripristina Equilibrio', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest' },
+        { nome: 'Trance dell\'Ordine', max: 1, fromLevel: 6, recharge: 'long_rest' },
+        { nome: 'Cavalcata dell\'Orologio', max: 1, fromLevel: 18, recharge: 'long_rest' },
+    ],
+    // Aberrant Mind: Psionic Sorcery usa Punti Stregoneria, niente extra.
+
+    // ── WARLOCK ────────────────────────────────────────────────────────
+    'the-hexblade': [
+        { nome: 'Maledizione del Lama Stregata', max: 'prof_bonus', fromLevel: 1, recharge: 'short_or_long' },
+        { nome: 'Spettro Maledetto', max: 1, fromLevel: 6, recharge: 'long_rest' },
+    ],
+    'the-fiend': [
+        { nome: 'Fortuna Tenebrosa', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest' },
+    ],
+    'the-celestial': [
+        { nome: 'Luce Curativa',
+          tipo: 'dice_pool',
+          // 1 + livello warlock dadi totali, dado fisso d6.
+          perLivelloCalc: 'warlock_lvl_plus_one_d6',
+          dado: 'd6',
+          fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'the-genie': [
+        { nome: 'Vaso del Genio (Riposo)', max: 1, fromLevel: 1, recharge: 'long_rest' },
+        { nome: 'Vaso del Genio (Ira)', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest' },
+        { nome: 'Desiderio Limitato', max: 1, fromLevel: 14, recharge: 'long_rest', note: 'recupera dopo 1d4 r. lunghi' },
+    ],
+    'the-undead': [
+        { nome: 'Forma del Terrore', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'the-great-old-one': [
+        { nome: 'Barriera Entropica', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+        { nome: 'Creare Schiavo', max: 1, fromLevel: 14, recharge: 'long_rest' },
+    ],
+
+    // ── ARTEFICE ───────────────────────────────────────────────────────
+    'alchemist': [
+        { nome: 'Elisir Sperimentale', usaMod: 'intelligenza', minMod: 1, fromLevel: 3, recharge: 'long_rest' },
+    ],
+};
+
+// Etichette di recharge user-friendly.
+const _RECHARGE_LABELS = {
+    long_rest: 'r. lungo',
+    short_rest: 'r. breve',
+    short_or_long: 'r. breve/lungo',
+    long_rest_or_bonus: 'r. lungo o az. bonus',
+    dawn: "all'alba",
+};
+
+// Calcola il valore massimo di una risorsa di sottoclasse per il PG.
+function _resolveSubclassResMax(res, pg, classEntry) {
+    const lvl = parseInt(classEntry?.livello) || 0;
+    if (typeof res.max === 'number') return res.max;
+    if (res.max === 'prof_bonus') {
+        return calcBonusCompetenza(pg.livello || 1) || 2;
+    }
+    if (res.usaMod) {
+        const mod = calcMod(pg[res.usaMod] || 10);
+        const minMod = res.minMod != null ? res.minMod : 1;
+        return Math.max(minMod, mod);
+    }
+    if (Array.isArray(res.perLivello)) {
+        return res.perLivello[Math.min(lvl, 20)] || 0;
+    }
+    if (res.perLivelloCalc === 'warlock_lvl_plus_one_d6') {
+        // Per "Luce Curativa" del Celestial Warlock: 1 + livello warlock.
+        const warlockLvl = (pg.classi || []).filter(c => c.nome === 'Warlock').reduce((a, c) => a + (c.livello || 0), 0) || 0;
+        return Math.max(1, warlockLvl + 1);
+    }
+    return 0;
+}
+
+// Ritorna la dimensione del dado per le risorse di tipo dice_pool che
+// scalano (es. Soulknife, Battle Master).
+function _resolveSubclassResDie(res, classEntry) {
+    if (Array.isArray(res.dadoPerLivello)) {
+        const lvl = parseInt(classEntry?.livello) || 0;
+        return res.dadoPerLivello[Math.min(lvl, 20)] || res.dado || '';
+    }
+    return res.dado || '';
+}
+
+// Helper: per ogni classe del PG, restituisce le risorse di sottoclasse
+// applicabili al livello corrente.
+function _pgSubclassResources(pg) {
+    const out = [];
+    if (!pg || !Array.isArray(pg.classi)) return out;
+    const stored = (pg.risorse_classe && pg.risorse_classe._subclass) || {};
+    pg.classi.forEach(c => {
+        const subSlug = c.sottoclasseSlug;
+        if (!subSlug) return;
+        const list = SUBCLASS_RESOURCES[subSlug];
+        if (!list) return;
+        list.forEach((res, rIdx) => {
+            const lvl = parseInt(c.livello) || 0;
+            if (lvl < (res.fromLevel || 1)) return;
+            const max = _resolveSubclassResMax(res, pg, c);
+            if (max <= 0) return;
+            const die = _resolveSubclassResDie(res, c);
+            const key = `${subSlug}__${rIdx}`;
+            const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+            out.push({
+                key,
+                nome: res.nome,
+                tipo: res.tipo || 'counter',
+                max, current,
+                die,
+                recharge: _RECHARGE_LABELS[res.recharge] || '',
+                classeNome: c.nome,
+                sottoclasseNome: c.sottoclasse || c.sottoclasseNome || subSlug,
+                note: res.note || '',
+                defaultMax: max,
+                fromLevel: res.fromLevel || 1,
+            });
+        });
+    });
+    return out;
+}
+
 const CLASS_SPELL_ABILITY = {
     'Bardo': 'carisma', 'Chierico': 'saggezza', 'Druido': 'saggezza', 'Mago': 'intelligenza',
     'Stregone': 'carisma', 'Warlock': 'carisma', 'Paladino': 'carisma', 'Ranger': 'saggezza',
@@ -2634,6 +2882,62 @@ async function renderSchedaPersonaggio(personaggioId) {
                 });
             });
         }
+        // Risorse di sottoclasse (auto-derivate da SUBCLASS_RESOURCES)
+        _pgSubclassResources(pg).forEach(sr => {
+            // Override utente (rinomina o cambio max).
+            const overrides = (classResources._overrides && classResources._overrides[sr.key]) || {};
+            const dispNome = overrides.nome || sr.nome;
+            let maxVal = sr.max;
+            if (typeof overrides.max === 'number' && overrides.max > 0) maxVal = overrides.max;
+            const current = Math.min(maxVal, sr.current);
+            const sub = sr.recharge ? ` <small>(${escapeHtml(sr.sottoclasseNome)}, ${sr.recharge})</small>` : ` <small>(${escapeHtml(sr.sottoclasseNome)})</small>`;
+            const dieBadge = sr.die ? ` <small style="color:var(--accent);font-weight:700;">${sr.die}</small>` : '';
+            const editBtn = `onclick="schedaOpenEditClassRes('${pg.id}','${sr.key}','${escapeHtml(sr.nome).replace(/'/g, '&#39;')}',${sr.defaultMax})" title="Modifica"`;
+            if (sr.tipo === 'portent') {
+                // Render specifico Portento (slot di dadi con valore salvato).
+                const stored = (pg.risorse_classe && pg.risorse_classe._portent && pg.risorse_classe._portent[sr.key]) || [];
+                const slots = [];
+                for (let i = 0; i < maxVal; i++) {
+                    const v = stored[i];
+                    const filled = v != null && v >= 1 && v <= 20;
+                    slots.push(`<button class="scheda-portent-slot${filled ? ' filled' : ''}" onclick="schedaPortentSlotClick('${pg.id}','${sr.key}',${i},${maxVal})" title="Click: imposta/usa">${filled ? v : '—'}</button>`);
+                }
+                const rollBtn = `<button class="scheda-portent-roll" onclick="schedaPortentRollAll('${pg.id}','${sr.key}',${maxVal})" title="Tira tutti">🎲</button>`;
+                resItems.push(`<div class="scheda-hd-row scheda-hd-row-portent">
+                    <span class="scheda-hd-total scheda-hd-total-clickable" ${editBtn}>${escapeHtml(dispNome)}${sub}</span>
+                    <div class="scheda-hd-avail scheda-portent-slots">
+                        ${slots.join('')}
+                        ${rollBtn}
+                    </div>
+                </div>`);
+            } else if (sr.tipo === 'ward_pool') {
+                // Distorsione Arcana (Abjuration): pool di PF = 2*livMago + IntMod.
+                const wizardLvl = (pg.classi || []).filter(c => c.nome === 'Mago').reduce((a,c) => a + (c.livello||0), 0);
+                const intMod = calcMod(pg.intelligenza || 10);
+                const wardMax = (typeof overrides.max === 'number' && overrides.max > 0) ? overrides.max : Math.max(0, 2 * wizardLvl + intMod);
+                const wardCur = Math.min(wardMax, current);
+                resItems.push(`<div class="scheda-hd-row">
+                    <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenEditClassRes('${pg.id}','${sr.key}','${escapeHtml(sr.nome).replace(/'/g, '&#39;')}',${Math.max(0, 2 * wizardLvl + intMod)})" title="Modifica">${escapeHtml(dispNome)}${sub}</span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${wardCur},-1,${wardMax})">−</button>
+                        <span class="scheda-hd-val" id="sSubRes_${sr.key}">${wardCur}</span>
+                        <span class="scheda-hd-max">/ ${wardMax}</span>
+                        <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${wardCur},1,${wardMax})">+</button>
+                    </div>
+                </div>`);
+            } else {
+                // Counter standard / dice_pool (con badge dado se presente).
+                resItems.push(`<div class="scheda-hd-row">
+                    <span class="scheda-hd-total scheda-hd-total-clickable" ${editBtn}>${escapeHtml(dispNome)}${dieBadge}${sub}</span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${current},-1,${maxVal})">−</button>
+                        <span class="scheda-hd-val" id="sSubRes_${sr.key}">${current}</span>
+                        <span class="scheda-hd-max">/ ${maxVal}</span>
+                        <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${current},1,${maxVal})">+</button>
+                    </div>
+                </div>`);
+            }
+        });
         // Risorse razziali (auto-derivate dai tratti con `uses`)
         _pgRaceResources(pg).forEach(rr => {
             const sub = rr.recharge ? ` <small>(razza, ${rr.recharge})</small>` : ` <small>(razza)</small>`;
@@ -6277,6 +6581,84 @@ window.schedaClassResChange = function(pgId, key, current, delta, max) {
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 }
 
+// Cambio current per le risorse di sottoclasse (counter / dice_pool / ward_pool).
+// Persistite in pg.risorse_classe._subclass[key].
+window.schedaSubclassResChange = function(pgId, key, current, delta, max) {
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    if (newVal === current) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._subclass) pg.risorse_classe._subclass = {};
+    pg.risorse_classe._subclass[key] = newVal;
+    const el = document.getElementById(`sSubRes_${key}`);
+    if (el) {
+        el.textContent = newVal;
+        const row = el.closest('.scheda-hd-row');
+        if (row) {
+            const btns = row.querySelectorAll('.scheda-hd-btn');
+            if (btns[0]) btns[0].setAttribute('onclick', `schedaSubclassResChange('${pgId}','${key}',${newVal},-1,${max})`);
+            if (btns[1]) btns[1].setAttribute('onclick', `schedaSubclassResChange('${pgId}','${key}',${newVal},1,${max})`);
+        }
+    }
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+};
+
+// Click su uno slot Portento: se vuoto chiede il valore (1-20),
+// se pieno offre di "spendere" (svuotare) il dado salvato.
+window.schedaPortentSlotClick = async function(pgId, key, idx, max) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._portent) pg.risorse_classe._portent = {};
+    if (!Array.isArray(pg.risorse_classe._portent[key])) pg.risorse_classe._portent[key] = [];
+    const arr = pg.risorse_classe._portent[key];
+    while (arr.length < max) arr.push(null);
+    arr.length = max;
+    const cur = arr[idx];
+    if (cur != null && cur >= 1 && cur <= 20) {
+        // Pieno → conferma "spendi"
+        if (confirm(`Spendere il Portento (valore ${cur})?`)) {
+            arr[idx] = null;
+            await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+            openSchedaPersonaggio(pgId);
+        }
+    } else {
+        // Vuoto → input valore
+        const val = await _schedaShowInputDialog({
+            title: `Portento – Slot ${idx + 1}`,
+            placeholder: 'Valore tirato (1-20)',
+            initial: '',
+        });
+        if (val == null) return;
+        const n = parseInt(val, 10);
+        if (!Number.isFinite(n) || n < 1 || n > 20) {
+            showNotification && showNotification('Valore non valido (1-20)');
+            return;
+        }
+        arr[idx] = n;
+        await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+        openSchedaPersonaggio(pgId);
+    }
+};
+
+// Tira tutti gli slot Portento ancora vuoti (utile al riposo lungo).
+window.schedaPortentRollAll = async function(pgId, key, max) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._portent) pg.risorse_classe._portent = {};
+    if (!Array.isArray(pg.risorse_classe._portent[key])) pg.risorse_classe._portent[key] = [];
+    const arr = pg.risorse_classe._portent[key];
+    while (arr.length < max) arr.push(null);
+    arr.length = max;
+    for (let i = 0; i < max; i++) {
+        if (arr[i] == null) arr[i] = 1 + Math.floor(Math.random() * 20);
+    }
+    await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+    openSchedaPersonaggio(pgId);
+};
+
 // Apre l'editor per una risorsa di classe (auto-derivata): permette di
 // sovrascrivere il nome e il valore massimo. Gli override sono
 // memorizzati in pg.risorse_classe._overrides[key] e applicati al
@@ -6297,12 +6679,10 @@ window.schedaOpenEditClassRes = function(pgId, key, defaultName, defaultMax) {
         <label style="display:block;font-size:0.78rem;color:var(--text-light);margin-bottom:4px;">Massimo</label>
         <input type="number" id="schedaCResMax" class="hp-calc-input" value="${curMax}" min="1" max="99">
         <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;">Default: ${escapeHtml(defaultName || '')} / ${defaultMax}</div>
-        <div class="dialog-actions" style="display:flex;gap:8px;justify-content:space-between;">
-            <button class="btn-secondary" id="schedaCResReset" style="background:#a55;color:#fff;">Reset</button>
-            <div style="display:flex;gap:8px;">
-                <button class="btn-secondary" id="schedaCResCancel">Annulla</button>
-                <button class="btn-primary" id="schedaCResSave">Salva</button>
-            </div>
+        <div class="dialog-actions">
+            <button class="btn-secondary" id="schedaCResReset" style="background:#a55;color:#fff;border-color:#a55;">Reset</button>
+            <button class="btn-secondary" id="schedaCResCancel">Annulla</button>
+            <button class="btn-primary" id="schedaCResSave">Salva</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
