@@ -2548,9 +2548,189 @@ const SUBCLASS_RESOURCES = {
         { nome: 'Forma del Gigante', max: 'prof_bonus', fromLevel: 3, recharge: 'short_or_long' },
     ],
 
-    // ── BARBARO (alcune utilità) ──────────────────────────────────────
+    // ── BARBARO ───────────────────────────────────────────────────────
     'path-of-the-zealot': [
         { nome: 'Presenza Fanatica', max: 1, fromLevel: 10, recharge: 'long_rest' },
+    ],
+    'path-of-wild-magic': [
+        { nome: 'Magia Selvaggia (Riserva di Cariche)', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest', note: 'cariche di Magia Cumulativa' },
+    ],
+    'path-of-the-storm-herald': [
+        // Storm Aura usa Rage; nessuna risorsa daily aggiuntiva.
+    ],
+    'path-of-the-ancestral-guardian': [
+        // Spirit Shield usa la reazione mentre infuriato; niente daily.
+    ],
+
+    // ── DRUIDO (oltre a Forma Selvatica/Wild Shape) ───────────────────
+    'circle-of-the-land': [
+        { nome: 'Recupero Naturale', max: 1, fromLevel: 2, recharge: 'long_rest', note: 'recupera slot a riposo breve' },
+    ],
+    'circle-of-dreams': [
+        { nome: 'Balsamo della Corte Estiva',
+          tipo: 'dice_pool',
+          perLivelloCalc: 'druid_level_d6',
+          dado: 'd6',
+          fromLevel: 2, recharge: 'long_rest', note: 'dadi = livello da Druido' },
+    ],
+    'circle-of-stars': [
+        { nome: 'Presagio Cosmico', max: 'prof_bonus', fromLevel: 10, recharge: 'long_rest' },
+    ],
+    'circle-of-the-shepherd': [
+        { nome: "Spirito del Difensore", max: 1, fromLevel: 14, recharge: 'long_rest', note: 'rinasce 1/giorno' },
+    ],
+
+    // ── CHIERICO ───────────────────────────────────────────────────────
+    // La maggior parte delle opzioni di sottoclasse usa Channel Divinity
+    // (gestito a livello classe). Ma alcuni domini hanno altre risorse.
+    'tempest-domain': [
+        { nome: 'Ira della Tempesta', usaMod: 'saggezza', minMod: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'war-domain': [
+        { nome: 'Sacerdote di Guerra', usaMod: 'saggezza', minMod: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'knowledge-domain': [
+        { nome: 'Visioni del Passato', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+    ],
+    'grave-domain': [
+        { nome: 'Sentinella alla Soglia della Morte', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest' },
+    ],
+    'twilight-domain': [
+        { nome: 'Benedizione Vigile', max: 1, fromLevel: 1, recharge: 'turn', note: 'al proprio turno' },
+    ],
+    'peace-domain': [
+        { nome: 'Vincolo Incoraggiante', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest', note: 'ricarica al r. lungo' },
+    ],
+    'order-domain': [
+        // Voice of Authority e Embodiment: niente daily.
+    ],
+    'arcana-domain': [
+        // Arcane Initiate / Spell Breaker: niente daily.
+    ],
+    'forge-domain': [
+        // Bonus dell'Artigiano: 1/r. lungo (creare oggetto magico)
+        { nome: 'Bonus dell\'Artigiano', max: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+
+    // ── STREGONE ───────────────────────────────────────────────────────
+    'wild-magic': [
+        { nome: 'Maree del Caos', max: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'shadow-magic': [
+        { nome: 'Forza dell\'Oltretomba', max: 1, fromLevel: 1, recharge: 'long_rest' },
+    ],
+    'divine-soul': [
+        { nome: 'Favorito dagli Dei', max: 1, fromLevel: 1, recharge: 'short_or_long' },
+        { nome: 'Recupero Ultraterreno', max: 1, fromLevel: 18, recharge: 'long_rest' },
+    ],
+    'storm-sorcery': [
+        // Tempestuous Magic e Heart of the Storm sono passive/free; niente daily.
+    ],
+    'draconic-bloodline': [
+        // Nessuna risorsa daily extra (Draconic Presence usa sorcery points).
+    ],
+    'aberrant-mind': [
+        // Psionic Sorcery e Psionic Defenses usano sorcery points / passive.
+    ],
+
+    // ── BARBARO ───────────────────────────────────────────────────────
+    // Path of the Battlerager / Berserker / Beast / Totem Warrior /
+    // Giant: nessuna daily oltre alle Ire (gestita a livello classe).
+
+    // ── BARDO ──────────────────────────────────────────────────────────
+    'college-of-eloquence': [
+        { nome: 'Lingua Universale', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest' },
+    ],
+    // Gli altri collegi usano Ispirazioni Bardiche (di classe) o sono passive.
+
+    // ── RANGER ─────────────────────────────────────────────────────────
+    'monster-slayer': [
+        { nome: 'Magia da Cacciatore', max: 'prof_bonus', fromLevel: 7, recharge: 'long_rest' },
+    ],
+    'fey-wanderer': [
+        { nome: 'Distorsione Affascinante', max: 'prof_bonus', fromLevel: 7, recharge: 'long_rest' },
+    ],
+    'horizon-walker': [
+        { nome: 'Individuazione Portali', max: 1, fromLevel: 3, recharge: 'short_or_long' },
+    ],
+    'gloom-stalker': [
+        // Iron Mind, Shadowy Dodge: passive/reactive senza daily.
+    ],
+    'drakewarden': [
+        // Drake Companion (compagno), niente counter aggiuntivo.
+    ],
+    'swarmkeeper': [
+        // Swarmkeeper Magic: solo incantesimi.
+    ],
+    'beast-master': [
+        // Compagno animale gestito a parte.
+    ],
+    'hunter': [
+        // Nessuna risorsa daily.
+    ],
+
+    // ── ROGUE ──────────────────────────────────────────────────────────
+    'inquisitive': [
+        { nome: 'Occhio Inerrante', usaMod: 'saggezza', minMod: 1, fromLevel: 13, recharge: 'long_rest' },
+    ],
+    'mastermind': [
+        // Master Tactician: passive.
+    ],
+    'arcane-trickster': [
+        // Solo incantesimi/legerdemain magico (no daily counter).
+    ],
+    'assassin': [
+        // Niente daily.
+    ],
+    'scout': [
+        // Niente daily.
+    ],
+    'swashbuckler': [
+        // Niente daily.
+    ],
+    'thief': [
+        // Niente daily.
+    ],
+
+    // ── PALADINO ───────────────────────────────────────────────────────
+    // Tutte le opzioni di Channel Divinity di sottoclasse condividono il
+    // pool di Incanalare Divinità della classe → niente da aggiungere.
+
+    // ── MONACO (oltre a Punti Ki) ─────────────────────────────────────
+    'way-of-mercy': [
+        // Hand of Healing/Harm usano Ki.
+    ],
+    'way-of-the-astral-self': [
+        // Arms/Visage/Body of the Astral Self usano Ki.
+    ],
+    'way-of-shadow': [
+        // Shadow Arts: usa Ki.
+    ],
+    'way-of-the-four-elements': [
+        // Discipline of the Elements: usa Ki.
+    ],
+    'way-of-the-sun-soul': [
+        // Tutto usa Ki.
+    ],
+    'way-of-the-long-death': [
+        // Mastery of Death usa Ki; Touch of the Long Death usa Ki.
+    ],
+    'way-of-the-drunken-master': [
+        // Tipsy Sway, Drunkard's Luck: passive/reactive.
+    ],
+    'way-of-the-kensei': [
+        // Tutto usa Ki.
+    ],
+
+    // ── COMBATTENTE (extra) ───────────────────────────────────────────
+    'cavalier': [
+        // Hold the Line / Ferocious Charger / Vigilant Defender: passive/reactive.
+    ],
+    'eldritch-knight': [
+        // Solo incantesimi.
+    ],
+    'champion': [
+        // Niente daily.
     ],
 
     // ── MONACO ─────────────────────────────────────────────────────────
@@ -2600,32 +2780,46 @@ const SUBCLASS_RESOURCES = {
     // Aberrant Mind: Psionic Sorcery usa Punti Stregoneria, niente extra.
 
     // ── WARLOCK ────────────────────────────────────────────────────────
-    'the-hexblade': [
+    'hexblade': [
         { nome: 'Maledizione del Lama Stregata', max: 'prof_bonus', fromLevel: 1, recharge: 'short_or_long' },
         { nome: 'Spettro Maledetto', max: 1, fromLevel: 6, recharge: 'long_rest' },
     ],
     'the-fiend': [
         { nome: 'Fortuna Tenebrosa', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest' },
+        { nome: 'Scaglia all\'Inferno', max: 1, fromLevel: 14, recharge: 'long_rest' },
     ],
-    'the-celestial': [
+    'celestial': [
         { nome: 'Luce Curativa',
           tipo: 'dice_pool',
-          // 1 + livello warlock dadi totali, dado fisso d6.
           perLivelloCalc: 'warlock_lvl_plus_one_d6',
           dado: 'd6',
-          fromLevel: 1, recharge: 'long_rest' },
+          fromLevel: 1, recharge: 'long_rest', note: '1 + livello Warlock dadi' },
+        { nome: 'Resilienza Celestiale (allies)', max: 5, fromLevel: 10, recharge: 'short_or_long', note: 'al termine del riposo' },
     ],
-    'the-genie': [
+    'genie': [
         { nome: 'Vaso del Genio (Riposo)', max: 1, fromLevel: 1, recharge: 'long_rest' },
         { nome: 'Vaso del Genio (Ira)', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest' },
         { nome: 'Desiderio Limitato', max: 1, fromLevel: 14, recharge: 'long_rest', note: 'recupera dopo 1d4 r. lunghi' },
     ],
-    'the-undead': [
+    'undead': [
         { nome: 'Forma del Terrore', max: 'prof_bonus', fromLevel: 1, recharge: 'long_rest' },
     ],
-    'the-great-old-one': [
+    'great-old-one': [
         { nome: 'Barriera Entropica', max: 1, fromLevel: 6, recharge: 'short_or_long' },
         { nome: 'Creare Schiavo', max: 1, fromLevel: 14, recharge: 'long_rest' },
+    ],
+    'archfey': [
+        { nome: 'Presenza Fatata', max: 1, fromLevel: 1, recharge: 'short_or_long' },
+        { nome: 'Fuga nella Nebbia', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+        { nome: 'Delirio Oscuro', max: 1, fromLevel: 14, recharge: 'short_or_long' },
+    ],
+    'fathomless': [
+        { nome: 'Tentacolo degli Abissi', max: 'prof_bonus', fromLevel: 1, recharge: 'short_or_long' },
+        { nome: 'Tuffo Abissale', max: 'prof_bonus', fromLevel: 6, recharge: 'long_rest' },
+    ],
+    'undying': [
+        { nome: 'Sfida la Morte', max: 1, fromLevel: 6, recharge: 'long_rest' },
+        { nome: 'Vita Indistruttibile', max: 1, fromLevel: 14, recharge: 'short_or_long' },
     ],
 
     // ── ARTEFICE ───────────────────────────────────────────────────────
@@ -2641,6 +2835,7 @@ const _RECHARGE_LABELS = {
     short_or_long: 'r. breve/lungo',
     long_rest_or_bonus: 'r. lungo o az. bonus',
     dawn: "all'alba",
+    turn: 'al turno',
 };
 
 // Calcola il valore massimo di una risorsa di sottoclasse per il PG.
@@ -2662,6 +2857,11 @@ function _resolveSubclassResMax(res, pg, classEntry) {
         // Per "Luce Curativa" del Celestial Warlock: 1 + livello warlock.
         const warlockLvl = (pg.classi || []).filter(c => c.nome === 'Warlock').reduce((a, c) => a + (c.livello || 0), 0) || 0;
         return Math.max(1, warlockLvl + 1);
+    }
+    if (res.perLivelloCalc === 'druid_level_d6') {
+        // Per "Balsamo della Corte Estiva" del Circle of Dreams: dadi = livello da Druido.
+        const druidLvl = (pg.classi || []).filter(c => c.nome === 'Druido').reduce((a, c) => a + (c.livello || 0), 0) || 0;
+        return Math.max(1, druidLvl);
     }
     return 0;
 }
