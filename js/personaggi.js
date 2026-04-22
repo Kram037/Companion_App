@@ -5154,29 +5154,45 @@ window.privToggleFeatureBody = function(headerEl) {
 
 // ============================================================
 // Tabelle custom della pagina 1 (sotto Risorse)
-// Stesso schema delle tabelle custom di pagina 2, ma persistite in
-// pg.privilegi.p1_tabs_order / p1_features.
+// Schema identico alla tabella "Risorse": ogni voce e' una risorsa
+// consumabile { nome, tipo: 'punti'|'dadi', max, current, dado? }.
+// Persistite in pg.privilegi.p1_tabs_order / p1_features.
 // ============================================================
 function _buildP1CustomTablesHtml(pg) {
     const priv = _normalizePrivilegi(pg);
     if (!priv.p1_tabs_order || priv.p1_tabs_order.length === 0) return '';
     return priv.p1_tabs_order.map(tabName => {
-        const items = priv.p1_features[tabName] || [];
-        const rows = items.length > 0
-            ? items.map((f, i) => _renderPrivFeatureRow(f, {
-                custom: true,
-                tabName,
-                index: i,
-                removeFn: `p1RemoveCustom('${escapeHtml(tabName)}',${i})`,
-                editFn: `p1EditCustom('${escapeHtml(tabName)}',${i})`,
-            })).join('')
-            : '<span class="scheda-empty">Nessuna voce</span>';
+        const items = (priv.p1_features[tabName] || []).filter(r => r && typeof r === 'object' && r.nome != null);
+        const rowsHtml = items.length > 0
+            ? items.map((r, i) => {
+                const max = Number.isFinite(parseInt(r.max)) ? parseInt(r.max) : 1;
+                const current = (r.current != null) ? r.current : max;
+                const label = r.tipo === 'dadi' && r.dado
+                    ? `${escapeHtml(r.nome)} <small>(${escapeHtml(r.dado)})</small>`
+                    : escapeHtml(r.nome);
+                const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
+                return `<div class="scheda-hd-row">
+                    <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenP1TabRes('${pg.id}',${tabKey},${i})" title="Modifica">${label}
+                        <button class="scheda-custom-res-del" onclick="event.stopPropagation();schedaP1TabResDelete('${pg.id}',${tabKey},${i})" title="Rimuovi">✕</button>
+                    </span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},-1,${max})">−</button>
+                        <span class="scheda-hd-val">${current}</span>
+                        <span class="scheda-hd-max">/ ${max}</span>
+                        <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},1,${max})">+</button>
+                    </div>
+                </div>`;
+            }).join('')
+            : '<span class="scheda-empty">Nessuna risorsa</span>';
+        const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
         return `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();p1AddCustom('${escapeHtml(tabName)}')" title="Aggiungi voce">&#9998;</button>
-                <button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();p1RemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenP1TabRes('${pg.id}',${tabKey})" title="Aggiungi risorsa">&#9998;</button>
+                <button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();p1RemoveTab(${tabKey})" title="Rimuovi tabella">✕</button>
             </div>
-            <div class="scheda-section-body">${rows}</div>
+            <div class="scheda-section-body">
+                ${items.length > 0 ? `<div class="scheda-hd-table">${rowsHtml}</div>` : rowsHtml}
+            </div>
         </div>`;
     }).join('');
 }
@@ -5237,80 +5253,128 @@ window.p1RemoveTab = function(tabName) {
     _p1Save(pg.id, priv).then(() => openSchedaPersonaggio(pg.id));
 };
 
-window.p1AddCustom = function(tabName) {
-    _privOpenP1EditDialog({ tabName, mode: 'add' });
-};
-
-window.p1EditCustom = function(tabName, index) {
+// Decremento/Incremento di una risorsa di una tabella custom di pagina 1.
+window.schedaP1TabResChange = async function(pgId, tabName, index, current, delta, max) {
     const pg = _schedaPgCache;
-    if (!pg) return;
+    if (!pg || pg.id !== pgId) return;
     const priv = _normalizePrivilegi(pg);
-    const item = (priv.p1_features[tabName] || [])[index];
+    const arr = priv.p1_features[tabName];
+    if (!Array.isArray(arr)) return;
+    const item = arr[index];
     if (!item) return;
-    _privOpenP1EditDialog({ tabName, mode: 'edit', index, item });
-};
-
-window.p1RemoveCustom = async function(tabName, index) {
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const priv = _normalizePrivilegi(pg);
-    if (!priv.p1_features[tabName]) return;
-    priv.p1_features[tabName].splice(index, 1);
-    await _p1Save(pg.id, priv);
-    openSchedaPersonaggio(pg.id);
-};
-
-function _privOpenP1EditDialog({ tabName, mode, index, item }) {
-    let modal = document.getElementById('privEditModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'privEditModal';
-        modal.className = 'modal';
-        document.body.appendChild(modal);
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    item.current = newVal;
+    pg.privilegi = priv;
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        try {
+            const { error } = await supabase.from('personaggi')
+                .update({ privilegi: priv, updated_at: new Date().toISOString() })
+                .eq('id', pgId);
+            if (error) console.warn('[p1 custom res] save failed', error);
+        } catch (e) { console.warn('[p1 custom res] save failed', e); }
     }
-    const it = item || { name: '', level: '', description: '' };
-    const title = mode === 'edit' ? 'Modifica voce' : `Aggiungi a ${tabName}`;
-    modal.innerHTML = `
-    <div class="modal-content priv-edit-card">
-        <button class="modal-close" onclick="privCloseEdit()" aria-label="Chiudi">×</button>
-        <h2 style="margin:0 0 12px;font-size:1.05rem;">${escapeHtml(title)}</h2>
-        <label class="priv-edit-label">Nome
-            <input type="text" id="privEditName" class="priv-edit-input" value="${escapeHtml(it.name)}" placeholder="Es. Nota, Trofeo, ...">
-        </label>
-        <label class="priv-edit-label">Livello (opzionale)
-            <input type="number" id="privEditLevel" class="priv-edit-input priv-edit-input-num" value="${it.level || ''}" min="1" max="20" placeholder="—">
-        </label>
-        <label class="priv-edit-label">Descrizione
-            <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione">${escapeHtml(it.description || '')}</textarea>
-        </label>
-        <div class="priv-edit-actions">
-            <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
-            <button class="btn-primary" onclick="p1ConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
+    openSchedaPersonaggio(pgId);
+};
+
+// Apre la dialog "Aggiungi/Modifica risorsa" per una tabella custom di pagina 1.
+window.schedaOpenP1TabRes = function(pgId, tabName, editIndex) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const priv = _normalizePrivilegi(pg);
+    const list = Array.isArray(priv.p1_features[tabName]) ? priv.p1_features[tabName] : [];
+    const editing = (editIndex != null && editIndex >= 0);
+    const existing = editing ? list[editIndex] : null;
+    const initialType = (existing && existing.tipo === 'dadi') ? 'dadi' : 'punti';
+    const initialDado = (existing && existing.dado) ? existing.dado : 'd8';
+    const initialNome = existing ? (existing.nome || '') : '';
+    const initialMax  = existing && Number.isFinite(parseInt(existing.max)) ? parseInt(existing.max) : 1;
+
+    const dadiBtns = ['d4','d6','d8','d10','d12','d20'].map(d =>
+        `<button type="button" class="btn-secondary custom-res-dice-btn ${d === initialDado ? 'active' : ''}" onclick="schedaCrDadoSelect('${d}')">${d}</button>`
+    ).join('');
+
+    const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
+    const confirmFn = editing
+        ? `schedaConfirmP1TabRes('${pgId}',${tabKey},${editIndex})`
+        : `schedaConfirmP1TabRes('${pgId}',${tabKey})`;
+
+    document.getElementById('p1TabResModal')?.remove();
+    const modalHtml = `
+    <div class="modal active" id="p1TabResModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('p1TabResModal')?.remove();document.body.style.overflow='';">&times;</button>
+            <h2>${editing ? 'Modifica Risorsa' : `Aggiungi a ${escapeHtml(tabName)}`}</h2>
+            <div class="form-group">
+                <label class="form-label">Nome della risorsa</label>
+                <input type="text" id="p1TabResNome" class="form-input" placeholder="Es. Frecce, Pozioni, Cariche" value="${escapeHtml(initialNome)}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo</label>
+                <div class="custom-res-type-row">
+                    <button type="button" class="btn-secondary custom-res-type-btn ${initialType === 'punti' ? 'active' : ''}" id="crTypePunti" onclick="schedaCrTypeSelect('punti')">Punti</button>
+                    <button type="button" class="btn-secondary custom-res-type-btn ${initialType === 'dadi'  ? 'active' : ''}" id="crTypeDadi" onclick="schedaCrTypeSelect('dadi')">Dadi</button>
+                </div>
+            </div>
+            <div class="form-group" id="crDadoGroup" style="display:${initialType === 'dadi' ? '' : 'none'};">
+                <label class="form-label">Tipo di dado</label>
+                <div class="custom-res-dice-row">${dadiBtns}</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Utilizzi massimi</label>
+                <input type="number" id="p1TabResMax" class="form-input" min="1" value="${initialMax}" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('p1TabResModal')?.remove();document.body.style.overflow='';">Annulla</button>
+                <button type="button" class="btn-primary" onclick="${confirmFn}">${editing ? 'Salva' : 'Aggiungi'}</button>
+            </div>
         </div>
     </div>`;
-    modal.classList.add('active');
-    setTimeout(() => document.getElementById('privEditName')?.focus(), 50);
-}
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+    window._crType = initialType;
+    window._crDado = initialDado;
+};
 
-window.p1ConfirmEdit = async function(tabName, mode, index) {
-    const name = (document.getElementById('privEditName')?.value || '').trim();
-    const lvlRaw = (document.getElementById('privEditLevel')?.value || '').trim();
-    const desc = (document.getElementById('privEditDesc')?.value || '').trim();
-    if (!name) {
-        showNotification && showNotification('Inserisci almeno il nome');
-        return;
-    }
-    const level = lvlRaw ? Math.max(1, Math.min(20, parseInt(lvlRaw) || 0)) : null;
+window.schedaConfirmP1TabRes = async function(pgId, tabName, editIndex) {
     const pg = _schedaPgCache;
-    if (!pg) return;
+    if (!pg || pg.id !== pgId) return;
+    const nome = document.getElementById('p1TabResNome')?.value?.trim();
+    if (!nome) { showNotification && showNotification('Inserisci un nome', 'error'); return; }
+    const max = parseInt(document.getElementById('p1TabResMax')?.value) || 1;
+    const tipo = window._crType || 'punti';
     const priv = _normalizePrivilegi(pg);
-    if (!priv.p1_features[tabName]) priv.p1_features[tabName] = [];
-    const newItem = { name, level, description: desc };
-    if (mode === 'edit' && index >= 0) priv.p1_features[tabName][index] = newItem;
-    else priv.p1_features[tabName].push(newItem);
-    await _p1Save(pg.id, priv);
-    privCloseEdit();
-    openSchedaPersonaggio(pg.id);
+    if (!Array.isArray(priv.p1_features[tabName])) priv.p1_features[tabName] = [];
+    const arr = priv.p1_features[tabName];
+    const editing = (editIndex != null && editIndex >= 0 && arr[editIndex]);
+    if (editing) {
+        const prev = arr[editIndex];
+        const prevCurrent = Number.isFinite(parseInt(prev.current)) ? parseInt(prev.current) : max;
+        const updated = { nome, tipo, max, current: Math.max(0, Math.min(prevCurrent, max)) };
+        if (tipo === 'dadi') updated.dado = window._crDado || 'd8';
+        arr[editIndex] = updated;
+    } else {
+        const newRes = { nome, tipo, max, current: max };
+        if (tipo === 'dadi') newRes.dado = window._crDado || 'd8';
+        arr.push(newRes);
+    }
+    await _p1Save(pgId, priv);
+    document.getElementById('p1TabResModal')?.remove();
+    document.body.style.overflow = '';
+    openSchedaPersonaggio(pgId);
+    showNotification && showNotification(editing ? 'Risorsa aggiornata' : 'Risorsa aggiunta');
+};
+
+window.schedaP1TabResDelete = async function(pgId, tabName, index) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const priv = _normalizePrivilegi(pg);
+    const arr = priv.p1_features[tabName];
+    if (!Array.isArray(arr) || !arr[index]) return;
+    arr.splice(index, 1);
+    await _p1Save(pgId, priv);
+    openSchedaPersonaggio(pgId);
+    showNotification && showNotification('Risorsa rimossa');
 };
 
 window.schedaOpenPrivilegesPage = async function(pgId) {
