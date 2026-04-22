@@ -1809,16 +1809,20 @@
 
 /* Picker Stili di Combattimento */
 .fs-picker-modal { width: 720px; max-width: 95vw; max-height: 90vh; display: flex; flex-direction: column; }
-.fs-pick-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.fs-pick-filter-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.fs-pick-filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.fs-pick-filter-pills .filter-pill { font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--text); transition: all var(--transition-fast); }
-.fs-pick-filter-pills .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
-.fs-pick-filter-pills .filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.fs-pick-filter-pills .filter-pill small { opacity: 0.85; margin-left: 3px; font-weight: 500; }
-.fs-pick-class { margin-bottom: 14px; }
-.fs-pick-class-title { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
-.fs-pick-class-title small { font-weight: 600; color: var(--text-muted); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+/* La lista scorre, mentre search row + filtri + contatori restano fissi sopra. */
+.fs-picker-modal .fs-picker-scroll { flex: 1 1 auto; overflow-y: auto; padding: 0 2px; min-height: 200px; }
+.fs-pick-counters { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.fs-pick-counter {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+.fs-pick-counter strong { color: var(--text); margin-right: 3px; font-weight: 700; }
+.fs-pick-counter.reached { background: rgba(108, 92, 231, 0.12); border-color: var(--accent); color: var(--accent); }
+.fs-pick-counter.reached strong { color: var(--accent); }
 .fs-pick-slots { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 4px 0 4px; }
 .fs-pick-slot-btn { font-size: 0.74rem; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--text-muted); transition: all var(--transition-fast); }
 .fs-pick-slot-btn:hover { border-color: var(--accent); color: var(--accent); }

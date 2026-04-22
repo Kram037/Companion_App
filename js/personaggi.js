@@ -6158,9 +6158,12 @@ function _schedaInvocationsContentHtml(currentInvIds) {
 }
 
 // ─── Picker Stili di Combattimento ─────────────────────────────────────
-// Dialog stile "scelta talenti/incantesimi" con barra di ricerca e filtri
-// per classe/sottoclasse e manuale. Gli stili disponibili sono determinati
-// dalle classi/sottoclassi del PG.
+// Dialog stile "scelta talenti/incantesimi": barra di ricerca fissata in
+// alto, pulsante per aprire/chiudere il pannello dei filtri (Classe/
+// Sottoclasse e Manuale). Solo la lista scorre, mentre la search row
+// resta sempre visibile.
+window._fsPickerState = window._fsPickerState || { search: '', source: 'all', slot: 'all', filterOpen: false };
+
 window.schedaOpenFightingStylesEdit = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) return;
@@ -6194,14 +6197,8 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     const allStyles = Object.values(flatStyles)
         .sort((a, b) => (a.fs.name || '').localeCompare(b.fs.name || ''));
 
-    // Stato del filtro e ricerca.
-    const sources = Array.from(new Set(allStyles.map(s => s.fs.source_short).filter(Boolean))).sort();
-    if (!window._fsPickerState) window._fsPickerState = {};
-    window._fsPickerState = {
-        search: '',
-        source: 'all',
-        slot: 'all',
-    };
+    // Reset stato del filtro a ogni apertura.
+    window._fsPickerState = { search: '', source: 'all', slot: 'all', filterOpen: false };
     window._fsPickerSel = sel;
     window._fsPickerAllowance = allowance;
     window._fsPickerSlotKeys = slotKeys;
@@ -6214,28 +6211,17 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     modal.className = 'modal active';
     modal.onclick = e => { if (e.target === modal) modal.remove(); };
 
-    const slotChips = `<button class="filter-pill ${window._fsPickerState.slot === 'all' ? 'active' : ''}" data-slot="all" onclick="schedaFsSetSlotFilter('all')">Tutte</button>` +
-        slotKeys.map(k => `<button class="filter-pill ${window._fsPickerState.slot === k ? 'active' : ''}" data-slot="${escapeHtml(k)}" onclick="schedaFsSetSlotFilter(${JSON.stringify(k).replace(/"/g, '&quot;')})">${escapeHtml(k)} <small>(${sel[k].length}/${allowance[k].max})</small></button>`).join('');
-    const sourceChips = `<button class="filter-pill ${window._fsPickerState.source === 'all' ? 'active' : ''}" onclick="schedaFsSetSourceFilter('all')">Tutti</button>` +
-        sources.map(src => `<button class="filter-pill ${window._fsPickerState.source === src ? 'active' : ''}" onclick="schedaFsSetSourceFilter('${escapeHtml(src)}')">${escapeHtml(src)}</button>`).join('');
-
     modal.innerHTML = `<div class="modal-content modal-content-lg fs-picker-modal" onclick="event.stopPropagation();">
         <button class="modal-close" onclick="document.getElementById('fsPickerModal')?.remove();">&times;</button>
         <h2 style="margin-top:0;">Scegli Stili di Combattimento</h2>
-        <div class="wizard-page-scroll" style="padding:6px 4px;">
-            <div class="spell-picker-search-row" style="margin-bottom:10px;">
-                <input type="text" id="fsPickerSearch" class="hp-calc-input spell-picker-search" placeholder="Cerca stile..." oninput="schedaFsSetSearch(this.value)" autocomplete="off" />
-            </div>
-            <div class="fs-pick-filter-row">
-                <div class="fs-pick-filter-label">Classe / Sottoclasse:</div>
-                <div class="fs-pick-filter-pills" id="fsPickerSlotChips">${slotChips}</div>
-            </div>
-            <div class="fs-pick-filter-row">
-                <div class="fs-pick-filter-label">Manuale:</div>
-                <div class="fs-pick-filter-pills" id="fsPickerSourceChips">${sourceChips}</div>
-            </div>
+
+        <div id="fsPickerHeader">${_fsPickerHeaderHtml()}</div>
+        <div id="fsPickerCounters" class="fs-pick-counters">${_fsPickerCountersHtml()}</div>
+
+        <div class="wizard-page-scroll fs-picker-scroll">
             <div id="fsPickerList" class="fs-pick-list"></div>
         </div>
+
         <div class="form-actions" style="margin-top:var(--spacing-md);display:flex;justify-content:flex-end;gap:8px;">
             <button class="btn-secondary" onclick="document.getElementById('fsPickerModal')?.remove();">Annulla</button>
             <button class="btn-primary" onclick="schedaSaveFightingStyles('${pgId}')">Salva</button>
@@ -6245,25 +6231,126 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     schedaFsRenderList();
 };
 
+// HTML della search row + pannello filtri (collassabile).
+function _fsPickerHeaderHtml() {
+    const state = window._fsPickerState;
+    const allStyles = window._fsPickerAllStyles || [];
+    const slotKeys = window._fsPickerSlotKeys || [];
+    const sources = Array.from(new Set(allStyles.map(s => s.fs.source_short).filter(Boolean))).sort();
+
+    const chip = (label, active, onclick) =>
+        `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
+
+    const slotChips = [chip('Tutte', state.slot === 'all', `schedaFsSetSlotFilter('all')`)]
+        .concat(slotKeys.map(k => chip(k, state.slot === k, `schedaFsSetSlotFilter(${JSON.stringify(k)})`)))
+        .join('');
+    const sourceChips = [chip('Tutti', state.source === 'all', `schedaFsSetSourceFilter('all')`)]
+        .concat(sources.map(s => chip(s, state.source === s, `schedaFsSetSourceFilter('${escapeHtml(s)}')`)))
+        .join('');
+
+    let activeCount = 0;
+    if (state.slot !== 'all') activeCount += 1;
+    if (state.source !== 'all') activeCount += 1;
+
+    return `
+        <div class="spell-picker-search-row">
+            <input type="text" id="fsPickerSearch" class="hp-calc-input spell-picker-search"
+                   placeholder="Cerca stile (IT/EN)..."
+                   value="${escapeHtml(state.search)}"
+                   oninput="schedaFsSetSearch(this.value)"
+                   autocomplete="off">
+            <button type="button" class="spell-picker-filter-btn ${state.filterOpen ? 'active' : ''}" id="fsPickerFilterBtn"
+                    onclick="schedaFsToggleFilterPanel()" title="Filtri" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                ${activeCount > 0 ? `<span class="spell-picker-filter-badge">${activeCount}</span>` : ''}
+            </button>
+        </div>
+        <div class="spell-filter-panel" id="fsPickerFilterPanel" style="display:${state.filterOpen ? '' : 'none'};">
+            <div class="spell-filter-group">
+                <div class="spell-filter-label">Classe / Sottoclasse</div>
+                <div class="spell-filter-chips">${slotChips}</div>
+            </div>
+            ${sources.length > 0 ? `<div class="spell-filter-group">
+                <div class="spell-filter-label">Manuale</div>
+                <div class="spell-filter-chips">${sourceChips}</div>
+            </div>` : ''}
+            <div class="spell-filter-actions">
+                <button type="button" class="btn-secondary btn-small" onclick="schedaFsResetFilters()">Reimposta</button>
+            </div>
+        </div>
+    `;
+}
+
+// Banner contatori "selezionati / max" per ciascuna classe/sottoclasse.
+function _fsPickerCountersHtml() {
+    const slotKeys = window._fsPickerSlotKeys || [];
+    const allowance = window._fsPickerAllowance || {};
+    const sel = window._fsPickerSel || {};
+    if (slotKeys.length === 0) return '';
+    return slotKeys.map(k => {
+        const cnt = (sel[k] || []).length;
+        const max = allowance[k] ? allowance[k].max : 0;
+        const reached = cnt >= max;
+        return `<span class="fs-pick-counter ${reached ? 'reached' : ''}" data-slot="${escapeHtml(k)}">
+            <strong>${escapeHtml(k)}:</strong> ${cnt}/${max}
+        </span>`;
+    }).join('');
+}
+
+window.schedaFsToggleFilterPanel = function() {
+    const state = window._fsPickerState;
+    state.filterOpen = !state.filterOpen;
+    const panel = document.getElementById('fsPickerFilterPanel');
+    const btn = document.getElementById('fsPickerFilterBtn');
+    if (panel) panel.style.display = state.filterOpen ? '' : 'none';
+    if (btn) btn.classList.toggle('active', state.filterOpen);
+};
+
+window.schedaFsResetFilters = function() {
+    const state = window._fsPickerState;
+    state.source = 'all';
+    state.slot = 'all';
+    _fsPickerRefreshHeader({ keepPanelOpen: true });
+    schedaFsRenderList();
+};
+
 window.schedaFsSetSearch = function(v) {
-    window._fsPickerState.search = (v || '').toLowerCase();
+    window._fsPickerState.search = v || '';
     schedaFsRenderList();
 };
 window.schedaFsSetSourceFilter = function(src) {
     window._fsPickerState.source = src;
-    document.querySelectorAll('#fsPickerSourceChips .filter-pill').forEach(b => {
-        b.classList.toggle('active', b.textContent.trim() === (src === 'all' ? 'Tutti' : src));
-    });
+    _fsPickerRefreshHeader({ keepPanelOpen: true });
     schedaFsRenderList();
 };
 window.schedaFsSetSlotFilter = function(slot) {
     window._fsPickerState.slot = slot;
-    document.querySelectorAll('#fsPickerSlotChips .filter-pill').forEach(b => {
-        const ds = b.getAttribute('data-slot');
-        b.classList.toggle('active', ds === slot);
-    });
+    _fsPickerRefreshHeader({ keepPanelOpen: true });
     schedaFsRenderList();
 };
+
+// Re-renderizza la search row + pannello filtri preservando focus e
+// stato di apertura del pannello.
+function _fsPickerRefreshHeader(opts) {
+    opts = opts || {};
+    const header = document.getElementById('fsPickerHeader');
+    if (!header) return;
+    if (opts.keepPanelOpen) window._fsPickerState.filterOpen = true;
+    header.innerHTML = _fsPickerHeaderHtml();
+    const counters = document.getElementById('fsPickerCounters');
+    if (counters) counters.innerHTML = _fsPickerCountersHtml();
+    // Re-focus della ricerca con il cursore in coda.
+    const input = document.getElementById('fsPickerSearch');
+    if (input) {
+        try {
+            input.focus();
+            const v = input.value;
+            input.setSelectionRange(v.length, v.length);
+        } catch (_) { /* ignore */ }
+    }
+}
 
 window.schedaFsRenderList = function() {
     const state = window._fsPickerState || { search: '', source: 'all', slot: 'all' };
@@ -6272,7 +6359,7 @@ window.schedaFsRenderList = function() {
     const sel = window._fsPickerSel || {};
     const listEl = document.getElementById('fsPickerList');
     if (!listEl) return;
-    const search = (state.search || '').trim();
+    const search = (state.search || '').trim().toLowerCase();
     const filtered = allStyles.filter(({ fs, slots }) => {
         if (state.source !== 'all' && fs.source_short !== state.source) return false;
         if (state.slot !== 'all' && !slots.includes(state.slot)) return false;
@@ -6283,17 +6370,16 @@ window.schedaFsRenderList = function() {
         return true;
     });
     if (filtered.length === 0) {
-        listEl.innerHTML = '<div class="scheda-empty" style="padding:14px;text-align:center;">Nessuno stile corrisponde ai filtri.</div>';
+        listEl.innerHTML = '<div class="scheda-empty" style="padding:18px;text-align:center;">Nessuno stile corrisponde ai filtri.</div>';
         return;
     }
     listEl.innerHTML = filtered.map(({ fs, slots }) => {
-        // Trova in quali slot del PG e' attualmente assegnato.
         const assignedTo = slots.filter(k => (sel[k] || []).includes(fs.slug));
         const isSelected = assignedTo.length > 0;
         const slotBadges = slots.map(k => {
             const reachedMax = (sel[k] || []).length >= allowance[k].max;
             const here = (sel[k] || []).includes(fs.slug);
-            return `<button class="fs-pick-slot-btn ${here ? 'is-on' : ''} ${reachedMax && !here ? 'is-full' : ''}" 
+            return `<button type="button" class="fs-pick-slot-btn ${here ? 'is-on' : ''} ${reachedMax && !here ? 'is-full' : ''}"
                 onclick="event.stopPropagation();schedaFsToggleAssign('${fs.slug}', ${JSON.stringify(k).replace(/"/g, '&quot;')})"
                 title="${here ? 'Assegnato a ' + escapeHtml(k) : 'Assegna a ' + escapeHtml(k)}">
                 ${here ? '✔ ' : '+ '}${escapeHtml(k)} <small>(${(sel[k] || []).length}/${allowance[k].max})</small>
@@ -6325,7 +6411,7 @@ window.schedaFsToggleAssign = function(slug, slotKey) {
             showNotification && showNotification(`Hai gia' raggiunto il massimo di stili per ${slotKey}`);
             return;
         }
-        // Per evitare duplicati tra slot dello stesso PG (uno stile per slot e' la regola).
+        // Uno stile per slot: rimuovilo dagli altri slot del PG.
         Object.keys(sel).forEach(k => {
             if (k !== slotKey) {
                 const j = sel[k].indexOf(slug);
@@ -6334,16 +6420,12 @@ window.schedaFsToggleAssign = function(slug, slotKey) {
         });
         arr.push(slug);
     }
-    // Aggiorna i contatori nelle pills.
-    const slotKeys = window._fsPickerSlotKeys || [];
-    slotKeys.forEach(k => {
-        const pill = document.querySelector(`#fsPickerSlotChips .filter-pill[data-slot="${k.replace(/"/g, '\\"')}"]`);
-        if (pill) {
-            const cnt = (sel[k] || []).length;
-            const max = allowance[k].max;
-            pill.innerHTML = `${escapeHtml(k)} <small>(${cnt}/${max})</small>`;
-        }
-    });
+    // Aggiorna i contatori nel banner sotto la search row.
+    const counters = document.getElementById('fsPickerCounters');
+    if (counters) counters.innerHTML = _fsPickerCountersHtml();
+    // Aggiorna anche le chip nel pannello filtri (se aperto): nessun
+    // contatore nelle chip in questo design, quindi basta ri-renderizzare
+    // la lista.
     schedaFsRenderList();
 };
 
