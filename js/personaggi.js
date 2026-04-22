@@ -935,6 +935,159 @@ function _pgSubclassGrantedSpells(pg) {
     return out;
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Invocazioni Demoniache (Eldritch Invocations) del Warlock.
+// Dataset in window.INVOCATIONS_DATA generato da
+// risorse/invocazioni/build_invocations.py.
+//
+// Per ogni invocazione:
+//   id, name, name_en, source, source_short, prerequisites (lista),
+//   description, effect, effect_data
+//
+// pg.invocazioni: array di id (stringhe slug, es. "agonizing-blast").
+// ─────────────────────────────────────────────────────────────────────────
+function _invocationsAll() { return window.INVOCATIONS_DATA || []; }
+
+function _invocationById(id) {
+    if (!id) return null;
+    return _invocationsAll().find(i => i.id === id) || null;
+}
+
+// Numero massimo di invocazioni che un Warlock conosce in base al livello,
+// come da PHB pag. 110 (tabella Warlock).
+function _pgWarlockLevel(pg) {
+    if (!pg || !Array.isArray(pg.classi)) return 0;
+    const w = pg.classi.find(c => {
+        const cls = _getClassData(c?.nome || '');
+        return cls && cls.slug === 'warlock';
+    });
+    return w ? (parseInt(w.livello) || 0) : 0;
+}
+
+function _maxInvocationsForLevel(lvl) {
+    if (lvl < 2) return 0;
+    if (lvl < 5) return 2;
+    if (lvl < 7) return 3;
+    if (lvl < 9) return 4;
+    if (lvl < 12) return 5;
+    if (lvl < 15) return 6;
+    if (lvl < 18) return 7;
+    return 8;
+}
+
+function _pgMaxInvocations(pg) {
+    return _maxInvocationsForLevel(_pgWarlockLevel(pg));
+}
+
+// Verifica se il PG soddisfa i prerequisiti dell'invocazione. Usato per
+// abilitare/disabilitare voci nel picker.
+function _pgMeetsInvocationPrereqs(pg, inv, opts = {}) {
+    if (!inv || !Array.isArray(inv.prerequisites)) return true;
+    const wlvl = _pgWarlockLevel(pg);
+    const subSlug = (() => {
+        const w = (pg.classi || []).find(c => {
+            const cls = _getClassData(c?.nome || '');
+            return cls && cls.slug === 'warlock';
+        });
+        return w ? (w.sottoclasseSlug || '') : '';
+    })();
+    const subName = (() => {
+        const cls = _getClassData('Warlock');
+        if (!cls) return '';
+        const sc = (cls.subclasses || []).find(s => s.slug === subSlug);
+        return sc ? (sc.name_en || sc.name || '') : '';
+    })().toLowerCase();
+    // Pact non e' modellato direttamente nel PG (e' un privilegio scelto a
+    // livello 3). Per ora consideriamo i pact prereq come "informativi"
+    // (non bloccano la selezione, ma restituiamo un warning testuale).
+    for (const pr of inv.prerequisites) {
+        if (pr.type === 'level') {
+            if (wlvl < (pr.value || 0)) return false;
+        } else if (pr.type === 'patron') {
+            const want = (pr.value || '').toLowerCase();
+            if (!subName.includes(want)) return false;
+        }
+        // Per spell/feature/feature_or_curse non blocchiamo (sono difficili
+        // da validare a runtime senza modellare i pact); se opts.strict,
+        // applichiamo comunque la validazione testuale piu' avanti.
+    }
+    return true;
+}
+
+// Etichetta leggibile dei prerequisiti (per il picker).
+function _formatInvocationPrereqs(inv) {
+    if (!inv.prerequisites || inv.prerequisites.length === 0) return '';
+    return inv.prerequisites.map(pr => {
+        if (pr.type === 'level') return `${pr.value}° livello`;
+        if (pr.type === 'spell') {
+            const it = pr.value_it || pr.value;
+            return `trucchetto ${it}`;
+        }
+        if (pr.type === 'feature') return pr.value;
+        if (pr.type === 'patron') return `patrono ${pr.value}`;
+        if (pr.type === 'feature_or_curse') return 'incantesimo maledizione o privilegio da warlock che maledice';
+        return pr.value || '';
+    }).join(', ');
+}
+
+// Lista degli "spell at will" e "spell per long rest" garantiti dalle
+// invocazioni selezionate (analogo razziale: appariranno nella pagina
+// incantesimi del PG con tag invocazione).
+function _pgInvocationGrantedSpells(pg) {
+    const ids = (pg && pg.invocazioni) || [];
+    const out = [];
+    ids.forEach(id => {
+        const inv = _invocationById(id);
+        if (!inv) return;
+        const d = inv.effect_data || {};
+        if (!d.spell_en || !d.spell_it) return;
+        const eff = inv.effect;
+        if (eff !== 'spell_at_will' && eff !== 'spell_per_long_rest') return;
+        out.push({
+            name: d.spell_it,
+            name_en: d.spell_en,
+            level_cast: d.level_cast || 1,
+            recharge: eff === 'spell_at_will' ? 'at_will' : 'long_rest',
+            invocation_id: id,
+            invocation_name: inv.name,
+        });
+    });
+    return out;
+}
+
+// Slot d'uso (1/lungo) per le invocazioni con effect spell_per_long_rest.
+function _pgInvocationSlots(pg) {
+    const list = _pgInvocationGrantedSpells(pg).filter(s => s.recharge === 'long_rest');
+    const stored = (pg.risorse_classe && pg.risorse_classe._invocations) || {};
+    const out = [];
+    list.forEach(sp => {
+        const key = (sp.name_en || sp.invocation_id).replace(/[^A-Za-z0-9]+/g, '_');
+        const max = 1;
+        const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+        out.push({
+            key, name: sp.name, name_en: sp.name_en,
+            level_cast: sp.level_cast,
+            invocation_name: sp.invocation_name,
+            recharge: 'r. lungo',
+            max, current,
+        });
+    });
+    return out;
+}
+
+// Skill auto-conferite dalle invocazioni (es. Beguiling Influence).
+function _pgInvocationGrantedSkills(pg) {
+    const ids = (pg && pg.invocazioni) || [];
+    const out = new Set();
+    ids.forEach(id => {
+        const inv = _invocationById(id);
+        if (!inv || inv.effect !== 'skill_proficiency') return;
+        const skills = (inv.effect_data || {}).skills || [];
+        skills.forEach(s => out.add(s));
+    });
+    return Array.from(out);
+}
+
 function getBackgroundData(nome) {
     if (!nome) return null;
     // Prima il dataset locale (window.BACKGROUNDS_DATA): mappa lo schema
@@ -2773,6 +2926,31 @@ window.schedaOpenSpellPage = async function(pgId) {
     </div>`;
     }
 
+    // Slot invocazioni 1/lungo (Warlock).
+    const invocationSlots = _pgInvocationSlots(pg);
+    let invocationSlotsBlock = '';
+    if (invocationSlots.length > 0) {
+        const rows = invocationSlots.map(is => {
+            const lvlLabel = `Lv ${is.level_cast}`;
+            return `<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${lvlLabel}</small> <small>(${is.recharge})</small></span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                    <span class="scheda-hd-val" id="sInvSlot_${is.key}">${is.current}</span>
+                    <span class="scheda-hd-max">/ ${is.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        invocationSlotsBlock = `
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot invocazioni</div>
+        <div class="scheda-section-body">
+            <div class="scheda-hd-list">${rows}</div>
+        </div>
+    </div>`;
+    }
+
     const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
 
     // Determina quali livelli mostrare:
@@ -2802,10 +2980,16 @@ window.schedaOpenSpellPage = async function(pgId) {
         const sp = _resolveSpell(s.name);
         if (sp) subclassLevels.add(sp.level);
     });
+    // Livelli con incantesimi conferiti dalle invocazioni del Warlock.
+    const invocationLevels = new Set();
+    _pgInvocationGrantedSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name) || _resolveSpell(s.name_en);
+        if (sp) invocationLevels.add(sp.level);
+    });
     const maxKnowableLevel = _maxKnownSpellLevel(classi);
     const knowableLevels = [];
     for (let l = 0; l <= maxKnowableLevel; l++) knowableLevels.push(l);
-    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels, ...subclassLevels]);
+    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels, ...subclassLevels, ...invocationLevels]);
     // Mostra fino al massimo livello disponibile nel dataset
     const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
     const orderedLevels = Array.from(levelsToShow)
@@ -2836,6 +3020,7 @@ window.schedaOpenSpellPage = async function(pgId) {
         </div>
     </div>
     ${innateSlotsBlock}
+    ${invocationSlotsBlock}
 
     <hr class="scheda-divider">
 
@@ -3157,8 +3342,24 @@ function buildSpellLevelSection(pg, level) {
         subclassUnique.push(x);
     });
 
+    // Incantesimi conferiti dalle invocazioni del Warlock (a volonta' o
+    // 1/lungo). Anche questi sono "locked" (derivati dalla scelta delle
+    // invocazioni nella pagina dei privilegi).
+    const invocationGranted = _pgInvocationGrantedSpells(pg)
+        .map(g => ({ src: g, sp: _resolveSpell(g.name) || _resolveSpell(g.name_en) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenInvocation = new Set();
+    const invocationUnique = [];
+    invocationGranted.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key) || seenSubclass.has(key)) return;
+        if (seenInvocation.has(key)) return;
+        seenInvocation.add(key);
+        invocationUnique.push(x);
+    });
+
     const knownCards = known
-        .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name))
+        .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name) && !seenInvocation.has(sp.name))
         .map(({ sp }) => {
             const id = sp.name;
             return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
@@ -3185,7 +3386,16 @@ function buildSpellLevelSection(pg, level) {
         </div>`;
     }).join('');
 
-    const cardsHtml = (knownCards + innateCards + subclassCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
+    const invocationCards = invocationUnique.map(({ src, sp }) => {
+        const id = sp.name;
+        const tag = src.recharge === 'at_will' ? 'invocazione · a volontà' : 'invocazione · 1/lungo';
+        return `<div class="spell-card spell-card-invocation" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+        </div>`;
+    }).join('');
+
+    const cardsHtml = (knownCards + innateCards + subclassCards + invocationCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
 
     const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
     const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
@@ -3387,12 +3597,18 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     window._spellPickerFilters = _defaultSpellFilters(pg);
     window._spellPickerSearchQ = '';
 
-    // Mappa incantesimi auto-garantiti da sottoclasse (sempre presenti):
+    // Mappa incantesimi auto-garantiti (sottoclasse o invocazioni warlock):
     // selected + disabled nel picker, con badge "garantito".
     const grantedByName = new Map();
     _pgSubclassGrantedSpells(pg).forEach(g => {
         const sp = _resolveSpell(g.name);
         if (sp) grantedByName.set(sp.name, g.source_label || 'sottoclasse');
+    });
+    _pgInvocationGrantedSpells(pg).forEach(g => {
+        const sp = _resolveSpell(g.name) || _resolveSpell(g.name_en);
+        if (sp && !grantedByName.has(sp.name)) {
+            grantedByName.set(sp.name, `invocazione: ${g.invocation_name}`);
+        }
     });
 
     const renderRow = (sp) => {
@@ -3637,10 +3853,15 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
         return sp ? sp.name : n;
     });
     // Escludi dal salvataggio gli incantesimi auto-garantiti dalla
-    // sottoclasse: sono derivati e verranno re-iniettati a runtime.
+    // sottoclasse o dalle invocazioni: sono derivati e verranno
+    // re-iniettati a runtime.
     const grantedSet = new Set();
     _pgSubclassGrantedSpells(pg).forEach(g => {
         const sp = _resolveSpell(g.name);
+        if (sp) grantedSet.add(sp.name);
+    });
+    _pgInvocationGrantedSpells(pg).forEach(g => {
+        const sp = _resolveSpell(g.name) || _resolveSpell(g.name_en);
         if (sp) grantedSet.add(sp.name);
     });
     const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked'))
@@ -4281,6 +4502,38 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         </div>
     </div>`;
 
+    // Sezione Invocazioni Demoniache (solo per Warlock).
+    let invocationsSectionHtml = '';
+    const wlvl = _pgWarlockLevel(pg);
+    if (wlvl >= 2) {
+        const maxInv = _pgMaxInvocations(pg);
+        const selected = (pg.invocazioni || []).map(id => _invocationById(id)).filter(Boolean);
+        const itemsHtml = selected.length > 0
+            ? selected.map(inv => {
+                const desc = (inv.description || '').replace(/\s+/g, ' ').trim();
+                const prereq = _formatInvocationPrereqs(inv);
+                const prereqLine = prereq ? `<div class="priv-feat-prereq"><strong>Prerequisiti:</strong> ${escapeHtml(prereq)}</div>` : '';
+                return `<div class="priv-feat-row">
+                    <div class="priv-feat-header priv-feat-clickable" onclick="privToggleFeatureBody(this)">
+                        <span class="priv-feat-level">${escapeHtml(inv.source_short || '')}</span>
+                        <span class="priv-feat-name">${escapeHtml(inv.name)}</span>
+                        <span class="priv-feat-arrow">&#9662;</span>
+                    </div>
+                    <div class="priv-feat-body">
+                        ${prereqLine}
+                        <div class="priv-feat-desc">${escapeHtml(desc)}</div>
+                    </div>
+                </div>`;
+            }).join('')
+            : '<span class="scheda-empty">Nessuna invocazione selezionata</span>';
+        invocationsSectionHtml = `<div class="scheda-section">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Invocazioni Demoniache <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenInvocationsEdit('${pg.id}')" title="Modifica invocazioni">&#9998;</button>
+            </div>
+            <div class="scheda-section-body" id="schedaInvocationsDisplay">${itemsHtml}</div>
+        </div>`;
+    }
+
     content.innerHTML = `
     ${buildSchedaHeader(pg, 'Pagina 2 · Privilegi')}
 
@@ -4295,6 +4548,8 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
     </div>` : ''}
 
     ${customSectionsHtml}
+
+    ${invocationsSectionHtml}
 
     ${talentiSectionHtml}
 
@@ -4671,6 +4926,316 @@ window.schedaCloseTalentiEdit = function() {
     document.body.style.overflow = '';
     window._schedaTalentiEditPgId = null;
     window._schedaTalentiEditList = null;
+};
+
+// ============================================================
+// Picker invocazioni del Warlock
+// ============================================================
+window._invocationPickerSearch = window._invocationPickerSearch || '';
+window._invocationPickerFilters = window._invocationPickerFilters || { source: 'all', prereq: 'all', meets: 'all' };
+
+function _invocationPickerHeaderHtml() {
+    const f = window._invocationPickerFilters;
+    const sources = Array.from(new Set(_invocationsAll().map(i => i.source_short || '?'))).sort();
+    const chip = (label, active, onclick) =>
+        `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
+    const meetsChips = [['all','Tutte'],['meet','Solo idonee']]
+        .map(([v, lab]) => chip(lab, f.meets === v, `_invocationPickerSetFilter('meets','${v}')`)).join('');
+    const prereqChips = [['all','Tutti'],['any','Sì'],['none','No']]
+        .map(([v, lab]) => chip(lab, f.prereq === v, `_invocationPickerSetFilter('prereq','${v}')`)).join('');
+    const sourceChips = [['all','Tutti']].concat(sources.map(s => [s, s]))
+        .map(([v, lab]) => chip(lab, f.source === v, `_invocationPickerSetFilter('source','${v}')`)).join('');
+
+    let activeCount = 0;
+    if (f.meets !== 'all') activeCount += 1;
+    if (f.prereq !== 'all') activeCount += 1;
+    if (f.source !== 'all') activeCount += 1;
+
+    return `
+        <div class="spell-picker-search-row">
+            <input type="text" id="invocationPickerSearch" class="hp-calc-input spell-picker-search"
+                   placeholder="Cerca invocazione (IT/EN)..."
+                   value="${escapeHtml(window._invocationPickerSearch)}"
+                   oninput="_invocationPickerOnSearch(this.value)">
+            <button type="button" class="spell-picker-filter-btn" id="invocationPickerFilterBtn"
+                    onclick="_invocationPickerTogglePanel()" title="Filtri" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                ${activeCount > 0 ? `<span class="spell-picker-filter-badge">${activeCount}</span>` : ''}
+            </button>
+        </div>
+        <div class="spell-filter-panel" id="invocationFilterPanel" style="display:none;">
+            <div class="spell-filter-group">
+                <div class="spell-filter-label">Idoneità</div>
+                <div class="spell-filter-chips">${meetsChips}</div>
+            </div>
+            <div class="spell-filter-group">
+                <div class="spell-filter-label">Prerequisiti</div>
+                <div class="spell-filter-chips">${prereqChips}</div>
+            </div>
+            <div class="spell-filter-group">
+                <div class="spell-filter-label">Manuale</div>
+                <div class="spell-filter-chips">${sourceChips}</div>
+            </div>
+            <div class="spell-filter-actions">
+                <button type="button" class="btn-secondary btn-small" onclick="_invocationPickerResetFilters()">Reimposta</button>
+            </div>
+        </div>
+    `;
+}
+
+window._invocationPickerTogglePanel = function() {
+    const panel = document.getElementById('invocationFilterPanel');
+    const btn = document.getElementById('invocationPickerFilterBtn');
+    if (!panel) return;
+    const visible = panel.style.display !== 'none';
+    panel.style.display = visible ? 'none' : '';
+    if (btn) btn.classList.toggle('active', !visible);
+};
+
+window._invocationPickerResetFilters = function() {
+    window._invocationPickerFilters = { source: 'all', prereq: 'all', meets: 'all' };
+    _schedaInvocationsRefreshModal({ keepPanelOpen: true });
+};
+
+window._invocationPickerOnSearch = function(v) {
+    window._invocationPickerSearch = v || '';
+    _schedaInvocationsRefreshModal({ keepFocus: true });
+};
+window._invocationPickerSetFilter = function(key, val) {
+    window._invocationPickerFilters[key] = val;
+    _schedaInvocationsRefreshModal({ keepPanelOpen: true });
+};
+
+function _invocationMatchesFilters(inv, pg) {
+    const f = window._invocationPickerFilters;
+    if (f.source !== 'all' && (inv.source_short || '?') !== f.source) return false;
+    const hasPrereq = (inv.prerequisites && inv.prerequisites.length > 0);
+    if (f.prereq === 'none' && hasPrereq) return false;
+    if (f.prereq === 'any' && !hasPrereq) return false;
+    if (f.meets === 'meet' && !_pgMeetsInvocationPrereqs(pg, inv)) return false;
+    return true;
+}
+function _invocationMatchesSearch(inv, q) {
+    if (!q) return true;
+    const hay = `${inv.name || ''} ${inv.name_en || ''} ${inv.description || ''}`.toLowerCase();
+    return hay.includes(q);
+}
+
+function _schedaInvocationsContentHtml(currentInvIds) {
+    const pg = _schedaPgCache;
+    const all = _invocationsAll();
+    const q = (window._invocationPickerSearch || '').trim().toLowerCase();
+    const maxInv = _pgMaxInvocations(pg);
+
+    const renderItem = (inv, opts) => {
+        const desc = (inv.description || '').replace(/\s+/g, ' ').trim();
+        const prereq = _formatInvocationPrereqs(inv);
+        const meets = _pgMeetsInvocationPrereqs(pg, inv);
+        const cls = opts.selected ? 'pg-talento-item selected' : `pg-talento-item ${opts.disabled ? 'pg-talento-item-disabled' : ''}`;
+        const onClick = (opts.onClick && !opts.disabled) ? `onclick="${opts.onClick}"` : '';
+        const removeBtn = opts.removeOnClick
+            ? `<button type="button" class="pg-talento-remove" onclick="event.stopPropagation();${opts.removeOnClick}">✕</button>`
+            : '';
+        const infoBtn = `<button type="button" class="pg-talento-info" title="Dettagli" onclick="event.stopPropagation();_featTogglePickerDetail(this)">ⓘ</button>`;
+        const prereqHtml = prereq
+            ? `<div class="pg-talento-prereq" ${(!meets && !opts.selected) ? 'style="color:var(--danger,#c0392b);"' : ''}><strong>Prerequisito:</strong> ${escapeHtml(prereq)}</div>`
+            : '';
+        const descHtml = desc
+            ? `<div class="pg-talento-desc">${escapeHtml(desc).replace(/\n/g, '<br>')}</div>`
+            : '';
+        return `
+            <div class="${cls}" ${onClick} ${opts.title ? `title="${escapeHtml(opts.title)}"` : ''}>
+                <div class="pg-talento-row">
+                    <span class="pg-talento-name">${escapeHtml(inv.name)}</span>
+                    <span class="option-source">(${escapeHtml(inv.source_short || '')})</span>
+                    ${infoBtn}
+                    ${removeBtn}
+                </div>
+                <div class="pg-talento-detail" style="display:none;">
+                    ${prereqHtml}
+                    ${descHtml || '<div class="pg-talento-desc"><em>Nessuna descrizione disponibile.</em></div>'}
+                </div>
+            </div>`;
+    };
+
+    const selected = currentInvIds.map(id => _invocationById(id)).filter(Boolean);
+    const selectedHtml = selected.length > 0
+        ? selected.map((inv, i) => renderItem(inv, { selected: true, removeOnClick: `schedaInvocationRemove(${i})` })).join('')
+        : '';
+
+    const available = all
+        .filter(inv => !currentInvIds.includes(inv.id))
+        .filter(inv => _invocationMatchesFilters(inv, pg))
+        .filter(inv => _invocationMatchesSearch(inv, q));
+
+    const canAddMore = currentInvIds.length < maxInv;
+
+    const listHtml = available.map(inv => {
+        const meets = _pgMeetsInvocationPrereqs(pg, inv);
+        const disabled = !meets || !canAddMore;
+        const reason = !canAddMore ? 'Limite invocazioni raggiunto' : (!meets ? 'Prerequisiti non soddisfatti' : '');
+        const safeId = inv.id.replace(/'/g, "\\'");
+        return renderItem(inv, {
+            onClick: `schedaInvocationAdd('${safeId}')`,
+            disabled,
+            title: disabled ? reason : '',
+        });
+    }).join('') || '<div class="scheda-empty" style="padding:12px;">Nessuna invocazione corrisponde ai filtri.</div>';
+
+    return `
+        <div class="invocations-summary"><strong>${currentInvIds.length}</strong> / ${maxInv} invocazioni selezionate</div>
+        ${_invocationPickerHeaderHtml()}
+        ${selectedHtml ? `<div class="form-section-label">Selezionate</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
+        <div class="form-section-label">Disponibili (${available.length})</div>
+        <div class="pg-talenti-available">${listHtml}</div>
+    `;
+}
+
+window.schedaOpenInvocationsEdit = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = pg.invocazioni ? [...pg.invocazioni] : [];
+
+    window._invocationPickerSearch = '';
+    window._invocationPickerFilters = { source: 'all', prereq: 'all', meets: 'all' };
+
+    const modalHtml = `
+    <div class="modal active" id="schedaInvocationsModal">
+        <div class="modal-content modal-content-lg">
+            <button class="modal-close" onclick="schedaCloseInvocationsEdit()">&times;</button>
+            <h2>Modifica Invocazioni Demoniache</h2>
+            <div class="wizard-page-scroll" id="schedaInvocationsContent">
+                ${_schedaInvocationsContentHtml(current)}
+            </div>
+            <div class="form-actions" style="margin-top:var(--spacing-md);">
+                <button type="button" class="btn-secondary" onclick="schedaCloseInvocationsEdit()">Chiudi</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+    window._schedaInvocationsEditPgId = pgId;
+    window._schedaInvocationsEditList = current;
+};
+
+window.schedaInvocationAdd = async function(invId) {
+    if (!window._schedaInvocationsEditList) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const inv = _invocationById(invId);
+    if (!inv) return;
+    if (window._schedaInvocationsEditList.includes(invId)) return;
+    if (window._schedaInvocationsEditList.length >= _pgMaxInvocations(pg)) return;
+    if (!_pgMeetsInvocationPrereqs(pg, inv)) return;
+    window._schedaInvocationsEditList.push(invId);
+    _applyInvocationSkillsToPg(pg);
+    await _schedaInvocationsSave();
+    _schedaInvocationsRefreshModal();
+};
+
+window.schedaInvocationRemove = async function(index) {
+    if (!window._schedaInvocationsEditList) return;
+    const removedId = window._schedaInvocationsEditList[index];
+    window._schedaInvocationsEditList.splice(index, 1);
+    const pg = _schedaPgCache;
+    if (pg) {
+        _removeInvocationSkillFromPg(pg, removedId);
+        _applyInvocationSkillsToPg(pg);
+    }
+    await _schedaInvocationsSave();
+    _schedaInvocationsRefreshModal();
+};
+
+// Aggiunge a pg.competenze_abilita le skill granted dalle invocazioni
+// attualmente selezionate (idempotente).
+function _applyInvocationSkillsToPg(pg) {
+    if (!pg) return;
+    if (!Array.isArray(pg.competenze_abilita)) pg.competenze_abilita = [];
+    const skills = _pgInvocationGrantedSkills(pg);
+    skills.forEach(s => {
+        if (!pg.competenze_abilita.includes(s)) pg.competenze_abilita.push(s);
+    });
+}
+
+// Quando si rimuove una invocazione che concedeva una skill, toglie la
+// competenza solo se non e' garantita anche da un'altra invocazione attiva.
+function _removeInvocationSkillFromPg(pg, removedInvId) {
+    if (!pg || !removedInvId) return;
+    const removed = _invocationById(removedInvId);
+    if (!removed || removed.effect !== 'skill_proficiency') return;
+    const removedSkills = (removed.effect_data || {}).skills || [];
+    const stillGranted = new Set(_pgInvocationGrantedSkills(pg));
+    if (!Array.isArray(pg.competenze_abilita)) return;
+    pg.competenze_abilita = pg.competenze_abilita.filter(s => {
+        if (!removedSkills.includes(s)) return true;
+        return stillGranted.has(s);
+    });
+}
+
+async function _schedaInvocationsSave() {
+    const pgId = window._schedaInvocationsEditPgId;
+    const list = window._schedaInvocationsEditList;
+    if (!pgId) return;
+    if (_schedaPgCache) _schedaPgCache.invocazioni = list;
+
+    // Refresh anche pannello privilegi se aperto.
+    if (typeof schedaOpenPrivilegesPage === 'function' && window._schedaCurrentTab === 'privilegi') {
+        schedaOpenPrivilegesPage(pgId);
+    }
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        const payload = {
+            invocazioni: list,
+            competenze_abilita: _schedaPgCache ? (_schedaPgCache.competenze_abilita || []) : undefined,
+            updated_at: new Date().toISOString(),
+        };
+        try {
+            let { error } = await supabase.from('personaggi').update(payload).eq('id', pgId);
+            // Retry rimuovendo colonne mancanti (es. 'invocazioni' non ancora migrata).
+            for (let i = 0; i < 4 && error; i++) {
+                const m = (error.message || '').match(/find ['"]?([a-z_]+)['"]? column/i)
+                       || (error.message || '').match(/column ['"]?([a-z_]+)['"]?/i);
+                if (!m || !(m[1] in payload)) break;
+                delete payload[m[1]];
+                ({ error } = await supabase.from('personaggi').update(payload).eq('id', pgId));
+            }
+            if (error) console.warn('[invocazioni] save failed', error);
+        } catch (e) {
+            console.warn('[invocazioni] save failed (column missing?)', e);
+        }
+    }
+}
+
+function _schedaInvocationsRefreshModal(opts = {}) {
+    const container = document.getElementById('schedaInvocationsContent');
+    if (!container) return;
+    const list = window._schedaInvocationsEditList || [];
+    container.innerHTML = _schedaInvocationsContentHtml(list);
+    if (opts.keepPanelOpen) {
+        const panel = document.getElementById('invocationFilterPanel');
+        const btn = document.getElementById('invocationPickerFilterBtn');
+        if (panel) panel.style.display = '';
+        if (btn) btn.classList.add('active');
+    }
+    if (opts.keepFocus) {
+        const inp = document.getElementById('invocationPickerSearch');
+        if (inp) {
+            inp.focus();
+            const v = inp.value;
+            inp.setSelectionRange(v.length, v.length);
+        }
+    }
+}
+
+window.schedaCloseInvocationsEdit = function() {
+    const m = document.getElementById('schedaInvocationsModal');
+    if (m) m.remove();
+    document.body.style.overflow = '';
+    window._schedaInvocationsEditPgId = null;
+    window._schedaInvocationsEditList = null;
 };
 
 // HP Calculator
@@ -5364,6 +5929,25 @@ window.schedaInnateSlotChange = function(pgId, key, current, delta, max) {
         const btns = row.querySelectorAll('.scheda-hd-btn');
         if (btns[0]) btns[0].setAttribute('onclick', `schedaInnateSlotChange('${pgId}','${key}',${newVal},-1,${max})`);
         if (btns[1]) btns[1].setAttribute('onclick', `schedaInnateSlotChange('${pgId}','${key}',${newVal},1,${max})`);
+    }
+    schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
+};
+
+window.schedaInvocationSlotChange = function(pgId, key, current, delta, max) {
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    if (newVal === current) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.risorse_classe) pg.risorse_classe = {};
+    if (!pg.risorse_classe._invocations) pg.risorse_classe._invocations = {};
+    pg.risorse_classe._invocations[key] = newVal;
+    const el = document.getElementById(`sInvSlot_${key}`);
+    if (el) el.textContent = newVal;
+    const row = el ? el.closest('.scheda-hd-row') : null;
+    if (row) {
+        const btns = row.querySelectorAll('.scheda-hd-btn');
+        if (btns[0]) btns[0].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},-1,${max})`);
+        if (btns[1]) btns[1].setAttribute('onclick', `schedaInvocationSlotChange('${pgId}','${key}',${newVal},1,${max})`);
     }
     schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 };
