@@ -104,95 +104,80 @@ async function loadRazzeBackground() {
 //        _author_name, _is_own }]
 // ─────────────────────────────────────────────────────────────────────────
 async function loadHomebrewSottoclassi() {
-    // Dedup: se una load è già in volo, restituisci la stessa promise per
-    // evitare query parallele e refresh UI a raffica.
+    // Dedup: chiamate concorrenti restituiscono la stessa promise.
     if (AppState._homebrewSottoclassiLoadPromise) {
         return AppState._homebrewSottoclassiLoadPromise;
     }
     AppState._homebrewSottoclassiLoadPromise = (async () => {
-    const supabase = getSupabaseClient();
-    if (!supabase || !AppState.currentUser?.uid) {
-        AppState.cachedHomebrewSottoclassi = [];
-        return [];
-    }
-    const ownUid = AppState.currentUser.uid;
-    try {
-        // Impostazioni dell'utente (solo per leggere amici_abilitati / enabled).
-        const userData = AppState.cachedUserData || (typeof findUserByUid === 'function'
-            ? await findUserByUid(ownUid)
-            : null);
-        const settings = userData?.homebrew_settings || { enabled: false, amici_abilitati: [] };
-
-        // 1) Carica le proprie (sempre). Non filtriamo parent_class_slug
-        //    lato server: lo filtreremo client-side per evitare problemi
-        //    di sintassi PostgREST con colonne null.
-        const ownReq = supabase
-            .from('homebrew_classi')
-            .select('*')
-            .eq('user_id', ownUid);
-
-        // 2) Risolvi gli auth-uid degli amici abilitati (se feature attiva).
-        let friendUids = [];
-        let friendInfoByUid = {};
-        if (settings.enabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
-            const { data: friendRows } = await supabase
-                .from('utenti')
-                .select('id, uid, nome_utente')
-                .in('id', settings.amici_abilitati);
-            (friendRows || []).forEach(f => {
-                if (f.uid) {
-                    friendUids.push(f.uid);
-                    friendInfoByUid[f.uid] = f;
-                }
-            });
+        const supabase = getSupabaseClient();
+        if (!supabase || !AppState.currentUser?.uid) {
+            AppState.cachedHomebrewSottoclassi = [];
+            return [];
         }
+        const ownUid = AppState.currentUser.uid;
+        try {
+            // Impostazioni dell'utente (per leggere amici_abilitati / enabled).
+            const userData = AppState.cachedUserData || (typeof findUserByUid === 'function'
+                ? await findUserByUid(ownUid)
+                : null);
+            const settings = userData?.homebrew_settings || { enabled: false, amici_abilitati: [] };
 
-        const friendReq = friendUids.length > 0
-            ? supabase
+            // Risolvi gli auth-uid degli amici abilitati (se feature attiva).
+            let friendUids = [];
+            let friendInfoByUid = {};
+            if (settings.enabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
+                const { data: friendRows } = await supabase
+                    .from('utenti')
+                    .select('id, uid, nome_utente')
+                    .in('id', settings.amici_abilitati);
+                (friendRows || []).forEach(f => {
+                    if (f.uid) {
+                        friendUids.push(f.uid);
+                        friendInfoByUid[f.uid] = f;
+                    }
+                });
+            }
+
+            // Una sola SELECT con IN su [io, ...amiciAbilitati].
+            const allUids = [ownUid, ...friendUids];
+            const { data, error } = await supabase
                 .from('homebrew_classi')
                 .select('*')
-                .in('user_id', friendUids)
-            : Promise.resolve({ data: [] });
+                .in('user_id', allUids);
 
-        const [ownRes, friendRes] = await Promise.all([ownReq, friendReq]);
+            if (error) {
+                console.warn('[homebrew] errore SELECT sottoclassi:', error);
+                AppState.cachedHomebrewSottoclassi = [];
+                return [];
+            }
 
-        if (ownRes && ownRes.error) {
-            console.warn('[homebrew] errore SELECT proprie sottoclassi:', ownRes.error);
-        }
-
-        const ownName = userData?.nome_utente || 'Tuo';
-        // Filtriamo qui le righe che sono effettivamente sottoclassi
-        // (parent_class_slug valorizzato): le righe legacy "classe" intera
-        // non vanno mostrate come sottoclassi.
-        const isSubclassRow = (r) => !!(r && r.parent_class_slug);
-        const ownList = (ownRes.data || []).filter(isSubclassRow).map(r => ({
-            ...r,
-            _author_uid: ownUid,
-            _author_name: ownName,
-            _is_own: true
-        }));
-        const friendList = (friendRes.data || []).filter(isSubclassRow).map(r => ({
-            ...r,
-            _author_uid: r.user_id,
-            _author_name: friendInfoByUid[r.user_id]?.nome_utente || 'Amico',
-            _is_own: false
-        }));
-
-        AppState.cachedHomebrewSottoclassi = [...ownList, ...friendList];
-        try {
-            console.log('[homebrew] sottoclassi caricate:', {
-                proprie: ownList.length,
-                amici: friendList.length,
-                righe_grezze_proprie: (ownRes.data || []).length,
-                slugs: AppState.cachedHomebrewSottoclassi.map(r => r.parent_class_slug + ':' + r.nome)
+            const ownName = userData?.nome_utente || 'Tuo';
+            const isSubclassRow = (r) => !!(r && r.parent_class_slug);
+            const list = (data || []).filter(isSubclassRow).map(r => {
+                const isOwn = r.user_id === ownUid;
+                return {
+                    ...r,
+                    _author_uid: r.user_id,
+                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                    _is_own: isOwn,
+                };
             });
-        } catch (_) {}
-        return AppState.cachedHomebrewSottoclassi;
-    } catch (e) {
-        console.warn('Errore caricamento sottoclassi homebrew:', e);
-        AppState.cachedHomebrewSottoclassi = [];
-        return [];
-    }
+
+            AppState.cachedHomebrewSottoclassi = list;
+            try {
+                console.log('[homebrew] sottoclassi caricate:', {
+                    totale: list.length,
+                    proprie: list.filter(x => x._is_own).length,
+                    amici: list.filter(x => !x._is_own).length,
+                    items: list.map(r => `${r.parent_class_slug}:${r.nome} (${r._is_own ? 'tuo' : r._author_name})`)
+                });
+            } catch (_) {}
+            return list;
+        } catch (e) {
+            console.warn('Errore caricamento sottoclassi homebrew:', e);
+            AppState.cachedHomebrewSottoclassi = [];
+            return [];
+        }
     })().finally(() => {
         AppState._homebrewSottoclassiLoadPromise = null;
     });
