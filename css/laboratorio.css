@@ -1407,3 +1407,95 @@
     line-height: 1.5;
 }
 
+/* ────────────────────────────────────────────────────────────
+   Bottone "Importa" accanto al titolo di una categoria laboratorio.
+   Inserito dinamicamente dal JS solo per la categoria oggetti.
+   ──────────────────────────────────────────────────────────── */
+.lab-import-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background 0.12s, border-color 0.12s;
+}
+.lab-import-btn:hover { background: var(--surface-hover); border-color: var(--primary); }
+#labSubPage .page-header { display: flex; align-items: center; gap: 12px; }
+#labSubPage .page-header h1 { margin: 0; }
+
+/* ────────────────────────────────────────────────────────────
+   Dialog di importazione oggetti.
+   ──────────────────────────────────────────────────────────── */
+.lab-import-modal {
+    width: min(820px, 96vw);
+    max-height: 92vh;
+    text-align: left;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+.lab-import-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+}
+.lab-import-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); }
+.lab-import-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+.lab-import-hint { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 8px; }
+.lab-import-example {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    margin: 0;
+}
+.lab-import-file-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+.lab-import-file-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+    border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+}
+.lab-import-file-btn:hover { background: var(--surface-hover); border-color: var(--primary); }
+.lab-import-file-name { color: var(--text-muted); font-size: 0.8rem; }
+.lab-import-textarea { width: 100%; min-height: 160px; resize: vertical; font-family: monospace; font-size: 0.85rem; }
+.lab-import-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;
+}
+
+.lab-import-preview-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; gap: 10px; flex-wrap: wrap;
+}
+.lab-import-summary { color: var(--text); font-weight: 600; }
+.lab-import-preview-actions { display: flex; gap: 12px; }
+.btn-link { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; padding: 0; }
+.btn-link:hover { text-decoration: underline; }
+
+.lab-import-preview-list { display: flex; flex-direction: column; gap: 8px; }
+.lab-import-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); cursor: pointer;
+}
+.lab-import-item input[type="checkbox"] { margin-top: 3px; }
+.lab-import-item-body { flex: 1; min-width: 0; }
+.lab-import-item-name { font-weight: 700; color: var(--text); }
+.lab-import-item-meta { color: var(--text-secondary); font-size: 0.8rem; margin-top: 2px; }
+.lab-import-item-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; line-height: 1.4; }
+.lab-import-warn { color: #f59e0b; font-size: 0.8rem; margin-top: 4px; }
+
+
+

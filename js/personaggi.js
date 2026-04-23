@@ -4997,7 +4997,8 @@ window.schedaOpenInventoryPage = async function(pgId) {
             meta = (typeof window.formatOggettoMeta === 'function')
                 ? window.formatOggettoMeta(view) : '';
         }
-        return `<div class="inv-item-row">
+        const rarClass = _invRarityClass(view._homebrew_rarita || view.rarita);
+        return `<div class="inv-item-row ${rarClass}">
             <div class="inv-item-main">
                 <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
                 ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
@@ -5113,6 +5114,21 @@ window.invOpenCoinKeypad = function(inputEl) {
 // - Se l'oggetto homebrew e' stato cancellato dall'autore, fallback
 //   sui campi snapshot dell'entry (nome/descrizione gia' salvati).
 // ─────────────────────────────────────────────────────────────────────
+// Mappa una rarita' (stringa libera, italiano o inglese) alla classe CSS
+// da applicare alla riga dell'oggetto. Ritorna stringa vuota per rarita'
+// sconosciute o "Comune" (che non ha colore).
+function _invRarityClass(rar) {
+    if (!rar || typeof rar !== 'string') return '';
+    const n = rar.trim().toLowerCase();
+    if (!n || n === 'comune' || n === 'common') return '';
+    if (n === 'non comune' || n === 'uncommon') return 'rarita-non-comune';
+    if (n === 'raro' || n === 'rare') return 'rarita-raro';
+    if (n === 'molto raro' || n === 'very rare') return 'rarita-molto-raro';
+    if (n === 'leggendario' || n === 'legendary') return 'rarita-leggendario';
+    if (n === 'artefatto' || n === 'artifact') return 'rarita-artefatto';
+    return '';
+}
+
 function _invResolveLive(entry) {
     if (!entry || typeof entry !== 'object') return entry || {};
     if (!entry._homebrew_id) return entry;
@@ -5297,7 +5313,13 @@ window.invQuickCreate = function(pgId) {
             </select>
             <input type="number" id="invItemQty" class="hp-calc-input inv-quick-qty" value="1" min="1" title="Quantita'">
         </div>
-        <textarea id="invItemDesc" class="equip-desc-textarea inv-quick-desc" placeholder="Descrizione dell'oggetto..."></textarea>
+        ${window.renderTextareaFullscreen({
+            id: 'invItemDesc',
+            className: 'equip-desc-textarea inv-quick-desc',
+            rows: 6,
+            placeholder: "Descrizione dell'oggetto...",
+            value: '',
+        })}
         <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-secondary" onclick="invAddItem('${pgId}')">Indietro</button>
             <button class="btn-primary" onclick="invSaveNewItem('${pgId}')">Aggiungi</button>
@@ -5423,7 +5445,13 @@ window.invEditItem = function(pgId, idx) {
             ? `<div class="equip-desc-rendered">${(item.descrizione && item.descrizione.trim())
                 ? window.formatRichText(item.descrizione)
                 : '<span class="equip-desc-empty">Nessuna descrizione</span>'}</div>`
-            : `<textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>`
+            : window.renderTextareaFullscreen({
+                id: 'invItemDesc',
+                className: 'equip-desc-textarea',
+                rows: 10,
+                placeholder: 'Descrizione (effetti magici, note...)',
+                value: item.descrizione || '',
+            })
         }
         <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>

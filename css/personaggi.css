@@ -2108,8 +2108,29 @@
 .inv-coin-name { font-size: 0.65rem; color: var(--text-light); }
 .inv-coin-name { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
 
-.inv-item-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.inv-item-row { display: flex; align-items: center; gap: 8px; padding: 8px 0 8px 10px; border-bottom: 1px solid var(--border); border-left: 3px solid transparent; transition: background 0.12s; }
 .inv-item-row:last-child { border-bottom: none; }
+
+/* ────────────────────────────────────────────────────────────
+   Colori per rarita' degli oggetti nel tesoro.
+   Ogni classe colora:
+   - il bordo sinistro della riga (indicatore visivo primario)
+   - il testo del nome
+   ──────────────────────────────────────────────────────────── */
+.inv-item-row.rarita-non-comune { border-left-color: #4ade80; }
+.inv-item-row.rarita-non-comune .inv-item-name { color: #4ade80; }
+
+.inv-item-row.rarita-raro { border-left-color: #60a5fa; }
+.inv-item-row.rarita-raro .inv-item-name { color: #60a5fa; }
+
+.inv-item-row.rarita-molto-raro { border-left-color: #f87171; }
+.inv-item-row.rarita-molto-raro .inv-item-name { color: #f87171; }
+
+.inv-item-row.rarita-leggendario { border-left-color: #c084fc; }
+.inv-item-row.rarita-leggendario .inv-item-name { color: #c084fc; }
+
+.inv-item-row.rarita-artefatto { border-left-color: #facc15; }
+.inv-item-row.rarita-artefatto .inv-item-name { color: #facc15; }
 /* Tablet/desktop: la lista del Tesoro va su due colonne. Su mobile resta single. */
 .inv-items-grid { display: block; }
 @media (min-width: 768px) {

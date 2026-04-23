@@ -100,12 +100,43 @@ window.labOpenCategory = function(tab) {
     const addBtn = document.getElementById('addHomebrewBtn');
     if (addBtn) addBtn.style.visibility = cat.isSettings ? 'hidden' : '';
 
+    // Bottone "Importa" (solo per la categoria oggetti): lo inseriamo
+    // dinamicamente vicino al titolo. Per ora l'ingestion e' disponibile
+    // solo per gli oggetti, i cui header hanno un formato standard.
+    _labMountImportButton(tab);
+
     if (cat.isSettings) {
         labRenderSettings();
     } else {
         loadLabContent();
     }
 };
+
+function _labMountImportButton(tab) {
+    const headerRow = document.querySelector('#labSubPage .page-header');
+    if (!headerRow) return;
+    let btn = document.getElementById('labImportBtn');
+    if (tab !== 'oggetti') {
+        if (btn) btn.remove();
+        return;
+    }
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'labImportBtn';
+        btn.className = 'lab-import-btn';
+        btn.type = 'button';
+        btn.title = 'Importa oggetti da file';
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>Importa</span>`;
+        btn.onclick = () => window.labOpenImportDialog();
+        headerRow.appendChild(btn);
+    }
+}
 
 window.labBackToHub = function() {
     const hub = document.getElementById('labHub');
@@ -168,9 +199,6 @@ function labRenderCard(item, cat) {
             ${detail ? `<p class="lab-card-detail">${escapeHtml(detail)}</p>` : ''}
         </div>
         <div class="lab-card-actions">
-            <button onclick="event.stopPropagation();labEditItem('${item.id}')" title="Modifica">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            </button>
             <button class="lab-delete" onclick="event.stopPropagation();labDeleteItem('${item.id}')" title="Elimina">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
@@ -2084,7 +2112,13 @@ function labFieldsOggetti(data) {
 
     <div class="form-group">
         <label for="hbDescrizione">Descrizione</label>
-        <textarea id="hbDescrizione" class="lab-ogg-desc" rows="14" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
+        ${window.renderTextareaFullscreen({
+            id: 'hbDescrizione',
+            className: 'lab-ogg-desc',
+            rows: 14,
+            placeholder: "Descrizione completa dell'oggetto, effetti magici, proprieta'...",
+            value: desc,
+        })}
         <div class="lab-help" style="margin-top:6px;">
             Formattazione: <b>**grassetto**</b> &nbsp;·&nbsp; <i>_corsivo_</i> &nbsp;·&nbsp; "- " a inizio riga per gli elenchi puntati.
         </div>
@@ -2747,3 +2781,385 @@ window.formatOggettoMeta = function formatOggettoMeta(item) {
     }
     return parts.join(', ');
 };
+
+// ============================================================================
+// INGESTION OGGETTI HOMEBREW (txt / pdf)
+// ============================================================================
+// Permette di importare oggetti magici in bulk a partire da un file di
+// testo o PDF con la struttura canonica D&D:
+//
+//     Nome Oggetto
+//     Tipo (sotto-tipo), rarità (requires attunement [by ...])
+//     Descrizione multi-riga dell'oggetto...
+//     [riga vuota come separatore]
+//     Altro Oggetto
+//     Tipo, rarità
+//     Descrizione...
+//
+// Il parser e' tollerante a EN/IT e a variazioni di spazio/punteggiatura.
+
+const _LAB_RARITA_MAP = {
+    'comune': 'Comune', 'common': 'Comune',
+    'non comune': 'Non Comune', 'uncommon': 'Non Comune',
+    'raro': 'Raro', 'rare': 'Raro',
+    'molto raro': 'Molto Raro', 'very rare': 'Molto Raro',
+    'leggendario': 'Leggendario', 'legendary': 'Leggendario',
+    'artefatto': 'Artefatto', 'artifact': 'Artefatto',
+};
+
+// Mappa i tipi canonici EN/IT al set accettato da LAB_OGG_TIPI.
+const _LAB_TIPO_MAP = {
+    'arma': 'Arma', 'weapon': 'Arma',
+    'armatura': 'Armatura', 'armor': 'Armatura', 'armour': 'Armatura',
+    'scudo': 'Scudo', 'shield': 'Scudo',
+    'focus': 'Focus', 'focus arcano': 'Focus', 'focus druidico': 'Focus', 'simbolo sacro': 'Focus', 'holy symbol': 'Focus',
+    'pozione': 'Pozione', 'potion': 'Pozione',
+    'pergamena': 'Pergamena', 'scroll': 'Pergamena',
+    'anello': 'Anello', 'ring': 'Anello',
+    'bacchetta': 'Bacchetta', 'wand': 'Bacchetta',
+    'bastone': 'Bastone', 'staff': 'Bastone',
+    'asta': 'Asta', 'rod': 'Asta',
+    'oggetto meraviglioso': 'Oggetto Meraviglioso', 'wondrous item': 'Oggetto Meraviglioso',
+};
+
+// Regex dell'header: "Tipo [(sotto)], rarita' [(requires attunement...)]".
+// Catturiamo:
+//   1: tipo grezzo       2: sotto-tipo (opzionale)
+//   3: rarita' grezza    4: parentesi aggiuntiva (sintonia, opzionale)
+const _LAB_HDR_RX = /^\s*([A-Za-zÀ-ÿ' ]+?)(?:\s*\(([^)]+)\))?\s*,\s*(comune|non comune|raro|molto raro|leggendario|artefatto|common|uncommon|rare|very rare|legendary|artifact)\s*(?:\(([^)]+)\))?\s*\.?\s*$/i;
+
+function _labNormalizeType(raw) {
+    if (!raw) return '';
+    const k = raw.trim().toLowerCase().replace(/\s+/g, ' ');
+    if (_LAB_TIPO_MAP[k]) return _LAB_TIPO_MAP[k];
+    // Fallback: capitalize
+    return raw.trim().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function _labNormalizeRarity(raw) {
+    if (!raw) return '';
+    const k = raw.trim().toLowerCase();
+    return _LAB_RARITA_MAP[k] || '';
+}
+
+// Parsa il parentesi aggiuntiva dell'header e restituisce info sintonia.
+function _labParseAttunement(paren) {
+    if (!paren) return { richiede: false, dettaglio: '' };
+    const t = paren.trim();
+    const low = t.toLowerCase();
+    // Normalizza "requires attunement..." e "richiede sintonia..."
+    const patterns = [
+        /^requires attunement(?:\s+(.+))?$/i,
+        /^richiede sintonia(?:\s+(.+))?$/i,
+    ];
+    for (const rx of patterns) {
+        const m = t.match(rx);
+        if (m) {
+            const det = (m[1] || '').trim();
+            // Pulizia tipica: "by a wizard" -> "con un mago", lascio raw
+            return { richiede: true, dettaglio: det };
+        }
+    }
+    if (low.includes('attunement') || low.includes('sintonia')) {
+        return { richiede: true, dettaglio: '' };
+    }
+    return { richiede: false, dettaglio: '' };
+}
+
+// Parser principale: prende una stringa e restituisce array di oggetti
+// {nome, tipo, sotto_tipo, rarita, richiede_sintonia, sintonia_dettaglio,
+//  descrizione, _warning}. Se _warning e' presente, l'oggetto e' stato
+// parsato parzialmente.
+function labParseItemsText(text) {
+    if (!text || typeof text !== 'string') return [];
+    // Normalizza line endings e rimuovi BOM.
+    let src = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    // Collassa righe vuote multiple in una sola (separatore blocchi).
+    // Non trim qui perche' vogliamo preservare l'indentazione interna.
+
+    // Strategy: scorri le righe e ogni volta che trovi una riga che e'
+    // un "header" D&D valido (cioe' matcha _LAB_HDR_RX), la riga
+    // immediatamente precedente e' il Nome. Tutte le righe fra un
+    // header e il prossimo Nome+Header sono la descrizione.
+    const lines = src.split('\n').map(l => l.replace(/[ \t]+$/g, ''));
+    const items = [];
+    let i = 0;
+    while (i < lines.length) {
+        // Trova un header con nome non vuoto sopra.
+        if (i >= 1 && lines[i].trim() && _LAB_HDR_RX.test(lines[i])) {
+            const nameLine = lines[i - 1].trim();
+            if (nameLine) {
+                const hdr = lines[i].match(_LAB_HDR_RX);
+                const tipoRaw = hdr[1];
+                const subRaw = hdr[2] || '';
+                const rarRaw = hdr[3];
+                const attRaw = hdr[4] || '';
+                // Raccogli descrizione fino al prossimo nome+header.
+                const descLines = [];
+                let j = i + 1;
+                while (j < lines.length) {
+                    // Lookahead: il prossimo blocco inizia quando
+                    // lines[j] e' non vuota, lines[j+1] e' header.
+                    if (lines[j].trim() && j + 1 < lines.length && _LAB_HDR_RX.test(lines[j + 1])) {
+                        break;
+                    }
+                    descLines.push(lines[j]);
+                    j++;
+                }
+                // Trim bordi vuoti della descrizione.
+                while (descLines.length && !descLines[0].trim()) descLines.shift();
+                while (descLines.length && !descLines[descLines.length - 1].trim()) descLines.pop();
+
+                const att = _labParseAttunement(attRaw);
+                const rec = {
+                    nome: nameLine,
+                    tipo: _labNormalizeType(tipoRaw),
+                    sotto_tipo: subRaw.trim(),
+                    rarita: _labNormalizeRarity(rarRaw),
+                    richiede_sintonia: att.richiede,
+                    sintonia_dettaglio: att.dettaglio,
+                    descrizione: descLines.join('\n').trim(),
+                    _tipo_raw: tipoRaw.trim(),
+                };
+                if (!rec.rarita) rec._warning = `rarità "${rarRaw}" non riconosciuta`;
+                items.push(rec);
+                i = j;
+                continue;
+            }
+        }
+        i++;
+    }
+    return items;
+}
+window.labParseItemsText = labParseItemsText;
+
+// ────────────────────────────────────────────────────────────
+// Dialog di importazione.
+// ────────────────────────────────────────────────────────────
+window.labOpenImportDialog = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay lab-import-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal lab-import-modal">
+            <div class="lab-import-header">
+                <h3 class="lab-import-title">Importa oggetti homebrew</h3>
+                <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()" title="Chiudi">×</button>
+            </div>
+            <div class="lab-import-body">
+                <div class="lab-import-step" id="labImportStep1">
+                    <p class="lab-import-hint">
+                        Carica un file <strong>.txt</strong> o <strong>.pdf</strong> contenente uno o più oggetti nel formato canonico D&amp;D:
+                    </p>
+<pre class="lab-import-example">Amulet of Health
+Wondrous item, rare (requires attunement)
+Your Constitution score is 19 while you wear this amulet...</pre>
+                    <p class="lab-import-hint" style="margin-top:10px;">Oppure incolla direttamente il testo qui sotto.</p>
+                    <div class="lab-import-file-row">
+                        <label class="lab-import-file-btn">
+                            <input type="file" id="labImportFile" accept=".txt,.pdf,text/plain,application/pdf"
+                                style="display:none;" onchange="window._labImportFileChanged(event)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Scegli file</span>
+                        </label>
+                        <span class="lab-import-file-name" id="labImportFileName">Nessun file</span>
+                    </div>
+                    ${window.renderTextareaFullscreen({
+                        id: 'labImportText',
+                        className: 'lab-import-textarea',
+                        rows: 10,
+                        placeholder: 'Incolla qui il testo degli oggetti...',
+                        value: '',
+                    })}
+                    <div class="lab-import-actions">
+                        <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+                        <button class="btn-primary" onclick="window._labImportParse()">Analizza</button>
+                    </div>
+                </div>
+                <div class="lab-import-step" id="labImportStep2" style="display:none;">
+                    <div class="lab-import-preview-head">
+                        <span id="labImportSummary" class="lab-import-summary"></span>
+                        <div class="lab-import-preview-actions">
+                            <button class="btn-link" onclick="window._labImportToggleAll(true)">Seleziona tutto</button>
+                            <button class="btn-link" onclick="window._labImportToggleAll(false)">Deseleziona tutto</button>
+                        </div>
+                    </div>
+                    <div class="lab-import-preview-list" id="labImportPreview"></div>
+                    <div class="lab-import-actions">
+                        <button class="btn-secondary" onclick="window._labImportBack()">Indietro</button>
+                        <button class="btn-primary" id="labImportSaveBtn" onclick="window._labImportSave()">Salva selezionati</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    // Stato locale del flusso di importazione. Lo appendo al DOM del
+    // dialog cosi' e' automaticamente pulito quando l'overlay viene
+    // rimosso.
+    overlay._parsed = [];
+};
+
+window._labImportFileChanged = async function(ev) {
+    const file = ev.target.files && ev.target.files[0];
+    const nameLabel = document.getElementById('labImportFileName');
+    const textArea = document.getElementById('labImportText');
+    if (!file) { if (nameLabel) nameLabel.textContent = 'Nessun file'; return; }
+    if (nameLabel) nameLabel.textContent = file.name;
+    try {
+        let text = '';
+        if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+            text = await _labExtractPdfText(file);
+        } else {
+            text = await file.text();
+        }
+        if (textArea) {
+            textArea.value = text;
+            textArea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    } catch (err) {
+        console.error('[lab][import] errore lettura file:', err);
+        alert('Impossibile leggere il file: ' + (err && err.message ? err.message : err));
+    }
+};
+
+// Carica pdf.js da CDN al primo uso (lazy) ed estrae il testo pagina
+// per pagina, concatenando con doppio newline fra le pagine per
+// aiutare il parser a segmentare i blocchi.
+async function _labEnsurePdfJs() {
+    if (window.pdfjsLib) return window.pdfjsLib;
+    await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Impossibile caricare pdf.js'));
+        document.head.appendChild(s);
+    });
+    if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    return window.pdfjsLib;
+}
+
+async function _labExtractPdfText(file) {
+    const pdfjs = await _labEnsurePdfJs();
+    if (!pdfjs) throw new Error('pdf.js non disponibile');
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjs.getDocument({ data: buf }).promise;
+    const pagesText = [];
+    for (let p = 1; p <= doc.numPages; p++) {
+        const page = await doc.getPage(p);
+        const content = await page.getTextContent();
+        // Ricostruiamo le righe usando la coordinata Y degli item.
+        // pdf.js non restituisce newline espliciti, quindi raggruppiamo
+        // per y arrotondato.
+        const rows = new Map();
+        for (const it of content.items) {
+            const y = Math.round(it.transform[5]);
+            if (!rows.has(y)) rows.set(y, []);
+            rows.get(y).push({ x: it.transform[4], str: it.str });
+        }
+        const sortedY = Array.from(rows.keys()).sort((a, b) => b - a); // top-to-bottom
+        const lines = sortedY.map(y => rows.get(y)
+            .sort((a, b) => a.x - b.x)
+            .map(o => o.str)
+            .join(''));
+        pagesText.push(lines.join('\n'));
+    }
+    return pagesText.join('\n\n');
+}
+
+window._labImportParse = function() {
+    const overlay = document.querySelector('.lab-import-overlay');
+    if (!overlay) return;
+    const txt = document.getElementById('labImportText')?.value || '';
+    const parsed = labParseItemsText(txt);
+    overlay._parsed = parsed;
+    const step1 = document.getElementById('labImportStep1');
+    const step2 = document.getElementById('labImportStep2');
+    const prev = document.getElementById('labImportPreview');
+    const summ = document.getElementById('labImportSummary');
+    if (!parsed.length) {
+        alert('Nessun oggetto riconosciuto. Controlla che l\'header segua il formato "Tipo, rarità".');
+        return;
+    }
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = '';
+    if (summ) summ.textContent = `${parsed.length} oggett${parsed.length === 1 ? 'o' : 'i'} riconosciut${parsed.length === 1 ? 'o' : 'i'}`;
+    if (prev) prev.innerHTML = parsed.map((it, idx) => {
+        const meta = window.formatOggettoMeta({
+            tipo: it.tipo, sotto_tipo: it.sotto_tipo, rarita: it.rarita,
+            richiede_sintonia: it.richiede_sintonia,
+            sintonia_dettaglio: it.sintonia_dettaglio,
+        });
+        const warn = it._warning ? `<div class="lab-import-warn">⚠️ ${escapeHtml(it._warning)}</div>` : '';
+        const descPreview = (it.descrizione || '').split('\n').slice(0, 3).join(' ').slice(0, 220);
+        return `<label class="lab-import-item">
+            <input type="checkbox" data-idx="${idx}" checked>
+            <div class="lab-import-item-body">
+                <div class="lab-import-item-name">${escapeHtml(it.nome)}</div>
+                <div class="lab-import-item-meta">${escapeHtml(meta)}</div>
+                ${descPreview ? `<div class="lab-import-item-desc">${escapeHtml(descPreview)}${it.descrizione.length > 220 ? '...' : ''}</div>` : ''}
+                ${warn}
+            </div>
+        </label>`;
+    }).join('');
+};
+
+window._labImportBack = function() {
+    document.getElementById('labImportStep1').style.display = '';
+    document.getElementById('labImportStep2').style.display = 'none';
+};
+
+window._labImportToggleAll = function(check) {
+    document.querySelectorAll('#labImportPreview input[type="checkbox"]')
+        .forEach(cb => { cb.checked = !!check; });
+};
+
+window._labImportSave = async function() {
+    const overlay = document.querySelector('.lab-import-overlay');
+    if (!overlay) return;
+    const parsed = overlay._parsed || [];
+    const selected = [];
+    document.querySelectorAll('#labImportPreview input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) {
+            const idx = parseInt(cb.dataset.idx, 10);
+            if (!Number.isNaN(idx) && parsed[idx]) selected.push(parsed[idx]);
+        }
+    });
+    if (!selected.length) { alert('Seleziona almeno un oggetto da importare.'); return; }
+    const saveBtn = document.getElementById('labImportSaveBtn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) {
+        alert('Devi essere loggato per importare oggetti.');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Salva selezionati'; }
+        return;
+    }
+    const rows = selected.map(it => ({
+        user_id: AppState.currentUser.uid,
+        nome: it.nome,
+        descrizione: it.descrizione || '',
+        tipo: it.tipo || null,
+        sotto_tipo: it.sotto_tipo || null,
+        rarita: it.rarita || null,
+        richiede_sintonia: !!it.richiede_sintonia,
+        sintonia_dettaglio: it.sintonia_dettaglio || null,
+        incantamento: 0,
+    }));
+    const { error } = await supabase.from('homebrew_oggetti').insert(rows);
+    if (error) {
+        console.error('[lab][import] errore insert:', error);
+        alert('Errore durante il salvataggio: ' + (error.message || ''));
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Salva selezionati'; }
+        return;
+    }
+    overlay.remove();
+    if (typeof loadLabContent === 'function') await loadLabContent();
+    if (typeof window.loadHomebrewOggetti === 'function') await window.loadHomebrewOggetti();
+};
+

@@ -73,6 +73,87 @@ function _formatRichInline(escaped) {
 window.escapeHtml = escapeHtml;
 window.formatRichText = formatRichText;
 
+// ────────────────────────────────────────────────────────────────────────
+// Textarea con bottone "schermo intero"
+// ────────────────────────────────────────────────────────────────────────
+//
+// Wrappa una <textarea> in un container con un piccolo bottone in alto a
+// destra. Al click, apre un overlay modale con una textarea molto piu'
+// grande (sincronizzata in entrambe le direzioni con l'originale tramite
+// eventi input). Chiudendo l'overlay, il valore resta nell'originale.
+//
+// API:
+//   renderTextareaFullscreen({ id, value, rows, placeholder, className, readonly })
+//     -> HTML string pronto per essere iniettato in un form.
+//
+// Stile: necessita delle classi .ta-fs-wrap, .ta-fs-btn, .ta-fs-overlay
+// definite in css/base.css.
+function renderTextareaFullscreen(opts = {}) {
+    const {
+        id = '',
+        value = '',
+        rows = 4,
+        placeholder = '',
+        className = '',
+        readonly = false,
+    } = opts;
+    const idAttr = id ? ` id="${id}"` : '';
+    const readonlyAttr = readonly ? ' readonly' : '';
+    const phAttr = placeholder ? ` placeholder="${escapeHtml(placeholder)}"` : '';
+    return `<div class="ta-fs-wrap">
+        <button type="button" class="ta-fs-btn" title="Schermo intero"
+            onclick="window.taFsOpen(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path d="M4 9V5a1 1 0 0 1 1-1h4"/>
+                <path d="M15 4h4a1 1 0 0 1 1 1v4"/>
+                <path d="M20 15v4a1 1 0 0 1-1 1h-4"/>
+                <path d="M9 20H5a1 1 0 0 1-1-1v-4"/>
+            </svg>
+        </button>
+        <textarea${idAttr} class="${className}" rows="${rows}"${phAttr}${readonlyAttr}>${escapeHtml(value || '')}</textarea>
+    </div>`;
+}
+
+// Apre la textarea in modalita' schermo intero. Sincronizza i valori in
+// entrambe le direzioni cosi' l'utente puo' chiudere con qualsiasi
+// metodo (X, ESC, click fuori) senza perdere il testo.
+window.taFsOpen = function(btn) {
+    const wrap = btn?.closest('.ta-fs-wrap');
+    const src = wrap?.querySelector('textarea');
+    if (!src) return;
+    const isReadonly = src.hasAttribute('readonly');
+    const overlay = document.createElement('div');
+    overlay.className = 'ta-fs-overlay';
+    overlay.innerHTML = `
+        <div class="ta-fs-modal">
+            <div class="ta-fs-header">
+                <span class="ta-fs-title">Descrizione</span>
+                <button type="button" class="ta-fs-close" title="Chiudi">×</button>
+            </div>
+            <textarea class="ta-fs-textarea"${isReadonly ? ' readonly' : ''}
+                placeholder="${escapeHtml(src.placeholder || '')}">${escapeHtml(src.value || '')}</textarea>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    const big = overlay.querySelector('.ta-fs-textarea');
+    big?.focus();
+
+    const syncFromBig = () => { src.value = big.value; src.dispatchEvent(new Event('input', { bubbles: true })); };
+    big?.addEventListener('input', syncFromBig);
+
+    const close = () => {
+        syncFromBig();
+        overlay.remove();
+        document.removeEventListener('keydown', onKey);
+    };
+    overlay.querySelector('.ta-fs-close')?.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+};
+
+window.renderTextareaFullscreen = renderTextareaFullscreen;
+
 // Notification System (simple)
 function showNotification(message) {
     // Crea elemento notifica
