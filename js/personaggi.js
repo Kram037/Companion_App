@@ -3624,7 +3624,7 @@ async function renderSchedaPersonaggio(personaggioId) {
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche</div>
             <div class="scheda-section-body">
         <div class="scheda-three-boxes">
-                    <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura')">
+                    <div class="scheda-box clickable" onclick="schedaOpenCABonus('${pg.id}')">
                         <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
                 <div class="scheda-box-label">CA</div>
             </div>
@@ -3857,28 +3857,68 @@ window.schedaOpenSpellPage = async function(pgId) {
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
     const classi = pg.classi || [];
 
+    // Aggrega per caratteristica (come prima) ma mantieni TUTTI i nomi delle classi
+    // che condividono quella caratteristica: l'utente potrebbe voler aggiungere bonus
+    // separati per classi diverse (es. oggetto che potenzia solo gli incantesimi da Mago).
     const spellAbilities = [];
     classi.forEach(c => {
         const ab = CLASS_SPELL_ABILITY[c.nome];
-        if (ab && !spellAbilities.find(s => s.ability === ab)) {
+        if (!ab) return;
+        const existing = spellAbilities.find(s => s.ability === ab);
+        if (existing) {
+            if (!existing.classi.includes(c.nome)) existing.classi.push(c.nome);
+        } else {
             const val = pg[ab] || 10;
             const m = Math.floor((val - 10) / 2);
-            spellAbilities.push({ classe: c.nome, ability: ab, mod: m });
+            spellAbilities.push({ classi: [c.nome], ability: ab, mod: m });
         }
     });
 
     const spellStatsHtml = spellAbilities.length > 0 ? spellAbilities.map(sa => {
-        const atkBonus = sa.mod + bonusComp;
-        const dc = 8 + bonusComp + sa.mod;
-        const atkStr = atkBonus >= 0 ? `+${atkBonus}` : `${atkBonus}`;
+        const atkBase = sa.mod + bonusComp;
+        const dcBase = 8 + bonusComp + sa.mod;
+        // Somma bonus manuali di tutte le classi che condividono questa caratteristica.
+        let atkExtra = 0, dcExtra = 0;
+        sa.classi.forEach(cn => {
+            const b = _getCasterBonusFor(pg, cn);
+            atkExtra += b.atk;
+            dcExtra += b.dc;
+        });
+        const atkTot = atkBase + atkExtra;
+        const dcTot = dcBase + dcExtra;
+        const atkStr = atkTot >= 0 ? `+${atkTot}` : `${atkTot}`;
         const modStr = sa.mod >= 0 ? `+${sa.mod}` : `${sa.mod}`;
+        const atkMark = atkExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+        const dcMark = dcExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+        // Cliccando una qualunque box apriamo la modal: passiamo la prima classe del gruppo
+        // (o tutte come array, encoded). Per semplicità usiamo la lista CSV escapata.
+        const classiArg = encodeURIComponent(JSON.stringify(sa.classi));
+        const onclick = `onclick="schedaOpenSpellCasterBonus('${pg.id}','${classiArg}')"`;
+        const classesLabel = sa.classi.join(' / ');
+        const titleAttr = `title="${escapeHtml(classesLabel)} – clicca per modificare i bonus"`;
         return `
-        <div class="scheda-spell-stats-row">
-            <div class="scheda-box"><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${atkStr}</div><div class="scheda-box-label">Attacco Inc.</div></div>
-            <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD Inc.</div></div>
+        <div class="scheda-spell-stats-row" data-classi="${escapeHtml(classesLabel)}">
+            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
+            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${atkStr}${atkMark}</div><div class="scheda-box-label">Attacco Inc.</div></div>
+            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${dcTot}${dcMark}</div><div class="scheda-box-label">CD Inc.</div></div>
         </div>`;
     }).join('') : '<p class="scheda-empty">Nessuna classe incantatrice</p>';
+
+    // Counter "Incantesimi preparati": conteggio = incantesimi conosciuti
+    // di livello >=1 (i trucchetti non si "preparano"). Il massimo e' un valore
+    // manuale impostato dall'utente (regole D&D: tipicamente mod + livello classe,
+    // ma con sottoclassi/oggetti puo' variare quindi lasciamo l'editing libero).
+    const preparedCount = (pg.incantesimi_conosciuti || [])
+        .map(n => _resolveSpell(n))
+        .filter(sp => sp && sp.level > 0).length;
+    const preparedMax = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    const preparedRatio = preparedMax > 0 ? `${preparedCount} / ${preparedMax}` : `${preparedCount} / —`;
+    const preparedOver = preparedMax > 0 && preparedCount > preparedMax;
+    const preparedBlock = spellAbilities.length > 0 ? `
+        <div class="scheda-prepared-block ${preparedOver ? 'over' : ''}" onclick="schedaOpenPreparedMax('${pg.id}')" title="Clicca per modificare il massimo">
+            <div class="scheda-prepared-label">Incantesimi preparati</div>
+            <div class="scheda-prepared-value" id="schedaPreparedRatio">${preparedRatio}</div>
+        </div>` : '';
 
     // Sincronizza gli slot salvati con quelli calcolati dalle classi correnti.
     // Necessario per allineare PG esistenti dopo modifiche alle regole di calcolo
@@ -4036,7 +4076,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     ${buildSchedaHeader(pg, 'Incantesimi')}
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
-        <div class="scheda-section-body">${spellStatsHtml}</div>
+        <div class="scheda-section-body">${spellStatsHtml}${preparedBlock}</div>
     </div>
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot Incantesimo</div>
@@ -4403,6 +4443,18 @@ const SPELL_LEVEL_LABELS = {
     9: 'Incantesimi di Livello 9'
 };
 
+function _spellIsConcentration(sp) {
+    if (!sp) return false;
+    const d = String(sp.duration || sp.duration_en || '').toLowerCase();
+    return d.includes('concentr');
+}
+
+function _spellConcMark(sp) {
+    return _spellIsConcentration(sp)
+        ? '<span class="spell-card-conc" title="Richiede concentrazione">C</span>'
+        : '';
+}
+
 function buildSpellLevelSection(pg, level) {
     const known = (pg.incantesimi_conosciuti || [])
         .map(n => ({ raw: n, sp: _resolveSpell(n) }))
@@ -4462,7 +4514,7 @@ function buildSpellLevelSection(pg, level) {
         .map(({ sp }) => {
             const id = sp.name;
             return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-                <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}</div>
+                <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)}</div>
                 <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
             </div>`;
         }).join('');
@@ -4471,7 +4523,7 @@ function buildSpellLevelSection(pg, level) {
         const id = sp.name;
         const tag = src.recharge === 'at_will' ? 'a volontà' : (sp.level === 0 ? 'razza' : `razza · ${src.ability}`);
         return `<div class="spell-card spell-card-innate" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag">${escapeHtml(tag)}</span></div>
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag">${escapeHtml(tag)}</span></div>
             <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
         </div>`;
     }).join('');
@@ -4480,7 +4532,7 @@ function buildSpellLevelSection(pg, level) {
         const id = sp.name;
         const label = src.source_label || 'sottoclasse';
         return `<div class="spell-card spell-card-subclass" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag spell-card-tag-subclass" title="Garantito da: ${escapeHtml(label)}">${escapeHtml(label)}</span></div>
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-subclass" title="Garantito da: ${escapeHtml(label)}">${escapeHtml(label)}</span></div>
             <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
         </div>`;
     }).join('');
@@ -4489,7 +4541,7 @@ function buildSpellLevelSection(pg, level) {
         const id = sp.name;
         const tag = src.recharge === 'at_will' ? 'invocazione · a volontà' : 'invocazione · 1/lungo';
         return `<div class="spell-card spell-card-invocation" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
             <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
         </div>`;
     }).join('');
@@ -6335,9 +6387,9 @@ window.invEditAttune = function(pgId, idx) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const raw = (pg.sintonia || [])[idx] || null;
-    const current = (raw && typeof raw === 'object') ? raw : { nome: (typeof raw === 'string' ? raw : ''), descrizione: '', magic_bonus: 0 };
-    const currentBonus = current.magic_bonus || 0;
-    const currentUid = (raw && typeof raw === 'object') ? (raw.from_treasure_uid || '') : '';
+    const current = (raw && typeof raw === 'object')
+        ? raw
+        : (raw ? { nome: String(raw) } : null);
 
     const attunable = _schedaInvAttunableItems(pg, idx);
     const treasureRows = attunable.length ? attunable.map(({ index, view }) => {
@@ -6347,115 +6399,87 @@ window.invEditAttune = function(pgId, idx) {
         const rarClass = _invRarityClass(rar);
         const subText = [sub, rar].filter(Boolean).join(' · ') || 'Richiede sintonia';
         return `<button type="button" class="inv-attune-pick-row ${rarClass}"
-                onclick="invAttunePickFromTreasure(${index})">
+                onclick="invAttuneFromTreasure('${pgId}',${idx},${index})">
             <span class="inv-attune-pick-name">${escapeHtml(view.nome || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
             <span class="inv-attune-pick-sub">${escapeHtml(subText)}</span>
         </button>`;
-    }).join('') : '<div class="inv-attune-pick-empty">Nessun oggetto che richiede sintonia nel tesoro.</div>';
+    }).join('') : `<div class="inv-attune-pick-empty">
+            Nessun oggetto che richiede sintonia nel tuo tesoro.<br>
+            <small>Aggiungi prima l'oggetto al tesoro, poi torna qui per assegnarlo a uno slot di sintonia.</small>
+        </div>`;
+
+    let currentHtml = '';
+    if (current) {
+        const bonus = current.magic_bonus || 0;
+        const nameWithEnch = `${escapeHtml(current.nome || 'Oggetto')}${bonus ? ' +' + bonus : ''}`;
+        const descHtml = current.descrizione
+            ? `<div class="inv-attune-current-desc">${escapeHtml(current.descrizione)}</div>` : '';
+        currentHtml = `<div class="inv-attune-current">
+            <div class="inv-attune-current-head">
+                <div>
+                    <div class="inv-attune-current-label">Slot occupato da</div>
+                    <div class="inv-attune-current-name">${nameWithEnch}</div>
+                </div>
+                <button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Libera slot</button>
+            </div>
+            ${descHtml}
+        </div>`;
+    }
 
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
-        <h3 style="margin-bottom:10px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
+    overlay.innerHTML = `<div class="hp-calc-modal inv-attune-modal">
+        <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <div class="hp-calc-title">Sintonia – Slot ${idx + 1}</div>
+        ${currentHtml}
         <div class="inv-attune-pick-section">
-            <div class="inv-attune-pick-label">Dal tuo Tesoro</div>
+            <div class="inv-attune-pick-label">${current ? 'Sostituisci con un oggetto del Tesoro' : 'Scegli dal Tesoro'}</div>
             <div class="inv-attune-pick-list">${treasureRows}</div>
         </div>
-        <div class="inv-attune-pick-divider"><span>oppure inserisci manualmente</span></div>
-        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:10px;">
-        <div class="equip-ench-row">
-            <span class="equip-ench-label">Incantamento</span>
-            <div class="custom-res-dice-row">
-                ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                ).join('')}
-            </div>
-            <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
-        </div>
-        <textarea id="invAttuneDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(current.descrizione || '')}</textarea>
-        <input type="hidden" id="invAttuneTreasureUid" value="${escapeHtml(currentUid)}">
-        <div class="dialog-actions" style="margin-top:12px;">
-            ${raw ? `<button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Elimina</button>` : ''}
-            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
-            <button class="btn-primary" onclick="invSaveAttune('${pgId}',${idx})">Salva</button>
+        <div class="dialog-actions inv-attune-actions">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Chiudi</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
-    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 };
 
-// Riempie i campi della modal sintonia con i dati di un oggetto del
-// tesoro e ne registra l'uid per il binding. L'utente puo' sempre
-// modificare nome/descrizione/bonus prima di salvare.
-window.invAttunePickFromTreasure = function(invIndex) {
+// Salva immediatamente l'oggetto del tesoro selezionato nello slot di sintonia.
+window.invAttuneFromTreasure = async function(pgId, slotIdx, invIndex) {
     const pg = _schedaPgCache;
     if (!pg || !Array.isArray(pg.inventario)) return;
     const view = _schedaInvViewAt(pg, invIndex);
     if (!view) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
     const ench = view.magic_bonus || view._homebrew_incantamento || 0;
     const desc = view.descrizione || view._homebrew_meta || '';
     const uid = _schedaEnsureInvUid(pg.inventario, invIndex);
-    const nameEl = document.getElementById('invAttuneName');
-    const descEl = document.getElementById('invAttuneDesc');
-    const bonusEl = document.getElementById('invAttuneBonus');
-    const uidEl = document.getElementById('invAttuneTreasureUid');
-    if (nameEl) nameEl.value = view.nome || '';
-    if (descEl) descEl.value = desc;
-    if (bonusEl) bonusEl.value = String(ench);
-    if (uidEl) uidEl.value = uid || '';
-    document.querySelectorAll('.equip-ench-row .custom-res-dice-btn').forEach(b => {
-        const v = b.textContent === 'No' ? 0 : parseInt(b.textContent.replace('+', '')) || 0;
-        b.classList.toggle('active', v === ench);
-    });
-    // Evidenzia visivamente la riga selezionata.
-    document.querySelectorAll('.inv-attune-pick-row').forEach(r => r.classList.remove('selected'));
-    const clicked = document.querySelector(`.inv-attune-pick-row[onclick*="(${invIndex})"]`);
-    if (clicked) clicked.classList.add('selected');
-};
 
-window.invSelectAttuneBonus = function(btn, bonus) {
-    const row = btn.parentElement;
-    if (!row) return;
-    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const hidden = document.getElementById('invAttuneBonus');
-    if (hidden) hidden.value = String(bonus);
-};
+    const slot = { nome: view.nome || 'Oggetto' };
+    if (desc) slot.descrizione = desc;
+    if (ench > 0) slot.magic_bonus = ench;
+    if (uid) slot.from_treasure_uid = uid;
 
-window.invSaveAttune = async function(pgId, idx) {
-    const nome = document.getElementById('invAttuneName')?.value?.trim() || '';
-    const desc = document.getElementById('invAttuneDesc')?.value?.trim() || '';
-    const bonus = parseInt(document.getElementById('invAttuneBonus')?.value) || 0;
-    const treasureUid = document.getElementById('invAttuneTreasureUid')?.value?.trim() || '';
-    const supabase = getSupabaseClient();
-    const pg = _schedaPgCache;
-    if (!supabase || !pg) return;
     const sintonia = pg.sintonia ? [...pg.sintonia] : [null, null, null];
     while (sintonia.length < 3) sintonia.push(null);
-    if (!nome) {
-        sintonia[idx] = null;
-    } else {
-        const slot = { nome };
-        if (desc) slot.descrizione = desc;
-        if (bonus > 0) slot.magic_bonus = bonus;
-        if (treasureUid) slot.from_treasure_uid = treasureUid;
-        sintonia[idx] = slot;
-    }
+    sintonia[slotIdx] = slot;
     pg.sintonia = sintonia;
-    // L'inventario potrebbe contenere uid appena generati: persistilo.
+
     const updates = { sintonia };
-    if (treasureUid) updates.inventario = pg.inventario;
+    if (uid) updates.inventario = pg.inventario;
     await supabase.from('personaggi').update(updates).eq('id', pgId);
+
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
 };
 
 window.invDeleteAttuneFromEdit = async function(pgId, idx) {
     const ok = await _schedaShowConfirmDialog({
-        title: 'Eliminare sintonia?',
-        message: 'Lo slot di sintonia verra\' liberato.',
-        confirmLabel: 'Elimina', danger: true,
+        title: 'Liberare lo slot?',
+        message: 'L\'oggetto verra\' rimosso dallo slot di sintonia (resta nel tesoro).',
+        confirmLabel: 'Libera', danger: true,
     });
     if (!ok) return;
     document.querySelector('.hp-calc-overlay')?.remove();
@@ -9595,6 +9619,23 @@ function buildEquipSection(pg) {
     </div>`;
 }
 
+// Bonus extra inseriti manualmente dall'utente (oggetti che non sono armatura/scudo,
+// privilegi non auto-applicati, ecc.). Sempre normalizzato per evitare null-checks.
+function _getBonusManuali(pg) {
+    const bm = (pg && typeof pg.bonus_manuali === 'object' && pg.bonus_manuali) ? pg.bonus_manuali : {};
+    return {
+        ca: parseInt(bm.ca) || 0,
+        incantatori: (bm.incantatori && typeof bm.incantatori === 'object') ? bm.incantatori : {},
+        spells_prepared_max: parseInt(bm.spells_prepared_max) || 0,
+    };
+}
+
+function _getCasterBonusFor(pg, classeNome) {
+    const inc = _getBonusManuali(pg).incantatori;
+    const e = inc[classeNome] || {};
+    return { atk: parseInt(e.atk) || 0, dc: parseInt(e.dc) || 0 };
+}
+
 function calcCAFromEquip(pg) {
     const equip = pg.equipaggiamento || [];
     const desMod = calcMod(pg.destrezza || 10);
@@ -9620,6 +9661,7 @@ function calcCAFromEquip(pg) {
     }
     if (armor?.magic_bonus) ca += armor.magic_bonus;
     if (shield) ca += shield.ca_base + (shield.magic_bonus || 0);
+    ca += _getBonusManuali(pg).ca;
     return ca;
 }
 
@@ -9660,8 +9702,249 @@ function getCABreakdown(pg) {
         const shieldMagic = shield.magic_bonus ? ` +${shield.magic_bonus} <span class="ca-stat-label">(magico)</span>` : '';
         lines.push(`${escapeHtml(shield.nome)}: +${shield.ca_base}${shieldMagic}`);
     }
+    const extra = _getBonusManuali(pg).ca;
+    if (extra) {
+        const sign = extra >= 0 ? '+' : '';
+        lines.push(`Bonus extra: ${sign}${extra} <span class="ca-stat-label">(manuale)</span>`);
+    }
     return lines;
 }
+
+// =====================================================
+// BONUS MANUALI: CA e Statistiche Incantatore
+// =====================================================
+window.schedaOpenCABonus = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const bm = _getBonusManuali(pg);
+    const lines = getCABreakdown(pg);
+    const breakdownHtml = `<div class="ca-breakdown">${lines.map(l => `<div class="ca-breakdown-line">${l}</div>`).join('')}</div>`;
+    const totalCA = pg.classe_armatura || 10;
+
+    const existing = document.getElementById('caBonusOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'caBonusOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal bonus-modal">
+            <button class="hp-calc-close" onclick="schedaCloseCABonus()">&times;</button>
+            <div class="hp-calc-title">Classe Armatura</div>
+            ${breakdownHtml}
+            <div class="hp-calc-hp-display"><span class="hp-calc-current">${totalCA}</span></div>
+            <div class="bonus-modal-row">
+                <label class="bonus-modal-label">Bonus extra (oggetti, privilegi non auto-applicati)</label>
+                <div class="bonus-modal-input-row">
+                    <button class="bonus-modal-step" onclick="schedaCABonusStep(-1)">−</button>
+                    <input type="number" id="caBonusInput" class="bonus-modal-input" value="${bm.ca}" step="1">
+                    <button class="bonus-modal-step" onclick="schedaCABonusStep(1)">+</button>
+                </div>
+                <div class="bonus-modal-hint">Es. Anello di protezione +1, Mantello del Mago Battagliero +1, ecc.</div>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaCABonusConfirm('${pgId}')">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => { document.getElementById('caBonusInput')?.focus(); }, 50);
+};
+
+window.schedaCloseCABonus = function() {
+    const o = document.getElementById('caBonusOverlay');
+    if (o) o.remove();
+};
+
+window.schedaCABonusStep = function(delta) {
+    const inp = document.getElementById('caBonusInput');
+    if (!inp) return;
+    const cur = parseInt(inp.value) || 0;
+    inp.value = cur + delta;
+};
+
+window.schedaCABonusConfirm = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const inp = document.getElementById('caBonusInput');
+    const newBonus = parseInt(inp?.value) || 0;
+
+    const bm = _getBonusManuali(pg);
+    const next = { ca: newBonus, incantatori: bm.incantatori || {}, spells_prepared_max: bm.spells_prepared_max || 0 };
+    pg.bonus_manuali = next;
+
+    const newCA = calcCAFromEquip(pg);
+    pg.classe_armatura = newCA;
+
+    const caEl = document.getElementById('schedaCA');
+    if (caEl) caEl.textContent = newCA;
+
+    schedaCloseCABonus();
+
+    await schedaInstantSave(pgId, { bonus_manuali: next, classe_armatura: newCA });
+    showNotification(newBonus ? `Bonus CA salvato (${newBonus >= 0 ? '+' : ''}${newBonus})` : 'Bonus CA rimosso');
+};
+
+window.schedaOpenSpellCasterBonus = function(pgId, classiArg) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let classi = [];
+    try { classi = JSON.parse(decodeURIComponent(classiArg)); } catch (_) { classi = []; }
+    if (!Array.isArray(classi) || classi.length === 0) return;
+
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const ability = CLASS_SPELL_ABILITY[classi[0]];
+    const abilVal = pg[ability] || 10;
+    const mod = Math.floor((abilVal - 10) / 2);
+
+    const rowsHtml = classi.map(cn => {
+        const b = _getCasterBonusFor(pg, cn);
+        const safe = escapeHtml(cn);
+        return `
+        <div class="bonus-modal-class-block">
+            <div class="bonus-modal-class-name">${safe}</div>
+            <div class="bonus-modal-grid">
+                <div class="bonus-modal-cell">
+                    <label class="bonus-modal-label">Bonus tiro per colpire</label>
+                    <div class="bonus-modal-input-row">
+                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','atk',-1)">−</button>
+                        <input type="number" data-classe="${safe}" data-kind="atk" class="bonus-modal-input spell-bonus-input" value="${b.atk}" step="1">
+                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','atk',1)">+</button>
+                    </div>
+                </div>
+                <div class="bonus-modal-cell">
+                    <label class="bonus-modal-label">Bonus CD incantesimi</label>
+                    <div class="bonus-modal-input-row">
+                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','dc',-1)">−</button>
+                        <input type="number" data-classe="${safe}" data-kind="dc" class="bonus-modal-input spell-bonus-input" value="${b.dc}" step="1">
+                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','dc',1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    const headerInfo = `Caratteristica: <b>${ability}</b> (mod ${mod >= 0 ? '+' : ''}${mod}) · Bonus competenza +${bonusComp}`;
+
+    const existing = document.getElementById('spellBonusOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'spellBonusOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal bonus-modal">
+            <button class="hp-calc-close" onclick="schedaCloseSpellCasterBonus()">&times;</button>
+            <div class="hp-calc-title">Bonus Incantesimi</div>
+            <div class="bonus-modal-info">${headerInfo}</div>
+            ${rowsHtml}
+            <div class="bonus-modal-hint">Es. <i>Bastone del Potere</i> +2 a tiri per colpire e CD; <i>Stella della Notte</i> +1 alla CD; ecc.</div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaSpellCasterBonusConfirm('${pgId}')">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.schedaCloseSpellCasterBonus = function() {
+    const o = document.getElementById('spellBonusOverlay');
+    if (o) o.remove();
+};
+
+window.schedaSpellBonusStep = function(classeNome, kind, delta) {
+    const inp = document.querySelector(`#spellBonusOverlay .spell-bonus-input[data-classe="${classeNome}"][data-kind="${kind}"]`);
+    if (!inp) return;
+    const cur = parseInt(inp.value) || 0;
+    inp.value = cur + delta;
+};
+
+window.schedaOpenPreparedMax = function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const current = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+
+    const existing = document.getElementById('preparedMaxOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'preparedMaxOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal bonus-modal">
+            <button class="hp-calc-close" onclick="schedaClosePreparedMax()">&times;</button>
+            <div class="hp-calc-title">Incantesimi preparati</div>
+            <div class="bonus-modal-info">Imposta il numero massimo di incantesimi che il personaggio può preparare. Lascia 0 per nasconderlo.</div>
+            <div class="bonus-modal-row">
+                <label class="bonus-modal-label">Massimo preparati</label>
+                <div class="bonus-modal-input-row">
+                    <button class="bonus-modal-step" onclick="schedaPreparedMaxStep(-1)">−</button>
+                    <input type="number" id="preparedMaxInput" class="bonus-modal-input" value="${current}" step="1" min="0">
+                    <button class="bonus-modal-step" onclick="schedaPreparedMaxStep(1)">+</button>
+                </div>
+                <div class="bonus-modal-hint">Regola standard: modificatore caratteristica da incantatore + livello di classe (minimo 1).</div>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaPreparedMaxConfirm('${pgId}')">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => { document.getElementById('preparedMaxInput')?.focus(); }, 50);
+};
+
+window.schedaClosePreparedMax = function() {
+    const o = document.getElementById('preparedMaxOverlay');
+    if (o) o.remove();
+};
+
+window.schedaPreparedMaxStep = function(delta) {
+    const inp = document.getElementById('preparedMaxInput');
+    if (!inp) return;
+    const cur = parseInt(inp.value) || 0;
+    inp.value = Math.max(0, cur + delta);
+};
+
+window.schedaPreparedMaxConfirm = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const inp = document.getElementById('preparedMaxInput');
+    const val = Math.max(0, parseInt(inp?.value) || 0);
+
+    const bm = _getBonusManuali(pg);
+    const next = { ca: bm.ca || 0, incantatori: bm.incantatori || {}, spells_prepared_max: val };
+    pg.bonus_manuali = next;
+
+    schedaClosePreparedMax();
+    await schedaInstantSave(pgId, { bonus_manuali: next });
+    if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
+    showNotification(val ? `Massimo preparati: ${val}` : 'Limite preparati rimosso');
+};
+
+window.schedaSpellCasterBonusConfirm = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+
+    const bm = _getBonusManuali(pg);
+    const inc = { ...(bm.incantatori || {}) };
+
+    document.querySelectorAll('#spellBonusOverlay .spell-bonus-input').forEach(inp => {
+        const cn = inp.getAttribute('data-classe');
+        const kind = inp.getAttribute('data-kind');
+        const v = parseInt(inp.value) || 0;
+        inc[cn] = inc[cn] || { atk: 0, dc: 0 };
+        inc[cn][kind] = v;
+        if (!inc[cn].atk && !inc[cn].dc) delete inc[cn];
+    });
+
+    const next = { ca: bm.ca || 0, incantatori: inc, spells_prepared_max: bm.spells_prepared_max || 0 };
+    pg.bonus_manuali = next;
+
+    schedaCloseSpellCasterBonus();
+    await schedaInstantSave(pgId, { bonus_manuali: next });
+    if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
+    showNotification('Bonus incantesimi salvato');
+};
 
 window.schedaOpenAddEquip = function(pgId) {
     const ARMA_CATS = {

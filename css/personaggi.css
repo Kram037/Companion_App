@@ -1909,6 +1909,108 @@
     font-size: 0.75em;
 }
 
+/* ----- Modal bonus manuali (CA + Statistiche Incantatore) ----- */
+.hp-calc-modal.bonus-modal {
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    text-align: left;
+}
+.hp-calc-modal.bonus-modal .hp-calc-title {
+    text-align: center;
+}
+.bonus-modal-info {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #bbb);
+    text-align: center;
+    margin: 4px 0 8px;
+}
+.bonus-modal-row {
+    margin: 12px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.bonus-modal-class-block {
+    margin: 14px 0 4px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.bonus-modal-class-name {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+.bonus-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.bonus-modal-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.bonus-modal-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary, #bbb);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.bonus-modal-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.bonus-modal-input {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.bonus-modal-step {
+    width: 30px;
+    height: 32px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    font-weight: 700;
+}
+.bonus-modal-step:hover {
+    background: var(--accent);
+    color: #fff;
+}
+.bonus-modal-hint {
+    font-size: 0.72rem;
+    color: var(--text-light, #888);
+    font-style: italic;
+    margin-top: 6px;
+}
+.scheda-bonus-mark {
+    color: var(--accent);
+    font-weight: 700;
+    margin-left: 2px;
+    font-size: 0.85em;
+}
+
 .scheda-equip-table {
     width: 100%;
     border-collapse: collapse;
@@ -2618,23 +2720,65 @@
     color: var(--text-muted);
     line-height: 1.2;
 }
-.inv-attune-pick-divider {
+/* Modal sintonia ridisegnata: solo selezione dal tesoro,
+   nessun inserimento manuale. */
+.hp-calc-modal.inv-attune-modal {
+    width: 480px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    text-align: left;
+    padding: 20px;
+}
+.hp-calc-modal.inv-attune-modal .hp-calc-title {
+    text-align: center;
+    margin-bottom: 14px;
+}
+.hp-calc-modal.inv-attune-modal .inv-attune-pick-list {
+    max-height: 320px;
+}
+.inv-attune-current {
+    background: rgba(96,165,250,0.08);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent, #60a5fa);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+.inv-attune-current-head {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
-    margin: 12px 0 10px;
-    color: var(--text-muted);
-    font-size: 0.78rem;
-    font-style: italic;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
-.inv-attune-pick-divider::before,
-.inv-attune-pick-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
+.inv-attune-current-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.inv-attune-current-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-top: 2px;
+}
+.inv-attune-current-desc {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    font-size: 0.82rem;
+    color: var(--text-secondary, #ccc);
+    line-height: 1.4;
+    white-space: pre-wrap;
+    max-height: 120px;
+    overflow-y: auto;
+}
+.inv-attune-actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* ── Voci "Dal tuo Tesoro" nel picker equipaggiamento ──
@@ -2826,6 +2970,65 @@
 .spell-card-meta { font-size: 0.66rem; color: var(--text-light); margin-top: 1px; line-height: 1.2; }
 .spell-card-innate { border-left-color: var(--warning, #d29c2a); background: linear-gradient(90deg, rgba(210,156,42,0.08), transparent 60%); }
 .spell-card-tag { display: inline-block; margin-left: 5px; padding: 0 5px; font-size: 0.56rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--warning, #d29c2a); border: 1px solid currentColor; border-radius: 999px; vertical-align: middle; }
+
+/* Marker "Concentrazione" sulle spell card */
+.spell-card-conc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: #b45309;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    line-height: 1;
+    vertical-align: middle;
+    font-family: 'Times New Roman', serif;
+    flex-shrink: 0;
+}
+
+/* Counter incantesimi preparati */
+.scheda-prepared-block {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent, #6c5ce7);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.scheda-prepared-block:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: var(--accent, #6c5ce7);
+}
+.scheda-prepared-block.over {
+    border-color: #ef4444;
+    background: rgba(239,68,68,0.08);
+}
+.scheda-prepared-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary, #ccc);
+    font-weight: 600;
+}
+.scheda-prepared-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+}
+.scheda-prepared-block.over .scheda-prepared-value {
+    color: #ef4444;
+}
 .scheda-innate-lvl { color: var(--text-muted); font-weight: 600; margin-left: 2px; }
 
 /* Incantesimi auto-garantiti da sottoclasse (Domini, Giuramenti, ...) */

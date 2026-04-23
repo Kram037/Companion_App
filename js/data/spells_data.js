@@ -3898,8 +3898,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Bloccare Persone": {
-    "name": "Bloccare Persone",
+  "Blocca Persone": {
+    "name": "Blocca Persone",
     "name_en": "Hold Person",
     "level": 2,
     "school": "enchantment",
@@ -3931,7 +3931,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": ["Bloccare Persone"],
     "translated": true
   },
   "Invisibilità": {
@@ -4268,8 +4268,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Raggio Lunare": {
-    "name": "Raggio Lunare",
+  "Bagliore Lunare": {
+    "name": "Bagliore Lunare",
     "name_en": "Moonbeam",
     "level": 2,
     "school": "evocation",
@@ -4291,7 +4291,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": ["Raggio Lunare"],
     "translated": true
   },
   "Aura Magica di Nystul": {
@@ -5092,8 +5092,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Lampeggiare": {
-    "name": "Lampeggiare",
+  "Intermittenza": {
+    "name": "Intermittenza",
     "name_en": "Blink",
     "level": 3,
     "school": "transmutation",
@@ -5117,7 +5117,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": ["Lampeggiare"],
     "translated": true
   },
   "Evocare Fulmini": {
@@ -7456,8 +7456,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Terreno Allucinatorio": {
-    "name": "Terreno Allucinatorio",
+  "Terreno Illusorio": {
+    "name": "Terreno Illusorio",
     "name_en": "Hallucinatory Terrain",
     "level": 4,
     "school": "illusion",
@@ -7485,7 +7485,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": ["Terreno Allucinatorio"],
     "translated": true
   },
   "Tempesta di Ghiaccio": {
@@ -8334,8 +8334,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Convocare Raffica": {
-    "name": "Convocare Raffica",
+  "Evoca Pioggia di Armi": {
+    "name": "Evoca Pioggia di Armi",
     "name_en": "Conjure Volley",
     "level": 5,
     "school": "conjuration",
@@ -8357,7 +8357,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger"
     ],
     "source": "Player's Handbook",
-    "aliases": [],
+    "aliases": ["Convocare Raffica"],
     "translated": true
   },
   "Contagio": {
@@ -9080,8 +9080,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Marea di Energia Negativa": {
-    "name": "Marea di Energia Negativa",
+  "Flusso di Energia Negativa": {
+    "name": "Flusso di Energia Negativa",
     "name_en": "Negative Energy Flood",
     "level": 5,
     "school": "necromancy",
@@ -9105,7 +9105,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard"
     ],
     "source": "Xanathar's Guide to Everything",
-    "aliases": [],
+    "aliases": ["Marea di Energia Negativa"],
     "translated": true
   },
   "Passamuri": {
@@ -9516,8 +9516,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Passo dell'Albero": {
-    "name": "Passo dell'Albero",
+  "Traslazione Arborea": {
+    "name": "Traslazione Arborea",
     "name_en": "Tree Stride",
     "level": 5,
     "school": "conjuration",
@@ -9541,7 +9541,7 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": ["Passo dell'Albero"],
     "translated": true
   },
   "Muro di Forza": {

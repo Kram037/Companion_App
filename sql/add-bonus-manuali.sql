@@ -1,0 +1,12 @@
+-- Aggiunge la colonna 'bonus_manuali' alla tabella personaggi.
+-- Contiene i bonus inseriti manualmente dall'utente (non derivati da equip/regole).
+-- Schema previsto:
+--   {
+--     "ca": 0,                              -- bonus extra alla CA (es. anello di protezione)
+--     "incantatori": {                       -- per ogni classe incantatrice
+--       "Mago":   { "atk": 0, "dc": 0 },     -- bonus al tiro per colpire e alla CD incantesimi
+--       "Bardo":  { "atk": 1, "dc": 0 }
+--     }
+--   }
+-- Sicuro da rieseguire.
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS bonus_manuali JSONB DEFAULT '{}';
