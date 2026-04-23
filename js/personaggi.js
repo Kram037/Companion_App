@@ -3278,6 +3278,42 @@ const CLASS_SPELL_ABILITY = {
     'Artefice': 'intelligenza'
 };
 
+// Classi che usano la "preparazione" (devono scegliere ogni giorno quali
+// incantesimi conosciuti rendere disponibili). Le altre classi
+// (Bardo, Stregone, Warlock, Ranger) hanno un numero fisso di
+// "incantesimi conosciuti" che sono sempre considerati preparati.
+const PREPARED_CASTER_CLASSES = ['Mago', 'Chierico', 'Druido', 'Paladino', 'Artefice'];
+
+function _pgUsesPreparedSystem(pg) {
+    return (pg?.classi || []).some(c => PREPARED_CASTER_CLASSES.includes(c.nome));
+}
+
+// Calcolo "regola standard" del numero massimo di incantesimi preparati.
+// - Mago/Chierico/Druido/Artefice: mod caratteristica + livello di classe
+// - Paladino: mod CAR + (livello/2 floor), minimo 1
+// - In multiclass si sommano i contributi delle singole classi (semplificazione).
+function _calcMaxPreparedAuto(pg) {
+    if (!pg) return 0;
+    let total = 0;
+    for (const c of (pg.classi || [])) {
+        if (!PREPARED_CASTER_CLASSES.includes(c.nome)) continue;
+        const ab = CLASS_SPELL_ABILITY[c.nome];
+        if (!ab) continue;
+        const mod = Math.floor(((pg[ab] || 10) - 10) / 2);
+        const lvl = c.livello || 1;
+        const lvlContrib = c.nome === 'Paladino' ? Math.floor(lvl / 2) : lvl;
+        total += Math.max(1, mod + lvlContrib);
+    }
+    return total;
+}
+
+function _spellIsPrepared(pg, spellName, spellLevel) {
+    if (spellLevel === 0) return true;
+    if (!_pgUsesPreparedSystem(pg)) return true;
+    const list = Array.isArray(pg.incantesimi_preparati) ? pg.incantesimi_preparati : [];
+    return list.includes(spellName);
+}
+
 async function renderSchedaPersonaggio(personaggioId) {
     const content = document.getElementById('schedaContent');
     if (!content) return;
@@ -3890,33 +3926,42 @@ window.schedaOpenSpellPage = async function(pgId) {
         const modStr = sa.mod >= 0 ? `+${sa.mod}` : `${sa.mod}`;
         const atkMark = atkExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
         const dcMark = dcExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
-        // Cliccando una qualunque box apriamo la modal: passiamo la prima classe del gruppo
-        // (o tutte come array, encoded). Per semplicità usiamo la lista CSV escapata.
         const classiArg = encodeURIComponent(JSON.stringify(sa.classi));
-        const onclick = `onclick="schedaOpenSpellCasterBonus('${pg.id}','${classiArg}')"`;
+        const onAtk = `onclick="schedaOpenSpellAtkBonus('${pg.id}','${classiArg}')"`;
+        const onDc = `onclick="schedaOpenSpellDcBonus('${pg.id}','${classiArg}')"`;
         const classesLabel = sa.classi.join(' / ');
-        const titleAttr = `title="${escapeHtml(classesLabel)} – clicca per modificare i bonus"`;
+        const titleAtk = `title="${escapeHtml(classesLabel)} – bonus tiro per colpire"`;
+        const titleDc = `title="${escapeHtml(classesLabel)} – bonus CD"`;
         return `
         <div class="scheda-spell-stats-row" data-classi="${escapeHtml(classesLabel)}">
-            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
-            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${atkStr}${atkMark}</div><div class="scheda-box-label">Attacco Inc.</div></div>
-            <div class="scheda-box clickable" ${onclick} ${titleAttr}><div class="scheda-box-val">${dcTot}${dcMark}</div><div class="scheda-box-label">CD Inc.</div></div>
+            <div class="scheda-box"><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
+            <div class="scheda-box clickable" ${onAtk} ${titleAtk}><div class="scheda-box-val">${atkStr}${atkMark}</div><div class="scheda-box-label">Attacco Inc.</div></div>
+            <div class="scheda-box clickable" ${onDc} ${titleDc}><div class="scheda-box-val">${dcTot}${dcMark}</div><div class="scheda-box-label">CD Inc.</div></div>
         </div>`;
     }).join('') : '<p class="scheda-empty">Nessuna classe incantatrice</p>';
 
-    // Counter "Incantesimi preparati": conteggio = incantesimi conosciuti
-    // di livello >=1 (i trucchetti non si "preparano"). Il massimo e' un valore
-    // manuale impostato dall'utente (regole D&D: tipicamente mod + livello classe,
-    // ma con sottoclassi/oggetti puo' variare quindi lasciamo l'editing libero).
-    const preparedCount = (pg.incantesimi_conosciuti || [])
-        .map(n => _resolveSpell(n))
-        .filter(sp => sp && sp.level > 0).length;
-    const preparedMax = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    // Counter "Incantesimi preparati": visibile solo per le classi che usano
+    // la preparazione (Mago/Chierico/Druido/Paladino/Artefice). Il conteggio
+    // include solo gli incantesimi marcati come preparati di livello >= 1
+    // (i trucchetti non si preparano). Il massimo e' precompilato con la
+    // formula standard (mod + livello), sovrascrivibile manualmente.
+    const usesPrepared = _pgUsesPreparedSystem(pg);
+    const preparedCount = usesPrepared
+        ? (pg.incantesimi_preparati || [])
+            .map(n => _resolveSpell(n))
+            .filter(sp => sp && sp.level > 0).length
+        : 0;
+    const autoMax = _calcMaxPreparedAuto(pg);
+    const overrideMax = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    const preparedMax = overrideMax > 0 ? overrideMax : autoMax;
     const preparedRatio = preparedMax > 0 ? `${preparedCount} / ${preparedMax}` : `${preparedCount} / —`;
     const preparedOver = preparedMax > 0 && preparedCount > preparedMax;
-    const preparedBlock = spellAbilities.length > 0 ? `
+    const preparedHint = overrideMax > 0
+        ? '<span class="scheda-prepared-hint">manuale</span>'
+        : (autoMax > 0 ? '<span class="scheda-prepared-hint">auto</span>' : '');
+    const preparedBlock = usesPrepared ? `
         <div class="scheda-prepared-block ${preparedOver ? 'over' : ''}" onclick="schedaOpenPreparedMax('${pg.id}')" title="Clicca per modificare il massimo">
-            <div class="scheda-prepared-label">Incantesimi preparati</div>
+            <div class="scheda-prepared-label">Incantesimi preparati ${preparedHint}</div>
             <div class="scheda-prepared-value" id="schedaPreparedRatio">${preparedRatio}</div>
         </div>` : '';
 
@@ -4455,6 +4500,22 @@ function _spellConcMark(sp) {
         : '';
 }
 
+// Toggle "preparato" per le spell card. Visibile solo per le classi
+// che usano la preparazione e per gli incantesimi conosciuti di livello >= 1
+// (i trucchetti e gli incantesimi razziali/sottoclasse/invocazione sono
+// sempre attivi).
+function _spellPrepToggle(pg, sp) {
+    if (!sp || sp.level === 0) return '';
+    if (!_pgUsesPreparedSystem(pg)) return '';
+    const prepared = _spellIsPrepared(pg, sp.name, sp.level);
+    const cls = prepared ? 'is-prepared' : '';
+    const tip = prepared ? 'Preparato (clicca per smarcare)' : 'Non preparato (clicca per preparare)';
+    const safeName = escapeAttr(sp.name);
+    return `<button type="button" class="spell-card-prep-btn ${cls}"
+        onclick="event.stopPropagation();schedaTogglePrepared('${pg.id}','${safeName}')"
+        title="${tip}" aria-label="${tip}"></button>`;
+}
+
 function buildSpellLevelSection(pg, level) {
     const known = (pg.incantesimi_conosciuti || [])
         .map(n => ({ raw: n, sp: _resolveSpell(n) }))
@@ -4513,8 +4574,10 @@ function buildSpellLevelSection(pg, level) {
         .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name) && !seenInvocation.has(sp.name))
         .map(({ sp }) => {
             const id = sp.name;
-            return `<div class="spell-card" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-                <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)}</div>
+            const prepared = _spellIsPrepared(pg, sp.name, sp.level);
+            const prepCls = (sp.level > 0 && _pgUsesPreparedSystem(pg) && !prepared) ? 'spell-card-unprepared' : '';
+            return `<div class="spell-card ${prepCls}" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+                <div class="spell-card-name">${_spellPrepToggle(pg, sp)}${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)}</div>
                 <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
             </div>`;
         }).join('');
@@ -5120,7 +5183,19 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
         .filter(n => allLevelNames.has(n) && !grantedSet.has(n));
     const merged = Array.from(new Set([...others, ...checked]));
     pg.incantesimi_conosciuti = merged;
-    await supabase.from('personaggi').update({ incantesimi_conosciuti: merged }).eq('id', pgId);
+
+    // Sincronizza la lista dei preparati: rimuovi quelli che non sono piu' tra
+    // i conosciuti (es. spell deselezionata dal picker).
+    const updates = { incantesimi_conosciuti: merged };
+    if (Array.isArray(pg.incantesimi_preparati) && pg.incantesimi_preparati.length > 0) {
+        const knownSet = new Set(merged);
+        const cleaned = pg.incantesimi_preparati.filter(n => knownSet.has(n));
+        if (cleaned.length !== pg.incantesimi_preparati.length) {
+            pg.incantesimi_preparati = cleaned;
+            updates.incantesimi_preparati = cleaned;
+        }
+    }
+    await supabase.from('personaggi').update(updates).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenSpellPage(pgId);
 };
@@ -9621,19 +9696,64 @@ function buildEquipSection(pg) {
 
 // Bonus extra inseriti manualmente dall'utente (oggetti che non sono armatura/scudo,
 // privilegi non auto-applicati, ecc.). Sempre normalizzato per evitare null-checks.
+//
+// Nuovo schema (lista di bonus singoli):
+//   { ca: [{nome, valore}, ...],
+//     incantatori: { "Mago": { atk: [...], dc: [...] }, ... },
+//     spells_prepared_max: 0 }
+//
+// Schema legacy (numero singolo): viene migrato al volo a un'unica entry
+// con nome "Manuale".
+function _normalizeBonusList(v) {
+    if (Array.isArray(v)) {
+        return v
+            .map(b => ({
+                nome: String(b?.nome ?? '').trim().slice(0, 80) || 'Manuale',
+                valore: parseInt(b?.valore) || 0,
+            }))
+            .filter(b => b.valore !== 0);
+    }
+    const n = parseInt(v) || 0;
+    if (n) return [{ nome: 'Manuale', valore: n }];
+    return [];
+}
+
+function _sumBonusList(arr) {
+    return (arr || []).reduce((s, b) => s + (parseInt(b.valore) || 0), 0);
+}
+
 function _getBonusManuali(pg) {
     const bm = (pg && typeof pg.bonus_manuali === 'object' && pg.bonus_manuali) ? pg.bonus_manuali : {};
+    const incRaw = (bm.incantatori && typeof bm.incantatori === 'object') ? bm.incantatori : {};
+    const inc = {};
+    for (const cn of Object.keys(incRaw)) {
+        const e = incRaw[cn] || {};
+        inc[cn] = {
+            atk: _normalizeBonusList(e.atk),
+            dc: _normalizeBonusList(e.dc),
+        };
+    }
     return {
-        ca: parseInt(bm.ca) || 0,
-        incantatori: (bm.incantatori && typeof bm.incantatori === 'object') ? bm.incantatori : {},
+        ca: _normalizeBonusList(bm.ca),
+        incantatori: inc,
         spells_prepared_max: parseInt(bm.spells_prepared_max) || 0,
     };
 }
 
 function _getCasterBonusFor(pg, classeNome) {
     const inc = _getBonusManuali(pg).incantatori;
-    const e = inc[classeNome] || {};
-    return { atk: parseInt(e.atk) || 0, dc: parseInt(e.dc) || 0 };
+    const e = inc[classeNome] || { atk: [], dc: [] };
+    return { atk: _sumBonusList(e.atk), dc: _sumBonusList(e.dc) };
+}
+
+// Confeziona l'oggetto da salvare a partire da una versione normalizzata di
+// bonus_manuali, preservando spells_prepared_max e altre chiavi future.
+function _buildBonusManualiPayload(parsed) {
+    return {
+        ca: parsed.ca || [],
+        incantatori: parsed.incantatori || {},
+        spells_prepared_max: parsed.spells_prepared_max || 0,
+    };
 }
 
 function calcCAFromEquip(pg) {
@@ -9661,7 +9781,7 @@ function calcCAFromEquip(pg) {
     }
     if (armor?.magic_bonus) ca += armor.magic_bonus;
     if (shield) ca += shield.ca_base + (shield.magic_bonus || 0);
-    ca += _getBonusManuali(pg).ca;
+    ca += _sumBonusList(_getBonusManuali(pg).ca);
     return ca;
 }
 
@@ -9702,16 +9822,91 @@ function getCABreakdown(pg) {
         const shieldMagic = shield.magic_bonus ? ` +${shield.magic_bonus} <span class="ca-stat-label">(magico)</span>` : '';
         lines.push(`${escapeHtml(shield.nome)}: +${shield.ca_base}${shieldMagic}`);
     }
-    const extra = _getBonusManuali(pg).ca;
-    if (extra) {
-        const sign = extra >= 0 ? '+' : '';
-        lines.push(`Bonus extra: ${sign}${extra} <span class="ca-stat-label">(manuale)</span>`);
-    }
+    const extras = _getBonusManuali(pg).ca;
+    extras.forEach(b => {
+        const sign = b.valore >= 0 ? '+' : '';
+        lines.push(`${escapeHtml(b.nome)}: ${sign}${b.valore} <span class="ca-stat-label">(manuale)</span>`);
+    });
     return lines;
 }
 
 // =====================================================
 // BONUS MANUALI: CA e Statistiche Incantatore
+// =====================================================
+// =====================================================
+// MODAL: lista editabile di bonus manuali (riusabile)
+// =====================================================
+// Stato corrente della modal: schermo CA o bonus incantatore (atk/dc).
+let _bonusListState = null;
+
+function _bonusListRowHtml(b, idx) {
+    const sign = b.valore >= 0 ? '+' : '';
+    return `<div class="bonus-list-row" data-idx="${idx}">
+        <input type="text" class="bonus-list-name" placeholder="Nome (es. Anello di protezione)" value="${escapeHtml(b.nome)}" maxlength="80">
+        <div class="bonus-list-val-row">
+            <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},-1)">−</button>
+            <input type="number" class="bonus-list-val" value="${sign}${b.valore}" step="1">
+            <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},1)">+</button>
+        </div>
+        <button type="button" class="bonus-list-del" onclick="schedaBonusListDelete(${idx})" title="Rimuovi">×</button>
+    </div>`;
+}
+
+function _bonusListRender() {
+    if (!_bonusListState) return;
+    const container = document.getElementById('bonusListContainer');
+    if (!container) return;
+    const html = _bonusListState.items.length
+        ? _bonusListState.items.map((b, i) => _bonusListRowHtml(b, i)).join('')
+        : '<div class="bonus-list-empty">Nessun bonus. Clicca "Aggiungi bonus" per inserirne uno.</div>';
+    container.innerHTML = html;
+    const totEl = document.getElementById('bonusListTotal');
+    if (totEl) {
+        const tot = _bonusListState.items.reduce((s, b) => s + (parseInt(b.valore) || 0), 0);
+        totEl.textContent = tot >= 0 ? `+${tot}` : `${tot}`;
+    }
+}
+
+function _bonusListSyncFromInputs() {
+    if (!_bonusListState) return;
+    const rows = document.querySelectorAll('#bonusListContainer .bonus-list-row');
+    rows.forEach((row, i) => {
+        if (!_bonusListState.items[i]) return;
+        const nameEl = row.querySelector('.bonus-list-name');
+        const valEl = row.querySelector('.bonus-list-val');
+        if (nameEl) _bonusListState.items[i].nome = nameEl.value.trim().slice(0, 80);
+        if (valEl) _bonusListState.items[i].valore = parseInt(valEl.value) || 0;
+    });
+}
+
+window.schedaBonusListStep = function(idx, delta) {
+    _bonusListSyncFromInputs();
+    if (!_bonusListState?.items[idx]) return;
+    _bonusListState.items[idx].valore = (parseInt(_bonusListState.items[idx].valore) || 0) + delta;
+    _bonusListRender();
+};
+
+window.schedaBonusListDelete = function(idx) {
+    _bonusListSyncFromInputs();
+    if (!_bonusListState) return;
+    _bonusListState.items.splice(idx, 1);
+    _bonusListRender();
+};
+
+window.schedaBonusListAdd = function() {
+    _bonusListSyncFromInputs();
+    if (!_bonusListState) return;
+    _bonusListState.items.push({ nome: '', valore: 1 });
+    _bonusListRender();
+    setTimeout(() => {
+        const rows = document.querySelectorAll('#bonusListContainer .bonus-list-row');
+        const last = rows[rows.length - 1];
+        last?.querySelector('.bonus-list-name')?.focus();
+    }, 30);
+};
+
+// =====================================================
+// MODAL CA
 // =====================================================
 window.schedaOpenCABonus = function(pgId) {
     const pg = _schedaPgCache;
@@ -9721,6 +9916,23 @@ window.schedaOpenCABonus = function(pgId) {
     const breakdownHtml = `<div class="ca-breakdown">${lines.map(l => `<div class="ca-breakdown-line">${l}</div>`).join('')}</div>`;
     const totalCA = pg.classe_armatura || 10;
 
+    _bonusListState = { kind: 'ca', pgId, items: bm.ca.map(b => ({ ...b })) };
+
+    // Pulsante Armatura Magica: visibile solo se conosciuto/preparato e
+    // il PG NON indossa armatura (la cui presenza la disattiverebbe).
+    const armorEquipped = (pg.equipaggiamento || []).some(e => e.tipo === 'armatura');
+    const knowsMageArmor = _pgKnowsSpellByName(pg, 'Armatura Magica', 'Mage Armor');
+    const alreadyApplied = _bonusListState.items.some(b => /armatura\s*magica/i.test(b.nome || ''));
+    const desMod = Math.floor(((pg.destrezza || 10) - 10) / 2);
+    let mageArmorBtn = '';
+    if (knowsMageArmor && !armorEquipped && !alreadyApplied) {
+        mageArmorBtn = `<button type="button" class="bonus-quick-btn" onclick="schedaApplyMageArmor()">
+            ✦ Applica Armatura Magica (CA = 13 ${desMod >= 0 ? '+' : ''}${desMod} = ${13 + desMod})
+        </button>`;
+    } else if (knowsMageArmor && armorEquipped) {
+        mageArmorBtn = `<div class="bonus-modal-hint" style="color:#d29c2a;">Armatura Magica disponibile ma stai indossando un'armatura: rimuovila per applicarla.</div>`;
+    }
+
     const existing = document.getElementById('caBonusOverlay');
     if (existing) existing.remove();
 
@@ -9728,19 +9940,20 @@ window.schedaOpenCABonus = function(pgId) {
     overlay.id = 'caBonusOverlay';
     overlay.className = 'hp-calc-overlay';
     overlay.innerHTML = `
-        <div class="hp-calc-modal bonus-modal">
+        <div class="hp-calc-modal bonus-modal bonus-list-modal">
             <button class="hp-calc-close" onclick="schedaCloseCABonus()">&times;</button>
             <div class="hp-calc-title">Classe Armatura</div>
             ${breakdownHtml}
             <div class="hp-calc-hp-display"><span class="hp-calc-current">${totalCA}</span></div>
-            <div class="bonus-modal-row">
-                <label class="bonus-modal-label">Bonus extra (oggetti, privilegi non auto-applicati)</label>
-                <div class="bonus-modal-input-row">
-                    <button class="bonus-modal-step" onclick="schedaCABonusStep(-1)">−</button>
-                    <input type="number" id="caBonusInput" class="bonus-modal-input" value="${bm.ca}" step="1">
-                    <button class="bonus-modal-step" onclick="schedaCABonusStep(1)">+</button>
+            <div class="bonus-list-section">
+                <div class="bonus-list-header">
+                    <label class="bonus-modal-label">Bonus extra</label>
+                    <span class="bonus-list-total-label">Tot: <span id="bonusListTotal">+0</span></span>
                 </div>
-                <div class="bonus-modal-hint">Es. Anello di protezione +1, Mantello del Mago Battagliero +1, ecc.</div>
+                <div id="bonusListContainer" class="bonus-list-container"></div>
+                <button type="button" class="bonus-list-add-btn" onclick="schedaBonusListAdd()">+ Aggiungi bonus</button>
+                ${mageArmorBtn}
+                <div class="bonus-modal-hint">Inserisci ogni bonus separatamente: Anello di Protezione +1, Mantello del Mago Battagliero +1, ecc.</div>
             </div>
             <div class="hp-calc-buttons">
                 <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaCABonusConfirm('${pgId}')">Conferma</button>
@@ -9748,29 +9961,40 @@ window.schedaOpenCABonus = function(pgId) {
         </div>
     `;
     document.body.appendChild(overlay);
-    setTimeout(() => { document.getElementById('caBonusInput')?.focus(); }, 50);
+    _bonusListRender();
 };
 
 window.schedaCloseCABonus = function() {
     const o = document.getElementById('caBonusOverlay');
     if (o) o.remove();
+    _bonusListState = null;
 };
 
-window.schedaCABonusStep = function(delta) {
-    const inp = document.getElementById('caBonusInput');
-    if (!inp) return;
-    const cur = parseInt(inp.value) || 0;
-    inp.value = cur + delta;
+window.schedaApplyMageArmor = function() {
+    if (!_bonusListState || _bonusListState.kind !== 'ca') return;
+    _bonusListSyncFromInputs();
+    // Armatura Magica: CA = 13 + Des (sostituisce il 10 base senza armatura).
+    // Equivalente a un bonus piatto di +3 alla CA base.
+    _bonusListState.items.push({ nome: 'Armatura Magica', valore: 3 });
+    _bonusListRender();
+    showNotification('Armatura Magica applicata (+3)');
 };
 
 window.schedaCABonusConfirm = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    const inp = document.getElementById('caBonusInput');
-    const newBonus = parseInt(inp?.value) || 0;
+    _bonusListSyncFromInputs();
+
+    const cleaned = (_bonusListState?.items || [])
+        .map(b => ({ nome: (b.nome || 'Manuale').trim().slice(0, 80) || 'Manuale', valore: parseInt(b.valore) || 0 }))
+        .filter(b => b.valore !== 0);
 
     const bm = _getBonusManuali(pg);
-    const next = { ca: newBonus, incantatori: bm.incantatori || {}, spells_prepared_max: bm.spells_prepared_max || 0 };
+    const next = _buildBonusManualiPayload({
+        ca: cleaned,
+        incantatori: bm.incantatori,
+        spells_prepared_max: bm.spells_prepared_max,
+    });
     pg.bonus_manuali = next;
 
     const newCA = calcCAFromEquip(pg);
@@ -9780,12 +10004,26 @@ window.schedaCABonusConfirm = async function(pgId) {
     if (caEl) caEl.textContent = newCA;
 
     schedaCloseCABonus();
-
     await schedaInstantSave(pgId, { bonus_manuali: next, classe_armatura: newCA });
-    showNotification(newBonus ? `Bonus CA salvato (${newBonus >= 0 ? '+' : ''}${newBonus})` : 'Bonus CA rimosso');
+    showNotification(`CA aggiornata: ${newCA}`);
 };
 
-window.schedaOpenSpellCasterBonus = function(pgId, classiArg) {
+// =====================================================
+// MODAL Bonus Incantatore (Atk e DC separate)
+// =====================================================
+function _pgKnowsSpellByName(pg, nameIt, nameEn) {
+    const list = pg?.incantesimi_conosciuti || [];
+    if (!list.length) return false;
+    const norm = s => String(s || '').toLowerCase();
+    const targets = [norm(nameIt), norm(nameEn)].filter(Boolean);
+    return list.some(n => {
+        const sp = _resolveSpell(n);
+        if (!sp) return targets.includes(norm(n));
+        return targets.includes(norm(sp.name)) || targets.includes(norm(sp.name_en));
+    });
+}
+
+function _openSpellBonusGeneric(pgId, classiArg, kind) {
     const pg = _schedaPgCache;
     if (!pg) return;
     let classi = [];
@@ -9797,34 +10035,35 @@ window.schedaOpenSpellCasterBonus = function(pgId, classiArg) {
     const abilVal = pg[ability] || 10;
     const mod = Math.floor((abilVal - 10) / 2);
 
-    const rowsHtml = classi.map(cn => {
-        const b = _getCasterBonusFor(pg, cn);
-        const safe = escapeHtml(cn);
-        return `
-        <div class="bonus-modal-class-block">
-            <div class="bonus-modal-class-name">${safe}</div>
-            <div class="bonus-modal-grid">
-                <div class="bonus-modal-cell">
-                    <label class="bonus-modal-label">Bonus tiro per colpire</label>
-                    <div class="bonus-modal-input-row">
-                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','atk',-1)">−</button>
-                        <input type="number" data-classe="${safe}" data-kind="atk" class="bonus-modal-input spell-bonus-input" value="${b.atk}" step="1">
-                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','atk',1)">+</button>
-                    </div>
-                </div>
-                <div class="bonus-modal-cell">
-                    <label class="bonus-modal-label">Bonus CD incantesimi</label>
-                    <div class="bonus-modal-input-row">
-                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','dc',-1)">−</button>
-                        <input type="number" data-classe="${safe}" data-kind="dc" class="bonus-modal-input spell-bonus-input" value="${b.dc}" step="1">
-                        <button class="bonus-modal-step" onclick="schedaSpellBonusStep('${safe}','dc',1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
+    const bm = _getBonusManuali(pg);
+    // _bonusListState multiplo: una entry per ciascuna classe del gruppo.
+    _bonusListState = {
+        kind: 'caster',
+        pgId,
+        casterKind: kind,
+        classi: [...classi],
+        groups: classi.map(cn => ({
+            classe: cn,
+            items: ((bm.incantatori[cn] || {})[kind] || []).map(b => ({ ...b })),
+        })),
+    };
 
-    const headerInfo = `Caratteristica: <b>${ability}</b> (mod ${mod >= 0 ? '+' : ''}${mod}) · Bonus competenza +${bonusComp}`;
+    const title = kind === 'atk' ? 'Bonus tiro per colpire' : 'Bonus CD incantesimi';
+    const baseInfo = kind === 'atk'
+        ? `Base: mod ${mod >= 0 ? '+' : ''}${mod} + comp +${bonusComp} = <b>${(mod + bonusComp) >= 0 ? '+' : ''}${mod + bonusComp}</b>`
+        : `Base: 8 + mod ${mod >= 0 ? '+' : ''}${mod} + comp +${bonusComp} = <b>${8 + mod + bonusComp}</b>`;
+    const headerInfo = `${escapeHtml(classi.join(' / '))} · Caratteristica: <b>${ability}</b><br>${baseInfo}`;
+
+    const groupsHtml = _bonusListState.groups.map((g, gi) => `
+        <div class="bonus-list-group" data-gidx="${gi}">
+            <div class="bonus-list-group-head">
+                <span class="bonus-list-group-name">${escapeHtml(g.classe)}</span>
+                <span class="bonus-list-total-label">Tot: <span id="bonusListGroupTotal_${gi}">+0</span></span>
+            </div>
+            <div id="bonusListGroupContainer_${gi}" class="bonus-list-container"></div>
+            <button type="button" class="bonus-list-add-btn" onclick="schedaBonusGroupAdd(${gi})">+ Aggiungi bonus</button>
+        </div>
+    `).join('');
 
     const existing = document.getElementById('spellBonusOverlay');
     if (existing) existing.remove();
@@ -9833,36 +10072,153 @@ window.schedaOpenSpellCasterBonus = function(pgId, classiArg) {
     overlay.id = 'spellBonusOverlay';
     overlay.className = 'hp-calc-overlay';
     overlay.innerHTML = `
-        <div class="hp-calc-modal bonus-modal">
+        <div class="hp-calc-modal bonus-modal bonus-list-modal">
             <button class="hp-calc-close" onclick="schedaCloseSpellCasterBonus()">&times;</button>
-            <div class="hp-calc-title">Bonus Incantesimi</div>
+            <div class="hp-calc-title">${title}</div>
             <div class="bonus-modal-info">${headerInfo}</div>
-            ${rowsHtml}
-            <div class="bonus-modal-hint">Es. <i>Bastone del Potere</i> +2 a tiri per colpire e CD; <i>Stella della Notte</i> +1 alla CD; ecc.</div>
+            ${groupsHtml}
+            <div class="bonus-modal-hint">Inserisci ogni bonus separatamente con il suo nome (es. <i>Bastone del Potere</i> +2, <i>Stella della Notte</i> +1).</div>
             <div class="hp-calc-buttons">
                 <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaSpellCasterBonusConfirm('${pgId}')">Conferma</button>
             </div>
         </div>
     `;
     document.body.appendChild(overlay);
+    _bonusGroupRenderAll();
+}
+
+window.schedaOpenSpellAtkBonus = function(pgId, classiArg) {
+    _openSpellBonusGeneric(pgId, classiArg, 'atk');
+};
+
+window.schedaOpenSpellDcBonus = function(pgId, classiArg) {
+    _openSpellBonusGeneric(pgId, classiArg, 'dc');
+};
+
+function _bonusGroupRowHtml(gi, b, idx) {
+    const sign = b.valore >= 0 ? '+' : '';
+    return `<div class="bonus-list-row" data-idx="${idx}">
+        <input type="text" class="bonus-list-name" placeholder="Nome (es. Bastone del Potere)" value="${escapeHtml(b.nome)}" maxlength="80">
+        <div class="bonus-list-val-row">
+            <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},-1)">−</button>
+            <input type="number" class="bonus-list-val" value="${sign}${b.valore}" step="1">
+            <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},1)">+</button>
+        </div>
+        <button type="button" class="bonus-list-del" onclick="schedaBonusGroupDelete(${gi},${idx})" title="Rimuovi">×</button>
+    </div>`;
+}
+
+function _bonusGroupRender(gi) {
+    if (!_bonusListState || _bonusListState.kind !== 'caster') return;
+    const g = _bonusListState.groups[gi];
+    if (!g) return;
+    const c = document.getElementById(`bonusListGroupContainer_${gi}`);
+    if (!c) return;
+    c.innerHTML = g.items.length
+        ? g.items.map((b, i) => _bonusGroupRowHtml(gi, b, i)).join('')
+        : '<div class="bonus-list-empty">Nessun bonus.</div>';
+    const totEl = document.getElementById(`bonusListGroupTotal_${gi}`);
+    if (totEl) {
+        const tot = g.items.reduce((s, b) => s + (parseInt(b.valore) || 0), 0);
+        totEl.textContent = tot >= 0 ? `+${tot}` : `${tot}`;
+    }
+}
+
+function _bonusGroupRenderAll() {
+    if (!_bonusListState?.groups) return;
+    _bonusListState.groups.forEach((_, gi) => _bonusGroupRender(gi));
+}
+
+function _bonusGroupSyncFromInputs() {
+    if (!_bonusListState?.groups) return;
+    _bonusListState.groups.forEach((g, gi) => {
+        const rows = document.querySelectorAll(`#bonusListGroupContainer_${gi} .bonus-list-row`);
+        rows.forEach((row, i) => {
+            if (!g.items[i]) return;
+            const nameEl = row.querySelector('.bonus-list-name');
+            const valEl = row.querySelector('.bonus-list-val');
+            if (nameEl) g.items[i].nome = nameEl.value.trim().slice(0, 80);
+            if (valEl) g.items[i].valore = parseInt(valEl.value) || 0;
+        });
+    });
+}
+
+window.schedaBonusGroupStep = function(gi, idx, delta) {
+    _bonusGroupSyncFromInputs();
+    const g = _bonusListState?.groups?.[gi];
+    if (!g?.items?.[idx]) return;
+    g.items[idx].valore = (parseInt(g.items[idx].valore) || 0) + delta;
+    _bonusGroupRender(gi);
+};
+
+window.schedaBonusGroupDelete = function(gi, idx) {
+    _bonusGroupSyncFromInputs();
+    const g = _bonusListState?.groups?.[gi];
+    if (!g) return;
+    g.items.splice(idx, 1);
+    _bonusGroupRender(gi);
+};
+
+window.schedaBonusGroupAdd = function(gi) {
+    _bonusGroupSyncFromInputs();
+    const g = _bonusListState?.groups?.[gi];
+    if (!g) return;
+    g.items.push({ nome: '', valore: 1 });
+    _bonusGroupRender(gi);
+    setTimeout(() => {
+        const rows = document.querySelectorAll(`#bonusListGroupContainer_${gi} .bonus-list-row`);
+        const last = rows[rows.length - 1];
+        last?.querySelector('.bonus-list-name')?.focus();
+    }, 30);
 };
 
 window.schedaCloseSpellCasterBonus = function() {
     const o = document.getElementById('spellBonusOverlay');
     if (o) o.remove();
+    _bonusListState = null;
 };
 
-window.schedaSpellBonusStep = function(classeNome, kind, delta) {
-    const inp = document.querySelector(`#spellBonusOverlay .spell-bonus-input[data-classe="${classeNome}"][data-kind="${kind}"]`);
-    if (!inp) return;
-    const cur = parseInt(inp.value) || 0;
-    inp.value = cur + delta;
+window.schedaTogglePrepared = async function(pgId, spellName) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!_pgUsesPreparedSystem(pg)) return;
+    const sp = _resolveSpell(spellName);
+    if (!sp || sp.level === 0) return;
+
+    let list = Array.isArray(pg.incantesimi_preparati) ? [...pg.incantesimi_preparati] : [];
+    const idx = list.indexOf(spellName);
+    const willPrepare = idx === -1;
+
+    if (willPrepare) {
+        // Controlla il limite massimo prima di aggiungere.
+        const autoMax = _calcMaxPreparedAuto(pg);
+        const overrideMax = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+        const maxPrep = overrideMax > 0 ? overrideMax : autoMax;
+        const currentCount = list
+            .map(n => _resolveSpell(n))
+            .filter(s => s && s.level > 0).length;
+        if (maxPrep > 0 && currentCount >= maxPrep) {
+            showNotification(`Limite raggiunto: ${currentCount}/${maxPrep} preparati`);
+            return;
+        }
+        list.push(spellName);
+    } else {
+        list.splice(idx, 1);
+    }
+
+    pg.incantesimi_preparati = list;
+    await schedaInstantSave(pgId, { incantesimi_preparati: list });
+    if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
 };
 
 window.schedaOpenPreparedMax = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    const current = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    const override = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    const auto = _calcMaxPreparedAuto(pg);
+    // Pre-compila con override se presente, altrimenti con il calcolo automatico
+    // (cosi' al primo accesso l'utente vede subito il valore standard).
+    const initial = override > 0 ? override : auto;
 
     const existing = document.getElementById('preparedMaxOverlay');
     if (existing) existing.remove();
@@ -9874,23 +10230,44 @@ window.schedaOpenPreparedMax = function(pgId) {
         <div class="hp-calc-modal bonus-modal">
             <button class="hp-calc-close" onclick="schedaClosePreparedMax()">&times;</button>
             <div class="hp-calc-title">Incantesimi preparati</div>
-            <div class="bonus-modal-info">Imposta il numero massimo di incantesimi che il personaggio può preparare. Lascia 0 per nasconderlo.</div>
+            <div class="bonus-modal-info">
+                Numero massimo di incantesimi che il personaggio può preparare.<br>
+                <b>Calcolo automatico</b>: <span style="color:var(--accent,#6c5ce7);font-weight:700;">${auto}</span>
+                ${override > 0 ? ` · <b>Manuale attuale</b>: <span style="color:var(--warning,#d29c2a);font-weight:700;">${override}</span>` : ''}
+            </div>
             <div class="bonus-modal-row">
                 <label class="bonus-modal-label">Massimo preparati</label>
                 <div class="bonus-modal-input-row">
                     <button class="bonus-modal-step" onclick="schedaPreparedMaxStep(-1)">−</button>
-                    <input type="number" id="preparedMaxInput" class="bonus-modal-input" value="${current}" step="1" min="0">
+                    <input type="number" id="preparedMaxInput" class="bonus-modal-input" value="${initial}" step="1" min="0">
                     <button class="bonus-modal-step" onclick="schedaPreparedMaxStep(1)">+</button>
                 </div>
-                <div class="bonus-modal-hint">Regola standard: modificatore caratteristica da incantatore + livello di classe (minimo 1).</div>
+                <div class="bonus-modal-hint">Regola standard: modificatore caratteristica + livello di classe (Paladino: livello/2). Imposta 0 per tornare al calcolo automatico.</div>
             </div>
             <div class="hp-calc-buttons">
+                ${override > 0 ? `<button class="btn-secondary" onclick="schedaPreparedMaxReset('${pgId}')">Ripristina auto</button>` : ''}
                 <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaPreparedMaxConfirm('${pgId}')">Conferma</button>
             </div>
         </div>
     `;
     document.body.appendChild(overlay);
     setTimeout(() => { document.getElementById('preparedMaxInput')?.focus(); }, 50);
+};
+
+window.schedaPreparedMaxReset = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const bm = _getBonusManuali(pg);
+    const next = _buildBonusManualiPayload({
+        ca: bm.ca,
+        incantatori: bm.incantatori,
+        spells_prepared_max: 0,
+    });
+    pg.bonus_manuali = next;
+    schedaClosePreparedMax();
+    await schedaInstantSave(pgId, { bonus_manuali: next });
+    if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
+    showNotification('Ripristinato calcolo automatico');
 };
 
 window.schedaClosePreparedMax = function() {
@@ -9910,40 +10287,63 @@ window.schedaPreparedMaxConfirm = async function(pgId) {
     if (!pg) return;
     const inp = document.getElementById('preparedMaxInput');
     const val = Math.max(0, parseInt(inp?.value) || 0);
+    const auto = _calcMaxPreparedAuto(pg);
 
     const bm = _getBonusManuali(pg);
-    const next = { ca: bm.ca || 0, incantatori: bm.incantatori || {}, spells_prepared_max: val };
+    // Se il valore inserito coincide con quello automatico, salviamo 0 per tornare
+    // alla modalita' "auto" (cosi' resta agganciato al livello/caratteristica).
+    const stored = (val === auto) ? 0 : val;
+    const next = _buildBonusManualiPayload({
+        ca: bm.ca,
+        incantatori: bm.incantatori,
+        spells_prepared_max: stored,
+    });
     pg.bonus_manuali = next;
 
     schedaClosePreparedMax();
     await schedaInstantSave(pgId, { bonus_manuali: next });
     if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
-    showNotification(val ? `Massimo preparati: ${val}` : 'Limite preparati rimosso');
+    showNotification(stored ? `Massimo preparati: ${val} (manuale)` : `Massimo preparati: ${auto} (automatico)`);
 };
 
 window.schedaSpellCasterBonusConfirm = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
+    if (!_bonusListState || _bonusListState.kind !== 'caster') return;
+
+    _bonusGroupSyncFromInputs();
 
     const bm = _getBonusManuali(pg);
-    const inc = { ...(bm.incantatori || {}) };
-
-    document.querySelectorAll('#spellBonusOverlay .spell-bonus-input').forEach(inp => {
-        const cn = inp.getAttribute('data-classe');
-        const kind = inp.getAttribute('data-kind');
-        const v = parseInt(inp.value) || 0;
-        inc[cn] = inc[cn] || { atk: 0, dc: 0 };
-        inc[cn][kind] = v;
-        if (!inc[cn].atk && !inc[cn].dc) delete inc[cn];
+    const inc = {};
+    // Copia tutti i dati esistenti per non perdere l'altro kind (atk vs dc).
+    for (const cn of Object.keys(bm.incantatori || {})) {
+        inc[cn] = {
+            atk: (bm.incantatori[cn].atk || []).map(b => ({ ...b })),
+            dc: (bm.incantatori[cn].dc || []).map(b => ({ ...b })),
+        };
+    }
+    // Sovrascrive solo il kind editato per ogni classe del gruppo.
+    const kind = _bonusListState.casterKind;
+    _bonusListState.groups.forEach(g => {
+        const cleaned = (g.items || [])
+            .map(b => ({ nome: (b.nome || 'Manuale').trim().slice(0, 80) || 'Manuale', valore: parseInt(b.valore) || 0 }))
+            .filter(b => b.valore !== 0);
+        inc[g.classe] = inc[g.classe] || { atk: [], dc: [] };
+        inc[g.classe][kind] = cleaned;
+        if (!inc[g.classe].atk?.length && !inc[g.classe].dc?.length) delete inc[g.classe];
     });
 
-    const next = { ca: bm.ca || 0, incantatori: inc, spells_prepared_max: bm.spells_prepared_max || 0 };
+    const next = _buildBonusManualiPayload({
+        ca: bm.ca,
+        incantatori: inc,
+        spells_prepared_max: bm.spells_prepared_max,
+    });
     pg.bonus_manuali = next;
 
     schedaCloseSpellCasterBonus();
     await schedaInstantSave(pgId, { bonus_manuali: next });
     if (typeof schedaOpenSpellPage === 'function') schedaOpenSpellPage(pgId);
-    showNotification('Bonus incantesimi salvato');
+    showNotification('Bonus salvato');
 };
 
 window.schedaOpenAddEquip = function(pgId) {
