@@ -26,5 +26,6 @@ __pycache__/
 # File di lavoro temporanei dataset oggetti magici
 risorse/oggetti magici/_names.txt
 risorse/oggetti magici/_id_name_list.txt
+risorse/oggetti magici/_todo.json
 risorse/oggetti magici/wikidot_descriptions.json
 
