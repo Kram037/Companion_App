@@ -838,17 +838,50 @@
 .picker-tab-panel.active { display: block; }
 
 /* Textarea grande per descrizioni di oggetti magici (equipaggiamento, tesoro,
-   sintonia). Alcuni oggetti hanno descrizioni molto lunghe → diamogli spazio. */
+   sintonia). Alcuni oggetti hanno descrizioni molto lunghe → diamogli spazio.
+   Stile coerente con il resto dell'app (no bianco di default del browser). */
 .equip-desc-textarea {
     width: 100%;
-    min-height: 320px;
-    max-height: 60vh;
+    box-sizing: border-box;
+    min-height: 360px;
+    max-height: 65vh;
     resize: vertical;
     font-family: inherit;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     line-height: 1.5;
-    padding: 10px 12px;
-    box-sizing: border-box;
+    padding: 12px 14px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    transition: border-color 0.15s;
+}
+.equip-desc-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.equip-desc-textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Riga "Incantamento" sopra alla descrizione: etichetta + chip */
+.equip-ench-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.equip-ench-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Etichetta di categoria all'interno dei picker (es. "Armi da Mischia Semplici",

@@ -5,6 +5,15 @@
     max-height: 92vh;
     overflow: hidden;
 }
+/* Variante extra-large per modal con contenuti larghi (es. dialog di
+   modifica oggetto con descrizione estesa). Niente flexbox imposto
+   cosi' funziona anche con layout semplici (input + textarea). */
+.modal-content-xl {
+    max-width: 760px;
+    width: 96%;
+    max-height: 92vh;
+    overflow-y: auto;
+}
 .modal-content-lg form,
 #monsterWizardContainer,
 #homebrewFormContent {

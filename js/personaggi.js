@@ -4906,33 +4906,25 @@ window.invEditItem = function(pgId, idx) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:520px;max-width:95vw;text-align:left;">
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:10px;font-size:1rem;">Modifica Oggetto</h3>
         <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;">
-        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-            <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+            <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;margin-bottom:0;">
             <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
                 <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
             </label>
         </div>
-        <div class="picker-tabs">
-            <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
-            <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
-        </div>
-        <div class="picker-tab-panel active" data-panel="desc">
-            <textarea id="invItemDesc" class="form-input equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>
-        </div>
-        <div class="picker-tab-panel" data-panel="ench">
-            <div class="form-group" style="margin-top:12px;">
-                <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
-                <div class="custom-res-dice-row">
-                    ${[0,1,2,3].map(b =>
-                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                    ).join('')}
-                </div>
-                <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
+        <div class="equip-ench-row">
+            <span class="equip-ench-label">Incantamento</span>
+            <div class="custom-res-dice-row" style="margin:0;flex:1;">
+                ${[0,1,2,3].map(b =>
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                ).join('')}
             </div>
+            <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
         </div>
+        <textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>
         <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
@@ -5002,27 +4994,19 @@ window.invEditAttune = function(pgId, idx) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:520px;max-width:95vw;text-align:left;">
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:10px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
-        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:8px;">
-        <div class="picker-tabs">
-            <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
-            <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
-        </div>
-        <div class="picker-tab-panel active" data-panel="desc">
-            <textarea id="invAttuneDesc" class="form-input equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(current.descrizione || '')}</textarea>
-        </div>
-        <div class="picker-tab-panel" data-panel="ench">
-            <div class="form-group" style="margin-top:12px;">
-                <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
-                <div class="custom-res-dice-row">
-                    ${[0,1,2,3].map(b =>
-                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                    ).join('')}
-                </div>
-                <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
+        <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:10px;">
+        <div class="equip-ench-row">
+            <span class="equip-ench-label">Incantamento</span>
+            <div class="custom-res-dice-row" style="margin:0;flex:1;">
+                ${[0,1,2,3].map(b =>
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                ).join('')}
             </div>
+            <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
         </div>
+        <textarea id="invAttuneDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(current.descrizione || '')}</textarea>
         <div class="dialog-actions" style="margin-top:12px;">
             ${raw ? `<button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Elimina</button>` : ''}
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
@@ -8480,28 +8464,19 @@ window.schedaEditEquip = function(pgId, index) {
 
     const modalHtml = `
     <div class="modal active" id="editEquipModal">
-        <div class="modal-content modal-content-lg">
+        <div class="modal-content modal-content-xl">
             <button class="modal-close" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">&times;</button>
             <h2 id="editEquipTitle">${formatEquipName(e)}</h2>
             ${e.proprieta ? `<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:12px;">${e.proprieta.join(', ')}</p>` : ''}
-            <div class="picker-tabs">
-                <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
-                <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
-            </div>
-            <div class="picker-tab-panel active" data-panel="desc">
-                <textarea id="editEquipDesc" class="form-input equip-desc-textarea" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
-            </div>
-            <div class="picker-tab-panel" data-panel="ench">
-                <div class="form-group" style="margin-top:12px;">
-                    <label class="form-label">Bonus Magico</label>
-                    <div class="custom-res-dice-row">
-                        ${[0,1,2,3].map(b =>
-                            `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                        ).join('')}
-                    </div>
-                    <p style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">Salvato automaticamente al click.</p>
+            <div class="equip-ench-row">
+                <span class="equip-ench-label">Incantamento</span>
+                <div class="custom-res-dice-row" style="margin:0;flex:1;">
+                    ${[0,1,2,3].map(b =>
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                    ).join('')}
                 </div>
             </div>
+            <textarea id="editEquipDesc" class="equip-desc-textarea" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Annulla</button>
                 <button type="button" class="btn-primary" onclick="schedaSaveEquipDesc('${pgId}',${index})">Salva</button>
