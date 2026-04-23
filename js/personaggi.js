@@ -4258,7 +4258,63 @@ window.schedaEditAvatar = async function(pgId) {
 };
 
 /* ── Spells / Trucchetti ── */
-function _spellsData() { return window.SPELLS_DATA || {}; }
+// Restituisce SOLO gli incantesimi del catalogo "ufficiale" (file js/data/spells.js).
+function _spellsDataNative() { return window.SPELLS_DATA || {}; }
+
+// Adatta una riga di homebrew_incantesimi al formato usato dal picker
+// (chiavi: name, name_en, school, school_it, casting_time, range,
+//  components, duration, description, classes, source, ...).
+function _hbSpellToCatalog(hb) {
+    const schoolIt = hb.scuola || '';
+    const schoolKey = (schoolIt || '').toLowerCase().trim();
+    // Per le scuole canoniche IT, mappo alla key EN cosi' i filtri standard
+    // funzionano correttamente; per le homebrew lascio la stringa lower.
+    const schoolEn = _SPELL_SCHOOL_IT_TO_EN[schoolKey] || schoolKey;
+    const sourceLabel = hb._author_name ? `Homebrew · ${hb._author_name}` : 'Homebrew';
+    return {
+        // Chiave logica univoca per il picker (non confligge con quelle native)
+        _hb_id: hb.id,
+        _is_homebrew: true,
+        _author_uid: hb._author_uid,
+        _author_name: hb._author_name,
+        _is_own: hb._is_own,
+        name: hb.nome || '',
+        name_en: hb.nome || '',
+        level: typeof hb.livello === 'number' ? hb.livello : 0,
+        school: schoolEn,
+        school_it: schoolIt,
+        casting_time: hb.tempo_lancio || '',
+        casting_time_en: hb.tempo_lancio || '',
+        range: hb.gittata || '',
+        range_en: hb.gittata || '',
+        components: hb.componenti || '',
+        components_en: hb.componenti || '',
+        duration: hb.durata || '',
+        duration_en: hb.durata || '',
+        description: hb.descrizione || '',
+        description_en: hb.descrizione || '',
+        classes: [],
+        classes_en: [],
+        source: sourceLabel,
+        ritual: false,
+    };
+}
+
+// Pool completo: nativi + homebrew abilitati. Indicizzato per nome IT
+// (chiave usata altrove) e per chiave _hb_id se presente.
+function _spellsData() {
+    const base = window.SPELLS_DATA || {};
+    const hbList = (window.AppState?.cachedHomebrewIncantesimi) || [];
+    if (!hbList.length) return base;
+    const merged = { ...base };
+    hbList.forEach(hb => {
+        const sp = _hbSpellToCatalog(hb);
+        // Evito di sovrascrivere uno spell ufficiale con stesso nome.
+        const key = sp.name && !merged[sp.name] ? sp.name : `__hb_${hb.id}`;
+        merged[key] = sp;
+    });
+    return merged;
+}
 
 /** Lingua corrente per i contenuti tradotti (incantesimi/privilegi): 'it' | 'en'.
  *  Centralizzata: leggi sempre da window.getAppLang() (impostazione globale dell'app). */
@@ -4509,8 +4565,24 @@ document.addEventListener('appLangChanged', () => {
 });
 
 // ── Helper per filtri spell picker ──────────────────────────────────
+// Mappa nomi italiani delle 8 scuole canoniche → chiave EN usata dai filtri.
+// Usata sia per gli incantesimi homebrew (che salvano la scuola in IT) sia
+// come fallback quando un dataset vecchio ha solo school_it.
+const _SPELL_SCHOOL_IT_TO_EN = {
+    'abiurazione': 'abjuration',
+    'evocazione': 'conjuration',
+    'divinazione': 'divination',
+    'ammaliamento': 'enchantment',
+    'invocazione': 'evocation',
+    'illusione': 'illusion',
+    'necromanzia': 'necromancy',
+    'trasmutazione': 'transmutation',
+};
 function _spellSchoolKey(sp) {
-    return (sp.school || sp.school_it || '').toLowerCase();
+    const raw = (sp.school || sp.school_it || '').toLowerCase().trim();
+    if (!raw) return '';
+    if (_SPELL_SCHOOL_IT_TO_EN[raw]) return _SPELL_SCHOOL_IT_TO_EN[raw];
+    return raw;
 }
 function _spellHasComponent(sp, c) {
     const txt = (sp.components || sp.components_en || '').toUpperCase();
@@ -4605,8 +4677,9 @@ function _applySpellPickerFilters(spell, f) {
     // Rituale
     if (f.ritual === 'yes' && !_spellIsRitual(spell)) return false;
     if (f.ritual === 'no' && _spellIsRitual(spell)) return false;
-    // Classi
-    if (f.classes && f.classes.length > 0) {
+    // Classi — gli homebrew non hanno classi assegnate, quindi bypassano il
+    // filtro (sono sempre disponibili a chiunque li abiliti).
+    if (f.classes && f.classes.length > 0 && !spell._is_homebrew) {
         const lists = [spell.classes || [], spell.classes_en || []];
         let ok = false;
         outer: for (const list of lists) for (const c of list) if (f.classes.includes(c)) { ok = true; break outer; }
@@ -4690,11 +4763,29 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     const chip = (label, active, onclick) =>
         `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" onclick="${onclick}">${escapeHtml(label)}</button>`;
 
+    // Scuole HOMEBREW: oltre alle 8 canoniche, aggiungo dinamicamente
+    // tutte le scuole non standard incontrate negli incantesimi disponibili
+    // (sia nel pool generale sia tra gli homebrew). La key del filtro e' la
+    // stringa lower-case (uguale a quanto restituito da _spellSchoolKey).
+    const _stdSchoolKeys = new Set(_SPELL_SCHOOLS.map(([k]) => k));
+    const customSchoolMap = new Map(); // key → label
+    const _addCustomSchool = sp => {
+        const k = _spellSchoolKey(sp);
+        if (!k || _stdSchoolKeys.has(k)) return;
+        const lab = sp.school_it || sp.school || k;
+        if (!customSchoolMap.has(k)) customSchoolMap.set(k, lab);
+    };
+    Object.values(all).forEach(_addCustomSchool);
+    (window.AppState?.cachedHomebrewIncantesimi || []).forEach(_addCustomSchool);
+    const customSchoolEntries = Array.from(customSchoolMap.entries())
+        .sort((a, b) => a[1].localeCompare(b[1], lang));
+
     const filtersPanelHtml = `<div class="spell-filter-panel" id="spellFilterPanel" style="display:none;">
         <div class="spell-filter-group">
             <div class="spell-filter-label">Scuola</div>
             <div class="spell-filter-chips">
                 ${_SPELL_SCHOOLS.map(([k, lab]) => chip(lab, f.schools.includes(k), `spellFilterToggle('schools','${k}')`)).join('')}
+                ${customSchoolEntries.map(([k, lab]) => chip(lab, f.schools.includes(k), `spellFilterToggle('schools','${k}')`)).join('')}
             </div>
         </div>
         <div class="spell-filter-group">

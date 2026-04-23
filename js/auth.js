@@ -34,6 +34,7 @@ function setupSupabaseAuth() {
                     loadRazzeBackground();
                     loadHomebrewSottoclassi();
                     loadHomebrewOggetti();
+                    loadHomebrewIncantesimi();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -246,6 +247,72 @@ async function loadHomebrewOggetti() {
 }
 
 window.loadHomebrewOggetti = loadHomebrewOggetti;
+
+// ─────────────────────────────────────────────────────────────────────────
+// loadHomebrewIncantesimi — fetch degli incantesimi homebrew di:
+//  • utente corrente (sempre);
+//  • amici esplicitamente abilitati (se master enabled).
+// Cache: AppState.cachedHomebrewIncantesimi
+//   = [{ id, nome, livello, scuola, tempo_lancio, gittata, componenti,
+//        durata, descrizione, _author_uid, _author_name, _is_own }]
+// ─────────────────────────────────────────────────────────────────────────
+async function loadHomebrewIncantesimi() {
+    if (AppState._homebrewIncantesimiLoadPromise) {
+        return AppState._homebrewIncantesimiLoadPromise;
+    }
+    AppState._homebrewIncantesimiLoadPromise = (async () => {
+        const supabase = getSupabaseClient();
+        if (!supabase || !AppState.currentUser?.uid) {
+            AppState.cachedHomebrewIncantesimi = [];
+            return [];
+        }
+        const ownUid = AppState.currentUser.uid;
+        try {
+            const { friendUids, friendInfoByUid, userData } = await _resolveHomebrewFriendUids();
+            const allUids = [ownUid, ...friendUids];
+            const { data, error } = await supabase
+                .from('homebrew_incantesimi')
+                .select('*')
+                .in('user_id', allUids);
+            if (error) {
+                console.warn('[homebrew] errore SELECT incantesimi:', error);
+                AppState.cachedHomebrewIncantesimi = [];
+                return [];
+            }
+            const ownName = userData?.nome_utente || 'Tuo';
+            const list = (data || []).map(r => {
+                const isOwn = r.user_id === ownUid;
+                return {
+                    ...r,
+                    _author_uid: r.user_id,
+                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                    _is_own: isOwn,
+                };
+            });
+            AppState.cachedHomebrewIncantesimi = list;
+            try {
+                console.log('[homebrew] incantesimi caricati:', {
+                    totale: list.length,
+                    proprie: list.filter(x => x._is_own).length,
+                    amici: list.filter(x => !x._is_own).length,
+                });
+            } catch (_) {}
+            try {
+                window.dispatchEvent(new CustomEvent('homebrew:incantesimi-loaded', { detail: { count: list.length } }));
+            } catch (_) {}
+            return list;
+        } catch (e) {
+            console.warn('Errore caricamento incantesimi homebrew:', e);
+            AppState.cachedHomebrewIncantesimi = [];
+            return [];
+        }
+    })().finally(() => {
+        AppState._homebrewIncantesimiLoadPromise = null;
+    });
+    return AppState._homebrewIncantesimiLoadPromise;
+}
+
+window.loadHomebrewIncantesimi = loadHomebrewIncantesimi;
 
 async function loadHomebrewSottoclassi() {
     // Dedup: chiamate concorrenti restituiscono la stessa promise.

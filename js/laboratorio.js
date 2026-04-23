@@ -1488,6 +1488,10 @@ function labFieldsBackground(data) {
 
 function labFieldsIncantesimi(data) {
     const scuole = ['Abiurazione','Ammaliamento','Divinazione','Evocazione','Illusione','Invocazione','Necromanzia','Trasmutazione'];
+    const currentSchool = data?.scuola || '';
+    // Se la scuola attuale e' homebrew (non in lista standard), la
+    // aggiungiamo come opzione extra cosi' resta preservata in editing.
+    const isCustomSchool = currentSchool && !scuole.includes(currentSchool);
     return `
     <div class="form-group">
         <label for="hbNome">Nome</label>
@@ -1502,11 +1506,12 @@ function labFieldsIncantesimi(data) {
             </select>
         </div>
         <div class="form-group">
-            <label for="hbScuola">Scuola</label>
-            <select id="hbScuola">
-                <option value="">-</option>
-                ${scuole.map(s => `<option value="${s}" ${data?.scuola === s ? 'selected' : ''}>${s}</option>`).join('')}
-            </select>
+            <label for="hbScuola">Scuola <span class="lab-help">(puoi anche inserirne una homebrew)</span></label>
+            <input type="text" id="hbScuola" list="hbScuolaList" placeholder="Es. Evocazione, Astromanzia..." value="${escapeHtml(currentSchool)}">
+            <datalist id="hbScuolaList">
+                ${scuole.map(s => `<option value="${s}"></option>`).join('')}
+                ${isCustomSchool ? `<option value="${escapeHtml(currentSchool)}"></option>` : ''}
+            </datalist>
         </div>
     </div>
     <div class="form-row form-row-2">
@@ -2393,6 +2398,9 @@ window.labDeleteItem = async function(id) {
     if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
         loadHomebrewOggetti();
     }
+    if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
+        loadHomebrewIncantesimi();
+    }
 };
 
 async function handleSaveHomebrew(e) {
@@ -2422,7 +2430,7 @@ async function handleSaveHomebrew(e) {
             break;
         case 'incantesimi':
             record.livello = parseInt(document.getElementById('hbLivello')?.value) || 0;
-            record.scuola = document.getElementById('hbScuola')?.value || null;
+            record.scuola = document.getElementById('hbScuola')?.value?.trim() || null;
             record.tempo_lancio = document.getElementById('hbTempoLancio')?.value?.trim() || null;
             record.gittata = document.getElementById('hbGittata')?.value?.trim() || null;
             record.componenti = document.getElementById('hbComponenti')?.value?.trim() || null;
@@ -2522,6 +2530,9 @@ async function handleSaveHomebrew(e) {
         if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
             loadHomebrewOggetti();
         }
+        if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
+            loadHomebrewIncantesimi();
+        }
     } catch (err) {
         console.error('Errore salvataggio homebrew:', err);
         showNotification('Errore nel salvataggio');
@@ -2597,6 +2608,7 @@ window.labToggleHbEnabled = async function(cb) {
     userData.homebrew_settings = settings;
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
+    if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -2616,6 +2628,7 @@ window.labToggleFriendHb = async function(cb) {
     userData.homebrew_settings = settings;
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
+    if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
 };
 
 // ============================================================================
@@ -2996,19 +3009,48 @@ const _LAB_SPELL_SCHOOL_MAP = {
 };
 const _LAB_SCHOOLS_RX_SRC = 'abiurazione|ammaliamento|divinazione|evocazione|illusione|invocazione|necromanzia|trasmutazione|abjuration|conjuration|divination|enchantment|evocation|illusion|necromancy|transmutation';
 
+// Capitalizza una stringa di scuola arbitraria (per le scuole homebrew
+// non presenti nella mappa standard). "astromanzia" → "Astromanzia".
+function _labCapitalizeSchool(s) {
+    if (!s) return '';
+    return s.trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Risolve una scuola dal testo grezzo: se e' una delle 8 scuole canoniche
+// (EN/IT) ritorna la versione italiana standard; altrimenti accetta
+// qualsiasi nome libero (scuola HOMEBREW, es. "Astromanzia").
+function _labResolveSchool(raw) {
+    if (!raw) return '';
+    const k = raw.trim().toLowerCase();
+    return _LAB_SPELL_SCHOOL_MAP[k] || _labCapitalizeSchool(raw);
+}
+
 const _LAB_SPELL_HDR_PATTERNS = [
+    // ── Pattern STANDARD (scuole canoniche EN/IT) ─────────────────────
     // IT: "<Scuola> di N° livello" (anche senza "°", anche "di N livello")
     { rx: new RegExp(`^(${_LAB_SCHOOLS_RX_SRC})\\s+di\\s+(\\d+)°?\\s*livello\\.?$`, 'i'),
-      get: m => ({ livello: parseInt(m[2], 10), scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+      get: m => ({ livello: parseInt(m[2], 10), scuola: _labResolveSchool(m[1]) }) },
     // IT: "Trucchetto di <Scuola>"
     { rx: new RegExp(`^trucchetto\\s+di\\s+(${_LAB_SCHOOLS_RX_SRC})\\.?$`, 'i'),
-      get: m => ({ livello: 0, scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+      get: m => ({ livello: 0, scuola: _labResolveSchool(m[1]) }) },
     // EN: "Nth-level <school>"
     { rx: new RegExp(`^(\\d+)(?:st|nd|rd|th)?-level\\s+(${_LAB_SCHOOLS_RX_SRC})\\.?$`, 'i'),
-      get: m => ({ livello: parseInt(m[1], 10), scuola: _LAB_SPELL_SCHOOL_MAP[m[2].toLowerCase()] }) },
+      get: m => ({ livello: parseInt(m[1], 10), scuola: _labResolveSchool(m[2]) }) },
     // EN: "<School> cantrip"
     { rx: new RegExp(`^(${_LAB_SCHOOLS_RX_SRC})\\s+cantrip\\.?$`, 'i'),
-      get: m => ({ livello: 0, scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+      get: m => ({ livello: 0, scuola: _labResolveSchool(m[1]) }) },
+    // ── FALLBACK per scuole HOMEBREW ──────────────────────────────────
+    // Stessa forma delle precedenti ma accetta qualsiasi parola come
+    // scuola (es. "Astromanzia", "Cronomanzia"). Provati DOPO i pattern
+    // standard cosi' le scuole canoniche restano normalizzate.
+    { rx: /^([A-Za-zÀ-ÿ' ]+?)\s+di\s+(\d+)°?\s*livello\.?$/i,
+      get: m => ({ livello: parseInt(m[2], 10), scuola: _labResolveSchool(m[1]) }) },
+    { rx: /^trucchetto\s+di\s+([A-Za-zÀ-ÿ' ]+?)\.?$/i,
+      get: m => ({ livello: 0, scuola: _labResolveSchool(m[1]) }) },
+    { rx: /^(\d+)(?:st|nd|rd|th)?-level\s+([A-Za-zÀ-ÿ' ]+?)\.?$/i,
+      get: m => ({ livello: parseInt(m[1], 10), scuola: _labResolveSchool(m[2]) }) },
+    { rx: /^([A-Za-zÀ-ÿ' ]+?)\s+cantrip\.?$/i,
+      get: m => ({ livello: 0, scuola: _labResolveSchool(m[1]) }) },
 ];
 
 // Parsa una singola riga come header di incantesimo. Tollera l'eventuale
@@ -3200,6 +3242,14 @@ Una luce brillante guizza dal tuo dito puntato verso un punto...`,
     },
 };
 
+// Apre la dialog di importazione bulk per la categoria specificata
+// ('oggetti' o 'incantesimi'). Usa _LAB_IMPORT_CONFIGS per i contenuti.
+window.labOpenImportDialog = function(category) {
+    const cat = _LAB_IMPORT_CONFIGS[category];
+    if (!cat) {
+        console.warn('[lab-import] categoria non supportata:', category);
+        return;
+    }
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay lab-import-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
