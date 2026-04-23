@@ -4906,8 +4906,8 @@ window.invEditItem = function(pgId, idx) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;max-width:95vw;">
-        <h3 style="margin-bottom:12px;font-size:1rem;">Modifica Oggetto</h3>
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:520px;max-width:95vw;text-align:left;">
+        <h3 style="margin-bottom:10px;font-size:1rem;">Modifica Oggetto</h3>
         <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;">
         <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
             <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;">
@@ -4915,17 +4915,25 @@ window.invEditItem = function(pgId, idx) {
                 <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
             </label>
         </div>
-        <div class="form-group" style="margin-bottom:8px;">
-            <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
-            <div class="custom-res-dice-row">
-                ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                ).join('')}
-            </div>
-            <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
+        <div class="picker-tabs">
+            <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
+            <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
         </div>
-        <textarea id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (effetti magici, note...)" rows="6" style="margin-bottom:8px;resize:vertical;min-height:120px;">${escapeHtml(item.descrizione || '')}</textarea>
-        <div class="dialog-actions">
+        <div class="picker-tab-panel active" data-panel="desc">
+            <textarea id="invItemDesc" class="form-input equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>
+        </div>
+        <div class="picker-tab-panel" data-panel="ench">
+            <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
+                <div class="custom-res-dice-row">
+                    ${[0,1,2,3].map(b =>
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
+            </div>
+        </div>
+        <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invUpdateItem('${pgId}',${idx})">Salva</button>
@@ -4994,20 +5002,28 @@ window.invEditAttune = function(pgId, idx) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;max-width:95vw;">
-        <h3 style="margin-bottom:12px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:520px;max-width:95vw;text-align:left;">
+        <h3 style="margin-bottom:10px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
         <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:8px;">
-        <div class="form-group" style="margin-bottom:8px;">
-            <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
-            <div class="custom-res-dice-row">
-                ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                ).join('')}
-            </div>
-            <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
+        <div class="picker-tabs">
+            <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
+            <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
         </div>
-        <textarea id="invAttuneDesc" class="hp-calc-input" placeholder="Descrizione (effetti magici, note...)" rows="6" style="margin-bottom:8px;resize:vertical;min-height:120px;">${escapeHtml(current.descrizione || '')}</textarea>
-        <div class="dialog-actions">
+        <div class="picker-tab-panel active" data-panel="desc">
+            <textarea id="invAttuneDesc" class="form-input equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(current.descrizione || '')}</textarea>
+        </div>
+        <div class="picker-tab-panel" data-panel="ench">
+            <div class="form-group" style="margin-top:12px;">
+                <label class="form-label" style="font-size:0.85rem;">Bonus Magico</label>
+                <div class="custom-res-dice-row">
+                    ${[0,1,2,3].map(b =>
+                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                    ).join('')}
+                </div>
+                <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
+            </div>
+        </div>
+        <div class="dialog-actions" style="margin-top:12px;">
             ${raw ? `<button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Elimina</button>` : ''}
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button class="btn-primary" onclick="invSaveAttune('${pgId}',${idx})">Salva</button>
@@ -8151,6 +8167,7 @@ function buildEquipSection(pg) {
         'druidico': 'Druidico',
         'sacro': 'Sacro',
         'componenti': 'Componenti',
+        'altro': 'Altro',
     };
     const focusItems = equip.filter(e => e.tipo === 'focus');
     const focusRows = focusItems.map(e => {
@@ -8292,7 +8309,7 @@ window.schedaOpenAddEquip = function(pgId) {
         'sacro': 'Simbolo Sacro',
         'componenti': 'Borsa con Componenti',
     };
-    const focusHtml = ['arcano','druidico','sacro','componenti'].map(cat => {
+    const focusCatHtml = ['arcano','druidico','sacro','componenti'].map(cat => {
         const label = FOCUS_LABELS[cat];
         const items = DND_FOCUS.filter(f => f.cat === cat).map(f =>
             `<div class="pg-talento-item" onclick="schedaAddFocus('${pgId}','${escapeHtml(f.nome)}')">
@@ -8302,6 +8319,14 @@ window.schedaOpenAddEquip = function(pgId) {
         ).join('');
         return `<div class="scheda-picker-cat">${label}</div>${items}`;
     }).join('');
+    // "Altro" → input libero del nome, senza dover creare un oggetto homebrew.
+    const altroHtml = `
+        <div class="scheda-picker-cat">Altro</div>
+        <div class="pg-talento-item" onclick="schedaAddFocusAltro('${pgId}')">
+            <span class="pg-talento-name">Focus Personalizzato…</span>
+            <span class="option-source">Inserisci il nome (es. amuleto, bracciale)</span>
+        </div>`;
+    const focusHtml = focusCatHtml + altroHtml;
 
     const modalHtml = `
     <div class="modal active" id="equipModal">
@@ -8345,9 +8370,37 @@ window.schedaAddFocus = async function(pgId, nome) {
     showNotification(`${focus.nome} aggiunto`);
 }
 
+// Aggiunge un focus personalizzato chiedendo all'utente il nome.
+// Utile per oggetti non standard (amuleto, bracciale, ecc.) senza dover
+// creare un homebrew completo.
+window.schedaAddFocusAltro = async function(pgId) {
+    const nome = await _schedaShowInputDialog({
+        title: 'Focus personalizzato',
+        placeholder: 'Es. Amuleto, Bracciale, Anello…',
+    });
+    if (!nome) return;
+    const trimmed = nome.trim();
+    if (!trimmed) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    pg.equipaggiamento.push({
+        nome: trimmed,
+        tipo: 'focus',
+        categoria: 'altro',
+    });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${trimmed} aggiunto`);
+}
+
 // Helper condiviso per i picker della scheda con tab a 2 vie (Armi/Armature, Linguaggi/Strumenti, ...)
 window.schedaPickerSwitchTab = function(btn, panelId) {
-    const modal = btn.closest('.modal-content');
+    // Funziona sia per .modal-content (modal standard) sia per .hp-calc-modal
+    // (overlay tipo dialog dell'inventario/sintonia).
+    const modal = btn.closest('.modal-content, .hp-calc-modal');
     if (!modal) return;
     modal.querySelectorAll('.picker-tab').forEach(b => b.classList.toggle('active', b === btn));
     modal.querySelectorAll('.picker-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === panelId));
@@ -8427,21 +8480,27 @@ window.schedaEditEquip = function(pgId, index) {
 
     const modalHtml = `
     <div class="modal active" id="editEquipModal">
-        <div class="modal-content">
+        <div class="modal-content modal-content-lg">
             <button class="modal-close" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">&times;</button>
-            <h2>${formatEquipName(e)}</h2>
+            <h2 id="editEquipTitle">${formatEquipName(e)}</h2>
             ${e.proprieta ? `<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:12px;">${e.proprieta.join(', ')}</p>` : ''}
-            <div class="form-group">
-                <label class="form-label">Bonus Magico</label>
-                <div class="custom-res-dice-row">
-                    ${[0,1,2,3].map(b =>
-                        `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                    ).join('')}
-                </div>
+            <div class="picker-tabs">
+                <button type="button" class="picker-tab active" data-panel="desc" onclick="schedaPickerSwitchTab(this,'desc')">Descrizione</button>
+                <button type="button" class="picker-tab" data-panel="ench" onclick="schedaPickerSwitchTab(this,'ench')">Incantamento</button>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="editEquipDesc">Descrizione</label>
-                <textarea id="editEquipDesc" class="form-input" rows="6" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
+            <div class="picker-tab-panel active" data-panel="desc">
+                <textarea id="editEquipDesc" class="form-input equip-desc-textarea" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
+            </div>
+            <div class="picker-tab-panel" data-panel="ench">
+                <div class="form-group" style="margin-top:12px;">
+                    <label class="form-label">Bonus Magico</label>
+                    <div class="custom-res-dice-row">
+                        ${[0,1,2,3].map(b =>
+                            `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                        ).join('')}
+                    </div>
+                    <p style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">Salvato automaticamente al click.</p>
+                </div>
             </div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Annulla</button>

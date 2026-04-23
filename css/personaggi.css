@@ -837,6 +837,20 @@
 .picker-tab-panel { display: none; }
 .picker-tab-panel.active { display: block; }
 
+/* Textarea grande per descrizioni di oggetti magici (equipaggiamento, tesoro,
+   sintonia). Alcuni oggetti hanno descrizioni molto lunghe → diamogli spazio. */
+.equip-desc-textarea {
+    width: 100%;
+    min-height: 320px;
+    max-height: 60vh;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
 /* Etichetta di categoria all'interno dei picker (es. "Armi da Mischia Semplici",
    "Armature Medie", "Strumenti Musicali"). Resa piu' visibile e in colore accent
    rosso per separare bene le categorie nelle liste lunghe. */
