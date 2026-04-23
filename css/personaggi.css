@@ -2159,10 +2159,10 @@
 .inv-item-row.rarita-raro .inv-item-name { color: #60a5fa; }
 
 .inv-item-row.rarita-molto-raro {
-    border-left-color: #a78bfa;
-    background: linear-gradient(90deg, rgba(167,139,250,0.12), transparent 60%);
+    border-left-color: #ef4444;
+    background: linear-gradient(90deg, rgba(239,68,68,0.12), transparent 60%);
 }
-.inv-item-row.rarita-molto-raro .inv-item-name { color: #a78bfa; }
+.inv-item-row.rarita-molto-raro .inv-item-name { color: #ef4444; }
 
 .inv-item-row.rarita-leggendario {
     border-left-color: #c084fc;
@@ -2266,9 +2266,9 @@
     transition: background 0.15s, border-color 0.15s, color 0.15s;
     box-sizing: border-box;
 }
-.inv-picker-filters-btn:hover { background: var(--surface-hover); border-color: var(--accent); }
+.inv-picker-filters-btn:hover { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
 .inv-picker-filters-btn.active { color: var(--primary); border-color: var(--primary); }
-.inv-picker-filters-icon { font-size: 1rem; }
+.inv-picker-filters-btn svg { display: block; }
 .inv-picker-filters-badge {
     display: none;
     position: absolute;
@@ -2480,8 +2480,8 @@
 .generic-magic-bonus-btn.rarita-non-comune .generic-magic-bonus { color: #4ade80; }
 .generic-magic-bonus-btn.rarita-raro { border-color: #60a5fa; }
 .generic-magic-bonus-btn.rarita-raro .generic-magic-bonus { color: #60a5fa; }
-.generic-magic-bonus-btn.rarita-molto-raro { border-color: #a78bfa; }
-.generic-magic-bonus-btn.rarita-molto-raro .generic-magic-bonus { color: #a78bfa; }
+.generic-magic-bonus-btn.rarita-molto-raro { border-color: #ef4444; }
+.generic-magic-bonus-btn.rarita-molto-raro .generic-magic-bonus { color: #ef4444; }
 
 .generic-magic-type-list {
     max-height: 55vh;
@@ -2537,8 +2537,8 @@
 .inv-picker-item.rarita-non-comune .inv-picker-item-name { color: #4ade80; }
 .inv-picker-item.rarita-raro { border-left: 4px solid #60a5fa; }
 .inv-picker-item.rarita-raro .inv-picker-item-name { color: #60a5fa; }
-.inv-picker-item.rarita-molto-raro { border-left: 4px solid #a78bfa; }
-.inv-picker-item.rarita-molto-raro .inv-picker-item-name { color: #a78bfa; }
+.inv-picker-item.rarita-molto-raro { border-left: 4px solid #ef4444; }
+.inv-picker-item.rarita-molto-raro .inv-picker-item-name { color: #ef4444; }
 .inv-picker-item.rarita-leggendario { border-left: 4px solid #c084fc; }
 .inv-picker-item.rarita-leggendario .inv-picker-item-name { color: #c084fc; }
 .inv-picker-item.rarita-artefatto { border-left: 4px solid #f59e0b; }

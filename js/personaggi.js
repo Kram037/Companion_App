@@ -5366,8 +5366,10 @@ function _invOpenPickerDialog(pgId) {
                 value="${escapeHtml(_invPickerState.search || '')}"
                 oninput="_invPickerOnSearch(this.value,'${pgId}')">
             <button type="button" id="invPickerFiltersBtn" class="inv-picker-filters-btn"
-                onclick="_invPickerToggleFilters('${pgId}')" title="Filtri">
-                <span class="inv-picker-filters-icon">⛃</span>
+                onclick="_invPickerToggleFilters('${pgId}')" title="Filtri" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
                 <span class="inv-picker-filters-badge" id="invPickerFiltersBadge"></span>
             </button>
         </div>
