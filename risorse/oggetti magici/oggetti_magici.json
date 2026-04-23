@@ -2,14 +2,14 @@
   "meta": {
     "lingua": "en+it",
     "fonte_pdf": "oggetti magici.pdf",
-    "count": 368,
+    "count": 367,
     "nota": "Descrizioni inglesi recuperate da PDF aidedd e dnd5e.wikidot.com. I campi *_it contengono le traduzioni italiane (vuote se non ancora tradotte)."
   },
   "items": [
     {
       "id": "absorbing-tattoo",
       "nome": "Absorbing Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio Assorbente",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -23,7 +23,7 @@
     {
       "id": "adamantine-armor",
       "nome": "Adamantine Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Adamantina",
       "tipo": "Armatura",
       "sotto_tipo": "medium or heavy but not hide",
       "sotto_tipo_it": "media o pesante (esclusa di pelle)",
@@ -37,7 +37,7 @@
     {
       "id": "adze-of-annam",
       "nome": "Adze of Annam",
-      "nome_it": "",
+      "nome_it": "Ascia di Annam",
       "tipo": "Arma",
       "sotto_tipo": "greataxe",
       "sotto_tipo_it": "ascia bipenne",
@@ -51,7 +51,7 @@
     {
       "id": "alchemical-compendium",
       "nome": "Alchemical Compendium",
-      "nome_it": "",
+      "nome_it": "Compendio Alchemico",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -65,7 +65,7 @@
     {
       "id": "alchemy-jug",
       "nome": "Alchemy Jug",
-      "nome_it": "",
+      "nome_it": "Brocca dell'Alchimia",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -79,7 +79,7 @@
     {
       "id": "all-purpose-tool",
       "nome": "All-Purpose Tool",
-      "nome_it": "",
+      "nome_it": "Strumento Tuttofare",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -93,7 +93,7 @@
     {
       "id": "amethyst-lodestone",
       "nome": "Amethyst Lodestone",
-      "nome_it": "",
+      "nome_it": "Pietra Magnetica di Ametista",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -107,7 +107,7 @@
     {
       "id": "amulet-of-health",
       "nome": "Amulet of Health",
-      "nome_it": "",
+      "nome_it": "Amuleto della Salute",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -121,7 +121,7 @@
     {
       "id": "amulet-of-proof-against-detection-and-location",
       "nome": "Amulet of Proof against Detection and Location",
-      "nome_it": "",
+      "nome_it": "Amuleto Inviolabile a Localizzazione e Individuazione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -135,7 +135,7 @@
     {
       "id": "amulet-of-the-devout",
       "nome": "Amulet of the Devout",
-      "nome_it": "",
+      "nome_it": "Amuleto del Devoto",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -149,7 +149,7 @@
     {
       "id": "amulet-of-the-planes",
       "nome": "Amulet of the Planes",
-      "nome_it": "",
+      "nome_it": "Amuleto dei Piani",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -163,7 +163,7 @@
     {
       "id": "animated-shield",
       "nome": "Animated Shield",
-      "nome_it": "",
+      "nome_it": "Scudo Animato",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -177,7 +177,7 @@
     {
       "id": "antimagic-armor",
       "nome": "Antimagic Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Antimagia",
       "tipo": "Armatura",
       "sotto_tipo": "light medium or heavy",
       "sotto_tipo_it": "leggera, media o pesante",
@@ -191,7 +191,7 @@
     {
       "id": "apparatus-of-kwalish",
       "nome": "Apparatus of Kwalish",
-      "nome_it": "",
+      "nome_it": "Apparato di Kwalish",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -205,7 +205,7 @@
     {
       "id": "arcane-grimoire",
       "nome": "Arcane Grimoire",
-      "nome_it": "",
+      "nome_it": "Grimorio Arcano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -219,7 +219,7 @@
     {
       "id": "arrow-catching-shield",
       "nome": "Arrow-Catching Shield",
-      "nome_it": "",
+      "nome_it": "Scudo Acchiappafrecce",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -233,7 +233,7 @@
     {
       "id": "arrow-of-slaying",
       "nome": "Arrow of Slaying",
-      "nome_it": "",
+      "nome_it": "Freccia Sterminatrice",
       "tipo": "Arma",
       "sotto_tipo": "arrow",
       "sotto_tipo_it": "freccia",
@@ -247,7 +247,7 @@
     {
       "id": "astral-shard",
       "nome": "Astral Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia Astrale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -261,7 +261,7 @@
     {
       "id": "astromancy-archive",
       "nome": "Astromancy Archive",
-      "nome_it": "",
+      "nome_it": "Archivio dell'Astromanzia",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -275,7 +275,7 @@
     {
       "id": "atlas-of-endless-horizons",
       "nome": "Atlas of Endless Horizons",
-      "nome_it": "",
+      "nome_it": "Atlante degli Orizzonti Infiniti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -289,7 +289,7 @@
     {
       "id": "axe-of-the-dwarvish-lords",
       "nome": "Axe of the Dwarvish Lords",
-      "nome_it": "",
+      "nome_it": "Ascia dei Signori Nanici",
       "tipo": "Arma",
       "sotto_tipo": "battleaxe",
       "sotto_tipo_it": "ascia da battaglia",
@@ -303,7 +303,7 @@
     {
       "id": "baba-yaga-s-mortar-and-pestle",
       "nome": "Baba Yaga's Mortar and Pestle",
-      "nome_it": "",
+      "nome_it": "Mortaio e Pestello di Baba Yaga",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -317,7 +317,7 @@
     {
       "id": "bag-of-beans",
       "nome": "Bag of Beans",
-      "nome_it": "",
+      "nome_it": "Borsa dei Fagioli",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -331,7 +331,7 @@
     {
       "id": "bag-of-devouring",
       "nome": "Bag of Devouring",
-      "nome_it": "",
+      "nome_it": "Borsa Divorante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -345,7 +345,7 @@
     {
       "id": "bag-of-holding",
       "nome": "Bag of Holding",
-      "nome_it": "",
+      "nome_it": "Borsa Conservante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -359,7 +359,7 @@
     {
       "id": "bag-of-tricks",
       "nome": "Bag of Tricks",
-      "nome_it": "",
+      "nome_it": "Borsa dei Trucchi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -373,7 +373,7 @@
     {
       "id": "baleful-talon",
       "nome": "Baleful Talon",
-      "nome_it": "",
+      "nome_it": "Artiglio Maligno",
       "tipo": "Arma",
       "sotto_tipo": "dagger",
       "sotto_tipo_it": "pugnale",
@@ -387,7 +387,7 @@
     {
       "id": "barrier-tattoo",
       "nome": "Barrier Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio della Barriera",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -401,7 +401,7 @@
     {
       "id": "bead-of-force",
       "nome": "Bead of Force",
-      "nome_it": "",
+      "nome_it": "Sfera di Forza",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -415,7 +415,7 @@
     {
       "id": "bead-of-nourishment",
       "nome": "Bead of Nourishment",
-      "nome_it": "",
+      "nome_it": "Perla del Nutrimento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -429,7 +429,7 @@
     {
       "id": "bead-of-refreshment",
       "nome": "Bead of Refreshment",
-      "nome_it": "",
+      "nome_it": "Perla del Ristoro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -443,7 +443,7 @@
     {
       "id": "bell-branch",
       "nome": "Bell Branch",
-      "nome_it": "",
+      "nome_it": "Ramo a Sonagli",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -457,7 +457,7 @@
     {
       "id": "belt-of-dwarvenkind",
       "nome": "Belt of Dwarvenkind",
-      "nome_it": "",
+      "nome_it": "Cintura della Stirpe Nanica",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -471,7 +471,7 @@
     {
       "id": "belt-of-giant-strength",
       "nome": "Belt of Giant Strength",
-      "nome_it": "",
+      "nome_it": "Cintura della Forza del Gigante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -485,7 +485,7 @@
     {
       "id": "berserker-axe",
       "nome": "Berserker Axe",
-      "nome_it": "",
+      "nome_it": "Ascia del Berserker",
       "tipo": "Arma",
       "sotto_tipo": "any axe",
       "sotto_tipo_it": "any axe",
@@ -499,7 +499,7 @@
     {
       "id": "bigby-s-beneficent-bracelet",
       "nome": "Bigby's Beneficent Bracelet",
-      "nome_it": "",
+      "nome_it": "Bracciale Benefico di Bigby",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -513,7 +513,7 @@
     {
       "id": "blackrazor",
       "nome": "Blackrazor",
-      "nome_it": "",
+      "nome_it": "Lamanera",
       "tipo": "Arma",
       "sotto_tipo": "greats word",
       "sotto_tipo_it": "greats word",
@@ -527,7 +527,7 @@
     {
       "id": "blasted-goggles",
       "nome": "Blasted Goggles",
-      "nome_it": "",
+      "nome_it": "Occhiali Esplosi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -541,7 +541,7 @@
     {
       "id": "blood-fury-tattoo",
       "nome": "Blood Fury Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio della Furia Sanguigna",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -555,7 +555,7 @@
     {
       "id": "bloodrage-greataxe",
       "nome": "Bloodrage Greataxe",
-      "nome_it": "",
+      "nome_it": "Ascia Bipenne dell'Ira di Sangue",
       "tipo": "Arma",
       "sotto_tipo": "greataxe",
       "sotto_tipo_it": "ascia bipenne",
@@ -569,7 +569,7 @@
     {
       "id": "bloodseeker-ammunition",
       "nome": "Bloodseeker Ammunition",
-      "nome_it": "",
+      "nome_it": "Munizione Cercasangue",
       "tipo": "Arma",
       "sotto_tipo": "any ammunition",
       "sotto_tipo_it": "qualsiasi munizione",
@@ -583,7 +583,7 @@
     {
       "id": "bloodshed-blade",
       "nome": "Bloodshed Blade",
-      "nome_it": "",
+      "nome_it": "Lama del Massacro",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -597,7 +597,7 @@
     {
       "id": "bloodwell-vial",
       "nome": "Bloodwell Vial",
-      "nome_it": "",
+      "nome_it": "Fiala del Pozzo di Sangue",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -611,7 +611,7 @@
     {
       "id": "book-of-exalted-deeds",
       "nome": "Book of Exalted Deeds",
-      "nome_it": "",
+      "nome_it": "Libro delle Gesta Esaltate",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -625,7 +625,7 @@
     {
       "id": "book-of-vile-darkness",
       "nome": "Book of Vile Darkness",
-      "nome_it": "",
+      "nome_it": "Libro dell'Oscurità Vile",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -639,7 +639,7 @@
     {
       "id": "boomerang-shield",
       "nome": "Boomerang Shield",
-      "nome_it": "",
+      "nome_it": "Scudo Boomerang",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -653,7 +653,7 @@
     {
       "id": "boots-of-elvenkind",
       "nome": "Boots of Elvenkind",
-      "nome_it": "",
+      "nome_it": "Stivali della Stirpe Elfica",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -667,7 +667,7 @@
     {
       "id": "boots-of-false-tracks",
       "nome": "Boots of False Tracks",
-      "nome_it": "",
+      "nome_it": "Stivali delle Tracce False",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -681,7 +681,7 @@
     {
       "id": "boots-of-levitation",
       "nome": "Boots of Levitation",
-      "nome_it": "",
+      "nome_it": "Stivali della Levitazione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -695,7 +695,7 @@
     {
       "id": "boots-of-speed",
       "nome": "Boots of Speed",
-      "nome_it": "",
+      "nome_it": "Stivali della Velocità",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -709,7 +709,7 @@
     {
       "id": "boots-of-striding-and-springing",
       "nome": "Boots of Striding and Springing",
-      "nome_it": "",
+      "nome_it": "Stivali del Falcare e del Saltare",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -723,7 +723,7 @@
     {
       "id": "boots-of-the-winterlands",
       "nome": "Boots of the Winterlands",
-      "nome_it": "",
+      "nome_it": "Stivali delle Terre Invernali",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -737,7 +737,7 @@
     {
       "id": "bow-of-conflagration",
       "nome": "Bow of Conflagration",
-      "nome_it": "",
+      "nome_it": "Arco della Conflagrazione",
       "tipo": "Arma",
       "sotto_tipo": "any bow",
       "sotto_tipo_it": "any bow",
@@ -751,7 +751,7 @@
     {
       "id": "bow-of-melodies",
       "nome": "Bow of Melodies",
-      "nome_it": "",
+      "nome_it": "Arco delle Melodie",
       "tipo": "Arma",
       "sotto_tipo": "any bow",
       "sotto_tipo_it": "any bow",
@@ -765,7 +765,7 @@
     {
       "id": "bowl-of-commanding-water-elementals",
       "nome": "Bowl of Commanding Water Elementals",
-      "nome_it": "",
+      "nome_it": "Coppa del Comando degli Elementali dell'Acqua",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -779,7 +779,7 @@
     {
       "id": "bracers-of-archery",
       "nome": "Bracers of Archery",
-      "nome_it": "",
+      "nome_it": "Bracciali del Tiro con l'Arco",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -793,7 +793,7 @@
     {
       "id": "bracers-of-defense",
       "nome": "Bracers of Defense",
-      "nome_it": "",
+      "nome_it": "Bracciali della Difesa",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -807,7 +807,7 @@
     {
       "id": "brazier-of-commanding-fire-elementals",
       "nome": "Brazier of Commanding Fire Elementals",
-      "nome_it": "",
+      "nome_it": "Braciere del Comando degli Elementali del Fuoco",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -821,7 +821,7 @@
     {
       "id": "brooch-of-shielding",
       "nome": "Brooch of Shielding",
-      "nome_it": "",
+      "nome_it": "Spilla della Schermatura",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -835,7 +835,7 @@
     {
       "id": "broom-of-flying",
       "nome": "Broom of Flying",
-      "nome_it": "",
+      "nome_it": "Scopa Volante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -849,7 +849,7 @@
     {
       "id": "candle-of-invocation",
       "nome": "Candle of Invocation",
-      "nome_it": "",
+      "nome_it": "Candela dell'Invocazione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -863,7 +863,7 @@
     {
       "id": "candle-of-the-deep",
       "nome": "Candle of the Deep",
-      "nome_it": "",
+      "nome_it": "Candela degli Abissi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -877,7 +877,7 @@
     {
       "id": "cap-of-water-breathing",
       "nome": "Cap of Water Breathing",
-      "nome_it": "",
+      "nome_it": "Cappuccio della Respirazione Acquatica",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -891,7 +891,7 @@
     {
       "id": "cape-of-the-mountebank",
       "nome": "Cape of the Mountebank",
-      "nome_it": "",
+      "nome_it": "Mantello del Ciarlatano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -905,7 +905,7 @@
     {
       "id": "card-sharp-s-deck",
       "nome": "Card Sharp's Deck",
-      "nome_it": "",
+      "nome_it": "Mazzo del Baro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -919,7 +919,7 @@
     {
       "id": "carpet-of-flying",
       "nome": "Carpet of Flying",
-      "nome_it": "",
+      "nome_it": "Tappeto Volante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -933,7 +933,7 @@
     {
       "id": "cast-off-armor",
       "nome": "Cast-off Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Sganciabile",
       "tipo": "Armatura",
       "sotto_tipo": "light medium or heavy",
       "sotto_tipo_it": "leggera, media o pesante",
@@ -947,7 +947,7 @@
     {
       "id": "cauldron-of-rebirth",
       "nome": "Cauldron of Rebirth",
-      "nome_it": "",
+      "nome_it": "Calderone della Rinascita",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -961,7 +961,7 @@
     {
       "id": "censer-of-controlling-air-elementals",
       "nome": "Censer of Controlling Air Elementals",
-      "nome_it": "",
+      "nome_it": "Incensiere del Controllo degli Elementali dell'Aria",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -975,7 +975,7 @@
     {
       "id": "charlatan-s-die",
       "nome": "Charlatan's Die",
-      "nome_it": "",
+      "nome_it": "Dado del Ciarlatano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -989,7 +989,7 @@
     {
       "id": "chime-of-opening",
       "nome": "Chime of Opening",
-      "nome_it": "",
+      "nome_it": "Campanella dell'Apertura",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1003,7 +1003,7 @@
     {
       "id": "circlet-of-blasting",
       "nome": "Circlet of Blasting",
-      "nome_it": "",
+      "nome_it": "Diadema dello Scoppio",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1017,7 +1017,7 @@
     {
       "id": "cloak-of-arachnida",
       "nome": "Cloak of Arachnida",
-      "nome_it": "",
+      "nome_it": "Mantello di Aracnida",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1031,7 +1031,7 @@
     {
       "id": "cloak-of-billowing",
       "nome": "Cloak of Billowing",
-      "nome_it": "",
+      "nome_it": "Mantello Sventolante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1045,7 +1045,7 @@
     {
       "id": "cloak-of-displacement",
       "nome": "Cloak of Displacement",
-      "nome_it": "",
+      "nome_it": "Mantello del Dislocamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1059,7 +1059,7 @@
     {
       "id": "cloak-of-elvenkind",
       "nome": "Cloak of Elvenkind",
-      "nome_it": "",
+      "nome_it": "Mantello della Stirpe Elfica",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1073,7 +1073,7 @@
     {
       "id": "cloak-of-invisibility",
       "nome": "Cloak of Invisibility",
-      "nome_it": "",
+      "nome_it": "Mantello dell'Invisibilità",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1087,7 +1087,7 @@
     {
       "id": "cloak-of-many-fashions",
       "nome": "Cloak of Many Fashions",
-      "nome_it": "",
+      "nome_it": "Mantello dei Mille Stili",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1101,7 +1101,7 @@
     {
       "id": "cloak-of-protection",
       "nome": "Cloak of Protection",
-      "nome_it": "",
+      "nome_it": "Mantello della Protezione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1115,7 +1115,7 @@
     {
       "id": "cloak-of-the-bat",
       "nome": "Cloak of the Bat",
-      "nome_it": "",
+      "nome_it": "Mantello del Pipistrello",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1129,7 +1129,7 @@
     {
       "id": "cloak-of-the-manta-ray",
       "nome": "Cloak of the Manta Ray",
-      "nome_it": "",
+      "nome_it": "Mantello della Manta",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1143,7 +1143,7 @@
     {
       "id": "clockwork-amulet",
       "nome": "Clockwork Amulet",
-      "nome_it": "",
+      "nome_it": "Amuleto a Orologeria",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1157,7 +1157,7 @@
     {
       "id": "clockwork-armor",
       "nome": "Clockwork Armor",
-      "nome_it": "",
+      "nome_it": "Armatura a Orologeria",
       "tipo": "Armatura",
       "sotto_tipo": "heavy",
       "sotto_tipo_it": "pesante",
@@ -1171,7 +1171,7 @@
     {
       "id": "clothes-of-mending",
       "nome": "Clothes of Mending",
-      "nome_it": "",
+      "nome_it": "Abiti del Rammendo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1185,7 +1185,7 @@
     {
       "id": "coiling-grasp-tattoo",
       "nome": "Coiling Grasp Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio della Stretta Avvolgente",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -1199,7 +1199,7 @@
     {
       "id": "crook-of-rao",
       "nome": "Crook of Rao",
-      "nome_it": "",
+      "nome_it": "Bastone di Rao",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1213,7 +1213,7 @@
     {
       "id": "crown-of-the-wrath-bringer",
       "nome": "Crown of the Wrath Bringer",
-      "nome_it": "",
+      "nome_it": "Corona del Portatore d'Ira",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1227,7 +1227,7 @@
     {
       "id": "crown-of-whirling-comets",
       "nome": "Crown of Whirling Comets",
-      "nome_it": "",
+      "nome_it": "Corona delle Comete Vorticanti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1241,7 +1241,7 @@
     {
       "id": "crystal-ball",
       "nome": "Crystal Ball",
-      "nome_it": "",
+      "nome_it": "Sfera di Cristallo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1255,7 +1255,7 @@
     {
       "id": "crystal-blade",
       "nome": "Crystal Blade",
-      "nome_it": "",
+      "nome_it": "Lama di Cristallo",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -1269,7 +1269,7 @@
     {
       "id": "crystalline-chronicle",
       "nome": "Crystalline Chronicle",
-      "nome_it": "",
+      "nome_it": "Cronaca Cristallina",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1283,7 +1283,7 @@
     {
       "id": "cube-of-force",
       "nome": "Cube of Force",
-      "nome_it": "",
+      "nome_it": "Cubo di Forza",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1297,7 +1297,7 @@
     {
       "id": "cubic-gate",
       "nome": "Cubic Gate",
-      "nome_it": "",
+      "nome_it": "Cubo dei Portali",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1311,7 +1311,7 @@
     {
       "id": "daern-s-instant-fortress",
       "nome": "Daern's Instant Fortress",
-      "nome_it": "",
+      "nome_it": "Fortezza Istantanea di Daern",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1325,7 +1325,7 @@
     {
       "id": "dagger-of-venom",
       "nome": "Dagger of Venom",
-      "nome_it": "",
+      "nome_it": "Pugnale del Veleno",
       "tipo": "Arma",
       "sotto_tipo": "dagger",
       "sotto_tipo_it": "pugnale",
@@ -1339,7 +1339,7 @@
     {
       "id": "dancing-sword",
       "nome": "Dancing Sword",
-      "nome_it": "",
+      "nome_it": "Spada Danzante",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -1353,7 +1353,7 @@
     {
       "id": "dark-shard-amulet",
       "nome": "Dark Shard Amulet",
-      "nome_it": "",
+      "nome_it": "Amuleto della Scheggia Oscura",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1367,7 +1367,7 @@
     {
       "id": "decanter-of-endless-water",
       "nome": "Decanter of Endless Water",
-      "nome_it": "",
+      "nome_it": "Decanter dell'Acqua Infinita",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1381,7 +1381,7 @@
     {
       "id": "deck-of-dimensions",
       "nome": "Deck of Dimensions",
-      "nome_it": "",
+      "nome_it": "Mazzo delle Dimensioni",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1395,7 +1395,7 @@
     {
       "id": "deck-of-illusions",
       "nome": "Deck of Illusions",
-      "nome_it": "",
+      "nome_it": "Mazzo delle Illusioni",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1409,7 +1409,7 @@
     {
       "id": "deck-of-many-things",
       "nome": "Deck of Many Things",
-      "nome_it": "",
+      "nome_it": "Mazzo delle Meraviglie",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1423,7 +1423,7 @@
     {
       "id": "deck-of-oracles",
       "nome": "Deck of Oracles",
-      "nome_it": "",
+      "nome_it": "Mazzo degli Oracoli",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1437,7 +1437,7 @@
     {
       "id": "deck-of-wonder",
       "nome": "Deck of Wonder",
-      "nome_it": "",
+      "nome_it": "Mazzo della Meraviglia",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1451,7 +1451,7 @@
     {
       "id": "defender",
       "nome": "Defender",
-      "nome_it": "",
+      "nome_it": "Difensore",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -1465,7 +1465,7 @@
     {
       "id": "delver-s-claws",
       "nome": "Delver's Claws",
-      "nome_it": "",
+      "nome_it": "Artigli dell'Esploratore Sotterraneo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1479,7 +1479,7 @@
     {
       "id": "demon-armor",
       "nome": "Demon Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Demoniaca",
       "tipo": "Armatura",
       "sotto_tipo": "plate",
       "sotto_tipo_it": "armatura completa",
@@ -1493,7 +1493,7 @@
     {
       "id": "demonomicon-of-iggwilv",
       "nome": "Demonomicon of Iggwilv",
-      "nome_it": "",
+      "nome_it": "Demonomicon di Iggwilv",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1507,7 +1507,7 @@
     {
       "id": "devotee-s-censer",
       "nome": "Devotee's Censer",
-      "nome_it": "",
+      "nome_it": "Incensiere del Devoto",
       "tipo": "Arma",
       "sotto_tipo": "flail",
       "sotto_tipo_it": "flagello",
@@ -1521,7 +1521,7 @@
     {
       "id": "dimensional-shackles",
       "nome": "Dimensional Shackles",
-      "nome_it": "",
+      "nome_it": "Catene Dimensionali",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1535,7 +1535,7 @@
     {
       "id": "donjon-s-sundering-sphere",
       "nome": "Donjon's Sundering Sphere",
-      "nome_it": "",
+      "nome_it": "Sfera Frantumante di Donjon",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1549,7 +1549,7 @@
     {
       "id": "dragon-scale-mail",
       "nome": "Dragon Scale Mail",
-      "nome_it": "",
+      "nome_it": "Cotta di Scaglie di Drago",
       "tipo": "Armatura",
       "sotto_tipo": "scale mail",
       "sotto_tipo_it": "corazza a scaglie",
@@ -1563,7 +1563,7 @@
     {
       "id": "dragon-slayer",
       "nome": "Dragon Slayer",
-      "nome_it": "",
+      "nome_it": "Ammazzadraghi",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -1577,7 +1577,7 @@
     {
       "id": "dragon-wing-bow",
       "nome": "Dragon Wing Bow",
-      "nome_it": "",
+      "nome_it": "Arco d'Ala di Drago",
       "tipo": "Arma",
       "sotto_tipo": "any bow",
       "sotto_tipo_it": "any bow",
@@ -1591,7 +1591,7 @@
     {
       "id": "dragonhide-belt",
       "nome": "Dragonhide Belt",
-      "nome_it": "",
+      "nome_it": "Cintura di Pelle di Drago",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1605,7 +1605,7 @@
     {
       "id": "dragonlance",
       "nome": "Dragonlance",
-      "nome_it": "",
+      "nome_it": "Dragolancia",
       "tipo": "Arma",
       "sotto_tipo": "lance or pike",
       "sotto_tipo_it": "lancia da cavaliere, picca",
@@ -1619,7 +1619,7 @@
     {
       "id": "dread-helm",
       "nome": "Dread Helm",
-      "nome_it": "",
+      "nome_it": "Elmo del Terrore",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1633,7 +1633,7 @@
     {
       "id": "dried-leech",
       "nome": "Dried Leech",
-      "nome_it": "",
+      "nome_it": "Sanguisuga Essiccata",
       "tipo": "Arma",
       "sotto_tipo": "any ammunition",
       "sotto_tipo_it": "qualsiasi munizione",
@@ -1647,7 +1647,7 @@
     {
       "id": "driftglobe",
       "nome": "Driftglobe",
-      "nome_it": "",
+      "nome_it": "Globo Galleggiante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1661,7 +1661,7 @@
     {
       "id": "duplicitous-manuscript",
       "nome": "Duplicitous Manuscript",
-      "nome_it": "",
+      "nome_it": "Manoscritto Duplice",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1675,7 +1675,7 @@
     {
       "id": "dust-of-disappearance",
       "nome": "Dust of Disappearance",
-      "nome_it": "",
+      "nome_it": "Polvere della Scomparsa",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1689,7 +1689,7 @@
     {
       "id": "dust-of-dryness",
       "nome": "Dust of Dryness",
-      "nome_it": "",
+      "nome_it": "Polvere della Disidratazione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1703,7 +1703,7 @@
     {
       "id": "dust-of-sneezing-and-choking",
       "nome": "Dust of Sneezing and Choking",
-      "nome_it": "",
+      "nome_it": "Polvere dello Starnuto e del Soffocamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1717,7 +1717,7 @@
     {
       "id": "dwarven-plate",
       "nome": "Dwarven Plate",
-      "nome_it": "",
+      "nome_it": "Armatura di Piastre Nanica",
       "tipo": "Armatura",
       "sotto_tipo": "plate",
       "sotto_tipo_it": "armatura completa",
@@ -1731,7 +1731,7 @@
     {
       "id": "dwarven-thrower",
       "nome": "Dwarven Thrower",
-      "nome_it": "",
+      "nome_it": "Lanciatore Nanico",
       "tipo": "Arma",
       "sotto_tipo": "warhammer",
       "sotto_tipo_it": "martello da guerra",
@@ -1745,7 +1745,7 @@
     {
       "id": "ear-horn-of-hearing",
       "nome": "Ear Horn of Hearing",
-      "nome_it": "",
+      "nome_it": "Cornetto Acustico dell'Udito",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1759,7 +1759,7 @@
     {
       "id": "efreeti-bottle",
       "nome": "Efreeti Bottle",
-      "nome_it": "",
+      "nome_it": "Bottiglia dell'Efreeti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1773,7 +1773,7 @@
     {
       "id": "efreeti-chain",
       "nome": "Efreeti Chain",
-      "nome_it": "",
+      "nome_it": "Cotta dell'Efreeti",
       "tipo": "Armatura",
       "sotto_tipo": "chain mail",
       "sotto_tipo_it": "cotta di maglia",
@@ -1787,7 +1787,7 @@
     {
       "id": "eldritch-claw-tattoo",
       "nome": "Eldritch Claw Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio dell'Artiglio Eldritch",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -1801,7 +1801,7 @@
     {
       "id": "elemental-essence-shard",
       "nome": "Elemental Essence Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia di Essenza Elementale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1815,7 +1815,7 @@
     {
       "id": "elemental-gem",
       "nome": "Elemental Gem",
-      "nome_it": "",
+      "nome_it": "Gemma Elementale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1829,7 +1829,7 @@
     {
       "id": "elixir-of-health",
       "nome": "Elixir of Health",
-      "nome_it": "",
+      "nome_it": "Elisir della Salute",
       "tipo": "Pozione",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1843,7 +1843,7 @@
     {
       "id": "elven-chain",
       "nome": "Elven Chain",
-      "nome_it": "",
+      "nome_it": "Cotta Elfica",
       "tipo": "Armatura",
       "sotto_tipo": "chain shirt",
       "sotto_tipo_it": "camiciotto di maglia",
@@ -1857,7 +1857,7 @@
     {
       "id": "emerald-pen",
       "nome": "Emerald Pen",
-      "nome_it": "",
+      "nome_it": "Penna di Smeraldo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1871,7 +1871,7 @@
     {
       "id": "enduring-spellbook",
       "nome": "Enduring Spellbook",
-      "nome_it": "",
+      "nome_it": "Libro degli Incantesimi Indistruttibile",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1885,7 +1885,7 @@
     {
       "id": "ersatz-eye",
       "nome": "Ersatz Eye",
-      "nome_it": "",
+      "nome_it": "Occhio Surrogato",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1899,7 +1899,7 @@
     {
       "id": "euryale-s-aegis",
       "nome": "Euryale's Aegis",
-      "nome_it": "",
+      "nome_it": "Egida di Euriale",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -1913,7 +1913,7 @@
     {
       "id": "eversmoking-bottle",
       "nome": "Eversmoking Bottle",
-      "nome_it": "",
+      "nome_it": "Bottiglia Fumigante Eterna",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1927,7 +1927,7 @@
     {
       "id": "eye-and-hand-of-vecna",
       "nome": "Eye and Hand of Vecna",
-      "nome_it": "",
+      "nome_it": "Occhio e Mano di Vecna",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1935,27 +1935,13 @@
       "richiede_sintonia": true,
       "sintonia_dettaglio": "",
       "incantamento": 0,
-      "descrizione_en": "speak his name. He was the Whispered One, the Master of the\nSpider Throne, the Undying King, and the Lord of the Rotted\nTower.\nSome say that Vecna's lieutenant Kas coveted the Spider Throne for\nhimself, or that the sword his lord made for him seduced him into\nrebellion. Whatever the reason, Kas brought the Undying King's\nrule to an end in a terrible battle that left Vecna's tower a heap of\nash. Of Vecna, all that remained were one hand and one eye, grisly\nartifacts that still seek to work the Whispered One's will in the\nworld.\nThe Eye of Vecna and the Hand of Vecna might be found together\nor separately. The eye looks like a bloodshot organ torn free from\nthe socket. The hand is a mummified and shriveled left extremity.\nTo attune to the eye, you must gouge out your own eye and press\nthe artifact into the empty socket. The eye grafts itself to your head\nand remains there until you die. Once in place, the eye transforms\ninto a golden eye with a slit for a pupil, much like that of a cat. If\nthe eye is ever removed, you die.\nTo attune to the hand, you must lop off your left hand at the wrist\nand the press the artifact against the stump. The hand grafts itself\nto your arm and becomes a functioning appendage. If the hand is\never removed, you die.\nRandom Properties. The Eye of Vecna and the Hand of Vecna\neach have the following random properties:\n• 1 minor beneficial property\n• 1 major beneficial property\n• 1 minor detrimental property\nProperties of the Eye. Your alignment changes to neutral evil,\nand you gain the following benefits:\n• You have truesight.\n• You can use an action to see as if you were wearing a ring of X-\nray vision. You can end this effect as a bonus action.\n• The eye has 8 charges. You can use an action and expend 1 or\nmore charges to cast one of the following spells (save DC 18) from\nit: clairvoyance (2 charges), crown of madness (1 charge),\ndisintegrate (4 charges), dominate monster (5 charges), or eyebite\n(4 charges). The eye regains 1d4 + 4 expended charges daily at\ndawn. Each time you cast a spell from the eye, there is a 5 percent\nchance that Vecna tears your soul from your body, devours it, and\nthen takes control of the body like a puppet. If that happens, you\nbecome an NPC under the DM's control.\nProperties of the Hand. Your alignment changes to neutral evil,\nand you gain the following benefits:\n• Your Strength score becomes 20, unless it is already 20 or higher.",
-      "descrizione_it": ""
-    },
-    {
-      "id": "any-melee-spell-attack-you-make-with-the-hand-and-any-melee",
-      "nome": "• Any melee spell attack you make with the hand, and any melee",
-      "nome_it": "",
-      "tipo": "Arma",
-      "sotto_tipo": "",
-      "sotto_tipo_it": "",
-      "rarita": "Artefatto",
-      "richiede_sintonia": false,
-      "sintonia_dettaglio": "",
-      "incantamento": 0,
-      "descrizione_en": "be rediscovered.\nDungeon Master's Guide",
+      "descrizione_en": "speak his name. He was the Whispered One, the Master of the\nSpider Throne, the Undying King, and the Lord of the Rotted\nTower.\nSome say that Vecna's lieutenant Kas coveted the Spider Throne for\nhimself, or that the sword his lord made for him seduced him into\nrebellion. Whatever the reason, Kas brought the Undying King's\nrule to an end in a terrible battle that left Vecna's tower a heap of\nash. Of Vecna, all that remained were one hand and one eye, grisly\nartifacts that still seek to work the Whispered One's will in the\nworld.\nThe Eye of Vecna and the Hand of Vecna might be found together\nor separately. The eye looks like a bloodshot organ torn free from\nthe socket. The hand is a mummified and shriveled left extremity.\nTo attune to the eye, you must gouge out your own eye and press\nthe artifact into the empty socket. The eye grafts itself to your head\nand remains there until you die. Once in place, the eye transforms\ninto a golden eye with a slit for a pupil, much like that of a cat. If\nthe eye is ever removed, you die.\nTo attune to the hand, you must lop off your left hand at the wrist\nand the press the artifact against the stump. The hand grafts itself\nto your arm and becomes a functioning appendage. If the hand is\never removed, you die.\nRandom Properties. The Eye of Vecna and the Hand of Vecna\neach have the following random properties:\n• 1 minor beneficial property\n• 1 major beneficial property\n• 1 minor detrimental property\nProperties of the Eye. Your alignment changes to neutral evil,\nand you gain the following benefits:\n• You have truesight.\n• You can use an action to see as if you were wearing a ring of X-\nray vision. You can end this effect as a bonus action.\n• The eye has 8 charges. You can use an action and expend 1 or\nmore charges to cast one of the following spells (save DC 18) from\nit: clairvoyance (2 charges), crown of madness (1 charge),\ndisintegrate (4 charges), dominate monster (5 charges), or eyebite\n(4 charges). The eye regains 1d4 + 4 expended charges daily at\ndawn. Each time you cast a spell from the eye, there is a 5 percent\nchance that Vecna tears your soul from your body, devours it, and\nthen takes control of the body like a puppet. If that happens, you\nbecome an NPC under the DM's control.\nProperties of the Hand. Your alignment changes to neutral evil,\nand you gain the following benefits:\n• Your Strength score becomes 20, unless it is already 20 or higher.\nbe rediscovered.\nDungeon Master's Guide",
       "descrizione_it": ""
     },
     {
       "id": "eyes-of-charming",
       "nome": "Eyes of Charming",
-      "nome_it": "",
+      "nome_it": "Occhi dell'Ammaliamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1969,7 +1955,7 @@
     {
       "id": "eyes-of-minute-seeing",
       "nome": "Eyes of Minute Seeing",
-      "nome_it": "",
+      "nome_it": "Occhi della Visione Minuta",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1983,7 +1969,7 @@
     {
       "id": "eyes-of-the-eagle",
       "nome": "Eyes of the Eagle",
-      "nome_it": "",
+      "nome_it": "Occhi dell'Aquila",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -1997,7 +1983,7 @@
     {
       "id": "fabulist-gem",
       "nome": "Fabulist Gem",
-      "nome_it": "",
+      "nome_it": "Gemma del Fabulista",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2011,7 +1997,7 @@
     {
       "id": "far-realm-shard",
       "nome": "Far Realm Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia del Reame Lontano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2025,7 +2011,7 @@
     {
       "id": "fate-cutter-shears",
       "nome": "Fate Cutter Shears",
-      "nome_it": "",
+      "nome_it": "Forbici Tagliafato",
       "tipo": "Arma",
       "sotto_tipo": "dagger",
       "sotto_tipo_it": "pugnale",
@@ -2039,7 +2025,7 @@
     {
       "id": "fate-dealer-s-deck",
       "nome": "Fate Dealer's Deck",
-      "nome_it": "",
+      "nome_it": "Mazzo del Donatore di Destini",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2053,7 +2039,7 @@
     {
       "id": "feywild-shard",
       "nome": "Feywild Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia del Reame Fatato",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2067,7 +2053,7 @@
     {
       "id": "feywrought-armor",
       "nome": "Feywrought Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Forgiafatata",
       "tipo": "Armatura",
       "sotto_tipo": "light medium or heavy",
       "sotto_tipo_it": "leggera, media o pesante",
@@ -2081,7 +2067,7 @@
     {
       "id": "figurine-of-wondrous-power",
       "nome": "Figurine of Wondrous Power",
-      "nome_it": "",
+      "nome_it": "Statuetta di Potere Meraviglioso",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2095,7 +2081,7 @@
     {
       "id": "figurine-of-wondrous-power-gold-canary",
       "nome": "Figurine of Wondrous Power: Gold Canary",
-      "nome_it": "",
+      "nome_it": "Statuetta di Potere Meraviglioso: Canarino d'Oro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2109,7 +2095,7 @@
     {
       "id": "flail-of-tiamat",
       "nome": "Flail of Tiamat",
-      "nome_it": "",
+      "nome_it": "Mazzafrusto di Tiamat",
       "tipo": "Arma",
       "sotto_tipo": "flail",
       "sotto_tipo_it": "flagello",
@@ -2123,7 +2109,7 @@
     {
       "id": "flame-tongue",
       "nome": "Flame Tongue",
-      "nome_it": "",
+      "nome_it": "Lingua di Fuoco",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -2137,7 +2123,7 @@
     {
       "id": "folding-boat",
       "nome": "Folding Boat",
-      "nome_it": "",
+      "nome_it": "Barca Pieghevole",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2151,7 +2137,7 @@
     {
       "id": "fool-s-blade",
       "nome": "Fool's Blade",
-      "nome_it": "",
+      "nome_it": "Lama del Folle",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -2165,7 +2151,7 @@
     {
       "id": "forcebreaker-weapon",
       "nome": "Forcebreaker Weapon",
-      "nome_it": "",
+      "nome_it": "Arma Spezzaforza",
       "tipo": "Arma",
       "sotto_tipo": "any weapon that deals bludgeoning damage",
       "sotto_tipo_it": "any weapon that deals bludgeoning damage",
@@ -2179,7 +2165,7 @@
     {
       "id": "frost-brand",
       "nome": "Frost Brand",
-      "nome_it": "",
+      "nome_it": "Spada del Gelo",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -2193,7 +2179,7 @@
     {
       "id": "fulminating-treatise",
       "nome": "Fulminating Treatise",
-      "nome_it": "",
+      "nome_it": "Trattato Fulminante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2207,7 +2193,7 @@
     {
       "id": "gauntlets-of-ogre-power",
       "nome": "Gauntlets of Ogre Power",
-      "nome_it": "",
+      "nome_it": "Guanti del Potere dell'Ogre",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2221,7 +2207,7 @@
     {
       "id": "gem-of-brightness",
       "nome": "Gem of Brightness",
-      "nome_it": "",
+      "nome_it": "Gemma del Bagliore",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2235,7 +2221,7 @@
     {
       "id": "gem-of-seeing",
       "nome": "Gem of Seeing",
-      "nome_it": "",
+      "nome_it": "Gemma della Vista",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2249,7 +2235,7 @@
     {
       "id": "ghost-step-tattoo",
       "nome": "Ghost Step Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio del Passo Spettrale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -2263,7 +2249,7 @@
     {
       "id": "giant-slayer",
       "nome": "Giant Slayer",
-      "nome_it": "",
+      "nome_it": "Ammazzagiganti",
       "tipo": "Arma",
       "sotto_tipo": "any axe or sword",
       "sotto_tipo_it": "any axe or sword",
@@ -2277,7 +2263,7 @@
     {
       "id": "glamoured-studded-leather",
       "nome": "Glamoured Studded Leather",
-      "nome_it": "",
+      "nome_it": "Armatura di Cuoio Borchiato Glamouroso",
       "tipo": "Armatura",
       "sotto_tipo": "studded leather",
       "sotto_tipo_it": "di cuoio borchiato",
@@ -2291,7 +2277,7 @@
     {
       "id": "glimmering-moonbow",
       "nome": "Glimmering Moonbow",
-      "nome_it": "",
+      "nome_it": "Arco Lunare Scintillante",
       "tipo": "Arma",
       "sotto_tipo": "any bow",
       "sotto_tipo_it": "any bow",
@@ -2305,7 +2291,7 @@
     {
       "id": "gloomwrought-armor",
       "nome": "Gloomwrought Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Forgiatenebra",
       "tipo": "Armatura",
       "sotto_tipo": "light medium or heavy",
       "sotto_tipo_it": "leggera, media o pesante",
@@ -2319,7 +2305,7 @@
     {
       "id": "gloves-of-missile-snaring",
       "nome": "Gloves of Missile Snaring",
-      "nome_it": "",
+      "nome_it": "Guanti del Blocco di Proiettili",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2333,7 +2319,7 @@
     {
       "id": "gloves-of-swimming-and-climbing",
       "nome": "Gloves of Swimming and Climbing",
-      "nome_it": "",
+      "nome_it": "Guanti del Nuoto e dell'Arrampicata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2347,7 +2333,7 @@
     {
       "id": "gloves-of-thievery",
       "nome": "Gloves of Thievery",
-      "nome_it": "",
+      "nome_it": "Guanti dello Scasso",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2361,7 +2347,7 @@
     {
       "id": "glowrune-pigment",
       "nome": "Glowrune Pigment",
-      "nome_it": "",
+      "nome_it": "Pigmento delle Rune Luminose",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2375,7 +2361,7 @@
     {
       "id": "goggles-of-night",
       "nome": "Goggles of Night",
-      "nome_it": "",
+      "nome_it": "Occhiali della Notte",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2389,7 +2375,7 @@
     {
       "id": "grasping-whip",
       "nome": "Grasping Whip",
-      "nome_it": "",
+      "nome_it": "Frusta Agganciante",
       "tipo": "Arma",
       "sotto_tipo": "whip",
       "sotto_tipo_it": "frusta",
@@ -2403,7 +2389,7 @@
     {
       "id": "guardian-emblem",
       "nome": "Guardian Emblem",
-      "nome_it": "",
+      "nome_it": "Emblema del Guardiano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "holy symbol",
       "sotto_tipo_it": "holy symbol",
@@ -2417,7 +2403,7 @@
     {
       "id": "hammer-of-runic-focus",
       "nome": "Hammer of Runic Focus",
-      "nome_it": "",
+      "nome_it": "Martello del Focus Runico",
       "tipo": "Arma",
       "sotto_tipo": "warhammer",
       "sotto_tipo_it": "martello da guerra",
@@ -2431,7 +2417,7 @@
     {
       "id": "hammer-of-thunderbolts",
       "nome": "Hammer of Thunderbolts",
-      "nome_it": "",
+      "nome_it": "Martello dei Fulmini",
       "tipo": "Arma",
       "sotto_tipo": "maul",
       "sotto_tipo_it": "maglio",
@@ -2445,7 +2431,7 @@
     {
       "id": "harp-of-gilded-plenty",
       "nome": "Harp of Gilded Plenty",
-      "nome_it": "",
+      "nome_it": "Arpa dell'Abbondanza Dorata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2459,7 +2445,7 @@
     {
       "id": "hat-of-disguise",
       "nome": "Hat of Disguise",
-      "nome_it": "",
+      "nome_it": "Cappello del Travestimento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2473,7 +2459,7 @@
     {
       "id": "hat-of-vermin",
       "nome": "Hat of Vermin",
-      "nome_it": "",
+      "nome_it": "Cappello dei Parassiti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2487,7 +2473,7 @@
     {
       "id": "hat-of-wizardry",
       "nome": "Hat of Wizardry",
-      "nome_it": "",
+      "nome_it": "Cappello della Magia",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2501,7 +2487,7 @@
     {
       "id": "headband-of-intellect",
       "nome": "Headband of Intellect",
-      "nome_it": "",
+      "nome_it": "Fascia dell'Intelletto",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2515,7 +2501,7 @@
     {
       "id": "heart-weaver-s-primer",
       "nome": "Heart Weaver's Primer",
-      "nome_it": "",
+      "nome_it": "Primer del Tessitore di Cuori",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2529,7 +2515,7 @@
     {
       "id": "helm-of-brilliance",
       "nome": "Helm of Brilliance",
-      "nome_it": "",
+      "nome_it": "Elmo della Brillantezza",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2543,7 +2529,7 @@
     {
       "id": "helm-of-comprehending-languages",
       "nome": "Helm of Comprehending Languages",
-      "nome_it": "",
+      "nome_it": "Elmo della Comprensione dei Linguaggi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2557,7 +2543,7 @@
     {
       "id": "helm-of-perfect-potential",
       "nome": "Helm of Perfect Potential",
-      "nome_it": "",
+      "nome_it": "Elmo del Potenziale Perfetto",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2571,7 +2557,7 @@
     {
       "id": "helm-of-telepathy",
       "nome": "Helm of Telepathy",
-      "nome_it": "",
+      "nome_it": "Elmo della Telepatia",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2585,7 +2571,7 @@
     {
       "id": "helm-of-teleportation",
       "nome": "Helm of Teleportation",
-      "nome_it": "",
+      "nome_it": "Elmo del Teletrasporto",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2599,7 +2585,7 @@
     {
       "id": "heward-s-handy-haversack",
       "nome": "Heward's Handy Haversack",
-      "nome_it": "",
+      "nome_it": "Sacca a Tracolla Manesca di Heward",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2613,7 +2599,7 @@
     {
       "id": "heward-s-handy-spice-pouch",
       "nome": "Heward's Handy Spice Pouch",
-      "nome_it": "",
+      "nome_it": "Sacchetto di Spezie Manesco di Heward",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2627,7 +2613,7 @@
     {
       "id": "holy-avenger",
       "nome": "Holy Avenger",
-      "nome_it": "",
+      "nome_it": "Vendicatore Sacro",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -2641,7 +2627,7 @@
     {
       "id": "horn-of-blasting",
       "nome": "Horn of Blasting",
-      "nome_it": "",
+      "nome_it": "Corno dello Scoppio",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2655,7 +2641,7 @@
     {
       "id": "horn-of-silent-alarm",
       "nome": "Horn of Silent Alarm",
-      "nome_it": "",
+      "nome_it": "Corno dell'Allarme Silenzioso",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2669,7 +2655,7 @@
     {
       "id": "horn-of-valhalla",
       "nome": "Horn of Valhalla",
-      "nome_it": "",
+      "nome_it": "Corno del Valhalla",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2683,7 +2669,7 @@
     {
       "id": "horseshoes-of-a-zephyr",
       "nome": "Horseshoes of a Zephyr",
-      "nome_it": "",
+      "nome_it": "Ferri di Cavallo dello Zefiro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2697,7 +2683,7 @@
     {
       "id": "horseshoes-of-speed",
       "nome": "Horseshoes of Speed",
-      "nome_it": "",
+      "nome_it": "Ferri di Cavallo della Velocità",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2711,7 +2697,7 @@
     {
       "id": "house-of-cards",
       "nome": "House of Cards",
-      "nome_it": "",
+      "nome_it": "Castello di Carte",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2725,7 +2711,7 @@
     {
       "id": "iggwilv-s-cauldron",
       "nome": "Iggwilv's Cauldron",
-      "nome_it": "",
+      "nome_it": "Calderone di Iggwilv",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2739,7 +2725,7 @@
     {
       "id": "illuminator-s-tattoo",
       "nome": "Illuminator's Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio dell'Illuminatore",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -2753,7 +2739,7 @@
     {
       "id": "immovable-rod",
       "nome": "Immovable Rod",
-      "nome_it": "",
+      "nome_it": "Asta Inamovibile",
       "tipo": "Asta",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2767,7 +2753,7 @@
     {
       "id": "instrument-of-illusions",
       "nome": "Instrument of Illusions",
-      "nome_it": "",
+      "nome_it": "Strumento delle Illusioni",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2781,7 +2767,7 @@
     {
       "id": "instrument-of-scribing",
       "nome": "Instrument of Scribing",
-      "nome_it": "",
+      "nome_it": "Strumento della Scrittura",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2795,7 +2781,7 @@
     {
       "id": "instrument-of-the-bards",
       "nome": "Instrument of the Bards",
-      "nome_it": "",
+      "nome_it": "Strumento dei Bardi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2809,7 +2795,7 @@
     {
       "id": "ioun-stone",
       "nome": "Ioun Stone",
-      "nome_it": "",
+      "nome_it": "Pietra Ioun",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2823,7 +2809,7 @@
     {
       "id": "iron-bands-of-bilarro",
       "nome": "Iron Bands of Bilarro",
-      "nome_it": "",
+      "nome_it": "Bende di Ferro di Bilarro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2837,7 +2823,7 @@
     {
       "id": "iron-flask",
       "nome": "Iron Flask",
-      "nome_it": "",
+      "nome_it": "Fiasca di Ferro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2851,7 +2837,7 @@
     {
       "id": "javelin-of-lightning",
       "nome": "Javelin of Lightning",
-      "nome_it": "",
+      "nome_it": "Giavellotto del Fulmine",
       "tipo": "Arma",
       "sotto_tipo": "javelin",
       "sotto_tipo_it": "giavellotto",
@@ -2865,7 +2851,7 @@
     {
       "id": "jester-s-mask",
       "nome": "Jester's Mask",
-      "nome_it": "",
+      "nome_it": "Maschera del Giullare",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2879,7 +2865,7 @@
     {
       "id": "keoghtom-s-ointment",
       "nome": "Keoghtom's Ointment",
-      "nome_it": "",
+      "nome_it": "Unguento di Keoghtom",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2893,7 +2879,7 @@
     {
       "id": "lantern-of-revealing",
       "nome": "Lantern of Revealing",
-      "nome_it": "",
+      "nome_it": "Lanterna del Rivelare",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2907,7 +2893,7 @@
     {
       "id": "lash-of-immolation",
       "nome": "Lash of Immolation",
-      "nome_it": "",
+      "nome_it": "Frusta dell'Immolazione",
       "tipo": "Arma",
       "sotto_tipo": "whip",
       "sotto_tipo_it": "frusta",
@@ -2921,7 +2907,7 @@
     {
       "id": "libram-of-souls-and-flesh",
       "nome": "Libram of Souls and Flesh",
-      "nome_it": "",
+      "nome_it": "Libro delle Anime e della Carne",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2935,7 +2921,7 @@
     {
       "id": "lifewell-tattoo",
       "nome": "Lifewell Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio del Pozzo di Vita",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -2949,7 +2935,7 @@
     {
       "id": "lock-of-trickery",
       "nome": "Lock of Trickery",
-      "nome_it": "",
+      "nome_it": "Serratura dell'Inganno",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2963,7 +2949,7 @@
     {
       "id": "longbow-of-the-healing-hearth",
       "nome": "Longbow of the Healing Hearth",
-      "nome_it": "",
+      "nome_it": "Arco Lungo del Focolare Curativo",
       "tipo": "Arma",
       "sotto_tipo": "longbow",
       "sotto_tipo_it": "arco lungo",
@@ -2977,7 +2963,7 @@
     {
       "id": "luba-s-tarokka-of-souls",
       "nome": "Luba's Tarokka of Souls",
-      "nome_it": "",
+      "nome_it": "Tarokka delle Anime di Luba",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -2991,7 +2977,7 @@
     {
       "id": "lucent-destroyer",
       "nome": "Lucent Destroyer",
-      "nome_it": "",
+      "nome_it": "Distruttore Lucente",
       "tipo": "Arma",
       "sotto_tipo": "musket",
       "sotto_tipo_it": "moschetto",
@@ -3005,7 +2991,7 @@
     {
       "id": "luck-blade",
       "nome": "Luck Blade",
-      "nome_it": "",
+      "nome_it": "Lama della Fortuna",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -3019,7 +3005,7 @@
     {
       "id": "lyre-of-building",
       "nome": "Lyre of Building",
-      "nome_it": "",
+      "nome_it": "Lira della Costruzione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3033,7 +3019,7 @@
     {
       "id": "mace-of-disruption",
       "nome": "Mace of Disruption",
-      "nome_it": "",
+      "nome_it": "Mazza della Distruzione",
       "tipo": "Arma",
       "sotto_tipo": "mace",
       "sotto_tipo_it": "mazza",
@@ -3047,7 +3033,7 @@
     {
       "id": "mace-of-smiting",
       "nome": "Mace of Smiting",
-      "nome_it": "",
+      "nome_it": "Mazza del Castigo",
       "tipo": "Arma",
       "sotto_tipo": "mace",
       "sotto_tipo_it": "mazza",
@@ -3061,7 +3047,7 @@
     {
       "id": "mace-of-terror",
       "nome": "Mace of Terror",
-      "nome_it": "",
+      "nome_it": "Mazza del Terrore",
       "tipo": "Arma",
       "sotto_tipo": "mace",
       "sotto_tipo_it": "mazza",
@@ -3075,7 +3061,7 @@
     {
       "id": "mantle-of-spell-resistance",
       "nome": "Mantle of Spell Resistance",
-      "nome_it": "",
+      "nome_it": "Manto della Resistenza agli Incantesimi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3089,7 +3075,7 @@
     {
       "id": "manual-of-bodily-health",
       "nome": "Manual of Bodily Health",
-      "nome_it": "",
+      "nome_it": "Manuale della Salute del Corpo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3103,7 +3089,7 @@
     {
       "id": "manual-of-gainful-exercise",
       "nome": "Manual of Gainful Exercise",
-      "nome_it": "",
+      "nome_it": "Manuale dell'Esercizio Vantaggioso",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3117,7 +3103,7 @@
     {
       "id": "manual-of-golems",
       "nome": "Manual of Golems",
-      "nome_it": "",
+      "nome_it": "Manuale dei Golem",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3131,7 +3117,7 @@
     {
       "id": "manual-of-quickness-of-action",
       "nome": "Manual of Quickness of Action",
-      "nome_it": "",
+      "nome_it": "Manuale della Rapidità d'Azione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3145,7 +3131,7 @@
     {
       "id": "mariner-s-armor",
       "nome": "Mariner's Armor",
-      "nome_it": "",
+      "nome_it": "Armatura del Marinaio",
       "tipo": "Armatura",
       "sotto_tipo": "light medium or heavy",
       "sotto_tipo_it": "leggera, media o pesante",
@@ -3159,7 +3145,7 @@
     {
       "id": "masquerade-tattoo",
       "nome": "Masquerade Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio della Mascherata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -3173,7 +3159,7 @@
     {
       "id": "medallion-of-thoughts",
       "nome": "Medallion of Thoughts",
-      "nome_it": "",
+      "nome_it": "Medaglione dei Pensieri",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3187,7 +3173,7 @@
     {
       "id": "mighty-servant-of-leuk-o",
       "nome": "Mighty Servant of Leuk-o",
-      "nome_it": "",
+      "nome_it": "Possente Servitore di Leuk-o",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3201,7 +3187,7 @@
     {
       "id": "mirror-of-life-trapping",
       "nome": "Mirror of Life Trapping",
-      "nome_it": "",
+      "nome_it": "Specchio dell'Imprigionamento di Vita",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3215,7 +3201,7 @@
     {
       "id": "mistral-mantle",
       "nome": "Mistral Mantle",
-      "nome_it": "",
+      "nome_it": "Manto del Maestrale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3229,7 +3215,7 @@
     {
       "id": "mithral-armor",
       "nome": "Mithral Armor",
-      "nome_it": "",
+      "nome_it": "Armatura di Mithral",
       "tipo": "Armatura",
       "sotto_tipo": "medium or heavy but not hide",
       "sotto_tipo_it": "media o pesante (esclusa di pelle)",
@@ -3243,7 +3229,7 @@
     {
       "id": "moon-sickle",
       "nome": "Moon Sickle",
-      "nome_it": "",
+      "nome_it": "Falcetto Lunare",
       "tipo": "Arma",
       "sotto_tipo": "sickle",
       "sotto_tipo_it": "falcetto",
@@ -3257,7 +3243,7 @@
     {
       "id": "moon-touched-sword",
       "nome": "Moon-touched Sword",
-      "nome_it": "",
+      "nome_it": "Spada Toccata dalla Luna",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -3271,7 +3257,7 @@
     {
       "id": "moonblade",
       "nome": "Moonblade",
-      "nome_it": "",
+      "nome_it": "Lamaluna",
       "tipo": "Arma",
       "sotto_tipo": "longs word",
       "sotto_tipo_it": "longs word",
@@ -3285,7 +3271,7 @@
     {
       "id": "mystery-key",
       "nome": "Mystery Key",
-      "nome_it": "",
+      "nome_it": "Chiave del Mistero",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3299,7 +3285,7 @@
     {
       "id": "nature-s-mantle",
       "nome": "Nature's Mantle",
-      "nome_it": "",
+      "nome_it": "Manto della Natura",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3313,7 +3299,7 @@
     {
       "id": "necklace-of-adaptation",
       "nome": "Necklace of Adaptation",
-      "nome_it": "",
+      "nome_it": "Collana dell'Adattamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3327,7 +3313,7 @@
     {
       "id": "necklace-of-fireballs",
       "nome": "Necklace of Fireballs",
-      "nome_it": "",
+      "nome_it": "Collana di Palle di Fuoco",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3341,7 +3327,7 @@
     {
       "id": "necklace-of-prayer-beads",
       "nome": "Necklace of Prayer Beads",
-      "nome_it": "",
+      "nome_it": "Collana di Grani di Preghiera",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3355,7 +3341,7 @@
     {
       "id": "nimbus-coronet",
       "nome": "Nimbus Coronet",
-      "nome_it": "",
+      "nome_it": "Coroncina del Nimbo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3369,7 +3355,7 @@
     {
       "id": "nine-lives-stealer",
       "nome": "Nine Lives Stealer",
-      "nome_it": "",
+      "nome_it": "Ladra di Nove Vite",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -3383,7 +3369,7 @@
     {
       "id": "nolzur-s-marvelous-pigments",
       "nome": "Nolzur's Marvelous Pigments",
-      "nome_it": "",
+      "nome_it": "Pigmenti Meravigliosi di Nolzur",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3397,7 +3383,7 @@
     {
       "id": "oathbow",
       "nome": "Oathbow",
-      "nome_it": "",
+      "nome_it": "Arco del Giuramento",
       "tipo": "Arma",
       "sotto_tipo": "longbow",
       "sotto_tipo_it": "arco lungo",
@@ -3411,7 +3397,7 @@
     {
       "id": "oil-of-etherealness",
       "nome": "Oil of Etherealness",
-      "nome_it": "",
+      "nome_it": "Olio dell'Etereità",
       "tipo": "Pozione",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3425,7 +3411,7 @@
     {
       "id": "oil-of-sharpness",
       "nome": "Oil of Sharpness",
-      "nome_it": "",
+      "nome_it": "Olio dell'Affilatura",
       "tipo": "Pozione",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3439,7 +3425,7 @@
     {
       "id": "oil-of-slipperiness",
       "nome": "Oil of Slipperiness",
-      "nome_it": "",
+      "nome_it": "Olio della Scivolosità",
       "tipo": "Pozione",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3453,7 +3439,7 @@
     {
       "id": "orb-of-direction",
       "nome": "Orb of Direction",
-      "nome_it": "",
+      "nome_it": "Orbe della Direzione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3467,7 +3453,7 @@
     {
       "id": "orb-of-dragonkind",
       "nome": "Orb of Dragonkind",
-      "nome_it": "",
+      "nome_it": "Orbe della Stirpe Draconica",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3481,7 +3467,7 @@
     {
       "id": "orb-of-skoraeus",
       "nome": "Orb of Skoraeus",
-      "nome_it": "",
+      "nome_it": "Orbe di Skoraeus",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3495,7 +3481,7 @@
     {
       "id": "orb-of-time",
       "nome": "Orb of Time",
-      "nome_it": "",
+      "nome_it": "Orbe del Tempo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3509,7 +3495,7 @@
     {
       "id": "outer-essence-shard",
       "nome": "Outer Essence Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia di Essenza Esterna",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3523,7 +3509,7 @@
     {
       "id": "pearl-of-power",
       "nome": "Pearl of Power",
-      "nome_it": "",
+      "nome_it": "Perla del Potere",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3537,7 +3523,7 @@
     {
       "id": "perfume-of-bewitching",
       "nome": "Perfume of Bewitching",
-      "nome_it": "",
+      "nome_it": "Profumo della Stregoneria",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3551,7 +3537,7 @@
     {
       "id": "periapt-of-health",
       "nome": "Periapt of Health",
-      "nome_it": "",
+      "nome_it": "Periapto della Salute",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3565,7 +3551,7 @@
     {
       "id": "periapt-of-proof-against-poison",
       "nome": "Periapt of Proof against Poison",
-      "nome_it": "",
+      "nome_it": "Periapto Inviolabile al Veleno",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3579,7 +3565,7 @@
     {
       "id": "periapt-of-wound-closure",
       "nome": "Periapt of Wound Closure",
-      "nome_it": "",
+      "nome_it": "Periapto della Chiusura delle Ferite",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3593,7 +3579,7 @@
     {
       "id": "philter-of-love",
       "nome": "Philter of Love",
-      "nome_it": "",
+      "nome_it": "Filtro d'Amore",
       "tipo": "Pozione",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3607,7 +3593,7 @@
     {
       "id": "pipe-of-smoke-monsters",
       "nome": "Pipe of Smoke Monsters",
-      "nome_it": "",
+      "nome_it": "Pipa dei Mostri di Fumo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3621,7 +3607,7 @@
     {
       "id": "pipes-of-haunting",
       "nome": "Pipes of Haunting",
-      "nome_it": "",
+      "nome_it": "Cornamusa dell'Infestazione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3635,7 +3621,7 @@
     {
       "id": "pipes-of-the-sewers",
       "nome": "Pipes of the Sewers",
-      "nome_it": "",
+      "nome_it": "Cornamusa delle Fogne",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3649,7 +3635,7 @@
     {
       "id": "planecaller-s-codex",
       "nome": "Planecaller's Codex",
-      "nome_it": "",
+      "nome_it": "Codice del Chiamatore di Piani",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3663,7 +3649,7 @@
     {
       "id": "plate-armor-of-etherealness",
       "nome": "Plate Armor of Etherealness",
-      "nome_it": "",
+      "nome_it": "Armatura di Piastre dell'Etereità",
       "tipo": "Armatura",
       "sotto_tipo": "plate",
       "sotto_tipo_it": "armatura completa",
@@ -3677,7 +3663,7 @@
     {
       "id": "plate-of-knight-s-fellowship",
       "nome": "Plate of Knight's Fellowship",
-      "nome_it": "",
+      "nome_it": "Piastre della Confraternita Cavalleresca",
       "tipo": "Armatura",
       "sotto_tipo": "plate",
       "sotto_tipo_it": "armatura completa",
@@ -3691,7 +3677,7 @@
     {
       "id": "platinum-scarf",
       "nome": "Platinum Scarf",
-      "nome_it": "",
+      "nome_it": "Sciarpa di Platino",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3705,7 +3691,7 @@
     {
       "id": "pole-of-angling",
       "nome": "Pole of Angling",
-      "nome_it": "",
+      "nome_it": "Asta da Pesca",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3719,7 +3705,7 @@
     {
       "id": "pole-of-collapsing",
       "nome": "Pole of Collapsing",
-      "nome_it": "",
+      "nome_it": "Asta Pieghevole",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3733,7 +3719,7 @@
     {
       "id": "portable-hole",
       "nome": "Portable Hole",
-      "nome_it": "",
+      "nome_it": "Buco Portatile",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3747,7 +3733,7 @@
     {
       "id": "pot-of-awakening",
       "nome": "Pot of Awakening",
-      "nome_it": "",
+      "nome_it": "Vaso del Risveglio",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3761,7 +3747,7 @@
     {
       "id": "prehistoric-figurines-of-wondrous-power",
       "nome": "Prehistoric Figurines of Wondrous Power",
-      "nome_it": "",
+      "nome_it": "Statuette Preistoriche di Potere Meraviglioso",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3775,7 +3761,7 @@
     {
       "id": "prosthetic-limb",
       "nome": "Prosthetic Limb",
-      "nome_it": "",
+      "nome_it": "Arto Protesico",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3789,7 +3775,7 @@
     {
       "id": "protective-verses",
       "nome": "Protective Verses",
-      "nome_it": "",
+      "nome_it": "Versi Protettivi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3803,7 +3789,7 @@
     {
       "id": "psi-crystal",
       "nome": "Psi Crystal",
-      "nome_it": "",
+      "nome_it": "Cristallo Psionico",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3817,7 +3803,7 @@
     {
       "id": "quaal-s-feather-token",
       "nome": "Quaal's Feather Token",
-      "nome_it": "",
+      "nome_it": "Piuma Talismano di Quaal",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3831,7 +3817,7 @@
     {
       "id": "quiver-of-ehlonna",
       "nome": "Quiver of Ehlonna",
-      "nome_it": "",
+      "nome_it": "Faretra di Ehlonna",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3845,7 +3831,7 @@
     {
       "id": "reaper-s-scream",
       "nome": "Reaper's Scream",
-      "nome_it": "",
+      "nome_it": "Urlo del Mietitore",
       "tipo": "Arma",
       "sotto_tipo": "morningstar",
       "sotto_tipo_it": "mazza ferrata",
@@ -3859,7 +3845,7 @@
     {
       "id": "reveler-s-concertina",
       "nome": "Reveler's Concertina",
-      "nome_it": "",
+      "nome_it": "Concertina del Festaiolo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3873,7 +3859,7 @@
     {
       "id": "rhythm-maker-s-drum",
       "nome": "Rhythm-Maker's Drum",
-      "nome_it": "",
+      "nome_it": "Tamburo del Ritmo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3887,7 +3873,7 @@
     {
       "id": "robe-of-eyes",
       "nome": "Robe of Eyes",
-      "nome_it": "",
+      "nome_it": "Veste degli Occhi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3901,7 +3887,7 @@
     {
       "id": "robe-of-scintillating-colors",
       "nome": "Robe of Scintillating Colors",
-      "nome_it": "",
+      "nome_it": "Veste dei Colori Scintillanti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3915,7 +3901,7 @@
     {
       "id": "robe-of-stars",
       "nome": "Robe of Stars",
-      "nome_it": "",
+      "nome_it": "Veste delle Stelle",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3929,7 +3915,7 @@
     {
       "id": "robe-of-the-archmagi",
       "nome": "Robe of the Archmagi",
-      "nome_it": "",
+      "nome_it": "Veste degli Arcimaghi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3943,7 +3929,7 @@
     {
       "id": "robe-of-useful-items",
       "nome": "Robe of Useful Items",
-      "nome_it": "",
+      "nome_it": "Veste degli Oggetti Utili",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3957,7 +3943,7 @@
     {
       "id": "rogue-s-mantle",
       "nome": "Rogue's Mantle",
-      "nome_it": "",
+      "nome_it": "Manto del Ladro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3971,7 +3957,7 @@
     {
       "id": "rope-of-climbing",
       "nome": "Rope of Climbing",
-      "nome_it": "",
+      "nome_it": "Corda dell'Arrampicata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3985,7 +3971,7 @@
     {
       "id": "rope-of-entanglement",
       "nome": "Rope of Entanglement",
-      "nome_it": "",
+      "nome_it": "Corda dell'Avviluppamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -3999,7 +3985,7 @@
     {
       "id": "rope-of-mending",
       "nome": "Rope of Mending",
-      "nome_it": "",
+      "nome_it": "Corda del Rammendo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4013,7 +3999,7 @@
     {
       "id": "ruby-of-the-war-mage",
       "nome": "Ruby of the War Mage",
-      "nome_it": "",
+      "nome_it": "Rubino del Mago di Guerra",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4027,7 +4013,7 @@
     {
       "id": "ruby-weave-gem",
       "nome": "Ruby Weave Gem",
-      "nome_it": "",
+      "nome_it": "Gemma di Trama Rubino",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4041,7 +4027,7 @@
     {
       "id": "ruinous-flail",
       "nome": "Ruinous Flail",
-      "nome_it": "",
+      "nome_it": "Mazzafrusto della Rovina",
       "tipo": "Arma",
       "sotto_tipo": "flail",
       "sotto_tipo_it": "flagello",
@@ -4055,7 +4041,7 @@
     {
       "id": "saddle-of-the-cavalier",
       "nome": "Saddle of the Cavalier",
-      "nome_it": "",
+      "nome_it": "Sella del Cavaliere",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4069,7 +4055,7 @@
     {
       "id": "sage-s-signet",
       "nome": "Sage's Signet",
-      "nome_it": "",
+      "nome_it": "Sigillo del Saggio",
       "tipo": "Anello",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4083,7 +4069,7 @@
     {
       "id": "sanctum-amulet",
       "nome": "Sanctum Amulet",
-      "nome_it": "",
+      "nome_it": "Amuleto del Sanctum",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4097,7 +4083,7 @@
     {
       "id": "sapphire-buckler",
       "nome": "Sapphire Buckler",
-      "nome_it": "",
+      "nome_it": "Brocchiero di Zaffiro",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4111,7 +4097,7 @@
     {
       "id": "scarab-of-protection",
       "nome": "Scarab of Protection",
-      "nome_it": "",
+      "nome_it": "Scarabeo della Protezione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4125,7 +4111,7 @@
     {
       "id": "scimitar-of-speed",
       "nome": "Scimitar of Speed",
-      "nome_it": "",
+      "nome_it": "Scimitarra della Velocità",
       "tipo": "Arma",
       "sotto_tipo": "scimitar",
       "sotto_tipo_it": "scimitarra",
@@ -4139,7 +4125,7 @@
     {
       "id": "sending-stones",
       "nome": "Sending Stones",
-      "nome_it": "",
+      "nome_it": "Pietre di Messaggio",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4153,7 +4139,7 @@
     {
       "id": "sentinel-shield",
       "nome": "Sentinel Shield",
-      "nome_it": "",
+      "nome_it": "Scudo Sentinella",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4167,7 +4153,7 @@
     {
       "id": "shadowfell-brand-tattoo",
       "nome": "Shadowfell Brand Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio Marchio dello Shadowfell",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -4181,7 +4167,7 @@
     {
       "id": "shadowfell-shard",
       "nome": "Shadowfell Shard",
-      "nome_it": "",
+      "nome_it": "Scheggia dello Shadowfell",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4195,7 +4181,7 @@
     {
       "id": "shield-1-2-or-3",
       "nome": "Shield, +1, +2, or +3",
-      "nome_it": "",
+      "nome_it": "Scudo, +1, +2 o +3",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4209,7 +4195,7 @@
     {
       "id": "shield-of-expression",
       "nome": "Shield of Expression",
-      "nome_it": "",
+      "nome_it": "Scudo dell'Espressione",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4223,7 +4209,7 @@
     {
       "id": "shield-of-missile-attraction",
       "nome": "Shield of Missile Attraction",
-      "nome_it": "",
+      "nome_it": "Scudo dell'Attrazione di Proiettili",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4237,7 +4223,7 @@
     {
       "id": "shield-of-the-blazing-dreadnought",
       "nome": "Shield of the Blazing Dreadnought",
-      "nome_it": "",
+      "nome_it": "Scudo del Dreadnought Fiammeggiante",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4251,7 +4237,7 @@
     {
       "id": "shield-of-the-tortoise",
       "nome": "Shield of the Tortoise",
-      "nome_it": "",
+      "nome_it": "Scudo della Tartaruga",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4265,7 +4251,7 @@
     {
       "id": "shrieking-greaves",
       "nome": "Shrieking Greaves",
-      "nome_it": "",
+      "nome_it": "Schinieri Stridenti",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4279,7 +4265,7 @@
     {
       "id": "skull-helm",
       "nome": "Skull Helm",
-      "nome_it": "",
+      "nome_it": "Elmo del Teschio",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4293,7 +4279,7 @@
     {
       "id": "sling-of-giant-felling",
       "nome": "Sling of Giant Felling",
-      "nome_it": "",
+      "nome_it": "Fionda dell'Abbattimento dei Giganti",
       "tipo": "Arma",
       "sotto_tipo": "sling",
       "sotto_tipo_it": "fionda",
@@ -4307,7 +4293,7 @@
     {
       "id": "slippers-of-spider-climbing",
       "nome": "Slippers of Spider Climbing",
-      "nome_it": "",
+      "nome_it": "Pantofole dell'Arrampicata del Ragno",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4321,7 +4307,7 @@
     {
       "id": "smoldering-armor",
       "nome": "Smoldering Armor",
-      "nome_it": "",
+      "nome_it": "Armatura Fumante",
       "tipo": "Armatura",
       "sotto_tipo": "any",
       "sotto_tipo_it": "qualsiasi",
@@ -4335,7 +4321,7 @@
     {
       "id": "sovereign-glue",
       "nome": "Sovereign Glue",
-      "nome_it": "",
+      "nome_it": "Colla Sovrana",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4349,7 +4335,7 @@
     {
       "id": "spell-scroll",
       "nome": "Spell Scroll",
-      "nome_it": "",
+      "nome_it": "Pergamena di Incantesimo",
       "tipo": "Pergamena",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4363,7 +4349,7 @@
     {
       "id": "spellguard-shield",
       "nome": "Spellguard Shield",
-      "nome_it": "",
+      "nome_it": "Scudo della Guardia Magica",
       "tipo": "Armatura",
       "sotto_tipo": "shield",
       "sotto_tipo_it": "scudo",
@@ -4377,7 +4363,7 @@
     {
       "id": "spellwrought-tattoo",
       "nome": "Spellwrought Tattoo",
-      "nome_it": "",
+      "nome_it": "Tatuaggio Forgiaincantesimi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "tattoo",
       "sotto_tipo_it": "tatuaggio",
@@ -4391,7 +4377,7 @@
     {
       "id": "sphere-of-annihilation",
       "nome": "Sphere of Annihilation",
-      "nome_it": "",
+      "nome_it": "Sfera dell'Annientamento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4405,7 +4391,7 @@
     {
       "id": "spindle-of-fate",
       "nome": "Spindle of Fate",
-      "nome_it": "",
+      "nome_it": "Fuso del Destino",
       "tipo": "Bacchetta",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4419,7 +4405,7 @@
     {
       "id": "starshot-crossbow",
       "nome": "Starshot Crossbow",
-      "nome_it": "",
+      "nome_it": "Balestra Sparastelle",
       "tipo": "Arma",
       "sotto_tipo": "any crossbow",
       "sotto_tipo_it": "any crossbow",
@@ -4433,7 +4419,7 @@
     {
       "id": "stone-of-controlling-earth-elementals",
       "nome": "Stone of Controlling Earth Elementals",
-      "nome_it": "",
+      "nome_it": "Pietra del Controllo degli Elementali della Terra",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4447,7 +4433,7 @@
     {
       "id": "stone-of-golorr",
       "nome": "Stone of Golorr",
-      "nome_it": "",
+      "nome_it": "Pietra di Golorr",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4461,7 +4447,7 @@
     {
       "id": "stone-of-good-luck-luckstone",
       "nome": "Stone of Good Luck (Luckstone)",
-      "nome_it": "",
+      "nome_it": "Pietra della Buona Sorte (Pietra Fortunata)",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4475,7 +4461,7 @@
     {
       "id": "stonebreaker-s-breastplate",
       "nome": "Stonebreaker's Breastplate",
-      "nome_it": "",
+      "nome_it": "Corazza dello Spaccapietra",
       "tipo": "Armatura",
       "sotto_tipo": "breastplate",
       "sotto_tipo_it": "corazza di piastre",
@@ -4489,7 +4475,7 @@
     {
       "id": "stonemaker-war-pick",
       "nome": "Stonemaker War Pick",
-      "nome_it": "",
+      "nome_it": "Piccone da Guerra del Forgiapietra",
       "tipo": "Arma",
       "sotto_tipo": "war pick",
       "sotto_tipo_it": "piccone da guerra",
@@ -4503,7 +4489,7 @@
     {
       "id": "sun-blade",
       "nome": "Sun Blade",
-      "nome_it": "",
+      "nome_it": "Lama Solare",
       "tipo": "Arma",
       "sotto_tipo": "longsword",
       "sotto_tipo_it": "spada lunga",
@@ -4517,7 +4503,7 @@
     {
       "id": "sun-staff",
       "nome": "Sun Staff",
-      "nome_it": "",
+      "nome_it": "Bastone Solare",
       "tipo": "Bastone",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4531,7 +4517,7 @@
     {
       "id": "sword-of-answering",
       "nome": "Sword of Answering",
-      "nome_it": "",
+      "nome_it": "Spada della Risposta",
       "tipo": "Arma",
       "sotto_tipo": "longsword",
       "sotto_tipo_it": "spada lunga",
@@ -4545,7 +4531,7 @@
     {
       "id": "sword-of-kas",
       "nome": "Sword of Kas",
-      "nome_it": "",
+      "nome_it": "Spada di Kas",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4559,7 +4545,7 @@
     {
       "id": "sword-of-life-stealing",
       "nome": "Sword of Life Stealing",
-      "nome_it": "",
+      "nome_it": "Spada del Furto della Vita",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -4573,7 +4559,7 @@
     {
       "id": "sword-of-sharpness",
       "nome": "Sword of Sharpness",
-      "nome_it": "",
+      "nome_it": "Spada dell'Affilatura",
       "tipo": "Arma",
       "sotto_tipo": "any sword that deals slashing damage",
       "sotto_tipo_it": "any sword that deals slashing damage",
@@ -4587,7 +4573,7 @@
     {
       "id": "sword-of-the-planes",
       "nome": "Sword of the Planes",
-      "nome_it": "",
+      "nome_it": "Spada dei Piani",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -4601,7 +4587,7 @@
     {
       "id": "sword-of-vengeance",
       "nome": "Sword of Vengeance",
-      "nome_it": "",
+      "nome_it": "Spada della Vendetta",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -4615,7 +4601,7 @@
     {
       "id": "sword-of-wounding",
       "nome": "Sword of Wounding",
-      "nome_it": "",
+      "nome_it": "Spada del Ferimento",
       "tipo": "Arma",
       "sotto_tipo": "any sword",
       "sotto_tipo_it": "qualsiasi spada",
@@ -4629,7 +4615,7 @@
     {
       "id": "sword-of-zariel",
       "nome": "Sword of Zariel",
-      "nome_it": "",
+      "nome_it": "Spada di Zariel",
       "tipo": "Arma",
       "sotto_tipo": "longsword",
       "sotto_tipo_it": "spada lunga",
@@ -4643,7 +4629,7 @@
     {
       "id": "talisman-of-pure-good",
       "nome": "Talisman of Pure Good",
-      "nome_it": "",
+      "nome_it": "Talismano del Bene Puro",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4657,7 +4643,7 @@
     {
       "id": "talisman-of-the-sphere",
       "nome": "Talisman of the Sphere",
-      "nome_it": "",
+      "nome_it": "Talismano della Sfera",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4671,7 +4657,7 @@
     {
       "id": "talisman-of-ultimate-evil",
       "nome": "Talisman of Ultimate Evil",
-      "nome_it": "",
+      "nome_it": "Talismano del Male Supremo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4685,7 +4671,7 @@
     {
       "id": "talking-doll",
       "nome": "Talking Doll",
-      "nome_it": "",
+      "nome_it": "Bambola Parlante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4699,7 +4685,7 @@
     {
       "id": "tankard-of-sobriety",
       "nome": "Tankard of Sobriety",
-      "nome_it": "",
+      "nome_it": "Boccale della Sobrietà",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4713,7 +4699,7 @@
     {
       "id": "teeth-of-dahlver-nar",
       "nome": "Teeth of Dahlver-Nar",
-      "nome_it": "",
+      "nome_it": "Denti di Dahlver-Nar",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4727,7 +4713,7 @@
     {
       "id": "telescopic-transporter",
       "nome": "Telescopic Transporter",
-      "nome_it": "",
+      "nome_it": "Trasportatore Telescopico",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4741,7 +4727,7 @@
     {
       "id": "tentacle-rod",
       "nome": "Tentacle Rod",
-      "nome_it": "",
+      "nome_it": "Asta dei Tentacoli",
       "tipo": "Asta",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4755,7 +4741,7 @@
     {
       "id": "thunderbuss",
       "nome": "Thunderbuss",
-      "nome_it": "",
+      "nome_it": "Tuonobombarda",
       "tipo": "Arma",
       "sotto_tipo": "pistol",
       "sotto_tipo_it": "pistola",
@@ -4769,7 +4755,7 @@
     {
       "id": "tidecaller-trident",
       "nome": "Tidecaller Trident",
-      "nome_it": "",
+      "nome_it": "Tridente del Chiamamarea",
       "tipo": "Arma",
       "sotto_tipo": "trident",
       "sotto_tipo_it": "tridente",
@@ -4783,7 +4769,7 @@
     {
       "id": "tome-of-clear-thought",
       "nome": "Tome of Clear Thought",
-      "nome_it": "",
+      "nome_it": "Tomo del Pensiero Limpido",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4797,7 +4783,7 @@
     {
       "id": "tome-of-leadership-and-influence",
       "nome": "Tome of Leadership and Influence",
-      "nome_it": "",
+      "nome_it": "Tomo del Comando e dell'Influenza",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4811,7 +4797,7 @@
     {
       "id": "tome-of-the-stilled-tongue",
       "nome": "Tome of the Stilled Tongue",
-      "nome_it": "",
+      "nome_it": "Tomo della Lingua Mozzata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4825,7 +4811,7 @@
     {
       "id": "tome-of-understanding",
       "nome": "Tome of Understanding",
-      "nome_it": "",
+      "nome_it": "Tomo della Comprensione",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4839,7 +4825,7 @@
     {
       "id": "topaz-annihilator",
       "nome": "Topaz Annihilator",
-      "nome_it": "",
+      "nome_it": "Annientatore di Topazio",
       "tipo": "Arma",
       "sotto_tipo": "firearm",
       "sotto_tipo_it": "firearm",
@@ -4853,7 +4839,7 @@
     {
       "id": "trident-of-fish-command",
       "nome": "Trident of Fish Command",
-      "nome_it": "",
+      "nome_it": "Tridente del Comando dei Pesci",
       "tipo": "Arma",
       "sotto_tipo": "trident",
       "sotto_tipo_it": "tridente",
@@ -4867,7 +4853,7 @@
     {
       "id": "unbreakable-arrow",
       "nome": "Unbreakable Arrow",
-      "nome_it": "",
+      "nome_it": "Freccia Infrangibile",
       "tipo": "Arma",
       "sotto_tipo": "arrow",
       "sotto_tipo_it": "freccia",
@@ -4881,7 +4867,7 @@
     {
       "id": "universal-solvent",
       "nome": "Universal Solvent",
-      "nome_it": "",
+      "nome_it": "Solvente Universale",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4895,7 +4881,7 @@
     {
       "id": "veteran-s-cane",
       "nome": "Veteran's Cane",
-      "nome_it": "",
+      "nome_it": "Bastone del Veterano",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4909,7 +4895,7 @@
     {
       "id": "vicious-weapon",
       "nome": "Vicious Weapon",
-      "nome_it": "",
+      "nome_it": "Arma Feroce",
       "tipo": "Arma",
       "sotto_tipo": "any",
       "sotto_tipo_it": "qualsiasi",
@@ -4923,7 +4909,7 @@
     {
       "id": "voidwalker-armor",
       "nome": "Voidwalker Armor",
-      "nome_it": "",
+      "nome_it": "Armatura del Camminatore del Vuoto",
       "tipo": "Armatura",
       "sotto_tipo": "studded leather",
       "sotto_tipo_it": "di cuoio borchiato",
@@ -4937,7 +4923,7 @@
     {
       "id": "vorpal-sword",
       "nome": "Vorpal Sword",
-      "nome_it": "",
+      "nome_it": "Spada Vorpal",
       "tipo": "Arma",
       "sotto_tipo": "any sword that deals slashing damage",
       "sotto_tipo_it": "any sword that deals slashing damage",
@@ -4951,7 +4937,7 @@
     {
       "id": "walloping-ammunition",
       "nome": "Walloping Ammunition",
-      "nome_it": "",
+      "nome_it": "Munizione Stordente",
       "tipo": "Arma",
       "sotto_tipo": "any ammunition",
       "sotto_tipo_it": "qualsiasi munizione",
@@ -4965,7 +4951,7 @@
     {
       "id": "war-horn-of-valor",
       "nome": "War Horn of Valor",
-      "nome_it": "",
+      "nome_it": "Corno da Guerra del Valore",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4979,7 +4965,7 @@
     {
       "id": "warrior-s-passkey",
       "nome": "Warrior's Passkey",
-      "nome_it": "",
+      "nome_it": "Passpartout del Guerriero",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -4993,7 +4979,7 @@
     {
       "id": "wave",
       "nome": "Wave",
-      "nome_it": "",
+      "nome_it": "Onda",
       "tipo": "Arma",
       "sotto_tipo": "trident",
       "sotto_tipo_it": "tridente",
@@ -5007,7 +4993,7 @@
     {
       "id": "wayfarer-s-boots",
       "nome": "Wayfarer's Boots",
-      "nome_it": "",
+      "nome_it": "Stivali del Viandante",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5021,7 +5007,7 @@
     {
       "id": "well-of-many-worlds",
       "nome": "Well of Many Worlds",
-      "nome_it": "",
+      "nome_it": "Pozzo dei Molti Mondi",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5035,7 +5021,7 @@
     {
       "id": "whelm",
       "nome": "Whelm",
-      "nome_it": "",
+      "nome_it": "Sopraffazione",
       "tipo": "Arma",
       "sotto_tipo": "warhammer",
       "sotto_tipo_it": "martello da guerra",
@@ -5049,7 +5035,7 @@
     {
       "id": "wind-fan",
       "nome": "Wind Fan",
-      "nome_it": "",
+      "nome_it": "Ventaglio del Vento",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5063,7 +5049,7 @@
     {
       "id": "winged-ammunition",
       "nome": "Winged Ammunition",
-      "nome_it": "",
+      "nome_it": "Munizione Alata",
       "tipo": "Arma",
       "sotto_tipo": "any ammunition",
       "sotto_tipo_it": "qualsiasi munizione",
@@ -5077,7 +5063,7 @@
     {
       "id": "winged-boots",
       "nome": "Winged Boots",
-      "nome_it": "",
+      "nome_it": "Stivali Alati",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5091,7 +5077,7 @@
     {
       "id": "wings-of-flying",
       "nome": "Wings of Flying",
-      "nome_it": "",
+      "nome_it": "Ali del Volo",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5105,7 +5091,7 @@
     {
       "id": "wraps-of-unarmed-prowess",
       "nome": "Wraps of Unarmed Prowess",
-      "nome_it": "",
+      "nome_it": "Bende dell'Abilità Disarmata",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5119,7 +5105,7 @@
     {
       "id": "wyrmreaver-gauntlets",
       "nome": "Wyrmreaver Gauntlets",
-      "nome_it": "",
+      "nome_it": "Guanti Squarciadrago",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5133,7 +5119,7 @@
     {
       "id": "wyrmskull-throne",
       "nome": "Wyrmskull Throne",
-      "nome_it": "",
+      "nome_it": "Trono del Teschio di Wyrm",
       "tipo": "Oggetto Meraviglioso",
       "sotto_tipo": "",
       "sotto_tipo_it": "",
@@ -5147,7 +5133,7 @@
     {
       "id": "zephyr-armor",
       "nome": "Zephyr Armor",
-      "nome_it": "",
+      "nome_it": "Armatura dello Zefiro",
       "tipo": "Armatura",
       "sotto_tipo": "light",
       "sotto_tipo_it": "leggera",
