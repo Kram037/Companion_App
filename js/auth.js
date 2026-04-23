@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-F debug amici + integrazione hb scheda');
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-G fallback get_amici per RLS bloccante');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
@@ -135,20 +135,48 @@ async function loadHomebrewSottoclassi() {
             } catch (_) {}
             if (masterEnabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
                 try { console.log('[homebrew][debug] amici_abilitati IDs in settings:', settings.amici_abilitati); } catch (_) {}
-                const { data: friendRows, error: friendErr } = await supabase
+
+                // Tentativo 1: SELECT diretta su `utenti`. Funziona solo se la
+                // RLS lo permette (di default su molti progetti Supabase NO).
+                let { data: friendRows, error: friendErr } = await supabase
                     .from('utenti')
                     .select('id, uid, nome_utente')
                     .in('id', settings.amici_abilitati);
                 if (friendErr) {
                     console.warn('[homebrew][debug] errore SELECT amici:', friendErr);
                 }
-                try { console.log('[homebrew][debug] friendRows risolti:', friendRows); } catch (_) {}
+                try { console.log('[homebrew][debug] friendRows risolti (via SELECT utenti):', friendRows); } catch (_) {}
+
+                // Fallback: se la SELECT non torna righe (RLS bloccante), usiamo
+                // la RPC `get_amici` che e' SECURITY DEFINER e bypassa l'RLS.
+                if (!friendRows || friendRows.length === 0) {
+                    try {
+                        const { data: amiciRpc, error: rpcErr } = await supabase.rpc('get_amici');
+                        if (rpcErr) {
+                            console.warn('[homebrew][debug] errore RPC get_amici:', rpcErr);
+                        } else {
+                            try { console.log('[homebrew][debug] get_amici RPC ha restituito:', amiciRpc); } catch (_) {}
+                            const setSel = new Set((settings.amici_abilitati || []).map(String));
+                            friendRows = (amiciRpc || [])
+                                .filter(a => setSel.has(String(a.amico_id || a.id)))
+                                .map(a => ({
+                                    id: a.amico_id || a.id,
+                                    uid: a.uid || a.amico_uid || null,
+                                    nome_utente: a.nome_utente || 'Amico',
+                                }));
+                            try { console.log('[homebrew][debug] friendRows risolti (via RPC fallback):', friendRows); } catch (_) {}
+                        }
+                    } catch (eRpc) {
+                        console.warn('[homebrew][debug] eccezione RPC get_amici:', eRpc);
+                    }
+                }
+
                 (friendRows || []).forEach(f => {
                     if (f.uid) {
                         friendUids.push(f.uid);
                         friendInfoByUid[f.uid] = f;
                     } else {
-                        console.warn('[homebrew][debug] amico senza uid (probabilmente row utenti senza colonna uid valorizzata):', f);
+                        console.warn('[homebrew][debug] amico senza uid (riga utenti senza uid valorizzato o RPC senza colonna uid):', f);
                     }
                 });
             } else {
