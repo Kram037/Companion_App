@@ -507,11 +507,7 @@ async function showRollRequestModal(request) {
 
     elements.rollRequestModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-        if (elements.rollRequestInput) {
-            elements.rollRequestInput.focus();
-        }
-    }, 100);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 }
 
 /**

@@ -155,13 +155,7 @@ function showPrompt(message, title = 'Input', defaultValue = '') {
         // Mostra modal
         elements.editFieldModal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        // Focus sull'input
-        setTimeout(() => {
-            if (elements.editFieldInput) {
-                elements.editFieldInput.focus();
-                elements.editFieldInput.select();
-            }
-        }, 100);
+        // Nessun auto-focus: evita la comparsa automatica della tastiera.
     });
 }
 

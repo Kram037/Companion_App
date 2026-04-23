@@ -1632,8 +1632,7 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
     renderSourceChips();
     updateFilterBadge();
     renderList();
-    // Auto-focus della search per partire subito a digitare.
-    setTimeout(() => searchInput && searchInput.focus(), 50);
+    // NIENTE auto-focus: l'utente decide se attivare la tastiera cliccando.
 }
 
 window.pgOpenBackgroundSelect = function() {
@@ -4962,7 +4961,7 @@ window.invAddItem = function(pgId) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
-    setTimeout(() => document.getElementById('invItemNome')?.focus(), 100);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 };
 
 window.invSaveNewItem = async function(pgId) {
@@ -5099,7 +5098,7 @@ window.invEditAttune = function(pgId, idx) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
-    setTimeout(() => document.getElementById('invAttuneName')?.focus(), 100);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 };
 
 window.invSelectAttuneBonus = function(btn, bonus) {
@@ -6006,7 +6005,7 @@ function _schedaShowInputDialog(opts) {
             if (e.key === 'Enter') { e.preventDefault(); finish(input.value); }
             if (e.key === 'Escape') { e.preventDefault(); finish(null); }
         };
-        setTimeout(() => { input.focus(); input.select(); }, 50);
+        // Nessun auto-focus: evita la comparsa automatica della tastiera.
     });
 }
 
@@ -6187,7 +6186,7 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
         </div>
     </div>`;
     modal.classList.add('active');
-    setTimeout(() => document.getElementById('privEditName')?.focus(), 50);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 }
 
 window.privDeleteFromEdit = async function(tabName, index) {
@@ -7659,7 +7658,7 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     };
 
     document.body.appendChild(overlay);
-    setTimeout(() => input.focus(), 50);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 }
 
 async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
@@ -7928,7 +7927,7 @@ window.schedaOpenEditClassRes = function(pgId, key, defaultName, defaultMax) {
         close();
         openSchedaPersonaggio(pgId);
     };
-    setTimeout(() => document.getElementById('schedaCResNome')?.focus(), 50);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 };
 
 window.schedaRaceResChange = function(pgId, key, current, delta, max) {

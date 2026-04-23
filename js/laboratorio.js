@@ -972,7 +972,7 @@ function _labSubOpenSpellPickerDialog(initialSelected, onConfirm) {
     });
 
     renderList();
-    setTimeout(() => sIn.focus(), 50);
+    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 }
 
 function _labSubReadSetupFromDOM() {
@@ -996,9 +996,7 @@ window.labSubChangeCount = function(level, delta) {
     if (valEl) valEl.textContent = next;
     // Re-render solo del blocco counts per aggiornare i bottoni −/+.
     _labSubRender();
-    // Mantiene il focus dell'input nome se possibile.
-    const nm = document.getElementById('labSubNome');
-    if (nm) nm.focus();
+    // Nessun auto-focus dopo i +/-: evita la comparsa automatica della tastiera.
 };
 
 function _labSubReadCurrentFromDOM() {

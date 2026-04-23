@@ -714,10 +714,9 @@ function setupEventListeners() {
             if (elements.editUserNameForm) {
                 elements.editUserNameForm.style.display = 'block';
                 if (elements.editUserNameInput) {
-                    // Pre-compila con il nome corrente
+                    // Pre-compila con il nome corrente. Niente auto-focus per evitare la tastiera automatica.
                     const currentName = elements.userName ? elements.userName.textContent : '';
                     elements.editUserNameInput.value = currentName;
-                    elements.editUserNameInput.focus();
                 }
             }
         };
