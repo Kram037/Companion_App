@@ -2,6 +2,9 @@
 // PERSONAGGI MANAGEMENT
 // ============================================================================
 
+// [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
+console.log('[homebrew][build] personaggi.js BUILD 2026-04-23-C con picker log');
+
 let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
 let pgSelectedClasses = [];
@@ -1817,6 +1820,17 @@ function pgGetHomebrewSubclassOptions(className) {
 function _renderSubclassSelector(c, index, onclickFn) {
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    try {
+        console.log('[homebrew][selector] _renderSubclassSelector chiamata:', {
+            classeNome: c.nome,
+            classeSlug: c.slug,
+            optsNative: opts.length,
+            optsHomebrew: hbOpts.length,
+            cacheArray: Array.isArray(window.AppState?.cachedHomebrewSottoclassi)
+                ? window.AppState.cachedHomebrewSottoclassi.length
+                : 'NULL'
+        });
+    } catch (_) {}
     if (opts.length === 0 && hbOpts.length === 0) return '';
     const label = c.sottoclasse
         ? escapeHtml(c.sottoclasse)
