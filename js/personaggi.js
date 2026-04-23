@@ -3377,17 +3377,21 @@ async function renderSchedaPersonaggio(personaggioId) {
             const val = pg[a.key] || 10;
             const m = fMod(val);
             const isSaveProf = saves.includes(a.key);
-            const saveMod = Math.floor((val - 10) / 2) + (isSaveProf ? bonusComp : 0);
+            const saveExtra = _getSaveBonusFor(pg, a.key);
+            const saveMod = Math.floor((val - 10) / 2) + (isSaveProf ? bonusComp : 0) + saveExtra;
             const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+            const saveMark = saveExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
             return `
             <div class="scheda-ability">
                 <div class="scheda-ability-label">${a.full}</div>
                 <div class="scheda-ability-input clickable" id="sAbil_${a.key}" data-field="${a.key}" data-pgid="${pg.id}" onclick="schedaOpenAbilityCalc('${pg.id}','${a.key}')">${val}</div>
                 <div class="scheda-ability-mod" id="sMod_${a.key}">${m}</div>
-                <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}" onclick="schedaToggleSave('${pg.id}','${a.key}')">
-                    <span class="scheda-save-dot">${isSaveProf ? '●' : '○'}</span>
-                    <span class="scheda-save-label">TS</span>
-                    <span class="scheda-save-val" id="sSave_${a.key}">${saveStr}</span>
+                <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}">
+                    <span class="scheda-save-dot" onclick="schedaToggleSave('${pg.id}','${a.key}')" title="Tocca per attivare/disattivare la competenza">${isSaveProf ? '●' : '○'}</span>
+                    <span class="scheda-save-clickable" onclick="schedaOpenSaveBonus('${pg.id}','${a.key}')" title="Modifica bonus extra ai TS">
+                        <span class="scheda-save-label">TS</span>
+                        <span class="scheda-save-val" id="sSave_${a.key}">${saveStr}${saveMark}</span>
+                    </span>
                 </div>
             </div>`;
         }).join('');
@@ -3765,10 +3769,12 @@ function schedaRecalcAbility(abilityKey, val, pgId) {
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
     const saves = pg.tiri_salvezza || [];
     const isSaveProf = saves.includes(abilityKey);
-    const saveMod = m + (isSaveProf ? bonusComp : 0);
+    const saveExtra = _getSaveBonusFor(pg, abilityKey);
+    const saveMod = m + (isSaveProf ? bonusComp : 0) + saveExtra;
     const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+    const saveMark = saveExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
     const saveEl = document.getElementById(`sSave_${abilityKey}`);
-    if (saveEl) saveEl.textContent = saveStr;
+    if (saveEl) saveEl.innerHTML = `${saveStr}${saveMark}`;
 
     // Update skills that depend on this ability
     const skillProf = pg.competenze_abilita || [];
@@ -3803,14 +3809,16 @@ window.schedaToggleSave = async function(pgId, abilityKey) {
     const val = pg[abilityKey] || 10;
     const m = Math.floor((val - 10) / 2);
     const isProf = saves.includes(abilityKey);
-    const saveMod = m + (isProf ? bonusComp : 0);
+    const saveExtra = _getSaveBonusFor(pg, abilityKey);
+    const saveMod = m + (isProf ? bonusComp : 0) + saveExtra;
     const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+    const saveMark = saveExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
 
     const saveEl = document.querySelector(`.scheda-ability-save[data-save="${abilityKey}"]`);
     if (saveEl) {
         saveEl.classList.toggle('proficient', isProf);
         saveEl.querySelector('.scheda-save-dot').textContent = isProf ? '●' : '○';
-        saveEl.querySelector('.scheda-save-val').textContent = saveStr;
+        saveEl.querySelector('.scheda-save-val').innerHTML = `${saveStr}${saveMark}`;
     }
     schedaInstantSave(pgId, { tiri_salvezza: saves });
 }
@@ -9733,9 +9741,15 @@ function _getBonusManuali(pg) {
             dc: _normalizeBonusList(e.dc),
         };
     }
+    const tsRaw = (bm.tiri_salvezza && typeof bm.tiri_salvezza === 'object') ? bm.tiri_salvezza : {};
+    const ts = {};
+    for (const ab of Object.keys(tsRaw)) {
+        ts[ab] = _normalizeBonusList(tsRaw[ab]);
+    }
     return {
         ca: _normalizeBonusList(bm.ca),
         incantatori: inc,
+        tiri_salvezza: ts,
         spells_prepared_max: parseInt(bm.spells_prepared_max) || 0,
     };
 }
@@ -9746,12 +9760,18 @@ function _getCasterBonusFor(pg, classeNome) {
     return { atk: _sumBonusList(e.atk), dc: _sumBonusList(e.dc) };
 }
 
+function _getSaveBonusFor(pg, abilityKey) {
+    const ts = _getBonusManuali(pg).tiri_salvezza;
+    return _sumBonusList(ts[abilityKey] || []);
+}
+
 // Confeziona l'oggetto da salvare a partire da una versione normalizzata di
 // bonus_manuali, preservando spells_prepared_max e altre chiavi future.
 function _buildBonusManualiPayload(parsed) {
     return {
         ca: parsed.ca || [],
         incantatori: parsed.incantatori || {},
+        tiri_salvezza: parsed.tiri_salvezza || {},
         spells_prepared_max: parsed.spells_prepared_max || 0,
     };
 }
@@ -9840,15 +9860,17 @@ function getCABreakdown(pg) {
 let _bonusListState = null;
 
 function _bonusListRowHtml(b, idx) {
-    const sign = b.valore >= 0 ? '+' : '';
+    const v = parseInt(b.valore) || 0;
     return `<div class="bonus-list-row" data-idx="${idx}">
-        <input type="text" class="bonus-list-name" placeholder="Nome (es. Anello di protezione)" value="${escapeHtml(b.nome)}" maxlength="80">
+        <div class="bonus-list-row-top">
+            <input type="text" class="bonus-list-name" placeholder="Nome (es. Anello di Protezione)" value="${escapeHtml(b.nome)}" maxlength="80">
+            <button type="button" class="bonus-list-del" onclick="schedaBonusListDelete(${idx})" title="Rimuovi">×</button>
+        </div>
         <div class="bonus-list-val-row">
             <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},-1)">−</button>
-            <input type="number" class="bonus-list-val" value="${sign}${b.valore}" step="1">
+            <input type="number" class="bonus-list-val" value="${v}" step="1">
             <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},1)">+</button>
         </div>
-        <button type="button" class="bonus-list-del" onclick="schedaBonusListDelete(${idx})" title="Rimuovi">×</button>
     </div>`;
 }
 
@@ -9993,6 +10015,7 @@ window.schedaCABonusConfirm = async function(pgId) {
     const next = _buildBonusManualiPayload({
         ca: cleaned,
         incantatori: bm.incantatori,
+        tiri_salvezza: bm.tiri_salvezza,
         spells_prepared_max: bm.spells_prepared_max,
     });
     pg.bonus_manuali = next;
@@ -10007,6 +10030,116 @@ window.schedaCABonusConfirm = async function(pgId) {
     await schedaInstantSave(pgId, { bonus_manuali: next, classe_armatura: newCA });
     showNotification(`CA aggiornata: ${newCA}`);
 };
+
+// =====================================================
+// MODAL Bonus Tiri Salvezza
+// =====================================================
+const _ABILITY_LABELS = {
+    forza: 'Forza',
+    destrezza: 'Destrezza',
+    costituzione: 'Costituzione',
+    intelligenza: 'Intelligenza',
+    saggezza: 'Saggezza',
+    carisma: 'Carisma',
+};
+
+window.schedaOpenSaveBonus = function(pgId, abilityKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const bm = _getBonusManuali(pg);
+    const items = (bm.tiri_salvezza[abilityKey] || []).map(b => ({ ...b }));
+
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const val = pg[abilityKey] || 10;
+    const mod = Math.floor((val - 10) / 2);
+    const isProf = (pg.tiri_salvezza || []).includes(abilityKey);
+    const profPart = isProf ? ` + comp +${bonusComp}` : '';
+    const baseTot = mod + (isProf ? bonusComp : 0);
+    const baseStr = baseTot >= 0 ? `+${baseTot}` : `${baseTot}`;
+
+    _bonusListState = { kind: 'save', pgId, abilityKey, items };
+
+    const labelAb = _ABILITY_LABELS[abilityKey] || abilityKey;
+    const headerInfo = `Base: mod ${mod >= 0 ? '+' : ''}${mod}${profPart} = <b>${baseStr}</b>`;
+
+    const existing = document.getElementById('saveBonusOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'saveBonusOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal bonus-modal bonus-list-modal">
+            <button class="hp-calc-close" onclick="schedaCloseSaveBonus()">&times;</button>
+            <div class="hp-calc-title">Bonus TS – ${escapeHtml(labelAb)}</div>
+            <div class="bonus-modal-info">${headerInfo}</div>
+            <div class="bonus-list-section">
+                <div class="bonus-list-header">
+                    <label class="bonus-modal-label">Bonus extra</label>
+                    <span class="bonus-list-total-label">Tot: <span id="bonusListTotal">+0</span></span>
+                </div>
+                <div id="bonusListContainer" class="bonus-list-container"></div>
+                <button type="button" class="bonus-list-add-btn" onclick="schedaBonusListAdd()">+ Aggiungi bonus</button>
+                <div class="bonus-modal-hint">Es. <i>Mantello della Protezione</i> +1, <i>Privilegio di classe</i> +2, ecc.</div>
+            </div>
+            <div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaSaveBonusConfirm('${pgId}','${abilityKey}')">Conferma</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    _bonusListRender();
+};
+
+window.schedaCloseSaveBonus = function() {
+    const o = document.getElementById('saveBonusOverlay');
+    if (o) o.remove();
+    _bonusListState = null;
+};
+
+window.schedaSaveBonusConfirm = async function(pgId, abilityKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    _bonusListSyncFromInputs();
+
+    const cleaned = (_bonusListState?.items || [])
+        .map(b => ({ nome: (b.nome || 'Manuale').trim().slice(0, 80) || 'Manuale', valore: parseInt(b.valore) || 0 }))
+        .filter(b => b.valore !== 0);
+
+    const bm = _getBonusManuali(pg);
+    const ts = { ...(bm.tiri_salvezza || {}) };
+    if (cleaned.length) ts[abilityKey] = cleaned;
+    else delete ts[abilityKey];
+
+    const next = _buildBonusManualiPayload({
+        ca: bm.ca,
+        incantatori: bm.incantatori,
+        tiri_salvezza: ts,
+        spells_prepared_max: bm.spells_prepared_max,
+    });
+    pg.bonus_manuali = next;
+
+    schedaCloseSaveBonus();
+
+    // Aggiorna inline il valore TS visualizzato senza ricaricare tutta la scheda.
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const val = pg[abilityKey] || 10;
+    const m = Math.floor((val - 10) / 2);
+    const isProf = (pg.tiri_salvezza || []).includes(abilityKey);
+    const saveExtra = _getSaveBonusFor(pg, abilityKey);
+    const saveMod = m + (isProf ? bonusComp : 0) + saveExtra;
+    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+    const saveMark = saveExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+    const saveEl = document.getElementById(`sSave_${abilityKey}`);
+    if (saveEl) saveEl.innerHTML = `${saveStr}${saveMark}`;
+
+    await schedaInstantSave(pgId, { bonus_manuali: next });
+    showNotification(`TS ${labelOrKey(abilityKey)} aggiornato: ${saveStr}`);
+};
+
+function labelOrKey(k) {
+    return _ABILITY_LABELS[k] || k;
+}
 
 // =====================================================
 // MODAL Bonus Incantatore (Atk e DC separate)
@@ -10096,15 +10229,17 @@ window.schedaOpenSpellDcBonus = function(pgId, classiArg) {
 };
 
 function _bonusGroupRowHtml(gi, b, idx) {
-    const sign = b.valore >= 0 ? '+' : '';
+    const v = parseInt(b.valore) || 0;
     return `<div class="bonus-list-row" data-idx="${idx}">
-        <input type="text" class="bonus-list-name" placeholder="Nome (es. Bastone del Potere)" value="${escapeHtml(b.nome)}" maxlength="80">
+        <div class="bonus-list-row-top">
+            <input type="text" class="bonus-list-name" placeholder="Nome (es. Bastone del Potere)" value="${escapeHtml(b.nome)}" maxlength="80">
+            <button type="button" class="bonus-list-del" onclick="schedaBonusGroupDelete(${gi},${idx})" title="Rimuovi">×</button>
+        </div>
         <div class="bonus-list-val-row">
             <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},-1)">−</button>
-            <input type="number" class="bonus-list-val" value="${sign}${b.valore}" step="1">
+            <input type="number" class="bonus-list-val" value="${v}" step="1">
             <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},1)">+</button>
         </div>
-        <button type="button" class="bonus-list-del" onclick="schedaBonusGroupDelete(${gi},${idx})" title="Rimuovi">×</button>
     </div>`;
 }
 
@@ -10261,6 +10396,7 @@ window.schedaPreparedMaxReset = async function(pgId) {
     const next = _buildBonusManualiPayload({
         ca: bm.ca,
         incantatori: bm.incantatori,
+        tiri_salvezza: bm.tiri_salvezza,
         spells_prepared_max: 0,
     });
     pg.bonus_manuali = next;
@@ -10296,6 +10432,7 @@ window.schedaPreparedMaxConfirm = async function(pgId) {
     const next = _buildBonusManualiPayload({
         ca: bm.ca,
         incantatori: bm.incantatori,
+        tiri_salvezza: bm.tiri_salvezza,
         spells_prepared_max: stored,
     });
     pg.bonus_manuali = next;
@@ -10336,6 +10473,7 @@ window.schedaSpellCasterBonusConfirm = async function(pgId) {
     const next = _buildBonusManualiPayload({
         ca: bm.ca,
         incantatori: inc,
+        tiri_salvezza: bm.tiri_salvezza,
         spells_prepared_max: bm.spells_prepared_max,
     });
     pg.bonus_manuali = next;

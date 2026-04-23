@@ -565,10 +565,12 @@
 .scheda-ability-input { width: 48px; padding: 4px 4px; text-align: center; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
 .scheda-ability-input:active { border-color: var(--accent); }
 .scheda-ability-mod { font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: center; }
-.scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-sm); transition: background 0.15s; -webkit-tap-highlight-color: transparent; user-select: none; }
-@media (hover: hover) { .scheda-ability-save:hover { background: var(--surface-hover); } }
+.scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; padding: 2px 4px; border-radius: var(--radius-sm); -webkit-tap-highlight-color: transparent; user-select: none; }
 .scheda-ability-save.proficient { color: var(--accent); font-weight: 600; }
-.scheda-save-dot { font-size: 1rem; }
+.scheda-save-dot { font-size: 1rem; cursor: pointer; padding: 2px 3px; border-radius: 3px; transition: background 0.15s; }
+@media (hover: hover) { .scheda-save-dot:hover { background: var(--surface-hover); } }
+.scheda-save-clickable { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 5px; border-radius: var(--radius-sm); transition: background 0.15s; }
+@media (hover: hover) { .scheda-save-clickable:hover { background: var(--surface-hover); } }
 .scheda-save-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
 
 /* Stat Boxes */
@@ -2013,41 +2015,54 @@
 
 /* ----- Lista editabile di bonus singoli ----- */
 .hp-calc-modal.bonus-list-modal {
-    width: 420px;
+    width: min(560px, 94vw);
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 .bonus-list-section {
-    margin-top: 12px;
+    margin-top: 14px;
 }
 .bonus-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+.bonus-list-header > .bonus-modal-label {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
 }
 .bonus-list-total-label {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     color: var(--text-secondary, #ccc);
     font-weight: 600;
+    white-space: nowrap;
 }
 .bonus-list-total-label > span {
     color: var(--accent, #6c5ce7);
     font-weight: 800;
     margin-left: 4px;
+    font-size: 1rem;
 }
 .bonus-list-container {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 8px;
-    max-height: 38vh;
+    gap: 8px;
+    margin-bottom: 10px;
+    max-height: 42vh;
     overflow-y: auto;
     padding-right: 2px;
 }
 .bonus-list-empty {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     color: var(--text-light, #888);
     font-style: italic;
-    padding: 6px 8px;
+    padding: 10px;
     background: rgba(255,255,255,0.02);
     border: 1px dashed var(--border);
     border-radius: 6px;
@@ -2055,12 +2070,17 @@
 }
 .bonus-list-row {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 8px;
-    background: rgba(255,255,255,0.04);
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
+}
+.bonus-list-row-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 .bonus-list-name {
     flex: 1;
@@ -2068,42 +2088,55 @@
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
-    border-radius: 4px;
-    padding: 5px 7px;
-    font-size: 0.85rem;
+    border-radius: 5px;
+    padding: 9px 11px;
+    font-size: 0.95rem;
     box-sizing: border-box;
+    width: 100%;
+}
+.bonus-list-name:focus {
+    outline: none;
+    border-color: var(--accent, #6c5ce7);
 }
 .bonus-list-val-row {
     display: flex;
     align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
+    gap: 8px;
+    justify-content: center;
 }
 .bonus-list-val {
-    width: 56px;
+    width: 80px;
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
-    border-radius: 4px;
-    padding: 5px 4px;
+    border-radius: 5px;
+    padding: 8px 6px;
     text-align: center;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 800;
+    font-size: 1.05rem;
     box-sizing: border-box;
 }
+.bonus-list-val-row .bonus-modal-step {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+}
 .bonus-list-del {
-    width: 26px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
     background: transparent;
     border: 1px solid var(--border);
     color: #ef4444;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     line-height: 1;
     font-weight: 700;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .bonus-list-del:hover {
     background: rgba(239,68,68,0.15);
@@ -2112,16 +2145,16 @@
 .bonus-list-add-btn {
     display: block;
     width: 100%;
-    padding: 7px;
+    padding: 10px;
     background: transparent;
     border: 1px dashed var(--accent, #6c5ce7);
     color: var(--accent, #6c5ce7);
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.88rem;
+    font-weight: 700;
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 .bonus-list-add-btn:hover {
     background: rgba(108,92,231,0.1);
@@ -2129,14 +2162,14 @@
 .bonus-quick-btn {
     display: block;
     width: 100%;
-    padding: 9px;
-    margin-bottom: 8px;
+    padding: 11px;
+    margin-bottom: 10px;
     background: linear-gradient(135deg, rgba(96,165,250,0.15), rgba(96,165,250,0.05));
     border: 1px solid #60a5fa;
     color: #60a5fa;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
     text-align: center;
     transition: all 0.15s;
@@ -2146,8 +2179,8 @@
     transform: translateY(-1px);
 }
 .bonus-list-group {
-    margin: 12px 0;
-    padding: 10px 12px;
+    margin: 14px 0;
+    padding: 12px 14px;
     background: rgba(255,255,255,0.04);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -2156,12 +2189,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    gap: 10px;
 }
 .bonus-list-group-name {
     font-weight: 700;
     color: var(--accent, #6c5ce7);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .scheda-equip-table {

@@ -1,12 +1,24 @@
 -- Aggiunge la colonna 'bonus_manuali' alla tabella personaggi.
 -- Contiene i bonus inseriti manualmente dall'utente (non derivati da equip/regole).
--- Schema previsto:
+--
+-- Schema attuale (lista di bonus singoli con nome + valore):
 --   {
---     "ca": 0,                              -- bonus extra alla CA (es. anello di protezione)
---     "incantatori": {                       -- per ogni classe incantatrice
---       "Mago":   { "atk": 0, "dc": 0 },     -- bonus al tiro per colpire e alla CD incantesimi
---       "Bardo":  { "atk": 1, "dc": 0 }
---     }
+--     "ca": [
+--       { "nome": "Anello di Protezione", "valore": 1 },
+--       { "nome": "Mantello del Mago Battagliero", "valore": 1 }
+--     ],
+--     "incantatori": {
+--       "Mago":  { "atk": [{"nome":"Bastone del Potere","valore":2}],
+--                  "dc":  [{"nome":"Stella della Notte","valore":1}] },
+--       "Bardo": { "atk": [], "dc": [] }
+--     },
+--     "tiri_salvezza": {
+--       "destrezza":   [{"nome":"Mantello della Protezione","valore":1}],
+--       "saggezza":    [{"nome":"Privilegio di classe","valore":2}]
+--     },
+--     "spells_prepared_max": 0
 --   }
+--
+-- Schema legacy (numero singolo) viene migrato al volo dal client.
 -- Sicuro da rieseguire.
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS bonus_manuali JSONB DEFAULT '{}';
