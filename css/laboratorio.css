@@ -1474,6 +1474,24 @@
 .lab-import-actions {
     display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;
 }
+/* Pareggiamento di .btn-primary e .btn-secondary nella riga azioni del
+   dialog di import: il secondario ha un border 1px che lo rende piu'
+   alto di 2px del primario (che ha border:none) e ha anche un
+   margin-top di default. Riallineo entrambi e do la stessa altezza. */
+.lab-import-actions > .btn-primary,
+.lab-import-actions > .btn-secondary {
+    margin: 0;
+    width: auto;
+    min-width: 130px;
+    height: 40px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.lab-import-actions > .btn-primary { border: 1px solid transparent; }
 
 .lab-import-preview-head {
     display: flex; align-items: center; justify-content: space-between;
