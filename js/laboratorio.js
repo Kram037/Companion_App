@@ -272,7 +272,9 @@ function _labSubInitState(editData) {
                     recharge: f.risorsa.recharge || 'long_rest',
                     tipo: f.risorsa.tipo || 'counter',
                     dado: f.risorsa.dado || 'd6'
-                } : _labSubEmptyRisorsa()
+                } : _labSubEmptyRisorsa(),
+                grants_spells: Array.isArray(f.grants_spells) && f.grants_spells.length > 0,
+                spells: Array.isArray(f.grants_spells) ? f.grants_spells.slice() : []
             });
         }
     }
@@ -292,6 +294,10 @@ function _labSubInitState(editData) {
         }
     }
 
+    const grantedRows = Array.isArray(e.granted_spells) ? e.granted_spells.map(r => ({
+        level: parseInt(r.level) || 1,
+        spells: Array.isArray(r.spells) ? r.spells.slice() : []
+    })) : [];
     return {
         editingId: e.id || null,
         page: e.parent_class_slug ? 'setup' : 'pick-class',
@@ -300,7 +306,9 @@ function _labSubInitState(editData) {
         subclassName: e.nome || '',
         countsByLevel,
         features,
-        currentIdx: 0
+        currentIdx: 0,
+        grantsSpells: grantedRows.length > 0,
+        grantedSpellsByLevel: grantedRows
     };
 }
 
@@ -315,7 +323,9 @@ function _labSubMakeEmptyFeature(level, slotIdx) {
         nome: '',
         descrizione: '',
         has_resource: false,
-        risorsa: _labSubEmptyRisorsa()
+        risorsa: _labSubEmptyRisorsa(),
+        grants_spells: false,
+        spells: []
     };
 }
 
@@ -367,6 +377,8 @@ function _labSubRender() {
         mlg.innerHTML = _labSubRenderPickClass();
     } else if (_labSubState.page === 'setup') {
         mlg.innerHTML = _labSubRenderSetupPage();
+    } else if (_labSubState.page === 'spells') {
+        mlg.innerHTML = _labSubRenderSpellsPage();
     } else {
         _labSubRebuildFeatures();
         if (!_labSubState.features.length) {
@@ -380,13 +392,25 @@ function _labSubRender() {
 }
 
 function _labSubStepperHtml(active) {
-    const steps = ['Classe', 'Sottoclasse', 'Privilegi'];
+    const steps = ['Classe', 'Sottoclasse', 'Incantesimi', 'Privilegi'];
     return `<div class="lab-sub-stepper">${steps.map((s, i) => `
         <div class="lab-sub-stepper-item${i === active ? ' active' : ''}${i < active ? ' done' : ''}">
             <span class="lab-sub-stepper-num">${i + 1}</span>
             <span class="lab-sub-stepper-name">${s}</span>
         </div>
     `).join('')}</div>`;
+}
+
+// Helper: ordered list of all italian spell names from SPELLS_DATA (per autocomplete).
+function _labSubAllSpellNames() {
+    if (typeof window === 'undefined' || !window.SPELLS_DATA) return [];
+    return Object.keys(window.SPELLS_DATA).sort((a, b) => a.localeCompare(b, 'it'));
+}
+
+function _labSubSpellDatalistHtml() {
+    if (document.getElementById('labSubSpellDatalist')) return ''; // già presente
+    const opts = _labSubAllSpellNames().map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+    return `<datalist id="labSubSpellDatalist">${opts}</datalist>`;
 }
 
 function _labSubRenderPickClass() {
@@ -446,7 +470,61 @@ function _labSubRenderSetupPage() {
         <div class="lab-sub-actions">
             <div class="lab-sub-actions-row">
                 <button type="button" class="btn-secondary" onclick="labSubBackFromSetup()">Indietro</button>
-                <button type="button" class="btn-primary" id="labSubSetupNext" ${(_labSubState.subclassName || '').trim() ? '' : 'disabled'} onclick="labSubGoToFeatures()">Avanti</button>
+                <button type="button" class="btn-primary" id="labSubSetupNext" ${(_labSubState.subclassName || '').trim() ? '' : 'disabled'} onclick="labSubGoToSpells()">Avanti</button>
+            </div>
+        </div>`;
+}
+
+function _labSubRenderSpellsPage() {
+    const dlist = _labSubSpellDatalistHtml();
+    const lvls = _labSubLevelsForCurrentClass();
+    // Suggerimento: se l'utente non ha ancora aggiunto righe e attiva il toggle,
+    // pre-popoliamo con le tier dei privilegi della classe (es. paladino: 3,5,9,13,17),
+    // ma per semplicità inseriamo un set vuoto da popolare manualmente.
+    const rows = (_labSubState.grantedSpellsByLevel || []).map((row, i) => {
+        const spellInputs = (row.spells.length ? row.spells : ['']).map((sp, sIdx) => `
+            <div class="lab-sub-spell-input">
+                <input type="text" list="labSubSpellDatalist" placeholder="Nome incantesimo" value="${escapeHtml(sp || '')}"
+                       data-row="${i}" data-spell="${sIdx}" oninput="labSubSpellInputChange(${i}, ${sIdx}, this.value)">
+                <button type="button" class="lab-sub-spell-remove" onclick="labSubRemoveSpell(${i}, ${sIdx})" title="Rimuovi">×</button>
+            </div>
+        `).join('');
+        const lvOptions = Array.from({length: 20}, (_, k) => k + 1).map(lv => `<option value="${lv}" ${row.level === lv ? 'selected' : ''}>${lv}° livello</option>`).join('');
+        return `
+        <div class="lab-sub-spell-row" data-row="${i}">
+            <div class="lab-sub-spell-row-head">
+                <select class="lab-sub-spell-row-level" onchange="labSubSpellRowLevelChange(${i}, this.value)">${lvOptions}</select>
+                <button type="button" class="btn-secondary lab-sub-spell-row-remove" onclick="labSubRemoveSpellRow(${i})">Rimuovi livello</button>
+            </div>
+            <div class="lab-sub-spell-list">${spellInputs}</div>
+            <button type="button" class="lab-sub-spell-add" onclick="labSubAddSpellToRow(${i})">+ Aggiungi incantesimo</button>
+        </div>`;
+    }).join('');
+    const empty = `<p class="lab-sub-hint" style="margin:8px 0 0;">Nessuna progressione configurata. Clicca <strong>+ Aggiungi livello</strong> per definire gli incantesimi conferiti per livello (es. Paladino: 3°, 5°, 9°, 13°, 17°).</p>`;
+
+    return `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${escapeHtml(_labSubState.subclassName || _labSubState.parentName || 'Sottoclasse')}</h2>
+        ${_labSubStepperHtml(2)}
+        <div class="lab-sub-step-label">Progressione di incantesimi della sottoclasse</div>
+        <p class="lab-sub-hint" style="text-align:left;margin:0 0 8px;">Esempi: incantesimi di Dominio del Chierico, di Giuramento del Paladino, di Patrono del Warlock. Lascia vuoto se la sottoclasse non conferisce incantesimi automaticamente.</p>
+        <div class="form-group">
+            <label class="lab-sub-toggle">
+                <input type="checkbox" id="labSubGrantsSpells" ${_labSubState.grantsSpells ? 'checked' : ''} onchange="labSubToggleGrantsSpells(this.checked)">
+                <span>Questa sottoclasse conferisce incantesimi automaticamente</span>
+            </label>
+        </div>
+        ${_labSubState.grantsSpells ? `
+        <div class="wizard-page-scroll lab-sub-feature-scroll">
+            <div class="lab-sub-spell-rows">${rows || empty}</div>
+            <button type="button" class="lab-sub-spell-add-row" onclick="labSubAddSpellRow()">+ Aggiungi livello</button>
+        </div>
+        ${dlist}
+        ` : '<div style="height:8px;"></div>'}
+        <div class="lab-sub-actions">
+            <div class="lab-sub-actions-row">
+                <button type="button" class="btn-secondary" onclick="labSubBackFromSpells()">Indietro</button>
+                <button type="button" class="btn-primary" onclick="labSubGoToFeatures()">Avanti</button>
             </div>
         </div>`;
 }
@@ -523,10 +601,23 @@ function _labSubRenderFeaturePage() {
 
     const subTitle = `${escapeHtml(_labSubState.subclassName || _labSubState.parentName || 'Sottoclasse')}`;
     const progressBar = _labSubProgressBarHtml();
+    const featureSpells = (f.spells && f.spells.length ? f.spells : ['']).map((sp, sIdx) => `
+        <div class="lab-sub-spell-input">
+            <input type="text" list="labSubSpellDatalist" placeholder="Nome incantesimo" value="${escapeHtml(sp || '')}"
+                   data-feat-spell="${sIdx}" oninput="labSubFeatSpellInput(${sIdx}, this.value)">
+            <button type="button" class="lab-sub-spell-remove" onclick="labSubFeatSpellRemove(${sIdx})" title="Rimuovi">×</button>
+        </div>
+    `).join('');
+    const featureSpellsBlock = f.grants_spells ? `
+        <div class="lab-sub-resource-box">
+            <div class="lab-sub-step-label" style="margin-top:0;">Incantesimi conferiti da questo privilegio</div>
+            <div class="lab-sub-spell-list">${featureSpells}</div>
+            <button type="button" class="lab-sub-spell-add" onclick="labSubFeatSpellAdd()">+ Aggiungi incantesimo</button>
+        </div>` : '';
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
         <h2>${subTitle}</h2>
-        ${_labSubStepperHtml(2)}
+        ${_labSubStepperHtml(3)}
         ${progressBar}
         <div class="lab-sub-feature-header">
             <span class="lab-sub-feature-level">${f.level}° livello</span>
@@ -549,7 +640,15 @@ function _labSubRenderFeaturePage() {
                 </label>
             </div>
             ${resourceBlock}
+            <div class="form-group">
+                <label class="lab-sub-toggle">
+                    <input type="checkbox" id="labSubGrantsSpellsFeat" ${f.grants_spells ? 'checked' : ''} onchange="labSubToggleFeatSpells(this.checked)">
+                    <span>Questo privilegio conferisce incantesimi specifici</span>
+                </label>
+            </div>
+            ${featureSpellsBlock}
         </div>
+        ${_labSubSpellDatalistHtml()}
         <div class="lab-sub-actions">
             <div class="lab-sub-actions-row">
                 <button type="button" class="btn-secondary" onclick="labSubBack()">Indietro</button>
@@ -602,8 +701,25 @@ window.labSubBackFromSetup = function() {
     _labSubRender();
 };
 
-window.labSubGoToFeatures = function() {
+window.labSubGoToSpells = function() {
     _labSubReadSetupFromDOM();
+    if (!(_labSubState.subclassName || '').trim()) {
+        showNotification('Inserisci il nome della sottoclasse');
+        return;
+    }
+    _labSubState.page = 'spells';
+    _labSubRender();
+};
+
+window.labSubBackFromSpells = function() {
+    _labSubReadSpellsFromDOM();
+    _labSubState.page = 'setup';
+    _labSubRender();
+};
+
+window.labSubGoToFeatures = function() {
+    if (_labSubState.page === 'setup') _labSubReadSetupFromDOM();
+    if (_labSubState.page === 'spells') _labSubReadSpellsFromDOM();
     if (!(_labSubState.subclassName || '').trim()) {
         showNotification('Inserisci il nome della sottoclasse');
         return;
@@ -612,6 +728,94 @@ window.labSubGoToFeatures = function() {
     _labSubRebuildFeatures();
     _labSubState.currentIdx = 0;
     _labSubRender();
+};
+
+function _labSubReadSpellsFromDOM() {
+    if (!_labSubState || _labSubState.page !== 'spells') return;
+    const tg = document.getElementById('labSubGrantsSpells');
+    if (tg) _labSubState.grantsSpells = tg.checked;
+    // I valori dei singoli input vengono salvati on-the-fly dai loro handler.
+}
+
+window.labSubToggleGrantsSpells = function(checked) {
+    _labSubState.grantsSpells = checked;
+    if (checked && (!_labSubState.grantedSpellsByLevel || _labSubState.grantedSpellsByLevel.length === 0)) {
+        _labSubState.grantedSpellsByLevel = [{ level: (_labSubLevelsForCurrentClass()[0] || 1), spells: [''] }];
+    }
+    _labSubRender();
+};
+
+window.labSubAddSpellRow = function() {
+    if (!_labSubState.grantedSpellsByLevel) _labSubState.grantedSpellsByLevel = [];
+    const used = new Set(_labSubState.grantedSpellsByLevel.map(r => r.level));
+    let nextLv = 1;
+    for (let lv = 1; lv <= 20; lv++) { if (!used.has(lv)) { nextLv = lv; break; } }
+    _labSubState.grantedSpellsByLevel.push({ level: nextLv, spells: [''] });
+    _labSubRender();
+};
+
+window.labSubRemoveSpellRow = function(rowIdx) {
+    if (!_labSubState.grantedSpellsByLevel) return;
+    _labSubState.grantedSpellsByLevel.splice(rowIdx, 1);
+    _labSubRender();
+};
+
+window.labSubAddSpellToRow = function(rowIdx) {
+    const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
+    if (!row) return;
+    row.spells.push('');
+    _labSubRender();
+};
+
+window.labSubRemoveSpell = function(rowIdx, spellIdx) {
+    const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
+    if (!row) return;
+    row.spells.splice(spellIdx, 1);
+    if (row.spells.length === 0) row.spells.push('');
+    _labSubRender();
+};
+
+window.labSubSpellInputChange = function(rowIdx, spellIdx, val) {
+    const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
+    if (!row) return;
+    row.spells[spellIdx] = val;
+};
+
+window.labSubSpellRowLevelChange = function(rowIdx, val) {
+    const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
+    if (!row) return;
+    row.level = parseInt(val) || 1;
+};
+
+window.labSubToggleFeatSpells = function(checked) {
+    _labSubReadCurrentFromDOM();
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f) return;
+    f.grants_spells = checked;
+    if (checked && (!f.spells || f.spells.length === 0)) f.spells = [''];
+    _labSubRender();
+};
+
+window.labSubFeatSpellAdd = function() {
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f) return;
+    if (!f.spells) f.spells = [];
+    f.spells.push('');
+    _labSubRender();
+};
+
+window.labSubFeatSpellRemove = function(spellIdx) {
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f || !f.spells) return;
+    f.spells.splice(spellIdx, 1);
+    if (f.spells.length === 0) f.spells.push('');
+    _labSubRender();
+};
+
+window.labSubFeatSpellInput = function(spellIdx, val) {
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f || !f.spells) return;
+    f.spells[spellIdx] = val;
 };
 
 function _labSubReadSetupFromDOM() {
@@ -660,6 +864,8 @@ function _labSubReadCurrentFromDOM() {
         else if (rmm) f.risorsa.max = rmm.value === '' ? '' : (parseInt(rmm.value) || 0);
         const rd = document.getElementById('labSubResDado'); if (rd) f.risorsa.dado = rd.value;
     }
+    const gs = document.getElementById('labSubGrantsSpellsFeat');
+    if (gs) f.grants_spells = gs.checked;
 }
 
 window.labSubFieldChange = function() {
@@ -705,8 +911,8 @@ window.labSubBack = function() {
         _labSubState.currentIdx -= 1;
         _labSubRender();
     } else {
-        // Torna allo step di setup (nome + count per livello).
-        _labSubState.page = 'setup';
+        // Torna allo step degli incantesimi.
+        _labSubState.page = 'spells';
         _labSubRender();
     }
 };
@@ -748,8 +954,24 @@ window.labSaveSottoclasse = async function() {
                 };
                 if (r.tipo === 'dice_pool' || r.tipo === 'portent') out.risorsa.dado = r.dado || 'd6';
             }
+            if (f.grants_spells && Array.isArray(f.spells)) {
+                const cleanSpells = f.spells.map(s => (s || '').trim()).filter(Boolean);
+                if (cleanSpells.length) out.grants_spells = cleanSpells;
+            }
             return out;
         });
+
+    // Compatta gli incantesimi conferiti dalla sottoclasse (per livello).
+    let cleanGrantedSpells = [];
+    if (_labSubState.grantsSpells && Array.isArray(_labSubState.grantedSpellsByLevel)) {
+        cleanGrantedSpells = _labSubState.grantedSpellsByLevel
+            .map(r => ({
+                level: parseInt(r.level) || 1,
+                spells: (Array.isArray(r.spells) ? r.spells : []).map(s => (s || '').trim()).filter(Boolean)
+            }))
+            .filter(r => r.spells.length > 0)
+            .sort((a, b) => a.level - b.level);
+    }
 
     if (!AppState.currentUser?.uid) { showNotification('Errore: utente non trovato'); return; }
     const supabase = getSupabaseClient();
@@ -760,6 +982,7 @@ window.labSaveSottoclasse = async function() {
         parent_class_slug: _labSubState.parentSlug,
         parent_class_name: _labSubState.parentName,
         sottoclasse_features: cleanFeatures,
+        granted_spells: cleanGrantedSpells,
         updated_at: new Date().toISOString()
     };
 

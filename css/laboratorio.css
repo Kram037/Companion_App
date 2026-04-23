@@ -884,6 +884,112 @@
     background: rgba(125, 99, 240, 0.04);
 }
 
+/* Granted-spells UI (sottoclasse + per-feature) */
+.lab-sub-spell-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+.lab-sub-spell-row {
+    padding: 10px 12px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: rgba(125, 99, 240, 0.04);
+}
+.lab-sub-spell-row-head {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.lab-sub-spell-row-level {
+    flex: 0 0 auto;
+    min-width: 110px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+.lab-sub-spell-row-remove {
+    margin-left: auto;
+    margin-top: 0;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    width: auto;
+    flex: 0 0 auto;
+}
+.lab-sub-spell-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.lab-sub-spell-input {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.lab-sub-spell-input > input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+.lab-sub-spell-remove {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.lab-sub-spell-remove:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: #ef4444;
+}
+.lab-sub-spell-add {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.lab-sub-spell-add:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.lab-sub-spell-add-row {
+    margin-top: 12px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px dashed var(--accent);
+    background: rgba(125, 99, 240, 0.05);
+    color: var(--accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.lab-sub-spell-add-row:hover {
+    background: rgba(125, 99, 240, 0.1);
+}
+
 .lab-sub-actions {
     margin-top: 14px;
     display: flex;
@@ -902,20 +1008,28 @@
     flex: 1;
     padding: 10px 16px;
     line-height: 1.2;
-    min-height: 0;
+    /* Forza l'altezza esatta su entrambi (40px = 10px*2 padding + ~20px line-height) */
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+    margin: 0; /* annulla il margin-top di .btn-secondary che lo spinge giù */
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
-/* Normalizza altezza: btn-primary non ha border, btn-secondary sì.
-   Aggiungiamo un border trasparente al primary così entrambi hanno
-   lo stesso box-model e quindi stessa altezza verticale. */
+/* Allinea il box-model del primary a quello del secondary (che ha border 1px) */
 .lab-sub-actions-row > .btn-primary {
     border: 1px solid transparent;
 }
 .lab-sub-create-btn {
     border: 1px solid transparent;
+    height: 42px;
+    min-height: 42px;
+    box-sizing: border-box;
+    margin: 0;
 }
 .lab-sub-create-btn {
     width: 100%;
