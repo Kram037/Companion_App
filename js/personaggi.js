@@ -9549,7 +9549,33 @@ window.schedaOpenAddEquip = function(pgId) {
         'guerra_mischia': 'Armi da Mischia da Guerra',
         'guerra_distanza': 'Armi a Distanza da Guerra'
     };
-    const armiHtml = Object.entries(ARMA_CATS).map(([cat, label]) => {
+
+    // Sezione "Dal tuo Tesoro": oggetti magici/homebrew dell'inventario
+    // classificati come Arma/Armatura/Scudo. Cliccandoli si avvia un
+    // flusso di equip (con scelta del tipo D&D di base se ambiguo).
+    const invSplit = _schedaInvWeaponsArmors(_schedaPgCache);
+    const _invRowHtml = (handler, view, index) => {
+        const sub = view._homebrew_sotto_tipo || view.sotto_tipo || '';
+        const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+        const rar = view._homebrew_rarita || view.rarita || '';
+        const rarClass = _invRarityClass(rar);
+        const subText = [sub, rar].filter(Boolean).join(' · ') || 'Oggetto magico';
+        return `<div class="pg-talento-item pg-talento-item-treasure ${rarClass}" onclick="${handler}('${pgId}',${index})">
+            <span class="pg-talento-name">${escapeHtml(view.nome || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
+            <span class="option-source">${escapeHtml(subText)}</span>
+        </div>`;
+    };
+    const tesoroArmiHtml = invSplit.armi.length
+        ? `<div class="scheda-picker-cat">Dal tuo Tesoro</div>${
+            invSplit.armi.map(({ index, view }) => _invRowHtml('schedaAddArmaFromInventory', view, index)).join('')
+        }` : '';
+    const tesoroArmatureHtml = (invSplit.armature.length || invSplit.scudi.length)
+        ? `<div class="scheda-picker-cat">Dal tuo Tesoro</div>${
+            [...invSplit.scudi, ...invSplit.armature]
+                .map(({ index, view }) => _invRowHtml('schedaAddArmaturaFromInventory', view, index)).join('')
+        }` : '';
+
+    const armiHtml = tesoroArmiHtml + Object.entries(ARMA_CATS).map(([cat, label]) => {
         const items = DND_ARMI.filter(a => a.cat === cat).map(a =>
             `<div class="pg-talento-item" onclick="schedaAddArma('${pgId}','${escapeHtml(a.nome)}')">
                 <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
@@ -9565,7 +9591,7 @@ window.schedaOpenAddEquip = function(pgId) {
         'pesante': 'Armature Pesanti',
         'scudo': 'Scudi'
     };
-    const armatureHtml = ['leggera','media','pesante','scudo'].map(cat => {
+    const armatureHtml = tesoroArmatureHtml + ['leggera','media','pesante','scudo'].map(cat => {
         const label = ARMATURA_LABELS[cat];
         const items = DND_ARMATURE.filter(a => a.cat === cat).map(a =>
             `<div class="pg-talento-item" onclick="schedaAddArmatura('${pgId}','${escapeHtml(a.nome)}')">
@@ -9726,6 +9752,264 @@ window.schedaAddArmatura = async function(pgId, nome) {
     document.body.style.overflow = '';
     showNotification(`${arm.nome} equipaggiata — CA: ${newCA}`);
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Equipaggia direttamente un'arma/armatura/scudo presa dall'inventario
+// (oggetto magico SRD o homebrew). Se l'oggetto specifica univocamente
+// il tipo D&D di base (es. "spada lunga"), equipaggia subito; altrimenti
+// apre un picker per scegliere il tipo specifico (es. "qualsiasi spada").
+// Il bonus magico (+N) si propaga ad attacco/danni o alla CA.
+// ──────────────────────────────────────────────────────────────────────
+function _schedaInvWeaponsArmors(pg) {
+    const result = { armi: [], armature: [], scudi: [] };
+    if (!pg || !Array.isArray(pg.inventario)) return result;
+    pg.inventario.forEach((entry, index) => {
+        const view = (typeof window._invResolveLive === 'function')
+            ? window._invResolveLive(entry) : entry;
+        const tipo = view._homebrew_tipo || view.tipo || '';
+        const sub = (view._homebrew_sotto_tipo || view.sotto_tipo || '').toLowerCase();
+        const nameLow = (view.nome || '').toLowerCase();
+        if (tipo === 'Arma') {
+            result.armi.push({ index, view });
+        } else if (tipo === 'Scudo' || (tipo === 'Armatura' && sub.includes('scudo'))
+                || nameLow === 'scudo' || nameLow.startsWith('scudo ')) {
+            result.scudi.push({ index, view });
+        } else if (tipo === 'Armatura') {
+            result.armature.push({ index, view });
+        }
+    });
+    return result;
+}
+
+// Trova candidati nel dataset DND per il sotto_tipo dato. Restituisce
+// l'array di voci compatibili (potrebbe essere 0, 1 o N).
+function _schedaMatchDndCandidates(dataset, subRaw, opts = {}) {
+    if (!Array.isArray(dataset) || !dataset.length) return [];
+    const sub = (subRaw || '').toLowerCase().trim();
+    if (!sub) return [];
+    // 1) match esatto sul nome
+    const exact = dataset.filter(x => (x.nome || '').toLowerCase() === sub);
+    if (exact.length) return exact;
+    // 2) "qualsiasi X" o "X qualsiasi" -> match per parola chiave
+    const cleaned = sub.replace(/\b(qualsiasi|qualunque|ogni|tutte le|tutti gli)\b/g, '').trim();
+    // 3) per le armi: "spada", "ascia", "martello", ...
+    if (cleaned) {
+        const tokens = cleaned.split(/[\s,()\/]+/).filter(t => t && t.length >= 3);
+        if (tokens.length) {
+            const matches = dataset.filter(x => {
+                const n = (x.nome || '').toLowerCase();
+                return tokens.some(t => n.includes(t));
+            });
+            if (matches.length) return matches;
+        }
+    }
+    // 4) per le armature: matcha per categoria (leggera/media/pesante)
+    if (opts.armatura) {
+        const cats = ['leggera','media','pesante'].filter(c => sub.includes(c));
+        if (cats.length) {
+            return dataset.filter(x => cats.includes(x.cat) && x.cat !== 'scudo');
+        }
+    }
+    return [];
+}
+
+// Ricostruisce il "view" dell'oggetto inventario per index.
+function _schedaInvViewAt(pg, index) {
+    if (!pg || !Array.isArray(pg.inventario)) return null;
+    const entry = pg.inventario[index];
+    if (!entry) return null;
+    return (typeof window._invResolveLive === 'function')
+        ? window._invResolveLive(entry) : entry;
+}
+
+window.schedaAddArmaFromInventory = function(pgId, invIndex) {
+    const pg = _schedaPgCache;
+    const view = _schedaInvViewAt(pg, invIndex);
+    if (!view) return;
+    const sub = view._homebrew_sotto_tipo || view.sotto_tipo || '';
+    const armi = (typeof DND_ARMI !== 'undefined') ? DND_ARMI : [];
+    const candidates = _schedaMatchDndCandidates(armi, sub);
+    if (candidates.length === 1) {
+        return _schedaApplyInvArmaEquip(pgId, invIndex, candidates[0].nome);
+    }
+    _schedaPickInvWeaponBase(pgId, invIndex, candidates.length ? candidates : armi, view, sub);
+};
+
+window.schedaAddArmaturaFromInventory = function(pgId, invIndex) {
+    const pg = _schedaPgCache;
+    const view = _schedaInvViewAt(pg, invIndex);
+    if (!view) return;
+    const tipo = view._homebrew_tipo || view.tipo || '';
+    const sub = (view._homebrew_sotto_tipo || view.sotto_tipo || '').toLowerCase();
+    const nameLow = (view.nome || '').toLowerCase();
+    const armature = (typeof DND_ARMATURE !== 'undefined') ? DND_ARMATURE : [];
+    // Caso scudo: equipaggio subito lo scudo standard.
+    if (tipo === 'Scudo' || sub.includes('scudo') || nameLow === 'scudo' || nameLow.startsWith('scudo ')) {
+        const scudo = armature.find(a => a.cat === 'scudo');
+        if (!scudo) return;
+        return _schedaApplyInvArmaturaEquip(pgId, invIndex, scudo.nome);
+    }
+    const candidates = _schedaMatchDndCandidates(
+        armature.filter(a => a.cat !== 'scudo'),
+        sub,
+        { armatura: true }
+    );
+    if (candidates.length === 1) {
+        return _schedaApplyInvArmaturaEquip(pgId, invIndex, candidates[0].nome);
+    }
+    _schedaPickInvArmorBase(pgId, invIndex, candidates.length ? candidates : armature.filter(a => a.cat !== 'scudo'), view, sub);
+};
+
+function _schedaPickInvWeaponBase(pgId, invIndex, candidates, view, subRaw) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+    const groups = {};
+    for (const o of candidates) {
+        const k = o.cat || 'altro';
+        (groups[k] = groups[k] || []).push(o);
+    }
+    const groupOrder = ['semplice_mischia','semplice_distanza','guerra_mischia','guerra_distanza'];
+    const groupLabels = {
+        semplice_mischia: 'Semplici da Mischia',
+        semplice_distanza: 'Semplici a Distanza',
+        guerra_mischia: 'Da Guerra (Mischia)',
+        guerra_distanza: 'Da Guerra (Distanza)',
+    };
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+        const ai = groupOrder.indexOf(a); const bi = groupOrder.indexOf(b);
+        return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    const body = sortedKeys.map(k => {
+        const rows = groups[k].map(o => `<button type="button" class="generic-magic-type-row"
+            onclick="_schedaApplyInvArmaEquip('${pgId}',${invIndex},'${escapeHtml(o.nome).replace(/'/g, "\\'")}')">
+            <span class="generic-magic-type-name">${escapeHtml(o.nome)}</span>
+            <span class="generic-magic-type-sub">${escapeHtml(`${o.danni} ${o.tipo_danno}`)}</span>
+        </button>`).join('');
+        return `<div class="generic-magic-group-label">${escapeHtml(groupLabels[k] || k)}</div>${rows}`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">${escapeHtml(view.nome || 'Arma')}${ench ? ' +' + ench : ''}</h3>
+        <p class="generic-magic-sub">Scegli il tipo di arma di base${subRaw ? ` (${escapeHtml(subRaw)})` : ''}</p>
+        <div class="generic-magic-type-list">${body}</div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+function _schedaPickInvArmorBase(pgId, invIndex, candidates, view, subRaw) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+    const groups = {};
+    for (const o of candidates) {
+        const k = o.cat || 'altro';
+        (groups[k] = groups[k] || []).push(o);
+    }
+    const groupOrder = ['leggera','media','pesante'];
+    const groupLabels = {
+        leggera: 'Armatura Leggera',
+        media: 'Armatura Media',
+        pesante: 'Armatura Pesante',
+    };
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+        const ai = groupOrder.indexOf(a); const bi = groupOrder.indexOf(b);
+        return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    const body = sortedKeys.map(k => {
+        const rows = groups[k].map(o => `<button type="button" class="generic-magic-type-row"
+            onclick="_schedaApplyInvArmaturaEquip('${pgId}',${invIndex},'${escapeHtml(o.nome).replace(/'/g, "\\'")}')">
+            <span class="generic-magic-type-name">${escapeHtml(o.nome)}</span>
+            <span class="generic-magic-type-sub">CA ${o.ca_base} · ${escapeHtml(o.cat)}</span>
+        </button>`).join('');
+        return `<div class="generic-magic-group-label">${escapeHtml(groupLabels[k] || k)}</div>${rows}`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">${escapeHtml(view.nome || 'Armatura')}${ench ? ' +' + ench : ''}</h3>
+        <p class="generic-magic-sub">Scegli il tipo di armatura di base${subRaw ? ` (${escapeHtml(subRaw)})` : ''}</p>
+        <div class="generic-magic-type-list">${body}</div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const pg = _schedaPgCache;
+    const view = _schedaInvViewAt(pg, invIndex);
+    if (!pg || !view) return;
+    const arma = DND_ARMI.find(a => a.nome === dndArmaNome);
+    if (!arma) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    const profBonus = 2;
+    const modFor = calcMod(pg.forza || 10);
+    const modDes = calcMod(pg.destrezza || 10);
+    const isFinesse = arma.proprieta.some(p => p.includes('Accurata'));
+    const isRanged = arma.cat.includes('distanza');
+    const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
+    const dmgMod = atkMod;
+    const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+    const displayName = ench ? `${view.nome} (${arma.nome})` : `${view.nome} (${arma.nome})`;
+    pg.equipaggiamento.push({
+        nome: displayName,
+        tipo: 'arma',
+        danni: arma.danni,
+        tipo_danno: arma.tipo_danno,
+        proprieta: arma.proprieta,
+        bonus_colpire: profBonus + atkMod + ench,
+        bonus_danno: dmgMod + ench,
+        magic_bonus: ench,
+        from_inventory_index: invIndex,
+    });
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${view.nome} equipaggiata`);
+};
+
+window._schedaApplyInvArmaturaEquip = async function(pgId, invIndex, dndArmNome) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const pg = _schedaPgCache;
+    const view = _schedaInvViewAt(pg, invIndex);
+    if (!pg || !view) return;
+    const arm = DND_ARMATURE.find(a => a.nome === dndArmNome);
+    if (!arm) return;
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    const isShield = arm.cat === 'scudo';
+    if (!isShield) {
+        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.tipo !== 'armatura');
+    } else {
+        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.tipo !== 'scudo');
+    }
+    const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+    const displayName = `${view.nome} (${arm.nome})`;
+    pg.equipaggiamento.push({
+        nome: displayName,
+        tipo: isShield ? 'scudo' : 'armatura',
+        ca_base: arm.ca_base + ench,
+        categoria: arm.cat,
+        mod_des: arm.mod_des,
+        max_des: arm.max_des,
+        magic_bonus: ench,
+        from_inventory_index: invIndex,
+    });
+    const newCA = calcCAFromEquip(pg);
+    pg.classe_armatura = newCA;
+    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA });
+    renderSchedaPersonaggio(pgId);
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    showNotification(`${view.nome} equipaggiata — CA: ${newCA}`);
+};
 
 window.schedaRemoveEquip = async function(pgId, index) {
     const pg = _schedaPgCache;

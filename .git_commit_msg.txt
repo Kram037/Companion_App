@@ -1,0 +1,16 @@
+feat(equip): equipaggia armi/armature/scudi dal tesoro (anche homebrew)
+
+Nella modal Aggiungi Equipaggiamento i tab Armi e Armature mostrano in
+testa una sezione "Dal tuo Tesoro" con tutti gli oggetti dell'inventario
+classificati come Arma / Armatura / Scudo, sia oggetti magici SRD che
+homebrew.
+
+- _schedaInvWeaponsArmors(pg): split inventario per categoria d'equip
+- match euristico DND_ARMI / DND_ARMATURE per sotto_tipo (es. "spada
+  lunga" -> diretto, "qualsiasi spada" -> picker filtrato per parola)
+- se la base e' univoca: equip diretto; altrimenti picker scelta tipo
+- gli scudi (tipo Scudo o sotto_tipo "scudo") si equipaggiano subito
+- bonus magico (+N) propagato a colpire/danni o alla CA
+- nome equipaggiato: "Nome Magico (Tipo Base)"
+- stile .pg-talento-item-treasure con bordo sx colorato per rarita'
+- cache bust personaggi.js / .css -> 20260228B
