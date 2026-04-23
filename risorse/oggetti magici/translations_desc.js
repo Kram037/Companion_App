@@ -856,4 +856,1402 @@ module.exports = {
         descrizione_it:
 "Ottieni un bonus di +1 alla CA mentre indossi questa armatura. Sei considerato competente con questa armatura anche se non hai competenza in armature medie.",
     },
+
+    // ── Voci C residue (candele e accessori) ───────────────────────────
+    'candle-of-invocation': {
+        descrizione_it:
+"Questo cero affusolato è dedicato a una divinità e ne condivide l'allineamento. L'allineamento della candela può essere rilevato con l'incantesimo Individuazione del Bene e del Male. Il DM sceglie il dio e l'allineamento associato o lo determina casualmente (vedi tabella d20).\n\n" +
+"La magia della candela si attiva quando viene accesa, cosa che richiede un'azione. Dopo aver bruciato per 4 ore, la candela viene distrutta. Puoi spegnerla in anticipo per usarla in un secondo momento, sottraendo il tempo bruciato in incrementi di 1 minuto dalla durata totale.\n\n" +
+"Mentre è accesa, la candela emana luce fioca entro 9 metri. Qualsiasi creatura entro quella luce il cui allineamento corrisponda a quello della candela effettua i tiri per colpire, i tiri salvezza e le prove di caratteristica con vantaggio. Inoltre, un chierico o druido nella luce con allineamento corrispondente può lanciare incantesimi di 1° livello che ha preparato senza spendere slot incantesimo, anche se l'effetto è come lanciato con slot di 1° livello.\n\n" +
+"In alternativa, quando accendi la candela per la prima volta, puoi lanciare l'incantesimo Cancello con essa. Farlo distrugge la candela.",
+    },
+    'candle-of-the-deep': {
+        descrizione_it:
+"La fiamma di questa candela non si estingue quando viene immersa nell'acqua. Emana luce e calore come una candela normale.",
+    },
+    'cap-of-water-breathing': {
+        descrizione_it:
+"Mentre indossi questo cappuccio sott'acqua, puoi pronunciarne la parola di comando con un'azione per creare una bolla d'aria attorno alla tua testa. Ti permette di respirare normalmente sott'acqua. La bolla rimane con te finché non pronunci di nuovo la parola di comando, finché il cappuccio non viene rimosso, o finché non sei più sott'acqua.",
+    },
+    'cape-of-the-mountebank': {
+        descrizione_it:
+"Questo mantello emana un debole odore di zolfo. Mentre lo indossi, puoi usarlo per lanciare l'incantesimo Porta Dimensionale con un'azione. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Quando scompari, lasci dietro di te una nuvola di fumo e appari in una nuvola di fumo simile a destinazione. Il fumo oscura leggermente lo spazio che hai lasciato e quello in cui appari, dissipandosi alla fine del tuo prossimo turno. Un vento leggero o più forte disperde il fumo.",
+    },
+    'card-sharp-s-deck': {
+        descrizione_it:
+"Le carte di questo mazzo brillano lungo i bordi. Mentre lo tieni, puoi usare le seguenti proprietà:\n\n" +
+"Affare Mortale. Con un'azione, puoi usare questo mazzo per effettuare un attacco con incantesimo a distanza lanciando una carta spettrale e usando Destrezza per il tiro per colpire. La carta ha gittata di 36 metri e infligge 1d8 danni da forza con un colpo.\n\n" +
+"Pioggia di Carte. Con un'azione, puoi mescolare il mazzo e lanciare l'incantesimo Pioggia di Carte al 3° livello dal mazzo (CD 15). Una volta che il mazzo ha lanciato l'incantesimo, non può lanciarlo di nuovo fino all'alba successiva.",
+    },
+    'carpet-of-flying': {
+        descrizione_it:
+"Puoi pronunciare la parola di comando del tappeto con un'azione per farlo librare e volare. Si muove secondo le tue direzioni vocali, purché tu sia entro 9 metri da esso.\n\n" +
+"Esistono quattro taglie di tappeto volante. Il DM ne sceglie la taglia o la determina casualmente:\n" +
+"- 1×1,5 m: capacità 90 kg, velocità di volo 24 m\n" +
+"- 1,2×1,8 m: capacità 180 kg, velocità di volo 18 m\n" +
+"- 1,5×2,1 m: capacità 270 kg, velocità di volo 12 m\n" +
+"- 1,8×2,7 m: capacità 360 kg, velocità di volo 9 m\n\n" +
+"Un tappeto può portare fino al doppio del peso indicato in tabella, ma vola a metà velocità se trasporta più della sua capacità normale.",
+    },
+
+    // ── Batch E residui ────────────────────────────────────────────────
+    'emerald-pen': {
+        descrizione_it:
+"Questa penna ha un pennino di smeraldo e non richiede inchiostro per scrivere. Mentre la tieni, puoi lanciare a volontà Scrittura Illusoria, senza componenti materiali.",
+    },
+    'enduring-spellbook': {
+        descrizione_it:
+"Questo libro degli incantesimi, e tutto ciò che è scritto sulle sue pagine, non può essere danneggiato dal fuoco o dall'immersione in acqua. Inoltre, il libro non si deteriora con l'età.",
+    },
+    'ersatz-eye': {
+        descrizione_it:
+"Questo occhio artificiale sostituisce uno reale che è andato perduto o è stato rimosso. Mentre l'occhio surrogato è incassato nella tua orbita, non può essere rimosso da nessuno tranne te, e puoi vedere attraverso il piccolo globo come se fosse un occhio normale.",
+    },
+    'euryale-s-aegis': {
+        descrizione_it:
+"Questo lucente scudo di ottone reca un rilievo della leggendaria druida medusa Euriale.\n\n" +
+"Mentre impugni questo scudo ottieni i seguenti benefici:\n\n" +
+"Benedizione di Euriale. Hai resistenza ai danni da veleno e sei immune alla condizione di pietrificato.\n\n" +
+"Araldica Pietrificante. Con un'azione bonus, puoi far divampare il fronte dello scudo con la magia pietrificante di una medusa, facendo brillare gli occhi del rilievo. Scegli una creatura che vedi entro 9 metri da te. La creatura deve riuscire in un tiro salvezza su Costituzione con CD 20, o ottiene la condizione di trattenuto mentre il suo corpo si trasforma in pietra. La creatura trattenuta deve effettuare un altro tiro salvezza su Costituzione con CD 20 all'inizio del suo prossimo turno. Se fallisce, ottiene la condizione di pietrificato per 24 ore. Se ha successo, la condizione di trattenuto termina. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Incantesimi. Mentre impugni lo scudo, puoi usare un'azione per lanciare uno dei seguenti incantesimi: Ristorare Inferiore, Localizzare Creatura, Trasporto Vegetale. Una volta usato per lanciare un incantesimo, lo scudo non può lanciare quell'incantesimo di nuovo fino all'alba successiva.",
+    },
+    'eversmoking-bottle': {
+        descrizione_it:
+"Da questa bottiglia di ottone fuoriesce continuamente una densa nuvola di fumo che oscura completamente le aree entro 18 metri. La nuvola persiste finché la bottiglia rimane aperta. Chiudere la bottiglia richiede di pronunciarne la parola di comando con un'azione. Una volta chiusa, la nuvola si dissolve dopo 10 minuti. Un vento moderato (18-32 km/h) può disperdere il fumo dopo 1 minuto, e un vento forte (33+ km/h) dopo 1 round.",
+    },
+    'eye-and-hand-of-vecna': {
+        descrizione_it:
+"Pochi pronunciano il suo nome senza paura o sussurri. Egli era il Sussurrato, il Maestro del Trono Ragno, il Re Senza Morte e il Signore della Torre Putrefatta. Si dice che il luogotenente di Vecna, Kas, bramasse il Trono Ragno per sé, o che la spada che il suo signore forgiò per lui lo sedusse alla ribellione. Qualunque sia la ragione, Kas pose fine al regno del Re Senza Morte in una terribile battaglia che lasciò la torre di Vecna ridotta a un cumulo di cenere. Di Vecna rimasero solo una mano e un occhio, raccapriccianti artefatti che ancora cercano di compiere la volontà del Sussurrato.\n\n" +
+"L'Occhio e la Mano di Vecna possono essere trovati insieme o separatamente. L'occhio appare come un organo iniettato di sangue strappato dalla sua orbita. La mano è un'estremità sinistra mummificata e raggrinzita.\n\n" +
+"Per sintonizzarti con l'occhio, devi cavarti il tuo stesso occhio e premere l'artefatto nell'orbita vuota. L'occhio si innesta sulla tua testa e vi rimane finché non muori. Una volta in posizione, si trasforma in un occhio dorato con pupilla a fessura. Se l'occhio viene mai rimosso, muori.\n\n" +
+"Per sintonizzarti con la mano, devi mozzarti la mano sinistra al polso e premere l'artefatto contro il moncone. La mano si innesta al tuo braccio e diventa un'appendice funzionante. Se la mano viene mai rimossa, muori.\n\n" +
+"Proprietà Casuali. L'Occhio e la Mano di Vecna hanno ciascuno: 1 proprietà benefica minore, 1 proprietà benefica maggiore, 1 proprietà dannosa minore.\n\n" +
+"Proprietà dell'Occhio. Il tuo allineamento cambia in neutrale malvagio. Hai vista vera. Puoi usare un'azione per vedere come se indossassi un anello di vista a raggi X (terminabile come azione bonus). L'occhio ha 8 cariche; con un'azione e spendendo cariche puoi lanciare (CD 18): Chiaroveggenza (2), Corona della Pazzia (1), Disintegrazione (4), Dominare Mostro (5), Occhio Malvagio (4). Recupera 1d4+4 cariche all'alba. Ogni volta che lanci un incantesimo dall'occhio, c'è 5% di probabilità che Vecna ti strappi l'anima dal corpo, la divori e prenda il controllo del tuo corpo come una marionetta — diventi un PNG sotto il controllo del DM.\n\n" +
+"Proprietà della Mano. Il tuo allineamento cambia in neutrale malvagio. Il tuo punteggio di Forza diventa 20, a meno che non sia già 20 o superiore. La mano consente di lanciare diversi incantesimi simili all'occhio (vedi descrizione completa nel manuale). Anch'essa ha la possibilità che Vecna prenda controllo.\n\n" +
+"Distruggere l'Occhio e la Mano. Se entrambi sono detenuti dalla stessa creatura e quella creatura viene uccisa con la spada di Kas, sia l'occhio che la mano vengono distrutti.",
+    },
+    'eyes-of-charming': {
+        descrizione_it:
+"Queste lenti di cristallo si applicano sopra gli occhi e hanno 3 cariche. Mentre le indossi, puoi spendere 1 carica con un'azione per lanciare l'incantesimo Charme su Persone (CD 13) su un umanoide entro 9 metri da te, purché tu e l'umanoide possiate vedervi. Le lenti recuperano tutte le cariche spese ogni giorno all'alba.",
+    },
+    'eyes-of-minute-seeing': {
+        descrizione_it:
+"Queste lenti di cristallo si applicano sopra gli occhi. Mentre le indossi, puoi vedere molto meglio del normale a 30 cm o meno. Hai vantaggio alle prove di Intelligenza (Indagare) effettuate cercando un'area o studiando un oggetto entro quella distanza.",
+    },
+    'eyes-of-the-eagle': {
+        descrizione_it:
+"Queste lenti di cristallo si applicano sopra gli occhi. Mentre le indossi, hai vantaggio alle prove di Saggezza (Percezione) basate sulla vista. In condizioni di luce adeguate, puoi distinguere creature ed oggetti molto distanti larghi anche solo 60 cm.",
+    },
+
+    // ── Batch F ────────────────────────────────────────────────────────
+    'fabulist-gem': {
+        descrizione_it:
+"Questa gemma rossa scintillante si trova comunemente incastonata in un anello o spilla. Mentre indossi la gemma, ottieni i seguenti benefici:\n\n" +
+"Monete Contraffatte. Puoi usare un'azione per creare magicamente un mucchio di monete, del valore complessivo non superiore a 100 mo, in uno spazio libero entro 3 metri da te. Il mucchio deve apparire su una superficie che possa sostenerlo. Dopo 1 ora, le monete svaniscono. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Moda Illusoria. Con un'azione bonus, puoi cambiare magicamente l'aspetto dei tuoi vestiti e armatura. Puoi cambiare lo stile, il colore e la qualità apparente di ciò che indossi, oppure farlo apparire come abiti completamente diversi. In ogni caso, i cambiamenti non superano un'ispezione fisica.",
+    },
+    'far-realm-shard': {
+        descrizione_it:
+"Questo cristallo contorto è impregnato dell'essenza distorta del Reame Lontano. Con un'azione, puoi attaccare la scheggia a un oggetto Minuscolo o staccarla. Cade se la sintonia termina. Puoi usare la scheggia come focus per incantesimi mentre la tieni o la indossi.\n\n" +
+"Quando usi un'opzione di Metamagia su un incantesimo mentre tieni o indossi la scheggia, puoi far emergere un viscido tendrillo dalla trama della realtà che colpisce una creatura che vedi entro 9 metri da te. La creatura deve riuscire in un tiro salvezza su Carisma contro la CD del tuo incantesimo o subire 3d6 danni psichici e diventare spaventata da te fino all'inizio del tuo prossimo turno.",
+    },
+    'fate-cutter-shears': {
+        descrizione_it:
+"Le lame di queste forbici da potatura recano molte tacche e ammaccature ma tagliano ancora pulitamente. Le forbici funzionano come pugnale magico. L'arma ha le seguenti proprietà:\n\n" +
+"Sempre Affilate. Quando colpisci con un attacco usando le forbici, il bersaglio subisce ulteriori 1d6 danni da forza.\n\n" +
+"Recidi Fili. Quando colpisci una creatura con le forbici, puoi tagliare il suo destino. Finché il bersaglio non termina un riposo lungo, i tiri per colpire contro di esso ottengono un colpo critico con un risultato di 19 o 20 al d20. Non riutilizzabile fino all'alba successiva.",
+    },
+    'fate-dealer-s-deck': {
+        descrizione_it:
+"Il dorso di queste carte è inciso con glifi che rappresentano i Piani Interni, i Piani Esterni o i simboli sacri di varie divinità. Mentre tieni questo mazzo, puoi usarlo come focus per incantesimi, e ottieni un bonus ai tiri per colpire con incantesimo e alla CD dei tuoi incantesimi. Il bonus è determinato dalla rarità del mazzo.\n\n" +
+"Inoltre, mentre tieni il mazzo, puoi estrarre una carta con un'azione per spendere e tirare uno dei tuoi Dadi Vita e aggiungere il bonus del mazzo al numero ottenuto. Una creatura che vedi entro 9 metri da te subisce danni radianti o recupera punti ferita (a tua scelta) pari al totale.\n\n" +
+"Rarità | Bonus\n" +
+"Raro | +1\n" +
+"Molto Raro | +2\n" +
+"Leggendario | +3",
+    },
+    'feywild-shard': {
+        descrizione_it:
+"Questo cristallo caldo brilla con i colori del tramonto del cielo del Reame Fatato ed evoca sussurri di memorie emotive. Con un'azione, puoi attaccare la scheggia a un oggetto Minuscolo o staccarla. Cade se la sintonia termina. Puoi usare la scheggia come focus per incantesimi mentre la tieni o la indossi.\n\n" +
+"Quando usi un'opzione di Metamagia su un incantesimo mentre tieni o indossi la scheggia, puoi tirare sulla tabella di Surge di Magia Selvaggia del Manuale del Giocatore. Se il risultato è un incantesimo, è troppo selvaggio per essere influenzato dalla tua Metamagia, e se richiede normalmente concentrazione, in questo caso non la richiede; l'incantesimo dura per la sua intera durata.\n\n" +
+"Se non hai l'Origine Stregonesca della Magia Selvaggia, una volta usata questa proprietà non può essere riutilizzata fino all'alba successiva.",
+    },
+    'feywrought-armor': {
+        descrizione_it:
+"Questa armatura colorata e floreale è stata forgiata nel Reame Fatato ed è infusa con la magia accattivante di quel piano.\n\n" +
+"Mentre indossi questa armatura, hai vantaggio ai tiri salvezza per evitare o terminare la condizione di affascinato su di te.\n\n" +
+"L'armatura ha 3 cariche. Puoi usare un'azione per spendere una carica per lanciare l'incantesimo Compulsione (CD 15) da quest'armatura. Recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'figurine-of-wondrous-power': {
+        descrizione_it:
+"Una Statuetta di Potere Meraviglioso è una figurina di una bestia abbastanza piccola da entrare in tasca. Se usi un'azione per pronunciarne la parola di comando e lanciarla in un punto a terra entro 18 metri da te, la statuetta diventa una creatura vivente. Se lo spazio è occupato o non c'è abbastanza spazio, la statuetta non si trasforma.\n\n" +
+"La creatura è amichevole verso di te e i tuoi compagni, comprende le tue lingue e obbedisce ai tuoi comandi. Se non emetti comandi, si difende ma non compie altre azioni. Esiste per una durata specifica per ogni statuetta. Alla fine, torna alla forma di statuetta. Torna anticipatamente se scende a 0 pf o se usi un'azione per pronunciare di nuovo la parola di comando toccandola. Quando torna statuetta, non riutilizzabile finché non passa un certo tempo.\n\n" +
+"Tipi noti: Grifone di Bronzo (Raro, fino a 6 ore, ricarica 5 giorni); Mosca d'Ebano (Raro, fino a 12 ore, ricarica 2 giorni); Leoni d'Oro (Raro, sempre in coppia, fino a 1 ora, ricarica 7 giorni); Capre d'Avorio (Raro, set di tre, vedi descrizione completa); Elefante di Marmo (Raro, fino a 24 ore, ricarica 7 giorni); Destriero d'Ossidiana (Molto Raro, diventa cavallo da incubo per 24 ore, ricarica 5 giorni; rischia di trasportarti su Hades); Cane d'Onice (Raro, mastino con Int 8 e scurovisione, fino a 6 ore, ricarica 7 giorni); Civetta Serpentina (Raro, civetta gigante, fino a 8 ore, ricarica 2 giorni); Corvo d'Argento (Non Comune, corvo, fino a 12 ore, ricarica 2 giorni).",
+    },
+    'figurine-of-wondrous-power-gold-canary': {
+        descrizione_it:
+"Variante leggendaria della Statuetta di Potere Meraviglioso aggiunta in Fizban's Treasury of Dragons.\n\n" +
+"Forma di Canarino Gigante. La statuetta diventa un canarino gigante (vedi blocco statistiche associato) per un massimo di 8 ore e può essere cavalcato come cavalcatura. Una volta diventata canarino gigante, non riutilizzabile fino all'alba successiva.\n\n" +
+"Forma di Drago d'Oro. Mentre ti mancano metà o più dei punti ferita, puoi pronunciare una parola di comando diversa e la statuetta diventa un drago d'oro adulto per un massimo di 1 ora. Il drago non può usare azioni leggendarie o azioni di tana. Una volta diventata drago d'oro adulto, non riutilizzabile fino a 1 anno successivo.\n\n" +
+"Canarino Gigante: bestia Grande non allineata, CA 12 (armatura naturale), 26 pf (4d10+4), velocità 9m, volo 18m, FOR 10, DES 14, COS 12, INT 2, SAG 10, CAR 6. Attacco Beccata: +4 al colpo, gittata 1,5 m, 1d10+2 perforanti.",
+    },
+    'flail-of-tiamat': {
+        descrizione_it:
+"Questo flagello magico è realizzato a immagine di Tiamat, con cinque teste frastagliate a forma delle teste di cinque diversi draghi cromatici. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con questo flagello. Quando colpisci con un tiro per colpire usandolo, il bersaglio subisce ulteriori 5d4 danni di un tipo a tua scelta tra acido, freddo, fuoco, fulmine o veleno.\n\n" +
+"Mentre tieni il flagello, puoi usare un'azione e pronunciare una parola di comando per far soffiare alle teste fiamme multicolori in un cono di 27 metri. Ogni creatura nell'area deve effettuare un tiro salvezza su Destrezza con CD 18. Se fallisce, subisce 14d6 danni di uno dei tipi a tua scelta (acido, freddo, fuoco, fulmine o veleno); se ha successo, ne subisce metà. Non riutilizzabile fino all'alba successiva.",
+    },
+    'flame-tongue': {
+        descrizione_it:
+"Puoi usare un'azione bonus per pronunciare la parola di comando di questa spada magica, facendo divampare fiamme dalla lama. Queste fiamme emanano luce intensa entro 12 metri e luce fioca per ulteriori 12 metri. Mentre la spada è infiammata, infligge ulteriori 2d6 danni da fuoco a qualsiasi bersaglio colpito. Le fiamme durano finché non usi un'azione bonus per pronunciare di nuovo la parola di comando o finché non lasci cadere o riponi la spada.",
+    },
+    'folding-boat': {
+        descrizione_it:
+"Questo oggetto appare come una scatola di legno di 30 cm di lunghezza, 15 cm di larghezza e 15 cm di profondità. Pesa 2 kg e galleggia. Può essere aperta per riporvi oggetti. Ha tre parole di comando, ciascuna usabile con un'azione.\n\n" +
+"La prima parola di comando fa dispiegare la scatola in una barca lunga 3 metri, larga 1,2 m e profonda 60 cm, con un paio di remi, un'ancora, un albero e una vela latina. La barca può ospitare comodamente fino a quattro creature Medie.\n\n" +
+"La seconda parola di comando fa dispiegare la scatola in una nave lunga 7,2 m, larga 2,4 m e profonda 1,8 m, con ponte, sedili da rematori, cinque coppie di remi, un timone, un'ancora, una cabina e un albero con vela quadra. Può ospitare comodamente quindici creature Medie.\n\n" +
+"Quando la scatola diventa un'imbarcazione, il suo peso diventa quello di un'imbarcazione normale di quelle dimensioni, e qualsiasi cosa fosse riposta nella scatola rimane nella barca.\n\n" +
+"La terza parola di comando fa ripiegare la barca nella scatola, purché non vi siano creature a bordo. Gli oggetti che non possono entrare nella scatola rimangono fuori.",
+    },
+    'fool-s-blade': {
+        descrizione_it:
+"Quest'arma appare ordinaria, ma reca una potente magia di illusione che permette al portatore di ingannare abilmente gli avversari.\n\n" +
+"Hai un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica. Mentre la impugni ottieni anche i seguenti benefici:\n\n" +
+"Finta del Folle. Con un'azione bonus, puoi fintare scegliendo come bersaglio una creatura entro 1,5 metri da te. Fino all'inizio del tuo prossimo turno, hai vantaggio ai tiri per colpire contro il bersaglio. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Sviare. Quando una creatura entro 18 metri da te ti bersaglia con un tiro per colpire, puoi usare la reazione per richiederle un tiro salvezza su Intelligenza con CD 15. Se fallisce, l'attacco bersaglia invece un'altra creatura a tua scelta entro la portata dell'attaccante. Non riutilizzabile fino all'alba successiva.",
+    },
+    'forcebreaker-weapon': {
+        descrizione_it:
+"Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica.\n\n" +
+"Quest'arma è stata creata per distruggere le strutture fatte di forza, come quelle create da Gabbia di Forza o Muro di Forza. Colpire una struttura di forza magica Grande o inferiore con quest'arma frantuma automaticamente quella struttura. Se il bersaglio è una struttura di forza Enorme o più grande, l'arma frantuma una porzione cubica di essa di 6 metri di lato.",
+    },
+    'frost-brand': {
+        descrizione_it:
+"Quando colpisci con un attacco usando questa spada magica, il bersaglio subisce ulteriori 1d6 danni da freddo. Inoltre, mentre tieni la spada, hai resistenza ai danni da fuoco.\n\n" +
+"In temperature gelide, la lama emana luce intensa entro 3 metri e luce fioca per ulteriori 3 metri.\n\n" +
+"Quando estrai quest'arma, puoi spegnere tutte le fiamme non magiche entro 9 metri da te. Questa proprietà non può essere usata più di una volta all'ora.",
+    },
+    'fulminating-treatise': {
+        descrizione_it:
+"Questo grosso libro degli incantesimi bruciacchiato emana odore di fumo e ozono, e scintille di energia crepitano lungo i bordi delle sue pagine. Quando viene trovato contiene gli incantesimi: Contingenza, Palla di Fuoco, Folata di Vento, Piccola Capanna di Leomund, Proiettile Magico, Onda Tonante e Muro di Forza. Funziona da libro degli incantesimi per te.\n\n" +
+"Mentre tieni il libro, puoi usarlo come focus per i tuoi incantesimi da mago.\n\n" +
+"Il libro ha 3 cariche e recupera 1d3 cariche spese ogni giorno all'alba. Puoi usare le cariche nei seguenti modi:\n" +
+"- Se passi 1 minuto a studiare il libro, puoi spendere 1 carica per sostituire uno dei tuoi incantesimi da mago preparati con un incantesimo diverso del libro. Il nuovo incantesimo deve essere della scuola di evocazione/invocazione.\n" +
+"- Quando una creatura che vedi subisce danni da un incantesimo di evocazione che hai lanciato, puoi usare la reazione e spendere 1 carica per infliggere alla creatura ulteriori 2d6 danni da forza e farla cadere prona se è Grande o inferiore.",
+    },
+
+    // ── Batch G ────────────────────────────────────────────────────────
+    'gauntlets-of-ogre-power': {
+        descrizione_it:
+"Il tuo punteggio di Forza è 19 mentre indossi questi guanti. Non hanno alcun effetto se la tua Forza è già 19 o superiore senza di essi.",
+    },
+    'gem-of-brightness': {
+        descrizione_it:
+"Questo prisma ha 50 cariche. Mentre lo tieni, puoi usare un'azione per pronunciare una di tre parole di comando per causare uno dei seguenti effetti:\n" +
+"- La prima parola di comando fa emanare alla gemma luce intensa entro 9 metri e luce fioca per ulteriori 9 metri. Non spende cariche. Dura finché non usi un'azione bonus per ripetere la parola di comando o finché non usi un'altra funzione della gemma.\n" +
+"- La seconda parola di comando spende 1 carica e fa lanciare alla gemma un brillante raggio di luce contro una creatura che vedi entro 18 metri da te. La creatura deve riuscire in un tiro salvezza su Costituzione con CD 15 o diventare accecata per 1 minuto. Può ripetere il TS alla fine di ogni suo turno.\n" +
+"- La terza parola di comando spende 5 cariche e fa esplodere la gemma in un lampo accecante in un cono di 9 metri. Ogni creatura nel cono effettua un tiro salvezza come per il raggio.\n\n" +
+"Quando tutte le cariche della gemma sono spese, la gemma diventa un gioiello non magico del valore di 50 mo.",
+    },
+    'gem-of-seeing': {
+        descrizione_it:
+"Questa gemma ha 3 cariche. Con un'azione, puoi pronunciare la parola di comando della gemma e spendere 1 carica. Per i prossimi 10 minuti, hai vista vera fino a 36 metri quando guardi attraverso la gemma. La gemma recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'ghost-step-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio si sposta e oscilla sulla pelle, parti di esso appaiono sfocate.\n\n" +
+"Sintonia del Tatuaggio. Per sintonizzarti, premi l'ago contro la pelle. Quando la sintonia è completa, l'ago diventa l'inchiostro del tatuaggio. Se la sintonia termina, il tatuaggio scompare e l'ago riappare.\n\n" +
+"Forma Spettrale. Il tatuaggio ha 3 cariche e recupera tutte le cariche spese ogni giorno all'alba. Con un'azione bonus mentre il tatuaggio è sulla tua pelle, puoi spendere 1 carica per diventare incorporeo fino alla fine del tuo prossimo turno. Per la durata, ottieni i seguenti benefici:\n" +
+"- Hai resistenza ai danni contundenti, perforanti e taglienti da attacchi non magici.\n" +
+"- Non puoi essere afferrato o trattenuto.\n" +
+"- Puoi muoverti attraverso creature e oggetti solidi come se fossero terreno difficile. Se termini il turno in un oggetto solido, subisci 1d10 danni da forza. Se l'effetto termina mentre sei in un oggetto solido, vieni spinto allo spazio libero più vicino e subisci 1d10 danni da forza per ogni 1,5 metri percorsi.",
+    },
+    'giant-slayer': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica.\n\n" +
+"Quando colpisci un gigante con essa, il gigante subisce ulteriori 2d6 danni del tipo dell'arma e deve riuscire in un tiro salvezza su Forza con CD 15 o cadere prono. Per gli scopi di quest'arma, \"gigante\" si riferisce a qualsiasi creatura di tipo gigante, inclusi ettin e troll.",
+    },
+    'glamoured-studded-leather': {
+        descrizione_it:
+"Mentre indossi questa armatura, ottieni un bonus di +1 alla CA. Puoi anche usare un'azione bonus per pronunciare la parola di comando dell'armatura e farle assumere l'aspetto di un normale set di vestiti o un altro tipo di armatura. Decidi tu come appare, inclusi colore, stile e accessori, ma l'armatura mantiene la propria sagoma e peso. L'apparenza illusoria dura finché non usi di nuovo questa proprietà o finché non rimuovi l'armatura.",
+    },
+    'glimmering-moonbow': {
+        descrizione_it:
+"Quest'arco argento e nero è inciso con le fasi della luna. Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica.\n\n" +
+"Quando colpisci con un attacco a distanza usando questo arco magico, il bersaglio subisce ulteriori 1d6 danni radianti. Se non carichi munizioni nell'arma, essa produce le proprie, creando automaticamente una munizione magica quando effettui un attacco a distanza con essa. La munizione svanisce nell'istante successivo al colpo o al mancato bersaglio.\n\n" +
+"Mentre impugni questo arco magico, puoi usare un'azione bonus per entrare in uno stato semi-incorporeo fino all'inizio del tuo prossimo turno. Mentre semi-incorporeo, hai resistenza ai danni contundenti, perforanti e taglienti. Non riutilizzabile fino all'alba successiva.",
+    },
+    'gloomwrought-armor': {
+        descrizione_it:
+"Questa intricata armatura in scala di grigio è stata forgiata nel Reame delle Ombre ed è infusa con la cupezza di quel piano.\n\n" +
+"Mentre indossi questa armatura, hai vantaggio ai tiri salvezza per evitare o terminare la condizione di spaventato su di te.\n\n" +
+"L'armatura ha 3 cariche. Puoi spendere una carica per lanciare l'incantesimo Calmare le Emozioni (CD 15) dall'armatura. Recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'gloves-of-missile-snaring': {
+        descrizione_it:
+"Questi guanti sembrano vestire come una seconda pelle quando li indossi. Quando vieni colpito da un attacco con arma a distanza mentre indossi i guanti, puoi usare la reazione per ridurre il danno di 1d10 + il tuo modificatore di Destrezza, purché tu abbia una mano libera. Se riduci il danno a 0, puoi catturare il proiettile se è abbastanza piccolo da poterlo tenere in quella mano.",
+    },
+    'gloves-of-swimming-and-climbing': {
+        descrizione_it:
+"Mentre indossi questi guanti, scalare e nuotare non ti costa movimento extra, e ottieni un bonus di +5 alle prove di Forza (Atletica) effettuate per scalare o nuotare.",
+    },
+    'gloves-of-thievery': {
+        descrizione_it:
+"Questi guanti sono invisibili mentre indossati. Mentre li indossi, ottieni un bonus di +5 alle prove di Destrezza (Rapidità di Mano) e alle prove di Destrezza effettuate per scassinare serrature.",
+    },
+    'glowrune-pigment': {
+        descrizione_it:
+"Questo set di 1d4+2 piccoli barattoli di vernice contiene pigmenti mescolati da gemme luminescenti frantumate. Questa vernice magica conferisce doni magici temporanei alle creature con rune disegnate sulla pelle.\n\n" +
+"Un barattolo contiene pigmento sufficiente per dipingere una runa. Una creatura può passare 10 minuti per dipingere una delle seguenti rune su sé stessa o su un'altra creatura:\n\n" +
+"Runa del Viaggio. Il terreno difficile non costa movimento extra alla creatura dipinta.\n\n" +
+"Runa della Vita. La creatura dipinta ottiene 10 punti ferita temporanei e ha vantaggio ai tiri salvezza contro la morte.\n\n" +
+"Runa della Luce. La creatura dipinta ottiene scurovisione fino a 9 metri. Se ha già scurovisione, il raggio aumenta di 9 metri.\n\n" +
+"Runa della Montagna. La creatura dipinta è immune all'essere fatta cadere prona e ha vantaggio ai tiri salvezza su Forza e Costituzione.\n\n" +
+"Runa dello Scudo. La creatura dipinta ha vantaggio ai tiri salvezza su Destrezza contro effetti che infliggono danni.\n\n" +
+"Una creatura può beneficiare di una sola runa dipinta alla volta, quindi una nuova runa non ha effetto se la vecchia non viene rimossa prima. I benefici durano 8 ore o finché la creatura dipinta usa la propria azione per cancellare la runa.",
+    },
+    'goggles-of-night': {
+        descrizione_it:
+"Mentre indossi queste lenti scure, hai scurovisione fino a 18 metri. Se hai già scurovisione, indossare gli occhiali ne aumenta il raggio di 18 metri.",
+    },
+    'grasping-whip': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con questa frusta magica. Quando colpisci una creatura o oggetto Grande o inferiore con questa frusta, puoi tirare quella creatura o oggetto di 1,5 metri verso di te invece di infliggere danni.\n\n" +
+"La competenza con una frusta ti permette di aggiungere il bonus di competenza al tiro per colpire di qualsiasi attacco con essa.",
+    },
+    'guardian-emblem': {
+        descrizione_it:
+"Questo emblema è il simbolo di una divinità o di una tradizione spirituale. Con un'azione, puoi attaccare l'emblema a un'armatura o a uno scudo, o rimuoverlo.\n\n" +
+"L'emblema ha 3 cariche. Quando tu o una creatura che vedi entro 9 metri da te subisce un colpo critico mentre indossi l'armatura o impugni lo scudo che reca l'emblema, puoi usare la reazione per spendere 1 carica e trasformare il colpo critico in un colpo normale. L'emblema recupera tutte le cariche spese ogni giorno all'alba.",
+    },
+
+    // ── Batch H ────────────────────────────────────────────────────────
+    'hammer-of-runic-focus': {
+        descrizione_it:
+"Questo martello magico ha 3 cariche. Con un'azione bonus, puoi spendere 1 carica e sbattere il martello a terra, creando un cerchio di rune luminose di 4,5 metri di raggio centrato sul punto d'impatto. Mentre sei dentro quell'area, il tuo martello brilla con rune corrispondenti, e ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con questo martello. Il cerchio di rune scompare dopo 1 minuto, quando ne crei un altro, o quando lo dismetti come azione bonus. Recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'hammer-of-thunderbolts': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica.\n\n" +
+"Flagello dei Giganti (richiede sintonia). Devi indossare una cintura di forza dei giganti (qualsiasi varietà) e guanti del potere dell'ogre per sintonizzarti con quest'arma. La sintonia termina se ti togli uno di quei due oggetti. Mentre sei sintonizzato e tieni l'arma, il tuo punteggio di Forza aumenta di 4 e può superare 20, ma non 30. Quando ottieni 20 al tiro per colpire effettuato con quest'arma contro un gigante, il gigante deve riuscire in un tiro salvezza su Costituzione con CD 17 o morire.\n\n" +
+"Il martello ha anche 5 cariche. Mentre sintonizzato, puoi spendere 1 carica e effettuare un attacco con arma a distanza con il martello, lanciandolo come se avesse la proprietà a distanza con gittata 6/18 m. Se l'attacco colpisce, il martello scatena un tuono udibile fino a 90 metri. Il bersaglio e ogni creatura entro 9 metri da esso devono riuscire in un tiro salvezza su Costituzione con CD 17 o essere storditi fino alla fine del tuo prossimo turno. Recupera 1d4+1 cariche spese ogni giorno all'alba.",
+    },
+    'harp-of-gilded-plenty': {
+        descrizione_it:
+"Questa arpa dorata è scolpita a immagine della dea Iallanis, raffigurata come una giovane gigante delle nubi. Quando una creatura si avvicina entro 1,5 metri dall'arpa, lo strumento si anima ed è capace di parlare, cantare e suonare da solo.\n\n" +
+"Ogni volta che cerchi di sintonizzarti con l'arpa, devi prima superare una prova di Carisma (Intrattenere) con CD 15 o di Carisma (Persuasione) con CD 20 per convincere l'arpa che ne sei degno. Se fallisci, non puoi tentare di nuovo fino all'alba successiva. Una volta sintonizzato, l'arpa si ridimensiona per adattarsi a te.\n\n" +
+"Canzone Risoluta. Ogni volta che effettui una prova di Carisma mentre sintonizzato all'arpa, puoi trattare un risultato di 9 o inferiore al dado come un 10.\n\n" +
+"Banchetto dell'Abbondanza. Se passi 10 minuti a suonare l'arpa, puoi lanciare l'incantesimo Banchetto degli Eroi da essa. Non riutilizzabile finché non sono passati 1d10+10 giorni.\n\n" +
+"Melodia Lenitiva. Con un'azione, puoi usare l'arpa per lanciare l'incantesimo Calmare le Emozioni (CD 19). Quando lanciato tramite l'arpa, la durata aumenta a 1 ora se mantieni la concentrazione. Cinque utilizzi al giorno, recuperati all'alba.\n\n" +
+"Senzienza. L'arpa è un oggetto senziente di allineamento caotico buono con Intelligenza 13, Saggezza 15 e Carisma 20. Ha udito e scurovisione fino a 36 metri. Parla, legge e capisce il Comune e il Gigante. Comunica telepaticamente con la creatura sintonizzata. Personalità drammatica e pomposa, orgogliosa della qualità della sua musica.",
+    },
+    'hat-of-disguise': {
+        descrizione_it:
+"Mentre indossi questo cappello, puoi usare un'azione per lanciare l'incantesimo Camuffarsi a volontà. L'incantesimo termina se il cappello viene rimosso.",
+    },
+    'hat-of-vermin': {
+        descrizione_it:
+"Questo cappello ha 3 cariche. Mentre lo tieni, puoi usare un'azione per spendere 1 carica e pronunciare una parola di comando che evoca a tua scelta un pipistrello, una rana o un ratto. La creatura evocata appare magicamente nel cappello e cerca di allontanarsi da te il più velocemente possibile. La creatura non è né amichevole né ostile, e non è sotto il tuo controllo. Si comporta come una creatura ordinaria della sua specie e scompare dopo 1 ora o quando scende a 0 pf. Recupera tutte le cariche spese ogni giorno all'alba.",
+    },
+    'hat-of-wizardry': {
+        descrizione_it:
+"Questo cappello antiquato a forma di cono è ornato con lune crescenti dorate e stelle. Mentre lo indossi ottieni i seguenti benefici:\n" +
+"- Puoi usare il cappello come focus per i tuoi incantesimi da mago.\n" +
+"- Puoi tentare di lanciare un trucchetto che non conosci. Il trucchetto deve essere nella lista del mago e devi superare una prova di Intelligenza (Arcano) con CD 10. Se la prova ha successo, lanci l'incantesimo. Se fallisce, fallisce anche l'incantesimo. In entrambi i casi, non puoi riutilizzare questa proprietà finché non termini un riposo lungo.",
+    },
+    'headband-of-intellect': {
+        descrizione_it:
+"Il tuo punteggio di Intelligenza è 19 mentre indossi questa fascia. Non ha alcun effetto se la tua Intelligenza è già 19 o superiore senza di essa.",
+    },
+    'heart-weaver-s-primer': {
+        descrizione_it:
+"Questo libro immacolato emana un debole profumo casuale a tua scelta. Quando viene trovato contiene gli incantesimi: Antipatia/Simpatia, Charme su Persone, Dominare Persone, Soggiogare, Schema Ipnotico, Modificare Memoria e Suggestione. Funziona da libro degli incantesimi per te.\n\n" +
+"Mentre tieni il libro, puoi usarlo come focus per i tuoi incantesimi da mago.\n\n" +
+"Il libro ha 3 cariche e recupera 1d3 cariche spese ogni giorno all'alba. Puoi usare le cariche nei seguenti modi:\n" +
+"- Se passi 1 minuto a studiare il libro, puoi spendere 1 carica per sostituire uno dei tuoi incantesimi da mago preparati con un incantesimo diverso del libro. Il nuovo incantesimo deve essere della scuola di ammaliamento.\n" +
+"- Quando lanci un incantesimo di ammaliamento, puoi spendere 1 carica per imporre svantaggio al primo tiro salvezza che un bersaglio effettua contro l'incantesimo.",
+    },
+    'helm-of-brilliance': {
+        descrizione_it:
+"Questo elmo abbagliante è incastonato con 1d10 diamanti, 2d10 rubini, 3d10 opali di fuoco e 4d10 opali. Qualsiasi gemma estratta dall'elmo si polverizza. Quando tutte le gemme sono rimosse o distrutte, l'elmo perde la sua magia.\n\n" +
+"Mentre lo indossi ottieni i seguenti benefici:\n" +
+"- Puoi usare un'azione per lanciare uno dei seguenti incantesimi (CD 18) usando una gemma dell'elmo del tipo specificato come componente: Luce del Giorno (opale), Palla di Fuoco (opale di fuoco), Spruzzo Prismatico (diamante) o Muro di Fuoco (rubino). La gemma viene distrutta quando l'incantesimo viene lanciato.\n" +
+"- Finché ha almeno un diamante, l'elmo emana luce fioca entro 9 metri quando almeno un non morto si trova in quell'area. Ogni non morto che inizia il turno nell'area subisce 1d6 danni radianti.\n" +
+"- Finché ha almeno un rubino, hai resistenza ai danni da fuoco.\n" +
+"- Finché ha almeno un opale di fuoco, puoi usare un'azione e parola di comando per far divampare un'arma che impugni. Le fiamme emanano luce intensa entro 3 metri e luce fioca per ulteriori 3 metri. Un colpo con l'arma fiammeggiante infligge ulteriori 1d6 danni da fuoco.\n\n" +
+"Tira un d20 se indossi l'elmo e subisci danni da fuoco fallendo un tiro salvezza contro un incantesimo. Con un 1, l'elmo emette raggi dalle gemme rimanenti. Ogni creatura entro 18 metri tranne te deve riuscire in un tiro salvezza su Destrezza con CD 17 o subire danni radianti pari al numero di gemme. L'elmo e le gemme vengono poi distrutti.",
+    },
+    'helm-of-comprehending-languages': {
+        descrizione_it:
+"Mentre indossi questo elmo, puoi usare un'azione per lanciare a volontà l'incantesimo Comprendere i Linguaggi.",
+    },
+    'helm-of-perfect-potential': {
+        descrizione_it:
+"Questo elmo color rame contiene una scheggia del Caos Elementale incastonata sulla fronte, circondata da un motivo a sole nascente. La leggenda narra che Annam forgiò questo elmo per sua figlia Diancastra perché contenesse il frammento di caos che lei usò per provare il proprio valore al padre.\n\n" +
+"Proprietà Casuali:\n" +
+"- 2 proprietà benefiche minori\n" +
+"- 1 proprietà benefica maggiore\n" +
+"- 1 proprietà dannosa minore\n\n" +
+"Maestro dell'Astuzia. Mentre indossi l'elmo, hai vantaggio alle prove di Carisma (Inganno) e Saggezza (Intuizione).\n\n" +
+"Freccia di Devastazione Elementale. Con un'azione bonus mentre indossi l'elmo, puoi lanciare un dardo di scottante energia elementale verso una creatura che vedi entro 27 metri da te. Il bersaglio deve effettuare un tiro salvezza su Destrezza con CD 20. Se fallisce, subisce 4d6 danni di tipo acido, freddo, fuoco, fulmine o tuono (a tua scelta); se ha successo, ne subisce metà.\n\n" +
+"Incantesimi. L'elmo ha 6 cariche e recupera 1d6 cariche all'alba. Con un'azione mentre lo indossi, puoi spendere cariche per lanciare (CD 20): Arma Elementale (1), Richiamare il Fulmine (2), Muro di Fuoco (3), Evocare Elementale (4), Tsunami (5).",
+    },
+    'helm-of-telepathy': {
+        descrizione_it:
+"Mentre indossi questo elmo, puoi usare un'azione per lanciare l'incantesimo Individuazione del Pensiero (CD 13). Finché mantieni la concentrazione, puoi usare un'azione bonus per inviare un messaggio telepatico a una creatura su cui sei focalizzato. Essa può rispondere usando un'azione bonus mentre il tuo focus su di lei continua.\n\n" +
+"Mentre sei focalizzato su una creatura con Individuazione del Pensiero, puoi usare un'azione per lanciare Suggestione (CD 13) dall'elmo su quella creatura. Non riutilizzabile fino all'alba successiva.",
+    },
+    'helm-of-teleportation': {
+        descrizione_it:
+"Questo elmo ha 3 cariche. Mentre lo indossi, puoi usare un'azione e spendere 1 carica per lanciare l'incantesimo Teletrasporto da esso. Recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'heward-s-handy-haversack': {
+        descrizione_it:
+"Questo zaino ha una tasca centrale e due tasche laterali, ognuna delle quali è uno spazio extradimensionale. Ogni tasca laterale può contenere fino a 9 kg di materiale, non superando un volume di 60 dm³. La grande tasca centrale può contenere fino a 230 dm³ o 36 kg. Lo zaino pesa sempre 2,3 kg, indipendentemente dal contenuto.\n\n" +
+"Posizionare un oggetto segue le regole normali per interagire con oggetti. Estrarre un oggetto richiede un'azione: l'oggetto cercato è sempre magicamente in cima.\n\n" +
+"Lo zaino ha alcune limitazioni: se sovraccarico o se un oggetto affilato lo perfora, lo zaino si rompe e viene distrutto, perdendo per sempre il contenuto (gli artefatti riappaiono). Se rovesciato, il contenuto fuoriesce illeso. Una creatura respirante che vi viene posta dentro può sopravvivere fino a 10 minuti, dopo i quali inizia a soffocare.\n\n" +
+"Posizionare lo zaino in uno spazio extradimensionale (sacca dimensionale, foro portatile, ecc.) distrugge istantaneamente entrambi gli oggetti e apre un cancello al Piano Astrale, risucchiando le creature entro 3 metri.",
+    },
+    'heward-s-handy-spice-pouch': {
+        descrizione_it:
+"Questa sacca da cintura appare vuota e ha 10 cariche. Mentre tieni la sacca, puoi usare un'azione per spendere 1 carica, pronunciare il nome di qualsiasi condimento alimentare non magico (come sale, pepe, zafferano o coriandolo) e estrarre un pizzico del condimento desiderato dalla sacca. Un pizzico è sufficiente per condire un singolo pasto. La sacca recupera 1d6+4 cariche spese ogni giorno all'alba.",
+    },
+    'holy-avenger': {
+        descrizione_it:
+"Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica. Quando colpisci un immondo o un non morto con essa, quella creatura subisce ulteriori 2d10 danni radianti.\n\n" +
+"Mentre tieni la spada sguainata, essa crea un'aura del raggio di 3 metri attorno a te. Tu e tutte le creature amichevoli nell'aura avete vantaggio ai tiri salvezza contro incantesimi e altri effetti magici. Se hai 17 o più livelli nella classe paladino, il raggio dell'aura aumenta a 9 metri.",
+    },
+    'horn-of-blasting': {
+        descrizione_it:
+"Puoi usare un'azione per pronunciare la parola di comando del corno e poi suonarlo, emettendo una raffica tonante in un cono di 9 metri udibile a 180 metri di distanza. Ogni creatura nel cono deve effettuare un tiro salvezza su Costituzione con CD 15. Se fallisce, subisce 5d6 danni da tuono ed è assordata per 1 minuto. Se ha successo, subisce metà danni e non è assordata. Le creature e gli oggetti di vetro o cristallo hanno svantaggio al tiro salvezza e subiscono 10d6 danni da tuono invece di 5d6.\n\n" +
+"Ogni utilizzo della magia del corno ha il 20% di probabilità di farlo esplodere. L'esplosione infligge 10d6 danni da fuoco al suonatore e distrugge il corno.",
+    },
+    'horn-of-silent-alarm': {
+        descrizione_it:
+"Questo corno ha 4 cariche. Quando usi un'azione per soffiarci dentro, una creatura a tua scelta può sentirne il suono, purché sia entro 180 metri dal corno e non assordata. Nessun'altra creatura sente alcun suono. Recupera 1d4 cariche spese ogni giorno all'alba.",
+    },
+    'horn-of-valhalla': {
+        descrizione_it:
+"Puoi usare un'azione per soffiare in questo corno. In risposta, spiriti guerrieri dal Valhalla appaiono entro 18 metri da te. Usano le statistiche di un berserker. Tornano al Valhalla dopo 1 ora o quando scendono a 0 pf. Una volta usato, il corno non può essere riutilizzato per 7 giorni.\n\n" +
+"Esistono quattro tipi di Corno del Valhalla, ciascuno fatto di un metallo diverso. Il tipo determina quanti berserker rispondono e i requisiti per l'uso (il DM sceglie o tira casualmente):\n" +
+"- 01-40 Argento: 2d4+2 berserker, nessun requisito\n" +
+"- 41-75 Ottone: 3d4+3, competenza in armi semplici\n" +
+"- 76-90 Bronzo: 4d4+4, competenza in armature medie\n" +
+"- 91-00 Ferro: 5d4+5, competenza in armi da guerra\n\n" +
+"Se suoni il corno senza soddisfare il requisito, i berserker evocati ti attaccano. Se lo soddisfi, sono amichevoli verso di te e i tuoi compagni.",
+    },
+    'horseshoes-of-a-zephyr': {
+        descrizione_it:
+"Questi quattro ferri di cavallo si applicano agli zoccoli di una creatura simile a un cavallo. Mentre le quattro scarpe sono attaccate, la creatura può muoversi normalmente ma fluttua a 10 cm dal terreno. Questo effetto significa che la creatura attraversa terreno difficile e altre superfici a piacimento, può attraversare l'acqua come se fosse terreno solido, può galleggiare nell'aria, e non viene rallentata dal terreno difficile, dalle sabbie mobili o da effetti simili. Inoltre, può viaggiare alla normale velocità per un massimo di 12 ore al giorno senza subire affaticamento da marcia forzata.",
+    },
+    'horseshoes-of-speed': {
+        descrizione_it:
+"Questi ferri di cavallo si applicano agli zoccoli di una creatura simile a un cavallo. Mentre tutti e quattro i ferri sono attaccati, aumentano la velocità di camminata della creatura di 9 metri.",
+    },
+
+    // ── Batch I ────────────────────────────────────────────────────────
+    'house-of-cards': {
+        descrizione_it:
+"Questo mazzo di carte è decorato con forme geometriche dal motivo protettivo. Mentre tieni il mazzo, puoi usare un'azione per mescolarlo e far sì che le carte si dispongano da sole trasformandosi in un rifugio fatto di carte. Il rifugio può avere la forma che desideri, ma deve stare in un cubo di 12 metri di lato centrato su un punto entro 9 metri da te. Il rifugio ha una porta e fino a quattro finestre, e solo tu puoi aprirle o chiuderle. Ha un pavimento e un tetto, e mantiene una temperatura confortevole all'interno.\n\n" +
+"Il rifugio ha CA 15, 50 punti ferita e immunità ai danni da veleno e psichici. Dura 24 ore, finché non lo dismetti come azione, o finché non viene ridotto a 0 pf. Quando la durata termina, si trasforma di nuovo in un mazzo di carte e appare nella tua mano. Una volta trasformato in rifugio, non riutilizzabile fino all'alba successiva.",
+    },
+    'iggwilv-s-cauldron': {
+        descrizione_it:
+"Iggwilv ha forgiato questo meraviglioso calderone con l'aiuto della sua madre adottiva, l'arcifata Baba Yaga. Il calderone ha due forme. Solo Iggwilv o Baba Yaga possono cambiare la forma del calderone (toccandolo come azione), senza necessariamente esserne sintonizzate. Nella prima forma, il calderone è di oro massiccio con immagini di alberi spogli, foglie cadenti e manici di scopa. Nella seconda forma, è di ferro con immagini di pipistrelli, rospi, gatti, lucertole e serpenti — otto di ciascuno. In entrambe le forme misura circa 90 cm di diametro, ha una bocca di 60 cm, un coperchio rotondo con maniglia, e otto piedi artigliati. Pesa 36 kg vuoto e contiene fino a 380 litri di liquido.\n\n" +
+"Sintonia. Qualsiasi umanoide che si sintonizzi col calderone deve riuscire in un tiro salvezza su Costituzione con CD 15 o invecchiare fino alla decrepitezza (velocità dimezzata, vista/udito ridotti a 9 metri, svantaggio a tutto). La creatura raggiunge la fine della propria vita naturale in 3d8 giorni. Solo Desiderio o intervento divino può invertire l'invecchiamento. Tre megere possono sintonizzarsi simultaneamente se hanno formato un coven.\n\n" +
+"Proprietà Casuali. 1 proprietà benefica minore, 1 proprietà dannosa minore.\n\n" +
+"Calderone d'Oro. Versare acqua e mescolare per 1 minuto trasforma in stufato sostanzioso (4 pasti per gallone). Versare vino e mescolare per 10 minuti crea un elisir che concede 10 pf temporanei (4 persone per gallone). Riempito con 90 galloni d'acqua e 10 di vino, funge da focus per Scrutare con CD automaticamente fallita e tra piani diversi. Immergere setole di scopa nell'acqua trasforma la scopa in Scopa Volante per 3 giorni.\n\n" +
+"Calderone di Ferro. Urlare nel calderone vuoto evoca uno sciame di pipistrelli che obbedisce per 1 minuto. Versare 1 gallone di sangue e mescolare crea una nuvola che fa svenire ogni umanoide entro 30 metri (per gallone) per 1 ora. Legare una rana morta a un ramo e immergerlo crea una Bacchetta della Metamorfosi con 3 cariche. Toccare il calderone con un corno di unicorno mentre si recita un poema congela nel tempo tutte le creature entro 300 metri.\n\n" +
+"Distruggere il Calderone. CA 19, 80 pf, immune a tutto tranne armi Lingua di Fuoco o Spada del Gelo. Frantumarlo in 8 pezzi termina i suoi effetti e fa perdere a tutte le megere del multiverso il tratto Incantesimo Condiviso da coven. Può essere ricostruito con Desiderio se tutti gli 8 pezzi sono entro 1,5 metri.",
+    },
+    'illuminator-s-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio magico presenta bellissima calligrafia, immagini di strumenti di scrittura e simili.\n\n" +
+"Sintonia del Tatuaggio. Per sintonizzarti, premi l'ago contro la pelle. Quando completata, l'ago diventa l'inchiostro del tatuaggio. Se la sintonia termina, il tatuaggio scompare e l'ago riappare.\n\n" +
+"Scrittura Magica. Mentre il tatuaggio è sulla tua pelle, puoi scrivere con la punta del dito come se fosse una penna a inchiostro inesauribile.\n\n" +
+"Con un'azione, puoi toccare un testo scritto lungo fino a una pagina e pronunciare il nome di una creatura. Lo scritto diventa invisibile a tutti tranne te e la creatura nominata per le successive 24 ore. Entrambi potete dismettere l'invisibilità toccando lo scritto. Non riutilizzabile fino all'alba successiva.",
+    },
+    'immovable-rod': {
+        descrizione_it:
+"Quest'asta di ferro piatta ha un pulsante a un'estremità. Puoi usare un'azione per premerlo, facendo sì che l'asta diventi magicamente fissata in posizione. Finché tu o un'altra creatura non usate un'azione per premere di nuovo il pulsante, l'asta non si muove, anche se sfida la gravità. L'asta può sostenere fino a 3.600 kg di peso. Più peso fa cadere l'asta a terra. Una creatura può usare un'azione per effettuare una prova di Forza con CD 30: se ha successo, sposta l'asta fino a 3 metri.",
+    },
+    'instrument-of-illusions': {
+        descrizione_it:
+"Mentre suoni questo strumento musicale, puoi creare effetti visivi illusori innocui in una sfera di 1,5 metri di raggio centrata sullo strumento. Se sei un bardo, il raggio aumenta a 4,5 metri. Esempi di effetti visivi: note musicali luminose, una danzatrice spettrale, farfalle, neve che cade dolcemente. Gli effetti magici non hanno né sostanza né suono, e sono ovviamente illusori. Gli effetti terminano quando smetti di suonare.",
+    },
+    'instrument-of-scribing': {
+        descrizione_it:
+"Questo strumento musicale ha 3 cariche. Mentre lo suoni, puoi usare un'azione per spendere 1 carica e scrivere un messaggio magico su un oggetto o superficie non magica che vedi entro 9 metri da te. Il messaggio può essere lungo fino a sei parole ed è scritto in un linguaggio che conosci. Se sei un bardo, puoi scrivere ulteriori sette parole e scegliere di far brillare debolmente il messaggio, permettendo di vederlo nell'oscurità non magica. Lanciare Dissolvi Magie sul messaggio lo cancella; altrimenti svanisce dopo 24 ore.\n\n" +
+"Lo strumento recupera tutte le cariche spese ogni giorno all'alba.",
+    },
+    'instrument-of-the-bards': {
+        descrizione_it:
+"Uno strumento dei bardi è un esempio squisito del suo genere, superiore a uno strumento ordinario sotto ogni aspetto. Esistono sette tipi, ciascuno chiamato come un leggendario collegio bardico. Una creatura che cerca di suonare lo strumento senza essere sintonizzata deve riuscire in un tiro salvezza su Saggezza con CD 15 o subire 2d4 danni psichici.\n\n" +
+"Puoi usare un'azione per suonare lo strumento e lanciare uno dei suoi incantesimi. Una volta lanciato un incantesimo dallo strumento, non può essere lanciato di nuovo fino all'alba successiva. Gli incantesimi usano la tua caratteristica di lancio e CD.\n\n" +
+"Tutti gli strumenti includono: Volare, Invisibilità, Levitazione, Protezione dal Bene e dal Male, più gli incantesimi specifici:\n" +
+"- Arpa Anstruth (Molto Raro): Controllare il Tempo, Cura Ferite (5° liv.), Muro di Spine\n" +
+"- Mandolino Canaith (Raro): Cura Ferite (3° liv.), Dissolvi Magie, Protezione dall'Energia (solo fulmine)\n" +
+"- Lira Cli (Raro): Plasmare la Pietra, Muro di Fuoco, Muro di Vento\n" +
+"- Liuto Doss (Non Comune): Amicizia con gli Animali, Protezione dall'Energia (solo fuoco), Protezione dal Veleno\n" +
+"- Bandore Fochlucan (Non Comune): Intralciare, Fuoco Fatato, Shillelagh, Parlare con gli Animali\n" +
+"- Cetra Mac-Fuirmidh (Non Comune): Pelle di Corteccia, Cura Ferite, Nube di Nebbia\n" +
+"- Arpa Ollamh (Leggendario): Confusione, Controllare il Tempo, Tempesta di Fuoco",
+    },
+    'ioun-stone': {
+        descrizione_it:
+"Una Pietra Ioun prende il nome da Ioun, dea della conoscenza e profezia. Esistono molti tipi di pietra Ioun, ciascuna una distinta combinazione di forma e colore.\n\n" +
+"Quando usi un'azione per lanciare in aria una di queste pietre, la pietra orbita attorno alla tua testa a una distanza di 0,3-0,9 metri e ti conferisce un beneficio. Una creatura deve usare un'azione per afferrare la pietra (CA 24 al tiro per colpire o prova di Destrezza Acrobazia con CD 24) per separarla. Puoi usare un'azione per afferrare e riporre la pietra.\n\n" +
+"Una pietra ha CA 24, 10 pf e resistenza a tutti i danni.\n\n" +
+"Tipi noti:\n" +
+"- Assorbimento (Molto Raro, ellissoide lavanda pallido): cancella incantesimi di 4° livello o inferiore (max 20 livelli totali) come reazione.\n" +
+"- Agilità (Molto Raro, sfera rosso scuro): Destrezza +2 (max 20).\n" +
+"- Consapevolezza (Raro, romboide blu scuro): non puoi essere colto di sorpresa.\n" +
+"- Fortezza (Molto Raro, romboide rosa): Costituzione +2 (max 20).\n" +
+"- Assorbimento Maggiore (Leggendario, ellissoide lavanda/verde marmorizzato): cancella incantesimi di 8° liv. o inferiore (max 50 livelli).\n" +
+"- Intuito (Molto Raro, sfera blu incandescente): Saggezza +2 (max 20).\n" +
+"- Intelletto (Molto Raro, sfera scarlatta/blu marmorizzata): Intelligenza +2 (max 20).\n" +
+"- Comando (Molto Raro, sfera rosa/verde marmorizzata): Carisma +2 (max 20).\n" +
+"- Maestria (Leggendario, prisma verde pallido): bonus di competenza +1.\n" +
+"- Protezione (Raro, prisma rosa polvere): +1 alla CA.\n" +
+"- Rigenerazione (Leggendario, fuso bianco perlaceo): recuperi 15 pf alla fine di ogni ora se hai almeno 1 pf.\n" +
+"- Riserva (Raro, prisma viola vibrante): immagazzina fino a 3 livelli di incantesimi.\n" +
+"- Forza (Molto Raro, romboide blu pallido): Forza +2 (max 20).\n" +
+"- Sostentamento (Raro, fuso trasparente): non hai bisogno di mangiare o bere.",
+    },
+    'iron-bands-of-bilarro': {
+        descrizione_it:
+"Questa sfera di ferro arrugginito misura 7,5 cm di diametro e pesa 0,5 kg. Puoi usare un'azione per pronunciare la parola di comando e lanciare la sfera contro una creatura Enorme o inferiore che vedi entro 18 metri da te. Mentre la sfera si muove in aria, si apre in un groviglio di bende metalliche.\n\n" +
+"Effettua un tiro per colpire a distanza con bonus pari al tuo modificatore di Destrezza più il tuo bonus di competenza. Se colpisce, il bersaglio è trattenuto finché non usi un'azione bonus per pronunciare di nuovo la parola di comando per liberarlo. Farlo, o mancare l'attacco, fa contrarre le bende che tornano sferiche.\n\n" +
+"Una creatura, inclusa quella trattenuta, può usare un'azione per effettuare una prova di Forza con CD 20 per spezzare le bende di ferro. Se ha successo, l'oggetto è distrutto e la creatura liberata. Se fallisce, ulteriori tentativi di quella creatura falliscono automaticamente per 24 ore.\n\n" +
+"Una volta usate, le bende non possono essere riutilizzate fino all'alba successiva.",
+    },
+    'iron-flask': {
+        descrizione_it:
+"Questa bottiglia di ferro ha un tappo di ottone. Puoi usare un'azione per pronunciare la parola di comando della fiasca, bersagliando una creatura che vedi entro 18 metri da te. Se il bersaglio è nativo di un piano d'esistenza diverso da quello in cui ti trovi, deve riuscire in un tiro salvezza su Saggezza con CD 17 o essere intrappolato nella fiasca. Se è già stato intrappolato in precedenza, ha vantaggio al tiro salvezza. Una volta intrappolata, la creatura rimane finché non viene rilasciata.\n\n" +
+"La fiasca contiene una creatura alla volta. Una creatura intrappolata non ha bisogno di respirare, mangiare o bere e non invecchia.\n\n" +
+"Puoi usare un'azione per togliere il tappo e rilasciare la creatura. Essa è amichevole verso te e i tuoi compagni per 1 ora e obbedisce ai tuoi comandi per quella durata. Se non emetti comandi o ne emetti uno che probabilmente la ucciderebbe, si difende ma non agisce. Alla fine della durata, agisce secondo la propria disposizione e allineamento normali.\n\n" +
+"Un incantesimo Identificare rivela che una creatura è dentro la fiasca, ma il solo modo per determinare il tipo è aprirla. Una fiasca appena scoperta potrebbe già contenere una creatura (vedi tabella d100 nel manuale).",
+    },
+
+    // ── Batch J ────────────────────────────────────────────────────────
+    'javelin-of-lightning': {
+        descrizione_it:
+"Questo giavellotto è un'arma magica. Quando lo lanci e pronunci la sua parola di comando, si trasforma in un fulmine, formando una linea larga 1,5 metri che si estende da te a un bersaglio entro 36 metri. Ogni creatura nella linea, escluso te e il bersaglio, deve effettuare un tiro salvezza su Destrezza con CD 13, subendo 4d6 danni da fulmine se fallisce, o la metà se ha successo. Il fulmine torna giavellotto quando raggiunge il bersaglio.\n\n" +
+"Effettua un attacco con arma a distanza contro il bersaglio. Se colpisci, il bersaglio subisce i danni del giavellotto più 4d6 danni da fulmine.\n\n" +
+"La proprietà del giavellotto non può essere riutilizzata fino all'alba successiva. Nel frattempo, il giavellotto può ancora essere usato come arma magica.",
+    },
+    'jester-s-mask': {
+        descrizione_it:
+"Questa colorata maschera arlecchino è bordata di perle. Mentre la indossi ottieni i seguenti benefici:\n\n" +
+"Focus Carismatico. Puoi usare la maschera come focus per incantesimi. Ottieni un bonus di +3 ai tiri per colpire e alle CD dei tiri salvezza dei tuoi incantesimi che usano Carisma come caratteristica di lancio.\n\n" +
+"Fuga Meravigliosa. Quando una creatura ti colpisce con un tiro per colpire, puoi usare la reazione per scomparire in una nuvola di fumo e scintille colorate. Non subisci danni e invece ti teletrasporti, assieme all'equipaggiamento, in uno spazio libero che vedi entro 9 metri da te. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Sottosopra. Quando ottieni 1 al d20, puoi trattare il tiro come se avessi ottenuto 20. Non riutilizzabile fino all'alba successiva.",
+    },
+
+    // ── Batch K ────────────────────────────────────────────────────────
+    'keoghtom-s-ointment': {
+        descrizione_it:
+"Questo barattolo di vetro, di 7,5 cm di diametro, contiene 1d4+1 dosi di un denso composto che emana un debole profumo di aloe. Il barattolo e il contenuto pesano 0,2 kg. Con un'azione, una dose di unguento può essere ingerita o applicata sulla pelle. La creatura che la riceve recupera 2d8+2 punti ferita, smette di essere avvelenata, ed è curata da qualsiasi malattia.",
+    },
+
+    // ── Batch L ────────────────────────────────────────────────────────
+    'lantern-of-revealing': {
+        descrizione_it:
+"Mentre accesa, questa lanterna a cappuccio brucia per 6 ore con 0,5 litri d'olio, emanando luce intensa entro 9 metri e luce fioca per ulteriori 9 metri. Le creature e gli oggetti invisibili sono visibili finché si trovano nella luce intensa della lanterna. Puoi usare un'azione per abbassare il cappuccio, riducendo la luce a fioca entro 1,5 metri.",
+    },
+    'lash-of-immolation': {
+        descrizione_it:
+"L'impugnatura di questa frusta di pelle scura reca la runa del fuoco, e braci danzano attorno alla coda della frusta.\n\n" +
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma, e con un colpo la frusta infligge ulteriori 1d6 danni da fuoco. Quando ottieni un colpo critico con un attacco usando questa frusta, il bersaglio ha anche la condizione di trattenuto fino all'inizio del tuo prossimo turno, mentre bende infuocate gli si avvolgono.\n\n" +
+"Invocare la Runa. Quando effettui un attacco con la frusta e colpisci, puoi usare la reazione per invocare la runa della frusta. Farlo aumenta i danni da fuoco extra inflitti dalla frusta a 2d6. Una volta invocata la runa, non può essere invocata di nuovo fino all'alba successiva.",
+    },
+    'libram-of-souls-and-flesh': {
+        descrizione_it:
+"Con copertine di pelle e rifiniture d'osso, questo tomo è freddo al tatto e sussurra debolmente. Quando viene trovato contiene gli incantesimi: Animare Morti, Cerchio della Morte, Falsa Vita, Dito della Morte, Parlare con i Morti, Evocare Non Morti, Tocco Vampirico, che diventano incantesimi da mago per te mentre sei sintonizzato. Funziona da libro degli incantesimi per te.\n\n" +
+"Mentre tieni il libro, puoi usarlo come focus per i tuoi incantesimi da mago.\n\n" +
+"Il libro ha 3 cariche e recupera 1d3 cariche spese ogni giorno all'alba. Puoi usare le cariche nei seguenti modi:\n" +
+"- Se passi 1 minuto a studiare il libro, puoi spendere 1 carica per sostituire uno dei tuoi incantesimi da mago preparati con un incantesimo diverso del libro. Il nuovo incantesimo deve essere della scuola di necromanzia.\n" +
+"- Con un'azione, puoi spendere 1 carica per assumere una parvenza di non morto per 10 minuti. Per la durata, hai un aspetto cadaverico, e i non morti sono indifferenti verso di te a meno che non li abbia danneggiati. Appari anche non morto a qualsiasi ispezione esteriore e agli incantesimi che determinano lo stato del bersaglio. L'effetto termina se infliggi danni o forzi una creatura a effettuare un tiro salvezza.",
+    },
+    'lifewell-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio magico presenta simboli di vita e rinascita.\n\n" +
+"Sintonia del Tatuaggio. Per sintonizzarti, premi l'ago contro la pelle. Quando completata, l'ago diventa l'inchiostro del tatuaggio. Se la sintonia termina, il tatuaggio scompare e l'ago riappare.\n\n" +
+"Resistenza Necrotica. Hai resistenza ai danni necrotici.\n\n" +
+"Protezione di Vita. Quando dovresti essere ridotto a 0 punti ferita, scendi invece a 1 punto ferita. Non riutilizzabile fino all'alba successiva.",
+    },
+    'lock-of-trickery': {
+        descrizione_it:
+"Questa serratura appare come una serratura ordinaria (del tipo descritto nel Manuale del Giocatore) e viene fornita con una singola chiave. I cilindretti di questa serratura si regolano magicamente per ostacolare i ladri. Le prove di Destrezza effettuate per scassinare la serratura hanno svantaggio.",
+    },
+    'longbow-of-the-healing-hearth': {
+        descrizione_it:
+"Questo arco lungo di avorio è inciso con una preghiera al dio Hiatea, le cui rune si intrecciano con incisioni dorate di spighe di grano e corna di cervo.\n\n" +
+"Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con quest'arma. Se non carichi munizioni nell'arma, essa produce le proprie, creando automaticamente una freccia magica quando tendi la corda. La freccia svanisce nell'istante successivo al colpo o al mancato bersaglio.\n\n" +
+"L'arco ha 8 cariche per le seguenti proprietà, utilizzabili mentre lo impugni. Recupera 1d4+1 cariche ogni giorno all'alba.\n\n" +
+"Freccia Curativa. Quando esegui l'azione di Attacco usando l'arco, puoi spendere 1 carica per sostituire uno dei tuoi attacchi con una freccia ardente di magia curativa, che colpisce automaticamente una creatura che vedi entro 45 metri da te. Il bersaglio può immediatamente spendere e tirare uno dei suoi Dadi Vita non spesi e recuperare un numero di punti ferita pari al risultato più il tuo modificatore di Saggezza (minimo +1). Se il bersaglio non ha Dadi Vita non spesi, non succede nulla. Una freccia curativa per turno.\n\n" +
+"Incantesimi. Mentre tieni l'arco, puoi usare un'azione per spendere cariche per lanciare (CD 18): Creare Cibo e Acqua (1), Vincolo di Protezione (2), Guardiano della Fede (3).",
+    },
+    'luba-s-tarokka-of-souls': {
+        descrizione_it:
+"Non tutti gli spiriti vaganti sono anime tragiche perdute. Alcuni languono come prigionieri, anime così malvagie che i mortali non osano liberarli. Creato da una figura della leggenda Vistani, il Tarokka delle Anime di Luba ha plasmato il destino di innumerevoli eroi. Le profezie di questo mazzo hanno anche rivelato grandi mali. Mamma Luba intrappolò entità malvagie tra i fili del fato, imprigionandole nel mazzo.\n\n" +
+"Come tutti i mazzi tarokka, contiene 54 carte: 14 dell'alto mazzo e 40 divise in quattro semi (monete, glifi, stelle, spade).\n\n" +
+"Proprietà Casuali. 2 proprietà dannose minori, 2 proprietà benefiche minori.\n\n" +
+"Incantesimi. Mentre tieni il mazzo, puoi usare un'azione per lanciare (CD 18): Comprendere i Linguaggi, Individuazione del Bene e del Male, Individuazione del Magico, Individuazione di Veleni e Malattie, Localizzare Oggetto o Scrutare. Una volta usato, l'incantesimo non riutilizzabile fino all'alba successiva.\n\n" +
+"Visione Persistente. Mentre tieni il mazzo, hai successo automatico ai tiri salvezza su Costituzione per mantenere la concentrazione su incantesimi di divinazione.\n\n" +
+"Torsione del Fato. Con un'azione, puoi estrarre una carta e influenzare la fortuna di un'altra creatura che vedi entro 4,5 metri:\n" +
+"- Bene: la creatura ha vantaggio ai tiri per colpire, alle prove di caratteristica e ai tiri salvezza per la prossima ora.\n" +
+"- Male: la creatura ha svantaggio ai tiri per colpire, alle prove di caratteristica e ai tiri salvezza per la prossima ora.\n\n" +
+"Due usi al giorno, recuperati all'alba.\n\n" +
+"Prigionieri del Fato. Ogni volta che usi Torsione del Fato, c'è una possibilità che una delle 14 anime intrappolate fugga (vedi tabella nel manuale: Flameskull, Wraith, Banshee, Vampiro, Mummia, Cavaliere della Morte, Spettro, Lord Mummia, ecc.). L'anima rilasciata appare entro 16d10 km, beneficia di 'Bene' permanente, e tu e il bersaglio originale subite 'Male' permanente.\n\n" +
+"Mescolare Fato. Se passano 7 giorni senza usare Torsione del Fato, la sintonia termina.\n\n" +
+"Distruggere il Mazzo. Solo se tutte e 14 le anime vengono liberate e distrutte; appare allora una 15ª anima (un lich); distruggendolo anche essa, il mazzo torna ordinario.",
+    },
+    'lucent-destroyer': {
+        descrizione_it:
+"Quest'arma magica è un moschetto di bronzo a tripla canna. Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con essa. Non richiede munizioni, i suoi danni sono radianti invece che perforanti, e non ha la proprietà ricaricare. La base dell'arma è marchiata con la runa della luce.\n\n" +
+"Inoltre, mentre sei sintonizzato con l'arma, puoi lanciare a volontà Luci Danzanti dal moschetto.\n\n" +
+"Invocare la Runa. Con un'azione, puoi invocare la runa dell'arma per lanciare l'incantesimo Raggio di Sole (CD 17). Una volta invocata la runa, non può essere invocata di nuovo fino all'alba successiva.",
+    },
+    'luck-blade': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica. Mentre la spada è sulla tua persona, ottieni anche un bonus di +1 ai tiri salvezza.\n\n" +
+"Fortuna. Se la spada è sulla tua persona, puoi invocare la sua fortuna (nessuna azione richiesta) per ritirare un tiro per colpire, prova di caratteristica o tiro salvezza che non ti è piaciuto. Devi usare il secondo tiro. Non riutilizzabile fino all'alba successiva.\n\n" +
+"Desiderio. La spada ha 1d4-1 cariche. Mentre la tieni, puoi usare un'azione per spendere 1 carica e lanciare l'incantesimo Desiderio. Non riutilizzabile fino all'alba successiva. La spada perde questa proprietà se non ha cariche.",
+    },
+    'lyre-of-building': {
+        descrizione_it:
+"Mentre tieni questa lira, puoi lanciare Riparare con un'azione. Puoi anche suonare la lira come reazione quando un oggetto o una struttura che vedi entro 90 metri da te subisce danni, rendendola immune a quei danni e a ulteriori danni dello stesso tipo fino all'inizio del tuo prossimo turno.\n\n" +
+"Inoltre, puoi suonare la lira con un'azione per lanciare Fabbricare, Smuovere il Terreno, Passamuro o Evocare Costrutto, e quell'incantesimo non può essere lanciato di nuovo fino all'alba successiva.",
+    },
+
+    // ── Batch M ────────────────────────────────────────────────────────
+    'mace-of-disruption': {
+        descrizione_it:
+"Quando colpisci un immondo o un non morto con quest'arma magica, quella creatura subisce ulteriori 2d6 danni radianti. Se il bersaglio ha 25 punti ferita o meno dopo aver subito questi danni, deve riuscire in un tiro salvezza su Saggezza con CD 15 o essere distrutto. Se ha successo, la creatura diventa spaventata da te fino alla fine del tuo prossimo turno.\n\n" +
+"Mentre tieni quest'arma, emana luce intensa entro 6 metri e luce fioca per ulteriori 6 metri.",
+    },
+    'mace-of-smiting': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica. Il bonus aumenta a +3 quando usi la mazza per attaccare un costrutto.\n\n" +
+"Quando ottieni 20 al tiro per colpire effettuato con quest'arma, il bersaglio subisce ulteriori 7 danni contundenti, o 14 danni contundenti se è un costrutto. Se un costrutto ha 25 punti ferita o meno dopo questi danni, viene distrutto.",
+    },
+    'mace-of-terror': {
+        descrizione_it:
+"Quest'arma magica ha 3 cariche. Mentre la tieni, puoi usare un'azione e spendere 1 carica per emettere un'ondata di terrore. Ogni creatura a tua scelta in un raggio di 9 metri da te deve riuscire in un tiro salvezza su Saggezza con CD 15 o essere spaventata da te per 1 minuto. Mentre spaventata in questo modo, deve passare i suoi turni cercando di allontanarsi il più possibile da te, e non può volontariamente muoversi entro 9 metri da te. Non può effettuare reazioni. Per la sua azione, può solo Scattare o cercare di sfuggire a un effetto che le impedisce di muoversi. Alla fine di ciascun suo turno, può ripetere il tiro salvezza.\n\n" +
+"La mazza recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'mantle-of-spell-resistance': {
+        descrizione_it:
+"Hai vantaggio ai tiri salvezza contro gli incantesimi mentre indossi questo mantello.",
+    },
+    'manual-of-bodily-health': {
+        descrizione_it:
+"Questo libro contiene consigli di salute e dieta, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Costituzione aumenta di 2, così come il massimo per quel punteggio. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'manual-of-gainful-exercise': {
+        descrizione_it:
+"Questo libro descrive esercizi fisici, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Forza aumenta di 2, così come il massimo per quel punteggio. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'manual-of-golems': {
+        descrizione_it:
+"Questo tomo contiene informazioni e incantesimi necessari per creare un particolare tipo di golem. Il DM sceglie il tipo o lo determina casualmente. Per decifrare e usare il manuale, devi essere un incantatore con almeno due slot incantesimo di 5° livello. Una creatura che non può usare un manuale dei golem e tenta di leggerlo subisce 6d6 danni psichici.\n\n" +
+"Tabella tipi:\n" +
+"- 1-5 Argilla: 30 giorni, 65.000 mo\n" +
+"- 6-17 Carne: 60 giorni, 50.000 mo\n" +
+"- 18 Ferro: 120 giorni, 100.000 mo\n" +
+"- 19-20 Pietra: 90 giorni, 80.000 mo\n\n" +
+"Per creare un golem, devi spendere il tempo indicato in tabella, lavorando senza interruzioni con il manuale a portata di mano e riposando non più di 8 ore al giorno. Devi anche pagare il costo specificato per acquistare i materiali.\n\n" +
+"Una volta finito di creare il golem, il libro viene consumato in fiamme arcane. Il golem si anima quando le ceneri del manuale gli vengono cosparse sopra. È sotto il tuo controllo e comprende e obbedisce ai tuoi comandi vocali.",
+    },
+    'manual-of-quickness-of-action': {
+        descrizione_it:
+"Questo libro contiene esercizi di coordinazione ed equilibrio, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Destrezza aumenta di 2, così come il massimo per quel punteggio. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'mariner-s-armor': {
+        descrizione_it:
+"Mentre indossi questa armatura, hai una velocità di nuoto pari alla tua velocità di camminata. Inoltre, ogni volta che inizi il tuo turno sott'acqua con 0 punti ferita, l'armatura ti fa risalire di 18 metri verso la superficie. L'armatura è decorata con motivi di pesci e conchiglie.",
+    },
+    'masquerade-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio magico appare sul tuo corpo come tu desideri.\n\n" +
+"Sintonia del Tatuaggio. Per sintonizzarti, premi l'ago contro la pelle. Quando completata, l'ago diventa l'inchiostro del tatuaggio. Se la sintonia termina, il tatuaggio scompare e l'ago riappare.\n\n" +
+"Inchiostro Fluido. Con un'azione bonus, puoi modellare il tatuaggio in qualsiasi colore o motivo e spostarlo in qualsiasi area della pelle. Qualunque forma assuma, è sempre evidentemente un tatuaggio. Le dimensioni vanno da non più piccolo di una moneta di rame fino a un'opera d'arte intricata che copre tutta la pelle.\n\n" +
+"Camuffarsi. Con un'azione, puoi usare il tatuaggio per lanciare l'incantesimo Camuffarsi (CD 13 per discernere il travestimento). Una volta lanciato, non può essere lanciato di nuovo dal tatuaggio fino all'alba successiva.",
+    },
+    'medallion-of-thoughts': {
+        descrizione_it:
+"Il medaglione ha 3 cariche. Mentre lo indossi, puoi usare un'azione e spendere 1 carica per lanciare l'incantesimo Individuazione del Pensiero (CD 13) da esso. Recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'mighty-servant-of-leuk-o': {
+        descrizione_it:
+"Chiamato come il signore della guerra che lo impiegò famigeratamente, il Possente Servitore di Leuk-o è una macchina alta 3 metri di fantastico potere che si trasforma in un costrutto animato quando pilotato. Realizzato di una lega nera lucente di origine sconosciuta, il servitore è spesso descritto come una combinazione di un nano sproporzionato e uno scarafaggio sovradimensionato. Contiene spazio per 1 tonnellata di carico e una cabina equipaggio interna, dalla quale fino a due creature Medie possono controllarlo.\n\n" +
+"Sintonia Pericolosa. Due creature possono essere sintonizzate al servitore alla volta. La sintonia richiede 2 ore (riposo lungo) durante le quali devi essere all'interno del servitore. Mentre si sintonizzano, qualsiasi creatura o struttura entro 15 metri ha il 25% di essere accidentalmente bersagliata da uno dei suoi attacchi Pugno Distruttivo.\n\n" +
+"Controllare il Servitore. Una volta sintonizzati, gli attuati possono aprire il portello facilmente. Altrimenti richiede una prova di Destrezza con strumenti da scasso CD 25. Mentre dentro: muovere il servitore (nessuna azione), aprire/chiudere portello (1 volta per turno, nessuna azione), comandare un'azione del blocco statistiche, o fargli fare un attacco di opportunità con la reazione.\n\n" +
+"Spirito nella Macchina. Alla sua morte, l'anima di Leuk-o fu attratta nell'artefatto e ne è la forza animatrice. Una volta ogni 24 ore, il servitore (a discrezione del DM) effettua un'azione anche senza equipaggio. Se perde metà dei pf, ogni creatura sintonizzata deve riuscire in un tiro salvezza su Saggezza CD 20 o essere affascinata per 24 ore in modalità distruttiva.\n\n" +
+"Auto-Distruzione. Sequenza segreta di leve/pulsanti su 3 round consecutivi. All'attivazione, esplosione in raggio 30 metri: TS Destrezza CD 25, 87 (25d6) danni da forza + 87 da fulmine + 87 da tuono. Strutture triplo danno. Le creature dentro muoiono. Dopo 2d6 giorni i pezzi cadono dal cielo entro 1.600 km e si ricongiungono se posti entro 1,5 metri.\n\n" +
+"Stat block: costrutto Enorme, CA 22, 310 pf, velocità 18 m, FOR 30, DES 14, COS 20, INT 1, SAG 14, CAR 10. Resistenze a perforanti/taglienti. Immunità ad acido, contundenti, freddo, fuoco, fulmine, necrotici, veleno, psichici, radianti. Quasi tutte le condizioni immune. Percezione cieca 36 m. Rigenerazione 10 pf/turno. Pugno Distruttivo: +17 al colpo, mischia 3 m o gittata 36 m, 36 (4d12+10) danni da forza (triplo agli oggetti). Salto di Schiacciamento: dopo aver saltato almeno 7,5 metri, atterra in uno spazio con creature, ognuna TS Destrezza CD 25, 26 (4d12) contundenti e prono se fallisce.",
+    },
+    'mirror-of-life-trapping': {
+        descrizione_it:
+"Quando questo specchio alto 1,2 metri viene visto indirettamente, la sua superficie mostra deboli immagini di creature. Pesa 22 kg, e ha CA 11, 10 pf e vulnerabilità ai danni contundenti. Si frantuma e viene distrutto a 0 pf.\n\n" +
+"Se lo specchio è appeso a una superficie verticale e sei entro 1,5 metri, puoi usare un'azione per pronunciarne la parola di comando e attivarlo. Rimane attivato finché non usi un'azione per pronunciare di nuovo la parola.\n\n" +
+"Qualsiasi creatura tranne te che vede la propria immagine riflessa nello specchio attivato mentre è entro 9 metri da esso deve riuscire in un tiro salvezza su Carisma con CD 15 o essere intrappolata, assieme all'equipaggiamento, in una delle dodici celle extradimensionali dello specchio. Il TS è effettuato con vantaggio se la creatura conosce la natura dello specchio, e i costrutti hanno automaticamente successo.\n\n" +
+"Una cella extradimensionale è un'estensione infinita riempita di nebbia densa che riduce la visibilità a 3 metri. Le creature intrappolate non invecchiano e non hanno bisogno di mangiare, bere o dormire. Una creatura intrappolata può fuggire usando magia che permetta viaggio planare. Se lo specchio cattura una creatura ma le 12 celle sono già occupate, libera casualmente una creatura intrappolata.\n\n" +
+"Mentre sei entro 1,5 metri dallo specchio, puoi usare un'azione per pronunciare il nome di una creatura intrappolata o chiamare una cella per numero. La creatura appare come immagine sulla superficie e potete comunicare normalmente. In modo simile, puoi usare un'azione per pronunciare una seconda parola di comando e liberare una creatura intrappolata.",
+    },
+    'mistral-mantle': {
+        descrizione_it:
+"Questo spesso mantello foderato di pelliccia ha la runa del gelo cucita sull'orlo con filo blu argenteo. Vento gelido vortica attorno al mantello, indipendentemente dal tempo.\n\n" +
+"Mentre indossi questo mantello, hai resistenza ai danni da freddo. Inoltre, quando ti muovi entro 1,5 metri da una creatura, puoi far sì che il vento freddo del mantello la colpisca. La creatura deve riuscire in un tiro salvezza su Destrezza con CD 14 o subire 1d6 danni da freddo e avere la condizione di prono. Una creatura può essere influenzata dal mantello solo una volta per turno.\n\n" +
+"Invocare la Runa. Con un'azione, puoi invocare la runa del mantello per lanciare l'incantesimo Tempesta di Nevischio (CD 14). Quando usi il mantello per lanciare l'incantesimo, l'area dell'incantesimo non è terreno difficile per te, e puoi vedere attraverso la tempesta, ignorando le penalità normali di un'area pesantemente oscurata. Non riutilizzabile fino all'alba successiva.",
+    },
+    'mithral-armor': {
+        descrizione_it:
+"Il mithral è un metallo leggero e flessibile. Una camicia di mithral può essere indossata sotto i vestiti normali. Se l'armatura normalmente impone svantaggio alle prove di Destrezza (Furtività) o ha un requisito minimo di Forza, la versione di mithral non lo fa.",
+    },
+    'moon-sickle': {
+        descrizione_it:
+"Questo falcetto dalla lama d'argento brilla dolcemente di luce lunare. Mentre tieni quest'arma magica, ottieni un bonus ai tiri per colpire e ai tiri di danno effettuati con essa, e ottieni un bonus ai tiri per colpire con incantesimo e alle CD dei tiri salvezza dei tuoi incantesimi da druido e ranger. Il bonus è determinato dalla rarità dell'arma. Inoltre, puoi usare il falcetto come focus per i tuoi incantesimi da druido e ranger.\n\n" +
+"Quando lanci un incantesimo che ripristina punti ferita, puoi tirare un d4 e aggiungere il numero ottenuto al totale dei punti ferita ripristinati, purché tu stia tenendo il falcetto.",
+    },
+    'moon-touched-sword': {
+        descrizione_it:
+"Nell'oscurità, la lama sguainata di questa spada emana luce lunare, creando luce intensa entro 4,5 metri e luce fioca per ulteriori 4,5 metri.",
+    },
+    'moonblade': {
+        descrizione_it:
+"Una Lamaluna passa di genitore in figlio. La spada sceglie il suo portatore e rimane legata a quella persona per tutta la vita. Se il portatore muore, un altro erede può reclamare la lama. Se non esiste un erede degno, la spada giace dormiente, funzionando come una normale spada lunga finché un'anima degna non la rivendica. La sintonia richiede uno speciale rituale nella sala del trono di un reggente elfico o in un tempio dedicato agli dei elfici.\n\n" +
+"Una Lamaluna non servirà nessuno che consideri vile, instabile, corrotto o in contrasto con la preservazione e protezione della stirpe elfica. Se rifiuta, hai svantaggio per 24 ore. Se accetta, ti sintonizzi e una nuova runa appare sulla lama.\n\n" +
+"Una Lamaluna ha una runa per ogni padrone servito (tipicamente 1d6+1). La prima runa concede sempre +1 ai tiri per colpire e ai tiri di danno. Ogni runa successiva concede una proprietà aggiuntiva (vedi tabella nel manuale): aumento del bonus fino a +3, proprietà minore casuale, accuratezza, lanciabile, funziona come Difensore, critico su 19-20, danni extra 1d6 (taglienti o tipo elementale), lampo accecante, anello di immagazzinare incantesimi, evocare ombra elfica, Spada Vorpal.\n\n" +
+"Senzienza. Lamaluna è un'arma senziente neutrale buona con Intelligenza 12, Saggezza 10 e Carisma 12. Ha udito e scurovisione fino a 36 metri. Comunica trasmettendo emozioni o, durante trance/sonno, attraverso visioni. Cerca l'avanzamento della stirpe elfica e degli ideali elfici (coraggio, lealtà, bellezza, musica, vita). Difetto: eccessiva sicurezza.",
+    },
+    'mystery-key': {
+        descrizione_it:
+"Un punto interrogativo è inciso sulla testa di questa chiave. La chiave ha il 5% di probabilità di sbloccare qualsiasi serratura in cui viene inserita. Una volta sbloccato qualcosa, la chiave scompare.",
+    },
+
+    // ── Batch N ────────────────────────────────────────────────────────
+    'nature-s-mantle': {
+        descrizione_it:
+"Questo mantello cambia colore e texture per fondersi col terreno circostante. Mentre indossi il mantello, puoi usarlo come focus per i tuoi incantesimi da druido e ranger.\n\n" +
+"Mentre sei in un'area lievemente oscurata, puoi Nasconderti come azione bonus anche se sei direttamente osservato.",
+    },
+    'necklace-of-adaptation': {
+        descrizione_it:
+"Mentre indossi questa collana, puoi respirare normalmente in qualsiasi ambiente, e hai vantaggio ai tiri salvezza contro gas e vapori dannosi (come gli effetti di Nube Mortale e Nube Maleodorante, veleni inalati e gli attacchi del soffio di alcuni draghi).",
+    },
+    'necklace-of-fireballs': {
+        descrizione_it:
+"Questa collana ha 1d6+3 perline appese. Puoi usare un'azione per staccare una perlina e lanciarla fino a 18 metri. Quando raggiunge la fine della traiettoria, la perlina detona come un incantesimo Palla di Fuoco di 3° livello (CD 15).\n\n" +
+"Puoi lanciare più perline, o anche l'intera collana, con una sola azione. Quando lo fai, aumenta il livello della Palla di Fuoco di 1 per ogni perlina oltre la prima.",
+    },
+    'necklace-of-prayer-beads': {
+        descrizione_it:
+"Questa collana ha 1d4+2 perline magiche di acquamarina, perla nera o topazio. Ha anche molte perline non magiche di pietre come ambra, diaspro sanguigno, citrino, corallo, giada, perla o quarzo. Se una perlina magica viene rimossa, perde la sua magia.\n\n" +
+"Esistono sei tipi di perline magiche. Il DM decide il tipo o lo determina casualmente. Per usarne una, devi indossare la collana. Ogni perlina contiene un incantesimo che puoi lanciare come azione bonus (usando la tua CD se necessario). Una volta lanciato, quella perlina non riutilizzabile fino all'alba successiva.\n\n" +
+"Tabella d20:\n" +
+"- 1-6 Benedizione: Benedire\n" +
+"- 7-12 Cura: Cura Ferite (2° liv.) o Ristorare Inferiore\n" +
+"- 13-16 Favore: Ristorare Superiore\n" +
+"- 17-18 Castigo: Castigo Marchiante\n" +
+"- 19 Evocazione: Alleato Planare\n" +
+"- 20 Cammino del Vento: Cammino del Vento",
+    },
+    'nimbus-coronet': {
+        descrizione_it:
+"Il design di questo diadema di bronzo ricorda nuvole vorticanti. Al centro è incastonata una pietra blu profondo, sulla quale è incisa la runa della nuvola.\n\n" +
+"Mentre indossi questo diadema, non subisci danni dalle cadute. Inoltre, con un'azione bonus, tu e tutto ciò che indossi o porti potete teletrasportarvi in uno spazio libero che vedi entro 4,5 metri da te, riapparendo in uno sbuffo di nuvole scintillanti.\n\n" +
+"Invocare la Runa. Con un'azione, puoi invocare la runa del diadema per assumere una forma di nuvola. La forma dura 1 minuto, finché non sei incapacitato, o finché non la dismetti (nessuna azione richiesta). Mentre in forma di nuvola, hai una velocità di volo di 18 metri e resistenza ai danni contundenti, perforanti e taglienti. Non riutilizzabile fino all'alba successiva.",
+    },
+    'nine-lives-stealer': {
+        descrizione_it:
+"Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica.\n\n" +
+"La spada ha 1d8+1 cariche. Se ottieni un colpo critico contro una creatura che ha meno di 100 punti ferita, deve riuscire in un tiro salvezza su Costituzione con CD 15 o essere uccisa istantaneamente mentre la spada le strappa la forza vitale dal corpo (un costrutto o un non morto è immune). La spada perde 1 carica se la creatura viene uccisa. Quando la spada non ha più cariche, perde questa proprietà.",
+    },
+    'nolzur-s-marvelous-pigments': {
+        descrizione_it:
+"La vernice fluisce dal pennello formando l'oggetto desiderato mentre ti concentri sulla sua immagine.\n\n" +
+"Ogni vasetto di vernice è sufficiente a coprire 100 m², il che ti permette di creare oggetti inanimati o caratteristiche del terreno (come una porta, una fossa, fiori, alberi, celle, stanze o armi) fino a 280 m³. Servono 10 minuti per coprire 10 m².\n\n" +
+"Quando completi la pittura, l'oggetto o la caratteristica del terreno raffigurato diventa un oggetto reale, non magico. Quindi, dipingere una porta su un muro crea una porta vera che può essere aperta verso ciò che si trova al di là. Dipingere una fossa su un pavimento crea una fossa reale.\n\n" +
+"Niente di creato può avere un valore superiore a 25 mo. Se dipingi un oggetto di valore maggiore (come un diamante o un mucchio d'oro), l'oggetto sembra autentico, ma un'ispezione ravvicinata rivela che è fatto di pasta, osso o altro materiale senza valore. Se dipingi una forma di energia come fuoco o fulmine, l'energia appare ma si dissipa appena completi la pittura, senza causare danni.",
+    },
+
+    // ── Batch O ────────────────────────────────────────────────────────
+    'oathbow': {
+        descrizione_it:
+"Quando incocchi una freccia su questo arco, sussurra in Elfico: \"Rapida sconfitta ai miei nemici\". Quando usi quest'arma per effettuare un attacco a distanza, puoi, come frase di comando, dire: \"Rapida morte a te che mi hai fatto torto\". Il bersaglio del tuo attacco diventa il tuo nemico giurato finché non muore o fino all'alba di sette giorni dopo. Puoi avere solo un nemico giurato alla volta. Quando il tuo nemico giurato muore, puoi sceglierne uno nuovo dopo l'alba successiva.\n\n" +
+"Quando effettui un tiro per colpire a distanza con quest'arma contro il tuo nemico giurato, hai vantaggio al tiro. Inoltre, il tuo bersaglio non ottiene alcun beneficio dalla copertura, tranne la copertura totale, e tu non subisci svantaggio per la lunga distanza. Se l'attacco colpisce, il tuo nemico giurato subisce ulteriori 3d6 danni perforanti.\n\n" +
+"Mentre il tuo nemico giurato è vivo, hai svantaggio ai tiri per colpire con tutte le altre armi.",
+    },
+    'oil-of-etherealness': {
+        descrizione_it:
+"Questo olio leggermente brillante può coprire una creatura Media, assieme all'equipaggiamento (richiede una fiala aggiuntiva per ogni categoria di taglia oltre Media). Applicarlo richiede 10 minuti. La creatura affetta ottiene poi l'effetto dell'incantesimo Etereità per 1 ora.",
+    },
+    'oil-of-sharpness': {
+        descrizione_it:
+"Questo olio gelatinoso trasparente brilla con minuscole, ultrasottili schegge d'argento. L'olio può coprire un'arma tagliente o perforante o fino a 5 munizioni taglienti o perforanti. Applicare l'olio richiede 1 minuto. Per 1 ora, l'oggetto rivestito è magico e ha un bonus di +3 ai tiri per colpire e ai tiri di danno.",
+    },
+    'oil-of-slipperiness': {
+        descrizione_it:
+"Questo unguento nero e appiccicoso è denso e pesante nel contenitore, ma scorre velocemente quando versato. L'olio può coprire una creatura Media o inferiore, assieme all'equipaggiamento (una fiala aggiuntiva per ogni categoria di taglia oltre Media). Applicare l'olio richiede 10 minuti. La creatura affetta ottiene poi l'effetto dell'incantesimo Libertà di Movimento per 8 ore.\n\n" +
+"In alternativa, l'olio può essere versato a terra come azione, dove copre un quadrato di 3 metri di lato, duplicando l'effetto dell'incantesimo Grasso in quell'area per 8 ore.",
+    },
+    'orb-of-direction': {
+        descrizione_it:
+"Mentre tieni questo orbe, puoi usare un'azione per determinare quale direzione è il nord. Questa proprietà funziona solo sul Piano Materiale.",
+    },
+    'orb-of-dragonkind': {
+        descrizione_it:
+"Un orbe è un globo di cristallo inciso di circa 25 cm di diametro. Quando viene usato, cresce a circa 50 cm di diametro, e una nebbia vortica al suo interno. Originariamente uno per ogni torre dei maghi, vennero usati per attirare e distruggere draghi durante una guerra. Solo tre si pensa siano sopravvissuti. La loro magia è stata distorta nei secoli; ognuno contiene l'essenza di un drago malvagio che si oppone a chi cerca di usarlo.\n\n" +
+"Mentre sintonizzato con un orbe, puoi usare un'azione per scrutare nelle sue profondità e pronunciare la sua parola di comando. Devi poi superare una prova di Carisma con CD 15. Se hai successo, controlli l'orbe finché rimani sintonizzato. Se fallisci, vieni affascinato dall'orbe finché rimani sintonizzato. Mentre affascinato, non puoi terminare volontariamente la sintonia, e l'orbe lancia Suggestione su di te a volontà (CD 18).\n\n" +
+"Proprietà Casuali: 2 proprietà benefiche minori, 1 dannosa minore, 1 dannosa maggiore.\n\n" +
+"Incantesimi. L'orbe ha 7 cariche e recupera 1d4+3 cariche all'alba. Se controlli l'orbe, puoi spendere cariche per lanciare (CD 18): Cura Ferite (5° liv., 3 cariche), Luce del Giorno (1), Pegno di Morte (2), Scrutare (3). Puoi anche lanciare Individuazione del Magico senza spendere cariche.\n\n" +
+"Chiamare Draghi. Mentre controlli l'orbe, puoi usare un'azione per emettere un richiamo telepatico in tutte le direzioni per 64 km. I draghi malvagi nel raggio si sentono compelliti a venire all'orbe il prima possibile. Le divinità draconiche come Tiamat sono inalterate. I draghi attratti potrebbero essere ostili. Una volta usata, non riutilizzabile per 1 ora.\n\n" +
+"Distruggere un Orbe. L'orbe appare fragile ma è impervio alla maggior parte dei danni, inclusi attacchi e soffi dei draghi. Un incantesimo Disintegrazione o un buon colpo da un'arma magica +3 è sufficiente per distruggerlo.",
+    },
+    'orb-of-skoraeus': {
+        descrizione_it:
+"Si dice infuso con la saggezza e il potere del dio Skoraeus, questo orbe di pietra lucida è venato di cristallo iridescente che sembra brillare dall'interno. L'orbe è di 20 cm di diametro e pesa 3,5 kg, rendendolo un ninnolo per un gigante della pietra ma più ingombrante per una creatura Media.\n\n" +
+"Mentre tieni questo orbe, puoi usarlo come focus per i tuoi incantesimi. Ottieni anche i seguenti benefici:\n\n" +
+"Componenti Abbondanti. L'orbe ha 3 cariche e recupera tutte le cariche all'alba. Quando lanci un incantesimo mentre tieni questo orbe, puoi spendere fino a 3 cariche per ignorare le componenti materiali dell'incantesimo con costo in monete d'oro, fino a 300 mo per carica spesa.\n\n" +
+"Mente Acuta. Ottieni un bonus di +2 a qualsiasi tiro salvezza su Costituzione effettuato per mantenere la concentrazione su un incantesimo.\n\n" +
+"Vista Divina. Puoi vedere normalmente nell'oscurità, sia magica che non magica, fino a una distanza di 36 metri.",
+    },
+    'orb-of-time': {
+        descrizione_it:
+"Mentre tieni questo orbe, puoi usare un'azione per determinare se all'esterno è mattino, pomeriggio, sera o notte. Questa proprietà funziona solo sul Piano Materiale.",
+    },
+    // ── Batch P ────────────────────────────────────────────────────────
+    'pearl-of-power': {
+        descrizione_it:
+"Mentre questa perla è sulla tua persona, puoi usare un'azione per pronunciare la sua parola di comando e recuperare uno slot incantesimo speso. Se lo slot speso era di 4° livello o superiore, il nuovo slot è di 3° livello. Una volta usata, la perla non può essere riutilizzata fino all'alba successiva.",
+    },
+    'perfume-of-bewitching': {
+        descrizione_it:
+"Questa minuscola fiala contiene un profumo magico, sufficiente per un solo uso. Puoi usare un'azione per applicare il profumo su te stesso, e il suo effetto dura 1 ora. Per la durata, hai vantaggio a tutte le prove di Carisma rivolte a umanoidi di grado di sfida 1 o inferiore. Coloro soggetti all'effetto non sono consapevoli di essere stati influenzati da magia.",
+    },
+    'periapt-of-health': {
+        descrizione_it:
+"Sei immune a contrarre qualsiasi malattia mentre indossi questo pendaglio. Se sei già infetto da una malattia, gli effetti della malattia sono soppressi mentre indossi il pendaglio.",
+    },
+    'periapt-of-proof-against-poison': {
+        descrizione_it:
+"Questa delicata catena d'argento ha un pendaglio di gemma nera taglio brillante. Mentre lo indossi, i veleni non hanno effetto su di te. Sei immune alla condizione di avvelenato e hai immunità ai danni da veleno.",
+    },
+    'periapt-of-wound-closure': {
+        descrizione_it:
+"Mentre indossi questo pendaglio, ti stabilizzi ogni volta che stai morendo all'inizio del tuo turno. Inoltre, ogni volta che tiri un Dado Vita per recuperare punti ferita, raddoppia il numero di punti ferita ripristinati.",
+    },
+    'philter-of-love': {
+        descrizione_it:
+"La prossima volta che vedi una creatura entro 10 minuti dopo aver bevuto questo filtro, sei affascinato da quella creatura per 1 ora. Se la creatura è di una specie e genere a cui sei normalmente attratto, la consideri il tuo vero amore mentre sei affascinato. Questo liquido frizzante color rosa contiene una bolla difficile da notare a forma di cuore.",
+    },
+    'pipe-of-smoke-monsters': {
+        descrizione_it:
+"Mentre fumi questa pipa, puoi usare un'azione per esalare uno sbuffo di fumo che assume la forma di una singola creatura, come un drago, un flumph o un froghemoth. La forma deve essere abbastanza piccola da entrare in un cubo di 30 cm di lato e perde la sua forma dopo pochi secondi, diventando uno sbuffo di fumo ordinario.",
+    },
+    'pipes-of-haunting': {
+        descrizione_it:
+"Devi essere competente negli strumenti a fiato per usare queste cornamuse. Hanno 3 cariche. Puoi usare un'azione per suonarle e spendere 1 carica per creare una melodia inquietante e ammaliante. Ogni creatura entro 9 metri da te che ti sente suonare deve riuscire in un tiro salvezza su Saggezza con CD 15 o essere spaventata da te per 1 minuto. Se vuoi, tutte le creature nell'area che non sono ostili automaticamente hanno successo. Una creatura che fallisce può ripetere il TS alla fine di ciascun suo turno. Una creatura che ha successo è immune all'effetto di queste cornamuse per 24 ore. Le cornamuse recuperano 1d3 cariche spese ogni giorno all'alba.",
+    },
+    'pipes-of-the-sewers': {
+        descrizione_it:
+"Devi essere competente negli strumenti a fiato per usare queste cornamuse. Mentre sei sintonizzato, ratti ordinari e ratti giganti sono indifferenti verso di te e non ti attaccheranno a meno che tu non li minacci o li danneggi.\n\n" +
+"Le cornamuse hanno 3 cariche. Se le suoni come azione, puoi usare un'azione bonus per spendere da 1 a 3 cariche, evocando uno sciame di ratti per ciascuna carica spesa, purché ci siano abbastanza ratti entro 800 metri da te. Gli sciami evocati si muovono verso la musica per la via più diretta ma non sono altrimenti sotto il tuo controllo. Le cornamuse recuperano 1d3 cariche all'alba.\n\n" +
+"Quando uno sciame di ratti non sotto controllo di un'altra creatura viene entro 9 metri da te mentre suoni, puoi effettuare una prova di Carisma contrastata dalla prova di Saggezza dello sciame. Se perdi, lo sciame si comporta normalmente per le successive 24 ore. Se vinci, lo sciame diventa amichevole verso te e i tuoi compagni finché continui a suonare ogni round come azione.",
+    },
+    'planecaller-s-codex': {
+        descrizione_it:
+"Le pagine di questo libro sono rilegate in pelle di immondo, e la copertina ha impressa la diagramma della Grande Ruota del multiverso. Quando trovato, contiene gli incantesimi: Bandire, Trova Famiglio, Porta, Cerchio Magico, Vincolo Planare ed Evocare Elementale. Funziona da libro degli incantesimi per te.\n\n" +
+"Mentre tieni il libro, puoi usarlo come focus per i tuoi incantesimi da mago.\n\n" +
+"Il libro ha 3 cariche e recupera 1d3 cariche spese ogni giorno all'alba. Puoi usare le cariche nei seguenti modi:\n" +
+"- Se passi 1 minuto a studiare il libro, puoi spendere 1 carica per sostituire uno dei tuoi incantesimi da mago preparati con un incantesimo diverso del libro. Il nuovo incantesimo deve essere della scuola di evocazione.\n" +
+"- Quando lanci un incantesimo di evocazione che evoca o crea una creatura, puoi spendere 1 carica per concedere a quella creatura vantaggio ai tiri per colpire per 1 minuto.",
+    },
+    'plate-armor-of-etherealness': {
+        descrizione_it:
+"Mentre indossi questa armatura, puoi pronunciare la sua parola di comando come azione per ottenere l'effetto dell'incantesimo Etereità, che dura 10 minuti o finché non rimuovi l'armatura o usi un'azione per pronunciare di nuovo la parola di comando. Questa proprietà non può essere riutilizzata fino all'alba successiva.",
+    },
+    'plate-of-knight-s-fellowship': {
+        descrizione_it:
+"Questa scintillante armatura di piastre argento e oro non si appanna mai.\n\n" +
+"Mentre indossi questa armatura, puoi usare un'azione bonus per evocare lo spirito di un guerriero in tuo aiuto. La forma corporea dello spirito si manifesta in uno spazio libero a tua scelta entro 9 metri da te, e usa il blocco statistiche del cavaliere. Lo spirito scompare quando scende a 0 pf o dopo 1 minuto.\n\n" +
+"Lo spirito è alleato di te e dei tuoi compagni. In combattimento, condivide la tua iniziativa ma agisce subito dopo di te. Obbedisce ai tuoi comandi (nessuna azione richiesta); se non emetti comandi, esegue Schivata e usa il movimento per evitare pericolo.\n\n" +
+"Una volta usata, non riutilizzabile fino all'alba successiva.",
+    },
+    'platinum-scarf': {
+        descrizione_it:
+"Questa sciarpa è fatta di tessuto resistente coperto di scaglie color platino.\n\n" +
+"Con un'azione, puoi staccare una scaglia dalla sciarpa e pronunciare una parola di comando, scegliendo uno dei seguenti effetti:\n\n" +
+"Soffio di Vita. La scaglia scompare, e tu o una creatura che tocchi recupera 10d4 punti ferita.\n\n" +
+"Scudo di Platino. Per 1 ora o finché non lo dismetti, la scaglia diventa uno scudo +1, che tu o un'altra creatura potete usare. Una creatura che impugna lo scudo ha immunità ai danni radianti.\n\n" +
+"Martello Radiante. Per 1 ora o finché non lo dismetti, la scaglia diventa un martello leggero magico. L'arma infligge 2d4 danni radianti, invece dei danni contundenti normali. Infligge ulteriori 2d4 danni radianti ai draghi cromatici.\n\n" +
+"Una volta strappate tre scaglie, non possono esserne rimosse altre fino all'alba successiva, quando tutte le scaglie mancanti ricrescono. Se strappi una scaglia ma non pronunci una parola di comando, scompare dopo 1 minuto.",
+    },
+    'pole-of-angling': {
+        descrizione_it:
+"Quando tieni questa asta e pronunci la sua parola di comando, si trasforma in una canna da pesca con una lenza di seta lunga 3,5 metri e un amo magico. L'amo non si stacca dai pesci che cattura finché tu non lo desideri. La canna è particolarmente fortunata e cattura un pesce dopo soli 1d4 minuti se ci sono pesci nelle vicinanze. Una parola di comando ritrasforma l'asta nella sua forma originale.",
+    },
+    'pole-of-collapsing': {
+        descrizione_it:
+"Quest'asta lunga 3 metri pesa 1 kg. Puoi usare un'azione per pronunciare la parola di comando, facendola contrarre in un'asta di 30 cm. Pronunciare di nuovo la parola di comando la fa tornare alla lunghezza originale. Ovviamente, contrarre l'asta non danneggia o muove ciò che è attaccato all'estremità.",
+    },
+    'portable-hole': {
+        descrizione_it:
+"Questo telo nero, fine come la seta, è ripiegato fino alle dimensioni di un fazzoletto. Si dispiega in un cerchio di 1,8 metri di diametro. Puoi usare un'azione per dispiegarlo e collocarlo su o contro una superficie solida, dove crea un foro extradimensionale profondo 3 metri. Il pozzo cilindrico esiste in uno spazio extradimensionale; qualsiasi creatura o oggetto al suo interno è completamente racchiuso.\n\n" +
+"Il foro portatile può essere ripiegato solo se vuoto di tutti gli oggetti e creature. Se viene rovesciato, ribaltato o ripiegato, qualsiasi creatura al suo interno viene espulsa illesa, e il foro deve essere riaperto prima di poter essere usato di nuovo. Se il foro viene piegato, una creatura nello spazio extradimensionale può usare un'azione per fare una prova di Forza CD 10. Se ha successo, una creatura forza l'apertura e fugge nello spazio occupato dall'utente.\n\n" +
+"Posizionare il foro all'interno di uno spazio extradimensionale creato da una Sacca di Conservazione, una Sacca Magica o oggetti simili distrugge istantaneamente entrambi gli oggetti e apre un portale al Piano Astrale. Il portale ha origine ovunque sia stato collocato l'oggetto. Qualsiasi creatura entro 3 metri viene risucchiata e depositata in una posizione casuale sul Piano Astrale. Il portale poi si chiude. Il portale è unidirezionale e non può essere riaperto.",
+    },
+    'pot-of-awakening': {
+        descrizione_it:
+"Se pianti una pianta ordinaria in questo vaso d'argilla e lo annaffi, la pianta diventa risvegliata 30 giorni dopo, come per l'incantesimo Risveglio. Quando la pianta si risveglia, le sue radici rompono il vaso, distruggendolo. La pianta risvegliata è amichevole verso di te.",
+    },
+    'prehistoric-figurines-of-wondrous-power': {
+        descrizione_it:
+"Una statuetta preistorica di potere meraviglioso è una statuetta scolpita di un animale preistorico abbastanza piccola da stare in una tasca. Se usi un'azione per pronunciarne la parola di comando e gettarla entro 18 metri da te, la statuetta diventa una creatura vivente. Se lo spazio dove apparirebbe è occupato, non si trasforma. La creatura è amichevole con te e i tuoi compagni. Capisce le tue lingue e obbedisce ai tuoi comandi vocali. Se non emetti comandi, si difende ma non agisce. Esistono varie versioni con diverse statistiche (vedi tabella nel manuale).",
+    },
+    'prosthetic-limb': {
+        descrizione_it:
+"Questo oggetto sostituisce un arto perduto, una mano, un piede, un occhio o qualsiasi altra parte del corpo. La protesi funziona in modo identico alla parte sostituita, comportandosi in tutto e per tutto come parte del corpo naturale e durando per la vita. Se sganciata, la protesi torna inerte.",
+    },
+    'protective-verses': {
+        descrizione_it:
+"Mentre indossi o tieni questo pezzo di pergamena con il versetto trascritto, non puoi essere affascinato o spaventato dai non morti.\n\n" +
+"Inoltre, puoi usare un'azione per leggere ad alta voce il versetto, terminando la condizione affascinato o spaventato su una creatura che puoi vedere entro 9 metri da te. Una volta usata questa azione, non può essere riutilizzata fino all'alba successiva.",
+    },
+    'psi-crystal': {
+        descrizione_it:
+"Mentre tieni questo cristallo, ottieni un bonus di +1 alle prove di Intelligenza. Inoltre, puoi telepaticamente comunicare con qualsiasi creatura entro 9 metri da te, purché parli almeno una lingua o sia altrimenti capace di comunicare.",
+    },
+
+    // ── Batch Q ────────────────────────────────────────────────────────
+    'quaal-s-feather-token': {
+        descrizione_it:
+"Questa minuscola piuma magica ha proprietà specifiche basate sul tipo. Esistono diversi tipi: Ancora (impedisce a una nave di muoversi per 24 ore), Albero d'Oro (cresce in un albero di 18 m, dura), Uccello (diventa un roc che ti porta in volo, una volta), Ventaglio (crea un vento favorevole per 8 ore), Cigno (diventa una barca per 24 ore), Frusta (diventa frusta magica per 1 ora). Il DM determina o sceglie il tipo. Una volta usato, il segno scompare.",
+    },
+    'quiver-of-ehlonna': {
+        descrizione_it:
+"Ognuno dei tre scomparti di questa faretra si collega a uno spazio extradimensionale che permette di contenere oggetti senza essere ingombri dal loro peso. Il scomparto più corto può contenere fino a sessanta frecce, dardi di balestra o oggetti simili. Il scomparto medio può contenere fino a diciotto giavellotti o oggetti simili. Il scomparto più lungo può contenere fino a sei oggetti lunghi, come archi, mazze o bastoni. Puoi estrarre qualsiasi oggetto dalla faretra come se da una faretra o un fodero ordinari.",
+    },
+
+    // ── Batch R ────────────────────────────────────────────────────────
+    'reaper-s-scream': {
+        descrizione_it:
+"Quest'arma magica è una falce di metallo nero con la lama che sussurra. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con essa. Inoltre, l'arma infligge ulteriori 2d6 danni necrotici quando colpisce.\n\n" +
+"Una volta per turno quando colpisci una creatura, puoi forzarla a effettuare un tiro salvezza su Costituzione CD 17. Se fallisce, la creatura viene ridotta a 0 punti ferita se aveva 50 pf o meno. Altrimenti subisce ulteriori 4d8 danni necrotici.\n\n" +
+"Mentre tieni l'arma, puoi usare un'azione bonus per emettere un urlo terrificante. Ogni creatura a tua scelta entro 9 metri che possa udirti deve riuscire in un tiro salvezza su Saggezza CD 17 o essere spaventata da te per 1 minuto. Una volta usata, non riutilizzabile fino all'alba successiva.",
+    },
+    'reveler-s-concertina': {
+        descrizione_it:
+"Mentre tieni questa fisarmonica, puoi usare un'azione per lanciare l'incantesimo Risata Irresistibile di Tasha (CD 15) da essa. Una volta lanciato, non può essere lanciato di nuovo fino al giorno successivo all'alba.\n\n" +
+"Inoltre, puoi suonare la concertina per 10 minuti come parte di un riposo breve per ispirare allegria. Tu e fino a otto creature consenzienti che ti ascoltano ottenete il beneficio dell'incantesimo Eroismo (caratteristica di lancio Carisma) per la durata del riposo, dopodiché la creatura non subisce alcun livello di esaustione che avrebbe altrimenti subito.",
+    },
+    'rhythm-maker-s-drum': {
+        descrizione_it:
+"Mentre tieni questo tamburo, puoi usarlo come focus per incantesimi da bardo. Inoltre, ottieni un bonus di +1 ai tiri per colpire con incantesimi e alle CD dei tiri salvezza dei tuoi incantesimi da bardo mentre tieni il tamburo.\n\n" +
+"Il tamburo ha 4 cariche. Mentre lo tieni, puoi usare un'azione per spendere 1 o più cariche per lanciare uno dei seguenti incantesimi (CD 13): Charme su Persone (1 carica), Comando (1), Compulsione (4), Suggestione Massima (3) o Suggestione (2).\n\n" +
+"Il tamburo recupera 1d4 cariche spese ogni giorno all'alba. Se spendi l'ultima carica, tira un d20. Con un 1, il tamburo diventa un tamburo ordinario.",
+    },
+    'robe-of-eyes': {
+        descrizione_it:
+"Questa veste è ricoperta di disegni simili a occhi. Mentre la indossi, ottieni i seguenti benefici:\n\n" +
+"- La veste ti permette di vedere in tutte le direzioni, e hai vantaggio alle prove di Saggezza (Percezione) basate sulla vista.\n" +
+"- Hai scurovisione fino a 36 metri.\n" +
+"- Puoi vedere creature e oggetti invisibili, oltre a vedere nel Piano Etereo, fino a 36 metri.\n\n" +
+"Gli occhi sulla veste non possono essere chiusi o distolti. Sebbene tu possa chiudere o coprire i tuoi occhi naturali, non sei mai considerato sorpreso se la veste è intatta.\n\n" +
+"L'incantesimo Luce lanciato sulla veste o un effetto Luce del Giorno targato sulla veste accecano sia te che gli occhi della veste per 1 minuto.",
+    },
+    'robe-of-scintillating-colors': {
+        descrizione_it:
+"Questa veste ha 3 cariche e recupera 1d3 cariche all'alba. Mentre la indossi, puoi usare un'azione e spendere 1 carica per far sì che la veste mostri un display vorticante di colori scintillanti fino alla fine del tuo prossimo turno. Durante questo tempo, la veste emette luce intensa entro 9 metri e luce fioca per ulteriori 9 metri. Le creature che vedono e sono entro 9 metri da te devono riuscire in un tiro salvezza su Saggezza CD 15 o essere accecate fino alla fine dell'effetto.",
+    },
+    'robe-of-stars': {
+        descrizione_it:
+"Questa veste nera o blu scuro è ricamata con piccole stelle bianche o argentee. Ottieni un bonus di +1 ai tiri salvezza mentre la indossi.\n\n" +
+"Sei punti potenza. La veste ha sei stelle, sul davanti. Mentre indossi la veste, puoi usare un'azione per estrarre una stella e usarla come una freccia magica +1 (incantesimo Dardo Incantato 5° livello da uno slot, ma uso individuale). Quando una stella viene rimossa, scompare; ricompare nuovamente all'alba successiva.\n\n" +
+"Mentre indossi la veste, puoi usare un'azione per entrare nel Piano Astrale, assieme all'equipaggiamento. Rimani nel piano finché non usi un'azione per tornare al piano in cui ti trovavi. Riappari nello spazio che hai lasciato o, se quel spazio è occupato, nello spazio libero più vicino.",
+    },
+    'robe-of-the-archmagi': {
+        descrizione_it:
+"Questa elegante veste è fatta di lino bianco, grigio o nero ricamata con simboli arcani. Il colore della veste corrisponde all'allineamento per cui è stata creata. Una veste bianca è fatta per maghi buoni, una grigia per maghi neutri e una nera per maghi malvagi.\n\n" +
+"Devi essere un mago, stregone o warlock per sintonizzarti con questa veste. Se cerchi di sintonizzarti con essa e il tuo allineamento non corrisponde a quello della veste, subisci 6d10 danni psichici e non puoi sintonizzarti.\n\n" +
+"Mentre indossi la veste, ottieni i seguenti benefici:\n" +
+"- Se non indossi armatura, la tua classe armatura di base è 15 + il tuo modificatore di Destrezza.\n" +
+"- Hai vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.\n" +
+"- La CD del tiro salvezza dei tuoi incantesimi aumenta di 2.",
+    },
+    'robe-of-useful-items': {
+        descrizione_it:
+"Questa veste ha vari pezzi di stoffa di forme diverse cuciti su di essa. Mentre la indossi, puoi usare un'azione per staccare una toppa, facendola diventare l'oggetto o la creatura che rappresenta. Una volta che l'ultima toppa viene rimossa, la veste diventa un oggetto ordinario.\n\n" +
+"La veste ha le seguenti due toppe ciascuno, più altre 4d4 toppe casuali (vedi tabella nel manuale): pugnale, lanterna a cappuccio (piena di olio e accesa), specchio in acciaio di 30 cm, asta di legno lunga 3 metri, scala di corda di canapa di 7,5 metri, sacco. Le toppe casuali possono includere: borsa di 100 mo, scatola di legno con stoppino di candela, ariete di ferro, finestra di vetro 3x9 m, scala 3 m, mulo (con sacche), prato di 3 m², pozzetto aperto di 3 metri, mastino, porta in legno (con apertura per spaccare), barca a remi 3 m, incantesimi (Pergamena a scelta del DM), spada lunga 2H, finestra di Etereità (per 10 secondi).",
+    },
+    'rogue-s-mantle': {
+        descrizione_it:
+"Questo mantello scuro ti consente di muoverti come un'ombra. Mentre lo indossi, ottieni i seguenti benefici:\n\n" +
+"- Hai vantaggio alle prove di Destrezza (Furtività).\n" +
+"- Hai un bonus di +1 alla CA.\n" +
+"- Quando una creatura non vista da te effettua un tiro per colpire contro di te, puoi usare la reazione per imporre svantaggio al tiro. Devi usare questa caratteristica prima di sapere se l'attacco colpisce.",
+    },
+    'rope-of-climbing': {
+        descrizione_it:
+"Questa corda di seta lunga 18 metri pesa 1,5 kg e può sostenere fino a 1.500 kg. Se tieni un'estremità della corda e usi un'azione per pronunciare la parola di comando, la corda si anima. Come azione bonus, puoi comandarle di muoversi o fissarsi a un oggetto entro 18 metri da te. Quando arriva all'oggetto, vi si fissa finché non emetti un altro comando.\n\n" +
+"La corda può anche slegare nodi. Pronunciare la parola di comando fa sciogliere o scivolare la corda da un nodo, anche se è stato legato saldamente. La corda ha CA 20 e 20 pf. Recupera 1 pf ogni 5 minuti se ha almeno 1 pf. Se la corda scende a 0 pf, viene distrutta.",
+    },
+    'rope-of-entanglement': {
+        descrizione_it:
+"Questa corda misura 9 metri di lunghezza. Mentre tieni un'estremità della corda, puoi usare un'azione per pronunciare la parola di comando e far sì che l'altra estremità si lanci verso una creatura entro 6 metri da te. La creatura bersaglio deve riuscire in un tiro salvezza su Destrezza CD 15 o essere trattenuta dalla corda.\n\n" +
+"Puoi rilasciare la creatura usando un'azione bonus per pronunciare una seconda parola di comando. Una creatura trattenuta dalla corda può usare un'azione per fare una prova di Forza CD 15. Se ha successo, non è più trattenuta.\n\n" +
+"La corda ha CA 20 e 20 pf. Recupera 1 pf ogni 5 minuti se ha almeno 1 pf. Se la corda scende a 0 pf, viene distrutta.",
+    },
+    'rope-of-mending': {
+        descrizione_it:
+"Puoi tagliare questa corda di canapa lunga 15 metri in qualsiasi numero di pezzi più piccoli, e poi usare un'azione per pronunciare la parola di comando e far sì che i pezzi si riuniscano magicamente. I pezzi devono essere a portata di mano quando pronunci la parola di comando. Una corda formata in questo modo è indistinguibile da una normale corda di canapa.",
+    },
+    'ruby-of-the-war-mage': {
+        descrizione_it:
+"Inciso con motivi marziali, questo rubino di 2,5 cm di diametro ti permette di usare un'arma semplice o da guerra come focus per incantesimi.\n\n" +
+"Per la durata della sintonia, puoi attaccare il rubino a un'arma premendolo contro l'arma per almeno 10 minuti. In seguito, finché il rubino rimane attaccato e tu sei sintonizzato con esso, puoi usare quell'arma come focus per i tuoi incantesimi.\n\n" +
+"Il rubino cade dall'arma se la tua sintonia con il rubino termina.",
+    },
+    'ruby-weave-gem': {
+        descrizione_it:
+"Forgiata da maghi rubino, questa gemma sfaccettata ti dà accesso al filo grezzo della Trama. Mentre la tieni, puoi usarla come focus per i tuoi incantesimi.\n\n" +
+"Magia Aumentata. Quando lanci un incantesimo mentre tieni la gemma, puoi lanciarla utilizzando uno slot 1 livello superiore al normale. Una volta usata in questo modo, la gemma non può essere riutilizzata in questo modo fino all'alba successiva.\n\n" +
+"Magia Frazionata. Immediatamente dopo aver usato Magia Aumentata, devi riuscire in un tiro salvezza su Costituzione CD 12 o subire 1d12 danni di forza per ogni livello dell'incantesimo lanciato e una caratteristica casuale viene ridotta di 1d4 (recupero con riposo lungo).",
+    },
+    'ruinous-flail': {
+        descrizione_it:
+"Quest'arma magica è un mazzafrusto la cui testa è marchiata con la runa della rovina. Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con essa, e ogni colpo infligge ulteriori 1d4 danni necrotici.\n\n" +
+"Quando colpisci un costrutto o un oggetto con quest'arma, infligge ulteriori 2d4 danni necrotici (oltre a 1d4 normale).\n\n" +
+"Invocare la Runa. Quando colpisci una creatura con quest'arma, puoi usare la reazione per invocare la runa dell'arma. Il bersaglio deve riuscire in un tiro salvezza su Costituzione CD 14 o subire ulteriori 4d8 danni necrotici e essere indebolito (svantaggio ai tiri per colpire e prove di Forza) per 1 minuto. Può ripetere il TS alla fine di ciascun suo turno. Una volta invocata, non riutilizzabile fino all'alba successiva.",
+    },
+
+    // ── Batch S ────────────────────────────────────────────────────────
+    'saddle-of-the-cavalier': {
+        descrizione_it:
+"Mentre sei in questa sella su una cavalcatura, non puoi essere disarcionato contro la tua volontà ed hai vantaggio ai tiri salvezza per evitare di cadere dalla cavalcatura.",
+    },
+    'sage-s-signet': {
+        descrizione_it:
+"Quest'anello d'argento ha una pietra arcobaleno incastonata. Mentre lo indossi, ottieni i seguenti benefici:\n\n" +
+"- Ottieni un bonus di +5 alle prove di Intelligenza.\n" +
+"- Una volta al giorno, puoi lanciare l'incantesimo Comunione con la Natura, Localizzare Creatura, Localizzare Oggetto o Visione del Vero senza componenti.\n\n" +
+"L'anello ha 5 cariche. Mentre lo indossi, puoi spendere 1 carica come azione per lanciare l'incantesimo Identificare. Recupera 1d4+1 cariche all'alba.",
+    },
+    'sanctum-amulet': {
+        descrizione_it:
+"Mentre indossi questo amuleto, puoi usare un'azione per lanciare l'incantesimo Sanctum Privato (CD 17) senza componenti. Una volta usato, non riutilizzabile fino all'alba successiva.\n\n" +
+"Inoltre, hai resistenza ai danni psichici e vantaggio ai tiri salvezza contro incantesimi che ti vincolerebbero (come Pacificare Persona).",
+    },
+    'sapphire-buckler': {
+        descrizione_it:
+"Mentre tieni questo brocchiero d'argento, ottieni un bonus di +2 alla CA. Questo bonus si aggiunge ai bonus normali dello scudo.\n\n" +
+"Inoltre, mentre tieni il brocchiero, ottieni resistenza ai danni da fulmine e tuono. Quando subisci tali danni, puoi usare la reazione per ridurre i danni a 0; il brocchiero ti danneggia per 1d4 punti ferita e la sua protezione termina fino all'alba successiva.",
+    },
+    'scarab-of-protection': {
+        descrizione_it:
+"Se tieni questo medaglione in mano per 1 round, una scaglia o un'iscrizione appare su una superficie. Successivamente, devi indossare il medaglione per ottenerne i benefici. Mentre lo indossi, ottieni i seguenti benefici:\n\n" +
+"- Hai vantaggio ai tiri salvezza contro incantesimi.\n" +
+"- Lo scarabeo ha 12 cariche. Se fallisci un tiro salvezza contro un incantesimo di necromanzia o un effetto dannoso originato da un non morto, puoi usare la reazione per spendere 1 carica e tirare di nuovo, prendendo il nuovo risultato. Se l'ultima carica viene spesa, lo scarabeo cade in polvere e viene distrutto.",
+    },
+    'scimitar-of-speed': {
+        descrizione_it:
+"Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con quest'arma magica. Inoltre, puoi effettuare un attacco con essa come azione bonus in ciascuno dei tuoi turni.",
+    },
+    'sending-stones': {
+        descrizione_it:
+"Le pietre di messaggio si trovano in coppia, ognuna scolpita o adornata in modo da somigliare all'altra. Mentre tieni una di queste pietre, puoi usare un'azione per lanciare l'incantesimo Inviare. Il bersaglio è il portatore dell'altra pietra. Se nessuna creatura tiene l'altra pietra, sai che prima di lanciare l'incantesimo e non lo lanci.\n\n" +
+"Una volta che l'incantesimo Inviare viene lanciato attraverso le pietre, esse non possono essere usate di nuovo fino all'alba successiva. Se una delle pietre della coppia viene distrutta, l'altra diventa non magica.",
+    },
+    'sentinel-shield': {
+        descrizione_it:
+"Mentre tieni questo scudo, hai vantaggio alle prove di iniziativa e alle prove di Saggezza (Percezione). Lo scudo è arrigegnato con un occhio, simile a quello di una bestia, sulla parte anteriore.",
+    },
+    'shadowfell-brand-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio magico raffigura simboli oscuri e legati allo Shadowfell.\n\n" +
+"Sintonia del Tatuaggio. Per sintonizzarti, premi l'ago contro la pelle. L'ago diventa l'inchiostro del tatuaggio. Se la sintonia termina, il tatuaggio scompare e l'ago riappare.\n\n" +
+"Resistenza Necrotica. Hai resistenza ai danni necrotici.\n\n" +
+"Aspetto Inquietante. Hai vantaggio alle prove di Carisma (Intimidire).\n\n" +
+"Furtività delle Ombre. Mentre sei in luce fioca o oscurità, puoi usare un'azione bonus per teletrasportarti fino a 9 metri in uno spazio libero che vedi che è anche in luce fioca o oscurità. Una volta usata, non riutilizzabile fino all'alba successiva.",
+    },
+    'shadowfell-shard': {
+        descrizione_it:
+"Questo cristallo scuro contiene l'essenza dello Shadowfell. Con un'azione, puoi attaccare la scheggia a un oggetto Minuscolo o staccarla. Cade se la sintonia termina. Puoi usarla come focus per incantesimi.\n\n" +
+"Quando lanci un incantesimo che infligge danni necrotici mentre tieni o indossi la scheggia, puoi infliggere ulteriori 1d6 danni necrotici a uno dei bersagli dell'incantesimo. Inoltre, mentre la tieni o indossi, hai resistenza ai danni necrotici.",
+    },
+    'shield-1-2-or-3': {
+        descrizione_it:
+"Mentre impugni questo scudo, ottieni un bonus alla CA pari al bonus dello scudo. Questo bonus si aggiunge al bonus normale dello scudo alla CA.",
+    },
+    'shield-of-expression': {
+        descrizione_it:
+"La parte anteriore di questo scudo è scolpita nella forma di un volto. Mentre impugni lo scudo, puoi usare un'azione bonus per cambiare l'espressione del volto.",
+    },
+    'shield-of-missile-attraction': {
+        descrizione_it:
+"Mentre tieni questo scudo, hai resistenza ai danni dagli attacchi con armi a distanza.\n\n" +
+"Maledizione. Questo scudo è maledetto. Sintonizzarsi con esso ti maledice fino a quando rimuovi la maledizione con Rimuovi Maledizione o magia simile. Rimuovere lo scudo non rimuove la maledizione. Ogni volta che un attacco con arma a distanza viene effettuato contro un bersaglio entro 3 metri da te, la maledizione fa diventare te il bersaglio invece.",
+    },
+    'shield-of-the-blazing-dreadnought': {
+        descrizione_it:
+"Quest'enorme scudo torre è imbronciato con la runa della furia.\n\n" +
+"Mentre impugni questo scudo, ottieni un bonus alla CA pari al bonus dello scudo +2.\n\n" +
+"Inoltre, hai resistenza ai danni da fuoco mentre impugni lo scudo.\n\n" +
+"Invocare la Runa. Come azione, puoi invocare la runa dello scudo. Per 1 minuto, le creature ostili entro 9 metri da te subiscono 1d6 danni da fuoco all'inizio dei loro turni. Una volta invocata, non riutilizzabile fino all'alba successiva.",
+    },
+    'shield-of-the-tortoise': {
+        descrizione_it:
+"Mentre tieni questo scudo, puoi usare un'azione bonus per pronunciare la parola di comando e far sì che lo scudo cresca, fornendoti copertura totale fino all'inizio del tuo prossimo turno. Mentre lo scudo è ingrandito, la tua velocità è 0. Puoi pronunciare di nuovo la parola di comando come azione bonus per restituire lo scudo alle dimensioni normali. Una volta usata, non riutilizzabile fino all'alba successiva.",
+    },
+    'shrieking-greaves': {
+        descrizione_it:
+"Questi schinieri di metallo emettono uno stridio quando li indossi e ti muovi.\n\n" +
+"Mentre indossi questi schinieri, qualsiasi creatura entro 18 metri da te che possa udire ti percepisce automaticamente, e tu hai svantaggio alle prove di Destrezza (Furtività).\n\n" +
+"Tuttavia, hai resistenza ai danni da tuono e immunità alla condizione di assordato.",
+    },
+    'skull-helm': {
+        descrizione_it:
+"Mentre indossi questo elmo a forma di teschio, ottieni resistenza ai danni necrotici. Inoltre, ottieni i seguenti benefici:\n\n" +
+"Aspetto Terrificante. Hai vantaggio alle prove di Carisma (Intimidire).\n\n" +
+"Sguardo Mortale. Come azione, puoi puntare lo sguardo su una creatura entro 9 metri che possa vederti. Il bersaglio deve riuscire in un tiro salvezza su Saggezza CD 15 o essere spaventato da te per 1 minuto. Può ripetere il TS alla fine di ciascun suo turno. Una volta usata, non riutilizzabile fino all'alba successiva.",
+    },
+    'sling-of-giant-felling': {
+        descrizione_it:
+"Quest'arma magica ti permette di colpire i giganti con potenza inaspettata. Quando colpisci una creatura con il sottotipo gigante con un attacco effettuato con questa fionda, infligge ulteriori 2d6 danni e la creatura deve riuscire in un tiro salvezza su Forza CD 15 o cadere prona.",
+    },
+    'slippers-of-spider-climbing': {
+        descrizione_it:
+"Mentre indossi queste pantofole leggere, puoi muoverti su e giù per superfici verticali e a testa in giù lungo i soffitti, lasciando libere le tue mani. Hai una velocità di scalata pari alla tua velocità di camminata. Tuttavia, le pantofole non funzionano su superfici scivolose, come quelle coperte di ghiaccio o olio.",
+    },
+    'smoldering-armor': {
+        descrizione_it:
+"Sottili volute di fumo si elevano da quest'armatura. Il fumo non ti odora ed è inoffensivo. L'armatura ti permette di esalare fumo senza danni anche se è bagnata.",
+    },
+    'sovereign-glue': {
+        descrizione_it:
+"Questa sostanza viscosa, lattiginosa e biancastra può tenere insieme due oggetti permanentemente. Deve essere conservata in un vasetto o fiala che è stato rivestito all'interno con olio di scivolosità. Quando trovato, un contenitore contiene 1d6+1 once di colla.\n\n" +
+"Un'oncia di colla può coprire un'area di 0,1 m². La colla impiega 1 minuto per fare presa. Una volta che la colla sovrana ha fatto presa, gli oggetti che lega possono essere separati solo applicando solvente universale o olio di etereità, o con un incantesimo Desiderio.",
+    },
+    'spell-scroll': {
+        descrizione_it:
+"Una pergamena di incantesimo contiene le parole di un singolo incantesimo, scritte in una scrittura misteriosa, esoterica. Se l'incantesimo è nella tua lista di incantesimi della classe, puoi leggere la pergamena e lanciare il suo incantesimo senza dover fornire componenti materiali. Altrimenti, la pergamena è incomprensibile. Lanciare l'incantesimo dalla pergamena richiede il tempo di lancio normale dell'incantesimo. Una volta lanciato, le parole sulla pergamena svaniscono e la pergamena si autodistrugge. Se il lancio viene interrotto, la pergamena non viene persa.\n\n" +
+"Se l'incantesimo è di un livello superiore al livello massimo di incantesimo che puoi lanciare normalmente, devi fare una prova della tua caratteristica di lancio per determinare se lo lanci con successo. La CD è 10 + livello dell'incantesimo. In caso di fallimento, l'incantesimo svanisce dalla pergamena senza altro effetto.",
+    },
+    'spellguard-shield': {
+        descrizione_it:
+"Mentre tieni questo scudo, hai vantaggio ai tiri salvezza contro incantesimi e altri effetti magici, e i tiri per colpire con incantesimo hanno svantaggio contro di te.",
+    },
+    'spellwrought-tattoo': {
+        descrizione_it:
+"Prodotto da un ago speciale, questo tatuaggio magico ti garantisce l'uso di un singolo incantesimo. Il livello dell'incantesimo determina la rarità del tatuaggio (cantrip = comune, 1° = comune, 2° = non comune, 3° = non comune, 4° = raro, 5° = raro, 6° = molto raro, 7° = molto raro, 8° = molto raro, 9° = leggendario).\n\n" +
+"Per applicare il tatuaggio, premi l'ago contro la pelle. L'ago diventa l'inchiostro del tatuaggio.\n\n" +
+"Mentre il tatuaggio è sulla pelle, puoi lanciare l'incantesimo del tatuaggio. Una volta lanciato, il tatuaggio svanisce.",
+    },
+    'sphere-of-annihilation': {
+        descrizione_it:
+"Questa sfera nera di 60 cm di diametro è un foro nel multiverso, che fluttua nello spazio, stabilizzato dal campo magico che la circonda.\n\n" +
+"La sfera annienta tutta la materia con cui entra in contatto. Spazi extradimensionali (come quelli creati da una Sacca Magica o un Buco Portatile) sopravvivono al contatto con essa, ma il loro contenuto viene annichilito.\n\n" +
+"Ogni volta che entri in contatto con la sfera o ti muovi a meno di 30 cm da essa, devi riuscire in un tiro salvezza su Destrezza CD 13 o subire 4d10 danni di forza. Gli oggetti che non vengono indossati o trasportati che entrano in contatto con la sfera vengono annichiliti.\n\n" +
+"La sfera è ferma finché qualcuno non la controlla. Se sei entro 18 metri dalla sfera incontrollata, puoi usare un'azione per fare una prova di Intelligenza (Arcano) CD 25. Se hai successo, la sfera si muove fino a 1,5 metri per ogni punto del tuo modificatore di Intelligenza (minimo 0). Se fallisci, la sfera si muove di 3 metri verso di te.\n\n" +
+"Se la sfera entra in contatto con un portale planare (come quello creato dall'incantesimo Porta) o uno spazio extradimensionale (come quello dentro un Buco Portatile), il DM determina casualmente cosa succede.",
+    },
+    'spindle-of-fate': {
+        descrizione_it:
+"Mentre tieni questo fuso magico, puoi usare un'azione per lanciare l'incantesimo Predire (CD 18), o un'azione bonus per imporre vantaggio o svantaggio a una creatura entro 18 metri sul prossimo tiro per colpire o tiro salvezza che effettua entro il tuo prossimo turno.\n\n" +
+"Il fuso ha 7 cariche. Le proprietà magiche spendono 1 carica ciascuna. Recupera 1d4+3 cariche all'alba.",
+    },
+    'starshot-crossbow': {
+        descrizione_it:
+"Quest'arma magica è una balestra leggera. Quando colpisci con un attacco usando questa balestra, l'attacco infligge ulteriori 1d6 danni radianti.\n\n" +
+"Inoltre, mentre tieni la balestra, puoi usare un'azione per evocare un dardo da balestra fatto di luce stellare. Il dardo dura finché non viene sparato dalla balestra o finché non passa 1 minuto.",
+    },
+    'stone-of-controlling-earth-elementals': {
+        descrizione_it:
+"Se la pietra è in contatto con la terra, puoi usare un'azione per pronunciarne la parola di comando ed evocare un Elementale della Terra, come se avessi lanciato l'incantesimo Evocazione di Elementali. La pietra non può essere riutilizzata fino all'alba successiva. La pietra pesa 2,5 kg.",
+    },
+    'stone-of-golorr': {
+        descrizione_it:
+"La Pietra di Golorr è il vessel di un'aberrazione che si nutre dei sussurri delle ricchezze. Ti concede potere divinatorio sui tesori celati, ma desidera essere usato. Mentre la tieni, puoi usare un'azione per lanciare uno qualsiasi dei seguenti incantesimi (CD 17), senza componenti: Localizzare Oggetto, Identificare, o Predire. Una volta usato un incantesimo, non riutilizzabile fino all'alba successiva.\n\n" +
+"Inoltre, l'entità intrappolata nella pietra può comunicare telepaticamente con te e potrebbe rivelare segreti su tesori sepolti. Tuttavia, è ingannevole e cerca la propria libertà.",
+    },
+    'stone-of-good-luck-luckstone': {
+        descrizione_it:
+"Mentre questa pietra agata levigata è sulla tua persona, ottieni un bonus di +1 alle prove di caratteristica e ai tiri salvezza.",
+    },
+    'stonebreaker-s-breastplate': {
+        descrizione_it:
+"Questa armatura di piastre forgiata da nani è incisa con martelli e picconi. Mentre la indossi, ottieni i seguenti benefici:\n\n" +
+"- Hai resistenza ai danni contundenti.\n" +
+"- Le tue armi corpo a corpo infliggono ulteriori 1d6 danni contundenti agli oggetti e ai costrutti.\n" +
+"- Una volta al giorno, puoi lanciare l'incantesimo Plasmare la Pietra senza componenti.",
+    },
+    'stonemaker-war-pick': {
+        descrizione_it:
+"Quest'arma magica è un piccone da guerra. Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con essa.\n\n" +
+"Inoltre, mentre tieni il piccone, puoi usare un'azione per lanciare gli incantesimi Plasmare la Pietra o Muro di Pietra (CD 16) senza componenti. Ciascuno può essere lanciato una volta al giorno e si ricarica all'alba.",
+    },
+    'sun-blade': {
+        descrizione_it:
+"Questo oggetto sembra inizialmente un'impugnatura di spada lunga. Mentre tieni l'impugnatura, puoi usare un'azione bonus per far apparire o scomparire una lama di pura luminosità solare. Mentre la lama esiste, questa spada lunga magica ha la proprietà di taglio. Se sei competente con la spada corta o la spada lunga, sei competente con la Lama Solare.\n\n" +
+"Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con questa spada, che infligge danni radianti invece di danni taglienti. Quando colpisci un non morto con essa, quel bersaglio subisce ulteriori 1d8 danni radianti.\n\n" +
+"La lama luminosa emette luce intensa entro 4,5 metri e luce fioca per ulteriori 4,5 metri. La luce è la luce solare. Mentre la lama persiste, puoi usare un'azione per espandere o restringere il raggio di luce intensa e fioca di 1,5 metri ciascuno (massimo 9 metri di luce intensa e ulteriori 9 metri di luce fioca, minimo 3 metri di ciascuna).",
+    },
+    'sun-staff': {
+        descrizione_it:
+"Quest'arma magica è un bastone. Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con esso. Inoltre, infligge ulteriori 1d8 danni radianti.\n\n" +
+"Mentre tieni il bastone, puoi usare un'azione per fargli emettere luce intensa entro 18 metri e luce fioca per ulteriori 18 metri. La luce è luce solare. Puoi usare un'azione bonus per terminarla.\n\n" +
+"Inoltre, mentre tieni il bastone, puoi usare un'azione per lanciare l'incantesimo Luce del Giorno o Raggio di Sole (CD 15). Una volta usato un incantesimo, non riutilizzabile fino all'alba successiva.",
+    },
+    'sword-of-answering': {
+        descrizione_it:
+"Esistono nove di queste lame magiche. Ognuna ha un nome proprio in elfico antico, ad esempio \"Risposta\", \"Concordia\", \"Discordia\", ecc. Ciascuna è un'arma simile a una spada lunga, e solo una persona del medesimo allineamento può sintonizzarsi con una particolare spada.\n\n" +
+"Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con questa spada magica. Inoltre, mentre la tieni, puoi usare la reazione per effettuare un attacco corpo a corpo con essa contro qualsiasi creatura entro la portata che ti danneggi con un attacco corpo a corpo.",
+    },
+    'sword-of-kas': {
+        descrizione_it:
+"La spada di Kas è una spada lunga magica. Originariamente forgiata per Kas il Sanguinario, il prediletto luogotenente del lich Vecna, la spada cospira contro il suo possessore. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con quest'arma.\n\n" +
+"La spada infligge ulteriori 2d10 danni necrotici a qualsiasi creatura colpita. Inoltre, ogni colpo critico ti consente di rigenerare punti ferita pari ai danni inflitti.\n\n" +
+"Proprietà Casuali. Ha 4 proprietà benefiche minori, 2 maggiori, 2 dannose minori, 1 dannosa maggiore.\n\n" +
+"Senzienza. La Spada di Kas è un'arma senziente caotica malvagia con Intelligenza 15, Saggezza 13 e Carisma 16. Ha udito e scurovisione fino a 36 metri. Comunica telepaticamente con il portatore. Cerca distruzione e di vendicarsi su Vecna.",
+    },
+    'sword-of-life-stealing': {
+        descrizione_it:
+"Quando attacchi una creatura con questa spada magica e ottieni 20 al tiro per colpire, quel bersaglio subisce ulteriori 10 danni necrotici se non è un costrutto o un non morto. Tu stesso poi recuperi 10 punti ferita.",
+    },
+    'sword-of-sharpness': {
+        descrizione_it:
+"Quando attacchi un oggetto con questa spada magica e colpisci, infliggi il massimo dei danni. Quando attacchi una creatura con quest'arma e ottieni 20 al tiro per colpire, quel bersaglio subisce ulteriori 14 danni taglienti. Inoltre, tira un altro d20. Se ottieni 20, mozzi uno dei tentacoli, una zampa, un braccio o un'altra appendice del bersaglio (a discrezione del DM). Se la creatura non ha appendici da mozzare, mozzi una porzione del corpo.\n\n" +
+"Inoltre, puoi pronunciare la parola di comando per far sì che la lama emani luce intensa entro 3 metri e luce fioca per ulteriori 3 metri. Pronunciare di nuovo la parola di comando o riporre la spada termina la luce.",
+    },
+    'sword-of-the-planes': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con questa spada lunga magica quando sei sul Piano Materiale. Su un altro piano d'esistenza, ottieni invece un bonus di +3.",
+    },
+    'sword-of-vengeance': {
+        descrizione_it:
+"Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con questa spada lunga magica.\n\n" +
+"Maledizione. Questa spada è maledetta e posseduta da uno spirito vendicativo. Diventare sintonizzato con essa estende la maledizione su di te. Finché rimani maledetto, sei riluttante a separartene, mantenendola entro portata in ogni momento. Hai anche svantaggio ai tiri per colpire effettuati con armi diverse da quest'una.\n\n" +
+"Mentre la spada è sulla tua persona, devi fare una prova di Saggezza CD 15 ogni volta che subisci danni in combattimento. Se fallisci, devi attaccare la creatura che ti ha inflitto i danni finché non muori o non muore. La maledizione si solleva con Rimuovi Maledizione.",
+    },
+    'sword-of-wounding': {
+        descrizione_it:
+"I punti ferita persi a causa di un attacco di questa spada magica possono essere recuperati solo attraverso un riposo breve o lungo, piuttosto che attraverso poteri magici.\n\n" +
+"Una volta per turno, quando colpisci una creatura con essa, puoi ferirla. Alla fine di ogni turno della creatura ferita, subisce 1d4 danni necrotici per ogni volta che è stata ferita dalla spada, e può quindi fare un tiro salvezza su Costituzione CD 15, terminando l'effetto di tutte le ferite causate da quest'arma se ha successo.",
+    },
+    'sword-of-zariel': {
+        descrizione_it:
+"La Spada di Zariel è una spada lunga magica forgiata per la fallen angel Zariel, signore di Avernus. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con essa, e infligge ulteriori 3d6 danni radianti a qualsiasi creatura colpita.\n\n" +
+"Quando attacchi una creatura malvagia con questa spada e ottieni un colpo critico, quel bersaglio deve riuscire in un tiro salvezza su Costituzione CD 18 o subire ulteriori 5d10 danni radianti.\n\n" +
+"Mentre tieni la spada, puoi usare un'azione per evocare un'arma a forma di spada celestiale di luce, oppure liberare un'esplosione di luce divina (Sacro Sole, CD 18) entro 9 metri. Una volta usata, non riutilizzabile fino all'alba successiva.\n\n" +
+"Senzienza. La spada è senziente e ha allineamento legale buono originariamente, ma cambia a malvagio se brandita da un essere malvagio.",
+    },
+
+    // ── Batch T ────────────────────────────────────────────────────────
+    'talisman-of-pure-good': {
+        descrizione_it:
+"Questo talismano è un potente simbolo di bontà. Una creatura malvagia che lo tocca subisce 6d6 danni radianti. Una creatura neutrale che lo tocca subisce 1d6 danni radianti. Solo una creatura buona può sintonizzarsi con esso.\n\n" +
+"Mentre indossi il talismano, ottieni un bonus di +2 ai tiri per colpire con incantesimo. Inoltre, se tu o una creatura che puoi vedere entro 9 metri da te effettua un tiro per colpire, puoi usare la reazione per dare a quella creatura un bonus di +2 al tiro per colpire.\n\n" +
+"Il talismano ha 7 cariche. Mentre lo indossi, puoi usare un'azione per spendere 1 carica per scegliere una creatura che vedi a terra entro 36 metri da te. Se la creatura è malvagia, una crepa fessurata si apre sotto di essa. La creatura deve riuscire in un tiro salvezza su Destrezza CD 20 o cadere nella crepa e essere distrutta, senza lasciare resti. La crepa poi si chiude. Una volta spese tutte le 7 cariche, il talismano scompare.",
+    },
+    'talisman-of-the-sphere': {
+        descrizione_it:
+"Quando effettui una prova di Intelligenza (Arcano) per controllare una Sfera dell'Annientamento mentre tieni questo talismano, raddoppia il tuo bonus di competenza alla prova. Inoltre, se inizi il tuo turno con il controllo di una sfera, puoi usare un'azione per levitare di 3 metri x il tuo modificatore di Intelligenza.",
+    },
+    'talisman-of-ultimate-evil': {
+        descrizione_it:
+"Questo oggetto simbolizza male incommensurato. Una creatura buona che tocca il talismano subisce 6d6 danni necrotici. Una creatura neutrale che lo tocca subisce 1d6 danni necrotici. Solo una creatura malvagia può sintonizzarsi con esso.\n\n" +
+"Mentre indossi il talismano, ottieni un bonus di +2 ai tiri per colpire con incantesimo. Inoltre, se tu o una creatura che vedi entro 9 metri effettua un tiro per colpire, puoi usare la reazione per dare a quella creatura un bonus di +2 al tiro per colpire.\n\n" +
+"Il talismano ha 6 cariche. Mentre lo indossi, puoi usare un'azione per spendere 1 carica per scegliere una creatura che vedi a terra entro 36 metri. Se la creatura è buona, una crepa si apre sotto di essa: TS Destrezza CD 20 o cadere nella crepa ed essere distrutta. Una volta spese tutte le cariche, il talismano scompare.",
+    },
+    'talking-doll': {
+        descrizione_it:
+"Mentre tieni questa bambola di porcellana, puoi usare un'azione per pronunciare una delle sue tre parole di comando per far parlare la bambola in una delle seguenti modalità: amichevole, spaventosa o allegra. La bambola parla nella tua lingua e usa frasi adatte al tono. La bambola parla per 1 minuto.",
+    },
+    'tankard-of-sobriety': {
+        descrizione_it:
+"Questo boccale ha decorazioni di motivi di balene e felci di mare. Hai vantaggio ai tiri salvezza per evitare gli effetti del consumo di alcol mentre bevi da questo boccale.",
+    },
+    'teeth-of-dahlver-nar': {
+        descrizione_it:
+"I Denti di Dahlver-Nar sono trentadue denti collezionati dal sacerdote nano Dahlver-Nar. Ognuno è un artefatto distinto che, quando piantato nel terreno, evoca una creatura specifica (animale, costrutto, drago, immondo, ecc.). I denti possono anche essere consumati per ottenere benefici temporanei, sebbene a costo di salute. La collezione completa è considerata un artefatto di immenso potere.",
+    },
+    'telescopic-transporter': {
+        descrizione_it:
+"Questo strumento ottico telescopico misura 30 cm contratto e 90 cm esteso. Mentre lo tieni, puoi usare un'azione per guardare attraverso di esso e teletrasportarti in un punto che vedi attraverso il telescopio (entro 1,5 km). Devi avere lo spazio libero. Una volta usato, non riutilizzabile fino all'alba successiva.",
+    },
+    'tentacle-rod': {
+        descrizione_it:
+"Quest'asta magica termina con tre tentacoli flessibili. Mentre la tieni, puoi usare un'azione per fare che i tentacoli attacchino una creatura che puoi vedere entro 4,5 metri da te. Effettua tre tiri per colpire con bonus pari al tuo modificatore di Intelligenza più il tuo bonus di competenza. Ogni colpo infligge 1d6 danni contundenti.\n\n" +
+"Se tutti e tre gli attacchi colpiscono una singola creatura, la creatura deve riuscire in un tiro salvezza su Costituzione CD 15. Se fallisce, la velocità della creatura è dimezzata, ha svantaggio ai tiri salvezza su Destrezza, e non può usare reazioni per 1 minuto. Inoltre, in ciascun suo turno, può eseguire un'azione o un'azione bonus, non entrambe. Alla fine di ciascun suo turno, può ripetere il tiro salvezza.",
+    },
+    'thunderbuss': {
+        descrizione_it:
+"Quest'arma da fuoco magica è un fucile (o moschettone) marchiato con la runa del tuono. Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con essa, e i danni che infligge sono di tipo tuono.\n\n" +
+"Quando colpisci una creatura, può anche essere spinta indietro fino a 3 metri se è di taglia Grande o inferiore.\n\n" +
+"Invocare la Runa. Come azione, invochi la runa per sparare un'esplosione conica di 9 metri. Ogni creatura nell'area: TS Costituzione CD 17 o subisce 8d6 danni tuono ed è spinta 3 metri (metà danni con successo). Una volta invocata, non riutilizzabile fino all'alba successiva.",
+    },
+    'tidecaller-trident': {
+        descrizione_it:
+"Quest'arma magica è un tridente. Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con essa. Inoltre, infligge ulteriori 1d6 danni da freddo.\n\n" +
+"Mentre tieni il tridente, puoi usare un'azione per lanciare uno dei seguenti incantesimi (CD 17), senza componenti: Controllare l'Acqua, Muro d'Acqua, o Forma di Bestia (1 ora). Una volta lanciato un incantesimo, non riutilizzabile fino all'alba successiva.\n\n" +
+"Mentre tieni il tridente, hai una velocità di nuoto di 18 metri.",
+    },
+    'tome-of-clear-thought': {
+        descrizione_it:
+"Questo libro contiene esercizi di pensiero e memoria, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Intelligenza aumenta di 2, così come il massimo. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'tome-of-leadership-and-influence': {
+        descrizione_it:
+"Questo libro contiene consigli su comando e relazioni interpersonali, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Carisma aumenta di 2, così come il massimo. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'tome-of-the-stilled-tongue': {
+        descrizione_it:
+"Questo tomo nero, sottile e rilegato in pelle, ha cinque lingue umane mummificate fissate alla copertina con uno spillone d'osso. La prima pagina del tomo reca la firma di Vecna. Le pagine restanti sono vuote. Quando trovi il libro, è possibile che le altre pagine vengano riempite con i risultati di rituali e incantesimi che hai esperito.\n\n" +
+"Il libro funziona da libro degli incantesimi e da focus arcano per te.\n\n" +
+"Mentre tieni il libro, puoi spendere 1 carica come azione bonus per silenziare una creatura che vedi entro 18 metri (TS Carisma CD 17 negato). La creatura non può parlare per 1 minuto.\n\n" +
+"Il libro ha 7 cariche e recupera 1d4+3 cariche all'alba.",
+    },
+    'tome-of-understanding': {
+        descrizione_it:
+"Questo libro contiene esercizi di consapevolezza e introspezione, e le sue parole sono cariche di magia. Se passi 48 ore in un periodo di 6 giorni o meno studiandone i contenuti e praticandone le linee guida, il tuo punteggio di Saggezza aumenta di 2, così come il massimo. Il manuale perde poi la magia, ma la riacquista in un secolo.",
+    },
+    'topaz-annihilator': {
+        descrizione_it:
+"Quest'arma magica è un cannone portatile di topazio. Ottieni un bonus di +2 ai tiri per colpire e ai tiri di danno effettuati con essa, e infligge danni da forza invece di danni perforanti.\n\n" +
+"Inoltre, mentre tieni l'arma, puoi usare un'azione per lanciare l'incantesimo Disintegrazione (CD 18) attraverso di essa. Una volta lanciato, non riutilizzabile fino all'alba successiva.",
+    },
+    'trident-of-fish-command': {
+        descrizione_it:
+"Questo tridente è un'arma magica. Ha 3 cariche. Mentre lo tieni, puoi usare un'azione e spendere 1 carica per lanciare l'incantesimo Dominare Bestia (CD 15) su una bestia che ha velocità di nuoto innata. Il tridente recupera 1d3 cariche spese ogni giorno all'alba.",
+    },
+
+    // ── Batch U ────────────────────────────────────────────────────────
+    'unbreakable-arrow': {
+        descrizione_it:
+"Questa freccia magica non può essere rotta, eccetto quando viene fatta a pezzi all'interno di un'area di un effetto di antimagia.",
+    },
+    'universal-solvent': {
+        descrizione_it:
+"Questo tubo contiene un liquido lattiginoso con un odore forte di alcol. Puoi usare un'azione per versarne il contenuto su una superficie entro portata. Il liquido scioglie istantaneamente fino a 30 cm² di adesivo che tocca, includendo Colla Sovrana.",
+    },
+
+    // ── Batch V ────────────────────────────────────────────────────────
+    'veteran-s-cane': {
+        descrizione_it:
+"Mentre tieni questo bastone, puoi usare un'azione bonus per pronunciare la sua parola di comando e far sì che si trasformi in una spada lunga +1, o pronunciare di nuovo la parola di comando per restituirlo alla forma di bastone.",
+    },
+    'vicious-weapon': {
+        descrizione_it:
+"Quando ottieni 20 al tiro per colpire effettuato con quest'arma magica, il bersaglio subisce ulteriori 7 danni dello stesso tipo dei danni normali dell'arma.",
+    },
+    'voidwalker-armor': {
+        descrizione_it:
+"Quest'armatura nera assorbe la luce. Mentre la indossi, ottieni i seguenti benefici:\n\n" +
+"- Hai resistenza ai danni necrotici e psichici.\n" +
+"- Puoi sopravvivere senza bisogno di aria, cibo o acqua.\n" +
+"- Una volta al giorno, puoi usare un'azione per attraversare un solido (fino a 1,5 metri di spessore) come per Passamuro, ma senza creare un foro permanente.",
+    },
+    'vorpal-sword': {
+        descrizione_it:
+"Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con questa spada magica. Inoltre, l'arma ignora la resistenza ai danni taglienti.\n\n" +
+"Quando attacchi una creatura che ha almeno una testa con quest'arma e ottieni 20 al tiro per colpire, mozzi una delle teste della creatura. La creatura muore se non può sopravvivere senza la testa persa. Una creatura è immune a questo effetto se è immune ai danni taglienti, non ha o non necessita di una testa, ha più teste o è di taglia Enorme o superiore. Tale creatura subisce invece 6d8 danni taglienti extra dal colpo.",
+    },
+
+    // ── Batch W ────────────────────────────────────────────────────────
+    'walloping-ammunition': {
+        descrizione_it:
+"Questa munizione confeziona un colpo straordinario. Una creatura colpita dalla munizione deve riuscire in un tiro salvezza su Forza CD 10 o cadere prona.",
+    },
+    'war-horn-of-valor': {
+        descrizione_it:
+"Mentre tieni questo corno, puoi usare un'azione per soffiarlo. Tu e tutte le creature alleate entro 18 metri ottenete 1d10 punti ferita temporanei e vantaggio ai tiri salvezza contro essere spaventato per 1 minuto. Una volta usato, non riutilizzabile fino all'alba successiva.",
+    },
+    'warrior-s-passkey': {
+        descrizione_it:
+"Mentre tieni questa chiave dorata, puoi usare un'azione per inserirla in qualsiasi serratura ordinaria, che si apre automaticamente. La chiave funziona anche su porte sbarrate magicamente fino al 3° livello (Chiusura Arcana, ad esempio). Una volta usata su una serratura magica, non riutilizzabile fino all'alba successiva.",
+    },
+    'wave': {
+        descrizione_it:
+"Onda è un tridente magico. Per ottenere i benefici, devi essere un seguace di un dio del mare. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con esso. Conta come arma magica con la proprietà di lancio.\n\n" +
+"Effetti aggiuntivi:\n" +
+"- Quando colpisci una creatura, infligge danni come se fosse un attacco critico (massimi danni dadi).\n" +
+"- Recuperi punti ferita pari ai danni necrotici inflitti.\n" +
+"- Mentre tieni il tridente, puoi lanciare Creare o Distruggere Acqua, Localizzare Oggetto, Acque Tranquille, Camminare sull'Acqua o Respirare sott'Acqua come azione.\n\n" +
+"Senzienza. Onda è un'arma senziente neutrale con Intelligenza 14, Saggezza 10 e Carisma 18. Comunica telepaticamente con il portatore.",
+    },
+    'wayfarer-s-boots': {
+        descrizione_it:
+"Mentre indossi questi stivali, puoi usare un'azione per lanciare l'incantesimo Passo Lungo (3 ore di durata, fino al doppio della velocità) su te stesso una volta al giorno. Inoltre, hai vantaggio ai tiri salvezza contro l'esaurimento da viaggi prolungati.",
+    },
+    'well-of-many-worlds': {
+        descrizione_it:
+"Questo tessuto nero fine, morbido come la seta, è ripiegato fino alle dimensioni di un fazzoletto. Si dispiega in un cerchio di 1,8 metri di diametro.\n\n" +
+"Puoi usare un'azione per dispiegare il tessuto e collocarlo su o contro una superficie solida, dove crea un portale a due vie verso un altro mondo o piano d'esistenza. Ogni volta che il pozzo si apre verso un altro mondo o piano, il DM decide la destinazione. Il portale rimane aperto finché non lo ripieghi (azione, deve essere vuoto). Una volta ripiegato, non riutilizzabile per 1d8 ore.",
+    },
+    'whelm': {
+        descrizione_it:
+"Sopraffazione è un martello da guerra magico. Ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con esso. Conta come arma magica con la proprietà di lancio (range 6/18 m). Quando lo lanci, torna alla tua mano alla fine del tuo turno.\n\n" +
+"Quando colpisci una creatura, infligge ulteriori 1d8 danni contundenti (2d8 ai giganti). Il bersaglio deve riuscire in un TS Costituzione CD 13 o essere stordito fino al tuo prossimo turno.\n\n" +
+"Inoltre, mentre tieni l'arma, puoi usare un'azione per lanciare gli incantesimi Identificare, Localizzare Oggetto o Frantumare (CD 13).\n\n" +
+"Senzienza. Whelm è senziente, neutrale legale, Intelligenza 15, Saggezza 12, Carisma 15. Comunica telepaticamente. Vuole proteggere i nani e distruggere i giganti e i goblin.",
+    },
+    'wind-fan': {
+        descrizione_it:
+"Mentre tieni questo ventaglio, puoi usare un'azione per lanciare l'incantesimo Folata di Vento (CD 13) da esso. Una volta usato, c'è una possibilità del 20% che il ventaglio si rompa e diventi inutile. Altrimenti, può essere usato di nuovo dopo 1 minuto.",
+    },
+    'winged-ammunition': {
+        descrizione_it:
+"Quando spari questa munizione magica, la sua portata aumenta di un fattore quattro.",
+    },
+    'winged-boots': {
+        descrizione_it:
+"Mentre indossi questi stivali, hai una velocità di volo pari alla tua velocità di camminata. Puoi usarli per volare per un massimo di 4 ore, in qualsiasi combinazione di intervalli (ognuno deve essere di almeno 1 minuto). Se voli quando il tempo finisce, scendi di 9 metri per round finché non atterri.\n\n" +
+"Quando non sono usati, recuperano 2 ore di capacità di volo per ogni 12 ore di non utilizzo.",
+    },
+    'wings-of-flying': {
+        descrizione_it:
+"Mentre indossi questo mantello, puoi usare un'azione per pronunciare la sua parola di comando. Questo trasforma il mantello in paia di ali di pipistrello o uccello sulla schiena per 1 ora o finché non ripeti la parola di comando come azione. Le ali ti danno una velocità di volo di 18 metri. Quando termina, il mantello non può essere usato di nuovo per 1d12 ore.",
+    },
+    'wraps-of-unarmed-prowess': {
+        descrizione_it:
+"Mentre indossi queste bende, ottieni un bonus di +3 ai tiri per colpire e ai tiri di danno effettuati con attacchi senz'armi.",
+    },
+    'wyrmreaver-gauntlets': {
+        descrizione_it:
+"Questi guanti pesanti d'acciaio nero sono incrostati di scaglie di drago. Mentre li indossi, ottieni i seguenti benefici:\n\n" +
+"- I tuoi attacchi senz'armi infliggono 1d8 danni perforanti invece dei danni normali.\n" +
+"- I tuoi attacchi senz'armi e con armi corpo a corpo che usano Forza infliggono ulteriori 2d6 danni ai draghi.\n" +
+"- Hai vantaggio ai TS contro l'effetto di paura del Soffio dei draghi.",
+    },
+    'wyrmskull-throne': {
+        descrizione_it:
+"Questo trono è scolpito da un singolo teschio di drago, e fissarsi alla sua occhiata produce una sensazione inquietante. Mentre siedi sul trono, ottieni i seguenti benefici:\n\n" +
+"- Hai vantaggio alle prove di Carisma effettuate per influenzare creature.\n" +
+"- Puoi lanciare gli incantesimi Comando, Suggestione, Suggestione Massima e Modificare Memoria (CD 18) senza componenti.\n" +
+"- Una volta al giorno, puoi convocare un drago al tuo trono. Il drago deve essere entro 16 km e si presenta entro un giorno se possibile.\n\n" +
+"Tuttavia, sintonizzarsi con il trono ti rende vulnerabile all'influenza del drago il cui teschio fu usato.",
+    },
+
+    // ── Batch Z ────────────────────────────────────────────────────────
+    'zephyr-armor': {
+        descrizione_it:
+"Quest'armatura leggera di pelle è incisa con motivi di vento e nuvole. Mentre la indossi, ottieni i seguenti benefici:\n\n" +
+"- Hai resistenza ai danni da fulmine e tuono.\n" +
+"- La tua velocità di camminata aumenta di 3 metri.\n" +
+"- Puoi cadere fino a 30 metri senza subire danni e atterrare in piedi.\n" +
+"- Una volta al giorno, puoi lanciare l'incantesimo Velocità (CD 15) su te stesso senza componenti.",
+    },
+
+    'outer-essence-shard': {
+        descrizione_it:
+"Questo cristallo tremolante contiene l'essenza di un Piano Esterno. Con un'azione, puoi attaccare la scheggia a un oggetto Minuscolo o staccarla. Cade se la sintonia termina. Puoi usare la scheggia come focus per incantesimi mentre la tieni o la indossi.\n\n" +
+"Tira un d4 per determinare l'essenza e proprietà:\n" +
+"d4 | Proprietà\n" +
+"1 | Legale. Puoi terminare una delle seguenti condizioni che affligge te o una creatura che vedi entro 9 metri: affascinato, accecato, assordato, spaventato, avvelenato o stordito.\n" +
+"2 | Caotico. Scegli una creatura che subisce danni dall'incantesimo. Quel bersaglio ha svantaggio ai tiri per colpire e alle prove di caratteristica effettuati prima dell'inizio del tuo prossimo turno.\n" +
+"3 | Buono. Tu o una creatura a tua scelta che vedi entro 9 metri ottieni 3d6 punti ferita temporanei.\n" +
+"4 | Malvagio. Scegli una creatura che subisce danni dall'incantesimo. Quel bersaglio subisce ulteriori 3d6 danni necrotici.",
+    },
 };
