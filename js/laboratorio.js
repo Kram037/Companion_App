@@ -1989,12 +1989,36 @@ function labFieldsOggetti(data) {
     const currentRar = data?.rarita || 'Comune';
     const currentEnch = _labOggCanEnch(currentType) ? (parseInt(data?.incantamento) || 0) : 0;
     const currentSint = !!data?.richiede_sintonia;
+    const currentSintDet = data?.sintonia_dettaglio || '';
     const currentSub = data?.sotto_tipo || '';
     const desc = (data?.descrizione != null ? data.descrizione : (data?.proprieta || ''));
     const showEnch = _labOggCanEnch(currentType);
 
-    const chip = (val, current, onclick) =>
-        `<button type="button" class="lab-chip ${val === current ? 'active' : ''}" onclick="${onclick}">${escapeHtml(val)}</button>`;
+    // Helper per costruire una "tendina" (dropdown custom). hiddenId e'
+    // l'id dell'<input type="hidden"> che tiene il valore selezionato;
+    // groupId e' l'id del wrapper .lab-dd (univoco per gruppo).
+    const dd = (groupId, hiddenId, options, current, opts = {}) => {
+        const onSelectFnName = opts.onSelectFnName || ''; // funzione globale opzionale
+        const placeholder = opts.placeholder || 'Seleziona...';
+        const display = current || placeholder;
+        return `
+        <div class="lab-dd" id="${groupId}">
+            <button type="button" class="lab-dd-trigger ${current ? '' : 'placeholder'}"
+                onclick="window.labOggDdToggle('${groupId}')">
+                <span class="lab-dd-value">${escapeHtml(display)}</span>
+                <span class="lab-dd-caret">▾</span>
+            </button>
+            <div class="lab-dd-panel">
+                ${options.map(opt => `
+                    <div class="lab-dd-option ${opt === current ? 'active' : ''}"
+                        onclick="window.labOggDdSelect('${groupId}','${hiddenId}','${opt.replace(/'/g, "\\'")}'${onSelectFnName ? `,'${onSelectFnName}'` : ''})">
+                        ${escapeHtml(opt)}
+                    </div>
+                `).join('')}
+            </div>
+            <input type="hidden" id="${hiddenId}" value="${escapeHtml(current)}">
+        </div>`;
+    };
 
     return `
     <div class="form-group">
@@ -2002,12 +2026,20 @@ function labFieldsOggetti(data) {
         <input type="text" id="hbNome" required placeholder="Nome dell'oggetto" value="${escapeHtml(data?.nome || '')}">
     </div>
 
-    <div class="form-group">
-        <label>Tipologia</label>
-        <div class="lab-chip-picker" id="hbTipoChips">
-            ${LAB_OGG_TIPI.map(t => chip(t, currentType, `window.labOggSelectTipo(this,'${t.replace(/'/g, "\\'")}')`)).join('')}
+    <div class="form-row form-row-2">
+        <div class="form-group">
+            <label>Tipologia</label>
+            ${dd('hbTipoDd', 'hbTipoOgg', LAB_OGG_TIPI, currentType, {
+                placeholder: 'Seleziona tipologia...',
+                onSelectFnName: 'labOggOnTipoChange',
+            })}
         </div>
-        <input type="hidden" id="hbTipoOgg" value="${escapeHtml(currentType)}">
+        <div class="form-group">
+            <label>Rarità</label>
+            ${dd('hbRaritaDd', 'hbRarita', LAB_OGG_RARITA, currentRar, {
+                placeholder: 'Seleziona rarità...',
+            })}
+        </div>
     </div>
 
     <div class="form-group">
@@ -2015,22 +2047,15 @@ function labFieldsOggetti(data) {
         <input type="text" id="hbSottoTipo" placeholder="Sotto-tipo dell'oggetto" value="${escapeHtml(currentSub)}">
     </div>
 
-    <div class="form-group">
-        <label>Rarità</label>
-        <div class="lab-chip-picker" id="hbRaritaChips">
-            ${LAB_OGG_RARITA.map(r => chip(r, currentRar, `window.labOggSelectRarita(this,'${r.replace(/'/g, "\\'")}')`)).join('')}
-        </div>
-        <input type="hidden" id="hbRarita" value="${escapeHtml(currentRar)}">
-    </div>
-
     <div class="form-row form-row-2">
         <div class="form-group">
-            <label>Sintonia</label>
-            <button type="button" class="lab-toggle-btn ${currentSint ? 'on' : ''}" id="hbSintoniaBtn"
-                onclick="window.labOggToggleSintonia(this)">
-                <span class="lab-toggle-dot"></span>
-                <span class="lab-toggle-label">${currentSint ? 'Richiede sintonia' : 'Nessuna sintonia'}</span>
-            </button>
+            <label>Richiede sintonia</label>
+            <div class="lab-yesno" id="hbSintYesNo">
+                <button type="button" class="lab-yesno-btn ${currentSint ? '' : 'active'}"
+                    onclick="window.labOggSetSintonia(false)">No</button>
+                <button type="button" class="lab-yesno-btn ${currentSint ? 'active' : ''}"
+                    onclick="window.labOggSetSintonia(true)">Sì</button>
+            </div>
             <input type="hidden" id="hbSintonia" value="${currentSint ? '1' : '0'}">
         </div>
         <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
@@ -2044,50 +2069,118 @@ function labFieldsOggetti(data) {
         </div>
     </div>
 
+    <div class="form-group" id="hbSintDetRow" style="${currentSint ? '' : 'display:none;'}">
+        <label for="hbSintoniaDet">Specifica sintonia <span class="lab-help">(opzionale, es. "con un mago della scuola di divinazione")</span></label>
+        <input type="text" id="hbSintoniaDet" placeholder="Lascia vuoto per sintonia generica" value="${escapeHtml(currentSintDet)}">
+    </div>
+
     <div class="form-group">
         <label for="hbDescrizione">Descrizione</label>
-        <textarea id="hbDescrizione" rows="6" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
+        <textarea id="hbDescrizione" class="lab-ogg-desc" rows="14" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
     </div>`;
 }
 
-window.labOggSelectTipo = function(btn, value) {
-    const cont = btn.parentElement;
-    if (!cont) return;
-    cont.querySelectorAll('.lab-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const hidden = document.getElementById('hbTipoOgg');
-    if (hidden) hidden.value = value;
-    // Mostra/nasconde incantamento in base al tipo.
-    const row = document.getElementById('hbIncantamentoRow');
-    if (row) {
-        const ok = _labOggCanEnch(value);
-        row.style.display = ok ? '' : 'none';
-        if (!ok) {
-            const eh = document.getElementById('hbIncantamento');
-            if (eh) eh.value = '0';
-            document.querySelectorAll('#hbIncantamentoRowBtns .custom-res-dice-btn')
-                .forEach((b, i) => b.classList.toggle('active', i === 0));
-        }
+// ── Custom dropdown (tendina) ──────────────────────────────────────────
+function _labOggDdPositionPanel(group) {
+    const trig = group.querySelector('.lab-dd-trigger');
+    const panel = group.querySelector('.lab-dd-panel');
+    if (!trig || !panel) return;
+    const r = trig.getBoundingClientRect();
+    const panelMaxH = 280;
+    const spaceBelow = window.innerHeight - r.bottom - 8;
+    const spaceAbove = r.top - 8;
+    const openUp = spaceBelow < 200 && spaceAbove > spaceBelow;
+    panel.style.left = r.left + 'px';
+    panel.style.width = r.width + 'px';
+    if (openUp) {
+        panel.style.top = '';
+        panel.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+        panel.style.maxHeight = Math.max(160, Math.min(panelMaxH, spaceAbove)) + 'px';
+    } else {
+        panel.style.bottom = '';
+        panel.style.top = (r.bottom + 4) + 'px';
+        panel.style.maxHeight = Math.max(160, Math.min(panelMaxH, spaceBelow)) + 'px';
+    }
+}
+
+window.labOggDdToggle = function(groupId) {
+    const me = document.getElementById(groupId);
+    if (!me) return;
+    const wasOpen = me.classList.contains('open');
+    // Chiude tutti i dropdown aperti.
+    document.querySelectorAll('.lab-dd.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) {
+        me.classList.add('open');
+        _labOggDdPositionPanel(me);
+        // Riposiziona su scroll/resize.
+        const reposition = () => { if (me.classList.contains('open')) _labOggDdPositionPanel(me); };
+        window.addEventListener('scroll', reposition, true);
+        window.addEventListener('resize', reposition);
+        // Listener globale per chiudere su click fuori.
+        setTimeout(() => {
+            const onDocClick = (ev) => {
+                if (!me.contains(ev.target)) {
+                    me.classList.remove('open');
+                    document.removeEventListener('click', onDocClick, true);
+                    window.removeEventListener('scroll', reposition, true);
+                    window.removeEventListener('resize', reposition);
+                }
+            };
+            document.addEventListener('click', onDocClick, true);
+        }, 0);
     }
 };
 
-window.labOggSelectRarita = function(btn, value) {
-    const cont = btn.parentElement;
-    if (!cont) return;
-    cont.querySelectorAll('.lab-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const hidden = document.getElementById('hbRarita');
+window.labOggDdSelect = function(groupId, hiddenId, value, onSelectFnName) {
+    const me = document.getElementById(groupId);
+    if (!me) return;
+    me.classList.remove('open');
+    me.querySelectorAll('.lab-dd-option').forEach(o => o.classList.remove('active'));
+    Array.from(me.querySelectorAll('.lab-dd-option'))
+        .find(o => o.textContent.trim() === value)?.classList.add('active');
+    const trigger = me.querySelector('.lab-dd-trigger');
+    if (trigger) {
+        trigger.classList.remove('placeholder');
+        const valEl = trigger.querySelector('.lab-dd-value');
+        if (valEl) valEl.textContent = value;
+    }
+    const hidden = document.getElementById(hiddenId);
     if (hidden) hidden.value = value;
+    if (onSelectFnName && typeof window[onSelectFnName] === 'function') {
+        window[onSelectFnName](value);
+    }
 };
 
-window.labOggToggleSintonia = function(btn) {
+window.labOggOnTipoChange = function(value) {
+    const row = document.getElementById('hbIncantamentoRow');
+    if (!row) return;
+    const ok = _labOggCanEnch(value);
+    row.style.display = ok ? '' : 'none';
+    if (!ok) {
+        const eh = document.getElementById('hbIncantamento');
+        if (eh) eh.value = '0';
+        document.querySelectorAll('#hbIncantamentoRowBtns .custom-res-dice-btn')
+            .forEach((b, i) => b.classList.toggle('active', i === 0));
+    }
+};
+
+// ── Sintonia Sì/No + dettaglio condizionale ────────────────────────────
+window.labOggSetSintonia = function(enabled) {
     const hidden = document.getElementById('hbSintonia');
-    const on = hidden?.value === '1';
-    const next = on ? '0' : '1';
-    if (hidden) hidden.value = next;
-    btn.classList.toggle('on', next === '1');
-    const lbl = btn.querySelector('.lab-toggle-label');
-    if (lbl) lbl.textContent = next === '1' ? 'Richiede sintonia' : 'Nessuna sintonia';
+    if (hidden) hidden.value = enabled ? '1' : '0';
+    const cont = document.getElementById('hbSintYesNo');
+    if (cont) {
+        const btns = cont.querySelectorAll('.lab-yesno-btn');
+        // Primo bottone = "No", secondo = "Sì".
+        if (btns[0]) btns[0].classList.toggle('active', !enabled);
+        if (btns[1]) btns[1].classList.toggle('active', !!enabled);
+    }
+    const detRow = document.getElementById('hbSintDetRow');
+    if (detRow) detRow.style.display = enabled ? '' : 'none';
+    if (!enabled) {
+        const det = document.getElementById('hbSintoniaDet');
+        if (det) det.value = '';
+    }
 };
 
 window.labOggSelectEnch = function(btn, value) {
@@ -2296,6 +2389,9 @@ async function handleSaveHomebrew(e) {
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
             record.sotto_tipo = document.getElementById('hbSottoTipo')?.value?.trim() || null;
             record.richiede_sintonia = document.getElementById('hbSintonia')?.value === '1';
+            record.sintonia_dettaglio = record.richiede_sintonia
+                ? (document.getElementById('hbSintoniaDet')?.value?.trim() || null)
+                : null;
             const desc = document.getElementById('hbDescrizione')?.value?.trim() || null;
             record.descrizione = desc;
             // Backwards compatibility: salva anche su `proprieta` finche' la
@@ -2569,12 +2665,16 @@ window.formatOggettoMeta = function formatOggettoMeta(item) {
         const sub = (item.sotto_tipo || '').trim();
         parts.push(sub ? `${item.tipo} (${sub})` : item.tipo);
     }
+    let sintStr = '';
+    if (item.richiede_sintonia) {
+        const det = (item.sintonia_dettaglio || '').trim();
+        sintStr = det ? ` (richiede sintonia ${det})` : ' (richiede sintonia)';
+    }
     if (item.rarita) {
         const r = String(item.rarita).toLowerCase();
-        const sint = item.richiede_sintonia ? ' (richiede sintonia)' : '';
-        parts.push(r + sint);
-    } else if (item.richiede_sintonia) {
-        parts.push('(richiede sintonia)');
+        parts.push(r + sintStr);
+    } else if (sintStr) {
+        parts.push(sintStr.trim().replace(/^\(/, '(').replace(/\)$/, ')'));
     }
     return parts.join(', ');
 };

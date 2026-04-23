@@ -4991,6 +4991,7 @@ window.schedaOpenInventoryPage = async function(pgId) {
                     sotto_tipo: view._homebrew_sotto_tipo,
                     rarita: view._homebrew_rarita,
                     richiede_sintonia: view._homebrew_richiede_sintonia,
+                    sintonia_dettaglio: view._homebrew_sintonia_dettaglio,
                 }) : '');
         } else if (view.rarita) {
             meta = (typeof window.formatOggettoMeta === 'function')
@@ -5122,6 +5123,7 @@ function _invResolveLive(entry) {
         _homebrew_sotto_tipo: hb.sotto_tipo || null,
         _homebrew_rarita: hb.rarita || null,
         _homebrew_richiede_sintonia: !!hb.richiede_sintonia,
+        _homebrew_sintonia_dettaglio: hb.sintonia_dettaglio || null,
         _homebrew_author: hb._author_name || null,
         // Snapshot della formula meta gia' formattata (utile a chi non
         // vuole reimpaginarla).
@@ -5331,6 +5333,7 @@ window.invEditItem = function(pgId, idx) {
                 sotto_tipo: item._homebrew_sotto_tipo,
                 rarita: item._homebrew_rarita,
                 richiede_sintonia: item._homebrew_richiede_sintonia,
+                sintonia_dettaglio: item._homebrew_sintonia_dettaglio,
             }) : ''))
         : '';
     const hbBanner = isHomebrew
