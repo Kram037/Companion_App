@@ -4644,15 +4644,14 @@ const _SPELL_SCHOOLS = [
 const _SPELL_CASTING_TIMES = ['Azione','Azione Bonus','Reazione','Minuti','Ore','Altro'];
 const _SPELL_SOURCES_KNOWN = ['PHB','XGtE','TCoE','SCAG','EBR','MMM','SCC'];
 
-function _defaultSpellFilters(pg) {
-    const pgClasses = Array.from(_pgSpellClasses(pg));
+function _defaultSpellFilters(_pg) {
     return {
         schools: [],            // array di chiavi school (es. 'evocation'); vuoto = tutte
         castingTimes: [],       // 'Azione','Azione Bonus','Reazione','Minuti','Ore','Altro'
         components: [],         // ['V','S','M']
         concentration: 'any',   // 'any' | 'yes' | 'no'
         ritual: 'any',          // 'any' | 'yes' | 'no'
-        classes: [...pgClasses],// default: classi del PG (vuoto = tutte)
+        classes: [],            // vuoto = tutte (per visualizzare tutti gli spell)
         sources: []             // codici source (vuoto = tutti)
     };
 }
@@ -4677,8 +4676,8 @@ function _applySpellPickerFilters(spell, f) {
     // Rituale
     if (f.ritual === 'yes' && !_spellIsRitual(spell)) return false;
     if (f.ritual === 'no' && _spellIsRitual(spell)) return false;
-    // Classi — gli homebrew non hanno classi assegnate, quindi bypassano il
-    // filtro (sono sempre disponibili a chiunque li abiliti).
+    // Classi — vuoto = nessun filtro (tutte le classi). Gli homebrew vivono
+    // nel loro tab dedicato e non hanno classi associate, quindi bypassano.
     if (f.classes && f.classes.length > 0 && !spell._is_homebrew) {
         const lists = [spell.classes || [], spell.classes_en || []];
         let ok = false;
@@ -4703,12 +4702,26 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     }));
 
     const lang = _spellLang();
-    const list = Object.values(all).filter(s => s.level === level);
+    // Lista nativa (esclude gli homebrew, che vivono nel tab dedicato).
+    const list = Object.values(all)
+        .filter(s => s.level === level && !s._is_homebrew);
     list.sort((a, b) => _spellField(a, 'name').localeCompare(_spellField(b, 'name'), lang));
 
-    // Inizializza i filtri di default (con classi del PG preselezionate)
+    // Lista homebrew separata
+    const hbCache = (window.AppState?.cachedHomebrewIncantesimi) || [];
+    const hbList = hbCache
+        .map(_hbSpellToCatalog)
+        .filter(s => s.level === level);
+    hbList.sort((a, b) => _spellField(a, 'name').localeCompare(_spellField(b, 'name'), lang));
+    const hasHomebrewTab = hbList.length > 0;
+
     window._spellPickerFilters = _defaultSpellFilters(pg);
     window._spellPickerSearchQ = '';
+    window._spellPickerTab = 'catalog'; // 'catalog' | 'homebrew'
+    window._spellPickerLists = { catalog: list, homebrew: hbList };
+    // Stato selezioni: persiste fra cambi tab (le checkbox nel tab non
+    // attivo non sono nel DOM, quindi serve un set lato JS).
+    window._spellPickerSelected = new Set(knownAll);
 
     // Mappa incantesimi auto-garantiti (sottoclasse o invocazioni warlock):
     // selected + disabled nel picker, con badge "garantito".
@@ -4726,7 +4739,7 @@ window.schedaOpenSpellPicker = function(pgId, level) {
 
     const renderRow = (sp) => {
         const id = sp.name;
-        const isKnown = knownAll.has(id);
+        const isKnown = (window._spellPickerSelected || knownAll).has(id);
         const grantedLabel = grantedByName.get(id);
         const isGranted = !!grantedLabel;
         const safeId = escapeAttr(id);
@@ -4734,11 +4747,21 @@ window.schedaOpenSpellPicker = function(pgId, level) {
         if (_spellIsConcentration(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-c" title="Concentrazione">C</span>');
         if (_spellIsRitual(sp)) tags.push('<span class="spell-pick-tag spell-pick-tag-r" title="Rituale">R</span>');
         if (isGranted) tags.push(`<span class="spell-pick-tag spell-pick-tag-granted" title="Garantito da: ${escapeHtml(grantedLabel)}">${escapeHtml(grantedLabel)}</span>`);
-        return `<label class="spell-pick-row${isGranted ? ' spell-pick-row-granted' : ''}" data-spell-id="${safeId}">
+        if (sp._is_homebrew) {
+            const author = sp._author_name ? ` · ${sp._author_name}` : '';
+            tags.push(`<span class="spell-pick-tag spell-pick-tag-hb" title="Homebrew${author}">HB</span>`);
+        }
+        const metaParts = [];
+        const school = _spellField(sp, 'school');
+        if (school) metaParts.push(escapeHtml(school));
+        const classes = _spellField(sp, 'classes') || [];
+        if (classes.length) metaParts.push(classes.join(', '));
+        if (sp._is_homebrew && sp._author_name) metaParts.push(`Homebrew · ${escapeHtml(sp._author_name)}`);
+        return `<label class="spell-pick-row${isGranted ? ' spell-pick-row-granted' : ''}${sp._is_homebrew ? ' spell-pick-row-hb' : ''}" data-spell-id="${safeId}">
             <input type="checkbox" class="spell-pick-cb" data-name="${safeId}" ${(isKnown || isGranted) ? 'checked' : ''} ${isGranted ? 'disabled' : ''}>
             <div class="spell-pick-info" onclick="event.preventDefault();schedaShowSpellDetail('${safeId}')">
                 <div class="spell-pick-name">${escapeHtml(_spellField(sp, 'name'))} ${tags.join('')}</div>
-                <div class="spell-pick-meta">${escapeHtml(_spellField(sp, 'school'))} · ${(_spellField(sp, 'classes') || []).join(', ')}</div>
+                <div class="spell-pick-meta">${metaParts.join(' · ')}</div>
             </div>
         </label>`;
     };
@@ -4813,7 +4836,7 @@ window.schedaOpenSpellPicker = function(pgId, level) {
             </div>
         </div>
         <div class="spell-filter-group">
-            <div class="spell-filter-label">Classi <small style="color:var(--text-light);">(default: classi del PG)</small></div>
+            <div class="spell-filter-label">Classi <small style="color:var(--text-light);">(vuoto = tutte)</small></div>
             <div class="spell-filter-chips">
                 ${allClasses.map(c => chip(c, f.classes.includes(c), `spellFilterToggle('classes',\`${c.replace(/`/g, '\\`')}\`)`)).join('')}
             </div>
@@ -4832,9 +4855,15 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const tabsHtml = hasHomebrewTab ? `
+        <div class="spell-picker-tabs">
+            <button type="button" class="spell-picker-tab active" data-tab="catalog" onclick="spellPickerSetTab('catalog')">Catalogo <span class="spell-picker-tab-count">${list.length}</span></button>
+            <button type="button" class="spell-picker-tab" data-tab="homebrew" onclick="spellPickerSetTab('homebrew')">Homebrew <span class="spell-picker-tab-count">${hbList.length}</span></button>
+        </div>` : '';
     overlay.innerHTML = `<div class="hp-calc-modal spell-picker-modal">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 style="margin-bottom:6px;">${escapeHtml(titleLabel)}</h3>
+        ${tabsHtml}
         <div class="spell-picker-search-row">
             <input type="text" id="spellPickerSearch" class="hp-calc-input spell-picker-search" placeholder="${placeholder}">
             <button type="button" class="spell-picker-filter-btn" id="spellPickerFilterBtn" onclick="spellFilterTogglePanel()" title="Filtri" aria-label="Filtri">
@@ -4853,8 +4882,6 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     </div>`;
     document.body.appendChild(overlay);
 
-    // Stato condiviso per re-render lista
-    window._spellPickerList = list;
     window._spellPickerRenderRow = renderRow;
     window._spellPickerEmptyMsg = emptyMsg;
     _spellPickerRefresh();
@@ -4866,10 +4893,26 @@ window.schedaOpenSpellPicker = function(pgId, level) {
             _spellPickerRefresh();
         });
     }
+
+    // Event delegation: tieni traccia delle selezioni anche quando le
+    // checkbox del tab non attivo non sono nel DOM.
+    const listEl = document.getElementById('spellPickerList');
+    if (listEl) {
+        listEl.addEventListener('change', e => {
+            const cb = e.target.closest('.spell-pick-cb');
+            if (!cb || cb.disabled) return;
+            const name = cb.dataset.name;
+            if (!name || !window._spellPickerSelected) return;
+            if (cb.checked) window._spellPickerSelected.add(name);
+            else window._spellPickerSelected.delete(name);
+        });
+    }
 };
 
 function _spellPickerRefresh() {
-    const list = window._spellPickerList || [];
+    const lists = window._spellPickerLists || { catalog: [], homebrew: [] };
+    const tab = window._spellPickerTab || 'catalog';
+    const list = lists[tab] || [];
     const renderRow = window._spellPickerRenderRow;
     const emptyMsg = window._spellPickerEmptyMsg || '';
     const f = window._spellPickerFilters;
@@ -4885,36 +4928,52 @@ function _spellPickerRefresh() {
         return name.includes(q) || sch.includes(q);
     });
 
-    const matching = filtered.filter(s => _spellMatchesPg(s, pgClasses));
-    const others = filtered.filter(s => !_spellMatchesPg(s, pgClasses));
-    const grpMatch = lang === 'en' ? 'Available for your class' : 'Disponibili per la tua classe';
-    const grpOther = lang === 'en' ? 'Others' : 'Altri';
-
     const listEl = document.getElementById('spellPickerList');
     if (!listEl) return;
     let html = '';
-    if (matching.length > 0) html += `<div class="spell-pick-group-title">${grpMatch}</div>${matching.map(renderRow).join('')}`;
-    if (others.length > 0) html += `<div class="spell-pick-group-title">${grpOther}</div>${others.map(renderRow).join('')}`;
-    if (filtered.length === 0) html = `<p class="scheda-empty">${emptyMsg}</p>`;
+    if (tab === 'homebrew') {
+        // Tab homebrew: niente raggruppamento per classe del PG; mostro la lista
+        // come unico blocco ordinato. Aggiungo l'autore se non e' del PG stesso.
+        if (filtered.length === 0) {
+            html = `<p class="scheda-empty">${emptyMsg}</p>`;
+        } else {
+            html = filtered.map(renderRow).join('');
+        }
+    } else {
+        const matching = filtered.filter(s => _spellMatchesPg(s, pgClasses));
+        const others = filtered.filter(s => !_spellMatchesPg(s, pgClasses));
+        const grpMatch = lang === 'en' ? 'Available for your class' : 'Disponibili per la tua classe';
+        const grpOther = lang === 'en' ? 'Others' : 'Altri';
+        if (matching.length > 0) html += `<div class="spell-pick-group-title">${grpMatch}</div>${matching.map(renderRow).join('')}`;
+        if (others.length > 0) html += `<div class="spell-pick-group-title">${grpOther}</div>${others.map(renderRow).join('')}`;
+        if (filtered.length === 0) html = `<p class="scheda-empty">${emptyMsg}</p>`;
+    }
     listEl.innerHTML = html;
 
     // Aggiorna badge contatore filtri attivi
     const badge = document.getElementById('spellFilterBadge');
     if (badge && f) {
-        const def = pg ? _defaultSpellFilters(pg) : null;
         let n = 0;
         n += f.schools.length;
         n += f.castingTimes.length;
         n += f.components.length;
         if (f.concentration !== 'any') n += 1;
         if (f.ritual !== 'any') n += 1;
-        // Considero "modificato" il filtro classi solo se differisce dal default (classi del PG)
-        if (def && (f.classes.length !== def.classes.length || f.classes.some(c => !def.classes.includes(c)))) n += 1;
+        n += f.classes.length;
         n += f.sources.length;
         if (n > 0) { badge.textContent = n; badge.style.display = ''; }
         else badge.style.display = 'none';
     }
 }
+
+window.spellPickerSetTab = function(tab) {
+    if (tab !== 'catalog' && tab !== 'homebrew') return;
+    window._spellPickerTab = tab;
+    document.querySelectorAll('.spell-picker-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tab);
+    });
+    _spellPickerRefresh();
+};
 
 window.spellFilterTogglePanel = function() {
     const panel = document.getElementById('spellFilterPanel');
@@ -4995,9 +5054,15 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
         const sp = _resolveSpell(g.name) || _resolveSpell(g.name_en);
         if (sp) grantedSet.add(sp.name);
     });
-    const checked = Array.from(document.querySelectorAll('.spell-pick-cb:checked'))
-        .map(cb => cb.dataset.name)
-        .filter(n => !grantedSet.has(n));
+    // Le selezioni vivono in _spellPickerSelected (persistono fra cambi tab).
+    // Filtro mantenendo solo quelle che corrispondono a un incantesimo del
+    // livello corrente (tab catalog + homebrew) e non sono auto-garantite.
+    const allLevelNames = new Set([
+        ...((window._spellPickerLists?.catalog) || []).map(s => s.name),
+        ...((window._spellPickerLists?.homebrew) || []).map(s => s.name),
+    ]);
+    const checked = Array.from(window._spellPickerSelected || [])
+        .filter(n => allLevelNames.has(n) && !grantedSet.has(n));
     const merged = Array.from(new Set([...others, ...checked]));
     pg.incantesimi_conosciuti = merged;
     await supabase.from('personaggi').update({ incantesimi_conosciuti: merged }).eq('id', pgId);

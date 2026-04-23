@@ -2527,6 +2527,54 @@
 .spell-pick-row-granted .spell-pick-cb { cursor: not-allowed; opacity: 0.7; }
 .spell-pick-row-granted:hover { background: rgba(108, 92, 231, 0.10); }
 
+/* Tab Catalogo / Homebrew nel picker incantesimi */
+.spell-picker-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.spell-picker-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 14px;
+    font-size: 0.92em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.spell-picker-tab:hover { color: var(--accent); }
+.spell-picker-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
+.spell-picker-tab-count {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    border-radius: 10px;
+    font-size: 0.78em;
+    padding: 1px 7px;
+    min-width: 18px;
+    text-align: center;
+}
+.spell-picker-tab.active .spell-picker-tab-count {
+    background: var(--accent);
+    color: #fff;
+}
+.spell-pick-tag-hb {
+    background: rgba(108, 92, 231, 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(108, 92, 231, 0.4);
+}
+.spell-pick-row-hb {
+    background: rgba(108, 92, 231, 0.04);
+}
+
 /* Search row con icona filtri */
 .spell-picker-search-row {
     display: flex;
