@@ -3966,8 +3966,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Bussare": {
-    "name": "Bussare",
+  "Scassinare": {
+    "name": "Scassinare",
     "name_en": "Knock",
     "level": 2,
     "school": "transmutation",
@@ -3993,7 +3993,9 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard"
     ],
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": [
+      "Bussare"
+    ],
     "translated": true
   },
   "Ristorare Inferiore": {
@@ -12818,6 +12820,141 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
+    "translated": true
+  },
+  "Comprensione dei Linguaggi": {
+    "name": "Comprensione dei Linguaggi",
+    "name_en": "Comprehend Languages",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (un pizzico di fuliggine e sale)",
+    "components_en": "V, S, M (a pinch of soot and salt)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Per la durata dell'incantesimo, comprendi il significato letterale di qualsiasi linguaggio parlato che senti. Comprendi anche qualsiasi linguaggio scritto che vedi, ma devi toccare la superficie sulla quale le parole sono scritte. Occorre circa 1 minuto per leggere una pagina di testo.\n\nQuesto incantesimo non decifra messaggi segreti in un testo o in un glifo, come un sigillo arcano, che non sia parte di un linguaggio scritto.\n\nRituale.",
+    "description_en": "For the duration, you understand the literal meaning of any spoken language that you hear. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text.\n\nThis spell doesn't decode secret messages in a text or glyph, such as an arcane sigil, that isn't part of a written language.\n\nRitual.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Trova Famiglio": {
+    "name": "Trova Famiglio",
+    "name_en": "Find Familiar",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 ora",
+    "casting_time_en": "1 hour",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S, M (10 mo di carbone, incenso ed erbe che devono essere consumati dal fuoco in un braciere d'ottone)",
+    "components_en": "V, S, M (10 gp worth of charcoal, incense, and herbs that must be consumed by fire in a brass brazier)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Ottieni il servizio di un famiglio, uno spirito che assume una forma animale di tua scelta: pipistrello, gatto, granchio, rana (rospo), falco, lucertola, polpo, gufo, serpente velenoso, pesce (chiappino), ratto, corvo, cavalluccio marino, ragno o donnola. Apparendo in uno spazio libero entro gittata, il famiglio ha le statistiche della forma scelta, anche se è un celestiale, un fatato o un immondo (a tua scelta) invece di una bestia.\n\nIl tuo famiglio agisce in modo indipendente da te, ma obbedisce sempre ai tuoi comandi. In combattimento, tira la propria iniziativa e agisce nel proprio turno. Un famiglio non può attaccare, ma può intraprendere altre azioni normalmente.\n\nQuando il famiglio scende a 0 punti ferita, scompare, senza lasciare alcuna forma fisica. Riappare dopo che lanci di nuovo questo incantesimo. Con un'azione, puoi temporaneamente congedare il tuo famiglio in una dimensione tascabile. In alternativa, puoi congedarlo per sempre. Con un'azione mentre è temporaneamente congedato, puoi farlo riapparire in qualsiasi spazio libero entro 9 metri da te. Ogni volta che il famiglio scende a 0 punti ferita o scompare nella dimensione tascabile, lascia nel suo spazio qualsiasi cosa indossasse o trasportasse.\n\nFinché il tuo famiglio si trova entro 30 metri da te, puoi comunicare con lui telepaticamente. Inoltre, con un'azione, puoi vedere attraverso gli occhi del tuo famiglio e udire ciò che ode fino all'inizio del tuo turno successivo, ottenendo i benefici dei sensi speciali che il famiglio possiede. Durante questo periodo, sei sordo e cieco riguardo ai tuoi sensi.\n\nNon puoi avere più di un famiglio alla volta. Se lanci questo incantesimo mentre hai già un famiglio, lo fai assumere una nuova forma. Scegli una delle forme dall'elenco soprastante. Il tuo famiglio si trasforma nella creatura scelta.\n\nInfine, quando lanci un incantesimo con gittata di Contatto, il tuo famiglio può consegnare l'incantesimo come se l'avesse lanciato lui stesso. Il tuo famiglio deve trovarsi entro 30 metri da te, e deve usare la propria reazione per consegnare l'incantesimo quando lo lanci. Se l'incantesimo richiede un tiro per colpire, usi il tuo modificatore di attacco per il tiro.\n\nRituale.",
+    "description_en": "You gain the service of a familiar, a spirit that takes an animal form you choose: bat, cat, crab, frog (toad), hawk, lizard, octopus, owl, poisonous snake, fish (quipper), rat, raven, sea horse, spider, or weasel. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a celestial, fey, or fiend (your choice) instead of a beast.\n\nYour familiar acts independently of you, but it always obeys your commands. In combat, it rolls its own initiative and acts on its own turn. A familiar can't attack, but it can take other actions as normal.\n\nWhen the familiar drops to 0 hit points, it disappears, leaving behind no physical form. It reappears after you cast this spell again. As an action, you can temporarily dismiss your familiar to a pocket dimension. Alternatively, you can dismiss it forever. As an action while it is temporarily dismissed, you can cause it to reappear in any unoccupied space within 30 feet of you. Whenever the familiar drops to 0 hit points or disappears into the pocket dimension, it leaves behind in its space anything it was wearing or carrying.\n\nWhile your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as an action, you can see through your familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the familiar has. During this time, you are deaf and blind with regard to your own senses.\n\nYou can't have more than one familiar at a time. If you cast this spell while you already have a familiar, you instead cause it to adopt a new form. Choose one of the forms from the above list. Your familiar transforms into the chosen creature.\n\nFinally, when you cast a spell with a range of touch, your familiar can deliver the spell as if it had cast the spell. Your familiar must be within 100 feet of you, and it must use its reaction to deliver the spell when you cast it. If the spell requires an attack roll, you use your attack modifier for the roll.\n\nRitual.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Trovare Famiglio",
+      "Trovare il Famiglio"
+    ],
+    "translated": true
+  },
+  "Identificare": {
+    "name": "Identificare",
+    "name_en": "Identify",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (una perla del valore di almeno 100 mo e una piuma di gufo)",
+    "components_en": "V, S, M (a pearl worth at least 100 gp and an owl feather)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Scegli un oggetto che devi toccare per tutta la durata del lancio dell'incantesimo. Se è un oggetto magico o un altro oggetto intriso di magia, ne apprendi le proprietà e come utilizzarle, se per essere usato richiede sintonia e quante cariche possiede, se ne ha. Apprendi se eventuali incantesimi stanno influenzando l'oggetto e quali sono. Se l'oggetto è stato creato da un incantesimo, apprendi quale incantesimo lo ha creato.\n\nSe invece tocchi una creatura per tutta la durata del lancio, apprendi quali incantesimi, se ce ne sono, la stanno attualmente influenzando.\n\nRituale.",
+    "description_en": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it.\n\nRitual.",
+    "classes": [
+      "Bardo",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Identifica",
+      "Identificazione"
+    ],
+    "translated": true
+  },
+  "Individuazione del Magico": {
+    "name": "Individuazione del Magico",
+    "name_en": "Detect Magic",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Per la durata dell'incantesimo, percepisci la presenza di magia entro 9 metri da te. Se percepisci magia in questo modo, puoi usare la tua azione per vedere una debole aura attorno a qualsiasi creatura o oggetto visibile nell'area che reca della magia, e ne apprendi la scuola di magia, se ce n'è una.\n\nL'incantesimo può penetrare la maggior parte delle barriere, ma è bloccato da 30 centimetri di pietra, 2,5 centimetri di metallo comune, una sottile lastra di piombo o 90 centimetri di legno o terra.\n\nRituale.",
+    "description_en": "For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any.\n\nThe spell can penetrate most barriers, but is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.\n\nRitual.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido",
+      "Paladino",
+      "Ranger",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Paladin",
+      "Ranger",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Rilevamento del Magico",
+      "Rileva Magia"
+    ],
     "translated": true
   }
 });
