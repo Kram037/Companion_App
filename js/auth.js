@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-H RPC dedicata get_uids_by_user_ids');
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-I RPC get_uids_by_user_ids con cast text');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {

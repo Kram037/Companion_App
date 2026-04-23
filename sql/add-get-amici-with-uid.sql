@@ -3,8 +3,9 @@
 --
 -- Risolve l'auth-uid di una lista di utenti dati i loro `utenti.id`.
 -- Necessaria per la visibilità degli homebrew degli amici: il loader
--- client-side deve fare una SELECT su tabelle homebrew filtrando per user_id
--- (= utenti.uid), ma la SELECT diretta su utenti viene bloccata dall'RLS.
+-- client-side deve fare una SELECT su tabelle homebrew filtrando per
+-- user_id (= utenti.uid degli amici abilitati), e la SELECT diretta su
+-- utenti viene bloccata dall'RLS.
 --
 -- SECURITY DEFINER: bypassa l'RLS della tabella utenti per permettere la
 -- lettura del solo uid (UUID identifier di Supabase Auth). NON è una
@@ -12,13 +13,22 @@
 -- privilegiata. Restituisce solo id, uid e nome_utente, MAI email/password
 -- o altri dati sensibili.
 --
--- Idempotente: CREATE OR REPLACE.
+-- I CAST espliciti a text sono necessari perché `utenti.id` è varchar(10)
+-- e `utenti.uid` può essere uuid o varchar a seconda della migrazione del DB.
+-- Castando tutto a text evitiamo errori 42804 (tipo di colonna che non
+-- combacia col tipo di ritorno).
+--
+-- IMPORTANTE: dropp esplicito prima del CREATE perché PostgreSQL non
+-- permette di cambiare il tipo di ritorno di una funzione esistente con
+-- CREATE OR REPLACE.
 -- ────────────────────────────────────────────────────────────────────────────
 
-CREATE OR REPLACE FUNCTION get_uids_by_user_ids(user_ids text[])
+DROP FUNCTION IF EXISTS get_uids_by_user_ids(text[]);
+
+CREATE FUNCTION get_uids_by_user_ids(user_ids text[])
 RETURNS TABLE(
     id text,
-    uid uuid,
+    uid text,
     nome_utente text
 )
 LANGUAGE plpgsql
@@ -27,9 +37,12 @@ SET search_path = public
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT u.id, u.uid, u.nome_utente
+    SELECT
+        u.id::text          AS id,
+        u.uid::text         AS uid,
+        u.nome_utente::text AS nome_utente
     FROM utenti u
-    WHERE u.id = ANY(user_ids);
+    WHERE u.id::text = ANY(user_ids);
 END;
 $$;
 
