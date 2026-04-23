@@ -5249,20 +5249,21 @@ window.invAddFromHomebrew = async function(pgId, hbId) {
 
 window.invQuickCreate = function(pgId) {
     document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const rarita = ['Comune','Non Comune','Raro','Molto Raro','Leggendario','Artefatto'];
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;">
+    overlay.innerHTML = `<div class="hp-calc-modal inv-quick-modal" style="width:780px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:12px;font-size:1rem;">Crea oggetto rapido</h3>
-        <input type="text" id="invItemNome" class="hp-calc-input" placeholder="Nome oggetto" style="margin-bottom:8px;">
-        <textarea id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (opzionale)" rows="3" style="margin-bottom:8px;resize:vertical;"></textarea>
-        <div style="display:flex;gap:8px;margin-bottom:8px;">
-            <input type="number" id="invItemQty" class="hp-calc-input" value="1" min="1" style="flex:1;">
-            <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
-                <input type="checkbox" id="invItemMagic"> Magico
-            </label>
+        <div class="inv-quick-row">
+            <input type="text" id="invItemNome" class="hp-calc-input inv-quick-name" placeholder="Nome oggetto">
+            <select id="invItemRarita" class="hp-calc-input inv-quick-rarita">
+                ${rarita.map(r => `<option value="${r}" ${r === 'Comune' ? 'selected' : ''}>${r}</option>`).join('')}
+            </select>
+            <input type="number" id="invItemQty" class="hp-calc-input inv-quick-qty" value="1" min="1" title="Quantita'">
         </div>
-        <div class="dialog-actions">
+        <textarea id="invItemDesc" class="equip-desc-textarea inv-quick-desc" placeholder="Descrizione dell'oggetto..."></textarea>
+        <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-secondary" onclick="invAddItem('${pgId}')">Indietro</button>
             <button class="btn-primary" onclick="invSaveNewItem('${pgId}')">Aggiungi</button>
         </div>
@@ -5275,12 +5276,15 @@ window.invSaveNewItem = async function(pgId) {
     if (!nome) return;
     const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
     const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
-    const magico = document.getElementById('invItemMagic')?.checked || false;
+    const rarita = document.getElementById('invItemRarita')?.value || 'Comune';
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
-    inventario.push({ nome, descrizione: desc, quantita: qty, magico });
+    const entry = { nome, descrizione: desc, quantita: qty, rarita };
+    // Magico inferito: tutto cio' che non e' "Comune" e' magico per definizione D&D.
+    entry.magico = rarita !== 'Comune';
+    inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();

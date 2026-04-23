@@ -2130,6 +2130,32 @@
     flex-shrink: 0;
 }
 
+/* ── Dialog "Crea oggetto rapido" ── */
+.inv-quick-modal { display: flex; flex-direction: column; }
+.inv-quick-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.inv-quick-row .hp-calc-input { margin-bottom: 0; }
+.inv-quick-name { flex: 1 1 auto; min-width: 0; }
+.inv-quick-rarita { flex: 0 0 170px; }
+.inv-quick-qty { flex: 0 0 70px; text-align: center; }
+.inv-quick-desc {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 280px;
+    resize: vertical;
+}
+@media (max-width: 600px) {
+    .inv-quick-row { flex-wrap: wrap; }
+    .inv-quick-name { flex: 1 1 100%; }
+    .inv-quick-rarita { flex: 1 1 auto; }
+    .inv-quick-qty { flex: 0 0 80px; }
+    .inv-quick-desc { min-height: 200px; }
+}
+
 .inv-edit-hb-banner {
     background: rgba(168, 85, 247, 0.10);
     border: 1px solid rgba(168, 85, 247, 0.35);
