@@ -29,6 +29,7 @@ function setupSupabaseAuth() {
                 
                 initializeUserDocument(session.user).then(() => {
                     loadRazzeBackground();
+                    loadHomebrewSottoclassi();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -90,6 +91,89 @@ async function loadRazzeBackground() {
         if (bgRes.data) AppState.cachedBackground = bgRes.data;
     } catch (e) { console.warn('Errore caricamento razze/background:', e); }
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Carica le sottoclassi homebrew visibili dall'utente corrente:
+//  • le proprie (sempre visibili);
+//  • quelle degli amici esplicitamente abilitati nelle impostazioni
+//    (`utenti.homebrew_settings.amici_abilitati`), solo se l'opzione
+//    master `enabled` è attiva.
+// Risultato cache: AppState.cachedHomebrewSottoclassi
+//   = [{ id, nome, parent_class_slug, parent_class_name,
+//        sottoclasse_features, granted_spells, _author_uid,
+//        _author_name, _is_own }]
+// ─────────────────────────────────────────────────────────────────────────
+async function loadHomebrewSottoclassi() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) {
+        AppState.cachedHomebrewSottoclassi = [];
+        return [];
+    }
+    const ownUid = AppState.currentUser.uid;
+    try {
+        // Impostazioni dell'utente (solo per leggere amici_abilitati / enabled).
+        const userData = AppState.cachedUserData || (typeof findUserByUid === 'function'
+            ? await findUserByUid(ownUid)
+            : null);
+        const settings = userData?.homebrew_settings || { enabled: false, amici_abilitati: [] };
+
+        // 1) Carica le proprie (sempre).
+        const ownReq = supabase
+            .from('homebrew_classi')
+            .select('*')
+            .eq('user_id', ownUid)
+            .not('parent_class_slug', 'is', null);
+
+        // 2) Risolvi gli auth-uid degli amici abilitati (se feature attiva).
+        let friendUids = [];
+        let friendInfoByUid = {};
+        if (settings.enabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
+            const { data: friendRows } = await supabase
+                .from('utenti')
+                .select('id, uid, nome_utente')
+                .in('id', settings.amici_abilitati);
+            (friendRows || []).forEach(f => {
+                if (f.uid) {
+                    friendUids.push(f.uid);
+                    friendInfoByUid[f.uid] = f;
+                }
+            });
+        }
+
+        const friendReq = friendUids.length > 0
+            ? supabase
+                .from('homebrew_classi')
+                .select('*')
+                .in('user_id', friendUids)
+                .not('parent_class_slug', 'is', null)
+            : Promise.resolve({ data: [] });
+
+        const [ownRes, friendRes] = await Promise.all([ownReq, friendReq]);
+
+        const ownName = userData?.nome_utente || 'Tuo';
+        const ownList = (ownRes.data || []).map(r => ({
+            ...r,
+            _author_uid: ownUid,
+            _author_name: ownName,
+            _is_own: true
+        }));
+        const friendList = (friendRes.data || []).map(r => ({
+            ...r,
+            _author_uid: r.user_id,
+            _author_name: friendInfoByUid[r.user_id]?.nome_utente || 'Amico',
+            _is_own: false
+        }));
+
+        AppState.cachedHomebrewSottoclassi = [...ownList, ...friendList];
+        return AppState.cachedHomebrewSottoclassi;
+    } catch (e) {
+        console.warn('Errore caricamento sottoclassi homebrew:', e);
+        AppState.cachedHomebrewSottoclassi = [];
+        return [];
+    }
+}
+
+window.loadHomebrewSottoclassi = loadHomebrewSottoclassi;
 
 async function checkAuthState() {
     const supabase = getSupabaseClient();

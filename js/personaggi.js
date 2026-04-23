@@ -1751,13 +1751,52 @@ function pgGetSubclassOptions(className) {
             slug: s.slug,
             name: s.name || s.name_en,
             minLevel: minLevel || 3,
+            isHomebrew: false,
         };
     });
 }
 
+// Restituisce le sottoclassi HOMEBREW visibili (proprie + amici abilitati)
+// per una data classe. Le voci contengono _hbId, _hbAuthor, _hbIsOwn per
+// permettere alla scheda di risalire a tutti i privilegi/incantesimi.
+function pgGetHomebrewSubclassOptions(className) {
+    const all = (window.AppState && Array.isArray(AppState.cachedHomebrewSottoclassi))
+        ? AppState.cachedHomebrewSottoclassi
+        : [];
+    if (all.length === 0) return [];
+    const data = window.CLASSES_DATA || [];
+    const cls = data.find(c =>
+        (c.name || '').toLowerCase() === String(className).toLowerCase() ||
+        (c.name_en || '').toLowerCase() === String(className).toLowerCase() ||
+        (c.slug || '').toLowerCase() === String(className).toLowerCase()
+    );
+    const slug = cls ? cls.slug : null;
+    if (!slug) return [];
+    return all
+        .filter(r => r.parent_class_slug === slug)
+        .map(r => {
+            // Min level = il minimo livello tra le feature definite (default 3)
+            const lvls = Array.isArray(r.sottoclasse_features)
+                ? r.sottoclasse_features.map(f => parseInt(f.level) || 99)
+                : [];
+            const minLevel = lvls.length ? Math.min(...lvls) : 3;
+            return {
+                slug: 'hb:' + r.id,
+                name: r.nome || 'Sottoclasse',
+                minLevel: minLevel || 3,
+                isHomebrew: true,
+                _hbId: r.id,
+                _hbAuthor: r._author_name || '',
+                _hbIsOwn: !!r._is_own,
+            };
+        })
+        .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it'));
+}
+
 function _renderSubclassSelector(c, index, onclickFn) {
     const opts = pgGetSubclassOptions(c.nome);
-    if (opts.length === 0) return '';
+    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    if (opts.length === 0 && hbOpts.length === 0) return '';
     const label = c.sottoclasse
         ? escapeHtml(c.sottoclasse)
         : '<span class="pg-subclass-trigger-empty">Sottoclasse…</span>';
@@ -1802,28 +1841,34 @@ window.pgOpenSubclassDropdown = function(index) {
     const c = pgSelectedClasses[index];
     if (!c) return;
     const opts = pgGetSubclassOptions(c.nome);
-    if (opts.length === 0) {
+    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    if (opts.length === 0 && hbOpts.length === 0) {
         showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
         return;
     }
-    const items = [
-        { value: '__none__', label: 'Nessuna sottoclasse' },
-        ...opts.map(o => ({
-            value: o.slug,
-            label: o.name + (c.livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : '')
-        }))
-    ];
+    const items = _buildSubclassPickerItems(opts, hbOpts, c.livello);
+    const allOpts = [...opts, ...hbOpts];
     openCustomSelect(items, (value) => {
         if (value === '__none__') {
             delete c.sottoclasse;
             delete c.sottoclasseSlug;
+            delete c.sottoclasse_homebrew_id;
+            delete c.sottoclasse_homebrew_author;
             c.thirdCaster = false;
         } else {
-            const sel = opts.find(o => o.slug === value);
+            const sel = allOpts.find(o => o.slug === value);
             if (sel) {
                 c.sottoclasse = sel.name;
                 c.sottoclasseSlug = sel.slug;
-                c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
+                if (sel.isHomebrew) {
+                    c.sottoclasse_homebrew_id = sel._hbId;
+                    if (sel._hbAuthor) c.sottoclasse_homebrew_author = sel._hbAuthor;
+                    c.thirdCaster = false;
+                } else {
+                    delete c.sottoclasse_homebrew_id;
+                    delete c.sottoclasse_homebrew_author;
+                    c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
+                }
             }
         }
         pgRenderClassi();
@@ -1831,11 +1876,38 @@ window.pgOpenSubclassDropdown = function(index) {
     }, `Sottoclasse di ${c.nome}`);
 };
 
+// Helper condiviso fra scheda completa e micro-scheda: costruisce gli
+// item del custom-select per le sottoclassi, separando con un divider
+// le voci homebrew dalle ufficiali.
+function _buildSubclassPickerItems(opts, hbOpts, livello) {
+    const items = [
+        { value: '__none__', label: 'Nessuna sottoclasse' },
+        ...opts.map(o => ({
+            value: o.slug,
+            label: o.name + (livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : '')
+        }))
+    ];
+    if (hbOpts.length > 0) {
+        items.push({ type: 'divider', label: 'Homebrew' });
+        hbOpts.forEach(o => {
+            const tag = o._hbIsOwn ? 'tuo' : (o._hbAuthor || 'amico');
+            items.push({
+                value: o.slug,
+                label: o.name + (livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : ''),
+                source: tag,
+            });
+        });
+    }
+    return items;
+}
+
 window.pgClearSubclass = function(index) {
     const c = pgSelectedClasses[index];
     if (!c) return;
     delete c.sottoclasse;
     delete c.sottoclasseSlug;
+    delete c.sottoclasse_homebrew_id;
+    delete c.sottoclasse_homebrew_author;
     c.thirdCaster = false;
     pgRenderClassi();
     pgResetAutoHP();
@@ -9246,28 +9318,34 @@ window.microOpenSubclassDropdown = function(index) {
     const c = _microSelectedClasses[index];
     if (!c) return;
     const opts = pgGetSubclassOptions(c.nome);
-    if (opts.length === 0) {
+    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    if (opts.length === 0 && hbOpts.length === 0) {
         showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
         return;
     }
-    const items = [
-        { value: '__none__', label: 'Nessuna sottoclasse' },
-        ...opts.map(o => ({
-            value: o.slug,
-            label: o.name + (c.livello < o.minLevel ? ` (dal liv. ${o.minLevel})` : '')
-        }))
-    ];
+    const items = _buildSubclassPickerItems(opts, hbOpts, c.livello);
+    const allOpts = [...opts, ...hbOpts];
     openCustomSelect(items, (value) => {
         if (value === '__none__') {
             delete c.sottoclasse;
             delete c.sottoclasseSlug;
+            delete c.sottoclasse_homebrew_id;
+            delete c.sottoclasse_homebrew_author;
             c.thirdCaster = false;
         } else {
-            const sel = opts.find(o => o.slug === value);
+            const sel = allOpts.find(o => o.slug === value);
             if (sel) {
                 c.sottoclasse = sel.name;
                 c.sottoclasseSlug = sel.slug;
-                c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
+                if (sel.isHomebrew) {
+                    c.sottoclasse_homebrew_id = sel._hbId;
+                    if (sel._hbAuthor) c.sottoclasse_homebrew_author = sel._hbAuthor;
+                    c.thirdCaster = false;
+                } else {
+                    delete c.sottoclasse_homebrew_id;
+                    delete c.sottoclasse_homebrew_author;
+                    c.thirdCaster = isThirdCasterSubclass(sel.slug, sel.name);
+                }
             }
         }
         microRenderClassi();
@@ -9279,6 +9357,8 @@ window.microClearSubclass = function(index) {
     if (!c) return;
     delete c.sottoclasse;
     delete c.sottoclasseSlug;
+    delete c.sottoclasse_homebrew_id;
+    delete c.sottoclasse_homebrew_author;
     c.thirdCaster = false;
     microRenderClassi();
 };

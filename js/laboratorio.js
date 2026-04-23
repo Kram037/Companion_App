@@ -1209,6 +1209,7 @@ window.labSaveSottoclasse = async function() {
         closeHomebrewModal();
         _labSubState = null;
         loadLabContent();
+        if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
     } catch (err) {
         console.error('Errore salvataggio sottoclasse:', err);
         // Se le colonne non esistono ancora nel DB, mostra un messaggio chiaro.
@@ -2091,6 +2092,9 @@ window.labDeleteItem = async function(id) {
     if (error) { showNotification('Errore nella cancellazione'); return; }
     showNotification('Eliminato');
     loadLabContent();
+    if (cat.table === 'homebrew_classi' && typeof loadHomebrewSottoclassi === 'function') {
+        loadHomebrewSottoclassi();
+    }
 };
 
 async function handleSaveHomebrew(e) {
@@ -2278,6 +2282,7 @@ window.labToggleHbEnabled = async function(cb) {
     settings.enabled = cb.checked;
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
+    if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -2295,6 +2300,7 @@ window.labToggleFriendHb = async function(cb) {
     }
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
+    if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
 };
 
 // ============================================================================
