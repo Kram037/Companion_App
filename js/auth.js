@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-B con CONTROL SELECT debug');
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-D con masterEnabled fix');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
@@ -123,12 +123,17 @@ async function loadHomebrewSottoclassi() {
             const userData = AppState.cachedUserData || (typeof findUserByUid === 'function'
                 ? await findUserByUid(ownUid)
                 : null);
-            const settings = userData?.homebrew_settings || { enabled: false, amici_abilitati: [] };
+            const settings = userData?.homebrew_settings || { enabled: undefined, amici_abilitati: [] };
+            // Allineato all'UI: default ON quando enabled non è esplicitamente false.
+            const masterEnabled = settings.enabled !== false;
 
             // Risolvi gli auth-uid degli amici abilitati (se feature attiva).
             let friendUids = [];
             let friendInfoByUid = {};
-            if (settings.enabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
+            try {
+                console.log('[homebrew][debug] settings:', settings, 'masterEnabled:', masterEnabled);
+            } catch (_) {}
+            if (masterEnabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
                 const { data: friendRows } = await supabase
                     .from('utenti')
                     .select('id, uid, nome_utente')
