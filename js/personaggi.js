@@ -4917,7 +4917,7 @@ window.invEditItem = function(pgId, idx) {
         </div>
         <div class="equip-ench-row">
             <span class="equip-ench-label">Incantamento</span>
-            <div class="custom-res-dice-row" style="margin:0;flex:1;">
+            <div class="custom-res-dice-row">
                 ${[0,1,2,3].map(b =>
                     `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
                 ).join('')}
@@ -4999,7 +4999,7 @@ window.invEditAttune = function(pgId, idx) {
         <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:10px;">
         <div class="equip-ench-row">
             <span class="equip-ench-label">Incantamento</span>
-            <div class="custom-res-dice-row" style="margin:0;flex:1;">
+            <div class="custom-res-dice-row">
                 ${[0,1,2,3].map(b =>
                     `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectAttuneBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
                 ).join('')}
@@ -8470,7 +8470,7 @@ window.schedaEditEquip = function(pgId, index) {
             ${e.proprieta ? `<p style="font-size:0.8rem;color:var(--text-light);margin-bottom:12px;">${e.proprieta.join(', ')}</p>` : ''}
             <div class="equip-ench-row">
                 <span class="equip-ench-label">Incantamento</span>
-                <div class="custom-res-dice-row" style="margin:0;flex:1;">
+                <div class="custom-res-dice-row">
                     ${[0,1,2,3].map(b =>
                         `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="schedaSetMagicBonus('${pgId}',${index},${b})">${b === 0 ? 'No' : '+' + b}</button>`
                     ).join('')}

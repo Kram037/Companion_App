@@ -868,13 +868,14 @@
     opacity: 0.8;
 }
 
-/* Riga "Incantamento" sopra alla descrizione: etichetta + chip */
+/* Sezione "Incantamento" sopra alla descrizione: etichetta in alto,
+   4 caselle (No / +1 / +2 / +3) in riga sotto. */
 .equip-ench-row {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 .equip-ench-label {
     font-size: 0.78rem;
@@ -882,6 +883,15 @@
     color: var(--text-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+.equip-ench-row .custom-res-dice-row {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    width: 100%;
+}
+.equip-ench-row .custom-res-dice-btn {
+    flex: 1;
 }
 
 /* Etichetta di categoria all'interno dei picker (es. "Armi da Mischia Semplici",
