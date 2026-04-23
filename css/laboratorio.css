@@ -161,6 +161,12 @@
     transition: border-color 0.2s;
 }
 .lab-card:hover { border-color: var(--primary); }
+.lab-card-clickable {
+    cursor: pointer;
+    transition: border-color 0.12s, background 0.12s, transform 0.06s;
+}
+.lab-card-clickable:hover { background: var(--surface-hover); }
+.lab-card-clickable:active { transform: scale(0.99); }
 
 .lab-card-icon {
     width: 40px;

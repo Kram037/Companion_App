@@ -25,35 +25,38 @@ const LAB_CATEGORIES = {
         label: 'Background',
         labelPlural: 'Background',
         icon: '📜',
-        fields: () => labFieldsBackground()
+        // Passare data per pre-compilare i campi in modifica.
+        fields: (data) => labFieldsBackground(data)
     },
     incantesimi: {
         table: 'homebrew_incantesimi',
         label: 'Incantesimo',
         labelPlural: 'Incantesimi',
         icon: '✨',
-        fields: () => labFieldsIncantesimi()
+        fields: (data) => labFieldsIncantesimi(data)
     },
     nemici: {
         table: 'homebrew_nemici',
         label: 'Nemico',
         labelPlural: 'Nemici e Combattimenti',
         icon: '💀',
-        fields: () => labFieldsNemici()
+        fields: (data) => labFieldsNemici(data)
     },
     talenti: {
         table: 'homebrew_talenti',
         label: 'Talento',
         labelPlural: 'Talenti',
         icon: '⭐',
-        fields: () => labFieldsTalenti()
+        fields: (data) => labFieldsTalenti(data)
     },
     oggetti: {
         table: 'homebrew_oggetti',
         label: 'Oggetto',
         labelPlural: 'Oggetti',
         icon: '🎒',
-        fields: () => labFieldsOggetti()
+        // Importante: passare editData a labFieldsOggetti per pre-compilare
+        // tutti i campi quando si apre la modifica di un oggetto esistente.
+        fields: (data) => labFieldsOggetti(data)
     },
     impostazioni: {
         label: 'Impostazioni',
@@ -151,9 +154,14 @@ async function loadLabContent() {
 
 function labRenderCard(item, cat) {
     const detail = labGetCardDetail(item, _labCurrentTab);
-    const clickAction = _labCurrentTab === 'nemici' ? `onclick="labViewNemico('${item.id}')"` : '';
+    // Tutta la card e' cliccabile: per i nemici apre la scheda di
+    // dettaglio (viewer dedicato), per tutto il resto apre direttamente
+    // il dialog di modifica con lo stato attuale gia' caricato.
+    const cardOnClick = _labCurrentTab === 'nemici'
+        ? `labViewNemico('${item.id}')`
+        : `labEditItem('${item.id}')`;
     return `
-    <div class="lab-card" data-id="${item.id}" ${clickAction} style="${clickAction ? 'cursor:pointer' : ''}">
+    <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="${cardOnClick}">
         <div class="lab-card-icon">${cat.icon}</div>
         <div class="lab-card-info">
             <p class="lab-card-name">${escapeHtml(item.nome)}</p>
