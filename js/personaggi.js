@@ -2841,6 +2841,9 @@ const SUBCLASS_RESOURCES = {
     'rune-knight': [
         { nome: 'Forma del Gigante', max: 'prof_bonus', fromLevel: 3, recharge: 'short_or_long' },
     ],
+    'gunslinger': [
+        { nome: 'Grinta', usaMod: 'saggezza', minMod: 1, fromLevel: 3, recharge: 'short_or_long' },
+    ],
 
     // ── BARBARO ───────────────────────────────────────────────────────
     'path-of-the-zealot': [
