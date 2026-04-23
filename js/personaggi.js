@@ -5571,7 +5571,7 @@ function _invPickerRenderList(pgId) {
                 : '';
             const subEn = (o._nome_pending && o.nome_en && o.nome_en !== o.nome)
                 ? '' : (o.nome_en && o.nome_en !== o.nome ? `<span class="inv-picker-item-en">${escapeHtml(o.nome_en)}</span>` : '');
-            return `<div class="inv-picker-item ${rarClass}" onclick="invAddFromCatalog('${pgId}','${o.id}')">
+            return `<div class="inv-picker-item ${rarClass}" onclick="_invShowItemPreview('${pgId}','catalog','${o.id}')">
                 <div class="inv-picker-item-main">
                     <div class="inv-picker-item-name">${escapeHtml(o.nome || 'Oggetto')} ${pendingBadge} ${subEn}</div>
                     ${meta ? `<div class="inv-picker-item-meta">${escapeHtml(meta)}</div>` : ''}
@@ -5613,7 +5613,7 @@ function _invPickerRenderList(pgId) {
                 : '';
             const subEn = (o.nome_en && o.nome_en !== o.nome_it)
                 ? `<span class="inv-picker-item-en">${escapeHtml(o.nome_en)}</span>` : '';
-            return `<div class="inv-picker-item ${rarClass}" onclick="invAddFromVeleni('${pgId}','${o.id}')">
+            return `<div class="inv-picker-item ${rarClass}" onclick="_invShowItemPreview('${pgId}','veleni','${o.id}')">
                 <div class="inv-picker-item-main">
                     <div class="inv-picker-item-name">${escapeHtml(o.nome_it || o.nome_en || 'Veleno')} ${pendingBadge} ${subEn}</div>
                     <div class="inv-picker-item-meta">${escapeHtml(meta)}</div>
@@ -5647,7 +5647,7 @@ function _invPickerRenderList(pgId) {
         const meta = (typeof window.formatOggettoMeta === 'function')
             ? window.formatOggettoMeta(o) : '';
         const author = o._is_own ? 'Tuo' : (o._author_name || 'Amico');
-        return `<div class="inv-picker-item" onclick="invAddFromHomebrew('${pgId}','${o.id}')">
+        return `<div class="inv-picker-item" onclick="_invShowItemPreview('${pgId}','homebrew','${o.id}')">
             <div class="inv-picker-item-main">
                 <div class="inv-picker-item-name">${escapeHtml(o.nome || 'Oggetto')}</div>
                 ${meta ? `<div class="inv-picker-item-meta">${escapeHtml(meta)}</div>` : ''}
@@ -5656,6 +5656,117 @@ function _invPickerRenderList(pgId) {
         </div>`;
     }).join('');
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Preview oggetto prima dell'aggiunta al tesoro.
+// Apre un overlay sopra il picker con nome, meta, descrizione completa
+// (formattata via formatRichText) e bottoni "Indietro" / "Aggiungi al
+// tesoro". Funziona per source='catalog'|'veleni'|'homebrew'.
+// ──────────────────────────────────────────────────────────────────────
+function _invFindItemBySource(source, id) {
+    if (source === 'catalog') {
+        const cat = Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
+        return cat.find(o => String(o.id) === String(id));
+    }
+    if (source === 'veleni') {
+        const ven = Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [];
+        return ven.find(o => String(o.id) === String(id));
+    }
+    if (source === 'homebrew') {
+        const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
+            ? AppState.cachedHomebrewOggetti : [];
+        return cache.find(o => String(o.id) === String(id));
+    }
+    return null;
+}
+
+function _invPreviewExtract(source, it) {
+    // Normalizza i campi cosi' la preview mostra la stessa shape per
+    // tutti e tre i dataset (catalog, veleni, homebrew).
+    if (!it) return null;
+    if (source === 'veleni') {
+        const meta = `${it.sotto_tipo_it || ''}${it.categoria_it ? ' (' + it.categoria_it + ')' : ''} · ${it.rarita_it || ''} · ${it.prezzo_mo || 0} mo`;
+        return {
+            nome: it.nome_it || it.nome_en || 'Veleno',
+            nomeAlt: (it.nome_en && it.nome_en !== it.nome_it) ? it.nome_en : '',
+            rarita: it.rarita_it || 'Comune',
+            meta,
+            extras: it.fonte ? `<div class="inv-preview-extra"><b>Fonte:</b> ${escapeHtml(it.fonte)}</div>` : '',
+            descrizione: it.descrizione_it || it.descrizione_en || '',
+            pendingTr: !!it._desc_pending,
+        };
+    }
+    if (source === 'homebrew') {
+        const meta = (typeof window.formatOggettoMeta === 'function')
+            ? window.formatOggettoMeta(it) : '';
+        const author = it._is_own ? 'Tuo' : (it._author_name || 'Amico');
+        return {
+            nome: it.nome || 'Oggetto',
+            nomeAlt: '',
+            rarita: it.rarita || 'Comune',
+            meta,
+            extras: `<div class="inv-preview-extra"><b>Autore:</b> ${escapeHtml(author)}</div>`,
+            descrizione: it.descrizione || it.proprieta || '',
+            pendingTr: false,
+        };
+    }
+    // catalog
+    const meta = (typeof window.formatOggettoMeta === 'function')
+        ? window.formatOggettoMeta(it) : '';
+    return {
+        nome: it.nome || it.nome_en || 'Oggetto',
+        nomeAlt: (it.nome_en && it.nome_en !== it.nome) ? it.nome_en : '',
+        rarita: it.rarita || 'Comune',
+        meta,
+        extras: '',
+        descrizione: it.descrizione || it.descrizione_en || '',
+        pendingTr: !!it._desc_pending,
+    };
+}
+
+window._invShowItemPreview = function(pgId, source, id) {
+    const it = _invFindItemBySource(source, id);
+    if (!it) return;
+    const data = _invPreviewExtract(source, it);
+    if (!data) return;
+    const rarClass = _invRarityClass(data.rarita);
+    const descHtml = data.descrizione
+        ? (typeof window.formatRichText === 'function'
+            ? window.formatRichText(data.descrizione)
+            : escapeHtml(data.descrizione).replace(/\n/g, '<br>'))
+        : '<i style="color:var(--text-muted);">Nessuna descrizione disponibile.</i>';
+    const trBadge = data.pendingTr
+        ? '<span class="inv-picker-tr-pending" style="margin-left:8px;" title="Traduzione italiana in arrivo">TR</span>'
+        : '';
+    const altName = data.nomeAlt
+        ? `<div class="inv-preview-alt">${escapeHtml(data.nomeAlt)}</div>` : '';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay inv-preview-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal inv-preview-modal ${rarClass}">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <div class="inv-preview-header">
+            <h3 class="inv-preview-title">${escapeHtml(data.nome)}${trBadge}</h3>
+            ${altName}
+            ${data.meta ? `<div class="inv-preview-meta">${escapeHtml(data.meta)}</div>` : ''}
+            ${data.extras || ''}
+        </div>
+        <div class="inv-preview-desc">${descHtml}</div>
+        <div class="dialog-actions inv-preview-actions">
+            <button type="button" class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">← Indietro</button>
+            <button type="button" class="btn-primary" id="invPreviewAddBtn">Aggiungi al tesoro</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#invPreviewAddBtn').onclick = () => {
+        overlay.remove();
+        if (source === 'catalog') return invAddFromCatalog(pgId, id);
+        if (source === 'veleni')  return invAddFromVeleni(pgId, id);
+        if (source === 'homebrew') return invAddFromHomebrew(pgId, id);
+    };
+};
 
 window.invAddFromHomebrew = async function(pgId, hbId) {
     const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
