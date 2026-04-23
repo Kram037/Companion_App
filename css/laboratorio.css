@@ -882,6 +882,84 @@
     border: 1px dashed var(--border);
     border-radius: var(--radius-sm);
     background: rgba(125, 99, 240, 0.04);
+    /* Evita overflow orizzontale: i grid figli devono potersi restringere */
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Field/grid coerenti con lo stile dell'app, pensati per stare comodi
+   nei box di risorsa/incantesimi senza generare overflow orizzontale. */
+.lab-sub-resource-box .lab-sub-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+    min-width: 0;
+}
+.lab-sub-resource-box .lab-sub-field:last-child {
+    margin-bottom: 0;
+}
+.lab-sub-resource-box .lab-sub-field > label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.lab-sub-resource-box .lab-sub-field > input,
+.lab-sub-resource-box .lab-sub-field > select,
+.lab-sub-resource-box .lab-sub-field > textarea {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+.lab-sub-resource-box .lab-sub-field > input:focus,
+.lab-sub-resource-box .lab-sub-field > select:focus,
+.lab-sub-resource-box .lab-sub-field > textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(125, 99, 240, 0.15);
+}
+.lab-sub-resource-box .lab-sub-field > input:disabled,
+.lab-sub-resource-box .lab-sub-field > select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.lab-sub-resource-box .lab-sub-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+    min-width: 0;
+}
+.lab-sub-resource-box .lab-sub-field-grid > .lab-sub-field {
+    margin-bottom: 0;
+    min-width: 0;
+}
+@media (max-width: 480px) {
+    .lab-sub-resource-box .lab-sub-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.lab-sub-uses-divider {
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
 }
 
 /* Granted-spells UI (sottoclasse + per-feature) */

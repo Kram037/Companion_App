@@ -274,7 +274,11 @@ function _labSubInitState(editData) {
                     dado: f.risorsa.dado || 'd6'
                 } : _labSubEmptyRisorsa(),
                 grants_spells: Array.isArray(f.grants_spells) && f.grants_spells.length > 0,
-                spells: Array.isArray(f.grants_spells) ? f.grants_spells.slice() : []
+                spells: Array.isArray(f.grants_spells) ? f.grants_spells.slice() : [],
+                spells_uses: f.spells_uses ? {
+                    recharge: f.spells_uses.recharge || 'unlimited',
+                    max: f.spells_uses.max ?? ''
+                } : _labSubEmptySpellsUses()
             });
         }
     }
@@ -316,6 +320,10 @@ function _labSubEmptyRisorsa() {
     return { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' };
 }
 
+function _labSubEmptySpellsUses() {
+    return { recharge: 'unlimited', max: '' };
+}
+
 function _labSubMakeEmptyFeature(level, slotIdx) {
     return {
         level: level || 1,
@@ -325,7 +333,8 @@ function _labSubMakeEmptyFeature(level, slotIdx) {
         has_resource: false,
         risorsa: _labSubEmptyRisorsa(),
         grants_spells: false,
-        spells: []
+        spells: [],
+        spells_uses: _labSubEmptySpellsUses()
     };
 }
 
@@ -556,33 +565,33 @@ function _labSubRenderFeaturePage() {
     const resourceBlock = f.has_resource ? `
         <div class="lab-sub-resource-box">
             <div class="lab-sub-step-label" style="margin-top:0;">Risorsa consumabile</div>
-            <div class="form-group">
-                <label>Nome risorsa</label>
+            <div class="lab-sub-field">
+                <label for="labSubResNome">Nome risorsa</label>
                 <input type="text" id="labSubResNome" value="${escapeHtml(f.risorsa.nome || '')}" placeholder="es. Dadi di Energia Psionica">
             </div>
-            <div class="form-row form-row-2">
-                <div class="form-group">
-                    <label>Tipo</label>
+            <div class="lab-sub-field-grid">
+                <div class="lab-sub-field">
+                    <label for="labSubResTipo">Tipo</label>
                     <select id="labSubResTipo" onchange="labSubFieldChange()">${tipoOpts}</select>
                 </div>
-                <div class="form-group">
-                    <label>Recupero</label>
+                <div class="lab-sub-field">
+                    <label for="labSubResRecharge">Recupero</label>
                     <select id="labSubResRecharge">${recOpts}</select>
                 </div>
             </div>
-            <div class="form-row form-row-2">
-                <div class="form-group">
-                    <label>Massimo (formula)</label>
+            <div class="lab-sub-field-grid">
+                <div class="lab-sub-field">
+                    <label for="labSubResMaxPreset">Massimo (formula)</label>
                     <select id="labSubResMaxPreset" onchange="labSubMaxPresetChange()">${maxOpts}</select>
                 </div>
-                <div class="form-group">
-                    <label>Massimo (manuale)</label>
+                <div class="lab-sub-field">
+                    <label for="labSubResMaxManual">Massimo (manuale)</label>
                     <input type="number" id="labSubResMaxManual" min="0" value="${isManualMax ? escapeHtml(String(f.risorsa.max ?? '')) : ''}" ${isManualMax ? '' : 'disabled'} placeholder="es. 4">
                 </div>
             </div>
             ${(f.risorsa.tipo === 'dice_pool' || f.risorsa.tipo === 'portent') ? `
-            <div class="form-group">
-                <label>Tipo di dado</label>
+            <div class="lab-sub-field">
+                <label for="labSubResDado">Tipo di dado</label>
                 <select id="labSubResDado">${dadoOpts}</select>
             </div>` : ''}
         </div>
@@ -596,6 +605,25 @@ function _labSubRenderFeaturePage() {
             <button type="button" class="lab-sub-spell-chip-x" onclick="labSubFeatSpellRemove(${sIdx})" title="Rimuovi">×</button>
         </span>
     `).join('');
+    const su = f.spells_uses || _labSubEmptySpellsUses();
+    const usesRecOpts = [
+        ['unlimited', 'Illimitato'],
+        ['short_rest', 'Riposo Breve'],
+        ['long_rest', 'Riposo Lungo'],
+        ['day', 'Al Giorno']
+    ].map(([v, l]) => `<option value="${v}" ${su.recharge === v ? 'selected' : ''}>${l}</option>`).join('');
+    const usesMaxOpts = [
+        ['', '— manuale —'],
+        ['prof_bonus', 'Pari al Bonus di Competenza'],
+        ['cha_mod', 'Modificatore di Carisma'],
+        ['wis_mod', 'Modificatore di Saggezza'],
+        ['int_mod', 'Modificatore di Intelligenza'],
+        ['con_mod', 'Modificatore di Costituzione'],
+        ['str_mod', 'Modificatore di Forza'],
+        ['dex_mod', 'Modificatore di Destrezza']
+    ].map(([v, l]) => `<option value="${v}" ${String(su.max) === v ? 'selected' : ''}>${l}</option>`).join('');
+    const isUnlimited = su.recharge === 'unlimited';
+    const isManualUsesMax = !['prof_bonus','cha_mod','wis_mod','int_mod','con_mod','str_mod','dex_mod'].includes(String(su.max));
     const featureSpellsBlock = f.grants_spells ? `
         <div class="lab-sub-resource-box">
             <div class="lab-sub-step-label" style="margin-top:0;">Incantesimi conferiti da questo privilegio</div>
@@ -603,6 +631,22 @@ function _labSubRenderFeaturePage() {
                 ${featChips}
                 <button type="button" class="lab-sub-spell-add" onclick="labSubFeatSpellAdd()">+ Aggiungi incantesimo</button>
             </div>
+            <div class="lab-sub-uses-divider">Utilizzi</div>
+            <div class="lab-sub-field">
+                <label for="labSubFeatSpellsRecharge">Recupero</label>
+                <select id="labSubFeatSpellsRecharge" onchange="labSubFeatSpellsUsesChange()">${usesRecOpts}</select>
+            </div>
+            <div class="lab-sub-field-grid" ${isUnlimited ? 'style="opacity:0.5;pointer-events:none;"' : ''}>
+                <div class="lab-sub-field">
+                    <label for="labSubFeatSpellsMaxPreset">Massimo (formula)</label>
+                    <select id="labSubFeatSpellsMaxPreset" onchange="labSubFeatSpellsUsesMaxPresetChange()" ${isUnlimited ? 'disabled' : ''}>${usesMaxOpts}</select>
+                </div>
+                <div class="lab-sub-field">
+                    <label for="labSubFeatSpellsMaxManual">Massimo (manuale)</label>
+                    <input type="number" id="labSubFeatSpellsMaxManual" min="0" value="${isManualUsesMax ? escapeHtml(String(su.max ?? '')) : ''}" ${(isUnlimited || !isManualUsesMax) ? 'disabled' : ''} placeholder="es. 1" onchange="labSubFeatSpellsUsesChange()" oninput="labSubFeatSpellsUsesChange()">
+                </div>
+            </div>
+            ${isUnlimited ? '<p class="lab-sub-hint lab-sub-hint-compact" style="margin-top:6px;">Gli incantesimi possono essere lanciati senza limiti di utilizzo (oltre agli slot incantesimo standard se applicabile).</p>' : ''}
         </div>` : '';
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
@@ -979,6 +1023,19 @@ function _labSubReadCurrentFromDOM() {
     }
     const gs = document.getElementById('labSubGrantsSpellsFeat');
     if (gs) f.grants_spells = gs.checked;
+    if (f.grants_spells) {
+        if (!f.spells_uses) f.spells_uses = _labSubEmptySpellsUses();
+        const rch = document.getElementById('labSubFeatSpellsRecharge');
+        if (rch) f.spells_uses.recharge = rch.value;
+        if (f.spells_uses.recharge !== 'unlimited') {
+            const mp = document.getElementById('labSubFeatSpellsMaxPreset');
+            const mm = document.getElementById('labSubFeatSpellsMaxManual');
+            if (mp && mp.value) f.spells_uses.max = mp.value;
+            else if (mm) f.spells_uses.max = mm.value === '' ? '' : (parseInt(mm.value) || 0);
+        } else {
+            f.spells_uses.max = '';
+        }
+    }
 }
 
 window.labSubFieldChange = function() {
@@ -1016,6 +1073,29 @@ window.labSubMaxPresetChange = function() {
         manual.disabled = false;
     }
     if (typeof window.labSubFieldChange === 'function') window.labSubFieldChange();
+};
+
+window.labSubFeatSpellsUsesChange = function() {
+    _labSubReadCurrentFromDOM();
+    // Se è cambiato il toggle "unlimited" rerendero per riflettere disabled/opacity.
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f) return;
+    const wasUnlimited = (document.getElementById('labSubFeatSpellsRecharge')?.value === 'unlimited');
+    // Re-render solo della sezione spells (basta un render completo, è leggero).
+    _labSubRender();
+};
+
+window.labSubFeatSpellsUsesMaxPresetChange = function() {
+    const preset = document.getElementById('labSubFeatSpellsMaxPreset');
+    const manual = document.getElementById('labSubFeatSpellsMaxManual');
+    if (!preset || !manual) return;
+    if (preset.value) {
+        manual.disabled = true;
+        manual.value = '';
+    } else {
+        manual.disabled = false;
+    }
+    if (typeof window.labSubFeatSpellsUsesChange === 'function') window.labSubFeatSpellsUsesChange();
 };
 
 window.labSubBack = function() {
@@ -1069,7 +1149,23 @@ window.labSaveSottoclasse = async function() {
             }
             if (f.grants_spells && Array.isArray(f.spells)) {
                 const cleanSpells = f.spells.map(s => (s || '').trim()).filter(Boolean);
-                if (cleanSpells.length) out.grants_spells = cleanSpells;
+                if (cleanSpells.length) {
+                    out.grants_spells = cleanSpells;
+                    const su = f.spells_uses || {};
+                    const rch = su.recharge || 'unlimited';
+                    if (rch !== 'unlimited') {
+                        const maxStr = String(su.max ?? '').trim();
+                        const isFormula = ['prof_bonus','cha_mod','wis_mod','int_mod','con_mod','str_mod','dex_mod'].includes(maxStr);
+                        const maxVal = isFormula ? maxStr : (parseInt(maxStr) || 0);
+                        if (maxVal) {
+                            out.spells_uses = { recharge: rch, max: maxVal };
+                        } else {
+                            out.spells_uses = { recharge: 'unlimited', max: null };
+                        }
+                    } else {
+                        out.spells_uses = { recharge: 'unlimited', max: null };
+                    }
+                }
             }
             return out;
         });
