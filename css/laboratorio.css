@@ -644,3 +644,137 @@
     .tipo-scheda-options { flex-direction: column; }
     .micro-slots-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ============================================================================
+   SOTTOCLASSI HOMEBREW WIZARD
+   ============================================================================ */
+
+.lab-sub-step-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin: 12px 0 8px;
+    font-weight: 700;
+}
+
+.lab-sub-class-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+.lab-sub-class-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+}
+.lab-sub-class-card:hover {
+    border-color: var(--accent);
+    background: var(--bg-elevated, var(--bg));
+}
+.lab-sub-class-card.active {
+    border-color: var(--accent);
+    background: rgba(125, 99, 240, 0.08);
+}
+.lab-sub-class-name {
+    font-weight: 700;
+    font-size: 0.96rem;
+}
+.lab-sub-class-levels {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.lab-sub-coverage {
+    margin-bottom: 10px;
+}
+.lab-sub-coverage-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.lab-sub-coverage-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-right: 4px;
+}
+.lab-sub-coverage-chip {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.lab-sub-coverage-chip.done {
+    background: rgba(76, 175, 80, 0.18);
+    color: #66bb6a;
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.lab-sub-feature-scroll {
+    max-height: 50vh;
+}
+
+.lab-sub-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.92rem;
+}
+
+.lab-sub-resource-box {
+    margin-top: 8px;
+    padding: 12px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: rgba(125, 99, 240, 0.04);
+}
+
+.lab-sub-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.lab-sub-actions-row {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+.lab-sub-actions-row > .btn-secondary,
+.lab-sub-actions-row > .btn-primary {
+    flex: 1;
+}
+.lab-sub-create-btn {
+    width: 100%;
+}
+.lab-sub-create-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.lab-sub-hint {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .lab-sub-class-grid { grid-template-columns: 1fr; }
+}

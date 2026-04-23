@@ -8,10 +8,10 @@ let _labEditingId = null;
 const LAB_CATEGORIES = {
     classi: {
         table: 'homebrew_classi',
-        label: 'Classe',
-        labelPlural: 'Classi',
+        label: 'Sottoclasse',
+        labelPlural: 'Sottoclassi',
         icon: '⚔',
-        fields: () => labFieldsClassi()
+        fields: () => ''
     },
     razze: {
         table: 'homebrew_razze',
@@ -37,7 +37,7 @@ const LAB_CATEGORIES = {
     nemici: {
         table: 'homebrew_nemici',
         label: 'Nemico',
-        labelPlural: 'Nemici',
+        labelPlural: 'Nemici e Combattimenti',
         icon: '💀',
         fields: () => labFieldsNemici()
     },
@@ -174,8 +174,10 @@ function labGetCardDetail(item, tab) {
     switch (tab) {
         case 'classi': {
             const parts = [];
-            if (item.dado_vita) parts.push(`d${item.dado_vita}`);
-            if (item.tipo_caster) parts.push(item.tipo_caster);
+            const cls = item.parent_class_name || item.parent_class_slug;
+            if (cls) parts.push(`Classe: ${cls}`);
+            const feats = Array.isArray(item.sottoclasse_features) ? item.sottoclasse_features : [];
+            if (feats.length) parts.push(`${feats.length} privileg${feats.length === 1 ? 'io' : 'i'}`);
             return parts.join(' · ');
         }
         case 'razze': {
@@ -207,71 +209,481 @@ function labGetCardDetail(item, tab) {
 // FORM FIELD GENERATORS
 // ============================================================================
 
-function labFieldsClassi(data) {
-    const ts = (data?.tiri_salvezza || []);
-    const saves = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
+// ============================================================================
+// SOTTOCLASSI HOMEBREW - Wizard creazione sottoclassi (sostituisce classi)
+// ============================================================================
+
+// Livelli a cui ogni classe ottiene i privilegi di sottoclasse (D&D 5e canon).
+const SUBCLASS_FEATURE_LEVELS_BY_SLUG = {
+    'artificer':  [3, 5, 9, 15],
+    'barbarian':  [3, 6, 10, 14],
+    'bard':       [3, 6, 14],
+    'cleric':     [1, 2, 6, 8, 17],
+    'druid':      [2, 6, 10, 14],
+    'fighter':    [3, 7, 10, 15, 18],
+    'monk':       [3, 6, 11, 17],
+    'paladin':    [3, 7, 15, 20],
+    'ranger':     [3, 7, 11, 15],
+    'rogue':      [3, 9, 13, 17],
+    'sorcerer':   [1, 6, 14, 18],
+    'warlock':    [1, 6, 10, 14],
+    'wizard':     [2, 6, 10, 14]
+};
+
+// Lista classi base supportate per le sottoclassi homebrew.
+function _labStandardClasses() {
+    const data = (typeof window !== 'undefined' && Array.isArray(window.CLASSES_DATA)) ? window.CLASSES_DATA : [];
+    const allowed = Object.keys(SUBCLASS_FEATURE_LEVELS_BY_SLUG);
+    const list = data
+        .filter(c => allowed.includes(c.slug))
+        .map(c => ({ slug: c.slug, name: c.name || c.slug }));
+    // Fallback nel caso in cui CLASSES_DATA non sia ancora caricato.
+    if (!list.length) {
+        const labels = {
+            artificer:'Artefice', barbarian:'Barbaro', bard:'Bardo', cleric:'Chierico',
+            druid:'Druido', fighter:'Guerriero', monk:'Monaco', paladin:'Paladino',
+            ranger:'Ranger', rogue:'Ladro', sorcerer:'Stregone', warlock:'Warlock', wizard:'Mago'
+        };
+        return allowed.map(s => ({ slug: s, name: labels[s] || s }));
+    }
+    list.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+    return list;
+}
+
+// Stato del wizard sottoclasse.
+let _labSubState = null;
+
+function _labSubInitState(editData) {
+    const e = editData || {};
+    const features = Array.isArray(e.sottoclasse_features) ? e.sottoclasse_features.map(f => ({
+        level: parseInt(f.level) || 1,
+        nome: f.nome || '',
+        descrizione: f.descrizione || '',
+        has_resource: !!f.risorsa,
+        risorsa: f.risorsa ? {
+            nome: f.risorsa.nome || '',
+            max: f.risorsa.max || '',
+            recharge: f.risorsa.recharge || 'long_rest',
+            tipo: f.risorsa.tipo || 'counter',
+            dado: f.risorsa.dado || 'd6'
+        } : { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' }
+    })) : [];
+    return {
+        editingId: e.id || null,
+        page: e.parent_class_slug ? 'features' : 'pick-class',
+        parentSlug: e.parent_class_slug || null,
+        parentName: e.parent_class_name || null,
+        subclassName: e.nome || '',
+        features,
+        currentIdx: features.length ? 0 : 0
+    };
+}
+
+function _labSubLevelsForCurrentClass() {
+    if (!_labSubState?.parentSlug) return [];
+    return SUBCLASS_FEATURE_LEVELS_BY_SLUG[_labSubState.parentSlug] || [];
+}
+
+function _labSubNextSuggestedLevel() {
+    const levels = _labSubLevelsForCurrentClass();
+    if (!levels.length) return 1;
+    const covered = new Set(_labSubState.features.map(f => f.level));
+    for (const lv of levels) {
+        if (!covered.has(lv)) return lv;
+    }
+    return levels[0];
+}
+
+function _labSubAllLevelsCovered() {
+    const levels = _labSubLevelsForCurrentClass();
+    if (!levels.length) return false;
+    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
+    const set = new Set(valid.map(f => f.level));
+    return levels.every(lv => set.has(lv));
+}
+
+function _openLabSottoclasseWizard(editData) {
+    _labEditingId = editData?.id || null;
+    _labSubState = _labSubInitState(editData);
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    _labSubRender();
+}
+
+function _labSubRender() {
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    const mlg = modal.querySelector('.modal-content-lg');
+    if (!mlg) return;
+    if (_labSubState.page === 'pick-class') {
+        mlg.innerHTML = _labSubRenderPickClass();
+    } else {
+        if (!_labSubState.features.length) {
+            _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
+            _labSubState.currentIdx = 0;
+        }
+        mlg.innerHTML = _labSubRenderFeaturePage();
+    }
+}
+
+function _labSubMakeEmptyFeature(level) {
+    return {
+        level: level || 1,
+        nome: '',
+        descrizione: '',
+        has_resource: false,
+        risorsa: { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' }
+    };
+}
+
+function _labSubRenderPickClass() {
+    const classes = _labStandardClasses();
+    const title = _labSubState.editingId ? 'Modifica Sottoclasse' : 'Nuova Sottoclasse';
+    const cards = classes.map(c => `
+        <button type="button" class="lab-sub-class-card${_labSubState.parentSlug === c.slug ? ' active' : ''}"
+                data-slug="${c.slug}" onclick="labSubPickClass('${c.slug}', '${escapeHtml(c.name)}')">
+            <span class="lab-sub-class-name">${escapeHtml(c.name)}</span>
+            <span class="lab-sub-class-levels">Liv ${(SUBCLASS_FEATURE_LEVELS_BY_SLUG[c.slug] || []).join(', ')}</span>
+        </button>
+    `).join('');
     return `
-    <div class="form-group">
-        <label for="hbNome">Nome</label>
-        <input type="text" id="hbNome" required placeholder="Nome della classe" value="${escapeHtml(data?.nome || '')}">
-    </div>
-    <div class="form-row form-row-2">
-        <div class="form-group">
-            <label for="hbDadoVita">Dado Vita</label>
-            <select id="hbDadoVita">
-                ${[6,8,10,12].map(d => `<option value="${d}" ${(data?.dado_vita || 8) === d ? 'selected' : ''}>d${d}</option>`).join('')}
-            </select>
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${title}</h2>
+        <div class="lab-sub-step-label">1. Scegli la classe madre</div>
+        <div class="wizard-page-scroll" style="max-height:55vh;">
+            <div class="lab-sub-class-grid">${cards}</div>
         </div>
-        <div class="form-group">
-            <label for="hbTipoCaster">Tipo Caster</label>
-            <select id="hbTipoCaster">
-                <option value="" ${!data?.tipo_caster ? 'selected' : ''}>Nessuno</option>
-                <option value="pieno" ${data?.tipo_caster === 'pieno' ? 'selected' : ''}>Pieno</option>
-                <option value="mezzo" ${data?.tipo_caster === 'mezzo' ? 'selected' : ''}>Mezzo</option>
-                <option value="terzo" ${data?.tipo_caster === 'terzo' ? 'selected' : ''}>Terzo</option>
-            </select>
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
+            <button type="button" class="btn-primary" id="labSubNextFromPick" disabled onclick="labSubGoToFeatures()">Avanti</button>
+        </div>`;
+}
+
+function _labSubRenderFeaturePage() {
+    const idx = _labSubState.currentIdx;
+    const total = _labSubState.features.length;
+    const f = _labSubState.features[idx];
+    const levels = _labSubLevelsForCurrentClass();
+    const levelOptions = levels.map(lv => `<option value="${lv}" ${f.level === lv ? 'selected' : ''}>${lv}° livello</option>`).join('');
+    const coverage = _labSubLevelsCoverageHtml();
+    const canCreate = _labSubAllLevelsCovered() && (_labSubState.subclassName || '').trim();
+
+    const recOpts = [
+        ['short_rest', 'Riposo Breve'],
+        ['long_rest', 'Riposo Lungo'],
+        ['day', 'Al Giorno'],
+        ['none', 'Nessun recupero']
+    ].map(([v, l]) => `<option value="${v}" ${f.risorsa.recharge === v ? 'selected' : ''}>${l}</option>`).join('');
+    const maxOpts = [
+        ['', '— manuale —'],
+        ['prof_bonus', 'Pari al Bonus di Competenza'],
+        ['cha_mod', 'Modificatore di Carisma'],
+        ['wis_mod', 'Modificatore di Saggezza'],
+        ['int_mod', 'Modificatore di Intelligenza'],
+        ['con_mod', 'Modificatore di Costituzione'],
+        ['str_mod', 'Modificatore di Forza'],
+        ['dex_mod', 'Modificatore di Destrezza']
+    ].map(([v, l]) => `<option value="${v}" ${String(f.risorsa.max) === v ? 'selected' : ''}>${l}</option>`).join('');
+    const isManualMax = !['prof_bonus','cha_mod','wis_mod','int_mod','con_mod','str_mod','dex_mod'].includes(String(f.risorsa.max));
+    const tipoOpts = [
+        ['counter', 'Contatore (usi)'],
+        ['dice_pool', 'Pool di Dadi'],
+        ['portent', 'Portento (dadi salvati)']
+    ].map(([v, l]) => `<option value="${v}" ${f.risorsa.tipo === v ? 'selected' : ''}>${l}</option>`).join('');
+    const dadoOpts = ['d4','d6','d8','d10','d12'].map(d => `<option value="${d}" ${f.risorsa.dado === d ? 'selected' : ''}>${d}</option>`).join('');
+
+    const resourceBlock = f.has_resource ? `
+        <div class="lab-sub-resource-box">
+            <div class="lab-sub-step-label" style="margin-top:0;">Risorsa consumabile</div>
+            <div class="form-group">
+                <label>Nome risorsa</label>
+                <input type="text" id="labSubResNome" value="${escapeHtml(f.risorsa.nome || '')}" placeholder="es. Dadi di Energia Psionica">
+            </div>
+            <div class="form-row form-row-2">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="labSubResTipo" onchange="labSubFieldChange()">${tipoOpts}</select>
+                </div>
+                <div class="form-group">
+                    <label>Recupero</label>
+                    <select id="labSubResRecharge">${recOpts}</select>
+                </div>
+            </div>
+            <div class="form-row form-row-2">
+                <div class="form-group">
+                    <label>Massimo (formula)</label>
+                    <select id="labSubResMaxPreset" onchange="labSubMaxPresetChange()">${maxOpts}</select>
+                </div>
+                <div class="form-group">
+                    <label>Massimo (manuale)</label>
+                    <input type="number" id="labSubResMaxManual" min="0" value="${isManualMax ? escapeHtml(String(f.risorsa.max ?? '')) : ''}" ${isManualMax ? '' : 'disabled'} placeholder="es. 4">
+                </div>
+            </div>
+            ${(f.risorsa.tipo === 'dice_pool' || f.risorsa.tipo === 'portent') ? `
+            <div class="form-group">
+                <label>Tipo di dado</label>
+                <select id="labSubResDado">${dadoOpts}</select>
+            </div>` : ''}
         </div>
-    </div>
-    <div class="form-group">
-        <label>Tiri Salvezza</label>
-        <div class="pg-res-grid" style="grid-template-columns: repeat(3, 1fr); gap: 6px;">
-            ${saves.map(s => `
-                <label style="display:flex;align-items:center;gap:4px;font-size:0.88em;cursor:pointer;">
-                    <input type="checkbox" class="hbSaveCheck" value="${s}" ${ts.includes(s) ? 'checked' : ''}>
-                    ${s.charAt(0).toUpperCase() + s.slice(1)}
+    ` : '';
+
+    return `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${escapeHtml(_labSubState.parentName || 'Sottoclasse')} · Sottoclasse Homebrew</h2>
+        <div class="lab-sub-coverage">${coverage}</div>
+        <div class="form-group">
+            <label for="labSubNome">Nome della sottoclasse</label>
+            <input type="text" id="labSubNome" value="${escapeHtml(_labSubState.subclassName || '')}" placeholder="es. Cavaliere della Tempesta" onchange="labSubFieldChange()" oninput="labSubFieldChange()">
+        </div>
+        <div class="lab-sub-step-label">Privilegio ${idx + 1} di ${total}</div>
+        <div class="wizard-page-scroll lab-sub-feature-scroll">
+            <div class="form-row form-row-2">
+                <div class="form-group">
+                    <label for="labSubLevel">Livello del privilegio</label>
+                    <select id="labSubLevel" onchange="labSubFieldChange()">${levelOptions}</select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn-secondary" onclick="labSubRemoveCurrent()" ${total <= 1 ? 'disabled' : ''}>Elimina questo privilegio</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="labSubFeatNome">Nome del privilegio</label>
+                <input type="text" id="labSubFeatNome" value="${escapeHtml(f.nome || '')}" placeholder="es. Tonante Carica" onchange="labSubFieldChange()" oninput="labSubFieldChange()">
+            </div>
+            <div class="form-group">
+                <label for="labSubFeatDesc">Descrizione</label>
+                <textarea id="labSubFeatDesc" rows="6" placeholder="Descrivi l'effetto del privilegio..." onchange="labSubFieldChange()" oninput="labSubFieldChange()">${escapeHtml(f.descrizione || '')}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="lab-sub-toggle">
+                    <input type="checkbox" id="labSubHasRes" ${f.has_resource ? 'checked' : ''} onchange="labSubToggleResource(this.checked)">
+                    <span>Questo privilegio ha effetti consumabili (verrà aggiunto come risorsa)</span>
                 </label>
-            `).join('')}
+            </div>
+            ${resourceBlock}
         </div>
-    </div>
-    <div class="form-group">
-        <label>Risorse Speciali</label>
-        <div id="hbRisorseList">${labRenderRisorse(data?.risorse_speciali || [])}</div>
-        <button type="button" class="hb-add-btn" onclick="labAddRisorsa()">+ Aggiungi risorsa</button>
+        <div class="lab-sub-actions">
+            <div class="lab-sub-actions-row">
+                <button type="button" class="btn-secondary" onclick="labSubBack()">Indietro</button>
+                <button type="button" class="btn-primary" onclick="labSubNext()">Avanti</button>
+            </div>
+            <button type="button" class="btn-primary lab-sub-create-btn" id="labSubCreateBtn" ${canCreate ? '' : 'disabled'} onclick="labSaveSottoclasse()">${_labSubState.editingId ? 'Salva modifiche' : 'Crea Sottoclasse'}</button>
+            ${!canCreate ? `<p class="lab-sub-hint">${_labSubCreateHint()}</p>` : ''}
+        </div>`;
+}
+
+function _labSubCreateHint() {
+    if (!(_labSubState.subclassName || '').trim()) return 'Inserisci un nome per la sottoclasse.';
+    const levels = _labSubLevelsForCurrentClass();
+    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
+    const covered = new Set(valid.map(f => f.level));
+    const missing = levels.filter(lv => !covered.has(lv));
+    if (missing.length) return `Inserisci almeno un privilegio (con nome e descrizione) per ogni livello: mancano ${missing.map(l => l + '°').join(', ')}.`;
+    return '';
+}
+
+function _labSubLevelsCoverageHtml() {
+    const levels = _labSubLevelsForCurrentClass();
+    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
+    const covered = new Set(valid.map(f => f.level));
+    return `<div class="lab-sub-coverage-row">
+        <span class="lab-sub-coverage-label">Livelli di sottoclasse:</span>
+        ${levels.map(lv => `<span class="lab-sub-coverage-chip${covered.has(lv) ? ' done' : ''}">${lv}°</span>`).join('')}
     </div>`;
 }
 
-function labRenderRisorse(risorse) {
-    if (!risorse.length) return '';
-    return risorse.map((r, i) => `
-    <div class="hb-attack-row" data-idx="${i}">
-        <input type="text" placeholder="Nome (es. Punti Ki)" value="${escapeHtml(r.nome || '')}" class="hbRisNome">
-        <input type="number" placeholder="Lv min" value="${r.livello_min || 1}" class="hbRisLvMin" style="width:60px">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>
-    </div>`).join('');
+window.labSubPickClass = function(slug, name) {
+    if (_labSubState.parentSlug && _labSubState.parentSlug !== slug && _labSubState.features.length) {
+        // Cambio classe: i livelli disponibili sono diversi, reset dei privilegi.
+        _labSubState.features = [];
+        _labSubState.currentIdx = 0;
+    }
+    _labSubState.parentSlug = slug;
+    _labSubState.parentName = name;
+    document.querySelectorAll('.lab-sub-class-card').forEach(c => c.classList.toggle('active', c.dataset.slug === slug));
+    const btn = document.getElementById('labSubNextFromPick');
+    if (btn) btn.disabled = false;
+};
+
+window.labSubGoToFeatures = function() {
+    if (!_labSubState.parentSlug) { showNotification('Seleziona una classe madre'); return; }
+    _labSubState.page = 'features';
+    if (!_labSubState.features.length) {
+        _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
+        _labSubState.currentIdx = 0;
+    }
+    _labSubRender();
+};
+
+function _labSubReadCurrentFromDOM() {
+    if (!_labSubState || _labSubState.page !== 'features') return;
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!f) return;
+    const lvEl = document.getElementById('labSubLevel');
+    if (lvEl) f.level = parseInt(lvEl.value) || f.level;
+    const nm = document.getElementById('labSubFeatNome');
+    if (nm) f.nome = nm.value;
+    const ds = document.getElementById('labSubFeatDesc');
+    if (ds) f.descrizione = ds.value;
+    const hr = document.getElementById('labSubHasRes');
+    if (hr) f.has_resource = hr.checked;
+    if (f.has_resource) {
+        const rn = document.getElementById('labSubResNome'); if (rn) f.risorsa.nome = rn.value;
+        const rt = document.getElementById('labSubResTipo'); if (rt) f.risorsa.tipo = rt.value;
+        const rr = document.getElementById('labSubResRecharge'); if (rr) f.risorsa.recharge = rr.value;
+        const rmp = document.getElementById('labSubResMaxPreset');
+        const rmm = document.getElementById('labSubResMaxManual');
+        if (rmp && rmp.value) f.risorsa.max = rmp.value;
+        else if (rmm) f.risorsa.max = rmm.value === '' ? '' : (parseInt(rmm.value) || 0);
+        const rd = document.getElementById('labSubResDado'); if (rd) f.risorsa.dado = rd.value;
+    }
+    const sn = document.getElementById('labSubNome');
+    if (sn) _labSubState.subclassName = sn.value;
 }
 
-window.labAddRisorsa = function() {
-    const list = document.getElementById('hbRisorseList');
-    if (!list) return;
-    const idx = list.children.length;
-    const row = document.createElement('div');
-    row.className = 'hb-attack-row';
-    row.dataset.idx = idx;
-    row.innerHTML = `
-        <input type="text" placeholder="Nome (es. Punti Ki)" class="hbRisNome">
-        <input type="number" placeholder="Lv min" value="1" class="hbRisLvMin" style="width:60px">
-        <button type="button" onclick="this.parentElement.remove()">✕</button>`;
-    list.appendChild(row);
+window.labSubFieldChange = function() {
+    _labSubReadCurrentFromDOM();
+    // Aggiorna chip di copertura e stato bottone Crea senza re-render completo.
+    const covEl = document.querySelector('.lab-sub-coverage');
+    if (covEl) covEl.innerHTML = _labSubLevelsCoverageHtml();
+    const btn = document.getElementById('labSubCreateBtn');
+    if (btn) btn.disabled = !_labSubAllLevelsCovered() || !(_labSubState.subclassName || '').trim();
+    let hint = document.querySelector('.lab-sub-hint');
+    const text = _labSubCreateHint();
+    if (text) {
+        if (!hint) {
+            const wrap = document.querySelector('.lab-sub-actions');
+            if (wrap) wrap.insertAdjacentHTML('beforeend', `<p class="lab-sub-hint">${text}</p>`);
+        } else hint.textContent = text;
+    } else if (hint) hint.remove();
+};
+
+window.labSubToggleResource = function(checked) {
+    _labSubReadCurrentFromDOM();
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (f) f.has_resource = checked;
+    _labSubRender();
+};
+
+window.labSubMaxPresetChange = function() {
+    const preset = document.getElementById('labSubResMaxPreset');
+    const manual = document.getElementById('labSubResMaxManual');
+    if (!preset || !manual) return;
+    if (preset.value) {
+        manual.disabled = true;
+        manual.value = '';
+    } else {
+        manual.disabled = false;
+    }
+    if (typeof window.labSubFieldChange === 'function') window.labSubFieldChange();
+};
+
+window.labSubBack = function() {
+    _labSubReadCurrentFromDOM();
+    if (_labSubState.currentIdx > 0) {
+        _labSubState.currentIdx -= 1;
+        _labSubRender();
+    } else {
+        // Torna alla selezione classe.
+        _labSubState.page = 'pick-class';
+        _labSubRender();
+    }
+};
+
+window.labSubNext = function() {
+    _labSubReadCurrentFromDOM();
+    const f = _labSubState.features[_labSubState.currentIdx];
+    if (!(f.nome || '').trim() || !(f.descrizione || '').trim()) {
+        showNotification('Compila nome e descrizione del privilegio prima di procedere');
+        return;
+    }
+    if (_labSubState.currentIdx < _labSubState.features.length - 1) {
+        _labSubState.currentIdx += 1;
+    } else {
+        _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
+        _labSubState.currentIdx = _labSubState.features.length - 1;
+    }
+    _labSubRender();
+};
+
+window.labSubRemoveCurrent = function() {
+    if (_labSubState.features.length <= 1) return;
+    _labSubState.features.splice(_labSubState.currentIdx, 1);
+    if (_labSubState.currentIdx >= _labSubState.features.length) _labSubState.currentIdx = _labSubState.features.length - 1;
+    _labSubRender();
+};
+
+window.labSaveSottoclasse = async function() {
+    _labSubReadCurrentFromDOM();
+    if (!(_labSubState.subclassName || '').trim()) { showNotification('Inserisci il nome della sottoclasse'); return; }
+    if (!_labSubAllLevelsCovered()) {
+        showNotification('Devi inserire almeno un privilegio per ogni livello di sottoclasse');
+        return;
+    }
+
+    // Compatta i privilegi (rimuove eventuali bozze vuote oltre quelli validi).
+    const cleanFeatures = _labSubState.features
+        .filter(f => (f.nome || '').trim() && (f.descrizione || '').trim())
+        .map(f => {
+            const out = {
+                level: parseInt(f.level) || 1,
+                nome: (f.nome || '').trim(),
+                descrizione: (f.descrizione || '').trim()
+            };
+            if (f.has_resource) {
+                const r = f.risorsa || {};
+                const maxStr = String(r.max ?? '').trim();
+                const isFormula = ['prof_bonus','cha_mod','wis_mod','int_mod','con_mod','str_mod','dex_mod'].includes(maxStr);
+                out.risorsa = {
+                    nome: (r.nome || out.nome).trim(),
+                    max: isFormula ? maxStr : (parseInt(maxStr) || 0),
+                    recharge: r.recharge || 'long_rest',
+                    tipo: r.tipo || 'counter'
+                };
+                if (r.tipo === 'dice_pool' || r.tipo === 'portent') out.risorsa.dado = r.dado || 'd6';
+            }
+            return out;
+        });
+
+    if (!AppState.currentUser?.uid) { showNotification('Errore: utente non trovato'); return; }
+    const supabase = getSupabaseClient();
+    if (!supabase) { showNotification('Errore: connessione DB non disponibile'); return; }
+
+    const record = {
+        nome: _labSubState.subclassName.trim(),
+        parent_class_slug: _labSubState.parentSlug,
+        parent_class_name: _labSubState.parentName,
+        sottoclasse_features: cleanFeatures,
+        updated_at: new Date().toISOString()
+    };
+
+    try {
+        if (_labSubState.editingId) {
+            const { error } = await supabase.from('homebrew_classi').update(record).eq('id', _labSubState.editingId);
+            if (error) throw error;
+            showNotification('Sottoclasse aggiornata');
+        } else {
+            record.user_id = AppState.currentUser.uid;
+            const { error } = await supabase.from('homebrew_classi').insert(record);
+            if (error) throw error;
+            showNotification('Sottoclasse creata');
+        }
+        closeHomebrewModal();
+        _labSubState = null;
+        loadLabContent();
+    } catch (err) {
+        console.error('Errore salvataggio sottoclasse:', err);
+        // Se le colonne non esistono ancora nel DB, mostra un messaggio chiaro.
+        const msg = (err && err.message) || '';
+        if (/column .* does not exist|schema cache/i.test(msg)) {
+            showNotification('Colonne mancanti su DB: esegui sql/add-sottoclassi-columns.sql');
+        } else {
+            showNotification('Errore nel salvataggio della sottoclasse');
+        }
+    }
 };
 
 let _labRazzeWizardStep = 0;
@@ -1069,6 +1481,10 @@ window.openHomebrewModal = function(editData) {
         _openLabRazzeWizard(editData);
         return;
     }
+    if (_labCurrentTab === 'classi') {
+        _openLabSottoclasseWizard(editData);
+        return;
+    }
 
     const modal = document.getElementById('homebrewModal');
     _restoreHomebrewModalStructure();
@@ -1115,6 +1531,7 @@ window.closeHomebrewModal = function() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
         _labEditingId = null;
+        _labSubState = null;
     }
 };
 
@@ -1160,14 +1577,8 @@ async function handleSaveHomebrew(e) {
 
     switch (_labCurrentTab) {
         case 'classi':
-            record.dado_vita = parseInt(document.getElementById('hbDadoVita')?.value) || 8;
-            record.tipo_caster = document.getElementById('hbTipoCaster')?.value || null;
-            record.tiri_salvezza = [...document.querySelectorAll('.hbSaveCheck:checked')].map(cb => cb.value);
-            record.risorse_speciali = [...document.querySelectorAll('#hbRisorseList .hb-attack-row')].map(row => ({
-                nome: row.querySelector('.hbRisNome')?.value || '',
-                livello_min: parseInt(row.querySelector('.hbRisLvMin')?.value) || 1
-            })).filter(r => r.nome);
-            break;
+            // Le sottoclassi sono salvate dal wizard dedicato (labSaveSottoclasse)
+            return;
         case 'razze':
             break;
         case 'background':
