@@ -390,7 +390,7 @@ async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId)
 
     const leggActions = m.azioni_leggendarie || [];
     const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
-        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${escapeHtml(a.descrizione || '')}</span></div>`
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${window.formatRichText(a.descrizione || '')}</span></div>`
     ).join('') : '';
 
     const resLeggMax = m.resistenze_leggendarie || 0;

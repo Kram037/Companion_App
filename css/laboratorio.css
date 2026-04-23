@@ -1328,6 +1328,7 @@
        contenitore .modal-content-lg ha overflow:hidden e taglierebbe
        qualsiasi popover position:absolute. */
     position: fixed;
+    box-sizing: border-box;
     max-height: 280px;
     overflow-y: auto;
     background: var(--surface, var(--bg));

@@ -452,7 +452,7 @@ function _featPickerItemHtml(t, opts) {
         ? `<div class="pg-talento-prereq"><strong>Prerequisito:</strong> ${escapeHtml(t.prerequisites)}</div>`
         : '';
     const descHtml = t.description
-        ? `<div class="pg-talento-desc">${escapeHtml(t.description).replace(/\n/g, '<br>')}</div>`
+        ? `<div class="pg-talento-desc">${window.formatRichText(t.description)}</div>`
         : '';
     return `
         <div class="${cls}" ${onClick}>
@@ -4480,7 +4480,7 @@ window.schedaShowSpellDetail = function(spellName) {
                 <div><span class="spell-meta-label">${lbl.comp}</span><span>${escapeHtml(_spellField(sp, 'components'))}</span></div>
                 <div><span class="spell-meta-label">${lbl.dur}</span><span>${escapeHtml(_spellField(sp, 'duration'))}</span></div>
             </div>
-            <div class="spell-detail-desc">${escapeHtml(_spellField(sp, 'description')).replace(/\n/g,'<br>')}</div>
+            <div class="spell-detail-desc">${window.formatRichText(_spellField(sp, 'description'))}</div>
             <div class="spell-detail-classes">${(_spellField(sp, 'classes') || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
             ${sp.source ? `<div class="spell-detail-source">${escapeHtml(sp.source)}</div>` : ''}
         </div>`;
@@ -5365,7 +5365,12 @@ window.invEditItem = function(pgId, idx) {
             </div>
             <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
         </div>
-        <textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)" ${lockAttr}>${escapeHtml(item.descrizione || '')}</textarea>
+        ${isHomebrew
+            ? `<div class="equip-desc-rendered">${(item.descrizione && item.descrizione.trim())
+                ? window.formatRichText(item.descrizione)
+                : '<span class="equip-desc-empty">Nessuna descrizione</span>'}</div>`
+            : `<textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>`
+        }
         <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
@@ -5710,28 +5715,9 @@ function _renderPrivFeatureRow(f, opts = {}) {
 }
 
 function _privDescToHtml(desc) {
-    // Conversione minimale markdown -> HTML (paragrafi, bullet list, bold)
-    const escaped = escapeHtml(desc)
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>');
-    const lines = escaped.split('\n');
-    let html = '';
-    let inList = false;
-    for (const raw of lines) {
-        const line = raw.trim();
-        if (!line) {
-            if (inList) { html += '</ul>'; inList = false; }
-            continue;
-        }
-        if (/^[*-]\s+/.test(line)) {
-            if (!inList) { html += '<ul class="priv-feat-list">'; inList = true; }
-            html += `<li>${line.replace(/^[*-]\s+/, '')}</li>`;
-        } else {
-            if (inList) { html += '</ul>'; inList = false; }
-            html += `<p>${line}</p>`;
-        }
-    }
-    if (inList) html += '</ul>';
+    // Delegato al formatter unico dell'app: garantisce una sintassi
+    // coerente ovunque (**bold**, *bold*, _italic_, "- bullet").
+    const html = window.formatRichText(desc);
     return html;
 }
 
@@ -6264,7 +6250,7 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                     </div>
                     <div class="priv-feat-body" style="display:none;">
                         ${prereqLine}
-                        <div class="priv-feat-desc">${escapeHtml(desc)}</div>
+                        <div class="priv-feat-desc">${window.formatRichText(desc)}</div>
                     </div>
                 </div>`;
             }).join('')
@@ -6971,7 +6957,7 @@ function _schedaInvocationsContentHtml(currentInvIds) {
             ? `<div class="pg-talento-prereq" ${(!meets && !opts.selected) ? 'style="color:var(--danger,#c0392b);"' : ''}><strong>Prerequisito:</strong> ${escapeHtml(prereq)}</div>`
             : '';
         const descHtml = desc
-            ? `<div class="pg-talento-desc">${escapeHtml(desc).replace(/\n/g, '<br>')}</div>`
+            ? `<div class="pg-talento-desc">${window.formatRichText(desc)}</div>`
             : '';
         return `
             <div class="${cls}" ${onClick} ${opts.title ? `title="${escapeHtml(opts.title)}"` : ''}>
@@ -7300,7 +7286,7 @@ window.schedaFsRenderList = function() {
                 <span class="fs-pick-arrow">▾</span>
             </div>
             <div class="fs-pick-slots">${slotBadgesHtml}</div>
-            <div class="fs-pick-desc">${escapeHtml(fs.description || '')}</div>
+            <div class="fs-pick-desc">${window.formatRichText(fs.description || '')}</div>
         </div>`;
     }).join('');
 };

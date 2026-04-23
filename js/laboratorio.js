@@ -2077,21 +2077,43 @@ function labFieldsOggetti(data) {
     <div class="form-group">
         <label for="hbDescrizione">Descrizione</label>
         <textarea id="hbDescrizione" class="lab-ogg-desc" rows="14" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
+        <div class="lab-help" style="margin-top:6px;">
+            Formattazione: <b>**grassetto**</b> &nbsp;·&nbsp; <i>_corsivo_</i> &nbsp;·&nbsp; "- " a inizio riga per gli elenchi puntati.
+        </div>
     </div>`;
 }
 
 // ── Custom dropdown (tendina) ──────────────────────────────────────────
+function _labOggDdGetPanel(group) {
+    // Il panel viene spostato a document.body durante l'apertura (vedi
+    // labOggDdToggle) per evitare che il transform su .modal-content lo
+    // ancori al modal e ne distrugga il position:fixed.
+    const id = group.id + '__panel';
+    return document.getElementById(id) || group.querySelector('.lab-dd-panel');
+}
+
 function _labOggDdPositionPanel(group) {
     const trig = group.querySelector('.lab-dd-trigger');
-    const panel = group.querySelector('.lab-dd-panel');
+    const panel = _labOggDdGetPanel(group);
     if (!trig || !panel) return;
     const r = trig.getBoundingClientRect();
     const panelMaxH = 280;
-    const spaceBelow = window.innerHeight - r.bottom - 8;
-    const spaceAbove = r.top - 8;
+    const margin = 8;
+    const spaceBelow = window.innerHeight - r.bottom - margin;
+    const spaceAbove = r.top - margin;
     const openUp = spaceBelow < 200 && spaceAbove > spaceBelow;
-    panel.style.left = r.left + 'px';
-    panel.style.width = r.width + 'px';
+
+    // Larghezza: usa la larghezza del trigger come base ma garantisce
+    // che il panel non superi il viewport (problema della "rarità" sul
+    // bordo destro della dialog).
+    const panelW = r.width;
+    let leftPos = r.left;
+    const overflowRight = (leftPos + panelW) - (window.innerWidth - margin);
+    if (overflowRight > 0) leftPos -= overflowRight;
+    if (leftPos < margin) leftPos = margin;
+    panel.style.left = leftPos + 'px';
+    panel.style.width = panelW + 'px';
+
     if (openUp) {
         panel.style.top = '';
         panel.style.bottom = (window.innerHeight - r.top + 4) + 'px';
@@ -2103,24 +2125,49 @@ function _labOggDdPositionPanel(group) {
     }
 }
 
+function _labOggDdClose(group) {
+    if (!group) return;
+    group.classList.remove('open');
+    // Riporta il panel dentro al gruppo se era stato spostato a body.
+    const detachedId = group.id + '__panel';
+    const panel = document.getElementById(detachedId);
+    if (panel && panel.parentElement === document.body) {
+        panel.removeAttribute('id');
+        panel.style.left = '';
+        panel.style.top = '';
+        panel.style.bottom = '';
+        panel.style.width = '';
+        panel.style.maxHeight = '';
+        group.appendChild(panel);
+    }
+}
+
 window.labOggDdToggle = function(groupId) {
     const me = document.getElementById(groupId);
     if (!me) return;
     const wasOpen = me.classList.contains('open');
     // Chiude tutti i dropdown aperti.
-    document.querySelectorAll('.lab-dd.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.lab-dd.open').forEach(el => _labOggDdClose(el));
     if (!wasOpen) {
+        // Sposta il panel a document.body per sfuggire al transform di
+        // .modal-content che renderebbe inutile position:fixed.
+        const panel = me.querySelector('.lab-dd-panel');
+        if (panel && panel.parentElement === me) {
+            panel.id = me.id + '__panel';
+            document.body.appendChild(panel);
+        }
         me.classList.add('open');
         _labOggDdPositionPanel(me);
-        // Riposiziona su scroll/resize.
         const reposition = () => { if (me.classList.contains('open')) _labOggDdPositionPanel(me); };
         window.addEventListener('scroll', reposition, true);
         window.addEventListener('resize', reposition);
-        // Listener globale per chiudere su click fuori.
         setTimeout(() => {
             const onDocClick = (ev) => {
-                if (!me.contains(ev.target)) {
-                    me.classList.remove('open');
+                const detachedPanel = document.getElementById(me.id + '__panel');
+                const insideTrigger = me.contains(ev.target);
+                const insidePanel = detachedPanel && detachedPanel.contains(ev.target);
+                if (!insideTrigger && !insidePanel) {
+                    _labOggDdClose(me);
                     document.removeEventListener('click', onDocClick, true);
                     window.removeEventListener('scroll', reposition, true);
                     window.removeEventListener('resize', reposition);
@@ -2134,10 +2181,13 @@ window.labOggDdToggle = function(groupId) {
 window.labOggDdSelect = function(groupId, hiddenId, value, onSelectFnName) {
     const me = document.getElementById(groupId);
     if (!me) return;
-    me.classList.remove('open');
-    me.querySelectorAll('.lab-dd-option').forEach(o => o.classList.remove('active'));
-    Array.from(me.querySelectorAll('.lab-dd-option'))
-        .find(o => o.textContent.trim() === value)?.classList.add('active');
+    const panel = _labOggDdGetPanel(me);
+    if (panel) {
+        panel.querySelectorAll('.lab-dd-option').forEach(o => o.classList.remove('active'));
+        Array.from(panel.querySelectorAll('.lab-dd-option'))
+            .find(o => o.textContent.trim() === value)?.classList.add('active');
+    }
+    _labOggDdClose(me);
     const trigger = me.querySelector('.lab-dd-trigger');
     if (trigger) {
         trigger.classList.remove('placeholder');
@@ -2543,7 +2593,7 @@ window.labViewNemico = async function(id) {
 
     const leggActions = m.azioni_leggendarie || [];
     const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
-        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${escapeHtml(a.descrizione || '')}</span></div>`
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${window.formatRichText(a.descrizione || '')}</span></div>`
     ).join('') : '';
 
     const resLeggMax = m.resistenze_leggendarie || 0;

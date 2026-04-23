@@ -15,6 +15,64 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ────────────────────────────────────────────────────────────────────────
+// Rich text formatter dell'app (mini-markdown)
+// ────────────────────────────────────────────────────────────────────────
+//
+// Converte un testo plain in HTML supportando:
+//   **testo**  ->  <strong>testo</strong>   (grassetto, doppio asterisco)
+//    *testo*   ->  <strong>testo</strong>   (grassetto, singolo asterisco)
+//    _testo_   ->  <em>testo</em>           (corsivo)
+//   "- voce"   ->  elemento di lista (linee consecutive vengono raccolte
+//                  in una <ul class="rt-list">)
+//   linea vuota ->  separatore di paragrafo
+//
+// Il testo di input viene sempre HTML-escaped prima di applicare i
+// pattern, quindi e' sicuro passargli contenuto utente.
+// Esposto come window.formatRichText cosi' che TUTTI i moduli (scheda,
+// tesoro, laboratorio, ecc.) possano usarlo in modo uniforme.
+function formatRichText(input) {
+    if (input == null) return '';
+    const raw = String(input);
+    if (!raw.trim()) return '';
+
+    const lines = raw.replace(/\r\n?/g, '\n').split('\n');
+    const out = [];
+    let inList = false;
+    const closeList = () => { if (inList) { out.push('</ul>'); inList = false; } };
+
+    for (const line of lines) {
+        const bullet = line.match(/^\s*[-•]\s+(.+)$/);
+        if (bullet) {
+            if (!inList) { out.push('<ul class="rt-list">'); inList = true; }
+            out.push('<li>' + _formatRichInline(escapeHtml(bullet[1])) + '</li>');
+            continue;
+        }
+        closeList();
+        if (line.trim() === '') {
+            out.push('<div class="rt-spacer"></div>');
+        } else {
+            out.push('<div class="rt-line">' + _formatRichInline(escapeHtml(line)) + '</div>');
+        }
+    }
+    closeList();
+    return out.join('');
+}
+
+// Applica le sostituzioni inline (bold/italic) su una stringa GIA' escaped.
+// L'ordine e' importante: prima il pattern doppio (** **), poi il singolo
+// (* *), poi il corsivo (_ _).
+function _formatRichInline(escaped) {
+    let s = escaped;
+    s = s.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[\s(\[{>])\*([^*\n]+?)\*(?=[\s.,;:!?)\]}<]|$)/g, '$1<strong>$2</strong>');
+    s = s.replace(/(^|[\s(\[{>])_([^_\n]+?)_(?=[\s.,;:!?)\]}<]|$)/g, '$1<em>$2</em>');
+    return s;
+}
+
+window.escapeHtml = escapeHtml;
+window.formatRichText = formatRichText;
+
 // Notification System (simple)
 function showNotification(message) {
     // Crea elemento notifica

@@ -787,3 +787,25 @@ body.user-logged-in .header-username {
     .btn-google { font-size: 0.92rem; }
     .icon-grid { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* ────────────────────────────────────────────────────────────
+   Rich text formatter (output di window.formatRichText)
+   - .rt-line  : una riga di testo
+   - .rt-spacer: separatore tra paragrafi (linea vuota nel sorgente)
+   - .rt-list  : lista non ordinata generata dai bullet "- "
+   ──────────────────────────────────────────────────────────── */
+.rt-line { line-height: 1.5; }
+.rt-line + .rt-line { margin-top: 2px; }
+.rt-spacer { height: 0.7em; }
+.rt-list {
+    list-style: disc;
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+.rt-list li {
+    line-height: 1.5;
+    margin: 2px 0;
+}
+.rt-line strong, .rt-list strong { color: var(--text); font-weight: 700; }
+.rt-line em, .rt-list em { color: var(--text); font-style: italic; }
+
