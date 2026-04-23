@@ -2402,6 +2402,135 @@
     margin-left: 6px;
     font-style: italic;
 }
+/* Voci "generiche" del catalogo: Arma/Armatura/Scudo +N. Hanno un
+   trattamento visivo distinto perche' aprono un dialog di selezione
+   invece di essere aggiunte direttamente. */
+.inv-picker-item-generic {
+    border-left: 4px dashed var(--accent);
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.06), transparent 70%);
+}
+.inv-picker-item-generic:hover {
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.14), transparent 70%);
+}
+.inv-picker-item-generic .inv-picker-item-name { color: var(--accent); font-weight: 600; }
+.inv-picker-item-generic .inv-picker-item-en { color: var(--text-muted); font-style: normal; }
+
+/* Dialog Arma/Armatura/Scudo +N a 2 step. */
+.generic-magic-modal {
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    text-align: left;
+    padding: 22px 22px 18px;
+}
+.generic-magic-modal-wide { width: 480px; }
+.generic-magic-title {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-align: center;
+}
+.generic-magic-rar-inline {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+.generic-magic-sub {
+    margin: 0 0 14px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+.generic-magic-bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.generic-magic-bonus-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    box-sizing: border-box;
+}
+.generic-magic-bonus-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+.generic-magic-bonus {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+.generic-magic-rar {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+.generic-magic-bonus-btn.rarita-non-comune { border-color: #4ade80; }
+.generic-magic-bonus-btn.rarita-non-comune .generic-magic-bonus { color: #4ade80; }
+.generic-magic-bonus-btn.rarita-raro { border-color: #60a5fa; }
+.generic-magic-bonus-btn.rarita-raro .generic-magic-bonus { color: #60a5fa; }
+.generic-magic-bonus-btn.rarita-molto-raro { border-color: #a78bfa; }
+.generic-magic-bonus-btn.rarita-molto-raro .generic-magic-bonus { color: #a78bfa; }
+
+.generic-magic-type-list {
+    max-height: 55vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+}
+.generic-magic-group-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    padding: 8px 12px 4px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.generic-magic-type-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+    box-sizing: border-box;
+}
+.generic-magic-type-row:last-child { border-bottom: none; }
+.generic-magic-type-row:hover { background: var(--surface-hover); }
+.generic-magic-type-name {
+    font-size: 0.92rem;
+    color: var(--text);
+    font-weight: 500;
+}
+.generic-magic-type-sub {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
 /* Bordi colorati per rarita' nelle righe del picker catalogo (riusano
    gli stessi colori delle .inv-item-row.rarita-* definiti piu' sopra). */
 .inv-picker-item.rarita-non-comune { border-left: 4px solid #4ade80; }

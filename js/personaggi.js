@@ -5529,6 +5529,13 @@ function _invPickerRenderList(pgId) {
             </div>`;
             return;
         }
+        // Voci "generiche": Arma/Armatura/Scudo +1/+2/+3. La rarita' viene
+        // scelta nello step successivo, quindi qui non hanno una rarita'
+        // fissa (per i filtri restituiscono true sempre se non c'e' filtro
+        // rarita' attivo, false altrimenti).
+        const generics = _invPickerGenericMagicEntries();
+        const filterActive = _invPickerActiveFilterCount() > 0;
+        const genericsFiltered = filterActive ? [] : generics;
         let list = cat.filter(_invPickerMatchesFilters);
         if (q) {
             list = list.filter(o => {
@@ -5536,13 +5543,24 @@ function _invPickerRenderList(pgId) {
                 return txt.toLowerCase().includes(q);
             });
         }
-        if (list.length === 0) {
+        const genericsVisible = q
+            ? genericsFiltered.filter(g => g.nome.toLowerCase().includes(q) || g.tipo.toLowerCase().includes(q))
+            : genericsFiltered;
+        if (list.length === 0 && genericsVisible.length === 0) {
             cont.innerHTML = `<div class="inv-picker-empty">
                 <p style="margin:0;">Nessun oggetto trovato per "${escapeHtml(q)}".</p>
             </div>`;
             return;
         }
-        cont.innerHTML = list.slice(0, 200).map(o => {
+        const genericsHtml = genericsVisible.map(g => {
+            return `<div class="inv-picker-item inv-picker-item-generic" onclick="_invOpenGenericMagicDialog('${pgId}','${g.kind}')">
+                <div class="inv-picker-item-main">
+                    <div class="inv-picker-item-name">${escapeHtml(g.nome)} <span class="inv-picker-item-en">scegli bonus e tipo</span></div>
+                    <div class="inv-picker-item-meta">${escapeHtml(g.meta)}</div>
+                </div>
+            </div>`;
+        }).join('');
+        cont.innerHTML = genericsHtml + list.slice(0, 200).map(o => {
             const meta = (typeof window.formatOggettoMeta === 'function')
                 ? window.formatOggettoMeta(o) : '';
             const rarClass = _invRarityClass(o.rarita);
@@ -5694,6 +5712,183 @@ window.invAddFromCatalog = async function(pgId, catId) {
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Voci "generiche" del catalogo: Arma/Armatura/Scudo +N.
+// Vengono mostrate in cima alla lista del catalogo. Cliccandole si apre
+// un dialog a 2 step (bonus → tipo specifico) che alla conferma aggiunge
+// l'oggetto all'inventario come snapshot completo (analogo a un item
+// del catalogo "fisso").
+// ──────────────────────────────────────────────────────────────────────
+function _invPickerGenericMagicEntries() {
+    return [
+        { kind: 'arma',     nome: 'Arma Magica',     tipo: 'Arma',     meta: 'Bonus: +1 / +2 / +3 · scegli tipo arma' },
+        { kind: 'armatura', nome: 'Armatura Magica', tipo: 'Armatura', meta: 'Bonus: +1 / +2 / +3 · scegli tipo armatura' },
+        { kind: 'scudo',    nome: 'Scudo Magico',    tipo: 'Scudo',    meta: 'Bonus: +1 / +2 / +3' },
+    ];
+}
+
+const _GENERIC_BONUS_OPTS = [
+    { bonus: 1, rarita: 'Non Comune' },
+    { bonus: 2, rarita: 'Raro' },
+    { bonus: 3, rarita: 'Molto Raro' },
+];
+
+window._invOpenGenericMagicDialog = function(pgId, kind) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const labels = { arma: 'Arma Magica', armatura: 'Armatura Magica', scudo: 'Scudo Magico' };
+    const title = labels[kind] || 'Oggetto Magico';
+    const bonusBtns = _GENERIC_BONUS_OPTS.map(b => {
+        const rarClass = _invRarityClass(b.rarita);
+        return `<button type="button" class="generic-magic-bonus-btn ${rarClass}"
+            onclick="_invGenericPickType('${pgId}','${kind}',${b.bonus})">
+            <span class="generic-magic-bonus">+${b.bonus}</span>
+            <span class="generic-magic-rar">${b.rarita}</span>
+        </button>`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">${escapeHtml(title)}</h3>
+        <p class="generic-magic-sub">Step 1 di 2 · Scegli il bonus magico</p>
+        <div class="generic-magic-bonus-grid">${bonusBtns}</div>
+        <div class="dialog-actions" style="margin-top:14px;justify-content:flex-end;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+};
+
+window._invGenericPickType = function(pgId, kind, bonus) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    if (kind === 'scudo') {
+        // Lo scudo non ha sotto-tipi: aggiungiamo subito.
+        _invAddGenericMagicItem(pgId, kind, bonus, 'Scudo');
+        return;
+    }
+    let options = [];
+    let labelTipo = '';
+    if (kind === 'arma') {
+        labelTipo = 'arma';
+        const armi = (typeof DND_ARMI !== 'undefined') ? DND_ARMI : [];
+        options = armi.map(a => ({
+            id: a.nome,
+            label: a.nome,
+            sub: `${a.danni} ${a.tipo_danno}`,
+            cat: a.cat,
+        }));
+    } else {
+        labelTipo = 'armatura';
+        const arms = (typeof DND_ARMATURE !== 'undefined') ? DND_ARMATURE : [];
+        options = arms.filter(a => a.cat !== 'scudo').map(a => ({
+            id: a.nome,
+            label: a.nome,
+            sub: `CA ${a.ca_base} · ${a.cat}`,
+            cat: a.cat,
+        }));
+    }
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const rar = _GENERIC_BONUS_OPTS.find(b => b.bonus === bonus)?.rarita || 'Non Comune';
+    // Raggruppa per categoria per leggibilita'.
+    const groups = {};
+    for (const o of options) {
+        const k = o.cat || 'altro';
+        (groups[k] = groups[k] || []).push(o);
+    }
+    const groupOrder = (kind === 'arma')
+        ? ['semplice_mischia', 'semplice_distanza', 'guerra_mischia', 'guerra_distanza']
+        : ['leggera', 'media', 'pesante'];
+    const groupLabels = {
+        semplice_mischia: 'Semplici da Mischia', semplice_distanza: 'Semplici a Distanza',
+        guerra_mischia: 'Da Guerra (Mischia)', guerra_distanza: 'Da Guerra (Distanza)',
+        leggera: 'Armatura Leggera', media: 'Armatura Media', pesante: 'Armatura Pesante',
+    };
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+        const ai = groupOrder.indexOf(a); const bi = groupOrder.indexOf(b);
+        return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    const body = sortedKeys.map(k => {
+        const rows = groups[k].map(o => `<button type="button" class="generic-magic-type-row"
+            onclick="_invAddGenericMagicItem('${pgId}','${kind}',${bonus},'${escapeHtml(o.id).replace(/'/g, "\\'")}')">
+            <span class="generic-magic-type-name">${escapeHtml(o.label)}</span>
+            <span class="generic-magic-type-sub">${escapeHtml(o.sub)}</span>
+        </button>`).join('');
+        return `<div class="generic-magic-group-label">${escapeHtml(groupLabels[k] || k)}</div>${rows}`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">${kind === 'arma' ? 'Arma' : 'Armatura'} +${bonus} <span class="generic-magic-rar-inline">(${escapeHtml(rar)})</span></h3>
+        <p class="generic-magic-sub">Step 2 di 2 · Scegli il tipo di ${escapeHtml(labelTipo)}</p>
+        <div class="generic-magic-type-list">${body}</div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:space-between;">
+            <button class="btn-secondary" onclick="_invOpenGenericMagicDialog('${pgId}','${kind}')">← Indietro</button>
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+};
+
+window._invAddGenericMagicItem = async function(pgId, kind, bonus, tipoSpecifico) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const rar = _GENERIC_BONUS_OPTS.find(b => b.bonus === bonus)?.rarita || 'Non Comune';
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    const tipoCatLabel = { arma: 'Arma', armatura: 'Armatura', scudo: 'Scudo' }[kind] || 'Oggetto';
+    // Costruisco l'entry replicando la forma usata da invAddFromCatalog,
+    // cosi' rimane consistente con gli oggetti del catalogo "fisso".
+    const nome = `${tipoSpecifico} +${bonus}`;
+    const entry = {
+        nome,
+        descrizione: `${tipoCatLabel} magica/o con bonus +${bonus} ai tiri per colpire e ai danni (arma) o alla CA (armatura/scudo).`,
+        quantita: 1,
+        tipo: tipoCatLabel,
+        sotto_tipo: tipoSpecifico,
+        rarita: rar,
+        richiede_sintonia: false,
+        sintonia_dettaglio: '',
+        incantamento: bonus,
+        magico: true,
+        magic_bonus: bonus,
+    };
+    // Per le armi cerco i dati combat (danni, tipo_danno, proprieta) cosi'
+    // che il sistema di equip/danni funzioni come per le armi normali.
+    if (kind === 'arma' && typeof DND_ARMI !== 'undefined') {
+        const arma = DND_ARMI.find(a => a.nome === tipoSpecifico);
+        if (arma) {
+            entry.danni = arma.danni;
+            entry.tipo_danno = arma.tipo_danno;
+            entry.proprieta = arma.proprieta;
+            entry.cat = arma.cat;
+        }
+    }
+    if (kind === 'armatura' && typeof DND_ARMATURE !== 'undefined') {
+        const arm = DND_ARMATURE.find(a => a.nome === tipoSpecifico);
+        if (arm) {
+            entry.ca_base = arm.ca_base;
+            entry.cat = arm.cat;
+            entry.mod_des = arm.mod_des;
+            entry.max_des = arm.max_des;
+            entry.forza = arm.forza;
+            entry.furtivita = arm.furtivita;
+        }
+    }
+    if (kind === 'scudo' && typeof DND_ARMATURE !== 'undefined') {
+        const sh = DND_ARMATURE.find(a => a.cat === 'scudo');
+        if (sh) {
+            entry.ca_base = sh.ca_base;
+            entry.cat = sh.cat;
+        }
+    }
+    inventario.push(entry);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     schedaOpenInventoryPage(pgId);
 };
 
