@@ -140,6 +140,14 @@ async function loadHomebrewSottoclassi() {
 
             // Una sola SELECT con IN su [io, ...amiciAbilitati].
             const allUids = [ownUid, ...friendUids];
+
+            // [DEBUG] Stato in ingresso.
+            try {
+                console.log('[homebrew][debug] ownUid:', ownUid);
+                console.log('[homebrew][debug] friendUids:', friendUids);
+                console.log('[homebrew][debug] allUids per IN:', allUids);
+            } catch (_) {}
+
             const { data, error } = await supabase
                 .from('homebrew_classi')
                 .select('*')
@@ -149,6 +157,43 @@ async function loadHomebrewSottoclassi() {
                 console.warn('[homebrew] errore SELECT sottoclassi:', error);
                 AppState.cachedHomebrewSottoclassi = [];
                 return [];
+            }
+
+            // [DEBUG] Cosa ha realmente risposto Supabase con il filtro IN.
+            try {
+                console.log('[homebrew][debug] righe restituite (con IN):', (data || []).length);
+                (data || []).forEach((r, i) => {
+                    console.log(`[homebrew][debug]  riga ${i}:`, {
+                        id: r.id,
+                        user_id: r.user_id,
+                        nome: r.nome,
+                        parent_class_slug: r.parent_class_slug,
+                        match_own: r.user_id === ownUid,
+                    });
+                });
+            } catch (_) {}
+
+            // [DEBUG] CONTROLLO senza filtro: serve a capire se RLS sta bloccando.
+            try {
+                const ctrl = await supabase
+                    .from('homebrew_classi')
+                    .select('id,user_id,nome,parent_class_slug');
+                if (ctrl.error) {
+                    console.warn('[homebrew][debug] CONTROL SELECT (senza IN) errore:', ctrl.error);
+                } else {
+                    console.log('[homebrew][debug] CONTROL SELECT (senza IN) totale visibile:',
+                        (ctrl.data || []).length);
+                    (ctrl.data || []).forEach((r, i) => {
+                        console.log(`[homebrew][debug]  ctrl ${i}:`, {
+                            user_id: r.user_id,
+                            nome: r.nome,
+                            parent_class_slug: r.parent_class_slug,
+                            match_own: r.user_id === ownUid,
+                        });
+                    });
+                }
+            } catch (eCtrl) {
+                console.warn('[homebrew][debug] eccezione control SELECT:', eCtrl);
             }
 
             const ownName = userData?.nome_utente || 'Tuo';
