@@ -1299,13 +1299,21 @@
 .lab-dd {
     position: relative;
     width: 100%;
+    min-width: 0;
 }
+/* Le colonne 1fr di .form-row-2 collasserebbero ad "auto" senza min-width:0
+   sui figli, facendo straboccare il trigger (visibile come "rarita' tagliata
+   a destra"). Garantiamo che i form-group dentro le grid si comprimano. */
+.form-row > .form-group { min-width: 0; }
+.form-row > .form-group > .lab-dd { width: 100%; max-width: 100%; }
 .lab-dd-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 10px 14px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
