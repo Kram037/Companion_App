@@ -964,7 +964,29 @@ function _isPwaInstalled() {
 }
 
 function _isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // iPad moderno (iPadOS 13+) si presenta come Mac: includiamo anche
+    // quel caso controllando il touch screen su MacIntel.
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) return true;
+    if (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1) return true;
+    return false;
+}
+
+// Su iOS l'unico browser che permette di installare una PWA "vera"
+// (Aggiungi alla schermata Home -> standalone) e' Safari. Chrome, Firefox,
+// Edge su iOS sono tutti basati su WKWebView e NON espongono il flusso
+// di installazione: l'opzione "Aggiungi a Home" non c'e' nel loro menu.
+function _isIOSSafari() {
+    if (!_isIOS()) return false;
+    const ua = navigator.userAgent;
+    // Esclude Chrome (CriOS), Firefox (FxiOS), Edge (EdgiOS), Opera (OPiOS)
+    // e i webview di app (FBAN/FBAV per Facebook, Instagram, Line, ecc).
+    if (/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser/i.test(ua)) return false;
+    if (/FBAN|FBAV|Instagram|Line\/|MicroMessenger|Twitter|TikTok/i.test(ua)) return false;
+    return /Safari/i.test(ua);
+}
+
+function _isIOSChromeOrOther() {
+    return _isIOS() && !_isIOSSafari();
 }
 
 function _setPwaBtnState(state) {
@@ -997,15 +1019,56 @@ function _showPwaInstructions() {
     const modal = document.getElementById('pwaInstructionsModal');
     const body = document.getElementById('pwaInstructionsBody');
     if (!modal || !body) return;
-    if (_isIOS()) {
+    const pageUrl = window.location.href;
+    if (_isIOSChromeOrOther()) {
+        // iOS Chrome / Firefox / Edge / in-app browser: NON possono
+        // installare la PWA. L'utente DEVE riaprire il link in Safari.
+        body.innerHTML = `
+            <p><b>Su iPhone/iPad la PWA si installa solo da Safari.</b></p>
+            <p style="margin:8px 0;">Il browser che stai usando non supporta l'installazione di app web. Apri questa pagina in <b>Safari</b> per continuare:</p>
+            <ol style="padding-left:18px;margin:8px 0;">
+                <li>Copia il link qui sotto.</li>
+                <li>Apri <b>Safari</b> dalla schermata Home.</li>
+                <li>Incolla l'indirizzo nella barra di ricerca e premi Invio.</li>
+                <li>Tocca <b>Condividi</b> (quadrato con freccia in su) → <b>Aggiungi alla schermata Home</b>.</li>
+            </ol>
+            <div class="pwa-link-row">
+                <input type="text" readonly value="${pageUrl.replace(/"/g, '&quot;')}" id="pwaCopyUrlInput" class="pwa-link-input">
+                <button type="button" class="btn-secondary btn-small" id="pwaCopyUrlBtn">Copia link</button>
+            </div>
+            <p style="font-size:0.8rem;color:var(--text-light);margin-top:8px;">Suggerimento: se sei dentro un'app (Instagram, Facebook, Telegram, ecc.) tocca <b>⋯</b> e scegli "Apri in Safari".</p>`;
+        // Bind del bottone "Copia link".
+        setTimeout(() => {
+            const cBtn = document.getElementById('pwaCopyUrlBtn');
+            const cInp = document.getElementById('pwaCopyUrlInput');
+            if (cBtn && cInp) {
+                cBtn.onclick = async () => {
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(cInp.value);
+                        } else {
+                            cInp.select();
+                            cInp.setSelectionRange(0, 99999);
+                            document.execCommand('copy');
+                        }
+                        cBtn.textContent = 'Copiato!';
+                        setTimeout(() => { cBtn.textContent = 'Copia link'; }, 1800);
+                    } catch (_) {
+                        cInp.select();
+                    }
+                };
+            }
+        }, 0);
+    } else if (_isIOS()) {
+        // Safari su iOS: percorso "Aggiungi alla schermata Home".
         body.innerHTML = `
             <p>Per installare <b>Companion App</b> su iPhone/iPad:</p>
             <ol style="padding-left:18px;margin:8px 0;">
-                <li>Apri questa pagina in <b>Safari</b>.</li>
-                <li>Tocca l'icona <b>Condividi</b> (quadrato con freccia in su) in basso.</li>
+                <li>Tocca l'icona <b>Condividi</b> (quadrato con freccia in su) nella barra in basso.</li>
                 <li>Scorri e seleziona <b>Aggiungi alla schermata Home</b>.</li>
-                <li>Conferma con <b>Aggiungi</b>.</li>
-            </ol>`;
+                <li>Conferma con <b>Aggiungi</b> in alto a destra.</li>
+            </ol>
+            <p style="font-size:0.85rem;color:var(--text-light);">Una volta aggiunta, l'app si aprira' a tutto schermo come una vera app, senza la barra di Safari.</p>`;
     } else {
         body.innerHTML = `
             <p>Per installare <b>Companion App</b>:</p>
@@ -1036,10 +1099,16 @@ function setupPwaInstall() {
     if (_isPwaInstalled()) {
         _setPwaBtnState('installed');
     } else if (_isIOS()) {
-        // iOS Safari non supporta beforeinstallprompt: mostra solo le istruzioni
+        // iOS: nessun browser su iPhone/iPad supporta beforeinstallprompt
+        // (sia Safari sia Chrome/Firefox/Edge iOS). Mostriamo le istruzioni
+        // contestuali (Safari -> Aggiungi alla Home, Chrome iOS -> apri in Safari).
         _setPwaBtnState('manual');
     } else {
-        _setPwaBtnState('unavailable');
+        // Anche su desktop/Android senza beforeinstallprompt ancora ricevuto
+        // partiamo in 'manual' invece di 'unavailable': se l'evento arrivera'
+        // poi, passeremo a 'available'. Cosi' il bottone resta cliccabile e
+        // mostra le istruzioni generiche al posto di un disabled muto.
+        _setPwaBtnState('manual');
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {

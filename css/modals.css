@@ -525,6 +525,31 @@
 .pwa-install-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .pwa-install-btn.pwa-installed { opacity: 0.7; }
 
+/* Riga "Copia link" nel modal istruzioni PWA (caso Chrome iOS / in-app
+   browser): permette all'utente di trasferire l'URL verso Safari, dato
+   che su iOS solo Safari puo' installare la PWA. */
+.pwa-link-row {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+    margin-top: 8px;
+}
+.pwa-link-input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    box-sizing: border-box;
+    -webkit-user-select: all;
+    user-select: all;
+}
+.pwa-link-input:focus { outline: none; border-color: var(--accent); }
+
 .theme-preview {
     width: 52px; height: 36px;
     border-radius: 4px;

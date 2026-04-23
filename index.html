@@ -9,12 +9,21 @@
     <title>Companion App - D&D Helper</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B0000">
+    <!-- Meta iOS: necessari perche' Safari iOS NON usa il manifest.json
+         per la PWA. Senza questi tag "Aggiungi alla schermata Home"
+         crea solo un bookmark, non una vera PWA standalone. -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Companion App">
+    <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="images/icon d20.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/icon d20.png">
     <link rel="stylesheet" href="css/base.css?v=20260427F">
     <link rel="stylesheet" href="css/components.css?v=1767940000">
-    <link rel="stylesheet" href="css/modals.css?v=1773500003">
+    <link rel="stylesheet" href="css/modals.css?v=20260227Y">
     <link rel="stylesheet" href="css/campagne.css?v=1767900400">
-    <link rel="stylesheet" href="css/personaggi.css?v=20260227X">
+    <link rel="stylesheet" href="css/personaggi.css?v=20260227Y">
     <link rel="stylesheet" href="css/sessions.css?v=1767900400">
     <link rel="stylesheet" href="css/combat.css?v=1767920000">
     <link rel="stylesheet" href="css/laboratorio.css?v=20260427O">
@@ -990,7 +999,7 @@
     <script src="js/laboratorio.js?v=20260427R"></script>
     <script src="js/realtime.js?v=1767900400"></script>
     <script src="js/initiative.js?v=1773800000"></script>
-    <script src="js/init.js?v=1773800000"></script>
+    <script src="js/init.js?v=20260227Y"></script>
     
     <!-- Cache busting script for development -->
     <script>

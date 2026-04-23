@@ -2159,10 +2159,10 @@
 .inv-item-row.rarita-raro .inv-item-name { color: #60a5fa; }
 
 .inv-item-row.rarita-molto-raro {
-    border-left-color: #f87171;
-    background: linear-gradient(90deg, rgba(248,113,113,0.12), transparent 60%);
+    border-left-color: #a78bfa;
+    background: linear-gradient(90deg, rgba(167,139,250,0.12), transparent 60%);
 }
-.inv-item-row.rarita-molto-raro .inv-item-name { color: #f87171; }
+.inv-item-row.rarita-molto-raro .inv-item-name { color: #a78bfa; }
 
 .inv-item-row.rarita-leggendario {
     border-left-color: #c084fc;
