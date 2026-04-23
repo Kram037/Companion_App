@@ -116,7 +116,9 @@ function _labMountImportButton(tab) {
     const headerRow = document.querySelector('#labSubPage .page-header');
     if (!headerRow) return;
     let btn = document.getElementById('labImportBtn');
-    if (tab !== 'oggetti') {
+    // L'import e' supportato solo per categorie con un parser dedicato.
+    const supported = ['oggetti', 'incantesimi'];
+    if (!supported.includes(tab)) {
         if (btn) btn.remove();
         return;
     }
@@ -125,7 +127,6 @@ function _labMountImportButton(tab) {
         btn.id = 'labImportBtn';
         btn.className = 'lab-import-btn';
         btn.type = 'button';
-        btn.title = 'Importa oggetti da file';
         btn.innerHTML = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -133,9 +134,10 @@ function _labMountImportButton(tab) {
                 <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
             <span>Importa</span>`;
-        btn.onclick = () => window.labOpenImportDialog();
         headerRow.appendChild(btn);
     }
+    btn.title = tab === 'incantesimi' ? 'Importa incantesimi da file' : 'Importa oggetti da file';
+    btn.onclick = () => window.labOpenImportDialog(tab);
 }
 
 window.labBackToHub = function() {
@@ -2962,27 +2964,255 @@ function labParseItemsText(text) {
 }
 window.labParseItemsText = labParseItemsText;
 
-// ────────────────────────────────────────────────────────────
-// Dialog di importazione.
-// ────────────────────────────────────────────────────────────
-window.labOpenImportDialog = function() {
+// ============================================================================
+// PARSER INCANTESIMI
+// ============================================================================
+// Riconosce blocchi di incantesimo D&D nel formato canonico:
+//
+//     Palla di Fuoco
+//     Evocazione di 3° livello                       (oppure: "3rd-level evocation")
+//     Tempo di lancio: 1 azione                      (oppure: "Casting Time: 1 action")
+//     Gittata: 45 metri
+//     Componenti: V, S, M (un piccolo bocciolo...)
+//     Durata: Istantaneo
+//     Una luce brillante guizza dal tuo dito puntato...
+//
+// La riga "scuola/livello" e' il marker di inizio blocco; la riga
+// immediatamente sopra e' il nome.
+//
+// NOTA SU "INVOCAZIONE" vs "EVOCAZIONE":
+// Il manuale italiano D&D 5e mappa Conjuration -> Evocazione e
+// Evocation -> Invocazione (sì, sembra invertito ma è il canone).
+
+const _LAB_SPELL_SCHOOL_MAP = {
+    'abiurazione': 'Abiurazione', 'abjuration': 'Abiurazione',
+    'ammaliamento': 'Ammaliamento', 'enchantment': 'Ammaliamento',
+    'divinazione': 'Divinazione', 'divination': 'Divinazione',
+    'evocazione': 'Evocazione', 'conjuration': 'Evocazione',
+    'illusione': 'Illusione', 'illusion': 'Illusione',
+    'invocazione': 'Invocazione', 'evocation': 'Invocazione',
+    'necromanzia': 'Necromanzia', 'necromancy': 'Necromanzia',
+    'trasmutazione': 'Trasmutazione', 'transmutation': 'Trasmutazione',
+};
+const _LAB_SCHOOLS_RX_SRC = 'abiurazione|ammaliamento|divinazione|evocazione|illusione|invocazione|necromanzia|trasmutazione|abjuration|conjuration|divination|enchantment|evocation|illusion|necromancy|transmutation';
+
+const _LAB_SPELL_HDR_PATTERNS = [
+    // IT: "<Scuola> di N° livello" (anche senza "°", anche "di N livello")
+    { rx: new RegExp(`^(${_LAB_SCHOOLS_RX_SRC})\\s+di\\s+(\\d+)°?\\s*livello\\.?$`, 'i'),
+      get: m => ({ livello: parseInt(m[2], 10), scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+    // IT: "Trucchetto di <Scuola>"
+    { rx: new RegExp(`^trucchetto\\s+di\\s+(${_LAB_SCHOOLS_RX_SRC})\\.?$`, 'i'),
+      get: m => ({ livello: 0, scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+    // EN: "Nth-level <school>"
+    { rx: new RegExp(`^(\\d+)(?:st|nd|rd|th)?-level\\s+(${_LAB_SCHOOLS_RX_SRC})\\.?$`, 'i'),
+      get: m => ({ livello: parseInt(m[1], 10), scuola: _LAB_SPELL_SCHOOL_MAP[m[2].toLowerCase()] }) },
+    // EN: "<School> cantrip"
+    { rx: new RegExp(`^(${_LAB_SCHOOLS_RX_SRC})\\s+cantrip\\.?$`, 'i'),
+      get: m => ({ livello: 0, scuola: _LAB_SPELL_SCHOOL_MAP[m[1].toLowerCase()] }) },
+];
+
+// Parsa una singola riga come header di incantesimo. Tollera l'eventuale
+// suffisso "(rituale)" / "(ritual)". Ritorna {livello, scuola, rituale}
+// oppure null.
+function _labParseSpellHeader(line) {
+    if (!line) return null;
+    let t = line.trim();
+    let rituale = false;
+    const rt = t.match(/\s*\(\s*(?:rituale|ritual)\s*\)\s*\.?\s*$/i);
+    if (rt) { rituale = true; t = t.slice(0, rt.index).trim(); }
+    for (const p of _LAB_SPELL_HDR_PATTERNS) {
+        const m = t.match(p.rx);
+        if (m) {
+            const r = p.get(m);
+            r.rituale = rituale;
+            return r;
+        }
+    }
+    return null;
+}
+
+// Mappa dei prefissi delle righe-attributo. Tutto case-insensitive.
+const _LAB_SPELL_FIELD_PATTERNS = [
+    { key: 'tempo_lancio', rx: /^(?:tempo\s+di\s+lancio|casting\s+time)\s*:\s*(.+)$/i },
+    { key: 'gittata',      rx: /^(?:gittata|range)\s*:\s*(.+)$/i },
+    { key: 'componenti',   rx: /^(?:componenti|components)\s*:\s*(.+)$/i },
+    { key: 'durata',       rx: /^(?:durata|duration)\s*:\s*(.+)$/i },
+];
+
+function labParseSpellsText(text) {
+    if (!text || typeof text !== 'string') return [];
+    const src = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    const lines = src.split('\n').map(l => l.replace(/[ \t]+$/g, ''));
+    const items = [];
+    let i = 0;
+    while (i < lines.length) {
+        if (i >= 1 && lines[i].trim()) {
+            const hdr = _labParseSpellHeader(lines[i]);
+            if (hdr) {
+                const nameLine = lines[i - 1].trim();
+                if (nameLine) {
+                    let j = i + 1;
+                    const fields = { tempo_lancio: '', gittata: '', componenti: '', durata: '' };
+                    // Consuma le righe-attributo consecutive (saltando
+                    // eventuali righe vuote tra l'una e l'altra).
+                    while (j < lines.length) {
+                        if (!lines[j].trim()) { j++; continue; }
+                        let matched = false;
+                        for (const f of _LAB_SPELL_FIELD_PATTERNS) {
+                            const mm = lines[j].match(f.rx);
+                            if (mm) { fields[f.key] = mm[1].trim(); matched = true; break; }
+                        }
+                        if (!matched) break;
+                        j++;
+                    }
+                    // Tutto il resto fino al prossimo header e' descrizione.
+                    const descLines = [];
+                    while (j < lines.length) {
+                        const next = lines[j + 1] || '';
+                        if (lines[j].trim() && _labParseSpellHeader(next)) break;
+                        descLines.push(lines[j]);
+                        j++;
+                    }
+                    while (descLines.length && !descLines[0].trim()) descLines.shift();
+                    while (descLines.length && !descLines[descLines.length - 1].trim()) descLines.pop();
+                    items.push({
+                        nome: nameLine,
+                        livello: hdr.livello,
+                        scuola: hdr.scuola || '',
+                        rituale: !!hdr.rituale,
+                        tempo_lancio: fields.tempo_lancio,
+                        gittata: fields.gittata,
+                        componenti: fields.componenti,
+                        durata: fields.durata,
+                        descrizione: descLines.join('\n').trim(),
+                    });
+                    i = j;
+                    continue;
+                }
+            }
+        }
+        i++;
+    }
+    return items;
+}
+window.labParseSpellsText = labParseSpellsText;
+
+// ============================================================================
+// DIALOG DI IMPORTAZIONE (oggetti / incantesimi)
+// ============================================================================
+//
+// Configurazione per categoria. Ogni voce definisce: titolo della
+// dialog, esempio mostrato, parser, tabella di destinazione, mapper
+// dal record parsato alla riga del DB e renderer della preview.
+const _LAB_IMPORT_CONFIGS = {
+    oggetti: {
+        title: 'Importa oggetti homebrew',
+        hintIntro: 'Carica un file <strong>.txt</strong> o <strong>.pdf</strong> contenente uno o più oggetti nel formato canonico D&amp;D:',
+        example:
+`Amulet of Health
+Wondrous item, rare (requires attunement)
+Your Constitution score is 19 while you wear this amulet...`,
+        textareaPh: 'Incolla qui il testo degli oggetti...',
+        notRecognizedMsg: 'Nessun oggetto riconosciuto. Controlla che l\'header segua il formato "Tipo, rarità".',
+        unitSingular: 'oggetto', unitPlural: 'oggetti',
+        parse: text => labParseItemsText(text),
+        table: 'homebrew_oggetti',
+        cacheReload: () => (typeof window.loadHomebrewOggetti === 'function' ? window.loadHomebrewOggetti() : null),
+        toRow: (it, uid) => ({
+            user_id: uid,
+            nome: it.nome,
+            descrizione: it.descrizione || '',
+            tipo: it.tipo || null,
+            sotto_tipo: it.sotto_tipo || null,
+            rarita: it.rarita || null,
+            richiede_sintonia: !!it.richiede_sintonia,
+            sintonia_dettaglio: it.sintonia_dettaglio || null,
+            incantamento: parseInt(it.incantamento) || 0,
+        }),
+        renderPreviewItem: (it, idx) => {
+            const meta = window.formatOggettoMeta({
+                tipo: it.tipo, sotto_tipo: it.sotto_tipo, rarita: it.rarita,
+                incantamento: it.incantamento,
+                richiede_sintonia: it.richiede_sintonia,
+                sintonia_dettaglio: it.sintonia_dettaglio,
+            });
+            const warn = it._warning ? `<div class="lab-import-warn">⚠️ ${escapeHtml(it._warning)}</div>` : '';
+            const descPreview = (it.descrizione || '').split('\n').slice(0, 3).join(' ').slice(0, 220);
+            return `<label class="lab-import-item">
+                <input type="checkbox" data-idx="${idx}" checked>
+                <div class="lab-import-item-body">
+                    <div class="lab-import-item-name">${escapeHtml(it.nome)}</div>
+                    <div class="lab-import-item-meta">${escapeHtml(meta)}</div>
+                    ${descPreview ? `<div class="lab-import-item-desc">${escapeHtml(descPreview)}${it.descrizione.length > 220 ? '...' : ''}</div>` : ''}
+                    ${warn}
+                </div>
+            </label>`;
+        },
+    },
+    incantesimi: {
+        title: 'Importa incantesimi homebrew',
+        hintIntro: 'Carica un file <strong>.txt</strong> o <strong>.pdf</strong> contenente uno o più incantesimi nel formato canonico D&amp;D:',
+        example:
+`Palla di Fuoco
+Evocazione di 3° livello
+Tempo di lancio: 1 azione
+Gittata: 45 metri
+Componenti: V, S, M (un piccolo bocciolo di pipistrello e zolfo)
+Durata: Istantaneo
+Una luce brillante guizza dal tuo dito puntato verso un punto...`,
+        textareaPh: 'Incolla qui il testo degli incantesimi...',
+        notRecognizedMsg: 'Nessun incantesimo riconosciuto. Controlla che la seconda riga di ogni blocco contenga la scuola e il livello (es. "Evocazione di 3° livello" o "3rd-level evocation").',
+        unitSingular: 'incantesimo', unitPlural: 'incantesimi',
+        parse: text => labParseSpellsText(text),
+        table: 'homebrew_incantesimi',
+        cacheReload: () => (typeof window.loadHomebrewIncantesimi === 'function' ? window.loadHomebrewIncantesimi() : null),
+        toRow: (it, uid) => ({
+            user_id: uid,
+            nome: it.nome,
+            livello: typeof it.livello === 'number' ? it.livello : 0,
+            scuola: it.scuola || null,
+            tempo_lancio: it.tempo_lancio || null,
+            gittata: it.gittata || null,
+            componenti: it.componenti || null,
+            durata: it.durata || null,
+            descrizione: it.descrizione || '',
+        }),
+        renderPreviewItem: (it, idx) => {
+            const lvl = it.livello === 0 ? 'Trucchetto' : `${it.livello}° livello`;
+            const meta = `${lvl}${it.scuola ? ' · ' + it.scuola : ''}${it.rituale ? ' · rituale' : ''}`;
+            const fieldsLine = [
+                it.tempo_lancio ? `<strong>Tempo:</strong> ${escapeHtml(it.tempo_lancio)}` : '',
+                it.gittata ? `<strong>Gittata:</strong> ${escapeHtml(it.gittata)}` : '',
+                it.durata ? `<strong>Durata:</strong> ${escapeHtml(it.durata)}` : '',
+                it.componenti ? `<strong>Comp.:</strong> ${escapeHtml(it.componenti)}` : '',
+            ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+            const descPreview = (it.descrizione || '').split('\n').slice(0, 3).join(' ').slice(0, 220);
+            return `<label class="lab-import-item">
+                <input type="checkbox" data-idx="${idx}" checked>
+                <div class="lab-import-item-body">
+                    <div class="lab-import-item-name">${escapeHtml(it.nome)}</div>
+                    <div class="lab-import-item-meta">${escapeHtml(meta)}</div>
+                    ${fieldsLine ? `<div class="lab-import-item-fields">${fieldsLine}</div>` : ''}
+                    ${descPreview ? `<div class="lab-import-item-desc">${escapeHtml(descPreview)}${it.descrizione.length > 220 ? '...' : ''}</div>` : ''}
+                </div>
+            </label>`;
+        },
+    },
+};
+
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay lab-import-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     overlay.innerHTML = `
         <div class="hp-calc-modal lab-import-modal">
             <div class="lab-import-header">
-                <h3 class="lab-import-title">Importa oggetti homebrew</h3>
+                <h3 class="lab-import-title">${escapeHtml(cat.title)}</h3>
                 <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()" title="Chiudi">×</button>
             </div>
             <div class="lab-import-body">
                 <div class="lab-import-step" id="labImportStep1">
-                    <p class="lab-import-hint">
-                        Carica un file <strong>.txt</strong> o <strong>.pdf</strong> contenente uno o più oggetti nel formato canonico D&amp;D:
-                    </p>
-<pre class="lab-import-example">Amulet of Health
-Wondrous item, rare (requires attunement)
-Your Constitution score is 19 while you wear this amulet...</pre>
+                    <p class="lab-import-hint">${cat.hintIntro}</p>
+<pre class="lab-import-example">${escapeHtml(cat.example)}</pre>
                     <p class="lab-import-hint" style="margin-top:10px;">Oppure incolla direttamente il testo qui sotto.</p>
                     <div class="lab-import-file-row">
                         <label class="lab-import-file-btn">
@@ -3001,7 +3231,7 @@ Your Constitution score is 19 while you wear this amulet...</pre>
                         id: 'labImportText',
                         className: 'lab-import-textarea',
                         rows: 10,
-                        placeholder: 'Incolla qui il testo degli oggetti...',
+                        placeholder: cat.textareaPh,
                         value: '',
                     })}
                     <div class="lab-import-actions">
@@ -3026,10 +3256,10 @@ Your Constitution score is 19 while you wear this amulet...</pre>
             </div>
         </div>`;
     document.body.appendChild(overlay);
-    // Stato locale del flusso di importazione. Lo appendo al DOM del
-    // dialog cosi' e' automaticamente pulito quando l'overlay viene
-    // rimosso.
+    // Stato locale del flusso. Lo appendo all'overlay cosi' e' pulito
+    // automaticamente quando l'overlay viene rimosso.
     overlay._parsed = [];
+    overlay._cat = cat;
 };
 
 window._labImportFileChanged = async function(ev) {
@@ -3105,41 +3335,25 @@ async function _labExtractPdfText(file) {
 window._labImportParse = function() {
     const overlay = document.querySelector('.lab-import-overlay');
     if (!overlay) return;
+    const cat = overlay._cat || _LAB_IMPORT_CONFIGS.oggetti;
     const txt = document.getElementById('labImportText')?.value || '';
-    const parsed = labParseItemsText(txt);
+    const parsed = cat.parse(txt);
     overlay._parsed = parsed;
     const step1 = document.getElementById('labImportStep1');
     const step2 = document.getElementById('labImportStep2');
     const prev = document.getElementById('labImportPreview');
     const summ = document.getElementById('labImportSummary');
     if (!parsed.length) {
-        alert('Nessun oggetto riconosciuto. Controlla che l\'header segua il formato "Tipo, rarità".');
+        alert(cat.notRecognizedMsg);
         return;
     }
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = '';
-    if (summ) summ.textContent = `${parsed.length} oggett${parsed.length === 1 ? 'o' : 'i'} riconosciut${parsed.length === 1 ? 'o' : 'i'}`;
-    if (prev) prev.innerHTML = parsed.map((it, idx) => {
-        const meta = window.formatOggettoMeta({
-            tipo: it.tipo, sotto_tipo: it.sotto_tipo, rarita: it.rarita,
-            richiede_sintonia: it.richiede_sintonia,
-            sintonia_dettaglio: it.sintonia_dettaglio,
-        });
-        const warn = it._warning ? `<div class="lab-import-warn">⚠️ ${escapeHtml(it._warning)}</div>` : '';
-        const descPreview = (it.descrizione || '').split('\n').slice(0, 3).join(' ').slice(0, 220);
-        const enchBadge = it.incantamento
-            ? ` <span class="lab-import-ench-badge">+${it.incantamento}</span>`
-            : '';
-        return `<label class="lab-import-item">
-            <input type="checkbox" data-idx="${idx}" checked>
-            <div class="lab-import-item-body">
-                <div class="lab-import-item-name">${escapeHtml(it.nome)}${enchBadge}</div>
-                <div class="lab-import-item-meta">${escapeHtml(meta)}</div>
-                ${descPreview ? `<div class="lab-import-item-desc">${escapeHtml(descPreview)}${it.descrizione.length > 220 ? '...' : ''}</div>` : ''}
-                ${warn}
-            </div>
-        </label>`;
-    }).join('');
+    if (summ) {
+        const unit = parsed.length === 1 ? cat.unitSingular : cat.unitPlural;
+        summ.textContent = `${parsed.length} ${unit} riconosciut${parsed.length === 1 ? 'o' : 'i'}`;
+    }
+    if (prev) prev.innerHTML = parsed.map((it, idx) => cat.renderPreviewItem(it, idx)).join('');
 };
 
 window._labImportBack = function() {
@@ -3155,6 +3369,7 @@ window._labImportToggleAll = function(check) {
 window._labImportSave = async function() {
     const overlay = document.querySelector('.lab-import-overlay');
     if (!overlay) return;
+    const cat = overlay._cat || _LAB_IMPORT_CONFIGS.oggetti;
     const parsed = overlay._parsed || [];
     const selected = [];
     document.querySelectorAll('#labImportPreview input[type="checkbox"]').forEach(cb => {
@@ -3163,27 +3378,18 @@ window._labImportSave = async function() {
             if (!Number.isNaN(idx) && parsed[idx]) selected.push(parsed[idx]);
         }
     });
-    if (!selected.length) { alert('Seleziona almeno un oggetto da importare.'); return; }
+    if (!selected.length) { alert(`Seleziona almeno un ${cat.unitSingular} da importare.`); return; }
     const saveBtn = document.getElementById('labImportSaveBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.currentUser?.uid) {
-        alert('Devi essere loggato per importare oggetti.');
+        alert(`Devi essere loggato per importare ${cat.unitPlural}.`);
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Salva selezionati'; }
         return;
     }
-    const rows = selected.map(it => ({
-        user_id: AppState.currentUser.uid,
-        nome: it.nome,
-        descrizione: it.descrizione || '',
-        tipo: it.tipo || null,
-        sotto_tipo: it.sotto_tipo || null,
-        rarita: it.rarita || null,
-        richiede_sintonia: !!it.richiede_sintonia,
-        sintonia_dettaglio: it.sintonia_dettaglio || null,
-        incantamento: parseInt(it.incantamento) || 0,
-    }));
-    const { error } = await supabase.from('homebrew_oggetti').insert(rows);
+    const uid = AppState.currentUser.uid;
+    const rows = selected.map(it => cat.toRow(it, uid));
+    const { error } = await supabase.from(cat.table).insert(rows);
     if (error) {
         console.error('[lab][import] errore insert:', error);
         alert('Errore durante il salvataggio: ' + (error.message || ''));
@@ -3192,6 +3398,8 @@ window._labImportSave = async function() {
     }
     overlay.remove();
     if (typeof loadLabContent === 'function') await loadLabContent();
-    if (typeof window.loadHomebrewOggetti === 'function') await window.loadHomebrewOggetti();
+    if (typeof cat.cacheReload === 'function') {
+        try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
+    }
 };
 

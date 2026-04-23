@@ -1513,6 +1513,8 @@
 .lab-import-item-name { font-weight: 700; color: var(--text); }
 .lab-import-item-meta { color: var(--text-secondary); font-size: 0.8rem; margin-top: 2px; }
 .lab-import-item-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; line-height: 1.4; }
+.lab-import-item-fields { color: var(--text-secondary); font-size: 0.78rem; margin-top: 3px; line-height: 1.4; }
+.lab-import-item-fields strong { color: var(--text); font-weight: 600; }
 .lab-import-warn { color: #f59e0b; font-size: 0.8rem; margin-top: 4px; }
 .lab-import-ench-badge {
     display: inline-block;
