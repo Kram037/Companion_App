@@ -1530,3 +1530,121 @@
 
 
 
+/* ── Textarea piu' grande + bottone "schermo intero" ──────────────────
+   Usato dalla dialog di edit incantesimi homebrew (e riusabile da
+   altri form del laboratorio). Il bottone .lab-fs-btn appare nella
+   label del textarea e apre un overlay full-screen per scrivere
+   comodamente, sincronizzando il valore alla chiusura. */
+.lab-fs-label {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.lab-fs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(108, 92, 231, 0.10);
+    color: var(--accent, #6c5ce7);
+    border: 1px solid rgba(108, 92, 231, 0.35);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+.lab-fs-btn:hover {
+    background: rgba(108, 92, 231, 0.18);
+    border-color: var(--accent, #6c5ce7);
+}
+.lab-fs-btn:active { transform: scale(0.97); }
+.lab-fs-btn svg { display: block; }
+
+.lab-textarea-large {
+    min-height: 220px;
+    max-height: 60vh;
+    resize: vertical;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* ── Overlay full-screen per scrivere la descrizione ─────────────── */
+.lab-fs-overlay {
+    z-index: 1400;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+}
+.lab-fs-modal {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg, #1a1a2e);
+}
+.lab-fs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface, rgba(255,255,255,0.03));
+}
+.lab-fs-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text);
+    font-weight: 600;
+}
+.lab-fs-header .modal-close {
+    position: static;
+    font-size: 1.6rem;
+    line-height: 1;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+.lab-fs-header .modal-close:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+}
+.lab-fs-textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    border: none;
+    outline: none;
+    padding: 22px 24px;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body, inherit);
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
+    box-sizing: border-box;
+}
+.lab-fs-textarea:focus { outline: none; }
+.lab-fs-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--surface, rgba(255,255,255,0.03));
+}
+
+@media (max-width: 600px) {
+    .lab-fs-header { padding: 10px 14px; }
+    .lab-fs-textarea { padding: 14px 16px; font-size: 0.95rem; }
+    .lab-fs-actions { padding: 10px 14px; }
+}

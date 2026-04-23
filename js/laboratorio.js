@@ -1535,10 +1535,76 @@ function labFieldsIncantesimi(data) {
         </div>
     </div>
     <div class="form-group">
-        <label for="hbDescrizione">Descrizione</label>
-        <textarea id="hbDescrizione" rows="3" placeholder="Descrizione breve...">${escapeHtml(data?.descrizione || '')}</textarea>
+        <label for="hbDescrizione" class="lab-fs-label">
+            <span>Descrizione</span>
+            <button type="button" class="lab-fs-btn" title="Apri a schermo intero"
+                onclick="labOpenFullscreenTextarea('hbDescrizione','Descrizione incantesimo')">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <polyline points="9 21 3 21 3 15"></polyline>
+                    <line x1="21" y1="3" x2="14" y2="10"></line>
+                    <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+                <span>Schermo intero</span>
+            </button>
+        </label>
+        <textarea id="hbDescrizione" rows="10" class="lab-textarea-large"
+            placeholder="Descrivi l'effetto dell'incantesimo, tiri salvezza, scaling per livelli superiori, ecc.">${escapeHtml(data?.descrizione || '')}</textarea>
     </div>`;
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Helper riusabile: apre una textarea esistente in un overlay full-screen
+// con area di scrittura grande. Alla chiusura, sincronizza il valore
+// modificato sul textarea originale. textareaId e' l'id del <textarea>
+// nel form sottostante; label e' il titolo mostrato in alto.
+// ──────────────────────────────────────────────────────────────────────
+window.labOpenFullscreenTextarea = function(textareaId, label) {
+    const ta = document.getElementById(textareaId);
+    if (!ta) return;
+    document.querySelector('.lab-fs-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay lab-fs-overlay';
+    overlay.dataset.textareaId = textareaId;
+    overlay.onclick = e => { if (e.target === overlay) labCloseFullscreenTextarea(textareaId); };
+    overlay.innerHTML = `<div class="hp-calc-modal lab-fs-modal">
+        <div class="lab-fs-header">
+            <h3>${escapeHtml(label || 'Descrizione')}</h3>
+            <button class="modal-close" type="button"
+                onclick="labCloseFullscreenTextarea('${textareaId}')">&times;</button>
+        </div>
+        <textarea id="${textareaId}__fs" class="lab-fs-textarea"
+            placeholder="${escapeHtml(ta.placeholder || '')}">${escapeHtml(ta.value)}</textarea>
+        <div class="lab-fs-actions">
+            <button type="button" class="btn-secondary"
+                onclick="labCancelFullscreenTextarea('${textareaId}')">Annulla</button>
+            <button type="button" class="btn-primary"
+                onclick="labCloseFullscreenTextarea('${textareaId}')">Conferma</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const fsTa = document.getElementById(textareaId + '__fs');
+    if (fsTa) {
+        fsTa.focus();
+        fsTa.setSelectionRange(fsTa.value.length, fsTa.value.length);
+    }
+};
+
+window.labCloseFullscreenTextarea = function(textareaId) {
+    const fsTa = document.getElementById(textareaId + '__fs');
+    const orig = document.getElementById(textareaId);
+    if (fsTa && orig) {
+        orig.value = fsTa.value;
+        orig.dispatchEvent(new Event('input', { bubbles: true }));
+        orig.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    document.querySelector('.lab-fs-overlay')?.remove();
+};
+
+window.labCancelFullscreenTextarea = function(_textareaId) {
+    document.querySelector('.lab-fs-overlay')?.remove();
+};
 
 function _openLabNemiciWizard(data) {
     const modal = document.getElementById('homebrewModal');
