@@ -123,12 +123,13 @@ async function loadHomebrewSottoclassi() {
             : null);
         const settings = userData?.homebrew_settings || { enabled: false, amici_abilitati: [] };
 
-        // 1) Carica le proprie (sempre).
+        // 1) Carica le proprie (sempre). Non filtriamo parent_class_slug
+        //    lato server: lo filtreremo client-side per evitare problemi
+        //    di sintassi PostgREST con colonne null.
         const ownReq = supabase
             .from('homebrew_classi')
             .select('*')
-            .eq('user_id', ownUid)
-            .not('parent_class_slug', 'is', null);
+            .eq('user_id', ownUid);
 
         // 2) Risolvi gli auth-uid degli amici abilitati (se feature attiva).
         let friendUids = [];
@@ -151,19 +152,26 @@ async function loadHomebrewSottoclassi() {
                 .from('homebrew_classi')
                 .select('*')
                 .in('user_id', friendUids)
-                .not('parent_class_slug', 'is', null)
             : Promise.resolve({ data: [] });
 
         const [ownRes, friendRes] = await Promise.all([ownReq, friendReq]);
 
+        if (ownRes && ownRes.error) {
+            console.warn('[homebrew] errore SELECT proprie sottoclassi:', ownRes.error);
+        }
+
         const ownName = userData?.nome_utente || 'Tuo';
-        const ownList = (ownRes.data || []).map(r => ({
+        // Filtriamo qui le righe che sono effettivamente sottoclassi
+        // (parent_class_slug valorizzato): le righe legacy "classe" intera
+        // non vanno mostrate come sottoclassi.
+        const isSubclassRow = (r) => !!(r && r.parent_class_slug);
+        const ownList = (ownRes.data || []).filter(isSubclassRow).map(r => ({
             ...r,
             _author_uid: ownUid,
             _author_name: ownName,
             _is_own: true
         }));
-        const friendList = (friendRes.data || []).map(r => ({
+        const friendList = (friendRes.data || []).filter(isSubclassRow).map(r => ({
             ...r,
             _author_uid: r.user_id,
             _author_name: friendInfoByUid[r.user_id]?.nome_utente || 'Amico',
@@ -175,6 +183,7 @@ async function loadHomebrewSottoclassi() {
             console.log('[homebrew] sottoclassi caricate:', {
                 proprie: ownList.length,
                 amici: friendList.length,
+                righe_grezze_proprie: (ownRes.data || []).length,
                 slugs: AppState.cachedHomebrewSottoclassi.map(r => r.parent_class_slug + ':' + r.nome)
             });
         } catch (_) {}

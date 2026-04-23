@@ -1760,24 +1760,11 @@ function pgGetSubclassOptions(className) {
 // per una data classe. Le voci contengono _hbId, _hbAuthor, _hbIsOwn per
 // permettere alla scheda di risalire a tutti i privilegi/incantesimi.
 function pgGetHomebrewSubclassOptions(className) {
-    // Safety: se la cache non è ancora stata popolata, lancia UNA sola
-    // load di background. Per evitare flicker, non facciamo render-ping
-    // ricorsivi: il render successivo verrà triggerato dal click handler
-    // dell'utente (open dropdown) che è async.
+    // Sync getter: se la cache non è popolata, restituisce []. Il preload
+    // viene gestito nel click-handler async (pgOpenSubclassDropdown) e
+    // all'apertura della modale, così evitiamo re-render side-effect che
+    // farebbero sfarfallare il bottone Sottoclasse.
     if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
-        if (typeof loadHomebrewSottoclassi === 'function' && !AppState._homebrewSottoclassiLoadPromise) {
-            loadHomebrewSottoclassi().then(() => {
-                // Solo se la cache contiene effettivamente qualcosa, ri-renderizza
-                // la striscia classi (così appare il bottone Sottoclasse).
-                const list = AppState.cachedHomebrewSottoclassi;
-                if (Array.isArray(list) && list.length > 0) {
-                    try {
-                        const wizardOpen = !!document.getElementById('pgClassiList');
-                        if (wizardOpen && typeof pgRenderClassi === 'function') pgRenderClassi();
-                    } catch (_) {}
-                }
-            });
-        }
         return [];
     }
     const all = AppState.cachedHomebrewSottoclassi;
@@ -8839,11 +8826,12 @@ window.openPersonaggioModal = function(personaggioId) {
     if (!form) return;
 
     // Refresh delle sottoclassi homebrew (proprie + amici abilitati) ad
-    // ogni apertura della modale, così la cache è sempre aggiornata.
+    // ogni apertura della modale: kick-off in background, NIENTE re-render
+    // dopo (per non sfarfallare il bottone). Quando l'utente cliccherà
+    // "Sottoclasse...", il click handler aspetterà la fine della load
+    // se ancora in volo.
     if (typeof loadHomebrewSottoclassi === 'function') {
-        loadHomebrewSottoclassi().then(() => {
-            try { if (typeof pgRenderClassi === 'function') pgRenderClassi(); } catch (_) {}
-        });
+        loadHomebrewSottoclassi();
     }
 
     form.reset();
