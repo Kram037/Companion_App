@@ -1972,7 +1972,7 @@ function labFieldsTalenti(data) {
 const LAB_OGG_TIPI = [
     'Arma','Armatura','Scudo','Focus','Pozione','Pergamena',
     'Anello','Bacchetta','Bastone','Asta',
-    'Oggetto Meraviglioso','Altro'
+    'Oggetto Meraviglioso'
 ];
 const LAB_OGG_RARITA = ['Comune','Non Comune','Raro','Molto Raro','Leggendario','Artefatto'];
 
