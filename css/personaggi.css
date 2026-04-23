@@ -2544,6 +2544,99 @@
 .inv-picker-item.rarita-artefatto { border-left: 4px solid #f59e0b; }
 .inv-picker-item.rarita-artefatto .inv-picker-item-name { color: #f59e0b; }
 
+/* ── Modal sintonia: sezione "Dal tuo Tesoro" ──
+   Mostra in testa alla modal di edit di uno slot di sintonia gli
+   oggetti del tesoro che richiedono sintonia. Cliccandone uno la
+   modal viene precompilata con nome / desc / bonus e si lega
+   all'uid del tesoro per la sync di rimozione. */
+.inv-attune-pick-section {
+    margin-bottom: 12px;
+}
+.inv-attune-pick-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.inv-attune-pick-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.inv-attune-pick-empty {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+}
+.inv-attune-pick-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface-2, rgba(255,255,255,0.04));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    font: inherit;
+}
+.inv-attune-pick-row:hover {
+    background: var(--surface-3, rgba(255,255,255,0.07));
+    border-color: var(--accent, #60a5fa);
+}
+.inv-attune-pick-row:active { transform: scale(0.99); }
+.inv-attune-pick-row.selected {
+    background: rgba(96,165,250,0.12);
+    border-color: var(--accent, #60a5fa);
+    box-shadow: 0 0 0 1px var(--accent, #60a5fa) inset;
+}
+.inv-attune-pick-row.rarita-non-comune  { border-left-color: #4ade80; }
+.inv-attune-pick-row.rarita-raro        { border-left-color: #60a5fa; }
+.inv-attune-pick-row.rarita-molto-raro  { border-left-color: #ef4444; }
+.inv-attune-pick-row.rarita-leggendario { border-left-color: #c084fc; }
+.inv-attune-pick-row.rarita-artefatto   { border-left-color: #f59e0b; }
+.inv-attune-pick-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.2;
+}
+.inv-attune-pick-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+}
+.inv-attune-pick-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 10px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.inv-attune-pick-divider::before,
+.inv-attune-pick-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
 /* ── Voci "Dal tuo Tesoro" nel picker equipaggiamento ──
    Distinguono visivamente le armi/armature/scudi presi dall'inventario
    magico (catalogo SRD o homebrew) rispetto alle armi/armature D&D di

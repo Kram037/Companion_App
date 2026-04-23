@@ -6270,21 +6270,66 @@ window.invRemoveItem = async function(pgId, idx) {
     const removedUid = removed && removed._treasure_uid;
     const updates = { inventario };
     let equipChanged = false;
-    if (removedUid && Array.isArray(pg.equipaggiamento)) {
-        const before = pg.equipaggiamento.length;
-        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.from_treasure_uid !== removedUid);
-        if (pg.equipaggiamento.length !== before) {
-            equipChanged = true;
-            updates.equipaggiamento = pg.equipaggiamento;
-            const newCA = calcCAFromEquip(pg);
-            pg.classe_armatura = newCA;
-            updates.classe_armatura = newCA;
+    let attuneChanged = false;
+    if (removedUid) {
+        if (Array.isArray(pg.equipaggiamento)) {
+            const before = pg.equipaggiamento.length;
+            pg.equipaggiamento = pg.equipaggiamento.filter(e => e.from_treasure_uid !== removedUid);
+            if (pg.equipaggiamento.length !== before) {
+                equipChanged = true;
+                updates.equipaggiamento = pg.equipaggiamento;
+                const newCA = calcCAFromEquip(pg);
+                pg.classe_armatura = newCA;
+                updates.classe_armatura = newCA;
+            }
+        }
+        if (Array.isArray(pg.sintonia)) {
+            const newSint = pg.sintonia.map(s => {
+                if (s && typeof s === 'object' && s.from_treasure_uid === removedUid) {
+                    attuneChanged = true;
+                    return null;
+                }
+                return s;
+            });
+            if (attuneChanged) {
+                pg.sintonia = newSint;
+                updates.sintonia = newSint;
+            }
         }
     }
     await supabase.from('personaggi').update(updates).eq('id', pgId);
     schedaOpenInventoryPage(pgId);
-    if (equipChanged) showNotification('Oggetto rimosso anche dall\'equipaggiamento');
+    if (equipChanged && attuneChanged) {
+        showNotification('Oggetto rimosso anche da equipaggiamento e sintonia');
+    } else if (equipChanged) {
+        showNotification('Oggetto rimosso anche dall\'equipaggiamento');
+    } else if (attuneChanged) {
+        showNotification('Oggetto rimosso anche dalla sintonia');
+    }
 };
+
+// Estrae dal tesoro tutti gli oggetti che richiedono sintonia (catalogo
+// SRD o homebrew). Esclude eventuali entry gia' usate da uno slot di
+// sintonia diverso da quello in editing (per non duplicare).
+function _schedaInvAttunableItems(pg, currentSlotIdx) {
+    if (!pg || !Array.isArray(pg.inventario)) return [];
+    const sintonia = Array.isArray(pg.sintonia) ? pg.sintonia : [];
+    const usedUids = new Set();
+    sintonia.forEach((s, i) => {
+        if (i === currentSlotIdx) return;
+        if (s && typeof s === 'object' && s.from_treasure_uid) usedUids.add(s.from_treasure_uid);
+    });
+    const out = [];
+    pg.inventario.forEach((entry, index) => {
+        const view = (typeof window._invResolveLive === 'function')
+            ? window._invResolveLive(entry) : entry;
+        const requires = !!(view.richiede_sintonia || view._homebrew_richiede_sintonia);
+        if (!requires) return;
+        if (entry._treasure_uid && usedUids.has(entry._treasure_uid)) return;
+        out.push({ index, view });
+    });
+    return out;
+}
 
 window.invEditAttune = function(pgId, idx) {
     const pg = _schedaPgCache;
@@ -6292,11 +6337,32 @@ window.invEditAttune = function(pgId, idx) {
     const raw = (pg.sintonia || [])[idx] || null;
     const current = (raw && typeof raw === 'object') ? raw : { nome: (typeof raw === 'string' ? raw : ''), descrizione: '', magic_bonus: 0 };
     const currentBonus = current.magic_bonus || 0;
+    const currentUid = (raw && typeof raw === 'object') ? (raw.from_treasure_uid || '') : '';
+
+    const attunable = _schedaInvAttunableItems(pg, idx);
+    const treasureRows = attunable.length ? attunable.map(({ index, view }) => {
+        const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+        const sub = view._homebrew_sotto_tipo || view.sotto_tipo || '';
+        const rar = view._homebrew_rarita || view.rarita || '';
+        const rarClass = _invRarityClass(rar);
+        const subText = [sub, rar].filter(Boolean).join(' · ') || 'Richiede sintonia';
+        return `<button type="button" class="inv-attune-pick-row ${rarClass}"
+                onclick="invAttunePickFromTreasure(${index})">
+            <span class="inv-attune-pick-name">${escapeHtml(view.nome || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
+            <span class="inv-attune-pick-sub">${escapeHtml(subText)}</span>
+        </button>`;
+    }).join('') : '<div class="inv-attune-pick-empty">Nessun oggetto che richiede sintonia nel tesoro.</div>';
+
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:10px;font-size:1rem;">Sintonia – Slot ${idx + 1}</h3>
+        <div class="inv-attune-pick-section">
+            <div class="inv-attune-pick-label">Dal tuo Tesoro</div>
+            <div class="inv-attune-pick-list">${treasureRows}</div>
+        </div>
+        <div class="inv-attune-pick-divider"><span>oppure inserisci manualmente</span></div>
         <input type="text" id="invAttuneName" class="hp-calc-input" value="${escapeHtml(current.nome || '')}" placeholder="Nome oggetto a sintonia" style="margin-bottom:10px;">
         <div class="equip-ench-row">
             <span class="equip-ench-label">Incantamento</span>
@@ -6308,6 +6374,7 @@ window.invEditAttune = function(pgId, idx) {
             <input type="hidden" id="invAttuneBonus" value="${currentBonus}">
         </div>
         <textarea id="invAttuneDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(current.descrizione || '')}</textarea>
+        <input type="hidden" id="invAttuneTreasureUid" value="${escapeHtml(currentUid)}">
         <div class="dialog-actions" style="margin-top:12px;">
             ${raw ? `<button class="btn-danger" onclick="invDeleteAttuneFromEdit('${pgId}',${idx})">Elimina</button>` : ''}
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
@@ -6316,6 +6383,35 @@ window.invEditAttune = function(pgId, idx) {
     </div>`;
     document.body.appendChild(overlay);
     // Nessun auto-focus: evita la comparsa automatica della tastiera.
+};
+
+// Riempie i campi della modal sintonia con i dati di un oggetto del
+// tesoro e ne registra l'uid per il binding. L'utente puo' sempre
+// modificare nome/descrizione/bonus prima di salvare.
+window.invAttunePickFromTreasure = function(invIndex) {
+    const pg = _schedaPgCache;
+    if (!pg || !Array.isArray(pg.inventario)) return;
+    const view = _schedaInvViewAt(pg, invIndex);
+    if (!view) return;
+    const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+    const desc = view.descrizione || view._homebrew_meta || '';
+    const uid = _schedaEnsureInvUid(pg.inventario, invIndex);
+    const nameEl = document.getElementById('invAttuneName');
+    const descEl = document.getElementById('invAttuneDesc');
+    const bonusEl = document.getElementById('invAttuneBonus');
+    const uidEl = document.getElementById('invAttuneTreasureUid');
+    if (nameEl) nameEl.value = view.nome || '';
+    if (descEl) descEl.value = desc;
+    if (bonusEl) bonusEl.value = String(ench);
+    if (uidEl) uidEl.value = uid || '';
+    document.querySelectorAll('.equip-ench-row .custom-res-dice-btn').forEach(b => {
+        const v = b.textContent === 'No' ? 0 : parseInt(b.textContent.replace('+', '')) || 0;
+        b.classList.toggle('active', v === ench);
+    });
+    // Evidenzia visivamente la riga selezionata.
+    document.querySelectorAll('.inv-attune-pick-row').forEach(r => r.classList.remove('selected'));
+    const clicked = document.querySelector(`.inv-attune-pick-row[onclick*="(${invIndex})"]`);
+    if (clicked) clicked.classList.add('selected');
 };
 
 window.invSelectAttuneBonus = function(btn, bonus) {
@@ -6331,6 +6427,7 @@ window.invSaveAttune = async function(pgId, idx) {
     const nome = document.getElementById('invAttuneName')?.value?.trim() || '';
     const desc = document.getElementById('invAttuneDesc')?.value?.trim() || '';
     const bonus = parseInt(document.getElementById('invAttuneBonus')?.value) || 0;
+    const treasureUid = document.getElementById('invAttuneTreasureUid')?.value?.trim() || '';
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
@@ -6342,10 +6439,14 @@ window.invSaveAttune = async function(pgId, idx) {
         const slot = { nome };
         if (desc) slot.descrizione = desc;
         if (bonus > 0) slot.magic_bonus = bonus;
+        if (treasureUid) slot.from_treasure_uid = treasureUid;
         sintonia[idx] = slot;
     }
     pg.sintonia = sintonia;
-    await supabase.from('personaggi').update({ sintonia }).eq('id', pgId);
+    // L'inventario potrebbe contenere uid appena generati: persistilo.
+    const updates = { sintonia };
+    if (treasureUid) updates.inventario = pg.inventario;
+    await supabase.from('personaggi').update(updates).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
 };
