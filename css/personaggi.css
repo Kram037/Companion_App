@@ -2039,6 +2039,107 @@
 .inv-item-name-clickable { cursor: pointer; transition: color 0.15s; }
 .inv-item-name-clickable:hover { color: var(--primary); text-decoration: underline; }
 .inv-magic-badge { color: #A855F7; font-size: 0.8rem; }
+.inv-hb-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(168, 85, 247, 0.18);
+    color: #C084FC;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+}
+
+/* ── Picker oggetti tesoro (tabs Catalogo / Homebrew) ── */
+.inv-picker-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+.inv-picker-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+.inv-picker-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+}
+.inv-picker-tab:hover { color: var(--text); }
+.inv-picker-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+.inv-picker-search-row { margin-bottom: 10px; }
+.inv-picker-search-row input { margin-bottom: 0; }
+.inv-picker-list {
+    flex: 1;
+    min-height: 200px;
+    max-height: 50vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+}
+.inv-picker-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+.inv-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+.inv-picker-item:last-child { border-bottom: none; }
+.inv-picker-item:hover { background: var(--surface-hover); }
+.inv-picker-item-main { flex: 1; min-width: 0; }
+.inv-picker-item-name {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.inv-picker-item-meta {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+.inv-picker-item-author {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.inv-edit-hb-banner {
+    background: rgba(168, 85, 247, 0.10);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
 .inv-item-qty { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; min-width: 28px; text-align: center; }
 .inv-item-actions { display: flex; gap: 4px; align-items: center; }
 .inv-item-actions .scheda-hd-btn { width: 26px; height: 26px; font-size: 0.8rem; }

@@ -199,6 +199,7 @@ function labGetCardDetail(item, tab) {
             const parts = [];
             if (item.tipo) parts.push(item.tipo);
             if (item.rarita) parts.push(item.rarita);
+            if (parseInt(item.incantamento) > 0) parts.push('+' + item.incantamento);
             return parts.join(' · ');
         }
         default: return '';
@@ -1970,8 +1971,15 @@ function labFieldsTalenti(data) {
 }
 
 function labFieldsOggetti(data) {
-    const tipi = ['Arma','Armatura','Pozione','Pergamena','Anello','Bacchetta','Bastone','Oggetto Meraviglioso','Altro'];
+    const tipi = ['Arma','Armatura','Scudo','Focus','Pozione','Pergamena','Anello','Bacchetta','Bastone','Oggetto Meraviglioso','Altro'];
     const rarita = ['Comune','Non Comune','Raro','Molto Raro','Leggendario','Artefatto'];
+    // Tipi che possono ricevere un incantamento magico (+1/+2/+3).
+    // Lo scudo e' considerato un'armatura nel framework di gioco.
+    const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
+    const currentType = data?.tipo || '';
+    const currentEnch = parseInt(data?.incantamento) || 0;
+    const showEnch = ENCH_TYPES.includes(currentType);
+    const desc = (data?.descrizione != null ? data.descrizione : (data?.proprieta || ''));
     return `
     <div class="form-group">
         <label for="hbNome">Nome</label>
@@ -1980,9 +1988,9 @@ function labFieldsOggetti(data) {
     <div class="form-row form-row-2">
         <div class="form-group">
             <label for="hbTipoOgg">Tipo</label>
-            <select id="hbTipoOgg">
+            <select id="hbTipoOgg" onchange="window.labOggTipoChange(this)">
                 <option value="">-</option>
-                ${tipi.map(t => `<option value="${t}" ${data?.tipo === t ? 'selected' : ''}>${t}</option>`).join('')}
+                ${tipi.map(t => `<option value="${t}" ${currentType === t ? 'selected' : ''}>${t}</option>`).join('')}
             </select>
         </div>
         <div class="form-group">
@@ -1992,11 +2000,45 @@ function labFieldsOggetti(data) {
             </select>
         </div>
     </div>
+    <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
+        <label>Incantamento</label>
+        <div class="custom-res-dice-row" id="hbIncantamentoRowBtns">
+            ${[0,1,2,3].map(b =>
+                `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentEnch ? 'active' : ''}" onclick="window.labOggSelectEnch(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+            ).join('')}
+        </div>
+        <input type="hidden" id="hbIncantamento" value="${currentEnch}">
+    </div>
     <div class="form-group">
-        <label for="hbProprieta">Proprietà</label>
-        <textarea id="hbProprieta" rows="3" placeholder="Descrizione proprietà...">${escapeHtml(data?.proprieta || '')}</textarea>
+        <label for="hbDescrizione">Descrizione</label>
+        <textarea id="hbDescrizione" rows="6" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
     </div>`;
 }
+
+// Gestione cambio tipo: mostra/nasconde la riga incantamento se il tipo
+// corrente e' compatibile (Arma/Armatura/Scudo/Focus).
+window.labOggTipoChange = function(sel) {
+    const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
+    const row = document.getElementById('hbIncantamentoRow');
+    if (!row) return;
+    const enabled = ENCH_TYPES.includes(sel.value);
+    row.style.display = enabled ? '' : 'none';
+    if (!enabled) {
+        const hidden = document.getElementById('hbIncantamento');
+        if (hidden) hidden.value = '0';
+        document.querySelectorAll('#hbIncantamentoRowBtns .custom-res-dice-btn')
+            .forEach((b, i) => b.classList.toggle('active', i === 0));
+    }
+};
+
+window.labOggSelectEnch = function(btn, value) {
+    const row = btn.parentElement;
+    if (!row) return;
+    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('hbIncantamento');
+    if (hidden) hidden.value = String(value);
+};
 
 // ============================================================================
 // MODAL OPEN / CLOSE / SAVE
@@ -2093,6 +2135,9 @@ window.labDeleteItem = async function(id) {
     if (cat.table === 'homebrew_classi' && typeof loadHomebrewSottoclassi === 'function') {
         loadHomebrewSottoclassi();
     }
+    if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
+        loadHomebrewOggetti();
+    }
 };
 
 async function handleSaveHomebrew(e) {
@@ -2187,11 +2232,19 @@ async function handleSaveHomebrew(e) {
             record.prerequisiti = document.getElementById('hbPrerequisiti')?.value?.trim() || null;
             record.effetti = document.getElementById('hbEffetti')?.value?.trim() || null;
             break;
-        case 'oggetti':
+        case 'oggetti': {
             record.tipo = document.getElementById('hbTipoOgg')?.value || null;
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
-            record.proprieta = document.getElementById('hbProprieta')?.value?.trim() || null;
+            const desc = document.getElementById('hbDescrizione')?.value?.trim() || null;
+            record.descrizione = desc;
+            // Backwards compatibility: salva anche su `proprieta` finche' la
+            // colonna esiste, cosi' i lettori vecchi continuano a vedere i dati.
+            record.proprieta = desc;
+            const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
+            const enchVal = parseInt(document.getElementById('hbIncantamento')?.value) || 0;
+            record.incantamento = ENCH_TYPES.includes(record.tipo) ? Math.max(0, Math.min(3, enchVal)) : 0;
             break;
+        }
     }
 
     try {
@@ -2207,6 +2260,9 @@ async function handleSaveHomebrew(e) {
         }
         closeHomebrewModal();
         loadLabContent();
+        if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
+            loadHomebrewOggetti();
+        }
     } catch (err) {
         console.error('Errore salvataggio homebrew:', err);
         showNotification('Errore nel salvataggio');
@@ -2281,6 +2337,7 @@ window.labToggleHbEnabled = async function(cb) {
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
+    if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -2299,6 +2356,7 @@ window.labToggleFriendHb = async function(cb) {
     await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
     userData.homebrew_settings = settings;
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
+    if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
 };
 
 // ============================================================================

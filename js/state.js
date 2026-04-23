@@ -14,6 +14,7 @@ const AppState = {
     cachedRazze: null,
     cachedBackground: null,
     cachedHomebrewSottoclassi: null,
+    cachedHomebrewOggetti: null,
     campagneFilters: {
         searchText: '',
         tipologia: 'all',

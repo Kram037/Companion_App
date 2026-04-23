@@ -4979,10 +4979,12 @@ window.schedaOpenInventoryPage = async function(pgId) {
 
     const oggetti = pg.inventario || [];
     const oggettiRows = oggetti.length > 0 ? oggetti.map((o, i) => {
-        const magicStr = o.magic_bonus ? ` <span class="inv-magic-badge">+${o.magic_bonus}</span>` : '';
+        const view = _invResolveLive(o);
+        const magicStr = view.magic_bonus ? ` <span class="inv-magic-badge">+${view.magic_bonus}</span>` : '';
+        const hbBadge = view._homebrew_id ? ' <span class="inv-hb-badge" title="Homebrew">HB</span>' : '';
         return `<div class="inv-item-row">
-            <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(o.nome || 'Oggetto')}${o.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}</div>
-            <div class="inv-item-qty">×${o.quantita || 1}</div>
+            <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+            <div class="inv-item-qty">×${view.quantita || 1}</div>
         </div>`;
     }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
 
@@ -5075,14 +5077,185 @@ window.invOpenCoinKeypad = function(inputEl) {
     inputEl.addEventListener('change', onChange);
 };
 
-window.invAddItem = function(pgId) {
+// ─────────────────────────────────────────────────────────────────────
+// Risoluzione "live" di un'entry inventario:
+// - Se l'entry ha _homebrew_id e l'oggetto e' nella cache homebrew,
+//   usa i campi attuali dall'autore (nome, descrizione, incantamento,
+//   tipo, rarita') sovrascrivendo i campi snapshot salvati.
+// - Mantiene SEMPRE quantita e ogni campo che l'utente abbia
+//   personalizzato localmente (note non gestite qui).
+// - Se l'oggetto homebrew e' stato cancellato dall'autore, fallback
+//   sui campi snapshot dell'entry (nome/descrizione gia' salvati).
+// ─────────────────────────────────────────────────────────────────────
+function _invResolveLive(entry) {
+    if (!entry || typeof entry !== 'object') return entry || {};
+    if (!entry._homebrew_id) return entry;
+    const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
+        ? AppState.cachedHomebrewOggetti : [];
+    const hb = cache.find(o => String(o.id) === String(entry._homebrew_id));
+    if (!hb) return entry; // autore ha cancellato l'oggetto: fallback snapshot
+    const ench = parseInt(hb.incantamento) || 0;
+    return {
+        ...entry,
+        nome: hb.nome || entry.nome,
+        descrizione: hb.descrizione || hb.proprieta || entry.descrizione || '',
+        magico: ench > 0 || !!entry.magico,
+        magic_bonus: ench > 0 ? ench : (entry.magic_bonus || 0),
+        _homebrew_tipo: hb.tipo || null,
+        _homebrew_rarita: hb.rarita || null,
+        _homebrew_author: hb._author_name || null,
+    };
+}
+
+window._invResolveLive = _invResolveLive;
+
+// ─────────────────────────────────────────────────────────────────────
+// Picker "Aggiungi Oggetto al Tesoro"
+// Tab "Catalogo" (vuoto, futuro dataset SRD) + tab "Homebrew" (visibile
+// solo se l'utente ha l'homebrew abilitato dai settings) + bottone "Crea
+// rapidamente" che apre la mini-dialog testo libero (vecchio
+// comportamento di invAddItem).
+// ─────────────────────────────────────────────────────────────────────
+window._invPickerState = { tab: 'catalog', search: '' };
+
+window.invAddItem = async function(pgId) {
+    // Carica gli homebrew oggetti in background; se la cache c'e' gia'
+    // partiamo subito con quella, altrimenti viene riempita dopo.
+    if (typeof window.loadHomebrewOggetti === 'function') {
+        try { await window.loadHomebrewOggetti(); } catch (_) {}
+    }
+    _invOpenPickerDialog(pgId);
+};
+
+function _invHomebrewEnabled() {
+    try {
+        const s = AppState.cachedUserData?.homebrew_settings;
+        return !!s && s.enabled !== false;
+    } catch (_) { return false; }
+}
+
+function _invOpenPickerDialog(pgId) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const showHb = _invHomebrewEnabled();
+    if (!showHb) _invPickerState.tab = 'catalog';
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:320px;">
-        <h3 style="margin-bottom:12px;font-size:1rem;">Nuovo Oggetto</h3>
+    overlay.innerHTML = `<div class="hp-calc-modal inv-picker-modal" style="width:720px;max-width:96vw;text-align:left;">
+        <h3 style="margin-bottom:10px;font-size:1rem;">Aggiungi Oggetto</h3>
+        <div class="inv-picker-tabs">
+            <button class="inv-picker-tab ${_invPickerState.tab === 'catalog' ? 'active' : ''}"
+                onclick="_invPickerSwitchTab('${pgId}','catalog')">Catalogo</button>
+            ${showHb ? `<button class="inv-picker-tab ${_invPickerState.tab === 'homebrew' ? 'active' : ''}"
+                onclick="_invPickerSwitchTab('${pgId}','homebrew')">Homebrew</button>` : ''}
+        </div>
+        <div class="inv-picker-search-row">
+            <input type="text" id="invPickerSearch" class="hp-calc-input" placeholder="Cerca per nome o tipo..."
+                value="${escapeHtml(_invPickerState.search || '')}"
+                oninput="_invPickerOnSearch(this.value,'${pgId}')">
+        </div>
+        <div id="invPickerList" class="inv-picker-list"></div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:space-between;">
+            <button class="btn-secondary" onclick="invQuickCreate('${pgId}')">+ Crea rapidamente</button>
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Chiudi</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    _invPickerRenderList(pgId);
+}
+
+window._invPickerSwitchTab = function(pgId, tab) {
+    _invPickerState.tab = tab;
+    document.querySelectorAll('.inv-picker-tab').forEach(b => b.classList.remove('active'));
+    const btn = Array.from(document.querySelectorAll('.inv-picker-tab'))
+        .find(b => b.textContent.trim().toLowerCase() === (tab === 'catalog' ? 'catalogo' : 'homebrew'));
+    if (btn) btn.classList.add('active');
+    _invPickerRenderList(pgId);
+};
+
+window._invPickerOnSearch = function(value, pgId) {
+    _invPickerState.search = value || '';
+    _invPickerRenderList(pgId);
+};
+
+function _invPickerRenderList(pgId) {
+    const cont = document.getElementById('invPickerList');
+    if (!cont) return;
+    const q = (_invPickerState.search || '').trim().toLowerCase();
+    if (_invPickerState.tab === 'catalog') {
+        cont.innerHTML = `<div class="inv-picker-empty">
+            <p style="margin:0 0 6px 0;">Catalogo oggetti non ancora disponibile.</p>
+            <p style="margin:0;color:var(--text-secondary);font-size:0.85rem;">Per ora puoi usare il tab "Homebrew" o "Crea rapidamente" per aggiungere un oggetto a testo libero.</p>
+        </div>`;
+        return;
+    }
+    const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
+        ? AppState.cachedHomebrewOggetti : [];
+    let list = cache;
+    if (q) {
+        list = list.filter(o => {
+            const txt = (o.nome || '') + ' ' + (o.tipo || '') + ' ' + (o.rarita || '');
+            return txt.toLowerCase().includes(q);
+        });
+    }
+    if (list.length === 0) {
+        cont.innerHTML = `<div class="inv-picker-empty">
+            <p style="margin:0;">Nessun oggetto homebrew disponibile.</p>
+            <p style="margin:6px 0 0 0;color:var(--text-secondary);font-size:0.85rem;">Crea oggetti nel Laboratorio o abilita gli homebrew degli amici dai Settings.</p>
+        </div>`;
+        return;
+    }
+    list.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+    cont.innerHTML = list.map(o => {
+        const meta = [o.tipo, o.rarita, parseInt(o.incantamento) > 0 ? `+${o.incantamento}` : null]
+            .filter(Boolean).join(' · ');
+        const author = o._is_own ? 'Tuo' : (o._author_name || 'Amico');
+        return `<div class="inv-picker-item" onclick="invAddFromHomebrew('${pgId}','${o.id}')">
+            <div class="inv-picker-item-main">
+                <div class="inv-picker-item-name">${escapeHtml(o.nome || 'Oggetto')}</div>
+                ${meta ? `<div class="inv-picker-item-meta">${escapeHtml(meta)}</div>` : ''}
+            </div>
+            <div class="inv-picker-item-author">${escapeHtml(author)}</div>
+        </div>`;
+    }).join('');
+}
+
+window.invAddFromHomebrew = async function(pgId, hbId) {
+    const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
+        ? AppState.cachedHomebrewOggetti : [];
+    const hb = cache.find(o => String(o.id) === String(hbId));
+    if (!hb) return;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    // Riferimento "live": salviamo solo i metadati di lookup + alcuni
+    // campi snapshot di fallback (utili se l'autore cancella l'oggetto).
+    const entry = {
+        nome: hb.nome || 'Oggetto',
+        descrizione: hb.descrizione || hb.proprieta || '',
+        quantita: 1,
+        magico: parseInt(hb.incantamento) > 0,
+        _homebrew_id: hb.id,
+        _homebrew_owner_uid: hb._author_uid,
+    };
+    if (parseInt(hb.incantamento) > 0) entry.magic_bonus = parseInt(hb.incantamento);
+    inventario.push(entry);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+window.invQuickCreate = function(pgId) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal" style="width:360px;">
+        <h3 style="margin-bottom:12px;font-size:1rem;">Crea oggetto rapido</h3>
         <input type="text" id="invItemNome" class="hp-calc-input" placeholder="Nome oggetto" style="margin-bottom:8px;">
-        <input type="text" id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (opzionale)" style="margin-bottom:8px;">
+        <textarea id="invItemDesc" class="hp-calc-input" placeholder="Descrizione (opzionale)" rows="3" style="margin-bottom:8px;resize:vertical;"></textarea>
         <div style="display:flex;gap:8px;margin-bottom:8px;">
             <input type="number" id="invItemQty" class="hp-calc-input" value="1" min="1" style="flex:1;">
             <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
@@ -5090,12 +5263,11 @@ window.invAddItem = function(pgId) {
             </label>
         </div>
         <div class="dialog-actions">
-            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button class="btn-secondary" onclick="invAddItem('${pgId}')">Indietro</button>
             <button class="btn-primary" onclick="invSaveNewItem('${pgId}')">Aggiungi</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
-    // Nessun auto-focus: evita la comparsa automatica della tastiera.
 };
 
 window.invSaveNewItem = async function(pgId) {
@@ -5118,31 +5290,38 @@ window.invSaveNewItem = async function(pgId) {
 window.invEditItem = function(pgId, idx) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    const item = (pg.inventario || [])[idx];
-    if (!item) return;
+    const raw = (pg.inventario || [])[idx];
+    if (!raw) return;
+    const item = _invResolveLive(raw);
     const currentBonus = item.magic_bonus || 0;
+    const isHomebrew = !!raw._homebrew_id;
+    const hbBanner = isHomebrew
+        ? `<div class="inv-edit-hb-banner">Oggetto homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · le modifiche di nome/descrizione/incantamento NON saranno salvate (si aggiornano live dall'autore). Quantita' e rimozione restano modificabili.</div>`
+        : '';
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const lockAttr = isHomebrew ? 'readonly' : '';
     overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:10px;font-size:1rem;">Modifica Oggetto</h3>
-        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;">
+        ${hbBanner}
+        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;" ${lockAttr}>
         <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
             <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;margin-bottom:0;">
             <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
-                <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''}> Magico
+                <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''} ${isHomebrew ? 'disabled' : ''}> Magico
             </label>
         </div>
         <div class="equip-ench-row">
             <span class="equip-ench-label">Incantamento</span>
             <div class="custom-res-dice-row">
                 ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" onclick="invSelectMagicBonus(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" ${isHomebrew ? 'disabled' : `onclick="invSelectMagicBonus(this,${b})"`}>${b === 0 ? 'No' : '+' + b}</button>`
                 ).join('')}
             </div>
             <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
         </div>
-        <textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)">${escapeHtml(item.descrizione || '')}</textarea>
+        <textarea id="invItemDesc" class="equip-desc-textarea" placeholder="Descrizione (effetti magici, note...)" ${lockAttr}>${escapeHtml(item.descrizione || '')}</textarea>
         <div class="dialog-actions" style="margin-top:12px;">
             <button class="btn-danger" onclick="invDeleteFromEdit('${pgId}',${idx})">Elimina</button>
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
@@ -5162,19 +5341,28 @@ window.invSelectMagicBonus = function(btn, bonus) {
 };
 
 window.invUpdateItem = async function(pgId, idx) {
-    const nome = document.getElementById('invItemNome')?.value?.trim();
-    if (!nome) return;
-    const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
-    const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
-    const magico = document.getElementById('invItemMagic')?.checked || false;
-    const magicBonus = parseInt(document.getElementById('invItemMagicBonus')?.value) || 0;
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
-    const updated = { nome, descrizione: desc, quantita: qty, magico };
-    if (magicBonus > 0) updated.magic_bonus = magicBonus;
-    inventario[idx] = updated;
+    const prev = inventario[idx] || {};
+    const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
+
+    // Per gli oggetti homebrew aggiorniamo SOLO la quantita' e teniamo
+    // intatti tutti i metadati di lookup (_homebrew_id, ecc.). Nome,
+    // descrizione e incantamento si risolvono live dalla cache.
+    if (prev._homebrew_id) {
+        inventario[idx] = { ...prev, quantita: qty };
+    } else {
+        const nome = document.getElementById('invItemNome')?.value?.trim();
+        if (!nome) return;
+        const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
+        const magico = document.getElementById('invItemMagic')?.checked || false;
+        const magicBonus = parseInt(document.getElementById('invItemMagicBonus')?.value) || 0;
+        const updated = { nome, descrizione: desc, quantita: qty, magico };
+        if (magicBonus > 0) updated.magic_bonus = magicBonus;
+        inventario[idx] = updated;
+    }
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();

@@ -33,6 +33,7 @@ function setupSupabaseAuth() {
                 initializeUserDocument(session.user).then(() => {
                     loadRazzeBackground();
                     loadHomebrewSottoclassi();
+                    loadHomebrewOggetti();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -106,6 +107,146 @@ async function loadRazzeBackground() {
 //        sottoclasse_features, granted_spells, _author_uid,
 //        _author_name, _is_own }]
 // ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// Helper: risolve gli auth-uid degli amici abilitati nelle impostazioni
+// homebrew dell'utente corrente. Usa SELECT diretta su `utenti` con
+// fallback su due RPC SECURITY DEFINER. Restituisce
+//   { friendUids: string[], friendInfoByUid: { [uid]: {id,uid,nome_utente} },
+//     userData, settings, masterEnabled }
+// ─────────────────────────────────────────────────────────────────────────
+async function _resolveHomebrewFriendUids({ verbose = false } = {}) {
+    const supabase = getSupabaseClient();
+    const ownUid = AppState.currentUser?.uid;
+    const userData = AppState.cachedUserData || (typeof findUserByUid === 'function'
+        ? await findUserByUid(ownUid)
+        : null);
+    const settings = userData?.homebrew_settings || { enabled: undefined, amici_abilitati: [] };
+    const masterEnabled = settings.enabled !== false;
+
+    let friendUids = [];
+    const friendInfoByUid = {};
+
+    if (!supabase || !ownUid) {
+        return { friendUids, friendInfoByUid, userData, settings, masterEnabled };
+    }
+    if (!masterEnabled || !Array.isArray(settings.amici_abilitati) || settings.amici_abilitati.length === 0) {
+        return { friendUids, friendInfoByUid, userData, settings, masterEnabled };
+    }
+
+    let friendRows = null;
+    try {
+        const sel = await supabase.from('utenti').select('id, uid, nome_utente').in('id', settings.amici_abilitati);
+        friendRows = sel.data;
+    } catch (_) { friendRows = null; }
+
+    const needsFallback = !friendRows || friendRows.length === 0
+        || (friendRows || []).every(f => !f.uid);
+    if (needsFallback) {
+        try {
+            const { data: uidsRpc } = await supabase
+                .rpc('get_uids_by_user_ids', { user_ids: settings.amici_abilitati });
+            if (Array.isArray(uidsRpc) && uidsRpc.length > 0) {
+                friendRows = uidsRpc.map(r => ({ id: r.id, uid: r.uid, nome_utente: r.nome_utente || 'Amico' }));
+            }
+        } catch (_) {}
+    }
+    if (!friendRows || friendRows.length === 0 || (friendRows || []).every(f => !f.uid)) {
+        try {
+            const { data: amiciRpc } = await supabase.rpc('get_amici');
+            const setSel = new Set((settings.amici_abilitati || []).map(String));
+            const merged = (amiciRpc || [])
+                .filter(a => setSel.has(String(a.amico_id || a.id)))
+                .map(a => ({
+                    id: a.amico_id || a.id,
+                    uid: a.uid || a.amico_uid || null,
+                    nome_utente: a.nome_utente || 'Amico',
+                }));
+            if (merged.some(m => m.uid)) friendRows = merged;
+        } catch (_) {}
+    }
+
+    (friendRows || []).forEach(f => {
+        if (f.uid) {
+            friendUids.push(f.uid);
+            friendInfoByUid[f.uid] = f;
+        } else if (verbose) {
+            console.warn('[homebrew] amico senza uid:', f);
+        }
+    });
+
+    return { friendUids, friendInfoByUid, userData, settings, masterEnabled };
+}
+
+// Espone l'helper anche su window in modo che altri moduli possano
+// fare resolve amici senza duplicare logica.
+window._resolveHomebrewFriendUids = _resolveHomebrewFriendUids;
+
+// ─────────────────────────────────────────────────────────────────────────
+// loadHomebrewOggetti — fetch degli oggetti homebrew di:
+//  • utente corrente (sempre);
+//  • amici esplicitamente abilitati (se master enabled).
+// Cache: AppState.cachedHomebrewOggetti
+//   = [{ id, nome, tipo, rarita, descrizione, proprieta, incantamento,
+//        _author_uid, _author_name, _is_own }]
+// ─────────────────────────────────────────────────────────────────────────
+async function loadHomebrewOggetti() {
+    if (AppState._homebrewOggettiLoadPromise) {
+        return AppState._homebrewOggettiLoadPromise;
+    }
+    AppState._homebrewOggettiLoadPromise = (async () => {
+        const supabase = getSupabaseClient();
+        if (!supabase || !AppState.currentUser?.uid) {
+            AppState.cachedHomebrewOggetti = [];
+            return [];
+        }
+        const ownUid = AppState.currentUser.uid;
+        try {
+            const { friendUids, friendInfoByUid, userData } = await _resolveHomebrewFriendUids();
+            const allUids = [ownUid, ...friendUids];
+            const { data, error } = await supabase
+                .from('homebrew_oggetti')
+                .select('*')
+                .in('user_id', allUids);
+            if (error) {
+                console.warn('[homebrew] errore SELECT oggetti:', error);
+                AppState.cachedHomebrewOggetti = [];
+                return [];
+            }
+            const ownName = userData?.nome_utente || 'Tuo';
+            const list = (data || []).map(r => {
+                const isOwn = r.user_id === ownUid;
+                return {
+                    ...r,
+                    _author_uid: r.user_id,
+                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                    _is_own: isOwn,
+                };
+            });
+            AppState.cachedHomebrewOggetti = list;
+            try {
+                console.log('[homebrew] oggetti caricati:', {
+                    totale: list.length,
+                    proprie: list.filter(x => x._is_own).length,
+                    amici: list.filter(x => !x._is_own).length,
+                });
+            } catch (_) {}
+            try {
+                window.dispatchEvent(new CustomEvent('homebrew:oggetti-loaded', { detail: { count: list.length } }));
+            } catch (_) {}
+            return list;
+        } catch (e) {
+            console.warn('Errore caricamento oggetti homebrew:', e);
+            AppState.cachedHomebrewOggetti = [];
+            return [];
+        }
+    })().finally(() => {
+        AppState._homebrewOggettiLoadPromise = null;
+    });
+    return AppState._homebrewOggettiLoadPromise;
+}
+
+window.loadHomebrewOggetti = loadHomebrewOggetti;
+
 async function loadHomebrewSottoclassi() {
     // Dedup: chiamate concorrenti restituiscono la stessa promise.
     if (AppState._homebrewSottoclassiLoadPromise) {
