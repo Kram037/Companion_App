@@ -3849,9 +3849,27 @@ window.schedaOpenSpellPage = async function(pgId) {
     schedaWireTabBar(pgId);
 }
 
+// Set di chiavi di sezioni "aperte" persistite tra i re-render della scheda.
+// Usato per le sezioni che hanno data-section-key (es. tabelle custom di
+// pagina 1) cosi' un'azione che ricostruisce il DOM non chiude la sezione.
+window._schedaOpenSections = window._schedaOpenSections || new Set();
+window._schedaClosedSections = window._schedaClosedSections || new Set();
+
 window.schedaToggleSection = function(titleEl) {
     const section = titleEl.closest('.scheda-section');
-    if (section) section.classList.toggle('collapsed');
+    if (!section) return;
+    section.classList.toggle('collapsed');
+    const key = section.getAttribute('data-section-key');
+    if (key) {
+        const isCollapsed = section.classList.contains('collapsed');
+        if (isCollapsed) {
+            window._schedaOpenSections.delete(key);
+            window._schedaClosedSections.add(key);
+        } else {
+            window._schedaOpenSections.add(key);
+            window._schedaClosedSections.delete(key);
+        }
+    }
 };
 
 /* ── Bottone "Vai a Statistiche" (icona spada) ─────────────────────────
@@ -4946,7 +4964,12 @@ window.invUpdateItem = async function(pgId, idx) {
 };
 
 window.invDeleteFromEdit = async function(pgId, idx) {
-    if (!confirm('Eliminare questo oggetto?')) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Eliminare oggetto?',
+        message: 'L\'oggetto verra\' rimosso dal tesoro.',
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     document.querySelector('.hp-calc-overlay')?.remove();
     await window.invRemoveItem(pgId, idx);
 };
@@ -5027,7 +5050,12 @@ window.invSaveAttune = async function(pgId, idx) {
 };
 
 window.invDeleteAttuneFromEdit = async function(pgId, idx) {
-    if (!confirm('Eliminare questo oggetto dalla sintonia?')) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Eliminare sintonia?',
+        message: 'Lo slot di sintonia verra\' liberato.',
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     document.querySelector('.hp-calc-overlay')?.remove();
     await window.invRemoveAttune(pgId, idx);
 };
@@ -5273,7 +5301,9 @@ function _buildP1CustomTablesHtml(pg) {
             }).join('')
             : '<span class="scheda-empty">Nessuna risorsa</span>';
         const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
-        return `<div class="scheda-section collapsed">
+        const sectionKey = 'p1tab:' + tabName;
+        const open = window._schedaOpenSections && window._schedaOpenSections.has(sectionKey);
+        return `<div class="scheda-section${open ? '' : ' collapsed'}" data-section-key="${escapeHtml(sectionKey)}">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
                 <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenP1TabRes('${pg.id}',${tabKey})" title="Aggiungi risorsa">&#9998;</button>
                 <button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();p1RemoveTab(${tabKey})" title="Rimuovi tabella">✕</button>
@@ -5328,11 +5358,17 @@ window.p1AddTab = async function() {
     }
     priv.p1_tabs_order.push(trimmed);
     priv.p1_features[trimmed] = [];
+    if (window._schedaOpenSections) window._schedaOpenSections.add('p1tab:' + trimmed);
     _p1Save(pg.id, priv).then(() => openSchedaPersonaggio(pg.id));
 };
 
-window.p1RemoveTab = function(tabName) {
-    if (!confirm(`Rimuovere la tabella "${tabName}" e tutte le sue voci?`)) return;
+window.p1RemoveTab = async function(tabName) {
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Rimuovere tabella?',
+        message: `La tabella "${tabName}" e tutte le sue voci verranno eliminate.`,
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     const pg = _schedaPgCache;
     if (!pg) return;
     const priv = _normalizePrivilegi(pg);
@@ -5460,7 +5496,12 @@ window.schedaConfirmP1TabRes = async function(pgId, tabName, editIndex) {
 };
 
 window.schedaP1TabResDeleteFromEdit = async function(pgId, tabName, index) {
-    if (!confirm('Eliminare definitivamente questa risorsa?')) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Eliminare risorsa?',
+        message: 'La risorsa verra\' eliminata definitivamente.',
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     document.getElementById('p1TabResModal')?.remove();
     document.body.style.overflow = '';
     await schedaP1TabResDelete(pgId, tabName, index);
@@ -5884,6 +5925,38 @@ function _schedaShowInputDialog(opts) {
     });
 }
 
+// Dialog di conferma promise-based con stile dell'app (sostituisce window.confirm).
+// opts: { title, message, confirmLabel, cancelLabel, danger? }
+function _schedaShowConfirmDialog(opts) {
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.className = 'hp-calc-overlay';
+        overlay.onclick = e => { if (e.target === overlay) { overlay.remove(); resolve(false); } };
+        const title = (opts && opts.title) || 'Conferma';
+        const message = (opts && opts.message) || '';
+        const confirmLabel = (opts && opts.confirmLabel) || 'OK';
+        const cancelLabel = (opts && opts.cancelLabel) || 'Annulla';
+        const danger = !!(opts && opts.danger);
+        overlay.innerHTML = `<div class="hp-calc-modal" style="width:340px;text-align:left;">
+            <h3 style="margin-bottom:10px;font-size:1rem;">${escapeHtml(title)}</h3>
+            <p style="margin:0 0 14px;font-size:0.92rem;color:var(--text);">${escapeHtml(message)}</p>
+            <div class="dialog-actions" style="display:flex;gap:8px;justify-content:flex-end;">
+                <button class="btn-secondary" id="schedaConfirmDlgCancel">${escapeHtml(cancelLabel)}</button>
+                <button class="${danger ? 'btn-danger' : 'btn-primary'}" id="schedaConfirmDlgOk">${escapeHtml(confirmLabel)}</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+        const finish = (val) => { overlay.remove(); resolve(val); };
+        document.getElementById('schedaConfirmDlgCancel').onclick = () => finish(false);
+        document.getElementById('schedaConfirmDlgOk').onclick = () => finish(true);
+        const onKey = (e) => {
+            if (e.key === 'Escape') { e.preventDefault(); document.removeEventListener('keydown', onKey); finish(false); }
+            if (e.key === 'Enter')  { e.preventDefault(); document.removeEventListener('keydown', onKey); finish(true); }
+        };
+        document.addEventListener('keydown', onKey);
+    });
+}
+
 // Tastierino numerico custom (stesso stile di pgOpenAbilityKeypad) per
 // dialog promise-based. Evita la tastiera nativa del telefono.
 // opts: { title, initial, min, max }
@@ -5977,9 +6050,14 @@ window.privAddTab = async function() {
     _privSave(pg.id, priv).then(() => schedaOpenPrivilegesPage(pg.id));
 };
 
-window.privRemoveTab = function(tabName) {
+window.privRemoveTab = async function(tabName) {
     if (PRIV_DEFAULT_CUSTOM_TABS.includes(tabName)) return;
-    if (!confirm(`Rimuovere la tabella "${tabName}" e tutti i suoi privilegi?`)) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Rimuovere tabella?',
+        message: `La tabella "${tabName}" e tutti i suoi privilegi verranno eliminati.`,
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     const pg = _schedaPgCache;
     if (!pg) return;
     const priv = _normalizePrivilegi(pg);
@@ -6028,7 +6106,12 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
 }
 
 window.privDeleteFromEdit = async function(tabName, index) {
-    if (!confirm('Eliminare definitivamente questa voce?')) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Eliminare voce?',
+        message: 'Questa voce verra\' rimossa definitivamente dalla tabella.',
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     privCloseEdit();
     if (typeof window.privRemoveCustom === 'function') {
         await window.privRemoveCustom(tabName, index);
@@ -7656,8 +7739,15 @@ window.schedaPortentSlotClick = async function(pgId, key, idx, max) {
     arr.length = max;
     const cur = arr[idx];
     if (cur != null && cur >= 1 && cur <= 20) {
-        // Pieno → conferma "spendi"
-        if (confirm(`Spendere il Portento (valore ${cur})?`)) {
+        // Pieno → conferma "spendi" con dialog custom (no browser confirm).
+        const ok = await _schedaShowConfirmDialog({
+            title: 'Spendere il Portento?',
+            message: `Vuoi spendere il dado salvato con valore ${cur}?`,
+            confirmLabel: 'Spendi',
+            cancelLabel: 'Annulla',
+            danger: true,
+        });
+        if (ok) {
             arr[idx] = null;
             await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
             openSchedaPersonaggio(pgId);
@@ -7954,7 +8044,12 @@ window.schedaConfirmCustomRes = async function(pgId, editIndex) {
 }
 
 window.schedaDeleteCustomResFromEdit = async function(pgId, index) {
-    if (!confirm('Eliminare definitivamente questa risorsa?')) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Eliminare risorsa?',
+        message: 'La risorsa verra\' eliminata definitivamente.',
+        confirmLabel: 'Elimina', danger: true,
+    });
+    if (!ok) return;
     schedaCloseCustomResModal();
     await schedaDeleteCustomRes(pgId, index);
 };
