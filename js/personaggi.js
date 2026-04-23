@@ -5331,6 +5331,28 @@ window.invSaveNewItem = async function(pgId) {
 // onchange che onblur senza moltiplicare le scritture (debouncing
 // implicito via flag pendente sul campo). Per gli oggetti homebrew
 // aggiorna solo `quantita`, preservando i metadati di lookup.
+// Toggle del popover informativo accanto al titolo del dialog di
+// modifica oggetto (sostituisce il vecchio banner fisso).
+window.invToggleHbInfo = function(btn) {
+    const pop = btn?.parentElement?.querySelector('.inv-edit-info-pop');
+    if (!pop) return;
+    const wasOpen = !pop.hasAttribute('hidden');
+    if (wasOpen) {
+        pop.setAttribute('hidden', '');
+        return;
+    }
+    pop.removeAttribute('hidden');
+    setTimeout(() => {
+        const onDoc = (ev) => {
+            if (!pop.contains(ev.target) && ev.target !== btn) {
+                pop.setAttribute('hidden', '');
+                document.removeEventListener('click', onDoc, true);
+            }
+        };
+        document.addEventListener('click', onDoc, true);
+    }, 0);
+};
+
 window.invQtyInlineUpdate = async function(pgId, idx, rawVal) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
@@ -5368,20 +5390,35 @@ window.invEditItem = function(pgId, idx) {
                 sintonia_dettaglio: item._homebrew_sintonia_dettaglio,
             }) : ''))
         : '';
-    const hbBanner = isHomebrew
-        ? `<div class="inv-edit-hb-banner">
-            <div><b>${escapeHtml(hbMeta || 'Oggetto magico')}</b></div>
-            <div style="margin-top:4px;">Homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · nome e descrizione si aggiornano live dall'autore.</div>
-        </div>`
-        : '';
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     const lockAttr = isHomebrew ? 'readonly' : '';
+    // Sotto-titolo discreto con la formula meta D&D ("Tipo, rarita'
+    // (richiede sintonia)"). Sempre visibile per gli homebrew, niente
+    // banner ingombrante.
+    const metaLine = (isHomebrew && hbMeta)
+        ? `<div class="inv-edit-meta">${escapeHtml(hbMeta)}</div>`
+        : '';
+    // Bottoncino "i" compatto: al click rivela un piccolo popover con
+    // il dettaglio "Homebrew di X · live updates". Niente banner fisso.
+    const infoBtn = isHomebrew
+        ? `<button type="button" class="inv-edit-info-btn"
+            title="Informazioni su questo oggetto homebrew"
+            onclick="invToggleHbInfo(this)">i</button>
+           <div class="inv-edit-info-pop" hidden>
+                Homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b>.<br>
+                Nome e descrizione si aggiornano live dall'autore: qui puoi solo vederli.
+                Per modificare la quantita' usa il numero accanto all'oggetto nella tabella.
+           </div>`
+        : '';
     overlay.innerHTML = `<div class="hp-calc-modal inv-edit-modal" style="width:720px;max-width:96vw;text-align:left;">
-        <h3 style="margin-bottom:10px;font-size:1rem;">Modifica Oggetto</h3>
-        ${hbBanner}
-        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:10px;" ${lockAttr}>
+        <div class="inv-edit-header">
+            <h3>Modifica Oggetto</h3>
+            ${infoBtn}
+        </div>
+        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:6px;" ${lockAttr}>
+        ${metaLine}
         ${isHomebrew
             ? `<div class="equip-desc-rendered">${(item.descrizione && item.descrizione.trim())
                 ? window.formatRichText(item.descrizione)
