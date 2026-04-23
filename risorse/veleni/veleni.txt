@@ -1,0 +1,1073 @@
+DnD 5 Poisons
+Ajida
+ingested (mixture) - 1000 gp
+Odorless and colorless liquid, this delayed poison
+can blind definitively.
+A creature that ingests this poison must succeed on
+a DC 18 Constitution saving throw or feel dizzy
+(with little consequences) for 1d8 minutes. After this
+time, and in case of failure on the first roll, it must succeed on a
+new DC 14 Constitution saving throw or become blinded. Only
+magic can restore a creature blinded that way.
+Recueil des poisons d´AideDD
+Arsenic
+ingested (toxin) - 500 gp
+Deadly and scentless poison in the form of a
+colorless liquid.
+A creature subjected to this poison must make a DC
+15 Constitution saving throw, becoming poisoned
+for 1 hour and taking 13 (3d8) poison damage on a
+failed save, or half as much damage on a successful one.
+Recueil des poisons d´AideDD
+Ascomoid spores
+inhaled (vegetal) - 400 gp
+This powder, elaborated form mushrooms, confuses
+the mind.
+A creature subjected to this poison must succeed on
+a DC 12 Constitution saving throw or be stunned for
+2d4 rounds. If the saving throw fails by 5 or more,
+the duration increases by 1d4 extra rounds.
+Recueil des poisons d´AideDD
+Aspic toxin
+injury (toxin) - 600 gp
+This poison prepared from the glands of this snake
+inflicts little damage, but it's almost impossible to
+resist it.
+A creature subjected to this poison must make a DC
+22 Constitution saving throw or be poisoned for 1d4
+rounds and take 5 (2d4) poison damage.
+Recueil des poisons d´AideDD
+Assassin's blood
+ingested (toxin) - 150 gp
+A creature subjected to this poison must make a DC
+10 Constitution saving throw. On a failed save, it
+takes 6 (1d12) poison damage and is poisoned for 24
+hours. On a successful save, the creature takes half
+damage and isn’t poisoned.
+Dungeon Master´s Guide
+Basilisk eye
+injury (mixture) - 600 gp
+This poison whose main element is an eye of basilisk
+has an immediate effect of petrification.
+A creature subjected to this poison must succeed on
+a DC 12 Constitution saving throw or be petrified. At
+each following turn, the creature can make a new
+saving throw to end the effect. Otherwise, the greater restoration
+spell or other magic can also end the effect.
+Recueil des poisons d´AideDD
+Belladonna
+ingested (vegetal) - 250 gp
+This preparation based on the black berries of
+belladonna causes at first visual disorders (dilation
+of the pupils) then an acceleration of the heartbeat
+which can cause death on a delicate subject. The
+poison looks like a black liquid which however
+passes relatively unnoticed in food or wine.
+A creature subjected to this poison must succeed on a DC 11
+Constitution saving throw or take 2 (1d4) poison damage and its
+Dexterity score is temporarily reduced by 2. The creature must
+repeat the saving throw every 10 min for 1 hour to end the effect
+and recover its Dexterity score on a successful save, or take others 2
+(1d4) poison damage on a failed one.
+Recueil des poisons d´AideDD
+Black adder venom
+injury (venom) - 150 gp
+This poison must be harvested from an
+incapacitated but alive giant wolf spider. The venom
+of this snake is delayed.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or take 3 (1d6)
+poison damage 2d6 rounds after the contact.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 1/12
+
+-- 1 of 12 --
+
+Black lotus dust
+ingested (vegetal) - 800 gp
+This dark gray poison tastes very bitter. One never
+fully recover.
+A creature subjected to this poison must succeed on
+a DC 12 Constitution saving throw or be poisoned
+until the end of its next long rest. In addition, the
+creature's Constitution score is permanently reduced by 1d6. Only
+the greater restoration spell or similar magic can restore this
+score.
+Recueil des poisons d´AideDD
+Black lotus extract
+ingested (vegetal) - 4000 gp
+Certainly, the most dangerous poison in the world.
+Fortunately, it is also the most difficult to find
+because of the extreme rarity of this plant and the
+exceptional care to give to the preparation. No one
+escapes and death is almost instantaneous. It is an
+odorless, colorless and virtually invisible liquid.
+A creature subjected to this poison must make a DC 20
+Constitution saving throw, taking 55 (10d10) poison damage on a
+failed save, or half as much damage on a successful one.
+Recueil des poisons d´AideDD
+Black oil
+ingested (mixture) - 500 gp
+This black liquid only affects mammals. It causes
+black coloring of the pupils of his victims, but allows
+to better withstand the pain. Some diplomats or
+spies use it when they fear being tortured.
+A creature subjected to this poison must make a DC
+20 Constitution saving throw. In case of failure, the creature sees
+only as a human in darkness but also gets resistance to
+bludgeoning damage, all of that during 1d4 hours.
+Recueil des poisons d´AideDD
+Bloodroot
+injury (vegetal) - 400 gp
+Dried and properly prepared, this root becomes a
+powerful slow-acting poison. The effect does appear
+more than one hour after contact.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or be shaken and
+its Dexterity score is temporarily reduced by 2 until its finishes a
+long rest.
+Recueil des poisons d´AideDD
+Blue whinnis
+injury (vegetal) - 200 gp
+This typical plant because of the color of its leaves is
+also a poison that in addition to its color gives off a
+smell so characteristic that any herbalist will
+recognize it immediately.
+A creature subjected to this poison must make a DC
+10 Constitution saving throw and falls unconscious for 6d10
+minutes on a failed save.
+Recueil des poisons d´AideDD
+Bluluka
+contact (vegetal) - 200 gp
+This bluish, sour-smelling substance is a slow-acting
+acid that attacks skin tissue.
+A creature subjected to this poison succeed on a DC
+12 Constitution saving throw or after 1d6 minutes
+the acid burns its flesh and makes appear at the
+location of the injury a bright blue indelible mark. Only magical
+healing can get rid of this stain.
+Recueil des poisons d´AideDD
+Bralia
+ingested (mixture) - 250 gp
+Bralia comes in the form of an odorless creamy
+liquid that has a characteristic acidic taste. Not very
+dangerous, it's used more to warn than to kill.
+A creature subjected to this poison must make a DC
+16 Constitution saving throw, taking 2 (1d4) poison
+damage on a failed save, or half as much damage on a successful
+one.
+Recueil des poisons d´AideDD
+Breath of the desert
+inhaled (mixture) - 700 gp
+This terrible magic poison gives a feeling of warmth
+and makes his victim sweat abnormally.
+A creature subjected to this poison must succeed on
+a DC 18 Constitution saving throw or its Wisdom
+score is reduced by 1d4 until the end of its next long
+rest.
+Recueil des poisons d´AideDD
+Burnt othur fumes
+inhaled (mixture) - 500 gp
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or take 10 (3d6)
+poison damage, and must repeat the saving throw at
+the start of each of its turns. On each successive
+failed save, the character takes 3 (1d6) poison
+damage. After three successful saves, the poison ends.
+Dungeon Master´s Guide
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 2/12
+
+-- 2 of 12 --
+
+Carrion crawler mucus
+contact (venom) - 200 gp
+This poison must be harvested from a dead or
+incapacitated carrion crawler.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or be poisoned
+for 1 minute. The poisoned creature is paralyzed.
+The creature can repeat the saving throw at the end of each of its
+turns, ending the effect on itself on a success.
+Dungeon Master´s Guide
+Caustar
+injury (vegetal) - 250 gp
+Caustar is a yellow cream made from poisonous
+herbs and is often used by mercenaries in combat.
+Once the poison has entered the body it causes an
+intense pain, not fatal though.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or take 7 (3d4) poison damage
+and be poisoned for 1d6 minutes. Damage cannot reduce the
+creature's hit points below 1 hp. As soon as the poison no longer
+acts, the creature recovers 1 hit point per round.
+Recueil des poisons d´AideDD
+Coulabine
+inhaled (toxin) - 800 gp
+This very fine greyish gas, once released, causes a
+strong acceleration of breathing in the victim(s).
+Any action more fatiguing than a slow march is
+generally impossible.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution DC 13 saving throw or be poisoned for up to 8
+hours. While poisoned, the creature is considered to have level 4
+exhaustion (if not superior before). Each hour, the creature can
+make a new saving throw. Each success reduces the level of
+exhaustion by 1. Once at level 0, the creature is no longer poisoned.
+Recueil des poisons d´AideDD
+Curare
+injury (vegetal) - 150 gp
+This poison, harvested from a tropical plant, causes
+paralysis of the muscles.
+A creature subjected to this poison must succeed on
+a DC 9 Constitution saving throw or become
+poisoned for 1 minute and paralyzed while
+poisoned. The creature can make a new saving throw at the end of
+each of its turns, ending the paralyzed condition on itself on a
+success.
+Recueil des poisons d´AideDD
+Cyanide
+ingested (toxin) - 600 gp
+This blackish poison has a characteristic odor of
+bitter almonds. Sold in salt-like powder, it causes
+death in just a few seconds.
+A creature subjected to this poison must make a DC
+15 Constitution saving throw, becoming poisoned
+for 1 hour and taking 18 (4d8) poison damage on a failed save, or
+half as much damage on a successful one.
+Recueil des poisons d´AideDD
+Cybella pollen
+inhaled (vegetal) - 300 gp
+Breathing the pollen of this flower bring on
+hallucinations (appearance of enemy creatures,
+feeling persecuted and/or being watched) to the
+victim.
+A creature subjected to this poison must succeed on
+a DC 12 Constitution saving throw or be frightened for 2d4 rounds.
+Recueil des poisons d´AideDD
+Dark reaver powder
+ingested (vegetal) - 400 gp
+This powdered deadly mushroom, mixed with food,
+causes violent abdominal pain leading to death in
+most cases, immediately after ingestion.
+A creature subjected to this poison must succeed on
+a DC 12 Constitution saving throw or be poisoned
+for 1d4 rounds and take 10 (5d4) poison damage.
+Recueil des poisons d´AideDD
+Dark snake
+contact (toxin) - 500 gp
+This poison is a carmine red powder that leaves for
+life its color on the surfaces it covers, with a wart-
+like appearance.
+A creature subjected to this poison must make a DC
+13 Constitution saving throw. In case of failure, red
+warts start to grow where the poison has been in contact and
+remain for 1d4 days. During this period, the creature's Charisma
+score is reduced by 2.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 3/12
+
+-- 3 of 12 --
+
+Deathblade
+injury (toxin) - 1600 gp
+This powerful spider venom poison is highly prized
+by drows for assassination. It destroys the walls of
+the vascular system causing massive internal
+bleeding. In a few minutes victims lose blood
+through all orifices and then die. This poison is
+made only by drows.
+A creature subjected to this poison must make a DC 18 Constitution
+saving throw, taking 36 (8d8) poison damage on a failed save, or
+half as much damage on a successful one.
+Recueil des poisons d´AideDD
+Desert desire
+ingested (vegetal) - 200 gp
+This green liquid poison is made from a special
+variety of cactus and causes severe dehydration
+(intense thirst, fatigue, dizziness).
+A creature subjected to this poison must succeed on
+a DC 11 Constitution DD 11 saving throw or its
+exhaustion level increases by 2 for 8+1d8 hours. Double normal
+water consumption reduces the exhaustion level by 1.
+Recueil des poisons d´AideDD
+Devil's herb
+ingested (vegetal) - 300 gp
+If inhaling the vapors of this plant is enough to
+cause slight hallucinations for a few hours, it's by
+ingestion that it becomes a real poison that causes
+strong hallucinations and a loss of voice.
+A creature that is subjected to this poison succeed
+on a DC 10 Constitution DC 10 saving throw or suffer
+hallucinations and not be able to speak intelligibly until it finishes a
+long rest. At the end of the long rest the creature has no memory of
+what happened since it takes the poison.
+Recueil des poisons d´AideDD
+Diffenbach
+ingested (mixture) - 400 gp
+This complex mixture causes the complete
+relaxation of the vocal cords of the victim, who can
+no longer speak. It is a yellowish liquid.
+A creature subject to this poison must make a DC 15
+Constitution saving throw, becoming completely
+silent for 2d4 hours in case of failure, or during 1d4 hours if
+successful.
+Recueil des poisons d´AideDD
+Doshenkana
+ingested (toxin) - 500 gp
+This poison takes the form of a fine green powder. It
+causes short breath, nausea, vision loss and
+seizures.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or be poisoned
+for 1d8 hours. If the saving throw fails by 10 or more, the creature
+permanently loses sight.
+Recueil des poisons d´AideDD
+Dream of Ya
+ingested (mixture) - 600 gp
+Purple powder or liquid that smells like grapes.
+After ingestion, the victim will no longer sleep.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or no longer be
+able to sleep until a magic dissipation of the drug.
+After each long rest his exhaustion level increases by 1, until death
+on the 6th day if nothing is done before. This poison even affects
+elves.
+Recueil des poisons d´AideDD
+Dream syrup
+ingested (mixture) - 800 gp
+Gray or white liquid with a sweet taste, this drug
+provides very pleasant dreams. Some people
+administer it voluntarily.
+A creature subjected to this poison must make a DC
+14 Wisdom saving throw during its first long rest
+after the poison ingestion. In case of failure, the creature wakes up
+in a smug state and is like charmed for 1d4 hours. It cannot attack
+or harm anybody with offensive or magical abilities. In addition, a
+creature has advantage to its ability checks to interact socially with
+the creature. If somebody harms the creature during this period,
+the effect of the drug fades immediately.
+Recueil des poisons d´AideDD
+Drider tears
+injury (toxin) - 400 gp
+Despite its name, this poison is developed from the
+saliva of these monsters. In contact with the blood,
+this poison increases the volume of the eyeballs, the
+eyes become bloodshot and blood-red tears flow.
+A creature subjected to this poison must succeed on
+a DC 16 Constitution saving throw or its Charisma score is
+temporarily reduced by 4 until the creature finishes a long rest.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 4/12
+
+-- 4 of 12 --
+
+Droon
+injury (toxin) - 1600 gp
+This red liquid poison is extremely powerful but
+very unstable (low DD). It's all or nothing.
+A creature subjected to this poison must succeed on
+a DC 8 Constitution saving throw or take 31 (7d8)
+poison damage.
+Recueil des poisons d´AideDD
+Drow poison
+injury (toxin) - 200 gp
+This poison is typically made only by the drow, and
+only in a place far removed from sunlight.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or be poisoned
+for 1 hour. If the saving throw fails by 5 or more, the
+creature is also unconscious while poisoned in this way. The
+creature wakes up if it takes damage or if another creature takes an
+action to shake it awake.
+Dungeon Master´s Guide
+Emloc
+ingested (toxin) - 600 gp
+This poison that looks like syrup has a strong sweet
+taste and a peach smell. It causes degradation of the
+walls of the blood system. The effect occurs about
+half an hour after ingestion.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or be poisoned for 25 + 1d10
+minutes. At the end of this period, the creature's hit point
+maximum of the creature is reduced by 1d10. Any magical healing
+restores the hit point maximum.
+Recueil des poisons d´AideDD
+Erwurg
+ingested (vegetal) - 150 gp
+This light green liquid poison, extracted from a
+flower of the woods, causes a strong cough.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or be coughed for
+5+1d10 minutes.
+Recueil des poisons d´AideDD
+Essence of ether
+inhaled (toxin) - 300 gp
+A creature subjected to this poison must succeed on
+a DC 15 Constitution saving throw or become
+poisoned for 8 hours. The poisoned creature is
+unconscious. The creature wakes up if it takes
+damage or if another creature takes an action to
+shake it awake.
+Dungeon Master´s Guide
+Ettercap poison
+injury (venom) - 200 gp
+This poison must be harvested from a dead or
+incapacitated ettercap.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or take 4 (1d8)
+poison damage and become poisoned for 1 minute.
+The creature can make a new saving throw at the end of each of its
+turns, ending the poisoned condition on itself on a success.
+Recueil des poisons d´AideDD
+Fluna
+injury (venom) - 200 gp
+Fluna is a swamp beetle that becomes aggressive
+only during breeding periods. Administered at high
+doses, its venom is very dangerous.
+A creature subjected to this poison must make a DC
+10 Constitution saving throw or take 7 (2d6) poison
+damage.
+Recueil des poisons d´AideDD
+Garaban
+injury (toxin) - 300 gp
+Red-colored liquid poison that is common among
+hunters and quickly puts the victim asleep. Even
+though it's an injury poison, it serves little in
+combat. Hunters use it mainly with thrown weapons
+to facilitate their approach.
+A creature subjected to this poison must succeed on a DC 12
+Wisdom saving throw or fall asleep for 1d4 minutes. The sleep is
+"natural" so any loud noise around the creature will wake it up.
+Recueil des poisons d´AideDD
+Ghoul saliva
+contact (toxin) - 600 gp
+This greenish oil made by clerics feels rot and
+paralyzes the lower limbs of its victims.
+A creature subjected to this poison must make a DC
+13 Constitution saving throw. In case of failure, the
+creature is restrained for 2d6 minutes, or half as
+this duration on a successful one.
+Recueil des poisons d´AideDD
+Giant centipede venom
+injury (venom) - 300 gp
+This poison must be harvested from a dead or
+incapacitated giant centipede.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or take 10 (3d6)
+poison damage. If the poison damage reduces the
+target to 0 hit points, the target is stable but poisoned for 1 hour,
+even after regaining hit points, and is paralyzed while poisoned.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 5/12
+
+-- 5 of 12 --
+
+Giant scorpion venom
+injury (venom) - 1000 gp
+This poison must be harvested from a dead or
+incapacitated giant scorpion.
+A creature subjected to this poison must make a DC
+12 Constitution saving throw, taking 22 (4d10)
+poison damage on a failed save, or half as much
+damage on a successful one.
+Recueil des poisons d´AideDD
+Giant spider venom
+injury (venom) - 300 gp
+This poison must be harvested from a dead or
+incapacitated giant spider.
+A creature subjected to this poison must make a DC
+11 Constitution saving throw, taking 9 (2d8) poison
+damage on a failed save, or half as much damage on
+a successful one. If the poison damage reduces the target to 0 hit
+points, the target is stable but poisoned for 1 hour, even after
+regaining hit points, and is paralyzed while poisoned.
+Recueil des poisons d´AideDD
+Giant Toad poison
+injury (venom) - 200 gp
+This poison must be harvested from a dead or
+incapacitated giant toad.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or take 5 (1d10)
+poison damage.
+Recueil des poisons d´AideDD
+Giant wasp venom
+injury (venom) - 300 gp
+This poison must be harvested from a dead or
+incapacitated giant wasp.
+A creature subjected to this poison must make a DC
+11 Constitution saving throw, taking 10 (3d6) poison
+damage on a failed save, or half as much damage on
+a successful one. If the poison damage reduces the target to 0 hit
+points, the target is stable but poisoned for 1 hour, even after
+regaining hit points, and is paralyzed while poisoned.
+Recueil des poisons d´AideDD
+Giant wolf spider venom
+injury (venom) - 250 gp
+This poison must be harvested from a dead or
+incapacitated giant wolf spider.
+A creature subjected to this poison must make a DC
+11 Constitution saving throw, taking 7 (2d6) poison
+damage on a failed save, or half as much damage on
+a successful one. If the poison damage reduces the target to 0 hit
+points, the target is stable but poisoned for 1 hour, even after
+regaining hit points, and is paralyzed while poisoned.
+Recueil des poisons d´AideDD
+Green dragon bile
+inhaled (toxin) - 2500 gp
+This greenish heavy gas is one of the deadliest mass
+poisons. Fortunately, due to the difficulty to get the
+basic substance, its price makes it an extremely rare
+poison.
+A creature subjected to this poison must make a DC
+22 Constitution saving throw, becoming poisoned for 1 hour and
+taking 45 (10d8) poison damage on a failed save, or half as much
+damage on a successful one.
+Recueil des poisons d´AideDD
+Greenblood oil
+ingested (vegetal) - 150 gp
+This poison causes strong nausea, immediately after
+each ingestion of liquid or food. It takes the form of
+a soluble powder.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or be poisoned
+for 1d6 minutes.
+Recueil des poisons d´AideDD
+Id moss
+ingested (vegetal) - 400 gp
+This white vegetal poison pulled out from a high-
+altitude plant causes in a few seconds a metabolic
+shock that can cause serious lesions in the brain.
+A creature subjected to this poison must make a DC
+10 Constitution saving throw. On a failed save, the
+creature is poisoned and its Intelligence score is temporarily
+reduced by 1d4 until the creature finishes a long rest.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 6/12
+
+-- 6 of 12 --
+
+Illumination of the harvester
+injury (mixture) - 400 gp
+Once this liquid and sticky poison in contact with
+the blood of his victim, the target temporarily loses
+hearing.
+A creature subjected to this poison must succeed on
+a DC 15 Constitution saving throw or be deafened
+until the end of its next short or long rest.
+Recueil des poisons d´AideDD
+Insanity mist
+inhaled (mixture) - 2000 gp
+The victim who breathes the perfume released by
+this potion is put in a nervous state close to
+madness that often ends in suicide.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or be poisoned.
+While poisoned in this way the creature's Wisdom score is reduced
+by 3d6 points. If its Wisdom is reduced to 2 or less, the creature
+suicides at the first opportunity.
+Recueil des poisons d´AideDD
+Jalwun jiwin
+injury (venom) - 400 gp
+Compared to other poisons used by drows, this one
+seems to be a nice warning. This black poison is
+prepared from the venom of an underground toad.
+The victim is sick with nausea, fever and vomiting.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or be poisoned for several days.
+At the end of each long rest, the creature can make a new saving
+throw to end the effect, which never exceeds one week.
+Recueil des poisons d´AideDD
+Jaraba rubber
+ingested (mixture) - 800 gp
+This poison looks like a light gray rubbery paste.
+Mixed with food, it dissolves when cooked to
+become undetectable by taste or smell.
+A creature subjected to this poison must succeed on
+a DC 16 Constitution saving throw or be poisoned.
+Also, while poisoned in this way, the creature's hit point maximum
+is reduced by 50%. The creature can make a new saving throw
+every minute (10 rounds) to end the effect and restore its hit point
+maximum (but not its current hit points). The DD decreases by 1
+each time.
+Recueil des poisons d´AideDD
+Jatropha curcas
+ingested (vegetal) - 200 gp
+The threat of these nuts lies in their delicious taste
+because who eats one will instinctively eat several
+others. Beyond a dozen nuts occur cramps in the
+legs. The tree grows only in the tropics.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or have its speed reduced to 5
+feet for 1d6 x 10 minutes. Additionally, the creature can't take the
+Dash action during this time.
+Recueil des poisons d´AideDD
+Killing eye toxin
+inhaled (toxin) - 2500 gp
+This dreadful gas is prepared from the liver of an
+extremely rare sea fish called killer eye. Once
+released, the toxic cloud kills most creatures that
+breathe it.
+A creature subjected to this poison must make a DC
+18 Constitution saving throw, being poisoned and taking 27 (6d8)
+poison damage on a failed save, or half as much damage on a
+successful one. The creature can make a new saving throw at the
+end of each of its turns, ending the poisoned condition on itself on
+a success.
+Recueil des poisons d´AideDD
+Last drink
+ingested (toxin) - 300 gp
+This poison is prepared to be mixed with wine. It
+does not alter the taste but brightens the color very
+slightly. It reacts with digestive acids and causes
+nausea, convulsions and abdominal cramps. The
+victim is then immune to this poison for a week.
+A creature subjected to this poison must succeed on a DC 13
+Constitution saving throw or be poisoned for 1d8 hours. Each hour,
+the creature can make a new saving throw. If it succeeds it is no
+longer poisoned.
+Recueil des poisons d´AideDD
+Lich dust
+ingested (mixture) - 400 gp
+This black syrup with a slight taste of ashes can
+neutralize its victim in a few seconds. It is usually
+added to the food of the victim and a few drops are
+enough, which explains its low price for a mixture.
+A creature subjected to this poison must make a DC
+14 Constitution saving throw, taking 10 (4d4) poison damage on a
+failed save, or half as much damage on a successful one.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 7/12
+
+-- 7 of 12 --
+
+Lomat's Illusion
+ingested (mixture) - 500 gp
+Tasteless liquid or sand-like powder, once ingested
+this poison causes the victim to believe that it is
+being watched continuously.
+A creature subjected to this poison must make a DD
+15 Wisdom saving throw. In case of failure, the
+creature becomes completely paranoid (frightened) for 6d10
+minutes.
+Recueil des poisons d´AideDD
+Mage's kintal
+injury (mixture) - 700 gp
+This poison which requires among other things
+many small scorpions for its preparation cuts the
+vocal cords of the victim. This substance is mostly
+used against wizards and other spellcasters.
+A creature subjected to this poison must succeed on
+a DC 18 Constitution DC 19 saving throw or be unable to produce a
+sound until the end of its next long rest.
+Recueil des poisons d´AideDD
+Malice
+inhaled (toxin) - 250 gp
+A creature subjected to this poison must succeed on
+a DC 15 Constitution saving throw or become
+poisoned for 1 hour. The poisoned creature is
+blinded.
+Dungeon Master´s Guide
+Malyss root paste
+contact (vegetal) - 300 gp
+The paste prepared from the roots of this plant,
+once in contact with the skin, causes tremor of all
+limbs and a slight breathlessness.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or have a
+disadvantage to all its Dexterity check until the creature finishes a
+long rest.
+Recueil des poisons d´AideDD
+Mandrake
+ingested (vegetal) - 300 gp
+First of all a beneficial plant, in overdose the
+mandrake is a real poison with bitter taste.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or be poisoned
+for 2d6 minutes. While poisoned, the creature's
+Wisdom score is temporarily reduced by 1d4 and suffers
+hallucinations.
+Recueil des poisons d´AideDD
+Midnight tears
+ingested (mixture) - 1500 gp
+A creature that ingests this poison suffers no effect
+until the stroke of midnight. If the poison has not
+been neutralized before then, the creature must
+succeed on a DC 17 Constitution saving throw,
+taking 31 (9d6) poison damage on a failed save, or
+half as much damage on a successful one.
+Dungeon Master´s Guide
+Murfa
+ingested (toxin) - 400 gp
+This colorless and odorless lead-based liquid causes
+uncontrollable convulsions.
+A creature subjected to this poison must make a DC
+14 Constitution saving throw. In case of failure, the
+creature is poisoned, falls prone and drops whatever
+it's holding, writhing in pain while poisoned. The creature can
+make a new saving throw at the end of each of its turns, ending the
+poisoned condition on itself on a success.
+Recueil des poisons d´AideDD
+Nibon
+ingested (toxin) - 400 gp
+This odorless and colorless liquid based on gold and
+silver makes completely deaf for a few minutes.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or have
+disadvantage to all attack rolls or ability check based
+on Dexterity until the end of its next short or long rest.
+Recueil des poisons d´AideDD
+Nitharit
+contact (vegetal) - 600 gp
+This powder only works if thrown in the eyes of the
+victims. It immediately causes burns that greatly
+impede vision.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or have
+disadvantage on attack rolls for 10 rounds.
+Recueil des poisons d´AideDD
+Oil of taggit
+contact (toxin) - 400 gp
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or become
+poisoned for 24 hours. The poisoned creature is
+unconscious. The creature wakes up if it takes
+damage.
+Dungeon Master´s Guide
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 8/12
+
+-- 8 of 12 --
+
+Opia
+ingested (toxin) - 400 gp
+This brown powder with smell of coffee dissolves in
+a drink and completely confuses the mind.
+2d4 rounds after absorption, a creature subjected to
+this poison must succeed on a DC 15 Wisdom saving
+throw or become stunned for 2d4 rounds.
+Recueil des poisons d´AideDD
+Pale tincture
+ingested (mixture) - 250 gp
+A creature subjected to this poison must succeed on
+a DC 16 Constitution saving throw or take 3 (1d6)
+poison damage and become poisoned. The poisoned
+creature must repeat the saving throw every 24
+hours, taking 3 (1d6) poison damage on a failed
+save. Until this poison ends, the damage the poison deals can’t be
+healed by any means. After seven successful saving throws, the
+effect ends and the creature can heal normally.
+Dungeon Master´s Guide
+Poison tree
+injury (vegetal) - 200 gp
+The poison tree is a rare plant that grows only in the
+heart of tropical jungles. To protect itself from
+insects, this tree produces a powerful orange poison;
+the slightest scratch causes excruciating pain in the
+wound. Its flowers are the only known natural
+antidote.
+A creature subjected to this poison must make a DC 10
+Constitution saving throw, taking 7 (2d6) damage on a failed save.
+Recueil des poisons d´AideDD
+Purple worm poison
+injury (venom) - 2000 gp
+This poison must be harvested from a dead or
+incapacitated purple worm.
+A creature subjected to this poison must make a DC
+19 Constitution saving throw, taking 42 (12d6)
+poison damage on a failed save, or half as much
+damage on a successful one.
+Dungeon Master´s Guide
+Quarigan
+injury (toxin) - 400 gp
+This substance is also called "Dwarf-catch" because
+it's only toxic for this race. This oil is used on
+weapons and dry after four or five days. Legend say
+that elves are at the origin of this poison.
+Any dwarf subjected to this poison must succeed on
+a DC 20 Constitution saving throw or take 9 (2d8) poison damage.
+Recueil des poisons d´AideDD
+Rhododendron
+ingested (vegetal) - 400 gp
+The poison made from this plant causes severe
+diarrhea and vomiting.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or be poisoned
+until the end of its next long rest. Its Strength score
+is also temporarily reduced by 2 while poisoned in this way.
+Recueil des poisons d´AideDD
+Royal scorpion tail
+contact (venom) - 1000 gp
+The venom of this animal, which is extracted from
+its tail, acts by simple contact with the skin.
+A creature subjected to this poison must succeed on
+a DC 16 Constitution saving throw or take 14 (4d6)
+poison damage and be poisoned for 1 minute. The
+creature must make a new saving throw at the end of each of its
+turns, ending the poisoned condition on itself on a success, or
+taking again 3 (1d6) poison damage in case of failure.
+Recueil des poisons d´AideDD
+Sand seller
+injury (mixture) - 600 gp
+This poisonous powder induces a magical sleep that
+does not affect elves or half-elves.
+A creature subjected to this poison must succeed on
+a DC 14 Wisdom saving throw or fall asleep for 1d6
+minutes.
+Recueil des poisons d´AideDD
+Sassone leaf residue
+contact (vegetal) - 200 gp
+White powder from dried leaves, this "cheap"
+poison that can be deadly for weak creatures by
+simple contact is fortunately relatively detectable
+thanks to the strong smell of fruits it releases.
+A creature subjected to this poison must succeed on
+a DC 9 Constitution saving throw or be poisoned until the end of its
+next short rest. While poisoned in this way, the creature's hit point
+maximum is reduced by 1d6. Any magical healing restores the hit
+point maximum.
+Recueil des poisons d´AideDD
+Serpent venom
+injury (venom) - 200 gp
+This poison must be harvested from a dead or
+incapacitated giant poisonous snake.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw, taking 10 (3d6)
+poison damage on a failed save, or half as much
+damage on a successful one.
+Dungeon Master´s Guide
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 9/12
+
+-- 9 of 12 --
+
+Shadow essence
+injury (mixture) - 800 gp
+This black poison made exclusively by clerics from
+the essences of this undead creature is very
+powerful. One never fully recover.
+A creature subjected to this poison must make a DC
+14 Constitution saving throw. Its Strength score is
+reduced by 1d4 on a failed save, or by 1d2 on a successful one. The
+reduction lasts until removed by the greater restoration spell or
+other magic.
+Recueil des poisons d´AideDD
+Silvered wine
+ingested (toxin) - 400 gp
+This poison is a silvered liquor with a very fine taste.
+In a completely unexplained way, it does not affect
+halflings and gnomes.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or fall into fits of
+laughter during 2d4 rounds.
+Recueil des poisons d´AideDD
+Slowfoot
+ingested (vegetal) - 150 gp
+Slowfoot is a small cottony flowers herb. It gives a
+light green liquid which, mixed in the food,
+increases the rhythm of the breathing and gives a
+feeling of exhaustion.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or his level of exhaustion
+increases by 1 until the creature finishes a long rest. If the saving
+throw fails by 5 or more, its level of exhaustion increases by 2
+instead of 1.
+Recueil des poisons d´AideDD
+Striped toadstool
+ingested (vegetal) - 300 gp
+This gray poison is harvested from a white and black
+fungus that lives only in the depths of the earth. It
+causes severe neurological disorders at the time of
+digestion.
+A creature subjected to this poison must,
+approximately 2 hours after being swallowed, succeed on a DC 10
+Constitution saving throw or the creature's Intelligence score is
+reduced by 2 until the end of its next long rest.
+Recueil des poisons d´AideDD
+Swamp gas
+inhaled (toxin) - 600 gp
+This greyish gas weakens its victims by slowing
+them down, or even putting them asleep.
+A creature subjected to this poison must succeed on
+a DC 14 Wisdom saving throw or fall asleep for 1d6
+round. A loud noise will not wake the creature, but
+any damage it takes will end its sleep.
+Recueil des poisons d´AideDD
+Terinav root
+contact (vegetal) - 500 gp
+This oil from roots of terinav causes a kind of
+temporal brain paralysis.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or be
+incapacitated for 1d6 rounds.
+Recueil des poisons d´AideDD
+Thrum
+ingested (toxin) - 700 gp
+This light blue liquid smells like lemon. It puts the
+victim in an advanced state of alcoholism.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or be poisoned
+until its finishes a long rest. While poisoned, the
+creature's Dexterity score is reduced by 1d4.
+Recueil des poisons d´AideDD
+Torpor
+ingested (mixture) - 600 gp
+A creature subjected to this poison must succeed on
+a DC 15 Constitution saving throw or become
+poisoned for 4d6 hours. The poisoned creature is
+incapacitated.
+Dungeon Master´s Guide
+Triple-flower enzyme
+contact (vegetal) - 200 gp
+This sticky yellow liquid, when in contact with the
+skin, inflicts damage if not neutralized. It can be
+easily removed by washing, but the lost health
+points are not recovered automatically.
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or be poisoned and take 1 poison
+damage every minute for 8 minutes.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 10/12
+
+-- 10 of 12 --
+
+Troll blood
+ingested (toxin) - 300 gp
+This gray-green fluid requires, among other things,
+five drops of troll blood for its preparation. It
+becomes completely harmless if it reaches a
+temperature above 105 °F. The effect being very
+short, the poisoner usually stands in front of his
+victim.
+A creature subjected to this poison must succeed on a DC 15
+Constitution saving throw or be petrified for 1d4 round. If the
+saving throw fails by 5 or more, the duration is 5 rounds.
+Recueil des poisons d´AideDD
+Truth serum
+ingested (mixture) - 150 gp
+A creature subjected to this poison must succeed on
+a DC 11 Constitution saving throw or become
+poisoned for 1 hour. The poisoned creature can’t
+knowingly speak a lie, as if under the effect of a zone
+of truth spell.
+Dungeon Master´s Guide
+Ubon
+ingested (toxin) - 800 gp
+This yellow liquid based on melted gold, odorless
+but with a taste of acidic melon, is dread.
+A creature subjected to this poison must succeed on
+a DC 14 Constitution saving throw or be poisoned.
+While poisoned, the creature's maximum hit points
+are reduced by 1d8 points. Only magic can end this poisoned
+condition.
+Recueil des poisons d´AideDD
+Ungol dust
+inhaled (mixture) - 600 gp
+This poison looks like dusty red-brown flakes. The
+smell they given off when consumed causes serious
+respiratory lesions which are never fully recovered.
+A creature subjected to this poison must succeed on
+a DC 15 Constitution saving throw or its
+Constitution score is reduced by 2. The reduction lasts until
+removed by the greater restoration spell or other magic.
+Recueil des poisons d´AideDD
+Uropygus
+inhaled (toxin) - 600 gp
+The yellowish gas extracted from this poison greatly
+disturbs the coordination and the auditory system,
+which affects the balance.
+A creature subjected to this poison must succeed on
+a DC 18 Constitution saving throw or fall prone. If
+the first saving throw is unsuccessful, the creature must repeat it at
+the beginning of each turn for 8 rounds. At each new failure, the
+creature falls prone again.
+Recueil des poisons d´AideDD
+Veiled flower
+ingested (vegetal) - 150 gp
+This small plant is relatively easily found in the
+meadows. It contains a small paralyzing poison that
+still worries herd owners. However, the taste of this
+herb is very strong and very unpleasant, which often
+allows from the first bite of food to realize that one
+poisons.
+A creature subjected to this poison must make a DC 9 Constitution
+saving throw or be restrained for 1 minute.
+Recueil des poisons d´AideDD
+Venoms blood
+injury (venom) - 1200 gp
+This mix of venoms (giant scorpions, toads and
+snakes) looks like a yellow liquid. It is more
+unstable (low DC) but more powerful than normal
+venoms.
+A creature subjected to this poison must make a DC
+9 Constitution saving throw, taking 33 (6d10) poison damage on a
+failed save, or half as much damage on a successful one.
+Recueil des poisons d´AideDD
+Witch caress
+contact (toxin) - 200 gp
+This poison in the form of a colorless liquid is
+almost impossible to detect visually. It is easy to
+wash with water, which makes it immediately
+harmless. Some unscrupulous jewelers use it on
+their goods, in their safes or when traveling in
+unsafe areas.
+A creature subjected to this poison must make a DC 12 Constitution
+saving throw, taking 4 (1d8) poison damage on a failed save, or half
+as much damage on a successful one.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 11/12
+
+-- 11 of 12 --
+
+Witch kiss
+contact (toxin) - 500 gp
+This mix of several toxins acts throughout all the
+body. It looks like a brown gelatin.
+A creature subjected to this poison must succeed on
+a DC 13 Constitution saving throw or be poisoned
+and its Constitution score (without affectation to hit
+points), Dexterity score, and Intelligence score are temporarily
+reduced by 1 until the creature finishes a long rest.
+Recueil des poisons d´AideDD
+Wolves herb
+ingested (vegetal) - 250 gp
+This very poisonous plant, generally used to kill
+foxes and wolves, can also be deadly for a
+humanoid. Well prepared, it also serves as an
+antidote to the venom of scorpions.
+A creature subjected to this poison must succeed on
+a first DC 9 Constitution saving throw or take 7 (3d4) poison
+damage. If unsuccessful, the creature must make a second DC 10
+Constitution saving throw or also be paralyzed for 1 minute.
+Recueil des poisons d´AideDD
+Wyvern poison
+injury (venom) - 1200 gp
+This poison must be harvested from a dead or
+incapacitated wyvern.
+A creature subjected to this poison must make a DC
+15 Constitution saving throw, taking 24 (7d6) poison
+damage on a failed save, or half as much damage on
+a successful one.
+Dungeon Master´s Guide
+Yellow lotus dust
+ingested (vegetal) - 800 gp
+This yellow poison has a very acidic citric taste. It
+permanently changes elocution.
+A creature subjected to this poison must succeed on
+a DC 10 Constitution saving throw or be poisoned
+until the end of its next long rest. In addition, the
+creature's Charisma score is permanently reduced by 1d6. Only the
+greater restoration spell or similar magic can restore this score.
+Recueil des poisons d´AideDD
+23/04/26, 22:16 List » DnD 5 Poisons
+https://www.aidedd.org/dnd/poisonsList.php 12/12
+
+-- 12 of 12 --

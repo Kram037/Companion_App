@@ -5326,7 +5326,7 @@ window._invResolveLive = _invResolveLive;
 // rapidamente" che apre la mini-dialog testo libero (vecchio
 // comportamento di invAddItem).
 // ─────────────────────────────────────────────────────────────────────
-window._invPickerState = { tab: 'catalog', search: '' };
+window._invPickerState = { tab: 'catalog', search: '', filters: { rarita: '', tipo: '' }, filtersOpen: false };
 
 window.invAddItem = async function(pgId) {
     // Carica gli homebrew oggetti in background; se la cache c'e' gia'
@@ -5356,6 +5356,8 @@ function _invOpenPickerDialog(pgId) {
         <div class="inv-picker-tabs">
             <button class="inv-picker-tab ${_invPickerState.tab === 'catalog' ? 'active' : ''}"
                 onclick="_invPickerSwitchTab('${pgId}','catalog')">Catalogo</button>
+            <button class="inv-picker-tab ${_invPickerState.tab === 'veleni' ? 'active' : ''}"
+                onclick="_invPickerSwitchTab('${pgId}','veleni')">Veleni</button>
             ${showHb ? `<button class="inv-picker-tab ${_invPickerState.tab === 'homebrew' ? 'active' : ''}"
                 onclick="_invPickerSwitchTab('${pgId}','homebrew')">Homebrew</button>` : ''}
         </div>
@@ -5363,7 +5365,13 @@ function _invOpenPickerDialog(pgId) {
             <input type="text" id="invPickerSearch" class="hp-calc-input" placeholder="Cerca per nome o tipo..."
                 value="${escapeHtml(_invPickerState.search || '')}"
                 oninput="_invPickerOnSearch(this.value,'${pgId}')">
+            <button type="button" id="invPickerFiltersBtn" class="inv-picker-filters-btn"
+                onclick="_invPickerToggleFilters('${pgId}')" title="Filtri">
+                <span class="inv-picker-filters-icon">⛃</span>
+                <span class="inv-picker-filters-badge" id="invPickerFiltersBadge"></span>
+            </button>
         </div>
+        <div id="invPickerFiltersPanel" class="inv-picker-filters-panel" style="display:none;"></div>
         <div id="invPickerList" class="inv-picker-list"></div>
         <div class="dialog-actions" style="margin-top:12px;justify-content:space-between;">
             <button class="btn-secondary" onclick="invQuickCreate('${pgId}')">+ Crea rapidamente</button>
@@ -5371,21 +5379,142 @@ function _invOpenPickerDialog(pgId) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
+    _invPickerRenderFiltersPanel(pgId);
+    _invPickerRenderFiltersBadge();
     _invPickerRenderList(pgId);
 }
 
 window._invPickerSwitchTab = function(pgId, tab) {
     _invPickerState.tab = tab;
+    // Cambiando dataset, le opzioni dei filtri cambiano: reset per evitare
+    // scelte non piu' presenti (es. "Arma" filtrato in tab Veleni).
+    _invPickerState.filters = { rarita: '', tipo: '' };
+    const tabLabel = { catalog: 'catalogo', veleni: 'veleni', homebrew: 'homebrew' }[tab] || tab;
     document.querySelectorAll('.inv-picker-tab').forEach(b => b.classList.remove('active'));
     const btn = Array.from(document.querySelectorAll('.inv-picker-tab'))
-        .find(b => b.textContent.trim().toLowerCase() === (tab === 'catalog' ? 'catalogo' : 'homebrew'));
+        .find(b => b.textContent.trim().toLowerCase() === tabLabel);
     if (btn) btn.classList.add('active');
+    _invPickerRenderFiltersPanel(pgId);
+    _invPickerRenderFiltersBadge();
     _invPickerRenderList(pgId);
 };
 
 window._invPickerOnSearch = function(value, pgId) {
     _invPickerState.search = value || '';
     _invPickerRenderList(pgId);
+};
+
+// ─── Filtri picker (rarita' + tipologia) ────────────────────────────
+// Le opzioni del dropdown vengono derivate dinamicamente dal dataset
+// del tab attivo, cosi' "Veleni" mostra ingerito/inalato/contatto/iniezione
+// mentre "Catalogo" mostra Arma/Armatura/Bacchetta/etc.
+function _invPickerActiveDataset() {
+    if (_invPickerState.tab === 'veleni') {
+        return Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [];
+    }
+    if (_invPickerState.tab === 'homebrew') {
+        return (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
+            ? AppState.cachedHomebrewOggetti : [];
+    }
+    return Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
+}
+
+function _invPickerOptionsFor(field) {
+    const ds = _invPickerActiveDataset();
+    const set = new Set();
+    for (const o of ds) {
+        let v = '';
+        if (field === 'rarita') {
+            v = o.rarita_it || o.rarita || '';
+        } else if (field === 'tipo') {
+            v = (_invPickerState.tab === 'veleni')
+                ? (o.sotto_tipo_it || o.sotto_tipo_en || '')
+                : (o.tipo || '');
+        }
+        v = String(v || '').trim();
+        if (v) set.add(v);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'));
+}
+
+function _invPickerActiveFilterCount() {
+    const f = _invPickerState.filters || {};
+    return (f.rarita ? 1 : 0) + (f.tipo ? 1 : 0);
+}
+
+function _invPickerMatchesFilters(o) {
+    const f = _invPickerState.filters || {};
+    if (f.rarita) {
+        const r = o.rarita_it || o.rarita || '';
+        if (String(r).trim() !== f.rarita) return false;
+    }
+    if (f.tipo) {
+        const t = (_invPickerState.tab === 'veleni')
+            ? (o.sotto_tipo_it || o.sotto_tipo_en || '')
+            : (o.tipo || '');
+        if (String(t).trim() !== f.tipo) return false;
+    }
+    return true;
+}
+
+function _invPickerRenderFiltersBadge() {
+    const badge = document.getElementById('invPickerFiltersBadge');
+    if (!badge) return;
+    const n = _invPickerActiveFilterCount();
+    badge.textContent = n ? String(n) : '';
+    badge.style.display = n ? 'inline-flex' : 'none';
+    const btn = document.getElementById('invPickerFiltersBtn');
+    if (btn) btn.classList.toggle('active', n > 0);
+}
+
+function _invPickerRenderFiltersPanel(pgId) {
+    const panel = document.getElementById('invPickerFiltersPanel');
+    if (!panel) return;
+    if (!_invPickerState.filtersOpen) {
+        panel.style.display = 'none';
+        return;
+    }
+    const f = _invPickerState.filters || {};
+    const tipoLabel = _invPickerState.tab === 'veleni' ? 'Tipo' : 'Tipologia';
+    const rarOpts = _invPickerOptionsFor('rarita');
+    const tipOpts = _invPickerOptionsFor('tipo');
+    panel.style.display = 'flex';
+    panel.innerHTML = `
+        <div class="inv-picker-filter-field">
+            <label>Rarità</label>
+            <select onchange="_invPickerSetFilter('rarita', this.value, '${pgId}')">
+                <option value="">Tutte</option>
+                ${rarOpts.map(v => `<option value="${escapeHtml(v)}" ${f.rarita === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <div class="inv-picker-filter-field">
+            <label>${tipoLabel}</label>
+            <select onchange="_invPickerSetFilter('tipo', this.value, '${pgId}')">
+                <option value="">Tutti</option>
+                ${tipOpts.map(v => `<option value="${escapeHtml(v)}" ${f.tipo === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <button type="button" class="inv-picker-filter-reset" onclick="_invPickerResetFilters('${pgId}')">Pulisci</button>
+    `;
+}
+
+window._invPickerToggleFilters = function(pgId) {
+    _invPickerState.filtersOpen = !_invPickerState.filtersOpen;
+    _invPickerRenderFiltersPanel(pgId);
+};
+
+window._invPickerSetFilter = function(field, value, pgId) {
+    _invPickerState.filters = _invPickerState.filters || {};
+    _invPickerState.filters[field] = value || '';
+    _invPickerRenderList(pgId);
+    _invPickerRenderFiltersBadge();
+};
+
+window._invPickerResetFilters = function(pgId) {
+    _invPickerState.filters = { rarita: '', tipo: '' };
+    _invPickerRenderFiltersPanel(pgId);
+    _invPickerRenderList(pgId);
+    _invPickerRenderFiltersBadge();
 };
 
 function _invPickerRenderList(pgId) {
@@ -5400,7 +5529,7 @@ function _invPickerRenderList(pgId) {
             </div>`;
             return;
         }
-        let list = cat;
+        let list = cat.filter(_invPickerMatchesFilters);
         if (q) {
             list = list.filter(o => {
                 const txt = (o.nome || '') + ' ' + (o.nome_en || '') + ' ' + (o.tipo || '') + ' ' + (o.sotto_tipo || '') + ' ' + (o.rarita || '');
@@ -5433,9 +5562,51 @@ function _invPickerRenderList(pgId) {
             : '');
         return;
     }
+    if (_invPickerState.tab === 'veleni') {
+        const ven = Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [];
+        if (ven.length === 0) {
+            cont.innerHTML = `<div class="inv-picker-empty">
+                <p style="margin:0;">Catalogo veleni non disponibile.</p>
+            </div>`;
+            return;
+        }
+        let vlist = ven.filter(_invPickerMatchesFilters);
+        if (q) {
+            vlist = vlist.filter(o => {
+                const txt = (o.nome_it || '') + ' ' + (o.nome_en || '') + ' '
+                    + (o.sotto_tipo_it || '') + ' ' + (o.categoria_it || '') + ' '
+                    + (o.rarita_it || '');
+                return txt.toLowerCase().includes(q);
+            });
+        }
+        if (vlist.length === 0) {
+            cont.innerHTML = `<div class="inv-picker-empty">
+                <p style="margin:0;">Nessun veleno trovato per "${escapeHtml(q)}".</p>
+            </div>`;
+            return;
+        }
+        cont.innerHTML = vlist.slice(0, 200).map(o => {
+            const meta = `${o.sotto_tipo_it || ''}${o.categoria_it ? ' (' + o.categoria_it + ')' : ''} · ${o.rarita_it || ''} · ${o.prezzo_mo || 0} mo`;
+            const rarClass = _invRarityClass(o.rarita_it);
+            const pendingBadge = o._nome_pending
+                ? '<span class="inv-picker-tr-pending" title="Traduzione italiana in arrivo">TR</span>'
+                : '';
+            const subEn = (o.nome_en && o.nome_en !== o.nome_it)
+                ? `<span class="inv-picker-item-en">${escapeHtml(o.nome_en)}</span>` : '';
+            return `<div class="inv-picker-item ${rarClass}" onclick="invAddFromVeleni('${pgId}','${o.id}')">
+                <div class="inv-picker-item-main">
+                    <div class="inv-picker-item-name">${escapeHtml(o.nome_it || o.nome_en || 'Veleno')} ${pendingBadge} ${subEn}</div>
+                    <div class="inv-picker-item-meta">${escapeHtml(meta)}</div>
+                </div>
+            </div>`;
+        }).join('') + (vlist.length > 200
+            ? `<div class="inv-picker-empty" style="padding:8px;font-size:0.8rem;color:var(--text-secondary);">Mostrando i primi 200 di ${vlist.length} risultati. Affina la ricerca.</div>`
+            : '');
+        return;
+    }
     const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
         ? AppState.cachedHomebrewOggetti : [];
-    let list = cache;
+    let list = cache.filter(_invPickerMatchesFilters);
     if (q) {
         list = list.filter(o => {
             const txt = (o.nome || '') + ' ' + (o.tipo || '') + ' ' + (o.rarita || '');
@@ -5519,6 +5690,36 @@ window.invAddFromCatalog = async function(pgId, catId) {
         _catalog_id: it.id,
     };
     if (parseInt(it.incantamento) > 0) entry.magic_bonus = parseInt(it.incantamento);
+    inventario.push(entry);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+// Aggiunge un veleno del catalogo (immutabile) all'inventario come
+// snapshot. Il veleno viene salvato come oggetto consumabile con tutte
+// le info utili (sotto_tipo, categoria, prezzo, rarita, descrizione).
+window.invAddFromVeleni = async function(pgId, veId) {
+    const ven = Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [];
+    const it = ven.find(o => String(o.id) === String(veId));
+    if (!it) return;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    const entry = {
+        nome: it.nome_it || it.nome_en || 'Veleno',
+        descrizione: it.descrizione_it || it.descrizione_en || '',
+        quantita: 1,
+        tipo: 'Veleno',
+        sotto_tipo: it.sotto_tipo_it || it.sotto_tipo_en || '',
+        rarita: it.rarita_it || 'Comune',
+        magico: false,
+        prezzo_mo: it.prezzo_mo || 0,
+        _veleno_categoria: it.categoria_it || it.categoria_en || '',
+        _veleno_id: it.id,
+    };
     inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);

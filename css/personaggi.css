@@ -595,8 +595,18 @@
 .scheda-hp-cell.clickable:hover { background: var(--surface-hover); }
 .scheda-hp-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-top: 2px; }
 
-/* Modal Level Up: scelta classe in caso di multiclasse */
-.levelup-modal { width: 320px; max-width: calc(100vw - 32px); text-align: left; padding: 22px 22px 18px; }
+/* Modal Level Up: scelta classe in caso di multiclasse.
+   Override di .hp-calc-modal { overflow:hidden } cosi' con molte classi
+   (es. tutte quelle disponibili al multiclass) la modal scorre invece
+   di sforare lo schermo verticalmente. */
+.levelup-modal {
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    text-align: left;
+    padding: 22px 22px 18px;
+}
 .levelup-title { margin: 0 0 4px; font-size: 1rem; color: var(--text); text-align: center; }
 .levelup-sub { margin: 0 0 14px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
 .levelup-pick-list { display: flex; flex-direction: column; gap: 6px; }
@@ -635,8 +645,17 @@
 .levelup-pick-multiclass:hover { background: color-mix(in srgb, var(--accent) 15%, var(--bg)); }
 .levelup-pick-back { background: var(--bg); width: 100%; }
 
-/* Dialog "Punti Ferita" del level up */
-.levelup-pf-modal { width: 320px; max-width: calc(100vw - 32px); text-align: left; padding: 22px 22px 18px; }
+/* Dialog "Punti Ferita" del level up.
+   - max-height + overflow-y: come .levelup-modal, evita di sforare il viewport
+   - width 360px: la base 320 era stretta, "Tira il dado" sforava a destra */
+.levelup-pf-modal {
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    text-align: left;
+    padding: 22px 22px 18px;
+}
 .levelup-pf-avg-btn {
     display: block;
     width: 100%;
@@ -656,9 +675,12 @@
     display: flex;
     gap: 8px;
     margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 .levelup-pf-input {
-    flex: 0 0 88px;
+    flex: 0 0 80px;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 10px 8px;
     text-align: center;
     background: var(--bg);
@@ -674,7 +696,9 @@
 .levelup-pf-input { -moz-appearance: textfield; }
 .levelup-pf-input:focus { outline: none; border-color: var(--accent); }
 .levelup-pf-roll-btn {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 10px 12px;
     background: var(--bg);
     color: var(--text);
@@ -708,6 +732,8 @@
     font-weight: 700;
     cursor: pointer;
     transition: opacity 0.15s, background 0.15s;
+    box-sizing: border-box;
+    min-width: 0;
 }
 .levelup-pf-cancel {
     background: var(--bg);
@@ -2215,8 +2241,99 @@
     color: var(--primary);
     border-bottom-color: var(--primary);
 }
-.inv-picker-search-row { margin-bottom: 10px; }
-.inv-picker-search-row input { margin-bottom: 0; }
+.inv-picker-search-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    margin-bottom: 10px;
+}
+.inv-picker-search-row input {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+}
+.inv-picker-filters-btn {
+    position: relative;
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    box-sizing: border-box;
+}
+.inv-picker-filters-btn:hover { background: var(--surface-hover); border-color: var(--accent); }
+.inv-picker-filters-btn.active { color: var(--primary); border-color: var(--primary); }
+.inv-picker-filters-icon { font-size: 1rem; }
+.inv-picker-filters-badge {
+    display: none;
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 9px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.inv-picker-filters-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: end;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.inv-picker-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 140px;
+    min-width: 120px;
+}
+.inv-picker-filter-field label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+.inv-picker-filter-field select {
+    padding: 7px 8px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.inv-picker-filter-field select:focus { outline: none; border-color: var(--accent); }
+.inv-picker-filter-reset {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.8rem;
+    height: 33px;
+    align-self: end;
+}
+.inv-picker-filter-reset:hover { background: var(--surface-hover); color: var(--text); }
 .inv-picker-list {
     flex: 1;
     min-height: 200px;
