@@ -1760,9 +1760,20 @@ function pgGetSubclassOptions(className) {
 // per una data classe. Le voci contengono _hbId, _hbAuthor, _hbIsOwn per
 // permettere alla scheda di risalire a tutti i privilegi/incantesimi.
 function pgGetHomebrewSubclassOptions(className) {
-    const all = (window.AppState && Array.isArray(AppState.cachedHomebrewSottoclassi))
-        ? AppState.cachedHomebrewSottoclassi
-        : [];
+    // Safety: se la cache non è ancora stata popolata, lancia un load
+    // asincrono in background così il prossimo render la troverà pronta.
+    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
+        if (typeof loadHomebrewSottoclassi === 'function') {
+            loadHomebrewSottoclassi().then(() => {
+                try {
+                    if (typeof pgRenderClassi === 'function') pgRenderClassi();
+                    if (typeof microRenderClassi === 'function') microRenderClassi();
+                } catch (_) {}
+            });
+        }
+        return [];
+    }
+    const all = AppState.cachedHomebrewSottoclassi;
     if (all.length === 0) return [];
     const data = window.CLASSES_DATA || [];
     const cls = data.find(c =>
@@ -1837,9 +1848,17 @@ function pgRenderClassi() {
     container.innerHTML = chipsHtml + addBtn;
 }
 
-window.pgOpenSubclassDropdown = function(index) {
+window.pgOpenSubclassDropdown = async function(index) {
     const c = pgSelectedClasses[index];
     if (!c) return;
+    // Sicurezza: assicurati che le sottoclassi homebrew siano in cache
+    // prima di mostrare il picker (importante subito dopo aver creato
+    // una sottoclasse nel laboratorio).
+    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
+        if (typeof loadHomebrewSottoclassi === 'function') {
+            try { await loadHomebrewSottoclassi(); } catch (_) {}
+        }
+    }
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
     if (opts.length === 0 && hbOpts.length === 0) {
@@ -9314,9 +9333,14 @@ function microRenderClassi() {
     microUpdateTotalLevel();
 }
 
-window.microOpenSubclassDropdown = function(index) {
+window.microOpenSubclassDropdown = async function(index) {
     const c = _microSelectedClasses[index];
     if (!c) return;
+    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
+        if (typeof loadHomebrewSottoclassi === 'function') {
+            try { await loadHomebrewSottoclassi(); } catch (_) {}
+        }
+    }
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
     if (opts.length === 0 && hbOpts.length === 0) {
