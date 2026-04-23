@@ -18,7 +18,15 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC_JSON = path.join(__dirname, 'oggetti_magici.json');
-const TRANSLATIONS = require('./translations.js');
+const TRANSLATIONS_NAMES = require('./translations.js');
+let TRANSLATIONS_DESC = {};
+try { TRANSLATIONS_DESC = require('./translations_desc.js'); } catch (_) {}
+
+// Merge dei due dictionary (descrizioni override + nomi).
+const TRANSLATIONS = {};
+for (const id of new Set([...Object.keys(TRANSLATIONS_NAMES), ...Object.keys(TRANSLATIONS_DESC)])) {
+    TRANSLATIONS[id] = { ...TRANSLATIONS_NAMES[id], ...TRANSLATIONS_DESC[id] };
+}
 
 // Item da rimuovere perche' frammenti OCR. Per ognuno indichiamo se la
 // descrizione_en va appesa a un altro item parent (per ricomporre il

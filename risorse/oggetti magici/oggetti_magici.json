@@ -18,7 +18,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "Produced by a special needle, this magic tattoo features designs that emphasize one color.\n\nTattoo Attunement. To attune to this item, you hold the needle to your skin where you want the tattoo to appear, pressing the needle there throughout the attunement process. When the attunement is complete, the needle turns into the ink that becomes the tattoo, which appears on the skin.\n\nIf your attunement to the tattoo ends, the tattoo vanishes, and the needle reappears in your space.\n\nDamage Resistance. While the tattoo is on your skin, you have resistance to a type of damage associated with that color, as shown on the table below. The DM chooses the color or determines it randomly.\n\nd10 | Damage Type | Color\n\n1 | Acid | Green\n\n2 | Cold | Blue\n\n3 | Fire | Red\n\n4 | Force | White\n\n5 | Lightning | Yellow\n\n6 | Necrotic | Black\n\n7 | Poison | Violet\n\n8 | Psychic | Silver\n\n9 | Radiant | Gold\n\n10 | Thunder | Orange\n\nDamage Absorption. When you take damage of the chosen type, you can use your reaction to gain immunity against that instance of the damage, and you regain a number of hit points equal to half the damage you would have taken. Once this reaction is used, it can't be used again until the next dawn.",
-      "descrizione_it": ""
+      "descrizione_it": "Prodotto da un ago speciale, questo tatuaggio magico presenta motivi che enfatizzano un singolo colore.\n\nSintonia del Tatuaggio. Per sintonizzarti con questo oggetto, premi l'ago contro la pelle dove vuoi che appaia il tatuaggio, mantenendo il contatto per tutto il processo di sintonia. Quando la sintonia è completa, l'ago si trasforma nell'inchiostro che diventa il tatuaggio sulla pelle.\n\nSe la sintonia col tatuaggio termina, il tatuaggio scompare e l'ago riappare nel tuo spazio.\n\nResistenza al Danno. Mentre il tatuaggio è sulla tua pelle, hai resistenza al tipo di danno associato al colore, come indicato nella tabella seguente. Il DM sceglie il colore o lo determina casualmente.\n\nd10 | Tipo di Danno | Colore\n1 | Acido | Verde\n2 | Freddo | Blu\n3 | Fuoco | Rosso\n4 | Forza | Bianco\n5 | Fulmine | Giallo\n6 | Necrotico | Nero\n7 | Veleno | Viola\n8 | Psichico | Argento\n9 | Radiante | Oro\n10 | Tuono | Arancione\n\nAssorbimento del Danno. Quando subisci danno del tipo scelto, puoi usare la reazione per ottenere immunità contro quella istanza di danno e recuperare un numero di punti ferita pari alla metà del danno che avresti subito. Una volta usata questa reazione, non può essere riutilizzata fino all'alba successiva."
     },
     {
       "id": "adamantine-armor",
@@ -32,7 +32,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This suit of armor is reinforced with adamantine, one of the\nhardest substances in existence. While you're wearing it, any\ncritical hit against you becomes a normal hit.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa armatura è rinforzata con adamantio, una delle sostanze più dure esistenti. Mentre la indossi, qualsiasi colpo critico contro di te diventa un colpo normale."
     },
     {
       "id": "adze-of-annam",
@@ -74,7 +74,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This ceramic jug appears to be able to hold a gallon of liquid and\nweighs 12 pounds whether full or empty. Sloshing sounds can be\nheard from within the jug when it is shaken, even if the jug is\nempty.\nYou can use an action and name one liquid from the table below to\ncause the jug to produce the chosen liquid. Afterward, you can\nuncork the jug as an action and pour that liquid out, up to 2 gallons\nper minute. The maximum amount of liquid the jug can produce\ndepends on the liquid you named.\nOnce the jug starts producing a liquid, it can't produce a different\none, or more of one that has reached its maximum, until the next\ndawn.\nLiquid Max Amount\nAcid 8 ounces\nBasic poison 1/2 ounce\nBeer 4 gallons\nHoney 1 gallon\nMayonnaise 2 gallons\nOil 1 quart\nVinegar 2 gallons\nWater, fresh 8 gallons\nWater, salt 12 gallons\nWine 1 gallon\nDungeon Master's Guide (BR)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa brocca di ceramica sembra in grado di contenere un gallone (circa 4 litri) di liquido e pesa 12 libbre sia piena sia vuota. Quando viene scossa, dall'interno della brocca si sentono rumori di liquido in movimento, anche se è vuota.\n\nCon un'azione, puoi nominare uno dei liquidi della tabella sottostante per fare in modo che la brocca produca quel liquido. In seguito, puoi stappare la brocca con un'azione e versare il liquido, fino a 2 galloni al minuto. La quantità massima di liquido che la brocca può produrre dipende dal liquido nominato.\n\nUna volta che la brocca inizia a produrre un liquido, non può produrne uno diverso, né più di uno che ha raggiunto il massimo, fino all'alba successiva.\n\nLiquido | Quantità Max\nAcido | 8 once\nVeleno comune | 1/2 oncia\nBirra | 4 galloni\nMiele | 1 gallone\nMaionese | 2 galloni\nOlio | 1 quarto\nAceto | 2 galloni\nAcqua dolce | 8 galloni\nAcqua salata | 12 galloni\nVino | 1 gallone"
     },
     {
       "id": "all-purpose-tool",
@@ -116,7 +116,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "Your Constitution score is 19 while you wear this amulet. It has no\neffect on you if your Constitution is 19 or higher without it.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Il tuo punteggio di Costituzione è 19 mentre indossi questo amuleto. Non ha effetto su di te se la tua Costituzione è già 19 o superiore."
     },
     {
       "id": "amulet-of-proof-against-detection-and-location",
@@ -130,7 +130,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this amulet, you are hidden from divination magic.\nYou can't be targeted by such magic or perceived through magical\nscrying sensors.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questo amuleto, sei nascosto alla magia di divinazione. Non puoi essere bersaglio di tale magia né percepito tramite sensori magici di scrutamento."
     },
     {
       "id": "amulet-of-the-devout",
@@ -144,7 +144,7 @@
       "sintonia_dettaglio": "a cleric or paladin",
       "incantamento": 0,
       "descrizione_en": "This amulet bears the symbol of a deity inlaid with precious stones or metals. While you wear the holy symbol, you gain a bonus to spell attack rolls and the saving throw DCs of your spells. The bonus is determined by the amulet's rarity.\n\nWhile you wear this amulet, you can use your Channel Divinity feature without expending one of the feature's uses. Once this property is used, it can't be used again until the next dawn.",
-      "descrizione_it": ""
+      "descrizione_it": "Questo amuleto reca il simbolo di una divinità intarsiato con pietre o metalli preziosi. Mentre indossi il simbolo sacro, ottieni un bonus ai tiri per colpire con incantesimo e alle CD dei tiri salvezza dei tuoi incantesimi. Il bonus è determinato dalla rarità dell'amuleto.\n\nMentre indossi questo amuleto, puoi usare il privilegio Incanalare Divinità senza spendere uno dei suoi utilizzi. Una volta usata questa proprietà, non può essere riutilizzata fino all'alba successiva."
     },
     {
       "id": "amulet-of-the-planes",
@@ -158,7 +158,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this amulet, you can use an action to name a\nlocation that you are familiar with on another plane of existence.\nThen make a DC 15 Intelligence check. On a successful check, you\ncast the plane shift spell. On a failure, you and each creature and\nobject within 15 feet of you travel to a random destination. Roll a\nd100. On a 1-60, you travel to a random location on the plane you\nnamed. On a 61-100, you travel to a randomly determined plane of\nexistence.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questo amuleto, puoi usare un'azione per nominare un luogo che ti è familiare su un altro piano di esistenza. Poi effettua una prova di Intelligenza con CD 15. Se la prova ha successo, lanci l'incantesimo Spostamento Planare. In caso di fallimento, tu e ogni creatura e oggetto entro 4,5 metri da te viaggiate verso una destinazione casuale. Tira un d100. Con un risultato di 1-60, viaggi verso un luogo casuale del piano nominato. Con un risultato di 61-100, viaggi verso un piano di esistenza determinato casualmente."
     },
     {
       "id": "animated-shield",
@@ -172,7 +172,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While holding this shield, you can speak its command word as a\nbonus action to cause it to animate. The shield leaps into the air\nand hovers in your space to protect you as if you were wielding it,\nleaving your hands free. The shield remains animated for 1 minute,\nuntil you use a bonus action to end this effect, or until you are\nincapacitated or die, at which point the shield falls to the ground or\ninto your hand if you have one free.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre impugni questo scudo, puoi pronunciare la sua parola di comando con un'azione bonus per farlo animare. Lo scudo balza in aria e fluttua nel tuo spazio per proteggerti come se lo stessi impugnando, lasciandoti le mani libere. Lo scudo rimane animato per 1 minuto, finché non usi un'azione bonus per terminare l'effetto, o finché non sei incapacitato o muori, momento in cui lo scudo cade a terra o nella tua mano se ne hai una libera."
     },
     {
       "id": "antimagic-armor",
@@ -186,7 +186,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this armor, you can use your reaction to give yourself advantage on a saving throw you make against a spell. Once this property is used, it can’t be used again until the next dawn.\n\nIn addition, while you wear this armor, you can use it to cast Antimagic Field, requiring no spell components. Once this property is used, it can’t be used again until the next dawn.",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questa armatura, puoi usare la reazione per ottenere vantaggio a un tiro salvezza che effettui contro un incantesimo. Una volta usata questa proprietà, non può essere riutilizzata fino all'alba successiva.\n\nInoltre, mentre indossi questa armatura puoi usarla per lanciare Campo Antimagia, senza richiedere componenti dell'incantesimo. Una volta usata questa proprietà, non può essere riutilizzata fino all'alba successiva."
     },
     {
       "id": "apparatus-of-kwalish",
@@ -228,7 +228,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 2,
       "descrizione_en": "You gain a +2 bonus to AC against ranged attacks while you wield\nthis shield. This bonus is in addition to the shield's normal bonus\nto AC. In addition, whenever an attacker makes a ranged attack\nagainst a target within 5 feet of you, you can use your reaction to\nbecome the target of the attack instead.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Ottieni un bonus di +2 alla CA contro gli attacchi a distanza mentre impugni questo scudo. Questo bonus si somma al normale bonus alla CA dello scudo. Inoltre, ogni volta che un attaccante effettua un attacco a distanza contro un bersaglio entro 1,5 metri da te, puoi usare la reazione per diventare tu il bersaglio dell'attacco al suo posto."
     },
     {
       "id": "arrow-of-slaying",
@@ -242,7 +242,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "An arrow of slaying is a magic weapon meant to slay a particular\nkind of creature. Some are more focused than others; for example,\nthere are both arrows of dragon slaying and arrows of blue\ndragon slaying. If a creature belonging to the type, race, or group\nassociated with an arrow of slaying takes damage from the arrow,\nthe creature must make a DC 17 Constitution saving throw, taking\nan extra 6d10 piercing damage on a failed save, or half as much\nextra damage on a successful one.\nOnce an arrow of slaying deals its extra damage to a creature, it\nbecomes a nonmagical arrow.\nOther types of magic ammunition of this kind exist, such as bolts of\nslaying meant for a crossbow, though arrows are most common.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Una freccia sterminatrice è un'arma magica concepita per uccidere un particolare tipo di creatura. Alcune sono più specifiche di altre: ad esempio, esistono frecce sterminatrici di draghi e frecce sterminatrici di draghi blu. Se una creatura appartenente al tipo, razza o gruppo associato alla freccia sterminatrice subisce danni dalla freccia, deve effettuare un tiro salvezza su Costituzione con CD 17, subendo 6d10 danni perforanti aggiuntivi se fallisce, o la metà di quei danni se ha successo.\n\nUna volta che una freccia sterminatrice ha inflitto i suoi danni aggiuntivi a una creatura, diventa una freccia non magica.\n\nEsistono anche altri tipi di munizioni magiche di questo genere, come quadrelli sterminatori per balestra, anche se le frecce sono le più comuni."
     },
     {
       "id": "astral-shard",
@@ -326,7 +326,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "If you dump the bag's contents out on the ground, they explode in a\n10-foot radius, extending from the beans. Each creature in the area,\nincluding you, must make a DC 15 Dexterity saving throw, taking\n5d4 fire damage on a failed save, or half as much damage on a\nsuccessful one. The fire ignites flammable objects in the area that\naren't being worn or carried.\nIf you remove a bean from the bag, plant it in dirt or sand, and then\nwater it, the bean produces an effect 1 minute later from the ground\nwhere it was planted. The DM can choose an effect from the\nfollowing table, determine it randomly, or create an effect.\nd100 Effect\n01 5d4 toadstools sprout. If a creature eats a toadstool, roll any\ndie. On an odd roll, the eater must succeed on a DC 15\nConstitution saving throw or take 5d6 poison damage and\nbecome poisoned for 1 hour. On an even roll, the eater gains\n5d6 temporary hit points for 1 hour.\n02-10 A geyser erupts and spouts water, beer, berry juice, tea,\nvinegar, wine, or oil (DM's choice) 30 feet into the air for 1d12\nrounds.\n11-20 A treant sprouts. There's a 50 percent chance that the treant\nis chaotic evil and attacks.\n21-30 An animate, immobile stone statue in your likeness rises. It\nmakes verbal threats against you. If you leave it and others\ncome near, it describes you as the most heinous of villains\nand directs the newcomers to find and attack you. If you are\non the same plane of existence as the statue, it knows where\nyou are. The statue becomes inanimate after 24 hours.\n31-40 A campfire with blue flames springs forth and burns for 24\nhours (or until it is extinguished).\n41-50 1d6 + 6 shriekers sprout.\n51-60 1d4 + 8 bright pink toads crawl forth. Whenever a toad is\ntouched, it transforms into a Large or smaller monster of the\nDM's choice. The monster remains for 1 minute, then\ndisappears in a puff of bright pink smoke.\n61-70 A hungry bulette burrows up and attacks.\n71-80 A fruit tree grows. It has 1d10 + 20 fruit, 1d8 of which act as\nrandomly determined magic potions, while one acts as an\ningested poison of the DM's choice. The tree vanishes after 1\nhour. Picked fruit remains, retaining any magic for 30 days.\n81-90 A nest of 1d4 + 3 eggs springs up. Any creature that eats an\negg must make a DC 20 Constitution saving throw. On a\nsuccessful save, a creature permanently increases its lowest\nability score by 1, randomly choosing among equally low\nscores. On a failed save, the creature takes 10d6 force\ndamage from an internal magical explosion.\n91-99 A pyramid with a 60-foot-square base bursts upward. Inside is\na sarcophagus containing a mummy lord. The pyramid is\ntreated as the mummy lord's lair, and its sarcophagus\ncontains treasure of the DM's choice.\n00 A giant beanstalk sprouts, growing to a height of the DM's\nchoice. The top leads where the DM chooses, such as to a\ngreat view, a cloud giant's castle, or a different plane of\nexistence.\nDungeon Master's Guide (SRD)\n21/04/26, 16:04 List » DnD 5 Magic Items",
-      "descrizione_it": ""
+      "descrizione_it": "All'interno di questa borsa di tessuto pesante ci sono 3d4 fagioli secchi. La borsa pesa mezza libbra più mezza oncia per ogni fagiolo che contiene.\n\nSe versi i fagioli dalla borsa, esplodono in un raggio di 3 metri da essi, dissolvendosi dopo l'esplosione. Ogni creatura entro 3 metri dai fagioli deve effettuare un tiro salvezza su Destrezza con CD 15, subendo 5d4 danni da fuoco se fallisce, o la metà se ha successo.\n\nPer evitare l'esplosione, i fagioli devono essere estratti con cura dalla borsa e piantati. Quando un fagiolo viene piantato in terra o terreno, accade un effetto, casuale o determinato dal DM (vedi tabella sul DMG)."
     },
     {
       "id": "bag-of-devouring",
@@ -340,7 +340,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This bag superficially resembles a bag of holding but is a feeding\norifice for a gigantic extradimensional creature. Turning the bag\ninside out closes the orifice.\nThe extradimensional creature attached to the bag can sense\nwhatever is placed inside the bag. Animal or vegetable matter\nplaced wholly in the bag is devoured and lost forever. When part of\na living creature is placed in the bag, as happens when someone\nreaches inside it, there is a 50 percent chance that the creature is\npulled inside the bag. A creature inside the bag can use its action to\ntry to escape with a successful DC 15 Strength check. Another\ncreature can use its action to reach into the bag to pull a creature\nout, doing so with a successful DC 20 Strength check (provided it\nisn't pulled inside the bag first). Any creature that starts its turn\ninside the bag is devoured, its body destroyed.\nInanimate objects can be stored in the bag, which can hold a cubic\nfoot of such material. However, once each day, the bag swallows\nany objects inside it and spits them out into another plane of\nexistence. The DM determines the time and plane.\nIf the bag is pierced or torn, it is destroyed, and anything contained\nwithin it is transported to a random location on the Astral Plane.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa borsa assomiglia molto a una Borsa Conservante ma è in realtà una bocca di un'enorme creatura extradimensionale. Posizionare qualsiasi creatura all'interno della borsa la teletrasporta nelle fauci della creatura. Quando la borsa si gira al rovescio, la creatura emerge.\n\nSe viene ascoltata, dall'interno della borsa si sente un debole digerimento. Gli oggetti collocati nella borsa vengono ingoiati dopo 1 minuto. Una volta al giorno la borsa ingoia qualsiasi creatura collocata al suo interno e di taglia Media o inferiore. La creatura ingoiata viene espulsa nel piano del Caos di Pandemonium."
     },
     {
       "id": "bag-of-holding",
@@ -354,7 +354,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This bag has an interior space considerably larger than its outside\ndimensions, roughly 2 feet in diameter at the mouth and 4 feet\ndeep. The bag can hold up to 500 pounds, not exceeding a volume\nof 64 cubic feet. The bag weighs 15 pounds, regardless of its\ncontents. Retrieving an item from the bag requires an action.\nIf the bag is overloaded, pierced, or torn, it ruptures and is\ndestroyed, and its contents are scattered in the Astral Plane. If the\nbag is turned inside out, its contents spill forth, unharmed, but the\nbag must be put right before it can be used again. Breathing\ncreatures inside the bag can survive up to a number of minutes\nequal to 10 divided by the number of creatures (minimum 1\nminute), after which time they begin to suffocate.\nPlacing a bag of holding inside an extradimensional space created\nby a Heward's handy haversack, portable hole, or similar item\ninstantly destroys both items and opens a gate to the Astral Plane.\nThe gate originates where the one item was placed inside the other.\nAny creature within 10 feet of the gate is sucked through it to a\nrandom location on the Astral Plane. The gate then closes. The gate\nis one-way only and can't be reopened.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa borsa ha una capacità interna di 500 libbre, occupando un volume non superiore a 64 piedi cubi. La borsa pesa sempre 15 libbre, indipendentemente dal suo contenuto. Estrarre un oggetto dalla borsa richiede un'azione.\n\nSe la borsa viene riempita oltre la sua capacità, o se è perforata o lacerata, si rompe e viene distrutta, e i suoi contenuti si disperdono nel Piano Astrale. Se la borsa è capovolta, i contenuti escono illesi, ma la borsa deve essere rimessa al diritto prima di poter essere riutilizzata. Le creature respiranti all'interno della borsa hanno aria sufficiente per 10 minuti, divisi per il numero di creature respiranti al suo interno.\n\nPosizionare una Borsa Conservante all'interno di un'altra borsa extradimensionale (come una Borsa Divorante, una Sacca a Tracolla Manesca di Heward o un Buco Portatile) distrugge entrambi gli oggetti e apre un portale verso il Piano Astrale. Il portale ha origine dove un oggetto è stato collocato dentro l'altro. Qualsiasi creatura entro 3 metri dal portale viene risucchiata e depositata in un luogo casuale del Piano Astrale. Il portale si chiude quindi. Il portale è a senso unico e non può essere riaperto."
     },
     {
       "id": "bag-of-tricks",
@@ -368,7 +368,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This ordinary bag, made from gray, rust, or tan cloth, appears\nempty. Reaching inside the bag, however, reveals the presence of a\nsmall, fuzzy object. The bag weighs 1/2 pound.\nYou can use an action to pull the fuzzy object from the bag and\nthrow it up to 20 feet. When the object lands, it transforms into a\ncreature you determine by rolling a d8 and consulting the table that\ncorresponds to the bag's color. The creature vanishes at the next\ndawn or when it is reduced to 0 hit points.\nThe creature is friendly to you and your companions, and it acts on\nyour turn. You can use a bonus action to command how the\ncreature moves and what action it takes on its next turn, or to give\nit general orders, such as to attack your enemies. In the absence of\nsuch orders, the creature acts in a fashion appropriate to its nature.\nOnce three fuzzy objects have been pulled from the bag, the bag\ncan't be used again until the next dawn.\nGray Bag of Tricks\nd8 Creature\n1 Weasel\n2 Giant rat\n3 Badger\n4 Boar\n5 Panther\n6 Giant badger\n7 Dire wolf\n8 Giant elk\nRust Bag of Tricks\nd8 Creature\n1 Rat\n2 Owl\n3 Mastiff\n4 Goat\n5 Giant goat\n6 Giant boar\n7 Lion\n8 Brown bear\nTan Bag of Tricks\nd8 Creature\n1 Jackal\n2 Ape\n3 Baboon\n4 Axe beak\n5 Black bear\n6 Giant weasel\n7 Giant hyena\n8 Tiger\nDungeon Master's Guide (SRD)\n21/04/26, 16:04 List » DnD 5 Magic Items",
-      "descrizione_it": ""
+      "descrizione_it": "Questa borsa di tessuto ordinaria, di colore grigio, marrone chiaro o nero, sembra vuota. Tuttavia, infilando una mano all'interno si avverte la presenza di un piccolo oggetto soffice. La borsa pesa mezza libbra.\n\nCon un'azione, puoi estrarre il piccolo oggetto dalla borsa e lanciarlo fino a 6 metri di distanza. Quando l'oggetto tocca terra, si trasforma in una creatura determinata tirando un d8 e consultando la tabella corrispondente al colore della borsa. La creatura scompare al raggiungimento di 0 punti ferita o all'alba successiva.\n\nLa creatura è amichevole verso te e i tuoi compagni e agisce nel tuo turno. Puoi usare un'azione bonus per ordinarle come muoversi e che azione compiere nel suo turno successivo, oppure darle istruzioni generali (come attaccare i nemici). In assenza di ordini, la creatura agisce in modo confacente alla sua natura.\n\nUna volta estratte tre creature dalla borsa, questa non può essere usata di nuovo fino all'alba successiva."
     },
     {
       "id": "baleful-talon",
@@ -410,7 +410,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This small black sphere measures 3/4 of an inch in diameter and\nweighs an ounce. Typically, 1d4 + 4 beads of force are found\ntogether.\nYou can use an action to throw the bead up to 60 feet. The bead\nexplodes on impact and is destroyed. Each creature within a 10-\nfoot radius of where the bead landed must succeed on a DC 15\nDexterity saving throw or take 5d4 force damage. A sphere of\ntransparent force then encloses the area for 1 minute. Any creature\nthat failed the save and is completely within the area is trapped\ninside this sphere. Creatures that succeeded on the save, or are\npartially within the area, are pushed away from the center of the\nsphere until they are no longer inside it. Only breathable air can\npass through the sphere's wall. No attack or other effect can.\nAn enclosed creature can use its action to push against the sphere's\nwall, moving the sphere up to half the creature's walking speed.\nThe sphere can be picked up, and its magic causes it to weigh only 1\npound, regardless of the weight of creatures inside.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa piccola perla nera misura circa 2 centimetri di diametro e pesa un'oncia. In genere, da 1 a 4 perle di forza si trovano insieme.\n\nPuoi usare un'azione per lanciare la perla fino a 18 metri di distanza. Al termine del movimento, la perla esplode in un'onda di forza. Ogni creatura entro 3 metri dal punto di esplosione deve riuscire in un tiro salvezza su Destrezza con CD 15 o subire 5d4 danni da forza. Una sfera di forza traslucida ingloba quindi l'area per 1 minuto. Qualsiasi creatura che ha fallito il tiro salvezza ed è interamente all'interno dell'area è intrappolata in questa sfera. Le creature che sono solo parzialmente all'interno dell'area, o quelle che hanno avuto successo nel tiro salvezza, vengono spinte via dal centro della sfera fino a non essere più all'interno di essa. Solo una creatura intrappolata può respirare. La sfera può essere danneggiata e distrutta. Ha 10 punti ferita, immunità a tutti i danni eccetto forza, e se ridotta a 0 pf, viene distrutta, liberando ogni creatura intrappolata al suo interno."
     },
     {
       "id": "bead-of-nourishment",
@@ -424,7 +424,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This spongy, flavorless, gelatinous bead dissolves on your tongue and provides as much nourishment as 1 day of rations.",
-      "descrizione_it": ""
+      "descrizione_it": "Questa perla aromatica si dissolve a contatto con la lingua e ti fornisce nutrimento sufficiente per 24 ore, anche se non puoi normalmente mangiare cibo o bere acqua, ad esempio se sei non morto."
     },
     {
       "id": "bead-of-refreshment",
@@ -438,7 +438,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This spongy, flavorless, gelatinous bead dissolves in liquid, transforming up to a pint of the liquid into fresh, cold drinking water. The bead has no effect on magical liquids or harmful substances such as poison.",
-      "descrizione_it": ""
+      "descrizione_it": "Questa perla si dissolve quando immersa in un liquido, conferendo a quel liquido il sapore dell'acqua fresca pulita. Una pinta del liquido così trattato diventa pura e potabile, eliminando ogni veleno o malattia che vi si trovi."
     },
     {
       "id": "bell-branch",
@@ -452,7 +452,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This silver implement is shaped like a tree branch and is strung with small golden bells. The branch is a spellcasting focus for your spells while you hold it.\n\nThe branch has 3 charges, and it regains 1d3 expended charges daily at dawn. You can use the charges in the following ways while holding it:\n\n- As a bonus action, you can expend 1 charge to detect the presence of aberrations, celestials, constructs, elementals, fey, fiends, or undead within 60 feet of you. If such creatures are present and don't have total cover from you, the bells ring softly, their tone indicating the creature types present.\n\n- As an action, you can expend 1 charge to cast Protection from Evil and Good.",
-      "descrizione_it": ""
+      "descrizione_it": "Tieni questo ramoscello e suoni le campanelle attaccate per usarlo come focus per i tuoi incantesimi da druido. Mentre suoni le campanelle, ricevi un bonus ai tiri per colpire con incantesimo e alle CD dei tiri salvezza dei tuoi incantesimi da druido. Il bonus è determinato dalla rarità del ramo a sonagli."
     },
     {
       "id": "belt-of-dwarvenkind",
@@ -466,7 +466,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this belt, you gain the following benefits:\n• Your Constitution score increases by 2, to a maximum of 20.\n• You have advantage on Charisma (Persuasion) checks made to\ninteract with dwarves.\nIn addition, while attuned to the belt, you have a 50 percent chance\neach day at dawn of growing a full beard if you're capable of\ngrowing one, or a visibly thicker beard if you already have one.\nIf you aren't a dwarf, you gain the following additional benefits\nwhile wearing the belt:\n• You have advantage on saving throws against poison, and you\nhave resistance against poison damage.\n• You have darkvision out to a range of 60 feet.\n• You can speak, read, and write Dwarvish.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questa cintura, ottieni i seguenti benefici:\n\n- Il tuo punteggio di Costituzione aumenta di 2, fino a un massimo di 20.\n- Hai vantaggio ai tiri salvezza su Carisma effettuati per resistere agli effetti degli incantesimi lanciati da giganti.\nInoltre, mentre la indossi hai una probabilità del 50% all'alba di ogni giorno di far crescere una folta barba scura, se sei in grado di farla crescere, o di rendere ancora più impressionante quella esistente, se ne hai già una. Se non apprezzi questa caratteristica, la barba si dissolve quando rimuovi la cintura."
     },
     {
       "id": "belt-of-giant-strength",
@@ -480,7 +480,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this belt, your Strength score changes to a score\ngranted by the belt. The item has no effect on you if your Strength\nwithout the belt is equal to or greater than the belt's score.\nSix varieties of this belt exist, corresponding with and having rarity\naccording to the six kinds of true giants. The belt of stone giant\nstrength and the belt of frost giant strength look different, but they\nhave the same effect.\nType Strength Rarity\nHill giant 21 Rare\nStone/frost giant 23 Very rare\nFire giant 25 Very rare\nCloud giant 27 Legendary\nStorm giant 29 Legendary\nDungeon Master's Guide (SRD)\n21/04/26, 16:04 List » DnD 5 Magic Items",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questa cintura, il tuo punteggio di Forza viene impostato secondo il tipo di gigante (vedi tabella). L'effetto non si applica se la tua Forza è già pari o superiore al valore della cintura.\n\nTipo di Cintura | Punteggio di Forza\nCintura del Gigante delle Colline | 21\nCintura del Gigante di Pietra/Frost | 23\nCintura del Gigante del Fuoco | 25\nCintura del Gigante delle Nuvole | 27\nCintura del Gigante delle Tempeste | 29"
     },
     {
       "id": "berserker-axe",
@@ -494,7 +494,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 1,
       "descrizione_en": "You gain a +1 bonus to attack and damage rolls made with this\nmagic weapon. In addition, while you are attuned to this weapon,\nyour hit point maximum increases by 1 for each level you have\nattained.\nCurse. This axe is cursed, and becoming attuned to it extends the\ncurse to you. As long as you remain cursed, you are unwilling to\npart with the axe, keeping it within reach at all times. You also have\ndisadvantage on attack rolls with weapons other than this one,\nunless no foe is within 60 feet of you that you can see or hear.\nWhenever a hostile creature damages you while the axe is in your\npossession, you must succeed on a DC 15 Wisdom saving throw or\ngo berserk. While berserk, you must use your action each round to\nattack the creature nearest to you with the axe. If you can make\nextra attacks as part of the Attack action, you use those extra\nattacks, moving to attack the next nearest creature after you fell\nyour current target. If you have multiple possible targets, you\nattack one at random. You are berserk until you start your turn\nwith no creatures within 60 feet of you that you can see or hear.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Ottieni un bonus di +1 ai tiri per colpire e ai tiri di danno effettuati con questa arma magica. Inoltre, mentre sei sintonizzato con quest'arma, il tuo massimo di punti ferita aumenta di 1 per ogni livello che hai.\n\nMaledizione. Questa ascia è maledetta e la sintonia con essa estende la maledizione a te. Finché rimani maledetto, sei restio a separarti dall'arma, mantenendola alla portata in ogni momento. Hai inoltre svantaggio ai tiri per colpire effettuati con altre armi.\n\nInoltre, mentre l'ascia è sulla tua persona, devi effettuare un tiro salvezza su Saggezza con CD 15 ogni volta che subisci danno in combattimento. In caso di fallimento, vai in furia per il proprio successivo turno. Per ogni turno in furia, devi effettuare attacchi in mischia contro la creatura più vicina. Se puoi attaccare più di una creatura nel tuo movimento, scegli a caso il bersaglio. La furia termina al tuo turno se non puoi vedere o avvicinarti a una creatura ostile."
     },
     {
       "id": "bigby-s-beneficent-bracelet",
@@ -662,7 +662,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While you wear these boots, your steps make no sound, regardless\nof the surface you are moving across. You also have advantage on\nDexterity (Stealth) checks that rely on moving silently.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi stivali, i tuoi passi non producono alcun rumore, indipendentemente dalla superficie su cui ti muovi. Hai inoltre vantaggio alle prove di Destrezza (Furtività) effettuate per muoverti silenziosamente."
     },
     {
       "id": "boots-of-false-tracks",
@@ -676,7 +676,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "Only humanoids can wear these boots. While wearing the boots, you can choose to have them leave tracks like those of another kind of humanoid of your size.",
-      "descrizione_it": ""
+      "descrizione_it": "Solo gli umanoidi possono indossare questi stivali. Mentre li indossi, puoi fare in modo che gli stivali lascino le tracce di una qualsiasi creatura umanoide di taglia simile alla tua."
     },
     {
       "id": "boots-of-levitation",
@@ -690,7 +690,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While you wear these boots, you can use an action to cast the\nlevitate spell on yourself at will.\nDungeon Master's Guide (SRD)\n21/04/26, 16:04 List » DnD 5 Magic Items",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi stivali, puoi usare un'azione per lanciare l'incantesimo Levitazione su te stesso a volontà."
     },
     {
       "id": "boots-of-speed",
@@ -704,7 +704,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While you wear these boots, you can use a bonus action and click\nthe boots' heels together. If you do, the boots double your walking\nspeed, and any creature that makes an opportunity attack against\nyou has disadvantage on the attack roll. If you click your heels\ntogether again, you end the effect.\nWhen the boots' property has been used for a total of 10 minutes,\nthe magic ceases to function until you finish a long rest.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi stivali, puoi usare un'azione bonus e battere i talloni insieme. Per 10 minuti, la tua velocità di camminata è raddoppiata, le creature ostili hanno svantaggio ai tiri per colpire contro di te quando le attacchi in mischia, e l'attacco di opportunità non si applica a te quando lasci la portata di una creatura ostile. Se i talloni perdono contatto, l'effetto termina.\n\nQuando l'effetto termina, non puoi riutilizzare la proprietà finché non l'avrai usata in modo continuativo per 10 minuti."
     },
     {
       "id": "boots-of-striding-and-springing",
@@ -718,7 +718,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While you wear these boots, your walking speed becomes 30 feet,\nunless your walking speed is higher, and your speed isn't reduced if\nyou are encumbered or wearing heavy armor. In addition, you can\njump three times the normal distance, though you can't jump\nfarther than your remaining movement would allow.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi stivali, la tua velocità di camminata diventa 9 metri, a meno che non sia già superiore, e la tua velocità non viene ridotta se sei carico o indossi armatura pesante. Inoltre, puoi saltare il triplo della distanza normale, ma non oltre la tua velocità di camminata rimanente."
     },
     {
       "id": "boots-of-the-winterlands",
@@ -732,7 +732,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "can tolerate temperatures as low as -100 degrees Fahrenheit.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questi stivali confortevoli sono caldi e impermeabili. Mentre li indossi ottieni i seguenti benefici:\n\n- Hai resistenza ai danni da freddo.\n- Ignori il terreno difficile creato da ghiaccio o neve.\n- Puoi sopportare temperature fino a -45 gradi Celsius senza ulteriore protezione. Se indossi indumenti pesanti, puoi sopportare temperature fino a -73 gradi Celsius."
     },
     {
       "id": "bow-of-conflagration",
@@ -788,7 +788,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing these bracers, you have proficiency with the\nlongbow and shortbow, and you gain a +2 bonus to damage rolls on\nranged attacks made with such weapons.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi bracciali, hai competenza nell'arco lungo e nell'arco corto, e ottieni un bonus di +2 ai tiri di danno con quei tipi d'arma."
     },
     {
       "id": "bracers-of-defense",
@@ -802,7 +802,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing these bracers, you gain a +2 bonus to AC if you are\nwearing no armor and using no shield.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questi bracciali, ottieni un bonus di +2 alla CA se non indossi alcuna armatura e non impugni alcuno scudo."
     },
     {
       "id": "brazier-of-commanding-fire-elementals",
@@ -816,7 +816,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While a fire burns in this brass brazier, you can use an action to\nspeak the brazier's command word and summon a fire elemental,\nas if you had cast the conjure elemental spell. The brazier can't be\nused this way again until the next dawn. The brazier weighs 5\npounds.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre nessun fuoco arde in questo braciere d'ottone, puoi usare un'azione per pronunciare la sua parola di comando ed evocare un elementale del fuoco, come se avessi lanciato l'incantesimo Evocare Elementale. Il braciere non può essere usato di nuovo allo stesso scopo fino all'alba successiva."
     },
     {
       "id": "brooch-of-shielding",
@@ -830,7 +830,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "While wearing this brooch, you have resistance to force damage,\nand you have immunity to damage from the magic missile spell.\nDungeon Master's Guide (SRD)\n21/04/26, 16:04 List » DnD 5 Magic Items",
-      "descrizione_it": ""
+      "descrizione_it": "Mentre indossi questa spilla, hai resistenza ai danni da forza e immunità ai danni inflitti dall'incantesimo Proiettile Magico."
     },
     {
       "id": "broom-of-flying",
@@ -844,7 +844,7 @@
       "sintonia_dettaglio": "",
       "incantamento": 0,
       "descrizione_en": "This wooden broom, which weighs 3 pounds, functions like a\nmundane broom until you stand astride it and speak its command\nword. It then hovers beneath you and can be ridden in the air. It\nhas a flying speed of 50 feet. It can carry up to 400 pounds, but its\nflying speed becomes 30 feet while carrying over 200 pounds. The\nbroom stops hovering when you land.\nYou can send the broom to travel alone to a destination within 1\nmile of you if you speak the command word, name the location, and\nare familiar with that place. The broom comes back to you when\nyou speak another command word, provided that the broom is still\nwithin 1 mile of you.\nDungeon Master's Guide (SRD)",
-      "descrizione_it": ""
+      "descrizione_it": "Questa scopa di legno, che pesa 1,5 kg, funziona come una normale scopa fino a quando non sei in piedi su di essa e ne pronunci la parola di comando. Allora si libra in volo e può essere cavalcata in volo. Ha una velocità di volo di 15 metri. Può trasportare fino a 200 libbre, ma la sua velocità di volo si dimezza se trasporta oltre 100 libbre. La scopa smette di volare se atterri. Puoi inviare la scopa a viaggiare da sola fino a una destinazione entro 1,5 km, se conosci il luogo. La scopa torna nel tuo spazio dopo 24 ore se il suo viaggio fallisce. Altrimenti, viaggia verso qualsiasi destinazione tu specifichi e poi torna nel tuo spazio."
     },
     {
       "id": "candle-of-invocation",
