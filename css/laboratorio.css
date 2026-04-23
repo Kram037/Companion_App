@@ -703,39 +703,169 @@
     color: var(--text-secondary);
 }
 
-.lab-sub-coverage {
-    margin-bottom: 10px;
-}
-.lab-sub-coverage-row {
+/* Stepper a 3 step (Classe / Sottoclasse / Privilegi) */
+.lab-sub-stepper {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 4px 0 14px;
+}
+.lab-sub-stepper-item {
+    display: flex;
+    align-items: center;
     gap: 6px;
+    flex: 1;
+    min-width: 0;
 }
-.lab-sub-coverage-label {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    margin-right: 4px;
+.lab-sub-stepper-item:not(:last-child)::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-left: 4px;
 }
-.lab-sub-coverage-chip {
-    font-size: 0.78rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 999px;
+.lab-sub-stepper-item.done:not(:last-child)::after,
+.lab-sub-stepper-item.active:not(:last-child)::after {
+    background: var(--accent);
+}
+.lab-sub-stepper-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     background: var(--bg);
     color: var(--text-secondary);
     border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
 }
-.lab-sub-coverage-chip.done {
-    background: rgba(76, 175, 80, 0.18);
-    color: #66bb6a;
-    border-color: rgba(76, 175, 80, 0.4);
+.lab-sub-stepper-item.done .lab-sub-stepper-num,
+.lab-sub-stepper-item.active .lab-sub-stepper-num {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+.lab-sub-stepper-name {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.lab-sub-stepper-item.active .lab-sub-stepper-name {
+    color: var(--text);
+    font-weight: 700;
+}
+
+/* Stepper numerici per il numero di privilegi per livello */
+.lab-sub-counts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+.lab-sub-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.lab-sub-count-level {
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.lab-sub-count-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.lab-sub-count-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.lab-sub-count-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.lab-sub-count-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.lab-sub-count-val {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Progress bar dei privilegi compilati */
+.lab-sub-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 12px;
+}
+.lab-sub-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.lab-sub-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.2s ease;
+}
+.lab-sub-progress-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Header del privilegio corrente */
+.lab-sub-feature-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.lab-sub-feature-level {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+.lab-sub-feature-pos {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+.lab-sub-feature-global {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-left: auto;
 }
 
 .lab-sub-feature-scroll {
-    max-height: 50vh;
+    max-height: 45vh;
 }
 
 .lab-sub-toggle {
@@ -765,10 +895,27 @@
     display: flex;
     gap: 8px;
     justify-content: space-between;
+    align-items: stretch;
 }
 .lab-sub-actions-row > .btn-secondary,
 .lab-sub-actions-row > .btn-primary {
     flex: 1;
+    padding: 10px 16px;
+    line-height: 1.2;
+    min-height: 0;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Normalizza altezza: btn-primary non ha border, btn-secondary sì.
+   Aggiungiamo un border trasparente al primary così entrambi hanno
+   lo stesso box-model e quindi stessa altezza verticale. */
+.lab-sub-actions-row > .btn-primary {
+    border: 1px solid transparent;
+}
+.lab-sub-create-btn {
+    border: 1px solid transparent;
 }
 .lab-sub-create-btn {
     width: 100%;

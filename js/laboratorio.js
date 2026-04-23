@@ -255,27 +255,67 @@ let _labSubState = null;
 
 function _labSubInitState(editData) {
     const e = editData || {};
-    const features = Array.isArray(e.sottoclasse_features) ? e.sottoclasse_features.map(f => ({
-        level: parseInt(f.level) || 1,
-        nome: f.nome || '',
-        descrizione: f.descrizione || '',
-        has_resource: !!f.risorsa,
-        risorsa: f.risorsa ? {
-            nome: f.risorsa.nome || '',
-            max: f.risorsa.max || '',
-            recharge: f.risorsa.recharge || 'long_rest',
-            tipo: f.risorsa.tipo || 'counter',
-            dado: f.risorsa.dado || 'd6'
-        } : { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' }
-    })) : [];
+    const slotsBuf = {}; // {level: [feature, feature, ...]}
+    if (Array.isArray(e.sottoclasse_features)) {
+        for (const f of e.sottoclasse_features) {
+            const lv = parseInt(f.level) || 1;
+            if (!slotsBuf[lv]) slotsBuf[lv] = [];
+            slotsBuf[lv].push({
+                level: lv,
+                slotIdx: slotsBuf[lv].length,
+                nome: f.nome || '',
+                descrizione: f.descrizione || '',
+                has_resource: !!f.risorsa,
+                risorsa: f.risorsa ? {
+                    nome: f.risorsa.nome || '',
+                    max: f.risorsa.max ?? '',
+                    recharge: f.risorsa.recharge || 'long_rest',
+                    tipo: f.risorsa.tipo || 'counter',
+                    dado: f.risorsa.dado || 'd6'
+                } : _labSubEmptyRisorsa()
+            });
+        }
+    }
+    // Calcola counts per livello dalle feature esistenti, default 1 per livello se vuoto.
+    const slug = e.parent_class_slug || null;
+    const lvls = slug ? (SUBCLASS_FEATURE_LEVELS_BY_SLUG[slug] || []) : [];
+    const countsByLevel = {};
+    for (const lv of lvls) countsByLevel[lv] = Math.max(1, (slotsBuf[lv] || []).length || 1);
+
+    // Costruisce features ordinate.
+    const features = [];
+    for (const lv of lvls) {
+        const cnt = countsByLevel[lv];
+        for (let i = 0; i < cnt; i++) {
+            const existing = (slotsBuf[lv] || [])[i];
+            features.push(existing || _labSubMakeEmptyFeature(lv, i));
+        }
+    }
+
     return {
         editingId: e.id || null,
-        page: e.parent_class_slug ? 'features' : 'pick-class',
-        parentSlug: e.parent_class_slug || null,
+        page: e.parent_class_slug ? 'setup' : 'pick-class',
+        parentSlug: slug,
         parentName: e.parent_class_name || null,
         subclassName: e.nome || '',
+        countsByLevel,
         features,
-        currentIdx: features.length ? 0 : 0
+        currentIdx: 0
+    };
+}
+
+function _labSubEmptyRisorsa() {
+    return { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' };
+}
+
+function _labSubMakeEmptyFeature(level, slotIdx) {
+    return {
+        level: level || 1,
+        slotIdx: slotIdx || 0,
+        nome: '',
+        descrizione: '',
+        has_resource: false,
+        risorsa: _labSubEmptyRisorsa()
     };
 }
 
@@ -284,22 +324,28 @@ function _labSubLevelsForCurrentClass() {
     return SUBCLASS_FEATURE_LEVELS_BY_SLUG[_labSubState.parentSlug] || [];
 }
 
-function _labSubNextSuggestedLevel() {
-    const levels = _labSubLevelsForCurrentClass();
-    if (!levels.length) return 1;
-    const covered = new Set(_labSubState.features.map(f => f.level));
-    for (const lv of levels) {
-        if (!covered.has(lv)) return lv;
+// Ricostruisce l'array features in base a countsByLevel, preservando i dati
+// già inseriti per (level, slotIdx) ancora presenti.
+function _labSubRebuildFeatures() {
+    const lvls = _labSubLevelsForCurrentClass();
+    const oldByKey = {};
+    for (const f of _labSubState.features) oldByKey[`${f.level}#${f.slotIdx}`] = f;
+    const next = [];
+    for (const lv of lvls) {
+        const cnt = Math.max(1, parseInt(_labSubState.countsByLevel[lv]) || 1);
+        for (let i = 0; i < cnt; i++) {
+            const old = oldByKey[`${lv}#${i}`];
+            next.push(old || _labSubMakeEmptyFeature(lv, i));
+        }
     }
-    return levels[0];
+    _labSubState.features = next;
+    if (_labSubState.currentIdx >= next.length) _labSubState.currentIdx = Math.max(0, next.length - 1);
 }
 
-function _labSubAllLevelsCovered() {
-    const levels = _labSubLevelsForCurrentClass();
-    if (!levels.length) return false;
-    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
-    const set = new Set(valid.map(f => f.level));
-    return levels.every(lv => set.has(lv));
+// Tutti i privilegi pianificati hanno nome+descrizione?
+function _labSubAllFeaturesComplete() {
+    if (!_labSubState.features.length) return false;
+    return _labSubState.features.every(f => (f.nome || '').trim() && (f.descrizione || '').trim());
 }
 
 function _openLabSottoclasseWizard(editData) {
@@ -319,23 +365,28 @@ function _labSubRender() {
     if (!mlg) return;
     if (_labSubState.page === 'pick-class') {
         mlg.innerHTML = _labSubRenderPickClass();
+    } else if (_labSubState.page === 'setup') {
+        mlg.innerHTML = _labSubRenderSetupPage();
     } else {
+        _labSubRebuildFeatures();
         if (!_labSubState.features.length) {
-            _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
-            _labSubState.currentIdx = 0;
+            // Non dovrebbe mai accadere (almeno 1 per livello), ma per sicurezza torna al setup.
+            _labSubState.page = 'setup';
+            mlg.innerHTML = _labSubRenderSetupPage();
+            return;
         }
         mlg.innerHTML = _labSubRenderFeaturePage();
     }
 }
 
-function _labSubMakeEmptyFeature(level) {
-    return {
-        level: level || 1,
-        nome: '',
-        descrizione: '',
-        has_resource: false,
-        risorsa: { nome: '', max: '', recharge: 'long_rest', tipo: 'counter', dado: 'd6' }
-    };
+function _labSubStepperHtml(active) {
+    const steps = ['Classe', 'Sottoclasse', 'Privilegi'];
+    return `<div class="lab-sub-stepper">${steps.map((s, i) => `
+        <div class="lab-sub-stepper-item${i === active ? ' active' : ''}${i < active ? ' done' : ''}">
+            <span class="lab-sub-stepper-num">${i + 1}</span>
+            <span class="lab-sub-stepper-name">${s}</span>
+        </div>
+    `).join('')}</div>`;
 }
 
 function _labSubRenderPickClass() {
@@ -351,13 +402,52 @@ function _labSubRenderPickClass() {
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
         <h2>${title}</h2>
-        <div class="lab-sub-step-label">1. Scegli la classe madre</div>
+        ${_labSubStepperHtml(0)}
+        <div class="lab-sub-step-label">Scegli la classe madre</div>
         <div class="wizard-page-scroll" style="max-height:55vh;">
             <div class="lab-sub-class-grid">${cards}</div>
         </div>
-        <div class="form-actions">
-            <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
-            <button type="button" class="btn-primary" id="labSubNextFromPick" disabled onclick="labSubGoToFeatures()">Avanti</button>
+        <div class="lab-sub-actions">
+            <div class="lab-sub-actions-row">
+                <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
+                <button type="button" class="btn-primary" id="labSubNextFromPick" ${_labSubState.parentSlug ? '' : 'disabled'} onclick="labSubGoToSetup()">Avanti</button>
+            </div>
+        </div>`;
+}
+
+function _labSubRenderSetupPage() {
+    const lvls = _labSubLevelsForCurrentClass();
+    // Assicura che countsByLevel abbia sempre tutti i livelli della classe scelta.
+    for (const lv of lvls) {
+        if (!_labSubState.countsByLevel[lv]) _labSubState.countsByLevel[lv] = 1;
+    }
+    const stepperRows = lvls.map(lv => {
+        const c = parseInt(_labSubState.countsByLevel[lv]) || 1;
+        return `
+        <div class="lab-sub-count-row">
+            <span class="lab-sub-count-level">${lv}° livello</span>
+            <div class="lab-sub-count-stepper">
+                <button type="button" class="lab-sub-count-btn" onclick="labSubChangeCount(${lv}, -1)" ${c <= 1 ? 'disabled' : ''}>−</button>
+                <span class="lab-sub-count-val" id="labSubCount_${lv}">${c}</span>
+                <button type="button" class="lab-sub-count-btn" onclick="labSubChangeCount(${lv}, 1)">+</button>
+            </div>
+        </div>`;
+    }).join('');
+    return `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${escapeHtml(_labSubState.parentName || 'Sottoclasse')}</h2>
+        ${_labSubStepperHtml(1)}
+        <div class="lab-sub-step-label">Nome della sottoclasse</div>
+        <div class="form-group">
+            <input type="text" id="labSubNome" value="${escapeHtml(_labSubState.subclassName || '')}" placeholder="es. Cavaliere della Tempesta" oninput="labSubSetupChange()">
+        </div>
+        <div class="lab-sub-step-label">Numero di privilegi per livello</div>
+        <div class="lab-sub-counts-list">${stepperRows}</div>
+        <div class="lab-sub-actions">
+            <div class="lab-sub-actions-row">
+                <button type="button" class="btn-secondary" onclick="labSubBackFromSetup()">Indietro</button>
+                <button type="button" class="btn-primary" id="labSubSetupNext" ${(_labSubState.subclassName || '').trim() ? '' : 'disabled'} onclick="labSubGoToFeatures()">Avanti</button>
+            </div>
         </div>`;
 }
 
@@ -365,10 +455,12 @@ function _labSubRenderFeaturePage() {
     const idx = _labSubState.currentIdx;
     const total = _labSubState.features.length;
     const f = _labSubState.features[idx];
-    const levels = _labSubLevelsForCurrentClass();
-    const levelOptions = levels.map(lv => `<option value="${lv}" ${f.level === lv ? 'selected' : ''}>${lv}° livello</option>`).join('');
-    const coverage = _labSubLevelsCoverageHtml();
-    const canCreate = _labSubAllLevelsCovered() && (_labSubState.subclassName || '').trim();
+    // Conta quanti privilegi ci sono per quel livello e qual è la posizione del corrente al suo interno.
+    const sameLevelFeatures = _labSubState.features.filter(x => x.level === f.level);
+    const levelLocalIdx = sameLevelFeatures.findIndex(x => x === f) + 1;
+    const levelLocalTot = sameLevelFeatures.length;
+    const isLast = idx === total - 1;
+    const canCreate = _labSubAllFeaturesComplete() && (_labSubState.subclassName || '').trim();
 
     const recOpts = [
         ['short_rest', 'Riposo Breve'],
@@ -429,26 +521,19 @@ function _labSubRenderFeaturePage() {
         </div>
     ` : '';
 
+    const subTitle = `${escapeHtml(_labSubState.subclassName || _labSubState.parentName || 'Sottoclasse')}`;
+    const progressBar = _labSubProgressBarHtml();
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
-        <h2>${escapeHtml(_labSubState.parentName || 'Sottoclasse')} · Sottoclasse Homebrew</h2>
-        <div class="lab-sub-coverage">${coverage}</div>
-        <div class="form-group">
-            <label for="labSubNome">Nome della sottoclasse</label>
-            <input type="text" id="labSubNome" value="${escapeHtml(_labSubState.subclassName || '')}" placeholder="es. Cavaliere della Tempesta" onchange="labSubFieldChange()" oninput="labSubFieldChange()">
+        <h2>${subTitle}</h2>
+        ${_labSubStepperHtml(2)}
+        ${progressBar}
+        <div class="lab-sub-feature-header">
+            <span class="lab-sub-feature-level">${f.level}° livello</span>
+            <span class="lab-sub-feature-pos">Privilegio ${levelLocalIdx} di ${levelLocalTot}</span>
+            <span class="lab-sub-feature-global">(${idx + 1}/${total})</span>
         </div>
-        <div class="lab-sub-step-label">Privilegio ${idx + 1} di ${total}</div>
         <div class="wizard-page-scroll lab-sub-feature-scroll">
-            <div class="form-row form-row-2">
-                <div class="form-group">
-                    <label for="labSubLevel">Livello del privilegio</label>
-                    <select id="labSubLevel" onchange="labSubFieldChange()">${levelOptions}</select>
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button type="button" class="btn-secondary" onclick="labSubRemoveCurrent()" ${total <= 1 ? 'disabled' : ''}>Elimina questo privilegio</button>
-                </div>
-            </div>
             <div class="form-group">
                 <label for="labSubFeatNome">Nome del privilegio</label>
                 <input type="text" id="labSubFeatNome" value="${escapeHtml(f.nome || '')}" placeholder="es. Tonante Carica" onchange="labSubFieldChange()" oninput="labSubFieldChange()">
@@ -468,7 +553,7 @@ function _labSubRenderFeaturePage() {
         <div class="lab-sub-actions">
             <div class="lab-sub-actions-row">
                 <button type="button" class="btn-secondary" onclick="labSubBack()">Indietro</button>
-                <button type="button" class="btn-primary" onclick="labSubNext()">Avanti</button>
+                <button type="button" class="btn-primary" onclick="labSubNext()" ${isLast ? 'disabled' : ''}>Avanti</button>
             </div>
             <button type="button" class="btn-primary lab-sub-create-btn" id="labSubCreateBtn" ${canCreate ? '' : 'disabled'} onclick="labSaveSottoclasse()">${_labSubState.editingId ? 'Salva modifiche' : 'Crea Sottoclasse'}</button>
             ${!canCreate ? `<p class="lab-sub-hint">${_labSubCreateHint()}</p>` : ''}
@@ -477,27 +562,24 @@ function _labSubRenderFeaturePage() {
 
 function _labSubCreateHint() {
     if (!(_labSubState.subclassName || '').trim()) return 'Inserisci un nome per la sottoclasse.';
-    const levels = _labSubLevelsForCurrentClass();
-    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
-    const covered = new Set(valid.map(f => f.level));
-    const missing = levels.filter(lv => !covered.has(lv));
-    if (missing.length) return `Inserisci almeno un privilegio (con nome e descrizione) per ogni livello: mancano ${missing.map(l => l + '°').join(', ')}.`;
+    const missing = _labSubState.features.filter(f => !(f.nome || '').trim() || !(f.descrizione || '').trim());
+    if (missing.length) return `Compila tutti i privilegi (mancano ${missing.length} su ${_labSubState.features.length}).`;
     return '';
 }
 
-function _labSubLevelsCoverageHtml() {
-    const levels = _labSubLevelsForCurrentClass();
-    const valid = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim());
-    const covered = new Set(valid.map(f => f.level));
-    return `<div class="lab-sub-coverage-row">
-        <span class="lab-sub-coverage-label">Livelli di sottoclasse:</span>
-        ${levels.map(lv => `<span class="lab-sub-coverage-chip${covered.has(lv) ? ' done' : ''}">${lv}°</span>`).join('')}
+function _labSubProgressBarHtml() {
+    const total = _labSubState.features.length;
+    const done = _labSubState.features.filter(f => (f.nome || '').trim() && (f.descrizione || '').trim()).length;
+    return `<div class="lab-sub-progress">
+        <div class="lab-sub-progress-bar"><div class="lab-sub-progress-fill" style="width:${total ? Math.round(done/total*100) : 0}%"></div></div>
+        <span class="lab-sub-progress-label">${done}/${total} privilegi compilati</span>
     </div>`;
 }
 
 window.labSubPickClass = function(slug, name) {
-    if (_labSubState.parentSlug && _labSubState.parentSlug !== slug && _labSubState.features.length) {
-        // Cambio classe: i livelli disponibili sono diversi, reset dei privilegi.
+    if (_labSubState.parentSlug && _labSubState.parentSlug !== slug) {
+        // Cambio classe: i livelli disponibili sono diversi, reset di counts e features.
+        _labSubState.countsByLevel = {};
         _labSubState.features = [];
         _labSubState.currentIdx = 0;
     }
@@ -508,22 +590,60 @@ window.labSubPickClass = function(slug, name) {
     if (btn) btn.disabled = false;
 };
 
-window.labSubGoToFeatures = function() {
+window.labSubGoToSetup = function() {
     if (!_labSubState.parentSlug) { showNotification('Seleziona una classe madre'); return; }
-    _labSubState.page = 'features';
-    if (!_labSubState.features.length) {
-        _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
-        _labSubState.currentIdx = 0;
-    }
+    _labSubState.page = 'setup';
     _labSubRender();
+};
+
+window.labSubBackFromSetup = function() {
+    _labSubReadSetupFromDOM();
+    _labSubState.page = 'pick-class';
+    _labSubRender();
+};
+
+window.labSubGoToFeatures = function() {
+    _labSubReadSetupFromDOM();
+    if (!(_labSubState.subclassName || '').trim()) {
+        showNotification('Inserisci il nome della sottoclasse');
+        return;
+    }
+    _labSubState.page = 'features';
+    _labSubRebuildFeatures();
+    _labSubState.currentIdx = 0;
+    _labSubRender();
+};
+
+function _labSubReadSetupFromDOM() {
+    if (!_labSubState || _labSubState.page !== 'setup') return;
+    const sn = document.getElementById('labSubNome');
+    if (sn) _labSubState.subclassName = sn.value;
+}
+
+window.labSubSetupChange = function() {
+    _labSubReadSetupFromDOM();
+    const btn = document.getElementById('labSubSetupNext');
+    if (btn) btn.disabled = !(_labSubState.subclassName || '').trim();
+};
+
+window.labSubChangeCount = function(level, delta) {
+    _labSubReadSetupFromDOM();
+    const cur = parseInt(_labSubState.countsByLevel[level]) || 1;
+    const next = Math.max(1, Math.min(8, cur + delta));
+    _labSubState.countsByLevel[level] = next;
+    const valEl = document.getElementById(`labSubCount_${level}`);
+    if (valEl) valEl.textContent = next;
+    // Re-render solo del blocco counts per aggiornare i bottoni −/+.
+    _labSubRender();
+    // Mantiene il focus dell'input nome se possibile.
+    const nm = document.getElementById('labSubNome');
+    if (nm) nm.focus();
 };
 
 function _labSubReadCurrentFromDOM() {
     if (!_labSubState || _labSubState.page !== 'features') return;
     const f = _labSubState.features[_labSubState.currentIdx];
     if (!f) return;
-    const lvEl = document.getElementById('labSubLevel');
-    if (lvEl) f.level = parseInt(lvEl.value) || f.level;
     const nm = document.getElementById('labSubFeatNome');
     if (nm) f.nome = nm.value;
     const ds = document.getElementById('labSubFeatDesc');
@@ -540,17 +660,15 @@ function _labSubReadCurrentFromDOM() {
         else if (rmm) f.risorsa.max = rmm.value === '' ? '' : (parseInt(rmm.value) || 0);
         const rd = document.getElementById('labSubResDado'); if (rd) f.risorsa.dado = rd.value;
     }
-    const sn = document.getElementById('labSubNome');
-    if (sn) _labSubState.subclassName = sn.value;
 }
 
 window.labSubFieldChange = function() {
     _labSubReadCurrentFromDOM();
-    // Aggiorna chip di copertura e stato bottone Crea senza re-render completo.
-    const covEl = document.querySelector('.lab-sub-coverage');
-    if (covEl) covEl.innerHTML = _labSubLevelsCoverageHtml();
+    // Aggiorna progress bar e stato bottone Crea senza re-render completo.
+    const progEl = document.querySelector('.lab-sub-progress');
+    if (progEl) progEl.outerHTML = _labSubProgressBarHtml();
     const btn = document.getElementById('labSubCreateBtn');
-    if (btn) btn.disabled = !_labSubAllLevelsCovered() || !(_labSubState.subclassName || '').trim();
+    if (btn) btn.disabled = !_labSubAllFeaturesComplete() || !(_labSubState.subclassName || '').trim();
     let hint = document.querySelector('.lab-sub-hint');
     const text = _labSubCreateHint();
     if (text) {
@@ -587,40 +705,25 @@ window.labSubBack = function() {
         _labSubState.currentIdx -= 1;
         _labSubRender();
     } else {
-        // Torna alla selezione classe.
-        _labSubState.page = 'pick-class';
+        // Torna allo step di setup (nome + count per livello).
+        _labSubState.page = 'setup';
         _labSubRender();
     }
 };
 
 window.labSubNext = function() {
     _labSubReadCurrentFromDOM();
-    const f = _labSubState.features[_labSubState.currentIdx];
-    if (!(f.nome || '').trim() || !(f.descrizione || '').trim()) {
-        showNotification('Compila nome e descrizione del privilegio prima di procedere');
-        return;
-    }
     if (_labSubState.currentIdx < _labSubState.features.length - 1) {
         _labSubState.currentIdx += 1;
-    } else {
-        _labSubState.features.push(_labSubMakeEmptyFeature(_labSubNextSuggestedLevel()));
-        _labSubState.currentIdx = _labSubState.features.length - 1;
+        _labSubRender();
     }
-    _labSubRender();
-};
-
-window.labSubRemoveCurrent = function() {
-    if (_labSubState.features.length <= 1) return;
-    _labSubState.features.splice(_labSubState.currentIdx, 1);
-    if (_labSubState.currentIdx >= _labSubState.features.length) _labSubState.currentIdx = _labSubState.features.length - 1;
-    _labSubRender();
 };
 
 window.labSaveSottoclasse = async function() {
     _labSubReadCurrentFromDOM();
     if (!(_labSubState.subclassName || '').trim()) { showNotification('Inserisci il nome della sottoclasse'); return; }
-    if (!_labSubAllLevelsCovered()) {
-        showNotification('Devi inserire almeno un privilegio per ogni livello di sottoclasse');
+    if (!_labSubAllFeaturesComplete()) {
+        showNotification('Compila nome e descrizione di tutti i privilegi prima di salvare');
         return;
     }
 
