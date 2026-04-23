@@ -19,3 +19,11 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Python cache
+__pycache__/
+*.pyc
+
+# File di lavoro temporanei dataset oggetti magici
+risorse/oggetti magici/_names.txt
+risorse/oggetti magici/wikidot_descriptions.json
+

@@ -2263,6 +2263,40 @@
     color: var(--text-muted);
     flex-shrink: 0;
 }
+/* Badge "TR" sui nomi del catalogo non ancora tradotti in italiano. */
+.inv-picker-tr-pending {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(255, 167, 38, 0.18);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 167, 38, 0.4);
+    vertical-align: middle;
+    margin-left: 4px;
+}
+.inv-picker-item-en {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 6px;
+    font-style: italic;
+}
+/* Bordi colorati per rarita' nelle righe del picker catalogo (riusano
+   gli stessi colori delle .inv-item-row.rarita-* definiti piu' sopra). */
+.inv-picker-item.rarita-non-comune { border-left: 4px solid #4ade80; }
+.inv-picker-item.rarita-non-comune .inv-picker-item-name { color: #4ade80; }
+.inv-picker-item.rarita-raro { border-left: 4px solid #60a5fa; }
+.inv-picker-item.rarita-raro .inv-picker-item-name { color: #60a5fa; }
+.inv-picker-item.rarita-molto-raro { border-left: 4px solid #a78bfa; }
+.inv-picker-item.rarita-molto-raro .inv-picker-item-name { color: #a78bfa; }
+.inv-picker-item.rarita-leggendario { border-left: 4px solid #c084fc; }
+.inv-picker-item.rarita-leggendario .inv-picker-item-name { color: #c084fc; }
+.inv-picker-item.rarita-artefatto { border-left: 4px solid #f59e0b; }
+.inv-picker-item.rarita-artefatto .inv-picker-item-name { color: #f59e0b; }
 
 /* ── Dialog "Crea oggetto rapido" ── */
 .inv-quick-modal { display: flex; flex-direction: column; }

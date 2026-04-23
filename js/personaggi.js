@@ -5393,10 +5393,44 @@ function _invPickerRenderList(pgId) {
     if (!cont) return;
     const q = (_invPickerState.search || '').trim().toLowerCase();
     if (_invPickerState.tab === 'catalog') {
-        cont.innerHTML = `<div class="inv-picker-empty">
-            <p style="margin:0 0 6px 0;">Catalogo oggetti non ancora disponibile.</p>
-            <p style="margin:0;color:var(--text-secondary);font-size:0.85rem;">Per ora puoi usare il tab "Homebrew" o "Crea rapidamente" per aggiungere un oggetto a testo libero.</p>
-        </div>`;
+        const cat = Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
+        if (cat.length === 0) {
+            cont.innerHTML = `<div class="inv-picker-empty">
+                <p style="margin:0;">Catalogo oggetti non disponibile.</p>
+            </div>`;
+            return;
+        }
+        let list = cat;
+        if (q) {
+            list = list.filter(o => {
+                const txt = (o.nome || '') + ' ' + (o.nome_en || '') + ' ' + (o.tipo || '') + ' ' + (o.sotto_tipo || '') + ' ' + (o.rarita || '');
+                return txt.toLowerCase().includes(q);
+            });
+        }
+        if (list.length === 0) {
+            cont.innerHTML = `<div class="inv-picker-empty">
+                <p style="margin:0;">Nessun oggetto trovato per "${escapeHtml(q)}".</p>
+            </div>`;
+            return;
+        }
+        cont.innerHTML = list.slice(0, 200).map(o => {
+            const meta = (typeof window.formatOggettoMeta === 'function')
+                ? window.formatOggettoMeta(o) : '';
+            const rarClass = _invRarityClass(o.rarita);
+            const pendingBadge = o._nome_pending
+                ? '<span class="inv-picker-tr-pending" title="Traduzione italiana in arrivo">TR</span>'
+                : '';
+            const subEn = (o._nome_pending && o.nome_en && o.nome_en !== o.nome)
+                ? '' : (o.nome_en && o.nome_en !== o.nome ? `<span class="inv-picker-item-en">${escapeHtml(o.nome_en)}</span>` : '');
+            return `<div class="inv-picker-item ${rarClass}" onclick="invAddFromCatalog('${pgId}','${o.id}')">
+                <div class="inv-picker-item-main">
+                    <div class="inv-picker-item-name">${escapeHtml(o.nome || 'Oggetto')} ${pendingBadge} ${subEn}</div>
+                    ${meta ? `<div class="inv-picker-item-meta">${escapeHtml(meta)}</div>` : ''}
+                </div>
+            </div>`;
+        }).join('') + (list.length > 200
+            ? `<div class="inv-picker-empty" style="padding:8px;font-size:0.8rem;color:var(--text-secondary);">Mostrando i primi 200 di ${list.length} risultati. Affina la ricerca.</div>`
+            : '');
         return;
     }
     const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewOggetti))
@@ -5452,6 +5486,39 @@ window.invAddFromHomebrew = async function(pgId, hbId) {
         _homebrew_owner_uid: hb._author_uid,
     };
     if (parseInt(hb.incantamento) > 0) entry.magic_bonus = parseInt(hb.incantamento);
+    inventario.push(entry);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    document.querySelector('.hp-calc-overlay')?.remove();
+    schedaOpenInventoryPage(pgId);
+};
+
+// Aggiunge un oggetto del catalogo (immutabile) al tesoro come snapshot
+// completo: dato che il catalogo non cambia, copiamo direttamente i campi
+// utili (tipo, sotto_tipo, rarita, incantamento, sintonia, descrizione)
+// nell'inventario senza riferimenti "live".
+window.invAddFromCatalog = async function(pgId, catId) {
+    const cat = Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
+    const it = cat.find(o => String(o.id) === String(catId));
+    if (!it) return;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    const entry = {
+        nome: it.nome || it.nome_en || 'Oggetto',
+        descrizione: it.descrizione || it.descrizione_en || '',
+        quantita: 1,
+        tipo: it.tipo || '',
+        sotto_tipo: it.sotto_tipo || '',
+        rarita: it.rarita || '',
+        richiede_sintonia: !!it.richiede_sintonia,
+        sintonia_dettaglio: it.sintonia_dettaglio || '',
+        incantamento: parseInt(it.incantamento) || 0,
+        magico: (it.rarita && it.rarita !== 'Comune') || (parseInt(it.incantamento) > 0),
+        _catalog_id: it.id,
+    };
+    if (parseInt(it.incantamento) > 0) entry.magic_bonus = parseInt(it.incantamento);
     inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
