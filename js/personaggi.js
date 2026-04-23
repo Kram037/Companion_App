@@ -6260,10 +6260,30 @@ window.invRemoveItem = async function(pgId, idx) {
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
+    const removed = inventario[idx];
     inventario.splice(idx, 1);
     pg.inventario = inventario;
-    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    // Propaga la rimozione all'equipaggiamento: ogni entry equip
+    // creata da questo oggetto del tesoro (matched per _treasure_uid)
+    // viene rimossa. La rimozione dall'equip non tocca il tesoro
+    // (relazione unidirezionale: equip -> tesoro).
+    const removedUid = removed && removed._treasure_uid;
+    const updates = { inventario };
+    let equipChanged = false;
+    if (removedUid && Array.isArray(pg.equipaggiamento)) {
+        const before = pg.equipaggiamento.length;
+        pg.equipaggiamento = pg.equipaggiamento.filter(e => e.from_treasure_uid !== removedUid);
+        if (pg.equipaggiamento.length !== before) {
+            equipChanged = true;
+            updates.equipaggiamento = pg.equipaggiamento;
+            const newCA = calcCAFromEquip(pg);
+            pg.classe_armatura = newCA;
+            updates.classe_armatura = newCA;
+        }
+    }
+    await supabase.from('personaggi').update(updates).eq('id', pgId);
     schedaOpenInventoryPage(pgId);
+    if (equipChanged) showNotification('Oggetto rimosso anche dall\'equipaggiamento');
 };
 
 window.invEditAttune = function(pgId, idx) {
@@ -9941,11 +9961,39 @@ function _schedaPickInvArmorBase(pgId, invIndex, candidates, view, subRaw) {
     document.body.appendChild(overlay);
 }
 
+// Costruisce il display name per un'entry equipaggiamento creata da un
+// oggetto dell'inventario. Rimuove il "+N" finale (sara' riapplicato da
+// formatEquipName via magic_bonus) e omette "(Tipo Base)" quando il
+// nome dell'oggetto contiene gia' il nome della base D&D (evita
+// duplicati tipo "Pugnale (Pugnale)" o "Pugnale +2 (Pugnale) +2").
+function _schedaBuildEquipDisplayName(invName, baseName) {
+    const stripped = (invName || '').replace(/\s*\+\d+\s*$/, '').trim();
+    const lowName = stripped.toLowerCase();
+    const lowBase = (baseName || '').toLowerCase().trim();
+    if (!stripped) return baseName || 'Oggetto';
+    if (!lowBase || lowName === lowBase || lowName.includes(lowBase)) {
+        return stripped;
+    }
+    return `${stripped} (${baseName})`;
+}
+
+// Garantisce che l'entry inventario abbia un uid stabile per essere
+// referenziata dall'equipaggiamento. Lo crea on-the-fly se mancante.
+function _schedaEnsureInvUid(inventario, idx) {
+    const it = inventario && inventario[idx];
+    if (!it || typeof it !== 'object') return null;
+    if (it._treasure_uid) return it._treasure_uid;
+    const uid = `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
+    it._treasure_uid = uid;
+    return uid;
+}
+
 window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
     document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
     const pg = _schedaPgCache;
+    if (!pg) return;
     const view = _schedaInvViewAt(pg, invIndex);
-    if (!pg || !view) return;
+    if (!view) return;
     const arma = DND_ARMI.find(a => a.nome === dndArmaNome);
     if (!arma) return;
     if (!pg.equipaggiamento) pg.equipaggiamento = [];
@@ -9957,7 +10005,8 @@ window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
     const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
     const dmgMod = atkMod;
     const ench = view.magic_bonus || view._homebrew_incantamento || 0;
-    const displayName = ench ? `${view.nome} (${arma.nome})` : `${view.nome} (${arma.nome})`;
+    const displayName = _schedaBuildEquipDisplayName(view.nome, arma.nome);
+    const treasureUid = _schedaEnsureInvUid(pg.inventario, invIndex);
     pg.equipaggiamento.push({
         nome: displayName,
         tipo: 'arma',
@@ -9967,9 +10016,11 @@ window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
         bonus_colpire: profBonus + atkMod + ench,
         bonus_danno: dmgMod + ench,
         magic_bonus: ench,
-        from_inventory_index: invIndex,
+        from_treasure_uid: treasureUid,
     });
-    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    const updates = { equipaggiamento: pg.equipaggiamento };
+    if (treasureUid) updates.inventario = pg.inventario;
+    await schedaInstantSave(pgId, updates);
     renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
@@ -9979,8 +10030,9 @@ window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
 window._schedaApplyInvArmaturaEquip = async function(pgId, invIndex, dndArmNome) {
     document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
     const pg = _schedaPgCache;
+    if (!pg) return;
     const view = _schedaInvViewAt(pg, invIndex);
-    if (!pg || !view) return;
+    if (!view) return;
     const arm = DND_ARMATURE.find(a => a.nome === dndArmNome);
     if (!arm) return;
     if (!pg.equipaggiamento) pg.equipaggiamento = [];
@@ -9991,20 +10043,23 @@ window._schedaApplyInvArmaturaEquip = async function(pgId, invIndex, dndArmNome)
         pg.equipaggiamento = pg.equipaggiamento.filter(e => e.tipo !== 'scudo');
     }
     const ench = view.magic_bonus || view._homebrew_incantamento || 0;
-    const displayName = `${view.nome} (${arm.nome})`;
+    const displayName = _schedaBuildEquipDisplayName(view.nome, arm.nome);
+    const treasureUid = _schedaEnsureInvUid(pg.inventario, invIndex);
     pg.equipaggiamento.push({
         nome: displayName,
         tipo: isShield ? 'scudo' : 'armatura',
-        ca_base: arm.ca_base + ench,
+        ca_base: arm.ca_base,
         categoria: arm.cat,
         mod_des: arm.mod_des,
         max_des: arm.max_des,
         magic_bonus: ench,
-        from_inventory_index: invIndex,
+        from_treasure_uid: treasureUid,
     });
     const newCA = calcCAFromEquip(pg);
     pg.classe_armatura = newCA;
-    await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA });
+    const updates = { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA };
+    if (treasureUid) updates.inventario = pg.inventario;
+    await schedaInstantSave(pgId, updates);
     renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
