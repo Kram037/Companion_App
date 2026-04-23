@@ -1760,15 +1760,22 @@ function pgGetSubclassOptions(className) {
 // per una data classe. Le voci contengono _hbId, _hbAuthor, _hbIsOwn per
 // permettere alla scheda di risalire a tutti i privilegi/incantesimi.
 function pgGetHomebrewSubclassOptions(className) {
-    // Safety: se la cache non è ancora stata popolata, lancia un load
-    // asincrono in background così il prossimo render la troverà pronta.
+    // Safety: se la cache non è ancora stata popolata, lancia UNA sola
+    // load di background. Per evitare flicker, non facciamo render-ping
+    // ricorsivi: il render successivo verrà triggerato dal click handler
+    // dell'utente (open dropdown) che è async.
     if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
-        if (typeof loadHomebrewSottoclassi === 'function') {
+        if (typeof loadHomebrewSottoclassi === 'function' && !AppState._homebrewSottoclassiLoadPromise) {
             loadHomebrewSottoclassi().then(() => {
-                try {
-                    if (typeof pgRenderClassi === 'function') pgRenderClassi();
-                    if (typeof microRenderClassi === 'function') microRenderClassi();
-                } catch (_) {}
+                // Solo se la cache contiene effettivamente qualcosa, ri-renderizza
+                // la striscia classi (così appare il bottone Sottoclasse).
+                const list = AppState.cachedHomebrewSottoclassi;
+                if (Array.isArray(list) && list.length > 0) {
+                    try {
+                        const wizardOpen = !!document.getElementById('pgClassiList');
+                        if (wizardOpen && typeof pgRenderClassi === 'function') pgRenderClassi();
+                    } catch (_) {}
+                }
             });
         }
         return [];
@@ -8830,6 +8837,14 @@ window.openPersonaggioModal = function(personaggioId) {
     editingPersonaggioId = personaggioId || null;
     const form = elements.personaggioForm;
     if (!form) return;
+
+    // Refresh delle sottoclassi homebrew (proprie + amici abilitati) ad
+    // ogni apertura della modale, così la cache è sempre aggiornata.
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        loadHomebrewSottoclassi().then(() => {
+            try { if (typeof pgRenderClassi === 'function') pgRenderClassi(); } catch (_) {}
+        });
+    }
 
     form.reset();
     pgSelectedClasses = [];

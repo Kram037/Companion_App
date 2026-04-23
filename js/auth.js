@@ -104,6 +104,12 @@ async function loadRazzeBackground() {
 //        _author_name, _is_own }]
 // ─────────────────────────────────────────────────────────────────────────
 async function loadHomebrewSottoclassi() {
+    // Dedup: se una load è già in volo, restituisci la stessa promise per
+    // evitare query parallele e refresh UI a raffica.
+    if (AppState._homebrewSottoclassiLoadPromise) {
+        return AppState._homebrewSottoclassiLoadPromise;
+    }
+    AppState._homebrewSottoclassiLoadPromise = (async () => {
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.currentUser?.uid) {
         AppState.cachedHomebrewSottoclassi = [];
@@ -165,12 +171,23 @@ async function loadHomebrewSottoclassi() {
         }));
 
         AppState.cachedHomebrewSottoclassi = [...ownList, ...friendList];
+        try {
+            console.log('[homebrew] sottoclassi caricate:', {
+                proprie: ownList.length,
+                amici: friendList.length,
+                slugs: AppState.cachedHomebrewSottoclassi.map(r => r.parent_class_slug + ':' + r.nome)
+            });
+        } catch (_) {}
         return AppState.cachedHomebrewSottoclassi;
     } catch (e) {
         console.warn('Errore caricamento sottoclassi homebrew:', e);
         AppState.cachedHomebrewSottoclassi = [];
         return [];
     }
+    })().finally(() => {
+        AppState._homebrewSottoclassiLoadPromise = null;
+    });
+    return AppState._homebrewSottoclassiLoadPromise;
 }
 
 window.loadHomebrewSottoclassi = loadHomebrewSottoclassi;
