@@ -921,58 +921,56 @@
     width: auto;
     flex: 0 0 auto;
 }
-.lab-sub-spell-list {
+.lab-sub-spell-chips {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.lab-sub-spell-input {
-    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
 }
-.lab-sub-spell-input > input {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 0.9rem;
-}
-.lab-sub-spell-remove {
-    flex: 0 0 auto;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--background);
-    color: var(--text-secondary);
-    cursor: pointer;
+.lab-sub-spell-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px 4px 10px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
     line-height: 1;
-    font-size: 1.1rem;
+}
+.lab-sub-spell-chip-name {
+    line-height: 1.2;
+}
+.lab-sub-spell-chip-x {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
-.lab-sub-spell-remove:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border-color: #ef4444;
+.lab-sub-spell-chip-x:hover {
+    background: rgba(255, 255, 255, 0.45);
 }
 .lab-sub-spell-add {
-    margin-top: 8px;
-    padding: 6px 10px;
-    border: 1px dashed var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    border: 1px dashed var(--accent);
+    background: rgba(125, 99, 240, 0.06);
+    color: var(--accent);
+    border-radius: 999px;
     cursor: pointer;
     font-size: 0.85rem;
+    font-weight: 600;
 }
 .lab-sub-spell-add:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    background: rgba(125, 99, 240, 0.15);
 }
 .lab-sub-spell-add-row {
     margin-top: 12px;
@@ -988,6 +986,107 @@
 }
 .lab-sub-spell-add-row:hover {
     background: rgba(125, 99, 240, 0.1);
+}
+
+/* Quando il toggle "conferisce incantesimi" è attivo, riduco lo spazio
+   verticale di intestazione/aiuto per dare più spazio al picker. */
+.lab-sub-hint-compact {
+    margin: 0 0 6px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-align: left;
+    line-height: 1.3;
+}
+.lab-sub-toggle-row {
+    margin-bottom: 6px;
+}
+.lab-sub-feature-scroll-tall {
+    max-height: 60vh;
+}
+
+/* Spell picker (overlay) per la creazione sottoclasse */
+.lab-sub-spell-picker-overlay {
+    z-index: 9999;
+}
+.lab-sub-spell-picker-modal {
+    width: min(620px, 95vw) !important;
+    max-width: 620px !important;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+}
+.lab-sub-spell-picker-controls {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 6px;
+    flex-wrap: wrap;
+}
+.lab-sub-spell-picker-search {
+    flex: 1 1 220px;
+    min-width: 180px;
+}
+.lab-sub-spell-picker-level,
+.lab-sub-spell-picker-school {
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9rem;
+    flex: 0 0 auto;
+}
+.lab-sub-spell-picker-meta {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+}
+.lab-sub-spell-picker-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+.lab-sub-spell-picker-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px;
+    background: var(--surface);
+    min-height: 240px;
+    max-height: 56vh;
+}
+.lab-sub-spell-picker-row {
+    display: grid;
+    grid-template-columns: 22px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.lab-sub-spell-picker-row:hover {
+    background: rgba(125, 99, 240, 0.08);
+}
+.lab-sub-spell-picker-row.selected {
+    background: rgba(125, 99, 240, 0.15);
+}
+.lab-sub-spell-picker-row-name {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.92rem;
+}
+.lab-sub-spell-picker-row-meta {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+.lab-sub-spell-picker-row > input[type=checkbox] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
 }
 
 .lab-sub-actions {

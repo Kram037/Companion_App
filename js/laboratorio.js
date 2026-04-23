@@ -401,18 +401,6 @@ function _labSubStepperHtml(active) {
     `).join('')}</div>`;
 }
 
-// Helper: ordered list of all italian spell names from SPELLS_DATA (per autocomplete).
-function _labSubAllSpellNames() {
-    if (typeof window === 'undefined' || !window.SPELLS_DATA) return [];
-    return Object.keys(window.SPELLS_DATA).sort((a, b) => a.localeCompare(b, 'it'));
-}
-
-function _labSubSpellDatalistHtml() {
-    if (document.getElementById('labSubSpellDatalist')) return ''; // già presente
-    const opts = _labSubAllSpellNames().map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
-    return `<datalist id="labSubSpellDatalist">${opts}</datalist>`;
-}
-
 function _labSubRenderPickClass() {
     const classes = _labStandardClasses();
     const title = _labSubState.editingId ? 'Modifica Sottoclasse' : 'Nuova Sottoclasse';
@@ -476,18 +464,13 @@ function _labSubRenderSetupPage() {
 }
 
 function _labSubRenderSpellsPage() {
-    const dlist = _labSubSpellDatalistHtml();
-    const lvls = _labSubLevelsForCurrentClass();
-    // Suggerimento: se l'utente non ha ancora aggiunto righe e attiva il toggle,
-    // pre-popoliamo con le tier dei privilegi della classe (es. paladino: 3,5,9,13,17),
-    // ma per semplicità inseriamo un set vuoto da popolare manualmente.
+    const isOn = !!_labSubState.grantsSpells;
     const rows = (_labSubState.grantedSpellsByLevel || []).map((row, i) => {
-        const spellInputs = (row.spells.length ? row.spells : ['']).map((sp, sIdx) => `
-            <div class="lab-sub-spell-input">
-                <input type="text" list="labSubSpellDatalist" placeholder="Nome incantesimo" value="${escapeHtml(sp || '')}"
-                       data-row="${i}" data-spell="${sIdx}" oninput="labSubSpellInputChange(${i}, ${sIdx}, this.value)">
-                <button type="button" class="lab-sub-spell-remove" onclick="labSubRemoveSpell(${i}, ${sIdx})" title="Rimuovi">×</button>
-            </div>
+        const chips = (row.spells || []).map((sp, sIdx) => `
+            <span class="lab-sub-spell-chip">
+                <span class="lab-sub-spell-chip-name">${escapeHtml(sp)}</span>
+                <button type="button" class="lab-sub-spell-chip-x" onclick="labSubRemoveSpell(${i}, ${sIdx})" title="Rimuovi">×</button>
+            </span>
         `).join('');
         const lvOptions = Array.from({length: 20}, (_, k) => k + 1).map(lv => `<option value="${lv}" ${row.level === lv ? 'selected' : ''}>${lv}° livello</option>`).join('');
         return `
@@ -496,30 +479,36 @@ function _labSubRenderSpellsPage() {
                 <select class="lab-sub-spell-row-level" onchange="labSubSpellRowLevelChange(${i}, this.value)">${lvOptions}</select>
                 <button type="button" class="btn-secondary lab-sub-spell-row-remove" onclick="labSubRemoveSpellRow(${i})">Rimuovi livello</button>
             </div>
-            <div class="lab-sub-spell-list">${spellInputs}</div>
-            <button type="button" class="lab-sub-spell-add" onclick="labSubAddSpellToRow(${i})">+ Aggiungi incantesimo</button>
+            <div class="lab-sub-spell-chips">
+                ${chips}
+                <button type="button" class="lab-sub-spell-add" onclick="labSubAddSpellToRow(${i})">+ Aggiungi incantesimo</button>
+            </div>
         </div>`;
     }).join('');
     const empty = `<p class="lab-sub-hint" style="margin:8px 0 0;">Nessuna progressione configurata. Clicca <strong>+ Aggiungi livello</strong> per definire gli incantesimi conferiti per livello (es. Paladino: 3°, 5°, 9°, 13°, 17°).</p>`;
+
+    // Quando il toggle è attivo, comprimo la spiegazione per dare spazio al picker.
+    const help = isOn
+        ? `<p class="lab-sub-hint lab-sub-hint-compact">Definisci la progressione di incantesimi conferiti per livello.</p>`
+        : `<p class="lab-sub-hint" style="text-align:left;margin:0 0 8px;">Esempi: incantesimi di Dominio del Chierico, di Giuramento del Paladino, di Patrono del Warlock. Lascia vuoto se la sottoclasse non conferisce incantesimi automaticamente.</p>`;
 
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
         <h2>${escapeHtml(_labSubState.subclassName || _labSubState.parentName || 'Sottoclasse')}</h2>
         ${_labSubStepperHtml(2)}
-        <div class="lab-sub-step-label">Progressione di incantesimi della sottoclasse</div>
-        <p class="lab-sub-hint" style="text-align:left;margin:0 0 8px;">Esempi: incantesimi di Dominio del Chierico, di Giuramento del Paladino, di Patrono del Warlock. Lascia vuoto se la sottoclasse non conferisce incantesimi automaticamente.</p>
-        <div class="form-group">
+        ${isOn ? '' : '<div class="lab-sub-step-label">Progressione di incantesimi della sottoclasse</div>'}
+        ${help}
+        <div class="form-group lab-sub-toggle-row">
             <label class="lab-sub-toggle">
-                <input type="checkbox" id="labSubGrantsSpells" ${_labSubState.grantsSpells ? 'checked' : ''} onchange="labSubToggleGrantsSpells(this.checked)">
+                <input type="checkbox" id="labSubGrantsSpells" ${isOn ? 'checked' : ''} onchange="labSubToggleGrantsSpells(this.checked)">
                 <span>Questa sottoclasse conferisce incantesimi automaticamente</span>
             </label>
         </div>
-        ${_labSubState.grantsSpells ? `
-        <div class="wizard-page-scroll lab-sub-feature-scroll">
+        ${isOn ? `
+        <div class="wizard-page-scroll lab-sub-feature-scroll lab-sub-feature-scroll-tall">
             <div class="lab-sub-spell-rows">${rows || empty}</div>
             <button type="button" class="lab-sub-spell-add-row" onclick="labSubAddSpellRow()">+ Aggiungi livello</button>
         </div>
-        ${dlist}
         ` : '<div style="height:8px;"></div>'}
         <div class="lab-sub-actions">
             <div class="lab-sub-actions-row">
@@ -601,18 +590,19 @@ function _labSubRenderFeaturePage() {
 
     const subTitle = `${escapeHtml(_labSubState.subclassName || _labSubState.parentName || 'Sottoclasse')}`;
     const progressBar = _labSubProgressBarHtml();
-    const featureSpells = (f.spells && f.spells.length ? f.spells : ['']).map((sp, sIdx) => `
-        <div class="lab-sub-spell-input">
-            <input type="text" list="labSubSpellDatalist" placeholder="Nome incantesimo" value="${escapeHtml(sp || '')}"
-                   data-feat-spell="${sIdx}" oninput="labSubFeatSpellInput(${sIdx}, this.value)">
-            <button type="button" class="lab-sub-spell-remove" onclick="labSubFeatSpellRemove(${sIdx})" title="Rimuovi">×</button>
-        </div>
+    const featChips = (f.spells || []).map((sp, sIdx) => `
+        <span class="lab-sub-spell-chip">
+            <span class="lab-sub-spell-chip-name">${escapeHtml(sp)}</span>
+            <button type="button" class="lab-sub-spell-chip-x" onclick="labSubFeatSpellRemove(${sIdx})" title="Rimuovi">×</button>
+        </span>
     `).join('');
     const featureSpellsBlock = f.grants_spells ? `
         <div class="lab-sub-resource-box">
             <div class="lab-sub-step-label" style="margin-top:0;">Incantesimi conferiti da questo privilegio</div>
-            <div class="lab-sub-spell-list">${featureSpells}</div>
-            <button type="button" class="lab-sub-spell-add" onclick="labSubFeatSpellAdd()">+ Aggiungi incantesimo</button>
+            <div class="lab-sub-spell-chips">
+                ${featChips}
+                <button type="button" class="lab-sub-spell-add" onclick="labSubFeatSpellAdd()">+ Aggiungi incantesimo</button>
+            </div>
         </div>` : '';
     return `
         <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
@@ -648,7 +638,6 @@ function _labSubRenderFeaturePage() {
             </div>
             ${featureSpellsBlock}
         </div>
-        ${_labSubSpellDatalistHtml()}
         <div class="lab-sub-actions">
             <div class="lab-sub-actions-row">
                 <button type="button" class="btn-secondary" onclick="labSubBack()">Indietro</button>
@@ -740,7 +729,7 @@ function _labSubReadSpellsFromDOM() {
 window.labSubToggleGrantsSpells = function(checked) {
     _labSubState.grantsSpells = checked;
     if (checked && (!_labSubState.grantedSpellsByLevel || _labSubState.grantedSpellsByLevel.length === 0)) {
-        _labSubState.grantedSpellsByLevel = [{ level: (_labSubLevelsForCurrentClass()[0] || 1), spells: [''] }];
+        _labSubState.grantedSpellsByLevel = [{ level: (_labSubLevelsForCurrentClass()[0] || 1), spells: [] }];
     }
     _labSubRender();
 };
@@ -750,7 +739,7 @@ window.labSubAddSpellRow = function() {
     const used = new Set(_labSubState.grantedSpellsByLevel.map(r => r.level));
     let nextLv = 1;
     for (let lv = 1; lv <= 20; lv++) { if (!used.has(lv)) { nextLv = lv; break; } }
-    _labSubState.grantedSpellsByLevel.push({ level: nextLv, spells: [''] });
+    _labSubState.grantedSpellsByLevel.push({ level: nextLv, spells: [] });
     _labSubRender();
 };
 
@@ -763,22 +752,17 @@ window.labSubRemoveSpellRow = function(rowIdx) {
 window.labSubAddSpellToRow = function(rowIdx) {
     const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
     if (!row) return;
-    row.spells.push('');
-    _labSubRender();
+    _labSubOpenSpellPickerDialog(row.spells, (selected) => {
+        row.spells = selected;
+        _labSubRender();
+    });
 };
 
 window.labSubRemoveSpell = function(rowIdx, spellIdx) {
     const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
     if (!row) return;
     row.spells.splice(spellIdx, 1);
-    if (row.spells.length === 0) row.spells.push('');
     _labSubRender();
-};
-
-window.labSubSpellInputChange = function(rowIdx, spellIdx, val) {
-    const row = _labSubState.grantedSpellsByLevel?.[rowIdx];
-    if (!row) return;
-    row.spells[spellIdx] = val;
 };
 
 window.labSubSpellRowLevelChange = function(rowIdx, val) {
@@ -792,31 +776,160 @@ window.labSubToggleFeatSpells = function(checked) {
     const f = _labSubState.features[_labSubState.currentIdx];
     if (!f) return;
     f.grants_spells = checked;
-    if (checked && (!f.spells || f.spells.length === 0)) f.spells = [''];
+    if (!Array.isArray(f.spells)) f.spells = [];
     _labSubRender();
 };
 
 window.labSubFeatSpellAdd = function() {
     const f = _labSubState.features[_labSubState.currentIdx];
     if (!f) return;
-    if (!f.spells) f.spells = [];
-    f.spells.push('');
-    _labSubRender();
+    if (!Array.isArray(f.spells)) f.spells = [];
+    _labSubReadCurrentFromDOM();
+    _labSubOpenSpellPickerDialog(f.spells, (selected) => {
+        f.spells = selected;
+        _labSubRender();
+    });
 };
 
 window.labSubFeatSpellRemove = function(spellIdx) {
     const f = _labSubState.features[_labSubState.currentIdx];
     if (!f || !f.spells) return;
     f.spells.splice(spellIdx, 1);
-    if (f.spells.length === 0) f.spells.push('');
     _labSubRender();
 };
 
-window.labSubFeatSpellInput = function(spellIdx, val) {
-    const f = _labSubState.features[_labSubState.currentIdx];
-    if (!f || !f.spells) return;
-    f.spells[spellIdx] = val;
-};
+// ─────────────────────────────────────────────────────────────────────────
+// Picker incantesimi: dialog modale che mostra la lista completa con
+// ricerca, filtro per livello/scuola e selezione multipla. Restituisce
+// (via callback) l'array dei nomi (italiani) selezionati.
+// ─────────────────────────────────────────────────────────────────────────
+function _labSubOpenSpellPickerDialog(initialSelected, onConfirm) {
+    const allSpells = window.SPELLS_DATA || {};
+    const allNames = Object.keys(allSpells).sort((a, b) => a.localeCompare(b, 'it'));
+    if (allNames.length === 0) {
+        if (typeof showNotification === 'function') showNotification('Lista incantesimi non disponibile');
+        return;
+    }
+    // Stato locale del picker
+    const state = {
+        q: '',
+        level: 'any',
+        school: 'any',
+        selected: new Set(Array.isArray(initialSelected) ? initialSelected : [])
+    };
+    // Raccoglie le scuole disponibili (in italiano)
+    const schoolSet = new Set();
+    allNames.forEach(n => {
+        const s = allSpells[n]?.school_it || allSpells[n]?.school;
+        if (s) schoolSet.add(s);
+    });
+    const schools = Array.from(schoolSet).sort((a, b) => a.localeCompare(b, 'it'));
+
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay lab-sub-spell-picker-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    const renderList = () => {
+        const listEl = overlay.querySelector('.lab-sub-spell-picker-list');
+        if (!listEl) return;
+        const ql = state.q.toLowerCase().trim();
+        const filtered = allNames.filter(name => {
+            const sp = allSpells[name];
+            if (ql) {
+                const enName = (sp?.name_en || '').toLowerCase();
+                if (!name.toLowerCase().includes(ql) && !enName.includes(ql)) return false;
+            }
+            if (state.level !== 'any') {
+                const lv = parseInt(sp?.level);
+                if (Number.isNaN(lv)) return false;
+                if (state.level === 'cantrip' && lv !== 0) return false;
+                if (state.level !== 'cantrip' && lv !== parseInt(state.level)) return false;
+            }
+            if (state.school !== 'any') {
+                const s = sp?.school_it || sp?.school || '';
+                if (s !== state.school) return false;
+            }
+            return true;
+        });
+        if (filtered.length === 0) {
+            listEl.innerHTML = '<p class="scheda-empty">Nessun incantesimo trovato</p>';
+            updateCounter();
+            return;
+        }
+        const cap = 250;
+        const shown = filtered.slice(0, cap);
+        listEl.innerHTML = shown.map((name, idx) => {
+            const sp = allSpells[name];
+            const lv = parseInt(sp?.level);
+            const lvLabel = Number.isNaN(lv) ? '' : (lv === 0 ? 'Tr.' : `Liv ${lv}`);
+            const sch = sp?.school_it || sp?.school || '';
+            const isSel = state.selected.has(name);
+            return `<label class="lab-sub-spell-picker-row${isSel ? ' selected' : ''}">
+                <input type="checkbox" data-name-idx="${idx}" ${isSel ? 'checked' : ''}>
+                <span class="lab-sub-spell-picker-row-name">${escapeHtml(name)}</span>
+                <span class="lab-sub-spell-picker-row-meta">${lvLabel}${sch ? ' · ' + escapeHtml(sch) : ''}</span>
+            </label>`;
+        }).join('') + (filtered.length > cap ? `<p class="scheda-empty" style="margin-top:8px;">Altri ${filtered.length - cap} risultati. Restringi la ricerca.</p>` : '');
+        listEl.querySelectorAll('input[type=checkbox]').forEach(cb => {
+            cb.addEventListener('change', e => {
+                const idx = parseInt(e.target.dataset.nameIdx);
+                const nm = shown[idx];
+                if (e.target.checked) state.selected.add(nm);
+                else state.selected.delete(nm);
+                e.target.closest('.lab-sub-spell-picker-row')?.classList.toggle('selected', e.target.checked);
+                updateCounter();
+            });
+        });
+        updateCounter();
+    };
+
+    const updateCounter = () => {
+        const c = overlay.querySelector('.lab-sub-spell-picker-count');
+        if (c) c.textContent = `${state.selected.size} selezionati`;
+    };
+
+    const lvOptions = `
+        <option value="any">Tutti i livelli</option>
+        <option value="cantrip">Trucchetti</option>
+        ${[1,2,3,4,5,6,7,8,9].map(l => `<option value="${l}">Livello ${l}</option>`).join('')}
+    `;
+    const schOptions = `<option value="any">Tutte le scuole</option>${schools.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}`;
+
+    overlay.innerHTML = `<div class="hp-calc-modal lab-sub-spell-picker-modal">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 style="margin:0 0 8px;">Scegli gli incantesimi</h3>
+        <div class="lab-sub-spell-picker-controls">
+            <input type="text" class="hp-calc-input lab-sub-spell-picker-search" placeholder="Cerca per nome..." autocomplete="off">
+            <select class="lab-sub-spell-picker-level">${lvOptions}</select>
+            <select class="lab-sub-spell-picker-school">${schOptions}</select>
+        </div>
+        <div class="lab-sub-spell-picker-meta">
+            <span class="lab-sub-spell-picker-count">0 selezionati</span>
+        </div>
+        <div class="lab-sub-spell-picker-list"></div>
+        <div class="dialog-actions">
+            <button type="button" class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+            <button type="button" class="btn-primary lab-sub-spell-picker-confirm">Conferma</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    const sIn = overlay.querySelector('.lab-sub-spell-picker-search');
+    sIn.addEventListener('input', () => { state.q = sIn.value; renderList(); });
+    const lvSel = overlay.querySelector('.lab-sub-spell-picker-level');
+    lvSel.addEventListener('change', () => { state.level = lvSel.value; renderList(); });
+    const schSel = overlay.querySelector('.lab-sub-spell-picker-school');
+    schSel.addEventListener('change', () => { state.school = schSel.value; renderList(); });
+    overlay.querySelector('.lab-sub-spell-picker-confirm').addEventListener('click', () => {
+        const out = Array.from(state.selected);
+        out.sort((a, b) => a.localeCompare(b, 'it'));
+        overlay.remove();
+        if (typeof onConfirm === 'function') onConfirm(out);
+    });
+
+    renderList();
+    setTimeout(() => sIn.focus(), 50);
+}
 
 function _labSubReadSetupFromDOM() {
     if (!_labSubState || _labSubState.page !== 'setup') return;
