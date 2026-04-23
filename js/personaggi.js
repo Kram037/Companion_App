@@ -3,7 +3,7 @@
 // ============================================================================
 
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] personaggi.js BUILD 2026-04-23-C con picker log');
+console.log('[homebrew][build] personaggi.js BUILD 2026-04-23-E fix AppState scope');
 
 let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
@@ -1766,7 +1766,7 @@ function pgGetHomebrewSubclassOptions(className) {
     // viene gestito nel click-handler async (pgOpenSubclassDropdown) e
     // all'apertura della modale, così evitiamo re-render side-effect che
     // farebbero sfarfallare il bottone Sottoclasse.
-    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
+    if (typeof AppState === 'undefined' || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
         return [];
     }
     const all = AppState.cachedHomebrewSottoclassi;

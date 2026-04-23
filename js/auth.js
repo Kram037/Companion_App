@@ -225,6 +225,21 @@ async function loadHomebrewSottoclassi() {
                     items: list.map(r => `${r.parent_class_slug}:${r.nome} (${r._is_own ? 'tuo' : r._author_name})`)
                 });
             } catch (_) {}
+            // Hook: notifica i renderer dipendenti che la cache è cambiata.
+            // Così il chip classe (con il bottone "Sottoclasse…") ridisegna
+            // includendo anche le voci homebrew appena caricate, senza
+            // bisogno di interazione utente.
+            try {
+                if (typeof window.pgRenderClassi === 'function') {
+                    window.pgRenderClassi();
+                }
+                if (typeof window.microRenderClassi === 'function') {
+                    window.microRenderClassi();
+                }
+                window.dispatchEvent(new CustomEvent('homebrew:sottoclassi-loaded', { detail: { count: list.length } }));
+            } catch (e) {
+                console.warn('[homebrew] errore re-render dopo load:', e);
+            }
             return list;
         } catch (e) {
             console.warn('Errore caricamento sottoclassi homebrew:', e);
