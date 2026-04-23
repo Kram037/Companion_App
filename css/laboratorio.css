@@ -1338,7 +1338,8 @@
     z-index: 5000;
     display: none;
 }
-.lab-dd.open .lab-dd-panel { display: block; }
+.lab-dd.open .lab-dd-panel,
+.lab-dd-panel.open { display: block; }
 .lab-dd-option {
     padding: 10px 14px;
     color: var(--text);

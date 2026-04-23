@@ -2132,6 +2132,7 @@ function _labOggDdClose(group) {
     const detachedId = group.id + '__panel';
     const panel = document.getElementById(detachedId);
     if (panel && panel.parentElement === document.body) {
+        panel.classList.remove('open');
         panel.removeAttribute('id');
         panel.style.left = '';
         panel.style.top = '';
@@ -2157,6 +2158,10 @@ window.labOggDdToggle = function(groupId) {
             document.body.appendChild(panel);
         }
         me.classList.add('open');
+        // Necessario perche' il panel, una volta spostato a body, non e'
+        // piu' discendente di .lab-dd.open: aggiungo la classe direttamente.
+        const detached = document.getElementById(me.id + '__panel');
+        if (detached) detached.classList.add('open');
         _labOggDdPositionPanel(me);
         const reposition = () => { if (me.classList.contains('open')) _labOggDdPositionPanel(me); };
         window.addEventListener('scroll', reposition, true);
