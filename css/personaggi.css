@@ -2173,8 +2173,9 @@
 }
 
 /* ----- Dialog secondaria: editor di un singolo bonus ----- */
-.bonus-edit-overlay {
-    z-index: 1000;
+/* Deve stare sopra .hp-calc-overlay (1200) e altre overlay scheda. */
+.hp-calc-overlay.bonus-edit-overlay {
+    z-index: 1400;
 }
 .hp-calc-modal.bonus-edit-modal {
     width: min(420px, 92vw);
