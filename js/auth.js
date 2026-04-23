@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-G fallback get_amici per RLS bloccante');
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-H RPC dedicata get_uids_by_user_ids');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
@@ -147,29 +147,57 @@ async function loadHomebrewSottoclassi() {
                 }
                 try { console.log('[homebrew][debug] friendRows risolti (via SELECT utenti):', friendRows); } catch (_) {}
 
-                // Fallback: se la SELECT non torna righe (RLS bloccante), usiamo
-                // la RPC `get_amici` che e' SECURITY DEFINER e bypassa l'RLS.
-                if (!friendRows || friendRows.length === 0) {
+                // Fallback 1: se la SELECT diretta su utenti non torna righe
+                // (RLS bloccante), proviamo la RPC dedicata get_uids_by_user_ids
+                // che e' SECURITY DEFINER e ritorna uid degli utenti per id.
+                const needsFallback = !friendRows || friendRows.length === 0
+                    || (friendRows || []).every(f => !f.uid);
+                if (needsFallback) {
+                    try {
+                        const { data: uidsRpc, error: uidsErr } = await supabase
+                            .rpc('get_uids_by_user_ids', { user_ids: settings.amici_abilitati });
+                        if (uidsErr) {
+                            console.warn('[homebrew][debug] errore RPC get_uids_by_user_ids:', uidsErr);
+                        } else {
+                            try { console.log('[homebrew][debug] get_uids_by_user_ids RPC:', uidsRpc); } catch (_) {}
+                            if (Array.isArray(uidsRpc) && uidsRpc.length > 0) {
+                                friendRows = uidsRpc.map(r => ({
+                                    id: r.id,
+                                    uid: r.uid,
+                                    nome_utente: r.nome_utente || 'Amico',
+                                }));
+                            }
+                        }
+                    } catch (eUids) {
+                        console.warn('[homebrew][debug] eccezione RPC get_uids_by_user_ids:', eUids);
+                    }
+                }
+
+                // Fallback 2: get_amici (legacy) come ulteriore rete di sicurezza,
+                // utile se la nuova RPC non e' ancora installata su questo DB.
+                if (!friendRows || friendRows.length === 0 || (friendRows || []).every(f => !f.uid)) {
                     try {
                         const { data: amiciRpc, error: rpcErr } = await supabase.rpc('get_amici');
                         if (rpcErr) {
                             console.warn('[homebrew][debug] errore RPC get_amici:', rpcErr);
                         } else {
-                            try { console.log('[homebrew][debug] get_amici RPC ha restituito:', amiciRpc); } catch (_) {}
+                            try { console.log('[homebrew][debug] get_amici RPC fallback:', amiciRpc); } catch (_) {}
                             const setSel = new Set((settings.amici_abilitati || []).map(String));
-                            friendRows = (amiciRpc || [])
+                            const merged = (amiciRpc || [])
                                 .filter(a => setSel.has(String(a.amico_id || a.id)))
                                 .map(a => ({
                                     id: a.amico_id || a.id,
                                     uid: a.uid || a.amico_uid || null,
                                     nome_utente: a.nome_utente || 'Amico',
                                 }));
-                            try { console.log('[homebrew][debug] friendRows risolti (via RPC fallback):', friendRows); } catch (_) {}
+                            // Se merged ha uid validi, usalo; altrimenti tieni il vecchio.
+                            if (merged.some(m => m.uid)) friendRows = merged;
                         }
                     } catch (eRpc) {
                         console.warn('[homebrew][debug] eccezione RPC get_amici:', eRpc);
                     }
                 }
+                try { console.log('[homebrew][debug] friendRows finali:', friendRows); } catch (_) {}
 
                 (friendRows || []).forEach(f => {
                     if (f.uid) {
