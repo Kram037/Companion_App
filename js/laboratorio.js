@@ -2083,26 +2083,25 @@ function labFieldsOggetti(data) {
         <input type="text" id="hbSottoTipo" placeholder="Sotto-tipo dell'oggetto" value="${escapeHtml(currentSub)}">
     </div>
 
-    <div class="form-row form-row-2">
-        <div class="form-group">
-            <label>Richiede sintonia</label>
-            <div class="lab-yesno" id="hbSintYesNo">
-                <button type="button" class="lab-yesno-btn ${currentSint ? '' : 'active'}"
-                    onclick="window.labOggSetSintonia(false)">No</button>
-                <button type="button" class="lab-yesno-btn ${currentSint ? 'active' : ''}"
-                    onclick="window.labOggSetSintonia(true)">Sì</button>
-            </div>
-            <input type="hidden" id="hbSintonia" value="${currentSint ? '1' : '0'}">
+    <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
+        <label>Incantamento <span class="lab-help">(solo armi, armature, scudi, focus)</span></label>
+        <div class="custom-res-dice-row" id="hbIncantamentoRowBtns">
+            ${[0,1,2,3].map(b =>
+                `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentEnch ? 'active' : ''}" onclick="window.labOggSelectEnch(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+            ).join('')}
         </div>
-        <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
-            <label>Incantamento <span class="lab-help">(solo armi, armature, scudi, focus)</span></label>
-            <div class="custom-res-dice-row" id="hbIncantamentoRowBtns">
-                ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentEnch ? 'active' : ''}" onclick="window.labOggSelectEnch(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-                ).join('')}
-            </div>
-            <input type="hidden" id="hbIncantamento" value="${currentEnch}">
+        <input type="hidden" id="hbIncantamento" value="${currentEnch}">
+    </div>
+
+    <div class="form-group">
+        <label>Richiede sintonia</label>
+        <div class="lab-yesno" id="hbSintYesNo">
+            <button type="button" class="lab-yesno-btn ${currentSint ? '' : 'active'}"
+                onclick="window.labOggSetSintonia(false)">No</button>
+            <button type="button" class="lab-yesno-btn ${currentSint ? 'active' : ''}"
+                onclick="window.labOggSetSintonia(true)">Sì</button>
         </div>
+        <input type="hidden" id="hbSintonia" value="${currentSint ? '1' : '0'}">
     </div>
 
     <div class="form-group" id="hbSintDetRow" style="${currentSint ? '' : 'display:none;'}">
@@ -2798,13 +2797,17 @@ window.formatOggettoMeta = function formatOggettoMeta(item) {
 //
 // Il parser e' tollerante a EN/IT e a variazioni di spazio/punteggiatura.
 
+// Le rarita' D&D in italiano cambiano genere in base al sostantivo che
+// le precede ("arma molto rara", "scudo raro", "pozione comune", ecc.).
+// Mappiamo qui sia la forma maschile che quella femminile (e quella
+// inglese standard) sul valore canonico usato dal laboratorio.
 const _LAB_RARITA_MAP = {
     'comune': 'Comune', 'common': 'Comune',
-    'non comune': 'Non Comune', 'uncommon': 'Non Comune',
-    'raro': 'Raro', 'rare': 'Raro',
-    'molto raro': 'Molto Raro', 'very rare': 'Molto Raro',
-    'leggendario': 'Leggendario', 'legendary': 'Leggendario',
-    'artefatto': 'Artefatto', 'artifact': 'Artefatto',
+    'non comune': 'Non Comune', 'non comuni': 'Non Comune', 'uncommon': 'Non Comune',
+    'raro': 'Raro', 'rara': 'Raro', 'rare': 'Raro',
+    'molto raro': 'Molto Raro', 'molto rara': 'Molto Raro', 'very rare': 'Molto Raro',
+    'leggendario': 'Leggendario', 'leggendaria': 'Leggendario', 'legendary': 'Leggendario',
+    'artefatto': 'Artefatto', 'artefatti': 'Artefatto', 'artifact': 'Artefatto',
 };
 
 // Mappa i tipi canonici EN/IT al set accettato da LAB_OGG_TIPI.
@@ -2826,7 +2829,11 @@ const _LAB_TIPO_MAP = {
 // Catturiamo:
 //   1: tipo grezzo       2: sotto-tipo (opzionale)
 //   3: rarita' grezza    4: parentesi aggiuntiva (sintonia, opzionale)
-const _LAB_HDR_RX = /^\s*([A-Za-zÀ-ÿ' ]+?)(?:\s*\(([^)]+)\))?\s*,\s*(comune|non comune|raro|molto raro|leggendario|artefatto|common|uncommon|rare|very rare|legendary|artifact)\s*(?:\(([^)]+)\))?\s*\.?\s*$/i;
+//
+// La regex e' case-insensitive (/i) e accetta sia le forme maschili che
+// quelle femminili italiane (rara/raro, molto rara/molto raro,
+// leggendaria/leggendario), oltre alle equivalenti inglesi.
+const _LAB_HDR_RX = /^\s*([A-Za-zÀ-ÿ' ]+?)(?:\s*\(([^)]+)\))?\s*,\s*(non\s*comune|non\s*comuni|comune|molto\s*rar[oa]|rar[oa]|leggendari[oa]|artefatt[oi]|common|uncommon|very\s*rare|rare|legendary|artifact)\s*(?:\(([^)]+)\))?\s*\.?\s*$/i;
 
 function _labNormalizeType(raw) {
     if (!raw) return '';
