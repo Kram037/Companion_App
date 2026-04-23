@@ -4990,6 +4990,7 @@ window.schedaOpenInventoryPage = async function(pgId) {
                     tipo: view._homebrew_tipo,
                     sotto_tipo: view._homebrew_sotto_tipo,
                     rarita: view._homebrew_rarita,
+                    incantamento: view._homebrew_incantamento,
                     richiede_sintonia: view._homebrew_richiede_sintonia,
                     sintonia_dettaglio: view._homebrew_sintonia_dettaglio,
                 }) : '');
@@ -5146,6 +5147,7 @@ function _invResolveLive(entry) {
         _homebrew_tipo: hb.tipo || null,
         _homebrew_sotto_tipo: hb.sotto_tipo || null,
         _homebrew_rarita: hb.rarita || null,
+        _homebrew_incantamento: parseInt(hb.incantamento) || 0,
         _homebrew_richiede_sintonia: !!hb.richiede_sintonia,
         _homebrew_sintonia_dettaglio: hb.sintonia_dettaglio || null,
         _homebrew_author: hb._author_name || null,
@@ -5256,10 +5258,10 @@ function _invPickerRenderList(pgId) {
     }
     list.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
     cont.innerHTML = list.map(o => {
-        const metaCore = (typeof window.formatOggettoMeta === 'function')
+        // formatOggettoMeta gia' include il bonus +N nella posizione
+        // canonica (subito dopo tipo/sotto-tipo, prima della rarita').
+        const meta = (typeof window.formatOggettoMeta === 'function')
             ? window.formatOggettoMeta(o) : '';
-        const enchStr = parseInt(o.incantamento) > 0 ? ` · +${o.incantamento}` : '';
-        const meta = metaCore + enchStr;
         const author = o._is_own ? 'Tuo' : (o._author_name || 'Amico');
         return `<div class="inv-picker-item" onclick="invAddFromHomebrew('${pgId}','${o.id}')">
             <div class="inv-picker-item-main">
@@ -5408,6 +5410,7 @@ window.invEditItem = function(pgId, idx) {
                 tipo: item._homebrew_tipo,
                 sotto_tipo: item._homebrew_sotto_tipo,
                 rarita: item._homebrew_rarita,
+                incantamento: item._homebrew_incantamento,
                 richiede_sintonia: item._homebrew_richiede_sintonia,
                 sintonia_dettaglio: item._homebrew_sintonia_dettaglio,
             }) : ''))

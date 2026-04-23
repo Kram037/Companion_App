@@ -232,8 +232,9 @@ function labGetCardDetail(item, tab) {
         case 'nemici': return `CA ${item.classe_armatura || 10} · PV ${item.punti_vita_max || 10} · GS ${item.grado_sfida || '0'}`;
         case 'talenti': return item.prerequisiti || '';
         case 'oggetti': {
-            const ench = parseInt(item.incantamento) > 0 ? ` +${item.incantamento}` : '';
-            return (window.formatOggettoMeta ? window.formatOggettoMeta(item) : '') + ench;
+            // formatOggettoMeta gia' include il bonus +N nella posizione
+            // canonica (subito dopo tipo/sotto-tipo, prima della rarita').
+            return window.formatOggettoMeta ? window.formatOggettoMeta(item) : '';
         }
         default: return '';
     }
@@ -2754,18 +2755,26 @@ function initLaboratorio() {
 // FORMATTAZIONE META OGGETTO
 // ============================================================================
 // Produce la "formuletta" canonica di un oggetto magico D&D:
-//   "Tipo (sotto-tipo), rarità (richiede sintonia)"
+//   "Tipo (sotto-tipo) [+N], rarità (richiede sintonia)"
 // Esempi:
 //   - Wondrous item, rare (requires attunement)  → "Oggetto Meraviglioso, raro (richiede sintonia)"
 //   - Weapon (arrow), very rare                  → "Arma (freccia), molto raro"
 //   - Wand, artifact (requires attunement)       → "Bacchetta, artefatto (richiede sintonia)"
+//   - Weapon (longsword) +2, very rare           → "Arma (spada lunga) +2, molto raro"
 // La rarita' viene mostrata in minuscolo (convenzione tipografica D&D).
+// Il bonus magico (+1/+2/+3) viene mostrato solo per i tipi che lo
+// ammettono (armi, armature, scudi, focus).
 window.formatOggettoMeta = function formatOggettoMeta(item) {
     if (!item) return '';
     const parts = [];
     if (item.tipo) {
         const sub = (item.sotto_tipo || '').trim();
-        parts.push(sub ? `${item.tipo} (${sub})` : item.tipo);
+        let head = sub ? `${item.tipo} (${sub})` : item.tipo;
+        const ench = parseInt(item.incantamento) || 0;
+        if (ench > 0 && (typeof _labOggCanEnch !== 'function' || _labOggCanEnch(item.tipo))) {
+            head += ` +${ench}`;
+        }
+        parts.push(head);
     }
     let sintStr = '';
     if (item.richiede_sintonia) {
