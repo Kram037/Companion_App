@@ -29,3 +29,6 @@ risorse/oggetti magici/_id_name_list.txt
 risorse/oggetti magici/_todo.json
 risorse/oggetti magici/wikidot_descriptions.json
 
+# Git commit message scratch file
+.git_commit_msg.txt
+
