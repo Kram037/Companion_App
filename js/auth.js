@@ -1,3 +1,6 @@
+// [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-B con CONTROL SELECT debug');
+
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
     const supabase = getSupabaseClient();
