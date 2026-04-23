@@ -9762,7 +9762,7 @@ function _getCasterBonusFor(pg, classeNome) {
 
 function _getSaveBonusFor(pg, abilityKey) {
     const ts = _getBonusManuali(pg).tiri_salvezza;
-    return _sumBonusList(ts[abilityKey] || []);
+    return _sumBonusList(ts[abilityKey] || []) + _sumBonusList(ts._all || []);
 }
 
 // Confeziona l'oggetto da salvare a partire da una versione normalizzata di
@@ -9856,75 +9856,263 @@ function getCABreakdown(pg) {
 // =====================================================
 // MODAL: lista editabile di bonus manuali (riusabile)
 // =====================================================
-// Stato corrente della modal: schermo CA o bonus incantatore (atk/dc).
+// La dialog principale (CA / Save / Caster) mostra solo CHIP cliccabili.
+// L'add/edit di un singolo bonus avviene in una dialog secondaria
+// sovrapposta che modifica direttamente lo stato condiviso e fa re-render.
 let _bonusListState = null;
+let _bonusEditState = null;
 
-function _bonusListRowHtml(b, idx) {
+// Sostituite dal nuovo flusso a chip; mantenute come stub vuoti per
+// retro-compatibilita' con eventuali handler inline (no-op).
+function _bonusListSyncFromInputs() {}
+function _bonusGroupSyncFromInputs() {}
+
+function _bonusChipHtml(b, onClickCall, opts = {}) {
     const v = parseInt(b.valore) || 0;
-    return `<div class="bonus-list-row" data-idx="${idx}">
-        <div class="bonus-list-row-top">
-            <input type="text" class="bonus-list-name" placeholder="Nome (es. Anello di Protezione)" value="${escapeHtml(b.nome)}" maxlength="80">
-            <button type="button" class="bonus-list-del" onclick="schedaBonusListDelete(${idx})" title="Rimuovi">×</button>
-        </div>
-        <div class="bonus-list-val-row">
-            <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},-1)">−</button>
-            <input type="number" class="bonus-list-val" value="${v}" step="1">
-            <button type="button" class="bonus-modal-step" onclick="schedaBonusListStep(${idx},1)">+</button>
-        </div>
-    </div>`;
+    const sign = v >= 0 ? '+' : '';
+    const cls = ['bonus-chip'];
+    if (v < 0) cls.push('negative');
+    if (opts.global) cls.push('is-global');
+    const tagHtml = opts.tag ? `<span class="bonus-chip-tag">${escapeHtml(opts.tag)}</span>` : '';
+    const safeOnClick = onClickCall.replace(/"/g, '&quot;');
+    return `<button type="button" class="${cls.join(' ')}" onclick="${safeOnClick}" title="Modifica bonus">
+        <span class="bonus-chip-name">${escapeHtml(b.nome || 'Manuale')}</span>
+        <span class="bonus-chip-val">${sign}${v}</span>
+        ${tagHtml}
+    </button>`;
 }
 
 function _bonusListRender() {
     if (!_bonusListState) return;
     const container = document.getElementById('bonusListContainer');
     if (!container) return;
-    const html = _bonusListState.items.length
-        ? _bonusListState.items.map((b, i) => _bonusListRowHtml(b, i)).join('')
-        : '<div class="bonus-list-empty">Nessun bonus. Clicca "Aggiungi bonus" per inserirne uno.</div>';
-    container.innerHTML = html;
-    const totEl = document.getElementById('bonusListTotal');
-    if (totEl) {
-        const tot = _bonusListState.items.reduce((s, b) => s + (parseInt(b.valore) || 0), 0);
-        totEl.textContent = tot >= 0 ? `+${tot}` : `${tot}`;
+
+    let html = '';
+    let tot = 0;
+    if (_bonusListState.kind === 'ca') {
+        const items = _bonusListState.items;
+        tot = _sumBonusList(items);
+        html = items.length
+            ? items.map((b, i) => _bonusChipHtml(b, `schedaBonusEditCA(${i})`)).join('')
+            : '<div class="bonus-list-empty">Nessun bonus. Clicca "+ Aggiungi bonus" per inserirne uno.</div>';
+    } else if (_bonusListState.kind === 'save') {
+        const local = _bonusListState.items;
+        const global = _bonusListState.globalItems;
+        tot = _sumBonusList(local) + _sumBonusList(global);
+        const localChips = local.map((b, i) => _bonusChipHtml(b, `schedaBonusEditSave(${i},'single')`));
+        const globalChips = global.map((b, i) => _bonusChipHtml(b, `schedaBonusEditSave(${i},'all')`, { global: true, tag: 'A tutti i TS' }));
+        const all = [...localChips, ...globalChips];
+        html = all.length
+            ? all.join('')
+            : '<div class="bonus-list-empty">Nessun bonus. Clicca "+ Aggiungi bonus" per inserirne uno.</div>';
     }
+    container.innerHTML = html;
+
+    const totEl = document.getElementById('bonusListTotal');
+    if (totEl) totEl.textContent = tot >= 0 ? `+${tot}` : `${tot}`;
 }
-
-function _bonusListSyncFromInputs() {
-    if (!_bonusListState) return;
-    const rows = document.querySelectorAll('#bonusListContainer .bonus-list-row');
-    rows.forEach((row, i) => {
-        if (!_bonusListState.items[i]) return;
-        const nameEl = row.querySelector('.bonus-list-name');
-        const valEl = row.querySelector('.bonus-list-val');
-        if (nameEl) _bonusListState.items[i].nome = nameEl.value.trim().slice(0, 80);
-        if (valEl) _bonusListState.items[i].valore = parseInt(valEl.value) || 0;
-    });
-}
-
-window.schedaBonusListStep = function(idx, delta) {
-    _bonusListSyncFromInputs();
-    if (!_bonusListState?.items[idx]) return;
-    _bonusListState.items[idx].valore = (parseInt(_bonusListState.items[idx].valore) || 0) + delta;
-    _bonusListRender();
-};
-
-window.schedaBonusListDelete = function(idx) {
-    _bonusListSyncFromInputs();
-    if (!_bonusListState) return;
-    _bonusListState.items.splice(idx, 1);
-    _bonusListRender();
-};
 
 window.schedaBonusListAdd = function() {
-    _bonusListSyncFromInputs();
     if (!_bonusListState) return;
-    _bonusListState.items.push({ nome: '', valore: 1 });
-    _bonusListRender();
-    setTimeout(() => {
-        const rows = document.querySelectorAll('#bonusListContainer .bonus-list-row');
-        const last = rows[rows.length - 1];
-        last?.querySelector('.bonus-list-name')?.focus();
-    }, 30);
+    if (_bonusListState.kind === 'ca') _bonusEditOpen({ parentKind: 'ca', isNew: true });
+    else if (_bonusListState.kind === 'save') _bonusEditOpen({ parentKind: 'save', isNew: true, scope: 'single' });
+};
+
+window.schedaBonusEditCA = function(idx) {
+    if (!_bonusListState?.items?.[idx]) return;
+    _bonusEditOpen({ parentKind: 'ca', isNew: false, itemIdx: idx, item: { ..._bonusListState.items[idx] } });
+};
+
+window.schedaBonusEditSave = function(idx, scope) {
+    if (!_bonusListState) return;
+    const arr = scope === 'all' ? _bonusListState.globalItems : _bonusListState.items;
+    if (!arr?.[idx]) return;
+    _bonusEditOpen({
+        parentKind: 'save',
+        isNew: false,
+        itemIdx: idx,
+        scope,
+        originalScope: scope,
+        item: { ...arr[idx] },
+    });
+};
+
+window.schedaBonusEditCaster = function(gi, idx) {
+    if (!_bonusListState?.groups?.[gi]?.items?.[idx]) return;
+    _bonusEditOpen({
+        parentKind: 'caster',
+        isNew: false,
+        groupIdx: gi,
+        itemIdx: idx,
+        item: { ..._bonusListState.groups[gi].items[idx] },
+    });
+};
+
+// =====================================================
+// MODAL secondaria: editor di un singolo bonus
+// =====================================================
+function _bonusEditOpen(state) {
+    _bonusEditState = {
+        item: { nome: '', valore: 1 },
+        ...state,
+    };
+    if (!_bonusEditState.item.nome && !_bonusEditState.item.valore) {
+        _bonusEditState.item = { nome: '', valore: 1 };
+    }
+    _bonusEditRender();
+}
+
+function _bonusEditRender() {
+    const existing = document.getElementById('bonusEditOverlay');
+    if (existing) existing.remove();
+    if (!_bonusEditState) return;
+
+    const e = _bonusEditState;
+    const title = e.isNew ? 'Aggiungi bonus' : 'Modifica bonus';
+
+    let scopeHtml = '';
+    if (e.parentKind === 'save') {
+        const abilityLabel = _ABILITY_LABELS[_bonusListState?.abilityKey] || _bonusListState?.abilityKey || '';
+        const scope = e.scope || 'single';
+        scopeHtml = `
+        <div class="bonus-edit-field">
+            <label>Applica a</label>
+            <div class="bonus-edit-scope">
+                <label class="bonus-edit-scope-opt ${scope==='single'?'selected':''}">
+                    <input type="radio" name="bonusScope" value="single" ${scope==='single'?'checked':''} onchange="schedaBonusEditorSetScope('single')">
+                    <span>Solo TS ${escapeHtml(abilityLabel)}</span>
+                </label>
+                <label class="bonus-edit-scope-opt ${scope==='all'?'selected':''}">
+                    <input type="radio" name="bonusScope" value="all" ${scope==='all'?'checked':''} onchange="schedaBonusEditorSetScope('all')">
+                    <span>Tutti i TS</span>
+                </label>
+            </div>
+        </div>`;
+    }
+
+    const deleteBtn = e.isNew ? '' : '<button class="hp-calc-btn dmg" onclick="schedaBonusEditorDelete()">Elimina</button>';
+    const v = parseInt(e.item.valore) || 0;
+    const placeholderName = e.parentKind === 'caster' ? 'Es. Bastone del Potere'
+        : e.parentKind === 'save' ? 'Es. Mantello della Protezione'
+        : 'Es. Anello di Protezione';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'bonusEditOverlay';
+    overlay.className = 'hp-calc-overlay bonus-edit-overlay';
+    overlay.innerHTML = `
+        <div class="hp-calc-modal bonus-edit-modal">
+            <button class="hp-calc-close" onclick="schedaBonusEditorClose()">&times;</button>
+            <div class="hp-calc-title">${title}</div>
+            <div class="bonus-edit-field">
+                <label>Nome</label>
+                <input type="text" id="bonusEditName" value="${escapeHtml(e.item.nome)}" placeholder="${placeholderName}" maxlength="80">
+            </div>
+            <div class="bonus-edit-field">
+                <label>Valore</label>
+                <div class="bonus-edit-val-row">
+                    <button type="button" class="bonus-modal-step" onclick="schedaBonusEditorStep(-1)">−</button>
+                    <input type="number" id="bonusEditValue" value="${v}" step="1">
+                    <button type="button" class="bonus-modal-step" onclick="schedaBonusEditorStep(1)">+</button>
+                </div>
+            </div>
+            ${scopeHtml}
+            <div class="hp-calc-buttons bonus-edit-buttons">
+                ${deleteBtn}
+                <button class="hp-calc-btn heal" onclick="schedaBonusEditorSave()">Salva</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => document.getElementById('bonusEditName')?.focus(), 50);
+}
+
+window.schedaBonusEditorSetScope = function(scope) {
+    if (!_bonusEditState) return;
+    _bonusEditState.scope = scope;
+    // Aggiorna le classi visive senza ricostruire l'intera modal.
+    document.querySelectorAll('#bonusEditOverlay .bonus-edit-scope-opt').forEach(el => {
+        const inp = el.querySelector('input');
+        el.classList.toggle('selected', inp?.value === scope);
+    });
+};
+
+window.schedaBonusEditorStep = function(delta) {
+    const inp = document.getElementById('bonusEditValue');
+    if (!inp) return;
+    const cur = parseInt(inp.value) || 0;
+    inp.value = cur + delta;
+};
+
+window.schedaBonusEditorClose = function() {
+    const o = document.getElementById('bonusEditOverlay');
+    if (o) o.remove();
+    _bonusEditState = null;
+};
+
+window.schedaBonusEditorSave = function() {
+    if (!_bonusEditState || !_bonusListState) return;
+    const nameEl = document.getElementById('bonusEditName');
+    const valEl = document.getElementById('bonusEditValue');
+    const nome = (nameEl?.value || '').trim().slice(0, 80) || 'Manuale';
+    const valore = parseInt(valEl?.value) || 0;
+
+    if (valore === 0) {
+        showNotification('Inserisci un valore diverso da 0');
+        return;
+    }
+
+    const e = _bonusEditState;
+    const newItem = { nome, valore };
+
+    if (e.parentKind === 'ca') {
+        if (e.isNew) _bonusListState.items.push(newItem);
+        else _bonusListState.items[e.itemIdx] = newItem;
+        _bonusListRender();
+    } else if (e.parentKind === 'save') {
+        const newScope = e.scope || 'single';
+        const newArrName = newScope === 'all' ? 'globalItems' : 'items';
+        if (e.isNew) {
+            _bonusListState[newArrName].push(newItem);
+        } else {
+            const origScope = e.originalScope || newScope;
+            const origArrName = origScope === 'all' ? 'globalItems' : 'items';
+            if (origArrName === newArrName) {
+                _bonusListState[newArrName][e.itemIdx] = newItem;
+            } else {
+                _bonusListState[origArrName].splice(e.itemIdx, 1);
+                _bonusListState[newArrName].push(newItem);
+            }
+        }
+        _bonusListRender();
+    } else if (e.parentKind === 'caster') {
+        const g = _bonusListState.groups[e.groupIdx];
+        if (!g) return;
+        if (e.isNew) g.items.push(newItem);
+        else g.items[e.itemIdx] = newItem;
+        _bonusGroupRender(e.groupIdx);
+    }
+
+    schedaBonusEditorClose();
+};
+
+window.schedaBonusEditorDelete = function() {
+    if (!_bonusEditState || !_bonusListState) return;
+    const e = _bonusEditState;
+    if (e.isNew) { schedaBonusEditorClose(); return; }
+
+    if (e.parentKind === 'ca') {
+        _bonusListState.items.splice(e.itemIdx, 1);
+        _bonusListRender();
+    } else if (e.parentKind === 'save') {
+        const origArrName = (e.originalScope || e.scope) === 'all' ? 'globalItems' : 'items';
+        _bonusListState[origArrName].splice(e.itemIdx, 1);
+        _bonusListRender();
+    } else if (e.parentKind === 'caster') {
+        const g = _bonusListState.groups[e.groupIdx];
+        if (g) g.items.splice(e.itemIdx, 1);
+        _bonusGroupRender(e.groupIdx);
+    }
+    schedaBonusEditorClose();
 };
 
 // =====================================================
@@ -9948,8 +10136,8 @@ window.schedaOpenCABonus = function(pgId) {
     const desMod = Math.floor(((pg.destrezza || 10) - 10) / 2);
     let mageArmorBtn = '';
     if (knowsMageArmor && !armorEquipped && !alreadyApplied) {
-        mageArmorBtn = `<button type="button" class="bonus-quick-btn" onclick="schedaApplyMageArmor()">
-            ✦ Applica Armatura Magica (CA = 13 ${desMod >= 0 ? '+' : ''}${desMod} = ${13 + desMod})
+        mageArmorBtn = `<button type="button" class="bonus-quick-btn small" onclick="schedaApplyMageArmor()" title="Aggiunge un bonus +3 (Armatura Magica = 13 + Des)">
+            ✦ Applica Armatura Magica (CA ${13 + desMod})
         </button>`;
     } else if (knowsMageArmor && armorEquipped) {
         mageArmorBtn = `<div class="bonus-modal-hint" style="color:#d29c2a;">Armatura Magica disponibile ma stai indossando un'armatura: rimuovila per applicarla.</div>`;
@@ -10048,6 +10236,7 @@ window.schedaOpenSaveBonus = function(pgId, abilityKey) {
     if (!pg) return;
     const bm = _getBonusManuali(pg);
     const items = (bm.tiri_salvezza[abilityKey] || []).map(b => ({ ...b }));
+    const globalItems = (bm.tiri_salvezza._all || []).map(b => ({ ...b }));
 
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
     const val = pg[abilityKey] || 10;
@@ -10057,7 +10246,7 @@ window.schedaOpenSaveBonus = function(pgId, abilityKey) {
     const baseTot = mod + (isProf ? bonusComp : 0);
     const baseStr = baseTot >= 0 ? `+${baseTot}` : `${baseTot}`;
 
-    _bonusListState = { kind: 'save', pgId, abilityKey, items };
+    _bonusListState = { kind: 'save', pgId, abilityKey, items, globalItems };
 
     const labelAb = _ABILITY_LABELS[abilityKey] || abilityKey;
     const headerInfo = `Base: mod ${mod >= 0 ? '+' : ''}${mod}${profPart} = <b>${baseStr}</b>`;
@@ -10100,16 +10289,20 @@ window.schedaCloseSaveBonus = function() {
 window.schedaSaveBonusConfirm = async function(pgId, abilityKey) {
     const pg = _schedaPgCache;
     if (!pg) return;
-    _bonusListSyncFromInputs();
 
-    const cleaned = (_bonusListState?.items || [])
+    const cleanList = arr => (arr || [])
         .map(b => ({ nome: (b.nome || 'Manuale').trim().slice(0, 80) || 'Manuale', valore: parseInt(b.valore) || 0 }))
         .filter(b => b.valore !== 0);
 
+    const cleanedLocal = cleanList(_bonusListState?.items);
+    const cleanedGlobal = cleanList(_bonusListState?.globalItems);
+
     const bm = _getBonusManuali(pg);
     const ts = { ...(bm.tiri_salvezza || {}) };
-    if (cleaned.length) ts[abilityKey] = cleaned;
+    if (cleanedLocal.length) ts[abilityKey] = cleanedLocal;
     else delete ts[abilityKey];
+    if (cleanedGlobal.length) ts._all = cleanedGlobal;
+    else delete ts._all;
 
     const next = _buildBonusManualiPayload({
         ca: bm.ca,
@@ -10121,20 +10314,22 @@ window.schedaSaveBonusConfirm = async function(pgId, abilityKey) {
 
     schedaCloseSaveBonus();
 
-    // Aggiorna inline il valore TS visualizzato senza ricaricare tutta la scheda.
+    // Aggiorna inline tutti i 6 TS (perche' i bonus globali influenzano tutti).
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
-    const val = pg[abilityKey] || 10;
-    const m = Math.floor((val - 10) / 2);
-    const isProf = (pg.tiri_salvezza || []).includes(abilityKey);
-    const saveExtra = _getSaveBonusFor(pg, abilityKey);
-    const saveMod = m + (isProf ? bonusComp : 0) + saveExtra;
-    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
-    const saveMark = saveExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
-    const saveEl = document.getElementById(`sSave_${abilityKey}`);
-    if (saveEl) saveEl.innerHTML = `${saveStr}${saveMark}`;
+    SCHEDA_ABILITIES.forEach(a => {
+        const v = pg[a.key] || 10;
+        const m = Math.floor((v - 10) / 2);
+        const isP = (pg.tiri_salvezza || []).includes(a.key);
+        const extra = _getSaveBonusFor(pg, a.key);
+        const sm = m + (isP ? bonusComp : 0) + extra;
+        const ss = sm >= 0 ? `+${sm}` : `${sm}`;
+        const mark = extra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+        const el = document.getElementById(`sSave_${a.key}`);
+        if (el) el.innerHTML = `${ss}${mark}`;
+    });
 
     await schedaInstantSave(pgId, { bonus_manuali: next });
-    showNotification(`TS ${labelOrKey(abilityKey)} aggiornato: ${saveStr}`);
+    showNotification(`TS ${labelOrKey(abilityKey)} aggiornato`);
 };
 
 function labelOrKey(k) {
@@ -10228,21 +10423,6 @@ window.schedaOpenSpellDcBonus = function(pgId, classiArg) {
     _openSpellBonusGeneric(pgId, classiArg, 'dc');
 };
 
-function _bonusGroupRowHtml(gi, b, idx) {
-    const v = parseInt(b.valore) || 0;
-    return `<div class="bonus-list-row" data-idx="${idx}">
-        <div class="bonus-list-row-top">
-            <input type="text" class="bonus-list-name" placeholder="Nome (es. Bastone del Potere)" value="${escapeHtml(b.nome)}" maxlength="80">
-            <button type="button" class="bonus-list-del" onclick="schedaBonusGroupDelete(${gi},${idx})" title="Rimuovi">×</button>
-        </div>
-        <div class="bonus-list-val-row">
-            <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},-1)">−</button>
-            <input type="number" class="bonus-list-val" value="${v}" step="1">
-            <button type="button" class="bonus-modal-step" onclick="schedaBonusGroupStep(${gi},${idx},1)">+</button>
-        </div>
-    </div>`;
-}
-
 function _bonusGroupRender(gi) {
     if (!_bonusListState || _bonusListState.kind !== 'caster') return;
     const g = _bonusListState.groups[gi];
@@ -10250,11 +10430,11 @@ function _bonusGroupRender(gi) {
     const c = document.getElementById(`bonusListGroupContainer_${gi}`);
     if (!c) return;
     c.innerHTML = g.items.length
-        ? g.items.map((b, i) => _bonusGroupRowHtml(gi, b, i)).join('')
+        ? g.items.map((b, i) => _bonusChipHtml(b, `schedaBonusEditCaster(${gi},${i})`)).join('')
         : '<div class="bonus-list-empty">Nessun bonus.</div>';
     const totEl = document.getElementById(`bonusListGroupTotal_${gi}`);
     if (totEl) {
-        const tot = g.items.reduce((s, b) => s + (parseInt(b.valore) || 0), 0);
+        const tot = _sumBonusList(g.items);
         totEl.textContent = tot >= 0 ? `+${tot}` : `${tot}`;
     }
 }
@@ -10264,47 +10444,9 @@ function _bonusGroupRenderAll() {
     _bonusListState.groups.forEach((_, gi) => _bonusGroupRender(gi));
 }
 
-function _bonusGroupSyncFromInputs() {
-    if (!_bonusListState?.groups) return;
-    _bonusListState.groups.forEach((g, gi) => {
-        const rows = document.querySelectorAll(`#bonusListGroupContainer_${gi} .bonus-list-row`);
-        rows.forEach((row, i) => {
-            if (!g.items[i]) return;
-            const nameEl = row.querySelector('.bonus-list-name');
-            const valEl = row.querySelector('.bonus-list-val');
-            if (nameEl) g.items[i].nome = nameEl.value.trim().slice(0, 80);
-            if (valEl) g.items[i].valore = parseInt(valEl.value) || 0;
-        });
-    });
-}
-
-window.schedaBonusGroupStep = function(gi, idx, delta) {
-    _bonusGroupSyncFromInputs();
-    const g = _bonusListState?.groups?.[gi];
-    if (!g?.items?.[idx]) return;
-    g.items[idx].valore = (parseInt(g.items[idx].valore) || 0) + delta;
-    _bonusGroupRender(gi);
-};
-
-window.schedaBonusGroupDelete = function(gi, idx) {
-    _bonusGroupSyncFromInputs();
-    const g = _bonusListState?.groups?.[gi];
-    if (!g) return;
-    g.items.splice(idx, 1);
-    _bonusGroupRender(gi);
-};
-
 window.schedaBonusGroupAdd = function(gi) {
-    _bonusGroupSyncFromInputs();
-    const g = _bonusListState?.groups?.[gi];
-    if (!g) return;
-    g.items.push({ nome: '', valore: 1 });
-    _bonusGroupRender(gi);
-    setTimeout(() => {
-        const rows = document.querySelectorAll(`#bonusListGroupContainer_${gi} .bonus-list-row`);
-        const last = rows[rows.length - 1];
-        last?.querySelector('.bonus-list-name')?.focus();
-    }, 30);
+    if (!_bonusListState?.groups?.[gi]) return;
+    _bonusEditOpen({ parentKind: 'caster', isNew: true, groupIdx: gi });
 };
 
 window.schedaCloseSpellCasterBonus = function() {

@@ -2068,79 +2068,66 @@
     border-radius: 6px;
     text-align: center;
 }
-.bonus-list-row {
+/* ----- Chip bonus (dialog principale) ----- */
+.bonus-list-container {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: stretch;
 }
-.bonus-list-row-top {
-    display: flex;
+.bonus-chip {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-}
-.bonus-list-name {
-    flex: 1;
-    min-width: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    padding: 7px 11px;
+    background: linear-gradient(135deg, rgba(108,92,231,0.18), rgba(108,92,231,0.08));
+    border: 1px solid var(--accent, #6c5ce7);
+    border-radius: 999px;
     color: var(--text);
-    border-radius: 5px;
-    padding: 9px 11px;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-    width: 100%;
-}
-.bonus-list-name:focus {
-    outline: none;
-    border-color: var(--accent, #6c5ce7);
-}
-.bonus-list-val-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-}
-.bonus-list-val {
-    width: 80px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 5px;
-    padding: 8px 6px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 1.05rem;
-    box-sizing: border-box;
-}
-.bonus-list-val-row .bonus-modal-step {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-}
-.bonus-list-del {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: #ef4444;
-    border-radius: 5px;
+    font-size: 0.85rem;
     cursor: pointer;
-    font-size: 1.25rem;
-    line-height: 1;
-    font-weight: 700;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-weight: 600;
+    transition: all 0.12s;
+    max-width: 100%;
+    box-sizing: border-box;
 }
-.bonus-list-del:hover {
-    background: rgba(239,68,68,0.15);
+.bonus-chip:hover {
+    background: linear-gradient(135deg, rgba(108,92,231,0.32), rgba(108,92,231,0.18));
+    transform: translateY(-1px);
+}
+.bonus-chip.negative {
+    background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.06));
     border-color: #ef4444;
+}
+.bonus-chip.is-global {
+    background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(245,158,11,0.06));
+    border-color: #f59e0b;
+}
+.bonus-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+}
+.bonus-chip-val {
+    font-weight: 800;
+    background: rgba(0,0,0,0.25);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.bonus-chip-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 4px;
+    color: #fbbf24;
+    flex-shrink: 0;
 }
 .bonus-list-add-btn {
     display: block;
@@ -2154,7 +2141,7 @@
     font-size: 0.88rem;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 10px;
+    margin: 10px 0;
 }
 .bonus-list-add-btn:hover {
     background: rgba(108,92,231,0.1);
@@ -2177,6 +2164,113 @@
 .bonus-quick-btn:hover {
     background: rgba(96,165,250,0.25);
     transform: translateY(-1px);
+}
+.bonus-quick-btn.small {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin: 6px 0 10px;
+}
+
+/* ----- Dialog secondaria: editor di un singolo bonus ----- */
+.bonus-edit-overlay {
+    z-index: 1000;
+}
+.hp-calc-modal.bonus-edit-modal {
+    width: min(420px, 92vw);
+    max-width: 92vw;
+}
+.bonus-edit-field {
+    margin: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.bonus-edit-field > label {
+    font-size: 0.72rem;
+    color: var(--text-secondary, #bbb);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+.bonus-edit-field input[type="text"] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 5px;
+    padding: 11px 13px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    width: 100%;
+}
+.bonus-edit-field input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent, #6c5ce7);
+}
+.bonus-edit-val-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+.bonus-edit-val-row input[type="number"] {
+    width: 100px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 5px;
+    padding: 11px 6px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    box-sizing: border-box;
+}
+.bonus-edit-val-row .bonus-modal-step {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+}
+.bonus-edit-scope {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.bonus-edit-scope-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.12s;
+}
+.bonus-edit-scope-opt:hover {
+    background: rgba(108,92,231,0.08);
+}
+.bonus-edit-scope-opt.selected {
+    border-color: var(--accent, #6c5ce7);
+    background: rgba(108,92,231,0.15);
+    color: var(--text);
+    font-weight: 600;
+}
+.bonus-edit-scope-opt input[type="radio"] {
+    accent-color: var(--accent, #6c5ce7);
+    width: 16px;
+    height: 16px;
+}
+.bonus-edit-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.bonus-edit-buttons .hp-calc-btn {
+    flex: 1;
+}
+.bonus-edit-buttons .hp-calc-btn.dmg {
+    flex: 0 0 auto;
 }
 .bonus-list-group {
     margin: 14px 0;
