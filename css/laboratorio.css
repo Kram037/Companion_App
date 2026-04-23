@@ -1514,6 +1514,17 @@
 .lab-import-item-meta { color: var(--text-secondary); font-size: 0.8rem; margin-top: 2px; }
 .lab-import-item-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; line-height: 1.4; }
 .lab-import-warn { color: #f59e0b; font-size: 0.8rem; margin-top: 4px; }
+.lab-import-ench-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent, #6c5ce7);
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    vertical-align: middle;
+}
 
 
 

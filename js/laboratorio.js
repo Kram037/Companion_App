@@ -2825,15 +2825,17 @@ const _LAB_TIPO_MAP = {
     'oggetto meraviglioso': 'Oggetto Meraviglioso', 'wondrous item': 'Oggetto Meraviglioso',
 };
 
-// Regex dell'header: "Tipo [(sotto)], rarita' [(requires attunement...)]".
+// Regex dell'header: "Tipo [(sotto)] [+N], rarita' [(requires attunement...)]".
 // Catturiamo:
-//   1: tipo grezzo       2: sotto-tipo (opzionale)
-//   3: rarita' grezza    4: parentesi aggiuntiva (sintonia, opzionale)
+//   1: tipo grezzo                  2: sotto-tipo (opzionale)
+//   3: incantamento +N (opzionale)  4: rarita' grezza
+//   5: parentesi aggiuntiva (sintonia, opzionale)
 //
 // La regex e' case-insensitive (/i) e accetta sia le forme maschili che
 // quelle femminili italiane (rara/raro, molto rara/molto raro,
-// leggendaria/leggendario), oltre alle equivalenti inglesi.
-const _LAB_HDR_RX = /^\s*([A-Za-zÀ-ÿ' ]+?)(?:\s*\(([^)]+)\))?\s*,\s*(non\s*comune|non\s*comuni|comune|molto\s*rar[oa]|rar[oa]|leggendari[oa]|artefatt[oi]|common|uncommon|very\s*rare|rare|legendary|artifact)\s*(?:\(([^)]+)\))?\s*\.?\s*$/i;
+// leggendaria/leggendario), oltre alle equivalenti inglesi. Il bonus
+// magico (+1/+2/+3) puo' apparire subito dopo il sotto-tipo.
+const _LAB_HDR_RX = /^\s*([A-Za-zÀ-ÿ' ]+?)(?:\s*\(([^)]+)\))?(?:\s*\+\s*([1-3]))?\s*,\s*(non\s*comune|non\s*comuni|comune|molto\s*rar[oa]|rar[oa]|leggendari[oa]|artefatt[oi]|common|uncommon|very\s*rare|rare|legendary|artifact)\s*(?:\(([^)]+)\))?\s*\.?\s*$/i;
 
 function _labNormalizeType(raw) {
     if (!raw) return '';
@@ -2899,8 +2901,9 @@ function labParseItemsText(text) {
                 const hdr = lines[i].match(_LAB_HDR_RX);
                 const tipoRaw = hdr[1];
                 const subRaw = hdr[2] || '';
-                const rarRaw = hdr[3];
-                const attRaw = hdr[4] || '';
+                const enchRaw = hdr[3] || '';
+                const rarRaw = hdr[4];
+                const attRaw = hdr[5] || '';
                 // Raccogli descrizione fino al prossimo nome+header.
                 const descLines = [];
                 let j = i + 1;
@@ -2918,10 +2921,20 @@ function labParseItemsText(text) {
                 while (descLines.length && !descLines[descLines.length - 1].trim()) descLines.pop();
 
                 const att = _labParseAttunement(attRaw);
+                const tipoNorm = _labNormalizeType(tipoRaw);
+                // L'incantamento si applica solo a tipi "magici" (armi,
+                // armature, scudi, focus). Per gli altri tipi viene
+                // ignorato anche se presente nell'header.
+                let enchNorm = 0;
+                if (enchRaw) {
+                    const n = parseInt(enchRaw, 10);
+                    if ([1,2,3].includes(n) && _labOggCanEnch(tipoNorm)) enchNorm = n;
+                }
                 const rec = {
                     nome: nameLine,
-                    tipo: _labNormalizeType(tipoRaw),
+                    tipo: tipoNorm,
                     sotto_tipo: subRaw.trim(),
+                    incantamento: enchNorm,
                     rarita: _labNormalizeRarity(rarRaw),
                     richiede_sintonia: att.richiede,
                     sintonia_dettaglio: att.dettaglio,
@@ -3105,10 +3118,13 @@ window._labImportParse = function() {
         });
         const warn = it._warning ? `<div class="lab-import-warn">⚠️ ${escapeHtml(it._warning)}</div>` : '';
         const descPreview = (it.descrizione || '').split('\n').slice(0, 3).join(' ').slice(0, 220);
+        const enchBadge = it.incantamento
+            ? ` <span class="lab-import-ench-badge">+${it.incantamento}</span>`
+            : '';
         return `<label class="lab-import-item">
             <input type="checkbox" data-idx="${idx}" checked>
             <div class="lab-import-item-body">
-                <div class="lab-import-item-name">${escapeHtml(it.nome)}</div>
+                <div class="lab-import-item-name">${escapeHtml(it.nome)}${enchBadge}</div>
                 <div class="lab-import-item-meta">${escapeHtml(meta)}</div>
                 ${descPreview ? `<div class="lab-import-item-desc">${escapeHtml(descPreview)}${it.descrizione.length > 220 ? '...' : ''}</div>` : ''}
                 ${warn}
@@ -3156,7 +3172,7 @@ window._labImportSave = async function() {
         rarita: it.rarita || null,
         richiede_sintonia: !!it.richiede_sintonia,
         sintonia_dettaglio: it.sintonia_dettaglio || null,
-        incantamento: 0,
+        incantamento: parseInt(it.incantamento) || 0,
     }));
     const { error } = await supabase.from('homebrew_oggetti').insert(rows);
     if (error) {
