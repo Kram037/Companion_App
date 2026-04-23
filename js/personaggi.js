@@ -1769,15 +1769,32 @@ function pgGetHomebrewSubclassOptions(className) {
     const all = AppState.cachedHomebrewSottoclassi;
     if (all.length === 0) return [];
     const data = window.CLASSES_DATA || [];
+    const targetLower = String(className || '').toLowerCase().trim();
     const cls = data.find(c =>
-        (c.name || '').toLowerCase() === String(className).toLowerCase() ||
-        (c.name_en || '').toLowerCase() === String(className).toLowerCase() ||
-        (c.slug || '').toLowerCase() === String(className).toLowerCase()
+        (c.name || '').toLowerCase() === targetLower ||
+        (c.name_en || '').toLowerCase() === targetLower ||
+        (c.slug || '').toLowerCase() === targetLower
     );
     const slug = cls ? cls.slug : null;
-    if (!slug) return [];
-    return all
-        .filter(r => r.parent_class_slug === slug)
+    // Filtro robusto: accetta match per slug (se trovato) E anche per
+    // parent_class_name salvato nel record homebrew (case/spaces-insensitive).
+    // In questo modo eventuali disallineamenti CLASSES_DATA <-> nome PG non
+    // ci bloccano la visibilità della sottoclasse homebrew.
+    const matches = all.filter(r => {
+        const slugMatch = slug && r.parent_class_slug === slug;
+        const nameMatch = (r.parent_class_name || '').toLowerCase().trim() === targetLower;
+        return slugMatch || nameMatch;
+    });
+    try {
+        console.log('[homebrew][picker] richiesta sottoclassi homebrew:', {
+            className, targetLower, classeSlugTrovato: slug,
+            sottoclassiInCache: all.length,
+            sottoclassiPerQuestaClasse: matches.length,
+            tutteLeCacheItems: all.map(r => `${r.parent_class_slug || '?'} (${r.parent_class_name || '?'}): ${r.nome}`)
+        });
+    } catch (_) {}
+    if (matches.length === 0) return [];
+    return matches
         .map(r => {
             // Min level = il minimo livello tra le feature definite (default 3)
             const lvls = Array.isArray(r.sottoclasse_features)
@@ -1845,12 +1862,11 @@ window.pgOpenSubclassDropdown = async function(index) {
     const c = pgSelectedClasses[index];
     if (!c) return;
     // Sicurezza: assicurati che le sottoclassi homebrew siano in cache
-    // prima di mostrare il picker (importante subito dopo aver creato
-    // una sottoclasse nel laboratorio).
-    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
-        if (typeof loadHomebrewSottoclassi === 'function') {
-            try { await loadHomebrewSottoclassi(); } catch (_) {}
-        }
+    // FRESCA prima di mostrare il picker (importante subito dopo aver
+    // creato una sottoclasse nel laboratorio o cambiato utente).
+    // La dedup interna del loader evita doppie query concorrenti.
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
     }
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
@@ -9338,10 +9354,11 @@ function microRenderClassi() {
 window.microOpenSubclassDropdown = async function(index) {
     const c = _microSelectedClasses[index];
     if (!c) return;
-    if (!window.AppState || !Array.isArray(AppState.cachedHomebrewSottoclassi)) {
-        if (typeof loadHomebrewSottoclassi === 'function') {
-            try { await loadHomebrewSottoclassi(); } catch (_) {}
-        }
+    // Refresh cache homebrew sempre prima del picker (la dedup interna evita
+    // doppie query). Cache vuota non significa "già provato": potrebbe essere
+    // un'inizializzazione precedente fatta senza utente loggato.
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
     }
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
