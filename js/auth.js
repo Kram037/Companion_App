@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-D con masterEnabled fix');
+console.log('[homebrew][build] auth.js BUILD 2026-04-23-F debug amici + integrazione hb scheda');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
@@ -134,16 +134,28 @@ async function loadHomebrewSottoclassi() {
                 console.log('[homebrew][debug] settings:', settings, 'masterEnabled:', masterEnabled);
             } catch (_) {}
             if (masterEnabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
-                const { data: friendRows } = await supabase
+                try { console.log('[homebrew][debug] amici_abilitati IDs in settings:', settings.amici_abilitati); } catch (_) {}
+                const { data: friendRows, error: friendErr } = await supabase
                     .from('utenti')
                     .select('id, uid, nome_utente')
                     .in('id', settings.amici_abilitati);
+                if (friendErr) {
+                    console.warn('[homebrew][debug] errore SELECT amici:', friendErr);
+                }
+                try { console.log('[homebrew][debug] friendRows risolti:', friendRows); } catch (_) {}
                 (friendRows || []).forEach(f => {
                     if (f.uid) {
                         friendUids.push(f.uid);
                         friendInfoByUid[f.uid] = f;
+                    } else {
+                        console.warn('[homebrew][debug] amico senza uid (probabilmente row utenti senza colonna uid valorizzata):', f);
                     }
                 });
+            } else {
+                try {
+                    console.log('[homebrew][debug] skip risoluzione amici. master:', masterEnabled,
+                        'amici_abilitati:', settings.amici_abilitati);
+                } catch (_) {}
             }
 
             // Una sola SELECT con IN su [io, ...amiciAbilitati].

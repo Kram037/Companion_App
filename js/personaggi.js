@@ -3,7 +3,7 @@
 // ============================================================================
 
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] personaggi.js BUILD 2026-04-23-E fix AppState scope');
+console.log('[homebrew][build] personaggi.js BUILD 2026-04-23-F integrazione sottoclassi homebrew nella scheda');
 
 let editingPersonaggioId = null;
 let pgWizardCurrentStep = 0;
@@ -925,15 +925,57 @@ function _pgSubclassGrantedSpells(pg) {
     if (!pg || !Array.isArray(pg.classi)) return [];
     const seen = new Set();
     const out = [];
+    const hbCache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewSottoclassi))
+        ? AppState.cachedHomebrewSottoclassi : [];
     pg.classi.forEach(c => {
         if (!c || !c.nome) return;
         const cls = _getClassData(c.nome);
         if (!cls) return;
         const subSlug = c.sottoclasseSlug || '';
         if (!subSlug) return;
+        const lvl = parseInt(c.livello) || 1;
+
+        // ── Caso HOMEBREW: lo slug e' 'hb:<id>' ──
+        if (c.sottoclasse_homebrew_id || subSlug.startsWith('hb:')) {
+            const hbId = c.sottoclasse_homebrew_id || subSlug.replace(/^hb:/, '');
+            const hb = hbCache.find(r => String(r.id) === String(hbId));
+            if (!hb) return;
+            const subLabel = hb.nome || c.sottoclasse || 'Sottoclasse Homebrew';
+            // 1. granted_spells a livello sottoclasse: [{ level, spells:[...] }]
+            (Array.isArray(hb.granted_spells) ? hb.granted_spells : []).forEach(g => {
+                if ((parseInt(g.level) || 99) > lvl) return;
+                (g.spells || []).forEach(name => {
+                    const key = (name || '').toLowerCase();
+                    if (!key || seen.has(key)) return;
+                    seen.add(key);
+                    out.push({
+                        name,
+                        source: cls.slug + ':hb:' + hbId,
+                        source_label: subLabel,
+                    });
+                });
+            });
+            // 2. spells per singolo privilegio (feature.grants_spells)
+            (Array.isArray(hb.sottoclasse_features) ? hb.sottoclasse_features : []).forEach(f => {
+                if ((parseInt(f.level) || 99) > lvl) return;
+                if (!Array.isArray(f.grants_spells) || f.grants_spells.length === 0) return;
+                f.grants_spells.forEach(name => {
+                    const key = (name || '').toLowerCase();
+                    if (!key || seen.has(key)) return;
+                    seen.add(key);
+                    out.push({
+                        name,
+                        source: cls.slug + ':hb:' + hbId + ':' + (f.nome || 'priv'),
+                        source_label: subLabel + (f.nome ? ' • ' + f.nome : ''),
+                    });
+                });
+            });
+            return;
+        }
+
+        // ── Caso NATIVO ──
         const subData = (data[cls.slug] || {})[subSlug];
         if (!subData) return;
-        const lvl = parseInt(c.livello) || 1;
         // Etichetta: "Dominio della Vita", "Giuramento di Devozione",
         // "Patrono del Demonio", ecc. — usa il nome IT della sottoclasse
         // se disponibile, altrimenti il name_en.
@@ -3134,13 +3176,53 @@ function _pgSubclassResources(pg) {
     const out = [];
     if (!pg || !Array.isArray(pg.classi)) return out;
     const stored = (pg.risorse_classe && pg.risorse_classe._subclass) || {};
+    const hbCache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewSottoclassi))
+        ? AppState.cachedHomebrewSottoclassi : [];
     pg.classi.forEach(c => {
         const subSlug = c.sottoclasseSlug;
         if (!subSlug) return;
+        const lvl = parseInt(c.livello) || 0;
+
+        // ── Caso HOMEBREW: estrae le `risorsa` dalle features ──
+        if (c.sottoclasse_homebrew_id || subSlug.startsWith('hb:')) {
+            const hbId = c.sottoclasse_homebrew_id || subSlug.replace(/^hb:/, '');
+            const hb = hbCache.find(r => String(r.id) === String(hbId));
+            if (!hb || !Array.isArray(hb.sottoclasse_features)) return;
+            hb.sottoclasse_features.forEach((f, fIdx) => {
+                if (!f || !f.risorsa) return;
+                if ((parseInt(f.level) || 1) > lvl) return;
+                const r = f.risorsa;
+                // Risolve max: numero diretto o formula tipo 'prof_bonus'
+                let max = 0;
+                if (typeof r.max === 'number') {
+                    max = r.max;
+                } else if (typeof r.max === 'string') {
+                    max = _resolveHomebrewResMax(r.max, pg, c);
+                }
+                if (max <= 0) return;
+                const key = `hb:${hbId}__${fIdx}`;
+                const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+                out.push({
+                    key,
+                    nome: r.nome || f.nome,
+                    tipo: r.tipo || 'counter',
+                    max, current,
+                    die: r.dado || (r.tipo === 'dice_pool' || r.tipo === 'portent' ? 'd6' : null),
+                    recharge: _RECHARGE_LABELS[r.recharge] || '',
+                    classeNome: c.nome,
+                    sottoclasseNome: hb.nome || c.sottoclasse || 'Sottoclasse Homebrew',
+                    note: '',
+                    defaultMax: max,
+                    fromLevel: parseInt(f.level) || 1,
+                });
+            });
+            return;
+        }
+
+        // ── Caso NATIVO ──
         const list = SUBCLASS_RESOURCES[subSlug];
         if (!list) return;
         list.forEach((res, rIdx) => {
-            const lvl = parseInt(c.livello) || 0;
             if (lvl < (res.fromLevel || 1)) return;
             const max = _resolveSubclassResMax(res, pg, c);
             if (max <= 0) return;
@@ -3163,6 +3245,28 @@ function _pgSubclassResources(pg) {
         });
     });
     return out;
+}
+
+// Risolve i valori "formula" del max risorsa per le sottoclassi homebrew.
+// Supporta: prof_bonus, cha_mod, wis_mod, int_mod, con_mod, str_mod, dex_mod
+// Per i mod usa la caratteristica primaria del PG. Se non riconosce la
+// stringa, prova a parsarla come intero.
+function _resolveHomebrewResMax(formula, pg, classeEntry) {
+    const f = String(formula || '').trim().toLowerCase();
+    if (f === 'prof_bonus') {
+        const totLvl = (pg.classi || []).reduce((s, c) => s + (parseInt(c.livello) || 0), 0) || 1;
+        return Math.floor((totLvl - 1) / 4) + 2;
+    }
+    const modMap = {
+        cha_mod: 'carisma', wis_mod: 'saggezza', int_mod: 'intelligenza',
+        con_mod: 'costituzione', str_mod: 'forza', dex_mod: 'destrezza'
+    };
+    if (modMap[f]) {
+        const stat = (pg.statistiche && pg.statistiche[modMap[f]]) || 10;
+        return Math.max(1, Math.floor((stat - 10) / 2));
+    }
+    const n = parseInt(f);
+    return isNaN(n) ? 0 : n;
 }
 
 const CLASS_SPELL_ABILITY = {
@@ -5261,7 +5365,34 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
         }));
     let subclassName = null;
     let subFeatures = [];
-    if (cls.subclasses && cls.subclasses.length > 0 && clsEntry.sottoclasseSlug) {
+    // ── Sottoclasse HOMEBREW: lo slug è 'hb:<id>' e i dati stanno in cache. ──
+    if (clsEntry.sottoclasse_homebrew_id || (clsEntry.sottoclasseSlug || '').startsWith('hb:')) {
+        const hbId = clsEntry.sottoclasse_homebrew_id
+            || String(clsEntry.sottoclasseSlug || '').replace(/^hb:/, '');
+        const cache = (typeof AppState !== 'undefined' && Array.isArray(AppState.cachedHomebrewSottoclassi))
+            ? AppState.cachedHomebrewSottoclassi : [];
+        const hb = cache.find(r => String(r.id) === String(hbId));
+        if (hb) {
+            subclassName = hb.nome || clsEntry.sottoclasse || 'Sottoclasse Homebrew';
+            const feats = Array.isArray(hb.sottoclasse_features) ? hb.sottoclasse_features : [];
+            subFeatures = feats
+                .filter(f => !f.level || parseInt(f.level) <= lvl)
+                .map(f => ({
+                    source: cls.slug + ':hb:' + hbId,
+                    source_label: subclassName,
+                    name_en: f.name || f.nome || '',
+                    name: f.name || f.nome || '',
+                    level: parseInt(f.level) || null,
+                    description: f.description || f.descrizione || '',
+                    description_en: f.description || f.descrizione || '',
+                    translated: true,
+                    _isHomebrew: true,
+                }));
+        } else {
+            // Fallback: la cache homebrew non è ancora disponibile.
+            subclassName = clsEntry.sottoclasse || 'Sottoclasse Homebrew';
+        }
+    } else if (cls.subclasses && cls.subclasses.length > 0 && clsEntry.sottoclasseSlug) {
         const sub = cls.subclasses.find(s => s.slug === clsEntry.sottoclasseSlug);
         if (sub) {
             subclassName = _localizedClassName(sub);
