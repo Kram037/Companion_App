@@ -55,7 +55,16 @@
 .lab-hub-card:active { transform: scale(0.97); }
 .lab-hub-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .lab-hub-card-icon { font-size: 1.6rem; line-height: 1; }
-.lab-hub-card-label { font-weight: 600; font-size: 0.85rem; color: var(--text); line-height: 1; }
+.lab-hub-card-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.2;
+    text-align: center;
+    padding: 0 6px;
+    word-break: break-word;
+    hyphens: auto;
+}
 
 /* Sub-page back button */
 .btn-back {
