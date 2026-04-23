@@ -2035,7 +2035,14 @@
        su tutti tranne le ultime due righe (best-effort). */
     .inv-items-grid > .inv-item-row:nth-last-child(-n+2) { border-bottom: none; }
 }
-.inv-item-name { flex: 1; font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.inv-item-main { flex: 1; min-width: 0; }
+.inv-item-name { font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.inv-item-meta {
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
 .inv-item-name-clickable { cursor: pointer; transition: color 0.15s; }
 .inv-item-name-clickable:hover { color: var(--primary); text-decoration: underline; }
 .inv-magic-badge { color: #A855F7; font-size: 0.8rem; }

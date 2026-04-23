@@ -196,11 +196,8 @@ function labGetCardDetail(item, tab) {
         case 'nemici': return `CA ${item.classe_armatura || 10} · PV ${item.punti_vita_max || 10} · GS ${item.grado_sfida || '0'}`;
         case 'talenti': return item.prerequisiti || '';
         case 'oggetti': {
-            const parts = [];
-            if (item.tipo) parts.push(item.tipo);
-            if (item.rarita) parts.push(item.rarita);
-            if (parseInt(item.incantamento) > 0) parts.push('+' + item.incantamento);
-            return parts.join(' · ');
+            const ench = parseInt(item.incantamento) > 0 ? ` +${item.incantamento}` : '';
+            return (window.formatOggettoMeta ? window.formatOggettoMeta(item) : '') + ench;
         }
         default: return '';
     }
@@ -1970,65 +1967,127 @@ function labFieldsTalenti(data) {
     </div>`;
 }
 
+// Tipologie e rarita' valide per oggetti homebrew. Le label coincidono
+// con i valori salvati su DB (italiano, no slug separato).
+const LAB_OGG_TIPI = [
+    'Arma','Armatura','Scudo','Focus','Pozione','Pergamena',
+    'Anello','Bacchetta','Bastone','Asta',
+    'Oggetto Meraviglioso','Altro'
+];
+const LAB_OGG_RARITA = ['Comune','Non Comune','Raro','Molto Raro','Leggendario','Artefatto'];
+
+// Solo questi tipi possono ricevere un incantamento magico (+1/+2/+3).
+// Vincolo richiesto dall'utente: armi, armature (incluso scudo), focus.
+const LAB_OGG_ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
+
+function _labOggCanEnch(tipo) {
+    return LAB_OGG_ENCH_TYPES.includes(tipo);
+}
+
 function labFieldsOggetti(data) {
-    const tipi = ['Arma','Armatura','Scudo','Focus','Pozione','Pergamena','Anello','Bacchetta','Bastone','Oggetto Meraviglioso','Altro'];
-    const rarita = ['Comune','Non Comune','Raro','Molto Raro','Leggendario','Artefatto'];
-    // Tipi che possono ricevere un incantamento magico (+1/+2/+3).
-    // Lo scudo e' considerato un'armatura nel framework di gioco.
-    const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
     const currentType = data?.tipo || '';
-    const currentEnch = parseInt(data?.incantamento) || 0;
-    const showEnch = ENCH_TYPES.includes(currentType);
+    const currentRar = data?.rarita || 'Comune';
+    const currentEnch = _labOggCanEnch(currentType) ? (parseInt(data?.incantamento) || 0) : 0;
+    const currentSint = !!data?.richiede_sintonia;
+    const currentSub = data?.sotto_tipo || '';
     const desc = (data?.descrizione != null ? data.descrizione : (data?.proprieta || ''));
+    const showEnch = _labOggCanEnch(currentType);
+
+    const chip = (val, current, onclick) =>
+        `<button type="button" class="lab-chip ${val === current ? 'active' : ''}" onclick="${onclick}">${escapeHtml(val)}</button>`;
+
     return `
     <div class="form-group">
         <label for="hbNome">Nome</label>
         <input type="text" id="hbNome" required placeholder="Nome dell'oggetto" value="${escapeHtml(data?.nome || '')}">
     </div>
+
+    <div class="form-group">
+        <label>Tipologia</label>
+        <div class="lab-chip-picker" id="hbTipoChips">
+            ${LAB_OGG_TIPI.map(t => chip(t, currentType, `window.labOggSelectTipo(this,'${t.replace(/'/g, "\\'")}')`)).join('')}
+        </div>
+        <input type="hidden" id="hbTipoOgg" value="${escapeHtml(currentType)}">
+    </div>
+
+    <div class="form-group">
+        <label for="hbSottoTipo">Specifica <span class="lab-help">(opzionale, es. "freccia", "spada lunga", "amuleto")</span></label>
+        <input type="text" id="hbSottoTipo" placeholder="Sotto-tipo dell'oggetto" value="${escapeHtml(currentSub)}">
+    </div>
+
+    <div class="form-group">
+        <label>Rarità</label>
+        <div class="lab-chip-picker" id="hbRaritaChips">
+            ${LAB_OGG_RARITA.map(r => chip(r, currentRar, `window.labOggSelectRarita(this,'${r.replace(/'/g, "\\'")}')`)).join('')}
+        </div>
+        <input type="hidden" id="hbRarita" value="${escapeHtml(currentRar)}">
+    </div>
+
     <div class="form-row form-row-2">
         <div class="form-group">
-            <label for="hbTipoOgg">Tipo</label>
-            <select id="hbTipoOgg" onchange="window.labOggTipoChange(this)">
-                <option value="">-</option>
-                ${tipi.map(t => `<option value="${t}" ${currentType === t ? 'selected' : ''}>${t}</option>`).join('')}
-            </select>
+            <label>Sintonia</label>
+            <button type="button" class="lab-toggle-btn ${currentSint ? 'on' : ''}" id="hbSintoniaBtn"
+                onclick="window.labOggToggleSintonia(this)">
+                <span class="lab-toggle-dot"></span>
+                <span class="lab-toggle-label">${currentSint ? 'Richiede sintonia' : 'Nessuna sintonia'}</span>
+            </button>
+            <input type="hidden" id="hbSintonia" value="${currentSint ? '1' : '0'}">
         </div>
-        <div class="form-group">
-            <label for="hbRarita">Rarità</label>
-            <select id="hbRarita">
-                ${rarita.map(r => `<option value="${r}" ${(data?.rarita || 'Comune') === r ? 'selected' : ''}>${r}</option>`).join('')}
-            </select>
+        <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
+            <label>Incantamento <span class="lab-help">(solo armi, armature, scudi, focus)</span></label>
+            <div class="custom-res-dice-row" id="hbIncantamentoRowBtns">
+                ${[0,1,2,3].map(b =>
+                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentEnch ? 'active' : ''}" onclick="window.labOggSelectEnch(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
+                ).join('')}
+            </div>
+            <input type="hidden" id="hbIncantamento" value="${currentEnch}">
         </div>
     </div>
-    <div class="form-group" id="hbIncantamentoRow" style="${showEnch ? '' : 'display:none;'}">
-        <label>Incantamento</label>
-        <div class="custom-res-dice-row" id="hbIncantamentoRowBtns">
-            ${[0,1,2,3].map(b =>
-                `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentEnch ? 'active' : ''}" onclick="window.labOggSelectEnch(this,${b})">${b === 0 ? 'No' : '+' + b}</button>`
-            ).join('')}
-        </div>
-        <input type="hidden" id="hbIncantamento" value="${currentEnch}">
-    </div>
+
     <div class="form-group">
         <label for="hbDescrizione">Descrizione</label>
         <textarea id="hbDescrizione" rows="6" placeholder="Descrizione completa dell'oggetto, effetti magici, proprieta'...">${escapeHtml(desc)}</textarea>
     </div>`;
 }
 
-// Gestione cambio tipo: mostra/nasconde la riga incantamento se il tipo
-// corrente e' compatibile (Arma/Armatura/Scudo/Focus).
-window.labOggTipoChange = function(sel) {
-    const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
+window.labOggSelectTipo = function(btn, value) {
+    const cont = btn.parentElement;
+    if (!cont) return;
+    cont.querySelectorAll('.lab-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('hbTipoOgg');
+    if (hidden) hidden.value = value;
+    // Mostra/nasconde incantamento in base al tipo.
     const row = document.getElementById('hbIncantamentoRow');
-    if (!row) return;
-    const enabled = ENCH_TYPES.includes(sel.value);
-    row.style.display = enabled ? '' : 'none';
-    if (!enabled) {
-        const hidden = document.getElementById('hbIncantamento');
-        if (hidden) hidden.value = '0';
-        document.querySelectorAll('#hbIncantamentoRowBtns .custom-res-dice-btn')
-            .forEach((b, i) => b.classList.toggle('active', i === 0));
+    if (row) {
+        const ok = _labOggCanEnch(value);
+        row.style.display = ok ? '' : 'none';
+        if (!ok) {
+            const eh = document.getElementById('hbIncantamento');
+            if (eh) eh.value = '0';
+            document.querySelectorAll('#hbIncantamentoRowBtns .custom-res-dice-btn')
+                .forEach((b, i) => b.classList.toggle('active', i === 0));
+        }
     }
+};
+
+window.labOggSelectRarita = function(btn, value) {
+    const cont = btn.parentElement;
+    if (!cont) return;
+    cont.querySelectorAll('.lab-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('hbRarita');
+    if (hidden) hidden.value = value;
+};
+
+window.labOggToggleSintonia = function(btn) {
+    const hidden = document.getElementById('hbSintonia');
+    const on = hidden?.value === '1';
+    const next = on ? '0' : '1';
+    if (hidden) hidden.value = next;
+    btn.classList.toggle('on', next === '1');
+    const lbl = btn.querySelector('.lab-toggle-label');
+    if (lbl) lbl.textContent = next === '1' ? 'Richiede sintonia' : 'Nessuna sintonia';
 };
 
 window.labOggSelectEnch = function(btn, value) {
@@ -2235,14 +2294,15 @@ async function handleSaveHomebrew(e) {
         case 'oggetti': {
             record.tipo = document.getElementById('hbTipoOgg')?.value || null;
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
+            record.sotto_tipo = document.getElementById('hbSottoTipo')?.value?.trim() || null;
+            record.richiede_sintonia = document.getElementById('hbSintonia')?.value === '1';
             const desc = document.getElementById('hbDescrizione')?.value?.trim() || null;
             record.descrizione = desc;
             // Backwards compatibility: salva anche su `proprieta` finche' la
             // colonna esiste, cosi' i lettori vecchi continuano a vedere i dati.
             record.proprieta = desc;
-            const ENCH_TYPES = ['Arma','Armatura','Scudo','Focus'];
             const enchVal = parseInt(document.getElementById('hbIncantamento')?.value) || 0;
-            record.incantamento = ENCH_TYPES.includes(record.tipo) ? Math.max(0, Math.min(3, enchVal)) : 0;
+            record.incantamento = _labOggCanEnch(record.tipo) ? Math.max(0, Math.min(3, enchVal)) : 0;
             break;
         }
     }
@@ -2491,3 +2551,30 @@ function initLaboratorio() {
         form.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
     }
 }
+
+// ============================================================================
+// FORMATTAZIONE META OGGETTO
+// ============================================================================
+// Produce la "formuletta" canonica di un oggetto magico D&D:
+//   "Tipo (sotto-tipo), rarità (richiede sintonia)"
+// Esempi:
+//   - Wondrous item, rare (requires attunement)  → "Oggetto Meraviglioso, raro (richiede sintonia)"
+//   - Weapon (arrow), very rare                  → "Arma (freccia), molto raro"
+//   - Wand, artifact (requires attunement)       → "Bacchetta, artefatto (richiede sintonia)"
+// La rarita' viene mostrata in minuscolo (convenzione tipografica D&D).
+window.formatOggettoMeta = function formatOggettoMeta(item) {
+    if (!item) return '';
+    const parts = [];
+    if (item.tipo) {
+        const sub = (item.sotto_tipo || '').trim();
+        parts.push(sub ? `${item.tipo} (${sub})` : item.tipo);
+    }
+    if (item.rarita) {
+        const r = String(item.rarita).toLowerCase();
+        const sint = item.richiede_sintonia ? ' (richiede sintonia)' : '';
+        parts.push(r + sint);
+    } else if (item.richiede_sintonia) {
+        parts.push('(richiede sintonia)');
+    }
+    return parts.join(', ');
+};

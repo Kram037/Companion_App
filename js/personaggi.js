@@ -808,7 +808,7 @@ function getRaceData(nome) {
     const local = buildMergedRaceData(nome, null);
     if (local) return local;
     if (AppState.cachedRazze) {
-        return AppState.cachedRazze.find(r => r.nome === nome) || null;
+    return AppState.cachedRazze.find(r => r.nome === nome) || null;
     }
     return null;
 }
@@ -1415,7 +1415,7 @@ function getBackgroundData(nome) {
         };
     }
     if (AppState.cachedBackground) {
-        return AppState.cachedBackground.find(b => b.nome === nome) || null;
+    return AppState.cachedBackground.find(b => b.nome === nome) || null;
     }
     return null;
 }
@@ -1711,12 +1711,12 @@ function _pgApplyBackgroundAutoPopulate() {
 
     const value = document.getElementById('pgBackground').value || '';
     if (!value) return;
-    const data = getBackgroundData(value);
+            const data = getBackgroundData(value);
     if (!data) return;
     if (Array.isArray(data.competenze_abilita) && data.competenze_abilita.length > 0) {
         _pgBgSkills = [...data.competenze_abilita];
-        data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
-    }
+                data.competenze_abilita.forEach(s => pgCurrentSkillProficiencies.add(s));
+            }
     if (Array.isArray(data.competenze_strumenti) && data.competenze_strumenti.length > 0) {
         _pgBgTools = [...data.competenze_strumenti];
         data.competenze_strumenti.forEach(t => pgCurrentBgTools.add(t));
@@ -2194,7 +2194,7 @@ function _computeSpellSlots(classi) {
         else if (thirdClasses.length === 1) { table = CLASS_SPELL_SLOTS.third; lv = thirdClasses[0].livello; }
         if (table) {
             const level = Math.min(Math.max(lv, 0), 20);
-            slots = table[level] ? { ...table[level] } : {};
+        slots = table[level] ? { ...table[level] } : {};
         }
     } else if (isMulticlass) {
         // MULTICLASS: regola PHB - tabella 'full' sul livello effettivo.
@@ -2213,7 +2213,7 @@ function _computeSpellSlots(classi) {
     if (pactClasses.length > 0) {
         const pactLevel = pactClasses.reduce((s, c) => s + c.livello, 0);
         if (pactLevel > 0) {
-            const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
+        const pactSlotLevel = Math.min(Math.ceil(pactLevel / 2), 5);
             const pactSlotCount = pactLevel >= 17 ? 4 : pactLevel >= 11 ? 3 : pactLevel >= 2 ? 2 : 1;
             slots[pactSlotLevel] = (slots[pactSlotLevel] || 0) + pactSlotCount;
 
@@ -2689,7 +2689,7 @@ async function schedaInstantSave(personaggioId, updates) {
     if (!supabase) return;
     updates.updated_at = new Date().toISOString();
     const { error } = await supabase.from('personaggi').update(updates).eq('id', personaggioId);
-    if (error) console.error('Errore salvataggio:', error);
+        if (error) console.error('Errore salvataggio:', error);
 }
 
 const SCHEDA_ABILITIES = [
@@ -3404,38 +3404,38 @@ async function renderSchedaPersonaggio(personaggioId) {
         // Class Resources (built-in + custom)
         const classResources = pg.risorse_classe || {};
         let classResourcesHtml = '';
-        const resItems = [];
+            const resItems = [];
         if (pg.classi && pg.classi.length > 0) {
             pg.classi.forEach(c => {
                 const resList = CLASS_RESOURCES[c.nome];
                 if (!resList) return;
                 resList.forEach((res, rIdx) => {
                     if (c.livello < res.fromLevel) return;
-                    let maxVal;
-                    if (res.hpPool) {
-                        maxVal = c.livello * 5;
-                    } else if (res.usaMod) {
-                        maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
-                    } else if (res.perLivello) {
-                        maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
-                    } else { return; }
-                    if (maxVal <= 0) return;
+                let maxVal;
+                if (res.hpPool) {
+                    maxVal = c.livello * 5;
+                } else if (res.usaMod) {
+                    maxVal = Math.max(1, calcMod(pg[res.usaMod] || 10));
+                } else if (res.perLivello) {
+                    maxVal = res.perLivello[Math.min(c.livello, 20)] || 0;
+                } else { return; }
+                if (maxVal <= 0) return;
                     const key = rIdx === 0 ? `${c.nome}_res` : `${c.nome}_res_${rIdx}`;
                     // Applica eventuali override utente (nome / max).
                     const overrides = (classResources._overrides && classResources._overrides[key]) || {};
                     const dispNome = overrides.nome || res.nome;
                     if (typeof overrides.max === 'number' && overrides.max > 0) maxVal = overrides.max;
-                    const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
-                    resItems.push(`<div class="scheda-hd-row">
+                const current = Math.min(maxVal, classResources[key] != null ? classResources[key] : maxVal);
+                resItems.push(`<div class="scheda-hd-row">
                         <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenEditClassRes('${pg.id}','${key}','${escapeHtml(res.nome).replace(/'/g, '&#39;')}',${maxVal})" title="Modifica">${escapeHtml(dispNome)} <small>(${escapeHtml(c.nome)})</small></span>
-                        <div class="scheda-hd-avail">
-                            <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
-                            <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
-                            <span class="scheda-hd-max">/ ${maxVal}</span>
-                            <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
-                        </div>
-                    </div>`);
-                });
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
+                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                        <span class="scheda-hd-max">/ ${maxVal}</span>
+                        <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
+                    </div>
+                </div>`);
+            });
             });
         }
         // Risorse di sottoclasse (auto-derivate da SUBCLASS_RESOURCES)
@@ -3596,7 +3596,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
             <div class="scheda-section-body">
-                <div class="scheda-abilities">${abilitiesHtml}</div>
+            <div class="scheda-abilities">${abilitiesHtml}</div>
             </div>
         </div>
 
@@ -3620,21 +3620,21 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche</div>
             <div class="scheda-section-body">
-                <div class="scheda-three-boxes">
+        <div class="scheda-three-boxes">
                     <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','classe_armatura')">
                         <div class="scheda-box-val" id="schedaCA">${pg.classe_armatura || 10}</div>
-                        <div class="scheda-box-label">CA</div>
-                    </div>
+                <div class="scheda-box-label">CA</div>
+            </div>
                     <div class="scheda-box clickable" onclick="schedaOpenStatCalc('${pg.id}','iniziativa')">
                         <div class="scheda-box-val" id="schedaInit">${initDisplay >= 0 ? '+' + initDisplay : initDisplay}</div>
-                        <div class="scheda-box-label">Iniziativa</div>
-                    </div>
+                <div class="scheda-box-label">Iniziativa</div>
+            </div>
                     <div class="scheda-box clickable" onclick="schedaOpenSpeedCalc('${pg.id}')">
                         <div class="scheda-box-val" id="schedaSpeed">${pg.velocita || 9}</div>
-                        <div class="scheda-box-label">Velocità</div>
-                    </div>
-                </div>
-                <div class="scheda-hp-section">
+                <div class="scheda-box-label">Velocità</div>
+            </div>
+        </div>
+        <div class="scheda-hp-section">
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
                         <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
                         <div class="scheda-hp-label">PV Max</div>
@@ -3646,16 +3646,16 @@ async function renderSchedaPersonaggio(personaggioId) {
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
                         <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
                         <div class="scheda-hp-label">PV Temp</div>
-                    </div>
                 </div>
+            </div>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Difese</span>
                         <span class="scheda-subsection-meta" id="sResImmCount">${resImmCount > 0 ? resImmCount : ''}</span>
                         <span class="scheda-subsection-arrow">▾</span>
-                    </div>
+            </div>
                     <div class="scheda-subsection-body">${resImmInlineHtml}</div>
-                </div>
+        </div>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Condizioni</span>
@@ -3682,7 +3682,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Dadi Vita</div>
             <div class="scheda-section-body">
-                ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
+            ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
             </div>
         </div>
 
@@ -4038,7 +4038,7 @@ window.schedaOpenSpellPage = async function(pgId) {
     <div class="scheda-section">
         <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot Incantesimo</div>
         <div class="scheda-section-body">
-            <div class="scheda-slots-table">${slotsHtml}</div>
+        <div class="scheda-slots-table">${slotsHtml}</div>
         </div>
     </div>
     ${innateSlotsBlock}
@@ -4982,8 +4982,25 @@ window.schedaOpenInventoryPage = async function(pgId) {
         const view = _invResolveLive(o);
         const magicStr = view.magic_bonus ? ` <span class="inv-magic-badge">+${view.magic_bonus}</span>` : '';
         const hbBadge = view._homebrew_id ? ' <span class="inv-hb-badge" title="Homebrew">HB</span>' : '';
+        // Riga meta sotto il nome (Tipo (sotto-tipo), rarità (richiede sintonia)).
+        let meta = '';
+        if (view._homebrew_id) {
+            meta = view._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
+                ? window.formatOggettoMeta({
+                    tipo: view._homebrew_tipo,
+                    sotto_tipo: view._homebrew_sotto_tipo,
+                    rarita: view._homebrew_rarita,
+                    richiede_sintonia: view._homebrew_richiede_sintonia,
+                }) : '');
+        } else if (view.rarita) {
+            meta = (typeof window.formatOggettoMeta === 'function')
+                ? window.formatOggettoMeta(view) : '';
+        }
         return `<div class="inv-item-row">
-            <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+            <div class="inv-item-main">
+                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+                ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
+            </div>
             <div class="inv-item-qty">×${view.quantita || 1}</div>
         </div>`;
     }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
@@ -5099,11 +5116,17 @@ function _invResolveLive(entry) {
         ...entry,
         nome: hb.nome || entry.nome,
         descrizione: hb.descrizione || hb.proprieta || entry.descrizione || '',
-        magico: ench > 0 || !!entry.magico,
+        magico: ench > 0 || !!hb.richiede_sintonia || (hb.rarita && hb.rarita !== 'Comune') || !!entry.magico,
         magic_bonus: ench > 0 ? ench : (entry.magic_bonus || 0),
         _homebrew_tipo: hb.tipo || null,
+        _homebrew_sotto_tipo: hb.sotto_tipo || null,
         _homebrew_rarita: hb.rarita || null,
+        _homebrew_richiede_sintonia: !!hb.richiede_sintonia,
         _homebrew_author: hb._author_name || null,
+        // Snapshot della formula meta gia' formattata (utile a chi non
+        // vuole reimpaginarla).
+        _homebrew_meta: (typeof window.formatOggettoMeta === 'function')
+            ? window.formatOggettoMeta(hb) : '',
     };
 }
 
@@ -5207,8 +5230,10 @@ function _invPickerRenderList(pgId) {
     }
     list.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
     cont.innerHTML = list.map(o => {
-        const meta = [o.tipo, o.rarita, parseInt(o.incantamento) > 0 ? `+${o.incantamento}` : null]
-            .filter(Boolean).join(' · ');
+        const metaCore = (typeof window.formatOggettoMeta === 'function')
+            ? window.formatOggettoMeta(o) : '';
+        const enchStr = parseInt(o.incantamento) > 0 ? ` · +${o.incantamento}` : '';
+        const meta = metaCore + enchStr;
         const author = o._is_own ? 'Tuo' : (o._author_name || 'Amico');
         return `<div class="inv-picker-item" onclick="invAddFromHomebrew('${pgId}','${o.id}')">
             <div class="inv-picker-item-main">
@@ -5299,8 +5324,20 @@ window.invEditItem = function(pgId, idx) {
     const item = _invResolveLive(raw);
     const currentBonus = item.magic_bonus || 0;
     const isHomebrew = !!raw._homebrew_id;
+    const hbMeta = isHomebrew
+        ? (item._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
+            ? window.formatOggettoMeta({
+                tipo: item._homebrew_tipo,
+                sotto_tipo: item._homebrew_sotto_tipo,
+                rarita: item._homebrew_rarita,
+                richiede_sintonia: item._homebrew_richiede_sintonia,
+            }) : ''))
+        : '';
     const hbBanner = isHomebrew
-        ? `<div class="inv-edit-hb-banner">Oggetto homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · le modifiche di nome/descrizione/incantamento NON saranno salvate (si aggiornano live dall'autore). Quantita' e rimozione restano modificabili.</div>`
+        ? `<div class="inv-edit-hb-banner">
+            <div><b>${escapeHtml(hbMeta || 'Oggetto magico')}</b></div>
+            <div style="margin-top:4px;">Homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · nome/descrizione/incantamento si aggiornano live dall'autore. Modificabili: quantita' ed eliminazione.</div>
+        </div>`
         : '';
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
