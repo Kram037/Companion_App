@@ -843,8 +843,8 @@
 .equip-desc-textarea {
     width: 100%;
     box-sizing: border-box;
-    min-height: 360px;
-    max-height: 65vh;
+    min-height: 280px;
+    max-height: 55vh;
     resize: vertical;
     font-family: inherit;
     font-size: 0.95rem;
@@ -873,8 +873,8 @@
 .equip-desc-rendered {
     width: 100%;
     box-sizing: border-box;
-    min-height: 360px;
-    max-height: 65vh;
+    min-height: 240px;
+    max-height: 55vh;
     overflow-y: auto;
     padding: 12px 14px;
     background: var(--bg);
@@ -886,6 +886,15 @@
     white-space: normal;
 }
 .equip-desc-empty { color: var(--text-muted); font-style: italic; }
+
+/* Dialog di modifica oggetto del tesoro: deve sempre stare nel viewport
+   (la base .hp-calc-modal ha overflow:hidden senza max-height, percio'
+   con contenuti corposi finiva tagliato sopra/sotto). */
+.inv-edit-modal {
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 
 /* Sezione "Incantamento" sopra alla descrizione: etichetta in alto,
    4 caselle (No / +1 / +2 / +3) in riga sotto. */
@@ -2193,6 +2202,49 @@
     line-height: 1.4;
 }
 .inv-item-qty { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; min-width: 28px; text-align: center; }
+
+/* Quantita' editabile inline nella riga del tesoro: una piccola "×N"
+   dove N e' un input numerico compatto. Stile minimo, allineato al
+   resto della tabella. */
+.inv-item-qty-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    transition: background 0.12s;
+}
+.inv-item-qty-edit:hover { background: var(--surface-hover); }
+.inv-item-qty-x {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.inv-item-qty-input {
+    width: 44px;
+    padding: 3px 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    font-family: inherit;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.inv-item-qty-input::-webkit-outer-spin-button,
+.inv-item-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.inv-item-qty-input:hover { border-color: var(--border); }
+.inv-item-qty-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg);
+}
 .inv-item-actions { display: flex; gap: 4px; align-items: center; }
 .inv-item-actions .scheda-hd-btn { width: 26px; height: 26px; font-size: 0.8rem; }
 

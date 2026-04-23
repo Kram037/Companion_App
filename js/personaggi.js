@@ -5002,7 +5002,15 @@ window.schedaOpenInventoryPage = async function(pgId) {
                 <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
                 ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
             </div>
-            <div class="inv-item-qty">×${view.quantita || 1}</div>
+            <div class="inv-item-qty-edit" title="Quantita'">
+                <span class="inv-item-qty-x">×</span>
+                <input type="number" class="inv-item-qty-input" min="1" step="1"
+                    value="${view.quantita || 1}"
+                    onclick="event.stopPropagation();this.select();"
+                    onchange="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onblur="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+            </div>
         </div>`;
     }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
 
@@ -5318,13 +5326,37 @@ window.invSaveNewItem = async function(pgId) {
     schedaOpenInventoryPage(pgId);
 };
 
+// Aggiornamento inline della quantita' direttamente dalla riga del
+// tesoro. Salta il save se il valore non e' cambiato; supporta sia
+// onchange che onblur senza moltiplicare le scritture (debouncing
+// implicito via flag pendente sul campo). Per gli oggetti homebrew
+// aggiorna solo `quantita`, preservando i metadati di lookup.
+window.invQtyInlineUpdate = async function(pgId, idx, rawVal) {
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    const prev = inventario[idx];
+    if (!prev) return;
+    let qty = parseInt(rawVal, 10);
+    if (!Number.isFinite(qty) || qty < 1) qty = 1;
+    if (qty > 9999) qty = 9999;
+    if ((prev.quantita || 1) === qty) return; // niente da fare
+    inventario[idx] = { ...prev, quantita: qty };
+    pg.inventario = inventario;
+    try {
+        await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    } catch (e) {
+        console.warn('[inv] errore aggiornamento quantita\' inline:', e);
+    }
+};
+
 window.invEditItem = function(pgId, idx) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const raw = (pg.inventario || [])[idx];
     if (!raw) return;
     const item = _invResolveLive(raw);
-    const currentBonus = item.magic_bonus || 0;
     const isHomebrew = !!raw._homebrew_id;
     const hbMeta = isHomebrew
         ? (item._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
@@ -5339,32 +5371,17 @@ window.invEditItem = function(pgId, idx) {
     const hbBanner = isHomebrew
         ? `<div class="inv-edit-hb-banner">
             <div><b>${escapeHtml(hbMeta || 'Oggetto magico')}</b></div>
-            <div style="margin-top:4px;">Homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · nome/descrizione/incantamento si aggiornano live dall'autore. Modificabili: quantita' ed eliminazione.</div>
+            <div style="margin-top:4px;">Homebrew di <b>${escapeHtml(item._homebrew_author || 'Autore')}</b> · nome e descrizione si aggiornano live dall'autore.</div>
         </div>`
         : '';
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     const lockAttr = isHomebrew ? 'readonly' : '';
-    overlay.innerHTML = `<div class="hp-calc-modal" style="width:720px;max-width:96vw;text-align:left;">
+    overlay.innerHTML = `<div class="hp-calc-modal inv-edit-modal" style="width:720px;max-width:96vw;text-align:left;">
         <h3 style="margin-bottom:10px;font-size:1rem;">Modifica Oggetto</h3>
         ${hbBanner}
-        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:8px;" ${lockAttr}>
-        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
-            <input type="number" id="invItemQty" class="hp-calc-input" value="${item.quantita || 1}" min="1" style="flex:1;margin-bottom:0;">
-            <label style="display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:0.85rem;white-space:nowrap;">
-                <input type="checkbox" id="invItemMagic" ${item.magico ? 'checked' : ''} ${isHomebrew ? 'disabled' : ''}> Magico
-            </label>
-        </div>
-        <div class="equip-ench-row">
-            <span class="equip-ench-label">Incantamento</span>
-            <div class="custom-res-dice-row">
-                ${[0,1,2,3].map(b =>
-                    `<button type="button" class="btn-secondary custom-res-dice-btn ${b === currentBonus ? 'active' : ''}" ${isHomebrew ? 'disabled' : `onclick="invSelectMagicBonus(this,${b})"`}>${b === 0 ? 'No' : '+' + b}</button>`
-                ).join('')}
-            </div>
-            <input type="hidden" id="invItemMagicBonus" value="${currentBonus}">
-        </div>
+        <input type="text" id="invItemNome" class="hp-calc-input" value="${escapeHtml(item.nome || '')}" placeholder="Nome" style="margin-bottom:10px;" ${lockAttr}>
         ${isHomebrew
             ? `<div class="equip-desc-rendered">${(item.descrizione && item.descrizione.trim())
                 ? window.formatRichText(item.descrizione)
@@ -5395,23 +5412,29 @@ window.invUpdateItem = async function(pgId, idx) {
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
     const prev = inventario[idx] || {};
-    const qty = parseInt(document.getElementById('invItemQty')?.value) || 1;
 
-    // Per gli oggetti homebrew aggiorniamo SOLO la quantita' e teniamo
-    // intatti tutti i metadati di lookup (_homebrew_id, ecc.). Nome,
-    // descrizione e incantamento si risolvono live dalla cache.
+    // Per gli oggetti homebrew non c'e' nulla da modificare nel dialog
+    // (nome e descrizione sono read-only e arrivano live dalla cache,
+    // la quantita' si modifica inline nella tabella). Ci limitiamo a
+    // chiudere il dialog senza salvare.
     if (prev._homebrew_id) {
-        inventario[idx] = { ...prev, quantita: qty };
-    } else {
-        const nome = document.getElementById('invItemNome')?.value?.trim();
-        if (!nome) return;
-        const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
-        const magico = document.getElementById('invItemMagic')?.checked || false;
-        const magicBonus = parseInt(document.getElementById('invItemMagicBonus')?.value) || 0;
-        const updated = { nome, descrizione: desc, quantita: qty, magico };
-        if (magicBonus > 0) updated.magic_bonus = magicBonus;
-        inventario[idx] = updated;
+        document.querySelector('.hp-calc-overlay')?.remove();
+        return;
     }
+
+    const nome = document.getElementById('invItemNome')?.value?.trim();
+    if (!nome) return;
+    const desc = document.getElementById('invItemDesc')?.value?.trim() || '';
+    // Conserviamo eventuali metadati storici (magico/magic_bonus) gia'
+    // salvati: il dialog non li espone piu' ma non vogliamo perderli su
+    // oggetti pre-esistenti.
+    const updated = {
+        ...prev,
+        nome,
+        descrizione: desc,
+        quantita: prev.quantita || 1,
+    };
+    inventario[idx] = updated;
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();

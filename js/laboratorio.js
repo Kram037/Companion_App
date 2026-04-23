@@ -2304,7 +2304,11 @@ function _restoreHomebrewModalStructure() {
         document.getElementById('closeHomebrewModal')?.addEventListener('click', closeHomebrewModal);
         document.getElementById('cancelHomebrewBtn')?.addEventListener('click', closeHomebrewModal);
         document.getElementById('homebrewForm')?.addEventListener('submit', handleSaveHomebrew);
-        document.getElementById('homebrewForm')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
+        // Previene il submit accidentale su Enter, MA solo fuori dalle
+        // textarea (dove Enter deve continuare a fare "a capo").
+        document.getElementById('homebrewForm')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target?.tagName !== 'TEXTAREA') e.preventDefault();
+        });
     }
 }
 
@@ -2699,7 +2703,9 @@ function initLaboratorio() {
     const form = document.getElementById('homebrewForm');
     if (form) {
         form.addEventListener('submit', handleSaveHomebrew);
-        form.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
+        form.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target?.tagName !== 'TEXTAREA') e.preventDefault();
+        });
     }
 }
 
