@@ -6813,7 +6813,7 @@ window.invEditAttune = function(pgId, idx) {
         const bonus = current.magic_bonus || 0;
         const nameWithEnch = `${escapeHtml(_invDisplayName(current) || 'Oggetto')}${bonus ? ' +' + bonus : ''}`;
         const descHtml = current.descrizione
-            ? `<div class="inv-attune-current-desc">${escapeHtml(current.descrizione)}</div>` : '';
+            ? `<div class="inv-attune-current-desc">${(typeof window.formatRichText === 'function' ? window.formatRichText(current.descrizione) : escapeHtml(current.descrizione))}</div>` : '';
         currentHtml = `<div class="inv-attune-current">
             <div class="inv-attune-current-head">
                 <div>
@@ -7058,28 +7058,25 @@ function _renderPrivFeatureRow(f, opts = {}) {
     const editFn = opts.editFn || (isCustom
         ? `privEditCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`
         : '');
-    // La cancellazione di una riga custom avviene dall'editor (pulsante
-    // rosso "Elimina"), non da una X affiancata al nome: evita misclick.
-    const actionBtn = '';
-    // Per le righe custom: il click sul nome apre l'editor. Se c'e'
-    // anche una descrizione, la freccia separata toggla il body.
-    // Per le righe non custom: comportamento legacy (header clickable
-    // per togglare il body se c'e' descrizione).
-    const headerClass = `priv-feat-header${(!isCustom && hasDesc) ? ' priv-feat-clickable' : ''}${isCustom ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
-    const headerOnclick = isCustom
-        ? (editFn ? `onclick="${editFn}"` : '')
-        : (hasDesc ? `onclick="privToggleFeatureBody(this)"` : '');
-    const arrowHtml = hasDesc
-        ? (isCustom
-            ? `<span class="priv-feat-arrow priv-feat-arrow-btn" onclick="event.stopPropagation();privToggleFeatureBody(this.parentNode)" title="Mostra/nascondi">▾</span>`
-            : '<span class="priv-feat-arrow">▾</span>')
+    // Per le righe custom: il click sull'header toggla il body (come per
+    // i privilegi auto). Se non c'e' descrizione, il click apre l'editor
+    // per evitare un'azione "morta". La matita affiancata apre sempre
+    // l'editor.
+    const isClickable = hasDesc || isCustom;
+    const headerClass = `priv-feat-header${isClickable ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
+    const headerOnclick = hasDesc
+        ? `onclick="privToggleFeatureBody(this)"`
+        : (isCustom && editFn ? `onclick="${editFn}"` : '');
+    const arrowHtml = hasDesc ? '<span class="priv-feat-arrow">▾</span>' : '';
+    const editBtn = (isCustom && editFn)
+        ? `<button class="priv-feat-edit-btn" onclick="event.stopPropagation();${editFn}" title="Modifica">&#9998;</button>`
         : '';
     return `<div class="priv-feat-row${isHidden ? ' priv-feat-row-hidden' : ''}">
         <div class="${headerClass}" ${headerOnclick}>
             ${lvlBadge}
             <span class="priv-feat-name">${escapeHtml(name)}${langWarn}</span>
             ${arrowHtml}
-            ${actionBtn}
+            ${editBtn}
         </div>
         ${hasDesc ? `<div class="priv-feat-body" style="display:none;">${_privDescToHtml(desc)}</div>` : ''}
     </div>`;
@@ -7486,12 +7483,15 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
             ? items.map((f, i) => _renderPrivFeatureRow(f, { custom: true, tabName, index: i })).join('')
             : (autoRows ? '' : '<span class="scheda-empty">Nessun privilegio aggiunto</span>');
         const isDefault = PRIV_DEFAULT_CUSTOM_TABS.includes(tabName);
-        const removeTabBtn = isDefault ? '' :
-            `<button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();privRemoveTab('${escapeHtml(tabName)}')" title="Rimuovi tabella">✕</button>`;
+        // Le tabelle predefinite (Razza/Background) hanno solo "aggiungi
+        // privilegio". Le tabelle create dall'utente hanno la matita che
+        // apre un mini-editor con: rinomina + aggiungi privilegio + elimina.
+        const editBtn = isDefault
+            ? `<button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>`
+            : `<button class="scheda-edit-btn" onclick="event.stopPropagation();privOpenCustomTabEdit('${escapeHtml(tabName)}')" title="Modifica tabella">&#9998;</button>`;
         customSectionsHtml += `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>
-                ${removeTabBtn}
+                ${editBtn}
             </div>
             <div class="scheda-section-body">${autoRows}${rows}</div>
         </div>`;
@@ -7900,6 +7900,89 @@ window.privRemoveTab = async function(tabName) {
     _privSave(pg.id, priv).then(() => schedaOpenPrivilegesPage(pg.id));
 };
 
+window.privRenameTab = async function(oldName, newName) {
+    const trimmed = String(newName || '').trim();
+    if (!trimmed || trimmed === oldName) return false;
+    if (PRIV_DEFAULT_CUSTOM_TABS.includes(oldName)) return false;
+    const pg = _schedaPgCache;
+    if (!pg) return false;
+    const priv = _normalizePrivilegi(pg);
+    if (priv.custom_tabs_order.includes(trimmed)) {
+        showNotification && showNotification('Esiste già una tabella con questo nome');
+        return false;
+    }
+    const idx = priv.custom_tabs_order.indexOf(oldName);
+    if (idx < 0) return false;
+    priv.custom_tabs_order[idx] = trimmed;
+    priv.custom_features[trimmed] = priv.custom_features[oldName] || [];
+    delete priv.custom_features[oldName];
+    await _privSave(pg.id, priv);
+    return true;
+};
+
+// Mini editor di una tabella custom: permette di rinominare la tabella,
+// aggiungere un nuovo privilegio o eliminare l'intera tabella.
+window.privOpenCustomTabEdit = function(tabName) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    if (PRIV_DEFAULT_CUSTOM_TABS.includes(tabName)) {
+        // Tabelle predefinite: niente rinomina/elimina, solo aggiungi.
+        return privAddCustom(tabName);
+    }
+    let modal = document.getElementById('privEditModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'privEditModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+    modal.innerHTML = `
+    <div class="modal-content priv-edit-card">
+        <button class="modal-close" onclick="privCloseEdit()" aria-label="Chiudi">×</button>
+        <h2 style="margin:0 0 12px;font-size:1.05rem;">Modifica tabella</h2>
+        <label class="priv-edit-label">Nome tabella
+            <input type="text" id="privTabRenameInput" class="priv-edit-input" value="${escapeHtml(tabName)}" placeholder="Nome della tabella" data-original="${escapeHtml(tabName)}">
+        </label>
+        <button type="button" class="btn-secondary" style="margin-top:8px;width:100%;"
+            onclick="privCloseEdit();privAddCustom('${escapeHtml(tabName)}')">+ Aggiungi privilegio</button>
+        <div class="priv-edit-actions">
+            <div>
+                <button class="btn-danger" onclick="privDeleteTabFromEdit('${escapeHtml(tabName)}')">Elimina tabella</button>
+            </div>
+            <div>
+                <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
+                <button class="btn-primary" onclick="privConfirmRenameTab('${escapeHtml(tabName)}')">Salva</button>
+            </div>
+        </div>
+    </div>`;
+    modal.classList.add('active');
+};
+
+window.privConfirmRenameTab = async function(oldName) {
+    const input = document.getElementById('privTabRenameInput');
+    if (!input) return;
+    const newName = (input.value || '').trim();
+    if (!newName) {
+        showNotification && showNotification('Inserisci un nome valido');
+        return;
+    }
+    if (newName === oldName) {
+        privCloseEdit();
+        return;
+    }
+    const ok = await privRenameTab(oldName, newName);
+    if (ok) {
+        privCloseEdit();
+        const pg = _schedaPgCache;
+        if (pg) schedaOpenPrivilegesPage(pg.id);
+    }
+};
+
+window.privDeleteTabFromEdit = async function(tabName) {
+    privCloseEdit();
+    await privRemoveTab(tabName);
+};
+
 function _privOpenEditDialog({ tabName, mode, index, item }) {
     let modal = document.getElementById('privEditModal');
     if (!modal) {
@@ -7927,9 +8010,9 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
         <label class="priv-edit-label">Descrizione
             <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione del privilegio">${escapeHtml(it.description || '')}</textarea>
         </label>
-        <div class="priv-edit-actions" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <div class="priv-edit-actions">
             <div>${deleteBtn}</div>
-            <div style="display:flex;gap:8px;">
+            <div>
                 <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
                 <button class="btn-primary" onclick="privConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
             </div>

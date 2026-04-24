@@ -1,17 +1,6 @@
 /* ============================================
    PERSONAGGI
    ============================================ */
-/* Pulsante "Elimina" usato negli editor (priv, risorse custom):
-   stessa altezza/spaziatura di btn-primary/btn-secondary in dialog. */
-.modal .btn-danger,
-.priv-edit-actions .btn-danger,
-.form-actions .btn-danger,
-.dialog-actions .btn-danger {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    border-radius: var(--radius-sm);
-    width: auto;
-}
 .personaggi-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -3933,6 +3922,31 @@
     margin-right: 4px;
 }
 
+/* Pulsantino "matita" sulle righe dei privilegi custom: apre l'editor
+   senza dover toggleare il body. Compatibile con touch (44x36 area). */
+.priv-feat-edit-btn {
+    flex: 0 0 auto;
+    appearance: none;
+    background: transparent;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    width: 30px;
+    height: 28px;
+    font-size: 0.85rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.priv-feat-edit-btn:hover {
+    background: var(--surface-hover);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
 .priv-feat-toggle {
     appearance: none;
     border: 1px solid var(--border);
@@ -4035,11 +4049,20 @@
 .priv-edit-textarea { resize: vertical; min-height: 100px; }
 .priv-edit-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: stretch;
     gap: 8px;
     margin-top: 6px;
 }
+.priv-edit-actions > div {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
 .priv-edit-actions .btn-primary,
-.priv-edit-actions .btn-secondary {
+.priv-edit-actions .btn-secondary,
+.priv-edit-actions .btn-danger {
     min-width: 110px;
+    width: auto;
+    margin: 0;
 }

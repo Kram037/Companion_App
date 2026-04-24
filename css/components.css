@@ -406,17 +406,32 @@
 [data-theme="dark"] .error-message { background: rgba(239,68,68,0.1); }
 
 /* Buttons */
+/* Baseline coerente per tutti i pulsanti d'azione: stessa altezza,
+   padding, font, line-height e box-sizing. Cosi' quando appaiono
+   affiancati (Annulla / Salva / Elimina) hanno SEMPRE la stessa
+   dimensione anche fuori da .dialog-actions. */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+    box-sizing: border-box;
+    min-height: 40px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .btn-primary {
     width: 100%;
-    padding: 10px 16px;
     background: var(--accent);
     color: white;
     border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-fast);
 }
 
 .btn-primary:hover {
@@ -428,15 +443,9 @@
 
 .btn-secondary {
     width: 100%;
-    padding: 10px 16px;
     background: var(--background);
     color: var(--text-secondary);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-fast);
     margin-top: var(--spacing-md);
 }
 
@@ -450,15 +459,14 @@
     display: flex;
     gap: 8px;
     margin-top: var(--spacing-md);
+    align-items: stretch;
 }
 .dialog-actions > .btn-primary,
-.dialog-actions > .btn-secondary {
+.dialog-actions > .btn-secondary,
+.dialog-actions > .btn-danger {
     flex: 1 1 0;
     width: auto;
     margin: 0;
-    min-height: 40px;
-    padding: 10px 14px;
-    box-sizing: border-box;
 }
 
 .modal-footer-text {

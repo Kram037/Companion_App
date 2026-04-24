@@ -266,16 +266,14 @@
     100% { left: 100%; }
 }
 
-/* Danger button */
+/* Danger button — i metrics di base (padding/min-height/font-size/box-sizing)
+   sono definiti su .btn-primary,.btn-secondary,.btn-danger in components.css
+   per garantire che i tre pulsanti abbiano sempre la stessa dimensione
+   quando sono affiancati. Qui solo il colore. */
 .btn-danger {
     background: #EF4444;
     color: white;
     border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    font-size: 0.85rem;
 }
 
 .btn-danger:hover { background: #DC2626; }
