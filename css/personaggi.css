@@ -780,6 +780,7 @@
 .scheda-perc-passiva { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 6px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .scheda-perc-val { font-size: 1rem; font-weight: 800; color: var(--accent); min-width: 28px; }
 .scheda-perc-label { font-size: 0.75rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; }
+.scheda-prof-bonus { margin-top: 0; margin-bottom: 8px; }
 
 /* Hit Dice Table */
 .scheda-hd-table { display: flex; flex-direction: column; gap: 0; }
