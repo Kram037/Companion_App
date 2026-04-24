@@ -2265,6 +2265,7 @@ window.renderCombatTimers = async function(sessioneId, isDM, myPgId) {
     }
 
     panel.style.display = 'block';
+    window._combatTimerCache = window._combatTimerCache || {};
     panel.innerHTML = `
         <div class="combat-timers-list">
             ${visibleTimers.map(t => {
@@ -2277,20 +2278,52 @@ window.renderCombatTimers = async function(sessioneId, isDM, myPgId) {
                 });
                 const isLow = t.remaining_rounds <= 1;
                 const canDelete = isDM || (t.target_kind === 'player' && t.target_id === myPgId);
+                window._combatTimerCache[t.id] = { ...t, targetLabel, condLabels };
                 return `
-                    <div class="combat-timer-chip ${isLow ? 'is-low' : ''}" title="${escapeHtml(t.nome)} - ${targetLabel}">
+                    <div class="combat-timer-chip ${isLow ? 'is-low' : ''}" onclick="combatShowTimerInfo('${t.id}')" title="${escapeHtml(t.nome)}">
                         <div class="combat-timer-rounds">${t.remaining_rounds}</div>
-                        <div class="combat-timer-info">
-                            <div class="combat-timer-name">${escapeHtml(t.nome)}</div>
-                            <div class="combat-timer-meta">
-                                <span class="combat-timer-target">${escapeHtml(targetLabel)}</span>
-                                ${condLabels.length > 0 ? `<span class="combat-timer-conds">${condLabels.map(l => `<span class="combat-timer-cond">${escapeHtml(l)}</span>`).join('')}</span>` : ''}
-                            </div>
-                        </div>
-                        ${canDelete ? `<button class="combat-timer-remove" type="button" onclick="combatRemoveTimer('${t.id}')" title="Rimuovi timer">&times;</button>` : ''}
+                        <div class="combat-timer-name">${escapeHtml(t.nome)}</div>
+                        ${canDelete ? `<button class="combat-timer-remove" type="button" onclick="event.stopPropagation(); combatRemoveTimer('${t.id}')" title="Rimuovi timer">&times;</button>` : ''}
                     </div>`;
             }).join('')}
         </div>`;
+};
+
+// Mostra una dialog con i dettagli completi del timer (target + condizioni
+// applicate) - tenuti fuori dalla chip per mantenere dimensione fissa.
+window.combatShowTimerInfo = function(timerId) {
+    const t = (window._combatTimerCache || {})[timerId];
+    if (!t) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    const condsHtml = (t.condLabels && t.condLabels.length)
+        ? `<div class="combat-timer-info-row">
+                <strong>Condizioni applicate</strong>
+                <div class="combat-timer-info-conds">
+                    ${t.condLabels.map(l => `<span class="combat-timer-cond">${escapeHtml(l)}</span>`).join('')}
+                </div>
+           </div>`
+        : `<div class="combat-timer-info-row combat-timer-info-empty">Nessuna condizione applicata</div>`;
+    overlay.innerHTML = `
+        <div class="hp-calc-modal combat-timer-info-modal">
+            <div class="hp-calc-title">${escapeHtml(t.nome)}</div>
+            <div class="combat-timer-info-body">
+                <div class="combat-timer-info-row">
+                    <strong>Round restanti</strong>
+                    <span>${t.remaining_rounds}</span>
+                </div>
+                <div class="combat-timer-info-row">
+                    <strong>Target</strong>
+                    <span>${escapeHtml(t.targetLabel)}</span>
+                </div>
+                ${condsHtml}
+            </div>
+            <div class="combat-timer-info-actions">
+                <button type="button" class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Chiudi</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
 };
 
 // Apre la dialog di creazione timer.

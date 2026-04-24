@@ -196,20 +196,26 @@
     margin-bottom: 6px;
 }
 .combat-timer-chip {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
     padding: 4px 8px 4px 4px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 999px;
-    flex: 0 1 auto;
+    flex: 0 0 calc(50% - 3px);
+    width: calc(50% - 3px);
     min-width: 0;
-    max-width: calc(50% - 3px);
     box-sizing: border-box;
     font-size: 0.78rem;
     line-height: 1.1;
     box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.15s ease;
+}
+.combat-timer-chip:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
 }
 .combat-timer-chip.is-low {
     border-color: var(--accent);
@@ -245,7 +251,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 .combat-timer-meta {
     display: flex;
@@ -273,8 +280,49 @@
     cursor: pointer;
     padding: 2px 4px;
     border-radius: 4px;
+    flex-shrink: 0;
 }
 .combat-timer-remove:hover { background: rgba(220,38,38,0.12); color: var(--accent); }
+
+/* Dialog dei dettagli del timer (mostrata cliccando sulla chip) */
+.combat-timer-info-modal {
+    max-width: 380px;
+    width: 92%;
+}
+.combat-timer-info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0 6px;
+}
+.combat-timer-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.88rem;
+    color: var(--text);
+}
+.combat-timer-info-row strong {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.combat-timer-info-row.combat-timer-info-empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+.combat-timer-info-conds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.combat-timer-info-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
 
 /* Dialog di creazione timer - layout compatto, fisso, niente overflow.
    La dialog non deve mai superare 90vh in altezza, cosi' resta sempre
