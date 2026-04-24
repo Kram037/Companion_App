@@ -7400,8 +7400,14 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         });
     }
 
-    // ── Sezioni custom (Razza, Background, e personalizzate) ──
-    let customSectionsHtml = '';
+    // ── Sezioni custom ──
+    // Le tabelle PREDEFINITE (Razza, Background) vengono renderizzate
+    // PRIMA di "Talenti", perche' fanno parte della base del personaggio.
+    // Le tabelle CREATE DALL'UTENTE invece vanno DOPO "Talenti", cosi' i
+    // privilegi automatici/standard restano in alto e l'utente personalizza
+    // in fondo.
+    let customDefaultSectionsHtml = '';  // Razza + Background (sopra a Talenti)
+    let customUserSectionsHtml = '';     // Tabelle utente (sotto a Talenti)
     priv.custom_tabs_order.forEach(tabName => {
         const items = priv.custom_features[tabName] || [];
         let autoRows = '';
@@ -7489,12 +7495,14 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
         const editBtn = isDefault
             ? `<button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>`
             : `<button class="scheda-edit-btn" onclick="event.stopPropagation();privOpenCustomTabEdit('${escapeHtml(tabName)}')" title="Modifica tabella">&#9998;</button>`;
-        customSectionsHtml += `<div class="scheda-section collapsed">
+        const sectionHtml = `<div class="scheda-section collapsed">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
                 ${editBtn}
             </div>
             <div class="scheda-section-body">${autoRows}${rows}</div>
         </div>`;
+        if (isDefault) customDefaultSectionsHtml += sectionHtml;
+        else customUserSectionsHtml += sectionHtml;
     });
 
     // Sezione Talenti: come tendine espandibili coerenti con le altre
@@ -7651,9 +7659,11 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
 
     ${invocationsSectionHtml}
 
-    ${customSectionsHtml}
+    ${customDefaultSectionsHtml}
 
     ${talentiSectionHtml}
+
+    ${customUserSectionsHtml}
 
     <div class="priv-add-tab-wrap">
         <button class="btn-secondary priv-add-tab-btn" onclick="privAddTab()">
