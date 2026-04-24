@@ -401,22 +401,44 @@ body.user-logged-in .header-username {
 
 .back-button-floating svg { width: 20px; height: 20px; }
 
-/* Glow "Ritorna alla sessione/combattimento": il back-button ereditato di
-   ogni pagina si trasforma in un richiamo visivo verso la sessione attiva. */
-.back-button-floating.glow-return-session {
+/* Bottone globale "Torna alla sessione/combattimento": fluttuante in
+   alto a destra, sempre visibile (su qualsiasi pagina) quando esiste una
+   sessione attiva e non si e' gia' nella sessione/combattimento. */
+.global-session-return-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1100;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
-    animation: backReturnGlow 2.2s ease-in-out infinite;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55), var(--shadow-md);
+    animation: globalReturnGlow 2.2s ease-in-out infinite;
+    transition: background 0.18s, transform 0.12s;
 }
-.back-button-floating.glow-return-session:hover {
+.global-session-return-btn:hover {
     background: var(--accent-dark);
-    color: #fff;
     border-color: var(--accent-dark);
+    transform: translateY(-1px);
 }
-@keyframes backReturnGlow {
+.global-session-return-btn:active { transform: translateY(0); }
+.global-session-return-btn svg { flex-shrink: 0; }
+.global-session-return-label { white-space: nowrap; }
+@keyframes globalReturnGlow {
     0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55), var(--shadow-md); }
     50%      { box-shadow: 0 0 18px 6px rgba(220, 38, 38, 0.55), var(--shadow-md); }
+}
+@media (max-width: 480px) {
+    .global-session-return-btn { padding: 7px 12px; font-size: 0.78rem; }
+    .global-session-return-label { display: none; }
 }
 
 /* ============================================

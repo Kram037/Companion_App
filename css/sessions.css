@@ -345,6 +345,71 @@
     margin-top: 0;
 }
 
+/* Card personaggi (sessione + dettaglio campagna) */
+.session-pg-cards { margin-bottom: var(--spacing-lg); }
+.session-pg-cards-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+.session-pg-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+}
+.session-pg-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    overflow: hidden;
+}
+.session-pg-card:hover {
+    background: var(--surface-hover, rgba(220,38,38,0.08));
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+.session-pg-card-initials {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.session-pg-card-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.campagna-pg-cards { display: block; }
+.campagna-pg-cards .session-pg-cards-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.campagna-pg-empty {
+    padding: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.88rem;
+    text-align: center;
+}
+
 /* Tiro generico table */
 .tiro-generico-table {
     background: var(--surface);

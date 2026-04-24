@@ -5,25 +5,17 @@ function clearActiveSession() {
 }
 
 // Quando esiste una sessione attiva e l'utente non e' gia' nella pagina
-// sessione/combattimento, applichiamo la classe `glow-return-session` ai
-// back-button rossi flottanti delle altre pagine. Il click su questi
-// pulsanti viene intercettato da un capture-phase listener globale e
-// reindirizzato alla sessione (o al combattimento se in corso) invece di
-// eseguire la normale navigazione "indietro".
+// sessione/combattimento mostriamo un bottone fluttuante GLOBALE che
+// riporta direttamente alla sessione (o al combattimento se in corso).
+// In questo modo il pulsante e' sempre raggiungibile da qualunque
+// pagina dell'app, anche da quelle senza un back button "rosso".
 function updateReturnToSessionBtn() {
     const isSessionPage = AppState.currentPage === 'sessione' || AppState.currentPage === 'combattimento';
-    const shouldGlow = !!AppState.activeSessionCampagnaId && !isSessionPage;
-    document.querySelectorAll('.back-button-floating').forEach(btn => {
-        if (btn.classList.contains('combat-back')) return;
-        if (btn.dataset && btn.dataset.noReturnGlow) return;
-        btn.classList.toggle('glow-return-session', shouldGlow);
-        if (shouldGlow) {
-            btn.setAttribute('aria-label', 'Ritorna alla sessione/combattimento');
-            btn.setAttribute('title', 'Ritorna alla sessione/combattimento');
-        } else {
-            btn.removeAttribute('title');
-        }
-    });
+    const shouldShow = !!AppState.activeSessionCampagnaId && !isSessionPage;
+    const btn = document.getElementById('globalSessionReturnBtn');
+    if (btn) {
+        btn.style.display = shouldShow ? 'inline-flex' : 'none';
+    }
 }
 
 // Verifica se la sessione attiva ha attualmente un combattimento in corso
@@ -68,14 +60,12 @@ async function _returnToActiveSessionOrCombat() {
     return true;
 }
 
-// Capture-phase global listener: intercetta i click sui back button con
-// glow-return-session prima che gli handler specifici possano agire.
+// Click sul bottone globale "Sessione": redirect alla sessione/combat.
 document.addEventListener('click', function(e) {
-    const btn = e.target && e.target.closest && e.target.closest('.back-button-floating.glow-return-session');
+    const btn = e.target && e.target.closest && e.target.closest('#globalSessionReturnBtn');
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
-    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
     _returnToActiveSessionOrCombat();
 }, true);
 

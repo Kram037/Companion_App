@@ -1063,6 +1063,12 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             </div>
 
+            <!-- Sezione Personaggi -->
+            <div class="dettagli-section dettagli-personaggi-section">
+                <h2 class="dettagli-section-title">Personaggi</h2>
+                <div id="campagnaPersonaggiCards" class="campagna-pg-cards"></div>
+            </div>
+
             <!-- Sezione Note -->
             ${note !== 'Nessuna nota' ? `
             <div class="dettagli-section dettagli-notes-section">
@@ -1077,6 +1083,11 @@ async function renderCampagnaDetailsContent(campagna) {
         // Salva i dati della campagna nello state per uso futuro
         AppState.currentCampagnaDetails = campagna;
         AppState.campagnaGiocatori = giocatoriCampagna;
+
+        // Render asincrono delle card personaggi (sotto le statistiche).
+        if (typeof renderCampagnaPersonaggiCards === 'function') {
+            renderCampagnaPersonaggiCards(campagna.id);
+        }
     }
 }
 

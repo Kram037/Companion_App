@@ -307,9 +307,11 @@ async function renderSessioneContent(campagnaId) {
             ` : ''}
             `}
 
+            <div id="sessionePersonaggiCards" class="session-pg-cards"></div>
             <div id="sessioneConditionsPanel"></div>
         `;
 
+        await renderSessionePersonaggiCards(campagnaId);
         await renderSessioneConditions(campagnaId, isDM);
 
         // Avvia timer se non già avviato
@@ -626,6 +628,75 @@ window.sessionSlotChange = async function(personaggioId, level, delta) {
         console.error('Errore aggiornamento slot:', e);
     }
 }
+
+// ===========================================================================
+// Card personaggi (riutilizzabili in sessione, dettaglio campagna, ecc.)
+// ===========================================================================
+// Recupera la lista dei personaggi della campagna gia' "appiattita" per il
+// rendering delle card (id personaggio + nome). Restituisce array vuoto se
+// non ci sono personaggi o c'e' stato un errore.
+async function getCampaignPersonaggiList(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !campagnaId) return [];
+    try {
+        const { data: pgList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+        if (!pgList) return [];
+        return pgList
+            .filter(p => p.personaggio_id)
+            .map(p => ({
+                id: p.personaggio_id,
+                nome: p.nome || '?',
+                player_user_id: p.player_user_id || null
+            }));
+    } catch (e) {
+        console.warn('Errore caricamento personaggi campagna:', e);
+        return [];
+    }
+}
+
+// Render delle card personaggi all'interno della pagina sessione.
+async function renderSessionePersonaggiCards(campagnaId) {
+    const container = document.getElementById('sessionePersonaggiCards');
+    if (!container) return;
+    const list = await getCampaignPersonaggiList(campagnaId);
+    if (list.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    container.innerHTML = `
+        <div class="session-pg-cards-title">Personaggi</div>
+        <div class="session-pg-cards-grid">
+            ${list.map(p => `
+                <button type="button" class="session-pg-card" onclick="openSchedaPersonaggio('${p.id}')" title="${escapeHtml(p.nome)}">
+                    <span class="session-pg-card-initials">${escapeHtml((p.nome || '?').substring(0, 2).toUpperCase())}</span>
+                    <span class="session-pg-card-name">${escapeHtml(p.nome)}</span>
+                </button>
+            `).join('')}
+        </div>`;
+}
+window.renderSessionePersonaggiCards = renderSessionePersonaggiCards;
+
+// Render delle card personaggi nella pagina dettaglio campagna (sotto le
+// statistiche). Stessa estetica.
+async function renderCampagnaPersonaggiCards(campagnaId) {
+    const container = document.getElementById('campagnaPersonaggiCards');
+    if (!container) return;
+    const list = await getCampaignPersonaggiList(campagnaId);
+    if (list.length === 0) {
+        container.innerHTML = `<div class="campagna-pg-empty">Nessun personaggio in questa campagna.</div>`;
+        return;
+    }
+    container.innerHTML = `
+        <div class="session-pg-cards-grid">
+            ${list.map(p => `
+                <button type="button" class="session-pg-card" onclick="openSchedaPersonaggio('${p.id}')" title="${escapeHtml(p.nome)}">
+                    <span class="session-pg-card-initials">${escapeHtml((p.nome || '?').substring(0, 2).toUpperCase())}</span>
+                    <span class="session-pg-card-name">${escapeHtml(p.nome)}</span>
+                </button>
+            `).join('')}
+        </div>`;
+}
+window.renderCampagnaPersonaggiCards = renderCampagnaPersonaggiCards;
 
 /**
  * Fetches campaign characters once and returns both names and conditions maps.

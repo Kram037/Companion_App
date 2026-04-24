@@ -171,7 +171,18 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             }).join('');
         }
 
-        // DM Toolbar
+        // Trova il personaggio del player corrente in questa campagna (per i timer
+        // personali). Per il DM resta null: la dialog timer chiede di scegliere
+        // il target tra i mostri o "globale".
+        let myPgId = null;
+        if (!isDM && currentUserId) {
+            for (const e of order) {
+                if (e.type === 'player' && e.id === currentUserId && e.pgId) { myPgId = e.pgId; break; }
+            }
+        }
+
+        // Toolbar: DM ha gli strumenti del master, i player hanno una toolbar
+        // ridotta con calcolatrice, timer (personale) e tira-dadi (placeholder).
         if (toolbar) {
             if (isDM) {
                 toolbar.style.display = 'flex';
@@ -185,17 +196,41 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                         <span>Dadi</span>
                     </button>
                     <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
                         <span>Calc</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatOpenTimerDialog('${campagnaId}','${sessioneId}','dm', null)" title="Timer combattimento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+                        <span>Timer</span>
                     </button>
                     <button class="combat-toolbar-btn danger" onclick="terminaCombattimento('${campagnaId}','${sessioneId}')" title="Termina combattimento">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         <span>Fine</span>
                     </button>`;
             } else {
-                toolbar.style.display = 'none';
+                toolbar.style.display = 'flex';
+                const timerOnclick = myPgId
+                    ? `combatOpenTimerDialog('${campagnaId}','${sessioneId}','player','${myPgId}')`
+                    : `showNotification('Nessun personaggio collegato al combattimento')`;
+                toolbar.innerHTML = `
+                    <button class="combat-toolbar-btn" onclick="combatDiceRoll()" title="Tira dadi (in arrivo)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+                        <span>Dadi</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+                        <span>Calc</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="${timerOnclick}" title="Timer personale">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+                        <span>Timer</span>
+                    </button>`;
             }
         }
+
+        // Render del pannello timer (visibile a tutti, ma con regole di filtro
+        // diverse per DM e player).
+        await renderCombatTimers(sessioneId, isDM, myPgId);
 
     } catch (error) {
         console.error('Errore rendering combattimento:', error);
@@ -238,6 +273,13 @@ window.combatNextTurn = async function(campagnaId, sessioneId, orderLen, round, 
     }
 
     await supabase.from('sessioni').update({ combat_round: nextRound, combat_turn_index: nextIdx }).eq('id', sessioneId);
+
+    // Avanzamento round: decrementa di 1 i timer attivi del combattimento.
+    // Solo quando il round cambia davvero, non ad ogni cambio turno.
+    if (nextRound !== round) {
+        try { await combatTickTimers(sessioneId, campagnaId); } catch (e) { console.warn('Errore tick timer:', e); }
+    }
+
     await sendAppEventBroadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
     await renderCombattimentoContent(campagnaId, sessioneId);
 }
@@ -2149,4 +2191,311 @@ window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
         console.error('❌ Errore nella rimozione iniziativa:', error);
         showNotification('Errore nella rimozione dell\'iniziativa: ' + (error.message || error));
     }
+};
+
+// =====================================================================
+// TIMER DI COMBATTIMENTO
+// ---------------------------------------------------------------------
+// I timer sono righe della tabella `combat_timers`. Ogni timer ha:
+//   - nome
+//   - target (mostro / personaggio / globale)
+//   - durata in round (1 minuto = 10 round)
+//   - condizioni opzionali: applicate al target alla creazione e
+//     rimosse alla scadenza
+// La pagina di combattimento mostra i timer attivi (DM vede tutto, il
+// player vede solo quelli del proprio personaggio + i "global"), e ad
+// ogni avanzamento di round vengono decrementati di 1.
+// =====================================================================
+
+window.renderCombatTimers = async function(sessioneId, isDM, myPgId) {
+    const panel = document.getElementById('combatTimersPanel');
+    if (!panel) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) { panel.style.display = 'none'; return; }
+
+    let timers = [];
+    try {
+        const { data } = await supabase.from('combat_timers')
+            .select('*')
+            .eq('sessione_id', sessioneId)
+            .eq('expired', false)
+            .order('created_at', { ascending: true });
+        timers = data || [];
+    } catch (e) {
+        console.warn('Errore caricamento timer:', e);
+    }
+
+    // Filtra per ruolo: il player vede solo i propri timer + i global.
+    const visibleTimers = isDM ? timers : timers.filter(t =>
+        t.target_kind === 'global' || (t.target_kind === 'player' && t.target_id === myPgId)
+    );
+
+    if (visibleTimers.length === 0) {
+        panel.style.display = 'none';
+        panel.innerHTML = '';
+        return;
+    }
+
+    panel.style.display = 'block';
+    panel.innerHTML = `
+        <div class="combat-timers-list">
+            ${visibleTimers.map(t => {
+                const targetLabel = t.target_kind === 'global'
+                    ? 'Globale'
+                    : (t.target_name || (t.target_kind === 'monster' ? 'Mostro' : 'Personaggio'));
+                const condLabels = (t.conditions || []).map(k => {
+                    const c = ALL_CONDITIONS.find(x => x.key === k);
+                    return c ? c.label : k;
+                });
+                const isLow = t.remaining_rounds <= 1;
+                const canDelete = isDM || (t.target_kind === 'player' && t.target_id === myPgId);
+                return `
+                    <div class="combat-timer-chip ${isLow ? 'is-low' : ''}" title="${escapeHtml(t.nome)} - ${targetLabel}">
+                        <div class="combat-timer-rounds">${t.remaining_rounds}</div>
+                        <div class="combat-timer-info">
+                            <div class="combat-timer-name">${escapeHtml(t.nome)}</div>
+                            <div class="combat-timer-meta">
+                                <span class="combat-timer-target">${escapeHtml(targetLabel)}</span>
+                                ${condLabels.length > 0 ? `<span class="combat-timer-conds">${condLabels.map(l => `<span class="combat-timer-cond">${escapeHtml(l)}</span>`).join('')}</span>` : ''}
+                            </div>
+                        </div>
+                        ${canDelete ? `<button class="combat-timer-remove" type="button" onclick="combatRemoveTimer('${t.id}')" title="Rimuovi timer">&times;</button>` : ''}
+                    </div>`;
+            }).join('')}
+        </div>`;
+};
+
+// Apre la dialog di creazione timer.
+//   mode = 'dm' o 'player'
+//   forcedPgId = pgId del player (solo in mode 'player')
+window.combatOpenTimerDialog = async function(campagnaId, sessioneId, mode, forcedPgId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    let monsters = [];
+    if (mode === 'dm') {
+        try {
+            const { data } = await supabase.from('mostri_combattimento')
+                .select('id, nome')
+                .eq('sessione_id', sessioneId)
+                .order('nome', { ascending: true });
+            monsters = data || [];
+        } catch (e) { console.warn('Errore caricamento mostri:', e); }
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'combatTimerOverlay';
+    overlay.className = 'hp-calc-overlay';
+
+    const condCheckboxes = ALL_CONDITIONS.map(c => `
+        <label class="pg-condition-item"><input type="checkbox" data-cond="${c.key}"> ${c.label}</label>
+    `).join('');
+
+    const targetSelector = mode === 'dm' ? `
+        <div class="combat-timer-field">
+            <label>Target</label>
+            <select id="combatTimerTarget">
+                <option value="global">Globale (nessun target)</option>
+                ${monsters.map(m => `<option value="monster:${m.id}:${escapeHtml(m.nome).replace(/"/g, '&quot;')}">Mostro - ${escapeHtml(m.nome)}</option>`).join('')}
+            </select>
+        </div>` : '';
+
+    overlay.innerHTML = `
+        <div class="hp-calc-modal combat-timer-modal">
+            <div class="hp-calc-title">Nuovo timer</div>
+            <div class="combat-timer-form">
+                <div class="combat-timer-field">
+                    <label>Nome</label>
+                    <input type="text" id="combatTimerName" placeholder="Es. Bagliore Lunare, Veleno..." maxlength="60" />
+                </div>
+                <div class="combat-timer-field">
+                    <label>Durata (round)</label>
+                    <div class="combat-timer-duration-row">
+                        <input type="number" id="combatTimerRounds" min="1" max="999" value="10" />
+                        <div class="combat-timer-presets">
+                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=1">1r</button>
+                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=10">1m (10r)</button>
+                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=100">10m (100r)</button>
+                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=600">1h (600r)</button>
+                        </div>
+                    </div>
+                </div>
+                ${targetSelector}
+                <div class="combat-timer-field">
+                    <label>Condizioni applicate (opzionali)</label>
+                    <div class="pg-conditions-grid combat-timer-conditions">${condCheckboxes}</div>
+                </div>
+            </div>
+            <div class="hp-calc-actions" style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+                <button class="btn-secondary btn-small" onclick="combatCloseTimerDialog()">Annulla</button>
+                <button class="btn-primary btn-small" onclick="combatSaveTimer('${campagnaId}','${sessioneId}','${mode}','${forcedPgId || ''}')">Avvia</button>
+            </div>
+        </div>`;
+
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) combatCloseTimerDialog(); });
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        const inp = document.getElementById('combatTimerName');
+        if (inp) inp.focus();
+    }, 50);
+};
+
+window.combatCloseTimerDialog = function() {
+    const o = document.getElementById('combatTimerOverlay');
+    if (o) o.remove();
+};
+
+window.combatSaveTimer = async function(campagnaId, sessioneId, mode, forcedPgId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const nameEl = document.getElementById('combatTimerName');
+    const roundsEl = document.getElementById('combatTimerRounds');
+    const targetEl = document.getElementById('combatTimerTarget');
+    if (!nameEl || !roundsEl) return;
+
+    const nome = (nameEl.value || '').trim();
+    const rounds = parseInt(roundsEl.value, 10);
+    if (!nome) { showNotification('Inserisci un nome'); return; }
+    if (!rounds || rounds < 1) { showNotification('Inserisci una durata valida'); return; }
+
+    let target_kind = 'global';
+    let target_id = null;
+    let target_name = null;
+    if (mode === 'player') {
+        if (!forcedPgId) { showNotification('Personaggio non disponibile'); return; }
+        target_kind = 'player';
+        target_id = forcedPgId;
+        try {
+            const { data: pg } = await supabase.from('personaggi').select('nome').eq('id', forcedPgId).single();
+            target_name = pg?.nome || null;
+        } catch (_) {}
+    } else if (targetEl) {
+        const v = targetEl.value || 'global';
+        if (v.startsWith('monster:')) {
+            const parts = v.split(':');
+            target_kind = 'monster';
+            target_id = parts[1];
+            target_name = parts.slice(2).join(':') || null;
+        }
+    }
+
+    const conds = Array.from(document.querySelectorAll('#combatTimerOverlay input[type="checkbox"][data-cond]:checked'))
+        .map(el => el.dataset.cond);
+
+    const userId = await getCurrentInternalUserId();
+
+    const payload = {
+        sessione_id: sessioneId,
+        campagna_id: campagnaId,
+        nome,
+        target_kind,
+        target_id,
+        target_name,
+        conditions: conds,
+        duration_rounds: rounds,
+        remaining_rounds: rounds,
+        created_by: userId
+    };
+
+    try {
+        const { data: inserted, error } = await supabase.from('combat_timers').insert(payload).select().single();
+        if (error) throw error;
+
+        // Applica le condizioni al target (se mostro o personaggio).
+        if (conds.length > 0 && target_id) {
+            const updateObj = {};
+            conds.forEach(c => { updateObj[c] = true; });
+            try {
+                if (target_kind === 'monster') {
+                    await supabase.from('mostri_combattimento').update(updateObj).eq('id', target_id);
+                } else if (target_kind === 'player') {
+                    await supabase.from('personaggi').update(updateObj).eq('id', target_id);
+                }
+            } catch (e2) { console.warn('Errore applicazione condizioni timer:', e2); }
+        }
+
+        combatCloseTimerDialog();
+        showNotification('Timer avviato');
+        await renderCombattimentoContent(campagnaId, sessioneId);
+        try { await sendAppEventBroadcast({ table: 'combat_timers', action: 'insert', sessioneId, campagnaId }); } catch (_) {}
+    } catch (e) {
+        console.error('Errore salvataggio timer:', e);
+        const msg = (e && (e.message || e.hint)) || 'Errore salvataggio timer';
+        showNotification(msg);
+    }
+};
+
+window.combatRemoveTimer = async function(timerId) {
+    if (!timerId) return;
+    const ok = await (typeof showConfirm === 'function' ? showConfirm('Rimuovere il timer?', 'Rimuovi timer') : Promise.resolve(confirm('Rimuovere il timer?')));
+    if (!ok) return;
+    await _combatExpireOrDeleteTimer(timerId, /*removeConditions*/ true, /*deleteRow*/ true);
+    const cId = window.AppState?.currentCampagnaId;
+    const sId = window.AppState?.currentSessioneId;
+    if (cId && sId) await renderCombattimentoContent(cId, sId);
+};
+
+// Esegue la "scadenza" o eliminazione di un timer:
+//   - rimuove le condizioni applicate al target (se richiesto)
+//   - elimina la riga dal DB (se deleteRow), altrimenti la marca come expired
+async function _combatExpireOrDeleteTimer(timerId, removeConditions, deleteRow) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    try {
+        const { data: t } = await supabase.from('combat_timers').select('*').eq('id', timerId).single();
+        if (!t) return;
+        if (removeConditions && t.target_id && Array.isArray(t.conditions) && t.conditions.length > 0) {
+            const updateObj = {};
+            t.conditions.forEach(c => { updateObj[c] = false; });
+            try {
+                if (t.target_kind === 'monster') {
+                    await supabase.from('mostri_combattimento').update(updateObj).eq('id', t.target_id);
+                } else if (t.target_kind === 'player') {
+                    await supabase.from('personaggi').update(updateObj).eq('id', t.target_id);
+                }
+            } catch (e) { console.warn('Errore rimozione condizioni timer:', e); }
+        }
+        if (deleteRow) {
+            await supabase.from('combat_timers').delete().eq('id', timerId);
+        } else {
+            await supabase.from('combat_timers').update({ expired: true, remaining_rounds: 0 }).eq('id', timerId);
+        }
+    } catch (e) { console.warn('Errore expire timer:', e); }
+}
+
+// Decrementa di 1 round tutti i timer attivi della sessione. I timer che
+// raggiungono 0 vengono fatti scadere (condizioni rimosse, riga eliminata).
+window.combatTickTimers = async function(sessioneId, campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !sessioneId) return;
+    try {
+        const { data: timers } = await supabase.from('combat_timers')
+            .select('*')
+            .eq('sessione_id', sessioneId)
+            .eq('expired', false);
+        if (!timers || timers.length === 0) return;
+
+        const expiringIds = [];
+        const updates = [];
+        for (const t of timers) {
+            const remaining = (t.remaining_rounds || 0) - 1;
+            if (remaining <= 0) {
+                expiringIds.push(t.id);
+            } else {
+                updates.push({ id: t.id, remaining });
+            }
+        }
+
+        for (const u of updates) {
+            await supabase.from('combat_timers').update({ remaining_rounds: u.remaining }).eq('id', u.id);
+        }
+        for (const id of expiringIds) {
+            await _combatExpireOrDeleteTimer(id, /*removeConditions*/ true, /*deleteRow*/ true);
+        }
+        if (expiringIds.length > 0) {
+            showNotification(expiringIds.length === 1 ? 'Un timer e\' scaduto' : `${expiringIds.length} timer scaduti`);
+        }
+    } catch (e) { console.warn('Errore tick timer:', e); }
 };
