@@ -9,6 +9,9 @@ function clearActiveSession() {
 // riporta direttamente alla sessione (o al combattimento se in corso).
 // In questo modo il pulsante e' sempre raggiungibile da qualunque
 // pagina dell'app, anche da quelle senza un back button "rosso".
+// Quando il bottone globale e' visibile, PRENDE IL POSTO del back-button
+// della pagina (non si sovrappone): il back-button viene temporaneamente
+// nascosto cosi' la posizione in basso a sinistra resta sempre la stessa.
 function updateReturnToSessionBtn() {
     const isSessionPage = AppState.currentPage === 'sessione' || AppState.currentPage === 'combattimento';
     const shouldShow = !!AppState.activeSessionCampagnaId && !isSessionPage;
@@ -16,13 +19,12 @@ function updateReturnToSessionBtn() {
     if (btn) {
         btn.style.display = shouldShow ? 'inline-flex' : 'none';
     }
-    // Se la pagina attiva ha gia' un back-button-floating in basso a sinistra,
-    // contrassegnamo il body cosi' il CSS sposta il return-btn poco piu' in
-    // alto per non sovrapporre i due controlli.
+    // Se il bottone globale e' visibile, nascondi il back-button della pagina
+    // attiva: il bottone "torna alla sessione" prende il suo posto fisico
+    // (stessa coordinata bottom/left). Quando torna nascosto, il back-button
+    // ridiventa visibile.
     try {
-        const activePage = document.querySelector('.page.active');
-        const hasBack = !!(activePage && activePage.querySelector('.back-button-floating'));
-        document.body.classList.toggle('has-page-back', !!hasBack);
+        document.body.classList.toggle('global-return-active', !!shouldShow);
     } catch (_) {}
 }
 
