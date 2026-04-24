@@ -5541,7 +5541,10 @@ window.schedaOpenInventoryPage = async function(pgId) {
     ${buildSchedaHeader(pg, 'Inventario')}
 
     <div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Monete</div>
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">
+            <span>Monete</span>
+            <span class="inv-coins-title-total" id="invCoinsTitleTotal" title="Totale in monete d'oro">${_formatGoldTotal(totalGold)} <small>MO</small></span>
+        </div>
         <div class="scheda-section-body">
             ${coinsHtml}
         </div>
@@ -5616,8 +5619,11 @@ window.invOpenCoinKeypad = function(inputEl) {
         const monete = pg.monete ? { ...pg.monete } : {};
         monete[coinKey] = val;
         pg.monete = monete;
+        const formattedTotal = _formatGoldTotal(_calcCoinsTotalGold(monete));
         const totEl = document.getElementById('invCoinTotal');
-        if (totEl) totEl.textContent = _formatGoldTotal(_calcCoinsTotalGold(monete));
+        if (totEl) totEl.textContent = formattedTotal;
+        const titleTotEl = document.getElementById('invCoinsTitleTotal');
+        if (titleTotEl) titleTotEl.innerHTML = `${formattedTotal} <small>MO</small>`;
         await supabase.from('personaggi').update({ monete }).eq('id', pgId);
         inputEl.removeEventListener('change', onChange);
     };
