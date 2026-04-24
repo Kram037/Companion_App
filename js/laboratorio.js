@@ -3044,7 +3044,7 @@ window.labViewNemico = async function(id) {
     if (!content) return;
 
     content.innerHTML = `
-        <h2 style="flex-shrink:0;">${escapeHtml(m.nome)} <button class="modal-close" onclick="closeHomebrewModal()">&times;</button></h2>
+        <h2 style="flex-shrink:0;">${escapeHtml(m.nome)} <button class="modal-close" onclick="closeHomebrewModal()" style="position:absolute;right:12px;top:12px;">&times;</button></h2>
         <div style="flex:1;overflow-y:auto;padding:0 2px;">
             <p style="color:var(--text-secondary);margin:0 0 12px;font-size:0.85rem;">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</p>
             <div class="scheda-three-boxes">
@@ -3071,7 +3071,8 @@ window.labViewNemico = async function(id) {
             ${spellHtml}
         </div>`;
 
-    modal.style.display = 'flex';
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 };
 
 // ============================================================================

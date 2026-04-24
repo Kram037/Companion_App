@@ -21,6 +21,9 @@ ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS maestrie_abilita JSONB
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dadi_vita_num INTEGER DEFAULT NULL;
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dado_vita INTEGER DEFAULT NULL;
 
+-- Mostri "placeholder" creati al volo durante il combattimento (solo nome + PV).
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS is_placeholder BOOLEAN DEFAULT FALSE;
+
 -- --- homebrew_nemici (laboratorio) ---
 ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS tiri_salvezza JSONB DEFAULT '[]';
 ALTER TABLE homebrew_nemici ADD COLUMN IF NOT EXISTS competenze_abilita JSONB DEFAULT '[]';

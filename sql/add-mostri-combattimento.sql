@@ -82,3 +82,4 @@ ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS azioni_legg_attuali IN
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS maestrie_abilita JSONB DEFAULT '[]';
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dadi_vita_num INTEGER DEFAULT NULL;
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dado_vita INTEGER DEFAULT NULL;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS is_placeholder BOOLEAN DEFAULT FALSE;

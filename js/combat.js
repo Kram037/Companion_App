@@ -50,7 +50,8 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         const order = [];
         tiriCompleted.forEach(t => {
             const pgName = pgNamesMap[t.giocatore_id];
-            order.push({ type: 'player', id: t.giocatore_id, name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?', init: t.valore, conditions: pgConditionsMap[t.giocatore_id] });
+            const cond = pgConditionsMap[t.giocatore_id];
+            order.push({ type: 'player', id: t.giocatore_id, pgId: cond?.id || null, name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?', init: t.valore, conditions: cond });
         });
         _combatMonsters.forEach(m => {
             order.push({ type: 'monster', id: m.id, name: m.nome, init: m.iniziativa ?? 0, monster: m });
@@ -70,32 +71,41 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             nextBtn.onclick = () => combatNextTurn(campagnaId, sessioneId, order.length, combatRound, turnIdx);
         }
 
+        // Helper: produce the click handler attribute for a given entry,
+        // applying access rules (player can only open their own sheet; non-DM
+        // cannot open monster sheets at all).
+        const buildClickHandler = (entry) => {
+            const isMonster = entry.type === 'monster';
+            if (isMonster) {
+                if (!isDM) return '';
+                if (entry.monster?.is_placeholder) {
+                    return `onclick="combatOpenPlaceholderDialog('${entry.id}','${campagnaId}','${sessioneId}')"`;
+                }
+                return `onclick="combatOpenMonsterFullSheet('${entry.id}','${campagnaId}','${sessioneId}')"`;
+            }
+            const isOwner = entry.id === currentUserId;
+            if (!isDM && !isOwner) return '';
+            if (!entry.pgId) return '';
+            return `onclick="openSchedaPersonaggio('${entry.pgId}')"`;
+        };
+
         // Left icons column (square portraits, no initiative number)
         if (initCol) {
             initCol.innerHTML = order.map((entry, idx) => {
                 const initials = entry.name.substring(0, 2).toUpperCase();
                 const isTurn = idx === turnIdx;
-                const isExpanded = _combatSelectedId === entry.id && _combatSelectedType === entry.type;
-                const dimmed = _combatSelectedId && !isExpanded;
-                return `<div class="combat-icon ${isTurn ? 'active' : ''} ${isExpanded ? 'active' : ''} ${dimmed ? 'dimmed' : ''} ${entry.type === 'monster' ? 'monster' : ''}" data-idx="${idx}">
+                const click = buildClickHandler(entry);
+                const clickable = click ? 'is-clickable' : 'is-locked';
+                return `<div class="combat-icon ${isTurn ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${clickable}" data-idx="${idx}" ${click}>
                     <span class="combat-icon-initials">${escapeHtml(initials)}</span>
                 </div>`;
             }).join('');
         }
 
-        // Right cards column
+        // Right cards column - always show all cards (no inline expansion)
         if (order.length === 0) {
             cardsCol.innerHTML = '<div class="content-placeholder"><p>In attesa dei tiri iniziativa...</p></div>';
-        } else if (_combatSelectedId) {
-            // Show expanded sheet
-            if (_combatSelectedType === 'monster') {
-                await renderCombatMonsterSheet(_combatSelectedId, isDM, campagnaId, sessioneId);
-            } else {
-                const isOwner = _combatSelectedId === currentUserId;
-                await renderCombatPlayerSheet(_combatSelectedId, isDM, isOwner, campagnaId, sessioneId);
-            }
         } else {
-            // Show all cards
             cardsCol.innerHTML = order.map((entry, idx) => {
                 const isTurn = idx === turnIdx;
                 const isMonster = entry.type === 'monster';
@@ -109,6 +119,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                     if (active.length > 0) condBadges = active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('');
                 }
 
+                // Players can only see HP of fellow party members (not monsters).
                 let hpDisplay = '';
                 if (isMonster && isDM && entry.monster) {
                     const mHp = entry.monster.pv_attuali ?? entry.monster.punti_vita_max;
@@ -119,8 +130,10 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                     hpDisplay = `<span class="combat-card-hp">${pHp}/${pMax}</span>`;
                 }
 
-                return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''}" 
-                    onclick="combatSelectEntry('${entry.type}','${entry.id}','${campagnaId}','${sessioneId}',${isDM},${entry.id === currentUserId})">
+                const click = buildClickHandler(entry);
+                const clickable = click ? 'is-clickable' : 'is-locked';
+
+                return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''} ${clickable}" ${click}>
                     <span class="combat-card-init" title="Iniziativa">${entry.init}</span>
                     <div class="combat-card-center">
                         <span class="combat-card-name">${escapeHtml(entry.name)}</span>
@@ -218,6 +231,240 @@ window.combatCloseSheet = async function(campagnaId, sessioneId) {
     _combatSelectedType = null;
     await renderCombattimentoContent(campagnaId, sessioneId);
 }
+
+// ===========================================================================
+// FULL SHEET / PLACEHOLDER DIALOG (combat session)
+// ===========================================================================
+
+// Apre la scheda completa di un mostro presente in combattimento riusando il
+// layout del viewer del laboratorio (labViewNemico). Funziona sia per mostri
+// importati che creati da zero. Solo il DM dovrebbe poter chiamare questa
+// funzione (gestito a livello di click handler).
+window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('*').eq('id', monsterId).single();
+    if (!m) { showNotification('Mostro non trovato'); return; }
+
+    if (m.is_placeholder) {
+        return combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
+    }
+
+    const fMod = (v) => { const mod = Math.floor(((v||10)-10)/2); return mod >= 0 ? `+${mod}` : `${mod}`; };
+    const bonusComp = Math.max(2, Math.floor(((parseInt(m.grado_sfida)||0)-1)/4)+2);
+    const saves = m.tiri_salvezza || [];
+    const skills = m.competenze_abilita || [];
+    const expert = m.maestrie_abilita || [];
+
+    const resistenzeHtml = (m.resistenze?.length) ? m.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r)}</span>`).join('') : '';
+    const immunitaHtml = (m.immunita?.length) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
+
+    const attacks = m.attacchi || [];
+    const attacksHtml = attacks.length > 0 ? attacks.map(a => {
+        const hasUsi = a.usi_max > 0;
+        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_, i) =>
+            `<span class="monster-action-use-pip ${i < (a.usi_attuali ?? a.usi_max) ? 'filled' : ''}"></span>`).join('')}</span>` : '';
+        return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
+    }).join('') : '';
+
+    const leggActions = m.azioni_leggendarie || [];
+    const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${(window.formatRichText ? window.formatRichText(a.descrizione || '') : escapeHtml(a.descrizione || ''))}</span></div>`
+    ).join('') : '';
+
+    const resLeggMax = m.resistenze_leggendarie || 0;
+    const resLeggCur = m.res_legg_attuali ?? resLeggMax;
+    const azLeggMax = m.azioni_legg_max || 0;
+    const azLeggCur = m.azioni_legg_attuali ?? azLeggMax;
+
+    const skillsHtml = skills.length > 0 ? SCHEDA_SKILLS.filter(sk => skills.includes(sk.key)).map(sk => {
+        const abilityMod = Math.floor(((m[sk.ability]||10)-10)/2);
+        const isExp = expert.includes(sk.key);
+        const total = abilityMod + bonusComp + (isExp ? bonusComp : 0);
+        const expLabel = isExp ? ' ★' : '';
+        return `<span class="scheda-tag">${sk.label} ${total >= 0 ? '+' + total : total}${expLabel}</span>`;
+    }).join('') : '';
+
+    let spellHtml = '';
+    const slots = m.slot_incantesimo;
+    const hasSpells = slots && typeof slots === 'object' && Object.keys(slots).length > 0;
+    if (hasSpells) {
+        const carInc = m.caratteristica_incantatore;
+        const incVal = m[carInc] || 10;
+        const incMod = Math.floor((incVal - 10) / 2);
+        const atkBonus = incMod + bonusComp;
+        const dc = 8 + bonusComp + incMod;
+        const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const cur = s.current ?? s.max;
+            const pips = Array.from({length: s.max}, (_, i) => `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}"></span>`).join('');
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${cur}/${s.max}</span></div>`;
+        }).join('');
+        spellHtml = `
+            <div class="combat-section-label">Incantesimi</div>
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">
+                <div class="scheda-box"><div class="scheda-box-val">${incMod >= 0 ? '+'+incMod : incMod}</div><div class="scheda-box-label">${(carInc||'').substring(0,3).toUpperCase()}</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>
+            </div>
+            <div class="scheda-slots-table">${slotsHtml}</div>`;
+    }
+
+    const pvAttuali = m.pv_attuali ?? m.punti_vita_max;
+    const pvMax = m.punti_vita_max || 10;
+
+    let modal = document.getElementById('combatMonsterFullModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'combatMonsterFullModal';
+        modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content modal-content-lg" id="combatMonsterFullContent" style="max-height:92vh;display:flex;flex-direction:column;"></div>`;
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeCombatMonsterFullModal(); });
+        document.body.appendChild(modal);
+    }
+    document.getElementById('combatMonsterFullContent').innerHTML = `
+        <h2 style="flex-shrink:0;">${escapeHtml(m.nome)}
+            <button class="modal-close" onclick="closeCombatMonsterFullModal()" style="position:absolute;right:12px;top:12px;">&times;</button>
+        </h2>
+        <div style="flex:1;overflow-y:auto;padding:0 2px;">
+            <p style="color:var(--text-secondary);margin:0 0 12px;font-size:0.85rem;">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</p>
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${pvAttuali}/${pvMax}</div><div class="scheda-box-label">PV</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
+            </div>
+            <div class="combat-abilities-grid" style="margin:12px 0;">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${skillsHtml ? `<div class="combat-section-label">Competenze</div><div class="scheda-tags">${skillsHtml}</div>` : ''}
+            ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+            ${resLeggMax > 0 ? `<div class="combat-section-label">Resistenze Leggendarie</div><div class="monster-res-legg-counter">${Array.from({length: resLeggMax}, (_, i) => `<span class="monster-res-legg-pip ${i < resLeggCur ? 'filled' : ''}"></span>`).join('')}<span class="monster-res-legg-label">${resLeggCur}/${resLeggMax}</span></div>` : ''}
+            ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie${azLeggMax > 0 ? ` (${azLeggCur}/${azLeggMax})` : ''}</div>` : ''}
+            ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+            ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
+            ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
+            ${spellHtml}
+        </div>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeCombatMonsterFullModal = function() {
+    const modal = document.getElementById('combatMonsterFullModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+};
+
+// Dialog rapida per i mostri "placeholder": mostra i PV (modificabili) e
+// permette di togglare le condizioni standard. Niente caratteristiche, niente
+// attacchi: il placeholder serve solo come segnaposto in iniziativa.
+window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('*').eq('id', monsterId).single();
+    if (!m) { showNotification('Mostro non trovato'); return; }
+
+    const pvAttuali = m.pv_attuali ?? m.punti_vita_max;
+    const pvMax = m.punti_vita_max || 10;
+
+    let modal = document.getElementById('combatPlaceholderModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'combatPlaceholderModal';
+        modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content" id="combatPlaceholderContent" style="max-width:420px;"></div>`;
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeCombatPlaceholderModal(); });
+        document.body.appendChild(modal);
+    }
+
+    const condRows = ALL_CONDITIONS.map(c => `
+        <label class="placeholder-cond-row">
+            <input type="checkbox" data-cond="${c.key}" ${m[c.key] ? 'checked' : ''}>
+            <span>${c.label}</span>
+        </label>`).join('');
+
+    document.getElementById('combatPlaceholderContent').innerHTML = `
+        <button class="modal-close" onclick="closeCombatPlaceholderModal()">&times;</button>
+        <h2 style="margin:0 0 6px;">${escapeHtml(m.nome)}</h2>
+        <p style="margin:0 0 12px;color:var(--text-secondary);font-size:0.82rem;">Placeholder · solo PV e condizioni</p>
+
+        <div class="form-group">
+            <label>Punti Vita</label>
+            <div class="placeholder-hp-row">
+                <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
+                <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
+                <span class="placeholder-hp-sep">/</span>
+                <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
+                <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Condizioni</label>
+            <div class="placeholder-cond-grid" id="phCondGrid">${condRows}</div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-danger" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
+            <button type="button" class="btn-primary" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
+        </div>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    const valEl = document.getElementById('phHpVal');
+    document.getElementById('phHpMinus').onclick = () => { valEl.value = Math.max(0, (parseInt(valEl.value)||0) - 1); };
+    document.getElementById('phHpPlus').onclick = () => { valEl.value = (parseInt(valEl.value)||0) + 1; };
+};
+
+window.closeCombatPlaceholderModal = function() {
+    const modal = document.getElementById('combatPlaceholderModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+};
+
+window.combatPlaceholderSave = async function(monsterId, campagnaId, sessioneId) {
+    const pvVal = Math.max(0, parseInt(document.getElementById('phHpVal')?.value) || 0);
+    const pvMax = Math.max(1, parseInt(document.getElementById('phHpMax')?.value) || 1);
+    const updates = {
+        pv_attuali: Math.min(pvVal, pvMax),
+        punti_vita_max: pvMax
+    };
+    document.querySelectorAll('#phCondGrid input[type="checkbox"]').forEach(cb => {
+        updates[cb.dataset.cond] = cb.checked;
+    });
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', monsterId);
+    if (error) { showNotification('Errore salvataggio: ' + error.message); return; }
+    closeCombatPlaceholderModal();
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+window.combatPlaceholderDelete = async function(monsterId, campagnaId, sessioneId) {
+    const ok = await showConfirm('Eliminare questo placeholder dal combattimento?');
+    if (!ok) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase.from('mostri_combattimento').delete().eq('id', monsterId);
+    if (error) { showNotification('Errore eliminazione: ' + error.message); return; }
+    closeCombatPlaceholderModal();
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
 
 async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessioneId) {
     const content = document.getElementById('combattimentoContent');
