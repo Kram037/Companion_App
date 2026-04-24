@@ -83,7 +83,8 @@ const predefinedIcons = [
     { name: 'sun', svg: '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>' },
     { name: 'treasure', svg: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>' },
     { name: 'skull', svg: '<circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2"></path><path d="M12 20v2"></path><path d="M8 18v-2a4 4 0 0 1 8 0v2"></path>' },
-    { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' }
+    { name: 'cross', svg: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>' },
+    { name: 'logo_leggenda', imageSrc: 'images/Logo Leggenda.jpeg' }
 ];
 
 let selectedIconName = 'dice';
@@ -101,8 +102,29 @@ const iconNameMap = {
     'sun': 'Sole',
     'treasure': 'Tesoro',
     'skull': 'Teschio',
-    'cross': 'Croce'
+    'cross': 'Croce',
+    'logo_leggenda': 'Logo Leggenda'
 };
+
+function getPredefinedIconByName(name) {
+    return predefinedIcons.find(i => i.name === name) || predefinedIcons[0];
+}
+
+function buildCampagnaCardIconHtml(icon) {
+    if (icon.imageSrc) {
+        const src = encodeURI(icon.imageSrc);
+        return `<div class="campagna-icon-svg campagna-icon-image"><img src="${src}" alt="" width="38" height="38" decoding="async" /></div>`;
+    }
+    return `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg></div>`;
+}
+
+function buildCampagnaDettagliIconHtml(icon) {
+    if (icon.imageSrc) {
+        const src = encodeURI(icon.imageSrc);
+        return `<div class="dettagli-icon-svg dettagli-icon-image"><img src="${src}" alt="" decoding="async" /></div>`;
+    }
+    return `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg></div>`;
+}
 
 const _dmCache = {};
 
@@ -540,8 +562,8 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         const numeroGiocatori = Array.isArray(campagna.giocatori) ? campagna.giocatori.length : 0;
 
         const iconName = campagna.icona_name || 'dice';
-        const selectedIcon = predefinedIcons.find(i => i.name === iconName) || predefinedIcons[0];
-        const iconaHTML = `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
+        const selectedIcon = getPredefinedIconByName(iconName);
+        const iconaHTML = buildCampagnaCardIconHtml(selectedIcon);
 
         const isPreferito = campagna.isPreferito === true;
         return `
@@ -1320,8 +1342,8 @@ async function renderInvitaGiocatoriTab(campagnaId) {
  */
 function renderCampagnaDetailsHeader(campagna) {
     const iconName = campagna.icona_name || 'dice';
-    const selectedIcon = predefinedIcons.find(i => i.name === iconName) || predefinedIcons[0];
-    const iconaHTML = `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg></div>`;
+    const selectedIcon = getPredefinedIconByName(iconName);
+    const iconaHTML = buildCampagnaDettagliIconHtml(selectedIcon);
 
     // Aggiorna icona container
     if (elements.dettagliIconContainer) {
@@ -1855,7 +1877,11 @@ function setupIconSelector() {
         iconOption.className = 'icon-option';
         if (index === 0) iconOption.classList.add('selected');
         iconOption.dataset.iconName = icon.name;
-        iconOption.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
+        if (icon.imageSrc) {
+            iconOption.innerHTML = `<img class="icon-option-img" src="${encodeURI(icon.imageSrc)}" alt="" decoding="async" />`;
+        } else {
+            iconOption.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
+        }
         iconOption.addEventListener('click', () => selectPredefinedIcon(icon.name));
         iconGrid.appendChild(iconOption);
     });
@@ -1875,22 +1901,26 @@ function selectPredefinedIcon(iconName) {
 }
 
 function updateIconPreview() {
-    const iconDisplay = document.getElementById('iconDisplay');
+    const iconPreview = document.getElementById('iconPreview');
     const iconaCampagna = document.getElementById('iconaCampagna');
     const iconNameDisplay = document.getElementById('iconNameDisplay');
-    
-    if (!iconDisplay) return;
-    
+
+    if (!iconPreview) return;
+
     const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
-    if (selectedIcon) {
-        iconDisplay.innerHTML = selectedIcon.svg;
-        if (iconNameDisplay) {
-            const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
-            iconNameDisplay.textContent = displayName;
-        }
-        if (iconaCampagna) {
-            iconaCampagna.value = selectedIconName;
-        }
+    if (!selectedIcon) return;
+
+    if (selectedIcon.imageSrc) {
+        iconPreview.innerHTML = `<img id="iconDisplay" class="icon-preview-img" src="${encodeURI(selectedIcon.imageSrc)}" alt="" decoding="async" />`;
+    } else {
+        iconPreview.innerHTML = `<svg id="iconDisplay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg>`;
+    }
+    if (iconNameDisplay) {
+        const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
+        iconNameDisplay.textContent = displayName;
+    }
+    if (iconaCampagna) {
+        iconaCampagna.value = selectedIconName;
     }
 }
 
