@@ -401,6 +401,24 @@ body.user-logged-in .header-username {
 
 .back-button-floating svg { width: 20px; height: 20px; }
 
+/* Glow "Ritorna alla sessione/combattimento": il back-button ereditato di
+   ogni pagina si trasforma in un richiamo visivo verso la sessione attiva. */
+.back-button-floating.glow-return-session {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    animation: backReturnGlow 2.2s ease-in-out infinite;
+}
+.back-button-floating.glow-return-session:hover {
+    background: var(--accent-dark);
+    color: #fff;
+    border-color: var(--accent-dark);
+}
+@keyframes backReturnGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55), var(--shadow-md); }
+    50%      { box-shadow: 0 0 18px 6px rgba(220, 38, 38, 0.55), var(--shadow-md); }
+}
+
 /* ============================================
    FAB (Floating Action Button) - bottom-right
    ============================================ */

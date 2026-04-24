@@ -78,7 +78,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             const isMonster = entry.type === 'monster';
             if (isMonster) {
                 if (!isDM) return '';
-                if (entry.monster?.is_placeholder) {
+                if (_isPlaceholderMonster(entry.monster)) {
                     return `onclick="combatOpenPlaceholderDialog('${entry.id}','${campagnaId}','${sessioneId}')"`;
                 }
                 return `onclick="combatOpenMonsterFullSheet('${entry.id}','${campagnaId}','${sessioneId}')"`;
@@ -86,7 +86,10 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             const isOwner = entry.id === currentUserId;
             if (!isDM && !isOwner) return '';
             if (!entry.pgId) return '';
-            return `onclick="openSchedaPersonaggio('${entry.pgId}')"`;
+            // Apri la scheda PG e centra automaticamente la tabella
+            // statistiche (PV / PV temp / CA) cosi' il DM/player vede subito
+            // i dati piu' rilevanti durante il combattimento.
+            return `onclick="openSchedaPersonaggio('${entry.pgId}',{scrollToStats:true})"`;
         };
 
         // Left icons column (square portraits, no initiative number)
@@ -236,6 +239,24 @@ window.combatCloseSheet = async function(campagnaId, sessioneId) {
 // FULL SHEET / PLACEHOLDER DIALOG (combat session)
 // ===========================================================================
 
+// Stabilisce se un mostro e' "placeholder" (segnaposto creato durante il
+// combattimento con solo nome / PV / CA opzionale). Oltre al flag esplicito
+// `is_placeholder` (richiede patch SQL applicata) usiamo un'euristica per
+// retro-compatibilita': tutte le statistiche di base a 10, niente attacchi,
+// niente azioni leggendarie, niente competenze, niente incantesimi.
+function _isPlaceholderMonster(m) {
+    if (!m) return false;
+    if (m.is_placeholder === true) return true;
+    const allTen = (['forza','destrezza','costituzione','intelligenza','saggezza','carisma'])
+        .every(k => (m[k] == null || m[k] === 10));
+    const noAttacks = !Array.isArray(m.attacchi) || m.attacchi.length === 0;
+    const noLegg = !Array.isArray(m.azioni_leggendarie) || m.azioni_leggendarie.length === 0;
+    const noSkills = !Array.isArray(m.competenze_abilita) || m.competenze_abilita.length === 0;
+    const noSpells = !m.slot_incantesimo || (typeof m.slot_incantesimo === 'object' && Object.keys(m.slot_incantesimo).length === 0);
+    return allTen && noAttacks && noLegg && noSkills && noSpells;
+}
+window._isPlaceholderMonster = _isPlaceholderMonster;
+
 // Apre la scheda completa di un mostro presente in combattimento riusando il
 // layout del viewer del laboratorio (labViewNemico). Funziona sia per mostri
 // importati che creati da zero. Solo il DM dovrebbe poter chiamare questa
@@ -246,7 +267,7 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
     const { data: m } = await supabase.from('mostri_combattimento').select('*').eq('id', monsterId).single();
     if (!m) { showNotification('Mostro non trovato'); return; }
 
-    if (m.is_placeholder) {
+    if (_isPlaceholderMonster(m)) {
         return combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
     }
 
@@ -375,13 +396,14 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
 
     const pvAttuali = m.pv_attuali ?? m.punti_vita_max;
     const pvMax = m.punti_vita_max || 10;
+    const ca = m.classe_armatura || 10;
 
     let modal = document.getElementById('combatPlaceholderModal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'combatPlaceholderModal';
         modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content" id="combatPlaceholderContent" style="max-width:420px;"></div>`;
+        modal.innerHTML = `<div class="modal-content" id="combatPlaceholderContent" style="max-width:460px;"></div>`;
         modal.addEventListener('click', (e) => { if (e.target === modal) closeCombatPlaceholderModal(); });
         document.body.appendChild(modal);
     }
@@ -394,17 +416,22 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
 
     document.getElementById('combatPlaceholderContent').innerHTML = `
         <button class="modal-close" onclick="closeCombatPlaceholderModal()">&times;</button>
-        <h2 style="margin:0 0 6px;">${escapeHtml(m.nome)}</h2>
-        <p style="margin:0 0 12px;color:var(--text-secondary);font-size:0.82rem;">Placeholder · solo PV e condizioni</p>
+        <h2 style="margin:0 0 12px;">${escapeHtml(m.nome)}</h2>
 
-        <div class="form-group">
-            <label>Punti Vita</label>
-            <div class="placeholder-hp-row">
-                <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
-                <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
-                <span class="placeholder-hp-sep">/</span>
-                <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
-                <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
+        <div class="placeholder-stats-row">
+            <div class="form-group placeholder-hp-group">
+                <label>Punti Vita</label>
+                <div class="placeholder-hp-row">
+                    <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
+                    <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
+                    <span class="placeholder-hp-sep">/</span>
+                    <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
+                    <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
+                </div>
+            </div>
+            <div class="form-group placeholder-ca-group">
+                <label>CA</label>
+                <input type="number" id="phCAVal" value="${ca}" min="1" inputmode="numeric" class="placeholder-ca-input">
             </div>
         </div>
 
@@ -437,9 +464,11 @@ window.closeCombatPlaceholderModal = function() {
 window.combatPlaceholderSave = async function(monsterId, campagnaId, sessioneId) {
     const pvVal = Math.max(0, parseInt(document.getElementById('phHpVal')?.value) || 0);
     const pvMax = Math.max(1, parseInt(document.getElementById('phHpMax')?.value) || 1);
+    const ca = Math.max(1, parseInt(document.getElementById('phCAVal')?.value) || 10);
     const updates = {
         pv_attuali: Math.min(pvVal, pvMax),
-        punti_vita_max: pvMax
+        punti_vita_max: pvMax,
+        classe_armatura: ca
     };
     document.querySelectorAll('#phCondGrid input[type="checkbox"]').forEach(cb => {
         updates[cb.dataset.cond] = cb.checked;
@@ -1235,9 +1264,15 @@ window.monsterStartPlaceholder = function(campagnaId, sessioneId) {
             <label for="phNome">Nome</label>
             <input type="text" id="phNome" placeholder="Es: Goblin #2" autofocus>
         </div>
-        <div class="form-group">
-            <label for="phPV">Punti Vita</label>
-            <input type="number" id="phPV" min="1" value="10" inputmode="numeric">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="form-group">
+                <label for="phPV">Punti Vita</label>
+                <input type="number" id="phPV" min="1" value="10" inputmode="numeric">
+            </div>
+            <div class="form-group">
+                <label for="phCA">Classe Armatura</label>
+                <input type="number" id="phCA" min="1" value="10" inputmode="numeric">
+            </div>
         </div>
         <div class="form-group">
             <label for="phInit">Iniziativa (opzionale, lascia vuoto per tirare)</label>
@@ -1254,6 +1289,7 @@ window.monsterSavePlaceholder = async function(campagnaId, sessioneId) {
     const nome = document.getElementById('phNome')?.value?.trim();
     if (!nome) { showNotification('Inserisci un nome'); return; }
     const pvMax = Math.max(1, parseInt(document.getElementById('phPV')?.value) || 10);
+    const ca = Math.max(1, parseInt(document.getElementById('phCA')?.value) || 10);
     const initRaw = document.getElementById('phInit')?.value;
     const init = (initRaw === '' || initRaw == null)
         ? (Math.floor(Math.random() * 20) + 1)
@@ -1273,7 +1309,7 @@ window.monsterSavePlaceholder = async function(campagnaId, sessioneId) {
         pv_attuali: pvMax,
         dadi_vita_num: 1,
         dado_vita: 8,
-        classe_armatura: 10,
+        classe_armatura: ca,
         velocita: 9,
         iniziativa: init,
         tiri_salvezza: [],

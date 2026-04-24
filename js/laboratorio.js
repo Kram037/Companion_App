@@ -2990,10 +2990,11 @@ window.labViewNemico = async function(id) {
     const immunitaHtml = (m.immunita?.length) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
 
     const attacks = m.attacchi || [];
-    const attacksHtml = attacks.length > 0 ? attacks.map(a => {
+    const attacksHtml = attacks.length > 0 ? attacks.map((a, ai) => {
         const hasUsi = a.usi_max > 0;
-        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, () =>
-            `<span class="monster-action-use-pip filled"></span>`).join('')}</span>` : '';
+        const usiCur = a.usi_attuali ?? a.usi_max;
+        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_, i) =>
+            `<span class="monster-action-use-pip ${i < usiCur ? 'filled' : ''}" onclick="labMonsterToggleAttackUse('${m.id}',${ai},${i})"></span>`).join('')}</span>` : '';
         return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
     }).join('') : '';
 
@@ -3026,8 +3027,11 @@ window.labViewNemico = async function(id) {
         const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
         const slotsHtml = levels.map(lvl => {
             const s = slots[lvl];
-            const pips = Array.from({length: s.max}, () => `<span class="scheda-slot-pip filled"></span>`).join('');
-            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${s.max}/${s.max}</span></div>`;
+            const cur = s.current ?? s.max;
+            const pips = Array.from({length: s.max}, (_, i) =>
+                `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}" onclick="labMonsterToggleSpellSlot('${m.id}',${lvl},${i})"></span>`
+            ).join('');
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${cur}/${s.max}</span></div>`;
         }).join('');
         spellHtml = `
             <div class="combat-section-label">Incantesimi</div>
@@ -3073,6 +3077,45 @@ window.labViewNemico = async function(id) {
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+};
+
+// Toggle dei pallini "utilizzi" delle azioni del mostro homebrew. Cliccare
+// un pallino consuma/ripristina gli usi rimanenti e persiste il valore in
+// `attacchi[i].usi_attuali` sulla riga `homebrew_nemici`.
+window.labMonsterToggleAttackUse = async function(monsterId, attackIdx, pipIdx) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('homebrew_nemici').select('attacchi').eq('id', monsterId).single();
+    if (!m) return;
+    const attacks = Array.isArray(m.attacchi) ? m.attacchi.map(a => ({...a})) : [];
+    const a = attacks[attackIdx];
+    if (!a) return;
+    const max = a.usi_max || 0;
+    if (max <= 0) return;
+    const cur = a.usi_attuali ?? max;
+    a.usi_attuali = pipIdx < cur ? pipIdx : pipIdx + 1;
+    if (a.usi_attuali > max) a.usi_attuali = max;
+    if (a.usi_attuali < 0) a.usi_attuali = 0;
+    await supabase.from('homebrew_nemici').update({ attacchi: attacks }).eq('id', monsterId);
+    if (typeof labViewNemico === 'function') labViewNemico(monsterId);
+};
+
+window.labMonsterToggleSpellSlot = async function(monsterId, level, pipIdx) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('homebrew_nemici').select('slot_incantesimo').eq('id', monsterId).single();
+    if (!m || !m.slot_incantesimo) return;
+    const slots = { ...m.slot_incantesimo };
+    const s = slots[level] ? { ...slots[level] } : null;
+    if (!s) return;
+    const cur = s.current ?? s.max;
+    s.current = pipIdx < cur ? pipIdx : pipIdx + 1;
+    if (s.current > s.max) s.current = s.max;
+    if (s.current < 0) s.current = 0;
+    slots[level] = s;
+    await supabase.from('homebrew_nemici').update({ slot_incantesimo: slots }).eq('id', monsterId);
+    // Re-render rapido del modale per riflettere lo stato salvato.
+    if (typeof labViewNemico === 'function') labViewNemico(monsterId);
 };
 
 // ============================================================================

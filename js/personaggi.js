@@ -2662,9 +2662,15 @@ function renderPersonaggi(personaggi, campagneMap = {}) {
 }
 
 // --- Scheda Personaggio Page ---
-window.openSchedaPersonaggio = async function(personaggioId) {
+window.openSchedaPersonaggio = async function(personaggioId, opts) {
     AppState.currentPersonaggioId = personaggioId;
     sessionStorage.setItem('currentPersonaggioId', personaggioId);
+    if (opts && opts.scrollToStats) {
+        // Flag consumato dopo il render della Pagina 1 per centrare la tabella
+        // delle statistiche (PV, PV temp, CA, ecc.). Usato quando si torna
+        // alla scheda da una sessione/combattimento.
+        window._schedaPendingScrollToStats = true;
+    }
     navigateToPage('scheda');
     await renderSchedaPersonaggio(personaggioId);
 }
@@ -3752,6 +3758,13 @@ async function renderSchedaPersonaggio(personaggioId) {
         schedaSetActiveTab('scheda');
         schedaWireTabBar(pg.id);
 
+        // Se richiesto (es. ritorno da combattimento), centra la vista sulla
+        // tabella delle statistiche (PV / PV temp / CA / iniziativa).
+        if (window._schedaPendingScrollToStats) {
+            window._schedaPendingScrollToStats = false;
+            setTimeout(() => { try { _scrollSchedaDividerIntoView(); } catch(_){} }, 60);
+        }
+
     } catch (e) {
         console.error('Errore caricamento scheda:', e);
         content.innerHTML = '<div class="content-placeholder"><p>Errore nel caricamento della scheda</p></div>';
@@ -4210,16 +4223,38 @@ function _scrollSchedaDividerIntoView() {
 }
 
 window.schedaScrollToStats = function() {
-    const pgId = window._schedaCurrentPgId;
+    const pgId = window._schedaCurrentPgId || AppState.currentPersonaggioId;
     const tab = window._schedaCurrentTab;
+    const tryScroll = () => {
+        const content = document.getElementById('schedaContent');
+        if (!content) return false;
+        const target = content.querySelector('.scheda-divider')
+                    || Array.from(content.querySelectorAll('.scheda-section-title'))
+                            .find(t => t.textContent.trim().startsWith('Statistiche'));
+        if (!target) return false;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return true;
+    };
     if (tab && tab !== 'scheda' && pgId) {
-        // Naviga a Pagina 1 e attende il render prima di scrollare.
+        // Naviga a Pagina 1 e attende che il divider/sezione "Statistiche"
+        // appaia nel DOM (polling) prima di eseguire lo scroll. Questo
+        // risolve il bug per cui il pulsante non funzionava da Inventario o
+        // da altre tab perche' il render era ancora in corso.
         renderSchedaPersonaggio(pgId).then(() => {
-            setTimeout(_scrollSchedaDividerIntoView, 80);
+            let tries = 0;
+            const tick = () => {
+                if (tryScroll() || tries++ > 25) return;
+                setTimeout(tick, 60);
+            };
+            setTimeout(tick, 30);
         });
         return;
     }
-    _scrollSchedaDividerIntoView();
+    if (!tryScroll()) {
+        // Fallback: se per qualche motivo non riusciamo a trovare il target,
+        // proviamo dopo un breve delay.
+        setTimeout(tryScroll, 80);
+    }
 };
 
 window.schedaToggleSubsection = function(titleEl) {
@@ -5242,6 +5277,11 @@ window.schedaOpenInventoryPage = async function(pgId) {
     const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
     if (!pg) return;
     _schedaPgCache = pg;
+    // Tracciamo la tab corrente cosi' il bottone "Vai a Statistiche" sa che
+    // deve prima navigare a Pagina 1 e poi scrollare. Senza questo flag il
+    // valore restava quello della tab precedente e il bottone non funzionava.
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'inventario';
 
     const monete = pg.monete || {};
     const coinCellHtml = (c) => {
@@ -12369,6 +12409,16 @@ async function renderMicroScheda(personaggioId) {
 
     const backBtn = document.getElementById('schedaBackBtn');
     if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+
+    // Se richiesto, centra la vista sul blocco PV/PV temp/Iniziativa.
+    if (window._schedaPendingScrollToStats) {
+        window._schedaPendingScrollToStats = false;
+        setTimeout(() => {
+            const target = content.querySelector('.scheda-hp-section')
+                        || content.querySelector('.scheda-three-boxes');
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
+    }
 }
 
 window.microSlotToggle = async function(pgId, level, index) {

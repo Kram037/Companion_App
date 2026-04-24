@@ -4,15 +4,80 @@ function clearActiveSession() {
     updateReturnToSessionBtn();
 }
 
+// Quando esiste una sessione attiva e l'utente non e' gia' nella pagina
+// sessione/combattimento, applichiamo la classe `glow-return-session` ai
+// back-button rossi flottanti delle altre pagine. Il click su questi
+// pulsanti viene intercettato da un capture-phase listener globale e
+// reindirizzato alla sessione (o al combattimento se in corso) invece di
+// eseguire la normale navigazione "indietro".
 function updateReturnToSessionBtn() {
-    const btn = document.getElementById('btnReturnSession');
-    if (!btn) return;
     const isSessionPage = AppState.currentPage === 'sessione' || AppState.currentPage === 'combattimento';
-    const isDettagliOfActiveSession = AppState.currentPage === 'dettagli'
-        && AppState.currentCampagnaId === AppState.activeSessionCampagnaId;
-    const show = AppState.activeSessionCampagnaId && !isSessionPage && !isDettagliOfActiveSession;
-    btn.style.display = show ? 'flex' : 'none';
+    const shouldGlow = !!AppState.activeSessionCampagnaId && !isSessionPage;
+    document.querySelectorAll('.back-button-floating').forEach(btn => {
+        if (btn.classList.contains('combat-back')) return;
+        if (btn.dataset && btn.dataset.noReturnGlow) return;
+        btn.classList.toggle('glow-return-session', shouldGlow);
+        if (shouldGlow) {
+            btn.setAttribute('aria-label', 'Ritorna alla sessione/combattimento');
+            btn.setAttribute('title', 'Ritorna alla sessione/combattimento');
+        } else {
+            btn.removeAttribute('title');
+        }
+    });
 }
+
+// Verifica se la sessione attiva ha attualmente un combattimento in corso
+// (presenza di richieste tiro iniziativa per quella sessione).
+async function _isCombatInProgress(sessioneId) {
+    if (!sessioneId) return false;
+    const supabase = getSupabaseClient();
+    if (!supabase) return false;
+    try {
+        const { data } = await supabase
+            .from('richieste_tiro_iniziativa')
+            .select('id')
+            .eq('sessione_id', sessioneId)
+            .limit(1);
+        return !!(data && data.length);
+    } catch (_) {
+        return false;
+    }
+}
+
+async function _returnToActiveSessionOrCombat() {
+    const campagnaId = AppState.activeSessionCampagnaId;
+    if (!campagnaId) return false;
+    const sessione = await getSessioneAttiva(campagnaId);
+    if (!sessione) {
+        clearActiveSession();
+        showNotification('La sessione e\' terminata');
+        return false;
+    }
+    const inCombat = await _isCombatInProgress(sessione.id);
+    if (inCombat) {
+        AppState.currentCampagnaId = campagnaId;
+        AppState.currentSessioneId = sessione.id;
+        sessionStorage.setItem('currentCampagnaId', campagnaId);
+        sessionStorage.setItem('currentSessioneId', sessione.id);
+        navigateToPage('combattimento');
+    } else {
+        if (typeof openSessionePage === 'function') {
+            openSessionePage(campagnaId);
+        }
+    }
+    return true;
+}
+
+// Capture-phase global listener: intercetta i click sui back button con
+// glow-return-session prima che gli handler specifici possano agire.
+document.addEventListener('click', function(e) {
+    const btn = e.target && e.target.closest && e.target.closest('.back-button-floating.glow-return-session');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    _returnToActiveSessionOrCombat();
+}, true);
 
 function updateScrollStatsBtn() {
     const btn = document.getElementById('btnScrollStats');

@@ -568,20 +568,9 @@ function setupEventListeners() {
         });
     }
 
-    const btnReturnSession = document.getElementById('btnReturnSession');
-    if (btnReturnSession) {
-        btnReturnSession.addEventListener('click', async () => {
-            const campagnaId = AppState.activeSessionCampagnaId;
-            if (!campagnaId) return;
-            const isActive = await checkSessioneAttiva(campagnaId);
-            if (isActive) {
-                openSessionePage(campagnaId);
-            } else {
-                clearActiveSession();
-                showNotification('La sessione è terminata');
-            }
-        });
-    }
+    // Il vecchio bottone "Ritorna alla sessione" e' stato rimosso: ora il
+    // ritorno avviene cliccando il back-button rosso flottante, che si
+    // illumina (classe glow-return-session) quando esiste una sessione attiva.
 
     const richiediTiroModal = document.getElementById('richiediTiroModal');
     const closeRichiediTiroBtn = document.getElementById('closeRichiediTiroModal');
