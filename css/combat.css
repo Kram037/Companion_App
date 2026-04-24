@@ -203,7 +203,10 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 999px;
-    max-width: 100%;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: calc(50% - 3px);
+    box-sizing: border-box;
     font-size: 0.78rem;
     line-height: 1.1;
     box-shadow: var(--shadow-sm);
@@ -242,7 +245,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 220px;
+    max-width: 100%;
 }
 .combat-timer-meta {
     display: flex;
@@ -406,6 +409,7 @@
 @media (max-width: 480px) {
     .combat-timer-conditions { grid-template-columns: repeat(2, 1fr); }
     .combat-timer-duration-row { grid-template-columns: 1fr 70px auto; }
+    .combat-timer-chip { max-width: 100%; }
 }
 
 /* Monster skill check items */
