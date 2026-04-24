@@ -2572,6 +2572,195 @@
        su tutti tranne le ultime due righe (best-effort). */
     .inv-items-grid > .inv-item-row:nth-last-child(-n+2) { border-bottom: none; }
 }
+
+/* ── Inventario v2: tabella sempre aperta, 2 colonne anche su mobile,
+   card compatte con drag & drop e nome troncato. ─────────────────── */
+.inv-items-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 8px;
+    row-gap: 4px;
+}
+@media (min-width: 768px) {
+    .inv-items-grid-2col {
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--spacing-md);
+    }
+}
+.inv-items-grid-2col .inv-item-row {
+    padding: 6px 8px 6px 6px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    min-width: 0;
+}
+.inv-items-grid-2col .inv-item-row.inv-item-card {
+    margin-bottom: 0;
+}
+.inv-items-grid-2col .inv-item-name {
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    min-width: 0;
+}
+.inv-items-grid-2col .inv-item-meta {
+    font-size: 0.68rem;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.inv-items-grid-2col .inv-item-main { min-width: 0; }
+.inv-items-grid-2col .inv-item-qty-edit {
+    padding: 2px 4px;
+    font-size: 0.75rem;
+}
+.inv-items-grid-2col .inv-item-qty-input {
+    width: 32px;
+    font-size: 0.78rem;
+}
+
+/* Drag handle a sinistra di ogni card. */
+.inv-item-handle {
+    flex: 0 0 auto;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    line-height: 1;
+    padding: 0 2px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    letter-spacing: -2px;
+    opacity: 0.55;
+    transition: opacity 0.12s;
+}
+.inv-item-handle:hover { opacity: 1; }
+.inv-item-row.inv-item-dragging {
+    opacity: 0.6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    transform: scale(0.98);
+    cursor: grabbing;
+}
+.inv-item-handle:active { cursor: grabbing; }
+
+/* Sezione Inventario "fissa" (non collassabile): titolo non cliccabile e
+   sempre con la freccia/indicatore disattivati. */
+.inv-section-fixed > .scheda-section-body { display: block !important; }
+.inv-section-title-fixed {
+    cursor: default !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+}
+.inv-section-title-fixed::after { display: none !important; }
+.inv-section-title-fixed > span:first-child { flex: 1; }
+.inv-section-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.inv-list-filters-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.inv-list-filters-btn:hover { color: var(--primary); border-color: var(--primary); }
+.inv-list-filters-btn.active {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb, 168, 85, 247), 0.10);
+}
+.inv-list-filters-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    border-radius: 7px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.inv-list-search-bar {
+    padding: 8px 10px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+.inv-list-search-input {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    background: var(--surface-alt, var(--background));
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+}
+.inv-list-search-input:focus { border-color: var(--primary); }
+.inv-list-filters-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+}
+.inv-list-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1 1 130px;
+}
+.inv-list-filter-field label {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+.inv-list-filter-field select {
+    padding: 4px 6px;
+    font-size: 0.8rem;
+    background: var(--surface-alt, var(--background));
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 100%;
+}
+.inv-list-filter-reset {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.inv-list-filter-reset:hover { color: var(--primary); border-color: var(--primary); }
 .inv-item-main { flex: 1; min-width: 0; }
 .inv-item-name { font-size: 0.9rem; color: var(--text); font-weight: 500; }
 .inv-item-meta {

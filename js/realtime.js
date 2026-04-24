@@ -512,7 +512,22 @@ async function refreshCurrentPageData() {
         } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
         } else if (page === 'scheda' && AppState.currentPersonaggioId) {
-            await renderSchedaPersonaggio(AppState.currentPersonaggioId);
+            // Mantieni la tab attualmente visualizzata: senza questo
+            // controllo qualunque evento realtime (anche generato da un
+            // altro utente nella stessa campagna) riportava l'utente
+            // alla "Pagina 1" della scheda mentre stava navigando in
+            // Inventario / Incantesimi / Privilegi.
+            const tab = window._schedaCurrentTab;
+            const pgId = AppState.currentPersonaggioId;
+            if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') {
+                await schedaOpenInventoryPage(pgId);
+            } else if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
+                await schedaOpenSpellPage(pgId);
+            } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
+                await schedaOpenPrivilegesPage(pgId);
+            } else {
+                await renderSchedaPersonaggio(pgId);
+            }
         }
     } catch (error) {
         console.warn('⚠️ Errore refresh pagina corrente:', error);

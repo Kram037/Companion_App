@@ -5269,6 +5269,299 @@ function _formatGoldTotal(g) {
     return g.toFixed(2).replace(/\.?0+$/, '');
 }
 
+// ──────────────────────────────────────────────────────────────────────
+// State + helpers per la lista oggetti dell'Inventario:
+//   - search testuale (nome / tipo / sotto-tipo / rarita')
+//   - filtri rarita' + tipologia (toggleable via icona imbuto)
+//   - drag & drop per riordinare gli oggetti (HTML5 + pointer events
+//     per supportare anche il touch). L'ordine viene salvato come
+//     ordine dell'array pg.inventario stesso (no campo separato).
+// ──────────────────────────────────────────────────────────────────────
+window._invListState = window._invListState || {
+    search: '',
+    filters: { rarita: '', tipo: '' },
+    filtersOpen: false,
+};
+
+function _invListItemView(o) {
+    return _invResolveLive(o);
+}
+
+function _invListItemRarity(view) {
+    return view._homebrew_rarita || view.rarita || '';
+}
+
+function _invListItemTipo(view) {
+    return view._homebrew_tipo || view.tipo || '';
+}
+
+function _invListMatches(view) {
+    const st = window._invListState || {};
+    const f = st.filters || {};
+    if (f.rarita) {
+        const r = String(_invListItemRarity(view) || '').trim();
+        if (r !== f.rarita) return false;
+    }
+    if (f.tipo) {
+        const t = String(_invListItemTipo(view) || '').trim();
+        if (t !== f.tipo) return false;
+    }
+    const q = (st.search || '').trim().toLowerCase();
+    if (q) {
+        const txt = [
+            _invDisplayName(view) || view.nome || '',
+            view.nome_en || '',
+            _invListItemTipo(view),
+            view._homebrew_sotto_tipo || view.sotto_tipo || '',
+            _invListItemRarity(view),
+        ].join(' ').toLowerCase();
+        if (!txt.includes(q)) return false;
+    }
+    return true;
+}
+
+function _invListBuildRowsHtml(pg, pgId) {
+    const oggetti = pg.inventario || [];
+    if (oggetti.length === 0) {
+        return '<span class="scheda-empty">Nessun oggetto</span>';
+    }
+    const visible = [];
+    oggetti.forEach((o, i) => {
+        const view = _invListItemView(o);
+        if (_invListMatches(view)) visible.push({ view, i });
+    });
+    if (visible.length === 0) {
+        return '<span class="scheda-empty">Nessun oggetto corrisponde ai filtri</span>';
+    }
+    return visible.map(({ view, i }) => {
+        const magicStr = view.magic_bonus
+            ? ` <span class="inv-magic-badge">+${view.magic_bonus}</span>` : '';
+        const hbBadge = view._homebrew_id
+            ? ' <span class="inv-hb-badge" title="Homebrew">HB</span>' : '';
+        let meta = '';
+        if (view._homebrew_id) {
+            meta = view._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
+                ? window.formatOggettoMeta({
+                    tipo: view._homebrew_tipo,
+                    sotto_tipo: view._homebrew_sotto_tipo,
+                    rarita: view._homebrew_rarita,
+                    incantamento: view._homebrew_incantamento,
+                    richiede_sintonia: view._homebrew_richiede_sintonia,
+                    sintonia_dettaglio: view._homebrew_sintonia_dettaglio,
+                }) : '');
+        } else if (view.rarita) {
+            meta = (typeof window.formatOggettoMeta === 'function')
+                ? window.formatOggettoMeta(view) : '';
+        }
+        const rarClass = _invRarityClass(_invListItemRarity(view));
+        return `<div class="inv-item-row inv-item-card ${rarClass}" data-idx="${i}">
+            <span class="inv-item-handle" title="Trascina per riordinare">⋮⋮</span>
+            <div class="inv-item-main">
+                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+                ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
+            </div>
+            <div class="inv-item-qty-edit" title="Quantita'">
+                <span class="inv-item-qty-x">×</span>
+                <input type="number" class="inv-item-qty-input" min="1" step="1"
+                    value="${view.quantita || 1}"
+                    onclick="event.stopPropagation();this.select();"
+                    onchange="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onblur="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function _invListReRender(pgId) {
+    const pg = _schedaPgCache;
+    const cont = document.getElementById('invItemsList');
+    if (!pg || !cont) return;
+    cont.innerHTML = _invListBuildRowsHtml(pg, pgId);
+    _invListInitDnD(pgId);
+}
+
+function _invListOptionsFor(pg, field) {
+    const set = new Set();
+    (pg.inventario || []).forEach(o => {
+        const view = _invListItemView(o);
+        const v = field === 'rarita' ? _invListItemRarity(view) : _invListItemTipo(view);
+        const s = String(v || '').trim();
+        if (s) set.add(s);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'));
+}
+
+function _invListActiveFilterCount() {
+    const f = (window._invListState && window._invListState.filters) || {};
+    return (f.rarita ? 1 : 0) + (f.tipo ? 1 : 0);
+}
+
+function _invListRenderFiltersBadge() {
+    const badge = document.getElementById('invListFiltersBadge');
+    if (!badge) return;
+    const n = _invListActiveFilterCount();
+    badge.textContent = n ? String(n) : '';
+    badge.style.display = n ? 'inline-flex' : 'none';
+    const btn = document.getElementById('invListFiltersBtn');
+    if (btn) btn.classList.toggle('active', n > 0 || window._invListState?.filtersOpen);
+}
+
+function _invListRenderFiltersPanel(pgId) {
+    const panel = document.getElementById('invListFiltersPanel');
+    if (!panel) return;
+    const pg = _schedaPgCache;
+    if (!pg) { panel.innerHTML = ''; return; }
+    const f = window._invListState.filters || {};
+    const rarOpts = _invListOptionsFor(pg, 'rarita');
+    const tipOpts = _invListOptionsFor(pg, 'tipo');
+    panel.innerHTML = `
+        <div class="inv-list-filter-field">
+            <label>Rarità</label>
+            <select onchange="invListSetFilter('rarita', this.value, '${pgId}')">
+                <option value="">Tutte</option>
+                ${rarOpts.map(v => `<option value="${escapeHtml(v)}" ${f.rarita === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <div class="inv-list-filter-field">
+            <label>Tipologia</label>
+            <select onchange="invListSetFilter('tipo', this.value, '${pgId}')">
+                <option value="">Tutte</option>
+                ${tipOpts.map(v => `<option value="${escapeHtml(v)}" ${f.tipo === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <button type="button" class="inv-list-filter-reset" onclick="invListResetFilters('${pgId}')">Pulisci</button>
+    `;
+}
+
+window.invListToggleFilters = function(pgId) {
+    window._invListState.filtersOpen = !window._invListState.filtersOpen;
+    const bar = document.getElementById('invListSearchBar');
+    if (bar) bar.style.display = window._invListState.filtersOpen ? '' : 'none';
+    if (window._invListState.filtersOpen) {
+        _invListRenderFiltersPanel(pgId);
+        const inp = document.getElementById('invListSearch');
+        if (inp) setTimeout(() => inp.focus(), 30);
+    }
+    _invListRenderFiltersBadge();
+};
+
+window.invListOnSearch = function(value, pgId) {
+    window._invListState.search = value || '';
+    _invListReRender(pgId);
+};
+
+window.invListSetFilter = function(field, value, pgId) {
+    window._invListState.filters = window._invListState.filters || {};
+    window._invListState.filters[field] = value || '';
+    _invListReRender(pgId);
+    _invListRenderFiltersBadge();
+};
+
+window.invListResetFilters = function(pgId) {
+    window._invListState.filters = { rarita: '', tipo: '' };
+    _invListRenderFiltersPanel(pgId);
+    _invListReRender(pgId);
+    _invListRenderFiltersBadge();
+};
+
+// Drag & drop cross-platform (mouse + touch via pointer events). Lo
+// "handle" e' il pallino di trascinamento a sinistra di ogni card; al
+// drop l'array pg.inventario viene riarrangiato e salvato su DB.
+function _invListInitDnD(pgId) {
+    const list = document.getElementById('invItemsList');
+    if (!list) return;
+    // Quando filtri/search sono attivi disabilitiamo il drag: un riordino
+    // parziale rischierebbe di rimescolare gli oggetti nascosti in modo
+    // confuso per l'utente.
+    const filterActive = !!(window._invListState?.search || _invListActiveFilterCount() > 0);
+    const rows = list.querySelectorAll('.inv-item-row[data-idx]');
+    rows.forEach(row => {
+        const handle = row.querySelector('.inv-item-handle');
+        if (!handle) return;
+        if (filterActive) {
+            handle.style.opacity = '0.25';
+            handle.title = 'Pulisci ricerca/filtri per riordinare';
+            handle.style.cursor = 'not-allowed';
+            return;
+        }
+        handle.addEventListener('pointerdown', function(e) {
+            if (e.button !== undefined && e.button !== 0) return;
+            e.preventDefault();
+            _invListStartDrag(pgId, e, row, handle);
+        });
+    });
+}
+
+function _invListStartDrag(pgId, ev, row, handle) {
+    const list = document.getElementById('invItemsList');
+    if (!list) return;
+    const startY = ev.clientY;
+    const startX = ev.clientX;
+    let didMove = false;
+    try { handle.setPointerCapture(ev.pointerId); } catch (_) {}
+
+    const onMove = (e) => {
+        const dy = Math.abs(e.clientY - startY);
+        const dx = Math.abs(e.clientX - startX);
+        if (!didMove && (dy > 6 || dx > 6)) {
+            didMove = true;
+            row.classList.add('inv-item-dragging');
+        }
+        if (!didMove) return;
+        const others = Array.from(list.querySelectorAll('.inv-item-row[data-idx]'))
+            .filter(el => el !== row);
+        let closest = null;
+        let closestDist = Number.POSITIVE_INFINITY;
+        for (const el of others) {
+            const box = el.getBoundingClientRect();
+            const cy = box.top + box.height / 2;
+            const dist = Math.abs(e.clientY - cy);
+            if (dist < closestDist) { closestDist = dist; closest = el; }
+        }
+        if (closest) {
+            const box = closest.getBoundingClientRect();
+            const before = e.clientY < box.top + box.height / 2;
+            if (before) list.insertBefore(row, closest);
+            else list.insertBefore(row, closest.nextSibling);
+        }
+    };
+
+    const onUp = async (e) => {
+        handle.removeEventListener('pointermove', onMove);
+        handle.removeEventListener('pointerup', onUp);
+        handle.removeEventListener('pointercancel', onUp);
+        try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+        if (!didMove) return;
+        row.classList.remove('inv-item-dragging');
+        const newOrder = Array.from(list.querySelectorAll('.inv-item-row[data-idx]'))
+            .map(el => parseInt(el.dataset.idx, 10))
+            .filter(n => !Number.isNaN(n));
+        await _invListReorderInventario(pgId, newOrder);
+    };
+
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    handle.addEventListener('pointercancel', onUp);
+}
+
+async function _invListReorderInventario(pgId, newOrder) {
+    const pg = _schedaPgCache;
+    if (!pg || !Array.isArray(pg.inventario)) return;
+    const old = pg.inventario;
+    if (newOrder.length !== old.length) return;
+    pg.inventario = newOrder.map(i => old[i]);
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        try {
+            await supabase.from('personaggi').update({ inventario: pg.inventario, updated_at: new Date().toISOString() }).eq('id', pgId);
+        } catch (e) {
+            console.warn('[inv] errore salvataggio riordino:', e);
+        }
+    }
+    _invListReRender(pgId);
+}
+
 window.schedaOpenInventoryPage = async function(pgId) {
     const content = document.getElementById('schedaContent');
     if (!content) return;
@@ -5311,44 +5604,10 @@ window.schedaOpenInventoryPage = async function(pgId) {
         ${coinCellHtml(COIN_TYPES[4])}${totalCellHtml}
     </div>`;
 
-    const oggetti = pg.inventario || [];
-    const oggettiRows = oggetti.length > 0 ? oggetti.map((o, i) => {
-        const view = _invResolveLive(o);
-        const magicStr = view.magic_bonus ? ` <span class="inv-magic-badge">+${view.magic_bonus}</span>` : '';
-        const hbBadge = view._homebrew_id ? ' <span class="inv-hb-badge" title="Homebrew">HB</span>' : '';
-        // Riga meta sotto il nome (Tipo (sotto-tipo), rarità (richiede sintonia)).
-        let meta = '';
-        if (view._homebrew_id) {
-            meta = view._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
-                ? window.formatOggettoMeta({
-                    tipo: view._homebrew_tipo,
-                    sotto_tipo: view._homebrew_sotto_tipo,
-                    rarita: view._homebrew_rarita,
-                    incantamento: view._homebrew_incantamento,
-                    richiede_sintonia: view._homebrew_richiede_sintonia,
-                    sintonia_dettaglio: view._homebrew_sintonia_dettaglio,
-                }) : '');
-        } else if (view.rarita) {
-            meta = (typeof window.formatOggettoMeta === 'function')
-                ? window.formatOggettoMeta(view) : '';
-        }
-        const rarClass = _invRarityClass(view._homebrew_rarita || view.rarita);
-        return `<div class="inv-item-row ${rarClass}">
-            <div class="inv-item-main">
-                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
-                ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
-            </div>
-            <div class="inv-item-qty-edit" title="Quantita'">
-                <span class="inv-item-qty-x">×</span>
-                <input type="number" class="inv-item-qty-input" min="1" step="1"
-                    value="${view.quantita || 1}"
-                    onclick="event.stopPropagation();this.select();"
-                    onchange="invQtyInlineUpdate('${pgId}',${i},this.value)"
-                    onblur="invQtyInlineUpdate('${pgId}',${i},this.value)"
-                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
-            </div>
-        </div>`;
-    }).join('') : '<span class="scheda-empty">Nessun oggetto</span>';
+    // Le righe degli oggetti vengono generate da _invListBuildRowsHtml,
+    // cosi' search/filtri/drag&drop possono ri-renderizzare la lista
+    // senza ricaricare l'intera pagina.
+    const oggettiRowsHtml = _invListBuildRowsHtml(pg, pgId);
 
     const sintonia = pg.sintonia || [];
     const maxSintonia = 3;
@@ -5391,18 +5650,40 @@ window.schedaOpenInventoryPage = async function(pgId) {
         </div>
     </div>
 
-    <div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Tesoro
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();invAddItem('${pgId}')" title="Aggiungi">&#9998;</button>
+    <div class="scheda-section inv-section-fixed">
+        <div class="scheda-section-title inv-section-title-fixed">
+            <span>Inventario</span>
+            <div class="inv-section-actions">
+                <button type="button" id="invListFiltersBtn" class="inv-list-filters-btn" onclick="invListToggleFilters('${pgId}')" title="Filtri e ricerca" aria-label="Filtri">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    <span class="inv-list-filters-badge" id="invListFiltersBadge"></span>
+                </button>
+                <button class="scheda-edit-btn" onclick="invAddItem('${pgId}')" title="Aggiungi oggetto">&#9998;</button>
+            </div>
+        </div>
+        <div id="invListSearchBar" class="inv-list-search-bar" style="display:none;">
+            <input type="text" id="invListSearch" class="inv-list-search-input" placeholder="Cerca per nome o tipo..."
+                value="${escapeHtml(window._invListState?.search || '')}"
+                oninput="invListOnSearch(this.value,'${pgId}')">
+            <div id="invListFiltersPanel" class="inv-list-filters-panel"></div>
         </div>
         <div class="scheda-section-body">
-            <div id="invItemsList" class="inv-items-grid">${oggettiRows}</div>
+            <div id="invItemsList" class="inv-items-grid inv-items-grid-2col">${oggettiRowsHtml}</div>
         </div>
     </div>
     `;
 
     schedaSetActiveTab('inventario');
     schedaWireTabBar(pgId);
+    _invListInitDnD(pgId);
+    if (window._invListState?.filtersOpen) {
+        const bar = document.getElementById('invListSearchBar');
+        if (bar) bar.style.display = '';
+        _invListRenderFiltersPanel(pgId);
+    }
+    _invListRenderFiltersBadge();
 };
 
 window.invCoinChange = async function(pgId, coinKey, delta) {
@@ -5931,7 +6212,7 @@ window._invShowItemPreview = function(pgId, source, id) {
         <div class="inv-preview-desc">${descHtml}</div>
         <div class="dialog-actions inv-preview-actions">
             <button type="button" class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">← Indietro</button>
-            <button type="button" class="btn-primary" id="invPreviewAddBtn">Aggiungi al tesoro</button>
+            <button type="button" class="btn-primary" id="invPreviewAddBtn">Aggiungi all'inventario</button>
         </div>
     </div>`;
     document.body.appendChild(overlay);
@@ -10781,7 +11062,7 @@ window.schedaOpenAddEquip = function(pgId) {
         'guerra_distanza': 'Armi a Distanza da Guerra'
     };
 
-    // Sezione "Dal tuo Tesoro": oggetti magici/homebrew dell'inventario
+    // Sezione "Dal tuo Inventario": oggetti magici/homebrew dell'inventario
     // classificati come Arma/Armatura/Scudo. Cliccandoli si avvia un
     // flusso di equip (con scelta del tipo D&D di base se ambiguo).
     const invSplit = _schedaInvWeaponsArmors(_schedaPgCache);
@@ -10797,11 +11078,11 @@ window.schedaOpenAddEquip = function(pgId) {
         </div>`;
     };
     const tesoroArmiHtml = invSplit.armi.length
-        ? `<div class="scheda-picker-cat">Dal tuo Tesoro</div>${
+        ? `<div class="scheda-picker-cat">Dal tuo Inventario</div>${
             invSplit.armi.map(({ index, view }) => _invRowHtml('schedaAddArmaFromInventory', view, index)).join('')
         }` : '';
     const tesoroArmatureHtml = (invSplit.armature.length || invSplit.scudi.length)
-        ? `<div class="scheda-picker-cat">Dal tuo Tesoro</div>${
+        ? `<div class="scheda-picker-cat">Dal tuo Inventario</div>${
             [...invSplit.scudi, ...invSplit.armature]
                 .map(({ index, view }) => _invRowHtml('schedaAddArmaturaFromInventory', view, index)).join('')
         }` : '';
