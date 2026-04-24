@@ -16,6 +16,14 @@ function updateReturnToSessionBtn() {
     if (btn) {
         btn.style.display = shouldShow ? 'inline-flex' : 'none';
     }
+    // Se la pagina attiva ha gia' un back-button-floating in basso a sinistra,
+    // contrassegnamo il body cosi' il CSS sposta il return-btn poco piu' in
+    // alto per non sovrapporre i due controlli.
+    try {
+        const activePage = document.querySelector('.page.active');
+        const hasBack = !!(activePage && activePage.querySelector('.back-button-floating'));
+        document.body.classList.toggle('has-page-back', !!hasBack);
+    } catch (_) {}
 }
 
 // Verifica se la sessione attiva ha attualmente un combattimento in corso

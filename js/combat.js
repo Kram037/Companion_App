@@ -232,10 +232,38 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         // diverse per DM e player).
         await renderCombatTimers(sessioneId, isDM, myPgId);
 
+        // Sincronizza lo scroll verticale tra la colonna delle icone (sx) e
+        // quella delle card (dx) in modo che le righe restino sempre
+        // allineate anche quando ci sono molte creature in iniziativa.
+        _attachCombatScrollSync();
+
     } catch (error) {
         console.error('Errore rendering combattimento:', error);
         cardsCol.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
     }
+}
+
+// Allinea lo scroll delle due colonne del combat (icone a sx, card a dx)
+// in modo che le righe restino visivamente sincronizzate. Senza questa
+// sync, scrollando una colonna l'altra resta ferma e i due lati si
+// disallineano. Idempotente: riattacca i listener solo una volta.
+let _combatScrollSyncAttached = false;
+function _attachCombatScrollSync() {
+    if (_combatScrollSyncAttached) return;
+    const initCol = document.getElementById('combatInitCol');
+    const cardsCol = document.getElementById('combattimentoContent');
+    if (!initCol || !cardsCol) return;
+    let lock = false;
+    const sync = (src, dst) => {
+        if (lock) return;
+        lock = true;
+        dst.scrollTop = src.scrollTop;
+        // Sblocca al frame successivo per evitare loop reciproci.
+        requestAnimationFrame(() => { lock = false; });
+    };
+    initCol.addEventListener('scroll', () => sync(initCol, cardsCol), { passive: true });
+    cardsCol.addEventListener('scroll', () => sync(cardsCol, initCol), { passive: true });
+    _combatScrollSyncAttached = true;
 }
 
 async function getCurrentInternalUserId() {
@@ -2287,14 +2315,21 @@ window.combatOpenTimerDialog = async function(campagnaId, sessioneId, mode, forc
     overlay.id = 'combatTimerOverlay';
     overlay.className = 'hp-calc-overlay';
 
-    const condCheckboxes = ALL_CONDITIONS.map(c => `
-        <label class="pg-condition-item"><input type="checkbox" data-cond="${c.key}"> ${c.label}</label>
+    // Condizioni: chip compatte sempre visibili, niente scroll. Le label
+    // sono brevi quindi entrano in 4-5 righe da 3 colonne anche su mobile.
+    const condChips = ALL_CONDITIONS.map(c => `
+        <label class="combat-timer-cond-chip">
+            <input type="checkbox" data-cond="${c.key}">
+            <span>${c.label}</span>
+        </label>
     `).join('');
 
+    // Tendina target mostro per il DM (segue lo stile generico dei select
+    // dell'app - vedi combat-timer-field select / .scheda-input).
     const targetSelector = mode === 'dm' ? `
         <div class="combat-timer-field">
             <label>Target</label>
-            <select id="combatTimerTarget">
+            <select id="combatTimerTarget" class="combat-timer-select">
                 <option value="global">Globale (nessun target)</option>
                 ${monsters.map(m => `<option value="monster:${m.id}:${escapeHtml(m.nome).replace(/"/g, '&quot;')}">Mostro - ${escapeHtml(m.nome)}</option>`).join('')}
             </select>
@@ -2309,24 +2344,26 @@ window.combatOpenTimerDialog = async function(campagnaId, sessioneId, mode, forc
                     <input type="text" id="combatTimerName" placeholder="Es. Bagliore Lunare, Veleno..." maxlength="60" />
                 </div>
                 <div class="combat-timer-field">
-                    <label>Durata (round)</label>
+                    <label>Durata</label>
                     <div class="combat-timer-duration-row">
-                        <input type="number" id="combatTimerRounds" min="1" max="999" value="10" />
-                        <div class="combat-timer-presets">
-                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=1">1r</button>
-                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=10">1m (10r)</button>
-                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=100">10m (100r)</button>
-                            <button type="button" class="btn-secondary btn-tiny" onclick="document.getElementById('combatTimerRounds').value=600">1h (600r)</button>
-                        </div>
+                        <select id="combatTimerPreset" class="combat-timer-select"
+                                onchange="document.getElementById('combatTimerRounds').value = this.value">
+                            <option value="1">1 round</option>
+                            <option value="10" selected>1 min (10r)</option>
+                            <option value="100">10 min (100r)</option>
+                            <option value="600">1 ora (600r)</option>
+                        </select>
+                        <input type="number" id="combatTimerRounds" min="1" max="9999" value="10" title="Round (modificabile)" />
+                        <span class="combat-timer-duration-suffix">round</span>
                     </div>
                 </div>
                 ${targetSelector}
                 <div class="combat-timer-field">
-                    <label>Condizioni applicate (opzionali)</label>
-                    <div class="pg-conditions-grid combat-timer-conditions">${condCheckboxes}</div>
+                    <label>Condizioni applicate <span class="combat-timer-field-hint">(opzionali)</span></label>
+                    <div class="combat-timer-conditions">${condChips}</div>
                 </div>
             </div>
-            <div class="hp-calc-actions" style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+            <div class="combat-timer-actions">
                 <button class="btn-secondary btn-small" onclick="combatCloseTimerDialog()">Annulla</button>
                 <button class="btn-primary btn-small" onclick="combatSaveTimer('${campagnaId}','${sessioneId}','${mode}','${forcedPgId || ''}')">Avvia</button>
             </div>

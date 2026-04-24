@@ -2994,7 +2994,7 @@ window.labViewNemico = async function(id) {
         const hasUsi = a.usi_max > 0;
         const usiCur = a.usi_attuali ?? a.usi_max;
         const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_, i) =>
-            `<span class="monster-action-use-pip ${i < usiCur ? 'filled' : ''}" onclick="labMonsterToggleAttackUse('${m.id}',${ai},${i})"></span>`).join('')}</span>` : '';
+            `<span class="monster-action-use-pip ${i < usiCur ? 'filled' : ''}" onclick="labMonsterToggleAttackUse('${m.id}',${ai},${i},event)"></span>`).join('')}</span>` : '';
         return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
     }).join('') : '';
 
@@ -3029,7 +3029,7 @@ window.labViewNemico = async function(id) {
             const s = slots[lvl];
             const cur = s.current ?? s.max;
             const pips = Array.from({length: s.max}, (_, i) =>
-                `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}" onclick="labMonsterToggleSpellSlot('${m.id}',${lvl},${i})"></span>`
+                `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}" onclick="labMonsterToggleSpellSlot('${m.id}',${lvl},${i},event)"></span>`
             ).join('');
             return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${cur}/${s.max}</span></div>`;
         }).join('');
@@ -3079,42 +3079,95 @@ window.labViewNemico = async function(id) {
     document.body.style.overflow = 'hidden';
 };
 
+// Helper interno: aggiorna in modo OTTIMISTICO il numero di pallini "filled"
+// in un container DOM. Cosi' il click si vede subito senza aspettare il
+// roundtrip su Supabase (e senza il flicker dovuto al re-render del modale).
+function _setPipsFilled(container, newCur) {
+    if (!container) return;
+    const pips = container.querySelectorAll('.monster-action-use-pip, .scheda-slot-pip');
+    pips.forEach((p, i) => p.classList.toggle('filled', i < newCur));
+}
+
 // Toggle dei pallini "utilizzi" delle azioni del mostro homebrew. Cliccare
 // un pallino consuma/ripristina gli usi rimanenti e persiste il valore in
 // `attacchi[i].usi_attuali` sulla riga `homebrew_nemici`.
-window.labMonsterToggleAttackUse = async function(monsterId, attackIdx, pipIdx) {
+window.labMonsterToggleAttackUse = async function(monsterId, attackIdx, pipIdx, ev) {
+    if (ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const { data: m } = await supabase.from('homebrew_nemici').select('attacchi').eq('id', monsterId).single();
-    if (!m) return;
+    const { data: m, error: fetchErr } = await supabase.from('homebrew_nemici').select('attacchi').eq('id', monsterId).single();
+    if (fetchErr || !m) {
+        console.warn('Errore fetch attacchi mostro:', fetchErr);
+        return;
+    }
     const attacks = Array.isArray(m.attacchi) ? m.attacchi.map(a => ({...a})) : [];
     const a = attacks[attackIdx];
     if (!a) return;
     const max = a.usi_max || 0;
     if (max <= 0) return;
     const cur = a.usi_attuali ?? max;
-    a.usi_attuali = pipIdx < cur ? pipIdx : pipIdx + 1;
-    if (a.usi_attuali > max) a.usi_attuali = max;
-    if (a.usi_attuali < 0) a.usi_attuali = 0;
-    await supabase.from('homebrew_nemici').update({ attacchi: attacks }).eq('id', monsterId);
+    let newCur = pipIdx < cur ? pipIdx : pipIdx + 1;
+    if (newCur > max) newCur = max;
+    if (newCur < 0) newCur = 0;
+    a.usi_attuali = newCur;
+
+    // Optimistic update visuale: aggiorniamo subito i pallini nel DOM
+    // senza aspettare il salvataggio su Supabase ne' il successivo re-render.
+    try {
+        const pipEl = (ev && ev.target) ? ev.target.closest('.monster-action-use-pip') : null;
+        const container = pipEl ? pipEl.parentElement : document.querySelectorAll('.monster-action-uses')[attackIdx];
+        _setPipsFilled(container, newCur);
+    } catch (_) {}
+
+    const { error } = await supabase.from('homebrew_nemici').update({ attacchi: attacks }).eq('id', monsterId);
+    if (error) {
+        console.error('Errore salvataggio pallini attacco:', error);
+        showNotification('Errore salvataggio: ' + (error.message || error.hint || 'sconosciuto'));
+        return;
+    }
+    // Refresh "leggero": rifacciamo il render solo se la modale non e' stata
+    // chiusa nel frattempo. Questo risolve allineamento eventuali modifiche
+    // collaterali (es. cambio descrizione su un altro client) ma non
+    // resetta lo stato visivo che abbiamo gia' aggiornato in ottico.
     if (typeof labViewNemico === 'function') labViewNemico(monsterId);
 };
 
-window.labMonsterToggleSpellSlot = async function(monsterId, level, pipIdx) {
+window.labMonsterToggleSpellSlot = async function(monsterId, level, pipIdx, ev) {
+    if (ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const { data: m } = await supabase.from('homebrew_nemici').select('slot_incantesimo').eq('id', monsterId).single();
-    if (!m || !m.slot_incantesimo) return;
+    const { data: m, error: fetchErr } = await supabase.from('homebrew_nemici').select('slot_incantesimo').eq('id', monsterId).single();
+    if (fetchErr || !m || !m.slot_incantesimo) {
+        console.warn('Errore fetch slot incantesimo mostro:', fetchErr);
+        return;
+    }
     const slots = { ...m.slot_incantesimo };
     const s = slots[level] ? { ...slots[level] } : null;
     if (!s) return;
     const cur = s.current ?? s.max;
-    s.current = pipIdx < cur ? pipIdx : pipIdx + 1;
-    if (s.current > s.max) s.current = s.max;
-    if (s.current < 0) s.current = 0;
+    let newCur = pipIdx < cur ? pipIdx : pipIdx + 1;
+    if (newCur > s.max) newCur = s.max;
+    if (newCur < 0) newCur = 0;
+    s.current = newCur;
     slots[level] = s;
-    await supabase.from('homebrew_nemici').update({ slot_incantesimo: slots }).eq('id', monsterId);
-    // Re-render rapido del modale per riflettere lo stato salvato.
+
+    try {
+        const pipEl = (ev && ev.target) ? ev.target.closest('.scheda-slot-pip') : null;
+        const container = pipEl ? pipEl.parentElement : null;
+        _setPipsFilled(container, newCur);
+        if (container) {
+            const row = container.closest('.scheda-slot-row');
+            const counter = row ? row.querySelector('.scheda-slot-count') : null;
+            if (counter) counter.textContent = `${newCur}/${s.max}`;
+        }
+    } catch (_) {}
+
+    const { error } = await supabase.from('homebrew_nemici').update({ slot_incantesimo: slots }).eq('id', monsterId);
+    if (error) {
+        console.error('Errore salvataggio slot incantesimo:', error);
+        showNotification('Errore salvataggio: ' + (error.message || error.hint || 'sconosciuto'));
+        return;
+    }
     if (typeof labViewNemico === 'function') labViewNemico(monsterId);
 };
 

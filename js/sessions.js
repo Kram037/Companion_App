@@ -312,7 +312,9 @@ async function renderSessioneContent(campagnaId) {
         `;
 
         await renderSessionePersonaggiCards(campagnaId);
-        await renderSessioneConditions(campagnaId, isDM);
+        // Il vecchio pannello "Stato Personaggi" e' stato rimosso: ora ci
+        // affidiamo alle card personaggi sopra. Manteniamo il div per
+        // retro-compatibilita' (eventuali handler che lo cercano).
 
         // Avvia timer se non già avviato
         if (!window.sessioneTimerInterval) {
