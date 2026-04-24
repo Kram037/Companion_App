@@ -190,8 +190,247 @@ async function loadLabContent() {
         return;
     }
 
+    if (_labCurrentTab === 'incantesimi' || _labCurrentTab === 'oggetti') {
+        _labRenderHomebrewListWithFilters(container, cat, data, _labCurrentTab);
+        return;
+    }
+
     container.innerHTML = `<div class="lab-list">${data.map(item => labRenderCard(item, cat)).join('')}</div>`;
 }
+
+// ============================================================================
+// HOMEBREW LIST: search bar + funnel filters (incantesimi / oggetti)
+// ============================================================================
+
+window._labListState = window._labListState || {};
+window._labListAllData = window._labListAllData || {};
+
+function _labListGetState(tab) {
+    if (!window._labListState[tab]) {
+        window._labListState[tab] = { search: '', filters: {}, filtersOpen: false };
+    }
+    return window._labListState[tab];
+}
+
+function _labListGetFilterDefs(tab) {
+    if (tab === 'incantesimi') {
+        return [
+            {
+                key: 'livello',
+                label: 'Livello',
+                options: () => [
+                    { value: '', label: 'Tutti' },
+                    { value: '0', label: 'Trucchetto' },
+                    { value: '1', label: '1° livello' },
+                    { value: '2', label: '2° livello' },
+                    { value: '3', label: '3° livello' },
+                    { value: '4', label: '4° livello' },
+                    { value: '5', label: '5° livello' },
+                    { value: '6', label: '6° livello' },
+                    { value: '7', label: '7° livello' },
+                    { value: '8', label: '8° livello' },
+                    { value: '9', label: '9° livello' },
+                ],
+                match: (item, value) => String(item.livello ?? '') === String(value),
+            },
+            {
+                key: 'scuola',
+                label: 'Scuola',
+                options: (data) => {
+                    const std = ['Abiurazione','Ammaliamento','Divinazione','Evocazione','Illusione','Invocazione','Necromanzia','Trasmutazione'];
+                    const found = new Set();
+                    (data || []).forEach(it => { if (it.scuola) found.add(it.scuola); });
+                    std.forEach(s => found.add(s));
+                    const opts = [{ value: '', label: 'Tutte' }];
+                    Array.from(found).sort((a,b) => a.localeCompare(b)).forEach(s => opts.push({ value: s, label: s }));
+                    return opts;
+                },
+                match: (item, value) => (item.scuola || '') === value,
+            },
+        ];
+    }
+    if (tab === 'oggetti') {
+        const tipi = (typeof LAB_OGG_TIPI !== 'undefined') ? LAB_OGG_TIPI : [];
+        const rarita = (typeof LAB_OGG_RARITA !== 'undefined') ? LAB_OGG_RARITA : [];
+        return [
+            {
+                key: 'tipo',
+                label: 'Tipo',
+                options: (data) => {
+                    const found = new Set();
+                    (data || []).forEach(it => { if (it.tipo) found.add(it.tipo); });
+                    tipi.forEach(t => found.add(t));
+                    const opts = [{ value: '', label: 'Tutti' }];
+                    Array.from(found).sort((a,b) => a.localeCompare(b)).forEach(t => opts.push({ value: t, label: t }));
+                    return opts;
+                },
+                match: (item, value) => (item.tipo || '') === value,
+            },
+            {
+                key: 'rarita',
+                label: 'Rarità',
+                options: () => {
+                    const opts = [{ value: '', label: 'Tutte' }];
+                    rarita.forEach(r => opts.push({ value: r, label: r }));
+                    return opts;
+                },
+                match: (item, value) => (item.rarita || '') === value,
+            },
+        ];
+    }
+    return [];
+}
+
+function _labListSearchPlaceholder(tab) {
+    if (tab === 'incantesimi') return 'Cerca per nome o scuola...';
+    if (tab === 'oggetti') return 'Cerca per nome o tipo...';
+    return 'Cerca...';
+}
+
+function _labListItemMatchesSearch(tab, item, q) {
+    if (!q) return true;
+    const needle = q.toLowerCase();
+    const fields = [item.nome, item.scuola, item.tipo, item.sotto_tipo, item.rarita];
+    return fields.some(f => typeof f === 'string' && f.toLowerCase().includes(needle));
+}
+
+function _labListApplyFilters(tab, data, state) {
+    const defs = _labListGetFilterDefs(tab);
+    const q = (state.search || '').trim();
+    return (data || []).filter(item => {
+        if (!_labListItemMatchesSearch(tab, item, q)) return false;
+        for (const def of defs) {
+            const val = state.filters[def.key];
+            if (val !== undefined && val !== null && val !== '') {
+                if (!def.match(item, val)) return false;
+            }
+        }
+        return true;
+    });
+}
+
+function _labListActiveFiltersCount(tab) {
+    const state = _labListGetState(tab);
+    let n = 0;
+    if ((state.search || '').trim()) n++;
+    Object.values(state.filters || {}).forEach(v => {
+        if (v !== undefined && v !== null && v !== '') n++;
+    });
+    return n;
+}
+
+function _labListBuildFiltersPanelHtml(tab, data) {
+    const state = _labListGetState(tab);
+    const defs = _labListGetFilterDefs(tab);
+    const fields = defs.map(def => {
+        const opts = def.options(data);
+        const cur = state.filters[def.key] || '';
+        const optsHtml = opts.map(o =>
+            `<option value="${escapeHtml(String(o.value))}" ${String(o.value)===String(cur)?'selected':''}>${escapeHtml(o.label)}</option>`
+        ).join('');
+        return `
+            <div class="inv-list-filter-field">
+                <label>${escapeHtml(def.label)}</label>
+                <select onchange="labListSetFilter('${tab}','${def.key}', this.value)">${optsHtml}</select>
+            </div>`;
+    }).join('');
+    const reset = `<button type="button" class="inv-list-filter-reset" onclick="labListResetFilters('${tab}')">Reset</button>`;
+    return `${fields}${reset}`;
+}
+
+function _labListBuildToolbarHtml(tab, data) {
+    const state = _labListGetState(tab);
+    const open = !!state.filtersOpen;
+    const activeN = _labListActiveFiltersCount(tab);
+    const badgeStyle = activeN > 0 ? 'display:inline-flex;' : '';
+    const filtersPanelHtml = _labListBuildFiltersPanelHtml(tab, data);
+    return `
+    <div class="lab-list-toolbar">
+        <button type="button" id="labListFiltersBtn" class="inv-list-filters-btn ${open?'active':''}" onclick="labListToggleFilters('${tab}')" title="Filtri e ricerca" aria-label="Filtri">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span class="inv-list-filters-badge" id="labListFiltersBadge" style="${badgeStyle}">${activeN || ''}</span>
+        </button>
+    </div>
+    <div id="labListSearchBar" class="inv-list-search-bar lab-list-search-bar" style="${open?'':'display:none;'}">
+        <input type="text" id="labListSearch" class="inv-list-search-input"
+            placeholder="${escapeHtml(_labListSearchPlaceholder(tab))}"
+            value="${escapeHtml(state.search || '')}"
+            oninput="labListOnSearch('${tab}', this.value)">
+        <div id="labListFiltersPanel" class="inv-list-filters-panel">${filtersPanelHtml}</div>
+    </div>`;
+}
+
+function _labRenderHomebrewListWithFilters(container, cat, data, tab) {
+    window._labListAllData[tab] = data;
+    const state = _labListGetState(tab);
+    const filtered = _labListApplyFilters(tab, data, state);
+    const toolbar = _labListBuildToolbarHtml(tab, data);
+    const listHtml = filtered.length === 0
+        ? `<div class="lab-empty">Nessun risultato per i filtri impostati</div>`
+        : `<div class="lab-list">${filtered.map(item => labRenderCard(item, cat)).join('')}</div>`;
+    container.innerHTML = `${toolbar}<div id="labListContainer">${listHtml}</div>`;
+}
+
+function _labListReRenderList(tab) {
+    const cat = LAB_CATEGORIES[tab];
+    const data = window._labListAllData[tab] || [];
+    const state = _labListGetState(tab);
+    const filtered = _labListApplyFilters(tab, data, state);
+    const wrap = document.getElementById('labListContainer');
+    if (!wrap) return;
+    wrap.innerHTML = filtered.length === 0
+        ? `<div class="lab-empty">Nessun risultato per i filtri impostati</div>`
+        : `<div class="lab-list">${filtered.map(item => labRenderCard(item, cat)).join('')}</div>`;
+    _labListRefreshBadge(tab);
+}
+
+function _labListRefreshBadge(tab) {
+    const badge = document.getElementById('labListFiltersBadge');
+    if (!badge) return;
+    const n = _labListActiveFiltersCount(tab);
+    badge.textContent = n || '';
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+}
+
+window.labListToggleFilters = function(tab) {
+    const state = _labListGetState(tab);
+    state.filtersOpen = !state.filtersOpen;
+    const bar = document.getElementById('labListSearchBar');
+    const btn = document.getElementById('labListFiltersBtn');
+    if (bar) bar.style.display = state.filtersOpen ? '' : 'none';
+    if (btn) btn.classList.toggle('active', state.filtersOpen);
+    if (state.filtersOpen) {
+        const inp = document.getElementById('labListSearch');
+        if (inp) setTimeout(() => inp.focus(), 0);
+    }
+};
+
+window.labListOnSearch = function(tab, value) {
+    const state = _labListGetState(tab);
+    state.search = value || '';
+    _labListReRenderList(tab);
+};
+
+window.labListSetFilter = function(tab, key, value) {
+    const state = _labListGetState(tab);
+    if (!state.filters) state.filters = {};
+    if (value === '' || value == null) delete state.filters[key];
+    else state.filters[key] = value;
+    _labListReRenderList(tab);
+};
+
+window.labListResetFilters = function(tab) {
+    const state = _labListGetState(tab);
+    state.search = '';
+    state.filters = {};
+    const inp = document.getElementById('labListSearch');
+    if (inp) inp.value = '';
+    const panel = document.getElementById('labListFiltersPanel');
+    if (panel) panel.innerHTML = _labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || []);
+    _labListReRenderList(tab);
+};
 
 async function _loadLabNemiciSection() {
     const container = document.getElementById('labContent');

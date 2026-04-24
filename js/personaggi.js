@@ -6797,29 +6797,14 @@ window.invEditAttune = function(pgId, idx) {
         ? raw
         : (raw ? { nome: String(raw) } : null);
 
-    const attunable = _schedaInvAttunableItems(pg, idx);
-    const treasureRows = attunable.length ? attunable.map(({ index, view }) => {
-        const ench = view.magic_bonus || view._homebrew_incantamento || 0;
-        const sub = view._homebrew_sotto_tipo || view.sotto_tipo || '';
-        const rar = view._homebrew_rarita || view.rarita || '';
-        const rarClass = _invRarityClass(rar);
-        const subText = [sub, rar].filter(Boolean).join(' · ') || 'Richiede sintonia';
-        return `<button type="button" class="inv-attune-pick-row ${rarClass}"
-                onclick="invAttuneFromTreasure('${pgId}',${idx},${index})">
-            <span class="inv-attune-pick-name">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
-            <span class="inv-attune-pick-sub">${escapeHtml(subText)}</span>
-        </button>`;
-    }).join('') : `<div class="inv-attune-pick-empty">
-            Nessun oggetto che richiede sintonia nel tuo tesoro.<br>
-            <small>Aggiungi prima l'oggetto al tesoro, poi torna qui per assegnarlo a uno slot di sintonia.</small>
-        </div>`;
-
     let currentHtml = '';
+    let pickerHtml = '';
     if (current) {
         const bonus = current.magic_bonus || 0;
         const nameWithEnch = `${escapeHtml(_invDisplayName(current) || 'Oggetto')}${bonus ? ' +' + bonus : ''}`;
         const descHtml = current.descrizione
-            ? `<div class="inv-attune-current-desc">${(typeof window.formatRichText === 'function' ? window.formatRichText(current.descrizione) : escapeHtml(current.descrizione))}</div>` : '';
+            ? `<div class="inv-attune-current-desc">${(typeof window.formatRichText === 'function' ? window.formatRichText(current.descrizione) : escapeHtml(current.descrizione))}</div>`
+            : '<div class="inv-attune-current-desc inv-attune-current-desc-empty">Nessuna descrizione disponibile per questo oggetto.</div>';
         currentHtml = `<div class="inv-attune-current">
             <div class="inv-attune-current-head">
                 <div>
@@ -6830,6 +6815,27 @@ window.invEditAttune = function(pgId, idx) {
             </div>
             ${descHtml}
         </div>`;
+    } else {
+        const attunable = _schedaInvAttunableItems(pg, idx);
+        const treasureRows = attunable.length ? attunable.map(({ index, view }) => {
+            const ench = view.magic_bonus || view._homebrew_incantamento || 0;
+            const sub = view._homebrew_sotto_tipo || view.sotto_tipo || '';
+            const rar = view._homebrew_rarita || view.rarita || '';
+            const rarClass = _invRarityClass(rar);
+            const subText = [sub, rar].filter(Boolean).join(' · ') || 'Richiede sintonia';
+            return `<button type="button" class="inv-attune-pick-row ${rarClass}"
+                    onclick="invAttuneFromTreasure('${pgId}',${idx},${index})">
+                <span class="inv-attune-pick-name">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
+                <span class="inv-attune-pick-sub">${escapeHtml(subText)}</span>
+            </button>`;
+        }).join('') : `<div class="inv-attune-pick-empty">
+                Nessun oggetto che richiede sintonia nel tuo tesoro.<br>
+                <small>Aggiungi prima l'oggetto al tesoro, poi torna qui per assegnarlo a uno slot di sintonia.</small>
+            </div>`;
+        pickerHtml = `<div class="inv-attune-pick-section">
+            <div class="inv-attune-pick-label">Scegli dal Tesoro</div>
+            <div class="inv-attune-pick-list">${treasureRows}</div>
+        </div>`;
     }
 
     const overlay = document.createElement('div');
@@ -6839,10 +6845,7 @@ window.invEditAttune = function(pgId, idx) {
         <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <div class="hp-calc-title">Sintonia – Slot ${idx + 1}</div>
         ${currentHtml}
-        <div class="inv-attune-pick-section">
-            <div class="inv-attune-pick-label">${current ? 'Sostituisci con un oggetto del Tesoro' : 'Scegli dal Tesoro'}</div>
-            <div class="inv-attune-pick-list">${treasureRows}</div>
-        </div>
+        ${pickerHtml}
         <div class="dialog-actions inv-attune-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Chiudi</button>
         </div>

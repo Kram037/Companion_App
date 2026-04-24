@@ -3229,15 +3229,19 @@
     margin-top: 2px;
 }
 .inv-attune-current-desc {
-    margin-top: 8px;
-    padding-top: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px dashed var(--border);
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--text-secondary, #ccc);
-    line-height: 1.4;
+    line-height: 1.5;
     white-space: pre-wrap;
-    max-height: 120px;
+    max-height: calc(100vh - 260px);
     overflow-y: auto;
+}
+.inv-attune-current-desc.inv-attune-current-desc-empty {
+    color: var(--text-muted);
+    font-style: italic;
 }
 .inv-attune-actions {
     margin-top: 14px;
