@@ -2573,11 +2573,12 @@
     .inv-items-grid > .inv-item-row:nth-last-child(-n+2) { border-bottom: none; }
 }
 
-/* ── Inventario v2: tabella sempre aperta, 2 colonne anche su mobile,
-   card compatte con drag & drop e nome troncato. ─────────────────── */
+/* ── Inventario v2: tabella sempre aperta, card compatte con nome
+   troncato. Su mobile resta a 1 colonna (le card sarebbero troppo
+   piccole per leggere il nome), su desktop passa a 2 colonne. ───── */
 .inv-items-grid-2col {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     column-gap: 8px;
     row-gap: 4px;
 }
@@ -2588,8 +2589,8 @@
     }
 }
 .inv-items-grid-2col .inv-item-row {
-    padding: 6px 8px 6px 6px;
-    gap: 4px;
+    padding: 6px 8px 6px 8px;
+    gap: 6px;
     border-bottom: 1px solid var(--border);
     border-radius: 6px;
     background: var(--surface);
@@ -2599,7 +2600,7 @@
     margin-bottom: 0;
 }
 .inv-items-grid-2col .inv-item-name {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2607,44 +2608,22 @@
     min-width: 0;
 }
 .inv-items-grid-2col .inv-item-meta {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .inv-items-grid-2col .inv-item-main { min-width: 0; }
-.inv-items-grid-2col .inv-item-qty-edit {
-    padding: 2px 4px;
-    font-size: 0.75rem;
+@media (min-width: 768px) {
+    /* Su desktop le card sono in 2 colonne: leggermente piu' compatte. */
+    .inv-items-grid-2col .inv-item-row {
+        padding: 6px 8px 6px 6px;
+        gap: 4px;
+    }
+    .inv-items-grid-2col .inv-item-name { font-size: 0.82rem; }
+    .inv-items-grid-2col .inv-item-meta { font-size: 0.68rem; }
 }
-.inv-items-grid-2col .inv-item-qty-input {
-    width: 32px;
-    font-size: 0.78rem;
-}
-
-/* Drag handle a sinistra di ogni card. */
-.inv-item-handle {
-    flex: 0 0 auto;
-    color: var(--text-light);
-    font-size: 0.85rem;
-    line-height: 1;
-    padding: 0 2px;
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-    letter-spacing: -2px;
-    opacity: 0.55;
-    transition: opacity 0.12s;
-}
-.inv-item-handle:hover { opacity: 1; }
-.inv-item-row.inv-item-dragging {
-    opacity: 0.6;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-    transform: scale(0.98);
-    cursor: grabbing;
-}
-.inv-item-handle:active { cursor: grabbing; }
 
 /* Sezione Inventario "fissa" (non collassabile): titolo non cliccabile e
    sempre con la freccia/indicatore disattivati. */
@@ -3397,7 +3376,7 @@
     font-size: 0.85rem;
 }
 .inv-item-qty-input {
-    width: 44px;
+    width: 56px;
     padding: 3px 4px;
     background: transparent;
     border: 1px solid transparent;

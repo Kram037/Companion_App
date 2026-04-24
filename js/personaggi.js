@@ -5355,7 +5355,6 @@ function _invListBuildRowsHtml(pg, pgId) {
         }
         const rarClass = _invRarityClass(_invListItemRarity(view));
         return `<div class="inv-item-row inv-item-card ${rarClass}" data-idx="${i}">
-            <span class="inv-item-handle" title="Trascina per riordinare">⋮⋮</span>
             <div class="inv-item-main">
                 <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
                 ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
@@ -5378,7 +5377,6 @@ function _invListReRender(pgId) {
     const cont = document.getElementById('invItemsList');
     if (!pg || !cont) return;
     cont.innerHTML = _invListBuildRowsHtml(pg, pgId);
-    _invListInitDnD(pgId);
 }
 
 function _invListOptionsFor(pg, field) {
@@ -5465,102 +5463,8 @@ window.invListResetFilters = function(pgId) {
     _invListRenderFiltersBadge();
 };
 
-// Drag & drop cross-platform (mouse + touch via pointer events). Lo
-// "handle" e' il pallino di trascinamento a sinistra di ogni card; al
-// drop l'array pg.inventario viene riarrangiato e salvato su DB.
-function _invListInitDnD(pgId) {
-    const list = document.getElementById('invItemsList');
-    if (!list) return;
-    // Quando filtri/search sono attivi disabilitiamo il drag: un riordino
-    // parziale rischierebbe di rimescolare gli oggetti nascosti in modo
-    // confuso per l'utente.
-    const filterActive = !!(window._invListState?.search || _invListActiveFilterCount() > 0);
-    const rows = list.querySelectorAll('.inv-item-row[data-idx]');
-    rows.forEach(row => {
-        const handle = row.querySelector('.inv-item-handle');
-        if (!handle) return;
-        if (filterActive) {
-            handle.style.opacity = '0.25';
-            handle.title = 'Pulisci ricerca/filtri per riordinare';
-            handle.style.cursor = 'not-allowed';
-            return;
-        }
-        handle.addEventListener('pointerdown', function(e) {
-            if (e.button !== undefined && e.button !== 0) return;
-            e.preventDefault();
-            _invListStartDrag(pgId, e, row, handle);
-        });
-    });
-}
-
-function _invListStartDrag(pgId, ev, row, handle) {
-    const list = document.getElementById('invItemsList');
-    if (!list) return;
-    const startY = ev.clientY;
-    const startX = ev.clientX;
-    let didMove = false;
-    try { handle.setPointerCapture(ev.pointerId); } catch (_) {}
-
-    const onMove = (e) => {
-        const dy = Math.abs(e.clientY - startY);
-        const dx = Math.abs(e.clientX - startX);
-        if (!didMove && (dy > 6 || dx > 6)) {
-            didMove = true;
-            row.classList.add('inv-item-dragging');
-        }
-        if (!didMove) return;
-        const others = Array.from(list.querySelectorAll('.inv-item-row[data-idx]'))
-            .filter(el => el !== row);
-        let closest = null;
-        let closestDist = Number.POSITIVE_INFINITY;
-        for (const el of others) {
-            const box = el.getBoundingClientRect();
-            const cy = box.top + box.height / 2;
-            const dist = Math.abs(e.clientY - cy);
-            if (dist < closestDist) { closestDist = dist; closest = el; }
-        }
-        if (closest) {
-            const box = closest.getBoundingClientRect();
-            const before = e.clientY < box.top + box.height / 2;
-            if (before) list.insertBefore(row, closest);
-            else list.insertBefore(row, closest.nextSibling);
-        }
-    };
-
-    const onUp = async (e) => {
-        handle.removeEventListener('pointermove', onMove);
-        handle.removeEventListener('pointerup', onUp);
-        handle.removeEventListener('pointercancel', onUp);
-        try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
-        if (!didMove) return;
-        row.classList.remove('inv-item-dragging');
-        const newOrder = Array.from(list.querySelectorAll('.inv-item-row[data-idx]'))
-            .map(el => parseInt(el.dataset.idx, 10))
-            .filter(n => !Number.isNaN(n));
-        await _invListReorderInventario(pgId, newOrder);
-    };
-
-    handle.addEventListener('pointermove', onMove);
-    handle.addEventListener('pointerup', onUp);
-    handle.addEventListener('pointercancel', onUp);
-}
-
-async function _invListReorderInventario(pgId, newOrder) {
-    const pg = _schedaPgCache;
-    if (!pg || !Array.isArray(pg.inventario)) return;
-    const old = pg.inventario;
-    if (newOrder.length !== old.length) return;
-    pg.inventario = newOrder.map(i => old[i]);
-    const supabase = getSupabaseClient();
-    if (supabase) {
-        try {
-            await supabase.from('personaggi').update({ inventario: pg.inventario, updated_at: new Date().toISOString() }).eq('id', pgId);
-        } catch (e) {
-            console.warn('[inv] errore salvataggio riordino:', e);
-        }
-    }
-    _invListReRender(pgId);
-}
+// Drag & drop rimosso: gli oggetti dell'inventario ora restano fissi
+// nell'ordine in cui sono stati aggiunti.
 
 window.schedaOpenInventoryPage = async function(pgId) {
     const content = document.getElementById('schedaContent');
@@ -5677,7 +5581,6 @@ window.schedaOpenInventoryPage = async function(pgId) {
 
     schedaSetActiveTab('inventario');
     schedaWireTabBar(pgId);
-    _invListInitDnD(pgId);
     if (window._invListState?.filtersOpen) {
         const bar = document.getElementById('invListSearchBar');
         if (bar) bar.style.display = '';
