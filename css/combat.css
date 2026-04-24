@@ -421,29 +421,51 @@
     flex: 0 0 auto;
 }
 .placeholder-hp-btn:hover { border-color: var(--accent); color: var(--accent); }
-.placeholder-cond-btn {
-    width: 100%;
+.placeholder-sub {
+    margin: -8px 0 14px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+/* Toolbar di azioni unificata fra placeholder dialog e full sheet del
+   mostro: Condizioni full-width sopra, [Duplica][Elimina] su una riga,
+   Salva (solo placeholder) full-width in fondo. */
+.combat-monster-actions-stack {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.combat-monster-cond-btn {
+    width: 100%;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 14px;
+    padding: 8px 12px;
+    font-size: 0.92rem;
 }
-.placeholder-cond-count {
+.combat-monster-cond-count {
     background: var(--accent);
     color: #fff;
     border-radius: 999px;
     padding: 1px 8px;
+    min-width: 22px;
+    text-align: center;
     font-size: 0.78rem;
     font-weight: 700;
+    line-height: 1.4;
 }
-.placeholder-actions {
-    display: flex;
+.combat-monster-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
 }
-.placeholder-actions .btn-primary { margin-left: auto; }
+.combat-monster-actions-row > button { width: 100%; }
+.combat-monster-save-btn {
+    width: 100%;
+    margin-top: 4px;
+}
 
 @media (max-width: 480px) {
     .placeholder-modal-content { padding: 18px 16px 14px; }
@@ -451,18 +473,6 @@
     .placeholder-ca-group { flex-basis: 76px; }
     .placeholder-hp-row input[type="number"] { width: 52px; font-size: 1rem; }
 }
-
-/* Toolbar di azioni in fondo alla full sheet del mostro in combattimento. */
-.combat-monster-full-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    padding: 12px 0 0;
-    border-top: 1px solid var(--border);
-    margin-top: 8px;
-}
-.combat-monster-full-actions .btn-danger { margin-left: auto; }
 
 /* Caselle "scheda-box" cliccabili (PV / CA / Velocità) nella full sheet:
    piccolo highlight per indicare che sono interattive. */

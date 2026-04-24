@@ -47,16 +47,40 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         const pgConditionsMap = charData.conditionsMap;
 
         // Build initiative order
+        // Tiebreak deterministico: a parità d'iniziativa l'ordine viene fissato
+        // dal momento in cui la creatura è entrata nel giro (created_at delle
+        // tiri_iniziativa per i player, created_at del mostro per i mostri).
+        // In questo modo, una volta deciso l'ordine, non cambia mai più anche
+        // quando vengono aggiunte nuove creature con lo stesso valore.
+        const _ts = (s) => { const t = s ? Date.parse(s) : NaN; return isNaN(t) ? 0 : t; };
         const order = [];
         tiriCompleted.forEach(t => {
             const pgName = pgNamesMap[t.giocatore_id];
             const cond = pgConditionsMap[t.giocatore_id];
-            order.push({ type: 'player', id: t.giocatore_id, pgId: cond?.id || null, name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?', init: t.valore, conditions: cond });
+            order.push({
+                type: 'player', id: t.giocatore_id, pgId: cond?.id || null,
+                name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?',
+                init: t.valore,
+                tiebreak: _ts(t.created_at) || _ts(t.completed_at) || 0,
+                conditions: cond
+            });
         });
         _combatMonsters.forEach(m => {
-            order.push({ type: 'monster', id: m.id, name: m.nome, init: m.iniziativa ?? 0, monster: m });
+            order.push({
+                type: 'monster', id: m.id, name: m.nome,
+                init: m.iniziativa ?? 0,
+                tiebreak: _ts(m.created_at),
+                monster: m
+            });
         });
-        order.sort((a, b) => b.init - a.init);
+        order.sort((a, b) => {
+            if ((b.init || 0) !== (a.init || 0)) return (b.init || 0) - (a.init || 0);
+            // Stesso valore d'iniziativa: chi è stato aggiunto prima agisce prima.
+            if (a.tiebreak !== b.tiebreak) return a.tiebreak - b.tiebreak;
+            // Ulteriore fallback: id stringa, per evitare riordini casuali
+            // se due creature hanno timestamp identici.
+            return String(a.id).localeCompare(String(b.id));
+        });
         _combatInitiativeOrder = order;
 
         const turnIdx = Math.min(combatTurnIdx, Math.max(0, order.length - 1));
@@ -384,11 +408,16 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
             ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
             ${condBadgesHtml}
             ${spellHtml}
-        </div>
-        <div class="combat-monster-full-actions" style="flex-shrink:0;">
-            <button class="btn-secondary btn-small" onclick="combatMonsterOpenConditions('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
-            <button class="btn-secondary btn-small" onclick="combatMonsterDuplicate('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
-            <button class="btn-danger btn-small" onclick="combatMonsterRemove('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+            <div class="combat-monster-actions-stack" style="margin-top:14px;">
+                <button class="btn-secondary combat-monster-cond-btn" onclick="combatMonsterOpenConditions('${m.id}','${campagnaId}','${sessioneId}')">
+                    <span>Condizioni</span>
+                    ${condActive.length || m.esaustione > 0 ? `<span class="combat-monster-cond-count">${condActive.length + (m.esaustione > 0 ? 1 : 0)}</span>` : ''}
+                </button>
+                <div class="combat-monster-actions-row">
+                    <button class="btn-secondary btn-small" onclick="combatMonsterDuplicate('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
+                    <button class="btn-danger btn-small" onclick="combatMonsterRemove('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+                </div>
+            </div>
         </div>`;
 
     modal.classList.add('active');
@@ -481,6 +510,7 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
     document.getElementById('combatPlaceholderContent').innerHTML = `
         <button class="modal-close" onclick="closeCombatPlaceholderModal()">&times;</button>
         <h2 class="placeholder-title">${escapeHtml(m.nome)}</h2>
+        <p class="placeholder-sub">Mostro placeholder · solo PV / CA / condizioni</p>
 
         <div class="placeholder-stats-row">
             <div class="form-group placeholder-hp-group">
@@ -499,16 +529,17 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
             </div>
         </div>
 
-        <button type="button" class="btn-secondary placeholder-cond-btn"
-            onclick="placeholderOpenConditions('${monsterId}','${campagnaId}','${sessioneId}')">
-            <span>Condizioni</span>
-            ${condCount > 0 ? `<span class="placeholder-cond-count">${condCount}</span>` : ''}
-        </button>
-
-        <div class="placeholder-actions">
-            <button type="button" class="btn-secondary btn-small" onclick="duplicateMonster('${monsterId}','${campagnaId}','${sessioneId}')">Duplica</button>
-            <button type="button" class="btn-danger btn-small" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
-            <button type="button" class="btn-primary btn-small" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
+        <div class="combat-monster-actions-stack">
+            <button type="button" class="btn-secondary combat-monster-cond-btn"
+                onclick="placeholderOpenConditions('${monsterId}','${campagnaId}','${sessioneId}')">
+                <span>Condizioni</span>
+                ${condCount > 0 ? `<span class="combat-monster-cond-count">${condCount}</span>` : ''}
+            </button>
+            <div class="combat-monster-actions-row">
+                <button type="button" class="btn-secondary btn-small" onclick="duplicateMonster('${monsterId}','${campagnaId}','${sessioneId}')">Duplica</button>
+                <button type="button" class="btn-danger btn-small" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
+            </div>
+            <button type="button" class="btn-primary combat-monster-save-btn" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
         </div>`;
 
     modal.classList.add('active');
