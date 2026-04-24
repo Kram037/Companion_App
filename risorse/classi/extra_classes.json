@@ -3627,6 +3627,14 @@
             "translated": true
           },
           {
+            "name_en": "Trick Shots List",
+            "name": "Lista dei Tiri Speciali",
+            "level": 3,
+            "description_en": "List of Trick Shots available to the Gunslinger. Each Trick Shot costs 1 grit point unless otherwise specified.\n\n• **Bullying Shot**: Gain advantage on an Intimidation check.\n• **Dazing Shot**: Constitution saving throw or disadvantage on attacks until end of next turn.\n• **Deadeye Shot**: Gain advantage on the attack roll.\n• **Disarming Shot**: Strength saving throw or drop held item, which is pushed 10 feet.\n• **Forceful Shot**: Strength saving throw or be pushed 15 feet.\n• **Piercing Shot** (+1 misfire): On a hit, make an additional attack roll with disadvantage against each creature behind the target in a line within the weapon's first range increment.\n• **Violent Shot**: For each grit point expended: +2 misfire and one additional damage die.\n• **Winging Shot**: Strength saving throw or be knocked prone.",
+            "description": "Elenco dei Tiri Speciali (Trick Shots) disponibili per il Pistolero. Ogni Tiro Speciale costa 1 punto Grinta salvo diversa indicazione.\n\n• **Tiro Intimidatorio** (*Bullying Shot*): Ottieni vantaggio a una prova di Intimidire.\n• **Tiro Stordente** (*Dazing Shot*): Il bersaglio effettua un tiro salvezza su Costituzione o subisce svantaggio agli attacchi fino al termine del suo turno successivo.\n• **Tiro di Precisione** (*Deadeye Shot*): Ottieni vantaggio sul tiro per colpire.\n• **Tiro Disarmante** (*Disarming Shot*): Il bersaglio effettua un tiro salvezza su Forza o lascia cadere un oggetto impugnato, che viene spinto a 3 metri di distanza (10 piedi).\n• **Tiro Spintone** (*Forceful Shot*): Il bersaglio effettua un tiro salvezza su Forza o viene spinto indietro di 4,5 metri (15 piedi).\n• **Tiro Perforante** (*Piercing Shot*) (+1 inceppamento): In caso di colpo, effettui un tiro per colpire aggiuntivo con svantaggio contro ogni creatura dietro al bersaglio in linea retta entro la prima distanza dell'arma.\n• **Tiro Violento** (*Violent Shot*): Per ogni punto Grinta speso: +2 inceppamento e un dado di danno aggiuntivo.\n• **Tiro Azzoppante** (*Winging Shot*): Il bersaglio effettua un tiro salvezza su Forza o cade prono.",
+            "translated": true
+          },
+          {
             "name_en": "Quickdraw",
             "name": "Estrazione Rapida",
             "level": 7,
