@@ -5335,7 +5335,7 @@ window.schedaOpenInventoryPage = async function(pgId) {
         const rarClass = _invRarityClass(view._homebrew_rarita || view.rarita);
         return `<div class="inv-item-row ${rarClass}">
             <div class="inv-item-main">
-                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(view.nome || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
                 ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
             </div>
             <div class="inv-item-qty-edit" title="Quantita'">
@@ -5355,7 +5355,8 @@ window.schedaOpenInventoryPage = async function(pgId) {
     const _attuneNameOf = (it) => {
         if (!it) return '';
         if (typeof it === 'string') return it;
-        return it.nome || '';
+        // Strippa eventuale " +N" finale duplicato col magic_bonus.
+        return _invDisplayName(it) || it.nome || '';
     };
     const _attuneBonusOf = (it) => {
         if (!it || typeof it === 'string') return 0;
@@ -6010,12 +6011,42 @@ window.invAddFromCatalog = async function(pgId, catId) {
 // l'oggetto all'inventario come snapshot completo (analogo a un item
 // del catalogo "fisso").
 // ──────────────────────────────────────────────────────────────────────
+// Restituisce il nome dell'item per il display, rimuovendo un eventuale
+// suffisso " +N" duplicato quando lo stesso bonus e' gia' presente in
+// magic_bonus (cosi' i vecchi item salvati con il vecchio formato
+// "Pugnale +2" non si vedono come "Pugnale +2 +2"). Per i nuovi item
+// salviamo il nome senza bonus, quindi qui non serve fare nulla.
+function _invDisplayName(view) {
+    if (!view) return '';
+    const nome = view.nome || '';
+    const bonus = parseInt(view.magic_bonus) || parseInt(view._homebrew_incantamento) || 0;
+    if (bonus <= 0) return nome;
+    const re = /\s*\+\d+\s*$/;
+    return nome.replace(re, '').trim() || nome;
+}
+window._invDisplayName = _invDisplayName;
+
 function _invPickerGenericMagicEntries() {
     return [
-        { kind: 'arma',     nome: 'Arma Magica',     tipo: 'Arma',     meta: 'Bonus: +1 / +2 / +3 · scegli tipo arma' },
-        { kind: 'armatura', nome: 'Armatura Magica', tipo: 'Armatura', meta: 'Bonus: +1 / +2 / +3 · scegli tipo armatura' },
-        { kind: 'scudo',    nome: 'Scudo Magico',    tipo: 'Scudo',    meta: 'Bonus: +1 / +2 / +3' },
+        { kind: 'arma',          nome: 'Arma Magica',     tipo: 'Arma',     meta: 'Bonus: +1 / +2 / +3 · scegli tipo arma' },
+        { kind: 'armatura',      nome: 'Armatura Magica', tipo: 'Armatura', meta: 'Bonus: +1 / +2 / +3 · scegli tipo armatura' },
+        { kind: 'scudo',         nome: 'Scudo Magico',    tipo: 'Scudo',    meta: 'Bonus: +1 / +2 / +3' },
+        { kind: 'pozione_cura',  nome: 'Pozione di Cura', tipo: 'Pozione',  meta: 'Comune / Non Comune / Raro / Molto Raro · scegli grado' },
     ];
+}
+
+// Varianti della Pozione di Cura (SRD). HP recuperati = dadi + bonus fisso.
+// Le mostriamo come una sola "voce generica" del catalogo: l'utente
+// seleziona quale grado tra i quattro al momento dell'aggiunta.
+const _POTION_HEALING_VARIANTS = [
+    { id: 'common',    nome: 'Pozione di Cura',           rarita: 'Comune',     dado: '2d4 + 2',   nome_en: 'Potion of Healing' },
+    { id: 'uncommon',  nome: 'Pozione di Cura Maggiore',  rarita: 'Non Comune', dado: '4d4 + 4',   nome_en: 'Potion of Greater Healing' },
+    { id: 'rare',      nome: 'Pozione di Cura Superiore', rarita: 'Raro',       dado: '8d4 + 8',   nome_en: 'Potion of Superior Healing' },
+    { id: 'very_rare', nome: 'Pozione di Cura Suprema',   rarita: 'Molto Raro', dado: '10d4 + 20', nome_en: 'Potion of Supreme Healing' },
+];
+
+function _potionHealingDescription(variant) {
+    return `Quando bevi questa pozione, recuperi ${variant.dado} punti ferita. Indipendentemente dalla sua potenza, il liquido rosso della pozione luccica quando viene agitato.`;
 }
 
 const _GENERIC_BONUS_OPTS = [
@@ -6025,6 +6056,9 @@ const _GENERIC_BONUS_OPTS = [
 ];
 
 window._invOpenGenericMagicDialog = function(pgId, kind) {
+    if (kind === 'pozione_cura') {
+        return _invOpenPotionHealingDialog(pgId);
+    }
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
@@ -6131,7 +6165,10 @@ window._invAddGenericMagicItem = async function(pgId, kind, bonus, tipoSpecifico
     const tipoCatLabel = { arma: 'Arma', armatura: 'Armatura', scudo: 'Scudo' }[kind] || 'Oggetto';
     // Costruisco l'entry replicando la forma usata da invAddFromCatalog,
     // cosi' rimane consistente con gli oggetti del catalogo "fisso".
-    const nome = `${tipoSpecifico} +${bonus}`;
+    // IMPORTANTE: il nome NON deve contenere "+N" perche' il bonus
+    // viene gia' mostrato come badge separato in tutte le viste; se
+    // lo includessimo nel nome ne vedremmo due (es. "Pugnale +2 +2").
+    const nome = tipoSpecifico;
     const entry = {
         nome,
         descrizione: `${tipoCatLabel} magica/o con bonus +${bonus} ai tiri per colpire e ai danni (arma) o alla CA (armatura/scudo).`,
@@ -6174,6 +6211,62 @@ window._invAddGenericMagicItem = async function(pgId, kind, bonus, tipoSpecifico
             entry.cat = sh.cat;
         }
     }
+    inventario.push(entry);
+    pg.inventario = inventario;
+    await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
+    schedaOpenInventoryPage(pgId);
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Voce generica "Pozione di Cura": un solo item nel picker che apre un
+// dialog con le 4 varianti SRD (Comune / Maggiore / Superiore / Suprema).
+// Click su una variante => aggiunta diretta al tesoro come snapshot.
+// ──────────────────────────────────────────────────────────────────────
+function _invOpenPotionHealingDialog(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const rows = _POTION_HEALING_VARIANTS.map(v => {
+        const rarClass = _invRarityClass(v.rarita);
+        return `<button type="button" class="generic-magic-type-row ${rarClass}"
+            onclick="_invAddPotionHealing('${pgId}','${v.id}')">
+            <span class="generic-magic-type-name">${escapeHtml(v.nome)}</span>
+            <span class="generic-magic-type-sub">${escapeHtml(v.rarita)} · recupera ${escapeHtml(v.dado)} PF</span>
+        </button>`;
+    }).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">Pozione di Cura</h3>
+        <p class="generic-magic-sub">Scegli il grado della pozione</p>
+        <div class="generic-magic-type-list">${rows}</div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+window._invAddPotionHealing = async function(pgId, variantId) {
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    const variant = _POTION_HEALING_VARIANTS.find(v => v.id === variantId);
+    if (!variant) return;
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!supabase || !pg) return;
+    const inventario = pg.inventario ? [...pg.inventario] : [];
+    const entry = {
+        nome: variant.nome,
+        descrizione: _potionHealingDescription(variant),
+        quantita: 1,
+        tipo: 'Pozione',
+        sotto_tipo: 'Cura',
+        rarita: variant.rarita,
+        richiede_sintonia: false,
+        sintonia_dettaglio: '',
+        magico: true,
+        // Per consultazione veloce dal sistema HP / consumo.
+        cura_dado: variant.dado,
+    };
     inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
@@ -6523,7 +6616,7 @@ window.invEditAttune = function(pgId, idx) {
         const subText = [sub, rar].filter(Boolean).join(' · ') || 'Richiede sintonia';
         return `<button type="button" class="inv-attune-pick-row ${rarClass}"
                 onclick="invAttuneFromTreasure('${pgId}',${idx},${index})">
-            <span class="inv-attune-pick-name">${escapeHtml(view.nome || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
+            <span class="inv-attune-pick-name">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
             <span class="inv-attune-pick-sub">${escapeHtml(subText)}</span>
         </button>`;
     }).join('') : `<div class="inv-attune-pick-empty">
@@ -6534,7 +6627,7 @@ window.invEditAttune = function(pgId, idx) {
     let currentHtml = '';
     if (current) {
         const bonus = current.magic_bonus || 0;
-        const nameWithEnch = `${escapeHtml(current.nome || 'Oggetto')}${bonus ? ' +' + bonus : ''}`;
+        const nameWithEnch = `${escapeHtml(_invDisplayName(current) || 'Oggetto')}${bonus ? ' +' + bonus : ''}`;
         const descHtml = current.descrizione
             ? `<div class="inv-attune-current-desc">${escapeHtml(current.descrizione)}</div>` : '';
         currentHtml = `<div class="inv-attune-current">
@@ -6580,7 +6673,7 @@ window.invAttuneFromTreasure = async function(pgId, slotIdx, invIndex) {
     const desc = view.descrizione || view._homebrew_meta || '';
     const uid = _schedaEnsureInvUid(pg.inventario, invIndex);
 
-    const slot = { nome: view.nome || 'Oggetto' };
+    const slot = { nome: _invDisplayName(view) || view.nome || 'Oggetto' };
     if (desc) slot.descrizione = desc;
     if (ench > 0) slot.magic_bonus = ench;
     if (uid) slot.from_treasure_uid = uid;
@@ -10699,7 +10792,7 @@ window.schedaOpenAddEquip = function(pgId) {
         const rarClass = _invRarityClass(rar);
         const subText = [sub, rar].filter(Boolean).join(' · ') || 'Oggetto magico';
         return `<div class="pg-talento-item pg-talento-item-treasure ${rarClass}" onclick="${handler}('${pgId}',${index})">
-            <span class="pg-talento-name">${escapeHtml(view.nome || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
+            <span class="pg-talento-name">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${ench ? ' +' + ench : ''}</span>
             <span class="option-source">${escapeHtml(subText)}</span>
         </div>`;
     };
@@ -11029,7 +11122,7 @@ function _schedaPickInvWeaponBase(pgId, invIndex, candidates, view, subRaw) {
     }).join('');
     overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-        <h3 class="generic-magic-title">${escapeHtml(view.nome || 'Arma')}${ench ? ' +' + ench : ''}</h3>
+        <h3 class="generic-magic-title">${escapeHtml(_invDisplayName(view) || 'Arma')}${ench ? ' +' + ench : ''}</h3>
         <p class="generic-magic-sub">Scegli il tipo di arma di base${subRaw ? ` (${escapeHtml(subRaw)})` : ''}</p>
         <div class="generic-magic-type-list">${body}</div>
         <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
@@ -11069,7 +11162,7 @@ function _schedaPickInvArmorBase(pgId, invIndex, candidates, view, subRaw) {
     }).join('');
     overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-        <h3 class="generic-magic-title">${escapeHtml(view.nome || 'Armatura')}${ench ? ' +' + ench : ''}</h3>
+        <h3 class="generic-magic-title">${escapeHtml(_invDisplayName(view) || 'Armatura')}${ench ? ' +' + ench : ''}</h3>
         <p class="generic-magic-sub">Scegli il tipo di armatura di base${subRaw ? ` (${escapeHtml(subRaw)})` : ''}</p>
         <div class="generic-magic-type-list">${body}</div>
         <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">

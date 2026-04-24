@@ -1678,10 +1678,11 @@
           },
           {
             "name_en": "Blade Flourish",
-            "name": "Stoccata di Lama",
+            "name": "Virtuosismo della Spada",
+            "aliases": ["Stoccata di Lama"],
             "level": 3,
             "description_en": "At 3rd level, when you take Attack action, walking speed increases by 10 ft until end of turn. If you hit, choose one Blade Flourish (only one per turn). Defensive: spend Bardic Inspiration die for extra damage; add die to your AC until next turn. Slashing: extra damage to target and another creature within 5 ft. Mobile: extra damage and push 5 + die feet; you can use reaction to move up to walking speed.",
-            "description": "Al 3° livello impari a eseguire spettacolari dimostrazioni di abilita' marziale e velocita'. Ogni volta che esegui l'azione Attaccare nel tuo turno, la tua velocita' di camminata aumenta di 10 piedi fino al termine del turno e se uno dei tuoi attacchi colpisce una creatura, puoi usare una delle seguenti opzioni di Stoccata di Lama (solo una per turno). **Stoccata Difensiva**: spendi un uso della tua Ispirazione Bardica per fare in modo che l'arma infligga danni extra al bersaglio pari al risultato del dado; aggiungi anche il risultato alla tua CA fino all'inizio del tuo turno successivo. **Stoccata Tagliente**: spendi un uso della tua Ispirazione Bardica per infliggere danni extra al bersaglio e a un'altra creatura a tua scelta entro 5 piedi da te, pari al risultato del dado. **Stoccata Mobile**: spendi un uso della tua Ispirazione Bardica per infliggere danni extra al bersaglio pari al risultato del dado; puoi anche spingere il bersaglio fino a 5 piedi da te + un numero di piedi pari al risultato del dado. Puoi quindi usare immediatamente la tua reazione per muoverti fino alla tua velocita' di camminata in uno spazio non occupato entro 5 piedi dal bersaglio.",
+            "description": "Al 3° livello impari a eseguire spettacolari dimostrazioni di abilita' marziale e velocita'. Ogni volta che esegui l'azione Attaccare nel tuo turno, la tua velocita' di camminata aumenta di 10 piedi fino al termine del turno e se uno dei tuoi attacchi colpisce una creatura, puoi usare una delle seguenti opzioni di Virtuosismo della Spada (solo una per turno). **Virtuosismo Difensivo**: spendi un uso della tua Ispirazione Bardica per fare in modo che l'arma infligga danni extra al bersaglio pari al risultato del dado; aggiungi anche il risultato alla tua CA fino all'inizio del tuo turno successivo. **Virtuosismo Tagliente**: spendi un uso della tua Ispirazione Bardica per infliggere danni extra al bersaglio e a un'altra creatura a tua scelta entro 5 piedi da te, pari al risultato del dado. **Virtuosismo Mobile**: spendi un uso della tua Ispirazione Bardica per infliggere danni extra al bersaglio pari al risultato del dado; puoi anche spingere il bersaglio fino a 5 piedi da te + un numero di piedi pari al risultato del dado. Puoi quindi usare immediatamente la tua reazione per muoverti fino alla tua velocita' di camminata in uno spazio non occupato entro 5 piedi dal bersaglio.",
             "translated": true
           },
           {
@@ -1697,7 +1698,7 @@
             "name": "Stoccata del Maestro",
             "level": 14,
             "description_en": "Starting at 14th level, whenever you use a Blade Flourish option, you can roll a d6 and use it instead of expending a Bardic Inspiration die.",
-            "description": "Dal 14° livello, ogni volta che usi un'opzione di Stoccata di Lama puoi tirare 1d6 e usarlo al posto di spendere un dado di Ispirazione Bardica.",
+            "description": "Dal 14° livello, ogni volta che usi un'opzione di Virtuosismo della Spada puoi tirare 1d6 e usarlo al posto di spendere un dado di Ispirazione Bardica.",
             "translated": true
           }
         ]
