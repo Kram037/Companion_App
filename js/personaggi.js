@@ -7945,11 +7945,11 @@ window.privOpenCustomTabEdit = function(tabName) {
         </label>
         <button type="button" class="btn-secondary" style="margin-top:8px;width:100%;"
             onclick="privCloseEdit();privAddCustom('${escapeHtml(tabName)}')">+ Aggiungi privilegio</button>
-        <div class="priv-edit-actions">
-            <div>
-                <button class="btn-danger" onclick="privDeleteTabFromEdit('${escapeHtml(tabName)}')">Elimina tabella</button>
+        <div class="priv-edit-actions priv-edit-actions-wrap">
+            <div class="priv-edit-actions-left">
+                <button class="btn-danger" onclick="privDeleteTabFromEdit('${escapeHtml(tabName)}')">Elimina</button>
             </div>
-            <div>
+            <div class="priv-edit-actions-right">
                 <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
                 <button class="btn-primary" onclick="privConfirmRenameTab('${escapeHtml(tabName)}')">Salva</button>
             </div>
@@ -8010,9 +8010,9 @@ function _privOpenEditDialog({ tabName, mode, index, item }) {
         <label class="priv-edit-label">Descrizione
             <textarea id="privEditDesc" class="priv-edit-textarea" rows="6" placeholder="Descrizione del privilegio">${escapeHtml(it.description || '')}</textarea>
         </label>
-        <div class="priv-edit-actions">
-            <div>${deleteBtn}</div>
-            <div>
+        <div class="priv-edit-actions priv-edit-actions-wrap">
+            <div class="priv-edit-actions-left">${deleteBtn}</div>
+            <div class="priv-edit-actions-right">
                 <button class="btn-secondary" onclick="privCloseEdit()">Annulla</button>
                 <button class="btn-primary" onclick="privConfirmEdit('${escapeHtml(tabName)}','${mode}',${index === undefined ? -1 : index})">Salva</button>
             </div>

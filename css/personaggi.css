@@ -4053,16 +4053,47 @@
     align-items: stretch;
     gap: 8px;
     margin-top: 6px;
+    flex-wrap: wrap;
 }
 .priv-edit-actions > div {
     display: flex;
     gap: 8px;
     align-items: stretch;
+    min-width: 0;
+}
+.priv-edit-actions-right {
+    flex: 1 1 auto;
+    justify-content: flex-end;
 }
 .priv-edit-actions .btn-primary,
 .priv-edit-actions .btn-secondary,
 .priv-edit-actions .btn-danger {
-    min-width: 110px;
+    min-width: 80px;
     width: auto;
     margin: 0;
+    flex: 0 1 auto;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+/* Su schermi stretti i 3 bottoni si dispongono uno sotto l'altro per
+   non far uscire "Salva" oltre il bordo della dialog. */
+@media (max-width: 420px) {
+    .priv-edit-actions-wrap {
+        flex-direction: column-reverse;
+        gap: 6px;
+    }
+    .priv-edit-actions-wrap .priv-edit-actions-left,
+    .priv-edit-actions-wrap .priv-edit-actions-right {
+        width: 100%;
+    }
+    .priv-edit-actions-wrap .priv-edit-actions-right {
+        justify-content: stretch;
+    }
+    .priv-edit-actions-wrap .priv-edit-actions-right > .btn-primary,
+    .priv-edit-actions-wrap .priv-edit-actions-right > .btn-secondary {
+        flex: 1 1 0;
+    }
+    .priv-edit-actions-wrap .priv-edit-actions-left > .btn-danger {
+        width: 100%;
+    }
 }
