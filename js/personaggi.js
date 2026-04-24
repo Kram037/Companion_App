@@ -3643,13 +3643,14 @@ async function renderSchedaPersonaggio(personaggioId) {
         <div class="scheda-page-grid">
         <div class="scheda-col scheda-col-left">
 
+        <div class="scheda-perc-passiva scheda-prof-bonus">
+            <span class="scheda-perc-val" id="sBonusComp">+${calcBonusCompetenza(pg.livello || 1)}</span>
+            <span class="scheda-perc-label">Bonus di Competenza</span>
+        </div>
+
         <div class="scheda-section">
             <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
             <div class="scheda-section-body">
-                <div class="scheda-perc-passiva scheda-prof-bonus">
-                    <span class="scheda-perc-val" id="sBonusComp">+${calcBonusCompetenza(pg.livello || 1)}</span>
-                    <span class="scheda-perc-label">Bonus di Competenza</span>
-                </div>
                 <div class="scheda-abilities">${abilitiesHtml}</div>
             </div>
         </div>
