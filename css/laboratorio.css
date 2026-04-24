@@ -1648,3 +1648,18 @@
     .lab-fs-textarea { padding: 14px 16px; font-size: 0.95rem; }
     .lab-fs-actions { padding: 10px 14px; }
 }
+
+/* Sub-tabs (categoria nemici: Nemici / Combattimenti) */
+.lab-subtabs { display: flex; gap: 6px; margin: 0 0 10px; padding: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.lab-subtab { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: transparent; border: none; color: var(--text-secondary); font-size: 0.88rem; font-weight: 600; border-radius: calc(var(--radius-sm) - 2px); cursor: pointer; transition: background 0.15s, color 0.15s; }
+.lab-subtab:hover { color: var(--text); }
+.lab-subtab.active { background: var(--accent-subtle, rgba(96,165,250,0.15)); color: var(--accent); }
+.lab-subtab-icon { font-size: 1rem; line-height: 1; }
+
+/* Wizard combattimento homebrew - riga mostro */
+.combat-hb-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; }
+.combat-hb-row-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.combat-hb-row-name { font-weight: 700; font-size: 0.92rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.combat-hb-row-meta { font-size: 0.78rem; color: var(--text-muted, var(--text-secondary)); }
+.combat-hb-row-del { background: transparent; border: 1px solid var(--border); color: #ef4444; width: 28px; height: 28px; border-radius: 50%; font-size: 1.2rem; line-height: 1; cursor: pointer; flex-shrink: 0; }
+.combat-hb-row-del:hover { background: rgba(239,68,68,0.12); }

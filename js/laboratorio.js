@@ -4,6 +4,8 @@
 
 let _labCurrentTab = 'classi';
 let _labEditingId = null;
+// Sub-tab solo per la categoria "nemici": 'nemici' (default) | 'combattimenti'.
+let _labNemiciSubTab = 'nemici';
 
 const LAB_CATEGORIES = {
     classi: {
@@ -163,6 +165,12 @@ async function loadLabContent() {
 
     if (!AppState.currentUser?.uid) return;
 
+    // La categoria "nemici" ha un selettore di sub-tab interno (Nemici / Combattimenti).
+    if (_labCurrentTab === 'nemici') {
+        await _loadLabNemiciSection();
+        return;
+    }
+
     container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
 
     const { data, error } = await supabase
@@ -184,6 +192,86 @@ async function loadLabContent() {
 
     container.innerHTML = `<div class="lab-list">${data.map(item => labRenderCard(item, cat)).join('')}</div>`;
 }
+
+async function _loadLabNemiciSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labNemiciSubTab;
+    const tabsHtml = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub==='nemici'?'active':''}" onclick="labNemiciSetSubTab('nemici')">
+                <span class="lab-subtab-icon">💀</span><span>Nemici</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub==='combattimenti'?'active':''}" onclick="labNemiciSetSubTab('combattimenti')">
+                <span class="lab-subtab-icon">⚔</span><span>Combattimenti</span>
+            </button>
+        </div>
+        <div id="labNemiciSubContent"></div>`;
+    container.innerHTML = tabsHtml;
+    const sc = document.getElementById('labNemiciSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    if (sub === 'nemici') {
+        const { data, error } = await supabase
+            .from('homebrew_nemici').select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) { sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>'; return; }
+        if (!data || data.length === 0) {
+            sc.innerHTML = `<div class="lab-empty">Nessun nemico homebrew. Premi <strong>+</strong> per crearne uno!</div>`;
+            return;
+        }
+        const cat = LAB_CATEGORIES.nemici;
+        sc.innerHTML = `<div class="lab-list">${data.map(it => labRenderCard(it, cat)).join('')}</div>`;
+    } else {
+        const { data, error } = await supabase
+            .from('homebrew_combattimenti').select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) {
+            sc.innerHTML = `<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>sql/add-homebrew-combattimenti.sql</code>?</small></div>`;
+            return;
+        }
+        if (!data || data.length === 0) {
+            sc.innerHTML = `<div class="lab-empty">Nessun combattimento. Premi <strong>+</strong> per crearne uno!</div>`;
+            return;
+        }
+        sc.innerHTML = `<div class="lab-list">${data.map(it => _labRenderCombatCard(it)).join('')}</div>`;
+    }
+}
+
+function _labRenderCombatCard(item) {
+    const arr = Array.isArray(item.mostri) ? item.mostri : [];
+    const totMostri = arr.length;
+    const list = arr.slice(0, 3)
+        .map(m => escapeHtml(m?.snapshot?.nome || m?.nome || 'Mostro'))
+        .join(', ');
+    const more = totMostri > 3 ? ` +${totMostri - 3}` : '';
+    const detail = totMostri
+        ? `${totMostri} mostri · ${list}${more}`
+        : 'Nessun mostro';
+    return `
+    <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="labEditCombatHomebrew('${item.id}')">
+        <div class="lab-card-icon">⚔</div>
+        <div class="lab-card-info">
+            <p class="lab-card-name">${escapeHtml(item.nome)}</p>
+            <p class="lab-card-detail">${detail}</p>
+        </div>
+        <div class="lab-card-actions">
+            <button class="lab-delete" onclick="event.stopPropagation();labDeleteCombatHomebrew('${item.id}')" title="Elimina">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+    </div>`;
+}
+
+window.labNemiciSetSubTab = function(sub) {
+    _labNemiciSubTab = (sub === 'combattimenti') ? 'combattimenti' : 'nemici';
+    loadLabContent();
+};
 
 function labRenderCard(item, cat) {
     const detail = labGetCardDetail(item, _labCurrentTab);
@@ -1606,6 +1694,187 @@ window.labCancelFullscreenTextarea = function(_textareaId) {
     document.querySelector('.lab-fs-overlay')?.remove();
 };
 
+// ============================================================================
+// COMBATTIMENTI HOMEBREW - Wizard creazione/modifica encounter
+// ============================================================================
+
+// Stato del wizard combattimento. Contiene una bozza dell'oggetto in modifica
+// con un array `mostri` (snapshot) modificabile in memoria fino al salvataggio.
+let _labCombatDraft = null;
+
+function _openLabCombatHomebrewWizard(data) {
+    const modal = document.getElementById('homebrewModal');
+    if (!modal) return;
+    _restoreHomebrewModalStructure();
+    const mlg = modal.querySelector('.modal-content-lg');
+    if (!mlg) return;
+
+    _labCombatDraft = {
+        id: data?.id || null,
+        nome: data?.nome || '',
+        mostri: Array.isArray(data?.mostri) ? data.mostri.map(m => ({ ...m })) : []
+    };
+    _labEditingId = data?.id || null;
+
+    mlg.innerHTML = `
+        <button class="modal-close" onclick="closeHomebrewModal()">&times;</button>
+        <h2>${_labEditingId ? 'Modifica Combattimento' : 'Nuovo Combattimento'}</h2>
+        <form id="labCombatForm" onsubmit="return false;">
+            <div class="form-group">
+                <label for="hbCombatNome">Nome combattimento</label>
+                <input type="text" id="hbCombatNome" placeholder="Es: Imboscata nei boschi" value="${escapeHtml(_labCombatDraft.nome)}">
+            </div>
+            <div class="form-section-label" style="margin-top:var(--spacing-sm)">Mostri inclusi</div>
+            <div id="hbCombatMostriList"></div>
+            <div class="form-actions" style="justify-content:center;margin-top:var(--spacing-xs)">
+                <button type="button" class="btn-secondary" onclick="labCombatAddMonster()">+ Aggiungi mostro</button>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeHomebrewModal()">Annulla</button>
+                <button type="button" class="btn-primary" onclick="labCombatSave()">${_labEditingId ? 'Salva' : 'Crea'}</button>
+            </div>
+        </form>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    _labCombatRenderMonsters();
+}
+
+function _labCombatRenderMonsters() {
+    const list = document.getElementById('hbCombatMostriList');
+    if (!list) return;
+    const arr = _labCombatDraft?.mostri || [];
+    if (arr.length === 0) {
+        list.innerHTML = `<div class="lab-empty" style="padding:12px;font-size:0.85rem">Nessun mostro aggiunto.</div>`;
+        return;
+    }
+    list.innerHTML = arr.map((m, idx) => {
+        const snap = m.snapshot || m;
+        const nome = snap?.nome || 'Mostro';
+        const gs = snap?.grado_sfida ?? snap?.gs ?? '?';
+        const pv = snap?.punti_vita_max ?? snap?.pv ?? '?';
+        return `
+        <div class="combat-hb-row">
+            <div class="combat-hb-row-info">
+                <span class="combat-hb-row-name">${escapeHtml(nome)}</span>
+                <span class="combat-hb-row-meta">GS ${escapeHtml(String(gs))} · PV ${escapeHtml(String(pv))}</span>
+            </div>
+            <button type="button" class="combat-hb-row-del" onclick="labCombatRemoveMonster(${idx})" title="Rimuovi">&times;</button>
+        </div>`;
+    }).join('');
+}
+
+window.labCombatRemoveMonster = function(idx) {
+    if (!_labCombatDraft) return;
+    _labCombatDraft.mostri.splice(idx, 1);
+    _labCombatRenderMonsters();
+};
+
+window.labCombatAddMonster = async function() {
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const { data, error } = await supabase
+        .from('homebrew_nemici').select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('nome');
+    if (error) { showNotification('Errore caricamento nemici'); return; }
+    const list = data || [];
+    if (list.length === 0) {
+        showNotification('Crea prima qualche nemico nella sezione "Nemici"');
+        return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal active';
+    overlay.style.zIndex = '1500';
+    overlay.innerHTML = `
+        <div class="modal-content modal-content-lg" style="max-width:520px;">
+            <button class="modal-close" type="button" id="hbCombatPickerClose">&times;</button>
+            <h2>Seleziona mostro</h2>
+            <div class="monster-hb-list">
+                ${list.map(n => `
+                    <div class="monster-hb-item" data-id="${n.id}">
+                        <div class="monster-hb-info">
+                            <span class="monster-hb-name">${escapeHtml(n.nome)}</span>
+                            <span class="monster-hb-sub">${escapeHtml(n.tipo || '')} · GS ${n.grado_sfida || 0} · PV ${n.punti_vita_max || '?'}</span>
+                        </div>
+                        <span class="monster-hb-arrow">›</span>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    const close = () => { overlay.remove(); };
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.querySelector('#hbCombatPickerClose').onclick = close;
+    overlay.querySelectorAll('.monster-hb-item').forEach(it => {
+        it.onclick = () => {
+            const id = it.dataset.id;
+            const found = list.find(x => x.id === id);
+            if (found) {
+                _labCombatDraft.mostri.push({
+                    source: 'homebrew',
+                    source_id: found.id,
+                    snapshot: found
+                });
+                _labCombatRenderMonsters();
+            }
+            close();
+        };
+    });
+};
+
+window.labCombatSave = async function() {
+    if (!_labCombatDraft) return;
+    const nome = (document.getElementById('hbCombatNome')?.value || '').trim();
+    if (!nome) { showNotification('Inserisci un nome'); return; }
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const payload = {
+        user_id: AppState.currentUser.uid,
+        nome,
+        mostri: _labCombatDraft.mostri || [],
+        updated_at: new Date().toISOString()
+    };
+
+    let error;
+    if (_labCombatDraft.id) {
+        ({ error } = await supabase.from('homebrew_combattimenti').update(payload).eq('id', _labCombatDraft.id));
+    } else {
+        ({ error } = await supabase.from('homebrew_combattimenti').insert(payload));
+    }
+    if (error) {
+        console.error(error);
+        showNotification('Errore nel salvataggio: ' + (error.message || ''));
+        return;
+    }
+
+    showNotification(_labCombatDraft.id ? 'Combattimento aggiornato' : 'Combattimento creato');
+    closeHomebrewModal();
+    _labCombatDraft = null;
+    loadLabContent();
+};
+
+window.labEditCombatHomebrew = async function(id) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data, error } = await supabase.from('homebrew_combattimenti').select('*').eq('id', id).single();
+    if (error || !data) { showNotification('Errore nel caricamento'); return; }
+    _openLabCombatHomebrewWizard(data);
+};
+
+window.labDeleteCombatHomebrew = async function(id) {
+    const confirmed = await showConfirm('Eliminare questo combattimento homebrew?');
+    if (!confirmed) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase.from('homebrew_combattimenti').delete().eq('id', id);
+    if (error) { showNotification('Errore nella cancellazione'); return; }
+    loadLabContent();
+};
+
 function _openLabNemiciWizard(data) {
     const modal = document.getElementById('homebrewModal');
     if (!modal) return;
@@ -2373,7 +2642,11 @@ window.openHomebrewModal = function(editData) {
     if (!cat) return;
 
     if (_labCurrentTab === 'nemici') {
-        _openLabNemiciWizard(editData);
+        if (_labNemiciSubTab === 'combattimenti') {
+            _openLabCombatHomebrewWizard(editData);
+        } else {
+            _openLabNemiciWizard(editData);
+        }
         return;
     }
     if (_labCurrentTab === 'razze') {

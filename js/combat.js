@@ -70,7 +70,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             nextBtn.onclick = () => combatNextTurn(campagnaId, sessioneId, order.length, combatRound, turnIdx);
         }
 
-        // Left icons column
+        // Left icons column (square portraits, no initiative number)
         if (initCol) {
             initCol.innerHTML = order.map((entry, idx) => {
                 const initials = entry.name.substring(0, 2).toUpperCase();
@@ -79,7 +79,6 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
                 const dimmed = _combatSelectedId && !isExpanded;
                 return `<div class="combat-icon ${isTurn ? 'active' : ''} ${isExpanded ? 'active' : ''} ${dimmed ? 'dimmed' : ''} ${entry.type === 'monster' ? 'monster' : ''}" data-idx="${idx}">
                     <span class="combat-icon-initials">${escapeHtml(initials)}</span>
-                    <span class="combat-icon-init">${entry.init}</span>
                 </div>`;
             }).join('');
         }
@@ -122,6 +121,7 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
 
                 return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''}" 
                     onclick="combatSelectEntry('${entry.type}','${entry.id}','${campagnaId}','${sessioneId}',${isDM},${entry.id === currentUserId})">
+                    <span class="combat-card-init" title="Iniziativa">${entry.init}</span>
                     <div class="combat-card-center">
                         <span class="combat-card-name">${escapeHtml(entry.name)}</span>
                         ${condBadges ? `<div class="combat-card-badges">${condBadges}</div>` : ''}
@@ -789,7 +789,17 @@ window.openMonsterCreationModal = function(campagnaId, sessioneId) {
                 <div class="monster-choice-card" onclick="monsterFromHomebrew('${campagnaId}','${sessioneId}')">
                     <span class="monster-choice-icon">📖</span>
                     <span class="monster-choice-label">Da Homebrew</span>
-                    <span class="monster-choice-desc">Importa dal laboratorio</span>
+                    <span class="monster-choice-desc">Importa un nemico dal laboratorio</span>
+                </div>
+                <div class="monster-choice-card" onclick="monsterFromCombatHomebrew('${campagnaId}','${sessioneId}')">
+                    <span class="monster-choice-icon">⚔</span>
+                    <span class="monster-choice-label">Da Combattimento</span>
+                    <span class="monster-choice-desc">Importa un combattimento già pronto</span>
+                </div>
+                <div class="monster-choice-card" onclick="monsterStartPlaceholder('${campagnaId}','${sessioneId}')">
+                    <span class="monster-choice-icon">👤</span>
+                    <span class="monster-choice-label">Placeholder</span>
+                    <span class="monster-choice-desc">Solo nome e PV</span>
                 </div>
             </div>
         </div>
@@ -851,6 +861,204 @@ window.monsterSelectHomebrew = function(nemiciId, campagnaId, sessioneId) {
         _monsterFromHomebrew = data;
         _showMonsterWizard(campagnaId, sessioneId, data);
     });
+};
+
+// ===========================================================================
+// IMPORT DA COMBATTIMENTO HOMEBREW (encounter)
+// ===========================================================================
+window.monsterFromCombatHomebrew = async function(campagnaId, sessioneId) {
+    const choicePage = document.getElementById('monsterChoicePage');
+    if (choicePage) choicePage.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: combats, error } = await supabase.from('homebrew_combattimenti')
+        .select('*').eq('user_id', AppState.currentUser?.uid).order('nome');
+
+    if (error || !combats || combats.length === 0) {
+        if (choicePage) choicePage.innerHTML = `
+            <div class="lab-empty">${error ? 'Errore nel caricamento' : 'Nessun combattimento homebrew trovato'}</div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">Crea da zero</button>
+            </div>`;
+        return;
+    }
+
+    if (choicePage) choicePage.innerHTML = `
+        <div class="monster-hb-list">
+            ${combats.map(c => {
+                const tot = Array.isArray(c.mostri) ? c.mostri.length : 0;
+                return `
+                <div class="monster-hb-item" onclick="monsterImportCombatHomebrew('${c.id}','${campagnaId}','${sessioneId}')">
+                    <div class="monster-hb-info">
+                        <span class="monster-hb-name">${escapeHtml(c.nome)}</span>
+                        <span class="monster-hb-sub">${tot} mostr${tot===1?'o':'i'}</span>
+                    </div>
+                    <span class="monster-hb-arrow">›</span>
+                </div>`;
+            }).join('')}
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+            <button type="button" class="btn-secondary" onclick="monsterStartNew('${campagnaId}','${sessioneId}')">Crea da zero</button>
+        </div>`;
+};
+
+window.monsterImportCombatHomebrew = async function(combatId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: combat, error } = await supabase.from('homebrew_combattimenti').select('*').eq('id', combatId).single();
+    if (error || !combat) { showNotification('Errore nel caricamento del combattimento'); return; }
+
+    const arr = Array.isArray(combat.mostri) ? combat.mostri : [];
+    if (arr.length === 0) {
+        showNotification('Questo combattimento non contiene mostri');
+        return;
+    }
+
+    let added = 0;
+    for (const entry of arr) {
+        const snap = entry?.snapshot || entry || {};
+        const monster = _buildMonsterPayloadFromSnapshot(snap, campagnaId, sessioneId);
+        const { error: insErr } = await supabase.from('mostri_combattimento').insert(monster);
+        if (!insErr) added++;
+        else console.error('Errore inserimento mostro:', insErr);
+    }
+
+    closeMonsterModal();
+    showNotification(`${added} mostr${added===1?'o':'i'} aggiunt${added===1?'o':'i'} al combattimento!`);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+function _buildMonsterPayloadFromSnapshot(snap, campagnaId, sessioneId) {
+    const dex = parseInt(snap.destrezza) || 10;
+    const dexMod = Math.floor((dex - 10) / 2);
+    const initMod = (snap.mod_iniziativa != null && snap.mod_iniziativa !== '')
+        ? parseInt(snap.mod_iniziativa) : dexMod;
+    const init = Math.floor(Math.random() * 20) + 1 + (isNaN(initMod) ? 0 : initMod);
+    const pvMax = parseInt(snap.punti_vita_max) || 10;
+    const resLegg = parseInt(snap.resistenze_leggendarie) || 0;
+    const azLegg = parseInt(snap.azioni_legg_max) || 0;
+    return {
+        sessione_id: sessioneId,
+        campagna_id: campagnaId,
+        nome: snap.nome || 'Mostro',
+        tipologia: snap.tipo || snap.tipologia || 'Bestia',
+        taglia: snap.taglia || 'Media',
+        allineamento: snap.allineamento || 'Neutrale',
+        grado_sfida: snap.grado_sfida || '0',
+        forza: parseInt(snap.forza) || 10,
+        destrezza: dex,
+        costituzione: parseInt(snap.costituzione) || 10,
+        intelligenza: parseInt(snap.intelligenza) || 10,
+        saggezza: parseInt(snap.saggezza) || 10,
+        carisma: parseInt(snap.carisma) || 10,
+        punti_vita_max: pvMax,
+        pv_attuali: pvMax,
+        dadi_vita_num: parseInt(snap.dadi_vita_num) || 1,
+        dado_vita: parseInt(snap.dado_vita) || _monsterSizeHitDie(snap.taglia),
+        classe_armatura: parseInt(snap.classe_armatura) || 10,
+        velocita: parseFloat(snap.velocita) || 9,
+        iniziativa: init,
+        tiri_salvezza: snap.tiri_salvezza || [],
+        competenze_abilita: snap.competenze_abilita || [],
+        maestrie_abilita: snap.maestrie_abilita || [],
+        resistenze: snap.resistenze || [],
+        immunita: snap.immunita || [],
+        attacchi: snap.attacchi || [],
+        azioni_leggendarie: snap.azioni_leggendarie || [],
+        resistenze_leggendarie: resLegg,
+        res_legg_attuali: resLegg,
+        azioni_legg_max: azLegg,
+        azioni_legg_attuali: azLegg,
+        slot_incantesimo: snap.slot_incantesimo || null,
+        caratteristica_incantatore: snap.caratteristica_incantatore || null
+    };
+}
+
+// ===========================================================================
+// PLACEHOLDER (solo nome + PV)
+// ===========================================================================
+window.monsterStartPlaceholder = function(campagnaId, sessioneId) {
+    const choicePage = document.getElementById('monsterChoicePage');
+    if (!choicePage) return;
+    choicePage.innerHTML = `
+        <div class="form-group">
+            <label for="phNome">Nome</label>
+            <input type="text" id="phNome" placeholder="Es: Goblin #2" autofocus>
+        </div>
+        <div class="form-group">
+            <label for="phPV">Punti Vita</label>
+            <input type="number" id="phPV" min="1" value="10" inputmode="numeric">
+        </div>
+        <div class="form-group">
+            <label for="phInit">Iniziativa (opzionale, lascia vuoto per tirare)</label>
+            <input type="number" id="phInit" placeholder="es: 14">
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeMonsterModal()">Annulla</button>
+            <button type="button" class="btn-primary" onclick="monsterSavePlaceholder('${campagnaId}','${sessioneId}')">Aggiungi</button>
+        </div>`;
+    setTimeout(() => document.getElementById('phNome')?.focus(), 50);
+};
+
+window.monsterSavePlaceholder = async function(campagnaId, sessioneId) {
+    const nome = document.getElementById('phNome')?.value?.trim();
+    if (!nome) { showNotification('Inserisci un nome'); return; }
+    const pvMax = Math.max(1, parseInt(document.getElementById('phPV')?.value) || 10);
+    const initRaw = document.getElementById('phInit')?.value;
+    const init = (initRaw === '' || initRaw == null)
+        ? (Math.floor(Math.random() * 20) + 1)
+        : (parseInt(initRaw) || 0);
+
+    const monster = {
+        sessione_id: sessioneId,
+        campagna_id: campagnaId,
+        nome,
+        tipologia: 'Bestia',
+        taglia: 'Media',
+        allineamento: 'Neutrale',
+        grado_sfida: '0',
+        forza: 10, destrezza: 10, costituzione: 10,
+        intelligenza: 10, saggezza: 10, carisma: 10,
+        punti_vita_max: pvMax,
+        pv_attuali: pvMax,
+        dadi_vita_num: 1,
+        dado_vita: 8,
+        classe_armatura: 10,
+        velocita: 9,
+        iniziativa: init,
+        tiri_salvezza: [],
+        competenze_abilita: [],
+        maestrie_abilita: [],
+        resistenze: [],
+        immunita: [],
+        attacchi: [],
+        azioni_leggendarie: [],
+        resistenze_leggendarie: 0,
+        res_legg_attuali: 0,
+        azioni_legg_max: 0,
+        azioni_legg_attuali: 0,
+        slot_incantesimo: null,
+        caratteristica_incantatore: null,
+        is_placeholder: true
+    };
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    let { error } = await supabase.from('mostri_combattimento').insert(monster);
+    if (error && /is_placeholder/i.test(error.message || '')) {
+        // Fallback se la colonna is_placeholder non esiste sul DB.
+        delete monster.is_placeholder;
+        ({ error } = await supabase.from('mostri_combattimento').insert(monster));
+    }
+    if (error) { showNotification('Errore creazione placeholder: ' + (error.message || '')); return; }
+
+    closeMonsterModal();
+    showNotification(`${nome} aggiunto al combattimento!`);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 const MONSTER_SIZE_DIE = { 'Minuscola': 4, 'Piccola': 6, 'Media': 8, 'Grande': 10, 'Enorme': 12, 'Mastodontica': 20 };
