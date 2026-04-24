@@ -113,7 +113,7 @@ function getPredefinedIconByName(name) {
 function buildCampagnaCardIconHtml(icon) {
     if (icon.imageSrc) {
         const src = encodeURI(icon.imageSrc);
-        return `<div class="campagna-icon-svg campagna-icon-image"><img src="${src}" alt="" width="38" height="38" decoding="async" /></div>`;
+        return `<div class="campagna-icon-svg campagna-icon-image"><img src="${src}" alt="" decoding="async" /></div>`;
     }
     return `<div class="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg></div>`;
 }

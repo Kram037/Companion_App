@@ -98,11 +98,15 @@
     color: var(--accent);
 }
 
+.campagna-icon-svg.campagna-icon-image {
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+}
+
 .campagna-icon-image img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-    border-radius: 4px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
 }
 
@@ -198,13 +202,15 @@
     color: var(--accent);
 }
 
+.dettagli-icon-svg.dettagli-icon-image {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+}
+
 .dettagli-icon-image img {
     width: 100%;
     height: 100%;
-    max-width: 48px;
-    max-height: 48px;
-    object-fit: contain;
-    border-radius: 6px;
+    object-fit: cover;
     display: block;
 }
 
