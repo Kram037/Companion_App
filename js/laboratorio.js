@@ -2057,7 +2057,8 @@ window.saveLabNemico = async function() {
         loadLabContent();
     } catch (err) {
         console.error('Errore salvataggio nemico:', err);
-        showNotification('Errore nel salvataggio');
+        const msg = (err && (err.message || err.details || err.hint)) ? String(err.message || err.details || err.hint) : '';
+        showNotification(msg ? `Errore nel salvataggio: ${msg.slice(0, 220)}` : 'Errore nel salvataggio');
     }
 };
 

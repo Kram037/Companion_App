@@ -69,3 +69,16 @@ FOR SELECT USING (
 -- Add round/turn tracking to sessioni
 ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS combat_round INTEGER DEFAULT 1;
 ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS combat_turn_index INTEGER DEFAULT 0;
+
+-- Estensioni schema mostri (idempotenti; vedi anche sql/patch-mostri-e-nemici-supabase.sql)
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS attacchi JSONB DEFAULT '[]';
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS azioni_leggendarie JSONB DEFAULT '[]';
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS resistenze_leggendarie INTEGER DEFAULT 0;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS res_legg_attuali INTEGER DEFAULT 0;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS slot_incantesimo JSONB DEFAULT NULL;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS caratteristica_incantatore TEXT DEFAULT NULL;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS azioni_legg_max INTEGER DEFAULT 0;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS azioni_legg_attuali INTEGER DEFAULT 0;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS maestrie_abilita JSONB DEFAULT '[]';
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dadi_vita_num INTEGER DEFAULT NULL;
+ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS dado_vita INTEGER DEFAULT NULL;
