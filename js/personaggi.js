@@ -8752,6 +8752,12 @@ window.schedaCloseHpCalc = async function() {
         if (fullModal && fullModal.classList.contains('active') && monsterId && typeof combatOpenMonsterFullSheet === 'function') {
             combatOpenMonsterFullSheet(monsterId, campagnaId, sessioneId);
         }
+        // Stessa cosa per la dialog placeholder: re-render per aggiornare
+        // i numeri delle box PV / CA al volo.
+        const phModal = document.getElementById('combatPlaceholderModal');
+        if (phModal && phModal.classList.contains('active') && monsterId && typeof combatOpenPlaceholderDialog === 'function') {
+            combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
+        }
     }
 }
 

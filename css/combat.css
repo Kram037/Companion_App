@@ -357,8 +357,8 @@
     .combat-toolbar-btn { width: 42px; height: 38px; }
 }
 
-/* Placeholder dialog: layout compatto e fisso (no scroll) con PV / CA
-   editabili e bottone "Condizioni" che apre il modale dedicato. */
+/* Placeholder dialog: estetica identica alla full sheet del mostro
+   (scheda-three-boxes per CA / PV / PV Max). */
 .placeholder-modal-content {
     max-width: 460px;
     width: 100%;
@@ -367,70 +367,21 @@
     padding: 22px 22px 18px;
 }
 .placeholder-title {
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     padding-right: 28px;
     font-size: 1.25rem;
 }
-.placeholder-stats-row {
+.placeholder-boxes { margin-bottom: 14px; }
+
+.placeholder-cond-chips {
+    margin: 6px 0 14px;
     display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    margin-bottom: 14px;
-}
-.placeholder-hp-group { flex: 1 1 auto; min-width: 0; margin: 0; }
-.placeholder-ca-group { flex: 0 0 84px; margin: 0; }
-.placeholder-ca-input {
-    width: 100%;
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 700;
-    padding: 8px 4px;
-}
-.placeholder-hp-row {
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
-    flex-wrap: nowrap;
-}
-.placeholder-hp-row input[type="number"] {
-    width: 64px;
-    min-width: 0;
-    text-align: center;
-    font-size: 1.05rem;
-    font-weight: 700;
-    padding: 8px 4px;
-    flex: 1 1 0;
-}
-.placeholder-hp-sep {
-    color: var(--text-secondary);
-    font-weight: 700;
-    flex: 0 0 auto;
-}
-.placeholder-hp-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 1.15rem;
-    font-weight: 800;
-    cursor: pointer;
-    line-height: 1;
-    flex: 0 0 auto;
-}
-.placeholder-hp-btn:hover { border-color: var(--accent); color: var(--accent); }
-.placeholder-sub {
-    margin: -8px 0 14px;
-    color: var(--text-secondary);
-    font-size: 0.82rem;
-    text-align: left;
 }
 
 /* Toolbar di azioni unificata fra placeholder dialog e full sheet del
-   mostro: Condizioni full-width sopra, [Duplica][Elimina] su una riga,
-   Salva (solo placeholder) full-width in fondo. */
+   mostro: Condizioni full-width sopra, [Duplica][Elimina] su una riga. */
 .combat-monster-actions-stack {
     display: flex;
     flex-direction: column;
@@ -460,18 +411,45 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    align-items: stretch;
 }
-.combat-monster-actions-row > button { width: 100%; }
-.combat-monster-save-btn {
+/* Pareggia perfettamente l'altezza dei bottoni Duplica / Elimina:
+   stessa box-sizing, stessa min-height, padding identico, line-height
+   coerente. Senza questo, btn-danger e btn-secondary potevano avere
+   altezze diverse a seconda dei bordi/padding ereditati. */
+.combat-monster-actions-row > button {
     width: 100%;
-    margin-top: 4px;
+    min-height: 38px;
+    padding: 8px 12px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Etichette di sezione con un po' di respiro sopra (usate per separare
+   visivamente "Condizioni" dalle resistenze/immunita' sottostanti). */
+.combat-section-label-spaced {
+    margin-top: 14px !important;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+.monster-fullsheet-conditions {
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+/* Modale condizioni mostro: piu' largo della HP calc per mostrare bene
+   le checkbox a 2 colonne. */
+.monster-conditions-modal {
+    width: min(380px, calc(100vw - 32px));
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 @media (max-width: 480px) {
     .placeholder-modal-content { padding: 18px 16px 14px; }
-    .placeholder-stats-row { gap: 10px; }
-    .placeholder-ca-group { flex-basis: 76px; }
-    .placeholder-hp-row input[type="number"] { width: 52px; font-size: 1rem; }
 }
 
 /* Caselle "scheda-box" cliccabili (PV / CA / Velocità) nella full sheet:

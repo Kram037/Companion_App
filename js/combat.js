@@ -370,7 +370,8 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
     }
     const condActive = ALL_CONDITIONS.filter(c => m[c.key]);
     const condBadgesHtml = condActive.length || (m.esaustione > 0)
-        ? `<div class="combat-conditions" style="margin-top:8px;">${condActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('')}${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>`
+        ? `<div class="combat-section-label combat-section-label-spaced">Condizioni</div>
+           <div class="combat-conditions monster-fullsheet-conditions">${condActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('')}${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>`
         : '';
 
     document.getElementById('combatMonsterFullContent').innerHTML = `
@@ -449,17 +450,13 @@ window.combatMonsterRemove = async function(mId, campagnaId, sessioneId) {
 
 window.combatMonsterOpenConditions = function(mId, campagnaId, sessioneId) {
     if (typeof openMonsterConditionsModal !== 'function') return;
-    openMonsterConditionsModal(mId, campagnaId, sessioneId);
-    const condModal = document.getElementById('monsterConditionsModal');
-    if (condModal) {
-        const obs = new MutationObserver(() => {
-            if (!condModal.classList.contains('active')) {
-                obs.disconnect();
-                setTimeout(() => combatOpenMonsterFullSheet(mId, campagnaId, sessioneId), 80);
-            }
-        });
-        obs.observe(condModal, { attributes: true, attributeFilter: ['class'] });
-    }
+    // Callback chiamata sia dopo ogni toggle istantaneo, sia alla chiusura
+    // del modale condizioni, per riflettere le chip/badge nella full sheet.
+    openMonsterConditionsModal(mId, campagnaId, sessioneId, () => {
+        if (typeof combatOpenMonsterFullSheet === 'function') {
+            combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
+        }
+    });
 };
 
 // Editor inline della CA del mostro: prompt numerico semplice. Funziona
@@ -478,14 +475,20 @@ window.combatMonsterEditCa = async function(mId, campagnaId, sessioneId) {
     const { error } = await supabase.from('mostri_combattimento').update({ classe_armatura: v }).eq('id', mId);
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
-    // Re-render della modale per riflettere il nuovo valore.
-    combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
+    // Re-render della modale che era aperta (full sheet o placeholder)
+    // per riflettere subito il nuovo valore di CA.
+    const phModal = document.getElementById('combatPlaceholderModal');
+    if (phModal && phModal.classList.contains('active')) {
+        combatOpenPlaceholderDialog(mId, campagnaId, sessioneId);
+    } else {
+        combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
+    }
     renderCombattimentoContent(campagnaId, sessioneId);
 };
 
-// Dialog rapida per i mostri "placeholder": mostra i PV (modificabili) e
-// permette di togglare le condizioni standard. Niente caratteristiche, niente
-// attacchi: il placeholder serve solo come segnaposto in iniziativa.
+// Dialog rapida per i mostri "placeholder": stessa estetica della full
+// sheet del mostro (scheda-three-boxes), niente caratteristiche, chip per
+// le condizioni e una piccola toolbar di azioni.
 window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
@@ -495,7 +498,10 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
     const pvAttuali = m.pv_attuali ?? m.punti_vita_max;
     const pvMax = m.punti_vita_max || 10;
     const ca = m.classe_armatura || 10;
-    const condCount = ALL_CONDITIONS.filter(c => m[c.key]).length + (m.esaustione > 0 ? 1 : 0);
+    const condActive = ALL_CONDITIONS.filter(c => m[c.key]);
+    const condCount = condActive.length + (m.esaustione > 0 ? 1 : 0);
+    const condChipsHtml = condActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('')
+        + (m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : '');
 
     let modal = document.getElementById('combatPlaceholderModal');
     if (!modal) {
@@ -510,24 +516,25 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
     document.getElementById('combatPlaceholderContent').innerHTML = `
         <button class="modal-close" onclick="closeCombatPlaceholderModal()">&times;</button>
         <h2 class="placeholder-title">${escapeHtml(m.nome)}</h2>
-        <p class="placeholder-sub">Mostro placeholder · solo PV / CA / condizioni</p>
 
-        <div class="placeholder-stats-row">
-            <div class="form-group placeholder-hp-group">
-                <label>Punti Vita</label>
-                <div class="placeholder-hp-row">
-                    <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
-                    <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
-                    <span class="placeholder-hp-sep">/</span>
-                    <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
-                    <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
-                </div>
+        <div class="scheda-three-boxes placeholder-boxes">
+            <div class="scheda-box clickable" onclick="combatMonsterEditCa('${m.id}','${campagnaId}','${sessioneId}')" title="Clicca per modificare la CA">
+                <div class="scheda-box-val">${ca}</div>
+                <div class="scheda-box-label">CA</div>
             </div>
-            <div class="form-group placeholder-ca-group">
-                <label>CA</label>
-                <input type="number" id="phCAVal" value="${ca}" min="1" inputmode="numeric" class="placeholder-ca-input">
+            <div class="scheda-box clickable" onclick="monsterHpCalc('${m.id}','pv_attuali',${pvAttuali},${pvMax},'${campagnaId}','${sessioneId}')" title="Clicca per modificare i PV">
+                <div class="scheda-box-val">${pvAttuali}/${pvMax}</div>
+                <div class="scheda-box-label">PV</div>
+            </div>
+            <div class="scheda-box clickable" onclick="placeholderEditPvMax('${m.id}','${campagnaId}','${sessioneId}')" title="Clicca per modificare i PV totali">
+                <div class="scheda-box-val">${pvMax}</div>
+                <div class="scheda-box-label">PV Max</div>
             </div>
         </div>
+
+        ${condCount > 0 ? `
+        <div class="combat-section-label combat-section-label-spaced">Condizioni</div>
+        <div class="combat-conditions placeholder-cond-chips">${condChipsHtml}</div>` : ''}
 
         <div class="combat-monster-actions-stack">
             <button type="button" class="btn-secondary combat-monster-cond-btn"
@@ -539,48 +546,42 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
                 <button type="button" class="btn-secondary btn-small" onclick="duplicateMonster('${monsterId}','${campagnaId}','${sessioneId}')">Duplica</button>
                 <button type="button" class="btn-danger btn-small" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
             </div>
-            <button type="button" class="btn-primary combat-monster-save-btn" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
         </div>`;
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-
-    const valEl = document.getElementById('phHpVal');
-    document.getElementById('phHpMinus').onclick = () => { valEl.value = Math.max(0, (parseInt(valEl.value)||0) - 1); };
-    document.getElementById('phHpPlus').onclick = () => { valEl.value = (parseInt(valEl.value)||0) + 1; };
 };
 
-// Apre il modale condizioni esistente per il placeholder. Al termine
-// (close del modale condizioni) ricaricheremo la dialog placeholder per
-// riflettere il nuovo conteggio condizioni.
-window.placeholderOpenConditions = async function(monsterId, campagnaId, sessioneId) {
-    // Salva prima eventuali modifiche pendenti su PV / CA in modo da non
-    // perderle quando il modale condizioni richiama renderCombattimento.
-    const pvVal = parseInt(document.getElementById('phHpVal')?.value);
-    const pvMax = parseInt(document.getElementById('phHpMax')?.value);
-    const ca = parseInt(document.getElementById('phCAVal')?.value);
+// Edit del PV max (solo placeholder): prompt numerico.
+window.placeholderEditPvMax = async function(monsterId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
-    if (supabase && (!isNaN(pvVal) || !isNaN(pvMax) || !isNaN(ca))) {
-        const upd = {};
-        if (!isNaN(pvMax) && pvMax > 0) upd.punti_vita_max = pvMax;
-        if (!isNaN(pvVal)) upd.pv_attuali = Math.min(Math.max(0, pvVal), upd.punti_vita_max || pvMax || 9999);
-        if (!isNaN(ca) && ca > 0) upd.classe_armatura = ca;
-        if (Object.keys(upd).length) await supabase.from('mostri_combattimento').update(upd).eq('id', monsterId);
-    }
-    if (typeof openMonsterConditionsModal === 'function') {
-        openMonsterConditionsModal(monsterId, campagnaId, sessioneId);
-        // Riapri la dialog placeholder dopo la chiusura del modale condizioni.
-        const condModal = document.getElementById('monsterConditionsModal');
-        if (condModal) {
-            const reopenObserver = new MutationObserver(() => {
-                if (!condModal.classList.contains('active')) {
-                    reopenObserver.disconnect();
-                    setTimeout(() => combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId), 80);
-                }
-            });
-            reopenObserver.observe(condModal, { attributes: true, attributeFilter: ['class'] });
-        }
-    }
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('punti_vita_max,pv_attuali,nome').eq('id', monsterId).single();
+    if (!m) return;
+    const cur = m.punti_vita_max ?? 10;
+    const raw = window.prompt(`PV totali per ${m.nome}`, String(cur));
+    if (raw == null) return;
+    const v = parseInt(raw);
+    if (isNaN(v) || v < 1) { showNotification('Valore PV non valido'); return; }
+    const updates = { punti_vita_max: v };
+    // Se i PV attuali superano il nuovo max, li clamp.
+    if ((m.pv_attuali ?? cur) > v) updates.pv_attuali = v;
+    const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', monsterId);
+    if (error) { showNotification('Errore: ' + error.message); return; }
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
+    renderCombattimentoContent(campagnaId, sessioneId);
+};
+
+// Apre il modale condizioni per il placeholder. Le condizioni vengono
+// applicate istantaneamente (vedi openMonsterConditionsModal). Quando
+// l'overlay viene chiuso ricarichiamo la dialog placeholder per
+// aggiornare le chip mostrate.
+window.placeholderOpenConditions = function(monsterId, campagnaId, sessioneId) {
+    if (typeof openMonsterConditionsModal !== 'function') return;
+    openMonsterConditionsModal(monsterId, campagnaId, sessioneId, () => {
+        combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
+    });
 };
 
 window.closeCombatPlaceholderModal = function() {
@@ -589,28 +590,6 @@ window.closeCombatPlaceholderModal = function() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
     }
-};
-
-window.combatPlaceholderSave = async function(monsterId, campagnaId, sessioneId) {
-    const pvVal = Math.max(0, parseInt(document.getElementById('phHpVal')?.value) || 0);
-    const pvMax = Math.max(1, parseInt(document.getElementById('phHpMax')?.value) || 1);
-    const ca = Math.max(1, parseInt(document.getElementById('phCAVal')?.value) || 10);
-    const updates = {
-        pv_attuali: Math.min(pvVal, pvMax),
-        punti_vita_max: pvMax,
-        classe_armatura: ca
-    };
-    document.querySelectorAll('#phCondGrid input[type="checkbox"]').forEach(cb => {
-        updates[cb.dataset.cond] = cb.checked;
-    });
-
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', monsterId);
-    if (error) { showNotification('Errore salvataggio: ' + error.message); return; }
-    closeCombatPlaceholderModal();
-    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 window.combatPlaceholderDelete = async function(monsterId, campagnaId, sessioneId) {
@@ -1122,12 +1101,18 @@ window.combatCalcPress = function(key) {
     else { input.value += key; }
 }
 
-// Monster conditions modal
-window.openMonsterConditionsModal = async function(mId, campagnaId, sessioneId) {
+// Modale condizioni mostro (auto-save: ogni toggle viene applicato
+// istantaneamente). Il quarto parametro opzionale onAfterChange viene
+// invocato dopo ogni modifica per consentire il re-render della dialog
+// sottostante (placeholder o full sheet).
+let _monsterConditionsOnChange = null;
+window.openMonsterConditionsModal = async function(mId, campagnaId, sessioneId, onAfterChange) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
     const { data: m } = await supabase.from('mostri_combattimento').select('*').eq('id', mId).single();
     if (!m) return;
+
+    _monsterConditionsOnChange = typeof onAfterChange === 'function' ? onAfterChange : null;
 
     const existing = document.getElementById('hpCalcOverlay');
     if (existing) existing.remove();
@@ -1136,34 +1121,61 @@ window.openMonsterConditionsModal = async function(mId, campagnaId, sessioneId) 
     overlay.id = 'hpCalcOverlay';
     overlay.className = 'hp-calc-overlay';
     overlay.innerHTML = `
-        <div class="hp-calc-modal" style="width:340px;max-height:80vh;overflow-y:auto;">
+        <div class="hp-calc-modal monster-conditions-modal">
             <div class="hp-calc-title">Condizioni - ${escapeHtml(m.nome)}</div>
             <div class="pg-conditions-grid">
-                ${ALL_CONDITIONS.map(c => `<label class="pg-condition-item"><input type="checkbox" id="mc_${c.key}" ${m[c.key] ? 'checked' : ''}> ${c.label}</label>`).join('')}
+                ${ALL_CONDITIONS.map(c => `<label class="pg-condition-item"><input type="checkbox" id="mc_${c.key}" data-cond="${c.key}" ${m[c.key] ? 'checked' : ''} onchange="monsterConditionToggle('${mId}','${c.key}',this.checked,'${campagnaId}','${sessioneId}')"> ${c.label}</label>`).join('')}
             </div>
             <div class="pg-exhaustion-row" style="margin-top:12px;">
                 <label>Esaustione</label>
-                <input type="number" id="mc_esaustione" value="${m.esaustione||0}" min="0" max="6" style="width:60px;">
+                <input type="number" id="mc_esaustione" value="${m.esaustione||0}" min="0" max="6" style="width:60px;"
+                    onchange="monsterExhaustionChange('${mId}',this.value,'${campagnaId}','${sessioneId}')">
             </div>
             <div class="hp-calc-actions" style="margin-top:12px;">
-                <button class="btn-primary btn-small" onclick="saveMonsterConditions('${mId}','${campagnaId}','${sessioneId}')">Salva</button>
-                <button class="btn-secondary btn-small" onclick="schedaCloseHpCalc()">Chiudi</button>
+                <button class="btn-secondary btn-small" onclick="closeMonsterConditionsModal()">Chiudi</button>
             </div>
         </div>`;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) schedaCloseHpCalc(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeMonsterConditionsModal(); });
     document.body.appendChild(overlay);
 }
 
-window.saveMonsterConditions = async function(mId, campagnaId, sessioneId) {
+// Toggle istantaneo di una singola condizione: salva su DB, broadcast,
+// re-render della pagina combattimento e callback per la dialog sotto.
+window.monsterConditionToggle = async function(mId, condKey, value, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const updates = {};
-    ALL_CONDITIONS.forEach(c => { updates[c.key] = document.getElementById(`mc_${c.key}`)?.checked || false; });
-    updates.esaustione = parseInt(document.getElementById('mc_esaustione')?.value) || 0;
-    await supabase.from('mostri_combattimento').update(updates).eq('id', mId);
-    schedaCloseHpCalc();
-    await renderCombatMonsterSheet(mId, true, campagnaId, sessioneId);
-    await renderCombattimentoContent(campagnaId, sessioneId);
+    const updates = {}; updates[condKey] = !!value;
+    const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', mId);
+    if (error) { showNotification('Errore: ' + error.message); return; }
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    renderCombattimentoContent(campagnaId, sessioneId);
+    if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
+};
+
+window.monsterExhaustionChange = async function(mId, raw, campagnaId, sessioneId) {
+    const v = Math.max(0, Math.min(6, parseInt(raw) || 0));
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase.from('mostri_combattimento').update({ esaustione: v }).eq('id', mId);
+    if (error) { showNotification('Errore: ' + error.message); return; }
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    renderCombattimentoContent(campagnaId, sessioneId);
+    if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
+};
+
+window.closeMonsterConditionsModal = function() {
+    const overlay = document.getElementById('hpCalcOverlay');
+    if (overlay) overlay.remove();
+    const cb = _monsterConditionsOnChange;
+    _monsterConditionsOnChange = null;
+    if (typeof cb === 'function') cb();
+};
+
+// Compat: vecchia firma "Salva" del modale condizioni (alcuni vecchi
+// onclick potrebbero ancora chiamarla). Ora salva e chiude.
+window.saveMonsterConditions = function(mId, campagnaId, sessioneId) {
+    closeMonsterConditionsModal();
+    renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 // Monster creation modal
