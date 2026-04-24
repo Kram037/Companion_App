@@ -6854,8 +6854,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Avvizzimento": {
-    "name": "Avvizzimento",
+  "Inaridire": {
+    "name": "Inaridire",
     "name_en": "Blight",
     "level": 4,
     "school": "necromancy",

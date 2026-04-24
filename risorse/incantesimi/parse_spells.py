@@ -311,7 +311,7 @@ SPELL_NAMES_IT = {
     "Aura of Life": "Aura di Vita",
     "Aura of Purity": "Aura di Purezza",
     "Banishment": "Bandire",
-    "Blight": "Avvizzimento",
+    "Blight": "Inaridire",
     "Charm Monster": "Charme su Mostro",
     "Compulsion": "Costrizione",
     "Confusion": "Confusione",

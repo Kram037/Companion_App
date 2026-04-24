@@ -2655,6 +2655,7 @@ function renderPersonaggi(personaggi, campagneMap = {}) {
             </div>
             <div class="pg-card-footer">
                 <div class="pg-card-campaigns"><span class="pg-card-campaigns-icon">⚔</span> ${campagneText}</div>
+                <button class="pg-card-action pg-card-subclass-btn" onclick="event.stopPropagation(); pgChangeSubclassFromCard('${pg.id}')" aria-label="Cambia sottoclasse" title="Cambia sottoclasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></button>
                 <button class="pg-card-delete" onclick="event.stopPropagation(); deletePersonaggio('${pg.id}')" aria-label="Elimina personaggio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
             </div>
         </div>`;
@@ -12234,6 +12235,146 @@ window.deletePersonaggio = async function(personaggioId) {
         console.error('Errore eliminazione personaggio:', error);
         showNotification('Errore: ' + (error.message || error));
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Cambio sottoclasse dalla card (lista personaggi)
+// Permette di cambiare la sottoclasse di un personaggio gia' creato.
+// I privilegi auto-derivati e le risorse di sottoclasse vengono ricalcolati
+// automaticamente al successivo render (sono derivati da CLASSES_DATA +
+// SUBCLASS_RESOURCES in base a sottoclasseSlug/sottoclasse_homebrew_id).
+// ─────────────────────────────────────────────────────────────────────
+window.pgChangeSubclassFromCard = async function(pgId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    let pg;
+    try {
+        const { data, error } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+        if (error) throw error;
+        pg = data;
+    } catch (e) {
+        console.error('Errore caricamento personaggio:', e);
+        showNotification('Errore nel caricamento del personaggio');
+        return;
+    }
+    if (!pg) return;
+
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
+    }
+
+    let classi = Array.isArray(pg.classi) && pg.classi.length > 0
+        ? pg.classi
+        : (pg.classe ? [{ nome: pg.classe, livello: pg.livello || 1 }] : []);
+
+    if (!classi.length) {
+        showNotification('Nessuna classe trovata per questo personaggio');
+        return;
+    }
+
+    const eligible = classi.map((c, i) => {
+        const opts = pgGetSubclassOptions(c.nome);
+        const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+        return { c, i, opts, hbOpts, hasOpts: opts.length > 0 || hbOpts.length > 0 };
+    }).filter(x => x.hasOpts);
+
+    if (!eligible.length) {
+        showNotification('Nessuna sottoclasse disponibile per le classi di questo personaggio');
+        return;
+    }
+
+    if (eligible.length === 1) {
+        _pgOpenSubclassPickerForSavedPg(pgId, pg, eligible[0].i);
+        return;
+    }
+
+    const items = eligible.map(({ c, i }) => ({
+        value: String(i),
+        label: `${c.nome} (Liv. ${c.livello || 1})${c.sottoclasse ? ' — ' + c.sottoclasse : ''}`
+    }));
+    openCustomSelect(items, (value) => {
+        _pgOpenSubclassPickerForSavedPg(pgId, pg, parseInt(value));
+    }, 'Per quale classe?');
+};
+
+async function _pgOpenSubclassPickerForSavedPg(pgId, pg, classIdx) {
+    if (!Array.isArray(pg.classi) || !pg.classi[classIdx]) return;
+    const c = pg.classi[classIdx];
+    const opts = pgGetSubclassOptions(c.nome);
+    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    if (opts.length === 0 && hbOpts.length === 0) {
+        showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const items = _buildSubclassPickerItems(opts, hbOpts, c.livello || 1);
+    const allOpts = [...opts, ...hbOpts];
+
+    openCustomSelect(items, async (value) => {
+        const newClassi = pg.classi.map(x => ({ ...x }));
+        const target = newClassi[classIdx];
+        if (value === '__none__') {
+            delete target.sottoclasse;
+            delete target.sottoclasseSlug;
+            delete target.sottoclasse_homebrew_id;
+            delete target.sottoclasse_homebrew_author;
+            target.thirdCaster = false;
+        } else {
+            const sel = allOpts.find(o => o.slug === value);
+            if (!sel) return;
+            target.sottoclasse = sel.name;
+            target.sottoclasseSlug = sel.slug;
+            if (sel.isHomebrew) {
+                target.sottoclasse_homebrew_id = sel._hbId;
+                if (sel._hbAuthor) target.sottoclasse_homebrew_author = sel._hbAuthor;
+                target.thirdCaster = false;
+            } else {
+                delete target.sottoclasse_homebrew_id;
+                delete target.sottoclasse_homebrew_author;
+                target.thirdCaster = (typeof isThirdCasterSubclass === 'function')
+                    ? isThirdCasterSubclass(sel.slug, sel.name) : false;
+            }
+        }
+
+        // Pulisce dai privilegi salvati le voci "hidden_auto" legate alla
+        // vecchia sottoclasse di questa stessa classe (prefisso
+        // "<classSlug>:<oldSubSlug>:"), per non lasciare fantasmi che, in
+        // teoria, potrebbero collidere se l'utente tornasse alla stessa
+        // sottoclasse in futuro. Le custom_features (tabelle utente) restano
+        // intatte.
+        const oldSubSlug = c.sottoclasseSlug || '';
+        let privilegi = pg.privilegi && typeof pg.privilegi === 'object' ? { ...pg.privilegi } : null;
+        if (privilegi && Array.isArray(privilegi.hidden_auto) && oldSubSlug) {
+            privilegi.hidden_auto = privilegi.hidden_auto.filter(k => {
+                if (typeof k !== 'string') return true;
+                return !k.includes(`:${oldSubSlug}:`);
+            });
+        }
+
+        const updates = { classi: newClassi, updated_at: new Date().toISOString() };
+        if (privilegi) updates.privilegi = privilegi;
+
+        const supabase = getSupabaseClient();
+        if (!supabase) return;
+        try {
+            const { error } = await supabase.from('personaggi').update(updates).eq('id', pgId);
+            if (error) throw error;
+            showNotification(target.sottoclasse
+                ? `Sottoclasse di ${c.nome} aggiornata: ${target.sottoclasse}`
+                : `Sottoclasse di ${c.nome} rimossa`);
+            await loadPersonaggi();
+            // Se la scheda di questo PG e' aperta, ricarica.
+            if (AppState.currentPersonaggioId === pgId && AppState.currentPage === 'scheda') {
+                if (typeof renderSchedaPersonaggio === 'function') {
+                    await renderSchedaPersonaggio(pgId);
+                }
+            }
+            try { await sendAppEventBroadcast({ table: 'personaggi', action: 'update', id: pgId }); } catch (_) {}
+        } catch (e) {
+            console.error('Errore aggiornamento sottoclasse:', e);
+            showNotification('Errore nel salvataggio della sottoclasse');
+        }
+    }, `Sottoclasse di ${c.nome}`);
 }
 
 // --- Scegli personaggio per campagna ---
