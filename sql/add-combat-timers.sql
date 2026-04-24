@@ -12,24 +12,33 @@
 --     quando il timer e' attivo, vengono applicate al target. Allo
 --     scadere del timer queste vengono rimosse (solo quelle che il
 --     timer stesso aveva applicato).
+--
+-- IMPORTANTE: in questo schema le PK delle tabelle correlate sono
+-- VARCHAR(10) (vedi create-sessioni-table.sql, create-personaggi.sql,
+-- add-mostri-combattimento.sql), non UUID. Per questo motivo anche le
+-- foreign key qui sotto sono dichiarate come VARCHAR(10).
 -- =====================================================================
 
 CREATE TABLE IF NOT EXISTS combat_timers (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    sessione_id     UUID NOT NULL REFERENCES sessioni(id) ON DELETE CASCADE,
-    campagna_id     UUID NOT NULL REFERENCES campagne(id) ON DELETE CASCADE,
+    id              VARCHAR(10) PRIMARY KEY
+                    DEFAULT SUBSTRING(REPLACE(gen_random_uuid()::text, '-', ''), 1, 10),
+    sessione_id     VARCHAR(10) NOT NULL REFERENCES sessioni(id) ON DELETE CASCADE,
+    campagna_id     VARCHAR(10) NOT NULL REFERENCES campagne(id) ON DELETE CASCADE,
     nome            TEXT NOT NULL,
     -- 'monster' | 'player' | 'global'
     target_kind     TEXT NOT NULL CHECK (target_kind IN ('monster','player','global')),
-    -- id del mostro (mostri_combattimento) o del personaggio (personaggi)
-    target_id       UUID,
+    -- id del mostro (mostri_combattimento) o del personaggio (personaggi).
+    -- Non vincolato con FK perche' puo' puntare a tabelle diverse a
+    -- seconda di target_kind. La pulizia dei timer "orfani" e' gestita
+    -- lato app o tramite la cascata su sessione_id (fine combattimento).
+    target_id       VARCHAR(10),
     -- nome leggibile del target, salvato per evitare join in lettura
     target_name     TEXT,
     -- chiavi delle condizioni applicate (esempio: {'avvelenato','prono'})
     conditions      TEXT[] NOT NULL DEFAULT '{}',
     duration_rounds INT NOT NULL CHECK (duration_rounds > 0),
     remaining_rounds INT NOT NULL CHECK (remaining_rounds >= 0),
-    created_by      UUID,
+    created_by      VARCHAR(10),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     expired         BOOLEAN NOT NULL DEFAULT FALSE
 );
