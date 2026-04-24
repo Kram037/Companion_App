@@ -281,10 +281,10 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
     const immunitaHtml = (m.immunita?.length) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
 
     const attacks = m.attacchi || [];
-    const attacksHtml = attacks.length > 0 ? attacks.map(a => {
+    const attacksHtml = attacks.length > 0 ? attacks.map((a, ai) => {
         const hasUsi = a.usi_max > 0;
         const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_, i) =>
-            `<span class="monster-action-use-pip ${i < (a.usi_attuali ?? a.usi_max) ? 'filled' : ''}"></span>`).join('')}</span>` : '';
+            `<span class="monster-action-use-pip ${i < (a.usi_attuali ?? a.usi_max) ? 'filled' : ''}" onclick="monsterToggleActionUse('${monsterId}',${ai},${i},'${campagnaId}','${sessioneId}')"></span>`).join('')}</span>` : '';
         return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
     }).join('') : '';
 
@@ -316,11 +316,12 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
         const atkBonus = incMod + bonusComp;
         const dc = 8 + bonusComp + incMod;
         const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
-        const slotsHtml = levels.map(lvl => {
+            const slotsHtml = levels.map(lvl => {
             const s = slots[lvl];
             const cur = s.current ?? s.max;
-            const pips = Array.from({length: s.max}, (_, i) => `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}"></span>`).join('');
-            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count">${cur}/${s.max}</span></div>`;
+            const pips = Array.from({length: s.max}, (_, i) =>
+                `<span class="scheda-slot-pip ${i < cur ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`).join('');
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips}</div><span class="scheda-slot-count" id="cmfSlotCount_${lvl}">${cur}/${s.max}</span></div>`;
         }).join('');
         spellHtml = `
             <div class="combat-section-label">Incantesimi</div>
@@ -340,41 +341,119 @@ window.combatOpenMonsterFullSheet = async function(monsterId, campagnaId, sessio
         modal = document.createElement('div');
         modal.id = 'combatMonsterFullModal';
         modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content modal-content-lg" id="combatMonsterFullContent" style="max-height:92vh;display:flex;flex-direction:column;"></div>`;
+        modal.innerHTML = `<div class="modal-content modal-content-lg combat-mfull-root" id="combatMonsterFullContent"></div>`;
         modal.addEventListener('click', (e) => { if (e.target === modal) closeCombatMonsterFullModal(); });
         document.body.appendChild(modal);
     }
+    modal.dataset.monsterId = monsterId;
+    modal.dataset.campagnaId = campagnaId;
+    modal.dataset.sessioneId = sessioneId;
+
+    const initVal = m.iniziativa != null && m.iniziativa !== '' ? String(m.iniziativa) : '';
+
     document.getElementById('combatMonsterFullContent').innerHTML = `
-        <h2 style="flex-shrink:0;">${escapeHtml(m.nome)}
-            <button class="modal-close" onclick="closeCombatMonsterFullModal()" style="position:absolute;right:12px;top:12px;">&times;</button>
-        </h2>
-        <div style="flex:1;overflow-y:auto;padding:0 2px;">
-            <p style="color:var(--text-secondary);margin:0 0 12px;font-size:0.85rem;">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</p>
-            <div class="scheda-three-boxes">
-                <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
-                <div class="scheda-box"><div class="scheda-box-val">${pvAttuali}/${pvMax}</div><div class="scheda-box-label">PV</div></div>
-                <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
+        <div class="combat-mfull-wrap">
+            <div class="combat-mfull-head">
+                <h2 class="combat-mfull-title">${escapeHtml(m.nome)}</h2>
+                <button type="button" class="modal-close" onclick="closeCombatMonsterFullModal()" aria-label="Chiudi">&times;</button>
             </div>
-            <div class="combat-abilities-grid" style="margin:12px 0;">
-                ${SCHEDA_ABILITIES.map(a => {
-                    const isSave = saves.includes(a.key);
-                    const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
-                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
-                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
-                }).join('')}
+            <div class="combat-mfull-scroll">
+                <p class="combat-mfull-meta">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</p>
+                <div class="scheda-three-boxes">
+                    <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${pvAttuali}/${pvMax}</div><div class="scheda-box-label">PV</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
+                </div>
+                <div class="combat-abilities-grid" style="margin:12px 0;">
+                    ${SCHEDA_ABILITIES.map(a => {
+                        const isSave = saves.includes(a.key);
+                        const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
+                        const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                        return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                    }).join('')}
+                </div>
+                ${skillsHtml ? `<div class="combat-section-label">Competenze</div><div class="scheda-tags">${skillsHtml}</div>` : ''}
+                ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+                ${resLeggMax > 0 ? `<div class="combat-section-label">Resistenze Leggendarie</div><div class="monster-res-legg-counter">${Array.from({length: resLeggMax}, (_, i) => `<span class="monster-res-legg-pip ${i < resLeggCur ? 'filled' : ''}" onclick="monsterToggleResLegg('${monsterId}',${i},'${campagnaId}','${sessioneId}')"></span>`).join('')}<span class="monster-res-legg-label">${resLeggCur}/${resLeggMax}</span></div>` : ''}
+                ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie${azLeggMax > 0 ? ` (${azLeggCur}/${azLeggMax})` : ''}</div>` : ''}
+                ${azLeggMax > 0 ? `<div class="monster-res-legg-counter" style="margin-bottom:8px;">${Array.from({length: azLeggMax}, (_, i) => `<span class="monster-res-legg-pip ${i < azLeggCur ? 'filled' : ''}" onclick="monsterToggleAzLegg('${monsterId}',${i},'${campagnaId}','${sessioneId}')"></span>`).join('')}<span class="monster-res-legg-label">${azLeggCur}/${azLeggMax}</span></div>` : ''}
+                ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+                ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
+                ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
+                ${spellHtml}
             </div>
-            ${skillsHtml ? `<div class="combat-section-label">Competenze</div><div class="scheda-tags">${skillsHtml}</div>` : ''}
-            ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
-            ${resLeggMax > 0 ? `<div class="combat-section-label">Resistenze Leggendarie</div><div class="monster-res-legg-counter">${Array.from({length: resLeggMax}, (_, i) => `<span class="monster-res-legg-pip ${i < resLeggCur ? 'filled' : ''}"></span>`).join('')}<span class="monster-res-legg-label">${resLeggCur}/${resLeggMax}</span></div>` : ''}
-            ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie${azLeggMax > 0 ? ` (${azLeggCur}/${azLeggMax})` : ''}</div>` : ''}
-            ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
-            ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
-            ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
-            ${spellHtml}
+            <div class="combat-mfull-footer">
+                <div class="combat-mfull-quicknums">
+                    <div class="cmf-num"><span class="cmf-num-lbl">PV</span>
+                        <input type="number" id="cmfPvCur" min="0" value="${pvAttuali}">
+                        <span class="cmf-num-sep">/</span>
+                        <input type="number" id="cmfPvMax" min="1" value="${pvMax}">
+                    </div>
+                    <div class="cmf-num"><span class="cmf-num-lbl">CA</span><input type="number" id="cmfCA" min="1" value="${m.classe_armatura||10}"></div>
+                    <div class="cmf-num"><span class="cmf-num-lbl">Iniz.</span><input type="number" id="cmfInit" value="${initVal}" placeholder="Totale"></div>
+                </div>
+                <div class="combat-mfull-actions">
+                    <button type="button" class="btn-primary btn-small" onclick="combatMonsterFullSaveQuick('${monsterId}','${campagnaId}','${sessioneId}')">Salva numeri</button>
+                    <button type="button" class="btn-secondary btn-small" onclick="openMonsterConditionsModal('${monsterId}','${campagnaId}','${sessioneId}')">Condizioni</button>
+                    <button type="button" class="btn-secondary btn-small" onclick="duplicateMonster('${monsterId}','${campagnaId}','${sessioneId}');closeCombatMonsterFullModal();">Duplica</button>
+                    <button type="button" class="btn-danger btn-small" onclick="combatMonsterFullConfirmRemove('${monsterId}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+                </div>
+            </div>
         </div>`;
+
+    if (hasSpells) {
+        const root = document.getElementById('combatMonsterFullContent');
+        root.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+            pip.addEventListener('click', () => combatMonsterFullSlotToggle(monsterId, parseInt(pip.dataset.lvl, 10), parseInt(pip.dataset.idx, 10), campagnaId, sessioneId));
+        });
+    }
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+};
+
+window.combatMonsterFullSaveQuick = async function(monsterId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    let pvMax = Math.max(1, parseInt(document.getElementById('cmfPvMax')?.value, 10) || 1);
+    let pvCur = Math.max(0, parseInt(document.getElementById('cmfPvCur')?.value, 10) || 0);
+    if (pvCur > pvMax) pvCur = pvMax;
+    const ca = Math.max(1, parseInt(document.getElementById('cmfCA')?.value, 10) || 10);
+    const initRaw = document.getElementById('cmfInit')?.value;
+    const initParsed = initRaw === '' || initRaw == null ? null : parseInt(initRaw, 10);
+    const updates = {
+        punti_vita_max: pvMax,
+        pv_attuali: pvCur,
+        classe_armatura: ca
+    };
+    if (initParsed != null && !isNaN(initParsed)) updates.iniziativa = initParsed;
+    const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', monsterId);
+    if (error) { showNotification('Errore: ' + (error.message || '')); return; }
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+    await combatOpenMonsterFullSheet(monsterId, campagnaId, sessioneId);
+};
+
+window.combatMonsterFullSlotToggle = async function(monsterId, level, pipIdx, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: mm } = await supabase.from('mostri_combattimento').select('slot_incantesimo').eq('id', monsterId).single();
+    if (!mm?.slot_incantesimo) return;
+    const slots = JSON.parse(JSON.stringify(mm.slot_incantesimo));
+    const s = slots[level];
+    if (!s) return;
+    const cur = s.current ?? s.max;
+    s.current = pipIdx < cur ? pipIdx : pipIdx + 1;
+    await supabase.from('mostri_combattimento').update({ slot_incantesimo: slots }).eq('id', monsterId);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+    await combatOpenMonsterFullSheet(monsterId, campagnaId, sessioneId);
+};
+
+window.combatMonsterFullConfirmRemove = async function(monsterId, campagnaId, sessioneId) {
+    const ok = await showConfirm('Rimuovere questo mostro dal combattimento?');
+    if (!ok) return;
+    await removeMonster(monsterId, campagnaId, sessioneId);
 };
 
 window.closeCombatMonsterFullModal = function() {
@@ -385,9 +464,9 @@ window.closeCombatMonsterFullModal = function() {
     }
 };
 
-// Dialog rapida per i mostri "placeholder": mostra i PV (modificabili) e
-// permette di togglare le condizioni standard. Niente caratteristiche, niente
-// attacchi: il placeholder serve solo come segnaposto in iniziativa.
+// Dialog compatta per i mostri "placeholder": PV/CA editabili, riepilogo
+// condizioni e bottone per aprire l'editor condizioni. Footer fisso con
+// Salva / Elimina (niente scroll per arrivare ai pulsanti).
 window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
@@ -397,60 +476,62 @@ window.combatOpenPlaceholderDialog = async function(monsterId, campagnaId, sessi
     const pvAttuali = m.pv_attuali ?? m.punti_vita_max;
     const pvMax = m.punti_vita_max || 10;
     const ca = m.classe_armatura || 10;
+    const condActive = ALL_CONDITIONS.filter(c => m[c.key]);
+    const condChips = condActive.length
+        ? condActive.map(c => `<span class="placeholder-cond-chip">${escapeHtml(c.label)}</span>`).join('')
+        : '<span class="placeholder-cond-none">Nessuna</span>';
+    const exh = (m.esaustione || 0) > 0 ? `<span class="placeholder-cond-chip exhaustion">Esaustione ${m.esaustione}</span>` : '';
 
     let modal = document.getElementById('combatPlaceholderModal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'combatPlaceholderModal';
         modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content" id="combatPlaceholderContent" style="max-width:460px;"></div>`;
+        modal.innerHTML = `<div class="modal-content combat-ph-modal" id="combatPlaceholderContent"></div>`;
         modal.addEventListener('click', (e) => { if (e.target === modal) closeCombatPlaceholderModal(); });
         document.body.appendChild(modal);
     }
 
-    const condRows = ALL_CONDITIONS.map(c => `
-        <label class="placeholder-cond-row">
-            <input type="checkbox" data-cond="${c.key}" ${m[c.key] ? 'checked' : ''}>
-            <span>${c.label}</span>
-        </label>`).join('');
-
     document.getElementById('combatPlaceholderContent').innerHTML = `
-        <button class="modal-close" onclick="closeCombatPlaceholderModal()">&times;</button>
-        <h2 style="margin:0 0 12px;">${escapeHtml(m.nome)}</h2>
-
-        <div class="placeholder-stats-row">
-            <div class="form-group placeholder-hp-group">
-                <label>Punti Vita</label>
-                <div class="placeholder-hp-row">
-                    <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
-                    <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
-                    <span class="placeholder-hp-sep">/</span>
-                    <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
-                    <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
+        <div class="combat-ph-wrap">
+            <div class="combat-ph-head">
+                <h2 class="combat-ph-title">${escapeHtml(m.nome)}</h2>
+                <button type="button" class="modal-close" onclick="closeCombatPlaceholderModal()" aria-label="Chiudi">&times;</button>
+            </div>
+            <div class="combat-ph-body">
+                <p class="combat-ph-hint">Segnaposto · modifica PV, CA e condizioni</p>
+                <div class="form-group">
+                    <label>Punti Vita</label>
+                    <div class="placeholder-hp-row">
+                        <button type="button" class="placeholder-hp-btn" id="phHpMinus">−</button>
+                        <input type="number" id="phHpVal" value="${pvAttuali}" min="0" inputmode="numeric">
+                        <span class="placeholder-hp-sep">/</span>
+                        <input type="number" id="phHpMax" value="${pvMax}" min="1" inputmode="numeric">
+                        <button type="button" class="placeholder-hp-btn" id="phHpPlus">+</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phCAVal">Classe Armatura</label>
+                    <input type="number" id="phCAVal" value="${ca}" min="1" inputmode="numeric" class="placeholder-ca-input" style="max-width:120px;">
+                </div>
+                <div class="form-group">
+                    <label>Condizioni attive</label>
+                    <div class="placeholder-cond-chips">${condChips}${exh}</div>
+                    <button type="button" class="btn-secondary btn-small" style="margin-top:8px;" onclick="openMonsterConditionsModal('${monsterId}','${campagnaId}','${sessioneId}')">Modifica condizioni…</button>
                 </div>
             </div>
-            <div class="form-group placeholder-ca-group">
-                <label>CA</label>
-                <input type="number" id="phCAVal" value="${ca}" min="1" inputmode="numeric" class="placeholder-ca-input">
+            <div class="combat-ph-footer">
+                <button type="button" class="btn-danger" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
+                <button type="button" class="btn-primary" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label>Condizioni</label>
-            <div class="placeholder-cond-grid" id="phCondGrid">${condRows}</div>
-        </div>
-
-        <div class="form-actions">
-            <button type="button" class="btn-danger" onclick="combatPlaceholderDelete('${monsterId}','${campagnaId}','${sessioneId}')">Elimina</button>
-            <button type="button" class="btn-primary" onclick="combatPlaceholderSave('${monsterId}','${campagnaId}','${sessioneId}')">Salva</button>
         </div>`;
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
     const valEl = document.getElementById('phHpVal');
-    document.getElementById('phHpMinus').onclick = () => { valEl.value = Math.max(0, (parseInt(valEl.value)||0) - 1); };
-    document.getElementById('phHpPlus').onclick = () => { valEl.value = (parseInt(valEl.value)||0) + 1; };
+    document.getElementById('phHpMinus').onclick = () => { valEl.value = Math.max(0, (parseInt(valEl.value, 10) || 0) - 1); };
+    document.getElementById('phHpPlus').onclick = () => { valEl.value = (parseInt(valEl.value, 10) || 0) + 1; };
 };
 
 window.closeCombatPlaceholderModal = function() {
@@ -470,9 +551,6 @@ window.combatPlaceholderSave = async function(monsterId, campagnaId, sessioneId)
         punti_vita_max: pvMax,
         classe_armatura: ca
     };
-    document.querySelectorAll('#phCondGrid input[type="checkbox"]').forEach(cb => {
-        updates[cb.dataset.cond] = cb.checked;
-    });
 
     const supabase = getSupabaseClient();
     if (!supabase) return;
@@ -484,7 +562,7 @@ window.combatPlaceholderSave = async function(monsterId, campagnaId, sessioneId)
 };
 
 window.combatPlaceholderDelete = async function(monsterId, campagnaId, sessioneId) {
-    const ok = await showConfirm('Eliminare questo placeholder dal combattimento?');
+    const ok = await showConfirm('Eliminare questo mostro dal combattimento?');
     if (!ok) return;
     const supabase = getSupabaseClient();
     if (!supabase) return;
@@ -799,6 +877,8 @@ window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ res_legg_attuali: newVal }).eq('id', mId);
     await renderCombattimentoContent(campagnaId, sessioneId);
+    const fullM = document.getElementById('combatMonsterFullModal');
+    if (fullM?.classList.contains('active') && fullM.dataset.monsterId === mId) await combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
 };
 
 window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
@@ -810,6 +890,8 @@ window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ azioni_legg_attuali: newVal }).eq('id', mId);
     await renderCombattimentoContent(campagnaId, sessioneId);
+    const fullA = document.getElementById('combatMonsterFullModal');
+    if (fullA?.classList.contains('active') && fullA.dataset.monsterId === mId) await combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
 };
 
 window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaId, sessioneId) {
@@ -824,6 +906,8 @@ window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaI
     updated[actionIdx] = action;
     await supabase.from('mostri_combattimento').update({ attacchi: updated }).eq('id', mId);
     await renderCombattimentoContent(campagnaId, sessioneId);
+    const fullAc = document.getElementById('combatMonsterFullModal');
+    if (fullAc?.classList.contains('active') && fullAc.dataset.monsterId === mId) await combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
 };
 
 // Monster HP Calculator (reuses the same overlay UI)
@@ -886,6 +970,8 @@ window.monsterHpApply = async function(direction) {
 window.removeMonster = async function(mId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
+    closeCombatMonsterFullModal();
+    closeCombatPlaceholderModal();
     await supabase.from('mostri_combattimento').delete().eq('id', mId);
     _combatSelectedId = null;
     _combatSelectedType = null;
@@ -946,8 +1032,13 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
         slot_incantesimo: original.slot_incantesimo ? JSON.parse(JSON.stringify(original.slot_incantesimo)) : null,
         caratteristica_incantatore: original.caratteristica_incantatore
     };
+    if (original.is_placeholder === true) clone.is_placeholder = true;
 
-    const { error } = await supabase.from('mostri_combattimento').insert(clone);
+    let { error } = await supabase.from('mostri_combattimento').insert(clone);
+    if (error && /is_placeholder/i.test(error.message || '')) {
+        delete clone.is_placeholder;
+        ({ error } = await supabase.from('mostri_combattimento').insert(clone));
+    }
     if (error) { showNotification('Errore nella duplicazione'); return; }
 
     showNotification(`${clone.nome} aggiunto!`);
@@ -1032,8 +1123,11 @@ window.saveMonsterConditions = async function(mId, campagnaId, sessioneId) {
     updates.esaustione = parseInt(document.getElementById('mc_esaustione')?.value) || 0;
     await supabase.from('mostri_combattimento').update(updates).eq('id', mId);
     schedaCloseHpCalc();
-    await renderCombatMonsterSheet(mId, true, campagnaId, sessioneId);
     await renderCombattimentoContent(campagnaId, sessioneId);
+    const ph = document.getElementById('combatPlaceholderModal');
+    if (ph?.classList.contains('active')) await combatOpenPlaceholderDialog(mId, campagnaId, sessioneId);
+    const full = document.getElementById('combatMonsterFullModal');
+    if (full?.classList.contains('active')) await combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
 }
 
 // Monster creation modal
@@ -1129,14 +1223,67 @@ window.monsterFromHomebrew = async function(campagnaId, sessioneId) {
         </div>`;
 };
 
-window.monsterSelectHomebrew = function(nemiciId, campagnaId, sessioneId) {
+window.monsterSelectHomebrew = async function(nemiciId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    supabase.from('homebrew_nemici').select('*').eq('id', nemiciId).single().then(({ data }) => {
-        if (!data) { showNotification('Errore nel caricamento'); return; }
-        _monsterFromHomebrew = data;
-        _showMonsterWizard(campagnaId, sessioneId, data);
-    });
+    const { data: hb } = await supabase.from('homebrew_nemici').select('*').eq('id', nemiciId).single();
+    if (!hb) { showNotification('Errore nel caricamento'); return; }
+
+    const dex = parseInt(hb.destrezza, 10) || 10;
+    const dexMod = Math.floor((dex - 10) / 2);
+    let initMod = dexMod;
+    if (hb.mod_iniziativa != null && hb.mod_iniziativa !== '') {
+        const parsed = parseInt(hb.mod_iniziativa, 10);
+        if (!isNaN(parsed)) initMod = parsed;
+    }
+    window._hbQuickInitMod = initMod;
+    const modLabel = initMod >= 0 ? `+${initMod}` : `${initMod}`;
+
+    const choicePage = document.getElementById('monsterChoicePage');
+    if (!choicePage) return;
+    choicePage.innerHTML = `
+        <div class="monster-hb-quickadd">
+            <h3 style="margin:0 0 8px;font-size:1.1rem;">${escapeHtml(hb.nome)}</h3>
+            <p style="margin:0 0 14px;color:var(--text-secondary);font-size:0.88rem;line-height:1.45;">
+                Inserisci il <strong>totale iniziativa</strong> (d20 + modificatore). Modificatore usato per il tiro automatico: <strong>${modLabel}</strong>.
+            </p>
+            <div class="form-group">
+                <label for="hbCombatInit">Iniziativa (totale)</label>
+                <input type="number" id="hbCombatInit" inputmode="numeric" placeholder="es. 18" autofocus>
+            </div>
+            <p style="margin:10px 0 0;color:var(--text-muted);font-size:0.82rem;">Lascia vuoto per tirare subito (d20 ${modLabel}).</p>
+            <div class="form-actions" style="margin-top:18px;">
+                <button type="button" class="btn-secondary" onclick="monsterFromHomebrew('${campagnaId}','${sessioneId}')">Indietro</button>
+                <button type="button" class="btn-primary" onclick="monsterInsertHomebrewFromQuick('${nemiciId}','${campagnaId}','${sessioneId}')">Aggiungi al combattimento</button>
+            </div>
+        </div>`;
+    setTimeout(() => document.getElementById('hbCombatInit')?.focus(), 50);
+};
+
+window.monsterInsertHomebrewFromQuick = async function(nemiciId, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: hb } = await supabase.from('homebrew_nemici').select('*').eq('id', nemiciId).single();
+    if (!hb) { showNotification('Errore nel caricamento'); return; }
+
+    const raw = document.getElementById('hbCombatInit')?.value;
+    const mod = Number.isFinite(window._hbQuickInitMod) ? window._hbQuickInitMod : 0;
+    let total;
+    if (raw === '' || raw == null || String(raw).trim() === '') {
+        total = Math.floor(Math.random() * 20) + 1 + mod;
+    } else {
+        total = parseInt(raw, 10);
+        if (isNaN(total)) { showNotification('Iniziativa non valida'); return; }
+    }
+
+    const monster = _buildMonsterPayloadFromHomebrew(hb, campagnaId, sessioneId, total);
+    const { error } = await supabase.from('mostri_combattimento').insert(monster);
+    if (error) { showNotification('Errore creazione mostro: ' + (error.message || '')); return; }
+
+    closeMonsterModal();
+    showNotification(`${hb.nome} aggiunto al combattimento!`);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // ===========================================================================
@@ -1250,6 +1397,62 @@ function _buildMonsterPayloadFromSnapshot(snap, campagnaId, sessioneId) {
         azioni_legg_attuali: azLegg,
         slot_incantesimo: snap.slot_incantesimo || null,
         caratteristica_incantatore: snap.caratteristica_incantatore || null
+    };
+}
+
+/** Costruisce il payload `mostri_combattimento` da una riga `homebrew_nemici`. */
+function _buildMonsterPayloadFromHomebrew(hb, campagnaId, sessioneId, initiativeTotal) {
+    const pvMax = parseInt(hb.punti_vita_max, 10) || 10;
+    const velRaw = hb.velocita;
+    const velocita = typeof velRaw === 'number' ? velRaw : (parseFloat(String(velRaw ?? '9').replace(',', '.')) || 9);
+    let slotInc = null;
+    if (hb.slot_incantesimo && typeof hb.slot_incantesimo === 'object') {
+        slotInc = JSON.parse(JSON.stringify(hb.slot_incantesimo));
+        Object.keys(slotInc).forEach(lv => {
+            const s = slotInc[lv];
+            if (s && s.current == null) s.current = s.max;
+        });
+    }
+    const attacchi = (hb.attacchi || []).map(a => {
+        const um = parseInt(a.usi_max, 10) || 0;
+        return { ...a, usi_max: um, usi_attuali: a.usi_attuali != null ? a.usi_attuali : um };
+    });
+    const resLegg = parseInt(hb.resistenze_leggendarie, 10) || 0;
+    const azLegg = parseInt(hb.azioni_legg_max, 10) || 0;
+    return {
+        sessione_id: sessioneId,
+        campagna_id: campagnaId,
+        nome: hb.nome || 'Mostro',
+        tipologia: hb.tipo || hb.tipologia || 'Bestia',
+        taglia: hb.taglia || 'Media',
+        allineamento: hb.allineamento || 'Neutrale',
+        grado_sfida: hb.grado_sfida || '0',
+        forza: parseInt(hb.forza, 10) || 10,
+        destrezza: parseInt(hb.destrezza, 10) || 10,
+        costituzione: parseInt(hb.costituzione, 10) || 10,
+        intelligenza: parseInt(hb.intelligenza, 10) || 10,
+        saggezza: parseInt(hb.saggezza, 10) || 10,
+        carisma: parseInt(hb.carisma, 10) || 10,
+        punti_vita_max: pvMax,
+        pv_attuali: pvMax,
+        dadi_vita_num: parseInt(hb.dadi_vita_num, 10) || 1,
+        dado_vita: parseInt(hb.dado_vita, 10) || _monsterSizeHitDie(hb.taglia || 'Media'),
+        classe_armatura: parseInt(hb.classe_armatura, 10) || 10,
+        velocita,
+        iniziativa: initiativeTotal,
+        tiri_salvezza: hb.tiri_salvezza || [],
+        competenze_abilita: hb.competenze_abilita || [],
+        maestrie_abilita: hb.maestrie_abilita || [],
+        resistenze: hb.resistenze || [],
+        immunita: hb.immunita || [],
+        attacchi,
+        azioni_leggendarie: hb.azioni_leggendarie || [],
+        resistenze_leggendarie: resLegg,
+        res_legg_attuali: resLegg,
+        azioni_legg_max: azLegg,
+        azioni_legg_attuali: azLegg,
+        slot_incantesimo: slotInc,
+        caratteristica_incantatore: hb.caratteristica_incantatore || null
     };
 }
 
