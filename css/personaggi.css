@@ -844,11 +844,16 @@
 .hp-calc-numpad-btn:hover { background: var(--surface-hover, rgba(255,255,255,0.08)); }
 .hp-calc-numpad-btn:active { background: var(--accent); color: white; }
 .hp-calc-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hp-calc-buttons.hp-calc-buttons-3col { grid-template-columns: minmax(80px, 1fr) 2fr; }
 .hp-calc-btn { padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
 .hp-calc-btn.heal { background: #22c55e; color: white; }
 .hp-calc-btn.damage { background: #ef4444; color: white; }
+.hp-calc-btn.neutral { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.hp-calc-btn.neutral:hover { background: var(--surface-hover, rgba(255,255,255,0.08)); opacity: 1; }
 .hp-calc-btn.hp-calc-btn-full { grid-column: 1 / -1; }
 .hp-calc-btn:hover { opacity: 0.85; }
+.hp-calc-hint { font-size: 0.78rem; color: var(--text-muted); margin: -6px 0 10px; line-height: 1.3; }
+.hp-calc-hint strong { color: var(--accent); font-weight: 800; }
 
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }

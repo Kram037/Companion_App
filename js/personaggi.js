@@ -2383,6 +2383,34 @@ function dieAvg(die) {
     return Math.ceil(die / 2) + 1;
 }
 
+// Calcola i PV massimi "medi" per un PG gia' creato, usando la stessa
+// formula della creazione (1 livello max + livelli successivi al valor
+// medio del dado, sommato a livello totale * mod COS). Considera la
+// prima classe in pg.classi come quella di livello 1.
+function _calcPVMedio(pg) {
+    if (!pg) return 0;
+    const classi = Array.isArray(pg.classi) ? pg.classi.filter(Boolean) : [];
+    if (classi.length === 0) return 0;
+    const cosMod = calcMod(pg.costituzione || 10);
+    let hp = 0;
+    let totalLevel = 0;
+    classi.forEach((cls, idx) => {
+        const die = CLASS_HIT_DIE[cls.nome] || 8;
+        const avg = dieAvg(die);
+        const lvl = parseInt(cls.livello) || 0;
+        totalLevel += lvl;
+        if (idx === 0) {
+            hp += die + Math.max(0, lvl - 1) * avg;
+        } else {
+            hp += lvl * avg;
+        }
+    });
+    if (totalLevel === 0) totalLevel = pg.livello || 1;
+    hp += totalLevel * cosMod;
+    return Math.max(1, hp);
+}
+window._calcPVMedio = _calcPVMedio;
+
 function pgCalcHP() {
     if (pgSelectedClasses.length === 0) return 0;
     const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
@@ -9187,18 +9215,35 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     overlay.className = 'hp-calc-overlay';
 
     const isDirectEdit = field === 'punti_vita_max';
-    const actionButtons = isDirectEdit
-        ? `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`
-        : `<div class="hp-calc-buttons">
+
+    let pvMedioHint = '';
+    let actionButtons;
+    if (isDirectEdit) {
+        const medio = (typeof _calcPVMedio === 'function')
+            ? _calcPVMedio(_schedaPgCache)
+            : 0;
+        if (medio > 0) {
+            pvMedioHint = `<div class="hp-calc-hint">PV medio (calcolato): <strong>${medio}</strong></div>`;
+            actionButtons = `<div class="hp-calc-buttons hp-calc-buttons-3col">
+                <button class="hp-calc-btn neutral" onclick="schedaHpResetMax()" title="Reimposta al valore medio (${medio})">Reset</button>
+                <button class="hp-calc-btn heal" onclick="schedaHpSetDirect()">Conferma</button>
+            </div>`;
+        } else {
+            actionButtons = `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`;
+        }
+    } else {
+        actionButtons = `<div class="hp-calc-buttons">
             <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
             <button class="hp-calc-btn heal" onclick="schedaHpApply(1)">+ Cura</button>
            </div>`;
+    }
 
     overlay.innerHTML = `
         <div class="hp-calc-modal">
             <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
             <div class="hp-calc-title">${label}</div>
             <div class="hp-calc-hp-display"><span class="hp-calc-current" id="hpCalcCurrent">${currentVal}</span>${maxDisplay}</div>
+            ${pvMedioHint}
             <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
             <div class="hp-calc-numpad">
                 <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('1')">1</button>
@@ -9232,6 +9277,18 @@ window.hpCalcNumpad = function(key) {
     const display = document.getElementById('hpCalcAmountDisplay');
     if (display) display.textContent = _hpCalcState.inputBuffer;
 }
+
+window.schedaHpResetMax = async function() {
+    if (!_hpCalcState) return;
+    if (_hpCalcState.field !== 'punti_vita_max') return;
+    const pg = _schedaPgCache;
+    const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pg) : 0;
+    if (!medio) return;
+    _hpCalcState.inputBuffer = String(medio);
+    const display = document.getElementById('hpCalcAmountDisplay');
+    if (display) display.textContent = medio;
+    await window.schedaHpSetDirect();
+};
 
 window.schedaHpSetDirect = async function() {
     if (!_hpCalcState) return;
@@ -9433,6 +9490,36 @@ window.schedaStatConfirm = async function() {
                     : oldDesMod + _getFactotumBonus(pg);
                 pg.iniziativa = baseInit + modDelta;
                 updates.iniziativa = pg.iniziativa;
+            }
+        }
+
+        // Propaga la variazione del modificatore di Costituzione ai PV
+        // massimi (e ai PV attuali) usando il livello totale del PG.
+        // Esempio: passare da COS 14 a 16 a livello 5 aggiunge +5 PV max.
+        if (field === 'costituzione' && pg) {
+            const oldCosMod = Math.floor(((parseInt(oldVal) || 10) - 10) / 2);
+            const newCosMod = Math.floor((clampedVal - 10) / 2);
+            const cosDelta = newCosMod - oldCosMod;
+            if (cosDelta !== 0) {
+                const totalLevel = (pg.classi || []).reduce((s, c) => s + (parseInt(c.livello) || 0), 0)
+                    || pg.livello || 1;
+                const pvDelta = cosDelta * totalLevel;
+                const oldPvMax = parseInt(pg.punti_vita_max) || 10;
+                const newPvMax = Math.max(1, oldPvMax + pvDelta);
+                pg.punti_vita_max = newPvMax;
+                updates.punti_vita_max = newPvMax;
+
+                const oldPvAttuali = pg.pv_attuali != null ? parseInt(pg.pv_attuali) : oldPvMax;
+                const newPvAttuali = Math.max(0, Math.min(newPvMax, oldPvAttuali + pvDelta));
+                if (newPvAttuali !== oldPvAttuali) {
+                    pg.pv_attuali = newPvAttuali;
+                    updates.pv_attuali = newPvAttuali;
+                }
+
+                const pvMaxEl = document.getElementById('schedaPvMax');
+                if (pvMaxEl) pvMaxEl.textContent = newPvMax;
+                const pvAttEl = document.getElementById('schedaPvAttuali');
+                if (pvAttEl) pvAttEl.textContent = newPvAttuali;
             }
         }
 
@@ -10223,13 +10310,14 @@ window.schedaCloseCustomResModal = function() {
 // =====================================================
 async function _recalcEquipFromStats(pgId) {
     const pg = _schedaPgCache;
-    if (!pg || !pg.equipaggiamento || pg.equipaggiamento.length === 0) return;
+    if (!pg) return;
+    const equip = Array.isArray(pg.equipaggiamento) ? pg.equipaggiamento : [];
     const modFor = calcMod(pg.forza || 10);
     const modDes = calcMod(pg.destrezza || 10);
     const totalLevel = (pg.classi || []).reduce((s, c) => s + (c.livello || 1), 0) || pg.livello || 1;
     const profBonus = calcBonusCompetenza(totalLevel);
-    let changed = false;
-    pg.equipaggiamento.forEach(e => {
+    let equipChanged = false;
+    equip.forEach(e => {
         if (e.tipo === 'arma') {
             const armaRef = DND_ARMI.find(a => a.nome === e.nome);
             const isFinesse = e.proprieta?.some(p => p.includes('Accurata'));
@@ -10241,20 +10329,22 @@ async function _recalcEquipFromStats(pgId) {
             if (e.bonus_colpire !== newColpire || e.bonus_danno !== newDanno) {
                 e.bonus_colpire = newColpire;
                 e.bonus_danno = newDanno;
-                changed = true;
+                equipChanged = true;
             }
         }
     });
     const newCA = calcCAFromEquip(pg);
-    if (pg.classe_armatura !== newCA) {
+    const caChanged = pg.classe_armatura !== newCA;
+    if (caChanged) {
         pg.classe_armatura = newCA;
-        changed = true;
         const caEl = document.getElementById('schedaCA');
         if (caEl) caEl.textContent = newCA;
     }
-    if (changed) {
-        await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: pg.classe_armatura });
-        renderSchedaPersonaggio(pgId);
+    if (equipChanged || caChanged) {
+        const updates = { classe_armatura: pg.classe_armatura };
+        if (equipChanged) updates.equipaggiamento = pg.equipaggiamento;
+        await schedaInstantSave(pgId, updates);
+        if (equipChanged) renderSchedaPersonaggio(pgId);
     }
 }
 
