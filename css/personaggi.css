@@ -248,6 +248,93 @@
 .scheda-avatar-initials {
     font-size: 1.6rem; font-weight: 800; color: var(--accent); letter-spacing: 0.02em;
 }
+
+/* ── Dialog "Cambia immagine personaggio" ── */
+.scheda-avatar-modal {
+    width: min(480px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: left;
+}
+.scheda-avatar-title {
+    margin: 0 0 var(--spacing-md);
+    font-size: 1.1rem;
+    color: var(--text);
+}
+.scheda-avatar-preview {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+}
+.scheda-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.scheda-avatar-preview-placeholder {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 12px;
+}
+.scheda-avatar-preview-error { color: var(--accent); }
+.scheda-avatar-preview-error small { color: var(--text-muted); display: block; margin-top: 4px; }
+.scheda-avatar-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px;
+}
+.scheda-avatar-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+}
+.scheda-avatar-input:focus { outline: none; border-color: var(--accent); }
+.scheda-avatar-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.4;
+}
+.scheda-avatar-hint strong { color: var(--text); }
+.scheda-avatar-hint em { color: var(--text-secondary); font-style: italic; }
+.scheda-avatar-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+.scheda-avatar-actions .btn-secondary,
+.scheda-avatar-actions .btn-primary {
+    flex: 0 1 auto;
+    min-width: 90px;
+}
+@media (max-width: 480px) {
+    .scheda-avatar-preview { width: 140px; height: 140px; }
+    .scheda-avatar-actions { flex-wrap: wrap; }
+    .scheda-avatar-actions button { flex: 1 1 auto; }
+}
 .scheda-identity-info {
     display: flex; flex-direction: column; justify-content: center;
     min-width: 0;
