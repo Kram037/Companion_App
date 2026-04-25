@@ -11678,7 +11678,7 @@ window.schedaOpenCustomWeaponDialog = function(pgId, opts) {
         </label>`).join('');
 
     const dmgTypes = ['taglienti','perforanti','contundenti','fuoco','freddo','elettricità','acido','veleno','radiante','necrotico','psichico','tuono','forza'];
-    const dmgTypeOpts = dmgTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    const dmgTypeOpts = `<option value="">— nessuno —</option>` + dmgTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
 
     const overlay = document.createElement('div');
     overlay.id = 'schedaCustomWeaponOverlay';
@@ -11755,7 +11755,7 @@ window.schedaSaveCustomWeapon = async function(pgId, invIndex) {
     }
     const categoria = overlay.querySelector('#cwCategory')?.value || 'mischia';
     const danni = (overlay.querySelector('#cwDamage')?.value || '').trim() || '1d4';
-    const tipoDanno = overlay.querySelector('#cwDamageType')?.value || 'contundenti';
+    const tipoDanno = overlay.querySelector('#cwDamageType')?.value || '';
     const magic = parseInt(overlay.querySelector('#cwMagic')?.value) || 0;
 
     const checkedProps = Array.from(overlay.querySelectorAll('#cwProps input[type="checkbox"]:checked'))
