@@ -11607,22 +11607,44 @@ window.schedaEditEquip = function(pgId, index) {
     const currentDesc = e.descrizione || '';
 
     // Se l'oggetto è collegato a una entry dell'inventario (via
-    // from_treasure_uid), recuperiamo la descrizione live dell'oggetto:
-    // così cliccando l'arma/armatura nell'equipaggiamento si vede
-    // sempre la descrizione completa dell'oggetto homebrew/SRD da cui
-    // è stata equipaggiata, senza dover andare nell'inventario.
+    // from_treasure_uid o, in fallback, per nome) recuperiamo la
+    // descrizione live dell'oggetto: così cliccando l'arma/armatura
+    // nell'equipaggiamento si vede sempre la descrizione completa
+    // dell'oggetto homebrew/SRD da cui è stata equipaggiata, senza
+    // dover andare nell'inventario.
     let inventoryDesc = '';
-    if (e.from_treasure_uid && Array.isArray(pg.inventario)) {
-        const idx = pg.inventario.findIndex(it => it && typeof it === 'object' && it._treasure_uid === e.from_treasure_uid);
-        if (idx >= 0) {
+    let inventoryName = '';
+    if (Array.isArray(pg.inventario) && pg.inventario.length) {
+        const stripBonus = (s) => String(s || '')
+            .replace(/\s*\+\d+\s*$/, '')
+            .replace(/\s*\([^)]+\)\s*$/, '')
+            .trim()
+            .toLowerCase();
+        const equipBase = stripBonus(e.nome);
+        let invItem = null;
+        if (e.from_treasure_uid) {
+            invItem = pg.inventario.find(it => it && typeof it === 'object' && it._treasure_uid === e.from_treasure_uid) || null;
+        }
+        if (!invItem && equipBase) {
+            // Fallback per oggetti equipaggiati prima del meccanismo
+            // from_treasure_uid: matching per nome (case-insensitive,
+            // ignorando bonus magici e parentesi tipo "(pugnale)").
+            invItem = pg.inventario.find(it => {
+                if (!it || typeof it !== 'object') return false;
+                const invName = stripBonus(it.nome);
+                return invName && (invName === equipBase || equipBase.startsWith(invName) || invName.startsWith(equipBase));
+            }) || null;
+        }
+        if (invItem) {
             const view = (typeof window._invResolveLive === 'function')
-                ? window._invResolveLive(pg.inventario[idx]) : pg.inventario[idx];
-            inventoryDesc = view?.descrizione || '';
+                ? window._invResolveLive(invItem) : invItem;
+            inventoryDesc = view?.descrizione || view?.proprieta || '';
+            inventoryName = view?.nome || '';
         }
     }
     const inventoryDescHtml = inventoryDesc
         ? `<div class="equip-inv-desc-section">
-                <div class="equip-inv-desc-label">Descrizione (dall'inventario)</div>
+                <div class="equip-inv-desc-label">Descrizione${inventoryName ? ` — ${escapeHtml(inventoryName)}` : ''} (dall'inventario)</div>
                 <div class="equip-inv-desc-body">${(typeof window.formatRichText === 'function' ? window.formatRichText(inventoryDesc) : escapeHtml(inventoryDesc))}</div>
             </div>`
         : '';
