@@ -116,15 +116,28 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
             return `onclick="openSchedaPersonaggio('${entry.pgId}',{scrollToStats:true})"`;
         };
 
-        // Left icons column (square portraits, no initiative number)
+        // Left icons column (square portraits, no initiative number).
+        // Per i player mostriamo l'immagine del personaggio se presente
+        // (immagine_url, normalizzata via _normalizeImageUrl per supportare
+        // gli URL di Google Drive); fallback alle iniziali del nome.
         if (initCol) {
             initCol.innerHTML = order.map((entry, idx) => {
                 const initials = entry.name.substring(0, 2).toUpperCase();
                 const isTurn = idx === turnIdx;
                 const click = buildClickHandler(entry);
                 const clickable = click ? 'is-clickable' : 'is-locked';
+                const initialsHtml = `<span class="combat-icon-initials">${escapeHtml(initials)}</span>`;
+                let portraitInner = initialsHtml;
+                if (entry.type === 'player' && entry.conditions?.immagine_url) {
+                    const rawUrl = entry.conditions.immagine_url;
+                    const url = (typeof window._normalizeImageUrl === 'function')
+                        ? window._normalizeImageUrl(rawUrl) : rawUrl;
+                    const safeUrl = String(url).replace(/"/g, '&quot;');
+                    const safeAlt = String(entry.name || '').replace(/"/g, '&quot;');
+                    portraitInner = `<img src="${safeUrl}" alt="${safeAlt}" class="combat-icon-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.parentElement.classList.add('combat-icon-img-error');this.remove();" data-fallback-initials="${escapeHtml(initials)}">${initialsHtml}`;
+                }
                 return `<div class="combat-icon ${isTurn ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${clickable}" data-idx="${idx}" ${click}>
-                    <span class="combat-icon-initials">${escapeHtml(initials)}</span>
+                    ${portraitInner}
                 </div>`;
             }).join('');
         }

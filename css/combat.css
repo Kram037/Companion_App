@@ -101,6 +101,21 @@
 .combat-icon.monster.active { border-color: #ef4444; background: rgba(239,68,68,0.12); }
 .combat-icon-initials { font-size: 0.95rem; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: 0.5px; }
 
+/* Portrait con immagine del personaggio: l'immagine copre tutto il
+   riquadro; le iniziali stanno dietro come fallback (visibili se
+   l'<img> fallisce a caricare e si auto-rimuove via onerror). */
+.combat-icon { position: relative; overflow: hidden; }
+.combat-icon-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    background: var(--bg);
+    z-index: 1;
+}
+
 /* Combat Cards (collapsed) - altezza fissa 52px per allinearsi alle
    icone a sinistra. Il contenuto interno e' troncato/ellipsis se cresce. */
 .combat-card { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); transition: all 0.15s; height: 52px; min-height: 52px; max-height: 52px; flex-shrink: 0; overflow: hidden; box-sizing: border-box; }

@@ -718,7 +718,7 @@ async function getCampaignCharacterData(campagnaId) {
         const pgIds = pgList.map(pg => pg.personaggio_id).filter(Boolean);
         if (pgIds.length > 0) {
             const { data: charRows } = await supabase.from('personaggi')
-                .select('id, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, punti_vita_max, pv_attuali')
+                .select('id, immagine_url, concentrazione, accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, invisibile, paralizzato, pietrificato, privo_di_sensi, prono, spaventato, stordito, trattenuto, esaustione, punti_vita_max, pv_attuali')
                 .in('id', pgIds);
             if (charRows) {
                 const charById = {};
