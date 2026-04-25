@@ -110,7 +110,7 @@
           "description": "Puoi ispirare gli altri attraverso parole o musica scintillanti. Per farlo, usi un'azione bonus nel tuo turno per scegliere una creatura diversa da te entro 18 metri da te che possa sentirti. Quella creatura ottiene un d6 di Ispirazione Bardica.\nUna volta nei prossimi 10 minuti, la creatura può tirare il dado e aggiungere il numero ottenuto a una prova di caratteristica, tiro per colpire o tiro salvezza che effettua. La creatura può aspettare a tirare il dado di Ispirazione Bardica finché dopo aver tirato il d20 prima di effettuare la prova di caratteristica, tiro per colpire o tiro salvezza, ma deve decidere prima che il DM dica se il tiro abbia successo o fallisca. Una volta tirato, il dado di Ispirazione Bardica è perso. Una creatura può avere un solo dado di Ispirazione Bardica alla volta.\nPuoi usare questo privilegio un numero di volte pari al tuo modificatore di Carisma (un minimo di una volta). Recuperi tutti gli usi consumati quando completi un riposo lungo.\nIl tuo dado di Ispirazione Bardica cambia quando raggiungi alcuni livelli di questa classe. Il dado diventa un d8 al 5° livello, un d10 al 10° livello e un d12 al 15° livello."
         },
         "Jack of All Trades": {
-          "name": "Esperto in Tutto",
+          "name": "Factotum",
           "description": "A partire dal 2° livello, puoi aggiungere metà del tuo bonus di competenza, arrotondato per difetto, a qualsiasi prova di caratteristica che effettui che non includa già il tuo bonus di competenza."
         },
         "Song of Rest": {

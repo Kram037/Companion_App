@@ -394,11 +394,16 @@ function getCharacterModifier(pg, tipoTiro, targetTiro) {
 
     const totalLevel = pg.livello || 1;
     const profBonus = Math.floor((totalLevel - 1) / 4) + 2;
+    const factotum = (typeof window._getFactotumBonus === 'function')
+        ? window._getFactotumBonus(pg)
+        : 0;
 
     if (tipoTiro === 'caratteristica') {
         const abilityKey = ABILITY_MAP[targetTiro];
         if (!abilityKey || pg[abilityKey] == null) return null;
-        return calcAbilityMod(pg[abilityKey]);
+        // Le prove di caratteristica pure non hanno competenza: il
+        // bonus Factotum del Bardo si applica sempre.
+        return calcAbilityMod(pg[abilityKey]) + factotum;
     }
 
     if (tipoTiro === 'salvezza') {
@@ -417,9 +422,14 @@ function getCharacterModifier(pg, tipoTiro, targetTiro) {
         if (!abilityKey || pg[abilityKey] == null) return null;
         let mod = calcAbilityMod(pg[abilityKey]);
         const skills = pg.competenze_abilita || [];
-        if (skills.includes(targetTiro)) {
-            mod += profBonus;
-        }
+        const expert = pg.maestrie_abilita || [];
+        const isProf = skills.includes(targetTiro);
+        const isExpert = expert.includes(targetTiro);
+        if (isProf) mod += profBonus;
+        if (isExpert) mod += profBonus;
+        // Factotum: meta' bonus competenza (arrotondato per difetto)
+        // alle prove in cui non sei competente.
+        if (!isProf && !isExpert) mod += factotum;
         return mod;
     }
 
@@ -458,14 +468,31 @@ async function showRollRequestModal(request) {
             }
         }
         if (supabase && userData && campagnaId) {
-            const { data: pgData } = await supabase.rpc('get_personaggio_campagna', {
+            const { data: pgRow } = await supabase.rpc('get_personaggio_campagna', {
                 p_campagna_id: campagnaId,
                 p_user_id: userData.id
             });
-            if (pgData && pgData.length > 0) {
-                const pg = pgData[0];
+            if (pgRow && pgRow.length > 0) {
+                // L'RPC ritorna solo poche colonne: per calcolare correttamente
+                // i modificatori (competenze, classi -> Factotum del Bardo,
+                // ecc.) carichiamo la riga completa della scheda.
+                let pg = pgRow[0];
+                try {
+                    const { data: full } = await supabase
+                        .from('personaggi')
+                        .select('classi, livello, forza, destrezza, costituzione, intelligenza, saggezza, carisma, iniziativa, competenze_abilita, maestrie_abilita, tiri_salvezza')
+                        .eq('id', pg.id)
+                        .single();
+                    if (full) pg = { ...pg, ...full };
+                } catch (e) { /* fallback su dati base */ }
+
                 if (isIniziativa) {
-                    modValue = pg.iniziativa != null ? pg.iniziativa : calcAbilityMod(pg.destrezza || 10);
+                    const fact = (typeof window._getFactotumBonus === 'function') ? window._getFactotumBonus(pg) : 0;
+                    if (pg.iniziativa != null) {
+                        modValue = pg.iniziativa;
+                    } else {
+                        modValue = calcAbilityMod(pg.destrezza || 10) + fact;
+                    }
                 } else if (tipoTiro && targetTiro) {
                     modValue = getCharacterModifier(pg, tipoTiro, targetTiro);
                 }

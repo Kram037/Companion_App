@@ -623,6 +623,23 @@ function calcBonusCompetenza(livello) {
     return Math.floor((livello - 1) / 4) + 2;
 }
 
+// Bonus "Factotum" (Jack of All Trades) del Bardo: dal 2° livello da Bardo
+// puoi aggiungere meta' del bonus di competenza (arrotondato per difetto)
+// a ogni prova di caratteristica in cui non sei competente. Si applica anche
+// alla Percezione Passiva e al tiro di Iniziativa (entrambe prove di
+// caratteristica). Ritorna 0 se il PG non e' un Bardo o e' < 2.
+function _getFactotumBonus(pg) {
+    if (!pg || !Array.isArray(pg.classi)) return 0;
+    const bardoLvl = pg.classi
+        .filter(c => c && (c.nome === 'Bardo' || c.nome === 'Bard'))
+        .reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
+    if (bardoLvl < 2) return 0;
+    const totLvl = pg.classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0)
+        || pg.livello || 1;
+    return Math.floor(calcBonusCompetenza(totLvl) / 2);
+}
+window._getFactotumBonus = _getFactotumBonus;
+
 function updateBonusCompetenza() {
     const livello = pgGetTotalLevel();
     const bonus = calcBonusCompetenza(livello);
@@ -3353,6 +3370,28 @@ async function renderSchedaPersonaggio(personaggioId) {
         }
         _schedaPgCache = pg;
 
+        // ── Auto-applica/aggiorna il bonus "Factotum" del Bardo (livello 2+)
+        //    sull'iniziativa salvata. Si traccia in bonus_manuali._jack_iniz_v
+        //    il bonus attualmente gia' incluso nel valore iniziativa, in modo
+        //    da applicare solo il delta quando il PG sale di livello (e il
+        //    Factotum aumenta) o quando, per un PG esistente, il bonus non
+        //    era ancora stato sommato.
+        try {
+            const desiredJot = _getFactotumBonus(pg);
+            const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
+            const appliedJot = parseInt(bm._jack_iniz_v) || 0;
+            if (desiredJot !== appliedJot) {
+                const delta = desiredJot - appliedJot;
+                const baseInit = (pg.iniziativa != null) ? pg.iniziativa : Math.floor(((pg.destrezza || 10) - 10) / 2);
+                pg.iniziativa = baseInit + delta;
+                pg.bonus_manuali = { ...bm, _jack_iniz_v: desiredJot };
+                schedaInstantSave(personaggioId, {
+                    iniziativa: pg.iniziativa,
+                    bonus_manuali: pg.bonus_manuali,
+                });
+            }
+        } catch (e) { console.warn('[scheda] Factotum auto-apply skipped:', e); }
+
         // Auto-injection di resistenze derivate da privilegi di sottoclasse
         // (es. Difese Psichiche dello Stregone Mente Aberrante a liv 6).
         // Persistite a DB se mancanti, in modo che siano visibili anche da
@@ -3407,17 +3446,20 @@ async function renderSchedaPersonaggio(personaggioId) {
         const initDisplay = pg.iniziativa != null ? pg.iniziativa : Math.floor(((pg.destrezza || 10) - 10) / 2);
 
         // 4. Skills with proficiency + expertise
+        const factotum = _getFactotumBonus(pg);
         const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
         const percProf = skillProf.includes('percezione');
         const percExpert = skillExpert.includes('percezione');
-        const percPassiva = 10 + sagMod + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0);
+        const percJot = (!percProf && !percExpert) ? factotum : 0;
+        const percPassiva = 10 + sagMod + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0) + percJot;
 
         const skillsHtml = SCHEDA_SKILLS.map(sk => {
             const abilityVal = pg[sk.ability] || 10;
             const abilityMod = Math.floor((abilityVal - 10) / 2);
             const isProf = skillProf.includes(sk.key);
             const isExpert = skillExpert.includes(sk.key);
-            const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+            const jot = (!isProf && !isExpert) ? factotum : 0;
+            const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0) + jot;
             const totalStr = total >= 0 ? `+${total}` : `${total}`;
             return `
             <div class="scheda-skill">
@@ -3786,6 +3828,7 @@ function schedaRecalcAbility(abilityKey, val, pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const factotum = _getFactotumBonus(pg);
     const saves = pg.tiri_salvezza || [];
     const isSaveProf = saves.includes(abilityKey);
     const saveExtra = _getSaveBonusFor(pg, abilityKey);
@@ -3795,13 +3838,13 @@ function schedaRecalcAbility(abilityKey, val, pgId) {
     const saveEl = document.getElementById(`sSave_${abilityKey}`);
     if (saveEl) saveEl.innerHTML = `${saveStr}${saveMark}`;
 
-    // Update skills that depend on this ability
     const skillProf = pg.competenze_abilita || [];
     const skillExpert = pg.maestrie_abilita || [];
     SCHEDA_SKILLS.filter(sk => sk.ability === abilityKey).forEach(sk => {
         const isProf = skillProf.includes(sk.key);
         const isExpert = skillExpert.includes(sk.key);
-        const total = m + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+        const jot = (!isProf && !isExpert) ? factotum : 0;
+        const total = m + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0) + jot;
         const totalStr = total >= 0 ? `+${total}` : `${total}`;
         const el = document.getElementById(`sSkill_${sk.key}`);
         if (el) el.textContent = totalStr;
@@ -3810,9 +3853,18 @@ function schedaRecalcAbility(abilityKey, val, pgId) {
     if (abilityKey === 'saggezza') {
         const percProf = skillProf.includes('percezione');
         const percExpert = skillExpert.includes('percezione');
-        const pp = 10 + m + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0);
+        const percJot = (!percProf && !percExpert) ? factotum : 0;
+        const pp = 10 + m + (percProf ? bonusComp : 0) + (percExpert ? bonusComp : 0) + percJot;
         const ppEl = document.getElementById('sPercPassiva');
         if (ppEl) ppEl.textContent = pp;
+    }
+
+    if (abilityKey === 'destrezza') {
+        const initEl = document.getElementById('schedaInit');
+        if (initEl && pg.iniziativa != null) {
+            const initStr = pg.iniziativa >= 0 ? `+${pg.iniziativa}` : `${pg.iniziativa}`;
+            initEl.textContent = initStr;
+        }
     }
 }
 
@@ -3877,6 +3929,7 @@ window.schedaToggleSkillExpert = async function(pgId, skillKey) {
 
 function schedaRefreshSkill(pg, skillKey) {
     const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const factotum = _getFactotumBonus(pg);
     const sk = SCHEDA_SKILLS.find(s => s.key === skillKey);
     if (!sk) return;
 
@@ -3884,7 +3937,8 @@ function schedaRefreshSkill(pg, skillKey) {
     const abilityMod = Math.floor((abilityVal - 10) / 2);
     const isProf = (pg.competenze_abilita || []).includes(skillKey);
     const isExpert = (pg.maestrie_abilita || []).includes(skillKey);
-    const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+    const jot = (!isProf && !isExpert) ? factotum : 0;
+    const total = abilityMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0) + jot;
     const totalStr = total >= 0 ? `+${total}` : `${total}`;
 
     const el = document.getElementById(`sSkill_${skillKey}`);
@@ -3899,7 +3953,7 @@ function schedaRefreshSkill(pg, skillKey) {
 
     if (skillKey === 'percezione') {
         const sagMod = Math.floor(((pg.saggezza || 10) - 10) / 2);
-        const pp = 10 + sagMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0);
+        const pp = 10 + sagMod + (isProf ? bonusComp : 0) + (isExpert ? bonusComp : 0) + jot;
         const ppEl = document.getElementById('sPercPassiva');
         if (ppEl) ppEl.textContent = pp;
     }
@@ -9352,6 +9406,7 @@ window.schedaStatConfirm = async function() {
     const field = _hpCalcState.field;
     const pgId = _hpCalcState.pgId;
     const pg = _schedaPgCache;
+    const oldVal = _hpCalcState.currentVal;
 
     if (pg) pg[field] = newVal;
 
@@ -9360,8 +9415,29 @@ window.schedaStatConfirm = async function() {
         if (pg) pg[field] = clampedVal;
         const abilEl = document.getElementById(`sAbil_${field}`);
         if (abilEl) abilEl.textContent = clampedVal;
+
+        const updates = { [field]: clampedVal };
+
+        // Propaga la variazione del modificatore di Destrezza al
+        // valore di iniziativa salvato (che e' un totale: dex_mod +
+        // factotum + bonus manuali). In questo modo cambiando la
+        // caratteristica si aggiorna automaticamente l'iniziativa
+        // mostrata e usata nei tiri.
+        if (field === 'destrezza' && pg) {
+            const oldDesMod = Math.floor(((parseInt(oldVal) || 10) - 10) / 2);
+            const newDesMod = Math.floor((clampedVal - 10) / 2);
+            const modDelta = newDesMod - oldDesMod;
+            if (modDelta !== 0) {
+                const baseInit = pg.iniziativa != null
+                    ? pg.iniziativa
+                    : oldDesMod + _getFactotumBonus(pg);
+                pg.iniziativa = baseInit + modDelta;
+                updates.iniziativa = pg.iniziativa;
+            }
+        }
+
         schedaRecalcAbility(field, clampedVal, pgId);
-        await schedaInstantSave(pgId, { [field]: clampedVal });
+        await schedaInstantSave(pgId, updates);
         _recalcEquipFromStats(pgId);
     } else {
         const displayIds = { classe_armatura: 'schedaCA', iniziativa: 'schedaInit' };
