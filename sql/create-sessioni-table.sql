@@ -20,32 +20,30 @@ CREATE TABLE IF NOT EXISTS iniziativa (
     UNIQUE(sessione_id, ordine) -- Un ordine per sessione
 );
 
--- Funzione per aggiornare numero_sessioni e tempo_di_gioco quando una sessione viene chiusa
+-- Funzione per aggiornare numero_sessioni e tempo_di_gioco quando una
+-- sessione viene chiusa. INCREMENTA i valori esistenti invece di
+-- ricalcolarli da zero, cosi' eventuali modifiche manuali fatte dal DM
+-- nei dettagli della campagna vengono preservate e la nuova sessione
+-- viene semplicemente sommata sopra.
 CREATE OR REPLACE FUNCTION update_campagna_stats_on_session_close()
 RETURNS TRIGGER AS $$
+DECLARE
+    durata INTEGER;
 BEGIN
-    -- Solo aggiorna se la sessione è stata appena chiusa (data_fine è stato impostato)
-    IF NEW.data_fine IS NOT NULL AND (OLD.data_fine IS NULL OR OLD.data_fine IS DISTINCT FROM NEW.data_fine) THEN
-        -- Calcola durata in minuti
+    -- Solo quando la sessione passa da aperta a chiusa
+    IF OLD.data_fine IS NULL AND NEW.data_fine IS NOT NULL THEN
+        durata := GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (NEW.data_fine - NEW.data_inizio)) / 60))::INTEGER;
+
+        -- Salva la durata calcolata sulla riga della sessione
         UPDATE sessioni
-        SET durata_minuti = EXTRACT(EPOCH FROM (NEW.data_fine - NEW.data_inizio)) / 60
+        SET durata_minuti = durata
         WHERE id = NEW.id;
 
-        -- Aggiorna statistiche campagna
+        -- Incrementa le statistiche campagna (preserva edit manuali)
         UPDATE campagne
-        SET 
-            numero_sessioni = (
-                SELECT COUNT(*) 
-                FROM sessioni 
-                WHERE campagna_id = NEW.campagna_id 
-                AND data_fine IS NOT NULL
-            ),
-            tempo_di_gioco = (
-                SELECT COALESCE(SUM(durata_minuti), 0)
-                FROM sessioni
-                WHERE campagna_id = NEW.campagna_id
-                AND data_fine IS NOT NULL
-            )
+        SET
+            numero_sessioni = COALESCE(numero_sessioni, 0) + 1,
+            tempo_di_gioco = COALESCE(tempo_di_gioco, 0) + durata
         WHERE id = NEW.campagna_id;
     END IF;
     RETURN NEW;
@@ -57,7 +55,7 @@ DROP TRIGGER IF EXISTS trigger_update_campagna_stats_on_session_close ON session
 CREATE TRIGGER trigger_update_campagna_stats_on_session_close
     AFTER UPDATE ON sessioni
     FOR EACH ROW
-    WHEN (NEW.data_fine IS NOT NULL AND (OLD.data_fine IS NULL OR OLD.data_fine IS DISTINCT FROM NEW.data_fine))
+    WHEN (OLD.data_fine IS NULL AND NEW.data_fine IS NOT NULL)
     EXECUTE FUNCTION update_campagna_stats_on_session_close();
 
 -- RLS Policies per sessioni
