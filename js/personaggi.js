@@ -11606,6 +11606,27 @@ window.schedaEditEquip = function(pgId, index) {
     const currentBonus = e.magic_bonus || 0;
     const currentDesc = e.descrizione || '';
 
+    // Se l'oggetto è collegato a una entry dell'inventario (via
+    // from_treasure_uid), recuperiamo la descrizione live dell'oggetto:
+    // così cliccando l'arma/armatura nell'equipaggiamento si vede
+    // sempre la descrizione completa dell'oggetto homebrew/SRD da cui
+    // è stata equipaggiata, senza dover andare nell'inventario.
+    let inventoryDesc = '';
+    if (e.from_treasure_uid && Array.isArray(pg.inventario)) {
+        const idx = pg.inventario.findIndex(it => it && typeof it === 'object' && it._treasure_uid === e.from_treasure_uid);
+        if (idx >= 0) {
+            const view = (typeof window._invResolveLive === 'function')
+                ? window._invResolveLive(pg.inventario[idx]) : pg.inventario[idx];
+            inventoryDesc = view?.descrizione || '';
+        }
+    }
+    const inventoryDescHtml = inventoryDesc
+        ? `<div class="equip-inv-desc-section">
+                <div class="equip-inv-desc-label">Descrizione (dall'inventario)</div>
+                <div class="equip-inv-desc-body">${(typeof window.formatRichText === 'function' ? window.formatRichText(inventoryDesc) : escapeHtml(inventoryDesc))}</div>
+            </div>`
+        : '';
+
     const modalHtml = `
     <div class="modal active" id="editEquipModal">
         <div class="modal-content modal-content-xl">
@@ -11620,7 +11641,9 @@ window.schedaEditEquip = function(pgId, index) {
                     ).join('')}
                 </div>
             </div>
-            <textarea id="editEquipDesc" class="equip-desc-textarea" placeholder="Aggiungi una descrizione, effetti magici, note...">${escapeHtml(currentDesc)}</textarea>
+            ${inventoryDescHtml}
+            <label class="equip-desc-label">${inventoryDesc ? 'Note personali' : 'Descrizione'}</label>
+            <textarea id="editEquipDesc" class="equip-desc-textarea" placeholder="${inventoryDesc ? 'Note aggiuntive su questo oggetto…' : 'Aggiungi una descrizione, effetti magici, note...'}">${escapeHtml(currentDesc)}</textarea>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('editEquipModal')?.remove();document.body.style.overflow=''">Annulla</button>
                 <button type="button" class="btn-primary" onclick="schedaSaveEquipDesc('${pgId}',${index})">Salva</button>

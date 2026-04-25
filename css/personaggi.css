@@ -888,6 +888,47 @@
     opacity: 0.8;
 }
 
+/* Etichetta sopra la textarea della descrizione (per distinguere
+   "Note personali" dalla descrizione dall'inventario). */
+.equip-desc-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px;
+}
+
+/* Sezione descrizione live presa dall'oggetto dell'inventario:
+   readonly, simile in stile a .inv-attune-current-desc. */
+.equip-inv-desc-section {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.equip-inv-desc-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.equip-inv-desc-body {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #ccc);
+    white-space: pre-wrap;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+.equip-inv-desc-body p { margin: 0 0 8px; }
+.equip-inv-desc-body p:last-child { margin-bottom: 0; }
+.equip-inv-desc-body strong { color: var(--text); }
+
 /* Versione "rendered" della descrizione (oggetti homebrew/read-only):
    stesso look della textarea ma con il rich text formattato. */
 .equip-desc-rendered {
