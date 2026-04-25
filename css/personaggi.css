@@ -3100,6 +3100,107 @@
     flex-shrink: 0;
 }
 
+/* Voce "Crea arma personalizzata" all'interno del picker
+   equipaggiamento, sia nella tab Armi sia come prima riga del
+   picker armi-da-inventario (override generic-magic-type-row). */
+.pg-talento-item.pg-talento-item-custom {
+    border-left: 4px solid var(--accent);
+    background: linear-gradient(90deg, rgba(220,38,38,0.08), transparent 70%);
+}
+.pg-talento-item.pg-talento-item-custom:hover {
+    background: linear-gradient(90deg, rgba(220,38,38,0.16), transparent 80%);
+}
+.pg-talento-item.pg-talento-item-custom .pg-talento-name { color: var(--accent); font-weight: 600; }
+
+.generic-magic-type-row.generic-magic-type-row-custom {
+    background: linear-gradient(90deg, rgba(220,38,38,0.08), transparent 70%);
+}
+.generic-magic-type-row.generic-magic-type-row-custom:hover {
+    background: linear-gradient(90deg, rgba(220,38,38,0.16), transparent 80%);
+}
+.generic-magic-type-row.generic-magic-type-row-custom .generic-magic-type-name {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Dialog "Arma personalizzata" - form compatto, fisso,
+   simile alle altre dialog dell'app (combat-timer-modal). */
+.hp-calc-modal.custom-weapon-modal {
+    width: 460px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    text-align: left;
+    padding: 22px 22px 18px;
+}
+.custom-weapon-title { margin: 0 0 4px; font-size: 1.05rem; color: var(--text); text-align: center; }
+.custom-weapon-sub { margin: 0 0 14px; font-size: 0.8rem; color: var(--text-secondary); text-align: center; }
+.custom-weapon-form { display: flex; flex-direction: column; gap: 10px; }
+.custom-weapon-row { display: flex; flex-direction: column; gap: 4px; }
+.custom-weapon-row > label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.custom-weapon-row.custom-weapon-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.custom-weapon-row.custom-weapon-row-2 > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.custom-weapon-row.custom-weapon-row-2 > div > label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.custom-weapon-row input[type="text"],
+.custom-weapon-row select,
+.custom-weapon-row.custom-weapon-row-2 input[type="text"],
+.custom-weapon-row.custom-weapon-row-2 select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+.custom-weapon-hint { font-weight: 400; color: var(--text-muted); text-transform: none; letter-spacing: 0; font-size: 0.72rem; }
+.custom-weapon-props {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 8px;
+}
+.custom-weapon-prop {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    font-size: 0.78rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.custom-weapon-prop:hover { border-color: var(--accent-light); }
+.custom-weapon-prop input[type="checkbox"] { accent-color: var(--accent); margin: 0; }
+.custom-weapon-prop:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(220,38,38,0.10);
+}
+.custom-weapon-actions { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
+@media (max-width: 480px) {
+    .custom-weapon-props { grid-template-columns: repeat(2, 1fr); }
+    .custom-weapon-row.custom-weapon-row-2 { grid-template-columns: 1fr; }
+}
+
 /* Bordi colorati per rarita' nelle righe del picker catalogo (riusano
    gli stessi colori delle .inv-item-row.rarita-* definiti piu' sopra). */
 .inv-picker-item.rarita-non-comune { border-left: 4px solid #4ade80; }

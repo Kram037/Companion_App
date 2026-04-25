@@ -11098,7 +11098,14 @@ window.schedaOpenAddEquip = function(pgId) {
                 .map(({ index, view }) => _invRowHtml('schedaAddArmaturaFromInventory', view, index)).join('')
         }` : '';
 
-    const armiHtml = tesoroArmiHtml + Object.entries(ARMA_CATS).map(([cat, label]) => {
+    const customArmaHtml = `
+        <div class="scheda-picker-cat">Creazione rapida</div>
+        <div class="pg-talento-item pg-talento-item-custom" onclick="schedaOpenCustomWeaponDialog('${pgId}')">
+            <span class="pg-talento-name">Arma personalizzata…</span>
+            <span class="option-source">Nome, danni e proprietà a scelta</span>
+        </div>`;
+
+    const armiHtml = tesoroArmiHtml + customArmaHtml + Object.entries(ARMA_CATS).map(([cat, label]) => {
         const items = DND_ARMI.filter(a => a.cat === cat).map(a =>
             `<div class="pg-talento-item" onclick="schedaAddArma('${pgId}','${escapeHtml(a.nome)}')">
                 <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
@@ -11412,11 +11419,17 @@ function _schedaPickInvWeaponBase(pgId, invIndex, candidates, view, subRaw) {
         </button>`).join('');
         return `<div class="generic-magic-group-label">${escapeHtml(groupLabels[k] || k)}</div>${rows}`;
     }).join('');
+    const customRow = `<button type="button" class="generic-magic-type-row generic-magic-type-row-custom"
+        onclick="schedaOpenCustomWeaponDialog('${pgId}', { invIndex: ${invIndex} })">
+        <span class="generic-magic-type-name">Arma personalizzata…</span>
+        <span class="generic-magic-type-sub">Nome, danni e proprietà custom</span>
+    </button>`;
+    const bodyWithCustom = `<div class="generic-magic-group-label">Personalizzata</div>${customRow}${body}`;
     overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 class="generic-magic-title">${escapeHtml(_invDisplayName(view) || 'Arma')}${ench ? ' +' + ench : ''}</h3>
         <p class="generic-magic-sub">Scegli il tipo di arma di base${subRaw ? ` (${escapeHtml(subRaw)})` : ''}</p>
-        <div class="generic-magic-type-list">${body}</div>
+        <div class="generic-magic-type-list">${bodyWithCustom}</div>
         <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
         </div>
@@ -11630,6 +11643,168 @@ window.schedaSaveEquipDesc = async function(pgId, index) {
     renderSchedaPersonaggio(pgId);
     showNotification('Descrizione aggiornata');
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Arma personalizzata: l'utente sceglie nome, categoria (mischia/distanza),
+// danni, tipo danno e proprietà a piacere. Usato sia in fase di
+// "creazione rapida" dall'aggiunta equipaggiamento, sia per equipaggiare
+// un oggetto homebrew dell'inventario senza essere vincolati ai tipi
+// standard di D&D (es. lama-pistola, frusta a catena, ecc.).
+// opts: { invIndex?: number }
+// ──────────────────────────────────────────────────────────────────────
+window.schedaOpenCustomWeaponDialog = function(pgId, opts) {
+    opts = opts || {};
+    const pg = _schedaPgCache;
+    if (!pg) return;
+
+    let prefilledName = '';
+    let prefilledMagic = 0;
+    let invIndex = (typeof opts.invIndex === 'number') ? opts.invIndex : null;
+    if (invIndex != null) {
+        const view = _schedaInvViewAt(pg, invIndex);
+        if (view) {
+            prefilledName = (_invDisplayName(view) || view.nome || '').replace(/\s*\+\d+\s*$/, '').trim();
+            prefilledMagic = view.magic_bonus || view._homebrew_incantamento || 0;
+        }
+    }
+
+    document.querySelectorAll('#schedaCustomWeaponOverlay').forEach(o => o.remove());
+
+    const propsList = ['Accurata','Due Mani','Leggera','Pesante','Portata','Lancio','Munizioni','Ricarica','Versatile','Speciale'];
+    const propsHtml = propsList.map(p => `
+        <label class="custom-weapon-prop">
+            <input type="checkbox" data-prop="${escapeHtml(p)}">
+            <span>${escapeHtml(p)}</span>
+        </label>`).join('');
+
+    const dmgTypes = ['taglienti','perforanti','contundenti','fuoco','freddo','elettricità','acido','veleno','radiante','necrotico','psichico','tuono','forza'];
+    const dmgTypeOpts = dmgTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'schedaCustomWeaponOverlay';
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    overlay.innerHTML = `
+        <div class="hp-calc-modal custom-weapon-modal">
+            <button class="modal-close" onclick="document.getElementById('schedaCustomWeaponOverlay')?.remove()">&times;</button>
+            <h3 class="custom-weapon-title">${invIndex != null ? 'Definisci arma personalizzata' : 'Crea arma personalizzata'}</h3>
+            ${invIndex != null ? '<p class="custom-weapon-sub">Definisci come usare questo oggetto dell\'inventario</p>' : '<p class="custom-weapon-sub">Specifica nome, danni e proprietà</p>'}
+            <div class="custom-weapon-form">
+                <div class="custom-weapon-row">
+                    <label>Nome</label>
+                    <input type="text" id="cwName" maxlength="80" placeholder="Es. Lama-pistola, Frusta a catena…" value="${escapeHtml(prefilledName)}" />
+                </div>
+                <div class="custom-weapon-row custom-weapon-row-2">
+                    <div>
+                        <label>Categoria</label>
+                        <select id="cwCategory">
+                            <option value="mischia" selected>Mischia (Forza)</option>
+                            <option value="distanza">Distanza (Destrezza)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Incantamento</label>
+                        <select id="cwMagic">
+                            <option value="0"${prefilledMagic === 0 ? ' selected' : ''}>Nessuno</option>
+                            <option value="1"${prefilledMagic === 1 ? ' selected' : ''}>+1</option>
+                            <option value="2"${prefilledMagic === 2 ? ' selected' : ''}>+2</option>
+                            <option value="3"${prefilledMagic === 3 ? ' selected' : ''}>+3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="custom-weapon-row custom-weapon-row-2">
+                    <div>
+                        <label>Danni</label>
+                        <input type="text" id="cwDamage" maxlength="20" placeholder="1d8" value="1d6" />
+                    </div>
+                    <div>
+                        <label>Tipo danno</label>
+                        <select id="cwDamageType">
+                            ${dmgTypeOpts}
+                        </select>
+                    </div>
+                </div>
+                <div class="custom-weapon-row">
+                    <label>Proprietà</label>
+                    <div class="custom-weapon-props" id="cwProps">${propsHtml}</div>
+                </div>
+                <div class="custom-weapon-row">
+                    <label>Altre proprietà <span class="custom-weapon-hint">(es. Gittata 9/27, Speciale)</span></label>
+                    <input type="text" id="cwExtraProps" maxlength="120" placeholder="Separate da virgola" />
+                </div>
+            </div>
+            <div class="dialog-actions custom-weapon-actions">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('schedaCustomWeaponOverlay')?.remove()">Annulla</button>
+                <button type="button" class="btn-primary" onclick="schedaSaveCustomWeapon('${pgId}', ${invIndex != null ? invIndex : 'null'})">Aggiungi</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+};
+
+window.schedaSaveCustomWeapon = async function(pgId, invIndex) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const overlay = document.getElementById('schedaCustomWeaponOverlay');
+    if (!overlay) return;
+
+    const nome = (overlay.querySelector('#cwName')?.value || '').trim();
+    if (!nome) {
+        showNotification('Inserisci un nome per l\'arma');
+        return;
+    }
+    const categoria = overlay.querySelector('#cwCategory')?.value || 'mischia';
+    const danni = (overlay.querySelector('#cwDamage')?.value || '').trim() || '1d4';
+    const tipoDanno = overlay.querySelector('#cwDamageType')?.value || 'contundenti';
+    const magic = parseInt(overlay.querySelector('#cwMagic')?.value) || 0;
+
+    const checkedProps = Array.from(overlay.querySelectorAll('#cwProps input[type="checkbox"]:checked'))
+        .map(el => el.dataset.prop);
+    const extraRaw = (overlay.querySelector('#cwExtraProps')?.value || '').trim();
+    const extraProps = extraRaw ? extraRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const proprieta = [...checkedProps, ...extraProps];
+
+    const isRanged = categoria === 'distanza';
+    const isFinesse = proprieta.some(p => p.toLowerCase().includes('accurata'));
+    const totalLevel = (pg.classi || []).reduce((s, c) => s + (c.livello || 1), 0) || pg.livello || 1;
+    const profBonus = calcBonusCompetenza(totalLevel);
+    const modFor = calcMod(pg.forza || 10);
+    const modDes = calcMod(pg.destrezza || 10);
+    const atkMod = isRanged ? modDes : (isFinesse ? Math.max(modFor, modDes) : modFor);
+    const dmgMod = atkMod;
+
+    if (!pg.equipaggiamento) pg.equipaggiamento = [];
+    const entry = {
+        nome,
+        tipo: 'arma',
+        danni,
+        tipo_danno: tipoDanno,
+        proprieta,
+        bonus_colpire: profBonus + atkMod + magic,
+        bonus_danno: dmgMod + magic,
+        magic_bonus: magic,
+        custom: true,
+    };
+
+    let updates = { equipaggiamento: pg.equipaggiamento };
+    if (typeof invIndex === 'number' && invIndex >= 0) {
+        const treasureUid = _schedaEnsureInvUid(pg.inventario, invIndex);
+        if (treasureUid) {
+            entry.from_treasure_uid = treasureUid;
+            updates.inventario = pg.inventario;
+        }
+    }
+    pg.equipaggiamento.push(entry);
+
+    await schedaInstantSave(pgId, updates);
+
+    overlay.remove();
+    document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
+    document.getElementById('equipModal')?.remove();
+    document.body.style.overflow = '';
+    renderSchedaPersonaggio(pgId);
+    showNotification(`${nome} aggiunta all'equipaggiamento`);
+};
 
 window.schedaSetMagicBonus = async function(pgId, index, bonus) {
     const pg = _schedaPgCache;
