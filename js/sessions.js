@@ -188,25 +188,30 @@ window.openSessionePage = async function(campagnaId) {
 };
 
 /**
- * Calcola il numero della sessione (sessioni concluse + 1)
+ * Calcola il numero della sessione corrente (numero_sessioni della
+ * campagna + 1). Si appoggia al campo `numero_sessioni` della tabella
+ * `campagne` (che il DM puo' modificare a mano dai dettagli e che il
+ * trigger DB incrementa di 1 ad ogni chiusura di sessione), cosi' il
+ * numero mostrato in alto durante la sessione attiva e' coerente con
+ * le statistiche della campagna.
  */
 async function getNumeroSessione(campagnaId) {
     const supabase = getSupabaseClient();
     if (!supabase) return 1;
 
     try {
-        const { count, error } = await supabase
-            .from('sessioni')
-            .select('*', { count: 'exact', head: true })
-            .eq('campagna_id', campagnaId)
-            .not('data_fine', 'is', null);
+        const { data, error } = await supabase
+            .from('campagne')
+            .select('numero_sessioni')
+            .eq('id', campagnaId)
+            .single();
 
         if (error) {
             console.error('❌ Errore nel conteggio sessioni:', error);
             return 1;
         }
 
-        return (count || 0) + 1;
+        return (data?.numero_sessioni || 0) + 1;
     } catch (error) {
         console.error('❌ Errore nel conteggio sessioni:', error);
         return 1;
