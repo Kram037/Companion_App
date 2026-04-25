@@ -2415,15 +2415,8 @@ window._calcPVMedio = _calcPVMedio;
 // Se non e' mai stato impostato, fa fallback al valore corrente di
 // pg.punti_vita_max (ipotesi: il PG e' stato creato con un suo
 // massimo che non era ancora tracciato come "reale").
-//
-// FUTURE: durante l'avanzamento di livello il PG ottiene PV nuovi
-// gia' comprensivi del bonus di Costituzione (es. "1d8+CON"). Per
-// aggiornare in modo corretto sia il PV medio (ricalcolato dalla
-// formula) sia il Max Reale dovremo:
-//   raw_gain = level_up_value - costituzione_mod
-//   nuovo_max_reale = max_reale + raw_gain
-// Il PV medio viene ricalcolato automaticamente perche' deriva da
-// classi/livelli/COS correnti tramite _calcPVMedio.
+// Cresce automaticamente al level-up (+pvGain registrato) e quando
+// cambia la Costituzione (delta_mod_COS * livello_totale).
 function _getPvMaxReale(pg) {
     if (!pg) return 0;
     const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
@@ -9254,13 +9247,9 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
         if (hintParts.length > 0) {
             pvMedioHint = `<div class="hp-calc-hint hp-calc-hint-grid">${hintParts.join('')}</div>`;
         }
-        const resetBtn = medio > 0
-            ? `<button class="hp-calc-btn neutral" onclick="schedaHpResetMax()" title="Reimposta al valore medio (${medio})">Reset al medio</button>`
-            : '';
-        const mainRow = resetBtn
-            ? `<div class="hp-calc-buttons hp-calc-buttons-3col">${resetBtn}<button class="hp-calc-btn heal" onclick="schedaHpSetDirect()">Conferma</button></div>`
-            : `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`;
-        actionButtons = `${mainRow}
+        actionButtons = `<div class="hp-calc-buttons">
+                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button>
+            </div>
             <div class="hp-calc-buttons hp-calc-buttons-extra">
                 <button class="hp-calc-btn neutral hp-calc-btn-full" onclick="schedaHpSetMaxReale()" title="Imposta il valore digitato come nuovo Max Reale">Imposta come Max Reale</button>
             </div>`;
@@ -9310,24 +9299,6 @@ window.hpCalcNumpad = function(key) {
     const display = document.getElementById('hpCalcAmountDisplay');
     if (display) display.textContent = _hpCalcState.inputBuffer;
 }
-
-window.schedaHpResetMax = async function() {
-    if (!_hpCalcState) return;
-    if (_hpCalcState.field !== 'punti_vita_max') return;
-    const pg = _schedaPgCache;
-    const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pg) : 0;
-    if (!medio) return;
-    const ok = await _schedaShowConfirmDialog({
-        title: 'Reimpostare i PV massimi al valore medio?',
-        message: `Il valore corrente verra' sostituito con il PV medio calcolato (${medio}). Il "Max reale" memorizzato non verra' modificato.`,
-        confirmLabel: 'Reimposta',
-    });
-    if (!ok) return;
-    _hpCalcState.inputBuffer = String(medio);
-    const display = document.getElementById('hpCalcAmountDisplay');
-    if (display) display.textContent = medio;
-    await window.schedaHpSetDirect();
-};
 
 // Imposta il valore digitato come nuovo "Max Reale" del PG.
 // Salva sia bonus_manuali._pv_max_reale sia pg.punti_vita_max,
@@ -9932,8 +9903,19 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     cls.livello = newLvl;
     classi[classIdx] = cls;
 
-    const newPvMax = (parseInt(pg.punti_vita_max) || 0) + pvGain;
-    const newPvAttuali = (pg.pv_attuali != null ? parseInt(pg.pv_attuali) : (parseInt(pg.punti_vita_max) || 0)) + pvGain;
+    const oldPvMax = parseInt(pg.punti_vita_max) || 0;
+    const newPvMax = oldPvMax + pvGain;
+    const newPvAttuali = (pg.pv_attuali != null ? parseInt(pg.pv_attuali) : oldPvMax) + pvGain;
+
+    // Anche il "Max Reale" cresce del valore registrato al level-up.
+    // Se non era ancora stato impostato esplicitamente, viene
+    // inizializzato al valore corrente prima del level-up + pvGain
+    // (così non assorbe variazioni manuali sul punti_vita_max).
+    const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
+    const storedReale = parseInt(bm._pv_max_reale);
+    const baseReale = (Number.isFinite(storedReale) && storedReale > 0) ? storedReale : oldPvMax;
+    bm._pv_max_reale = Math.max(1, baseReale + pvGain);
+    pg.bonus_manuali = bm;
 
     const dadi = { ...(pg.dadi_vita_disponibili || {}) };
     const currentDadi = dadi[cls.nome] != null ? parseInt(dadi[cls.nome]) : (newLvl - 1);
@@ -9963,7 +9945,8 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
         punti_vita_max: newPvMax,
         pv_attuali: newPvAttuali,
         dadi_vita_disponibili: dadi,
-        slot_incantesimo: newSlotIncantesimo
+        slot_incantesimo: newSlotIncantesimo,
+        bonus_manuali: pg.bonus_manuali,
     };
 
     pg.classi = classi;
