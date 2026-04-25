@@ -2411,6 +2411,28 @@ function _calcPVMedio(pg) {
 }
 window._calcPVMedio = _calcPVMedio;
 
+// Restituisce il "Max reale" salvato in bonus_manuali._pv_max_reale.
+// Se non e' mai stato impostato, fa fallback al valore corrente di
+// pg.punti_vita_max (ipotesi: il PG e' stato creato con un suo
+// massimo che non era ancora tracciato come "reale").
+//
+// FUTURE: durante l'avanzamento di livello il PG ottiene PV nuovi
+// gia' comprensivi del bonus di Costituzione (es. "1d8+CON"). Per
+// aggiornare in modo corretto sia il PV medio (ricalcolato dalla
+// formula) sia il Max Reale dovremo:
+//   raw_gain = level_up_value - costituzione_mod
+//   nuovo_max_reale = max_reale + raw_gain
+// Il PV medio viene ricalcolato automaticamente perche' deriva da
+// classi/livelli/COS correnti tramite _calcPVMedio.
+function _getPvMaxReale(pg) {
+    if (!pg) return 0;
+    const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
+    const stored = parseInt(bm._pv_max_reale);
+    if (Number.isFinite(stored) && stored > 0) return stored;
+    return parseInt(pg.punti_vita_max) || 0;
+}
+window._getPvMaxReale = _getPvMaxReale;
+
 function pgCalcHP() {
     if (pgSelectedClasses.length === 0) return 0;
     const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
@@ -9219,18 +9241,29 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     let pvMedioHint = '';
     let actionButtons;
     if (isDirectEdit) {
-        const medio = (typeof _calcPVMedio === 'function')
-            ? _calcPVMedio(_schedaPgCache)
-            : 0;
+        const pgRef = _schedaPgCache;
+        const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pgRef) : 0;
+        const reale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pgRef) : 0;
+        const hintParts = [];
         if (medio > 0) {
-            pvMedioHint = `<div class="hp-calc-hint">PV medio (calcolato): <strong>${medio}</strong></div>`;
-            actionButtons = `<div class="hp-calc-buttons hp-calc-buttons-3col">
-                <button class="hp-calc-btn neutral" onclick="schedaHpResetMax()" title="Reimposta al valore medio (${medio})">Reset</button>
-                <button class="hp-calc-btn heal" onclick="schedaHpSetDirect()">Conferma</button>
-            </div>`;
-        } else {
-            actionButtons = `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`;
+            hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">PV medio</span><strong class="hp-calc-medio">${medio}</strong></div>`);
         }
+        if (reale > 0) {
+            hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">Max reale</span><strong class="hp-calc-reale">${reale}</strong></div>`);
+        }
+        if (hintParts.length > 0) {
+            pvMedioHint = `<div class="hp-calc-hint hp-calc-hint-grid">${hintParts.join('')}</div>`;
+        }
+        const resetBtn = medio > 0
+            ? `<button class="hp-calc-btn neutral" onclick="schedaHpResetMax()" title="Reimposta al valore medio (${medio})">Reset al medio</button>`
+            : '';
+        const mainRow = resetBtn
+            ? `<div class="hp-calc-buttons hp-calc-buttons-3col">${resetBtn}<button class="hp-calc-btn heal" onclick="schedaHpSetDirect()">Conferma</button></div>`
+            : `<div class="hp-calc-buttons"><button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button></div>`;
+        actionButtons = `${mainRow}
+            <div class="hp-calc-buttons hp-calc-buttons-extra">
+                <button class="hp-calc-btn neutral hp-calc-btn-full" onclick="schedaHpSetMaxReale()" title="Imposta il valore digitato come nuovo Max Reale">Imposta come Max Reale</button>
+            </div>`;
     } else {
         actionButtons = `<div class="hp-calc-buttons">
             <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
@@ -9284,10 +9317,64 @@ window.schedaHpResetMax = async function() {
     const pg = _schedaPgCache;
     const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pg) : 0;
     if (!medio) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Reimpostare i PV massimi al valore medio?',
+        message: `Il valore corrente verra' sostituito con il PV medio calcolato (${medio}). Il "Max reale" memorizzato non verra' modificato.`,
+        confirmLabel: 'Reimposta',
+    });
+    if (!ok) return;
     _hpCalcState.inputBuffer = String(medio);
     const display = document.getElementById('hpCalcAmountDisplay');
     if (display) display.textContent = medio;
     await window.schedaHpSetDirect();
+};
+
+// Imposta il valore digitato come nuovo "Max Reale" del PG.
+// Salva sia bonus_manuali._pv_max_reale sia pg.punti_vita_max,
+// chiedendo prima conferma all'utente.
+window.schedaHpSetMaxReale = async function() {
+    if (!_hpCalcState) return;
+    if (_hpCalcState.field !== 'punti_vita_max') return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const buf = parseInt(_hpCalcState.inputBuffer) || 0;
+    if (buf <= 0) {
+        showNotification('Digita un valore valido nel tastierino prima di impostare il Max Reale');
+        return;
+    }
+    const oldReale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pg) : (parseInt(pg.punti_vita_max) || 0);
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Aggiornare il Max Reale?',
+        message: `Il Max Reale passera' da ${oldReale} a ${buf} PV. Anche il valore di PV massimi corrente verra' impostato a ${buf}.`,
+        confirmLabel: 'Conferma',
+    });
+    if (!ok) return;
+
+    const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
+    bm._pv_max_reale = buf;
+    pg.bonus_manuali = bm;
+    pg.punti_vita_max = buf;
+
+    _hpCalcState.currentVal = buf;
+    _hpCalcState.inputBuffer = '0';
+    const cur = document.getElementById('hpCalcCurrent');
+    if (cur) cur.textContent = buf;
+    const amt = document.getElementById('hpCalcAmountDisplay');
+    if (amt) amt.textContent = '0';
+    const realeEl = document.querySelector('#hpCalcOverlay .hp-calc-reale');
+    if (realeEl) realeEl.textContent = buf;
+    const pgDisplay = document.getElementById('schedaPvMax');
+    if (pgDisplay) pgDisplay.textContent = buf;
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({
+            punti_vita_max: buf,
+            bonus_manuali: pg.bonus_manuali,
+            updated_at: new Date().toISOString(),
+        }).eq('id', _hpCalcState.pgId);
+    }
+    showNotification('Max Reale aggiornato');
 };
 
 window.schedaHpSetDirect = async function() {
@@ -9514,6 +9601,17 @@ window.schedaStatConfirm = async function() {
                 if (newPvAttuali !== oldPvAttuali) {
                     pg.pv_attuali = newPvAttuali;
                     updates.pv_attuali = newPvAttuali;
+                }
+
+                // Anche il "Max Reale" (se gia' impostato esplicitamente)
+                // deve seguire il delta di COS, perche' rappresenta i PV
+                // massimi effettivi del PG comprensivi del bonus COS.
+                const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
+                const storedReale = parseInt(bm._pv_max_reale);
+                if (Number.isFinite(storedReale) && storedReale > 0) {
+                    bm._pv_max_reale = Math.max(1, storedReale + pvDelta);
+                    pg.bonus_manuali = bm;
+                    updates.bonus_manuali = pg.bonus_manuali;
                 }
 
                 const pvMaxEl = document.getElementById('schedaPvMax');

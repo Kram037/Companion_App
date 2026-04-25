@@ -854,6 +854,11 @@
 .hp-calc-btn:hover { opacity: 0.85; }
 .hp-calc-hint { font-size: 0.78rem; color: var(--text-muted); margin: -6px 0 10px; line-height: 1.3; }
 .hp-calc-hint strong { color: var(--accent); font-weight: 800; }
+.hp-calc-hint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.hp-calc-hint-grid .hp-calc-hint-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.hp-calc-hint-grid .hp-calc-hint-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; }
+.hp-calc-hint-grid strong { font-size: 1.05rem; color: var(--accent); font-weight: 800; }
+.hp-calc-buttons.hp-calc-buttons-extra { margin-top: 8px; }
 
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
