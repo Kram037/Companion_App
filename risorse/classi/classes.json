@@ -9501,8 +9501,8 @@
         "name_en": "Eldritch Invocations",
         "level": 2,
         "description_en": "In your study of occult lore, you have unearthed eldritch invocations, fragments of forbidden knowledge that imbue you with an abiding magical ability. \n \nAt 2nd level, you gain two eldritch invocations of your choice. Your invocation options are detailed at the end of the class description. When you gain certain warlock levels, you gain additional invocations of your choice, as shown in the Invocations Known column of the Warlock table. \n \nAdditionally, when you gain a level in this class, you can choose one of the invocations you know and replace it with another invocation that you could learn at that level.",
-        "name": "Invocazioni Mistiche",
-        "description": "Nei tuoi studi della tradizione occulta, hai dissotterrato invocazioni mistiche, frammenti di conoscenza proibita che ti imbevono di una capacità magica permanente.\nAl 2° livello, ottieni due invocazioni mistiche a tua scelta. Le tue opzioni di invocazione sono dettagliate alla fine della descrizione della classe. Quando ottieni alcuni livelli da warlock, ottieni invocazioni mistiche aggiuntive a tua scelta, come mostrato nella colonna Invocazioni Conosciute della tabella del Warlock.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere una delle invocazioni che conosci e sostituirla con un'altra invocazione che potresti imparare a quel livello.",
+        "name": "Suppliche Occulte",
+        "description": "Nei tuoi studi della tradizione occulta, hai dissotterrato suppliche occulte, frammenti di conoscenza proibita che ti imbevono di una capacità magica permanente.\nAl 2° livello, ottieni due suppliche occulte a tua scelta. Le tue opzioni di suppliche sono dettagliate alla fine della descrizione della classe. Quando ottieni alcuni livelli da warlock, ottieni suppliche occulte aggiuntive a tua scelta, come mostrato nella colonna suppliche Conosciute della tabella del Warlock.\nInoltre, quando ottieni un livello in questa classe, puoi scegliere una delle suppliche che conosci e sostituirla con un'altra supplica che potresti imparare a quel livello.",
         "translated": true
       },
       {
@@ -9563,7 +9563,7 @@
             "name_en": "Dark One's Own Luck",
             "level": 6,
             "description_en": "Starting at 6th level, you can call on your patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add a d10 to your roll. You can do so after seeing the initial roll but before any of the roll's effects occur. \n \nOnce you use this feature, you can't use it again until you finish a short or long rest.",
-            "name": "Fortuna dell'Oscuro",
+            "name": "Fortuna Tenebrosa",
             "description": "A partire dal 6° livello, puoi attingere alla fortuna oscura del tuo patrono quando ne hai più bisogno. Quando effettui una prova di caratteristica o un tiro salvezza, puoi usare questo privilegio per aggiungere un d10 al tuo tiro. Puoi farlo dopo aver visto il tiro iniziale ma prima che siano applicate le sue conseguenze.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo breve o lungo.",
             "translated": true
           },

@@ -99,7 +99,7 @@ const DND_BACKGROUNDS = [
     // PHB
     'Accolito','Artigiano di Gilda','Ciarlatano','Criminale','Eremita',
     'Eroe Popolare','Forestiero','Intrattenitore','Marinaio','Monello',
-    'Nobile','Ricercatore','Soldato',
+    'Nobile','Sapiente','Soldato',
     // PHB (varianti)
     'Cavaliere','Gladiatore','Mercante di Gilda','Pirata','Spia',
     // EBR
@@ -3648,7 +3648,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         // Talisman, ecc.
         _pgInvocationSlots(pg).filter(is => !is.is_spell).forEach(is => {
             resItems.push(`<div class="scheda-hd-row">
-                <span class="scheda-hd-total">${escapeHtml(is.name)} <small>(invocazione, ${escapeHtml(is.recharge)})</small></span>
+                <span class="scheda-hd-total">${escapeHtml(is.name)} <small>(supplica, ${escapeHtml(is.recharge)})</small></span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
                     <span class="scheda-hd-val" id="sInvRes_${is.key}">${is.current}</span>
@@ -4177,7 +4177,7 @@ window.schedaOpenSpellPage = async function(pgId) {
             }).join('');
             invocationSlotsBlock = `
     <div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot invocazioni</div>
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot suppliche</div>
         <div class="scheda-section-body">
             <div class="scheda-hd-list">${rows}</div>
         </div>
@@ -4859,7 +4859,7 @@ function buildSpellLevelSection(pg, level) {
 
     const invocationCards = invocationUnique.map(({ src, sp }) => {
         const id = sp.name;
-        const tag = src.recharge === 'at_will' ? 'invocazione · a volontà' : 'invocazione · 1/lungo';
+        const tag = src.recharge === 'at_will' ? 'supplica · a volontà' : 'supplica · 1/lungo';
         return `<div class="spell-card spell-card-invocation" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
             <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
             <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
@@ -5108,7 +5108,7 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     _pgInvocationGrantedSpells(pg).forEach(g => {
         const sp = _resolveSpell(g.name) || _resolveSpell(g.name_en);
         if (sp && !grantedByName.has(sp.name)) {
-            grantedByName.set(sp.name, `invocazione: ${g.invocation_name}`);
+            grantedByName.set(sp.name, `supplica: ${g.invocation_name}`);
         }
     });
 
@@ -7856,10 +7856,10 @@ window.schedaOpenPrivilegesPage = async function(pgId) {
                     </div>
                 </div>`;
             }).join('')
-            : '<span class="scheda-empty">Nessuna invocazione selezionata</span>';
+            : '<span class="scheda-empty">Nessuna supplica selezionata</span>';
         invocationsSectionHtml = `<div class="scheda-section collapsed">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Invocazioni Occulte <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
-                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenInvocationsEdit('${pg.id}')" title="Modifica invocazioni">&#9998;</button>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Suppliche Occulte <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenInvocationsEdit('${pg.id}')" title="Modifica suppliche">&#9998;</button>
             </div>
             <div class="scheda-section-body" id="schedaInvocationsDisplay">${itemsHtml}</div>
         </div>`;
@@ -8555,7 +8555,7 @@ function _invocationPickerHeaderHtml() {
     return `
         <div class="spell-picker-search-row">
             <input type="text" id="invocationPickerSearch" class="hp-calc-input spell-picker-search"
-                   placeholder="Cerca invocazione (IT/EN)..."
+                   placeholder="Cerca supplica (IT/EN)..."
                    value="${escapeHtml(window._invocationPickerSearch)}"
                    oninput="_invocationPickerOnSearch(this.value)">
             <button type="button" class="spell-picker-filter-btn" id="invocationPickerFilterBtn"
@@ -8676,17 +8676,17 @@ function _schedaInvocationsContentHtml(currentInvIds) {
     const listHtml = available.map(inv => {
         const meets = _pgMeetsInvocationPrereqs(pg, inv);
         const disabled = !meets || !canAddMore;
-        const reason = !canAddMore ? 'Limite invocazioni raggiunto' : (!meets ? 'Prerequisiti non soddisfatti' : '');
+        const reason = !canAddMore ? 'Limite suppliche raggiunto' : (!meets ? 'Prerequisiti non soddisfatti' : '');
         const safeId = inv.id.replace(/'/g, "\\'");
         return renderItem(inv, {
             onClick: `schedaInvocationAdd('${safeId}')`,
             disabled,
             title: disabled ? reason : '',
         });
-    }).join('') || '<div class="scheda-empty" style="padding:12px;">Nessuna invocazione corrisponde ai filtri.</div>';
+    }).join('') || '<div class="scheda-empty" style="padding:12px;">Nessuna supplica corrisponde ai filtri.</div>';
 
     return `
-        <div class="invocations-summary"><strong>${currentInvIds.length}</strong> / ${maxInv} invocazioni selezionate</div>
+        <div class="invocations-summary"><strong>${currentInvIds.length}</strong> / ${maxInv} suppliche selezionate</div>
         ${_invocationPickerHeaderHtml()}
         ${selectedHtml ? `<div class="form-section-label">Selezionate</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
         <div class="form-section-label">Disponibili (${available.length})</div>
@@ -9063,7 +9063,7 @@ window.schedaOpenInvocationsEdit = function(pgId) {
     <div class="modal active" id="schedaInvocationsModal">
         <div class="modal-content modal-content-lg">
             <button class="modal-close" onclick="schedaCloseInvocationsEdit()">&times;</button>
-            <h2>Modifica Invocazioni Occulte</h2>
+            <h2>Modifica Suppliche Occulte</h2>
             <div class="wizard-page-scroll" id="schedaInvocationsContent">
                 ${_schedaInvocationsContentHtml(current)}
             </div>
@@ -9160,9 +9160,9 @@ async function _schedaInvocationsSave() {
                 delete payload[m[1]];
                 ({ error } = await supabase.from('personaggi').update(payload).eq('id', pgId));
             }
-            if (error) console.warn('[invocazioni] save failed', error);
+            if (error) console.warn('[suppliche] save failed', error);
         } catch (e) {
-            console.warn('[invocazioni] save failed (column missing?)', e);
+            console.warn('[suppliche] save failed (column missing?)', e);
         }
     }
 }
