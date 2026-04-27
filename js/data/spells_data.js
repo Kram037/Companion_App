@@ -12956,5 +12956,95 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Rileva Magia"
     ],
     "translated": true
+  },
+  "Lancia Psichica di Raulothim": {
+    "name": "Lancia Psichica di Raulothim",
+    "name_en": "Raulothim's Psychic Lance",
+    "level": 4,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Scagli una scintillante lancia di potere psichico dalla tua fronte contro una creatura che puoi vedere e che si trova a gittata. In alternativa, puoi pronunciare il nome di una creatura. Se il bersaglio con nome è entro la gittata, diventa il bersaglio dell'incantesimo anche se non puoi vederlo. Se il bersaglio nominato non è nel raggio d'azione, la lancia si dissipa senza effetto. Il bersaglio deve effettuare un tiro salvezza su Intelligenza. Se fallisce il Tiro Salvezza, il bersaglio subisce 7d6 danni psichici ed è incapacitato fino all'inizio del turno successivo dell'incantatore. Se il Tiro Salvezza riesce, la creatura subisce la metà dei danni e non diventa Incapacitato. Ai Livelli Superiori. Quando lanci questo incantesimo utilizzando uno slot incantesimo di 5° livello o superiore, il danno aumenta di 1d6 per ogni livello dello slot superiore al 4°.",
+    "description_en": "You unleash a shimmering lance of psychic power from your forehead at a creature that you can see within range. Alternatively, you can utter a creature’s name. If the named target is within range, it becomes the spell’s target even if you can’t see it. If the named target isn’t within range, the lance dissipates without effect. The target must make an Intelligence saving throw. On a failed save, the target takes 7d6 psychic damage and is incapacitated until the start of your next turn. On a successful save, the creature takes half as much damage and isn’t incapacitated. At Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d6 for each slot level above 4th.",
+    "classes": [
+      "Bardo",
+      "Mago",
+      "Stregone",
+      "Warlock"
+      ],
+    "classes_en": [
+      "Bard",
+      "Wizard",
+      "Sorcerer",
+      "Warlock"
+    ],
+    "source": "Fizban's Treasury of Dragons (TCoE)",
+    "aliases": [],
+    "translated": true
+  },
+  "Legame Telepatico di Rary": {
+    "name": "Legame Telepatico di Rary",
+    "name_en": "Rary's Telepathic Bond",
+    "level": 5,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (due pezzi di guscio di uova di due differenti creature)",
+    "components_en": "V, S, M (pieces of eggshell from two different kinds of creatures)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Crei un legame telepatico tra un massimo di otto creature consenzienti che puoi vedere entro gittata. Ogni creatura diventa legata a tutte le altre per la durata dell'incantesimo. Le reature con un punteggio di Intelligenza di 2 o inferiore non sono interessate da questo incantesimo. Fino al termine dell'incantesimo, le creature possono comunicare telepaticamente attraverso il legame, anche se non hanno un linguaggio comune. La comunicazione è possibile a distanza, anche se non può estendersi a altri piani di esistenza.",
+    "description_en": "You forge a telepathic link among up to eight willing creatures of your choice within range, psychically linking each creature to all the others for the duration. Creatures with Intelligence scores of 2 or less aren’t affected by this spell. Until the spell ends, the targets can communicate telepathically through the bond whether or not they have a common language. The communication is possible over any distance, though it can’t extend to other planes of existence.",
+    "classes": [
+      "Bardo",
+      "Mago"
+      ],
+    "classes_en": [
+      "Bard",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Evoca Spirito Draconico": {
+    "name": "Evoca Spirito Draconico",
+    "name_en": "Summon Draconian",
+    "level": 5,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (un oggetto con l'immagine di un drago inciso, del valore di almeno 500 mo)",
+    "components_en": "V, S, M (an object with the image of a dragon engraved on it, worth at least 500 gp)",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Richiami uno spirito draconico. Si manifesta in uno spazio libero che puoi vedere entro gittata. Questa forma corporea usa il blocco statistiche dello Spirito Draconico. Quando lanci l'incantesimo, scegli una famiglia di draghi: Chromatico, Gemma o Metallico. La creatura assomiglia a un drago della famiglia prescelta, che determina certi tratti nel suo blocco statistiche. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata a te e ai tuoi compagni. In combattimento, la creatura condivide il tuo conteggio dell'iniziativa, ma agisce immediatamente dopo di te. Obbedisce ai tuoi comandi verbali (non è richiesta alcuna azione). Se non gliene impartisci nessuno, prende l'azione Schivare e usa il movimento per evitare il pericolo. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 6° livello o superiore, usa il livello più alto dove appare il livello dell'incantesimo nel blocco statistiche.",
+    "description_en": "You call forth a draconic spirit. It manifests in an unoccupied space that you can see within range. This corporeal form uses the Draconic Spirit stat block. When you cast this spell, choose a family of dragon: chromatic, gem, or metallic. The creature resembles a dragon of the chosen family, which determines certain traits in its stat block. The creature disappears when it drops to 0 hit points or when the spell ends. The creature is an ally to you and your companions. In combat, the creature shares your initiative count, but it takes its turn immediately after yours. It obeys your verbal commands (no action required by you). If you don’t issue any, it takes the Dodge action and uses its move to avoid danger. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, use the higher level wherever the spell’s level appears in the stat block.",
+    "classes": [
+      "Druido",
+      "Mago",
+      "Stregone"
+    ],
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons (TCoE)",
+    "aliases": [],
+    "translated": true
   }
 });
