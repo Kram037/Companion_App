@@ -21,7 +21,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/icon d20.png">
     <link rel="stylesheet" href="css/base.css?v=20260424I">
     <link rel="stylesheet" href="css/components.css?v=20260424M">
-    <link rel="stylesheet" href="css/modals.css?v=20260424W">
+    <link rel="stylesheet" href="css/modals.css?v=20260427A">
     <link rel="stylesheet" href="css/campagne.css?v=20260424X">
     <link rel="stylesheet" href="css/personaggi.css?v=20260425E">
     <link rel="stylesheet" href="css/sessions.css?v=20260424G">
@@ -531,6 +531,7 @@
                         <span id="installPwaBtnLabel">Scarica app</span>
                     </button>
                 </div>
+                <p class="settings-app-version" id="settingsAppVersion" aria-live="polite"></p>
             </div>
         </div>
     </div>
@@ -982,6 +983,7 @@
         console.log('âœ… Supabase caricato e inizializzato (ES Module)');
     </script>
     <script src="js/supabase.js?v=1767900400"></script>
+    <script src="js/version.js?v=20260427A"></script>
     <script src="js/state.js?v=20260423E"></script>
     <script src="js/utils.js?v=20260427F"></script>
     <script src="js/lang.js?v=1771800000"></script>
@@ -1007,7 +1009,7 @@
     <script src="js/laboratorio.js?v=20260424I"></script>
     <script src="js/realtime.js?v=20260424J"></script>
     <script src="js/initiative.js?v=20260425E"></script>
-    <script src="js/init.js?v=20260424G"></script>
+    <script src="js/init.js?v=20260427A"></script>
     
     <!-- Cache busting script for development -->
     <script>
@@ -1019,8 +1021,12 @@
             }
         });
         
-        // Log version for debugging
-        console.log('Companion App loaded - v1.0');
+        if (typeof window.APP_VERSION !== 'undefined') {
+            const d = window.APP_BUILD_DATE ? ` · ${window.APP_BUILD_DATE}` : '';
+            console.log(`Companion App loaded · v${window.APP_VERSION}${d}`);
+        } else {
+            console.log('Companion App loaded');
+        }
     </script>
 </body>
 </html>

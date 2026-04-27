@@ -133,6 +133,12 @@ async function init() {
         console.log('✅ Tutti gli elementi DOM trovati');
     }
 
+    const settingsAppVersion = document.getElementById('settingsAppVersion');
+    if (settingsAppVersion && typeof window.APP_VERSION !== 'undefined') {
+        const d = window.APP_BUILD_DATE ? ` · ${window.APP_BUILD_DATE}` : '';
+        settingsAppVersion.textContent = `Companion App · v${window.APP_VERSION}${d}`;
+    }
+
     // Load saved theme
     loadTheme();
     
