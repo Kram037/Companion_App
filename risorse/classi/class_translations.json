@@ -879,7 +879,7 @@
               "description": "A partire dal 1° livello, quando riduci una creatura ostile a 0 punti ferita, ottieni punti ferita temporanei pari al tuo modificatore di Carisma + il tuo livello da warlock (minimo 1)."
             },
             "Dark One's Own Luck": {
-              "name": "Fortuna dell'oscuro",
+              "name": "Fortuna dell'Oscuro",
               "description": "A partire dal 6° livello, puoi attingere alla fortuna oscura del tuo patrono quando ne hai più bisogno. Quando effettui una prova di caratteristica o un tiro salvezza, puoi usare questo privilegio per aggiungere un d10 al tuo tiro. Puoi farlo dopo aver visto il tiro iniziale ma prima che siano applicate le sue conseguenze.\nUna volta usato questo privilegio, non puoi usarlo di nuovo finché non termini un riposo breve o lungo."
             },
             "Fiendish Resilience": {

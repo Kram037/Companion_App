@@ -3150,7 +3150,7 @@ const SUBCLASS_RESOURCES = {
     ],
     'the-fiend': [
         // Dark One's Own Luck: 1 uso per riposo breve o lungo (non bonus di competenza).
-        { nome: 'Fortuna dell\'oscuro', max: 1, fromLevel: 6, recharge: 'short_or_long' },
+        { nome: 'Fortuna dell\'Oscuro', max: 1, fromLevel: 6, recharge: 'short_or_long' },
         { nome: 'Scaglia all\'Inferno', max: 1, fromLevel: 14, recharge: 'long_rest' },
     ],
     'celestial': [
