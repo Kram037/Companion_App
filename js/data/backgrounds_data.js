@@ -819,9 +819,9 @@ window.BACKGROUNDS_DATA = {
     },
     "description": ""
   },
-  "Ricercatore": {
-    "id": "ricercatore",
-    "name": "Ricercatore",
+  "Sapiente": {
+    "id": "sapiente",
+    "name": "Sapiente",
     "name_en": "Sage",
     "source_short": "PHB",
     "skill_proficiencies": [
@@ -843,7 +843,7 @@ window.BACKGROUNDS_DATA = {
     ],
     "starting_gold": 10,
     "feature": {
-      "name": "Ricercatore",
+      "name": "Sapiente",
       "description": "Quando tenti di apprendere o ricordare un'informazione, se non conosci quell'informazione, sai dove e da chi puoi ottenerla, di solito da una biblioteca, uno scriptorium, un'universita', un saggio o un altro ricercatore. Il DM potrebbe stabilire che le conoscenze cercate siano custodite in un luogo quasi inaccessibile, o che semplicemente non possano essere trovate. Per portare alla luce informazioni molto ricercate potrebbero essere necessari un viaggio o altre vicissitudini."
     },
     "description": ""

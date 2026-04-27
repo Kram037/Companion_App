@@ -1156,8 +1156,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Tuono Fragoroso": {
-    "name": "Tuono Fragoroso",
+  "Rombo di Tuono": {
+    "name": "Rombo di Tuono",
     "name_en": "Thunderclap",
     "level": 0,
     "school": "evocation",
@@ -2316,8 +2316,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Rimprovero Infernale": {
-    "name": "Rimprovero Infernale",
+  "Intimidire Infernale": {
+    "name": "Intimidire Infernale",
     "name_en": "Hellish Rebuke",
     "level": 1,
     "school": "evocation",
@@ -2634,8 +2634,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Raggio della Malattia": {
-    "name": "Raggio della Malattia",
+  "Raggio di Infermità": {
+    "name": "Raggio di Infermità",
     "name_en": "Ray of Sickness",
     "level": 1,
     "school": "necromancy",
@@ -4466,8 +4466,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Raggio Indebolente": {
-    "name": "Raggio Indebolente",
+  "Raggio di Affaticamento": {
+    "name": "Raggio di Affaticamento",
     "name_en": "Ray of Enfeeblement",
     "level": 2,
     "school": "necromancy",
@@ -4520,8 +4520,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Raggio Cocente": {
-    "name": "Raggio Cocente",
+  "Raggio Rovente": {
+    "name": "Raggio Rovente",
     "name_en": "Scorching Ray",
     "level": 2,
     "school": "evocation",
@@ -9398,8 +9398,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "aliases": [],
     "translated": true
   },
-  "Statica Sinaptica": {
-    "name": "Statica Sinaptica",
+  "Scossa Sinaptica": {
+    "name": "Scossa Sinaptica",
     "name_en": "Synaptic Static",
     "level": 5,
     "school": "enchantment",
