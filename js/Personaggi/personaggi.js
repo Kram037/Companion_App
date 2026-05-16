@@ -2635,7 +2635,7 @@ function pgRenderDadiVita() {
     const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
     const totalLevel = pgGetTotalLevel();
 
-    container.innerHTML = pgSelectedClasses.map((cls, idx) => {
+    const html = pgSelectedClasses.map((cls, idx) => {
         const die = CLASS_HIT_DIE[cls.nome] || 8;
         const avg = dieAvg(die);
         let detail;
@@ -2651,6 +2651,7 @@ function pgRenderDadiVita() {
             <span class="pg-dado-vita-detail">${detail}</span>
         </div>`;
     }).join('');
+    setSafeHtml(container, html);
 
     const hp = pgCalcHP();
     const cosTotal = totalLevel * cosMod;
@@ -2680,30 +2681,33 @@ window.pgOpenAbilityKeypad = function(inputEl) {
     const overlay = document.createElement('div');
     overlay.id = 'pgKeypadOverlay';
     overlay.className = 'hp-calc-overlay';
-    overlay.innerHTML = `
+    const keypadKeys = ['1','2','3','4','5','6','7','8','9','C','0','⌫'];
+    setSafeHtml(overlay, `
         <div class="hp-calc-modal">
-            <button class="hp-calc-close" onclick="pgCloseKeypad()">&times;</button>
+            <button class="hp-calc-close" data-keypad-action="close">&times;</button>
             <div class="hp-calc-title">${escapeHtml(label)}</div>
             <div class="hp-calc-input-display" id="kpDisplay">${escapeHtml(currentVal)}</div>
             <div class="hp-calc-numpad">
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('1')">1</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('2')">2</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('3')">3</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('4')">4</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('5')">5</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('6')">6</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('7')">7</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('8')">8</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('9')">9</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('C')">C</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('0')">0</button>
-                <button class="hp-calc-numpad-btn" onclick="pgKeypadInput('⌫')">⌫</button>
+                ${keypadKeys.map(key => `<button class="hp-calc-numpad-btn" data-keypad-action="input" data-keypad-key="${safeAttr(key)}">${escapeHtml(key)}</button>`).join('')}
             </div>
             <div class="hp-calc-buttons">
-                <button class="hp-calc-btn heal hp-calc-btn-full" onclick="pgKeypadConfirm()">Conferma</button>
+                <button class="hp-calc-btn heal hp-calc-btn-full" data-keypad-action="confirm">Conferma</button>
             </div>
         </div>
-    `;
+    `);
+    overlay.addEventListener('click', (event) => {
+        const actionEl = event.target.closest('[data-keypad-action]');
+        if (!actionEl || !overlay.contains(actionEl)) return;
+
+        const action = actionEl.dataset.keypadAction;
+        if (action === 'close') {
+            pgCloseKeypad();
+        } else if (action === 'confirm') {
+            pgKeypadConfirm();
+        } else if (action === 'input') {
+            pgKeypadInput(actionEl.dataset.keypadKey || '');
+        }
+    });
     document.body.appendChild(overlay);
 };
 
