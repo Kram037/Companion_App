@@ -1887,7 +1887,7 @@ function pgGetHomebrewSubclassOptions(className) {
         return slugMatch || nameMatch;
     });
     try {
-        console.log('[homebrew][picker] richiesta sottoclassi homebrew:', {
+        appDebug('[homebrew][picker] richiesta sottoclassi homebrew:', {
             className, targetLower, classeSlugTrovato: slug,
             sottoclassiInCache: all.length,
             sottoclassiPerQuestaClasse: matches.length,
@@ -1919,7 +1919,7 @@ function _renderSubclassSelector(c, index, onclickFn) {
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
     try {
-        console.log('[homebrew][selector] _renderSubclassSelector chiamata:', {
+        appDebug('[homebrew][selector] _renderSubclassSelector chiamata:', {
             classeNome: c.nome,
             classeSlug: c.slug,
             optsNative: opts.length,
@@ -2358,7 +2358,7 @@ function pgRenderSlotIncantesimo() {
     const slotLevels = Object.keys(defaultSlots).map(Number).sort((a, b) => a - b);
 
     if (slotLevels.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessun incantesimo disponibile per questa classe</p>';
+        setSafeHtml(container, '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessun incantesimo disponibile per questa classe</p>');
         pgCurrentSlotIncantesimo = {};
         return;
     }
@@ -2490,7 +2490,7 @@ function pgRenderDadiVita() {
     if (!container) return;
 
     if (pgSelectedClasses.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Seleziona una classe per vedere i dadi vita</p>';
+        setSafeHtml(container, '<p style="color:var(--text-muted); font-size:0.85rem;">Seleziona una classe per vedere i dadi vita</p>');
         return;
     }
 
@@ -3457,7 +3457,7 @@ async function renderSchedaPersonaggio(personaggioId) {
     if (!content) return;
 
     const supabase = getSupabaseClient();
-    if (!supabase) { content.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
+    if (!supabase) { setSafeHtml(content, '<p>Errore: Supabase non disponibile</p>'); return; }
 
     // Check tipo_scheda to route to micro view
     const { data: checkPg } = await supabase.from('personaggi').select('tipo_scheda').eq('id', personaggioId).single();
@@ -3473,7 +3473,7 @@ async function renderSchedaPersonaggio(personaggioId) {
     if (typeof updateScrollStatsBtn === 'function') updateScrollStatsBtn();
 
     if (!_schedaPgCache || _schedaPgCache.id !== personaggioId) {
-        content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>';
+        setSafeHtml(content, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento scheda...</p></div>');
     }
 
     try {
