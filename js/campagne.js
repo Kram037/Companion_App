@@ -142,7 +142,7 @@ async function loadCampagne(userId, options = {}) {
     _campagneLoading = true;
 
     if (!silent && elements.campagneList) {
-        elements.campagneList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>';
+        setSafeHtml(elements.campagneList, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento campagne...</p></div>');
     }
     
     if (!skipRealtimeSetup && campagneChannel) {
@@ -887,7 +887,7 @@ async function loadCampagnaDetails(campagnaId, options = {}) {
     }
 
     if (!silent && elements.dettagliCampagnaContent) {
-        elements.dettagliCampagnaContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento dettagli...</p></div>';
+        setSafeHtml(elements.dettagliCampagnaContent, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento dettagli...</p></div>');
     }
 
     try {
@@ -1215,12 +1215,12 @@ function switchGiocatoriTab(tabName, campagnaId) {
 async function renderGestisciGiocatoriTab(campagnaId) {
     if (!elements.gestisciGiocatoriContent) return;
 
-    elements.gestisciGiocatoriContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+    setSafeHtml(elements.gestisciGiocatoriContent, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>');
 
     try {
         const supabase = getSupabaseClient();
         if (!supabase) {
-            elements.gestisciGiocatoriContent.innerHTML = '<div class="content-placeholder"><p>Supabase non disponibile</p></div>';
+            setSafeHtml(elements.gestisciGiocatoriContent, '<div class="content-placeholder"><p>Supabase non disponibile</p></div>');
             return;
         }
 
@@ -1230,7 +1230,7 @@ async function renderGestisciGiocatoriTab(campagnaId) {
 
         if (utentiError) {
             console.error('❌ Errore RPC get_giocatori_campagna:', utentiError);
-            elements.gestisciGiocatoriContent.innerHTML = `<div class="content-placeholder"><p>Errore: ${utentiError.message || 'Impossibile caricare i giocatori'}</p></div>`;
+            setSafeHtml(elements.gestisciGiocatoriContent, `<div class="content-placeholder"><p>Errore: ${escapeHtml(utentiError.message || 'Impossibile caricare i giocatori')}</p></div>`);
             return;
         }
 
@@ -1263,13 +1263,13 @@ async function renderGestisciGiocatoriTab(campagnaId) {
         }
 
         if (giocatoriAttuali.length === 0) {
-            elements.gestisciGiocatoriContent.innerHTML = `
+            setSafeHtml(elements.gestisciGiocatoriContent, `
                 <div class="content-placeholder">
                     <p>Non ci sono giocatori. Invita amici nella tua campagna!</p>
                 </div>
-            `;
+            `);
         } else {
-            elements.gestisciGiocatoriContent.innerHTML = `
+            setSafeHtml(elements.gestisciGiocatoriContent, `
                 <div class="giocatori-modal-list">
                     ${giocatoriAttuali.map(giocatore => `
                         <div class="giocatore-modal-item">
@@ -1294,11 +1294,11 @@ async function renderGestisciGiocatoriTab(campagnaId) {
                         </div>
                     `).join('')}
                 </div>
-            `;
+            `);
         }
     } catch (error) {
         console.error('❌ Errore nel caricamento giocatori:', error);
-        elements.gestisciGiocatoriContent.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+        setSafeHtml(elements.gestisciGiocatoriContent, '<p>Errore nel caricamento dei giocatori</p>');
     }
 }
 
@@ -1308,12 +1308,12 @@ async function renderGestisciGiocatoriTab(campagnaId) {
 async function renderInvitaGiocatoriTab(campagnaId) {
     if (!elements.invitaGiocatoriContent) return;
 
-    elements.invitaGiocatoriContent.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+    setSafeHtml(elements.invitaGiocatoriContent, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>');
 
     try {
         const supabase = getSupabaseClient();
         if (!supabase) {
-            elements.invitaGiocatoriContent.innerHTML = '<div class="content-placeholder"><p>Supabase non disponibile</p></div>';
+            setSafeHtml(elements.invitaGiocatoriContent, '<div class="content-placeholder"><p>Supabase non disponibile</p></div>');
             return;
         }
 
@@ -1339,7 +1339,7 @@ async function renderInvitaGiocatoriTab(campagnaId) {
 
         if (amiciError) {
             console.error('❌ Errore RPC get_amici:', amiciError);
-            elements.invitaGiocatoriContent.innerHTML = `<div class="content-placeholder"><p>Errore: ${amiciError.message || 'Impossibile caricare gli amici'}</p></div>`;
+            setSafeHtml(elements.invitaGiocatoriContent, `<div class="content-placeholder"><p>Errore: ${escapeHtml(amiciError.message || 'Impossibile caricare gli amici')}</p></div>`);
             return;
         }
 
@@ -1361,13 +1361,13 @@ async function renderInvitaGiocatoriTab(campagnaId) {
         const invitatiIds = new Set((invitiEsistenti || []).map(inv => inv.invitato_id));
 
         if (amiciDaInvitare.length === 0) {
-            elements.invitaGiocatoriContent.innerHTML = `
+            setSafeHtml(elements.invitaGiocatoriContent, `
                 <div class="content-placeholder">
                     <p>Non hai amici da invitare. Aggiungi degli amici prima!</p>
                 </div>
-            `;
+            `);
         } else {
-            elements.invitaGiocatoriContent.innerHTML = `
+            setSafeHtml(elements.invitaGiocatoriContent, `
                 <div class="amici-invito-list">
                     ${amiciDaInvitare.map(amico => {
                         const giaInvitato = invitatiIds.has(amico.id);
@@ -1398,11 +1398,11 @@ async function renderInvitaGiocatoriTab(campagnaId) {
                         `;
                     }).join('')}
                 </div>
-            `;
+            `);
         }
     } catch (error) {
         console.error('❌ Errore nel caricamento amici per invito:', error);
-        elements.invitaGiocatoriContent.innerHTML = '<p>Errore nel caricamento degli amici</p>';
+        setSafeHtml(elements.invitaGiocatoriContent, '<p>Errore nel caricamento degli amici</p>');
     }
 }
 
@@ -1563,7 +1563,7 @@ async function openEditDMModal(campagnaId) {
     }
 
     try {
-        elements.dmPlayersList.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>';
+        setSafeHtml(elements.dmPlayersList, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>');
         elements.editDMModal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
@@ -1572,18 +1572,18 @@ async function openEditDMModal(campagnaId) {
         
         if (error) {
             console.error('❌ Errore RPC get_giocatori_campagna:', error);
-            elements.dmPlayersList.innerHTML = `<div class="content-placeholder"><p>Errore: ${error.message || 'Impossibile caricare i giocatori'}</p></div>`;
+            setSafeHtml(elements.dmPlayersList, `<div class="content-placeholder"><p>Errore: ${escapeHtml(error.message || 'Impossibile caricare i giocatori')}</p></div>`);
             return;
         }
 
         if (!giocatori || giocatori.length === 0) {
-            elements.dmPlayersList.innerHTML = '<p>Non ci sono giocatori nella campagna per cambiare il DM</p>';
+            setSafeHtml(elements.dmPlayersList, '<p>Non ci sono giocatori nella campagna per cambiare il DM</p>');
             return;
         }
 
         // Popola la lista con le card dei giocatori
-        elements.dmPlayersList.innerHTML = giocatori.map(giocatore => `
-            <div class="dm-player-card" data-giocatore-id="${giocatore.id}" data-giocatore-nome="${escapeHtml(giocatore.nome_utente)}">
+        setSafeHtml(elements.dmPlayersList, giocatori.map(giocatore => `
+            <div class="dm-player-card" data-giocatore-id="${safeAttr(giocatore.id)}" data-giocatore-nome="${safeAttr(giocatore.nome_utente)}">
                 <div class="giocatore-info">
                     <div class="giocatore-avatar">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1597,7 +1597,7 @@ async function openEditDMModal(campagnaId) {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `).join(''));
 
         // Aggiungi event listener a tutte le card
         const playerCards = elements.dmPlayersList.querySelectorAll('.dm-player-card');
@@ -1612,7 +1612,7 @@ async function openEditDMModal(campagnaId) {
     } catch (error) {
         console.error('❌ Errore nell\'apertura modal DM:', error);
         if (elements.dmPlayersList) {
-            elements.dmPlayersList.innerHTML = '<p>Errore nel caricamento dei giocatori</p>';
+            setSafeHtml(elements.dmPlayersList, '<p>Errore nel caricamento dei giocatori</p>');
         }
     }
 }
