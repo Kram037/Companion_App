@@ -3,7 +3,7 @@
 //   - Bardo "Collegio della Danza" (College of Dance, D&D 2024)
 //
 // Aggiorna sia risorse/classi/extra_classes.json (documentazione) sia
-// il file gia' generato js/data/classes_data.js (consumato dal browser).
+// il file gia' generato js/Personaggi/data/classes_data.js (consumato dal browser).
 //
 // Uso:  node risorse/classi/add_homebrew_subclasses.js
 
@@ -12,7 +12,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const EXTRA = path.join(ROOT, 'risorse', 'classi', 'extra_classes.json');
-const GENERATED = path.join(ROOT, 'js', 'data', 'classes_data.js');
+const GENERATED = path.join(ROOT, 'js', 'Personaggi', 'data', 'classes_data.js');
 
 // ── Definizione delle due sottoclassi ────────────────────────────────
 const GUNSLINGER = {
@@ -147,7 +147,7 @@ function updateExtraJson() {
     console.log(`[extra_classes.json] gunslinger: ${r1}, college-of-dance: ${r2}`);
 }
 
-// 2. js/data/classes_data.js (file generato; aggiorno l'array in-place)
+    // 2. js/Personaggi/data/classes_data.js (file generato; aggiorno l'array in-place)
 function updateGenerated() {
     const txt = fs.readFileSync(GENERATED, 'utf8');
     // Estraggo la prima riga di commento e ricostruisco

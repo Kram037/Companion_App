@@ -10,7 +10,7 @@ nella lista degli incantesimi del PG (col tag della sottoclasse).
 
 Output:
   - risorse/classi/subclass_spells.json   (debug, leggibile)
-  - js/data/subclass_spells_data.js       (consumato dal frontend)
+  - js/Personaggi/data/subclass_spells_data.js       (consumato dal frontend)
 
 Schema:
   {
@@ -37,7 +37,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 SPELLS_JSON = ROOT / "risorse" / "incantesimi" / "spells.json"
 OUT_JSON = ROOT / "risorse" / "classi" / "subclass_spells.json"
-OUT_JS = ROOT / "js" / "data" / "subclass_spells_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "subclass_spells_data.js"
 
 # ─────────────────────────────────────────────────────────────────────────
 # Caricamento dataset incantesimi: serve per mappare nomi EN -> nomi IT

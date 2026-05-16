@@ -1,4 +1,4 @@
-"""Build razze.json + js/data/races_data.js a partire da un dataset
+"""Build razze.json + js/Personaggi/data/races_data.js a partire da un dataset
 hardcoded in italiano, con riferimenti a una libreria di tratti comuni.
 
 Filosofia:
@@ -76,7 +76,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 
 OUT_JSON = HERE / "razze.json"
-OUT_JS = ROOT / "js" / "data" / "races_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "races_data.js"
 
 
 # ---------------------------------------------------------------------------

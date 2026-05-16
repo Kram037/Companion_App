@@ -252,7 +252,7 @@ const DND_COMPETENZE_STRUMENTI_GROUPED = {
 };
 const DND_COMPETENZE_STRUMENTI = Object.values(DND_COMPETENZE_STRUMENTI_GROUPED).flatMap(g => g.items);
 
-// Talenti: dataset locale caricato da js/data/feats_data.js (window.FEATS_DATA).
+// Talenti: dataset locale caricato da js/Personaggi/data/feats_data.js (window.FEATS_DATA).
 // Sorgente: PDF aidedd.org parsato in risorse/talenti/parse_feats.py.
 // Solo i NOMI ITALIANI sono puntatori salvati nel DB (pg.talenti = [string, ...]),
 // l'app risolve descrizione/prerequisiti/fonte localmente.
@@ -4674,7 +4674,7 @@ async function _schedaPersistAvatar(pgId, urlOrNull) {
 }
 
 /* ── Spells / Trucchetti ── */
-// Restituisce SOLO gli incantesimi del catalogo "ufficiale" (file js/data/spells.js).
+// Restituisce SOLO gli incantesimi del catalogo "ufficiale" (file js/Personaggi/data/spells_data.js).
 function _spellsDataNative() { return window.SPELLS_DATA || {}; }
 
 // Adatta una riga di homebrew_incantesimi al formato usato dal picker

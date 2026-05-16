@@ -3,7 +3,7 @@
 //
 // Aggiorna:
 //   - risorse/classi/extra_classes.json (sorgente)
-//   - js/data/classes_data.js (file generato consumato dal browser)
+//   - js/Personaggi/data/classes_data.js (file generato consumato dal browser)
 //
 // Uso:  node risorse/classi/add_blood_domain.js
 
@@ -12,7 +12,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const EXTRA = path.join(ROOT, 'risorse', 'classi', 'extra_classes.json');
-const GENERATED = path.join(ROOT, 'js', 'data', 'classes_data.js');
+const GENERATED = path.join(ROOT, 'js', 'Personaggi', 'data', 'classes_data.js');
 
 const BLOOD_DOMAIN = {
     slug: 'blood-domain',

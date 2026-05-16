@@ -4,7 +4,7 @@ Estrae i dati strutturati dai PDF in `risorse/incantesimi/` (trucchetti.pdf,
 livello1.pdf, ..., livello9.pdf) e produce due file consumabili dal frontend:
 
 - `risorse/incantesimi/spells.json`   (debug human-readable)
-- `js/data/spells_data.js`            (oggetto `window.SPELLS_DATA`)
+- `js/Personaggi/data/spells_data.js` (oggetto `window.SPELLS_DATA`)
 
 Caratteristiche:
 - Nome italiano usato come ID (chiave). `name_en` mantiene il nome originale.
@@ -28,7 +28,7 @@ PDF_FILES = [HERE / "trucchetti.pdf"] + [
 ]
 
 OUT_JSON = HERE / "spells.json"
-OUT_JS = ROOT / "js" / "data" / "spells_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "spells_data.js"
 TRANSLATIONS_FILE = HERE / "spell_translations.json"
 
 # ---------------------------------------------------------------------------

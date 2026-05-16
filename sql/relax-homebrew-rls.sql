@@ -4,7 +4,7 @@
 --
 -- Razionale: la visibilità "Mostra solo i miei homebrew + quelli degli amici
 -- esplicitamente abilitati nei Settings del laboratorio" viene gestita
--- interamente lato client (loadHomebrewSottoclassi in js/auth.js, e
+-- interamente lato client (loadHomebrewSottoclassi in js/Core/auth.js, e
 -- analoghe). Mantenere RLS strette su SELECT renderebbe impossibile leggere
 -- l'homebrew di un amico abilitato senza inventarsi join complesse fra
 -- utenti.homebrew_settings -> amici_abilitati e auth.uid().

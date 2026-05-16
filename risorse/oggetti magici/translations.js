@@ -7,7 +7,7 @@
  *   node "risorse/oggetti magici/apply_translations.js"
  *
  * Lo script aggiorna `oggetti_magici.json` (single source of truth) e
- * rigenera `js/data/oggetti_magici_data.js`.
+ * rigenera `js/Personaggi/data/oggetti_magici_data.js`.
  *
  * Convenzione di stile per i nomi:
  *   - Italiano canonico D&D 5e dove esistente (es. "Borsa Conservante",
@@ -20,7 +20,7 @@
  * Convenzione di stile per le descrizioni:
  *   - Traduzione in italiano corrente, fedele al testo originale.
  *   - Mantieni nomi di incantesimi in italiano se esiste la traduzione
- *     ufficiale (vedi `js/data/spells_data.js`), altrimenti lascia in EN
+ *     ufficiale (vedi `js/Personaggi/data/spells_data.js`), altrimenti lascia in EN
  *     in *corsivo* (markdown non supportato qui, lascia tra virgolette).
  *   - Mantieni le tabelle con `|` come separatore di colonna.
  */

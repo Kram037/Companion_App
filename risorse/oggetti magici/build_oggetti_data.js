@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Genera js/data/oggetti_magici_data.js a partire dal JSON canonico
+ * Genera js/Personaggi/data/oggetti_magici_data.js a partire dal JSON canonico
  * `risorse/oggetti magici/oggetti_magici.json`.
  *
  * Schema del dataset prodotto:
@@ -29,7 +29,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const SRC_JSON = path.join(__dirname, 'oggetti_magici.json');
-const OUT_JS = path.join(ROOT, 'js', 'data', 'oggetti_magici_data.js');
+const OUT_JS = path.join(ROOT, 'js', 'Personaggi', 'data', 'oggetti_magici_data.js');
 
 function clean(s) {
   if (s == null) return '';

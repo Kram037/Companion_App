@@ -1,4 +1,4 @@
-// Genera js/data/veleni_data.js a partire da risorse/veleni/veleni.json.
+// Genera js/Personaggi/data/veleni_data.js a partire da risorse/veleni/veleni.json.
 // Aggiunge i flag _nome_pending/_desc_pending per i campi non ancora tradotti.
 // Esegui: node "risorse/veleni/build_veleni_data.js"
 
@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC  = path.join(__dirname, 'veleni.json');
-const DEST = path.join(__dirname, '..', '..', 'js', 'data', 'veleni_data.js');
+const DEST = path.join(__dirname, '..', '..', 'js', 'Personaggi', 'data', 'veleni_data.js');
 
 const json = JSON.parse(fs.readFileSync(SRC, 'utf8'));
 const items = (json.items || []).map(it => {

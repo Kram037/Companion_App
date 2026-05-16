@@ -1,7 +1,7 @@
 """
 Scarica le 12 classi base D&D 5e dall'API open5e e produce:
   - risorse/classi/classes.json   (debug, leggibile)
-  - js/data/classes_data.js       (consumato dal frontend)
+  - js/Personaggi/data/classes_data.js       (consumato dal frontend)
 
 Per ogni classe estrae:
   - meta (dadi vita, competenze armi/armature/abilità/tiri salvezza, equipment)
@@ -23,7 +23,7 @@ from pathlib import Path
 API_URL = "https://api.open5e.com/v1/classes/?limit=20"
 ROOT = Path(__file__).resolve().parent.parent.parent  # repo root
 OUT_JSON = ROOT / "risorse" / "classi" / "classes.json"
-OUT_JS = ROOT / "js" / "data" / "classes_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "classes_data.js"
 TRANSLATIONS = ROOT / "risorse" / "classi" / "class_translations.json"
 EXTRA_CLASSES = ROOT / "risorse" / "classi" / "extra_classes.json"
 

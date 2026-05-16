@@ -106,7 +106,7 @@ window.formatRichText = formatRichText;
 //     -> HTML string pronto per essere iniettato in un form.
 //
 // Stile: necessita delle classi .ta-fs-wrap, .ta-fs-btn, .ta-fs-overlay
-// definite in css/base.css.
+// definite in css/Core/base.css.
 function renderTextareaFullscreen(opts = {}) {
     const {
         id = '',

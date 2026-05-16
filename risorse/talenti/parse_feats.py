@@ -4,7 +4,7 @@ Estrae i dati dal PDF `risorse/talenti/talenti.pdf` (lista da aidedd.org)
 e produce due file consumabili dal frontend:
 
 - `risorse/talenti/talenti.json`     (debug human-readable)
-- `js/data/feats_data.js`            (oggetto `window.FEATS_DATA`)
+- `js/Personaggi/data/feats_data.js` (oggetto `window.FEATS_DATA`)
 
 Pattern (replicato da `risorse/incantesimi/parse_spells.py`):
 - Il nome italiano e' usato come chiave (id). `name_en` mantiene il nome originale.
@@ -26,7 +26,7 @@ ROOT = HERE.parent.parent
 
 PDF_FILE = HERE / "talenti.pdf"
 OUT_JSON = HERE / "talenti.json"
-OUT_JS = ROOT / "js" / "data" / "feats_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "feats_data.js"
 TRANSLATIONS_FILE = HERE / "feat_translations.json"
 WIKIDOT_FILE = HERE / "wikidot_descriptions.json"
 

@@ -3,7 +3,7 @@
 Costruisce il dataset locale dei background (D&D 5e) gia' tradotto in italiano,
 emettendo:
   - risorse/background/backgrounds.json (consultabile/diffabile)
-  - js/data/backgrounds_data.js          (window.BACKGROUNDS_DATA per il front-end)
+  - js/Personaggi/data/backgrounds_data.js (window.BACKGROUNDS_DATA per il front-end)
 
 Schema per singolo background:
     {
@@ -38,7 +38,7 @@ import re
 
 OUT_DIR = os.path.dirname(__file__)
 JSON_OUT = os.path.join(OUT_DIR, "backgrounds.json")
-JS_OUT = os.path.normpath(os.path.join(OUT_DIR, "..", "..", "js", "data", "backgrounds_data.js"))
+JS_OUT = os.path.normpath(os.path.join(OUT_DIR, "..", "..", "js", "Personaggi", "data", "backgrounds_data.js"))
 
 
 def _slug(name: str) -> str:
@@ -54,7 +54,7 @@ def _slug(name: str) -> str:
 
 
 # Mappa nomi "comuni" degli strumenti -> nomi canonici usati dal client
-# (cfr. DND_COMPETENZE_STRUMENTI_GROUPED in js/personaggi.js). Senza questa
+# (cfr. DND_COMPETENZE_STRUMENTI_GROUPED in js/Personaggi/personaggi.js). Senza questa
 # normalizzazione il raggruppamento "Linguaggi e Competenze" della scheda
 # (_toolsByGroup) non riconoscerebbe gli strumenti auto-popolati dai
 # background e li ometterebbe dal pannello.

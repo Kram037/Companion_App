@@ -29,7 +29,7 @@ Per ogni invocazione abbiamo:
 
 Output:
   - risorse/invocazioni/invocazioni.json
-  - js/data/invocations_data.js  (window.INVOCATIONS_DATA)
+  - js/Personaggi/data/invocations_data.js  (window.INVOCATIONS_DATA)
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 SPELLS_JSON = ROOT / "risorse" / "incantesimi" / "spells.json"
 OUT_JSON = ROOT / "risorse" / "invocazioni" / "invocazioni.json"
-OUT_JS = ROOT / "js" / "data" / "invocations_data.js"
+OUT_JS = ROOT / "js" / "Personaggi" / "data" / "invocations_data.js"
 
 SPELLS = json.loads(SPELLS_JSON.read_text(encoding="utf-8"))
 EN_TO_IT: dict[str, str] = {sp.get("name_en", ""): k for k, sp in SPELLS.items() if sp.get("name_en")}
