@@ -491,6 +491,30 @@ function handleCampagnaDetailsActionClick(event) {
     }
 }
 
+function setupGiocatoriCampagnaDelegation() {
+    const containers = [elements.gestisciGiocatoriContent, elements.invitaGiocatoriContent].filter(Boolean);
+
+    containers.forEach(container => {
+        if (container.dataset.giocatoriCampagnaDelegationReady === 'true') return;
+        container.dataset.giocatoriCampagnaDelegationReady = 'true';
+        container.addEventListener('click', handleGiocatoriCampagnaActionClick);
+    });
+}
+
+function handleGiocatoriCampagnaActionClick(event) {
+    const button = event.target.closest('[data-giocatori-action]');
+    if (!button) return;
+
+    event.preventDefault();
+    const { giocatoriAction, campagnaId, giocatoreId, invitoId, amicoId } = button.dataset;
+
+    if (giocatoriAction === 'remove-player' && campagnaId && giocatoreId) {
+        window.rimuoviGiocatoreDaCampagna(campagnaId, invitoId || '', giocatoreId);
+    } else if (giocatoriAction === 'invite-friend' && campagnaId && amicoId) {
+        window.invitaAmicoAllaCampagna(campagnaId, amicoId);
+    }
+}
+
 async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     if (!elements.campagneList) return;
 
@@ -1214,6 +1238,7 @@ function switchGiocatoriTab(tabName, campagnaId) {
  */
 async function renderGestisciGiocatoriTab(campagnaId) {
     if (!elements.gestisciGiocatoriContent) return;
+    const safeCampagnaId = safeAttr(campagnaId);
 
     setSafeHtml(elements.gestisciGiocatoriContent, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>');
 
@@ -1285,7 +1310,13 @@ async function renderGestisciGiocatoriTab(campagnaId) {
                                     <p class="giocatore-cid">CID: ${giocatore.cid || ''}</p>
                                 </div>
                             </div>
-                            <button class="btn-icon-remove" onclick="rimuoviGiocatoreDaCampagna('${campagnaId}', '${giocatore.invitoId || ''}', '${giocatore.id}')" aria-label="Rimuovi giocatore" title="Rimuovi dalla campagna">
+                            <button class="btn-icon-remove"
+                                    data-giocatori-action="remove-player"
+                                    data-campagna-id="${safeCampagnaId}"
+                                    data-invito-id="${safeAttr(giocatore.invitoId || '')}"
+                                    data-giocatore-id="${safeAttr(giocatore.id)}"
+                                    aria-label="Rimuovi giocatore"
+                                    title="Rimuovi dalla campagna">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1307,6 +1338,7 @@ async function renderGestisciGiocatoriTab(campagnaId) {
  */
 async function renderInvitaGiocatoriTab(campagnaId) {
     if (!elements.invitaGiocatoriContent) return;
+    const safeCampagnaId = safeAttr(campagnaId);
 
     setSafeHtml(elements.invitaGiocatoriContent, '<div class="loading-placeholder"><div class="loading-spinner"></div><p>Caricamento...</p></div>');
 
@@ -1386,7 +1418,9 @@ async function renderInvitaGiocatoriTab(campagnaId) {
                                     </div>
                                 </div>
                                 <button class="btn-icon-invita ${giaInvitato ? 'btn-disabled' : ''}" 
-                                        onclick="invitaAmicoAllaCampagna('${campagnaId}', '${amico.id}')" 
+                                        data-giocatori-action="invite-friend"
+                                        data-campagna-id="${safeCampagnaId}"
+                                        data-amico-id="${safeAttr(amico.id)}"
                                         ${giaInvitato ? 'disabled' : ''}
                                         title="${giaInvitato ? 'Già invitato' : 'Invita'}">
                                     ${giaInvitato ? 
