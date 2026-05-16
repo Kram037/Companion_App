@@ -1,5 +1,5 @@
 // [BUILD-MARKER] Se vedi questa riga in console, hai la versione nuova del file.
-console.log('[homebrew][build] auth.js BUILD 2026-04-23-I RPC get_uids_by_user_ids con cast text');
+appDebug('[homebrew][build] auth.js BUILD 2026-04-23-I RPC get_uids_by_user_ids con cast text');
 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
@@ -14,7 +14,7 @@ function setupSupabaseAuth() {
         // Listen for auth state changes
         let _authInitDone = false;
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('🔄 Auth state changed:', event, session?.user?.email || 'null');
+            appDebug('Auth state changed:', event, session?.user?.email || 'null');
             
             if (session?.user) {
                 const alreadyLoggedSameUser = AppState.isLoggedIn && AppState.currentUser?.uid === session.user.id;
@@ -64,7 +64,7 @@ function setupSupabaseAuth() {
                 AppState.isLoggedIn = false;
                 invalidateUserCache();
                 updateUIForLoggedOut();
-                console.log('👤 Utente non autenticato');
+                appDebug('Utente non autenticato');
                 
                 // Ferma Realtime subscriptions
                 stopRollRequestsRealtime();

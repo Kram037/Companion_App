@@ -5,7 +5,7 @@ function loadTheme() {
 }
 
 async function setTheme(theme, save = true) {
-    console.log('🎨 Cambio tema a:', theme);
+    appDebug('Cambio tema a:', theme);
     
     // Remove existing theme attribute
     document.documentElement.removeAttribute('data-theme');
@@ -40,7 +40,7 @@ async function setTheme(theme, save = true) {
     // Save to localStorage
     if (save) {
         localStorage.setItem('theme', theme);
-        console.log('✅ Tema salvato in localStorage:', theme);
+        appDebug('Tema salvato in localStorage:', theme);
         
         // Save to Supabase if user is logged in
         if (AppState.isLoggedIn && AppState.currentUser) {
@@ -56,7 +56,7 @@ async function setTheme(theme, save = true) {
                         .eq('uid', AppState.currentUser.uid);
                     
                     if (error) throw error;
-                    console.log('✅ Tema salvato in Supabase:', temaScuro);
+                    appDebug('Tema salvato in Supabase:', temaScuro);
                     await sendAppEventBroadcast({ table: 'utenti', action: 'update', uid: AppState.currentUser.uid });
                 } catch (error) {
                     console.error('❌ Errore nel salvataggio tema in Supabase:', error);

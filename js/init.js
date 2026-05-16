@@ -113,12 +113,12 @@ async function init() {
     };
 
     // Check if all required elements exist
-    console.log('🔍 Verifica elementi DOM...');
-    console.log('userBtn:', elements.userBtn);
-    console.log('settingsBtn:', elements.settingsBtn);
-    console.log('loginModal:', elements.loginModal);
-    console.log('userModal:', elements.userModal);
-    console.log('toolbarBtns:', elements.toolbarBtns?.length || 0);
+    appDebug('Verifica elementi DOM...');
+    appDebug('userBtn:', elements.userBtn);
+    appDebug('settingsBtn:', elements.settingsBtn);
+    appDebug('loginModal:', elements.loginModal);
+    appDebug('userModal:', elements.userModal);
+    appDebug('toolbarBtns:', elements.toolbarBtns?.length || 0);
     
     if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal || !elements.userModal) {
         console.error('❌ Alcuni elementi DOM non sono stati trovati');
@@ -130,7 +130,7 @@ async function init() {
         });
         // Non return, continua comunque per vedere cosa funziona
     } else {
-        console.log('✅ Tutti gli elementi DOM trovati');
+        appDebug('Tutti gli elementi DOM trovati');
     }
 
     const settingsAppVersion = document.getElementById('settingsAppVersion');
@@ -146,27 +146,27 @@ async function init() {
     const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');
     if (savedCampagnaId) {
         AppState.currentCampagnaId = savedCampagnaId;
-        console.log('📌 Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
+        appDebug('Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
     }
     
     // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
     const savedSessioneId = sessionStorage.getItem('currentSessioneId');
     if (savedSessioneId) {
         AppState.currentSessioneId = savedSessioneId;
-        console.log('📌 Sessione salvata ripristinata dalla sessione:', savedSessioneId);
+        appDebug('Sessione salvata ripristinata dalla sessione:', savedSessioneId);
     }
     
     const savedPersonaggioId = sessionStorage.getItem('currentPersonaggioId');
     if (savedPersonaggioId) {
         AppState.currentPersonaggioId = savedPersonaggioId;
-        console.log('📌 Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
+        appDebug('Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
     }
 
     // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
     const savedPage = sessionStorage.getItem('currentPage');
     if (savedPage) {
         AppState.currentPage = savedPage;
-        console.log('📌 Pagina salvata ripristinata dalla sessione:', savedPage);
+        appDebug('Pagina salvata ripristinata dalla sessione:', savedPage);
     }
 
     const savedActiveSession = sessionStorage.getItem('activeSessionCampagnaId');
@@ -189,7 +189,7 @@ async function init() {
     }
     
     // Setup event listeners immediately (don't wait for Supabase)
-    console.log('🔧 Setup event listeners...');
+    appDebug('Setup event listeners...');
     setupEventListeners();
 
     // Browser back/forward navigation
@@ -222,13 +222,13 @@ async function init() {
     // Replace current history entry with initial state
     history.replaceState({ page: AppState.currentPage || 'campagne' }, '', null);
 
-    console.log('📄 Navigazione alla pagina iniziale...');
+    appDebug('Navigazione alla pagina iniziale...');
     navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
     
     // Wait for Supabase to be ready (in background, non-blocking)
     waitForSupabase().then((success) => {
         if (success) {
-            console.log('✅ Supabase pronto, setup auth...');
+            appDebug('Supabase pronto, setup auth...');
             setupSupabaseAuth();
             checkAuthState();
         } else {
@@ -422,7 +422,7 @@ function setupEventListeners() {
             e.preventDefault();
             toggleLoginRegisterMode(true);
         });
-        console.log('✅ Event listener aggiunto a registerLink');
+        appDebug('Event listener aggiunto a registerLink');
     }
 
     if (elements.loginLink) {
@@ -430,7 +430,7 @@ function setupEventListeners() {
             e.preventDefault();
             toggleLoginRegisterMode(false);
         });
-        console.log('✅ Event listener aggiunto a loginLink');
+        appDebug('Event listener aggiunto a loginLink');
     }
 
     // Google Login button
@@ -440,7 +440,7 @@ function setupEventListeners() {
             e.stopPropagation();
             handleGoogleLogin();
         });
-        console.log('✅ Event listener aggiunto a googleLoginBtn');
+        appDebug('Event listener aggiunto a googleLoginBtn');
     }
 
     if (elements.addCampagnaBtn) {
@@ -459,10 +459,10 @@ function setupEventListeners() {
         elements.addAmicoBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('➕ Click su Aggiungi Amico');
+            appDebug('Click su Aggiungi Amico');
             openAddAmicoModal();
         };
-        console.log('✅ Event listener aggiunto a addAmicoBtn');
+        appDebug('Event listener aggiunto a addAmicoBtn');
     }
     
     // Add Amico Modal listeners
@@ -673,7 +673,7 @@ function setupEventListeners() {
             sessionStorage.removeItem('currentCampagnaId');
             navigateToPage('campagne');
         };
-        console.log('✅ Event listener aggiunto a backToCampagneBtn');
+        appDebug('Event listener aggiunto a backToCampagneBtn');
     }
 
     // Back to dettagli button (from sessione page)
@@ -687,7 +687,7 @@ function setupEventListeners() {
                 await loadCampagnaDetails(campagnaId);
             }
         };
-        console.log('✅ Event listener aggiunto a backToDettagliBtn');
+        appDebug('Event listener aggiunto a backToDettagliBtn');
     }
 
     // Back to sessione button (from combattimento page)
@@ -701,7 +701,7 @@ function setupEventListeners() {
                 await renderSessioneContent(campagnaId);
             }
         };
-        console.log('✅ Event listener aggiunto a backToSessioneBtn');
+        appDebug('Event listener aggiunto a backToSessioneBtn');
     }
 
     // Edit user name button
@@ -718,7 +718,7 @@ function setupEventListeners() {
                 }
             }
         };
-        console.log('✅ Event listener aggiunto a editUserNameBtn');
+        appDebug('Event listener aggiunto a editUserNameBtn');
     }
 
     // Save user name button
@@ -728,7 +728,7 @@ function setupEventListeners() {
             e.stopPropagation();
             await handleSaveUserName();
         };
-        console.log('✅ Event listener aggiunto a saveUserNameBtn');
+        appDebug('Event listener aggiunto a saveUserNameBtn');
     }
 
     // Cancel edit user name button
@@ -743,7 +743,7 @@ function setupEventListeners() {
                 elements.editUserNameInput.value = '';
             }
         };
-        console.log('✅ Event listener aggiunto a cancelEditUserNameBtn');
+        appDebug('Event listener aggiunto a cancelEditUserNameBtn');
     }
 
     // Close invita giocatori modal
@@ -934,8 +934,8 @@ function setupEventListeners() {
 
 function startApp() {
     try {
-        console.log('🚀 Inizializzazione app...');
-        console.log('Document readyState:', document.readyState);
+        appDebug('Inizializzazione app...');
+        appDebug('Document readyState:', document.readyState);
         
         // Call init synchronously first to set up event listeners
         init().catch(error => {
@@ -943,7 +943,7 @@ function startApp() {
             console.error('Stack:', error.stack);
         });
         
-        console.log('✅ Inizializzazione avviata');
+        appDebug('Inizializzazione avviata');
     } catch (error) {
         console.error('❌ Errore critico durante l\'inizializzazione:', error);
         console.error('Stack:', error.stack);
@@ -1147,12 +1147,12 @@ function setupPwaInstall() {
 // Wait for DOM to be ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 DOMContentLoaded fired');
+        appDebug('DOMContentLoaded fired');
         startApp();
     });
 } else {
     // DOM already loaded, but wait a bit for all scripts to load
-    console.log('📄 DOM già caricato, attendo script...');
+    appDebug('DOM gia caricato, attendo script...');
     setTimeout(() => {
         startApp();
     }, 100);
