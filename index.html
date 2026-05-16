@@ -967,20 +967,24 @@
         </div>
     </div>
 
+    <script src="js/config.js?v=20260516A"></script>
+
     <!-- Supabase SDK -->
     <script type="module">
         // Carica Supabase come ES module
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
-        // Configurazione
-        const SUPABASE_URL = 'https://tezlofuwlydbjitiymkk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlemxvZnV3bHlkYmppdGl5bWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNTg2NTMsImV4cCI6MjA4MTYzNDY1M30.RoerUrtO6Y9gagzutXDL6Yz0XBJce9bVnmAL4Lf1IDc';
+        const config = window.CompanionConfig || {};
+        const SUPABASE_URL = config.supabaseUrl;
+        const SUPABASE_ANON_KEY = config.supabaseAnonKey;
         
         // Crea il client e rendilo disponibile globalmente
         window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseCreateClient = createClient; // Per compatibilitÃ 
         
-        console.log('âœ… Supabase caricato e inizializzato (ES Module)');
+        if (config.debug) {
+            console.log('Supabase caricato e inizializzato (ES Module)');
+        }
     </script>
     <script src="js/supabase.js?v=1767900400"></script>
     <script src="js/version.js?v=20260427A"></script>
@@ -1030,6 +1034,3 @@
     </script>
 </body>
 </html>
-
-
-

@@ -15,6 +15,22 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function appDebug(...args) {
+    if (window.CompanionConfig?.debug) {
+        console.log(...args);
+    }
+}
+
+function safeAttr(value) {
+    return escapeHtml(String(value ?? ''));
+}
+
+function setSafeHtml(element, html) {
+    if (element) {
+        element.innerHTML = html;
+    }
+}
+
 // ────────────────────────────────────────────────────────────────────────
 // Rich text formatter dell'app (mini-markdown)
 // ────────────────────────────────────────────────────────────────────────
@@ -71,6 +87,9 @@ function _formatRichInline(escaped) {
 }
 
 window.escapeHtml = escapeHtml;
+window.safeAttr = safeAttr;
+window.setSafeHtml = setSafeHtml;
+window.appDebug = appDebug;
 window.formatRichText = formatRichText;
 
 // ────────────────────────────────────────────────────────────────────────

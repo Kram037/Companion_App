@@ -485,6 +485,9 @@ function setupEventListeners() {
     if (elements.invitaAmicoBtn) {
         elements.invitaAmicoBtn.addEventListener('click', handleInvitaAmico);
     }
+    if (typeof setupAmiciEventDelegation === 'function') {
+        setupAmiciEventDelegation();
+    }
     
     // Laboratorio init
     initLaboratorio();

@@ -152,10 +152,10 @@ async function handleCercaUtente(e) {
             
             const safeNomeUtente = escapeHtml(data.nome_utente || '');
             const safeCid = escapeHtml(String(data.cid ?? ''));
-            searchUserInfo.innerHTML = `
+            setSafeHtml(searchUserInfo, `
                 <p><strong>${safeNomeUtente}</strong> (CID: ${safeCid})</p>
                 ${statusText}
-            `;
+            `);
             
             // Mostra/nascondi pulsante invita
             const invitaBtn = document.getElementById('invitaAmicoBtn');
@@ -343,7 +343,7 @@ async function loadAmici(options = {}) {
     const amiciPlaceholder = document.getElementById('amiciPlaceholder');
     if (!silent && amiciPlaceholder) {
         amiciPlaceholder.style.display = 'block';
-        amiciPlaceholder.innerHTML = '<div class="loading-spinner"></div><p>Caricamento amici...</p>';
+        setSafeHtml(amiciPlaceholder, '<div class="loading-spinner"></div><p>Caricamento amici...</p>');
     }
     
     try {
@@ -353,7 +353,7 @@ async function loadAmici(options = {}) {
             return;
         }
         
-        console.log('🔍 Caricamento richieste amicizia per utente:', currentUser.id);
+        appDebug('Caricamento richieste amicizia per utente:', currentUser.id);
         
         // Usa le funzioni SQL per ottenere i dati (bypassano RLS)
         const [amiciResult, richiesteEntrataResult, richiesteUscitaResult] = await Promise.all([
@@ -399,17 +399,111 @@ async function loadAmici(options = {}) {
             }
         }));
         
-        console.log('✅ Amici caricati:', amici.length, 'Richieste in entrata:', richiesteInEntrata.length, 'Richieste in uscita:', richiesteInUscita.length);
+        appDebug('Amici caricati:', amici.length, 'Richieste in entrata:', richiesteInEntrata.length, 'Richieste in uscita:', richiesteInUscita.length);
         
         // Renderizza
         renderAmici(amici, richiesteInEntrata, richiesteInUscita);
     } catch (error) {
         console.error('❌ Errore nel caricamento amici:', error);
-        console.error('Dettagli errore:', error.message, error.code);
+        appDebug('Dettagli errore:', error.message, error.code);
         showNotification('Errore nel caricamento degli amici. Riprova.');
         // Mostra comunque il placeholder
         renderAmici([], [], []);
     }
+}
+
+function setupAmiciEventDelegation() {
+    const containers = [elements.amiciList, elements.richiesteInEntrataList].filter(Boolean);
+
+    containers.forEach(container => {
+        if (container.dataset.amiciDelegationReady === 'true') return;
+        container.dataset.amiciDelegationReady = 'true';
+        container.addEventListener('click', handleAmiciListClick);
+    });
+}
+
+function handleAmiciListClick(event) {
+    const button = event.target.closest('[data-amici-action]');
+    if (!button) return;
+
+    event.preventDefault();
+    const { amiciAction, requestId, amicoId } = button.dataset;
+
+    if (amiciAction === 'accept' && requestId) {
+        window.acceptFriendRequest(requestId);
+    } else if (amiciAction === 'reject' && requestId) {
+        window.rejectFriendRequest(requestId);
+    } else if (amiciAction === 'remove' && amicoId) {
+        window.rimuoviAmico(amicoId);
+    }
+}
+
+function amicoAvatarHtml(stroke = 'currentColor') {
+    return `
+        <div class="amico-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </div>
+    `;
+}
+
+function richiestaInEntrataHtml(req) {
+    const requestId = safeAttr(req.id);
+    const nome = escapeHtml(req.utente?.nome_utente || 'Utente');
+    const cid = escapeHtml(String(req.utente?.cid ?? ''));
+
+    return `
+        <div class="amico-item">
+            <div class="amico-info">
+                ${amicoAvatarHtml()}
+                <div>
+                    <p class="amico-nome">${nome}</p>
+                    <p class="amico-cid">CID: ${cid}</p>
+                </div>
+            </div>
+            <div class="amico-actions">
+                <button class="btn-icon-amico btn-accept" data-amici-action="accept" data-request-id="${requestId}" aria-label="Accetta richiesta" title="Accetta richiesta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-icon-amico btn-reject" data-amici-action="reject" data-request-id="${requestId}" aria-label="Rifiuta richiesta" title="Rifiuta richiesta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function amicoHtml(amico) {
+    const amicoId = safeAttr(amico.id);
+    const nome = escapeHtml(amico.nome_utente || 'Utente');
+    const cid = escapeHtml(String(amico.cid ?? ''));
+
+    return `
+        <div class="amico-item">
+            <div class="amico-info">
+                ${amicoAvatarHtml()}
+                <div>
+                    <p class="amico-nome">${nome}</p>
+                    <p class="amico-cid">CID: ${cid}</p>
+                </div>
+            </div>
+            <div class="amico-actions">
+                <button class="btn-icon-remove" data-amici-action="remove" data-amico-id="${amicoId}" aria-label="Rimuovi amico" title="Rimuovi amico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -425,37 +519,7 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
     if (richiesteInEntrataSection) {
         if (richiesteInEntrata.length > 0) {
             richiesteInEntrataSection.style.display = 'block';
-            if (richiesteInEntrataList) {
-                richiesteInEntrataList.innerHTML = richiesteInEntrata.map(req => `
-                    <div class="amico-item">
-                        <div class="amico-info">
-                            <div class="amico-avatar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="amico-nome">${escapeHtml(req.utente?.nome_utente || 'Utente')}</p>
-                                <p class="amico-cid">CID: ${escapeHtml(String(req.utente?.cid ?? ''))}</p>
-                            </div>
-                        </div>
-                        <div class="amico-actions">
-                            <button class="btn-icon-amico btn-accept" onclick="acceptFriendRequest('${req.id}')" aria-label="Accetta richiesta" title="Accetta richiesta">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                            </button>
-                            <button class="btn-icon-amico btn-reject" onclick="rejectFriendRequest('${req.id}')" aria-label="Rifiuta richiesta" title="Rifiuta richiesta">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            setSafeHtml(richiesteInEntrataList, richiesteInEntrata.map(richiestaInEntrataHtml).join(''));
         } else {
             richiesteInEntrataSection.style.display = 'none';
         }
@@ -466,7 +530,7 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
         // Nessun amico e nessuna richiesta
         if (amiciPlaceholder) {
             amiciPlaceholder.style.display = 'block';
-            amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
+            setSafeHtml(amiciPlaceholder, '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>');
         }
         if (amiciList) {
             amiciList.style.display = 'none';
@@ -477,30 +541,7 @@ function renderAmici(amici, richiesteInEntrata, richiesteInUscita) {
         }
         if (amiciList) {
             amiciList.style.display = 'grid';
-            amiciList.innerHTML = amici.map(amico => `
-                <div class="amico-item">
-                    <div class="amico-info">
-                        <div class="amico-avatar">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="amico-nome">${escapeHtml(amico.nome_utente || 'Utente')}</p>
-                            <p class="amico-cid">CID: ${escapeHtml(String(amico.cid ?? ''))}</p>
-                        </div>
-                    </div>
-                    <div class="amico-actions">
-                        <button class="btn-icon-remove" onclick="rimuoviAmico('${amico.id}')" aria-label="Rimuovi amico" title="Rimuovi amico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            setSafeHtml(amiciList, amici.map(amicoHtml).join(''));
         }
     }
 }
