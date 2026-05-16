@@ -505,6 +505,35 @@ function handleCampagnaDetailsActionClick(event) {
     }
 }
 
+function setupCampagnaDetailsContentDelegation() {
+    const content = elements.dettagliCampagnaContent;
+    if (!content || content.dataset.campagnaDetailsContentDelegationReady === 'true') return;
+
+    content.dataset.campagnaDetailsContentDelegationReady = 'true';
+    content.addEventListener('click', handleCampagnaDetailsContentClick);
+}
+
+function handleCampagnaDetailsContentClick(event) {
+    const button = event.target.closest('[data-dettagli-field-action]');
+    if (!button) return;
+
+    event.preventDefault();
+    const { dettagliFieldAction, campagnaId } = button.dataset;
+    if (!campagnaId) return;
+
+    if (dettagliFieldAction === 'edit-dm') {
+        window.editDMField(campagnaId);
+    } else if (dettagliFieldAction === 'manage-players') {
+        window.openInvitaGiocatoriModal(campagnaId);
+    } else if (dettagliFieldAction === 'edit-created-at') {
+        window.editDataCreazione(campagnaId);
+    } else if (dettagliFieldAction === 'edit-sessions') {
+        window.editNumeroSessioni(campagnaId);
+    } else if (dettagliFieldAction === 'edit-play-time') {
+        window.editTempoGioco(campagnaId);
+    }
+}
+
 function setupGiocatoriCampagnaDelegation() {
     const containers = [elements.gestisciGiocatoriContent, elements.invitaGiocatoriContent].filter(Boolean);
 
@@ -1121,7 +1150,9 @@ async function renderCampagnaDetailsContent(campagna) {
     }
 
     if (elements.dettagliCampagnaContent) {
-        elements.dettagliCampagnaContent.innerHTML = `
+        const safeCampagnaId = safeAttr(campagna.id);
+
+        setSafeHtml(elements.dettagliCampagnaContent, `
             <!-- Sezione Informazioni Principali -->
             <div class="dettagli-section dettagli-main-info">
                 <h2 class="dettagli-section-title">Informazioni</h2>
@@ -1129,7 +1160,7 @@ async function renderCampagnaDetailsContent(campagna) {
                     <div class="info-item">
                         <span class="info-label">DM:</span>
                         <span class="info-value" id="dmValue">${escapeHtml(nomeDM)}</span>
-                        ${isDM ? `<button class="btn-icon-small" onclick="editDMField('${campagna.id}')" aria-label="Modifica DM">
+                        ${isDM ? `<button class="btn-icon-small" data-dettagli-field-action="edit-dm" data-campagna-id="${safeCampagnaId}" aria-label="Modifica DM">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1139,7 +1170,7 @@ async function renderCampagnaDetailsContent(campagna) {
                     <div class="info-item">
                         <span class="info-label">Giocatori:</span>
                         <span class="info-value" id="giocatoriValue">${numeroGiocatori}</span>
-                        ${isDM ? `<button class="btn-icon-small" onclick="openInvitaGiocatoriModal('${campagna.id}')" aria-label="Gestisci giocatori">
+                        ${isDM ? `<button class="btn-icon-small" data-dettagli-field-action="manage-players" data-campagna-id="${safeCampagnaId}" aria-label="Gestisci giocatori">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1149,7 +1180,7 @@ async function renderCampagnaDetailsContent(campagna) {
                     <div class="info-item">
                         <span class="info-label">Creata il:</span>
                         <span class="info-value">${dataCreazione}</span>
-                        ${isDM ? `<button class="btn-icon-small" onclick="editDataCreazione('${campagna.id}')" aria-label="Modifica data creazione">
+                        ${isDM ? `<button class="btn-icon-small" data-dettagli-field-action="edit-created-at" data-campagna-id="${safeCampagnaId}" aria-label="Modifica data creazione">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1169,7 +1200,7 @@ async function renderCampagnaDetailsContent(campagna) {
                             <span class="stat-label">Sessioni</span>
                             <span class="stat-value" id="sessioniValue">${campagna.numero_sessioni || 0}</span>
                         </div>
-                        ${isDM ? `<button class="btn-icon-small stat-edit" onclick="editNumeroSessioni('${campagna.id}')" aria-label="Modifica numero sessioni">
+                        ${isDM ? `<button class="btn-icon-small stat-edit" data-dettagli-field-action="edit-sessions" data-campagna-id="${safeCampagnaId}" aria-label="Modifica numero sessioni">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1182,7 +1213,7 @@ async function renderCampagnaDetailsContent(campagna) {
                             <span class="stat-label">Tempo di gioco</span>
                             <span class="stat-value" id="tempoGiocoValue">${tempoGioco}</span>
                         </div>
-                        ${isDM ? `<button class="btn-icon-small stat-edit" onclick="editTempoGioco('${campagna.id}')" aria-label="Modifica tempo di gioco">
+                        ${isDM ? `<button class="btn-icon-small stat-edit" data-dettagli-field-action="edit-play-time" data-campagna-id="${safeCampagnaId}" aria-label="Modifica tempo di gioco">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1207,7 +1238,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
             </div>
             ` : ''}
-        `;
+        `);
 
         // Salva i dati della campagna nello state per uso futuro
         AppState.currentCampagnaDetails = campagna;

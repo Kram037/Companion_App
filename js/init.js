@@ -459,6 +459,9 @@ function setupEventListeners() {
     if (typeof setupCampagnaDetailsActionsDelegation === 'function') {
         setupCampagnaDetailsActionsDelegation();
     }
+    if (typeof setupCampagnaDetailsContentDelegation === 'function') {
+        setupCampagnaDetailsContentDelegation();
+    }
     if (typeof setupGiocatoriCampagnaDelegation === 'function') {
         setupGiocatoriCampagnaDelegation();
     }
