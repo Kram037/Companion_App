@@ -529,19 +529,57 @@ window.pgRemoveTalento = function(index) {
 // =====================================================
 // WIZARD STEP 6: EQUIPAGGIAMENTO
 // =====================================================
+function pgCloseEquipSelectModal() {
+    document.getElementById('pgEquipSelectModal')?.remove();
+    document.body.style.overflow = 'hidden';
+}
+
+function pgSetupEquipSelectedDelegation(container) {
+    if (!container || container.dataset.equipSelectedDelegationReady === 'true') return;
+    container.dataset.equipSelectedDelegationReady = 'true';
+    container.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-equip-action="remove"]');
+        if (!button) return;
+        event.preventDefault();
+        window.pgRemoveEquip(parseInt(button.dataset.equipIndex, 10));
+    });
+}
+
+function pgSetupEquipModalDelegation(modal) {
+    if (!modal) return;
+    modal.addEventListener('click', (event) => {
+        const closeButton = event.target.closest('[data-equip-modal-action="close"]');
+        if (closeButton || event.target === modal) {
+            event.preventDefault();
+            pgCloseEquipSelectModal();
+            return;
+        }
+
+        const item = event.target.closest('[data-equip-select-type][data-equip-name]');
+        if (!item) return;
+        event.preventDefault();
+        if (item.dataset.equipSelectType === 'arma') {
+            window.pgSelectEquipArma(item.dataset.equipName);
+        } else if (item.dataset.equipSelectType === 'armatura') {
+            window.pgSelectEquipArmatura(item.dataset.equipName);
+        }
+    });
+}
+
 function pgRenderEquipSelected() {
     const container = document.getElementById('pgEquipSelected');
     if (!container) return;
+    pgSetupEquipSelectedDelegation(container);
     if (pgSelectedEquipment.length === 0) {
-        container.innerHTML = '<span class="scheda-empty">Nessun equipaggiamento selezionato</span>';
+        setSafeHtml(container, '<span class="scheda-empty">Nessun equipaggiamento selezionato</span>');
         return;
     }
-    container.innerHTML = pgSelectedEquipment.map((e, i) => `
+    setSafeHtml(container, pgSelectedEquipment.map((e, i) => `
         <div class="pg-talento-item selected">
             <span class="pg-talento-name">${escapeHtml(e.nome)}${e.tipo === 'arma' ? ` <small>(${e.danni} ${e.tipo_danno})</small>` : e.ca_base ? ` <small>(CA ${e.ca_base})</small>` : ''}</span>
-            <button type="button" class="pg-talento-remove" onclick="pgRemoveEquip(${i})">✕</button>
+            <button type="button" class="pg-talento-remove" data-equip-action="remove" data-equip-index="${i}">✕</button>
         </div>
-    `).join('');
+    `).join(''));
 }
 
 window.pgOpenEquipSelect = function(tipo) {
@@ -555,7 +593,7 @@ window.pgOpenEquipSelect = function(tipo) {
         };
         listHtml = Object.entries(ARMA_CATS).map(([cat, label]) => {
             const items = DND_ARMI.filter(a => a.cat === cat).map(a =>
-                `<div class="pg-talento-item" onclick="pgSelectEquipArma('${escapeHtml(a.nome)}')">
+                `<div class="pg-talento-item" data-equip-select-type="arma" data-equip-name="${safeAttr(a.nome)}">
                     <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
                     <span class="option-source">${a.danni} ${a.tipo_danno}</span>
                 </div>`
@@ -566,7 +604,7 @@ window.pgOpenEquipSelect = function(tipo) {
         listHtml = ['leggera','media','pesante','scudo'].map(cat => {
             const label = cat === 'scudo' ? 'Scudi' : `Armature ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
             const items = DND_ARMATURE.filter(a => a.cat === cat).map(a =>
-                `<div class="pg-talento-item" onclick="pgSelectEquipArmatura('${escapeHtml(a.nome)}')">
+                `<div class="pg-talento-item" data-equip-select-type="armatura" data-equip-name="${safeAttr(a.nome)}">
                     <span class="pg-talento-name">${escapeHtml(a.nome)}</span>
                     <span class="option-source">CA ${a.ca_base}</span>
                 </div>`
@@ -577,15 +615,16 @@ window.pgOpenEquipSelect = function(tipo) {
     const modalHtml = `
     <div class="modal active" id="pgEquipSelectModal">
         <div class="modal-content modal-content-lg">
-            <button class="modal-close" onclick="document.getElementById('pgEquipSelectModal')?.remove();document.body.style.overflow='hidden'">&times;</button>
+            <button class="modal-close" data-equip-modal-action="close">&times;</button>
             <h2>${tipo === 'arma' ? 'Scegli Arma' : 'Scegli Armatura'}</h2>
             <div class="wizard-page-scroll">${listHtml}</div>
             <div class="form-actions" style="margin-top:var(--spacing-md);">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('pgEquipSelectModal')?.remove();document.body.style.overflow='hidden'">Chiudi</button>
+                <button type="button" class="btn-secondary" data-equip-modal-action="close">Chiudi</button>
             </div>
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    pgSetupEquipModalDelegation(document.getElementById('pgEquipSelectModal'));
 }
 
 window.pgSelectEquipArma = function(nome) {
