@@ -453,6 +453,9 @@ function setupEventListeners() {
 
     // Filtri campagne
     setupCampagneFilters();
+    if (typeof setupCampagneEventDelegation === 'function') {
+        setupCampagneEventDelegation();
+    }
     
     // Amici button
     if (elements.addAmicoBtn) {

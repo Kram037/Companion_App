@@ -425,16 +425,51 @@ async function applyFiltersAndRerender() {
     }
 }
 
+function setupCampagneEventDelegation() {
+    const list = elements.campagneList;
+    if (!list || list.dataset.campagneDelegationReady === 'true') return;
+
+    list.dataset.campagneDelegationReady = 'true';
+    list.addEventListener('click', handleCampagneListClick);
+}
+
+function handleCampagneListClick(event) {
+    const actionButton = event.target.closest('[data-campagne-action]');
+    if (actionButton) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const { campagneAction, campagnaId, invitoId } = actionButton.dataset;
+        if (campagneAction === 'accept-invite' && invitoId) {
+            window.accettaInvitoCampagna(invitoId);
+        } else if (campagneAction === 'reject-invite' && invitoId) {
+            window.rifiutaInvitoCampagna(invitoId);
+        } else if (campagneAction === 'favorite' && campagnaId) {
+            window.togglePreferito(campagnaId);
+        } else if (campagneAction === 'edit' && campagnaId) {
+            window.editCampagna(campagnaId);
+        } else if (campagneAction === 'delete' && campagnaId) {
+            window.deleteCampagna(campagnaId);
+        }
+        return;
+    }
+
+    const card = event.target.closest('.campagna-card[data-campagna-id]');
+    if (card?.dataset.campagnaId) {
+        window.openCampagnaDetails(card.dataset.campagnaId);
+    }
+}
+
 async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     if (!elements.campagneList) return;
 
     // If user is not logged in, show login message
     if (!isLoggedIn) {
-        elements.campagneList.innerHTML = `
+        setSafeHtml(elements.campagneList, `
             <div class="content-placeholder">
                 <p>Accedi per vedere e creare le tue campagne</p>
             </div>
-        `;
+        `);
         return;
     }
 
@@ -469,6 +504,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
             const nomeCampagna = campagna?.nome_campagna || 'Campagna sconosciuta';
             const nomeDM = inviante?.nome_utente || 'DM sconosciuto';
             const cidDM = inviante?.cid || '';
+            const safeInvitoId = safeAttr(invito.id);
             
             return `
                 <div class="invito-card">
@@ -479,8 +515,8 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                         <p><strong>Campagna: ${escapeHtml(nomeCampagna)}</strong></p>
                         <p class="invito-from">DM: ${escapeHtml(nomeDM)}${cidDM ? ` (CID: ${cidDM})` : ''}</p>
                         <div class="invito-actions">
-                            <button class="btn-primary btn-small" onclick="accettaInvitoCampagna('${invito.id}')">Accetta</button>
-                            <button class="btn-secondary btn-small" onclick="rifiutaInvitoCampagna('${invito.id}')">Rifiuta</button>
+                            <button class="btn-primary btn-small" data-campagne-action="accept-invite" data-invito-id="${safeInvitoId}">Accetta</button>
+                            <button class="btn-secondary btn-small" data-campagne-action="reject-invite" data-invito-id="${safeInvitoId}">Rifiuta</button>
                         </div>
                     </div>
                 </div>
@@ -490,11 +526,11 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
 
     // If logged in but no campaigns and no invites
     if (campagne.length === 0 && invitiRicevuti.length === 0) {
-        elements.campagneList.innerHTML = `
+        setSafeHtml(elements.campagneList, `
             <div class="content-placeholder">
                 <p>Non hai campagne. Crea o partecipa a una campagna!</p>
             </div>
-        `;
+        `);
         return;
     }
 
@@ -566,17 +602,18 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         const iconaHTML = buildCampagnaCardIconHtml(selectedIcon);
 
         const isPreferito = campagna.isPreferito === true;
+        const safeCampagnaId = safeAttr(campagna.id);
         return `
             <div class="campagna-card" 
-                 data-campagna-id="${campagna.id}"
-                 onclick="openCampagnaDetails('${campagna.id}')"
+                 data-campagna-id="${safeCampagnaId}"
                  style="cursor: pointer;">
                 <div class="campagna-header">
                     <div class="campagna-icon">${iconaHTML}</div>
                     <h3 class="campagna-title">${escapeHtml(campagna.nome_campagna || 'Senza nome')}</h3>
-                    <div class="campagna-actions" onclick="event.stopPropagation();">
+                    <div class="campagna-actions">
                         <button class="btn-star ${isPreferito ? 'starred' : ''}" 
-                                onclick="togglePreferito('${campagna.id}')" 
+                                data-campagne-action="favorite"
+                                data-campagna-id="${safeCampagnaId}"
                                 aria-label="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
                                 title="${isPreferito ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}">
                             <svg viewBox="0 0 24 24" fill="${isPreferito ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
@@ -584,13 +621,13 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
                             </svg>
                         </button>
                         ${isDM ? `
-                        <button class="btn-icon" onclick="editCampagna('${campagna.id}')" aria-label="Modifica">
+                        <button class="btn-icon" data-campagne-action="edit" data-campagna-id="${safeCampagnaId}" aria-label="Modifica">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
                         </button>
-                        <button class="btn-icon" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina">
+                        <button class="btn-icon" data-campagne-action="delete" data-campagna-id="${safeCampagnaId}" aria-label="Elimina">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -609,7 +646,7 @@ async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) 
         `;
     }).join('');
 
-    elements.campagneList.innerHTML = htmlContent;
+    setSafeHtml(elements.campagneList, htmlContent);
 }
 
 /**
