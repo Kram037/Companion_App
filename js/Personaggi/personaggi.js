@@ -441,12 +441,42 @@ function _featPickerUpdateBadge(ctx) {
 
 let pgCurrentTalenti = [];
 
+function pgSetupTalentiDelegation(container) {
+    if (!container || container.dataset.pgTalentiDelegated === '1') return;
+    container.dataset.pgTalentiDelegated = '1';
+    container.addEventListener('click', (event) => {
+        const actionEl = event.target.closest('[data-feat-action]');
+        if (!actionEl || !container.contains(actionEl)) return;
+
+        const action = actionEl.dataset.featAction;
+        if (action === 'toggle-detail') {
+            event.stopPropagation();
+            _featTogglePickerDetail(actionEl);
+            return;
+        }
+        if (action === 'add') {
+            pgAddTalento(actionEl.dataset.featName || '');
+            return;
+        }
+        if (action === 'remove') {
+            event.stopPropagation();
+            pgRemoveTalento(Number(actionEl.dataset.featIndex));
+        }
+    });
+}
+
 function _featPickerItemHtml(t, opts) {
-    const onClick = opts.onClick ? `onclick="${opts.onClick}"` : '';
-    const removeBtn = opts.removeOnClick
+    const itemAttrs = opts.itemAction
+        ? `data-feat-action="${safeAttr(opts.itemAction)}" data-feat-name="${safeAttr(opts.itemValue || t.nome)}"`
+        : (opts.onClick ? `onclick="${opts.onClick}"` : '');
+    const removeBtn = opts.removeAction
+        ? `<button type="button" class="pg-talento-remove" data-feat-action="${safeAttr(opts.removeAction)}" data-feat-index="${safeAttr(opts.removeIndex)}">✕</button>`
+        : opts.removeOnClick
         ? `<button type="button" class="pg-talento-remove" onclick="event.stopPropagation();${opts.removeOnClick}">✕</button>`
         : '';
-    const infoBtn = `<button type="button" class="pg-talento-info" title="Dettagli" onclick="event.stopPropagation();_featTogglePickerDetail(this)">ⓘ</button>`;
+    const infoBtn = opts.delegatedInfo
+        ? `<button type="button" class="pg-talento-info" title="Dettagli" data-feat-action="toggle-detail">ⓘ</button>`
+        : `<button type="button" class="pg-talento-info" title="Dettagli" onclick="event.stopPropagation();_featTogglePickerDetail(this)">ⓘ</button>`;
     const cls = opts.selected ? 'pg-talento-item selected' : 'pg-talento-item';
     const prereqHtml = t.prerequisites
         ? `<div class="pg-talento-prereq"><strong>Prerequisito:</strong> ${escapeHtml(t.prerequisites)}</div>`
@@ -455,7 +485,7 @@ function _featPickerItemHtml(t, opts) {
         ? `<div class="pg-talento-desc">${window.formatRichText(t.description)}</div>`
         : '';
     return `
-        <div class="${cls}" ${onClick}>
+        <div class="${cls}" ${itemAttrs}>
             <div class="pg-talento-row">
                 <span class="pg-talento-name">${escapeHtml(t.nome)}</span>
                 <span class="option-source">(${escapeHtml(t.fonte || '')})</span>
@@ -481,6 +511,7 @@ window._featTogglePickerDetail = function(btn) {
 function pgRenderTalenti() {
     const container = document.getElementById('pgTalentiList');
     if (!container) return;
+    pgSetupTalentiDelegation(container);
     const ctx = 'wizard';
     if (!window._featPickerFilters[ctx]) window._featPickerFilters[ctx] = _defaultFeatFilters();
     const f = window._featPickerFilters[ctx];
@@ -494,7 +525,12 @@ function pgRenderTalenti() {
             prerequisites: info.prerequisites || '',
             description: info.description || ''
         };
-        return _featPickerItemHtml(t, { selected: true, removeOnClick: `pgRemoveTalento(${i})` });
+        return _featPickerItemHtml(t, {
+            selected: true,
+            delegatedInfo: true,
+            removeAction: 'remove',
+            removeIndex: i
+        });
     }).join('');
 
     const available = _featsList()
@@ -502,15 +538,19 @@ function pgRenderTalenti() {
         .filter(t => _featMatchesFilters(t, f))
         .filter(t => _featMatchesSearch(t, q));
     const listHtml = available.map(t =>
-        _featPickerItemHtml(t, { onClick: `pgAddTalento('${escapeHtml(t.nome).replace(/'/g, "\\'")}')` })
+        _featPickerItemHtml(t, {
+            delegatedInfo: true,
+            itemAction: 'add',
+            itemValue: t.nome
+        })
     ).join('') || '<div class="scheda-empty" style="padding:12px;">Nessun talento corrisponde ai filtri.</div>';
 
-    container.innerHTML = `
+    setSafeHtml(container, `
         ${_featPickerHeaderHtml(ctx)}
         ${selectedHtml ? `<div class="form-section-label">Selezionati</div><div class="pg-talenti-selected">${selectedHtml}</div>` : ''}
         <div class="form-section-label">Disponibili (${available.length})</div>
         <div class="pg-talenti-available">${listHtml}</div>
-    `;
+    `);
     _featPickerUpdateBadge(ctx);
 }
 
@@ -1915,7 +1955,7 @@ function pgGetHomebrewSubclassOptions(className) {
         .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it'));
 }
 
-function _renderSubclassSelector(c, index, onclickFn) {
+function _renderSubclassSelector(c, index, onclickFn, mode = 'inline') {
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
     try {
@@ -1933,41 +1973,82 @@ function _renderSubclassSelector(c, index, onclickFn) {
     const label = c.sottoclasse
         ? escapeHtml(c.sottoclasse)
         : '<span class="pg-subclass-trigger-empty">Sottoclasse…</span>';
+    const isDelegated = mode === 'pg';
     const clearBtn = c.sottoclasse
-        ? `<button type="button" class="pg-subclass-clear" onclick="event.stopPropagation();${onclickFn.replace('pgOpenSubclassDropdown','pgClearSubclass').replace('microOpenSubclassDropdown','microClearSubclass')}(${index})" title="Rimuovi sottoclasse">×</button>`
+        ? isDelegated
+            ? `<button type="button" class="pg-subclass-clear" data-action="clear-subclass" data-index="${index}" title="Rimuovi sottoclasse">×</button>`
+            : `<button type="button" class="pg-subclass-clear" onclick="event.stopPropagation();${onclickFn.replace('pgOpenSubclassDropdown','pgClearSubclass').replace('microOpenSubclassDropdown','microClearSubclass')}(${index})" title="Rimuovi sottoclasse">×</button>`
         : '';
+    const triggerAttrs = isDelegated
+        ? `data-action="open-subclass" data-index="${index}"`
+        : `onclick="${onclickFn}(${index})"`;
     return `
-        <button type="button" class="pg-subclass-trigger" onclick="${onclickFn}(${index})">
+        <button type="button" class="pg-subclass-trigger" ${triggerAttrs}>
             ${label}
             ${clearBtn}
         </button>`;
 }
 
+function pgSetupClassiDelegation(container) {
+    if (!container || container.dataset.pgClassiDelegated === '1') return;
+    container.dataset.pgClassiDelegated = '1';
+    container.addEventListener('click', (event) => {
+        const actionEl = event.target.closest('[data-action]');
+        if (!actionEl || !container.contains(actionEl)) return;
+
+        const index = Number(actionEl.dataset.index);
+        switch (actionEl.dataset.action) {
+            case 'level-down':
+                pgClassLevelChange(index, -1);
+                break;
+            case 'level-up':
+                pgClassLevelChange(index, 1);
+                break;
+            case 'remove-class':
+                pgRemoveClasse(index);
+                break;
+            case 'open-subclass':
+                pgOpenSubclassDropdown(index);
+                break;
+            case 'clear-subclass':
+                event.stopPropagation();
+                pgClearSubclass(index);
+                break;
+            case 'add-class':
+                pgOpenClassDropdown();
+                break;
+            default:
+                break;
+        }
+    });
+}
+
 function pgRenderClassi() {
     const container = document.getElementById('pgClassiList');
     if (!container) return;
+    pgSetupClassiDelegation(container);
     const chipsHtml = pgSelectedClasses.map((c, i) => {
-        const subSelector = _renderSubclassSelector(c, i, 'pgOpenSubclassDropdown');
+        const subSelector = _renderSubclassSelector(c, i, 'pgOpenSubclassDropdown', 'pg');
         return `
         <div class="pg-classe-chip">
             <div class="pg-classe-chip-top">
                 <span class="pg-classe-name">${escapeHtml(c.nome)}</span>
                 <div class="pg-classe-lv-controls">
                     <span class="pg-classe-lv-label">Lv.</span>
-                    <button type="button" class="pg-classe-lv-btn" onclick="pgClassLevelChange(${i},-1)">−</button>
+                    <button type="button" class="pg-classe-lv-btn" data-action="level-down" data-index="${i}">−</button>
                     <span class="pg-classe-lv-val">${c.livello}</span>
-                    <button type="button" class="pg-classe-lv-btn" onclick="pgClassLevelChange(${i},1)">+</button>
+                    <button type="button" class="pg-classe-lv-btn" data-action="level-up" data-index="${i}">+</button>
                 </div>
-                <button type="button" class="pg-classe-remove" onclick="pgRemoveClasse(${i})">&times;</button>
+                <button type="button" class="pg-classe-remove" data-action="remove-class" data-index="${i}">&times;</button>
             </div>
             ${subSelector}
         </div>`;
     }).join('');
 
-    const addBtn = `<button type="button" class="pg-add-class-btn" onclick="pgOpenClassDropdown()">
+    const addBtn = `<button type="button" class="pg-add-class-btn" data-action="add-class">
         <span class="pg-add-class-plus">+</span> Aggiungi classe
     </button>`;
-    container.innerHTML = chipsHtml + addBtn;
+    setSafeHtml(container, chipsHtml + addBtn);
 }
 
 window.pgOpenSubclassDropdown = async function(index) {
@@ -2086,11 +2167,29 @@ function pgGetSelectedSaves() {
 let pgCurrentSkillProficiencies = new Set();
 let pgCurrentSkillExpertise = new Set();
 
+function pgSetupSkillsDelegation(container) {
+    if (!container || container.dataset.pgSkillsDelegated === '1') return;
+    container.dataset.pgSkillsDelegated = '1';
+    container.addEventListener('click', (event) => {
+        const actionEl = event.target.closest('[data-skill-action]');
+        if (!actionEl || !container.contains(actionEl)) return;
+
+        const skillKey = actionEl.dataset.skillKey;
+        if (!skillKey) return;
+        if (actionEl.dataset.skillAction === 'toggle-prof') {
+            pgToggleSkill(skillKey);
+        } else if (actionEl.dataset.skillAction === 'toggle-expert') {
+            pgToggleSkillExpert(skillKey);
+        }
+    });
+}
+
 function pgRenderSkills() {
     const container = document.getElementById('pgSkillsList');
     if (!container) return;
+    pgSetupSkillsDelegation(container);
     const bonus = calcBonusCompetenza(pgGetTotalLevel());
-    container.innerHTML = DND_SKILLS.map(skill => {
+    const html = DND_SKILLS.map(skill => {
         const abilityInput = document.getElementById(`pg${skill.ability.charAt(0).toUpperCase() + skill.ability.slice(1)}`);
         const abilityScore = parseInt(abilityInput?.value) || 10;
         const abilityMod = calcMod(abilityScore);
@@ -2099,13 +2198,14 @@ function pgRenderSkills() {
         const totalVal = abilityMod + (isProf ? bonus : 0) + (isExpert ? bonus : 0);
         return `
         <div class="pg-skill-item ${isProf ? 'proficient' : ''} ${isExpert ? 'expert' : ''}">
-            <span class="pg-skill-dot ${isProf ? 'active' : ''}" onclick="pgToggleSkill('${skill.key}')" title="Competenza">●</span>
-            <span class="pg-skill-dot expert ${isExpert ? 'active' : ''}" onclick="pgToggleSkillExpert('${skill.key}')" title="Maestria">★</span>
+            <span class="pg-skill-dot ${isProf ? 'active' : ''}" data-skill-action="toggle-prof" data-skill-key="${skill.key}" title="Competenza">●</span>
+            <span class="pg-skill-dot expert ${isExpert ? 'active' : ''}" data-skill-action="toggle-expert" data-skill-key="${skill.key}" title="Maestria">★</span>
             <span class="pg-skill-value">${formatModPlain(totalVal)}</span>
             <span class="pg-skill-name">${skill.nome}</span>
             <span class="pg-skill-ability">(${skill.abbr})</span>
         </div>`;
     }).join('');
+    setSafeHtml(container, html);
 }
 
 window.pgToggleSkill = function(skillKey) {
@@ -2143,19 +2243,38 @@ function pgCalcPercPassiva() {
 let pgCurrentResistenze = [];
 let pgCurrentImmunita = [];
 
+function pgSetupResImmDelegation(container) {
+    if (!container || container.dataset.pgResImmDelegated === '1') return;
+    container.dataset.pgResImmDelegated = '1';
+    container.addEventListener('change', (event) => {
+        const input = event.target.closest('[data-res-action]');
+        if (!input || !container.contains(input)) return;
+
+        const value = input.dataset.damageType;
+        if (!value) return;
+        if (input.dataset.resAction === 'res') {
+            pgToggleRes(value, input.checked);
+        } else if (input.dataset.resAction === 'imm') {
+            pgToggleImm(value, input.checked);
+        }
+    });
+}
+
 function pgRenderResImmGrid(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.innerHTML = DAMAGE_TYPES.map(dt => {
+    pgSetupResImmDelegation(container);
+    const html = DAMAGE_TYPES.map(dt => {
         const isRes = pgCurrentResistenze.includes(dt.value);
         const isImm = pgCurrentImmunita.includes(dt.value);
         return `
         <div class="pg-res-row">
             <span class="pg-res-label">${dt.label}</span>
-            <input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} onchange="pgToggleRes('${dt.value}', this.checked)" title="Resistenza">
-            <input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} onchange="pgToggleImm('${dt.value}', this.checked)" title="Immunità">
+            <input type="checkbox" class="pg-res-cb" ${isRes ? 'checked' : ''} data-res-action="res" data-damage-type="${dt.value}" title="Resistenza">
+            <input type="checkbox" class="pg-imm-cb" ${isImm ? 'checked' : ''} data-res-action="imm" data-damage-type="${dt.value}" title="Immunità">
         </div>`;
     }).join('');
+    setSafeHtml(container, html);
 }
 
 window.pgToggleRes = function(val, checked) {
@@ -2350,9 +2469,27 @@ function pgBuildSlotIncantesimo() {
     return result;
 }
 
+function pgSetupSlotIncantesimoDelegation(container) {
+    if (!container || container.dataset.pgSlotDelegated === '1') return;
+    container.dataset.pgSlotDelegated = '1';
+    container.addEventListener('click', (event) => {
+        const actionEl = event.target.closest('[data-slot-action]');
+        if (!actionEl || !container.contains(actionEl)) return;
+
+        const level = Number(actionEl.dataset.slotLevel);
+        if (!Number.isFinite(level)) return;
+        if (actionEl.dataset.slotAction === 'decrement') {
+            pgSlotDecrement(level);
+        } else if (actionEl.dataset.slotAction === 'increment') {
+            pgSlotIncrement(level);
+        }
+    });
+}
+
 function pgRenderSlotIncantesimo() {
     const container = document.getElementById('pgSlotIncantesimoList');
     if (!container) return;
+    pgSetupSlotIncantesimoDelegation(container);
 
     const defaultSlots = pgCalcSpellSlots();
     const slotLevels = Object.keys(defaultSlots).map(Number).sort((a, b) => a - b);
@@ -2375,20 +2512,21 @@ function pgRenderSlotIncantesimo() {
     });
     pgCurrentSlotIncantesimo = merged;
 
-    container.innerHTML = slotLevels.map(lvl => {
+    const html = slotLevels.map(lvl => {
         const s = merged[lvl];
         return `
         <div class="pg-slot-row">
             <span class="pg-slot-label">Livello ${lvl}</span>
             <div class="pg-slot-controls">
-                <button type="button" class="pg-slot-btn" onclick="pgSlotDecrement(${lvl})">−</button>
+                <button type="button" class="pg-slot-btn" data-slot-action="decrement" data-slot-level="${lvl}">−</button>
                 <span class="pg-slot-value" id="slotCurrent${lvl}">${s.current}</span>
                 <span class="pg-slot-sep">/</span>
                 <span class="pg-slot-max">${s.max}</span>
-                <button type="button" class="pg-slot-btn" onclick="pgSlotIncrement(${lvl})">+</button>
+                <button type="button" class="pg-slot-btn" data-slot-action="increment" data-slot-level="${lvl}">+</button>
             </div>
         </div>`;
     }).join('');
+    setSafeHtml(container, html);
 }
 
 window.pgSlotDecrement = function(lvl) {
