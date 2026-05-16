@@ -460,6 +460,37 @@ function handleCampagneListClick(event) {
     }
 }
 
+function setupCampagnaDetailsActionsDelegation() {
+    const actions = document.getElementById('dettagliActions');
+    if (!actions || actions.dataset.campagnaDetailsDelegationReady === 'true') return;
+
+    actions.dataset.campagnaDetailsDelegationReady = 'true';
+    actions.addEventListener('click', handleCampagnaDetailsActionClick);
+}
+
+function handleCampagnaDetailsActionClick(event) {
+    const button = event.target.closest('[data-dettagli-action]');
+    if (!button) return;
+
+    event.preventDefault();
+    const { dettagliAction, campagnaId } = button.dataset;
+    if (!campagnaId) return;
+
+    if (dettagliAction === 'edit') {
+        window.editCampagna(campagnaId);
+    } else if (dettagliAction === 'delete') {
+        window.deleteCampagna(campagnaId);
+    } else if (dettagliAction === 'open-session') {
+        window.openSessionePage?.(campagnaId);
+    } else if (dettagliAction === 'start-session') {
+        window.iniziaSessione?.(campagnaId);
+    } else if (dettagliAction === 'choose-character') {
+        window.openScegliPersonaggioModal?.(campagnaId);
+    } else if (dettagliAction === 'join-session') {
+        window.playerJoinSession?.(campagnaId);
+    }
+}
+
 async function renderCampagne(campagne, isLoggedIn = true, invitiRicevuti = []) {
     if (!elements.campagneList) return;
 
@@ -965,18 +996,19 @@ async function renderCampagnaDetailsContent(campagna) {
     if (dettagliActionsElement) {
         // Verifica se c'è una sessione attiva (sia per DM che giocatori)
         const sessioneAttiva = await checkSessioneAttiva(campagna.id);
+        const safeCampagnaId = safeAttr(campagna.id);
         
         if (isDM) {
-            dettagliActionsElement.innerHTML = `
+            setSafeHtml(dettagliActionsElement, `
                 <div class="dettagli-actions-top">
-                    <button class="btn-secondary btn-small" onclick="editCampagna('${campagna.id}')" aria-label="Modifica campagna">
+                    <button class="btn-secondary btn-small" data-dettagli-action="edit" data-campagna-id="${safeCampagnaId}" aria-label="Modifica campagna">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                         Modifica
                     </button>
-                    <button class="btn-secondary btn-small" onclick="deleteCampagna('${campagna.id}')" aria-label="Elimina campagna" style="color: #dc3545;">
+                    <button class="btn-secondary btn-small" data-dettagli-action="delete" data-campagna-id="${safeCampagnaId}" aria-label="Elimina campagna" style="color: #dc3545;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -986,7 +1018,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
                 <div class="dettagli-actions-start">
                     ${sessioneAttiva ? `
-                    <button class="btn-primary btn-small" onclick="openSessionePage('${campagna.id}')" aria-label="Vai alla sessione">
+                    <button class="btn-primary btn-small" data-dettagli-action="open-session" data-campagna-id="${safeCampagnaId}" aria-label="Vai alla sessione">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
@@ -994,7 +1026,7 @@ async function renderCampagnaDetailsContent(campagna) {
                         Sessione Attiva
                     </button>
                     ` : `
-                    <button class="btn-primary btn-small btn-start-session" onclick="iniziaSessione('${campagna.id}')" aria-label="Inizia sessione">
+                    <button class="btn-primary btn-small btn-start-session" data-dettagli-action="start-session" data-campagna-id="${safeCampagnaId}" aria-label="Inizia sessione">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                         </svg>
@@ -1002,7 +1034,7 @@ async function renderCampagnaDetailsContent(campagna) {
                     </button>
                     `}
                 </div>
-            `;
+            `);
         } else {
             let pgLabel = '';
             try {
@@ -1025,9 +1057,9 @@ async function renderCampagnaDetailsContent(campagna) {
                 }
             } catch (e) { console.warn('Errore caricamento pg campagna:', e); }
 
-            dettagliActionsElement.innerHTML = `
+            setSafeHtml(dettagliActionsElement, `
                 <div class="dettagli-actions-top">
-                    <button class="btn-secondary btn-small" onclick="openScegliPersonaggioModal('${campagna.id}')" aria-label="Scegli personaggio">
+                    <button class="btn-secondary btn-small" data-dettagli-action="choose-character" data-campagna-id="${safeCampagnaId}" aria-label="Scegli personaggio">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
@@ -1037,7 +1069,7 @@ async function renderCampagnaDetailsContent(campagna) {
                 </div>
                 ${sessioneAttiva ? `
                 <div class="dettagli-actions-start">
-                    <button class="btn-primary btn-small" onclick="playerJoinSession('${campagna.id}')" aria-label="Vai alla sessione">
+                    <button class="btn-primary btn-small" data-dettagli-action="join-session" data-campagna-id="${safeCampagnaId}" aria-label="Vai alla sessione">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 4px;">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
@@ -1046,7 +1078,7 @@ async function renderCampagnaDetailsContent(campagna) {
                     </button>
                 </div>
                 ` : ''}
-            `;
+            `);
         }
     }
 

@@ -456,6 +456,9 @@ function setupEventListeners() {
     if (typeof setupCampagneEventDelegation === 'function') {
         setupCampagneEventDelegation();
     }
+    if (typeof setupCampagnaDetailsActionsDelegation === 'function') {
+        setupCampagnaDetailsActionsDelegation();
+    }
     
     // Amici button
     if (elements.addAmicoBtn) {
