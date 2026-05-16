@@ -126,6 +126,20 @@ function buildCampagnaDettagliIconHtml(icon) {
     return `<div class="dettagli-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg></div>`;
 }
 
+function buildIconOptionHtml(icon) {
+    if (icon.imageSrc) {
+        return `<img class="icon-option-img" src="${encodeURI(icon.imageSrc)}" alt="" decoding="async" />`;
+    }
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
+}
+
+function buildIconPreviewHtml(icon) {
+    if (icon.imageSrc) {
+        return `<img id="iconDisplay" class="icon-preview-img" src="${encodeURI(icon.imageSrc)}" alt="" decoding="async" />`;
+    }
+    return `<svg id="iconDisplay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
+}
+
 const _dmCache = {};
 
 // ============================================
@@ -1450,7 +1464,7 @@ function renderCampagnaDetailsHeader(campagna) {
 
     // Aggiorna icona container
     if (elements.dettagliIconContainer) {
-        elements.dettagliIconContainer.innerHTML = iconaHTML;
+        setSafeHtml(elements.dettagliIconContainer, iconaHTML);
     }
 
     // Aggiorna titolo
@@ -1980,11 +1994,7 @@ function setupIconSelector() {
         iconOption.className = 'icon-option';
         if (index === 0) iconOption.classList.add('selected');
         iconOption.dataset.iconName = icon.name;
-        if (icon.imageSrc) {
-            iconOption.innerHTML = `<img class="icon-option-img" src="${encodeURI(icon.imageSrc)}" alt="" decoding="async" />`;
-        } else {
-            iconOption.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon.svg}</svg>`;
-        }
+        setSafeHtml(iconOption, buildIconOptionHtml(icon));
         iconOption.addEventListener('click', () => selectPredefinedIcon(icon.name));
         iconGrid.appendChild(iconOption);
     });
@@ -2013,11 +2023,7 @@ function updateIconPreview() {
     const selectedIcon = predefinedIcons.find(i => i.name === selectedIconName);
     if (!selectedIcon) return;
 
-    if (selectedIcon.imageSrc) {
-        iconPreview.innerHTML = `<img id="iconDisplay" class="icon-preview-img" src="${encodeURI(selectedIcon.imageSrc)}" alt="" decoding="async" />`;
-    } else {
-        iconPreview.innerHTML = `<svg id="iconDisplay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${selectedIcon.svg}</svg>`;
-    }
+    setSafeHtml(iconPreview, buildIconPreviewHtml(selectedIcon));
     if (iconNameDisplay) {
         const displayName = iconNameMap[selectedIconName] || selectedIcon.name.charAt(0).toUpperCase() + selectedIcon.name.slice(1);
         iconNameDisplay.textContent = displayName;
