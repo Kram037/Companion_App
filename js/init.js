@@ -500,6 +500,9 @@ function setupEventListeners() {
     if (typeof setupAmiciEventDelegation === 'function') {
         setupAmiciEventDelegation();
     }
+    if (typeof setupPersonaggiListDelegation === 'function') {
+        setupPersonaggiListDelegation();
+    }
     
     // Laboratorio init
     initLaboratorio();
