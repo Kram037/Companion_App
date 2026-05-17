@@ -522,7 +522,7 @@ window._invResolveLive = _invResolveLive;
 // rapidamente" che apre la mini-dialog testo libero (vecchio
 // comportamento di invAddItem).
 // ─────────────────────────────────────────────────────────────────────
-window._invPickerState = { tab: 'catalog', search: '', filters: { rarita: '', tipo: '' }, filtersOpen: false };
+window._invPickerState = { tab: 'catalog', search: '', filters: { rarita: '', tipo: '' } };
 
 window.invAddItem = async function(pgId) {
     // Carica gli homebrew oggetti in background; se la cache c'e' gia'
@@ -557,19 +557,33 @@ function _invOpenPickerDialog(pgId) {
             ${showHb ? `<button class="inv-picker-tab ${_invPickerState.tab === 'homebrew' ? 'active' : ''}"
                 onclick="_invPickerSwitchTab('${pgId}','homebrew')">Homebrew</button>` : ''}
         </div>
-        <div class="inv-picker-search-row">
-            <input type="text" id="invPickerSearch" class="hp-calc-input" placeholder="Cerca per nome o tipo..."
-                value="${escapeHtml(_invPickerState.search || '')}"
-                oninput="_invPickerOnSearch(this.value,'${pgId}')">
-            <button type="button" id="invPickerFiltersBtn" class="inv-picker-filters-btn"
-                onclick="_invPickerToggleFilters('${pgId}')" title="Filtri" aria-label="Filtri">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        <div class="filters-bar inv-picker-search-row">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <span class="inv-picker-filters-badge" id="invPickerFiltersBadge"></span>
+                <input type="text" id="invPickerSearch" class="filter-search" placeholder="Cerca per nome o tipo..."
+                    value="${escapeHtml(_invPickerState.search || '')}"
+                    oninput="_invPickerOnSearch(this.value,'${pgId}')">
+            </div>
+            <button type="button" id="invPickerFiltersBtn" class="comp-filter-btn"
+                onclick="_invPickerToggleFilters('${pgId}')" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong id="invPickerFiltersBadge" style="display:none;"></strong>
             </button>
         </div>
-        <div id="invPickerFiltersPanel" class="inv-picker-filters-panel" style="display:none;"></div>
         <div id="invPickerList" class="inv-picker-list"></div>
         <div class="dialog-actions" style="margin-top:12px;justify-content:space-between;">
             <button class="btn-secondary" onclick="invQuickCreate('${pgId}')">+ Crea rapidamente</button>
@@ -577,7 +591,6 @@ function _invOpenPickerDialog(pgId) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
-    _invPickerRenderFiltersPanel(pgId);
     _invPickerRenderFiltersBadge();
     _invPickerRenderList(pgId);
 }
@@ -592,7 +605,6 @@ window._invPickerSwitchTab = function(pgId, tab) {
     const btn = Array.from(document.querySelectorAll('.inv-picker-tab'))
         .find(b => b.textContent.trim().toLowerCase() === tabLabel);
     if (btn) btn.classList.add('active');
-    _invPickerRenderFiltersPanel(pgId);
     _invPickerRenderFiltersBadge();
     _invPickerRenderList(pgId);
 };
@@ -637,20 +649,22 @@ function _invPickerOptionsFor(field) {
 
 function _invPickerActiveFilterCount() {
     const f = _invPickerState.filters || {};
-    return (f.rarita ? 1 : 0) + (f.tipo ? 1 : 0);
+    return _invPickerFilterValues(f.rarita).length + _invPickerFilterValues(f.tipo).length;
 }
 
 function _invPickerMatchesFilters(o) {
     const f = _invPickerState.filters || {};
-    if (f.rarita) {
+    const raritaFilters = _invPickerFilterValues(f.rarita);
+    const tipoFilters = _invPickerFilterValues(f.tipo);
+    if (raritaFilters.length) {
         const r = o.rarita_it || o.rarita || '';
-        if (String(r).trim() !== f.rarita) return false;
+        if (!raritaFilters.includes(String(r).trim())) return false;
     }
-    if (f.tipo) {
+    if (tipoFilters.length) {
         const t = (_invPickerState.tab === 'veleni')
             ? (o.sotto_tipo_it || o.sotto_tipo_en || '')
             : (o.tipo || '');
-        if (String(t).trim() !== f.tipo) return false;
+        if (!tipoFilters.includes(String(t).trim())) return false;
     }
     return true;
 }
@@ -714,6 +728,92 @@ window._invPickerResetFilters = function(pgId) {
     _invPickerRenderList(pgId);
     _invPickerRenderFiltersBadge();
 };
+
+function _invPickerBuildFilterButton(field, label, emptyLabel, options, value, pgId) {
+    const selected = _invPickerFilterValues(value);
+    const normalized = [{ value: '', label: emptyLabel }, ...options.map(v => ({ value: String(v), label: v }))];
+    const selectable = normalized.filter(o => o.value !== '');
+    const isSingle = selectable.length === 2;
+    const encoded = encodeURIComponent(JSON.stringify(isSingle ? normalized : selectable)).replace(/'/g, '%27');
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(o => o.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="_invPickerPickFilter('${field}','${encoded}','${safeAttr(label)}','${pgId}','${isSingle ? 'single' : 'multi'}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _invPickerFiltersHtml(pgId) {
+    const f = _invPickerState.filters || {};
+    const tipoLabel = _invPickerState.tab === 'veleni' ? 'Tipo' : 'Tipologia';
+    const rarOpts = _invPickerOptionsFor('rarita');
+    const tipOpts = _invPickerOptionsFor('tipo');
+    return [
+        _invPickerBuildFilterButton('rarita', 'Rarita', 'Tutte', rarOpts, f.rarita, pgId),
+        _invPickerBuildFilterButton('tipo', tipoLabel, 'Tutti', tipOpts, f.tipo, pgId),
+    ].join('');
+}
+
+window._invPickerToggleFilters = function(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay inv-picker-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_invPickerFiltersHtml(pgId)}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="_invPickerResetFilters('${pgId}')">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window._invPickerSetFilter = function(field, value, pgId) {
+    _invPickerState.filters = _invPickerState.filters || {};
+    const values = _invPickerFilterValues(value);
+    _invPickerState.filters[field] = values.length ? values : '';
+    _invPickerRenderList(pgId);
+    _invPickerRenderFiltersBadge();
+};
+
+window._invPickerPickFilter = function(field, encodedOptions, title, pgId, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const current = _invPickerFilterValues(_invPickerState.filters?.[field]);
+    const rerender = () => {
+        const overlay = document.querySelector('.inv-picker-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invPickerFiltersHtml(pgId);
+    };
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            _invPickerSetFilter(field, value, pgId);
+            rerender();
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, current, values => {
+        _invPickerSetFilter(field, values, pgId);
+        rerender();
+    }, title || 'Filtro');
+};
+
+window._invPickerResetFilters = function(pgId) {
+    _invPickerState.filters = { rarita: '', tipo: '' };
+    const overlay = document.querySelector('.inv-picker-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invPickerFiltersHtml(pgId);
+    _invPickerRenderList(pgId);
+    _invPickerRenderFiltersBadge();
+};
+
+function _invPickerFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
+}
 
 function _invPickerRenderList(pgId) {
     const cont = document.getElementById('invPickerList');

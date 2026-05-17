@@ -854,6 +854,15 @@ window.schedaOpenSpellPicker = function(pgId, level) {
     (window.AppState?.cachedHomebrewIncantesimi || []).forEach(_addCustomSchool);
     const customSchoolEntries = Array.from(customSchoolMap.entries())
         .sort((a, b) => a[1].localeCompare(b[1], lang));
+    window._spellPickerFilterOptions = {
+        schools: _SPELL_SCHOOLS.concat(customSchoolEntries).map(([value, label]) => ({ value, label })),
+        castingTimes: _SPELL_CASTING_TIMES.map(value => ({ value, label: value })),
+        components: ['V', 'S', 'M'].map(value => ({ value, label: value })),
+        concentration: [{ value: 'any', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
+        ritual: [{ value: 'any', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
+        classes: allClasses.map(value => ({ value, label: value })),
+        sources: allSources.map(value => ({ value, label: value })),
+    };
 
     const filtersPanelHtml = `<div class="spell-filter-panel" id="spellFilterPanel" style="display:none;">
         <div class="spell-filter-group">
@@ -916,16 +925,30 @@ window.schedaOpenSpellPicker = function(pgId, level) {
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 style="margin-bottom:6px;">${escapeHtml(titleLabel)}</h3>
         ${tabsHtml}
-        <div class="spell-picker-search-row">
-            <input type="text" id="spellPickerSearch" class="hp-calc-input spell-picker-search" placeholder="${placeholder}">
-            <button type="button" class="spell-picker-filter-btn" id="spellPickerFilterBtn" onclick="spellFilterTogglePanel()" title="Filtri" aria-label="Filtri">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        <div class="filters-bar spell-picker-search-row">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <span class="spell-picker-filter-badge" id="spellFilterBadge" style="display:none;">0</span>
+                <input type="text" id="spellPickerSearch" class="filter-search" placeholder="${placeholder}">
+            </div>
+            <button type="button" class="comp-filter-btn" id="spellPickerFilterBtn" onclick="spellFilterTogglePanel()" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong id="spellFilterBadge" style="display:none;">0</strong>
             </button>
         </div>
-        ${filtersPanelHtml}
         <div class="spell-picker-list" id="spellPickerList"></div>
         <div class="dialog-actions">
             <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">${cancelLbl}</button>
@@ -1002,20 +1025,7 @@ function _spellPickerRefresh() {
     }
     listEl.innerHTML = html;
 
-    // Aggiorna badge contatore filtri attivi
-    const badge = document.getElementById('spellFilterBadge');
-    if (badge && f) {
-        let n = 0;
-        n += f.schools.length;
-        n += f.castingTimes.length;
-        n += f.components.length;
-        if (f.concentration !== 'any') n += 1;
-        if (f.ritual !== 'any') n += 1;
-        n += f.classes.length;
-        n += f.sources.length;
-        if (n > 0) { badge.textContent = n; badge.style.display = ''; }
-        else badge.style.display = 'none';
-    }
+    _spellFilterUpdateBadge();
 }
 
 window.spellPickerSetTab = function(tab) {
@@ -1077,6 +1087,106 @@ function _refreshSpellFilterChips() {
         btn.classList.toggle('active', active);
     });
 }
+
+function _spellPickerActiveFilterCount() {
+    const f = window._spellPickerFilters;
+    if (!f) return 0;
+    let n = 0;
+    n += (f.schools || []).length;
+    n += (f.castingTimes || []).length;
+    n += (f.components || []).length;
+    if (f.concentration && f.concentration !== 'any') n += 1;
+    if (f.ritual && f.ritual !== 'any') n += 1;
+    n += (f.classes || []).length;
+    n += (f.sources || []).length;
+    return n;
+}
+
+function _spellFilterBuildButton(field, label, options, value, mode = 'multi') {
+    const selected = Array.isArray(value) ? value.map(String) : (value && value !== 'any' ? [String(value)] : []);
+    const encoded = encodeURIComponent(JSON.stringify(options || [])).replace(/'/g, '%27');
+    const selectedLabel = mode === 'single' && selected.length
+        ? (options || []).find(o => String(o.value) === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="spellFilterPick('${field}','${encoded}','${safeAttr(label)}','${mode}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _spellFiltersHtml() {
+    const f = window._spellPickerFilters || _defaultSpellFilters(_schedaPgCache || {});
+    const opts = window._spellPickerFilterOptions || {};
+    return [
+        _spellFilterBuildButton('schools', 'Scuola', opts.schools || [], f.schools || []),
+        _spellFilterBuildButton('castingTimes', 'Tempo di lancio', opts.castingTimes || [], f.castingTimes || []),
+        _spellFilterBuildButton('components', 'Componenti', opts.components || [], f.components || []),
+        _spellFilterBuildButton('concentration', 'Concentrazione', opts.concentration || [], f.concentration || 'any', 'single'),
+        _spellFilterBuildButton('ritual', 'Rituale', opts.ritual || [], f.ritual || 'any', 'single'),
+        _spellFilterBuildButton('classes', 'Classi', opts.classes || [], f.classes || []),
+        (opts.sources || []).length ? _spellFilterBuildButton('sources', 'Manuale', opts.sources || [], f.sources || []) : '',
+    ].filter(Boolean).join('');
+}
+
+function _spellFilterRerenderDialog() {
+    const overlay = document.querySelector('.spell-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _spellFiltersHtml();
+}
+
+function _spellFilterUpdateBadge() {
+    const badge = document.getElementById('spellFilterBadge');
+    if (!badge) return;
+    const n = _spellPickerActiveFilterCount();
+    badge.textContent = n ? String(n) : '';
+    badge.style.display = n ? 'inline-flex' : 'none';
+    document.getElementById('spellPickerFilterBtn')?.classList.toggle('active', n > 0);
+}
+
+window.spellFilterTogglePanel = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay spell-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_spellFiltersHtml()}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="spellFilterReset()">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.spellFilterPick = function(field, encodedOptions, title, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const f = window._spellPickerFilters;
+    if (!f) return;
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            f[field] = value || 'any';
+            _spellPickerRefresh();
+            _spellFilterRerenderDialog();
+        }, title || 'Filtro');
+        return;
+    }
+    const current = Array.isArray(f[field]) ? f[field] : [];
+    openMultiSelect(options, current, values => {
+        f[field] = values;
+        _spellPickerRefresh();
+        _spellFilterRerenderDialog();
+    }, title || 'Filtro');
+};
+
+window.spellFilterReset = function() {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    window._spellPickerFilters = _defaultSpellFilters(pg);
+    _spellPickerRefresh();
+    _spellFilterRerenderDialog();
+};
 
 // Alias storico
 window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };

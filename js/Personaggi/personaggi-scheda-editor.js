@@ -267,9 +267,131 @@ window._invocationPickerSetFilter = function(key, val) {
     _schedaInvocationsRefreshModal({ keepPanelOpen: true });
 };
 
+function _pickerFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '' || value === 'all') return [];
+    return [String(value).trim()].filter(Boolean);
+}
+
+function _invocationPickerActiveFilterCount() {
+    const f = window._invocationPickerFilters || {};
+    return _pickerFilterValues(f.meets).length + _pickerFilterValues(f.prereq).length + _pickerFilterValues(f.source).length;
+}
+
+function _invocationPickerBuildFilterButton(field, label, options, value, mode = 'multi') {
+    const selected = _pickerFilterValues(value);
+    const normalized = mode === 'single' ? [{ value: 'all', label: 'Tutte' }, ...options] : options;
+    const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
+    const selectedLabel = mode === 'single' && selected.length
+        ? normalized.find(o => String(o.value) === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="_invocationPickerPickFilter('${field}','${encoded}','${safeAttr(label)}','${mode}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _invocationPickerFiltersHtml() {
+    const f = window._invocationPickerFilters || {};
+    const sources = Array.from(new Set(_invocationsAll().map(i => i.source_short || '?'))).sort()
+        .map(value => ({ value, label: value }));
+    return [
+        _invocationPickerBuildFilterButton('meets', 'Idoneita', [
+            { value: 'meet', label: 'Solo idonee' },
+        ], f.meets || 'all', 'single'),
+        _invocationPickerBuildFilterButton('prereq', 'Prerequisiti', [
+            { value: 'any', label: 'Si' },
+            { value: 'none', label: 'No' },
+        ], f.prereq || 'all', 'single'),
+        sources.length ? _invocationPickerBuildFilterButton('source', 'Manuale', sources, f.source || []) : '',
+    ].filter(Boolean).join('');
+}
+
+function _invocationPickerRenderFilterOverlay() {
+    const overlay = document.querySelector('.invocation-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invocationPickerFiltersHtml();
+}
+
+function _invocationPickerHeaderHtml() {
+    const activeCount = _invocationPickerActiveFilterCount();
+    return `
+        <div class="filters-bar spell-picker-search-row">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="invocationPickerSearch" class="filter-search"
+                   placeholder="Cerca supplica (IT/EN)..."
+                   value="${escapeHtml(window._invocationPickerSearch)}"
+                   oninput="_invocationPickerOnSearch(this.value)">
+            </div>
+            <button type="button" class="comp-filter-btn" id="invocationPickerFilterBtn"
+                    onclick="_invocationPickerTogglePanel()" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong style="${activeCount ? '' : 'display:none;'}">${activeCount || ''}</strong>
+            </button>
+        </div>
+    `;
+}
+
+window._invocationPickerTogglePanel = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay invocation-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_invocationPickerFiltersHtml()}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="_invocationPickerResetFilters()">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window._invocationPickerPickFilter = function(field, encodedOptions, title, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const f = window._invocationPickerFilters || (window._invocationPickerFilters = { source: [], prereq: 'all', meets: 'all' });
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            f[field] = value || 'all';
+            _schedaInvocationsRefreshModal();
+            _invocationPickerRenderFilterOverlay();
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, _pickerFilterValues(f[field]), values => {
+        f[field] = values;
+        _schedaInvocationsRefreshModal();
+        _invocationPickerRenderFilterOverlay();
+    }, title || 'Filtro');
+};
+
+window._invocationPickerResetFilters = function() {
+    window._invocationPickerFilters = { source: [], prereq: 'all', meets: 'all' };
+    _schedaInvocationsRefreshModal();
+    _invocationPickerRenderFilterOverlay();
+};
+
 function _invocationMatchesFilters(inv, pg) {
     const f = window._invocationPickerFilters;
-    if (f.source !== 'all' && (inv.source_short || '?') !== f.source) return false;
+    const sourceFilters = _pickerFilterValues(f.source);
+    if (sourceFilters.length && !sourceFilters.includes(inv.source_short || '?')) return false;
     const hasPrereq = (inv.prerequisites && inv.prerequisites.length > 0);
     if (f.prereq === 'none' && hasPrereq) return false;
     if (f.prereq === 'any' && !hasPrereq) return false;
@@ -560,6 +682,122 @@ window.schedaFsSetSlotFilter = function(slot) {
     schedaFsRenderList();
 };
 
+function _fsPickerActiveFilterCount() {
+    const state = window._fsPickerState || {};
+    return _pickerFilterValues(state.slot).length + _pickerFilterValues(state.source).length;
+}
+
+function _fsPickerBuildFilterButton(field, label, options, value) {
+    const selected = _pickerFilterValues(value);
+    const encoded = encodeURIComponent(JSON.stringify(options || [])).replace(/'/g, '%27');
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="schedaFsPickFilter('${field}','${encoded}','${safeAttr(label)}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${selected.length}</small>` : ''}
+    </button>`;
+}
+
+function _fsPickerFiltersHtml() {
+    const state = window._fsPickerState || {};
+    const allStyles = window._fsPickerAllStyles || [];
+    const slotKeys = window._fsPickerSlotKeys || [];
+    const sources = Array.from(new Set(allStyles.map(s => s.fs.source_short).filter(Boolean))).sort();
+    return [
+        _fsPickerBuildFilterButton('slot', 'Classe / Sottoclasse', slotKeys.map(value => ({ value, label: value })), state.slot || []),
+        sources.length ? _fsPickerBuildFilterButton('source', 'Manuale', sources.map(value => ({ value, label: value })), state.source || []) : '',
+    ].filter(Boolean).join('');
+}
+
+function _fsPickerRenderFilterOverlay() {
+    const overlay = document.querySelector('.fs-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _fsPickerFiltersHtml();
+}
+
+function _fsPickerHeaderHtml() {
+    const state = window._fsPickerState;
+    const activeCount = _fsPickerActiveFilterCount();
+    return `
+        <div class="filters-bar spell-picker-search-row">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="fsPickerSearch" class="filter-search"
+                   placeholder="Cerca stile (IT/EN)..."
+                   value="${escapeHtml(state.search)}"
+                   oninput="schedaFsSetSearch(this.value)"
+                   autocomplete="off">
+            </div>
+            <button type="button" class="comp-filter-btn" id="fsPickerFilterBtn"
+                    onclick="schedaFsToggleFilterPanel()" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong style="${activeCount ? '' : 'display:none;'}">${activeCount || ''}</strong>
+            </button>
+        </div>
+    `;
+}
+
+window.schedaFsToggleFilterPanel = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay fs-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_fsPickerFiltersHtml()}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="schedaFsResetFilters()">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.schedaFsPickFilter = function(field, encodedOptions, title) {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const state = window._fsPickerState;
+    openMultiSelect(options, _pickerFilterValues(state[field]), values => {
+        state[field] = values;
+        _fsPickerRefreshHeader();
+        schedaFsRenderList();
+        _fsPickerRenderFilterOverlay();
+    }, title || 'Filtro');
+};
+
+window.schedaFsResetFilters = function() {
+    const state = window._fsPickerState;
+    state.source = [];
+    state.slot = [];
+    _fsPickerRefreshHeader();
+    schedaFsRenderList();
+    _fsPickerRenderFilterOverlay();
+};
+
+window.schedaFsSetSourceFilter = function(src) {
+    window._fsPickerState.source = src;
+    _fsPickerRefreshHeader();
+    schedaFsRenderList();
+};
+
+window.schedaFsSetSlotFilter = function(slot) {
+    window._fsPickerState.slot = slot;
+    _fsPickerRefreshHeader();
+    schedaFsRenderList();
+};
+
 // Re-renderizza la search row + pannello filtri preservando focus e
 // stato di apertura del pannello.
 function _fsPickerRefreshHeader(opts) {
@@ -589,9 +827,11 @@ window.schedaFsRenderList = function() {
     const listEl = document.getElementById('fsPickerList');
     if (!listEl) return;
     const search = (state.search || '').trim().toLowerCase();
+    const sourceFilters = _pickerFilterValues(state.source);
+    const slotFilters = _pickerFilterValues(state.slot);
     const filtered = allStyles.filter(({ fs, slots }) => {
-        if (state.source !== 'all' && fs.source_short !== state.source) return false;
-        if (state.slot !== 'all' && !slots.includes(state.slot)) return false;
+        if (sourceFilters.length && !sourceFilters.includes(fs.source_short || '')) return false;
+        if (slotFilters.length && !slots.some(slot => slotFilters.includes(slot))) return false;
         if (search) {
             const txt = `${fs.name || ''} ${fs.name_en || ''} ${fs.description || ''}`.toLowerCase();
             if (!txt.includes(search)) return false;

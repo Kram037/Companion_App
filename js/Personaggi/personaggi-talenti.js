@@ -108,6 +108,40 @@ function _featPickerHeaderHtml(ctx) {
     `;
 }
 
+function _featPickerHeaderHtml(ctx) {
+    const q = window._featPickerSearch[ctx] || '';
+    const activeCount = _featPickerActiveFilterCount(ctx);
+    return `
+        <div class="filters-bar spell-picker-search-row">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="featPickerSearch_${ctx}" class="filter-search"
+                    placeholder="Cerca talento (IT/EN/fonte)..."
+                    value="${escapeHtml(q)}" oninput="_featPickerOnSearch('${ctx}', this.value)">
+            </div>
+            <button type="button" class="comp-filter-btn" id="featPickerFilterBtn_${ctx}"
+                    onclick="_featFilterTogglePanel('${ctx}')" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong id="featFilterBadge_${ctx}" style="${activeCount ? '' : 'display:none;'}">${activeCount || ''}</strong>
+            </button>
+        </div>
+    `;
+}
+
 function _featPickerActiveFilterCount(ctx) {
     const f = window._featPickerFilters[ctx];
     if (!f) return 0;
@@ -187,7 +221,82 @@ function _featPickerUpdateBadge(ctx) {
     const n = _featPickerActiveFilterCount(ctx);
     if (n > 0) { badge.textContent = n; badge.style.display = ''; }
     else badge.style.display = 'none';
+    document.getElementById(`featPickerFilterBtn_${ctx}`)?.classList.toggle('active', n > 0);
 }
+
+function _featBuildFilterButton(ctx, field, label, options, value, mode = 'multi') {
+    const selected = Array.isArray(value) ? value.map(String) : (value && value !== 'any' ? [String(value)] : []);
+    const encoded = encodeURIComponent(JSON.stringify(options || [])).replace(/'/g, '%27');
+    const selectedLabel = mode === 'single' && selected.length
+        ? (options || []).find(o => String(o.value) === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="_featFilterPick('${ctx}','${field}','${encoded}','${safeAttr(label)}','${mode}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _featFiltersHtml(ctx) {
+    const f = window._featPickerFilters[ctx] || _defaultFeatFilters();
+    const sources = _featAllSources().map(value => ({ value, label: value }));
+    return [
+        _featBuildFilterButton(ctx, 'prereq', 'Prerequisiti', [
+            { value: 'any', label: 'Tutti' },
+            { value: 'yes', label: 'Si' },
+            { value: 'no', label: 'No' },
+        ], f.prereq || 'any', 'single'),
+        sources.length ? _featBuildFilterButton(ctx, 'sources', 'Manuale', sources, f.sources || []) : '',
+    ].filter(Boolean).join('');
+}
+
+function _featFilterRerenderDialog(ctx) {
+    const overlay = Array.from(document.querySelectorAll('.feat-filter-overlay'))
+        .find(el => el.dataset.ctx === ctx);
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _featFiltersHtml(ctx);
+}
+
+window._featFilterTogglePanel = function(ctx) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay feat-filter-overlay';
+    overlay.dataset.ctx = ctx;
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_featFiltersHtml(ctx)}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="_featFilterReset('${ctx}')">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window._featFilterPick = function(ctx, field, encodedOptions, title, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const f = window._featPickerFilters[ctx] || (window._featPickerFilters[ctx] = _defaultFeatFilters());
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            f[field] = value || 'any';
+            _featPickerRefresh(ctx);
+            _featFilterRerenderDialog(ctx);
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, Array.isArray(f[field]) ? f[field] : [], values => {
+        f[field] = values;
+        _featPickerRefresh(ctx);
+        _featFilterRerenderDialog(ctx);
+    }, title || 'Filtro');
+};
+
+window._featFilterReset = function(ctx) {
+    window._featPickerFilters[ctx] = _defaultFeatFilters();
+    _featPickerRefresh(ctx);
+    _featFilterRerenderDialog(ctx);
+};
 
 let pgCurrentTalenti = [];
 

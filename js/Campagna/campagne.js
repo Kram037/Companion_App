@@ -418,22 +418,13 @@ function updateCampagneFiltersButton() {
 
 window.openCampagneFiltersDialog = function() {
     const overlay = document.createElement('div');
-    overlay.className = 'hp-calc-overlay campagne-filter-overlay';
+    overlay.className = 'hp-calc-overlay comp-filter-overlay campagne-filter-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     overlay.innerHTML = `
         <div class="hp-calc-modal comp-filter-modal">
             <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
             <h2 class="comp-filter-title">Filtri</h2>
             <div class="comp-filter-panel">${campagneFiltersHtml()}</div>
-            <div class="campagne-filter-toggle">
-                <label class="filter-chip-toggle">
-                    <input type="checkbox" id="campagneDialogPreferiti" ${AppState.campagneFilters.soloPreferiti ? 'checked' : ''}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    <span>Preferiti</span>
-                </label>
-            </div>
             <div class="comp-filter-actions">
                 <button type="button" class="btn-secondary" onclick="resetCampagneFiltersFromDialog()">Reset</button>
                 <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
@@ -441,18 +432,24 @@ window.openCampagneFiltersDialog = function() {
         </div>
     `;
     document.body.appendChild(overlay);
-    overlay.querySelector('#campagneDialogPreferiti')?.addEventListener('change', event => {
-        AppState.campagneFilters.soloPreferiti = event.target.checked;
-        updateCampagneFiltersButton();
-        applyFiltersAndRerender();
-    });
 };
 
 function campagneFiltersHtml() {
     return [
         campagneFilterSelect('tipologia', AppState.campagneFilters.tipologia, [['all', 'Tutte'], ['lunghe', 'Lunghe'], ['one-shot', 'One-shot']], 'Tipo'),
         campagneFilterSelect('dm', AppState.campagneFilters.dm, [['all', 'Tutti'], ['yes', 'Sono DM'], ['no', 'Non sono DM']], 'Ruolo'),
+        campagneFavoriteFilterSelect(),
     ].join('');
+}
+
+function campagneFavoriteFilterSelect() {
+    const selected = AppState.campagneFilters.soloPreferiti ? ['yes'] : [];
+    const options = [{ value: 'all', label: 'Tutti' }, { value: 'yes', label: 'Solo preferiti' }];
+    const encoded = encodeURIComponent(JSON.stringify(options)).replace(/'/g, '%27');
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFavoriteFilter('${encoded}','Preferiti')" data-value="${safeAttr(selected.join(','))}">
+        Preferiti
+        ${selected.length ? '<small>Solo preferiti</small>' : ''}
+    </button>`;
 }
 
 function campagneFilterSelect(key, value, options, title) {
@@ -494,6 +491,17 @@ window.pickCampagneFilter = function(key, encodedOptions, title, mode = 'multi')
     }, title || 'Filtro');
 };
 
+window.pickCampagneFavoriteFilter = function(encodedOptions, title) {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    openCustomSelect(options, value => {
+        AppState.campagneFilters.soloPreferiti = value === 'yes';
+        const overlay = document.querySelector('.campagne-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
+        updateCampagneFiltersButton();
+        applyFiltersAndRerender();
+    }, title || 'Filtro');
+};
+
 window.resetCampagneFiltersFromDialog = function() {
     AppState.campagneFilters.tipologia = 'all';
     AppState.campagneFilters.dm = 'all';
@@ -501,8 +509,6 @@ window.resetCampagneFiltersFromDialog = function() {
     const overlay = document.querySelector('.campagne-filter-overlay');
     if (overlay) {
         overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
-        const preferiti = overlay.querySelector('#campagneDialogPreferiti');
-        if (preferiti) preferiti.checked = false;
     }
     updateCampagneFiltersButton();
     applyFiltersAndRerender();

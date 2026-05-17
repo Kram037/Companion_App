@@ -410,19 +410,21 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
             <div class="razza-picker-body">
                 <div class="spell-picker-search-row">
                     <input type="text" id="razzaPickerSearch" class="hp-calc-input spell-picker-search" placeholder="${escapeAttr(placeholder)}" autocomplete="off">
-                    ${hideFilters ? '' : `<button type="button" class="spell-picker-filter-btn" id="razzaPickerFilterBtn" title="Filtri">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                        <span class="spell-picker-filter-badge" id="razzaPickerFilterBadge" style="display:none;">0</span>
+                    ${hideFilters ? '' : `<button type="button" class="comp-filter-btn" id="razzaPickerFilterBtn" title="Filtri">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <span>Filtri</span>
+                        <strong id="razzaPickerFilterBadge" style="display:none;">0</strong>
                     </button>`}
-                </div>
-                <div class="spell-filter-panel" id="razzaPickerFilterPanel" style="display:none;">
-                    <div class="spell-filter-group">
-                        <div class="spell-filter-label">Manuale</div>
-                        <div class="spell-filter-chips" id="razzaPickerSourceChips"></div>
-                    </div>
-                    <div class="spell-filter-actions">
-                        <button type="button" class="btn-secondary btn-small" id="razzaPickerResetBtn">Reset</button>
-                    </div>
                 </div>
                 <div class="custom-select-list" id="razzaPickerList"></div>
                 <div class="razza-picker-empty" id="razzaPickerEmpty" style="display:none;">${escapeHtml(emptyText)}</div>
@@ -439,30 +441,9 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
     const listEl = overlay.querySelector('#razzaPickerList');
     const emptyEl = overlay.querySelector('#razzaPickerEmpty');
     const filterBtn = overlay.querySelector('#razzaPickerFilterBtn');
-    const filterPanel = overlay.querySelector('#razzaPickerFilterPanel');
     const filterBadge = overlay.querySelector('#razzaPickerFilterBadge');
-    const sourceChipsEl = overlay.querySelector('#razzaPickerSourceChips');
-    const resetBtn = overlay.querySelector('#razzaPickerResetBtn');
 
     if (window[SK_SEARCH]) searchInput.value = window[SK_SEARCH];
-
-    function renderSourceChips() {
-        if (!sourceChipsEl) return;
-        setSafeHtml(sourceChipsEl, allSources.map(src => {
-            const active = window[SK_SOURCES].has(src);
-            return `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" data-src="${escapeAttr(src)}">${escapeHtml(src)}</button>`;
-        }).join(''));
-        sourceChipsEl.querySelectorAll('.spell-filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const src = chip.dataset.src;
-                if (window[SK_SOURCES].has(src)) window[SK_SOURCES].delete(src);
-                else window[SK_SOURCES].add(src);
-                chip.classList.toggle('active');
-                renderList();
-                updateFilterBadge();
-            });
-        });
-    }
 
     function updateFilterBadge() {
         if (!filterBadge) return;
@@ -507,22 +488,47 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 
     if (filterBtn) {
         filterBtn.addEventListener('click', () => {
-            window[SK_SHOW] = !window[SK_SHOW];
-            filterPanel.style.display = window[SK_SHOW] ? '' : 'none';
-        });
-        if (window[SK_SHOW]) filterPanel.style.display = '';
-    }
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            window[SK_SOURCES] = new Set();
-            renderSourceChips();
-            updateFilterBadge();
-            renderList();
+            const options = allSources.map(src => ({ value: src, label: src }));
+            const selected = window[SK_SOURCES] || new Set();
+            const filterOverlay = document.createElement('div');
+            filterOverlay.className = 'hp-calc-overlay comp-filter-overlay razza-source-filter-overlay';
+            filterOverlay.onclick = e => { if (e.target === filterOverlay) filterOverlay.remove(); };
+            filterOverlay.innerHTML = `
+                <div class="hp-calc-modal comp-filter-modal">
+                    <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+                    <h2 class="comp-filter-title">Manuale</h2>
+                    <div class="custom-select-list">
+                        ${options.map((o, i) => `
+                            <label class="custom-select-check-item">
+                                <input type="checkbox" data-idx="${i}" ${selected.has(o.value) ? 'checked' : ''}>
+                                <span>${escapeHtml(o.label)}</span>
+                            </label>`).join('')}
+                    </div>
+                    <div class="comp-filter-actions">
+                        <button type="button" class="btn-secondary" data-action="reset">Reset</button>
+                        <button type="button" class="btn-primary" data-action="apply">Applica</button>
+                    </div>
+                </div>
+            `;
+            filterOverlay.addEventListener('click', e => {
+                const action = e.target.closest('[data-action]')?.dataset.action;
+                if (action === 'reset') {
+                    filterOverlay.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+                } else if (action === 'apply') {
+                    const values = Array.from(filterOverlay.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => options[parseInt(cb.dataset.idx)]?.value)
+                        .filter(Boolean);
+                    window[SK_SOURCES] = new Set(values);
+                    renderList();
+                    updateFilterBadge();
+                    filterOverlay.remove();
+                }
+            });
+            document.body.appendChild(filterOverlay);
         });
     }
 
     searchInput.addEventListener('input', () => renderList());
-    renderSourceChips();
     updateFilterBadge();
     renderList();
     // NIENTE auto-focus: l'utente decide se attivare la tastiera cliccando.
