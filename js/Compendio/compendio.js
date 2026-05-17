@@ -66,12 +66,14 @@ window.compendioBackToHub = function() {
         const title = document.getElementById('compendioSubTitle');
         if (title) title.textContent = COMP_TABS[_compCurrentTab]?.label || 'Compendio';
         compendioRenderTab();
+        _compScrollToTop();
         return;
     }
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
     if (hub) hub.style.display = '';
     if (sub) sub.style.display = 'none';
+    _compScrollToTop();
 };
 
 window.compendioShowHub = function() {
@@ -82,6 +84,7 @@ window.compendioShowHub = function() {
     const sub = document.getElementById('compendioSubPage');
     if (hub) hub.style.display = '';
     if (sub) sub.style.display = 'none';
+    _compScrollToTop();
 };
 
 window.compendioOpenTab = function(tab) {
@@ -95,6 +98,7 @@ window.compendioOpenTab = function(tab) {
     const title = document.getElementById('compendioSubTitle');
     if (title) title.textContent = COMP_TABS[tab].label;
     compendioRenderTab();
+    _compScrollToTop();
 };
 
 function loadCompendio() {
@@ -502,6 +506,7 @@ window.compendioOpenDetail = function(type, id) {
     _compCurrentTab = type;
     _compStateFor(type).detail = { id };
     compendioRenderTab();
+    _compScrollToTop();
 };
 
 function _compDetailPageHtml(item) {
@@ -663,6 +668,14 @@ function _compRich(text) {
 
 function _compPlain(text) {
     return String(text || '').replace(/\*\*/g, '').replace(/\n+/g, ' ').trim();
+}
+
+function _compScrollToTop() {
+    requestAnimationFrame(() => {
+        document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });
+        document.getElementById('compendioContent')?.scrollTo?.({ top: 0, left: 0 });
+        window.scrollTo?.({ top: 0, left: 0 });
+    });
 }
 
 function _compLang() {
