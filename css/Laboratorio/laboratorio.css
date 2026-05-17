@@ -51,9 +51,10 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     min-height: 0;
+    font: inherit;
 }
 .lab-hub-card:active { transform: scale(0.97); }
-.lab-hub-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.lab-hub-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .lab-hub-card-icon { font-size: 1.6rem; line-height: 1; }
 .lab-hub-card-label {
     font-weight: 600;
@@ -64,6 +65,16 @@
     padding: 0 6px;
     word-break: break-word;
     hyphens: auto;
+}
+
+@media (min-width: 760px) {
+    .lab-hub-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+    }
 }
 
 /* Sub-page back button */
