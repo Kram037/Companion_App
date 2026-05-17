@@ -195,16 +195,16 @@
     align-items: center;
     gap: 9px;
     width: 100%;
-    border: 1px solid rgba(139, 0, 0, 0.26);
-    border-left: 4px solid var(--primary);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
     border-radius: 8px;
-    color: var(--primary);
+    color: var(--text);
     font-weight: 800;
     font-size: 0.84rem;
     position: sticky;
     top: 0;
     z-index: 1;
-    background: linear-gradient(90deg, rgba(139, 0, 0, 0.10), var(--card-bg));
+    background: var(--card-bg);
     padding: 8px 10px;
     cursor: pointer;
     text-align: left;
@@ -216,6 +216,7 @@
     height: 17px;
     flex-shrink: 0;
     transition: transform 0.15s ease;
+    color: var(--text-secondary);
 }
 
 .comp-group-divider.open svg {
@@ -224,6 +225,7 @@
 
 .comp-group-divider span {
     flex: 1;
+    color: var(--primary);
 }
 
 .comp-group-divider small {
@@ -325,8 +327,8 @@
 .comp-spell-card-meta {
     margin-top: 3px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 8px;
+    flex-direction: column;
+    gap: 2px;
     color: var(--text-secondary);
     font-size: 0.74rem;
     line-height: 1.25;
@@ -386,11 +388,15 @@
 }
 
 .comp-detail-box-label {
-    color: var(--text-secondary);
+    color: var(--primary);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0;
     margin-bottom: 4px;
+}
+
+.spell-meta-label {
+    color: var(--primary);
 }
 
 .comp-detail-box-value {
@@ -406,7 +412,7 @@
 .comp-detail-section h3 {
     font-size: 0.98rem;
     margin: 0 0 8px;
-    color: var(--text);
+    color: var(--primary);
 }
 
 .comp-feature-list {
@@ -426,7 +432,7 @@
     margin: 0 0 6px;
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--text);
+    color: var(--primary);
 }
 
 .comp-rich {
@@ -437,6 +443,16 @@
 
 .comp-rich p { margin: 0 0 8px; }
 .comp-rich p:last-child { margin-bottom: 0; }
+.comp-rich strong,
+.comp-rich b,
+.comp-rich h1,
+.comp-rich h2,
+.comp-rich h3,
+.comp-rich h4,
+.comp-rich h5,
+.comp-rich h6 {
+    color: var(--primary);
+}
 
 .comp-spell-detail {
     background: var(--card-bg);
@@ -491,12 +507,24 @@
 
 .comp-filter-actions .btn-secondary,
 .comp-filter-actions .btn-primary {
+    flex: 1 1 0;
+    width: auto;
     min-height: 38px;
     padding: 8px 14px;
+    margin-top: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
+}
+
+.comp-spell-card-meta span + span::before {
+    content: none;
+    margin-right: 0;
+}
+
+.custom-select-overlay {
+    z-index: 1300;
 }
 
 .user-social-section {

@@ -236,7 +236,7 @@ function _compItems(tab) {
                 title: raceLabel,
                 subtitle: '',
                 group: 'Razze senza sottorazze',
-                tags: [race.source_short || race.source, _compField(race, 'asi_text')].filter(Boolean),
+                tags: [_compField(race, 'asi_text')].filter(Boolean),
                 desc: '',
                 data: { ...race, baseRaceKey: key, baseRace: race, isSubrace: false },
             }];
@@ -314,6 +314,7 @@ function _compItems(tab) {
 
 function _compToolbarHtml(tab, state, allItems) {
     const activeFilters = Object.values(state.filters || {}).filter(Boolean).length;
+    const filtersHtml = _compFiltersHtml(tab, state, allItems);
     return `
         <div class="comp-toolbar">
             <label class="comp-search-wrap">
@@ -321,11 +322,11 @@ function _compToolbarHtml(tab, state, allItems) {
                 <input class="comp-search" type="search" placeholder="Cerca in ${escapeHtml(COMP_TABS[tab].label.toLowerCase())}..."
                     value="${escapeHtml(state.search || '')}" oninput="compendioSetSearch(this.value)">
             </label>
-            <button type="button" class="comp-filter-btn" onclick="compendioOpenFilters()">
+            ${filtersHtml ? `<button type="button" class="comp-filter-btn" onclick="compendioOpenFilters()">
                 ${_compIcon('sliders')}
                 <span>Filtri</span>
                 ${activeFilters ? `<strong>${activeFilters}</strong>` : ''}
-            </button>
+            </button>` : ''}
         </div>
     `;
 }
@@ -362,8 +363,8 @@ function _compFiltersHtml(tab, state, allItems) {
 function _compSelect(key, value, options, title) {
     const normalized = options.map(([v, label]) => ({ value: v, label }));
     const current = normalized.find(o => String(o.value) === String(value || '')) || normalized[0];
-    const encoded = encodeURIComponent(JSON.stringify(normalized));
-    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${escapeHtml(value || '')}">
+    const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${_compEscapeAttr(value || '')}">
         ${escapeHtml(current?.label || title || 'Filtro')}
     </button>`;
 }
