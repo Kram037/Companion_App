@@ -76,10 +76,10 @@ function labRenderHub() {
     const grid = document.getElementById('labHubGrid');
     if (!grid) return;
     grid.innerHTML = Object.entries(LAB_CATEGORIES).map(([key, cat]) => `
-        <div class="lab-hub-card" onclick="labOpenCategory('${key}')">
-            <span class="lab-hub-card-icon">${cat.icon}</span>
+        <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
+            <span class="lab-hub-card-icon" aria-hidden="true">${cat.icon}</span>
             <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
-        </div>
+        </button>
     `).join('');
     document.getElementById('laboratorioPage')?.classList.add('lab-hub-active');
 }
@@ -4128,4 +4128,3 @@ window._labImportSave = async function() {
         try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
     }
 };
-

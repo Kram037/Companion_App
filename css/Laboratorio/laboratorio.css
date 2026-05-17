@@ -3,7 +3,13 @@
    ============================================================================ */
 
 /* Lock scroll when hub is visible */
-.main-content:has(.lab-hub-active) { overflow: hidden; }
+.main-content:has(#laboratorioPage.active.lab-hub-active) { overflow: hidden; }
+
+#laboratorioPage.active.lab-hub-active,
+#laboratorioPage.active.lab-hub-active > .page-content {
+    height: 100%;
+    overflow: hidden;
+}
 
 /* Hub */
 #labHub {

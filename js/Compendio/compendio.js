@@ -88,6 +88,99 @@ const COMP_CLASS_LABELS = {
     warlock: { it: 'Warlock', en: 'Warlock' },
 };
 
+const COMP_ARTIFICER_SPELLS = new Set([
+    'absorb elements',
+    'acid splash',
+    'aid',
+    'alarm',
+    'alter self',
+    'animate objects',
+    'arcane eye',
+    'arcane lock',
+    'bigby\'s hand',
+    'blink',
+    'blur',
+    'booming blade',
+    'catapult',
+    'catnap',
+    'continual flame',
+    'create bonfire',
+    'create food and water',
+    'creation',
+    'cure wounds',
+    'dancing lights',
+    'darkvision',
+    'detect magic',
+    'disguise self',
+    'dispel magic',
+    'elemental bane',
+    'elemental weapon',
+    'enhance ability',
+    'enlarge/reduce',
+    'expeditious retreat',
+    'fabricate',
+    'faerie fire',
+    'false life',
+    'feather fall',
+    'fire bolt',
+    'flame arrows',
+    'fly',
+    'freedom of movement',
+    'frostbite',
+    'grease',
+    'greater restoration',
+    'guidance',
+    'haste',
+    'heat metal',
+    'identify',
+    'invisibility',
+    'jump',
+    'lesser restoration',
+    'levitate',
+    'light',
+    'lightning lure',
+    'longstrider',
+    'mage hand',
+    'magic mouth',
+    'magic stone',
+    'magic weapon',
+    'mending',
+    'message',
+    'poison spray',
+    'prestidigitation',
+    'protection from energy',
+    'protection from poison',
+    'purify food and drink',
+    'pyrotechnics',
+    'ray of frost',
+    'resistance',
+    'revivify',
+    'rope trick',
+    'sanctuary',
+    'see invisibility',
+    'shocking grasp',
+    'skill empowerment',
+    'skywrite',
+    'snare',
+    'spare the dying',
+    'spider climb',
+    'stone shape',
+    'stoneskin',
+    'summon construct',
+    'sword burst',
+    'tasha\'s caustic brew',
+    'thorn whip',
+    'thunderclap',
+    'tiny servant',
+    'transmute rock',
+    'true strike',
+    'vitriolic sphere',
+    'wall of stone',
+    'water breathing',
+    'water walk',
+    'web',
+]);
+
 function compendioRenderHub() {
     const grid = document.getElementById('compendioHubGrid');
     if (!grid) return;
@@ -783,7 +876,8 @@ function _compSpellClassLabels(sp) {
     if (!sp) return [];
     const labels = _compLang() === 'en' ? (sp.classes_en || sp.classes || []) : (sp.classes || sp.classes_en || []);
     const sourceClass = _compSpellSourceClass(sp, _compLang());
-    return sourceClass ? [...labels, sourceClass] : labels;
+    const virtualClasses = _compSpellVirtualClasses(sp);
+    return [...labels, sourceClass, ...virtualClasses].filter(Boolean);
 }
 
 function _compSpellMatchesClass(sp, className) {
@@ -793,11 +887,19 @@ function _compSpellMatchesClass(sp, className) {
         ...(sp?.classes_en || []),
         _compSpellSourceClass(sp, 'it'),
         _compSpellSourceClass(sp, 'en'),
+        ..._compSpellVirtualClasses(sp, 'it'),
+        ..._compSpellVirtualClasses(sp, 'en'),
     ].filter(Boolean);
     return labels.some(label => {
         const aliases = _compClassAliasSet(label);
         return [...aliases].some(alias => wanted.has(alias));
     });
+}
+
+function _compSpellVirtualClasses(sp, lang = _compLang()) {
+    const name = String(sp?.name_en || sp?.name || '').trim().toLowerCase();
+    if (!COMP_ARTIFICER_SPELLS.has(name)) return [];
+    return [COMP_CLASS_LABELS.artefice[lang]];
 }
 
 function _compSpellSourceClass(sp, lang = _compLang()) {
