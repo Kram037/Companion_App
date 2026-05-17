@@ -54,13 +54,15 @@ function _invListItemTipo(view) {
 function _invListMatches(view) {
     const st = window._invListState || {};
     const f = st.filters || {};
-    if (f.rarita) {
+    const raritaFilters = _invListFilterValues(f.rarita);
+    const tipoFilters = _invListFilterValues(f.tipo);
+    if (raritaFilters.length) {
         const r = String(_invListItemRarity(view) || '').trim();
-        if (r !== f.rarita) return false;
+        if (!raritaFilters.includes(r)) return false;
     }
-    if (f.tipo) {
+    if (tipoFilters.length) {
         const t = String(_invListItemTipo(view) || '').trim();
-        if (t !== f.tipo) return false;
+        if (!tipoFilters.includes(t)) return false;
     }
     const q = (st.search || '').trim().toLowerCase();
     if (q) {
@@ -148,7 +150,7 @@ function _invListOptionsFor(pg, field) {
 
 function _invListActiveFilterCount() {
     const f = (window._invListState && window._invListState.filters) || {};
-    return (f.rarita ? 1 : 0) + (f.tipo ? 1 : 0);
+    return _invListFilterValues(f.rarita).length + _invListFilterValues(f.tipo).length;
 }
 
 function _invListRenderFiltersBadge() {
@@ -158,7 +160,7 @@ function _invListRenderFiltersBadge() {
     badge.textContent = n ? String(n) : '';
     badge.style.display = n ? 'inline-flex' : 'none';
     const btn = document.getElementById('invListFiltersBtn');
-    if (btn) btn.classList.toggle('active', n > 0 || window._invListState?.filtersOpen);
+    if (btn) btn.classList.toggle('active', n > 0);
 }
 
 function _invListRenderFiltersPanel(pgId) {
@@ -188,16 +190,53 @@ function _invListRenderFiltersPanel(pgId) {
     `;
 }
 
+function _invListBuildFilterButton(field, label, emptyLabel, options, value, pgId) {
+    const selected = _invListFilterValues(value);
+    const normalized = [{ value: '', label: emptyLabel }, ...options.map(v => ({ value: String(v), label: v }))];
+    const selectable = normalized.filter(o => o.value !== '');
+    const isSingle = selectable.length === 2;
+    const encoded = encodeURIComponent(JSON.stringify(isSingle ? normalized : selectable)).replace(/'/g, '%27');
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(o => o.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="invListPickFilter('${field}','${encoded}','${safeAttr(label)}','${pgId}','${isSingle ? 'single' : 'multi'}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _invListFiltersHtml(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return '';
+    const f = window._invListState.filters || {};
+    const rarOpts = _invListOptionsFor(pg, 'rarita');
+    const tipOpts = _invListOptionsFor(pg, 'tipo');
+    return [
+        _invListBuildFilterButton('rarita', 'Rarita', 'Tutte', rarOpts, f.rarita, pgId),
+        _invListBuildFilterButton('tipo', 'Tipologia', 'Tutte', tipOpts, f.tipo, pgId),
+    ].join('');
+}
+
 window.invListToggleFilters = function(pgId) {
-    window._invListState.filtersOpen = !window._invListState.filtersOpen;
-    const bar = document.getElementById('invListSearchBar');
-    if (bar) bar.style.display = window._invListState.filtersOpen ? '' : 'none';
-    if (window._invListState.filtersOpen) {
-        _invListRenderFiltersPanel(pgId);
-        const inp = document.getElementById('invListSearch');
-        if (inp) setTimeout(() => inp.focus(), 30);
-    }
-    _invListRenderFiltersBadge();
+    invListOpenFiltersDialog(pgId);
+};
+
+window.invListOpenFiltersDialog = function(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay inv-list-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_invListFiltersHtml(pgId)}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="invListResetFilters('${pgId}')">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
 };
 
 window.invListOnSearch = function(value, pgId) {
@@ -207,17 +246,43 @@ window.invListOnSearch = function(value, pgId) {
 
 window.invListSetFilter = function(field, value, pgId) {
     window._invListState.filters = window._invListState.filters || {};
-    window._invListState.filters[field] = value || '';
+    const values = _invListFilterValues(value);
+    window._invListState.filters[field] = values.length ? values : '';
     _invListReRender(pgId);
     _invListRenderFiltersBadge();
 };
 
+window.invListPickFilter = function(field, encodedOptions, title, pgId, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const current = _invListFilterValues(window._invListState.filters?.[field]);
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            invListSetFilter(field, value, pgId);
+            const overlay = document.querySelector('.inv-list-filter-overlay');
+            if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, current, values => {
+        invListSetFilter(field, values, pgId);
+        const overlay = document.querySelector('.inv-list-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
+    }, title || 'Filtro');
+};
+
 window.invListResetFilters = function(pgId) {
     window._invListState.filters = { rarita: '', tipo: '' };
-    _invListRenderFiltersPanel(pgId);
+    const overlay = document.querySelector('.inv-list-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
     _invListReRender(pgId);
     _invListRenderFiltersBadge();
 };
+
+function _invListFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
+}
 
 // Drag & drop rimosso: gli oggetti dell'inventario ora restano fissi
 // nell'ordine in cui sono stati aggiunti.
@@ -317,20 +382,34 @@ window.schedaOpenInventoryPage = async function(pgId) {
         <div class="scheda-section-title inv-section-title-fixed">
             <span>Inventario</span>
             <div class="inv-section-actions">
-                <button type="button" id="invListFiltersBtn" class="inv-list-filters-btn" onclick="invListToggleFilters('${pgId}')" title="Filtri e ricerca" aria-label="Filtri">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                    </svg>
-                    <span class="inv-list-filters-badge" id="invListFiltersBadge"></span>
-                </button>
                 <button class="scheda-edit-btn" onclick="invAddItem('${pgId}')" title="Aggiungi oggetto">&#9998;</button>
             </div>
         </div>
-        <div id="invListSearchBar" class="inv-list-search-bar" style="display:none;">
-            <input type="text" id="invListSearch" class="inv-list-search-input" placeholder="Cerca per nome o tipo..."
-                value="${escapeHtml(window._invListState?.search || '')}"
-                oninput="invListOnSearch(this.value,'${pgId}')">
-            <div id="invListFiltersPanel" class="inv-list-filters-panel"></div>
+        <div class="filters-bar inv-list-toolbar">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="invListSearch" class="filter-search" placeholder="Cerca per nome o tipo..."
+                    value="${escapeHtml(window._invListState?.search || '')}"
+                    oninput="invListOnSearch(this.value,'${pgId}')">
+            </div>
+            <button type="button" id="invListFiltersBtn" class="comp-filter-btn" onclick="invListToggleFilters('${pgId}')" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong id="invListFiltersBadge" style="display:none;"></strong>
+            </button>
         </div>
         <div class="scheda-section-body">
             <div id="invItemsList" class="inv-items-grid inv-items-grid-2col">${oggettiRowsHtml}</div>
@@ -340,11 +419,6 @@ window.schedaOpenInventoryPage = async function(pgId) {
 
     schedaSetActiveTab('inventario');
     schedaWireTabBar(pgId);
-    if (window._invListState?.filtersOpen) {
-        const bar = document.getElementById('invListSearchBar');
-        if (bar) bar.style.display = '';
-        _invListRenderFiltersPanel(pgId);
-    }
     _invListRenderFiltersBadge();
 };
 
