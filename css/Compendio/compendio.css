@@ -96,6 +96,8 @@
 
 .comp-toolbar {
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 8px;
     margin-bottom: 10px;
 }
@@ -126,30 +128,42 @@
     font-size: 0.9rem;
 }
 
-.comp-filter-row {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: thin;
-}
-
-.comp-filter-row select,
-.comp-filter-row button {
+.comp-filter-btn {
     min-height: 34px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--card-bg);
     color: var(--text);
-    font-size: 0.78rem;
-    padding: 6px 9px;
-    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-.comp-filter-row button.active {
+.comp-filter-btn:hover {
     border-color: var(--primary);
+}
+
+.comp-filter-btn svg {
+    width: 17px;
+    height: 17px;
     color: var(--primary);
-    background: var(--primary-light, rgba(139,0,0,0.08));
+}
+
+.comp-filter-btn strong {
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    font-size: 0.68rem;
+    line-height: 1;
 }
 
 .comp-count {
@@ -164,11 +178,58 @@
     gap: 8px;
 }
 
+.comp-grouped-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comp-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comp-group-divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 800;
+    font-size: 0.84rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bg);
+    padding: 6px 0;
+}
+
+.comp-group-divider::before,
+.comp-group-divider::after {
+    content: "";
+    height: 1px;
+    background: var(--border);
+    flex: 1;
+}
+
+.comp-group-divider small {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    background: var(--surface, rgba(0,0,0,0.04));
+    border: 1px solid var(--border);
+    font-size: 0.68rem;
+}
+
 .comp-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s, transform 0.06s;
 }
@@ -182,9 +243,29 @@
 
 .comp-card-title {
     margin: 0;
-    font-size: 0.96rem;
+    font-size: 0.92rem;
     font-weight: 750;
     color: var(--text);
+}
+
+.comp-card-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.comp-card-source {
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    white-space: nowrap;
+    margin-top: 1px;
+}
+
+.comp-card-compact {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
 }
 
 .comp-card-meta {
@@ -218,6 +299,47 @@
     overflow: hidden;
 }
 
+.comp-spell-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.comp-spell-card-body {
+    min-width: 0;
+}
+
+.comp-spell-card-meta {
+    margin-top: 3px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    line-height: 1.25;
+}
+
+.comp-spell-card-meta span + span::before {
+    content: "·";
+    margin-right: 8px;
+    color: var(--text-secondary);
+}
+
+.comp-spell-level {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    font-size: 0.88rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
 .comp-empty {
     color: var(--text-secondary);
     text-align: center;
@@ -225,16 +347,38 @@
     font-size: 0.9rem;
 }
 
-.comp-detail-modal {
-    max-width: min(920px, 94vw);
-    max-height: 88vh;
-    overflow-y: auto;
-}
-
 .comp-detail-title {
     margin: 0 28px 6px 0;
     font-size: 1.25rem;
     color: var(--text);
+}
+
+.comp-detail-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 28px;
+}
+
+.comp-detail-back {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.comp-detail-back svg {
+    width: 17px;
+    height: 17px;
+    color: var(--primary);
 }
 
 .comp-detail-subtitle {
@@ -310,6 +454,62 @@
 .comp-rich p { margin: 0 0 8px; }
 .comp-rich p:last-child { margin-bottom: 0; }
 
+.comp-spell-detail {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.comp-spell-detail-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.comp-spell-level-large {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+}
+
+.comp-filter-modal {
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    text-align: left;
+}
+
+.comp-filter-title {
+    margin: 0 28px 12px 0;
+    font-size: 1.05rem;
+    color: var(--text);
+}
+
+.comp-filter-panel {
+    display: grid;
+    gap: 8px;
+}
+
+.comp-filter-panel select {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 0.86rem;
+    padding: 7px 9px;
+}
+
+.comp-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+}
+
 .user-social-section {
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
@@ -348,7 +548,7 @@
     }
 
     .comp-toolbar {
-        grid-template-columns: minmax(260px, 1fr);
+        grid-template-columns: minmax(260px, 1fr) auto;
     }
 
     .comp-list {
