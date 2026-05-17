@@ -3,12 +3,12 @@
    ============================================================================ */
 
 /* Lock scroll when hub is visible */
-.main-content:has(#laboratorioPage.active.lab-hub-active) { overflow: hidden; }
-
-#laboratorioPage.active.lab-hub-active,
-#laboratorioPage.active.lab-hub-active > .page-content {
-    height: 100%;
+.main-content:has(#laboratorioPage.active .laboratorio-content #labHub:not([style*="display: none"])) {
     overflow: hidden;
+}
+
+.laboratorio-content {
+    min-height: 100%;
 }
 
 /* Hub */
@@ -611,16 +611,6 @@
     display: inline-block;
 }
 
-@media (max-width: 768px) {
-    #labHub {
-        height: calc(100svh - 58px - 72px - 2rem);
-    }
-}
-@media (max-width: 480px) {
-    #labHub {
-        height: calc(100svh - 58px - 72px - 1.5rem);
-    }
-}
 .hb-checkbox-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

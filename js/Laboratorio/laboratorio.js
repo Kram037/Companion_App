@@ -81,7 +81,6 @@ function labRenderHub() {
             <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
         </button>
     `).join('');
-    document.getElementById('laboratorioPage')?.classList.add('lab-hub-active');
 }
 
 window.labOpenCategory = function(tab) {
@@ -94,10 +93,9 @@ window.labOpenCategory = function(tab) {
     if (hub) hub.style.display = 'none';
     if (sub) sub.style.display = '';
 
-    document.getElementById('laboratorioPage')?.classList.remove('lab-hub-active');
-
     const title = document.getElementById('labSubTitle');
     if (title) title.textContent = cat.labelPlural || cat.label;
+    _labScrollToTop();
 
     const addBtn = document.getElementById('addHomebrewBtn');
     if (addBtn) addBtn.style.visibility = cat.isSettings ? 'hidden' : '';
@@ -147,8 +145,17 @@ window.labBackToHub = function() {
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = '';
     if (sub) sub.style.display = 'none';
-    document.getElementById('laboratorioPage')?.classList.add('lab-hub-active');
+    _labScrollToTop();
 };
+
+window.laboratorioShowHub = window.labBackToHub;
+
+function _labScrollToTop() {
+    requestAnimationFrame(() => {
+        document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });
+        window.scrollTo?.({ top: 0, left: 0 });
+    });
+}
 
 async function loadLabContent() {
     const container = document.getElementById('labContent');

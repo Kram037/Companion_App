@@ -2,7 +2,7 @@
    COMPENDIO PAGE
    ============================================================================ */
 
-.main-content:has(.compendio-content #compendioHub:not([style*="display: none"])) {
+.main-content:has(#compendioPage.active .compendio-content #compendioHub:not([style*="display: none"])) {
     overflow: hidden;
 }
 
