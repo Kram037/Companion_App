@@ -74,6 +74,16 @@ window.compendioBackToHub = function() {
     if (sub) sub.style.display = 'none';
 };
 
+window.compendioShowHub = function() {
+    Object.keys(COMP_TABS).forEach(tab => {
+        _compStateFor(tab).detail = null;
+    });
+    const hub = document.getElementById('compendioHub');
+    const sub = document.getElementById('compendioSubPage');
+    if (hub) hub.style.display = '';
+    if (sub) sub.style.display = 'none';
+};
+
 window.compendioOpenTab = function(tab) {
     if (!COMP_TABS[tab]) return;
     _compCurrentTab = tab;
@@ -96,7 +106,7 @@ function loadCompendio() {
 
 function _compStateFor(tab) {
     if (!window._compState[tab]) {
-        window._compState[tab] = { search: '', filters: {}, detail: null };
+        window._compState[tab] = { search: '', filters: {}, detail: null, openGroups: {} };
     }
     return window._compState[tab];
 }
@@ -134,6 +144,17 @@ window.compendioSetFilter = function(key, value) {
     if (value) filters[key] = value;
     else delete filters[key];
     compendioRenderTab();
+};
+
+window.compendioPickFilter = function(key, encodedOptions, title) {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    openCustomSelect(options, value => {
+        compendioSetFilter(key, value);
+        const overlay = document.querySelector('.comp-filter-overlay');
+        if (overlay) {
+            overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
+        }
+    }, title || 'Filtro');
 };
 
 window.compendioResetFilters = function() {
@@ -229,8 +250,8 @@ function _compItems(tab) {
             subtitle: '',
             source: bg.source_short || bg.source || '',
             search: [bg.name, bg.name_en, bg.description, bg.feature_name, bg.feature?.name, bg.feature_description, bg.feature?.description, bg.skill_proficiencies].join(' '),
-            tags: [bg.source_short, _compArrayLabel(bg.skill_proficiencies), _compArrayLabel(bg.tool_proficiencies)].filter(Boolean),
-            desc: bg.description || bg.feature_description || bg.feature?.description || '',
+            tags: [_compArrayLabel(bg.skill_proficiencies)].filter(Boolean),
+            desc: '',
             data: bg,
         }));
     }
@@ -242,8 +263,8 @@ function _compItems(tab) {
             subtitle: '',
             source: feat.source_short || feat.source || '',
             search: [feat.name, feat.name_en, feat.prerequisites, feat.description].join(' '),
-            tags: [feat.source_short, feat.prerequisites ? `Prereq: ${feat.prerequisites}` : 'Nessun prerequisito'].filter(Boolean),
-            desc: feat.description || '',
+            tags: [feat.prerequisites ? `Prereq: ${feat.prerequisites}` : 'Nessun prerequisito'].filter(Boolean),
+            desc: '',
             data: feat,
         }));
     }
@@ -255,8 +276,8 @@ function _compItems(tab) {
             subtitle: '',
             source: style.source_short || style.source || '',
             search: [style.name, style.name_it, style.name_en, style.description, style.classes].join(' '),
-            tags: [style.source_short, _compArrayLabel(style.classes)].filter(Boolean),
-            desc: style.description || style.description_it || style.description_en || '',
+            tags: [_compArrayLabel(style.classes)].filter(Boolean),
+            desc: '',
             data: style,
         }));
     }
@@ -268,8 +289,8 @@ function _compItems(tab) {
             subtitle: '',
             source: inv.source_short || inv.source || '',
             search: [inv.name, inv.name_it, inv.name_en, inv.description, inv.prerequisites].join(' '),
-            tags: [inv.source_short, _compPrereqLabel(inv.prerequisites)].filter(Boolean),
-            desc: inv.description || inv.description_it || inv.description_en || '',
+            tags: [_compPrereqLabel(inv.prerequisites)].filter(Boolean),
+            desc: '',
             data: inv,
         }));
     }
@@ -316,32 +337,35 @@ function _compFiltersHtml(tab, state, allItems) {
         const classes = _compUnique(allItems.flatMap(i => i.data.classes || []));
         const sources = _compUnique(allItems.map(i => i.data.source).filter(Boolean));
         return [
-            _compSelect('level', f.level, [['', 'Livello: Tutti'], ['0', 'Trucchetti'], ...Array.from({ length: 9 }, (_, i) => [String(i + 1), `Livello ${i + 1}`])]),
-            _compSelect('school', f.school, [['', 'Scuola: Tutte'], ...schools.map(v => [v, v])]),
-            _compSelect('component', f.component, [['', 'Componenti: Tutte'], ['V', 'V'], ['S', 'S'], ['M', 'M']]),
-            _compSelect('concentration', f.concentration, [['', 'Concentrazione: Tutti'], ['yes', 'Si'], ['no', 'No']]),
-            _compSelect('ritual', f.ritual, [['', 'Rituale: Tutti'], ['yes', 'Si'], ['no', 'No']]),
-            _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])]),
-            _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])]),
+            _compSelect('level', f.level, [['', 'Livello: Tutti'], ['0', 'Trucchetti'], ...Array.from({ length: 9 }, (_, i) => [String(i + 1), `Livello ${i + 1}`])], 'Livello'),
+            _compSelect('school', f.school, [['', 'Scuola: Tutte'], ...schools.map(v => [v, v])], 'Scuola'),
+            _compSelect('component', f.component, [['', 'Componenti: Tutte'], ['V', 'V'], ['S', 'S'], ['M', 'M']], 'Componenti'),
+            _compSelect('concentration', f.concentration, [['', 'Concentrazione: Tutti'], ['yes', 'Si'], ['no', 'No']], 'Concentrazione'),
+            _compSelect('ritual', f.ritual, [['', 'Rituale: Tutti'], ['yes', 'Si'], ['no', 'No']], 'Rituale'),
+            _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])], 'Classe'),
+            _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])], 'Fonte'),
         ].join('');
     }
     const sources = _compUnique(allItems.map(i => i.source).filter(Boolean));
-    const base = sources.length > 1 ? _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])]) : '';
+    const base = sources.length > 1 ? _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])], 'Fonte') : '';
     if (tab === 'sottoclassi') {
         const classes = _compUnique(allItems.map(i => i.data.className).filter(Boolean));
-        return base + _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])]);
+        return base + _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])], 'Classe');
     }
     if (tab === 'razze') {
         const groups = _compUnique(allItems.map(i => i.group).filter(Boolean));
-        return base + _compSelect('group', f.group, [['', 'Gruppo: Tutti'], ...groups.map(v => [v, v])]);
+        return base + _compSelect('group', f.group, [['', 'Gruppo: Tutti'], ...groups.map(v => [v, v])], 'Gruppo');
     }
     return base;
 }
 
-function _compSelect(key, value, options) {
-    return `<select onchange="compendioSetFilter('${key}', this.value)">
-        ${options.map(([v, label]) => `<option value="${escapeHtml(v)}" ${String(value || '') === String(v) ? 'selected' : ''}>${escapeHtml(label)}</option>`).join('')}
-    </select>`;
+function _compSelect(key, value, options, title) {
+    const normalized = options.map(([v, label]) => ({ value: v, label }));
+    const current = normalized.find(o => String(o.value) === String(value || '')) || normalized[0];
+    const encoded = encodeURIComponent(JSON.stringify(normalized));
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${escapeHtml(value || '')}">
+        ${escapeHtml(current?.label || title || 'Filtro')}
+    </button>`;
 }
 
 function _compMatches(item, state) {
@@ -373,18 +397,32 @@ function _compListHtml(tab, items) {
     const sorted = _compSortItems(tab, items);
     if (tab === 'sottoclassi' || tab === 'razze' || tab === 'incantesimi') {
         const groups = _compGroupItems(sorted);
+        const state = _compStateFor(tab);
         return `<div class="comp-grouped-list">${groups.map(group => `
             <section class="comp-group">
-                <div class="comp-group-divider">
+                <button type="button" class="comp-group-divider ${_compGroupOpen(tab, group.label, state) ? 'open' : ''}" onclick="compendioToggleGroup('${_compEscapeAttr(group.label)}')">
+                    ${_compIcon('chevron-right')}
                     <span>${escapeHtml(group.label)}</span>
                     <small>${group.items.length}</small>
-                </div>
-                <div class="comp-list">${group.items.map(item => _compCardHtml(item)).join('')}</div>
+                </button>
+                <div class="comp-list" ${_compGroupOpen(tab, group.label, state) ? '' : 'style="display:none;"'}>${group.items.map(item => _compCardHtml(item)).join('')}</div>
             </section>
         `).join('')}</div>`;
     }
     return `<div class="comp-list">${sorted.map(item => _compCardHtml(item)).join('')}</div>`;
 }
+
+function _compGroupOpen(tab, label, state) {
+    if (Object.prototype.hasOwnProperty.call(state.openGroups || {}, label)) return !!state.openGroups[label];
+    return tab === 'incantesimi';
+}
+
+window.compendioToggleGroup = function(label) {
+    const state = _compStateFor(_compCurrentTab);
+    state.openGroups = state.openGroups || {};
+    state.openGroups[label] = !_compGroupOpen(_compCurrentTab, label, state);
+    compendioRenderTab();
+};
 
 function _compSortItems(tab, items) {
     const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
@@ -423,7 +461,9 @@ function _compCardHtml(item) {
     if (item.type === 'sottoclassi' || (item.type === 'razze' && item.data.isSubrace)) {
         return `
             <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
-                <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
+                <div class="comp-card-main">
+                    <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
+                </div>
             </article>
         `;
     }
@@ -466,10 +506,6 @@ window.compendioOpenDetail = function(type, id) {
 function _compDetailPageHtml(item) {
     return `
         <div class="comp-detail-page">
-            <button type="button" class="comp-detail-back" onclick="compendioBackToHub()">
-                ${_compIcon('arrow-left')}
-                <span>Torna alla lista</span>
-            </button>
             ${_compDetailHtml(item)}
         </div>
     `;
@@ -498,7 +534,6 @@ function _compClassDetail(cls) {
         ['Incantesimi', _compField(cls, 'spellcasting_ability') || 'Non incantatore'],
     ];
     return `
-        <h2 class="comp-detail-title">${escapeHtml(_compName(cls) || 'Classe')}</h2>
         ${_compBoxes(boxes)}
         <section class="comp-detail-section">
             <h3>Multiclasse</h3>
@@ -522,7 +557,6 @@ function _compClassDetail(cls) {
 
 function _compFeatureDetail(title, subtitle, features, data) {
     return `
-        <h2 class="comp-detail-title">${escapeHtml(title)}</h2>
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
         ${_compFeaturesSection(features)}
     `;
@@ -538,7 +572,6 @@ function _compRaceDetail(race, title, subtitle) {
         ? [_compField(base, 'description'), _compField(race, 'description')].filter(Boolean).join('\n\n')
         : _compField(base, 'description');
     return `
-        <h2 class="comp-detail-title">${escapeHtml(title)}</h2>
         <div class="comp-detail-subtitle">${escapeHtml([subtitle, base.source_short || base.source].filter(Boolean).join(' - '))}</div>
         ${_compBoxes([
             ['Taglia', base.size],
@@ -553,7 +586,6 @@ function _compRaceDetail(race, title, subtitle) {
 
 function _compBackgroundDetail(bg, title, subtitle) {
     return `
-        <h2 class="comp-detail-title">${escapeHtml(title)}</h2>
         <div class="comp-detail-subtitle">${escapeHtml([subtitle, bg.source_short || bg.source].filter(Boolean).join(' - '))}</div>
         ${_compBoxes([
             ['Abilita', bg.skill_proficiencies],
@@ -572,7 +604,6 @@ function _compSpellDetail(sp) {
         <article class="comp-spell-detail">
             <header class="comp-spell-detail-head">
                 <div>
-                    <h2 class="spell-detail-name">${escapeHtml(_compSpellField(sp, 'name') || 'Incantesimo')}</h2>
                     <div class="spell-detail-sub">${escapeHtml(lvlText)} &middot; ${escapeHtml(_compSpellField(sp, 'school'))}</div>
                 </div>
                 <div class="comp-spell-level comp-spell-level-large">${escapeHtml(_compSpellLevelShort(sp.level))}</div>
@@ -592,7 +623,6 @@ function _compSpellDetail(sp) {
 
 function _compSimpleDetail(item, boxes) {
     return `
-        <h2 class="comp-detail-title">${escapeHtml(item.title)}</h2>
         <div class="comp-detail-subtitle">${escapeHtml(item.subtitle || '')}</div>
         ${_compBoxes(boxes)}
         <section class="comp-detail-section"><h3>Descrizione</h3><div class="comp-rich">${_compRich(item.data.description || item.data.description_it || item.data.description_en || '')}</div></section>
@@ -756,6 +786,7 @@ function _compIcon(name) {
         search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
         sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>',
         'arrow-left': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>',
+        'chevron-right': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>',
     };
     return icons[name] || icons['book-open'];
 }

@@ -168,6 +168,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
     } else if (pageName === 'compendio') {
+        if (typeof compendioShowHub === 'function') compendioShowHub();
         if (typeof loadCompendio === 'function') loadCompendio();
     } else if (pageName === 'campagne') {
         if (AppState.isLoggedIn && AppState.currentUser) {
