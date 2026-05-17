@@ -48,6 +48,46 @@ const COMP_MULTICLASS_PROFICIENCIES = {
     Warlock: 'Armature leggere, armi semplici',
 };
 
+const COMP_CLASS_ALIASES = {
+    artefice: ['artificer'],
+    artificer: ['artefice'],
+    bardo: ['bard'],
+    bard: ['bardo'],
+    chierico: ['cleric'],
+    cleric: ['chierico'],
+    druido: ['druid'],
+    druid: ['druido'],
+    guerriero: ['fighter'],
+    fighter: ['guerriero'],
+    ladro: ['rogue'],
+    rogue: ['ladro'],
+    mago: ['wizard'],
+    wizard: ['mago'],
+    monaco: ['monk'],
+    monk: ['monaco'],
+    paladino: ['paladin'],
+    paladin: ['paladino'],
+    ranger: ['ranger'],
+    stregone: ['sorcerer'],
+    sorcerer: ['stregone'],
+    warlock: ['warlock'],
+};
+
+const COMP_CLASS_LABELS = {
+    artefice: { it: 'Artefice', en: 'Artificer' },
+    bardo: { it: 'Bardo', en: 'Bard' },
+    chierico: { it: 'Chierico', en: 'Cleric' },
+    druido: { it: 'Druido', en: 'Druid' },
+    guerriero: { it: 'Guerriero', en: 'Fighter' },
+    ladro: { it: 'Ladro', en: 'Rogue' },
+    mago: { it: 'Mago', en: 'Wizard' },
+    monaco: { it: 'Monaco', en: 'Monk' },
+    paladino: { it: 'Paladino', en: 'Paladin' },
+    ranger: { it: 'Ranger', en: 'Ranger' },
+    stregone: { it: 'Stregone', en: 'Sorcerer' },
+    warlock: { it: 'Warlock', en: 'Warlock' },
+};
+
 function compendioRenderHub() {
     const grid = document.getElementById('compendioHubGrid');
     if (!grid) return;
@@ -339,7 +379,7 @@ function _compFiltersHtml(tab, state, allItems) {
     const f = state.filters || {};
     if (tab === 'incantesimi') {
         const schools = _compUnique(allItems.map(i => i.data.school_it || i.data.school).filter(Boolean));
-        const classes = _compUnique(allItems.flatMap(i => i.data.classes || []));
+        const classes = _compSpellClassOptions(allItems);
         const sources = _compUnique(allItems.map(i => i.source).filter(Boolean));
         return [
             _compSelect('level', f.level, [['', 'Tutti'], ['0', 'Trucchetti'], ...Array.from({ length: 9 }, (_, i) => [String(i + 1), `Livello ${i + 1}`])], 'Livello'),
@@ -382,7 +422,7 @@ function _compMatches(item, state) {
     if (f.group && item.group !== f.group) return false;
     if (f.class) {
         if (item.type === 'sottoclassi' && item.data.className !== f.class && item.data.classNameEn !== f.class) return false;
-        if (item.type === 'incantesimi' && !(item.data.classes || []).includes(f.class)) return false;
+        if (item.type === 'incantesimi' && !_compSpellMatchesClass(item.data, f.class)) return false;
     }
     if (item.type === 'incantesimi') {
         const sp = item.data;
@@ -729,6 +769,59 @@ function _compSpellSource(sp) {
         return _compSourceFromAbbrev(classExpansion[1]);
     }
     return source;
+}
+
+function _compSpellClassOptions(allItems) {
+    const spellClasses = allItems.flatMap(item => _compSpellClassLabels(item.data));
+    const casterClasses = (window.CLASSES_DATA || [])
+        .filter(cls => cls.spellcasting_ability || cls.spellcasting_ability_en)
+        .map(cls => _compName(cls));
+    return _compUnique([...spellClasses, ...casterClasses]);
+}
+
+function _compSpellClassLabels(sp) {
+    if (!sp) return [];
+    const labels = _compLang() === 'en' ? (sp.classes_en || sp.classes || []) : (sp.classes || sp.classes_en || []);
+    const sourceClass = _compSpellSourceClass(sp, _compLang());
+    return sourceClass ? [...labels, sourceClass] : labels;
+}
+
+function _compSpellMatchesClass(sp, className) {
+    const wanted = _compClassAliasSet(className);
+    const labels = [
+        ...(sp?.classes || []),
+        ...(sp?.classes_en || []),
+        _compSpellSourceClass(sp, 'it'),
+        _compSpellSourceClass(sp, 'en'),
+    ].filter(Boolean);
+    return labels.some(label => {
+        const aliases = _compClassAliasSet(label);
+        return [...aliases].some(alias => wanted.has(alias));
+    });
+}
+
+function _compSpellSourceClass(sp, lang = _compLang()) {
+    const match = String(sp?.source || '').trim().match(/^(.+?)\s+\[[A-Za-z0-9+]+\]$/);
+    if (!match) return '';
+    const key = _compClassKey(match[1]);
+    return key ? COMP_CLASS_LABELS[key]?.[lang] || match[1] : match[1];
+}
+
+function _compClassAliasSet(value) {
+    const key = _compClassKey(value);
+    if (!key) return new Set();
+    return new Set([key, ...(COMP_CLASS_ALIASES[key] || [])]);
+}
+
+function _compClassKey(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return '';
+    if (COMP_CLASS_LABELS[key]) return key;
+    const labelKey = Object.entries(COMP_CLASS_ALIASES)
+        .find(([canonical, aliases]) => COMP_CLASS_LABELS[canonical] && (canonical === key || aliases.includes(key)))?.[0];
+    if (labelKey) return labelKey;
+    if (COMP_CLASS_ALIASES[key]) return key;
+    return Object.entries(COMP_CLASS_ALIASES).find(([canonical, aliases]) => aliases.includes(key) || canonical === key)?.[0] || key;
 }
 
 function _compSourceFromAbbrev(abbrev) {
