@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="css/Core/base.css?v=20260424I">
     <link rel="stylesheet" href="css/Core/components.css?v=20260424M">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260427A">
-    <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260424X">
+    <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
     <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260425E">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
     <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260425E">
@@ -81,25 +81,20 @@
                         </svg>
                         <input type="text" id="campagneSearchInput" class="filter-search" placeholder="Cerca campagna...">
                     </div>
-                    <div class="filter-chips">
-                        <select id="campagneTipologiaFilter" class="filter-chip-select">
-                            <option value="all">Tipo: Tutte</option>
-                            <option value="lunghe">Lunghe</option>
-                            <option value="one-shot">One-shot</option>
-                        </select>
-                        <select id="campagneDMFilter" class="filter-chip-select">
-                            <option value="all">Ruolo: Tutti</option>
-                            <option value="yes">Sono DM</option>
-                            <option value="no">Non sono DM</option>
-                        </select>
-                        <label class="filter-chip-toggle" id="preferitiChipLabel">
-                            <input type="checkbox" id="togglePreferitiFilter">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                            <span>Preferiti</span>
-                        </label>
-                    </div>
+                    <button type="button" class="comp-filter-btn" id="campagneFiltersBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <span>Filtri</span>
+                    </button>
                 </div>
                 <div id="campagneList" class="campagne-list">
                     <div class="content-placeholder">
@@ -1032,7 +1027,7 @@
     <script src="js/Core/auth.js?v=20260427K"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
-    <script src="js/Campagna/campagne.js?v=20260424W"></script>
+    <script src="js/Campagna/campagne.js?v=20260517A"></script>
     <script src="js/Personaggi/data/spells_data.js?v=20260428A"></script>
     <script src="js/Personaggi/data/classes_data.js?v=20260428B"></script>
     <script src="js/Personaggi/data/feats_data.js?v=1773360000"></script>
@@ -1043,7 +1038,7 @@
     <script src="js/Personaggi/data/fighting_styles_data.js?v=1773360000"></script>
     <script src="js/Personaggi/data/oggetti_magici_data.js?v=20260227E"></script>
     <script src="js/Personaggi/data/veleni_data.js?v=20260227A"></script>
-    <script src="js/Compendio/compendio.js?v=20260517F"></script>
+    <script src="js/Compendio/compendio.js?v=20260517G"></script>
     <script src="js/Personaggi/personaggi-catalog.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-state.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-talenti.js?v=20260517A"></script>

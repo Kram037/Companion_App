@@ -371,9 +371,7 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
  */
 function setupCampagneFilters() {
     const searchInput = document.getElementById('campagneSearchInput');
-    const tipologiaFilter = document.getElementById('campagneTipologiaFilter');
-    const dmFilter = document.getElementById('campagneDMFilter');
-    const preferitiFilter = document.getElementById('togglePreferitiFilter');
+    const filtersBtn = document.getElementById('campagneFiltersBtn');
     let searchTimeout;
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -385,25 +383,8 @@ function setupCampagneFilters() {
         });
     }
 
-    if (tipologiaFilter) {
-        tipologiaFilter.addEventListener('change', (e) => {
-            AppState.campagneFilters.tipologia = e.target.value;
-            applyFiltersAndRerender();
-        });
-    }
-
-    if (dmFilter) {
-        dmFilter.addEventListener('change', (e) => {
-            AppState.campagneFilters.dm = e.target.value;
-            applyFiltersAndRerender();
-        });
-    }
-
-    if (preferitiFilter) {
-        preferitiFilter.addEventListener('change', (e) => {
-            AppState.campagneFilters.soloPreferiti = e.target.checked;
-            applyFiltersAndRerender();
-        });
+    if (filtersBtn) {
+        filtersBtn.addEventListener('click', openCampagneFiltersDialog);
     }
 
     // Carica preferenze salvate dal localStorage (opzionale)
@@ -414,14 +395,99 @@ function setupCampagneFilters() {
             AppState.campagneFilters = { ...AppState.campagneFilters, ...parsed };
             // Applica i valori salvati agli input
             if (searchInput) searchInput.value = AppState.campagneFilters.searchText || '';
-            if (tipologiaFilter) tipologiaFilter.value = AppState.campagneFilters.tipologia || 'all';
-            if (dmFilter) dmFilter.value = AppState.campagneFilters.dm || 'all';
-            if (preferitiFilter) preferitiFilter.checked = AppState.campagneFilters.soloPreferiti || false;
         } catch (e) {
             console.warn('Errore nel caricamento filtri salvati:', e);
         }
     }
+    updateCampagneFiltersButton();
 }
+
+function updateCampagneFiltersButton() {
+    const btn = document.getElementById('campagneFiltersBtn');
+    if (!btn) return;
+    const filters = AppState.campagneFilters || {};
+    const activeCount = [
+        filters.tipologia && filters.tipologia !== 'all',
+        filters.dm && filters.dm !== 'all',
+        !!filters.soloPreferiti,
+    ].filter(Boolean).length;
+    const badge = activeCount ? `<strong>${activeCount}</strong>` : '';
+    const icon = btn.querySelector('svg')?.outerHTML || '';
+    btn.innerHTML = `${icon}<span>Filtri</span>${badge}`;
+}
+
+window.openCampagneFiltersDialog = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay campagne-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${campagneFiltersHtml()}</div>
+            <div class="campagne-filter-toggle">
+                <label class="filter-chip-toggle">
+                    <input type="checkbox" id="campagneDialogPreferiti" ${AppState.campagneFilters.soloPreferiti ? 'checked' : ''}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>Preferiti</span>
+                </label>
+            </div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="resetCampagneFiltersFromDialog()">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#campagneDialogPreferiti')?.addEventListener('change', event => {
+        AppState.campagneFilters.soloPreferiti = event.target.checked;
+        updateCampagneFiltersButton();
+        applyFiltersAndRerender();
+    });
+};
+
+function campagneFiltersHtml() {
+    return [
+        campagneFilterSelect('tipologia', AppState.campagneFilters.tipologia, [['all', 'Tutte'], ['lunghe', 'Lunghe'], ['one-shot', 'One-shot']], 'Tipo'),
+        campagneFilterSelect('dm', AppState.campagneFilters.dm, [['all', 'Tutti'], ['yes', 'Sono DM'], ['no', 'Non sono DM']], 'Ruolo'),
+    ].join('');
+}
+
+function campagneFilterSelect(key, value, options, title) {
+    const normalized = options.map(([v, label]) => ({ value: v, label }));
+    const current = normalized.find(o => String(o.value) === String(value || 'all')) || normalized[0];
+    const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}')" data-value="${safeAttr(value || 'all')}">
+        ${escapeHtml(current?.label || title)}
+    </button>`;
+}
+
+window.pickCampagneFilter = function(key, encodedOptions, title) {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    openCustomSelect(options, value => {
+        AppState.campagneFilters[key] = value;
+        const overlay = document.querySelector('.campagne-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
+        updateCampagneFiltersButton();
+        applyFiltersAndRerender();
+    }, title || 'Filtro');
+};
+
+window.resetCampagneFiltersFromDialog = function() {
+    AppState.campagneFilters.tipologia = 'all';
+    AppState.campagneFilters.dm = 'all';
+    AppState.campagneFilters.soloPreferiti = false;
+    const overlay = document.querySelector('.campagne-filter-overlay');
+    if (overlay) {
+        overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
+        const preferiti = overlay.querySelector('#campagneDialogPreferiti');
+        if (preferiti) preferiti.checked = false;
+    }
+    updateCampagneFiltersButton();
+    applyFiltersAndRerender();
+};
 
 /**
  * Applica i filtri usando i dati cached (senza ricaricare da DB)
@@ -430,6 +496,7 @@ async function applyFiltersAndRerender() {
     if (!AppState.currentUser || !AppState.isLoggedIn) return;
     
     localStorage.setItem('campagneFilters', JSON.stringify(AppState.campagneFilters));
+    updateCampagneFiltersButton();
     
     if (AppState.cachedCampagne && AppState.cachedUserData) {
         const campagneFiltrate = applyCampagneFilters(AppState.cachedCampagne, AppState.campagneFilters, AppState.cachedUserData.id);

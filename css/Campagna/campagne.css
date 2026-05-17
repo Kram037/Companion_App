@@ -1,6 +1,26 @@
 /* ============================================
    CAMPAGNE LIST & CARDS
    ============================================ */
+.filters-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.filters-bar .comp-filter-btn {
+    min-height: 40px;
+}
+
+.campagne-filter-toggle {
+    margin-top: 10px;
+}
+
+.campagne-filter-toggle .filter-chip-toggle {
+    width: 100%;
+    justify-content: center;
+}
+
 .campagne-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

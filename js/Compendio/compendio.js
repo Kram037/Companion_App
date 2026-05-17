@@ -304,7 +304,7 @@ function _compItems(tab) {
             id: key,
             title: _compSpellField(sp, 'name') || key,
             subtitle: '',
-            source: sp.source || '',
+            source: _compSpellSource(sp),
             group: _compSpellLevel(sp.level),
             sortLevel: Number(sp.level) || 0,
             search: [sp.name, sp.name_en, sp.school_it, sp.school, sp.components, sp.components_en, sp.duration, sp.duration_en, (sp.classes || []).join(' '), (sp.classes_en || []).join(' '), sp.description, sp.description_en].join(' '),
@@ -340,26 +340,26 @@ function _compFiltersHtml(tab, state, allItems) {
     if (tab === 'incantesimi') {
         const schools = _compUnique(allItems.map(i => i.data.school_it || i.data.school).filter(Boolean));
         const classes = _compUnique(allItems.flatMap(i => i.data.classes || []));
-        const sources = _compUnique(allItems.map(i => i.data.source).filter(Boolean));
+        const sources = _compUnique(allItems.map(i => i.source).filter(Boolean));
         return [
-            _compSelect('level', f.level, [['', 'Livello: Tutti'], ['0', 'Trucchetti'], ...Array.from({ length: 9 }, (_, i) => [String(i + 1), `Livello ${i + 1}`])], 'Livello'),
-            _compSelect('school', f.school, [['', 'Scuola: Tutte'], ...schools.map(v => [v, v])], 'Scuola'),
-            _compSelect('component', f.component, [['', 'Componenti: Tutte'], ['V', 'V'], ['S', 'S'], ['M', 'M']], 'Componenti'),
-            _compSelect('concentration', f.concentration, [['', 'Concentrazione: Tutti'], ['yes', 'Si'], ['no', 'No']], 'Concentrazione'),
-            _compSelect('ritual', f.ritual, [['', 'Rituale: Tutti'], ['yes', 'Si'], ['no', 'No']], 'Rituale'),
-            _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])], 'Classe'),
-            _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])], 'Fonte'),
+            _compSelect('level', f.level, [['', 'Tutti'], ['0', 'Trucchetti'], ...Array.from({ length: 9 }, (_, i) => [String(i + 1), `Livello ${i + 1}`])], 'Livello'),
+            _compSelect('school', f.school, [['', 'Tutte'], ...schools.map(v => [v, v])], 'Scuola'),
+            _compSelect('component', f.component, [['', 'Tutte'], ['V', 'V'], ['S', 'S'], ['M', 'M']], 'Componenti'),
+            _compSelect('concentration', f.concentration, [['', 'Tutti'], ['yes', 'Si'], ['no', 'No']], 'Concentrazione'),
+            _compSelect('ritual', f.ritual, [['', 'Tutti'], ['yes', 'Si'], ['no', 'No']], 'Rituale'),
+            _compSelect('class', f.class, [['', 'Tutte'], ...classes.map(v => [v, v])], 'Classe'),
+            _compSelect('source', f.source, [['', 'Tutte'], ...sources.map(v => [v, v])], 'Fonte'),
         ].join('');
     }
     const sources = _compUnique(allItems.map(i => i.source).filter(Boolean));
-    const base = sources.length > 1 ? _compSelect('source', f.source, [['', 'Fonte: Tutte'], ...sources.map(v => [v, v])], 'Fonte') : '';
+    const base = sources.length > 1 ? _compSelect('source', f.source, [['', 'Tutte'], ...sources.map(v => [v, v])], 'Fonte') : '';
     if (tab === 'sottoclassi') {
         const classes = _compUnique(allItems.map(i => i.data.className).filter(Boolean));
-        return base + _compSelect('class', f.class, [['', 'Classe: Tutte'], ...classes.map(v => [v, v])], 'Classe');
+        return base + _compSelect('class', f.class, [['', 'Tutte'], ...classes.map(v => [v, v])], 'Classe');
     }
     if (tab === 'razze') {
         const groups = _compUnique(allItems.map(i => i.group).filter(Boolean));
-        return base + _compSelect('group', f.group, [['', 'Gruppo: Tutti'], ...groups.map(v => [v, v])], 'Gruppo');
+        return base + _compSelect('group', f.group, [['', 'Tutti'], ...groups.map(v => [v, v])], 'Gruppo');
     }
     return base;
 }
@@ -622,7 +622,7 @@ function _compSpellDetail(sp) {
             </div>
             <div class="spell-detail-desc">${_compRich(_compSpellField(sp, 'description'))}</div>
             <div class="spell-detail-classes">${(_compSpellField(sp, 'classes') || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
-            ${sp.source ? `<div class="spell-detail-source">${escapeHtml(sp.source)}</div>` : ''}
+            ${_compSpellSource(sp) ? `<div class="spell-detail-source">${escapeHtml(_compSpellSource(sp))}</div>` : ''}
         </article>
     `;
 }
@@ -720,6 +720,30 @@ function _compSpellField(sp, key) {
         case 'classes': return sp.classes || sp.classes_en || [];
     }
     return '';
+}
+
+function _compSpellSource(sp) {
+    const source = String(sp?.source || '').trim();
+    if (!source) return '';
+    const classExpansion = source.match(/^(?:Artificer|Bard|Cleric|Druid|Paladin|Ranger|Sorcerer|Warlock|Wizard|Artefice|Bardo|Chierico|Druido|Paladino|Stregone|Mago|Ladro)\s+\[([A-Za-z0-9+]+)\]$/i);
+    if (classExpansion) {
+        return _compSourceFromAbbrev(classExpansion[1]);
+    }
+    return source;
+}
+
+function _compSourceFromAbbrev(abbrev) {
+    const key = String(abbrev || '').trim().toUpperCase();
+    const sources = {
+        TCOE: "Tasha's Cauldron of Everything",
+        XGTE: "Xanathar's Guide to Everything",
+        FTD: "Fizban's Treasury of Dragons",
+        PHB: "Player's Handbook",
+        SRD: "Player's Handbook (SRD)",
+        BR: "Player's Handbook (BR+)",
+        'BR+': "Player's Handbook (BR+)",
+    };
+    return sources[key] || abbrev;
 }
 
 function _compEscapeAttr(value) {
