@@ -366,10 +366,9 @@ function _compFiltersHtml(tab, state, allItems) {
 
 function _compSelect(key, value, options, title) {
     const normalized = options.map(([v, label]) => ({ value: v, label }));
-    const current = normalized.find(o => String(o.value) === String(value || '')) || normalized[0];
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
     return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${_compEscapeAttr(value || '')}">
-        ${escapeHtml(current?.label || title || 'Filtro')}
+        ${escapeHtml(title || 'Filtro')}
     </button>`;
 }
 

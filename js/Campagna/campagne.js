@@ -457,10 +457,9 @@ function campagneFiltersHtml() {
 
 function campagneFilterSelect(key, value, options, title) {
     const normalized = options.map(([v, label]) => ({ value: v, label }));
-    const current = normalized.find(o => String(o.value) === String(value || 'all')) || normalized[0];
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
     return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}')" data-value="${safeAttr(value || 'all')}">
-        ${escapeHtml(current?.label || title)}
+        ${escapeHtml(title)}
     </button>`;
 }
 

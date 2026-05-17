@@ -30,12 +30,15 @@
 }
 .lab-hub-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 8px;
     padding: 0 var(--spacing-sm);
     flex: 1;
     min-height: 0;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
 }
 .lab-hub-card {
     background: var(--card-bg);
@@ -65,16 +68,6 @@
     padding: 0 6px;
     word-break: break-word;
     hyphens: auto;
-}
-
-@media (min-width: 760px) {
-    .lab-hub-grid {
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        max-width: 900px;
-        width: 100%;
-        margin: 0 auto;
-    }
 }
 
 /* Sub-page back button */
