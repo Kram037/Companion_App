@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v15';
+const CACHE_NAME = 'companion-app-v16';
 
 const APP_SHELL_URLS = [
     './',
@@ -28,6 +28,7 @@ const APP_SHELL_URLS = [
     './js/Personaggi/personaggi-competenze.js',
     './js/Personaggi/personaggi-slot-incantesimo.js',
     './js/Personaggi/personaggi-pv-keypad.js',
+    './js/Personaggi/personaggi-wizard-navigation.js',
     './js/Personaggi/personaggi.js',
     './js/Sessioni/sessions.js',
     './js/Combattimento/combat.js',
