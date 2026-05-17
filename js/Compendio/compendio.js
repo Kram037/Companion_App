@@ -284,11 +284,21 @@ window.compendioSetFilter = function(key, value) {
     compendioRenderTab();
 };
 
-window.compendioPickFilter = function(key, encodedOptions, title) {
+window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi') {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
     const current = _compFilterValues(_compStateFor(_compCurrentTab).filters[key]);
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            window.compendioSetFilter(key, value);
+            const overlay = document.querySelector('.comp-filter-overlay');
+            if (overlay) {
+                overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
+            }
+        }, title || 'Filtro');
+        return;
+    }
     openMultiSelect(options, current, values => {
-        compendioSetFilter(key, values);
+        window.compendioSetFilter(key, values);
         const overlay = document.querySelector('.comp-filter-overlay');
         if (overlay) {
             overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
@@ -501,13 +511,16 @@ function _compFiltersHtml(tab, state, allItems) {
 
 function _compSelect(key, value, options, title) {
     const selected = _compFilterValues(value);
-    const normalized = options
-        .filter(([v]) => String(v || '') !== '')
-        .map(([v, label]) => ({ value: String(v), label }));
+    const nonEmpty = options.filter(([v]) => String(v || '') !== '');
+    const isSingle = nonEmpty.length === 2;
+    const normalized = (isSingle ? options : nonEmpty).map(([v, label]) => ({ value: String(v || ''), label }));
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
-    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${_compEscapeAttr(selected.join(','))}">
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(opt => opt.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}','${isSingle ? 'single' : 'multi'}')" data-value="${_compEscapeAttr(selected.join(','))}">
         ${escapeHtml(title || 'Filtro')}
-        ${selected.length ? `<small>${selected.length}</small>` : ''}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
     </button>`;
 }
 

@@ -329,12 +329,19 @@ function _labListBuildFiltersPanelHtml(tab, data) {
     const defs = _labListGetFilterDefs(tab);
     const fields = defs.map(def => {
         const selected = _labListFilterValues(state.filters[def.key]);
-        const opts = def.options(data).filter(o => String(o.value || '') !== '');
-        const encoded = encodeURIComponent(JSON.stringify(opts.map(o => ({ value: String(o.value), label: o.label })))).replace(/'/g, '%27');
+        const allOptions = def.options(data);
+        const selectable = allOptions.filter(o => String(o.value || '') !== '');
+        const isSingle = selectable.length === 2;
+        const opts = isSingle ? allOptions : selectable;
+        const normalized = opts.map(o => ({ value: String(o.value || ''), label: o.label }));
+        const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
+        const selectedLabel = isSingle && selected.length
+            ? normalized.find(opt => opt.value === selected[0])?.label || selected[0]
+            : selected.length;
         return `
-            <button type="button" class="custom-select-trigger comp-filter-select" onclick="labListPickFilter('${tab}','${def.key}','${encoded}','${_labEscapeAttr(def.label)}')" data-value="${_labEscapeAttr(selected.join(','))}">
+            <button type="button" class="custom-select-trigger comp-filter-select" onclick="labListPickFilter('${tab}','${def.key}','${encoded}','${_labEscapeAttr(def.label)}','${isSingle ? 'single' : 'multi'}')" data-value="${_labEscapeAttr(selected.join(','))}">
                 ${escapeHtml(def.label)}
-                ${selected.length ? `<small>${selected.length}</small>` : ''}
+                ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
             </button>`;
     }).join('');
     return fields;
@@ -432,10 +439,18 @@ window.labListSetFilter = function(tab, key, value) {
     _labListReRenderList(tab);
 };
 
-window.labListPickFilter = function(tab, key, encodedOptions, title) {
+window.labListPickFilter = function(tab, key, encodedOptions, title, mode = 'multi') {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
     const state = _labListGetState(tab);
     const current = _labListFilterValues(state.filters[key]);
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            labListSetFilter(tab, key, value);
+            const overlay = document.querySelector('.lab-filter-overlay');
+            if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || []);
+        }, title || 'Filtro');
+        return;
+    }
     openMultiSelect(options, current, values => {
         labListSetFilter(tab, key, values);
         const overlay = document.querySelector('.lab-filter-overlay');

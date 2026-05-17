@@ -457,19 +457,32 @@ function campagneFiltersHtml() {
 
 function campagneFilterSelect(key, value, options, title) {
     const selected = campagneFilterValues(value).filter(v => v !== 'all');
-    const normalized = options
-        .filter(([v]) => v !== 'all')
-        .map(([v, label]) => ({ value: v, label }));
+    const nonAll = options.filter(([v]) => v !== 'all');
+    const isSingle = nonAll.length === 2;
+    const normalized = (isSingle ? options : nonAll).map(([v, label]) => ({ value: v, label }));
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
-    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}')" data-value="${safeAttr(selected.join(','))}">
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(opt => opt.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}','${isSingle ? 'single' : 'multi'}')" data-value="${safeAttr(selected.join(','))}">
         ${escapeHtml(title)}
-        ${selected.length ? `<small>${selected.length}</small>` : ''}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
     </button>`;
 }
 
-window.pickCampagneFilter = function(key, encodedOptions, title) {
+window.pickCampagneFilter = function(key, encodedOptions, title, mode = 'multi') {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
     const current = campagneFilterValues(AppState.campagneFilters[key]).filter(v => v !== 'all');
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            AppState.campagneFilters[key] = value || 'all';
+            const overlay = document.querySelector('.campagne-filter-overlay');
+            if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
+            updateCampagneFiltersButton();
+            applyFiltersAndRerender();
+        }, title || 'Filtro');
+        return;
+    }
     openMultiSelect(options, current, values => {
         const selected = campagneFilterValues(values);
         if (selected.length) AppState.campagneFilters[key] = selected;
