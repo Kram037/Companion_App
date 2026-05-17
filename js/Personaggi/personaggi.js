@@ -1653,11 +1653,11 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
     const overlay = document.createElement('div');
     overlay.id = 'customSelectOverlay';
     overlay.className = 'custom-select-overlay';
-    overlay.innerHTML = `
+    setSafeHtml(overlay, `
         <div class="custom-select-panel razza-picker-panel">
             <div class="custom-select-header">
                 <span>${escapeHtml(title || 'Seleziona')}</span>
-                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+                <button class="custom-select-close" data-razza-picker-action="close">&times;</button>
             </div>
             <div class="razza-picker-body">
                 <div class="spell-picker-search-row">
@@ -1679,9 +1679,13 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
                 <div class="custom-select-list" id="razzaPickerList"></div>
                 <div class="razza-picker-empty" id="razzaPickerEmpty" style="display:none;">${escapeHtml(emptyText)}</div>
             </div>
-        </div>`;
+        </div>`);
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.closest('[data-razza-picker-action="close"]')) {
+            closeCustomSelect();
+        }
+    });
 
     const searchInput = overlay.querySelector('#razzaPickerSearch');
     const listEl = overlay.querySelector('#razzaPickerList');
@@ -1696,10 +1700,10 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
 
     function renderSourceChips() {
         if (!sourceChipsEl) return;
-        sourceChipsEl.innerHTML = allSources.map(src => {
+        setSafeHtml(sourceChipsEl, allSources.map(src => {
             const active = window[SK_SOURCES].has(src);
             return `<button type="button" class="spell-filter-chip ${active ? 'active' : ''}" data-src="${escapeAttr(src)}">${escapeHtml(src)}</button>`;
-        }).join('');
+        }).join(''));
         sourceChipsEl.querySelectorAll('.spell-filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 const src = chip.dataset.src;
@@ -1735,15 +1739,15 @@ function openRazzaPicker(options, title, onSelect, opts = {}) {
             return true;
         });
         if (filtered.length === 0) {
-            listEl.innerHTML = '';
+            setSafeHtml(listEl, '');
             emptyEl.style.display = '';
             return;
         }
         emptyEl.style.display = 'none';
-        listEl.innerHTML = filtered.map(o => {
+        setSafeHtml(listEl, filtered.map(o => {
             const srcHtml = o.source ? ` <span class="option-source">(${escapeHtml(o.source)})</span>` : '';
             return `<button type="button" class="custom-select-item" data-val="${escapeAttr(o.value)}">${escapeHtml(o.label)}${srcHtml}</button>`;
-        }).join('');
+        }).join(''));
         listEl.querySelectorAll('.custom-select-item').forEach(btn => {
             btn.addEventListener('click', () => {
                 const val = btn.dataset.val;

@@ -408,14 +408,14 @@ window.openCustomSelect = function(options, callback, title) {
         const srcHtml = o.source ? ` <span class="option-source">(${escapeHtml(o.source)})</span>` : '';
         return `<button type="button" class="custom-select-item" data-idx="${i}">${escapeHtml(o.label)}${srcHtml}</button>`;
     }).join('');
-    overlay.innerHTML = `
+    setSafeHtml(overlay, `
         <div class="custom-select-panel">
             <div class="custom-select-header">
                 <span>${escapeHtml(title || 'Seleziona')}</span>
-                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+                <button class="custom-select-close" data-custom-select-action="close">&times;</button>
             </div>
             <div class="custom-select-list">${listHtml}</div>
-        </div>`;
+        </div>`);
     overlay.querySelector('.custom-select-list').addEventListener('click', (e) => {
         const btn = e.target.closest('.custom-select-item');
         if (btn) {
@@ -424,7 +424,11 @@ window.openCustomSelect = function(options, callback, title) {
             closeCustomSelect();
         }
     });
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.closest('[data-custom-select-action="close"]')) {
+            closeCustomSelect();
+        }
+    });
     document.body.appendChild(overlay);
 }
 
@@ -435,11 +439,11 @@ window.openMultiSelect = function(options, currentSelected, callback, title) {
     const overlay = document.createElement('div');
     overlay.id = 'customSelectOverlay';
     overlay.className = 'custom-select-overlay';
-    overlay.innerHTML = `
+    setSafeHtml(overlay, `
         <div class="custom-select-panel">
             <div class="custom-select-header">
                 <span>${escapeHtml(title || 'Seleziona')}</span>
-                <button class="custom-select-close" onclick="closeCustomSelect()">&times;</button>
+                <button class="custom-select-close" data-custom-select-action="close">&times;</button>
             </div>
             <div class="custom-select-list">
                 ${options.map((o, i) => `
@@ -449,9 +453,9 @@ window.openMultiSelect = function(options, currentSelected, callback, title) {
                 </label>`).join('')}
             </div>
             <div class="custom-select-footer">
-                <button type="button" class="btn-primary btn-small" onclick="confirmMultiSelect()">Aggiungi</button>
+                <button type="button" class="btn-primary btn-small" data-custom-select-action="confirm-multi">Aggiungi</button>
             </div>
-        </div>`;
+        </div>`);
     overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => {
         cb.addEventListener('change', () => {
             const opt = options[parseInt(cb.dataset.idx)];
@@ -459,7 +463,14 @@ window.openMultiSelect = function(options, currentSelected, callback, title) {
             else window._multiSelectState.delete(opt.value);
         });
     });
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomSelect(); });
+    overlay.addEventListener('click', (e) => {
+        const action = e.target.closest('[data-custom-select-action]')?.dataset.customSelectAction;
+        if (e.target === overlay || action === 'close') {
+            closeCustomSelect();
+        } else if (action === 'confirm-multi') {
+            confirmMultiSelect();
+        }
+    });
     document.body.appendChild(overlay);
 }
 
