@@ -508,9 +508,11 @@
 .comp-filter-actions .btn-primary {
     flex: 1 1 0;
     width: auto;
-    min-height: 38px;
-    padding: 8px 14px;
-    margin-top: 0;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 14px;
+    margin: 0;
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
