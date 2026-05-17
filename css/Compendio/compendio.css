@@ -48,42 +48,41 @@
 .comp-hub-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-lg, 12px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     cursor: pointer;
     transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     min-height: 0;
+    font: inherit;
 }
 
 .comp-hub-card:hover {
-    border-color: var(--primary);
+    border-color: var(--accent);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .comp-hub-card:active { transform: scale(0.97); }
 
 .comp-hub-card-icon {
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
+    font-size: 1.6rem;
+    line-height: 1;
 }
 
 .comp-hub-card-label {
-    font-weight: 700;
-    font-size: 0.86rem;
+    font-weight: 600;
+    font-size: 0.85rem;
     color: var(--text);
+    line-height: 1.2;
     text-align: center;
     padding: 0 6px;
-    line-height: 1.2;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .comp-sub-header {
@@ -144,13 +143,13 @@
 }
 
 .comp-filter-btn:hover {
-    border-color: var(--primary);
+    border-color: var(--accent);
 }
 
 .comp-filter-btn svg {
     width: 17px;
     height: 17px;
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-filter-btn strong {
@@ -160,7 +159,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary);
+    background: var(--accent);
     color: white;
     font-size: 0.68rem;
     line-height: 1;
@@ -225,7 +224,7 @@
 
 .comp-group-divider span {
     flex: 1;
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-group-divider small {
@@ -235,9 +234,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary);
+    color: var(--accent);
     background: var(--card-bg);
-    border: 1px solid rgba(139, 0, 0, 0.22);
+    border: 1px solid var(--accent-light);
     font-size: 0.68rem;
 }
 
@@ -251,7 +250,7 @@
 }
 
 .comp-card:hover {
-    border-color: var(--primary);
+    border-color: var(--accent);
     background: var(--surface-hover);
 }
 
@@ -347,7 +346,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary);
+    background: var(--accent);
     color: white;
     font-size: 0.88rem;
     font-weight: 800;
@@ -388,7 +387,7 @@
 }
 
 .comp-detail-box-label {
-    color: var(--primary);
+    color: var(--accent);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -396,7 +395,7 @@
 }
 
 .spell-meta-label {
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-detail-box-value {
@@ -412,7 +411,7 @@
 .comp-detail-section h3 {
     font-size: 0.98rem;
     margin: 0 0 8px;
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-feature-list {
@@ -432,7 +431,7 @@
     margin: 0 0 6px;
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-rich {
@@ -451,7 +450,7 @@
 .comp-rich h4,
 .comp-rich h5,
 .comp-rich h6 {
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .comp-spell-detail {

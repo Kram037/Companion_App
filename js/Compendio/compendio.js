@@ -6,14 +6,14 @@ let _compCurrentTab = 'classi';
 window._compState = window._compState || {};
 
 const COMP_TABS = {
-    classi: { label: 'Classi', icon: 'book-open' },
-    sottoclassi: { label: 'Sottoclassi', icon: 'layers' },
-    razze: { label: 'Razze', icon: 'users' },
-    background: { label: 'Background', icon: 'scroll' },
-    talenti: { label: 'Talenti', icon: 'star' },
-    stili: { label: 'Stili di Combattimento', icon: 'shield' },
-    suppliche: { label: 'Suppliche Occulte', icon: 'sparkles' },
-    incantesimi: { label: 'Incantesimi', icon: 'wand' },
+    classi: { label: 'Classi', icon: '📚' },
+    sottoclassi: { label: 'Sottoclassi', icon: '⚔️' },
+    razze: { label: 'Razze', icon: '🧬' },
+    background: { label: 'Background', icon: '📜' },
+    talenti: { label: 'Talenti', icon: '⭐' },
+    stili: { label: 'Stili di Combattimento', icon: '🛡️' },
+    suppliche: { label: 'Suppliche Occulte', icon: '🔮' },
+    incantesimi: { label: 'Incantesimi', icon: '✨' },
 };
 
 const COMP_MULTICLASS_REQUIREMENTS = {
@@ -53,7 +53,7 @@ function compendioRenderHub() {
     if (!grid) return;
     grid.innerHTML = Object.entries(COMP_TABS).map(([key, tab]) => `
         <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
-            <span class="comp-hub-card-icon" aria-hidden="true">${_compIcon(tab.icon)}</span>
+            <span class="comp-hub-card-icon" aria-hidden="true">${tab.icon}</span>
             <span class="comp-hub-card-label">${escapeHtml(tab.label)}</span>
         </button>
     `).join('');
