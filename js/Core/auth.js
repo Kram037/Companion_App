@@ -48,7 +48,7 @@ function setupSupabaseAuth() {
                         renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
-                    } else if (AppState.currentCampagnaId && !['campagne','amici','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
+                    } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
                         navigateToPage('dettagli');
                     } else {
                         navigateToPage(AppState.currentPage || 'campagne');

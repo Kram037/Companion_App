@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v35';
+const CACHE_NAME = 'companion-app-v36';
 
 const APP_SHELL_URLS = [
     './',
@@ -15,6 +15,7 @@ const APP_SHELL_URLS = [
     './js/Core/auth.js',
     './js/Core/users.js',
     './js/Social/amici.js',
+    './js/Compendio/compendio.js',
     './js/Campagna/campagne.js',
     './js/Personaggi/personaggi-catalog.js',
     './js/Personaggi/personaggi-state.js',
@@ -63,6 +64,7 @@ const APP_SHELL_URLS = [
     './css/Sessioni/sessions.css',
     './css/Combattimento/combat.css',
     './css/Laboratorio/laboratorio.css',
+    './css/Compendio/compendio.css',
     './images/icon d20.png',
     './images/Icona_scheda_combattimento.png',
     './images/Logo Leggenda.jpeg'

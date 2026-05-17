@@ -47,6 +47,7 @@ async function init() {
         campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
+        openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
         addHomebrewBtn: document.getElementById('addHomebrewBtn'),
         addPersonaggioBtn: document.getElementById('addPersonaggioBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
@@ -467,6 +468,15 @@ function setupEventListeners() {
     }
     
     // Amici button
+    if (elements.openAmiciFromUserBtn) {
+        elements.openAmiciFromUserBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeUserModal();
+            navigateToPage('amici');
+        };
+    }
+
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.onclick = function(e) {
             e.preventDefault();

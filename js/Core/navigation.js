@@ -134,7 +134,7 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
             sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
         }
     } else {
-        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'personaggi' || pageName === 'laboratorio') {
+        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'compendio' || pageName === 'personaggi' || pageName === 'laboratorio') {
             sessionStorage.removeItem('currentCampagnaId');
             sessionStorage.removeItem('currentSessioneId');
             sessionStorage.removeItem('currentPersonaggioId');
@@ -167,6 +167,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
     
     if (pageName === 'amici' && AppState.isLoggedIn) {
         loadAmici();
+    } else if (pageName === 'compendio') {
+        if (typeof loadCompendio === 'function') loadCompendio();
     } else if (pageName === 'campagne') {
         if (AppState.isLoggedIn && AppState.currentUser) {
             loadCampagne(AppState.currentUser.uid);

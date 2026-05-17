@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
     <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260425E">
     <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260424B">
+    <link rel="stylesheet" href="css/Compendio/compendio.css?v=20260517A">
 </head>
 <body>
     <!-- Header -->
@@ -107,6 +108,28 @@
                 </div>
             </div>
             <button class="btn-fab" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
+        </section>
+
+        <!-- Compendio Page -->
+        <section class="page" id="compendioPage">
+            <div class="page-content compendio-content">
+                <div id="compendioHub">
+                    <h1 class="comp-hub-title">Compendio</h1>
+                    <p class="comp-hub-subtitle">Manuale virtuale della Companion App</p>
+                    <div class="comp-hub-grid" id="compendioHubGrid"></div>
+                </div>
+                <div id="compendioSubPage" style="display:none;">
+                    <div class="page-header comp-sub-header">
+                        <h1 id="compendioSubTitle">Compendio</h1>
+                    </div>
+                    <div id="compendioContent" class="comp-content"></div>
+                    <button class="back-button-floating" onclick="compendioBackToHub()" aria-label="Indietro" data-no-return-glow="1">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </section>
 
         <!-- Amici Page -->
@@ -289,14 +312,15 @@
             </svg>
             <span>Laboratorio</span>
         </button>
-        <button class="toolbar-btn" data-page="amici" aria-label="Amici">
+        <button class="toolbar-btn" data-page="compendio" aria-label="Compendio">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path>
+                <path d="M8 6h8"></path>
+                <path d="M8 10h8"></path>
+                <path d="M8 14h5"></path>
             </svg>
-            <span>Amici</span>
+            <span>Compendio</span>
         </button>
     </nav>
 
@@ -380,6 +404,18 @@
                         <button class="btn-primary" id="saveUserNameBtn" style="flex: 1; padding: 0.5rem;">Salva</button>
                         <button class="btn-secondary" id="cancelEditUserNameBtn" style="flex: 1; padding: 0.5rem; margin-top: 0;">Annulla</button>
                     </div>
+                </div>
+                <div class="user-social-section">
+                    <div class="user-social-title">Social</div>
+                    <button class="btn-secondary user-social-btn" id="openAmiciFromUserBtn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Amici</span>
+                    </button>
                 </div>
                 <button class="btn-secondary" id="logoutBtn">Esci</button>
             </div>
@@ -1007,6 +1043,7 @@
     <script src="js/Personaggi/data/fighting_styles_data.js?v=1773360000"></script>
     <script src="js/Personaggi/data/oggetti_magici_data.js?v=20260227E"></script>
     <script src="js/Personaggi/data/veleni_data.js?v=20260227A"></script>
+    <script src="js/Compendio/compendio.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-catalog.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-state.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-talenti.js?v=20260517A"></script>
