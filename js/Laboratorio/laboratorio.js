@@ -307,10 +307,8 @@ function _labListApplyFilters(tab, data, state) {
     return (data || []).filter(item => {
         if (!_labListItemMatchesSearch(tab, item, q)) return false;
         for (const def of defs) {
-            const val = state.filters[def.key];
-            if (val !== undefined && val !== null && val !== '') {
-                if (!def.match(item, val)) return false;
-            }
+            const values = _labListFilterValues(state.filters[def.key]);
+            if (values.length && !values.some(value => def.match(item, value))) return false;
         }
         return true;
     });
@@ -321,7 +319,7 @@ function _labListActiveFiltersCount(tab) {
     let n = 0;
     if ((state.search || '').trim()) n++;
     Object.values(state.filters || {}).forEach(v => {
-        if (v !== undefined && v !== null && v !== '') n++;
+        n += _labListFilterValues(v).length;
     });
     return n;
 }
@@ -330,42 +328,38 @@ function _labListBuildFiltersPanelHtml(tab, data) {
     const state = _labListGetState(tab);
     const defs = _labListGetFilterDefs(tab);
     const fields = defs.map(def => {
-        const opts = def.options(data);
-        const cur = state.filters[def.key] || '';
-        const optsHtml = opts.map(o =>
-            `<option value="${escapeHtml(String(o.value))}" ${String(o.value)===String(cur)?'selected':''}>${escapeHtml(o.label)}</option>`
-        ).join('');
+        const selected = _labListFilterValues(state.filters[def.key]);
+        const opts = def.options(data).filter(o => String(o.value || '') !== '');
+        const encoded = encodeURIComponent(JSON.stringify(opts.map(o => ({ value: String(o.value), label: o.label })))).replace(/'/g, '%27');
         return `
-            <div class="inv-list-filter-field">
-                <label>${escapeHtml(def.label)}</label>
-                <select onchange="labListSetFilter('${tab}','${def.key}', this.value)">${optsHtml}</select>
-            </div>`;
+            <button type="button" class="custom-select-trigger comp-filter-select" onclick="labListPickFilter('${tab}','${def.key}','${encoded}','${_labEscapeAttr(def.label)}')" data-value="${_labEscapeAttr(selected.join(','))}">
+                ${escapeHtml(def.label)}
+                ${selected.length ? `<small>${selected.length}</small>` : ''}
+            </button>`;
     }).join('');
-    const reset = `<button type="button" class="inv-list-filter-reset" onclick="labListResetFilters('${tab}')">Reset</button>`;
-    return `${fields}${reset}`;
+    return fields;
 }
 
 function _labListBuildToolbarHtml(tab, data) {
     const state = _labListGetState(tab);
-    const open = !!state.filtersOpen;
     const activeN = _labListActiveFiltersCount(tab);
-    const badgeStyle = activeN > 0 ? 'display:inline-flex;' : '';
-    const filtersPanelHtml = _labListBuildFiltersPanelHtml(tab, data);
     return `
-    <div class="lab-list-toolbar">
-        <button type="button" id="labListFiltersBtn" class="inv-list-filters-btn ${open?'active':''}" onclick="labListToggleFilters('${tab}')" title="Filtri e ricerca" aria-label="Filtri">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+    <div class="filters-bar lab-list-toolbar">
+        <div class="filter-search-wrap">
+            <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span class="inv-list-filters-badge" id="labListFiltersBadge" style="${badgeStyle}">${activeN || ''}</span>
+            <input type="text" id="labListSearch" class="filter-search"
+                placeholder="${escapeHtml(_labListSearchPlaceholder(tab))}"
+                value="${escapeHtml(state.search || '')}"
+                oninput="labListOnSearch('${tab}', this.value)">
+        </div>
+        <button type="button" id="labListFiltersBtn" class="comp-filter-btn" onclick="labListOpenFiltersDialog('${tab}')" aria-label="Filtri">
+            ${_labFilterIcon()}
+            <span>Filtri</span>
+            ${activeN ? `<strong id="labListFiltersBadge">${activeN}</strong>` : '<strong id="labListFiltersBadge" style="display:none;"></strong>'}
         </button>
-    </div>
-    <div id="labListSearchBar" class="inv-list-search-bar lab-list-search-bar" style="${open?'':'display:none;'}">
-        <input type="text" id="labListSearch" class="inv-list-search-input"
-            placeholder="${escapeHtml(_labListSearchPlaceholder(tab))}"
-            value="${escapeHtml(state.search || '')}"
-            oninput="labListOnSearch('${tab}', this.value)">
-        <div id="labListFiltersPanel" class="inv-list-filters-panel">${filtersPanelHtml}</div>
     </div>`;
 }
 
@@ -402,16 +396,25 @@ function _labListRefreshBadge(tab) {
 }
 
 window.labListToggleFilters = function(tab) {
-    const state = _labListGetState(tab);
-    state.filtersOpen = !state.filtersOpen;
-    const bar = document.getElementById('labListSearchBar');
-    const btn = document.getElementById('labListFiltersBtn');
-    if (bar) bar.style.display = state.filtersOpen ? '' : 'none';
-    if (btn) btn.classList.toggle('active', state.filtersOpen);
-    if (state.filtersOpen) {
-        const inp = document.getElementById('labListSearch');
-        if (inp) setTimeout(() => inp.focus(), 0);
-    }
+    labListOpenFiltersDialog(tab);
+};
+
+window.labListOpenFiltersDialog = function(tab) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay lab-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || [])}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="labListResetFilters('${tab}')">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
 };
 
 window.labListOnSearch = function(tab, value) {
@@ -423,9 +426,21 @@ window.labListOnSearch = function(tab, value) {
 window.labListSetFilter = function(tab, key, value) {
     const state = _labListGetState(tab);
     if (!state.filters) state.filters = {};
-    if (value === '' || value == null) delete state.filters[key];
-    else state.filters[key] = value;
+    const values = _labListFilterValues(value);
+    if (!values.length) delete state.filters[key];
+    else state.filters[key] = values;
     _labListReRenderList(tab);
+};
+
+window.labListPickFilter = function(tab, key, encodedOptions, title) {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const state = _labListGetState(tab);
+    const current = _labListFilterValues(state.filters[key]);
+    openMultiSelect(options, current, values => {
+        labListSetFilter(tab, key, values);
+        const overlay = document.querySelector('.lab-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || []);
+    }, title || 'Filtro');
 };
 
 window.labListResetFilters = function(tab) {
@@ -434,10 +449,34 @@ window.labListResetFilters = function(tab) {
     state.filters = {};
     const inp = document.getElementById('labListSearch');
     if (inp) inp.value = '';
-    const panel = document.getElementById('labListFiltersPanel');
+    const panel = document.querySelector('.lab-filter-overlay .comp-filter-panel');
     if (panel) panel.innerHTML = _labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || []);
     _labListReRenderList(tab);
 };
+
+function _labListFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
+}
+
+function _labEscapeAttr(value) {
+    return String(value || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function _labFilterIcon() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="21" x2="4" y2="14"></line>
+        <line x1="4" y1="10" x2="4" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12" y2="3"></line>
+        <line x1="20" y1="21" x2="20" y2="16"></line>
+        <line x1="20" y1="12" x2="20" y2="3"></line>
+        <line x1="1" y1="14" x2="7" y2="14"></line>
+        <line x1="9" y1="8" x2="15" y2="8"></line>
+        <line x1="17" y1="16" x2="23" y2="16"></line>
+    </svg>`;
+}
 
 async function _loadLabNemiciSection() {
     const container = document.getElementById('labContent');

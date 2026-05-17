@@ -278,15 +278,17 @@ window.compendioSetSearch = function(value) {
 
 window.compendioSetFilter = function(key, value) {
     const filters = _compStateFor(_compCurrentTab).filters;
-    if (value) filters[key] = value;
+    const values = _compFilterValues(value).filter(Boolean);
+    if (values.length) filters[key] = values;
     else delete filters[key];
     compendioRenderTab();
 };
 
 window.compendioPickFilter = function(key, encodedOptions, title) {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
-    openCustomSelect(options, value => {
-        compendioSetFilter(key, value);
+    const current = _compFilterValues(_compStateFor(_compCurrentTab).filters[key]);
+    openMultiSelect(options, current, values => {
+        compendioSetFilter(key, values);
         const overlay = document.querySelector('.comp-filter-overlay');
         if (overlay) {
             overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
@@ -450,7 +452,7 @@ function _compItems(tab) {
 }
 
 function _compToolbarHtml(tab, state, allItems) {
-    const activeFilters = Object.values(state.filters || {}).filter(Boolean).length;
+    const activeFilters = Object.values(state.filters || {}).reduce((count, value) => count + _compFilterValues(value).length, 0);
     const filtersHtml = _compFiltersHtml(tab, state, allItems);
     return `
         <div class="comp-toolbar">
@@ -498,10 +500,14 @@ function _compFiltersHtml(tab, state, allItems) {
 }
 
 function _compSelect(key, value, options, title) {
-    const normalized = options.map(([v, label]) => ({ value: v, label }));
+    const selected = _compFilterValues(value);
+    const normalized = options
+        .filter(([v]) => String(v || '') !== '')
+        .map(([v, label]) => ({ value: String(v), label }));
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
-    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${_compEscapeAttr(value || '')}">
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickFilter('${key}','${encoded}','${_compEscapeAttr(title || 'Filtro')}')" data-value="${_compEscapeAttr(selected.join(','))}">
         ${escapeHtml(title || 'Filtro')}
+        ${selected.length ? `<small>${selected.length}</small>` : ''}
     </button>`;
 }
 
@@ -511,21 +517,29 @@ function _compMatches(item, state) {
         return false;
     }
     const f = state.filters || {};
-    if (f.source && item.source !== f.source) return false;
-    if (f.group && item.group !== f.group) return false;
-    if (f.class) {
-        if (item.type === 'sottoclassi' && item.data.className !== f.class && item.data.classNameEn !== f.class) return false;
-        if (item.type === 'incantesimi' && !_compSpellMatchesClass(item.data, f.class)) return false;
+    const sources = _compFilterValues(f.source);
+    const groups = _compFilterValues(f.group);
+    const classes = _compFilterValues(f.class);
+    if (sources.length && !sources.includes(item.source)) return false;
+    if (groups.length && !groups.includes(item.group)) return false;
+    if (classes.length) {
+        if (item.type === 'sottoclassi' && !classes.some(cls => item.data.className === cls || item.data.classNameEn === cls)) return false;
+        if (item.type === 'incantesimi' && !classes.some(cls => _compSpellMatchesClass(item.data, cls))) return false;
     }
     if (item.type === 'incantesimi') {
         const sp = item.data;
-        if (f.level && String(sp.level) !== String(f.level)) return false;
-        if (f.school && (sp.school_it || sp.school) !== f.school) return false;
-        if (f.component && !_compSpellHasComponent(sp, f.component)) return false;
-        if (f.concentration === 'yes' && !_compSpellIsConcentration(sp)) return false;
-        if (f.concentration === 'no' && _compSpellIsConcentration(sp)) return false;
-        if (f.ritual === 'yes' && !_compSpellIsRitual(sp)) return false;
-        if (f.ritual === 'no' && _compSpellIsRitual(sp)) return false;
+        const levels = _compFilterValues(f.level);
+        const schools = _compFilterValues(f.school);
+        const components = _compFilterValues(f.component);
+        const concentrations = _compFilterValues(f.concentration);
+        const rituals = _compFilterValues(f.ritual);
+        if (levels.length && !levels.includes(String(sp.level))) return false;
+        if (schools.length && !schools.includes(sp.school_it || sp.school)) return false;
+        if (components.length && !components.some(component => _compSpellHasComponent(sp, component))) return false;
+        if (concentrations.length === 1 && concentrations[0] === 'yes' && !_compSpellIsConcentration(sp)) return false;
+        if (concentrations.length === 1 && concentrations[0] === 'no' && _compSpellIsConcentration(sp)) return false;
+        if (rituals.length === 1 && rituals[0] === 'yes' && !_compSpellIsRitual(sp)) return false;
+        if (rituals.length === 1 && rituals[0] === 'no' && _compSpellIsRitual(sp)) return false;
     }
     return true;
 }
@@ -949,6 +963,12 @@ function _compObjectValues(value) {
     if (Array.isArray(value)) return value;
     if (typeof value === 'object') return Object.values(value);
     return [];
+}
+
+function _compFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
 }
 
 function _compUnique(values) {

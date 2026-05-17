@@ -171,10 +171,12 @@
 .lab-list-toolbar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    padding: 0 0 6px;
+    justify-content: stretch;
+    gap: 8px;
+    padding: 0;
+    margin-bottom: 10px;
 }
+.lab-list-toolbar .filter-search-wrap { flex: 1; }
 .lab-list-search-bar {
     margin: 0 0 10px;
     border: 1px solid var(--border);

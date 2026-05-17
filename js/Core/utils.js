@@ -434,7 +434,7 @@ window.openCustomSelect = function(options, callback, title) {
 
 window.openMultiSelect = function(options, currentSelected, callback, title) {
     closeCustomSelect();
-    window._multiSelectState = new Set(currentSelected || []);
+    window._multiSelectState = new Set((currentSelected || []).map(String));
     window._multiSelectCb = callback;
     const overlay = document.createElement('div');
     overlay.id = 'customSelectOverlay';
@@ -448,25 +448,29 @@ window.openMultiSelect = function(options, currentSelected, callback, title) {
             <div class="custom-select-list">
                 ${options.map((o, i) => `
                 <label class="custom-select-check-item">
-                    <input type="checkbox" data-idx="${i}" ${window._multiSelectState.has(o.value) ? 'checked' : ''}>
+                    <input type="checkbox" data-idx="${i}" ${window._multiSelectState.has(String(o.value)) ? 'checked' : ''}>
                     <span>${escapeHtml(o.label)}</span>
                 </label>`).join('')}
             </div>
             <div class="custom-select-footer">
-                <button type="button" class="btn-primary btn-small" data-custom-select-action="confirm-multi">Aggiungi</button>
+                <button type="button" class="btn-secondary" data-custom-select-action="reset-multi">Reset</button>
+                <button type="button" class="btn-primary" data-custom-select-action="confirm-multi">Applica</button>
             </div>
         </div>`);
     overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => {
         cb.addEventListener('change', () => {
             const opt = options[parseInt(cb.dataset.idx)];
-            if (cb.checked) window._multiSelectState.add(opt.value);
-            else window._multiSelectState.delete(opt.value);
+            if (cb.checked) window._multiSelectState.add(String(opt.value));
+            else window._multiSelectState.delete(String(opt.value));
         });
     });
     overlay.addEventListener('click', (e) => {
         const action = e.target.closest('[data-custom-select-action]')?.dataset.customSelectAction;
         if (e.target === overlay || action === 'close') {
             closeCustomSelect();
+        } else if (action === 'reset-multi') {
+            window._multiSelectState.clear();
+            overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => { cb.checked = false; });
         } else if (action === 'confirm-multi') {
             confirmMultiSelect();
         }

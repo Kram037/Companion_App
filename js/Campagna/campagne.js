@@ -332,18 +332,20 @@ function applyCampagneFilters(campagne, filters, currentUserId) {
     }
 
     // Filtro per tipologia (se il campo esiste nel database)
-    if (filters.tipologia && filters.tipologia !== 'all') {
+    const tipologie = campagneFilterValues(filters.tipologia).filter(v => v !== 'all');
+    if (tipologie.length) {
         filtered = filtered.filter(c => {
             // Se il campo tipologia non esiste, ignora il filtro
             if (!c.tipologia) return true;
-            return c.tipologia === filters.tipologia;
+            return tipologie.includes(c.tipologia);
         });
     }
 
     // Filtro per DM
-    if (filters.dm === 'yes') {
+    const ruoli = campagneFilterValues(filters.dm).filter(v => v !== 'all');
+    if (ruoli.length === 1 && ruoli[0] === 'yes') {
         filtered = filtered.filter(c => c.id_dm === currentUserId);
-    } else if (filters.dm === 'no') {
+    } else if (ruoli.length === 1 && ruoli[0] === 'no') {
         filtered = filtered.filter(c => c.id_dm !== currentUserId);
     }
 
@@ -406,11 +408,9 @@ function updateCampagneFiltersButton() {
     const btn = document.getElementById('campagneFiltersBtn');
     if (!btn) return;
     const filters = AppState.campagneFilters || {};
-    const activeCount = [
-        filters.tipologia && filters.tipologia !== 'all',
-        filters.dm && filters.dm !== 'all',
-        !!filters.soloPreferiti,
-    ].filter(Boolean).length;
+    const activeCount = campagneFilterValues(filters.tipologia).filter(v => v !== 'all').length
+        + campagneFilterValues(filters.dm).filter(v => v !== 'all').length
+        + (filters.soloPreferiti ? 1 : 0);
     const badge = activeCount ? `<strong>${activeCount}</strong>` : '';
     const icon = btn.querySelector('svg')?.outerHTML || '';
     btn.innerHTML = `${icon}<span>Filtri</span>${badge}`;
@@ -456,17 +456,24 @@ function campagneFiltersHtml() {
 }
 
 function campagneFilterSelect(key, value, options, title) {
-    const normalized = options.map(([v, label]) => ({ value: v, label }));
+    const selected = campagneFilterValues(value).filter(v => v !== 'all');
+    const normalized = options
+        .filter(([v]) => v !== 'all')
+        .map(([v, label]) => ({ value: v, label }));
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
-    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}')" data-value="${safeAttr(value || 'all')}">
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="pickCampagneFilter('${key}','${encoded}','${safeAttr(title)}')" data-value="${safeAttr(selected.join(','))}">
         ${escapeHtml(title)}
+        ${selected.length ? `<small>${selected.length}</small>` : ''}
     </button>`;
 }
 
 window.pickCampagneFilter = function(key, encodedOptions, title) {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
-    openCustomSelect(options, value => {
-        AppState.campagneFilters[key] = value;
+    const current = campagneFilterValues(AppState.campagneFilters[key]).filter(v => v !== 'all');
+    openMultiSelect(options, current, values => {
+        const selected = campagneFilterValues(values);
+        if (selected.length) AppState.campagneFilters[key] = selected;
+        else AppState.campagneFilters[key] = 'all';
         const overlay = document.querySelector('.campagne-filter-overlay');
         if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = campagneFiltersHtml();
         updateCampagneFiltersButton();
@@ -487,6 +494,12 @@ window.resetCampagneFiltersFromDialog = function() {
     updateCampagneFiltersButton();
     applyFiltersAndRerender();
 };
+
+function campagneFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
+}
 
 /**
  * Applica i filtri usando i dati cached (senza ricaricare da DB)
