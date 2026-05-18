@@ -93,35 +93,40 @@
     padding: 0 var(--spacing-sm) 88px;
 }
 
-.comp-inner-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+.comp-equipment-main-tabs {
     margin: 0 0 12px;
 }
 
-.comp-inner-tab {
-    min-height: 38px;
+.comp-object-kind-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 10px;
+    padding: 3px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--card-bg);
+}
+
+.comp-object-kind-tab {
+    min-width: 92px;
+    min-height: 30px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
     color: var(--text-secondary);
     font: inherit;
-    font-size: 0.84rem;
+    font-size: 0.78rem;
     font-weight: 800;
     cursor: pointer;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    padding: 5px 12px;
+    transition: background 0.15s, color 0.15s;
 }
 
-.comp-inner-tab:hover,
-.comp-inner-tab.active {
-    border-color: var(--accent);
+.comp-object-kind-tab:hover,
+.comp-object-kind-tab.active {
+    background: var(--accent-subtle, rgba(139, 0, 0, 0.12));
     color: var(--accent);
-    background: var(--surface-hover);
-}
-
-.comp-object-kind-tabs {
-    margin-bottom: 10px;
 }
 
 .comp-toolbar {
@@ -515,18 +520,6 @@
     color: var(--text-secondary);
     font-size: 0.76rem;
     line-height: 1.3;
-}
-
-.comp-object-detail-modal {
-    width: 560px;
-    max-width: calc(100vw - 32px);
-    text-align: left;
-}
-
-.comp-object-detail-title {
-    margin: 0 28px 8px 0;
-    color: var(--text);
-    font-size: 1.12rem;
 }
 
 .comp-feature-list {

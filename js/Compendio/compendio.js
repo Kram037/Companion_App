@@ -6,8 +6,8 @@ let _compCurrentTab = 'classi';
 window._compState = window._compState || {};
 
 const COMP_TABS = {
-    classi: { label: 'Classi e Sottoclassi', icon: '📚' },
-    oggetti: { label: 'Oggetti ed Equipaggiamento', icon: '🎒' },
+    classi: { label: 'Classi', icon: '📚' },
+    oggetti: { label: 'Equipaggiamento', icon: '🎒' },
     razze: { label: 'Razze', icon: '🧬' },
     background: { label: 'Background', icon: '📜' },
     talenti: { label: 'Talenti', icon: '⭐' },
@@ -744,9 +744,13 @@ function _compObjectsPageHtml() {
     const state = _compStateFor('oggetti');
     state.subTab = state.subTab || 'equipaggiamento';
     return `
-        <div class="comp-inner-tabs">
-            <button type="button" class="comp-inner-tab ${state.subTab === 'equipaggiamento' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('equipaggiamento')">Equipaggiamento</button>
-            <button type="button" class="comp-inner-tab ${state.subTab === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('oggetti')">Oggetti e Veleni</button>
+        <div class="lab-subtabs comp-equipment-main-tabs">
+            <button type="button" class="lab-subtab ${state.subTab === 'equipaggiamento' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('equipaggiamento')">
+                <span class="lab-subtab-icon">🛡️</span><span>Equipaggiamento</span>
+            </button>
+            <button type="button" class="lab-subtab ${state.subTab === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('oggetti')">
+                <span class="lab-subtab-icon">🎒</span><span>Oggetti e Veleni</span>
+            </button>
         </div>
         ${state.subTab === 'oggetti' ? _compObjectsInventoryHtml(state) : _compEquipmentTablesHtml()}
     `;
@@ -794,20 +798,21 @@ function _compEquipmentTablesHtml() {
 
 function _compObjectsInventoryHtml(state) {
     state.objectKind = state.objectKind || 'oggetti';
+    const searchLabel = state.objectKind === 'veleni' ? 'veleno' : 'oggetto';
     const activeFilters = _compObjectsActiveFilterCount();
     return `
-        <div class="lab-subtabs comp-object-kind-tabs">
-            <button type="button" class="lab-subtab ${state.objectKind === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectKind('oggetti')">
-                <span class="lab-subtab-icon">🎒</span><span>Oggetti</span>
+        <div class="comp-object-kind-tabs">
+            <button type="button" class="comp-object-kind-tab ${state.objectKind === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectKind('oggetti')">
+                Oggetti
             </button>
-            <button type="button" class="lab-subtab ${state.objectKind === 'veleni' ? 'active' : ''}" onclick="compendioSetObjectKind('veleni')">
-                <span class="lab-subtab-icon">☠</span><span>Veleni</span>
+            <button type="button" class="comp-object-kind-tab ${state.objectKind === 'veleni' ? 'active' : ''}" onclick="compendioSetObjectKind('veleni')">
+                Veleni
             </button>
         </div>
         <div class="comp-toolbar">
             <label class="comp-search-wrap">
                 ${_compIcon('search')}
-                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca oggetto o veleno..."
+                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca ${searchLabel}..."
                     value="${escapeHtml(state.objectsSearch || '')}" oninput="compendioSetObjectsSearch(this.value)">
             </label>
             <button type="button" class="comp-filter-btn" onclick="compendioOpenObjectsFilters()" aria-label="Filtri">
@@ -867,26 +872,16 @@ function _compObjectsInventoryListHtml(state = _compStateFor('oggetti')) {
     const poisons = (Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [])
         .map(item => _compInventoryItem('veleni', item))
         .filter(Boolean);
+    const kind = state.objectKind === 'veleni' ? 'veleni' : 'oggetti';
+    const baseItems = kind === 'veleni' ? poisons : magicItems;
     const q = String(state.objectsSearch || '').trim().toLowerCase();
-    const all = [...magicItems, ...poisons]
+    const all = baseItems
         .filter(item => !q || item.search.includes(q))
         .filter(item => _compObjectMatchesFilters(item, state))
-        .sort((a, b) => a.group.localeCompare(b.group, 'it') || a.title.localeCompare(b.title, 'it'));
-    const groups = _compGroupItems(all);
+        .sort((a, b) => a.title.localeCompare(b.title, 'it'));
     return `
-        <p class="comp-count">${all.length} risultati su ${magicItems.length + poisons.length}</p>
-        ${all.length ? `<div class="comp-grouped-list">${groups.map(group => `
-            <section class="comp-group">
-                <button type="button" class="comp-group-divider ${_compObjectsGroupOpen(group.label, state) ? 'open' : ''}" onclick="compendioToggleObjectsGroup('${_compEscapeAttr(group.label)}')">
-                    ${_compIcon('chevron-right')}
-                    <span>${escapeHtml(group.label)}</span>
-                    <small>${group.items.length}</small>
-                </button>
-                <div class="comp-list" ${_compObjectsGroupOpen(group.label, state) ? '' : 'style="display:none;"'}>
-                    ${group.items.map(_compInventoryCardHtml).join('')}
-                </div>
-            </section>
-        `).join('')}</div>` : '<div class="comp-empty">Nessun elemento trovato</div>'}
+        <p class="comp-count">${all.length} risultati su ${baseItems.length}</p>
+        ${all.length ? `<div class="comp-list">${all.map(_compInventoryCardHtml).join('')}</div>` : '<div class="comp-empty">Nessun elemento trovato</div>'}
     `;
 }
 
@@ -955,16 +950,12 @@ function _compRenderObjectsInventoryList() {
 window.compendioSetObjectKind = function(kind) {
     const state = _compStateFor('oggetti');
     state.objectKind = kind === 'veleni' ? 'veleni' : 'oggetti';
-    state.objectFilters = state.objectFilters || {};
-    state.objectFilters.kind = state.objectKind;
+    state.objectFilters = {};
     compendioRenderTab();
 };
 
 function _compObjectMatchesFilters(item, state) {
     const f = state.objectFilters || {};
-    const kind = f.kind || state.objectKind || 'oggetti';
-    if (kind === 'oggetti' && item.source !== 'catalog') return false;
-    if (kind === 'veleni' && item.source !== 'veleni') return false;
     const rarities = _compFilterValues(f.rarity);
     const types = _compFilterValues(f.type);
     const attunements = _compFilterValues(f.attunement);
@@ -983,7 +974,6 @@ function _compObjectsActiveFilterCount() {
     const state = _compStateFor('oggetti');
     const f = state.objectFilters || {};
     let n = 0;
-    if ((f.kind || state.objectKind) === 'veleni') n += 1;
     n += _compFilterValues(f.rarity).length;
     n += _compFilterValues(f.type).length;
     n += _compFilterValues(f.attunement).length;
@@ -1012,26 +1002,30 @@ window.compendioOpenObjectsFilters = function() {
 function _compObjectsFiltersHtml() {
     const state = _compStateFor('oggetti');
     const f = state.objectFilters || {};
+    const kind = state.objectKind === 'veleni' ? 'veleni' : 'oggetti';
     const items = [...(Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : []).map(i => _compInventoryItem('catalog', i)),
         ...(Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : []).map(i => _compInventoryItem('veleni', i))].filter(Boolean);
-    const kind = f.kind || state.objectKind || 'oggetti';
     const filterPool = items.filter(i => kind === 'veleni' ? i.source === 'veleni' : i.source === 'catalog');
     const rarities = _compUnique(filterPool.map(i => i.rarity));
     const types = _compUnique(filterPool.map(i => i.type));
-    return [
-        _compObjectSelect('kind', f.kind || state.objectKind || 'oggetti', [['oggetti', 'Oggetti'], ['veleni', 'Veleni']], 'Oggetti o veleni', 'single'),
+    const filters = [
         _compObjectSelect('rarity', f.rarity, rarities.map(v => [v, v]), 'Rarita'),
         _compObjectSelect('type', f.type, types.map(v => [v, v]), 'Tipologia'),
-        _compObjectSelect('attunement', f.attunement, [['yes', 'Si'], ['no', 'No']], 'Sintonia', 'single'),
-        _compObjectSelect('cost', f.cost, [['0-100', '0-100 mo'], ['101-500', '101-500 mo'], ['501-1000', '501-1000 mo'], ['1001+', '1001+ mo']], 'Costo'),
-    ].join('');
+    ];
+    if (kind === 'oggetti') {
+        filters.push(_compObjectSelect('attunement', f.attunement, [['yes', 'Si'], ['no', 'No']], 'Sintonia', 'single'));
+    }
+    if (kind === 'veleni') {
+        filters.push(_compObjectSelect('cost', f.cost, [['0-100', '0-100 mo'], ['101-500', '101-500 mo'], ['501-1000', '501-1000 mo'], ['1001+', '1001+ mo']], 'Costo'));
+    }
+    return filters.join('');
 }
 
 function _compObjectSelect(key, value, options, title, forcedMode = '') {
     const selected = _compFilterValues(value);
     const normalized = options.map(([v, label]) => ({ value: String(v), label }));
     const isSingle = forcedMode === 'single' || normalized.length === 2;
-    const singleOptions = key === 'kind' ? normalized : [{ value: '', label: 'Tutti' }, ...normalized];
+    const singleOptions = [{ value: '', label: 'Tutti' }, ...normalized];
     const encoded = encodeURIComponent(JSON.stringify(isSingle ? singleOptions : normalized)).replace(/'/g, '%27');
     const selectedLabel = isSingle && selected.length
         ? normalized.find(opt => opt.value === selected[0])?.label || selected[0]
@@ -1049,10 +1043,10 @@ window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = '
     if (mode === 'single') {
         openCustomSelect(options, value => {
             state.objectFilters[key] = value || '';
-            if (key === 'kind' && value) state.objectKind = value;
+            if (!value) delete state.objectFilters[key];
+            _compRenderObjectsInventoryList();
             const overlay = document.querySelector('.comp-objects-filter-overlay');
             if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
-            compendioRenderTab();
         }, title || 'Filtro');
         return;
     }
@@ -1066,9 +1060,8 @@ window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = '
 
 window.compendioResetObjectsFilters = function() {
     const state = _compStateFor('oggetti');
-    state.objectKind = 'oggetti';
-    state.objectFilters = { kind: 'oggetti' };
-    compendioRenderTab();
+    state.objectFilters = {};
+    _compRenderObjectsInventoryList();
     const overlay = document.querySelector('.comp-objects-filter-overlay');
     if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
 };
@@ -1082,22 +1075,36 @@ function _compCostInRange(cost, range) {
 window.compendioOpenObjectDetail = function(source, id) {
     const item = _compFindInventoryData(source, id);
     if (!item) return;
-    const detail = _compObjectDetailData(source, item);
+    const data = _compObjectPreviewData(source, item);
+    if (!data) return;
+    const rarClass = typeof _invRarityClass === 'function' ? _invRarityClass(data.rarita) : '';
+    const descHtml = data.descrizione
+        ? (typeof window.formatRichText === 'function'
+            ? window.formatRichText(data.descrizione)
+            : escapeHtml(data.descrizione).replace(/\n/g, '<br>'))
+        : '<i style="color:var(--text-muted);">Nessuna descrizione disponibile.</i>';
+    const trBadge = data.pendingTr
+        ? '<span class="inv-picker-tr-pending" style="margin-left:8px;" title="Traduzione italiana in arrivo">TR</span>'
+        : '';
+    const altName = data.nomeAlt
+        ? `<div class="inv-preview-alt">${escapeHtml(data.nomeAlt)}</div>`
+        : '';
     const overlay = document.createElement('div');
-    overlay.className = 'hp-calc-overlay comp-object-detail-overlay';
+    overlay.className = 'hp-calc-overlay inv-preview-overlay comp-object-detail-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `
-        <div class="hp-calc-modal comp-object-detail-modal">
-            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
-            <h2 class="comp-object-detail-title">${escapeHtml(detail.title)}</h2>
-            ${detail.subtitle ? `<div class="comp-detail-subtitle">${escapeHtml(detail.subtitle)}</div>` : ''}
-            ${_compBoxes(detail.boxes)}
-            <section class="comp-detail-section">
-                <h3>Descrizione</h3>
-                <div class="comp-rich">${_compRich(detail.description)}</div>
-            </section>
+    overlay.innerHTML = `<div class="hp-calc-modal inv-preview-modal ${rarClass}">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <div class="inv-preview-header">
+            <h3 class="inv-preview-title">${escapeHtml(data.nome)}${trBadge}</h3>
+            ${altName}
+            ${data.meta ? `<div class="inv-preview-meta">${escapeHtml(data.meta)}</div>` : ''}
+            ${data.extras || ''}
         </div>
-    `;
+        <div class="inv-preview-desc">${descHtml}</div>
+        <div class="dialog-actions inv-preview-actions">
+            <button type="button" class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">← Indietro</button>
+        </div>
+    </div>`;
     document.body.appendChild(overlay);
 };
 
@@ -1136,30 +1143,21 @@ function _compObjectDetailData(source, item) {
     };
 }
 
-function _compObjectsGroupOpen(label, state) {
-    if (Object.prototype.hasOwnProperty.call(state.openGroups || {}, label)) return !!state.openGroups[label];
-    return true;
-}
-
-window.compendioToggleObjectsGroup = function(label) {
-    const state = _compStateFor('oggetti');
-    state.openGroups = state.openGroups || {};
-    state.openGroups[label] = !_compObjectsGroupOpen(label, state);
-    compendioRenderTab();
-};
-
-function _compEquipmentCategory(value) {
-    const labels = {
-        semplice_mischia: 'Semplice da mischia',
-        semplice_distanza: 'Semplice a distanza',
-        guerra_mischia: 'Da guerra da mischia',
-        guerra_distanza: 'Da guerra a distanza',
-        leggera: 'Leggera',
-        media: 'Media',
-        pesante: 'Pesante',
-        scudo: 'Scudo',
+function _compObjectPreviewData(source, item) {
+    if (typeof _invPreviewExtract === 'function') {
+        const preview = _invPreviewExtract(source, item);
+        if (preview) return preview;
+    }
+    const detail = _compObjectDetailData(source, item);
+    return {
+        nome: detail.title,
+        nomeAlt: detail.subtitle || '',
+        rarita: source === 'veleni' ? item.rarita_it : item.rarita,
+        meta: detail.boxes.map(([label, value]) => value ? `${label}: ${value}` : '').filter(Boolean).join(' · '),
+        extras: '',
+        descrizione: detail.description,
+        pendingTr: !!item._desc_pending,
     };
-    return labels[value] || value || '';
 }
 
 function _compArmorClassLabel(armor) {
