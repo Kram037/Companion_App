@@ -6,8 +6,8 @@ let _compCurrentTab = 'classi';
 window._compState = window._compState || {};
 
 const COMP_TABS = {
-    classi: { label: 'Classi', icon: '📚' },
-    sottoclassi: { label: 'Sottoclassi', icon: '⚔️' },
+    classi: { label: 'Classi e Sottoclassi', icon: '📚' },
+    oggetti: { label: 'Oggetti ed Equipaggiamento', icon: '🎒' },
     razze: { label: 'Razze', icon: '🧬' },
     background: { label: 'Background', icon: '📜' },
     talenti: { label: 'Talenti', icon: '⭐' },
@@ -344,6 +344,9 @@ function _compItems(tab) {
             desc: '',
             data: cls,
         }));
+    }
+    if (tab === 'oggetti') {
+        return [];
     }
     if (tab === 'sottoclassi') {
         return (window.CLASSES_DATA || []).flatMap(cls => (cls.subclasses || []).map(sub => ({
@@ -716,8 +719,68 @@ function _compClassDetail(cls) {
             <div class="comp-rich">${_compRich(_compField(cls, 'equipment') || '')}</div>
         </section>
         ${_compFeaturesSection(cls.features || [])}
-        ${cls.subclasses?.length ? `<section class="comp-detail-section"><h3>Sottoclassi</h3><div class="comp-card-meta">${cls.subclasses.map(s => `<span class="comp-tag">${escapeHtml(_compName(s))}</span>`).join('')}</div></section>` : ''}
+        ${_compClassSubclassesSection(cls)}
     `;
+}
+
+function _compClassSubclassesSection(cls) {
+    const subclasses = _compSortedSubclasses(cls.subclasses || []);
+    if (!subclasses.length) return '';
+    const clsId = cls.slug || cls.name || cls.name_en || 'classe';
+    return `<section class="comp-detail-section">
+        <h3>Sottoclassi</h3>
+        <div class="comp-subclass-accordion-list">
+            ${subclasses.map(sub => _compSubclassAccordionHtml(clsId, sub)).join('')}
+        </div>
+    </section>`;
+}
+
+function _compSubclassAccordionHtml(clsId, sub) {
+    const subId = sub.slug || sub.name || sub.name_en || _compName(sub);
+    const key = _compSubclassOpenKey(clsId, subId);
+    const state = _compStateFor('classi');
+    const isOpen = !!state.openSubclasses?.[key];
+    const features = sub.features || [];
+    return `<section class="comp-subclass-accordion">
+        <button type="button" class="comp-group-divider comp-subclass-toggle ${isOpen ? 'open' : ''}" onclick="compendioToggleClassSubclass('${_compEscapeAttr(clsId)}','${_compEscapeAttr(subId)}')">
+            ${_compIcon('chevron-right')}
+            <span>${escapeHtml(_compName(sub) || 'Sottoclasse')}</span>
+            <small>${features.length}</small>
+        </button>
+        <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
+            ${_compFeaturesSection(features)}
+        </div>
+    </section>`;
+}
+
+window.compendioToggleClassSubclass = function(clsId, subId) {
+    const state = _compStateFor('classi');
+    state.openSubclasses = state.openSubclasses || {};
+    const key = _compSubclassOpenKey(clsId, subId);
+    state.openSubclasses[key] = !state.openSubclasses[key];
+    compendioRenderTab();
+};
+
+function _compSubclassOpenKey(clsId, subId) {
+    return `${clsId}::${subId}`;
+}
+
+function _compSortedSubclasses(subclasses) {
+    const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
+    return [...subclasses].sort((a, b) => {
+        const an = _compSubclassSortLabel(a);
+        const bn = _compSubclassSortLabel(b);
+        const byClean = collator.compare(an, bn);
+        if (byClean !== 0) return byClean;
+        return collator.compare(_compName(a) || '', _compName(b) || '');
+    });
+}
+
+function _compSubclassSortLabel(sub) {
+    let name = String(_compName(sub) || '').trim();
+    name = name.replace(/^(via|cammino|giuramento|circolo|dominio|collegio|scuola|tradizione|archetipo|sentiero)\s+(dell'|della|dello|degli|delle|del|dei|di|de)\s*/i, '');
+    name = name.replace(/^(way|path|oath|circle|domain|college|school|tradition|archetype)\s+of\s+(the\s+)?/i, '');
+    return name.trim() || String(_compName(sub) || '').trim();
 }
 
 function _compFeatureDetail(title, subtitle, features, data) {

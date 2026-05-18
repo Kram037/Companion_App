@@ -434,6 +434,30 @@
     color: var(--accent);
 }
 
+.comp-subclass-accordion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comp-subclass-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comp-subclass-toggle {
+    position: static;
+}
+
+.comp-subclass-body {
+    padding-left: 8px;
+}
+
+.comp-subclass-body .comp-detail-section {
+    margin-top: 0;
+}
+
 .comp-rich {
     color: var(--text-secondary);
     font-size: 0.86rem;
