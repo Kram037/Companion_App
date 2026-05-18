@@ -762,70 +762,118 @@ window.compendioSetObjectsSubTab = function(tab) {
 window.compendioSetObjectsSearch = function(value) {
     const state = _compStateFor('oggetti');
     state.objectsSearch = value || '';
-    compendioRenderTab();
+    _compRenderObjectsInventoryList();
 };
 
 function _compEquipmentTablesHtml() {
     const weapons = typeof DND_ARMI !== 'undefined' && Array.isArray(DND_ARMI) ? DND_ARMI : [];
     const armors = typeof DND_ARMATURE !== 'undefined' && Array.isArray(DND_ARMATURE) ? DND_ARMATURE : [];
+    const weaponGroups = [
+        ['semplice_mischia', 'Armi semplici da mischia'],
+        ['semplice_distanza', 'Armi semplici a distanza'],
+        ['guerra_mischia', 'Armi da guerra da mischia'],
+        ['guerra_distanza', 'Armi da guerra a distanza'],
+    ];
+    const armorGroups = [
+        ['leggera', 'Armature leggere'],
+        ['media', 'Armature medie'],
+        ['pesante', 'Armature pesanti'],
+        ['scudo', 'Scudi'],
+    ];
     return `
         <section class="comp-detail-section">
             <h3>Armi</h3>
-            <div class="comp-table-wrap">
-                <table class="comp-equipment-table">
-                    <thead><tr><th>Nome</th><th>Categoria</th><th>Danni</th><th>Tipo</th><th>Proprieta</th></tr></thead>
-                    <tbody>${weapons.map(w => `
-                        <tr>
-                            <td>${escapeHtml(w.nome || '')}</td>
-                            <td>${escapeHtml(_compEquipmentCategory(w.cat))}</td>
-                            <td>${escapeHtml(w.danni || '-')}</td>
-                            <td>${escapeHtml(w.tipo_danno || '-')}</td>
-                            <td>${escapeHtml(_compArrayLabel(w.proprieta) || '-')}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>
-            </div>
+            ${weaponGroups.map(([cat, label]) => _compWeaponTable(label, weapons.filter(w => w.cat === cat))).join('')}
         </section>
         <section class="comp-detail-section">
             <h3>Armature e Scudi</h3>
-            <div class="comp-table-wrap">
-                <table class="comp-equipment-table">
-                    <thead><tr><th>Nome</th><th>Categoria</th><th>CA</th><th>Forza</th><th>Furtivita</th></tr></thead>
-                    <tbody>${armors.map(a => `
-                        <tr>
-                            <td>${escapeHtml(a.nome || '')}</td>
-                            <td>${escapeHtml(_compEquipmentCategory(a.cat))}</td>
-                            <td>${escapeHtml(_compArmorClassLabel(a))}</td>
-                            <td>${escapeHtml(a.forza ? String(a.forza) : '-')}</td>
-                            <td>${escapeHtml(a.furtivita || '-')}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>
-            </div>
+            ${armorGroups.map(([cat, label]) => _compArmorTable(label, armors.filter(a => a.cat === cat))).join('')}
         </section>
     `;
 }
 
 function _compObjectsInventoryHtml(state) {
-    const q = String(state.objectsSearch || '').trim().toLowerCase();
+    state.objectKind = state.objectKind || 'oggetti';
+    const activeFilters = _compObjectsActiveFilterCount();
+    return `
+        <div class="lab-subtabs comp-object-kind-tabs">
+            <button type="button" class="lab-subtab ${state.objectKind === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectKind('oggetti')">
+                <span class="lab-subtab-icon">🎒</span><span>Oggetti</span>
+            </button>
+            <button type="button" class="lab-subtab ${state.objectKind === 'veleni' ? 'active' : ''}" onclick="compendioSetObjectKind('veleni')">
+                <span class="lab-subtab-icon">☠</span><span>Veleni</span>
+            </button>
+        </div>
+        <div class="comp-toolbar">
+            <label class="comp-search-wrap">
+                ${_compIcon('search')}
+                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca oggetto o veleno..."
+                    value="${escapeHtml(state.objectsSearch || '')}" oninput="compendioSetObjectsSearch(this.value)">
+            </label>
+            <button type="button" class="comp-filter-btn" onclick="compendioOpenObjectsFilters()" aria-label="Filtri">
+                ${_compIcon('sliders')}
+                <span>Filtri</span>
+                ${activeFilters ? `<strong id="compObjectsFiltersBadge">${activeFilters}</strong>` : '<strong id="compObjectsFiltersBadge" style="display:none;"></strong>'}
+            </button>
+        </div>
+        <div id="compObjectsListContent">${_compObjectsInventoryListHtml(state)}</div>
+    `;
+}
+
+function _compWeaponTable(label, rows) {
+    if (!rows.length) return '';
+    return `<div class="comp-equipment-subtable">
+        <h4>${escapeHtml(label)}</h4>
+        <div class="comp-table-wrap">
+            <table class="comp-equipment-table">
+                <thead><tr><th>Nome</th><th>Danni</th><th>Tipo</th><th>Proprieta</th></tr></thead>
+                <tbody>${rows.map(w => `
+                    <tr>
+                        <td>${escapeHtml(w.nome || '')}</td>
+                        <td>${escapeHtml(w.danni || '-')}</td>
+                        <td>${escapeHtml(w.tipo_danno || '-')}</td>
+                        <td>${escapeHtml(_compArrayLabel(w.proprieta) || '-')}</td>
+                    </tr>
+                `).join('')}</tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+function _compArmorTable(label, rows) {
+    if (!rows.length) return '';
+    return `<div class="comp-equipment-subtable">
+        <h4>${escapeHtml(label)}</h4>
+        <div class="comp-table-wrap">
+            <table class="comp-equipment-table">
+                <thead><tr><th>Nome</th><th>CA</th><th>Forza</th><th>Furtivita</th></tr></thead>
+                <tbody>${rows.map(a => `
+                    <tr>
+                        <td>${escapeHtml(a.nome || '')}</td>
+                        <td>${escapeHtml(_compArmorClassLabel(a))}</td>
+                        <td>${escapeHtml(a.forza ? String(a.forza) : '-')}</td>
+                        <td>${escapeHtml(a.furtivita || '-')}</td>
+                    </tr>
+                `).join('')}</tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+function _compObjectsInventoryListHtml(state = _compStateFor('oggetti')) {
     const magicItems = (Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [])
         .map(item => _compInventoryItem('catalog', item))
         .filter(Boolean);
     const poisons = (Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [])
         .map(item => _compInventoryItem('veleni', item))
         .filter(Boolean);
+    const q = String(state.objectsSearch || '').trim().toLowerCase();
     const all = [...magicItems, ...poisons]
         .filter(item => !q || item.search.includes(q))
+        .filter(item => _compObjectMatchesFilters(item, state))
         .sort((a, b) => a.group.localeCompare(b.group, 'it') || a.title.localeCompare(b.title, 'it'));
     const groups = _compGroupItems(all);
     return `
-        <div class="comp-toolbar">
-            <label class="comp-search-wrap">
-                ${_compIcon('search')}
-                <input class="comp-search" type="search" placeholder="Cerca oggetto o veleno..."
-                    value="${escapeHtml(state.objectsSearch || '')}" oninput="compendioSetObjectsSearch(this.value)">
-            </label>
-        </div>
         <p class="comp-count">${all.length} risultati su ${magicItems.length + poisons.length}</p>
         ${all.length ? `<div class="comp-grouped-list">${groups.map(group => `
             <section class="comp-group">
@@ -855,6 +903,10 @@ function _compInventoryItem(source, item) {
             meta,
             group: 'Veleni',
             rarity: item.rarita_it || '',
+            type: item.sotto_tipo_it || 'Veleno',
+            attunement: '',
+            cost: Number(item.prezzo_mo) || 0,
+            data: item,
             search: [title, item.nome_en, item.sotto_tipo_it, item.categoria_it, item.rarita_it, item.descrizione_it, item.descrizione_en].join(' ').toLowerCase(),
         };
     }
@@ -870,20 +922,218 @@ function _compInventoryItem(source, item) {
         meta,
         group: 'Oggetti Magici',
         rarity: item.rarita || '',
+        type: item.tipo || '',
+        attunement: item.richiede_sintonia ? 'yes' : 'no',
+        cost: null,
+        data: item,
         search: [title, item.nome_en, item.tipo, item.sotto_tipo, item.rarita, item.descrizione, item.descrizione_en].join(' ').toLowerCase(),
     };
 }
 
 function _compInventoryCardHtml(item) {
     const rarClass = typeof _invRarityClass === 'function' ? _invRarityClass(item.rarity) : '';
-    return `<article class="comp-card comp-inventory-card ${rarClass}">
+    return `<article class="comp-card comp-inventory-card ${rarClass}" onclick="compendioOpenObjectDetail('${item.source}','${_compEscapeAttr(item.id)}')">
         <div class="comp-card-main">
             <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
             <span class="comp-card-source">${escapeHtml(item.rarity || item.group)}</span>
         </div>
-        ${item.subtitle ? `<div class="comp-card-subtitle">${escapeHtml(item.subtitle)}</div>` : ''}
         ${item.meta ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(item.meta)}</div>` : ''}
     </article>`;
+}
+
+function _compRenderObjectsInventoryList() {
+    const target = document.getElementById('compObjectsListContent');
+    if (target) target.innerHTML = _compObjectsInventoryListHtml();
+    const badge = document.getElementById('compObjectsFiltersBadge');
+    if (badge) {
+        const n = _compObjectsActiveFilterCount();
+        badge.textContent = n ? String(n) : '';
+        badge.style.display = n ? 'inline-flex' : 'none';
+    }
+}
+
+window.compendioSetObjectKind = function(kind) {
+    const state = _compStateFor('oggetti');
+    state.objectKind = kind === 'veleni' ? 'veleni' : 'oggetti';
+    state.objectFilters = state.objectFilters || {};
+    state.objectFilters.kind = state.objectKind;
+    compendioRenderTab();
+};
+
+function _compObjectMatchesFilters(item, state) {
+    const f = state.objectFilters || {};
+    const kind = f.kind || state.objectKind || 'oggetti';
+    if (kind === 'oggetti' && item.source !== 'catalog') return false;
+    if (kind === 'veleni' && item.source !== 'veleni') return false;
+    const rarities = _compFilterValues(f.rarity);
+    const types = _compFilterValues(f.type);
+    const attunements = _compFilterValues(f.attunement);
+    const costs = _compFilterValues(f.cost);
+    if (rarities.length && !rarities.includes(item.rarity)) return false;
+    if (types.length && !types.includes(item.type)) return false;
+    if (attunements.length && !attunements.includes(item.attunement)) return false;
+    if (costs.length) {
+        if (!Number.isFinite(item.cost)) return false;
+        if (!costs.some(range => _compCostInRange(item.cost, range))) return false;
+    }
+    return true;
+}
+
+function _compObjectsActiveFilterCount() {
+    const state = _compStateFor('oggetti');
+    const f = state.objectFilters || {};
+    let n = 0;
+    if ((f.kind || state.objectKind) === 'veleni') n += 1;
+    n += _compFilterValues(f.rarity).length;
+    n += _compFilterValues(f.type).length;
+    n += _compFilterValues(f.attunement).length;
+    n += _compFilterValues(f.cost).length;
+    return n;
+}
+
+window.compendioOpenObjectsFilters = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay comp-objects-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_compObjectsFiltersHtml()}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="compendioResetObjectsFilters()">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+function _compObjectsFiltersHtml() {
+    const state = _compStateFor('oggetti');
+    const f = state.objectFilters || {};
+    const items = [...(Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : []).map(i => _compInventoryItem('catalog', i)),
+        ...(Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : []).map(i => _compInventoryItem('veleni', i))].filter(Boolean);
+    const kind = f.kind || state.objectKind || 'oggetti';
+    const filterPool = items.filter(i => kind === 'veleni' ? i.source === 'veleni' : i.source === 'catalog');
+    const rarities = _compUnique(filterPool.map(i => i.rarity));
+    const types = _compUnique(filterPool.map(i => i.type));
+    return [
+        _compObjectSelect('kind', f.kind || state.objectKind || 'oggetti', [['oggetti', 'Oggetti'], ['veleni', 'Veleni']], 'Oggetti o veleni', 'single'),
+        _compObjectSelect('rarity', f.rarity, rarities.map(v => [v, v]), 'Rarita'),
+        _compObjectSelect('type', f.type, types.map(v => [v, v]), 'Tipologia'),
+        _compObjectSelect('attunement', f.attunement, [['yes', 'Si'], ['no', 'No']], 'Sintonia', 'single'),
+        _compObjectSelect('cost', f.cost, [['0-100', '0-100 mo'], ['101-500', '101-500 mo'], ['501-1000', '501-1000 mo'], ['1001+', '1001+ mo']], 'Costo'),
+    ].join('');
+}
+
+function _compObjectSelect(key, value, options, title, forcedMode = '') {
+    const selected = _compFilterValues(value);
+    const normalized = options.map(([v, label]) => ({ value: String(v), label }));
+    const isSingle = forcedMode === 'single' || normalized.length === 2;
+    const singleOptions = key === 'kind' ? normalized : [{ value: '', label: 'Tutti' }, ...normalized];
+    const encoded = encodeURIComponent(JSON.stringify(isSingle ? singleOptions : normalized)).replace(/'/g, '%27');
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(opt => opt.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="compendioPickObjectFilter('${key}','${encoded}','${_compEscapeAttr(title)}','${isSingle ? 'single' : 'multi'}')" data-value="${_compEscapeAttr(selected.join(','))}">
+        ${escapeHtml(title)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const state = _compStateFor('oggetti');
+    state.objectFilters = state.objectFilters || {};
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            state.objectFilters[key] = value || '';
+            if (key === 'kind' && value) state.objectKind = value;
+            const overlay = document.querySelector('.comp-objects-filter-overlay');
+            if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
+            compendioRenderTab();
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, _compFilterValues(state.objectFilters[key]), values => {
+        state.objectFilters[key] = values;
+        _compRenderObjectsInventoryList();
+        const overlay = document.querySelector('.comp-objects-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
+    }, title || 'Filtro');
+};
+
+window.compendioResetObjectsFilters = function() {
+    const state = _compStateFor('oggetti');
+    state.objectKind = 'oggetti';
+    state.objectFilters = { kind: 'oggetti' };
+    compendioRenderTab();
+    const overlay = document.querySelector('.comp-objects-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
+};
+
+function _compCostInRange(cost, range) {
+    if (range === '1001+') return cost >= 1001;
+    const [min, max] = String(range).split('-').map(Number);
+    return cost >= min && cost <= max;
+}
+
+window.compendioOpenObjectDetail = function(source, id) {
+    const item = _compFindInventoryData(source, id);
+    if (!item) return;
+    const detail = _compObjectDetailData(source, item);
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-object-detail-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-object-detail-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-object-detail-title">${escapeHtml(detail.title)}</h2>
+            ${detail.subtitle ? `<div class="comp-detail-subtitle">${escapeHtml(detail.subtitle)}</div>` : ''}
+            ${_compBoxes(detail.boxes)}
+            <section class="comp-detail-section">
+                <h3>Descrizione</h3>
+                <div class="comp-rich">${_compRich(detail.description)}</div>
+            </section>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+function _compFindInventoryData(source, id) {
+    const list = source === 'veleni'
+        ? (Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [])
+        : (Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : []);
+    return list.find(item => String(item.id) === String(id));
+}
+
+function _compObjectDetailData(source, item) {
+    if (source === 'veleni') {
+        return {
+            title: item.nome_it || item.nome_en || 'Veleno',
+            subtitle: item.nome_en && item.nome_en !== item.nome_it ? item.nome_en : '',
+            boxes: [
+                ['Tipo', item.sotto_tipo_it],
+                ['Categoria', item.categoria_it],
+                ['Rarita', item.rarita_it],
+                ['Costo', item.prezzo_mo != null ? `${item.prezzo_mo} mo` : ''],
+                ['Fonte', item.fonte],
+            ],
+            description: item.descrizione_it || item.descrizione_en || '',
+        };
+    }
+    return {
+        title: item.nome || item.nome_en || 'Oggetto',
+        subtitle: '',
+        boxes: [
+            ['Tipo', [item.tipo, item.sotto_tipo].filter(Boolean).join(' - ')],
+            ['Rarita', item.rarita],
+            ['Sintonia', item.richiede_sintonia ? (item.sintonia_dettaglio || 'Si') : 'No'],
+            ['Incantamento', item.incantamento ? `+${item.incantamento}` : ''],
+        ],
+        description: item.descrizione || item.descrizione_en || '',
+    };
 }
 
 function _compObjectsGroupOpen(label, state) {

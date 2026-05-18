@@ -2954,6 +2954,26 @@
     align-items: stretch;
     margin-bottom: 10px;
 }
+.filters-bar.inv-picker-search-row,
+.filters-bar.inv-list-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.filters-bar.inv-picker-search-row .filter-search-wrap,
+.filters-bar.inv-list-toolbar .filter-search-wrap {
+    min-width: 0;
+}
+.filters-bar.inv-picker-search-row .comp-filter-btn,
+.filters-bar.inv-list-toolbar .comp-filter-btn {
+    align-self: stretch;
+    white-space: nowrap;
+}
+.filters-bar.inv-list-toolbar {
+    padding: 0 10px;
+}
 .inv-picker-search-row input {
     flex: 1;
     min-width: 0;
