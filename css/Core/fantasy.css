@@ -537,6 +537,66 @@ body {
         #14110F;
 }
 
+/* Compendio: tab come finestre sul manuale ------------------------------ */
+#compendioHub .comp-hub-card {
+    position: relative;
+    isolation: isolate;
+    border-color: var(--fantasy-gold-line);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        inset 0 0 0 5px rgba(198, 154, 74, 0.045),
+        0 12px 28px rgba(28, 18, 12, 0.16);
+    background:
+        linear-gradient(145deg, rgba(31, 26, 20, 0.84), rgba(12, 10, 9, 0.74)),
+        var(--card-bg);
+}
+
+#compendioHub .comp-hub-card::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: calc(var(--radius-lg, 12px) - 5px);
+    border: 1px solid rgba(198, 154, 74, 0.24);
+    background:
+        radial-gradient(circle at 50% 48%, rgba(198, 154, 74, 0.18), transparent 34%),
+        linear-gradient(145deg, rgba(255, 244, 210, 0.08), rgba(0, 0, 0, 0.40)),
+        url("../../images/Compendio/spellbook.svg") center / min(86%, 150px) no-repeat,
+        linear-gradient(135deg, rgba(82, 57, 24, 0.34), rgba(10, 8, 7, 0.70));
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        inset 0 0 24px rgba(0, 0, 0, 0.34);
+    opacity: 0.82;
+    transition: opacity 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+}
+
+#compendioHub .comp-hub-card::after {
+    opacity: 0.46;
+    background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 26%, transparent 74%, rgba(198, 154, 74, 0.16)),
+        radial-gradient(circle at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.28));
+}
+
+#compendioHub .comp-hub-card:hover::before {
+    opacity: 1;
+    border-color: rgba(198, 154, 74, 0.42);
+    transform: scale(1.015);
+}
+
+#compendioHub .comp-hub-card-icon,
+#compendioHub .comp-hub-card-label {
+    position: relative;
+    z-index: 2;
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.64),
+        0 0 12px rgba(198, 154, 74, 0.12);
+}
+
+#compendioHub .comp-hub-card-label {
+    color: var(--primary);
+}
+
 /* Scheda personaggio: look da scheda rilegata ---------------------------- */
 .scheda-content {
     max-width: 720px;
