@@ -197,11 +197,78 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
         if (!Number.isFinite(pvGain) || pvGain < 1) return;
         const extra = detail.textContent ? ` (${detail.textContent})` : '';
         overlay.remove();
-        await _doLevelUp(pgId, classIdx, pvGain, extra, opts);
+        await _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extra, opts);
     };
 
     document.body.appendChild(overlay);
     // Nessun auto-focus: evita la comparsa automatica della tastiera.
+}
+
+async function _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
+    const pending = await _getPendingSubclassForLevelUp(classIdx, opts);
+    if (!pending) {
+        await _doLevelUp(pgId, classIdx, pvGain, extraMsg, opts);
+        return;
+    }
+
+    const items = _buildRequiredSubclassPickerItems(pending.opts, pending.hbOpts, pending.newLvl);
+    const allOpts = [...pending.opts, ...pending.hbOpts];
+    showNotification(`Scegli la sottoclasse di ${pending.className} per completare il level up`);
+    openCustomSelect(items, async (value) => {
+        const selected = allOpts.find(o => o.slug === value);
+        if (!selected) return;
+        await _doLevelUp(pgId, classIdx, pvGain, extraMsg, {
+            ...opts,
+            requiredSubclass: selected,
+        });
+    }, `Sottoclasse di ${pending.className}`);
+}
+
+async function _getPendingSubclassForLevelUp(classIdx, opts = {}) {
+    const pg = _schedaPgCache;
+    if (!pg) return null;
+    const cls = opts?.newClassName
+        ? { nome: opts.newClassName, livello: 0 }
+        : (pg.classi || [])[classIdx];
+    if (!cls || cls.sottoclasse) return null;
+
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
+    }
+    if (typeof _pgUnlockedSubclassOptions !== 'function') return null;
+
+    const newLvl = (parseInt(cls.livello) || 0) + 1;
+    const { opts: nativeOpts, hbOpts } = _pgUnlockedSubclassOptions(cls.nome, newLvl);
+    if (nativeOpts.length === 0 && hbOpts.length === 0) return null;
+    return {
+        className: cls.nome,
+        newLvl,
+        opts: nativeOpts,
+        hbOpts,
+    };
+}
+
+function _buildRequiredSubclassPickerItems(opts, hbOpts, livello) {
+    if (typeof _buildSubclassPickerItems !== 'function') return [];
+    const items = _buildSubclassPickerItems(opts, hbOpts, livello)
+        .filter(item => item.value !== '__none__');
+    while (items[0]?.type === 'divider') items.shift();
+    return items;
+}
+
+function _applyRequiredSubclassToClass(cls, selected) {
+    if (!cls || !selected) return;
+    cls.sottoclasse = selected.name;
+    cls.sottoclasseSlug = selected.slug;
+    if (selected.isHomebrew) {
+        cls.sottoclasse_homebrew_id = selected._hbId;
+        if (selected._hbAuthor) cls.sottoclasse_homebrew_author = selected._hbAuthor;
+        cls.thirdCaster = false;
+    } else {
+        delete cls.sottoclasse_homebrew_id;
+        delete cls.sottoclasse_homebrew_author;
+        cls.thirdCaster = isThirdCasterSubclass(selected.slug, selected.name);
+    }
 }
 
 async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
@@ -229,6 +296,9 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     const newLvl = (parseInt(cls.livello) || 0) + 1;
     if (newLvl > 20) { showNotification('Livello massimo raggiunto (20)'); return; }
     cls.livello = newLvl;
+    if (opts.requiredSubclass) {
+        _applyRequiredSubclassToClass(cls, opts.requiredSubclass);
+    }
     classi[classIdx] = cls;
 
     const oldPvMax = parseInt(pg.punti_vita_max) || 0;
@@ -292,69 +362,6 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
         showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
     }
     await renderSchedaPersonaggio(pgId);
-    setTimeout(() => _schedaMaybePromptSubclassAfterLevelUp(pgId, classIdx), 120);
-}
-
-async function _schedaMaybePromptSubclassAfterLevelUp(pgId, classIdx) {
-    const pg = _schedaPgCache;
-    if (!pg || pg.id !== pgId) return;
-    const classi = Array.isArray(pg.classi) ? pg.classi.map(c => ({ ...c })) : [];
-    const cls = classi[classIdx];
-    if (!cls || cls.sottoclasse) return;
-
-    if (typeof loadHomebrewSottoclassi === 'function') {
-        try { await loadHomebrewSottoclassi(); } catch (_) {}
-    }
-
-    if (typeof _pgUnlockedSubclassOptions !== 'function' || typeof _buildSubclassPickerItems !== 'function') return;
-    const level = parseInt(cls.livello) || 1;
-    const { opts, hbOpts } = _pgUnlockedSubclassOptions(cls.nome, level);
-    if (opts.length === 0 && hbOpts.length === 0) return;
-
-    const items = _buildSubclassPickerItems(opts, hbOpts, level);
-    const allOpts = [...opts, ...hbOpts];
-    showNotification(`Ora puoi scegliere la sottoclasse di ${cls.nome}`);
-    openCustomSelect(items, async (value) => {
-        if (value === '__none__') return;
-        const selected = allOpts.find(o => o.slug === value);
-        if (!selected) return;
-
-        const currentPg = _schedaPgCache;
-        const nextClassi = Array.isArray(currentPg?.classi)
-            ? currentPg.classi.map(c => ({ ...c }))
-            : classi;
-        const target = nextClassi[classIdx];
-        if (!target) return;
-
-        target.sottoclasse = selected.name;
-        target.sottoclasseSlug = selected.slug;
-        if (selected.isHomebrew) {
-            target.sottoclasse_homebrew_id = selected._hbId;
-            if (selected._hbAuthor) target.sottoclasse_homebrew_author = selected._hbAuthor;
-            target.thirdCaster = false;
-        } else {
-            delete target.sottoclasse_homebrew_id;
-            delete target.sottoclasse_homebrew_author;
-            target.thirdCaster = isThirdCasterSubclass(selected.slug, selected.name);
-        }
-
-        const classeDisplay = nextClassi.map(c => `${c.nome} ${c.livello}`).join(' / ');
-        const slotIncantesimo = typeof pgRebuildSlotsForClassi === 'function'
-            ? pgRebuildSlotsForClassi(nextClassi, currentPg?.slot_incantesimo || {})
-            : (currentPg?.slot_incantesimo || {});
-        await schedaInstantSave(pgId, {
-            classi: nextClassi,
-            classe: classeDisplay,
-            slot_incantesimo: slotIncantesimo,
-        });
-        if (_schedaPgCache?.id === pgId) {
-            _schedaPgCache.classi = nextClassi;
-            _schedaPgCache.classe = classeDisplay;
-            _schedaPgCache.slot_incantesimo = slotIncantesimo;
-        }
-        showNotification(`Sottoclasse scelta: ${selected.name}`);
-        renderSchedaPersonaggio(pgId);
-    }, `Sottoclasse di ${cls.nome}`);
 }
 
 window.schedaHdChange = function(pgId, className, current, delta, max) {
