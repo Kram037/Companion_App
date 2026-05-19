@@ -542,6 +542,9 @@ body {
     --comp-window-gap: 8px;
     --comp-window-col: calc((100% - var(--comp-window-gap)) / 2);
     --comp-window-row: calc((100% - 24px) / 4);
+    --comp-book-anchor-right: calc(25% - 2px);
+    --comp-book-anchor-top: calc(12.5% - 3px);
+    --comp-book-size: clamp(680px, 158vw, 1220px);
     position: relative;
     isolation: isolate;
 }
@@ -553,7 +556,7 @@ body {
     z-index: 0;
     pointer-events: none;
     background:
-        url("../../images/Compendio/spellbook.svg") right 0 bottom clamp(-128px, -18svh, -96px) / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
+        url("../../images/Compendio/spellbook.svg") right var(--comp-book-anchor-right) top var(--comp-book-anchor-top) / var(--comp-book-size) var(--comp-book-size) no-repeat,
         radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.08), transparent 58%),
         linear-gradient(145deg, rgba(255, 244, 210, 0.018), rgba(8, 7, 6, 0.12));
     opacity: 0.24;
@@ -615,11 +618,9 @@ body {
     #compendioHub .comp-hub-grid {
         --comp-window-col: calc((100% - 24px) / 4);
         --comp-window-row: calc((100% - var(--comp-window-gap)) / 2);
-    }
-
-    #compendioHub .comp-hub-grid::before {
-        background-position: right 0 bottom clamp(-240px, -28svh, -160px), center, center;
-        background-size: clamp(820px, 116vw, 1360px) clamp(820px, 116vw, 1360px), auto, auto;
+        --comp-book-anchor-right: calc(12.5% - 3px);
+        --comp-book-anchor-top: calc(25% - 2px);
+        --comp-book-size: clamp(820px, 116vw, 1360px);
     }
 }
 
