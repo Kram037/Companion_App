@@ -75,16 +75,26 @@ const LAB_CATEGORIES = {
 function labRenderHub() {
     const grid = document.getElementById('labHubGrid');
     if (!grid) return;
-    grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
-    grid.style.gridTemplateRows = 'repeat(4, minmax(0, 1fr))';
-    grid.style.gridAutoFlow = 'row';
-    grid.innerHTML = Object.entries(LAB_CATEGORIES).map(([key, cat]) => `
-        <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
-            <span class="lab-hub-card-icon" aria-hidden="true">${cat.icon}</span>
-            <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
-        </button>
-    `).join('');
+    grid.style.display = 'flex';
+    grid.style.flexDirection = 'column';
+    grid.style.gridTemplateColumns = '';
+    grid.style.gridTemplateRows = '';
+    grid.style.gridAutoFlow = '';
+    const rows = [];
+    const categories = Object.entries(LAB_CATEGORIES);
+    for (let i = 0; i < categories.length; i += 2) {
+        rows.push(`
+            <div class="lab-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
+                ${categories.slice(i, i + 2).map(([key, cat]) => `
+                    <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
+                        <span class="lab-hub-card-icon" aria-hidden="true">${cat.icon}</span>
+                        <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `);
+    }
+    grid.innerHTML = rows.join('');
 }
 
 window.labOpenCategory = function(tab) {

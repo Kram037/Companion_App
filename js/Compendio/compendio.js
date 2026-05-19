@@ -184,16 +184,26 @@ const COMP_ARTIFICER_SPELLS = new Set([
 function compendioRenderHub() {
     const grid = document.getElementById('compendioHubGrid');
     if (!grid) return;
-    grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
-    grid.style.gridTemplateRows = 'repeat(4, minmax(0, 1fr))';
-    grid.style.gridAutoFlow = 'row';
-    grid.innerHTML = Object.entries(COMP_TABS).map(([key, tab]) => `
-        <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
-            <span class="comp-hub-card-icon" aria-hidden="true">${tab.icon}</span>
-            <span class="comp-hub-card-label">${escapeHtml(tab.label)}</span>
-        </button>
-    `).join('');
+    grid.style.display = 'flex';
+    grid.style.flexDirection = 'column';
+    grid.style.gridTemplateColumns = '';
+    grid.style.gridTemplateRows = '';
+    grid.style.gridAutoFlow = '';
+    const rows = [];
+    const tabs = Object.entries(COMP_TABS);
+    for (let i = 0; i < tabs.length; i += 2) {
+        rows.push(`
+            <div class="comp-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
+                ${tabs.slice(i, i + 2).map(([key, tab]) => `
+                    <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
+                        <span class="comp-hub-card-icon" aria-hidden="true">${tab.icon}</span>
+                        <span class="comp-hub-card-label">${escapeHtml(tab.label)}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `);
+    }
+    grid.innerHTML = rows.join('');
 }
 
 window.compendioBackToHub = function() {
