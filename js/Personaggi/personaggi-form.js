@@ -15,6 +15,10 @@ async function handleSavePersonaggio(e) {
         showNotification('Seleziona almeno una classe');
         return;
     }
+    if (typeof pgValidateRequiredSubclasses === 'function') {
+        const ok = await pgValidateRequiredSubclasses({ requireSubclasses: !editingPersonaggioId });
+        if (!ok) return;
+    }
     pgSaving = true;
     const saveBtn = document.getElementById('savePersonaggioBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }

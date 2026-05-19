@@ -195,6 +195,30 @@ window.pgNormalizeSelectedClassesForLevel = function(notify = false) {
     return changed;
 };
 
+function _pgClassHasUnlockedSubclassChoice(c) {
+    if (!c) return false;
+    const level = parseInt(c.livello) || 1;
+    const { opts, hbOpts } = _pgUnlockedSubclassOptions(c.nome, level);
+    return opts.length > 0 || hbOpts.length > 0;
+}
+
+window.pgValidateRequiredSubclasses = async function({ requireSubclasses = true } = {}) {
+    if (!requireSubclasses) return true;
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
+    }
+    if (typeof pgNormalizeSelectedClassesForLevel === 'function') {
+        const changed = pgNormalizeSelectedClassesForLevel(false);
+        if (changed) pgRenderClassi();
+    }
+    const missing = pgSelectedClasses.find(c =>
+        _pgClassHasUnlockedSubclassChoice(c) && !c.sottoclasse
+    );
+    if (!missing) return true;
+    showNotification(`Scegli la sottoclasse di ${missing.nome}`);
+    return false;
+};
+
 function pgRebuildSlotsForClassi(classi, previousSlots = {}) {
     if (typeof calcSpellSlotsFromClassi !== 'function') return previousSlots || {};
     const autoSlots = calcSpellSlotsFromClassi(classi || []);

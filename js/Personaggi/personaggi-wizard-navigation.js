@@ -37,12 +37,16 @@ window.pgValidateIdentityStep = function({ requireIdentity = true } = {}) {
 };
 
 // --- Wizard Navigation ---
-window.pgWizardNext = function() {
+window.pgWizardNext = async function() {
     if (pgWizardCurrentStep === 0) {
         if (!pgValidateIdentityStep({ requireIdentity: !editingPersonaggioId })) return;
     }
     if (pgWizardCurrentStep === 1) {
         if (pgSelectedClasses.length === 0) { showNotification('Seleziona almeno una classe'); return; }
+        if (typeof pgValidateRequiredSubclasses === 'function') {
+            const ok = await pgValidateRequiredSubclasses({ requireSubclasses: !editingPersonaggioId });
+            if (!ok) return;
+        }
     }
     pgWizardGoTo(pgWizardCurrentStep + 1);
 }
