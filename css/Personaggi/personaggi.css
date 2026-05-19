@@ -528,7 +528,7 @@
    La visibilita' e' controllata via style.display da updateScrollStatsBtn() in navigation.js. */
 .btn-scroll-stats {
     position: fixed;
-    bottom: 90px;
+    bottom: calc(var(--app-bottom-toolbar-height, 64px) + 18px + env(safe-area-inset-bottom, 0px));
     right: 18px;
     width: 44px;
     height: 44px;
@@ -560,7 +560,12 @@
     pointer-events: none;
 }
 @media (max-width: 480px) {
-    .btn-scroll-stats { width: 40px; height: 40px; bottom: 80px; right: 14px; }
+    .btn-scroll-stats {
+        width: 40px;
+        height: 40px;
+        bottom: calc(var(--app-bottom-toolbar-height, 60px) + 16px + env(safe-area-inset-bottom, 0px));
+        right: 14px;
+    }
     .btn-scroll-stats-icon { width: 26px; height: 26px; }
 }
 

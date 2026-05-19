@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v80';
+const CACHE_NAME = 'companion-app-v81';
 
 const APP_SHELL_URLS = [
     './',
@@ -67,7 +67,7 @@ const APP_SHELL_URLS = [
     './css/Laboratorio/laboratorio.css',
     './css/Compendio/compendio.css',
     './images/icon d20.png',
-    './images/Icona_scheda_combattimento.png',
+    './images/Scheda%20personaggio/Icona_scheda_combattimento.png',
     './images/Logo Leggenda.jpeg'
 ];
 
