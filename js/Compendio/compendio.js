@@ -1405,15 +1405,23 @@ function _compClassProgressionSection(cls, title = 'Progressione di classe') {
     const columns = _compClassProgressionColumns(rows);
     const hasProgressionColumns = columns.some(key => key !== 'Level');
     if (!rows.length || !hasProgressionColumns) return '';
+    const tableClasses = [
+        'comp-level-table',
+        columns.some(_compIsSpellSlotColumn) ? 'comp-level-table-spell-slots' : '',
+        columns.length <= 4 ? 'comp-level-table-fill' : '',
+    ].filter(Boolean).join(' ');
     return `<section class="comp-detail-section">
         <h3>${escapeHtml(title)}</h3>
         <div class="comp-table-wrap comp-level-table-wrap">
-            <table class="comp-level-table">
+            <table class="${tableClasses}">
+                <colgroup>
+                    ${columns.map(key => `<col class="${_compProgressionColumnClass(key)}">`).join('')}
+                </colgroup>
                 <thead>
-                    <tr>${columns.map(key => `<th>${escapeHtml(_compClassColumnLabel(key))}</th>`).join('')}</tr>
+                    <tr>${columns.map(key => `<th class="${_compProgressionColumnClass(key)}">${escapeHtml(_compClassColumnLabel(key))}</th>`).join('')}</tr>
                 </thead>
                 <tbody>
-                    ${rows.map(row => `<tr>${columns.map(key => `<td>${escapeHtml(_compClassCellValue(row, key))}</td>`).join('')}</tr>`).join('')}
+                    ${rows.map(row => `<tr>${columns.map(key => `<td class="${_compProgressionColumnClass(key)}">${escapeHtml(_compClassCellValue(row, key))}</td>`).join('')}</tr>`).join('')}
                 </tbody>
             </table>
         </div>
@@ -1446,6 +1454,18 @@ function _compClassProgressionColumns(rows) {
     return [...ordered, ...extras];
 }
 
+function _compIsSpellSlotColumn(key) {
+    return /^(1st|2nd|3rd|4th|5th|6th|7th|8th|9th)$/.test(key);
+}
+
+function _compProgressionColumnClass(key) {
+    if (key === 'Level') return 'comp-level-col-level';
+    if (_compIsSpellSlotColumn(key)) return 'comp-level-col-slot';
+    if (['Rages', 'Infused Items', 'Sorcery Points', 'Ki Points', 'Cantrips Known', 'Spell Slots'].includes(key)) return 'comp-level-col-short';
+    if (['Rage Damage', 'Sneak Attack', 'Martial Arts', 'Slot Level', 'Invocations Known'].includes(key)) return 'comp-level-col-medium';
+    return 'comp-level-col-wide';
+}
+
 function _compClassColumnLabel(key) {
     const it = {
         Level: 'Liv.',
@@ -1460,7 +1480,7 @@ function _compClassColumnLabel(key) {
         'Infused Items': 'Elementi infusi',
         'Sorcery Points': 'Punti stregoneria',
         'Cantrips Known': 'Trucchetti',
-        'Spells Known': 'Incantesimi conosciuti',
+        'Spells Known': 'Inc. conosciuti',
         'Spell Slots': 'Slot',
         'Slot Level': 'Livello slot',
         'Invocations Known': 'Suppliche',

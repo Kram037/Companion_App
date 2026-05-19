@@ -527,13 +527,19 @@
     width: max-content;
     max-width: none;
     border-collapse: collapse;
-    min-width: 0;
+    min-width: 100%;
     table-layout: auto;
     font-size: 0.8rem;
 }
 
+.comp-level-table col.comp-level-col-level { width: 44px; }
+.comp-level-table col.comp-level-col-slot { width: 30px; }
+.comp-level-table col.comp-level-col-short { width: 58px; }
+.comp-level-table col.comp-level-col-medium { width: 82px; }
+.comp-level-table col.comp-level-col-wide { width: 104px; }
+
 .comp-level-table td {
-    min-width: 42px;
+    box-sizing: border-box;
     padding: 6px 10px;
     border-bottom: 1px solid var(--border);
     text-align: center;
@@ -542,8 +548,7 @@
 }
 
 .comp-level-table th {
-    min-width: 46px;
-    max-width: 128px;
+    box-sizing: border-box;
     padding: 6px 8px;
     border-bottom: 1px solid var(--border);
     text-align: center;
@@ -573,6 +578,35 @@
     background: var(--surface, rgba(0,0,0,0.03));
 }
 
+.comp-level-table .comp-level-col-level {
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+}
+
+.comp-level-table .comp-level-col-slot {
+    width: 30px;
+    min-width: 30px;
+    max-width: 34px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.comp-level-table .comp-level-col-short {
+    min-width: 54px;
+    max-width: 72px;
+}
+
+.comp-level-table .comp-level-col-medium {
+    min-width: 72px;
+    max-width: 98px;
+}
+
+.comp-level-table .comp-level-col-wide {
+    min-width: 92px;
+    max-width: 132px;
+}
+
 .comp-level-table th:first-child {
     z-index: 2;
     background: var(--surface, rgba(0,0,0,0.03));
@@ -588,7 +622,6 @@
     }
 
     .comp-level-table td {
-        min-width: 32px;
         padding: 4px 6px;
     }
 
@@ -605,6 +638,29 @@
         width: 34px;
         min-width: 34px;
         max-width: 34px;
+    }
+
+    .comp-level-table .comp-level-col-slot {
+        width: 24px;
+        min-width: 24px;
+        max-width: 26px;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .comp-level-table .comp-level-col-short {
+        min-width: 42px;
+        max-width: 54px;
+    }
+
+    .comp-level-table .comp-level-col-medium {
+        min-width: 50px;
+        max-width: 66px;
+    }
+
+    .comp-level-table .comp-level-col-wide {
+        min-width: 58px;
+        max-width: 76px;
     }
 }
 
