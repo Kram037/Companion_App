@@ -213,7 +213,6 @@ async function _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extraMsg = 
 
     const items = _buildRequiredSubclassPickerItems(pending.opts, pending.hbOpts, pending.newLvl);
     const allOpts = [...pending.opts, ...pending.hbOpts];
-    showNotification(`Scegli la sottoclasse di ${pending.className} per completare il level up`);
     openCustomSelect(items, async (value) => {
         const selected = allOpts.find(o => o.slug === value);
         if (!selected) return;
