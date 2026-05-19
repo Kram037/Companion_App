@@ -553,7 +553,7 @@ body {
     z-index: 0;
     pointer-events: none;
     background:
-        url("../../images/Compendio/spellbook.svg") right 0 bottom -18vh / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
+        url("../../images/Compendio/spellbook.svg") right 0 bottom clamp(-128px, -18svh, -96px) / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
         radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.08), transparent 58%),
         linear-gradient(145deg, rgba(255, 244, 210, 0.018), rgba(8, 7, 6, 0.12));
     opacity: 0.24;
@@ -618,7 +618,7 @@ body {
     }
 
     #compendioHub .comp-hub-grid::before {
-        background-position: right 0 bottom -28vh, center, center;
+        background-position: right 0 bottom clamp(-240px, -28svh, -160px), center, center;
         background-size: clamp(820px, 116vw, 1360px) clamp(820px, 116vw, 1360px), auto, auto;
     }
 }
