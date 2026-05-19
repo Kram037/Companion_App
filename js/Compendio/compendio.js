@@ -757,11 +757,12 @@ function _compClassDetail(cls) {
         ${_compBoxes(boxes)}
         <section class="comp-detail-section">
             <h3>Multiclasse</h3>
-            ${_compBoxes([
+            ${_compStackedBoxes([
                 ['Requisiti', COMP_MULTICLASS_REQUIREMENTS[cls.name] || 'Verifica sul manuale'],
                 ['Competenze ottenute', COMP_MULTICLASS_PROFICIENCIES[cls.name] || 'Verifica sul manuale'],
             ])}
         </section>
+        ${_compClassProgressionSection(cls)}
         <section class="comp-detail-section">
             <h3>Competenze iniziali</h3>
             <div class="comp-rich">${_compRich(_compField(cls, 'prof_skills') || '')}</div>
@@ -1310,8 +1311,10 @@ function _compBackgroundDetail(bg, title, subtitle) {
             ['Abilita', bg.skill_proficiencies],
             ['Strumenti', bg.tool_proficiencies],
             ['Linguaggi', bg.languages_text || bg.languages || bg.languages_specific],
-            ['Equipaggiamento', bg.equipment || bg.starting_equipment],
+        ])}
+        ${_compStackedBoxes([
             ['Monete iniziali', bg.starting_gold != null ? `${bg.starting_gold} mo` : ''],
+            ['Equipaggiamento', bg.equipment || bg.starting_equipment],
         ])}
         <section class="comp-detail-section"><h3>${escapeHtml(bg.feature_name || bg.feature?.name || 'Privilegio')}</h3><div class="comp-rich">${_compRich(bg.feature_description || bg.feature?.description || bg.description || '')}</div></section>
     `;
@@ -1367,9 +1370,121 @@ function _compBoxes(boxes) {
     return `<div class="comp-detail-grid">${clean.map(([label, value]) => `
         <div class="comp-detail-box">
             <div class="comp-detail-box-label">${escapeHtml(label)}</div>
-            <div class="comp-detail-box-value">${escapeHtml(_compArrayLabel(value))}</div>
+            <div class="comp-detail-box-value">${_compBoxValueHtml(value)}</div>
         </div>
     `).join('')}</div>`;
+}
+
+function _compStackedBoxes(boxes) {
+    const clean = boxes.filter(([, value]) => {
+        if (Array.isArray(value)) return value.length > 0;
+        return value != null && String(value).trim() !== '';
+    });
+    if (!clean.length) return '';
+    return `<div class="comp-detail-grid comp-detail-grid-stacked">${clean.map(([label, value]) => `
+        <div class="comp-detail-box">
+            <div class="comp-detail-box-label">${escapeHtml(label)}</div>
+            <div class="comp-detail-box-value">${_compBoxValueHtml(value, true)}</div>
+        </div>
+    `).join('')}</div>`;
+}
+
+function _compBoxValueHtml(value, preferList = false) {
+    if (Array.isArray(value) && preferList) {
+        const items = value.filter(Boolean);
+        if (!items.length) return '';
+        return `<ul class="comp-box-list">${items.map(v => `<li>${escapeHtml(v)}</li>`).join('')}</ul>`;
+    }
+    return escapeHtml(_compArrayLabel(value));
+}
+
+function _compClassProgressionSection(cls) {
+    const rows = Array.isArray(cls.level_table) ? cls.level_table : [];
+    const columns = _compClassProgressionColumns(rows);
+    const hasProgressionColumns = columns.some(key => !['Level', 'Proficiency Bonus'].includes(key));
+    if (!rows.length || !hasProgressionColumns) return '';
+    return `<section class="comp-detail-section">
+        <h3>Progressione di classe</h3>
+        <div class="comp-table-wrap comp-level-table-wrap">
+            <table class="comp-level-table">
+                <thead>
+                    <tr>${columns.map(key => `<th>${escapeHtml(_compClassColumnLabel(key))}</th>`).join('')}</tr>
+                </thead>
+                <tbody>
+                    ${rows.map(row => `<tr>${columns.map(key => `<td>${escapeHtml(_compClassCellValue(row, key))}</td>`).join('')}</tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+    </section>`;
+}
+
+function _compClassProgressionColumns(rows) {
+    if (!rows.length) return [];
+    const preferred = [
+        'Level', 'Proficiency Bonus',
+        'Rages', 'Rage Damage', 'Sneak Attack', 'Martial Arts', 'Ki Points', 'Unarmored Movement',
+        'Sorcery Points', 'Cantrips Known', 'Spells Known',
+        'Spell Slots', 'Slot Level', 'Invocations Known',
+        '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th',
+    ];
+    const present = new Set();
+    rows.forEach(row => {
+        Object.keys(row || {}).forEach(key => {
+            if (key === '_level' || key === 'Features') return;
+            const hasValue = rows.some(r => {
+                const value = r?.[key];
+                return value != null && String(value).trim() !== '' && String(value).trim() !== '-';
+            });
+            if (hasValue || key === 'Level' || key === 'Proficiency Bonus') present.add(key);
+        });
+    });
+    const ordered = preferred.filter(key => present.has(key));
+    const extras = Array.from(present).filter(key => !preferred.includes(key)).sort((a, b) => a.localeCompare(b, 'it'));
+    return [...ordered, ...extras];
+}
+
+function _compClassColumnLabel(key) {
+    const it = {
+        Level: 'Liv.',
+        'Proficiency Bonus': 'Bonus competenza',
+        Rages: 'Ire',
+        'Rage Damage': 'Danno ira',
+        'Sneak Attack': 'Attacco furtivo',
+        'Martial Arts': 'Arti marziali',
+        'Ki Points': 'Punti ki',
+        'Unarmored Movement': 'Movimento senza armatura',
+        'Sorcery Points': 'Punti stregoneria',
+        'Cantrips Known': 'Trucchetti',
+        'Spells Known': 'Incantesimi conosciuti',
+        'Spell Slots': 'Slot',
+        'Slot Level': 'Livello slot',
+        'Invocations Known': 'Suppliche',
+        '1st': `1\u00B0`,
+        '2nd': `2\u00B0`,
+        '3rd': `3\u00B0`,
+        '4th': `4\u00B0`,
+        '5th': `5\u00B0`,
+        '6th': `6\u00B0`,
+        '7th': `7\u00B0`,
+        '8th': `8\u00B0`,
+        '9th': `9\u00B0`,
+    };
+    if (_compLang() === 'en') {
+        if (key === 'Level') return 'Lv.';
+        if (key === 'Proficiency Bonus') return 'Proficiency';
+        return key;
+    }
+    return it[key] || key;
+}
+
+function _compClassCellValue(row, key) {
+    if (key === 'Level') return String(row?._level || row?.Level || '');
+    const raw = String(row?.[key] ?? '').trim();
+    if (!raw || raw === '-') return '-';
+    if (_compLang() === 'it') {
+        return raw.replace(/^(\d+)(st|nd|rd|th)$/i, (_, n) => `${n}\u00B0`);
+    }
+    return raw;
 }
 
 function _compRich(text) {
