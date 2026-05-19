@@ -1449,14 +1449,13 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    overflow: hidden;
+    background: transparent;
+    overflow: visible;
 }
 
 .lab-import-host .lab-import-body {
     min-height: 0;
+    padding: 0;
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -1478,8 +1477,28 @@
     border-bottom: 1px solid var(--border);
 }
 .lab-import-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); }
-.lab-import-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+.lab-import-body {
+    padding: 16px 18px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+.lab-import-step {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+.lab-import-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+}
 .lab-import-hint { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 8px; }
+.lab-import-paste-hint { margin-top: 0; }
 .lab-import-example {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -1501,7 +1520,12 @@
 .lab-import-file-name { color: var(--text-muted); font-size: 0.8rem; }
 .lab-import-textarea { width: 100%; min-height: 160px; resize: vertical; font-family: monospace; font-size: 0.85rem; }
 .lab-import-actions {
-    display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 14px;
+    flex-shrink: 0;
 }
 /* Pareggiamento di .btn-primary e .btn-secondary nella riga azioni del
    dialog di import: il secondario ha un border 1px che lo rende piu'
@@ -1521,6 +1545,11 @@
     line-height: 1;
 }
 .lab-import-actions > .btn-primary { border: 1px solid transparent; }
+.lab-import-actions > .btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.2);
+}
 
 .lab-import-preview-head {
     display: flex; align-items: center; justify-content: space-between;

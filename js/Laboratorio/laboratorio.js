@@ -3126,6 +3126,7 @@ window.labSetHomebrewModalMode = function(mode) {
                 host._cat = _LAB_IMPORT_CONFIGS[_labCurrentTab];
                 host._parsed = [];
                 host._embedded = true;
+                _labWireImportControls(host);
             }
         }
     }
@@ -4116,51 +4117,55 @@ Una luce brillante guizza dal tuo dito puntato verso un punto...`,
     },
 };
 
-function _labImportContentHtml(cat, closeAction, showHeaderClose = true) {
+function _labImportContentHtml(cat, closeAction, showHeader = true) {
     return `
-        <div class="lab-import-header">
+        ${showHeader ? `<div class="lab-import-header">
             <h3 class="lab-import-title">${escapeHtml(cat.title)}</h3>
-            ${showHeaderClose ? `<button class="hp-calc-close" onclick="${closeAction}" title="Chiudi">&times;</button>` : ''}
-        </div>
+            <button class="hp-calc-close" onclick="${closeAction}" title="Chiudi">&times;</button>
+        </div>` : ''}
         <div class="lab-import-body">
             <div class="lab-import-step" id="labImportStep1">
-                <p class="lab-import-hint">${cat.hintIntro}</p>
+                <div class="lab-import-scroll">
+                    <p class="lab-import-hint">${cat.hintIntro}</p>
 <pre class="lab-import-example">${escapeHtml(cat.example)}</pre>
-                <p class="lab-import-hint" style="margin-top:10px;">Oppure incolla direttamente il testo qui sotto.</p>
-                <div class="lab-import-file-row">
-                    <label class="lab-import-file-btn">
-                        <input type="file" id="labImportFile" accept=".txt,.pdf,text/plain,application/pdf"
-                            style="display:none;" onchange="window._labImportFileChanged(event)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                        <span>Scegli file</span>
-                    </label>
-                    <span class="lab-import-file-name" id="labImportFileName">Nessun file</span>
+                    <div class="lab-import-file-row">
+                        <label class="lab-import-file-btn">
+                            <input type="file" id="labImportFile" accept=".txt,.pdf,text/plain,application/pdf"
+                                style="display:none;" onchange="window._labImportFileChanged(event)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Scegli file</span>
+                        </label>
+                        <span class="lab-import-file-name" id="labImportFileName">Nessun file</span>
+                    </div>
+                    <p class="lab-import-hint lab-import-paste-hint">Oppure incolla il testo qui sotto.</p>
+                    ${window.renderTextareaFullscreen({
+                        id: 'labImportText',
+                        className: 'lab-import-textarea',
+                        rows: 10,
+                        placeholder: cat.textareaPh,
+                        value: '',
+                    })}
                 </div>
-                ${window.renderTextareaFullscreen({
-                    id: 'labImportText',
-                    className: 'lab-import-textarea',
-                    rows: 10,
-                    placeholder: cat.textareaPh,
-                    value: '',
-                })}
                 <div class="lab-import-actions">
                     <button class="btn-secondary" onclick="${closeAction}">Annulla</button>
-                    <button class="btn-primary" onclick="window._labImportParse()">Analizza</button>
+                    <button class="btn-primary" id="labImportAnalyzeBtn" onclick="window._labImportParse()" disabled>Analizza</button>
                 </div>
             </div>
             <div class="lab-import-step" id="labImportStep2" style="display:none;">
-                <div class="lab-import-preview-head">
-                    <span id="labImportSummary" class="lab-import-summary"></span>
-                    <div class="lab-import-preview-actions">
-                        <button class="btn-link" onclick="window._labImportToggleAll(true)">Seleziona tutto</button>
-                        <button class="btn-link" onclick="window._labImportToggleAll(false)">Deseleziona tutto</button>
+                <div class="lab-import-scroll">
+                    <div class="lab-import-preview-head">
+                        <span id="labImportSummary" class="lab-import-summary"></span>
+                        <div class="lab-import-preview-actions">
+                            <button class="btn-link" onclick="window._labImportToggleAll(true)">Seleziona tutto</button>
+                            <button class="btn-link" onclick="window._labImportToggleAll(false)">Deseleziona tutto</button>
+                        </div>
                     </div>
+                    <div class="lab-import-preview-list" id="labImportPreview"></div>
                 </div>
-                <div class="lab-import-preview-list" id="labImportPreview"></div>
                 <div class="lab-import-actions">
                     <button class="btn-secondary" onclick="window._labImportBack()">Indietro</button>
                     <button class="btn-primary" id="labImportSaveBtn" onclick="window._labImportSave()">Salva selezionati</button>
@@ -4177,6 +4182,21 @@ function _labImportEmbeddedHtml(category) {
 
 function _labImportRoot() {
     return document.querySelector('.lab-import-overlay') || document.getElementById('labImportHost');
+}
+
+function _labWireImportControls(root) {
+    if (!root) return;
+    root.querySelector('#labImportText')?.addEventListener('input', () => _labImportUpdateAnalyzeState(root));
+    _labImportUpdateAnalyzeState(root);
+}
+
+function _labImportUpdateAnalyzeState(root) {
+    const target = root?.closest?.('.lab-import-overlay, .lab-import-host') || root || _labImportRoot();
+    if (!target) return;
+    const hasText = !!target.querySelector('#labImportText')?.value?.trim();
+    const hasFile = !!target.querySelector('#labImportFile')?.files?.length;
+    const analyzeBtn = target.querySelector('#labImportAnalyzeBtn');
+    if (analyzeBtn) analyzeBtn.disabled = !(hasText || hasFile);
 }
 
 // Apre la dialog di importazione bulk per la categoria specificata
@@ -4197,6 +4217,7 @@ window.labOpenImportDialog = function(category) {
     document.body.appendChild(overlay);
     overlay._parsed = [];
     overlay._cat = cat;
+    _labWireImportControls(overlay);
 };
 
 window._labImportFileChanged = async function(ev) {
@@ -4204,8 +4225,13 @@ window._labImportFileChanged = async function(ev) {
     const file = ev.target.files && ev.target.files[0];
     const nameLabel = root?.querySelector('#labImportFileName');
     const textArea = root?.querySelector('#labImportText');
-    if (!file) { if (nameLabel) nameLabel.textContent = 'Nessun file'; return; }
+    if (!file) {
+        if (nameLabel) nameLabel.textContent = 'Nessun file';
+        _labImportUpdateAnalyzeState(root);
+        return;
+    }
     if (nameLabel) nameLabel.textContent = file.name;
+    _labImportUpdateAnalyzeState(root);
     try {
         let text = '';
         if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
