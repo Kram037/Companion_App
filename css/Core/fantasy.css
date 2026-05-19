@@ -159,12 +159,14 @@ body {
 }
 
 .toolbar-btn svg {
+    width: 26px;
+    height: 26px;
     transition: transform 0.18s ease, filter 0.18s ease;
 }
 
 .toolbar-btn .toolbar-icon {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     display: block;
     flex: 0 0 auto;
     font-size: 0;
@@ -1307,8 +1309,13 @@ body {
     }
 
     .toolbar-btn .toolbar-icon {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
+    }
+
+    .toolbar-btn svg {
+        width: 24px;
+        height: 24px;
     }
 
     :is(.lab-hub-card, .comp-hub-card):hover {
