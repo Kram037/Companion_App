@@ -1240,6 +1240,7 @@ function _compSubclassAccordionHtml(clsId, sub) {
             <small>${features.length}</small>
         </button>
         <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
+            ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
             ${_compFeaturesSection(features)}
         </div>
     </section>`;
@@ -1278,6 +1279,7 @@ function _compSubclassSortLabel(sub) {
 function _compFeatureDetail(title, subtitle, features, data) {
     return `
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
+        ${_compClassProgressionSection(data, 'Progressione incantesimi')}
         ${_compFeaturesSection(features)}
     `;
 }
@@ -1398,13 +1400,13 @@ function _compBoxValueHtml(value, preferList = false) {
     return escapeHtml(_compArrayLabel(value));
 }
 
-function _compClassProgressionSection(cls) {
+function _compClassProgressionSection(cls, title = 'Progressione di classe') {
     const rows = Array.isArray(cls.level_table) ? cls.level_table : [];
     const columns = _compClassProgressionColumns(rows);
-    const hasProgressionColumns = columns.some(key => !['Level', 'Proficiency Bonus'].includes(key));
+    const hasProgressionColumns = columns.some(key => key !== 'Level');
     if (!rows.length || !hasProgressionColumns) return '';
     return `<section class="comp-detail-section">
-        <h3>Progressione di classe</h3>
+        <h3>${escapeHtml(title)}</h3>
         <div class="comp-table-wrap comp-level-table-wrap">
             <table class="comp-level-table">
                 <thead>
@@ -1421,8 +1423,9 @@ function _compClassProgressionSection(cls) {
 function _compClassProgressionColumns(rows) {
     if (!rows.length) return [];
     const preferred = [
-        'Level', 'Proficiency Bonus',
+        'Level',
         'Rages', 'Rage Damage', 'Sneak Attack', 'Martial Arts', 'Ki Points', 'Unarmored Movement',
+        'Infusions Known', 'Infused Items',
         'Sorcery Points', 'Cantrips Known', 'Spells Known',
         'Spell Slots', 'Slot Level', 'Invocations Known',
         '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th',
@@ -1430,12 +1433,12 @@ function _compClassProgressionColumns(rows) {
     const present = new Set();
     rows.forEach(row => {
         Object.keys(row || {}).forEach(key => {
-            if (key === '_level' || key === 'Features') return;
+            if (key === '_level' || key === 'Features' || key === 'Proficiency Bonus') return;
             const hasValue = rows.some(r => {
                 const value = r?.[key];
                 return value != null && String(value).trim() !== '' && String(value).trim() !== '-';
             });
-            if (hasValue || key === 'Level' || key === 'Proficiency Bonus') present.add(key);
+            if (hasValue || key === 'Level') present.add(key);
         });
     });
     const ordered = preferred.filter(key => present.has(key));
@@ -1453,6 +1456,8 @@ function _compClassColumnLabel(key) {
         'Martial Arts': 'Arti marziali',
         'Ki Points': 'Punti ki',
         'Unarmored Movement': 'Movimento senza armatura',
+        'Infusions Known': 'Infusioni conosciute',
+        'Infused Items': 'Elementi infusi',
         'Sorcery Points': 'Punti stregoneria',
         'Cantrips Known': 'Trucchetti',
         'Spells Known': 'Incantesimi conosciuti',
