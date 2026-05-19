@@ -524,14 +524,17 @@
 }
 
 .comp-level-table {
-    width: 100%;
+    width: max-content;
+    max-width: none;
     border-collapse: collapse;
-    min-width: 620px;
-    font-size: 0.74rem;
+    min-width: 0;
+    table-layout: auto;
+    font-size: 0.72rem;
 }
 
 .comp-level-table td {
-    padding: 5px 7px;
+    width: 1%;
+    padding: 3px 5px;
     border-bottom: 1px solid var(--border);
     text-align: center;
     vertical-align: middle;
@@ -539,7 +542,10 @@
 }
 
 .comp-level-table th {
-    padding: 5px 5px;
+    width: 1%;
+    min-width: 26px;
+    max-width: 58px;
+    padding: 4px 4px;
     border-bottom: 1px solid var(--border);
     text-align: center;
     vertical-align: middle;
@@ -551,6 +557,9 @@
 
 .comp-level-table th:first-child,
 .comp-level-table td:first-child {
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
     text-align: left;
     position: sticky;
     left: 0;
@@ -560,7 +569,7 @@
 
 .comp-level-table th {
     color: var(--accent);
-    font-size: 0.58rem;
+    font-size: 0.56rem;
     text-transform: uppercase;
     letter-spacing: 0;
     background: var(--surface, rgba(0,0,0,0.03));
