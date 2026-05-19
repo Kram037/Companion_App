@@ -162,8 +162,31 @@ body {
     transition: transform 0.18s ease, filter 0.18s ease;
 }
 
+.toolbar-btn .toolbar-icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    flex: 0 0 auto;
+    font-size: 0;
+    line-height: 0;
+    background-color: currentColor;
+    transition: transform 0.18s ease, filter 0.18s ease;
+    -webkit-mask: var(--toolbar-icon-url) center / contain no-repeat;
+    mask: var(--toolbar-icon-url) center / contain no-repeat;
+}
+
+.toolbar-icon-laboratorio {
+    --toolbar-icon-url: url("../../images/Toolbar/Laboratorio.svg");
+}
+
+.toolbar-icon-compendio {
+    --toolbar-icon-url: url("../../images/Toolbar/Compendio.svg");
+}
+
 .toolbar-btn.active svg,
-.toolbar-btn:hover svg {
+.toolbar-btn:hover svg,
+.toolbar-btn.active .toolbar-icon,
+.toolbar-btn:hover .toolbar-icon {
     transform: translateY(-1px);
     filter: drop-shadow(0 0 8px rgba(198, 154, 74, 0.20));
 }
@@ -1281,6 +1304,11 @@ body {
 
     .bottom-toolbar::after {
         width: 30px;
+    }
+
+    .toolbar-btn .toolbar-icon {
+        width: 20px;
+        height: 20px;
     }
 
     :is(.lab-hub-card, .comp-hub-card):hover {
