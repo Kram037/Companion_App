@@ -75,6 +75,10 @@ const LAB_CATEGORIES = {
 function labRenderHub() {
     const grid = document.getElementById('labHubGrid');
     if (!grid) return;
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+    grid.style.gridTemplateRows = 'repeat(4, minmax(0, 1fr))';
+    grid.style.gridAutoFlow = 'row';
     grid.innerHTML = Object.entries(LAB_CATEGORIES).map(([key, cat]) => `
         <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
             <span class="lab-hub-card-icon" aria-hidden="true">${cat.icon}</span>

@@ -184,6 +184,10 @@ const COMP_ARTIFICER_SPELLS = new Set([
 function compendioRenderHub() {
     const grid = document.getElementById('compendioHubGrid');
     if (!grid) return;
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+    grid.style.gridTemplateRows = 'repeat(4, minmax(0, 1fr))';
+    grid.style.gridAutoFlow = 'row';
     grid.innerHTML = Object.entries(COMP_TABS).map(([key, tab]) => `
         <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
             <span class="comp-hub-card-icon" aria-hidden="true">${tab.icon}</span>
