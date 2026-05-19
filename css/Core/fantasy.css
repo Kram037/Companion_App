@@ -539,8 +539,32 @@ body {
 
 /* Compendio: tab come finestre su un unico manuale ---------------------- */
 #compendioHub .comp-hub-grid {
+    --comp-window-gap: 8px;
+    --comp-window-col: calc((100% - var(--comp-window-gap)) / 2);
+    --comp-window-row: calc((100% - 24px) / 4);
     position: relative;
     isolation: isolate;
+}
+
+#compendioHub .comp-hub-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0 var(--spacing-sm);
+    z-index: 0;
+    pointer-events: none;
+    background:
+        url("../../images/Compendio/spellbook.svg") left -22vw bottom -18vh / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
+        radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.08), transparent 58%),
+        linear-gradient(145deg, rgba(255, 244, 210, 0.018), rgba(8, 7, 6, 0.12));
+    opacity: 0.24;
+    -webkit-mask-image:
+        repeating-linear-gradient(to right, #000 0 var(--comp-window-col), transparent var(--comp-window-col) calc(var(--comp-window-col) + var(--comp-window-gap))),
+        repeating-linear-gradient(to bottom, #000 0 var(--comp-window-row), transparent var(--comp-window-row) calc(var(--comp-window-row) + var(--comp-window-gap)));
+    -webkit-mask-composite: source-in;
+    mask-image:
+        repeating-linear-gradient(to right, #000 0 var(--comp-window-col), transparent var(--comp-window-col) calc(var(--comp-window-col) + var(--comp-window-gap))),
+        repeating-linear-gradient(to bottom, #000 0 var(--comp-window-row), transparent var(--comp-window-row) calc(var(--comp-window-row) + var(--comp-window-gap)));
+    mask-composite: intersect;
 }
 
 #compendioHub .comp-hub-card {
@@ -548,34 +572,18 @@ body {
     isolation: isolate;
     z-index: 1;
     border-color: var(--fantasy-line);
-    background: rgba(18, 15, 13, 0.28);
-}
-
-#compendioHub .comp-hub-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    background:
-        url("../../images/Compendio/spellbook.svg") left -18vw bottom -16vh / clamp(620px, 150vw, 1180px) clamp(620px, 150vw, 1180px) no-repeat fixed,
-        radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.12), transparent 58%),
-        linear-gradient(145deg, rgba(255, 244, 210, 0.025), rgba(8, 7, 6, 0.18));
-    box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.18);
-    opacity: 0.34;
-    transition: opacity 0.22s ease;
+    background: rgba(18, 15, 13, 0.44);
 }
 
 #compendioHub .comp-hub-card::after {
-    opacity: 0.24;
+    opacity: 0.20;
     background:
         linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 30%, transparent 76%, rgba(198, 154, 74, 0.09)),
         linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.16));
 }
 
-#compendioHub .comp-hub-card:hover::before {
-    opacity: 0.42;
+#compendioHub .comp-hub-card:hover {
+    background: rgba(18, 15, 13, 0.50);
 }
 
 #compendioHub .comp-hub-card-icon,
@@ -592,9 +600,14 @@ body {
 }
 
 @media (min-width: 760px) {
-    #compendioHub .comp-hub-card::before {
+    #compendioHub .comp-hub-grid {
+        --comp-window-col: calc((100% - 24px) / 4);
+        --comp-window-row: calc((100% - var(--comp-window-gap)) / 2);
+    }
+
+    #compendioHub .comp-hub-grid::before {
         background-position: left -8vw bottom -28vh, center, center;
-        background-size: clamp(760px, 112vw, 1320px) clamp(760px, 112vw, 1320px), auto, auto;
+        background-size: clamp(820px, 116vw, 1360px) clamp(820px, 116vw, 1360px), auto, auto;
     }
 }
 
