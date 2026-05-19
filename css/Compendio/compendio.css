@@ -529,12 +529,12 @@
     border-collapse: collapse;
     min-width: 0;
     table-layout: auto;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
 }
 
 .comp-level-table td {
-    width: 1%;
-    padding: 3px 5px;
+    min-width: 42px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--border);
     text-align: center;
     vertical-align: middle;
@@ -542,24 +542,22 @@
 }
 
 .comp-level-table th {
-    width: 1%;
-    min-width: 26px;
-    max-width: 58px;
-    padding: 4px 4px;
+    min-width: 46px;
+    max-width: 128px;
+    padding: 6px 8px;
     border-bottom: 1px solid var(--border);
     text-align: center;
     vertical-align: middle;
     white-space: normal;
-    overflow-wrap: anywhere;
-    max-width: 76px;
-    line-height: 1.08;
+    overflow-wrap: normal;
+    line-height: 1.14;
 }
 
 .comp-level-table th:first-child,
 .comp-level-table td:first-child {
-    width: 34px;
-    min-width: 34px;
-    max-width: 34px;
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
     text-align: left;
     position: sticky;
     left: 0;
@@ -569,7 +567,7 @@
 
 .comp-level-table th {
     color: var(--accent);
-    font-size: 0.56rem;
+    font-size: 0.66rem;
     text-transform: uppercase;
     letter-spacing: 0;
     background: var(--surface, rgba(0,0,0,0.03));
@@ -582,6 +580,32 @@
 
 .comp-level-table tr:last-child td {
     border-bottom: 0;
+}
+
+@media (max-width: 640px) {
+    .comp-level-table {
+        font-size: 0.7rem;
+    }
+
+    .comp-level-table td {
+        min-width: 32px;
+        padding: 4px 6px;
+    }
+
+    .comp-level-table th {
+        min-width: 34px;
+        max-width: 84px;
+        padding: 5px 5px;
+        font-size: 0.56rem;
+        line-height: 1.08;
+    }
+
+    .comp-level-table th:first-child,
+    .comp-level-table td:first-child {
+        width: 34px;
+        min-width: 34px;
+        max-width: 34px;
+    }
 }
 
 .comp-inventory-card {
