@@ -484,8 +484,6 @@
     }
     /* Il divisore non serve quando le pagine sono affiancate. */
     .scheda-page-grid > .scheda-divider { display: none; }
-    /* Anche il bottone-spada e' inutile su schermi grandi. */
-    .btn-scroll-stats { display: none !important; }
 }
 
 /* ------------------------------------------------------------
