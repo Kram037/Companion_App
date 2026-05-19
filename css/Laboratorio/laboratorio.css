@@ -1431,27 +1431,33 @@
 }
 
 /* ────────────────────────────────────────────────────────────
-   Bottone "Importa" accanto al titolo di una categoria laboratorio.
-   Inserito dinamicamente dal JS solo per la categoria oggetti.
+   Import integrato nella dialog di creazione homebrew.
    ──────────────────────────────────────────────────────────── */
-.lab-import-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-left: auto;
-    transition: background 0.12s, border-color 0.12s;
+.lab-homebrew-mode-tabs {
+    margin-top: -4px;
 }
-.lab-import-btn:hover { background: var(--surface-hover); border-color: var(--primary); }
-#labSubPage .page-header { display: flex; align-items: center; gap: 12px; }
-#labSubPage .page-header h1 { margin: 0; }
+
+.lab-homebrew-import-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.lab-import-host {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+}
+
+.lab-import-host .lab-import-body {
+    min-height: 0;
+}
 
 /* ────────────────────────────────────────────────────────────
    Dialog di importazione oggetti.

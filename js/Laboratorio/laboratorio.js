@@ -100,10 +100,7 @@ window.labOpenCategory = function(tab) {
     const addBtn = document.getElementById('addHomebrewBtn');
     if (addBtn) addBtn.style.visibility = cat.isSettings ? 'hidden' : '';
 
-    // Bottone "Importa" (solo per la categoria oggetti): lo inseriamo
-    // dinamicamente vicino al titolo. Per ora l'ingestion e' disponibile
-    // solo per gli oggetti, i cui header hanno un formato standard.
-    _labMountImportButton(tab);
+    document.getElementById('labImportBtn')?.remove();
 
     if (cat.isSettings) {
         _labSetStickyTools('');
@@ -112,34 +109,6 @@ window.labOpenCategory = function(tab) {
         loadLabContent();
     }
 };
-
-function _labMountImportButton(tab) {
-    const headerRow = document.querySelector('#labSubPage .page-header');
-    if (!headerRow) return;
-    let btn = document.getElementById('labImportBtn');
-    // L'import e' supportato solo per categorie con un parser dedicato.
-    const supported = ['oggetti', 'incantesimi'];
-    if (!supported.includes(tab)) {
-        if (btn) btn.remove();
-        return;
-    }
-    if (!btn) {
-        btn = document.createElement('button');
-        btn.id = 'labImportBtn';
-        btn.className = 'lab-import-btn';
-        btn.type = 'button';
-        btn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <span>Importa</span>`;
-        headerRow.appendChild(btn);
-    }
-    btn.title = tab === 'incantesimi' ? 'Importa incantesimi da file' : 'Importa oggetti da file';
-    btn.onclick = () => window.labOpenImportDialog(tab);
-}
 
 window.labBackToHub = function() {
     const hub = document.getElementById('labHub');
@@ -3066,6 +3035,7 @@ window.openHomebrewModal = function(editData) {
 
     const modal = document.getElementById('homebrewModal');
     _restoreHomebrewModalStructure();
+    _ensureHomebrewModeShell();
     const title = document.getElementById('homebrewModalTitle');
     const content = document.getElementById('homebrewFormContent');
     const saveBtn = document.getElementById('saveHomebrewBtn');
@@ -3073,6 +3043,8 @@ window.openHomebrewModal = function(editData) {
     title.textContent = _labEditingId ? `Modifica ${cat.label}` : `${cat.label} Homebrew`;
     saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea';
     content.innerHTML = cat.fields(editData);
+    _labConfigureHomebrewModeTabs();
+    window.labSetHomebrewModalMode('form');
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -3105,7 +3077,64 @@ function _restoreHomebrewModalStructure() {
             if (e.key === 'Enter' && e.target?.tagName !== 'TEXTAREA') e.preventDefault();
         });
     }
+    _ensureHomebrewModeShell();
 }
+
+function _ensureHomebrewModeShell() {
+    const title = document.getElementById('homebrewModalTitle');
+    const form = document.getElementById('homebrewForm');
+    if (!title || !form) return;
+    if (!document.getElementById('homebrewModeTabs')) {
+        title.insertAdjacentHTML('afterend', `
+            <div class="modal-tabs lab-homebrew-mode-tabs" id="homebrewModeTabs" style="display:none;">
+                <button type="button" class="modal-tab active" data-mode="form" onclick="labSetHomebrewModalMode('form')">Crea</button>
+                <button type="button" class="modal-tab" data-mode="import" onclick="labSetHomebrewModalMode('import')">Import</button>
+            </div>`);
+    }
+    if (!document.getElementById('homebrewImportContent')) {
+        form.insertAdjacentHTML('afterend', '<div id="homebrewImportContent" class="lab-homebrew-import-content" style="display:none;"></div>');
+    }
+}
+
+function _labCanUseImportTab() {
+    return !_labEditingId && !!_LAB_IMPORT_CONFIGS[_labCurrentTab];
+}
+
+function _labConfigureHomebrewModeTabs() {
+    const tabs = document.getElementById('homebrewModeTabs');
+    const canImport = _labCanUseImportTab();
+    if (tabs) tabs.style.display = canImport ? '' : 'none';
+    if (!canImport) {
+        const importContent = document.getElementById('homebrewImportContent');
+        if (importContent) importContent.innerHTML = '';
+    }
+}
+
+window.labSetHomebrewModalMode = function(mode) {
+    const canImport = _labCanUseImportTab();
+    const importMode = canImport && mode === 'import';
+    const form = document.getElementById('homebrewForm');
+    const importContent = document.getElementById('homebrewImportContent');
+    const tabs = document.getElementById('homebrewModeTabs');
+    if (form) form.style.display = importMode ? 'none' : '';
+    if (importContent) {
+        importContent.style.display = importMode ? '' : 'none';
+        if (importMode && !importContent.innerHTML.trim()) {
+            importContent.innerHTML = _labImportEmbeddedHtml(_labCurrentTab);
+            const host = document.getElementById('labImportHost');
+            if (host) {
+                host._cat = _LAB_IMPORT_CONFIGS[_labCurrentTab];
+                host._parsed = [];
+                host._embedded = true;
+            }
+        }
+    }
+    if (tabs) {
+        tabs.querySelectorAll('.modal-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === (importMode ? 'import' : 'form'));
+        });
+    }
+};
 
 window.closeHomebrewModal = function() {
     const modal = document.getElementById('homebrewModal');
@@ -3114,6 +3143,8 @@ window.closeHomebrewModal = function() {
         document.body.style.overflow = '';
         _labEditingId = null;
         _labSubState = null;
+        const importContent = document.getElementById('homebrewImportContent');
+        if (importContent) importContent.innerHTML = '';
     }
 };
 
@@ -4085,6 +4116,69 @@ Una luce brillante guizza dal tuo dito puntato verso un punto...`,
     },
 };
 
+function _labImportContentHtml(cat, closeAction, showHeaderClose = true) {
+    return `
+        <div class="lab-import-header">
+            <h3 class="lab-import-title">${escapeHtml(cat.title)}</h3>
+            ${showHeaderClose ? `<button class="hp-calc-close" onclick="${closeAction}" title="Chiudi">&times;</button>` : ''}
+        </div>
+        <div class="lab-import-body">
+            <div class="lab-import-step" id="labImportStep1">
+                <p class="lab-import-hint">${cat.hintIntro}</p>
+<pre class="lab-import-example">${escapeHtml(cat.example)}</pre>
+                <p class="lab-import-hint" style="margin-top:10px;">Oppure incolla direttamente il testo qui sotto.</p>
+                <div class="lab-import-file-row">
+                    <label class="lab-import-file-btn">
+                        <input type="file" id="labImportFile" accept=".txt,.pdf,text/plain,application/pdf"
+                            style="display:none;" onchange="window._labImportFileChanged(event)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <span>Scegli file</span>
+                    </label>
+                    <span class="lab-import-file-name" id="labImportFileName">Nessun file</span>
+                </div>
+                ${window.renderTextareaFullscreen({
+                    id: 'labImportText',
+                    className: 'lab-import-textarea',
+                    rows: 10,
+                    placeholder: cat.textareaPh,
+                    value: '',
+                })}
+                <div class="lab-import-actions">
+                    <button class="btn-secondary" onclick="${closeAction}">Annulla</button>
+                    <button class="btn-primary" onclick="window._labImportParse()">Analizza</button>
+                </div>
+            </div>
+            <div class="lab-import-step" id="labImportStep2" style="display:none;">
+                <div class="lab-import-preview-head">
+                    <span id="labImportSummary" class="lab-import-summary"></span>
+                    <div class="lab-import-preview-actions">
+                        <button class="btn-link" onclick="window._labImportToggleAll(true)">Seleziona tutto</button>
+                        <button class="btn-link" onclick="window._labImportToggleAll(false)">Deseleziona tutto</button>
+                    </div>
+                </div>
+                <div class="lab-import-preview-list" id="labImportPreview"></div>
+                <div class="lab-import-actions">
+                    <button class="btn-secondary" onclick="window._labImportBack()">Indietro</button>
+                    <button class="btn-primary" id="labImportSaveBtn" onclick="window._labImportSave()">Salva selezionati</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function _labImportEmbeddedHtml(category) {
+    const cat = _LAB_IMPORT_CONFIGS[category];
+    if (!cat) return '';
+    return `<div id="labImportHost" class="lab-import-host">${_labImportContentHtml(cat, 'closeHomebrewModal()', false)}</div>`;
+}
+
+function _labImportRoot() {
+    return document.querySelector('.lab-import-overlay') || document.getElementById('labImportHost');
+}
+
 // Apre la dialog di importazione bulk per la categoria specificata
 // ('oggetti' o 'incantesimi'). Usa _LAB_IMPORT_CONFIGS per i contenuti.
 window.labOpenImportDialog = function(category) {
@@ -4098,67 +4192,18 @@ window.labOpenImportDialog = function(category) {
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     overlay.innerHTML = `
         <div class="hp-calc-modal lab-import-modal">
-            <div class="lab-import-header">
-                <h3 class="lab-import-title">${escapeHtml(cat.title)}</h3>
-                <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()" title="Chiudi">×</button>
-            </div>
-            <div class="lab-import-body">
-                <div class="lab-import-step" id="labImportStep1">
-                    <p class="lab-import-hint">${cat.hintIntro}</p>
-<pre class="lab-import-example">${escapeHtml(cat.example)}</pre>
-                    <p class="lab-import-hint" style="margin-top:10px;">Oppure incolla direttamente il testo qui sotto.</p>
-                    <div class="lab-import-file-row">
-                        <label class="lab-import-file-btn">
-                            <input type="file" id="labImportFile" accept=".txt,.pdf,text/plain,application/pdf"
-                                style="display:none;" onchange="window._labImportFileChanged(event)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="17 8 12 3 7 8"/>
-                                <line x1="12" y1="3" x2="12" y2="15"/>
-                            </svg>
-                            <span>Scegli file</span>
-                        </label>
-                        <span class="lab-import-file-name" id="labImportFileName">Nessun file</span>
-                    </div>
-                    ${window.renderTextareaFullscreen({
-                        id: 'labImportText',
-                        className: 'lab-import-textarea',
-                        rows: 10,
-                        placeholder: cat.textareaPh,
-                        value: '',
-                    })}
-                    <div class="lab-import-actions">
-                        <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
-                        <button class="btn-primary" onclick="window._labImportParse()">Analizza</button>
-                    </div>
-                </div>
-                <div class="lab-import-step" id="labImportStep2" style="display:none;">
-                    <div class="lab-import-preview-head">
-                        <span id="labImportSummary" class="lab-import-summary"></span>
-                        <div class="lab-import-preview-actions">
-                            <button class="btn-link" onclick="window._labImportToggleAll(true)">Seleziona tutto</button>
-                            <button class="btn-link" onclick="window._labImportToggleAll(false)">Deseleziona tutto</button>
-                        </div>
-                    </div>
-                    <div class="lab-import-preview-list" id="labImportPreview"></div>
-                    <div class="lab-import-actions">
-                        <button class="btn-secondary" onclick="window._labImportBack()">Indietro</button>
-                        <button class="btn-primary" id="labImportSaveBtn" onclick="window._labImportSave()">Salva selezionati</button>
-                    </div>
-                </div>
-            </div>
+            ${_labImportContentHtml(cat, "this.closest('.hp-calc-overlay').remove()", true)}
         </div>`;
     document.body.appendChild(overlay);
-    // Stato locale del flusso. Lo appendo all'overlay cosi' e' pulito
-    // automaticamente quando l'overlay viene rimosso.
     overlay._parsed = [];
     overlay._cat = cat;
 };
 
 window._labImportFileChanged = async function(ev) {
+    const root = ev.target?.closest?.('.lab-import-overlay, .lab-import-host') || _labImportRoot();
     const file = ev.target.files && ev.target.files[0];
-    const nameLabel = document.getElementById('labImportFileName');
-    const textArea = document.getElementById('labImportText');
+    const nameLabel = root?.querySelector('#labImportFileName');
+    const textArea = root?.querySelector('#labImportText');
     if (!file) { if (nameLabel) nameLabel.textContent = 'Nessun file'; return; }
     if (nameLabel) nameLabel.textContent = file.name;
     try {
@@ -4226,16 +4271,16 @@ async function _labExtractPdfText(file) {
 }
 
 window._labImportParse = function() {
-    const overlay = document.querySelector('.lab-import-overlay');
-    if (!overlay) return;
-    const cat = overlay._cat || _LAB_IMPORT_CONFIGS.oggetti;
-    const txt = document.getElementById('labImportText')?.value || '';
+    const root = _labImportRoot();
+    if (!root) return;
+    const cat = root._cat || _LAB_IMPORT_CONFIGS.oggetti;
+    const txt = root.querySelector('#labImportText')?.value || '';
     const parsed = cat.parse(txt);
-    overlay._parsed = parsed;
-    const step1 = document.getElementById('labImportStep1');
-    const step2 = document.getElementById('labImportStep2');
-    const prev = document.getElementById('labImportPreview');
-    const summ = document.getElementById('labImportSummary');
+    root._parsed = parsed;
+    const step1 = root.querySelector('#labImportStep1');
+    const step2 = root.querySelector('#labImportStep2');
+    const prev = root.querySelector('#labImportPreview');
+    const summ = root.querySelector('#labImportSummary');
     if (!parsed.length) {
         alert(cat.notRecognizedMsg);
         return;
@@ -4250,29 +4295,35 @@ window._labImportParse = function() {
 };
 
 window._labImportBack = function() {
-    document.getElementById('labImportStep1').style.display = '';
-    document.getElementById('labImportStep2').style.display = 'none';
+    const root = _labImportRoot();
+    if (!root) return;
+    const step1 = root.querySelector('#labImportStep1');
+    const step2 = root.querySelector('#labImportStep2');
+    if (step1) step1.style.display = '';
+    if (step2) step2.style.display = 'none';
 };
 
 window._labImportToggleAll = function(check) {
-    document.querySelectorAll('#labImportPreview input[type="checkbox"]')
+    const root = _labImportRoot();
+    if (!root) return;
+    root.querySelectorAll('#labImportPreview input[type="checkbox"]')
         .forEach(cb => { cb.checked = !!check; });
 };
 
 window._labImportSave = async function() {
-    const overlay = document.querySelector('.lab-import-overlay');
-    if (!overlay) return;
-    const cat = overlay._cat || _LAB_IMPORT_CONFIGS.oggetti;
-    const parsed = overlay._parsed || [];
+    const root = _labImportRoot();
+    if (!root) return;
+    const cat = root._cat || _LAB_IMPORT_CONFIGS.oggetti;
+    const parsed = root._parsed || [];
     const selected = [];
-    document.querySelectorAll('#labImportPreview input[type="checkbox"]').forEach(cb => {
+    root.querySelectorAll('#labImportPreview input[type="checkbox"]').forEach(cb => {
         if (cb.checked) {
             const idx = parseInt(cb.dataset.idx, 10);
             if (!Number.isNaN(idx) && parsed[idx]) selected.push(parsed[idx]);
         }
     });
     if (!selected.length) { alert(`Seleziona almeno un ${cat.unitSingular} da importare.`); return; }
-    const saveBtn = document.getElementById('labImportSaveBtn');
+    const saveBtn = root.querySelector('#labImportSaveBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.currentUser?.uid) {
@@ -4289,7 +4340,11 @@ window._labImportSave = async function() {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Salva selezionati'; }
         return;
     }
-    overlay.remove();
+    if (root._embedded) {
+        closeHomebrewModal();
+    } else {
+        root.remove();
+    }
     if (typeof loadLabContent === 'function') await loadLabContent();
     if (typeof cat.cacheReload === 'function') {
         try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
