@@ -553,7 +553,7 @@ body {
     z-index: 0;
     pointer-events: none;
     background:
-        url("../../images/Compendio/spellbook.svg") left -34vw bottom -18vh / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
+        url("../../images/Compendio/spellbook.svg") right 0 bottom -18vh / clamp(680px, 158vw, 1220px) clamp(680px, 158vw, 1220px) no-repeat,
         radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.08), transparent 58%),
         linear-gradient(145deg, rgba(255, 244, 210, 0.018), rgba(8, 7, 6, 0.12));
     opacity: 0.24;
@@ -571,30 +571,30 @@ body {
     position: relative;
     isolation: isolate;
     z-index: 1;
-    border-color: rgba(228, 189, 99, 0.42);
+    border-color: rgba(228, 189, 99, 0.30);
     background:
-        radial-gradient(circle at 50% 50%, rgba(18, 15, 13, 0.18), rgba(18, 15, 13, 0.46) 68%),
-        linear-gradient(90deg, rgba(228, 189, 99, 0.12), transparent 24%, transparent 76%, rgba(228, 189, 99, 0.10)),
+        radial-gradient(circle at 50% 50%, rgba(18, 15, 13, 0.16), rgba(18, 15, 13, 0.45) 72%),
+        linear-gradient(90deg, rgba(228, 189, 99, 0.065), transparent 26%, transparent 74%, rgba(228, 189, 99, 0.055)),
         rgba(18, 15, 13, 0.42);
     box-shadow:
-        inset 0 0 0 1px rgba(228, 189, 99, 0.12),
-        inset 0 0 28px rgba(198, 154, 74, 0.08),
+        inset 0 0 0 1px rgba(228, 189, 99, 0.07),
+        inset 0 0 24px rgba(198, 154, 74, 0.045),
         var(--fantasy-shadow-soft);
 }
 
 #compendioHub .comp-hub-card::after {
-    opacity: 0.32;
+    opacity: 0.18;
     background:
-        radial-gradient(circle at 50% 50%, transparent 36%, rgba(198, 154, 74, 0.11) 100%),
-        linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 30%, transparent 76%, rgba(198, 154, 74, 0.09)),
+        radial-gradient(circle at 50% 50%, transparent 42%, rgba(198, 154, 74, 0.06) 100%),
+        linear-gradient(120deg, rgba(255, 255, 255, 0.065), transparent 30%, transparent 76%, rgba(198, 154, 74, 0.055)),
         linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.16));
 }
 
 #compendioHub .comp-hub-card:hover {
-    border-color: rgba(228, 189, 99, 0.66);
+    border-color: rgba(228, 189, 99, 0.46);
     background:
-        radial-gradient(circle at 50% 50%, rgba(18, 15, 13, 0.15), rgba(18, 15, 13, 0.50) 68%),
-        linear-gradient(90deg, rgba(228, 189, 99, 0.16), transparent 24%, transparent 76%, rgba(228, 189, 99, 0.14)),
+        radial-gradient(circle at 50% 50%, rgba(18, 15, 13, 0.14), rgba(18, 15, 13, 0.49) 72%),
+        linear-gradient(90deg, rgba(228, 189, 99, 0.09), transparent 26%, transparent 74%, rgba(228, 189, 99, 0.08)),
         rgba(18, 15, 13, 0.46);
 }
 
@@ -618,7 +618,7 @@ body {
     }
 
     #compendioHub .comp-hub-grid::before {
-        background-position: left -22vw bottom -28vh, center, center;
+        background-position: right 0 bottom -28vh, center, center;
         background-size: clamp(820px, 116vw, 1360px) clamp(820px, 116vw, 1360px), auto, auto;
     }
 }
