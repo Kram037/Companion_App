@@ -42,21 +42,23 @@ window.microOpenSubclassDropdown = async function(index) {
     if (typeof loadHomebrewSottoclassi === 'function') {
         try { await loadHomebrewSottoclassi(); } catch (_) {}
     }
-    const opts = pgGetSubclassOptions(c.nome);
-    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
-    if (opts.length === 0 && hbOpts.length === 0) {
+    const available = _pgAllSubclassOptions(c.nome);
+    if (available.length === 0) {
         showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const level = parseInt(c.livello) || 1;
+    const { opts, hbOpts } = _pgUnlockedSubclassOptions(c.nome, level);
+    if (opts.length === 0 && hbOpts.length === 0) {
+        const minLevel = _pgSubclassMinLevel(c.nome) || 3;
+        showNotification(`La sottoclasse di ${c.nome} si sceglie dal livello ${minLevel}`);
         return;
     }
     const items = _buildSubclassPickerItems(opts, hbOpts, c.livello);
     const allOpts = [...opts, ...hbOpts];
     openCustomSelect(items, (value) => {
         if (value === '__none__') {
-            delete c.sottoclasse;
-            delete c.sottoclasseSlug;
-            delete c.sottoclasse_homebrew_id;
-            delete c.sottoclasse_homebrew_author;
-            c.thirdCaster = false;
+            _pgSubclassFieldsClear(c);
         } else {
             const sel = allOpts.find(o => o.slug === value);
             if (sel) {
@@ -80,11 +82,7 @@ window.microOpenSubclassDropdown = async function(index) {
 window.microClearSubclass = function(index) {
     const c = _microSelectedClasses[index];
     if (!c) return;
-    delete c.sottoclasse;
-    delete c.sottoclasseSlug;
-    delete c.sottoclasse_homebrew_id;
-    delete c.sottoclasse_homebrew_author;
-    c.thirdCaster = false;
+    _pgSubclassFieldsClear(c);
     microRenderClassi();
 };
 
@@ -112,6 +110,7 @@ window.microClassLevelChange = function(i, delta) {
     const c = _microSelectedClasses[i];
     if (!c) return;
     c.livello = Math.max(1, Math.min(20, c.livello + delta));
+    _pgEnsureSubclassAllowed(c);
     microRenderClassi();
 };
 

@@ -19,13 +19,13 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="images/icon d20.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/Core/base.css?v=20260519D">
+    <link rel="stylesheet" href="css/Core/base.css?v=20260519E">
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
-    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260519B">
+    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260519C">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
-    <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260425E">
+    <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260519A">
     <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260519E">
     <link rel="stylesheet" href="css/Compendio/compendio.css?v=20260519G">
 </head>
@@ -121,17 +121,17 @@
                 </div>
                 <div id="compendioSubPage" style="display:none;">
                     <div class="page-top-stack">
-                        <div class="page-header comp-sub-header">
+                        <div class="page-header comp-sub-header page-header-with-back">
+                            <button class="page-header-back" onclick="compendioBackToHub()" aria-label="Indietro" data-no-return-glow="1">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
                             <h1 id="compendioSubTitle">Compendio</h1>
                         </div>
                         <div id="compendioStickyTools"></div>
                     </div>
                     <div id="compendioContent" class="comp-content"></div>
-                    <button class="back-button-floating" onclick="compendioBackToHub()" aria-label="Indietro" data-no-return-glow="1">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                    </button>
                 </div>
             </div>
         </section>
@@ -176,17 +176,17 @@
                 <!-- Sub-page view (hidden by default) -->
                 <div id="labSubPage" style="display:none;">
                     <div class="page-top-stack">
-                        <div class="page-header">
+                        <div class="page-header page-header-with-back">
+                            <button class="page-header-back" onclick="labBackToHub()" aria-label="Indietro" data-no-return-glow="1">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
                             <h1 id="labSubTitle">Laboratorio</h1>
                         </div>
                         <div id="labStickyTools"></div>
                     </div>
                     <div id="labContent" class="lab-content"></div>
-                    <button class="back-button-floating" onclick="labBackToHub()" aria-label="Indietro" data-no-return-glow="1">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                    </button>
                     <button class="btn-fab" id="addHomebrewBtn" aria-label="Crea Homebrew">+</button>
                 </div>
             </div>
@@ -213,8 +213,8 @@
         <section class="page" id="schedaPage">
             <div class="page-content scheda-content">
                 <div class="page-top-stack scheda-top-stack">
-                    <div class="page-header scheda-page-header">
-                        <button class="scheda-header-back" id="schedaBackBtn" aria-label="Torna ai personaggi">
+                    <div class="page-header scheda-page-header page-header-with-back">
+                        <button class="page-header-back scheda-header-back" id="schedaBackBtn" aria-label="Torna ai personaggi">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M19 12H5M12 19l-7-7 7-7"/>
                             </svg>
@@ -236,7 +236,12 @@
         <section class="page" id="sessionePage">
             <div class="page-content sessione-content">
                 <div class="page-top-stack">
-                    <div class="page-header">
+                    <div class="page-header page-header-with-back">
+                        <button class="page-header-back" id="backToDettagliBtn" aria-label="Torna ai dettagli">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
                         <h1 id="sessioneCampagnaTitle">Sessione</h1>
                     </div>
                 </div>
@@ -244,17 +249,12 @@
                     <!-- Il contenuto verrÃ  popolato dinamicamente -->
                 </div>
             </div>
-            <button class="back-button-floating" id="backToDettagliBtn" aria-label="Torna ai dettagli">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
         </section>
 
         <!-- Combattimento Page -->
         <section class="page" id="combattimentoPage">
             <div class="combat-header">
-                <button class="back-button-floating combat-back" id="backToSessioneBtn" aria-label="Torna alla sessione">
+                <button class="page-header-back combat-back" id="backToSessioneBtn" aria-label="Torna alla sessione">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
                 <div class="combat-round-center" id="combatRoundInfo">
@@ -277,7 +277,12 @@
         <section class="page" id="dettagliPage">
             <div class="page-content dettagli-content">
                 <div class="page-top-stack">
-                    <div class="page-header">
+                    <div class="page-header page-header-with-back">
+                        <button class="page-header-back" id="backToCampagneBtn" aria-label="Torna alle campagne">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
                         <h1 id="dettagliCampagnaTitle">Dettagli Campagna</h1>
                     </div>
                 </div>
@@ -293,12 +298,6 @@
                     <!-- Il contenuto verrÃ  popolato dinamicamente -->
                 </div>
             </div>
-            <!-- Bottone indietro in basso a sinistra sopra la toolbar -->
-            <button class="back-button-floating" id="backToCampagneBtn" aria-label="Torna alle campagne">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
         </section>
     </main>
 
@@ -1078,11 +1077,11 @@
     <script src="js/Personaggi/personaggi-razze-background.js?v=20260517B"></script>
     <script src="js/Personaggi/personaggi-sottoclassi.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-invocazioni-stili.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-classi.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-classi.js?v=20260519A"></script>
     <script src="js/Personaggi/personaggi-competenze.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-slot-incantesimo.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-pv-keypad.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260519A"></script>
     <script src="js/Personaggi/personaggi-lista.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-core.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-risorse.js?v=20260517A"></script>
@@ -1095,13 +1094,13 @@
     <script src="js/Personaggi/personaggi-scheda-privilegi.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-editor.js?v=20260517B"></script>
     <script src="js/Personaggi/personaggi-scheda-calcolatori.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260519A"></script>
     <script src="js/Personaggi/personaggi-scheda-bonus.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-equipaggiamento.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-form.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-form.js?v=20260519A"></script>
     <script src="js/Personaggi/personaggi-campagna-picker.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-micro.js?v=20260519A"></script>
+    <script src="js/Personaggi/personaggi-micro.js?v=20260519B"></script>
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
     <script src="js/Sessioni/sessions.js?v=20260425F"></script>
     <script src="js/Combattimento/combat.js?v=20260425E"></script>

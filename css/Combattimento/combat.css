@@ -73,7 +73,7 @@
 
 /* Combat Header */
 .combat-header { display: flex; align-items: center; padding: 10px 50px; min-height: 50px; justify-content: center; flex-shrink: 0; border-bottom: 1px solid var(--border); position: relative; }
-#combattimentoPage .combat-back.back-button-floating { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 10; }
+#combattimentoPage .combat-back.page-header-back { left: 10px; z-index: 10; }
 .combat-round-center { text-align: center; flex: 1; }
 .combat-round-num { font-size: 0.82rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
 .combat-turn-name { font-size: 0.9rem; font-weight: 700; color: var(--accent); }

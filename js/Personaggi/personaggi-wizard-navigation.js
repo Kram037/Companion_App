@@ -2,11 +2,44 @@
 // CHARACTER WIZARD NAVIGATION
 // ============================================================================
 
+function _pgRequiresSubrace(raceName) {
+    if (!raceName || typeof buildSubraceOptionsLocal !== 'function') return false;
+    return buildSubraceOptionsLocal(raceName).length > 0;
+}
+
+window.pgValidateIdentityStep = function({ requireIdentity = true } = {}) {
+    const nome = document.getElementById('pgNome')?.value?.trim() || '';
+    if (!nome) {
+        showNotification('Inserisci un nome per il personaggio');
+        return false;
+    }
+    if (!requireIdentity) return true;
+
+    const razza = document.getElementById('pgRazza')?.value || '';
+    if (!razza) {
+        showNotification('Seleziona una razza');
+        return false;
+    }
+
+    const sottorazza = document.getElementById('pgSottorazza')?.value || '';
+    if (_pgRequiresSubrace(razza) && !sottorazza) {
+        showNotification('Seleziona una sottorazza');
+        return false;
+    }
+
+    const background = document.getElementById('pgBackground')?.value || '';
+    if (!background) {
+        showNotification('Seleziona un background');
+        return false;
+    }
+
+    return true;
+};
+
 // --- Wizard Navigation ---
 window.pgWizardNext = function() {
     if (pgWizardCurrentStep === 0) {
-        const nome = document.getElementById('pgNome').value.trim();
-        if (!nome) { showNotification('Inserisci un nome per il personaggio'); return; }
+        if (!pgValidateIdentityStep({ requireIdentity: !editingPersonaggioId })) return;
     }
     if (pgWizardCurrentStep === 1) {
         if (pgSelectedClasses.length === 0) { showNotification('Seleziona almeno una classe'); return; }

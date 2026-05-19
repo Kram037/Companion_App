@@ -30,6 +30,7 @@ window.pgRemoveClasse = function(index) {
 window.pgUpdateClassLevel = function(index, value) {
     const lv = Math.max(1, Math.min(20, parseInt(value) || 1));
     pgSelectedClasses[index].livello = lv;
+    _pgEnsureSubclassAllowed(pgSelectedClasses[index]);
     pgUpdateTotalLevel();
     pgResetAutoHP();
 }
@@ -134,9 +135,86 @@ function pgGetHomebrewSubclassOptions(className) {
         .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it'));
 }
 
+function _pgSubclassFieldsClear(c) {
+    if (!c) return;
+    delete c.sottoclasse;
+    delete c.sottoclasseSlug;
+    delete c.sottoclasse_homebrew_id;
+    delete c.sottoclasse_homebrew_author;
+    c.thirdCaster = false;
+}
+
+function _pgAllSubclassOptions(className) {
+    return [
+        ...pgGetSubclassOptions(className),
+        ...pgGetHomebrewSubclassOptions(className),
+    ];
+}
+
+function _pgSubclassMinLevel(className) {
+    const all = _pgAllSubclassOptions(className);
+    if (all.length === 0) return null;
+    return Math.min(...all.map(o => parseInt(o.minLevel) || 3));
+}
+
+function _pgUnlockedSubclassOptions(className, livello) {
+    const lv = parseInt(livello) || 1;
+    return {
+        opts: pgGetSubclassOptions(className).filter(o => lv >= (parseInt(o.minLevel) || 3)),
+        hbOpts: pgGetHomebrewSubclassOptions(className).filter(o => lv >= (parseInt(o.minLevel) || 3)),
+    };
+}
+
+function _pgFindSubclassOption(c) {
+    if (!c?.sottoclasse && !c?.sottoclasseSlug) return null;
+    const slug = String(c.sottoclasseSlug || '').toLowerCase();
+    const name = String(c.sottoclasse || '').toLowerCase();
+    return _pgAllSubclassOptions(c.nome).find(o =>
+        (slug && String(o.slug || '').toLowerCase() === slug) ||
+        (name && String(o.name || '').toLowerCase() === name)
+    ) || null;
+}
+
+function _pgEnsureSubclassAllowed(c) {
+    const selected = _pgFindSubclassOption(c);
+    if (!selected) return false;
+    const level = parseInt(c.livello) || 1;
+    if (level >= (parseInt(selected.minLevel) || 3)) return false;
+    _pgSubclassFieldsClear(c);
+    return true;
+}
+
+window.pgNormalizeSelectedClassesForLevel = function(notify = false) {
+    let changed = false;
+    pgSelectedClasses.forEach(c => {
+        changed = _pgEnsureSubclassAllowed(c) || changed;
+    });
+    if (changed && notify) {
+        showNotification('Ho rimosso le sottoclassi non disponibili al livello attuale');
+    }
+    return changed;
+};
+
+function pgRebuildSlotsForClassi(classi, previousSlots = {}) {
+    if (typeof calcSpellSlotsFromClassi !== 'function') return previousSlots || {};
+    const autoSlots = calcSpellSlotsFromClassi(classi || []);
+    const rebuilt = {};
+    Object.keys(autoSlots).forEach(lvKey => {
+        const lv = String(lvKey);
+        const max = autoSlots[lvKey];
+        const prev = previousSlots?.[lv] || previousSlots?.[parseInt(lv)] || null;
+        const prevUsed = prev && Number.isFinite(parseInt(prev.used))
+            ? Math.min(parseInt(prev.used), max)
+            : 0;
+        rebuilt[lv] = { max, current: Math.max(0, max - prevUsed), used: prevUsed };
+    });
+    return rebuilt;
+}
+
 function _renderSubclassSelector(c, index, onclickFn, mode = 'inline') {
     const opts = pgGetSubclassOptions(c.nome);
     const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
+    const allOpts = [...opts, ...hbOpts];
     try {
         appDebug('[homebrew][selector] _renderSubclassSelector chiamata:', {
             classeNome: c.nome,
@@ -148,7 +226,17 @@ function _renderSubclassSelector(c, index, onclickFn, mode = 'inline') {
                 : 'NULL'
         });
     } catch (_) {}
-    if (opts.length === 0 && hbOpts.length === 0) return '';
+    if (allOpts.length === 0) return '';
+    _pgEnsureSubclassAllowed(c);
+    const level = parseInt(c.livello) || 1;
+    const minLevel = _pgSubclassMinLevel(c.nome);
+    const unlocked = _pgUnlockedSubclassOptions(c.nome, level);
+    if (unlocked.opts.length === 0 && unlocked.hbOpts.length === 0) {
+        return `
+        <button type="button" class="pg-subclass-trigger pg-subclass-trigger-locked" disabled>
+            <span class="pg-subclass-trigger-empty">Sottoclasse dal liv. ${minLevel || 3}</span>
+        </button>`;
+    }
     const label = c.sottoclasse
         ? escapeHtml(c.sottoclasse)
         : '<span class="pg-subclass-trigger-empty">Sottoclasse…</span>';
@@ -240,21 +328,23 @@ window.pgOpenSubclassDropdown = async function(index) {
     if (typeof loadHomebrewSottoclassi === 'function') {
         try { await loadHomebrewSottoclassi(); } catch (_) {}
     }
-    const opts = pgGetSubclassOptions(c.nome);
-    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
-    if (opts.length === 0 && hbOpts.length === 0) {
+    const available = _pgAllSubclassOptions(c.nome);
+    if (available.length === 0) {
         showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const level = parseInt(c.livello) || 1;
+    const { opts, hbOpts } = _pgUnlockedSubclassOptions(c.nome, level);
+    if (opts.length === 0 && hbOpts.length === 0) {
+        const minLevel = _pgSubclassMinLevel(c.nome) || 3;
+        showNotification(`La sottoclasse di ${c.nome} si sceglie dal livello ${minLevel}`);
         return;
     }
     const items = _buildSubclassPickerItems(opts, hbOpts, c.livello);
     const allOpts = [...opts, ...hbOpts];
     openCustomSelect(items, (value) => {
         if (value === '__none__') {
-            delete c.sottoclasse;
-            delete c.sottoclasseSlug;
-            delete c.sottoclasse_homebrew_id;
-            delete c.sottoclasse_homebrew_author;
-            c.thirdCaster = false;
+            _pgSubclassFieldsClear(c);
         } else {
             const sel = allOpts.find(o => o.slug === value);
             if (sel) {
@@ -304,11 +394,7 @@ function _buildSubclassPickerItems(opts, hbOpts, livello) {
 window.pgClearSubclass = function(index) {
     const c = pgSelectedClasses[index];
     if (!c) return;
-    delete c.sottoclasse;
-    delete c.sottoclasseSlug;
-    delete c.sottoclasse_homebrew_id;
-    delete c.sottoclasse_homebrew_author;
-    c.thirdCaster = false;
+    _pgSubclassFieldsClear(c);
     pgRenderClassi();
     pgResetAutoHP();
 };
@@ -317,6 +403,7 @@ window.pgClassLevelChange = function(index, delta) {
     const c = pgSelectedClasses[index];
     if (!c) return;
     c.livello = Math.max(1, Math.min(20, c.livello + delta));
+    _pgEnsureSubclassAllowed(c);
     pgRenderClassi();
     pgUpdateTotalLevel();
     pgResetAutoHP();

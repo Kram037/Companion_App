@@ -498,6 +498,7 @@ body.global-return-active .back-button-floating { display: none !important; }
     margin: 0;
     padding: 7px var(--spacing-sm);
     border-bottom: 1px solid var(--border);
+    position: relative;
 }
 
 .page-header h1 {
@@ -546,6 +547,43 @@ body.global-return-active .back-button-floating { display: none !important; }
     font-weight: 800;
     line-height: 1.15;
     letter-spacing: 0;
+}
+
+.page-header-with-back h1 {
+    max-width: calc(100% - 96px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-header-back {
+    position: absolute;
+    left: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.page-header-back:hover {
+    border-color: var(--accent-light);
+    color: var(--accent);
+    background: var(--surface-hover);
+}
+
+.page-header-back svg {
+    width: 16px;
+    height: 16px;
 }
 
 .page-top-stack .page-header h1 > div + div {
@@ -703,6 +741,7 @@ body.global-return-active .back-button-floating { display: none !important; }
 
     .page-top-stack .page-header { min-height: 28px; padding: 2px var(--spacing-sm); }
     .page-top-stack .page-header h1 { font-size: 0.98rem; }
+    .page-header-back { left: 8px; width: 28px; height: 26px; }
     .filters-bar { gap: 6px; margin-bottom: var(--spacing-md); }
     .page-top-stack .filters-bar { margin-bottom: 0; }
     .filter-search { padding: 8px 10px 8px 32px; font-size: 0.85rem; }
@@ -826,7 +865,6 @@ body.global-return-active .back-button-floating { display: none !important; }
     .back-button-floating { width: 36px; height: 36px; bottom: 68px; left: 10px; }
     .back-button-floating svg { width: 18px; height: 18px; }
     .btn-fab { width: 42px; height: 42px; bottom: 68px; right: 10px; font-size: 1.3rem; }
-    #combattimentoPage .combat-back.back-button-floating { bottom: auto; top: 50%; transform: translateY(-50%); }
 
     .in-app-notifications { max-width: calc(100vw - 2rem); right: var(--spacing-sm); top: 60px; }
     .in-app-notification { padding: 10px 12px; }

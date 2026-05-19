@@ -226,43 +226,6 @@
     position: relative;
 }
 
-.scheda-page-header h1 {
-    max-width: calc(100% - 96px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.scheda-header-back {
-    position: absolute;
-    left: var(--spacing-sm);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.scheda-header-back:hover {
-    border-color: var(--accent-light);
-    color: var(--accent);
-    background: var(--surface-hover);
-}
-
-.scheda-header-back svg {
-    width: 16px;
-    height: 16px;
-}
-
 /* Header scheda: layout simile alla scheda cartacea
    ┌───────┬──────────────────┬─────────────┐
    │ FOTO  │ Nome / classe    │ Level Up    │
@@ -471,7 +434,6 @@
     .scheda-avatar-initials { font-size: 1.3rem; }
     .scheda-name { font-size: 1.1rem; }
     .scheda-subtitle { font-size: 0.78rem; }
-    .scheda-header-back { left: 8px; width: 28px; height: 26px; }
     .scheda-quick-classi { font-size: 0.82rem; }
     .scheda-quick-sottoclassi { font-size: 0.76rem; }
     .scheda-quick-razza { font-size: 0.72rem; }
@@ -1694,6 +1656,18 @@
 .pg-subclass-trigger:hover {
     background: var(--surface-hover);
     border-color: var(--accent-light);
+}
+.pg-subclass-trigger:disabled,
+.pg-subclass-trigger-locked {
+    cursor: not-allowed;
+    opacity: 0.78;
+    background: var(--bg);
+    border-style: dashed;
+}
+.pg-subclass-trigger:disabled:hover,
+.pg-subclass-trigger-locked:hover {
+    background: var(--bg);
+    border-color: var(--border);
 }
 .pg-subclass-trigger-empty {
     color: var(--text-light);

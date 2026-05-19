@@ -6,6 +6,15 @@ let pgSaving = false;
 async function handleSavePersonaggio(e) {
     e.preventDefault();
     if (pgSaving) return;
+    if (typeof pgValidateIdentityStep === 'function' && !pgValidateIdentityStep({ requireIdentity: !editingPersonaggioId })) return;
+    if (typeof pgNormalizeSelectedClassesForLevel === 'function') {
+        const changed = pgNormalizeSelectedClassesForLevel(true);
+        if (changed) pgRenderClassi();
+    }
+    if (pgSelectedClasses.length === 0) {
+        showNotification('Seleziona almeno una classe');
+        return;
+    }
     pgSaving = true;
     const saveBtn = document.getElementById('savePersonaggioBtn');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio...'; }
@@ -15,6 +24,8 @@ async function handleSavePersonaggio(e) {
     const userData = await findUserByUid(AppState.currentUser?.uid);
     if (!userData) {
         showNotification('Errore: utente non trovato');
+        pgSaving = false;
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = editingPersonaggioId ? 'Salva' : 'Crea'; }
         return;
     }
 
@@ -79,6 +90,8 @@ async function handleSavePersonaggio(e) {
 
     if (!pgData.nome) {
         showNotification('Inserisci un nome per il personaggio');
+        pgSaving = false;
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = editingPersonaggioId ? 'Salva' : 'Crea'; }
         return;
     }
 
@@ -239,6 +252,9 @@ window.pgChangeSubclassFromCard = async function(pgId) {
     let classi = Array.isArray(pg.classi) && pg.classi.length > 0
         ? pg.classi
         : (pg.classe ? [{ nome: pg.classe, livello: pg.livello || 1 }] : []);
+    if (!Array.isArray(pg.classi) || pg.classi.length === 0) {
+        pg.classi = classi;
+    }
 
     if (!classi.length) {
         showNotification('Nessuna classe trovata per questo personaggio');
@@ -246,9 +262,8 @@ window.pgChangeSubclassFromCard = async function(pgId) {
     }
 
     const eligible = classi.map((c, i) => {
-        const opts = pgGetSubclassOptions(c.nome);
-        const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
-        return { c, i, opts, hbOpts, hasOpts: opts.length > 0 || hbOpts.length > 0 };
+        const opts = _pgAllSubclassOptions(c.nome);
+        return { c, i, hasOpts: opts.length > 0 };
     }).filter(x => x.hasOpts);
 
     if (!eligible.length) {
@@ -273,10 +288,16 @@ window.pgChangeSubclassFromCard = async function(pgId) {
 async function _pgOpenSubclassPickerForSavedPg(pgId, pg, classIdx) {
     if (!Array.isArray(pg.classi) || !pg.classi[classIdx]) return;
     const c = pg.classi[classIdx];
-    const opts = pgGetSubclassOptions(c.nome);
-    const hbOpts = pgGetHomebrewSubclassOptions(c.nome);
-    if (opts.length === 0 && hbOpts.length === 0) {
+    const available = _pgAllSubclassOptions(c.nome);
+    if (available.length === 0) {
         showNotification(`Nessuna sottoclasse disponibile per ${c.nome}`);
+        return;
+    }
+    const level = parseInt(c.livello) || 1;
+    const { opts, hbOpts } = _pgUnlockedSubclassOptions(c.nome, level);
+    if (opts.length === 0 && hbOpts.length === 0) {
+        const minLevel = _pgSubclassMinLevel(c.nome) || 3;
+        showNotification(`La sottoclasse di ${c.nome} si sceglie dal livello ${minLevel}`);
         return;
     }
     const items = _buildSubclassPickerItems(opts, hbOpts, c.livello || 1);
@@ -286,11 +307,7 @@ async function _pgOpenSubclassPickerForSavedPg(pgId, pg, classIdx) {
         const newClassi = pg.classi.map(x => ({ ...x }));
         const target = newClassi[classIdx];
         if (value === '__none__') {
-            delete target.sottoclasse;
-            delete target.sottoclasseSlug;
-            delete target.sottoclasse_homebrew_id;
-            delete target.sottoclasse_homebrew_author;
-            target.thirdCaster = false;
+            _pgSubclassFieldsClear(target);
         } else {
             const sel = allOpts.find(o => o.slug === value);
             if (!sel) return;
@@ -324,6 +341,9 @@ async function _pgOpenSubclassPickerForSavedPg(pgId, pg, classIdx) {
         }
 
         const updates = { classi: newClassi, updated_at: new Date().toISOString() };
+        if (typeof pgRebuildSlotsForClassi === 'function') {
+            updates.slot_incantesimo = pgRebuildSlotsForClassi(newClassi, pg.slot_incantesimo || {});
+        }
         if (privilegi) updates.privilegi = privilegi;
 
         const supabase = getSupabaseClient();

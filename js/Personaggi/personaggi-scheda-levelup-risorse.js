@@ -291,7 +291,70 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     } else {
         showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
     }
-    renderSchedaPersonaggio(pgId);
+    await renderSchedaPersonaggio(pgId);
+    setTimeout(() => _schedaMaybePromptSubclassAfterLevelUp(pgId, classIdx), 120);
+}
+
+async function _schedaMaybePromptSubclassAfterLevelUp(pgId, classIdx) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const classi = Array.isArray(pg.classi) ? pg.classi.map(c => ({ ...c })) : [];
+    const cls = classi[classIdx];
+    if (!cls || cls.sottoclasse) return;
+
+    if (typeof loadHomebrewSottoclassi === 'function') {
+        try { await loadHomebrewSottoclassi(); } catch (_) {}
+    }
+
+    if (typeof _pgUnlockedSubclassOptions !== 'function' || typeof _buildSubclassPickerItems !== 'function') return;
+    const level = parseInt(cls.livello) || 1;
+    const { opts, hbOpts } = _pgUnlockedSubclassOptions(cls.nome, level);
+    if (opts.length === 0 && hbOpts.length === 0) return;
+
+    const items = _buildSubclassPickerItems(opts, hbOpts, level);
+    const allOpts = [...opts, ...hbOpts];
+    showNotification(`Ora puoi scegliere la sottoclasse di ${cls.nome}`);
+    openCustomSelect(items, async (value) => {
+        if (value === '__none__') return;
+        const selected = allOpts.find(o => o.slug === value);
+        if (!selected) return;
+
+        const currentPg = _schedaPgCache;
+        const nextClassi = Array.isArray(currentPg?.classi)
+            ? currentPg.classi.map(c => ({ ...c }))
+            : classi;
+        const target = nextClassi[classIdx];
+        if (!target) return;
+
+        target.sottoclasse = selected.name;
+        target.sottoclasseSlug = selected.slug;
+        if (selected.isHomebrew) {
+            target.sottoclasse_homebrew_id = selected._hbId;
+            if (selected._hbAuthor) target.sottoclasse_homebrew_author = selected._hbAuthor;
+            target.thirdCaster = false;
+        } else {
+            delete target.sottoclasse_homebrew_id;
+            delete target.sottoclasse_homebrew_author;
+            target.thirdCaster = isThirdCasterSubclass(selected.slug, selected.name);
+        }
+
+        const classeDisplay = nextClassi.map(c => `${c.nome} ${c.livello}`).join(' / ');
+        const slotIncantesimo = typeof pgRebuildSlotsForClassi === 'function'
+            ? pgRebuildSlotsForClassi(nextClassi, currentPg?.slot_incantesimo || {})
+            : (currentPg?.slot_incantesimo || {});
+        await schedaInstantSave(pgId, {
+            classi: nextClassi,
+            classe: classeDisplay,
+            slot_incantesimo: slotIncantesimo,
+        });
+        if (_schedaPgCache?.id === pgId) {
+            _schedaPgCache.classi = nextClassi;
+            _schedaPgCache.classe = classeDisplay;
+            _schedaPgCache.slot_incantesimo = slotIncantesimo;
+        }
+        showNotification(`Sottoclasse scelta: ${selected.name}`);
+        renderSchedaPersonaggio(pgId);
+    }, `Sottoclasse di ${cls.nome}`);
 }
 
 window.schedaHdChange = function(pgId, className, current, delta, max) {
