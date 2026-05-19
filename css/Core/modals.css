@@ -542,9 +542,14 @@
 .pwa-install-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    flex-shrink: 0;
-    padding: 6px 12px;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 132px;
+    min-height: 36px;
+    margin-top: 0;
+    padding: 7px 12px;
     font-size: 0.82rem;
 }
 .pwa-install-btn svg { flex-shrink: 0; }

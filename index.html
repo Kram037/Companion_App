@@ -19,9 +19,9 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="images/icon d20.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/Core/base.css?v=20260519C">
+    <link rel="stylesheet" href="css/Core/base.css?v=20260519D">
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
-    <link rel="stylesheet" href="css/Core/modals.css?v=20260517D">
+    <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
     <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260518A">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
@@ -111,8 +111,12 @@
         <section class="page" id="compendioPage">
             <div class="page-content compendio-content">
                 <div id="compendioHub">
-                    <h1 class="comp-hub-title">Compendio</h1>
-                    <p class="comp-hub-subtitle">Manuale virtuale della Companion App</p>
+                    <div class="page-top-stack">
+                        <div class="page-header">
+                            <h1>Compendio</h1>
+                        </div>
+                    </div>
+                    <p class="comp-hub-subtitle">Manuale virtuale</p>
                     <div class="comp-hub-grid" id="compendioHubGrid"></div>
                 </div>
                 <div id="compendioSubPage" style="display:none;">
@@ -135,8 +139,10 @@
         <!-- Amici Page -->
         <section class="page" id="amiciPage">
             <div class="page-content">
-                <div class="page-header">
-                    <h1>Amici</h1>
+                <div class="page-top-stack">
+                    <div class="page-header">
+                        <h1>Amici</h1>
+                    </div>
                 </div>
                 
                 <!-- Richieste in entrata -->
@@ -159,7 +165,11 @@
             <div class="page-content laboratorio-content">
                 <!-- Hub view -->
                 <div id="labHub">
-                    <h1 class="lab-hub-title">Laboratorio</h1>
+                    <div class="page-top-stack">
+                        <div class="page-header">
+                            <h1>Laboratorio</h1>
+                        </div>
+                    </div>
                     <p class="lab-hub-subtitle">Il tuo mondo, le tue regole</p>
                     <div class="lab-hub-grid" id="labHubGrid"></div>
                 </div>
@@ -185,8 +195,10 @@
         <!-- Personaggi Page -->
         <section class="page" id="personaggiPage">
             <div class="page-content">
-                <div class="page-header">
-                    <h1>Personaggi</h1>
+                <div class="page-top-stack">
+                    <div class="page-header">
+                        <h1>Personaggi</h1>
+                    </div>
                 </div>
                 <div id="personaggiList" class="personaggi-list">
                     <div class="content-placeholder">
@@ -218,8 +230,10 @@
         <!-- Sessione Page -->
         <section class="page" id="sessionePage">
             <div class="page-content sessione-content">
-                <div class="sessione-header">
-                    <h1 id="sessioneCampagnaTitle" class="sessione-title">Sessione</h1>
+                <div class="page-top-stack">
+                    <div class="page-header">
+                        <h1 id="sessioneCampagnaTitle">Sessione</h1>
+                    </div>
                 </div>
                 <div id="sessioneContent">
                     <!-- Il contenuto verrÃ  popolato dinamicamente -->
@@ -257,11 +271,15 @@
         <!-- Dettagli Campagna Page -->
         <section class="page" id="dettagliPage">
             <div class="page-content dettagli-content">
+                <div class="page-top-stack">
+                    <div class="page-header">
+                        <h1 id="dettagliCampagnaTitle">Dettagli Campagna</h1>
+                    </div>
+                </div>
                 <div class="dettagli-header">
                     <div class="dettagli-icon-container" id="dettagliIconContainer">
                         <!-- L'icona verrÃ  popolata dinamicamente -->
                     </div>
-                    <h1 id="dettagliCampagnaTitle" class="dettagli-title">Dettagli Campagna</h1>
                     <div class="dettagli-actions" id="dettagliActions">
                         <!-- Le azioni rapide verranno popolate dinamicamente -->
                     </div>

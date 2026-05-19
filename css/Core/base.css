@@ -524,6 +524,7 @@ body.global-return-active .back-button-floating { display: none !important; }
     position: sticky;
     top: 0;
     z-index: 90;
+    flex-shrink: 0;
     background: var(--surface);
     border: 0;
     border-radius: 0;
@@ -545,6 +546,13 @@ body.global-return-active .back-button-floating { display: none !important; }
     font-weight: 800;
     line-height: 1.15;
     letter-spacing: 0;
+}
+
+.page-top-stack .page-header h1 > div + div {
+    margin-top: 1px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
 }
 
 .page-top-stack:empty {
