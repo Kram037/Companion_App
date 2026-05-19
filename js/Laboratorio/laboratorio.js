@@ -1949,9 +1949,49 @@ function labFieldsBackground(data) {
     </div>`;
 }
 
+function _labNormalizeSpellLevel(value) {
+    const level = parseInt(value, 10);
+    return Number.isFinite(level) && level >= 0 && level <= 9 ? level : 0;
+}
+
+function _labSpellLevelLabel(value) {
+    const level = _labNormalizeSpellLevel(value);
+    return level === 0 ? 'Trucchetto' : `${level}°`;
+}
+
+function _labSetSpellLevelField(value) {
+    const normalized = String(_labNormalizeSpellLevel(value));
+    const hidden = document.getElementById('hbLivello');
+    const btn = document.getElementById('hbLivelloBtn');
+    if (hidden) hidden.value = normalized;
+    if (btn) {
+        btn.dataset.value = normalized;
+        btn.textContent = _labSpellLevelLabel(normalized);
+    }
+}
+
+window.labOpenSpellLevelSelect = function() {
+    const options = [
+        { value: '0', label: 'Trucchetto' },
+        ...[1,2,3,4,5,6,7,8,9].map(level => ({
+            value: String(level),
+            label: _labSpellLevelLabel(level),
+        })),
+    ];
+
+    openCustomSelect(options, (value) => {
+        _labSetSpellLevelField(value);
+        const hidden = document.getElementById('hbLivello');
+        if (hidden) {
+            hidden.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }, 'Livello incantesimo');
+};
+
 function labFieldsIncantesimi(data) {
     const scuole = ['Abiurazione','Ammaliamento','Divinazione','Evocazione','Illusione','Invocazione','Necromanzia','Trasmutazione'];
     const currentSchool = data?.scuola || '';
+    const currentLevel = _labNormalizeSpellLevel(data?.livello);
     // Se la scuola attuale e' homebrew (non in lista standard), la
     // aggiungiamo come opzione extra cosi' resta preservata in editing.
     const isCustomSchool = currentSchool && !scuole.includes(currentSchool);
@@ -1962,11 +2002,13 @@ function labFieldsIncantesimi(data) {
     </div>
     <div class="form-row form-row-2">
         <div class="form-group">
-            <label for="hbLivello">Livello</label>
-            <select id="hbLivello">
-                <option value="0" ${(data?.livello ?? 0) === 0 ? 'selected' : ''}>Trucchetto</option>
+            <label for="hbLivelloBtn">Livello</label>
+            <select id="hbLivello" hidden>
+                <option value="0" ${currentLevel === 0 ? 'selected' : ''}>Trucchetto</option>
                 ${[1,2,3,4,5,6,7,8,9].map(l => `<option value="${l}" ${data?.livello === l ? 'selected' : ''}>${l}°</option>`).join('')}
             </select>
+            <button type="button" class="custom-select-trigger" id="hbLivelloBtn"
+                data-value="${currentLevel}" onclick="labOpenSpellLevelSelect()">${escapeHtml(_labSpellLevelLabel(currentLevel))}</button>
         </div>
         <div class="form-group">
             <label for="hbScuola">Scuola <span class="lab-help">(puoi anche inserirne una homebrew)</span></label>
@@ -3043,9 +3085,11 @@ window.openHomebrewModal = function(editData) {
     title.textContent = _labEditingId ? `Modifica ${cat.label}` : `${cat.label} Homebrew`;
     saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea';
     content.innerHTML = cat.fields(editData);
+    if (_labCurrentTab === 'incantesimi') _labSetSpellLevelField(editData?.livello);
     _labConfigureHomebrewModeTabs();
     window.labSetHomebrewModalMode('form');
 
+    modal.classList.add('lab-homebrew-compact');
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 };
@@ -3141,6 +3185,7 @@ window.closeHomebrewModal = function() {
     const modal = document.getElementById('homebrewModal');
     if (modal) {
         modal.classList.remove('active');
+        modal.classList.remove('lab-homebrew-compact');
         document.body.style.overflow = '';
         _labEditingId = null;
         _labSubState = null;
