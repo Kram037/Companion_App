@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v101';
+const CACHE_NAME = 'companion-app-v102';
 
 const APP_SHELL_URLS = [
     './',
@@ -68,7 +68,6 @@ const APP_SHELL_URLS = [
     './css/Compendio/compendio.css',
     './images/icon d20.png',
     './images/Scheda%20personaggio/Icona_scheda_combattimento.png',
-    './images/Compendio/spellbook.svg',
     './images/Toolbar/Compendio.svg',
     './images/Toolbar/Laboratorio.svg',
     './images/Logo Leggenda.jpeg'
