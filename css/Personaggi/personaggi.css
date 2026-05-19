@@ -3986,8 +3986,10 @@
 
 /* Tab Catalogo / Homebrew nel picker incantesimi */
 .spell-picker-tabs {
-    display: flex;
-    gap: 4px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    width: 100%;
     margin-bottom: 10px;
     border-bottom: 1px solid var(--border);
 }
@@ -4002,7 +4004,9 @@
     transition: color 0.15s, border-color 0.15s;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    min-width: 0;
 }
 .spell-picker-tab:hover { color: var(--accent); }
 .spell-picker-tab.active {
@@ -4034,12 +4038,22 @@
 
 /* Search row con icona filtri */
 .spell-picker-search-row {
-    display: flex;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
     margin-bottom: 8px;
     align-items: center;
+    width: 100%;
+    flex-direction: row;
 }
-.spell-picker-search { flex: 1; margin-bottom: 0 !important; }
+.spell-picker-search-row .filter-search-wrap {
+    min-width: 0;
+}
+.spell-picker-search { width: 100%; margin-bottom: 0 !important; }
+.spell-picker-search-row .comp-filter-btn {
+    min-height: 40px;
+    white-space: nowrap;
+}
 .spell-picker-filter-btn {
     position: relative;
     display: inline-flex;

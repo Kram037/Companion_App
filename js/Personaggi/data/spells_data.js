@@ -18,11 +18,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You hurl a bubble of acid. Choose one creature you can see within range, or choose two creatures you can see within range that are within 5 feet of each other. A target must succeed on a Dexterity saving throw or take 1d6 acid damage. This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -83,12 +85,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -174,13 +178,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -205,12 +211,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -288,11 +296,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried. This spell's damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10).",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -352,13 +362,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -383,12 +395,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -412,11 +426,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends.",
     "classes": [
       "Chierico",
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -504,13 +520,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Chierico",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -535,12 +553,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [
@@ -568,13 +588,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -598,11 +620,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You touch one to three pebbles and imbue them with magic. You or someone else can make a ranged spell attack with one of the pebbles by throwing it or hurling it with a sling. If thrown, it has a range of 60 feet. If someone else attacks with the pebble, that attacker adds your spellcasting ability modifier, not the attacker's, to the attack roll. On a hit, the target takes bludgeoning damage equal to 1d6 + your spellcasting ability modifier. Whether the attack hits or misses, the spell then ends on the stone. If you cast this spell again, the spell ends on any pebbles still affected by your previous casting.",
     "classes": [
       "Druido",
-      "Warlock"
+      "Warlock",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
-      "Warlock"
+      "Warlock",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -629,14 +653,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Druido",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -661,12 +687,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -784,13 +812,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -816,13 +846,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -898,11 +930,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 cold damage, and its speed is reduced by 10 feet until the start of your next turn. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -926,11 +960,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one saving throw of its choice. It can roll the die before or after making the saving throw. The spell then ends.",
     "classes": [
       "Chierico",
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -1036,11 +1072,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Lightning springs from your hand to deliver a shock to a creature you try to touch. Make a melee spell attack against the target. You have advantage on the attack roll if the target is wearing armor made of metal. On a hit, the target takes 1d8 lightning damage, and it can't take reactions until the start of its next turn. The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -1065,10 +1103,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Tocchi una creatura vivente con 0 punti ferita. La creatura si stabilizza. L'incantesimo non ha effetto sui non morti o sui costrutti.",
     "description_en": "You touch a living creature that has 0 hit points. The creature becomes stable. This spell has no effect on undead or constructs.",
     "classes": [
-      "Chierico"
+      "Chierico",
+      "Artefice"
     ],
     "classes_en": [
-      "Cleric"
+      "Cleric",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -1093,12 +1133,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -1147,10 +1189,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Crei una lunga frusta simile a una liana, ricoperta di spine, che brandisci nei confronti di una creatura entro gittata. Effettua un attacco con incantesimo in mischia contro il bersaglio. In caso di colpo il bersaglio subisce 1d6 danni perforanti e, se è di taglia Grande o più piccola, lo trascini fino a 3 metri verso di te. I danni aumentano di 1d6 al 5° (2d6), 11° (3d6) e 17° livello (4d6).",
     "description_en": "You create a long, vine-like whip covered in thorns that lashes out at your command toward a creature in range. Make a melee spell attack against the target. If the attack hits, the creature takes 1d6 piercing damage, and if the creature is Large or smaller, you pull the creature up to 10 feet closer to you. This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
     "classes": [
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Player's Handbook (BR+)",
     "aliases": [],
@@ -1177,14 +1221,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Druid",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -1326,13 +1372,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -1552,11 +1600,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Choose one object weighing 1 to 5 pounds within range that isn't being worn or carried. The object flies in a straight line up to 90 feet in a direction you choose before falling to the ground, stopping early if it impacts against a solid surface. If the object would strike a creature, that creature must make a Dexterity saving throw. On a failed save, the object strikes the target and stops moving. When the object strikes something, the object and what it strikes each take 3d8 bludgeoning damage. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the maximum weight of objects that you can target with this spell increases by 5 pounds, and the damage increases by 1d8, for each slot level above 1st.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -1817,14 +1867,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Druido",
       "Paladino",
-      "Ranger"
+      "Ranger",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
       "Paladin",
-      "Ranger"
+      "Ranger",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -1877,12 +1929,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -2045,12 +2099,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -2074,11 +2130,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Each object in a 20-foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a Dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10-foot radius. Any attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible.",
     "classes": [
       "Bardo",
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -2104,11 +2162,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Bolstering yourself with a necromantic facsimile of life, you gain 1d4 + 4 temporary hit points for the duration. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you gain 5 additional temporary hit points for each slot level above 1st.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -2135,12 +2195,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -2223,10 +2285,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Grasso viscoso ricopre il terreno in un quadrato di 3 metri di lato centrato su un punto entro gittata e diventa terreno difficile per la durata. Quando il grasso compare, ogni creatura che si trova nell'area deve riuscire in un tiro salvezza su Destrezza o cadere prona. Una creatura che entra nell'area o termina lì il proprio turno deve riuscire in un tiro salvezza su Destrezza o cadere prona.",
     "description_en": "Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration. When the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Sorcerer [TCoE]",
     "aliases": [],
@@ -2500,13 +2564,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -2532,13 +2598,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Druido",
       "Ranger",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Druid",
       "Ranger",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -2679,10 +2747,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Proteggi una creatura entro gittata dagli attacchi. Finché l'incantesimo non termina, ogni creatura che bersaglia la creatura protetta con un attacco o un incantesimo dannoso deve prima effettuare un tiro salvezza su Saggezza. In caso di fallimento deve scegliere un nuovo bersaglio o perdere l'attacco/incantesimo. L'incantesimo non protegge dagli effetti ad area. Se la creatura protetta effettua un attacco, lancia un incantesimo che bersaglia una creatura ostile o infligge danni a un'altra creatura, l'incantesimo termina.",
     "description_en": "You ward a creature within range against attack. Until the spell ends, any creature who targets the warded creature with an attack or a harmful spell must first make a Wisdom saving throw. On a failed save, the creature must choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from area effects, such as the explosion of a fireball. If the warded creature makes an attack, casts a spell that affects an enemy creature, or deal dommage to another creature, this spell ends.",
     "classes": [
-      "Chierico"
+      "Chierico",
+      "Artefice"
     ],
     "classes_en": [
-      "Cleric"
+      "Cleric",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -2851,12 +2921,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Ranger",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -2880,11 +2952,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A stream of acid emanates from you in a line 30 feet long and 5 feet wide in a direction you choose. Each creature in the line must succeed on a Dexterity saving throw or be covered in acid for the spell's duration or until a creature uses its action to scrape or wash the acid off itself or another creature. A creature covered in the acid takes 2d4 acid damage at the start of each of its turns. At Higher Levels. When you cast this spell using a spell slot 2nd level or higher, the damage increases by 2d4 for each slot level above 1st.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -3108,11 +3182,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Your spell bolsters your allies with toughness and resolve. Choose up to three creatures within range. Each target's hit point maximum and current hit points increase by 5 for the duration. At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, a target's hit points increase by an additional 5 for each slot level above 2nd.",
     "classes": [
       "Chierico",
-      "Paladino"
+      "Paladino",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Paladin"
+      "Paladin",
+      "Artificer"
     ],
     "source": "Bard [TCoE]",
     "aliases": [],
@@ -3136,11 +3212,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You assume a different form. When you cast the spell, choose one of the following options, the effects of which last for the duration of the spell. While the spell lasts, you can end one option as an action to gain the benefits of a different one. Aquatic Adaptation. You adapt your body to an aquatic environment, sprouting gills and growing webbing between your fingers. You can breathe underwater and gain a swimming speed equal to your walking speed. Change Appearance. You transform your appearance. You decide what you look like, including your height, weight, facial features, sound of your voice, hair length, coloration, and distinguishing characteristics, if any. You can make yourself appear as a member of another race, though none of your statistics change. You also can't appear as a creature of a different size than you, and your basic shape stays the same; if you're bipedal, you can't use this spell to become quadrupedal, for instance. At any time for the duration of the spell, you can use your action to change your appearance in this way again. Natural Weapons. You grow claws, fangs, spines, horns, or a different natural weapon of your choice. Your unarmed strikes deal 1d6 bludgeoning, piercing, or slashing damage, as appropriate to the natural weapon you chose, and you are proficient with your unarmed strikes. Finally, the natural weapon is magic and you have a +1 bonus to the attack and damage rolls you make using it.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -3163,10 +3241,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Tocchi una porta, finestra, cancello, scrigno o altro varco chiuso, e questo viene bloccato per la durata. Tu e le creature che hai designato quando hai lanciato l'incantesimo potete aprire l'oggetto normalmente. Puoi anche stabilire una parola d'ordine che, pronunciata entro 1,5 metri dall'oggetto, sopprime l'incantesimo per 1 minuto. Altrimenti l'oggetto è invalicabile finché non viene rotto, l'incantesimo non viene dissolto o sospeso. Lanciare bussare sull'oggetto sopprime chiusura arcana per 10 minuti. Mentre è soggetto all'incantesimo, l'oggetto è anche più difficile da rompere o da forzare: la CD per romperlo o per scassinarne le serrature aumenta di 10.",
     "description_en": "You touch a closed door, window, gate, chest, or other entryway, and it becomes locked for the duration. You and the creatures you designate when you cast this spell can open the object normally. You can also set a password that, when spoken within 5 feet of the object, suppresses this spell for 1 minute. Otherwise, it is impassable until it is broken or the spell is dispelled or suppressed. Casting knock on the object suppresses arcane lock for 10 minutes. While affected by this spell, the object is more difficult to break or force open; the DC to break it or pick any locks on it increases by 10.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -3250,11 +3330,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Your body becomes blurred, shifting and wavering to all who can see you. For the duration, any creature has disadvantage on attack rolls against you. An attacker is immune to this effect if it doesn't rely on sight, as with blindsight, or can see through illusions, as with truesight.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -3364,11 +3446,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A flame, equivalent in brightness to a torch, springs forth from an object that you touch. The effect looks like a regular flame, but it creates no heat and doesn't use oxygen. A continual flame can be covered or hidden but not smothered or quenched.",
     "classes": [
       "Chierico",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Druid [TCoE]",
     "aliases": [],
@@ -3482,13 +3566,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -3634,13 +3720,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Chierico",
       "Druido",
-      "Stregone"
+      "Stregone",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
-      "Sorcerer"
+      "Sorcerer",
+      "Artificer"
     ],
     "source": "Ranger [TCoE]",
     "aliases": [],
@@ -3664,11 +3752,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You cause a creature or an object you can see within range to grow larger or smaller for the duration. Choose either a creature or an object that is neither worn nor carried. If the target is unwilling, it can make a Constitution saving throw. On a success, the spell has no effect. If the target is a creature, everything it is wearing and carrying changes size with it. Any item dropped by an affected creature returns to normal size at once. Enlarge. The target's size doubles in all dimensions, and its weight is multiplied by eight. This growth increases its size by one category —from Medium to Large, for example. If there isn't enough room for the target to double its size, the creature or object attains the maximum possible size in the space available. Until the spell ends, the target also has advantage on Strength checks and Strength saving throws. The target's weapons also grow to match its new size. While these weapons are enlarged, the target's attacks with them deal 1d4 extra damage. Reduce. The target's size is halved in all dimensions, and its weight is reduced to one-eighth of normal. This reduction decreases its size by one category—from Medium to Small, for example. Until the spell ends, the target also has disadvantage on Strength checks and Strength saving throws. The target's weapons also shrink to match its new size. While these weapons are reduced, the target's attacks with them deal 1d4 less damage (this can't reduce the damage below 1).",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Bard [TCoE]",
     "aliases": [],
@@ -3888,11 +3978,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Choose a manufactured metal object, such as a metal weapon or a suit of heavy or medium metal armor, that you can see within range. You cause the object to glow red-hot. Any creature in physical contact with the object takes 2d8 fire damage when you cast the spell. Until the spell ends, you can use a bonus action on each of your subsequent turns to cause this damage again. If a creature is holding or wearing the object and takes the damage from it, the creature must succeed on a Constitution saving throw or drop the object if it can. If it doesn't drop the object, it has disadvantage on attack rolls and ability checks until the start of your next turn. At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for each slot level above 2nd.",
     "classes": [
       "Bardo",
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -3954,13 +4046,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4019,14 +4113,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Druido",
       "Paladino",
-      "Ranger"
+      "Ranger",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
       "Paladin",
-      "Ranger"
+      "Ranger",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4050,11 +4146,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "One creature or loose object of your choice that you can see within range rises vertically, up to 20 feet, and remains suspended there for the duration. The spell can levitate a target that weighs up to 500 pounds. An unwilling creature that succeeds on a Constitution saving throw is unaffected. The target can move only by pushing or pulling against a fixed object or surface within reach (such as a wall or a ceiling), which allows it to move as if it were climbing. You can change the target's altitude by up to 20 feet in either direction on your turn. If you are the target, you can move up or down as part of your move. Otherwise, you can use your action to move the target, which must remain within the spell's range. When the spell ends, the target floats gently to the ground if it is still aloft.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4114,11 +4212,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You touch a nonmagical weapon. Until the spell ends, that weapon becomes a magic weapon with a +1 bonus to attack rolls and damage rolls. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the bonus increases to +2. When you use a spell slot of 6th level or higher, the bonus increases to +3.",
     "classes": [
       "Paladino",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Paladin",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Ranger [TCoE]",
     "aliases": [],
@@ -4424,13 +4524,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Druido",
       "Paladino",
-      "Ranger"
+      "Ranger",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Druid",
       "Paladin",
-      "Ranger"
+      "Ranger",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4455,12 +4557,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -4511,10 +4615,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Tocchi un pezzo di corda lunga fino a 18 metri. Un'estremità della corda si solleva in aria fino a quando l'intera corda non pende perpendicolare al suolo. All'estremità superiore della corda, un'apertura invisibile si apre verso uno spazio extradimensionale che dura fino al termine dell'incantesimo. Lo spazio extradimensionale può essere raggiunto arrampicandosi fino in cima alla corda. Lo spazio può contenere fino a otto creature Medie o più piccole. La corda può essere tirata dentro lo spazio, facendola scomparire dalla vista esterna. Attacchi e incantesimi non possono attraversare l'apertura dentro o fuori dallo spazio extradimensionale, ma chi è dentro può vedere fuori come attraverso una finestra di 90 cm per 1,5 metri centrata sulla corda. Tutto ciò che è dentro lo spazio extradimensionale cade fuori al termine dell'incantesimo.",
     "description_en": "You touch a length of rope that is up to 60 feet long. One end of the rope then rises into the air until the whole rope hangs perpendicular to the ground. At the upper end of the rope, an invisible entrance opens to an extradimensional space that lasts until the spell ends. The extradimensional space can be reached by climbing to the top of the rope. The space can hold as many as eight Medium or smaller creatures. The rope can be pulled into the space, making the rope disappear from view outside the space. Attacks and spells can't cross through the entrance into or out of the extradimensional space, but those inside can see out of it as if through a 3-foot-by-5-foot window centered on the rope. Anything inside the extradimensional space drops out when the spell ends.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4567,12 +4673,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4687,12 +4795,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -4916,11 +5026,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You conjure a mass of thick, sticky webbing at a point of your choice within range. The webs fill a 20-foot cube from that point for the duration. The webs are difficult terrain and lightly obscure their area. If the webs aren't anchored between two solid masses (such as walls or trees) or layered across a floor, wall, or ceiling, the conjured web collapses on itself, and the spell ends at the start of your next turn. Webs layered over a flat surface have a depth of 5 feet. Each creature that starts its turn in the webs or that enters them during its turn must make a Dexterity saving throw. On a failed save, the creature is restrained as long as it remains in the webs or until it breaks free. A creature restrained by the webs can use its action to make a Strength check against your spell save DC. If it succeeds, it is no longer restrained. The webs are flammable. Any 5-foot cube of webs exposed to fire burns away in 1 round, dealing 2d4 fire damage to any creature that starts its turn in the fire.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5110,11 +5222,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Roll a d20 at the end of each of your turns for the duration of the spell. On a roll of 11 or higher, you vanish from your current plane of existence and appear in the Ethereal Plane (the spell fails and the casting is wasted if you were already on that plane). At the start of your next turn, and when the spell ends if you are on the Ethereal Plane, you return to an unoccupied space of your choice that you can see within 10 feet of the space you vanished from. If no unoccupied space is available within that range, you appear in the nearest unoccupied space (chosen at random if more than one space is equally near). You can dismiss this spell as an action. While on the Ethereal Plane, you can see and hear the plane you originated from, which is cast in shades of gray, and you can't see anything there more than 60 feet away. You can only affect and be affected by other creatures on the Ethereal Plane. Creatures that aren't there can't perceive you or interact with you, unless they have the ability to do so.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": ["Lampeggiare"],
@@ -5165,12 +5279,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -5310,11 +5426,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You create 45 pounds of food and 30 gallons of water on the ground or in containers within range, enough to sustain up to fifteen humanoids or five steeds for 24 hours. The food is bland but nourishing, and spoils if uneaten after 24 hours. The water is clean and doesn't go bad.",
     "classes": [
       "Chierico",
-      "Paladino"
+      "Paladino",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Paladin"
+      "Paladin",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5403,7 +5521,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Paladino",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
@@ -5412,7 +5531,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Paladin",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5435,10 +5555,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Un'arma non magica che tocchi diventa un'arma magica. Scegli uno dei seguenti tipi di danno: acido, freddo, fuoco, fulmine o tuono. Per la durata dell'incantesimo, l'arma ha un bonus di +1 ai tiri per colpire e infligge 1d4 danni aggiuntivi del tipo prescelto quando colpisce. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 5° o 6° livello, il bonus ai tiri per colpire aumenta a +2 e i danni aggiuntivi aumentano a 2d4. Quando usi uno slot di 7° livello o superiore, il bonus aumenta a +3 e i danni aggiuntivi aumentano a 3d4.",
     "description_en": "A nonmagical weapon you touch becomes a magic weapon. Choose one of the following damage types: acid, cold, fire, lightning, or thunder. For the duration, the weapon has a +1 bonus to attack rolls and deals an extra 1d4 damage of the chosen type when it hits. At Higher Levels. When you cast this spell using a spell slot of 5th or 6th level, the bonus to attack rolls increases to +2 and the extra damage increases to 2d4. When you use a spell slot of 7th level or higher, the bonus increases to +3 and the extra damage increases to 3d4.",
     "classes": [
-      "Paladino"
+      "Paladino",
+      "Artefice"
     ],
     "classes_en": [
-      "Paladin"
+      "Paladin",
+      "Artificer"
     ],
     "source": "Druid [TCoE]",
     "aliases": [],
@@ -5586,13 +5708,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -5617,12 +5741,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5677,12 +5803,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Chierico",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5706,11 +5834,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Choose a willing creature that you can see within range. Until the spell ends, the target's speed is doubled, it gains a +2 bonus to AC, it has advantage on Dexterity saving throws, and it gains an additional action on each of its turns. That action can be used only to take the Attack (one weapon attack only), Dash, Disengage, Hide, or Use an Object action. When the spell ends, the target can't move or take actions until after its next turn, as a wave of lethargy sweeps over it.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -5794,13 +5924,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -6087,14 +6219,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -6150,11 +6284,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You touch a creature that has died within the last minute. That creature returns to life with 1 hit point. This spell can't return to life a creature that has died of old age, nor can it restore any missing body parts.",
     "classes": [
       "Chierico",
-      "Paladino"
+      "Paladino",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
-      "Paladin"
+      "Paladin",
+      "Artificer"
     ],
     "source": "Druid [TCoE]",
     "aliases": [],
@@ -6587,10 +6723,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Tocchi un oggetto Minuscolo non magico che non sia attaccato a un altro oggetto o a una superficie e che non sia portato da un'altra creatura. Il bersaglio si anima e fa spuntare piccole braccia e gambe, diventando una creatura sotto il tuo controllo finché l'incantesimo non termina o la creatura scende a 0 punti ferita. Vedi il blocco statistiche per le sue statistiche. Come azione bonus, puoi impartire mentalmente un comando alla creatura se è entro 36 metri da te (Se controlli più creature con questo incantesimo, puoi comandarle tutte simultaneamente, impartendo lo stesso comando a ciascuna). Decidi quale azione la creatura compirà e dove si muoverà nel suo prossimo turno, oppure puoi impartirle un comando semplice e generale, come prendere una chiave, fare la guardia o impilare libri. Se non impartisci comandi, il servitore non fa nulla se non difendersi dalle creature ostili. Una volta dato un ordine, il servitore continua a seguirlo finché il compito non è completo. Quando la creatura scende a 0 punti ferita, ritorna alla forma originale, e i danni rimanenti vengono trasferiti a quella forma. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, puoi animare due oggetti aggiuntivi per ogni livello dello slot sopra il 3°.",
     "description_en": "You touch one Tiny, nonmagical object that isn't attached to another object or a surface and isn't being carried by another creature. The target animates and sprouts little arms and legs, becoming a creature under your control until the spell ends or the creature drops to 0 hit points. See the stat block for its statistics. As a bonus action, you can mentally command the creature if it is within 120 feet of you. (If you control multiple creatures with this spell, you can command any or all of them at the same time, issuing the same command to each one.) You decide what action the creature will take and where it will move during its next turn, or you can issue a simple, general command, such as to fetch a key, stand watch, or stack some books. If you issue no commands, the servant does nothing other than defend itself against hostile creatures. Once given an order, the servant continues to follow that order until its task is complete. When the creature drops to 0 hit points, it reverts to its original form, and any remaining damage carries over to that form. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, you can animate two additional objects for each slot level above 3rd.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -6759,10 +6897,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Crei un occhio invisibile e magico entro gittata che fluttua nell'aria per la durata dell'incantesimo. Ricevi mentalmente le informazioni visive dall'occhio, che ha vista normale e scurovisione fino a 9 metri. L'occhio può guardare in tutte le direzioni. Come azione, puoi muovere l'occhio fino a 9 metri in qualsiasi direzione. Non c'è limite a quanto lontano da te l'occhio possa muoversi, ma non può entrare in un altro piano di esistenza. Una barriera solida blocca il movimento dell'occhio, ma esso può attraversare un'apertura larga anche solo 2,5 cm di diametro.",
     "description_en": "You create an invisible, magical eye within range that hovers in the air for the duration. You mentally receive visual information from the eye, which has normal vision and darkvision out to 30 feet. The eye can look in every direction. As an action, you can move the eye up to 30 feet in any direction. There is no limit to how far away from you the eye can move, but it can't enter another plane of existence. A solid barrier blocks the eye's movement, but the eye can pass through an opening as small as 1 inch in diameter.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7171,12 +7311,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -7225,10 +7367,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Converti materiali grezzi in prodotti dello stesso materiale. Per esempio, puoi fabbricare un ponte di legno da un boschetto, una corda da un fascio di canapa e vestiti da lino o lana. Scegli materiali grezzi che puoi vedere entro gittata. Puoi fabbricare un oggetto Grande o di taglia inferiore (contenuto in un cubo di 3 metri di lato, o otto cubi connessi di 1,5 metri di lato), data una quantità sufficiente di materiale grezzo. Se stai lavorando con metallo, pietra o un'altra sostanza minerale, però, l'oggetto fabbricato non può essere più grande di Medio (contenuto in un singolo cubo di 1,5 metri di lato). La qualità degli oggetti realizzati dall'incantesimo è commisurata alla qualità dei materiali grezzi. Le creature o gli oggetti magici non possono essere creati o trasmutati da questo incantesimo. Non puoi nemmeno usarlo per creare oggetti che ordinariamente richiedono un alto grado di artigianato, come gioielli, armi, vetro o armature, a meno che tu non abbia competenza con il tipo di attrezzi da artigiano usati per fabbricare tali oggetti.",
     "description_en": "You convert raw materials into products of the same material. For example, you can fabricate a wooden bridge from a clump of trees, a rope from a patch of hemp, and clothes from flax or wool. Choose raw materials that you can see within range. You can fabricate a Large or smaller object (contained within a 10-foot cube, or eight connected 5-foot cubes), given a sufficient quantity of raw material. If you are working with metal, stone, or another mineral substance, however, the fabricated object can be no larger than Medium (contained within a single 5-foot cube). The quality of objects made by the spell is commensurate with the quality of the raw materials. Creatures or magic items can't be created or transmuted by this spell. You also can't use it to create items that ordinarily require a high degree of craftsmanship, such as jewelry, weapons, glass, or armor, unless you have proficiency with the type of artisan's tools used to craft such objects.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7306,13 +7450,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Chierico",
       "Druido",
-      "Ranger"
+      "Ranger",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
-      "Ranger"
+      "Ranger",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7535,10 +7681,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Nascondi uno scrigno, e tutto il suo contenuto, sul Piano Etereo. Devi toccare lo scrigno e la replica in miniatura che funge da componente materiale per l'incantesimo. Lo scrigno può contenere fino a 0,3 metri cubi di materiale non vivente (90 cm per 60 cm per 60 cm). Mentre lo scrigno rimane sul Piano Etereo, puoi usare un'azione e toccare la replica per richiamare lo scrigno. Appare in uno spazio libero sul terreno entro 1,5 metri da te. Puoi rimandare lo scrigno sul Piano Etereo usando un'azione e toccando sia lo scrigno sia la replica. Dopo 60 giorni, c'è una probabilità cumulativa del 5% al giorno che l'effetto dell'incantesimo termini. Questo effetto termina se lanci di nuovo questo incantesimo, se la replica più piccola viene distrutta, o se scegli di terminare l'incantesimo come azione. Se l'incantesimo termina e lo scrigno più grande è sul Piano Etereo, è irrimediabilmente perduto.",
     "description_en": "You hide a chest, and all its contents, on the Ethereal Plane. You must touch the chest and the miniature replica that serves as a material component for the spell. The chest can contain up to 12 cubic feet of nonliving material (3 feet by 2 feet by 2 feet). While the chest remains on the Ethereal Plane, you can use an action and touch the replica to recall the chest. It appears in an unoccupied space on the ground within 5 feet of you. You can send the chest back to the Ethereal Plane by using an action and touching both the chest and the replica. After 60 days, there is a cumulative 5 percent chance per day that the spell's effect ends. This effect ends if you cast this spell again, if the smaller replica chest is destroyed, or if you choose to end the spell as an action. If the spell ends and the larger chest is on the Ethereal Plane, it is irretrievably lost.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7597,10 +7745,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Evochi un cane da guardia spettrale in uno spazio libero che puoi vedere entro gittata, dove rimane per la durata dell'incantesimo, finché non lo congedi come azione, o finché non ti allontani di più di 30 metri da esso. Il cane è invisibile a tutte le creature eccetto te e non può essere danneggiato. Quando una creatura Piccola o di taglia superiore arriva entro 9 metri da esso senza prima pronunciare la parola d'ordine che specifichi quando lanci l'incantesimo, il cane inizia ad abbaiare ad alta voce. Il cane vede le creature invisibili e può vedere nel Piano Etereo. Ignora le illusioni. All'inizio di ciascuno dei tuoi turni, il cane tenta di mordere una creatura entro 1,5 metri da esso che ti sia ostile. Il bonus di attacco del cane è pari al tuo modificatore di caratteristica da incantatore + il tuo bonus di competenza. Se colpisce, infligge 4d8 danni perforanti.",
     "description_en": "You conjure a phantom watchdog in an unoccupied space that you can see within range, where it remains for the duration, until you dismiss it as an action, or until you move more than 100 feet away from it. The hound is invisible to all creatures except you and can't be harmed. When a Small or larger creature comes within 30 feet of it without first speaking the password that you specify when you cast this spell, the hound starts barking loudly. The hound sees invisible creatures and can see into the Ethereal Plane. It ignores illusions. At the start of each of your turns, the hound attempts to bite one creature within 5 feet of it that is hostile to you. The hound's attack bonus is equal to your spellcasting ability modifier + your proficiency bonus. On a hit, it deals 4d8 piercing damage.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7623,10 +7773,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Rendi un'area entro gittata magicamente sicura. L'area è un cubo che può essere piccolo come 1,5 metri o grande fino a 30 metri di lato. L'incantesimo dura per la durata o finché non usi un'azione per congedarlo. Quando lanci l'incantesimo, decidi quale tipo di sicurezza fornisce, scegliendo qualsiasi o tutte le seguenti proprietà:\n• Il suono non può attraversare la barriera al bordo dell'area protetta.\n• La barriera dell'area protetta appare scura e nebbiosa, impedendo la vista (inclusa la scurovisione) attraverso di essa.\n• I sensori creati da incantesimi di divinazione non possono apparire all'interno dell'area protetta o attraversare la barriera al suo perimetro.\n• Le creature nell'area non possono essere bersagliate da incantesimi di divinazione.\n• Nulla può teletrasportarsi dentro o fuori dall'area protetta.\n• Il viaggio planare è bloccato all'interno dell'area protetta.\nLanciare questo incantesimo nello stesso punto ogni giorno per un anno rende l'effetto permanente. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 5° livello o superiore, puoi aumentare le dimensioni del cubo di 30 metri per ogni livello dello slot oltre il 4°. Quindi potresti proteggere un cubo di 60 metri di lato usando uno slot di 5° livello.",
     "description_en": "You make an area within range magically secure. The area is a cube that can be as small as 5 feet to as large as 100 feet on each side. The spell lasts for the duration or until you use an action to dismiss it. When you cast the spell, you decide what sort of security the spell provides, choosing any or all of the following properties:\n• Sound can't pass through the barrier at the edge of the warded area.\n• The barrier of the warded area appears dark and foggy, preventing vision (including darkvision through it.\n• Sensors created by divination spells can't appear inside the protected area or pass through the barrier at its perimeter.\n• Creatures in the area can't be targeted by divination spells.\n• Nothing can teleport into or out of the warded area.\n• Planar travel is blocked within the warded area. Casting this spell on the same spot every day for a year makes this effect permanent. At Higher Levels. When you cast this spell using a spell slot of 5th level or higher, you can increase the size of the cube by 100 feet for each slot level beyond 4th. Thus you could protect a cube that can be up to 200 feet on one side by using a spell slot of 5th level.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7649,10 +7801,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Una sfera di forza scintillante racchiude una creatura o un oggetto di taglia Grande o inferiore entro gittata. Una creatura non consenziente deve effettuare un tiro salvezza su Destrezza. Se fallisce, la creatura è racchiusa per la durata dell'incantesimo. Nulla - né oggetti fisici, energia, né altri effetti di incantesimi - può attraversare la barriera, dentro o fuori, ma una creatura nella sfera può respirare. La sfera è immune a tutti i danni, e una creatura o oggetto al suo interno non può essere danneggiato da attacchi o effetti che provengono dall'esterno, né una creatura all'interno può danneggiare nulla all'esterno. La sfera è priva di peso e appena abbastanza grande da contenere la creatura o l'oggetto al suo interno. Una creatura racchiusa può usare la sua azione per spingere contro le pareti della sfera e quindi farla rotolare fino a metà della velocità della creatura. Allo stesso modo, la sfera può essere raccolta e mossa da altre creature. Un incantesimo disintegrare che bersaglia la sfera la distrugge senza danneggiare nulla al suo interno.",
     "description_en": "A sphere of shimmering force encloses a creature or object of Large size or smaller within range. An unwilling creature must make a Dexterity saving throw. On a failed save, the creature is enclosed for the duration. Nothing—not physical objects, energy, or other spell effects—can pass through the barrier, in or out, though a creature in the sphere can breathe there. The sphere is immune to all damage, and a creature or object inside can't be damaged by attacks or effects originating from outside, nor can a creature inside the sphere damage anything outside it. The sphere is weightless and just large enough to contain the creature or object inside. An enclosed creature can use its action to push against the sphere's walls and thus roll the sphere at up to half the creature's speed. Similarly, the globe can be picked up and moved by other creatures. A disintegrate spell targeting the globe destroys it without harming anything inside it.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7817,12 +7971,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Chierico",
       "Druido",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Druid",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7848,13 +8004,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -7933,10 +8091,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Richiami lo spirito di un costrutto. Si manifesta in uno spazio libero che puoi vedere entro gittata. Questa forma corporea usa il blocco statistiche dello Spirito Costrutto. Quando lanci l'incantesimo, scegli un materiale: Argilla, Metallo o Pietra. La creatura assomiglia a un golem o un modron (a tua scelta) fatto del materiale prescelto, che determina certi tratti nel suo blocco statistiche. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata a te e ai tuoi compagni. In combattimento, la creatura condivide il tuo conteggio dell'iniziativa, ma agisce immediatamente dopo di te. Obbedisce ai tuoi comandi verbali (non è richiesta alcuna azione). Se non gliene impartisci nessuno, prende l'azione Schivare e usa il movimento per evitare il pericolo. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, usa il livello più alto dove appare il livello dell'incantesimo nel blocco statistiche.",
     "description_en": "You call forth the spirit of a construct. It manifests in an unoccupied space that you can see within range. This corporeal form uses the Construct Spirit stat block. When you cast the spell, choose a material: Clay, Metal, or Stone. The creature resembles a golem or a modron (your choice) made of the chosen material, which determines certain traits in its stat block. The creature disappears when it drops to 0 hit points or when the spell ends. The creature is an ally to you and your companions. In combat, the creature shares your initiative count, but it takes its turn immediately after yours. It obeys your verbal commands (no action required by you). If you don’t issue any, it takes the Dodge action and uses its move to avoid danger. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, use the higher level wherever the spell’s level appears in the stat block.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
@@ -8107,12 +8267,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -8215,10 +8377,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Crei una grande mano di forza scintillante e traslucida in uno spazio libero che puoi vedere entro gittata. La mano dura per la durata dell'incantesimo, e si muove al tuo comando, imitando i movimenti della tua mano. La mano è un oggetto con CA 20 e punti ferita pari ai tuoi punti ferita massimi. Se scende a 0 punti ferita, l'incantesimo termina. Ha Forza 26 (+8) e Destrezza 10 (+0). La mano non riempie il suo spazio. Quando lanci l'incantesimo e come azione bonus nei tuoi turni successivi, puoi muovere la mano fino a 18 metri e poi causare uno dei seguenti effetti con essa. Pugno Stretto. La mano colpisce una creatura o un oggetto entro 1,5 metri da essa. Effettua un attacco in mischia con incantesimo per la mano usando le tue statistiche di gioco. Se colpisci, il bersaglio subisce 4d8 danni da forza. Mano Possente. La mano tenta di spingere una creatura entro 1,5 metri da essa in una direzione che scegli. Effettua una prova con la Forza della mano contestata dalla prova di Forza (Atletica) del bersaglio. Se il bersaglio è Medio o di taglia inferiore, hai vantaggio alla prova. Se hai successo, la mano spinge il bersaglio fino a 1,5 metri più un numero di metri pari a cinque volte il tuo modificatore di caratteristica da incantatore (in piedi: equivalente a circa 1,5 metri × modificatore). La mano si muove con il bersaglio per restare entro 1,5 metri da esso. Mano Afferrante. La mano tenta di afferrare una creatura Enorme o di taglia inferiore entro 1,5 metri da essa. Usa il valore di Forza della mano per risolvere l'afferrare. Se il bersaglio è Medio o di taglia inferiore, hai vantaggio alla prova. Mentre la mano sta afferrando il bersaglio, puoi usare un'azione bonus per farlo stritolare. Quando lo fai, il bersaglio subisce danni contundenti pari a 2d6 + il tuo modificatore di caratteristica da incantatore. Mano Interposta. La mano si interpone tra te e una creatura che scegli finché non dai alla mano un comando diverso. La mano si muove per restare tra te e il bersaglio, fornendoti copertura parziale contro il bersaglio. Il bersaglio non può muoversi attraverso lo spazio della mano se il suo valore di Forza è minore o uguale a quello della mano. Se è superiore, il bersaglio può muoversi verso di te attraverso lo spazio della mano, ma quello spazio è terreno difficile per il bersaglio. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 6° livello o superiore, i danni dell'opzione pugno stretto aumentano di 2d8 e i danni di mano afferrante aumentano di 2d6 per ogni livello dello slot sopra il 5°.",
     "description_en": "You create a Large hand of shimmering, translucent force in an unoccupied space that you can see within range. The hand lasts for the spell's duration, and it moves at your command, mimicking the movements of your own hand. The hand is an object that has AC 20 and hit points equal to your hit point maximum. If it drops to 0 hit points, the spell ends. It has a Strength of 26 (+8) and a Dexterity of 10 (+0). The hand doesn't fill its space. When you cast the spell and as a bonus action on your subsequent turns, you can move the hand up to 60 feet and then cause one of the following effects with it. Clenched Fist. The hand strikes one creature or object within 5 feet of it. Make a melee spell attack for the hand using your game statistics. On a hit, the target takes 4d8 force damage. Forceful Hand. The hand attempts to push a creature within 5 feet of it in a direction you choose. Make a check with the hand's Strength contested by the Strength (Athletics) check of the target. If the target is Medium or smaller, you have advantage on the check. If you succeed, the hand pushes the target up to 5 feet plus a number of feet equal to five times your spellcasting ability modifier. The hand moves with the target to remain within 5 feet of it. Grasping Hand. The hand attempts to grapple a Huge or smaller creature within 5 feet of it. You use the hand's Strength score to resolve the grapple. If the target is Medium or smaller, you have advantage on the check. While the hand is grappling the target, you can use a bonus action to have the hand crush it. When you do so, the target takes bludgeoning damage equal to 2d6 + your spellcasting ability modifier. Interposing Hand. The hand interposes itself between you and a creature you choose until you give the hand a different command. The hand moves to stay between you and the target, providing you with half cover against the target. The target can't move through the hand's space if its Strength score is less than or equal to the hand's Strength score. If its Strength score is higher than the hand's Strength score, the target can move toward you through the hand's space, but that space is difficult terrain for the target. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, the damage from the clenched fist option increases by 2d8 and the damage from the grasping hand increases by 2d6 for each slot level above 5th.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Sorcerer [TCoE]",
     "aliases": [],
@@ -8436,11 +8600,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You pull wisps of shadow material from the Shadowfell to create a nonliving object of vegetable matter within range: soft goods, rope, wood, or something similar. You can also use this spell to create mineral objects such as stone, crystal, or metal. The object created must be no larger than a 5-foot cube, and the object must be of a form and material that you have seen before. The duration depends on the object's material. If the object is composed of multiple materials, use the shortest duration. Material Duration Vegetable matter 1 day Stone or crystal 12 hours Precious metals 1 hour Gems 10 minutes Adamantine or mithral 1 minute Using any material created by this spell as another spell's material component causes that spell to fail. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, the cube increases by 5 feet for each slot level above 5th.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -8755,12 +8921,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Chierico",
-      "Druido"
+      "Druido",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
-      "Druid"
+      "Druid",
+      "Artificer"
     ],
     "source": "Ranger [TCoE]",
     "aliases": [],
@@ -9305,12 +9473,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -9506,11 +9676,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You choose an area of stone or mud that you can see that fits within a 40-foot cube and is within range, and choose one of the following effects. Transmute Rock to Mud. Nonmagical rock of any sort in the area becomes an equal volume of thick, flowing mud that remains for the spell's duration. The ground in the spell's area becomes muddy enough that creatures can sink into it. Each foot that a creature moves through the mud costs 4 feet of movement, and any creature on the ground when you cast the spell must make a Strength saving throw. A creature must also make the saving throw when it moves into the area for the first time on a turn or ends its turn there. On a failed save, a creature sinks into the mud and is restrained, though it can use an action to end the restrained condition on itself by pulling itself free of the mud. If you cast the spell on a ceiling, the mud falls. Any creature under the mud when it falls must make a Dexterity saving throw. A creature takes 4d8 bludgeoning damage on a failed save, or half as much damage on a successful one. Transmute Mud to Rock. Nonmagical mud or quicksand in the area no more than 10 feet deep transforms into soft stone for the spell's duration. Any creature in the mud when it transforms must make a Dexterity saving throw. On a successful save, a creature is shunted safely to the surface to an unoccupied space. On a failed save, a creature becomes restrained by the rock. A restrained creature, or another creature within reach, can use an action to try to break the rock by succeeding on a DC 20 Strength check or by dealing damage to it. The rock has AC 15 and 25 hit points, and it is immune to poison and psychic damage.",
     "classes": [
       "Druido",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
@@ -9619,12 +9791,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [],
@@ -12901,11 +13075,13 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it.\n\nRitual.",
     "classes": [
       "Bardo",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
@@ -12938,7 +13114,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Artefice"
     ],
     "classes_en": [
       "Bard",
@@ -12948,7 +13125,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Artificer"
     ],
     "source": "Player's Handbook (SRD)",
     "aliases": [
