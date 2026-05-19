@@ -13,6 +13,7 @@
 :root {
     --app-header-height: 64px;
     --app-bottom-toolbar-height: 64px;
+    --main-content-padding: var(--spacing-lg);
     --primary: #E8E4DF;
     --primary-dark: #D5CFC8;
     --secondary: #F0EDE8;
@@ -267,7 +268,7 @@ body.user-logged-in .header-username {
    ============================================ */
 .main-content {
     flex: 1;
-    padding: var(--spacing-lg);
+    padding: 0 var(--main-content-padding) var(--main-content-padding);
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
@@ -290,6 +291,7 @@ body.user-logged-in .header-username {
 .page-content {
     max-width: 800px;
     margin: 0 auto;
+    padding-top: var(--main-content-padding);
 }
 
 .page-content h1 {
@@ -527,7 +529,7 @@ body.global-return-active .back-button-floating { display: none !important; }
     border-radius: 0;
     box-shadow: var(--shadow-sm);
     width: 100vw;
-    margin: calc(-1 * var(--spacing-lg)) calc(50% - 50vw) var(--spacing-md);
+    margin: calc(-1 * var(--main-content-padding)) calc(50% - 50vw) var(--spacing-md);
     overflow: visible;
 }
 
@@ -677,8 +679,10 @@ body.global-return-active .back-button-floating { display: none !important; }
 
 /* ── Mobile (<= 480px) — Telefoni piccoli ── */
 @media (max-width: 480px) {
-    :root { --app-header-height: 58px; }
-    .main-content { padding: var(--spacing-sm); }
+    :root {
+        --app-header-height: 58px;
+        --main-content-padding: var(--spacing-sm);
+    }
 
     .header { padding: 0 var(--spacing-md); }
     .d20-logo { width: 42px; height: 42px; }
@@ -689,7 +693,6 @@ body.global-return-active .back-button-floating { display: none !important; }
 
     .page-header .btn-icon { display: none; }
 
-    .page-top-stack { margin-top: calc(-1 * var(--spacing-sm)); }
     .page-top-stack .page-header { min-height: 28px; padding: 2px var(--spacing-sm); }
     .page-top-stack .page-header h1 { font-size: 0.98rem; }
     .filters-bar { gap: 6px; margin-bottom: var(--spacing-md); }
@@ -847,10 +850,11 @@ body.global-return-active .back-button-floating { display: none !important; }
 }
 
 /* ── Tablet & Small desktop (<= 768px) ── */
-@media (max-width: 768px) {
-    .main-content { padding: var(--spacing-md); }
-    .page-top-stack { margin-top: calc(-1 * var(--spacing-md)); }
+@media (min-width: 481px) and (max-width: 768px) {
+    :root { --main-content-padding: var(--spacing-md); }
+}
 
+@media (max-width: 768px) {
     .campagne-list { grid-template-columns: 1fr; }
     .personaggi-list { grid-template-columns: 1fr; }
 
