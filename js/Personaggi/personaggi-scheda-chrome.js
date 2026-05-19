@@ -148,8 +148,72 @@ function _refreshResImmInlineRow(dmgType) {
 }
 
 /* ── Header scheda condiviso (foto a sx, identità a sx, level-up + ispirazione a dx) ── */
+function schedaSetPageTitle(pgOrTitle) {
+    const titleEl = document.getElementById('schedaPageTitle');
+    if (!titleEl) return;
+    const title = typeof pgOrTitle === 'string'
+        ? pgOrTitle
+        : (pgOrTitle?.nome || 'Scheda');
+    titleEl.textContent = title || 'Scheda';
+}
+
+window.schedaSetPageTitle = schedaSetPageTitle;
+
+function _schedaCleanSubclassName(name) {
+    const raw = String(name || '').trim();
+    if (!raw) return '';
+    const cleaned = raw
+        .replace(/^(via|cammino|sentiero|giuramento|circolo|dominio|collegio|scuola|tradizione|archetipo)\s+(dell'|della|dello|degli|delle|del|dei|di|de)\s*/i, '')
+        .replace(/^(way|path|oath|circle|domain|college|school|tradition|archetype)\s+of\s+(the\s+)?/i, '')
+        .trim();
+    return cleaned || raw;
+}
+
+function _schedaBuildClassLine(pg) {
+    if (Array.isArray(pg?.classi) && pg.classi.length > 0) {
+        return pg.classi
+            .map(c => {
+                const name = String(c?.nome || '').trim();
+                if (!name) return '';
+                const level = parseInt(c?.livello, 10) || 1;
+                return `${name} ${level}`;
+            })
+            .filter(Boolean)
+            .join(' / ');
+    }
+    return String(pg?.classe || '').trim();
+}
+
+function _schedaBuildSubclassLine(pg) {
+    if (!Array.isArray(pg?.classi)) return '';
+    return pg.classi
+        .map(c => _schedaCleanSubclassName(c?.sottoclasse))
+        .filter(Boolean)
+        .join(' / ');
+}
+
+function _schedaBuildRaceLine(pg) {
+    const race = String(pg?.razza || '').trim();
+    const subrace = String(pg?.sottorazza || '').trim();
+    if (!race && !subrace) return '';
+    if (!subrace) return race;
+    if (!race) return subrace;
+    const raceKey = race.toLowerCase();
+    const subraceKey = subrace.toLowerCase();
+    return subraceKey.includes(raceKey) ? subrace : `${race} ${subrace}`;
+}
+
+function _schedaBuildQuickInfo(pg) {
+    return {
+        classi: _schedaBuildClassLine(pg) || '-',
+        sottoclassi: _schedaBuildSubclassLine(pg) || '-',
+        razza: _schedaBuildRaceLine(pg) || '-',
+    };
+}
+
 function buildSchedaHeader(pg, pageLabel) {
     if (!pg) return '';
+    schedaSetPageTitle(pg);
     const initials = (pg.nome || '?').trim().split(/\s+/).slice(0, 2).map(s => s.charAt(0).toUpperCase()).join('') || '?';
     const rawUrl = pg.immagine_url || '';
     // Normalizza on-the-fly: copre eventuali URL Drive salvati prima
@@ -159,14 +223,7 @@ function buildSchedaHeader(pg, pageLabel) {
     const avatarInner = imgUrl
         ? `<img src="${escapeAttr(imgUrl)}" alt="${escapeAttr(pg.nome || '')}" class="scheda-avatar-img" referrerpolicy="no-referrer" loading="lazy">`
         : `<span class="scheda-avatar-initials">${escapeHtml(initials)}</span>`;
-    const subtitle = (() => {
-        if (pageLabel) return escapeHtml(pageLabel);
-        if (pg.classi && pg.classi.length > 0) {
-            return pg.classi.map(c => `${escapeHtml(c.nome)} ${parseInt(c.livello) || 1}`).join(' / ');
-        }
-        return escapeHtml(pg.classe || '');
-    })();
-    const subtitleSm = pageLabel ? '' : escapeHtml(pg.razza || '');
+    const quickInfo = _schedaBuildQuickInfo(pg);
     const hasClasses = pg.classi && pg.classi.length > 0;
     const levelUpBtn = hasClasses
         ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
@@ -183,9 +240,9 @@ function buildSchedaHeader(pg, pageLabel) {
             ${avatarInner}
         </button>
         <div class="scheda-identity-info">
-            <div class="scheda-name">${escapeHtml(pg.nome || '')}</div>
-            <div class="scheda-subtitle">${subtitle}</div>
-            ${subtitleSm ? `<div class="scheda-subtitle-sm">${subtitleSm}</div>` : ''}
+            <div class="scheda-quick-line scheda-quick-classi">${escapeHtml(quickInfo.classi)}</div>
+            <div class="scheda-quick-line scheda-quick-sottoclassi">${escapeHtml(quickInfo.sottoclassi)}</div>
+            <div class="scheda-quick-line scheda-quick-razza">${escapeHtml(quickInfo.razza)}</div>
         </div>
         <div class="scheda-identity-actions">
             ${levelUpBtn}

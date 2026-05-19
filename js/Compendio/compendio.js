@@ -677,7 +677,7 @@ function _compGroupItems(items) {
 
 function _compCardHtml(item) {
     if (item.type === 'incantesimi') return _compSpellCardHtml(item);
-    if (item.type === 'sottoclassi' || (item.type === 'razze' && item.data.isSubrace)) {
+    if (item.type === 'sottoclassi' || item.type === 'razze') {
         return `
             <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
                 <div class="comp-card-main">

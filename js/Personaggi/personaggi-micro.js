@@ -239,6 +239,7 @@ async function renderMicroScheda(personaggioId) {
     const { data: pg, error } = await supabase.from('personaggi').select('*').eq('id', personaggioId).single();
     if (error || !pg) { content.innerHTML = '<p>Personaggio non trovato</p>'; return; }
     _schedaPgCache = pg;
+    if (typeof schedaSetPageTitle === 'function') schedaSetPageTitle(pg);
 
     let classeDisplay = pg.classe || '';
     if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
