@@ -544,7 +544,7 @@ body {
     --comp-window-row: calc((100% - 24px) / 4);
     --comp-book-anchor-right: calc(25% - 2px);
     --comp-book-anchor-top: calc(12.5% - 3px);
-    --comp-book-size: clamp(680px, 158vw, 1220px);
+    --comp-book-size: clamp(680px, 158vw, 760px);
     position: relative;
     isolation: isolate;
 }
@@ -612,16 +612,6 @@ body {
 
 #compendioHub .comp-hub-card-label {
     color: var(--primary);
-}
-
-@media (min-width: 760px) {
-    #compendioHub .comp-hub-grid {
-        --comp-window-col: calc((100% - 24px) / 4);
-        --comp-window-row: calc((100% - var(--comp-window-gap)) / 2);
-        --comp-book-anchor-right: calc(12.5% - 3px);
-        --comp-book-anchor-top: calc(25% - 2px);
-        --comp-book-size: clamp(820px, 116vw, 1360px);
-    }
 }
 
 /* Scheda personaggio: look da scheda rilegata ---------------------------- */
