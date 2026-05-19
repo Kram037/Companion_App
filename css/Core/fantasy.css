@@ -545,59 +545,48 @@ body {
 
 #compendioHub .comp-hub-card {
     --comp-window-x: 0%;
-    --comp-window-y: 0%;
-    --comp-window-size: 200% 400%;
+    --comp-window-y: 12%;
+    --comp-window-size: 260% 520%;
     position: relative;
     isolation: isolate;
     z-index: 1;
-    border-color: var(--fantasy-gold-line);
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
-        inset 0 0 0 5px rgba(198, 154, 74, 0.045),
-        0 12px 28px rgba(28, 18, 12, 0.16);
-    background:
-        linear-gradient(145deg, rgba(31, 26, 20, 0.42), rgba(12, 10, 9, 0.32)),
-        rgba(18, 15, 13, 0.28);
-    backdrop-filter: blur(1px);
+    border-color: var(--fantasy-line);
+    background: rgba(18, 15, 13, 0.28);
 }
 
 #compendioHub .comp-hub-card::before {
     content: "";
     position: absolute;
-    inset: 8px;
+    inset: 0;
     z-index: 0;
     pointer-events: none;
-    border: 1px solid rgba(198, 154, 74, 0.24);
-    border-radius: calc(var(--radius-lg, 12px) - 5px);
+    border-radius: inherit;
     background:
-        radial-gradient(circle at 50% 50%, rgba(198, 154, 74, 0.10), transparent 42%),
-        linear-gradient(145deg, rgba(255, 244, 210, 0.04), rgba(0, 0, 0, 0.24)),
         url("../../images/Compendio/spellbook.svg") var(--comp-window-x) var(--comp-window-y) / var(--comp-window-size) no-repeat,
-        linear-gradient(135deg, rgba(82, 57, 24, 0.12), rgba(10, 8, 7, 0.34));
-    box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.24);
-    opacity: 0.66;
-    transition: opacity 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+        radial-gradient(ellipse at 18% 100%, rgba(198, 154, 74, 0.12), transparent 58%),
+        linear-gradient(145deg, rgba(255, 244, 210, 0.025), rgba(8, 7, 6, 0.18));
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.18);
+    opacity: 0.56;
+    transition: opacity 0.22s ease;
 }
 
-#compendioHub .comp-hub-card:nth-child(2) { --comp-window-x: 100%; }
-#compendioHub .comp-hub-card:nth-child(3) { --comp-window-y: 33.333%; }
-#compendioHub .comp-hub-card:nth-child(4) { --comp-window-x: 100%; --comp-window-y: 33.333%; }
-#compendioHub .comp-hub-card:nth-child(5) { --comp-window-y: 66.667%; }
-#compendioHub .comp-hub-card:nth-child(6) { --comp-window-x: 100%; --comp-window-y: 66.667%; }
-#compendioHub .comp-hub-card:nth-child(7) { --comp-window-y: 100%; }
-#compendioHub .comp-hub-card:nth-child(8) { --comp-window-x: 100%; --comp-window-y: 100%; }
+#compendioHub .comp-hub-card:nth-child(2) { --comp-window-x: 88%; }
+#compendioHub .comp-hub-card:nth-child(3) { --comp-window-y: 40%; }
+#compendioHub .comp-hub-card:nth-child(4) { --comp-window-x: 88%; --comp-window-y: 40%; }
+#compendioHub .comp-hub-card:nth-child(5) { --comp-window-y: 68%; }
+#compendioHub .comp-hub-card:nth-child(6) { --comp-window-x: 88%; --comp-window-y: 68%; }
+#compendioHub .comp-hub-card:nth-child(7) { --comp-window-y: 96%; }
+#compendioHub .comp-hub-card:nth-child(8) { --comp-window-x: 88%; --comp-window-y: 96%; }
 
 #compendioHub .comp-hub-card::after {
-    opacity: 0.42;
+    opacity: 0.24;
     background:
-        radial-gradient(circle at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.24)),
-        linear-gradient(120deg, rgba(255, 255, 255, 0.10), transparent 28%, transparent 74%, rgba(198, 154, 74, 0.12));
+        linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 30%, transparent 76%, rgba(198, 154, 74, 0.09)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.16));
 }
 
 #compendioHub .comp-hub-card:hover::before {
-    opacity: 0.84;
-    border-color: rgba(198, 154, 74, 0.42);
-    transform: scale(1.015);
+    opacity: 0.68;
 }
 
 #compendioHub .comp-hub-card-icon,
@@ -615,16 +604,16 @@ body {
 
 @media (min-width: 760px) {
     #compendioHub .comp-hub-card {
-        --comp-window-size: 400% 200%;
+        --comp-window-size: 520% 260%;
     }
 
-    #compendioHub .comp-hub-card:nth-child(2) { --comp-window-x: 33.333%; --comp-window-y: 0%; }
-    #compendioHub .comp-hub-card:nth-child(3) { --comp-window-x: 66.667%; --comp-window-y: 0%; }
-    #compendioHub .comp-hub-card:nth-child(4) { --comp-window-x: 100%; --comp-window-y: 0%; }
-    #compendioHub .comp-hub-card:nth-child(5) { --comp-window-x: 0%; --comp-window-y: 100%; }
-    #compendioHub .comp-hub-card:nth-child(6) { --comp-window-x: 33.333%; --comp-window-y: 100%; }
-    #compendioHub .comp-hub-card:nth-child(7) { --comp-window-x: 66.667%; --comp-window-y: 100%; }
-    #compendioHub .comp-hub-card:nth-child(8) { --comp-window-x: 100%; --comp-window-y: 100%; }
+    #compendioHub .comp-hub-card:nth-child(2) { --comp-window-x: 28%; --comp-window-y: 12%; }
+    #compendioHub .comp-hub-card:nth-child(3) { --comp-window-x: 56%; --comp-window-y: 12%; }
+    #compendioHub .comp-hub-card:nth-child(4) { --comp-window-x: 84%; --comp-window-y: 12%; }
+    #compendioHub .comp-hub-card:nth-child(5) { --comp-window-x: 0%; --comp-window-y: 94%; }
+    #compendioHub .comp-hub-card:nth-child(6) { --comp-window-x: 28%; --comp-window-y: 94%; }
+    #compendioHub .comp-hub-card:nth-child(7) { --comp-window-x: 56%; --comp-window-y: 94%; }
+    #compendioHub .comp-hub-card:nth-child(8) { --comp-window-x: 84%; --comp-window-y: 94%; }
 }
 
 /* Scheda personaggio: look da scheda rilegata ---------------------------- */
