@@ -202,6 +202,7 @@ window.compendioBackToHub = function() {
         _compScrollToTop();
         return;
     }
+    _compSetStickyTools('');
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
     if (hub) hub.style.display = '';
@@ -213,6 +214,7 @@ window.compendioShowHub = function() {
     Object.keys(COMP_TABS).forEach(tab => {
         _compStateFor(tab).detail = null;
     });
+    _compSetStickyTools('');
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
     if (hub) hub.style.display = '';
@@ -253,6 +255,7 @@ function compendioRenderTab() {
     if (!container) return;
     if (_compCurrentTab === 'oggetti') {
         container.innerHTML = _compObjectsPageHtml();
+        _compRenderObjectsStickyTools();
         _compScrollToTop();
         return;
     }
@@ -263,22 +266,20 @@ function compendioRenderTab() {
         if (item) {
             const title = document.getElementById('compendioSubTitle');
             if (title) title.textContent = item.title;
+            _compSetStickyTools('');
             container.innerHTML = _compDetailPageHtml(item);
             return;
         }
         state.detail = null;
     }
     const filtered = items.filter(item => _compMatches(item, state));
-    container.innerHTML = `
-        ${_compToolbarHtml(_compCurrentTab, state, items)}
-        <p class="comp-count">${filtered.length} risultati su ${items.length}</p>
-        ${filtered.length ? _compListHtml(_compCurrentTab, filtered) : '<div class="comp-empty">Nessun elemento trovato</div>'}
-    `;
+    _compRenderStickyTools(_compCurrentTab, state, items);
+    container.innerHTML = _compListContentHtml(_compCurrentTab, filtered, items.length);
 }
 
 window.compendioSetSearch = function(value) {
     _compStateFor(_compCurrentTab).search = value || '';
-    compendioRenderTab();
+    _compRenderCurrentListContent();
 };
 
 window.compendioSetFilter = function(key, value) {
@@ -286,7 +287,8 @@ window.compendioSetFilter = function(key, value) {
     const values = _compFilterValues(value).filter(Boolean);
     if (values.length) filters[key] = values;
     else delete filters[key];
-    compendioRenderTab();
+    _compRenderCurrentListContent();
+    _compRefreshStickyTools();
 };
 
 window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi') {
@@ -313,7 +315,8 @@ window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi'
 
 window.compendioResetFilters = function() {
     _compStateFor(_compCurrentTab).filters = {};
-    compendioRenderTab();
+    _compRenderCurrentListContent();
+    _compRefreshStickyTools();
 };
 
 window.compendioOpenFilters = function() {
@@ -470,10 +473,10 @@ function _compItems(tab) {
 }
 
 function _compToolbarHtml(tab, state, allItems) {
-    const activeFilters = Object.values(state.filters || {}).reduce((count, value) => count + _compFilterValues(value).length, 0);
+    const activeFilters = _compActiveFiltersCount(state);
     const filtersHtml = _compFiltersHtml(tab, state, allItems);
     return `
-        <div class="comp-toolbar">
+        <div class="comp-toolbar page-tools-row">
             <label class="comp-search-wrap">
                 ${_compIcon('search')}
                 <input class="comp-search" type="search" placeholder="Cerca in ${escapeHtml(COMP_TABS[tab].label.toLowerCase())}..."
@@ -482,10 +485,54 @@ function _compToolbarHtml(tab, state, allItems) {
             ${filtersHtml ? `<button type="button" class="comp-filter-btn" onclick="compendioOpenFilters()">
                 ${_compIcon('sliders')}
                 <span>Filtri</span>
-                ${activeFilters ? `<strong>${activeFilters}</strong>` : ''}
+                ${activeFilters ? `<strong id="compFiltersBadge">${activeFilters}</strong>` : '<strong id="compFiltersBadge" style="display:none;"></strong>'}
             </button>` : ''}
         </div>
     `;
+}
+
+function _compActiveFiltersCount(state) {
+    return Object.values(state?.filters || {}).reduce((count, value) => count + _compFilterValues(value).length, 0);
+}
+
+function _compSetStickyTools(html) {
+    const target = document.getElementById('compendioStickyTools');
+    if (target) target.innerHTML = html || '';
+}
+
+function _compRenderStickyTools(tab, state, items) {
+    _compSetStickyTools(_compToolbarHtml(tab, state, items));
+}
+
+function _compRefreshStickyTools() {
+    if (_compCurrentTab === 'oggetti') {
+        _compRenderObjectsStickyTools();
+        return;
+    }
+    const items = _compItems(_compCurrentTab);
+    const state = _compStateFor(_compCurrentTab);
+    if (state.detail) return;
+    _compRenderStickyTools(_compCurrentTab, state, items);
+}
+
+function _compListContentHtml(tab, filtered, total) {
+    return `
+        <p class="comp-count">${filtered.length} risultati su ${total}</p>
+        ${filtered.length ? _compListHtml(tab, filtered) : '<div class="comp-empty">Nessun elemento trovato</div>'}
+    `;
+}
+
+function _compRenderCurrentListContent() {
+    if (_compCurrentTab === 'oggetti') {
+        _compRenderObjectsInventoryList();
+        return;
+    }
+    const container = document.getElementById('compendioContent');
+    const state = _compStateFor(_compCurrentTab);
+    if (!container || state.detail) return;
+    const items = _compItems(_compCurrentTab);
+    const filtered = items.filter(item => _compMatches(item, state));
+    container.innerHTML = _compListContentHtml(_compCurrentTab, filtered, items.length);
 }
 
 function _compFiltersHtml(tab, state, allItems) {
@@ -798,8 +845,6 @@ function _compEquipmentTablesHtml() {
 
 function _compObjectsInventoryHtml(state) {
     state.objectKind = state.objectKind || 'oggetti';
-    const searchLabel = state.objectKind === 'veleni' ? 'veleno' : 'oggetto';
-    const activeFilters = _compObjectsActiveFilterCount();
     return `
         <div class="comp-object-kind-tabs">
             <button type="button" class="comp-object-kind-tab ${state.objectKind === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectKind('oggetti')">
@@ -809,7 +854,21 @@ function _compObjectsInventoryHtml(state) {
                 Veleni
             </button>
         </div>
-        <div class="comp-toolbar">
+        <div id="compObjectsListContent">${_compObjectsInventoryListHtml(state)}</div>
+    `;
+}
+
+function _compRenderObjectsStickyTools() {
+    const state = _compStateFor('oggetti');
+    if (state.subTab !== 'oggetti') {
+        _compSetStickyTools('');
+        return;
+    }
+    state.objectKind = state.objectKind || 'oggetti';
+    const searchLabel = state.objectKind === 'veleni' ? 'veleno' : 'oggetto';
+    const activeFilters = _compObjectsActiveFilterCount();
+    _compSetStickyTools(`
+        <div class="comp-toolbar page-tools-row">
             <label class="comp-search-wrap">
                 ${_compIcon('search')}
                 <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca ${searchLabel}..."
@@ -821,8 +880,7 @@ function _compObjectsInventoryHtml(state) {
                 ${activeFilters ? `<strong id="compObjectsFiltersBadge">${activeFilters}</strong>` : '<strong id="compObjectsFiltersBadge" style="display:none;"></strong>'}
             </button>
         </div>
-        <div id="compObjectsListContent">${_compObjectsInventoryListHtml(state)}</div>
-    `;
+    `);
 }
 
 function _compWeaponTable(label, rows) {

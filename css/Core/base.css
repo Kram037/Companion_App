@@ -11,6 +11,8 @@
 
 /* ── Tokens ── */
 :root {
+    --app-header-height: 64px;
+    --app-bottom-toolbar-height: 64px;
     --primary: #E8E4DF;
     --primary-dark: #D5CFC8;
     --secondary: #F0EDE8;
@@ -118,7 +120,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    height: 64px;
+    height: var(--app-header-height);
 }
 
 [data-theme="dark"] .header {
@@ -323,7 +325,7 @@ body.user-logged-in .header-username {
     align-items: center;
     padding: 6px 0 env(safe-area-inset-bottom, 6px);
     z-index: 100;
-    height: 64px;
+    height: var(--app-bottom-toolbar-height);
 }
 
 [data-theme="dark"] .bottom-toolbar {
@@ -485,14 +487,21 @@ body.global-return-active .back-button-floating { display: none !important; }
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
     gap: var(--spacing-md);
+    min-height: 42px;
+    margin: 0;
+    padding: 7px var(--spacing-sm);
+    border-bottom: 1px solid var(--border);
 }
 
 .page-header h1 {
     margin: 0;
     font-size: 1.5rem;
     text-align: center;
+}
+
+.page-top-stack .page-header h1 {
+    margin: 0;
 }
 
 .page-header .btn-primary {
@@ -503,6 +512,41 @@ body.global-return-active .back-button-floating { display: none !important; }
 
 .page-header .btn-icon {
     display: none;
+}
+
+.page-top-stack {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin: calc(-1 * var(--spacing-lg)) 0 var(--spacing-md);
+    overflow: visible;
+}
+
+.page-top-stack:empty {
+    display: none;
+}
+
+.page-tools-row,
+.page-top-stack .comp-toolbar,
+.page-top-stack .lab-list-toolbar {
+    margin: 0;
+    padding: 8px;
+    border-top: 1px solid var(--border);
+    border-bottom: 0;
+}
+
+.page-top-stack .filter-search,
+.page-top-stack .comp-search {
+    min-height: 36px;
+}
+
+.page-top-stack .comp-filter-btn {
+    min-height: 36px;
 }
 
 /* ============================================
@@ -614,18 +658,21 @@ body.global-return-active .back-button-floating { display: none !important; }
 
 /* ── Mobile (<= 480px) — Telefoni piccoli ── */
 @media (max-width: 480px) {
+    :root { --app-header-height: 58px; }
     .main-content { padding: var(--spacing-sm); }
 
-    .header { padding: 0 var(--spacing-md); height: 58px; }
+    .header { padding: 0 var(--spacing-md); }
     .d20-logo { width: 42px; height: 42px; }
 
-    .page-header { padding: 0; gap: var(--spacing-sm); justify-content: center; }
+    .page-header { padding: 6px var(--spacing-sm); gap: var(--spacing-sm); justify-content: center; }
     .page-header h1 { font-size: 1.2rem; text-align: center; }
     .page-content h1 { font-size: 1.2rem; margin-bottom: var(--spacing-md); }
 
     .page-header .btn-icon { display: none; }
 
+    .page-top-stack { margin-top: calc(-1 * var(--spacing-sm)); }
     .filters-bar { gap: 6px; margin-bottom: var(--spacing-md); }
+    .page-top-stack .filters-bar { margin-bottom: 0; }
     .filter-search { padding: 8px 10px 8px 32px; font-size: 0.85rem; }
     .filter-chips { gap: 4px; }
     .filter-chip-select { font-size: 0.72rem; padding: 5px 22px 5px 8px; }
@@ -944,4 +991,3 @@ body.global-return-active .back-button-floating { display: none !important; }
 }
 .ta-fs-textarea::placeholder { color: var(--text-muted); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-

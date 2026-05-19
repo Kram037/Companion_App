@@ -69,6 +69,13 @@
     margin-bottom: var(--spacing-lg);
 }
 
+.filters-bar.page-tools-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+}
+
 .filter-search-wrap { position: relative; }
 
 .filter-search-icon {

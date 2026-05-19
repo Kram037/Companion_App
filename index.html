@@ -19,8 +19,8 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="images/icon d20.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/icon d20.png">
-    <link rel="stylesheet" href="css/Core/base.css?v=20260424I">
-    <link rel="stylesheet" href="css/Core/components.css?v=20260424M">
+    <link rel="stylesheet" href="css/Core/base.css?v=20260519A">
+    <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260517D">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
     <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260518A">
@@ -70,31 +70,33 @@
         <!-- Campagne Page (Landing) -->
         <section class="page active" id="campagnePage">
             <div class="page-content">
-                <div class="page-header">
-                    <h1>Campagne</h1>
-                </div>
-                <div class="filters-bar">
-                    <div class="filter-search-wrap">
-                        <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                        <input type="text" id="campagneSearchInput" class="filter-search" placeholder="Cerca campagna...">
+                <div class="page-top-stack">
+                    <div class="page-header">
+                        <h1>Campagne</h1>
                     </div>
-                    <button type="button" class="comp-filter-btn" id="campagneFiltersBtn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="4" y1="21" x2="4" y2="14"></line>
-                            <line x1="4" y1="10" x2="4" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12" y2="3"></line>
-                            <line x1="20" y1="21" x2="20" y2="16"></line>
-                            <line x1="20" y1="12" x2="20" y2="3"></line>
-                            <line x1="1" y1="14" x2="7" y2="14"></line>
-                            <line x1="9" y1="8" x2="15" y2="8"></line>
-                            <line x1="17" y1="16" x2="23" y2="16"></line>
-                        </svg>
-                        <span>Filtri</span>
-                    </button>
+                    <div class="filters-bar page-tools-row">
+                        <div class="filter-search-wrap">
+                            <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="campagneSearchInput" class="filter-search" placeholder="Cerca campagna...">
+                        </div>
+                        <button type="button" class="comp-filter-btn" id="campagneFiltersBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="4" y1="21" x2="4" y2="14"></line>
+                                <line x1="4" y1="10" x2="4" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12" y2="3"></line>
+                                <line x1="20" y1="21" x2="20" y2="16"></line>
+                                <line x1="20" y1="12" x2="20" y2="3"></line>
+                                <line x1="1" y1="14" x2="7" y2="14"></line>
+                                <line x1="9" y1="8" x2="15" y2="8"></line>
+                                <line x1="17" y1="16" x2="23" y2="16"></line>
+                            </svg>
+                            <span>Filtri</span>
+                        </button>
+                    </div>
                 </div>
                 <div id="campagneList" class="campagne-list">
                     <div class="content-placeholder">
@@ -114,8 +116,11 @@
                     <div class="comp-hub-grid" id="compendioHubGrid"></div>
                 </div>
                 <div id="compendioSubPage" style="display:none;">
-                    <div class="page-header comp-sub-header">
-                        <h1 id="compendioSubTitle">Compendio</h1>
+                    <div class="page-top-stack">
+                        <div class="page-header comp-sub-header">
+                            <h1 id="compendioSubTitle">Compendio</h1>
+                        </div>
+                        <div id="compendioStickyTools"></div>
                     </div>
                     <div id="compendioContent" class="comp-content"></div>
                     <button class="back-button-floating" onclick="compendioBackToHub()" aria-label="Indietro" data-no-return-glow="1">
@@ -160,8 +165,11 @@
                 </div>
                 <!-- Sub-page view (hidden by default) -->
                 <div id="labSubPage" style="display:none;">
-                    <div class="page-header">
-                        <h1 id="labSubTitle">Laboratorio</h1>
+                    <div class="page-top-stack">
+                        <div class="page-header">
+                            <h1 id="labSubTitle">Laboratorio</h1>
+                        </div>
+                        <div id="labStickyTools"></div>
                     </div>
                     <div id="labContent" class="lab-content"></div>
                     <button class="back-button-floating" onclick="labBackToHub()" aria-label="Indietro" data-no-return-glow="1">
@@ -1038,7 +1046,7 @@
     <script src="js/Personaggi/data/fighting_styles_data.js?v=1773360000"></script>
     <script src="js/Personaggi/data/oggetti_magici_data.js?v=20260227E"></script>
     <script src="js/Personaggi/data/veleni_data.js?v=20260227A"></script>
-    <script src="js/Compendio/compendio.js?v=20260518D"></script>
+    <script src="js/Compendio/compendio.js?v=20260519A"></script>
     <script src="js/Personaggi/personaggi-catalog.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-state.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-talenti.js?v=20260517B"></script>
@@ -1074,7 +1082,7 @@
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
     <script src="js/Sessioni/sessions.js?v=20260425F"></script>
     <script src="js/Combattimento/combat.js?v=20260425E"></script>
-    <script src="js/Laboratorio/laboratorio.js?v=20260517D"></script>
+    <script src="js/Laboratorio/laboratorio.js?v=20260519A"></script>
     <script src="js/Core/realtime.js?v=20260424J"></script>
     <script src="js/Sessioni/initiative.js?v=20260425E"></script>
     <script src="js/Core/init.js?v=20260427A"></script>

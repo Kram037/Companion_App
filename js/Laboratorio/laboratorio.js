@@ -106,6 +106,7 @@ window.labOpenCategory = function(tab) {
     _labMountImportButton(tab);
 
     if (cat.isSettings) {
+        _labSetStickyTools('');
         labRenderSettings();
     } else {
         loadLabContent();
@@ -145,6 +146,7 @@ window.labBackToHub = function() {
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = '';
     if (sub) sub.style.display = 'none';
+    _labSetStickyTools('');
     _labScrollToTop();
 };
 
@@ -163,6 +165,7 @@ async function loadLabContent() {
 
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.isLoggedIn) {
+        _labSetStickyTools('');
         container.innerHTML = '<div class="content-placeholder"><p>Accedi per creare i tuoi contenuti homebrew</p></div>';
         return;
     }
@@ -193,16 +196,13 @@ async function loadLabContent() {
     }
 
     if (!data || data.length === 0) {
-        container.innerHTML = `<div class="lab-empty">Nessun contenuto homebrew. Premi <strong>+</strong> per crearne uno!</div>`;
+        _labRenderHomebrewListWithFilters(container, cat, [], _labCurrentTab, {
+            emptyHtml: `<div class="lab-empty">Nessun contenuto homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+        });
         return;
     }
 
-    if (_labCurrentTab === 'incantesimi' || _labCurrentTab === 'oggetti') {
-        _labRenderHomebrewListWithFilters(container, cat, data, _labCurrentTab);
-        return;
-    }
-
-    container.innerHTML = `<div class="lab-list">${data.map(item => labRenderCard(item, cat)).join('')}</div>`;
+    _labRenderHomebrewListWithFilters(container, cat, data, _labCurrentTab);
 }
 
 // ============================================================================
@@ -211,6 +211,7 @@ async function loadLabContent() {
 
 window._labListState = window._labListState || {};
 window._labListAllData = window._labListAllData || {};
+window._labListRenderers = window._labListRenderers || {};
 
 function _labListGetState(tab) {
     if (!window._labListState[tab]) {
@@ -220,6 +221,73 @@ function _labListGetState(tab) {
 }
 
 function _labListGetFilterDefs(tab) {
+    if (tab === 'classi') {
+        return [{
+            key: 'classe',
+            label: 'Classe',
+            options: (data) => {
+                const found = new Set();
+                (data || []).forEach(it => {
+                    const label = it.parent_class_name || it.parent_class_slug;
+                    if (label) found.add(label);
+                });
+                return [{ value: '', label: 'Tutte' }, ...Array.from(found).sort((a, b) => a.localeCompare(b, 'it')).map(v => ({ value: v, label: v }))];
+            },
+            match: (item, value) => [item.parent_class_name, item.parent_class_slug].map(String).includes(String(value)),
+        }];
+    }
+    if (tab === 'razze') {
+        return [{
+            key: 'taglia',
+            label: 'Taglia',
+            options: (data) => {
+                const found = new Set(['Minuscola', 'Piccola', 'Media', 'Grande']);
+                (data || []).forEach(it => { if (it.taglia) found.add(it.taglia); });
+                return [{ value: '', label: 'Tutte' }, ...Array.from(found).sort((a, b) => a.localeCompare(b, 'it')).map(v => ({ value: v, label: v }))];
+            },
+            match: (item, value) => String(item.taglia || '') === String(value),
+        }];
+    }
+    if (tab === 'talenti') {
+        return [{
+            key: 'prerequisiti',
+            label: 'Prerequisiti',
+            options: () => [{ value: '', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
+            match: (item, value) => value === 'yes' ? !!String(item.prerequisiti || '').trim() : !String(item.prerequisiti || '').trim(),
+        }];
+    }
+    if (tab === 'nemici') {
+        return [{
+            key: 'gs',
+            label: 'Grado sfida',
+            options: (data) => {
+                const found = new Set();
+                (data || []).forEach(it => { if (it.grado_sfida != null && it.grado_sfida !== '') found.add(String(it.grado_sfida)); });
+                return [{ value: '', label: 'Tutti' }, ...Array.from(found).sort((a, b) => Number(a) - Number(b)).map(v => ({ value: v, label: v }))];
+            },
+            match: (item, value) => String(item.grado_sfida ?? '') === String(value),
+        }];
+    }
+    if (tab === 'combattimenti') {
+        return [{
+            key: 'mostri',
+            label: 'Mostri',
+            options: () => [
+                { value: '', label: 'Tutti' },
+                { value: '0', label: 'Nessuno' },
+                { value: '1-3', label: '1-3' },
+                { value: '4-6', label: '4-6' },
+                { value: '7+', label: '7+' },
+            ],
+            match: (item, value) => {
+                const count = Array.isArray(item.mostri) ? item.mostri.length : 0;
+                if (value === '0') return count === 0;
+                if (value === '7+') return count >= 7;
+                const [min, max] = String(value).split('-').map(Number);
+                return count >= min && count <= max;
+            },
+        }];
+    }
     if (tab === 'incantesimi') {
         return [
             {
@@ -289,6 +357,12 @@ function _labListGetFilterDefs(tab) {
 }
 
 function _labListSearchPlaceholder(tab) {
+    if (tab === 'classi') return 'Cerca sottoclasse...';
+    if (tab === 'razze') return 'Cerca razza...';
+    if (tab === 'background') return 'Cerca background...';
+    if (tab === 'talenti') return 'Cerca talento...';
+    if (tab === 'nemici') return 'Cerca nemico...';
+    if (tab === 'combattimenti') return 'Cerca combattimento...';
     if (tab === 'incantesimi') return 'Cerca per nome o scuola...';
     if (tab === 'oggetti') return 'Cerca per nome o tipo...';
     return 'Cerca...';
@@ -297,8 +371,23 @@ function _labListSearchPlaceholder(tab) {
 function _labListItemMatchesSearch(tab, item, q) {
     if (!q) return true;
     const needle = q.toLowerCase();
-    const fields = [item.nome, item.scuola, item.tipo, item.sotto_tipo, item.rarita];
-    return fields.some(f => typeof f === 'string' && f.toLowerCase().includes(needle));
+    const combatNames = Array.isArray(item.mostri)
+        ? item.mostri.map(m => m?.snapshot?.nome || m?.nome).join(' ')
+        : '';
+    const fields = [
+        item.nome,
+        item.scuola,
+        item.tipo,
+        item.sotto_tipo,
+        item.rarita,
+        item.parent_class_name,
+        item.parent_class_slug,
+        item.taglia,
+        item.prerequisiti,
+        item.grado_sfida,
+        combatNames,
+    ];
+    return fields.some(f => f != null && String(f).toLowerCase().includes(needle));
 }
 
 function _labListApplyFilters(tab, data, state) {
@@ -317,7 +406,6 @@ function _labListApplyFilters(tab, data, state) {
 function _labListActiveFiltersCount(tab) {
     const state = _labListGetState(tab);
     let n = 0;
-    if ((state.search || '').trim()) n++;
     Object.values(state.filters || {}).forEach(v => {
         n += _labListFilterValues(v).length;
     });
@@ -344,14 +432,14 @@ function _labListBuildFiltersPanelHtml(tab, data) {
                 ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
             </button>`;
     }).join('');
-    return fields;
+    return fields || '<div class="comp-empty">Nessun filtro disponibile per questa lista.</div>';
 }
 
 function _labListBuildToolbarHtml(tab, data) {
     const state = _labListGetState(tab);
     const activeN = _labListActiveFiltersCount(tab);
     return `
-    <div class="filters-bar lab-list-toolbar">
+    <div class="filters-bar lab-list-toolbar page-tools-row">
         <div class="filter-search-wrap">
             <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -370,27 +458,46 @@ function _labListBuildToolbarHtml(tab, data) {
     </div>`;
 }
 
-function _labRenderHomebrewListWithFilters(container, cat, data, tab) {
+function _labSetStickyTools(html) {
+    const target = document.getElementById('labStickyTools');
+    if (target) target.innerHTML = html || '';
+}
+
+function _labRenderStickyTools(tab, data) {
+    if (!tab || LAB_CATEGORIES[tab]?.isSettings) {
+        _labSetStickyTools('');
+        return;
+    }
+    _labSetStickyTools(_labListBuildToolbarHtml(tab, data || []));
+}
+
+function _labRenderHomebrewListWithFilters(container, cat, data, tab, options = {}) {
     window._labListAllData[tab] = data;
+    window._labListRenderers[tab] = {
+        render: options.render || ((item) => labRenderCard(item, cat)),
+        emptyHtml: options.emptyHtml || '<div class="lab-empty">Nessun risultato per i filtri impostati</div>',
+    };
     const state = _labListGetState(tab);
     const filtered = _labListApplyFilters(tab, data, state);
-    const toolbar = _labListBuildToolbarHtml(tab, data);
+    _labRenderStickyTools(tab, data);
+    const renderer = window._labListRenderers[tab];
     const listHtml = filtered.length === 0
-        ? `<div class="lab-empty">Nessun risultato per i filtri impostati</div>`
-        : `<div class="lab-list">${filtered.map(item => labRenderCard(item, cat)).join('')}</div>`;
-    container.innerHTML = `${toolbar}<div id="labListContainer">${listHtml}</div>`;
+        ? renderer.emptyHtml
+        : `<div class="lab-list">${filtered.map(renderer.render).join('')}</div>`;
+    container.innerHTML = `<div id="labListContainer">${listHtml}</div>`;
 }
 
 function _labListReRenderList(tab) {
-    const cat = LAB_CATEGORIES[tab];
     const data = window._labListAllData[tab] || [];
     const state = _labListGetState(tab);
     const filtered = _labListApplyFilters(tab, data, state);
     const wrap = document.getElementById('labListContainer');
     if (!wrap) return;
+    const renderer = window._labListRenderers[tab] || {};
+    const render = renderer.render || ((item) => labRenderCard(item, LAB_CATEGORIES[tab]));
     wrap.innerHTML = filtered.length === 0
-        ? `<div class="lab-empty">Nessun risultato per i filtri impostati</div>`
-        : `<div class="lab-list">${filtered.map(item => labRenderCard(item, cat)).join('')}</div>`;
+        ? (renderer.emptyHtml || '<div class="lab-empty">Nessun risultato per i filtri impostati</div>')
+        : `<div class="lab-list">${filtered.map(render).join('')}</div>`;
     _labListRefreshBadge(tab);
 }
 
@@ -511,6 +618,7 @@ async function _loadLabNemiciSection() {
         </div>
         <div id="labNemiciSubContent"></div>`;
     container.innerHTML = tabsHtml;
+    _labSetStickyTools('');
     const sc = document.getElementById('labNemiciSubContent');
     sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
 
@@ -520,12 +628,11 @@ async function _loadLabNemiciSection() {
             .eq('user_id', AppState.currentUser.uid)
             .order('created_at', { ascending: false });
         if (error) { sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>'; return; }
-        if (!data || data.length === 0) {
-            sc.innerHTML = `<div class="lab-empty">Nessun nemico homebrew. Premi <strong>+</strong> per crearne uno!</div>`;
-            return;
-        }
         const cat = LAB_CATEGORIES.nemici;
-        sc.innerHTML = `<div class="lab-list">${data.map(it => labRenderCard(it, cat)).join('')}</div>`;
+        _labRenderHomebrewListWithFilters(sc, cat, data || [], 'nemici', {
+            emptyHtml: `<div class="lab-empty">Nessun nemico homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+            render: (item) => labRenderCard(item, cat),
+        });
     } else {
         const { data, error } = await supabase
             .from('homebrew_combattimenti').select('*')
@@ -535,11 +642,10 @@ async function _loadLabNemiciSection() {
             sc.innerHTML = `<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>sql/add-homebrew-combattimenti.sql</code>?</small></div>`;
             return;
         }
-        if (!data || data.length === 0) {
-            sc.innerHTML = `<div class="lab-empty">Nessun combattimento. Premi <strong>+</strong> per crearne uno!</div>`;
-            return;
-        }
-        sc.innerHTML = `<div class="lab-list">${data.map(it => _labRenderCombatCard(it)).join('')}</div>`;
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.nemici, data || [], 'combattimenti', {
+            emptyHtml: `<div class="lab-empty">Nessun combattimento. Premi <strong>+</strong> per crearne uno!</div>`,
+            render: _labRenderCombatCard,
+        });
     }
 }
 
