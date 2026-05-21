@@ -26,6 +26,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Spruzzo Acido"
@@ -60,6 +66,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [
       "Custodia della Lama"
@@ -94,6 +102,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -124,6 +138,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -154,6 +170,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -188,6 +206,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -220,6 +244,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -246,6 +276,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -272,6 +304,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Colpo Occulto"
@@ -304,6 +338,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Dardo Infuocato"
@@ -338,6 +378,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -372,6 +414,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -404,6 +452,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -434,6 +488,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -464,6 +524,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -496,6 +558,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -530,6 +594,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -562,6 +632,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [
       "Frusta Folgorante"
@@ -598,6 +674,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -628,6 +710,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -664,6 +752,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -696,6 +790,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -726,6 +826,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -758,6 +860,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -788,6 +892,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -822,6 +928,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -856,6 +968,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -882,6 +1000,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -908,6 +1028,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -938,6 +1060,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -968,6 +1096,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -994,6 +1128,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1024,6 +1160,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1050,6 +1188,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1080,6 +1220,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Folgorare"
@@ -1110,6 +1256,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1142,6 +1294,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -1168,6 +1326,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1196,6 +1356,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -1232,8 +1398,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
-    "aliases": [],
+    "aliases": [
+      "Tuono Fragoroso"
+    ],
     "translated": true
   },
   "Rintocco dei Morti": {
@@ -1262,6 +1436,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1294,6 +1470,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1320,6 +1498,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Bard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Schernire"
@@ -1348,6 +1528,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1382,7 +1564,49 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Allarme": {
+    "name": "Allarme",
+    "name_en": "Alarm",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un minuscolo campana e un pezzo di fine filo d'argento)",
+    "components_en": "V, S, M (a tiny bell and a piece of fine silver wire)",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Imposti una protezione su una porta, una finestra o un'area non piu' grande di un cubo di 6 metri. Finche' dura, una creatura Minuscola o piu' grande che entra o tocca l'area fa scattare l'allarme, salvo le creature che hai escluso al momento del lancio. Puoi scegliere un allarme mentale, percepibile da te entro 1,5 km e capace di svegliarti, oppure un allarme sonoro udibile entro 18 metri.",
+    "description_en": "You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible. A mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping. An audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
+    "classes": [
+      "Ranger",
+      "Mago",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Ranger",
+      "Wizard",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -1412,6 +1636,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1438,6 +1664,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -1464,6 +1692,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -1492,6 +1722,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Rovina"
@@ -1522,6 +1754,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1550,6 +1784,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1578,6 +1814,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1608,6 +1846,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1636,10 +1880,42 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [
       "Provocare Paura"
     ],
+    "translated": true
+  },
+  "Cerimonia": {
+    "name": "Cerimonia",
+    "name_en": "Ceremony",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 ora",
+    "casting_time_en": "1 hour",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (25 mo del valore di di argento in polvere, che l'incantesimo consuma)",
+    "components_en": "V, S, M (25 gp worth of powdered silver, which the spell consumes)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Compi un rito religioso minore scegliendo uno degli effetti previsti, come espiazione, benedizione dell'acqua, passaggio all'eta' adulta, matrimonio, consacrazione funebre, dedicazione o investitura. Ogni rito applica il proprio beneficio o vincolo per la durata indicata dall'incantesimo; una creatura puo' beneficiare di alcuni riti una sola volta finche' le condizioni non cambiano.",
+    "description_en": "You perform one of several religious ceremonies. When you cast the spell, choose one of the following ceremonies, the target of which must be within 10 feet of you throughout the casting. Atonement. You touch one willing creature whose alignment has changed, and you make a DC 20 Wisdom (Insight) check. On a successful check, you restore the target to its original alignment. Bless Water. You touch one vial of water and cause it to become holy water. Coming of Age. You touch one humanoid who is a young adult. For the next 24 hours, whenever the target makes an ability check, it can roll a d4 and add the number rolled to the ability check. A creature can benefit from this rite only once. Dedication. You touch one humanoid who wishes to be dedicated to your god's service. For the next 24 hours, whenever the target makes a saving throw, it can roll a d4 and add the number rolled to the save. A creature can benefit from this rite only once. Funeral Rite. You touch one corpse, and for the next 7 days, the target can't become undead by any means short of a wish spell. Wedding. You touch adult humanoids willing to be bonded together in marriage. For the next 7 days, each target gains a +2 bonus to AC while they are within 30 feet of each other. A creature can benefit from this rite again only if widowed.",
+    "classes": [
+      "Chierico",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Paladin"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Xanathar's Guide to Everything",
+    "aliases": [],
     "translated": true
   },
   "Dardo del Caos": {
@@ -1664,6 +1940,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Sorcerer"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -1698,6 +1976,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Charme su Persona"
@@ -1728,6 +2008,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -1750,13 +2032,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can affect. Creatures in a 15-foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can't see). Starting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the end of your next turn. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d10 for each slot level above 1st.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -1778,13 +2068,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom saving throw or follow the command on its next turn. The spell has no effect if the target is undead, if it doesn't understand your language, or if your command is directly harmful to it. Some typical commands and their effects follow. You might issue a command other than one described here. If you do so, the DM determines how the target behaves. If the target is prevented from following your command, the spell ends. Approach. The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you. Drop. The target drops whatever it is holding and then ends its turn. Flee. The target spends its turn moving away from you by the fastest available means. Grovel. The target falls prone and then ends its turn. Halt. The target stays where it is and takes no actions. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, you can affect one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them.",
     "classes": [
       "Chierico",
-      "Paladino"
+      "Paladino",
+      "Bardo"
     ],
     "classes_en": [
       "Cleric",
-      "Paladin"
+      "Paladin",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [
       "Ordine"
     ],
@@ -1812,9 +2110,47 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [
       "Duello Forzato"
+    ],
+    "translated": true
+  },
+  "Comprensione dei Linguaggi": {
+    "name": "Comprensione dei Linguaggi",
+    "name_en": "Comprehend Languages",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (un pizzico di soot e salt)",
+    "components_en": "V, S, M (a pinch of soot and salt)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Per la durata comprendi il significato letterale di qualunque lingua parlata che senti. Comprendi anche testi scritti che tocchi, leggendo circa una pagina al minuto. L'incantesimo non decifra messaggi segreti, simboli speciali o codici che non siano una lingua scritta.",
+    "description_en": "For the duration, you understand the literal meaning of any spoken language that you hear. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text. This spell doesn't decode secret messages in a text or a glyph, such as an arcane sigil, that isn't part of a written language.",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Comprendere Linguaggi"
     ],
     "translated": true
   },
@@ -1842,6 +2178,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1878,6 +2216,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1906,6 +2250,88 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Individuazione del Magico": {
+    "name": "Individuazione del Magico",
+    "name_en": "Detect Magic",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Per la durata percepisci la presenza di magia entro 9 metri. Se la percepisci, puoi usare un'azione per vedere una tenue aura attorno a creature od oggetti visibili nell'area e conoscere la scuola di magia, se presente. L'effetto attraversa molte barriere, ma viene bloccato da pietra, metallo comune, piombo, legno o terra abbastanza spessi.",
+    "description_en": "For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido",
+      "Paladino",
+      "Ranger",
+      "Stregone",
+      "Mago",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Paladin",
+      "Ranger",
+      "Sorcerer",
+      "Wizard",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Individuazione di Veleni e Malattie": {
+    "name": "Individuazione di Veleni e Malattie",
+    "name_en": "Detect Poison and Disease",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (un yew foglia)",
+    "components_en": "V, S, M (a yew leaf)",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Per la durata percepisci presenza e posizione di veleni, creature velenose e malattie entro 9 metri, e ne identifichi il tipo. L'effetto puo' attraversare molte barriere, ma viene bloccato da pietra, metallo comune, piombo, legno o terra abbastanza spessi.",
+    "description_en": "For the duration, you can sense the presence and location of poisons, poisonous creatures, and diseases within 30 feet of you. You also identify the kind of poison, poisonous creature, or disease in each case. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Paladino",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Paladin",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -1938,6 +2364,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Camuffarsi"
@@ -1966,6 +2398,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Bard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -1992,6 +2426,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2024,6 +2460,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -2050,6 +2488,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -2071,12 +2511,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Erbe contorte e intrecciate erompono in un quadrato di 6 metri di lato a partire da un punto entro gittata. Per la durata, le piante trasformano l'area in terreno difficile. Una creatura nell'area al momento del lancio deve riuscire in un tiro salvezza su Forza o essere intrappolata dalle piante. Una creatura intrappolata può usare la sua azione per fare una prova di Forza contro la CD del tuo incantesimo. Al termine dell'incantesimo le piante svaniscono.",
     "description_en": "Grasping weeds and vines sprout from the ground in a 20-foot square starting from a point within range. For the duration, these plants turn the ground in the area into difficult terrain. A creature in the area when you cast the spell must succeed on a Strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself. When the spell ends, the conjured plants wilt away.",
     "classes": [
-      "Druido"
+      "Druido",
+      "Ranger"
     ],
     "classes_en": [
-      "Druid"
+      "Druid",
+      "Ranger"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -2108,6 +2556,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2138,6 +2592,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Fuoco Fatato"
@@ -2170,6 +2630,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Falsa Vita"
@@ -2204,6 +2670,40 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Trova Famiglio": {
+    "name": "Trova Famiglio",
+    "name_en": "Find Familiar",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 ora",
+    "casting_time_en": "1 hour",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S, M (10 mo del valore di di charcoal, incenso, e herbs che deve be consumed by fuoco in un brass braciere)",
+    "components_en": "V, S, M (10 gp worth of charcoal, incense, and herbs that must be consumed by fire in a brass brazier)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Ottieni il servizio di uno spirito che assume la forma di un piccolo animale a tua scelta. Il famiglio agisce indipendentemente ma obbedisce ai tuoi comandi, tira iniziativa propria e non puo' attaccare. Puoi comunicare telepaticamente con lui entro 30 metri, percepire attraverso i suoi sensi, congedarlo temporaneamente o definitivamente, e quando lanci un incantesimo a contatto puoi farlo trasmettere dal famiglio.",
+    "description_en": "You gain the service of a familiar, a spirit that takes an animal form you choose: bat, cat, crab, frog (toad), hawk, lizard, octopus, owl, poisonous snake, fish (quipper), rat, raven, sea horse, spider, or weasel. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a celestial, fey, or fiend (your choice) instead of a beast. Your familiar acts independently of you, but it always obeys your commands. In combat, it rolls its own initiative and acts on its own turn. A familiar can't attack, but it can take other actions as normal. When the familiar drops to 0 hit points, it disappears, leaving behind no physical form. It reappears after you cast this spell again. As an action, you can temporarily dismiss the familiar to a pocket dimension. Alternatively, you can dismiss it forever. As an action while it is temporarily dismissed, you can cause it to reappear in any unoccupied space within 30 feet of you. Whenever the familiar drops to 0 hit points or disappears into the pocket dimension, it leaves behind in its space anything it was wearing or carrying. While your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as an action, you can see through your familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the familiar has. During this time, you are deaf and blind with regard to your own senses. You can't have more than one familiar at a time. If you cast this spell while you already have a familiar, you instead cause it to adopt a new form. Choose one of the forms from the above list. Your familiar transforms into the chosen creature. Finally, when you cast a spell with a range of touch, your familiar can deliver the spell as if it had cast the spell. Your familiar must be within 100 feet of you, and it must use its reaction to deliver the spell when you cast it. If the spell requires an attack roll, you use your attack modifier for the roll.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2236,6 +2736,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2264,6 +2766,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2286,13 +2790,24 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration. When the grease appears, each creature standing in its area must succeed on a Dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a Dexterity saving throw or fall prone.",
     "classes": [
       "Mago",
+      "Stregone",
       "Artefice"
     ],
     "classes_en": [
       "Wizard",
+      "Sorcerer",
       "Artificer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -2318,6 +2833,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Dardo Guida"
@@ -2346,6 +2863,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -2376,6 +2895,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2402,8 +2923,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": [
+      "Rimprovero Infernale"
+    ],
     "translated": true
   },
   "Eroismo": {
@@ -2430,6 +2955,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2456,6 +2983,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [
       "Maledire"
@@ -2484,6 +3013,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2514,7 +3045,77 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Identificare": {
+    "name": "Identificare",
+    "name_en": "Identify",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un perla del valore di almeno 100 mo e un owl piuma)",
+    "components_en": "V, S, M (a pearl worth at least 100 gp and an owl feather)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tocchi un oggetto per tutta la durata del lancio. Se e' magico o influenzato dalla magia, ne apprendi proprieta', uso, eventuale sintonia, cariche e incantesimi attivi; se e' stato creato da un incantesimo, scopri quale. Se tocchi una creatura, apprendi quali incantesimi la stanno influenzando.",
+    "description_en": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it. If you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it.",
+    "classes": [
+      "Bardo",
+      "Mago",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Scrittura Illusoria": {
+    "name": "Scrittura Illusoria",
+    "name_en": "Illusory Script",
+    "level": 1,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "S, M (un piombo-based inchiostro del valore di almeno 10 mo, che l'incantesimo consuma)",
+    "components_en": "S, M (a lead-based ink worth at least 10 gp, which the spell consumes)",
+    "duration": "10 giorni",
+    "duration_en": "10 days",
+    "description": "Scrivi un messaggio su un supporto e lo avvolgi in un'illusione. Per te e per le creature designate il testo resta normale; per gli altri puo' apparire incomprensibile o come un messaggio diverso scritto in un'altra grafia o lingua. Chi possiede vera vista legge il messaggio nascosto, e l'incantesimo puo' essere dissolto.",
+    "description_en": "You write on parchment, paper, or some other suitable writing material and imbue it with a potent illusion that lasts for the duration. To you and any creatures you designate when you cast the spell, the writing appears normal, written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, you can cause the writing to appear to be an entirely different message, written in a different hand and language, though the language must be one you know. Should the spell be dispelled, the original script and the illusion both disappear. A creature with truesight can read the hidden message.",
+    "classes": [
+      "Bardo",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Warlock",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -2540,6 +3141,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2574,6 +3177,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2608,6 +3217,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2636,6 +3251,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [
       "Armatura del Mago"
@@ -2666,6 +3283,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2690,15 +3309,61 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Paladino",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Druido"
     ],
     "classes_en": [
       "Cleric",
       "Paladin",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Druid"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Purificare Cibo e Bevande": {
+    "name": "Purificare Cibo e Bevande",
+    "name_en": "Purify Food and Drink",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tutto il cibo e le bevande non magici entro una sfera di 1,5 metri centrata su un punto entro gittata vengono purificati: veleni e malattie presenti vengono rimossi.",
+    "description_en": "All nonmagical food and drink within a 5-foot-radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Paladino",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Paladin",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -2726,8 +3391,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
-    "aliases": [],
+    "aliases": [
+      "Raggio della Malattia"
+    ],
     "translated": true
   },
   "Santuario": {
@@ -2754,6 +3423,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2775,12 +3450,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "La prossima volta che colpisci una creatura con un attacco con arma in mischia prima del termine dell'incantesimo, l'arma rifulge di luce ardente, e l'attacco infligge 1d6 danni da fuoco extra al bersaglio e lo incendia. All'inizio di ogni suo turno fino al termine dell'incantesimo, il bersaglio deve riuscire in un tiro salvezza su Costituzione o subire 1d6 danni da fuoco. In caso di successo l'incantesimo termina. Se il bersaglio o una creatura entro 1,5 metri usano un'azione per spegnere le fiamme, l'incantesimo termina. Se lanciato a livello 2° o superiore, i danni iniziali aumentano di 1d6 per ogni livello di slot sopra il 1°.",
     "description_en": "The next time you hit a creature with a melee weapon attack during the spell's duration, your weapon flares with white-hot intensity, and the attack deals an extra 1d6 fire damage to the target and causes the target to ignite in flames. At the start of each of its turns until the spell ends, the target must make a Constitution saving throw. On a failed save, it takes 1d6 fire damage. On a successful save, the spell ends. If the target or a creature within 5 feet of it uses an action to put out the flames, or if some other effect douses the flames (such as the target being submerged in water), the spell ends. At Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, the initial extra damage dealt by the attack increases by 1d6 for each slot level above 1st.",
     "classes": [
-      "Paladino"
+      "Paladino",
+      "Ranger"
     ],
     "classes_en": [
-      "Paladin"
+      "Paladin",
+      "Ranger"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [
       "Castigo Cocente"
     ],
@@ -2810,6 +3493,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2838,6 +3523,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2868,6 +3555,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2898,6 +3587,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -2930,7 +3621,45 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Parlare con gli Animali": {
+    "name": "Parlare con gli Animali",
+    "name_en": "Speak with Animals",
+    "level": 1,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "10 minuti",
+    "duration_en": "10 minutes",
+    "description": "Per la durata puoi comprendere verbalmente le bestie e comunicare con loro. La loro conoscenza resta limitata dalla loro intelligenza, ma possono condividere informazioni su luoghi, creature e pericoli percepiti di recente. A discrezione del DM, puoi convincerle a piccoli favori.",
+    "description_en": "You gain the ability to comprehend and verbally communicate with beasts for the duration. The knowledge and awareness of many beasts is limited by their intelligence, but at minimum, beasts can give you information about nearby locations and monsters, including whatever they can perceive or have perceived within the past day. You might be able to persuade a beast to perform a small favor for you, at the DM's discretion.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -2960,6 +3689,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -2988,6 +3723,36 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Disco Fluttuante di Tenser": {
+    "name": "Disco Fluttuante di Tenser",
+    "name_en": "Tenser's Floating Disk",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (una goccia di mercurio)",
+    "components_en": "V, S, M (a drop of mercury)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Crei un disco di forza orizzontale che fluttua a circa 90 cm da terra e puo' sostenere fino a 250 kg. Il disco resta vicino a te, ti segue se ti allontani entro il limite previsto e svanisce se esci troppo dalla sua portata, se la durata termina o se viene sovraccaricato.",
+    "description_en": "This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground. The disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. It can move across uneven terrain, up or down stairs, slopes and the like, but it can't cross an elevation change of 10 feet or more. For example, the disk can't move across a 10-foot-deep pit, nor could it leave such a pit if it was created at the bottom. If you move more than 100 feet from the disk (typically because it can't move around an obstacle to follow you), the spell ends.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3014,6 +3779,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [
       "Castigo Tonante"
@@ -3048,6 +3815,40 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Servitore Inosservato": {
+    "name": "Servitore Inosservato",
+    "name_en": "Unseen Servant",
+    "level": 1,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (un pezzo di spago e un pezzetto di legno)",
+    "components_en": "V, S, M (a piece of string and a bit of wood)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Crei una forza invisibile, priva di mente e forma, che esegue compiti semplici a tuo comando entro gittata: recuperare oggetti, pulire, riparare, servire cibo o simili. Non puo' attaccare, ha CA e punti ferita minimi e scompare se scende a 0 punti ferita o se l'incantesimo termina.",
+    "description_en": "This spell creates an invisible, mindless, shapeless, Medium force that performs simple tasks at your command until the spell ends. The servant springs into existence in an unoccupied space on the ground within range. It has AC 10, 1 hit point, and a Strength of 2, and it can't attack. If it drops to 0 hit points, the spell ends. Once on each of your turns as a bonus action, you can mentally command the servant to move up to 15 feet and interact with an object. The servant can perform simple tasks that a human servant could do, such as fetching things, cleaning, mending, folding clothes, lighting fires, serving food, and pouring wine. Once you give the command, the servant performs the task to the best of its ability until it completes the task, then waits for your next command. If you command the servant to perform a task that would move it more than 60 feet away from you, the spell ends.",
+    "classes": [
+      "Bardo",
+      "Warlock",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Warlock",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3078,6 +3879,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -3104,6 +3907,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [
       "Castigo Iracondo"
@@ -3132,6 +3937,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3160,6 +3967,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3183,14 +3992,30 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Chierico",
       "Paladino",
+      "Bardo",
+      "Ranger",
       "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Paladin",
+      "Bard",
+      "Ranger",
       "Artificer"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ],
+      "Ranger": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3220,6 +4045,44 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Messaggero Animale": {
+    "name": "Messaggero Animale",
+    "name_en": "Animal Messenger",
+    "level": 2,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un morsel di food)",
+    "components_en": "V, S, M (a morsel of food)",
+    "duration": "24 ore",
+    "duration_en": "24 hours",
+    "description": "Affidi un breve messaggio a una bestia Minuscola entro gittata. Scegli un luogo e descrivi un destinatario; la bestia viaggia verso quel luogo per la durata e, se trova il bersaglio, gli comunica il messaggio con la tua voce. Ai livelli superiori aumentano distanza e durata.",
+    "description_en": "By means of this spell, you use an animal to deliver a message. Choose a Tiny beast you can see within range, such as a squirrel, a blue jay, or a bat. You specify a location, which you must have visited, and a recipient who matches a general description, such as \"a man or woman dressed in the uniform of the town guard\" or \"a red-haired dwarf wearing a pointed hat.\" You also speak a message of up to twenty-five words. The target beast travels for the duration of the spell toward the specified location, covering about 50 miles per 24 hours for a flying messenger, or 25 miles for other animals. When the messenger arrives, it delivers your message to the creature that you described, replicating the sound of your voice. The messenger speaks only to a creature matching the description you gave. If the messenger doesn't reach its destination before the spell ends, the message is lost, and the beast makes its way back to where you cast this spell. At Higher Levels. If you cast this spell using a spell slot of 3nd level or higher, the duration of the spell increases by 48 hours for each slot level above 2nd.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3248,8 +4111,55 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
+    "translated": true
+  },
+  "Presagio": {
+    "name": "Presagio",
+    "name_en": "Augury",
+    "level": 2,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (specially marked sticks, bones, o similar tokens del valore di almeno 25 mo)",
+    "components_en": "V, S, M (specially marked sticks, bones, or similar tokens worth at least 25 gp)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Interroghi un'entita' ultraterrena sul risultato di un'azione che intendi compiere entro i prossimi 30 minuti. Ricevi un presagio: beneficio, sventura, entrambi o nessuno. L'incantesimo non considera eventi successivi che potrebbero cambiare l'esito, e lanci ripetuti prima di un riposo lungo possono produrre risposte casuali.",
+    "description_en": "By casting gem-inlaid sticks, rolling dragon bones, laying out ornate cards, or employing some other divining tool, you receive an omen from an otherworldly entity about the results of a specific course of action that you plan to take within the next 30 minutes. The DM chooses from the following possible omens:\n• Weal, for good results\n• Woe, for bad results\n• Weal and woe, for both good and bad results\n• Nothing, for results that aren't especially good or bad The spell doesn't take into account any possible circumstances that might change the outcome, such as the casting of additional spells or the loss or gain of a companion. If you cast the spell two or more times before completing your next long rest, there is a cumulative 25 percent chance for each casting after the first that you get a random reading. The DM makes this roll in secret.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Mago"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Wizard"
+    ],
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Wizard": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Auspicio"
+    ],
     "translated": true
   },
   "Pelle di Corteccia": {
@@ -3276,7 +4186,39 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Sensi Bestiali": {
+    "name": "Sensi Bestiali",
+    "name_en": "Beast Sense",
+    "level": 2,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "S",
+    "components_en": "S",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Tocchi una bestia consenziente e, per la durata, puoi usare un'azione per vedere e sentire attraverso i suoi sensi finche' resta sul tuo stesso piano di esistenza. Durante questa percezione sei cieco e sordo rispetto ai tuoi sensi normali.",
+    "description_en": "You touch a willing beast. For the duration of the spell, you can use your action to see through the beast's eyes and hear what it hears, and continue to do so until you use your action to return to your normal senses. While perceiving through the beast's senses, you gain the benefits of any special senses possessed by that creature, though you are blinded and deafened to your own surroundings.",
+    "classes": [
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
   },
@@ -3308,6 +4250,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3338,6 +4282,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3364,6 +4314,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3392,6 +4344,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3424,6 +4378,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -3447,14 +4403,25 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Chierico",
       "Mago",
+      "Druido",
       "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Wizard",
+      "Druid",
       "Artificer"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3480,6 +4447,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -3512,6 +4481,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -3542,6 +4513,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3576,6 +4549,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3606,6 +4585,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3634,6 +4615,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3664,6 +4647,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3696,6 +4681,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3721,6 +4708,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Chierico",
       "Druido",
       "Stregone",
+      "Ranger",
+      "Mago",
       "Artefice"
     ],
     "classes_en": [
@@ -3728,9 +4717,23 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid",
       "Sorcerer",
+      "Ranger",
+      "Wizard",
       "Artificer"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ],
+      "Wizard": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3753,14 +4756,30 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Mago",
+      "Bardo",
+      "Druido",
       "Artefice"
     ],
     "classes_en": [
       "Sorcerer",
       "Wizard",
+      "Bard",
+      "Druid",
       "Artificer"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ],
+      "Druid": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3788,6 +4807,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3814,6 +4835,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3844,6 +4867,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -3865,12 +4890,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Evochi una lama infuocata nella tua mano libera. La lama è simile per dimensioni e forma a una scimitarra e dura per la durata dell'incantesimo. Se la lasci andare, scompare, ma puoi richiamarla di nuovo come azione bonus. Puoi usare la tua azione per effettuare un attacco in mischia con incantesimo con la lama infuocata. Se colpisci, il bersaglio subisce 3d6 danni da fuoco. La lama infuocata emette luce intensa con raggio di 3 metri e luce fioca per altri 3 metri. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, i danni aumentano di 1d6 per ogni due livelli dello slot sopra il 2°.",
     "description_en": "You evoke a fiery blade in your free hand. The blade is similar in size and shape to a scimitar, and it lasts for the duration. If you let go of the blade, it disappears, but you can evoke the blade again as a bonus action. You can use your action to make a melee spell attack with the fiery blade. On a hit, the target takes 3d6 fire damage. The flaming blade sheds bright light in a 10-foot radius and dim light for an additional 10 feet. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for every two slot levels above 2nd.",
     "classes": [
-      "Druido"
+      "Druido",
+      "Stregone"
     ],
     "classes_en": [
-      "Druid"
+      "Druid",
+      "Sorcerer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3892,13 +4925,57 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A 5-foot-diameter sphere of fire appears in an unoccupied space of your choice within range and lasts for the duration. Any creature that ends its turn within 5 feet of the sphere must make a Dexterity saving throw. The creature takes 2d6 fire damage on a failed save, or half as much damage on a successful one. As a bonus action, you can move the sphere up to 30 feet. If you ram the sphere into a creature, that creature must make the saving throw against the sphere's damage, and the sphere stops moving this turn. When you move the sphere, you can direct it over barriers up to 5 feet tall and jump it across pits up to 10 feet wide. The sphere ignites flammable objects not being worn or carried, and it sheds bright light in a 20-foot radius and dim light for an additional 20 feet. At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d6 for each slot level above 2nd.",
     "classes": [
       "Druido",
-      "Mago"
+      "Mago",
+      "Stregone"
     ],
     "classes_en": [
       "Druid",
-      "Wizard"
+      "Wizard",
+      "Sorcerer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Riposo Inviolato": {
+    "name": "Riposo Inviolato",
+    "name_en": "Gentle Repose",
+    "level": 2,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un pizzico di salt e uno moneta di rame placed on ciascun di corpse's eyes, che deve remain there per duration)",
+    "components_en": "V, S, M (a pinch of salt and one copper piece placed on each of the corpse's eyes, which must remain there for the duration)",
+    "duration": "10 giorni",
+    "duration_en": "10 days",
+    "description": "Tocchi un cadavere o resti mortali e li proteggi dalla decomposizione per 10 giorni. Per la durata il bersaglio non puo' diventare non morto e il tempo trascorso non conta contro i limiti di incantesimi che riportano in vita i morti.",
+    "description_en": "You touch a corpse or other remains. For the duration, the target is protected from decay and can't become undead. The spell also effectively extends the time limit on raising the target from the dead, since days spent under the influence of this spell don't count against the time limit of spells such as raise dead.",
+    "classes": [
+      "Chierico",
+      "Mago",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Wizard",
+      "Paladin"
+    ],
+    "class_source_tags_en": {
+      "Paladin": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3921,14 +4998,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Ranger"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Ranger"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -3956,6 +5041,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -3986,12 +5073,18 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
-  "Blocca Persone": {
-    "name": "Blocca Persone",
+  "Bloccare Persone": {
+    "name": "Bloccare Persone",
     "name_en": "Hold Person",
     "level": 2,
     "school": "enchantment",
@@ -4022,10 +5115,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Bloccare Persone"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Invisibilità": {
@@ -4058,12 +5151,18 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
-  "Scassinare": {
-    "name": "Scassinare",
+  "Bussare": {
+    "name": "Bussare",
     "name_en": "Knock",
     "level": 2,
     "school": "transmutation",
@@ -4088,10 +5187,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Bussare"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Ristorare Inferiore": {
@@ -4126,6 +5225,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4156,6 +5261,44 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Localizza Animali o Vegetali": {
+    "name": "Localizza Animali o Vegetali",
+    "name_en": "Locate Animals or Plants",
+    "level": 2,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (un pezzetto di pelliccia da un bloodhound)",
+    "components_en": "V, S, M (a bit of fur from a bloodhound)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Descrivi o nomini un tipo specifico di bestia o pianta. Concentrandoti sulla natura circostante, apprendi direzione e distanza della creatura o pianta piu' vicina di quel tipo entro 7,5 km, se presente.",
+    "description_en": "Describe or name a specific kind of beast or plant. Concentrating on the voice of nature in your surroundings, you learn the direction and distance to the closest creature or plant of that kind within 5 miles, if any are present.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4192,6 +5335,44 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Bocca Magica": {
+    "name": "Bocca Magica",
+    "name_en": "Magic Mouth",
+    "level": 2,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un piccolo bit di honeycomb e giada polvere del valore di almeno 10 mo, che l'incantesimo consuma)",
+    "components_en": "V, S, M (a small bit of honeycomb and jade dust worth at least 10 gp, which the spell consumes)",
+    "duration": "Finché non dissolto",
+    "duration_en": "Until dispelled",
+    "description": "Impianti un messaggio in un oggetto entro gittata e stabilisci una condizione osservabile che lo faccia pronunciare. Quando la condizione si verifica, una bocca magica appare sull'oggetto e recita il messaggio con la voce e il volume scelti; il messaggio puo' durare fino a 25 parole.",
+    "description_en": "You implant a message within an object in range, a message that is uttered when a trigger condition is met. Choose an object that you can see and that isn't being worn or carried by another creature. Then speak the message, which must be 25 words or less, though it can be delivered over as long as 10 minutes. Finally, determine the circumstance that will trigger the spell to deliver your message. When that circumstance occurs, a magical mouth appears on the object and recites the message in your voice and at the same volume you spoke. If the object you chose has a mouth or something that looks like a mouth (for example, the mouth of a statue), the magical mouth appears there so that the words appear to come from the object's mouth. When you cast this spell, you can have the spell end after it delivers its message, or it can remain and repeat its message whenever the trigger occurs. The triggering circumstance can be as general or as detailed as you like, though it must be based on visual or audible conditions that occur within 30 feet of the object. For example, you could instruct the mouth to speak when any creature moves within 30 feet of the object or when a silver bell rings within 30 feet of it.",
+    "classes": [
+      "Bardo",
+      "Mago",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4215,14 +5396,30 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Paladino",
       "Mago",
+      "Ranger",
+      "Stregone",
       "Artefice"
     ],
     "classes_en": [
       "Paladin",
       "Wizard",
+      "Ranger",
+      "Sorcerer",
       "Artificer"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ],
+      "Sorcerer": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -4250,6 +5447,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -4276,6 +5475,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4306,6 +5507,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -4329,14 +5532,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Stregone",
       "Warlock",
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
       "Sorcerer",
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -4366,12 +5577,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
-  "Bagliore Lunare": {
-    "name": "Bagliore Lunare",
+  "Raggio Lunare": {
+    "name": "Raggio Lunare",
     "name_en": "Moonbeam",
     "level": 2,
     "school": "evocation",
@@ -4392,10 +5605,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Raggio Lunare"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Aura Magica di Nystul": {
@@ -4420,6 +5633,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4448,6 +5663,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4478,6 +5695,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (BR+)",
     "aliases": [],
     "translated": true
@@ -4499,12 +5718,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Fino a sei creature a tua scelta che puoi vedere entro gittata recuperano ciascuna punti ferita pari a 2d8 + il tuo modificatore di caratteristica da incantatore. Questo incantesimo non ha effetto su non morti o costrutti. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 3° livello o superiore, la guarigione aumenta di 1d8 per ogni livello dello slot sopra il 2°.",
     "description_en": "Up to six creatures of your choice that you can see within range each regain hit points equal to 2d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs. At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the healing increases by 1d8 for each slot level above 2nd.",
     "classes": [
-      "Chierico"
+      "Chierico",
+      "Paladino"
     ],
     "classes_en": [
-      "Cleric"
+      "Cleric",
+      "Paladin"
     ],
-    "source": "Paladin [TCoE]",
+    "class_source_tags_en": {
+      "Paladin": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -4538,6 +5765,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4570,6 +5803,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -4598,8 +5837,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": [
+      "Raggio Indebolente"
+    ],
     "translated": true
   },
   "Trucco della Corda": {
@@ -4626,6 +5869,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4654,8 +5903,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [],
+    "aliases": [
+      "Raggio Cocente"
+    ],
     "translated": true
   },
   "Vedere Invisibilità": {
@@ -4686,6 +5939,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4716,6 +5975,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -4748,7 +6009,73 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Silenzio": {
+    "name": "Silenzio",
+    "name_en": "Silence",
+    "level": 2,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 10 minuti",
+    "duration_en": "Concentration, up to 10 minutes",
+    "description": "Crei una sfera di 6 metri di raggio in cui nessun suono puo' essere prodotto o attraversare l'area. Le creature all'interno sono sorde e gli incantesimi con componente verbale non possono essere lanciati li'. L'area puo' essere centrata su un punto e resta immobile.",
+    "description_en": "For the duration, no sound can be created within or pass through a 20-foot-radius sphere centered on a point you choose within range. Any creature or object entirely inside the sphere is immune to thunder damage, and creatures are deafened while entirely inside it. Casting a spell that includes a verbal component is impossible there.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Scritta Celeste": {
+    "name": "Scritta Celeste",
+    "name_en": "Skywrite",
+    "level": 2,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Vista",
+    "range_en": "Sight",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Fino a dieci parole si formano come nuvole nel cielo in un punto che puoi vedere. Il messaggio resta visibile per la durata, poi si disperde. Un vento forte puo' disperderlo prima.",
+    "description_en": "You cause up to ten words to form in a part of the sky you can see. The words appear to be made of cloud and remain in place for the spell's duration. The words dissipate when the spell ends. A strong wind can disperse the clouds and end the spell early.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
   },
@@ -4776,6 +6103,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -4808,6 +6137,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4836,6 +6171,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4862,6 +6199,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4894,6 +6233,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -4922,6 +6263,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -4950,6 +6293,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -4971,12 +6316,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Questo incantesimo protegge una creatura consenziente che tocchi e crea una connessione mistica tra te e il bersaglio fino al termine dell'incantesimo. Mentre il bersaglio è entro 18 metri da te, ottiene un bonus di +1 alla CA e ai tiri salvezza, e ha resistenza a tutti i danni. Inoltre, ogni volta che subisce danni, anche tu subisci la stessa quantità di danni. L'incantesimo termina se scendi a 0 punti ferita o se tu e il bersaglio venite separati di più di 18 metri. Termina anche se l'incantesimo viene lanciato di nuovo su una delle creature collegate. Puoi anche congedare l'incantesimo come azione.",
     "description_en": "This spell wards a willing creature you touch and creates a mystic connection between you and the target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to AC and saving throws, and it has resistance to all damage. Also, each time it takes damage, you take the same amount of damage. The spell ends if you drop to 0 hit points or if you and the target become separated by more than 60 feet. It also ends if the spell is cast again on either of the connected creatures. You can also dismiss the spell as an action.",
     "classes": [
-      "Chierico"
+      "Chierico",
+      "Paladino"
     ],
     "classes_en": [
-      "Cleric"
+      "Cleric",
+      "Paladin"
     ],
-    "source": "Paladin [TCoE]",
+    "class_source_tags_en": {
+      "Paladin": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -5008,6 +6361,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5038,6 +6393,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5068,6 +6429,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5096,6 +6459,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5117,12 +6482,25 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Energia curativa si irradia da te in un'aura con raggio di 9 metri. Fino al termine dell'incantesimo l'aura si muove con te, restando centrata su di te. Puoi usare un'azione bonus per far sì che una creatura nell'aura (incluso te stesso) recuperi 2d6 punti ferita.",
     "description_en": "Healing energy radiates from you in an aura with a 30-foot radius. Until the spell ends, the aura moves with you, centered on you. You can use a bonus action to cause one creature in the aura (including you) to regain 2d6 hit points.",
     "classes": [
-      "Paladino"
+      "Paladino",
+      "Chierico",
+      "Druido"
     ],
     "classes_en": [
-      "Paladin"
+      "Paladin",
+      "Cleric",
+      "Druid"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ],
+      "Druid": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -5148,6 +6526,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5178,6 +6558,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5204,12 +6586,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
-  "Intermittenza": {
-    "name": "Intermittenza",
+  "Lampeggiare": {
+    "name": "Lampeggiare",
     "name_en": "Blink",
     "level": 3,
     "school": "transmutation",
@@ -5226,18 +6610,16 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Roll a d20 at the end of each of your turns for the duration of the spell. On a roll of 11 or higher, you vanish from your current plane of existence and appear in the Ethereal Plane (the spell fails and the casting is wasted if you were already on that plane). At the start of your next turn, and when the spell ends if you are on the Ethereal Plane, you return to an unoccupied space of your choice that you can see within 10 feet of the space you vanished from. If no unoccupied space is available within that range, you appear in the nearest unoccupied space (chosen at random if more than one space is equally near). You can dismiss this spell as an action. While on the Ethereal Plane, you can see and hear the plane you originated from, which is cast in shades of gray, and you can't see anything there more than 60 feet away. You can only affect and be affected by other creatures on the Ethereal Plane. Creatures that aren't there can't perceive you or interact with you, unless they have the ability to do so.",
     "classes": [
       "Stregone",
-      "Mago",
-      "Artefice"
+      "Mago"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard",
-      "Artificer"
+      "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Lampeggiare"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Evocare Fulmini": {
@@ -5262,6 +6644,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5294,6 +6678,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5326,6 +6716,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5354,6 +6746,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5380,6 +6774,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -5410,6 +6806,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5440,6 +6838,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Paladin",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5466,6 +6870,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -5500,6 +6906,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Sorcerer"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5540,6 +6948,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5562,13 +6976,29 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A nonmagical weapon you touch becomes a magic weapon. Choose one of the following damage types: acid, cold, fire, lightning, or thunder. For the duration, the weapon has a +1 bonus to attack rolls and deals an extra 1d4 damage of the chosen type when it hits. At Higher Levels. When you cast this spell using a spell slot of 5th or 6th level, the bonus to attack rolls increases to +2 and the extra damage increases to 2d4. When you use a spell slot of 7th level or higher, the bonus increases to +3 and the extra damage increases to 3d4.",
     "classes": [
       "Paladino",
+      "Druido",
+      "Ranger",
       "Artefice"
     ],
     "classes_en": [
       "Paladin",
+      "Druid",
+      "Ranger",
       "Artificer"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Ranger": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -5600,6 +7030,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5630,6 +7062,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5662,7 +7096,43 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Fingere Morte": {
+    "name": "Fingere Morte",
+    "name_en": "Feign Death",
+    "level": 3,
+    "school": "necromancy",
+    "school_it": "Necromanzia",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un pizzico di graveyard terra)",
+    "components_en": "V, S, M (a pinch of graveyard dirt)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Tocchi una creatura consenziente e la metti in uno stato indistinguibile dalla morte. Per la durata appare morta a esami non magici e agli effetti che determinano lo stato, e' accecata e incapacitata, la sua velocita' e' 0, ha resistenza a tutti i danni tranne quelli psichici, e malattie o veleni gia' presenti sono sospesi.",
+    "description_en": "You touch a willing creature and put it into a cataleptic state that is indistinguishable from death. For the spell's duration, or until you use an action to touch the target and dismiss the spell, the target appears dead to all outward inspection and to spells used to determine the target's status. The target is blinded and incapacitated, and its speed drops to 0. The target has resistance to all damage except psychic damage. If the target is diseased or poisoned when you cast the spell, or becomes diseased or poisoned while under the spell's effect, the disease and poison have no effect until the spell ends.",
+    "classes": [
+      "Bardo",
+      "Chierico",
+      "Druido",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -5690,6 +7160,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5724,6 +7196,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5756,6 +7234,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5786,6 +7270,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5809,15 +7295,15 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Chierico",
-      "Mago",
-      "Artefice"
+      "Mago"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
-      "Wizard",
-      "Artificer"
+      "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5848,6 +7334,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5874,6 +7366,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -5906,6 +7400,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -5940,7 +7436,43 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Capanna Minuscola di Leomund": {
+    "name": "Capanna Minuscola di Leomund",
+    "name_en": "Leomund's Tiny Hut",
+    "level": 3,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Incantatore (emisfera di 3 metri di raggio)",
+    "range_en": "Self (10-foot-radius hemisphere)",
+    "components": "V, S, M (un piccolo perlina di cristallo)",
+    "components_en": "V, S, M (a small crystal bead)",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Crei una cupola immobile di forza, abbastanza grande da proteggere te e un gruppo ristretto di creature presenti al lancio. Creature e oggetti designati possono attraversarla liberamente; gli altri non possono entrare, incantesimi ed effetti magici non la attraversano, e l'interno resta confortevole e asciutto.",
+    "description_en": "A 10-foot-radius immobile dome of force springs into existence around and above you and remains stationary for the duration. The spell ends if you leave its area. Nine creatures of Medium size or smaller can fit inside the dome with you. The spell fails if its area includes a larger creature or more than nine creatures. Creatures and objects within the dome when you cast this spell can move through it freely. All other creatures and objects are barred from passing through it. Spells and other magical effects can't extend through the dome or be cast through it. The atmosphere inside the space is comfortable and dry, regardless of the weather outside. Until the spell ends, you can command the interior to become dimly lit or dark. The dome is opaque from the outside, of any color you choose, but it is transparent from the inside.",
+    "classes": [
+      "Bardo",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -5968,6 +7500,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -5994,6 +7528,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -6022,6 +7558,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6054,6 +7592,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6086,6 +7626,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6107,12 +7649,56 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Mentre pronunci parole di guarigione, fino a sei creature di tua scelta che puoi vedere entro gittata recuperano punti ferita pari a 1d4 + il tuo modificatore di caratteristica da incantatore. L'incantesimo non ha effetto su non morti o costrutti. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 4° livello o superiore, la guarigione aumenta di 1d4 per ogni livello dello slot sopra il 3°.",
     "description_en": "As you call out words of restoration, up to six creatures of your choice that you can see within range regain hit points equal to 1d4 + your spellcasting ability modifier. This spell has no effect on undead or constructs. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the healing increases by 1d4 for each slot level above 3rd.",
     "classes": [
-      "Chierico"
+      "Chierico",
+      "Bardo"
     ],
     "classes_en": [
-      "Cleric"
+      "Cleric",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Fondersi nella Pietra": {
+    "name": "Fondersi nella Pietra",
+    "name_en": "Meld into Stone",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Entri in un blocco o superficie di pietra abbastanza grande da contenerti, fondendoti con esso insieme all'equipaggiamento trasportato. Resti consapevole del passare del tempo ma non puoi vedere fuori; puoi uscire dove sei entrato. Danni o modifiche alla pietra possono ferirti o espellerti.",
+    "description_en": "You step into a stone object or surface large enough to fully contain your body, melding yourself and all the equipment you carry with the stone for the duration. Using your movement, you step into the stone at a point you can touch. Nothing of your presence remains visible or otherwise detectable by nonmagical senses. While merged with the stone, you can't see what occurs outside it, and any Wisdom (Perception) checks you make to hear sounds outside it are made with disadvantage. You remain aware of the passage of time and can cast spells on yourself while merged in the stone. You can use your movement to leave the stone where you entered it, which ends the spell. You otherwise can't move. Minor physical damage to the stone doesn't harm you, but its partial destruction or a change in its shape (to the extent that you no longer fit within it) expels you and deals 6d6 bludgeoning damage to you. The stone's complete destruction (or transmutation into a different substance) expels you and deals 50 bludgeoning damage to you. If expelled, you fall prone in an unoccupied space closest to where you first entered.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6140,6 +7726,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6170,6 +7758,36 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Destriero Fantomatico": {
+    "name": "Destriero Fantomatico",
+    "name_en": "Phantom Steed",
+    "level": 3,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Crei una creatura cavalcabile quasi reale, simile a un destriero, con aspetto scelto da te. Puo' essere cavalcata da te o da una creatura designata, ha velocita' elevata e svanisce gradualmente quando l'incantesimo termina o se subisce danni.",
+    "description_en": "A Large quasi-real, horselike creature appears on the ground in an unoccupied space of your choice within range. You decide the creature's appearance, but it is equipped with a saddle, bit, and bridle. Any of the equipment created by the spell vanishes in a puff of smoke if it is carried more than 10 feet away from the steed. For the duration, you or a creature you choose can ride the steed. The creature uses the statistics for a riding horse, except it has a speed of 100 feet and can travel 10 miles in an hour, or 13 miles at a fast pace. When the spell ends, the steed gradually fades, giving the rider 1 minute to dismount. The spell ends if you use an action to dismiss it or if the steed takes any damage.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6200,6 +7818,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6225,17 +7845,17 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druido",
       "Ranger",
       "Stregone",
-      "Mago",
-      "Artefice"
+      "Mago"
     ],
     "classes_en": [
       "Cleric",
       "Druid",
       "Ranger",
       "Sorcerer",
-      "Wizard",
-      "Artificer"
+      "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6268,6 +7888,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6291,14 +7913,30 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Chierico",
       "Paladino",
+      "Druido",
+      "Ranger",
       "Artefice"
     ],
     "classes_en": [
       "Cleric",
       "Paladin",
+      "Druid",
+      "Ranger",
       "Artificer"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Ranger": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6328,6 +7966,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6358,6 +7998,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6380,13 +8022,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You alter time around up to six creatures of your choice in a 40- foot cube within range. Each target must succeed on a Wisdom saving throw or be affected by this spell for the duration. An affected target's speed is halved, it takes a -2 penalty to AC and Dexterity saving throws, and it can't use reactions. On its turn, it can use either an action or a bonus action, not both. Regardless of the creature's abilities or magic items, it can't make more than one melee or ranged attack during its turn. If the creature attempts to cast a spell with a casting time of 1 action, roll a d20. On an 11 or higher, the spell doesn't take effect until the creature's next turn, and the creature must use its action on that turn to complete the spell. If it can't, the spell is wasted. A creature affected by this spell makes another Wisdom saving throw at the end of each of its turns. On a successful save, the effect ends for it.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6408,13 +8058,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You grant the semblance of life and intelligence to a corpse of your choice within range, allowing it to answer the questions you pose. The corpse must still have a mouth and can't be undead. The spell fails if the corpse was the target of this spell within the last 10 days. Until the spell ends, you can ask the corpse up to five questions. The corpse knows only what it knew in life, including the languages it knew. Answers are usually brief, cryptic, or repetitive, and the corpse is under no compulsion to offer a truthful answer if you are hostile to it or it recognizes you as an enemy. This spell doesn't return the creature's soul to its body, only its animating spirit. Thus, the corpse can't learn new information, doesn't comprehend anything that has happened since it died, and can't speculate about future events.",
     "classes": [
       "Bardo",
-      "Chierico"
+      "Chierico",
+      "Mago"
     ],
     "classes_en": [
       "Bard",
-      "Cleric"
+      "Cleric",
+      "Wizard"
     ],
-    "source": "Wizard [TCoE]",
+    "class_source_tags_en": {
+      "Wizard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6444,6 +8102,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6470,6 +8130,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6502,6 +8164,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -6532,6 +8196,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6564,6 +8230,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -6592,6 +8260,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6620,6 +8290,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -6648,6 +8320,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -6678,6 +8352,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6708,6 +8384,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6736,6 +8414,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6770,6 +8454,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6792,13 +8478,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "The touch of your shadow-wreathed hand can siphon life force from others to heal your wounds. Make a melee spell attack against a creature within your reach. On a hit, the target takes 3d6 necrotic damage, and you regain hit points equal to half the amount of necrotic damage dealt. Until the spell ends, you can make the attack again on each of your turns as an action. At Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
     "classes": [
       "Warlock",
-      "Mago"
+      "Mago",
+      "Stregone"
     ],
     "classes_en": [
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Sorcerer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6824,6 +8518,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -6854,7 +8550,89 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Respirare sott'Acqua": {
+    "name": "Respirare sott'Acqua",
+    "name_en": "Water Breathing",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un corto reed o pezzo di straw)",
+    "components_en": "V, S, M (a short reed or piece of straw)",
+    "duration": "24 ore",
+    "duration_en": "24 hours",
+    "description": "Fino a dieci creature consenzienti entro gittata ottengono la capacita' di respirare sott'acqua per 24 ore. Le creature influenzate conservano anche il loro normale modo di respirare.",
+    "description_en": "This spell grants up to ten willing creatures you can see within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Mago",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Wizard",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Camminare sull'Acqua": {
+    "name": "Camminare sull'Acqua",
+    "name_en": "Water Walk",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un pezzo di cork)",
+    "components_en": "V, S, M (a piece of cork)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Fino a dieci creature consenzienti entro gittata possono muoversi su liquidi come se fossero terreno solido innocuo. Se una creatura bersaglio e' sommersa in un liquido, viene portata verso la superficie alla velocita' indicata dall'incantesimo.",
+    "description_en": "This spell grants the ability to move across any liquid surface—such as water, acid, mud, snow, quicksand, or lava—as if it were harmless solid ground (creatures crossing molten lava can still take damage from the heat). Up to ten willing creatures you can see within range gain this ability for the duration. If you target a creature submerged in a liquid, the spell carries the target to the surface of the liquid at a rate of 60 feet per round.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Artefice"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Artificer"
+    ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -6882,6 +8660,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6910,6 +8690,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -6931,12 +8717,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Energia preservatrice di vita si irradia da te in un'aura con raggio di 9 metri. Fino al termine dell'incantesimo, l'aura si muove con te, restando centrata su di te. Ogni creatura non ostile nell'aura (incluso te stesso) ha resistenza ai danni necrotici, e i suoi punti ferita massimi non possono essere ridotti. Inoltre, una creatura vivente non ostile recupera 1 punto ferita quando inizia il turno nell'aura con 0 punti ferita.",
     "description_en": "Life-preserving energy radiates from you in an aura with a 30-foot radius. Until the spell ends, the aura moves with you, centered on you. Each non-hostile creature in the aura (including you) has resistance to necrotic damage, and its hit point maximum can't be reduced. In addition, a non-hostile, living creature regains 1 hit point when it starts its turn in the aura with 0 hit points.",
     "classes": [
-      "Paladino"
+      "Paladino",
+      "Chierico"
     ],
     "classes_en": [
-      "Paladin"
+      "Paladin",
+      "Cleric"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -6957,12 +8751,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Energia purificatrice si irradia da te in un'aura con raggio di 9 metri. Fino al termine dell'incantesimo, l'aura si muove con te, restando centrata su di te. Ogni creatura non ostile nell'aura (incluso te stesso) non può ammalarsi, ha resistenza ai danni da veleno e ha vantaggio ai tiri salvezza contro effetti che provocano una qualsiasi delle seguenti condizioni: accecato, ammaliato, assordato, spaventato, paralizzato, avvelenato e stordito.",
     "description_en": "Purifying energy radiates from you in an aura with a 30-foot radius. Until the spell ends, the aura moves with you, centered on you. Each non-hostile creature in the aura (including you) can't become diseased, has resistance to poison damage, and has advantage on saving throws against effects that cause any of the following conditions: blinded, charmed, deafened, frightened, paralyzed, poisoned, and stunned.",
     "classes": [
-      "Paladino"
+      "Paladino",
+      "Chierico"
     ],
     "classes_en": [
-      "Paladin"
+      "Paladin",
+      "Cleric"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -6996,6 +8798,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7028,6 +8832,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7062,6 +8868,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -7088,6 +8896,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Bard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7120,6 +8930,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7148,6 +8960,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7176,6 +8990,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7206,6 +9022,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7234,6 +9052,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7266,6 +9086,47 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Divinazione": {
+    "name": "Divinazione",
+    "name_en": "Divination",
+    "level": 4,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (incenso e un sacrificial offering appropriate to tuo religion, together del valore di almeno 25 mo, che l'incantesimo consuma)",
+    "components_en": "V, S, M (incense and a sacrificial offering appropriate to your religion, together worth at least 25 gp, which the spell consumes)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Offri una domanda riguardo un obiettivo, evento o attivita' che avverra' entro 7 giorni. Ricevi dal DM una risposta veritiera sotto forma di breve frase, rima o presagio. L'incantesimo non tiene conto di eventi che potrebbero cambiare l'esito, e lanci ripetuti prima di un riposo lungo possono dare risposte casuali.",
+    "description_en": "Your magic and an offering put you in contact with a god or a god's servants. You ask a single question concerning a specific goal, event, or activity to occur within 7 days. The DM offers a truthful reply. The reply might be a short phrase, a cryptic rhyme, or an omen. The spell doesn't take into account any possible circumstances that might change the outcome, such as the casting of additional spells or the loss or gain of a companion. If you cast the spell two or more times before finishing your next long rest, there is a cumulative 25 percent chance for each casting after the first that you get a random reading. The DM makes this roll in secret.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Mago"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Wizard"
+    ],
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Wizard": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7288,13 +9149,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You attempt to beguile a beast that you can see within range. It must succeed on a Wisdom saving throw or be charmed by you for the duration. If you or creatures that are friendly to you are fighting it, it has advantage on the saving throw. While the beast is charmed, you have a telepathic link with it as long as the two of you are on the same plane of existence. You can use this telepathic link to issue commands to the creature while you are conscious (no action required), which it does its best to obey. You can specify a simple and general course of action, such as \"Attack that creature,\" \"Run over there,\" or \"Fetch that object.\" If the creature completes the order and doesn't receive further direction from you, it defends and preserves itself to the best of its ability. You can use your action to take total and precise control of the target. Until the end of your next turn, the creature takes only the actions you choose, and doesn't do anything that you don't allow it to do. During this time, you can also cause the creature to use a reaction, but this requires you to use your own reaction as well. Each time the target takes damage, it makes a new Wisdom saving throw against the spell. If the saving throw succeeds, the spell ends. At Higher Levels. When you cast this spell with a 5th-level spell slot, the duration is concentration, up to 10 minutes. When you use a 6th-level spell slot, the duration is concentration, up to 1 hour. When you use a spell slot of 7th level or higher, the duration is concentration, up to 8 hours.",
     "classes": [
       "Druido",
-      "Stregone"
+      "Stregone",
+      "Ranger"
     ],
     "classes_en": [
       "Druid",
-      "Sorcerer"
+      "Sorcerer",
+      "Ranger"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -7326,6 +9195,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -7352,6 +9227,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7380,6 +9257,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7406,6 +9289,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -7427,12 +9312,25 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Sottili fiamme avvolgenti circondano il tuo corpo per la durata dell'incantesimo, emettendo luce intensa con raggio di 3 metri e luce fioca per altri 3 metri. Puoi terminare l'incantesimo anticipatamente usando un'azione per congedarlo. Le fiamme ti forniscono uno scudo caldo o uno scudo freddo, a tua scelta. Lo scudo caldo ti concede resistenza ai danni da freddo, e lo scudo freddo ti concede resistenza ai danni da fuoco. Inoltre, ogni volta che una creatura entro 1,5 metri da te ti colpisce con un attacco in mischia, lo scudo erompe in fiamme. L'attaccante subisce 2d8 danni da fuoco da uno scudo caldo, o 2d8 danni da freddo da uno scudo freddo.",
     "description_en": "Thin and wispy flames wreathe your body for the duration, shedding bright light in a 10-foot radius and dim light for an additional 10 feet. You can end the spell early by using an action to dismiss it. The flames provide you with a warm shield or a chill shield, as you choose. The warm shield grants you resistance to cold damage, and the chill shield grants you resistance to fire damage. In addition, whenever a creature within 5 feet of you hits you with a melee attack, the shield erupts with flame. The attacker takes 2d8 fire damage from a warm shield, or 2d8 cold damage from a cold shield.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Druido",
+      "Stregone"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Druid",
+      "Sorcerer"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -7466,6 +9364,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7492,6 +9396,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7520,6 +9426,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -7550,6 +9458,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7576,6 +9486,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7604,12 +9516,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
   },
-  "Terreno Illusorio": {
-    "name": "Terreno Illusorio",
+  "Terreno Allucinatorio": {
+    "name": "Terreno Allucinatorio",
     "name_en": "Hallucinatory Terrain",
     "level": 4,
     "school": "illusion",
@@ -7636,10 +9550,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Terreno Allucinatorio"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Tempesta di Ghiaccio": {
@@ -7668,6 +9582,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7696,6 +9612,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7732,6 +9654,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7760,6 +9684,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7788,6 +9718,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7816,6 +9752,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7837,12 +9779,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Penetri negli incubi di una creatura che puoi vedere entro gittata e crei una manifestazione illusoria delle sue paure più profonde, visibile solo a quella creatura. Il bersaglio deve effettuare un tiro salvezza su Saggezza. Se fallisce, il bersaglio è spaventato per la durata dell'incantesimo. Alla fine di ciascuno dei turni del bersaglio prima che l'incantesimo termini, il bersaglio deve superare un tiro salvezza su Saggezza o subire 4d10 danni psichici. Se lo supera, l'incantesimo termina. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 5° livello o superiore, i danni aumentano di 1d10 per ogni livello dello slot sopra il 4°.",
     "description_en": "You tap into the nightmares of a creature you can see within range and create an illusory manifestation of its deepest fears, visible only to that creature. The target must make a Wisdom saving throw. On a failed save, the target becomes frightened for the duration. At the end of each of the target's turns before the spell ends, the target must succeed on a Wisdom saving throw or take 4d10 psychic damage. On a successful save, the spell ends. At Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d10 for each slot level above 4th.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -7874,6 +9824,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -7900,6 +9852,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -7930,6 +9884,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -7956,6 +9912,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -7988,6 +9946,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8022,6 +9986,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8050,6 +10020,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8078,6 +10050,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -8106,6 +10080,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -8136,6 +10116,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -8164,6 +10146,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8192,6 +10176,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8222,6 +10208,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8252,6 +10240,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8284,6 +10274,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8310,6 +10306,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8338,6 +10336,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8364,6 +10364,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -8386,13 +10388,24 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You create a Large hand of shimmering, translucent force in an unoccupied space that you can see within range. The hand lasts for the spell's duration, and it moves at your command, mimicking the movements of your own hand. The hand is an object that has AC 20 and hit points equal to your hit point maximum. If it drops to 0 hit points, the spell ends. It has a Strength of 26 (+8) and a Dexterity of 10 (+0). The hand doesn't fill its space. When you cast the spell and as a bonus action on your subsequent turns, you can move the hand up to 60 feet and then cause one of the following effects with it. Clenched Fist. The hand strikes one creature or object within 5 feet of it. Make a melee spell attack for the hand using your game statistics. On a hit, the target takes 4d8 force damage. Forceful Hand. The hand attempts to push a creature within 5 feet of it in a direction you choose. Make a check with the hand's Strength contested by the Strength (Athletics) check of the target. If the target is Medium or smaller, you have advantage on the check. If you succeed, the hand pushes the target up to 5 feet plus a number of feet equal to five times your spellcasting ability modifier. The hand moves with the target to remain within 5 feet of it. Grasping Hand. The hand attempts to grapple a Huge or smaller creature within 5 feet of it. You use the hand's Strength score to resolve the grapple. If the target is Medium or smaller, you have advantage on the check. While the hand is grappling the target, you can use a bonus action to have the hand crush it. When you do so, the target takes bludgeoning damage equal to 2d6 + your spellcasting ability modifier. Interposing Hand. The hand interposes itself between you and a creature you choose until you give the hand a different command. The hand moves to stay between you and the target, providing you with half cover against the target. The target can't move through the hand's space if its Strength score is less than or equal to the hand's Strength score. If its Strength score is higher than the hand's Strength score, the target can move toward you through the hand's space, but that space is difficult terrain for the target. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, the damage from the clenched fist option increases by 2d8 and the damage from the grasping hand increases by 2d6 for each slot level above 5th.",
     "classes": [
       "Mago",
+      "Stregone",
       "Artefice"
     ],
     "classes_en": [
       "Wizard",
+      "Sorcerer",
       "Artificer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -8418,6 +10431,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -8446,6 +10461,66 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Comunione": {
+    "name": "Comunione",
+    "name_en": "Commune",
+    "level": 5,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (incenso e un fiala di sacro o unholy acqua)",
+    "components_en": "V, S, M (incense and a vial of holy or unholy water)",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Contatti una divinita' o un suo emissario e puoi porre fino a tre domande a cui si possa rispondere si' o no. Le risposte sono corrette entro i limiti della conoscenza dell'entita'. Lanci ripetuti prima di un riposo lungo possono produrre risposte casuali.",
+    "description_en": "You contact your deity or a divine proxy and ask up to three questions that can be answered with a yes or no. You must ask your questions before the spell ends. You receive a correct answer for each question. Divine beings aren't necessarily omniscient, so you might receive \"unclear\" as an answer if a question pertains to information that lies beyond the deity's knowledge. In a case where a one-word answer could be misleading or contrary to the deity's interests, the DM might offer a short phrase as an answer instead. If you cast the spell two or more times before finishing your next long rest, there is a cumulative 25 percent chance for each casting after the first that you get no answer. The DM makes this roll in secret.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Comunione con la Natura": {
+    "name": "Comunione con la Natura",
+    "name_en": "Commune with Nature",
+    "level": 5,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Entri in comunione con gli spiriti della natura e ottieni informazioni sul territorio entro 4,5 km all'aperto o 90 metri in ambienti sotterranei. Puoi apprendere dati su terreni, acque, piante, minerali, creature potenti, influenze planari, edifici o altri elementi naturali rilevanti.",
+    "description_en": "You briefly become one with nature and gain knowledge of the surrounding territory. In the outdoors, the spell gives you knowledge of the land within 3 miles of you. In caves and other natural underground settings, the radius is limited to 300 feet. The spell doesn't function where nature has been replaced by construction, such as in dungeons and towns. You instantly gain knowledge of up to three facts of your choice about any of the following subjects as they relate to the area:\n• terrain and bodies of water\n• prevalent plants, minerals, animals, or peoples\n• powerful celestials, fey, fiends, elementals, or undead\n• influence from other planes of existence\n• buildings For example, you could determine the location of powerful undead in the area, the location of major sources of safe drinking water, and the location of any nearby towns.",
+    "classes": [
+      "Druido",
+      "Ranger"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8468,13 +10543,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A blast of cold air erupts from your hands. Each creature in a 60- foot cone must make a Constitution saving throw. A creature takes 8d8 cold damage on a failed save, or half as much damage on a successful one. A creature killed by this spell becomes a frozen statue until it thaws. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, the damage increases by 1d8 for each slot level above 5th.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Druido"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Druid"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -8502,12 +10585,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
-  "Evoca Pioggia di Armi": {
-    "name": "Evoca Pioggia di Armi",
+  "Convocare Raffica": {
+    "name": "Convocare Raffica",
     "name_en": "Conjure Volley",
     "level": 5,
     "school": "conjuration",
@@ -8528,10 +10613,40 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
-    "aliases": [
-      "Convocare Raffica"
+    "aliases": [],
+    "translated": true
+  },
+  "Contattare Altri Piani": {
+    "name": "Contattare Altri Piani",
+    "name_en": "Contact Other Plane",
+    "level": 5,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V",
+    "components_en": "V",
+    "duration": "1 minuto",
+    "duration_en": "1 minute",
+    "description": "Proietti la mente verso un'entita' extraplanare per porre fino a cinque domande. Prima devi superare un tiro salvezza su Intelligenza; se fallisci subisci danni psichici e sei mentalmente scosso fino a un riposo lungo. Se riesci, ricevi risposte brevi e veritiere, nei limiti della conoscenza dell'entita'.",
+    "description_en": "You mentally contact a demigod, the spirit of a long-dead sage, or some other mysterious entity from another plane. Contacting this extraplanar intelligence can strain or even break your mind. When you cast this spell, make a DC 15 Intelligence saving throw. On a failure, you take 6d6 psychic damage and are insane until you finish a long rest. While insane, you can't take actions, can't understand what other creatures say, can't read, and speak only in gibberish. A greater restoration spell cast on you ends this effect. On a successful save, you can ask the entity up to five questions. You must ask your questions before the spell ends. The DM answers each question with one word, such as \"yes,\" \"no,\" \"maybe,\" \"never,\" \"irrelevant,\" or \"unclear\" (if the entity doesn't know the answer to the question). If a one-word answer would be misleading, the DM might instead offer a short phrase as an answer.",
+    "classes": [
+      "Warlock",
+      "Mago"
     ],
+    "classes_en": [
+      "Warlock",
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
     "translated": true
   },
   "Contagio": {
@@ -8558,6 +10673,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8588,6 +10705,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8618,6 +10737,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8646,6 +10771,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8674,6 +10801,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8700,6 +10829,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -8728,6 +10859,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8758,6 +10891,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8788,6 +10923,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8818,6 +10955,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8848,6 +10987,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -8874,6 +11015,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8908,6 +11051,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Paladin",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8932,15 +11077,26 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Chierico",
       "Druido",
+      "Ranger",
       "Artefice"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
+      "Ranger",
       "Artificer"
     ],
-    "source": "Ranger [TCoE]",
+    "class_source_tags_en": {
+      "Ranger": [
+        "TCoE"
+      ],
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -8966,6 +11122,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -8998,6 +11156,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9026,6 +11186,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9054,6 +11216,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9082,6 +11246,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9112,6 +11278,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Sorcerer"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9142,6 +11310,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9168,6 +11338,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9198,6 +11370,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9220,13 +11394,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You become invisible at the same time that an illusory double of you appears where you are standing. The double lasts for the duration, but the invisibility ends if you attack or cast a spell. You can use your action to move your illusory double up to twice your speed and make it gesture, speak, and behave in whatever way you choose. You can see through its eyes and hear through its ears as if you were located where it is. On each of your turns as a bonus action, you can switch from using its senses to using your own, or back again. While you are using its senses, you are blinded and deafened in regard to your own surroundings.",
     "classes": [
       "Bardo",
-      "Mago"
+      "Mago",
+      "Warlock"
     ],
     "classes_en": [
       "Bard",
-      "Wizard"
+      "Wizard",
+      "Warlock"
     ],
-    "source": "Warlock [TCoE]",
+    "class_source_tags_en": {
+      "Warlock": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -9254,12 +11436,14 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
-  "Flusso di Energia Negativa": {
-    "name": "Flusso di Energia Negativa",
+  "Marea di Energia Negativa": {
+    "name": "Marea di Energia Negativa",
     "name_en": "Negative Energy Flood",
     "level": 5,
     "school": "necromancy",
@@ -9282,10 +11466,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
-    "aliases": [
-      "Marea di Energia Negativa"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Passamuri": {
@@ -9310,6 +11494,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9334,15 +11520,23 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bardo",
       "Chierico",
       "Druido",
-      "Mago"
+      "Mago",
+      "Warlock"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
       "Druid",
-      "Wizard"
+      "Wizard",
+      "Warlock"
     ],
-    "source": "Warlock [TCoE]",
+    "class_source_tags_en": {
+      "Warlock": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -9372,6 +11566,42 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Legame Telepatico di Rary": {
+    "name": "Legame Telepatico di Rary",
+    "name_en": "Rary's Telepathic Bond",
+    "level": 5,
+    "school": "divination",
+    "school_it": "Divinazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (pieces di eggshell da due different kinds di creature)",
+    "components_en": "V, S, M (pieces of eggshell from two different kinds of creatures)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Crei un legame telepatico tra un massimo di otto creature consenzienti che puoi vedere entro gittata. Ogni creatura diventa legata a tutte le altre per la durata dell'incantesimo. Le reature con un punteggio di Intelligenza di 2 o inferiore non sono interessate da questo incantesimo. Fino al termine dell'incantesimo, le creature possono comunicare telepaticamente attraverso il legame, anche se non hanno un linguaggio comune. La comunicazione è possibile a distanza, anche se non può estendersi a altri piani di esistenza.",
+    "description_en": "You forge a telepathic link among up to eight willing creatures of your choice within range, psychically linking each creature to all the others for the duration. Creatures with Intelligence scores of 2 or less aren't affected by this spell. Until the spell ends, the targets can communicate telepathically through the bond whether or not they have a common language. The communication is possible over any distance, though it can't extend to other planes of existence.",
+    "classes": [
+      "Mago",
+      "Bardo"
+    ],
+    "classes_en": [
+      "Wizard",
+      "Bard"
+    ],
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9398,6 +11628,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9432,6 +11664,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9462,6 +11696,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9494,6 +11730,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9522,6 +11764,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Ranger",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9550,6 +11794,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Paladin"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -9576,6 +11822,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -9608,8 +11856,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
-    "aliases": [],
+    "aliases": [
+      "Statica Sinaptica"
+    ],
     "translated": true
   },
   "Telecinesi": {
@@ -9636,6 +11888,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9659,14 +11913,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Warlock"
     ],
     "classes_en": [
       "Bard",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Warlock"
     ],
-    "source": "Warlock [TCoE]",
+    "class_source_tags_en": {
+      "Warlock": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -9696,12 +11958,18 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
   },
-  "Traslazione Arborea": {
-    "name": "Traslazione Arborea",
+  "Passo dell'Albero": {
+    "name": "Passo dell'Albero",
     "name_en": "Tree Stride",
     "level": 5,
     "school": "conjuration",
@@ -9724,10 +11992,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Passo dell'Albero"
-    ],
+    "aliases": [],
     "translated": true
   },
   "Muro di Forza": {
@@ -9752,6 +12020,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9782,6 +12052,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9814,6 +12086,12 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Wizard",
       "Artificer"
     ],
+    "class_source_tags_en": {
+      "Artificer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9842,6 +12120,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Ranger"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9872,6 +12152,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -9898,6 +12180,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9924,6 +12208,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -9952,6 +12238,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -9982,6 +12270,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10010,6 +12300,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10036,6 +12328,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10062,6 +12356,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10092,6 +12388,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10120,6 +12418,36 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Evocazione Istantanea di Drawmij": {
+    "name": "Evocazione Istantanea di Drawmij",
+    "name_en": "Drawmij's Instant Summons",
+    "level": 6,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un zaffiro del valore di 1,000 mo)",
+    "components_en": "V, S, M (a sapphire worth 1,000 gp)",
+    "duration": "Finché non dissolto",
+    "duration_en": "Until dispelled",
+    "description": "Tocchi un oggetto e lo leghi a uno zaffiro usato come componente. In seguito puoi frantumare lo zaffiro per richiamare l'oggetto nella tua mano se non e' trasportato o indossato da un'altra creatura; se lo e', apprendi chi lo possiede e dove si trova in quel momento.",
+    "description_en": "You touch an object weighing 10 pounds or less whose longest dimension is 6 feet or less. The spell leaves an invisible mark on its surface and invisibly inscribes the name of the item on the sapphire you use as the material component. Each time you cast this spell, you must use a different sapphire. At any time thereafter, you can use your action to speak the item's name and crush the sapphire. The item instantly appears in your hand regardless of physical or planar distances, and the spell ends. If another creature is holding or carrying the item, crushing the sapphire doesn't transport the item to you, but instead you learn who the creature possessing the object is and roughly where that creature is located at that moment. Dispel magic or a similar effect successfully applied to the sapphire ends this spell's effect.",
+    "classes": [
+      "Mago"
+    ],
+    "classes_en": [
+      "Wizard"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10146,6 +12474,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10178,6 +12508,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10208,6 +12540,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10230,13 +12564,54 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You attempt to turn one creature that you can see within range into stone. If the target's body is made of flesh, the creature must make a Constitution saving throw. On a failed save, it is restrained as its flesh begins to harden. On a successful save, the creature isn't affected. A creature restrained by this spell must make another Constitution saving throw at the end of each of its turns. If it successfully saves against this spell three times, the spell ends. If it fails its saves three times, it is turned to stone and subjected to the petrified condition for the duration. The successes and failures don't need to be consecutive; keep track of both until the target collects three of a kind. If the creature is physically broken while petrified, it suffers from similar deformities if it reverts to its original state. If you maintain your concentration on this spell for the entire possible duration, the creature is turned to stone until the effect is removed.",
     "classes": [
       "Warlock",
-      "Mago"
+      "Mago",
+      "Druido",
+      "Stregone"
     ],
     "classes_en": [
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Druid",
+      "Sorcerer"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ],
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Interdizione": {
+    "name": "Interdizione",
+    "name_en": "Forbiddance",
+    "level": 6,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "10 minuti",
+    "casting_time_en": "10 minutes",
+    "range": "Contatto",
+    "range_en": "Touch",
+    "components": "V, S, M (un sprinkling di acqua santa, raro incenso, e rubino in polvere del valore di almeno 1,000 mo)",
+    "components_en": "V, S, M (a sprinkling of holy water, rare incense, and powdered ruby worth at least 1,000 gp)",
+    "duration": "1 giorno",
+    "duration_en": "1 day",
+    "description": "Consacri una vasta area contro il viaggio planare. Per la durata, creature non autorizzate non possono teletrasportarsi nell'area o entrarvi tramite mezzi planari. Scegli uno o piu' tipi di creature tra celestiali, elementali, fate, immondi e non morti: quelle creature subiscono danni radianti o necrotici quando entrano o iniziano il turno nell'area. Lanciandolo ogni giorno nello stesso luogo per 30 giorni, l'effetto diventa permanente.",
+    "description_en": "You create a ward against magical travel that protects up to 40,000 square feet of floor space to a height of 30 feet above the floor. For the duration, creatures can't teleport into the area or use portals, such as those created by the gate spell, to enter the area. The spell proofs the area against planar travel, and therefore prevents creatures from accessing the area by way of the Astral Plane, Ethereal Plane, Feywild, Shadowfell, or the plane shift spell. In addition, the spell damages types of creatures that you choose when you cast it. Choose one or more of the following: celestials, elementals, fey, fiends, and undead. When a chosen creature enters the spell's area for the first time on a turn or starts its turn there, the creature takes 5d10 radiant or necrotic damage (your choice when you cast this spell). When you cast this spell, you can designate a password. A creature that speaks the password as it enters the area takes no damage from the spell. The spell's area can't overlap with the area of another forbiddance spell. If you cast forbiddance every day for 30 days in the same location, the spell lasts until it is dispelled, and the material components are consumed on the last casting.",
+    "classes": [
+      "Chierico"
+    ],
+    "classes_en": [
+      "Cleric"
+    ],
+    "class_source_tags_en": {},
+    "ritual": true,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -10264,6 +12639,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10292,6 +12669,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10318,6 +12697,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10346,6 +12727,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10368,13 +12751,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You bring forth a great feast, including magnificent food and drink. The feast takes 1 hour to consume and disappears at the end of that time, and the beneficial effects don't set in until this hour is over. Up to twelve creatures can partake of the feast. A creature that partakes of the feast gains several benefits. The creature is cured of all diseases and poison, becomes immune to poison and being frightened, and makes all Wisdom saving throws with advantage. Its hit point maximum also increases by 2d10, and it gains the same number of hit points. These benefits last for 24 hours.",
     "classes": [
       "Chierico",
-      "Druido"
+      "Druido",
+      "Bardo"
     ],
     "classes_en": [
       "Cleric",
-      "Druid"
+      "Druid",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -10406,6 +12797,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10438,6 +12831,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10470,6 +12865,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10502,6 +12899,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10528,6 +12927,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10560,6 +12961,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10590,6 +12993,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10620,6 +13025,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10641,12 +13048,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Una sfera frigida di energia gelida sfreccia dalla punta delle tue dita fino a un punto a tua scelta entro gittata, dove esplode in una sfera di 18 metri di raggio. Ogni creatura nell'area deve effettuare un tiro salvezza su Costituzione. Se fallisce, una creatura subisce 10d6 danni da freddo. Se lo supera, ne subisce metà. Se la sfera colpisce un corpo d'acqua o un liquido principalmente acquoso (non includendo le creature acquatiche), congela il liquido a una profondità di 15 cm su un'area di 9 metri quadrati. Questo ghiaccio dura 1 minuto. Le creature che stavano nuotando sulla superficie dell'acqua congelata sono intrappolate nel ghiaccio. Una creatura intrappolata può usare un'azione per effettuare una prova di Forza contro la CD del tuo tiro salvezza per incantesimi per liberarsi. Puoi astenerti dallo sparare la sfera dopo aver completato l'incantesimo, se vuoi. Una piccola sfera delle dimensioni di un sasso da fionda, fredda al tatto, appare nella tua mano. In qualsiasi momento, tu o una creatura a cui dai la sfera potete lanciare la sfera (a una gittata di 12 metri) o scagliarla con una fionda (alla normale gittata della fionda). Si frantuma all'impatto, con lo stesso effetto del lancio normale dell'incantesimo. Puoi anche posare la sfera senza frantumarla. Dopo 1 minuto, se la sfera non si è già frantumata, esplode. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 7° livello o superiore, i danni aumentano di 1d6 per ogni livello dello slot sopra il 6°.",
     "description_en": "A frigid globe of cold energy streaks from your fingertips to a point of your choice within range, where it explodes in a 60-foot-radius sphere. Each creature within the area must make a Constitution saving throw. On a failed save, a creature takes 10d6 cold damage. On a successful save, it takes half as much damage. If the globe strikes a body of water or a liquid that is principally water (not including water-based creatures), it freezes the liquid to a depth of 6 inches over an area 30 feet square. This ice lasts for 1 minute. Creatures that were swimming on the surface of frozen water are trapped in the ice. A trapped creature can use an action to make a Strength check against your spell save DC to break free. You can refrain from firing the globe after completing the spell, if you wish. A small globe about the size of a sling stone, cool to the touch, appears in your hand. At any time, you or a creature you give the globe to can throw the globe (to a range of 40 feet) or hurl it with a sling (to the sling's normal range). It shatters on impact, with the same effect as the normal casting of the spell. You can also set the globe down without shattering it. After 1 minute, if the globe hasn't already shattered, it explodes. At Higher Levels. When you cast this spell using a spell slot of 7th level or higher, the damage increases by 1d6 for each slot level above 6th.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Stregone"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Sorcerer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -10674,6 +13089,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10700,6 +13117,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10726,6 +13145,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10754,6 +13175,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10784,6 +13207,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10812,6 +13237,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10840,6 +13267,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -10863,14 +13292,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Chierico"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Cleric"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -10900,6 +13337,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -10926,6 +13365,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -10952,6 +13393,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -10986,6 +13429,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11012,6 +13457,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11038,6 +13485,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11064,6 +13513,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11090,6 +13541,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11116,6 +13569,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11146,6 +13601,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -11174,6 +13631,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11200,6 +13659,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11232,6 +13693,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -11266,6 +13729,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11296,6 +13761,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11326,6 +13793,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Sorcerer"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11356,6 +13825,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11386,6 +13857,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11414,6 +13887,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11442,6 +13917,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11476,6 +13953,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11506,6 +13985,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -11528,13 +14009,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "Eight multicolored rays of light flash from your hand. Each ray is a different color and has a different power and purpose. Each creature in a 60-foot cone must make a Dexterity saving throw. For each target, roll a d8 to determine which color ray affects it. 1. Red. The target takes 10d6 fire damage on a failed save, or half as much damage on a successful one. 2. Orange. The target takes 10d6 acid damage on a failed save, or half as much damage on a successful one. 3. Yellow. The target takes 10d6 lightning damage on a failed save, or half as much damage on a successful one. 4. Green. The target takes 10d6 poison damage on a failed save, or half as much damage on a successful one. 5. Blue. The target takes 10d6 cold damage on a failed save, or half as much damage on a successful one. 6. Indigo. On a failed save, the target is restrained. It must then make a Constitution saving throw at the end of each of its turns. If it successfully saves three times, the spell ends. If it fails its save three times, it permanently turns to stone and is subjected to the petrified condition. The successes and failures don't need to be consecutive; keep track of both until the target collects three of a kind. 7. Violet. On a failed save, the target is blinded. It must then make a Wisdom saving throw at the start of your next turn. A successful save ends the blindness. If it fails that save, the creature is transported to another plane of existence of the DM's choosing and is no longer blinded. (Typically, a creature that is on a plane that isn't its home plane is banished home, while other creatures are usually cast into the Astral or Ethereal planes.) 8. Special. The target is struck by two rays. Roll twice more, rerolling any 8.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -11562,6 +14051,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11592,6 +14083,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11620,6 +14113,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11650,6 +14145,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11676,6 +14173,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11702,6 +14201,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11725,14 +14226,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Bardo",
       "Chierico",
-      "Mago"
+      "Mago",
+      "Druido"
     ],
     "classes_en": [
       "Bard",
       "Cleric",
-      "Wizard"
+      "Wizard",
+      "Druid"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -11762,6 +14271,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11788,6 +14299,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -11818,6 +14331,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -11846,6 +14361,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -11872,6 +14389,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11900,6 +14419,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11922,13 +14443,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "This spell attracts or repels creatures of your choice. You target something within range, either a Huge or smaller object or creature or an area that is no larger than a 200-foot cube. Then specify a kind of intelligent creature, such as red dragons, goblins, or vampires. You invest the target with an aura that either attracts or repels the specified creatures for the duration. Choose antipathy or sympathy as the aura's effect. Antipathy. The enchantment causes creatures of the kind you designated to feel an intense urge to leave the area and avoid the target. When such a creature can see the target or comes within 60 feet of it, the creature must succeed on a Wisdom saving throw or become frightened. The creature remains frightened while it can see the target or is within 60 feet of it. While frightened by the target, the creature must use its movement to move to the nearest safe spot from which it can't see the target. If the creature moves more than 60 feet from the target and can't see it, the creature is no longer frightened, but the creature becomes frightened again if it regains sight of the target or moves within 60 feet of it. Sympathy. The enchantment causes the specified creatures to feel an intense urge to approach the target while within 60 feet of it or able to see it. When such a creature can see the target or comes within 60 feet of it, the creature must succeed on a Wisdom saving throw or use its movement on each of its turns to enter the area or move within reach of the target. When the creature has done so, it can't willingly move away from the target. If the target damages or otherwise harms an affected creature, the affected creature can make a Wisdom saving throw to end the effect, as described below. Ending the Effect. If an affected creature ends its turn while not within 60 feet of the target or able to see it, the creature makes a Wisdom saving throw. On a successful save, the creature is no longer affected by the target and recognizes the feeling of repugnance or attraction as magical. In addition, a creature affected by the spell is allowed another Wisdom saving throw every 24 hours while the spell persists. A creature that successfully saves against this effect is immune to it for 1 minute, after which time it can be affected again.",
     "classes": [
       "Druido",
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
       "Druid",
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -11954,6 +14483,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -11984,6 +14515,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12006,13 +14539,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "You create a shadowy door on a flat solid surface that you can see within range. The door is large enough to allow Medium creatures to pass through unhindered. When opened, the door leads to a demiplane that appears to be an empty room 30 feet in each dimension, made of wood or stone. When the spell ends, the door disappears, and any creatures or objects inside the demiplane remain trapped there, as the door also disappears from the other side. Each time you cast this spell, you can create a new demiplane, or have the shadowy door connect to a demiplane you created with a previous casting of this spell. Additionally, if you know the nature and contents of a demiplane created by a casting of this spell by another creature, you can have the shadowy door connect to its demiplane instead.",
     "classes": [
       "Warlock",
-      "Mago"
+      "Mago",
+      "Stregone"
     ],
     "classes_en": [
       "Warlock",
-      "Wizard"
+      "Wizard",
+      "Sorcerer"
     ],
-    "source": "Sorcerer [TCoE]",
+    "class_source_tags_en": {
+      "Sorcerer": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -12044,6 +14585,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12074,6 +14617,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Sorcerer"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12106,6 +14651,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12134,6 +14681,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Warlock"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12160,6 +14709,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12186,6 +14737,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12208,13 +14761,21 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description_en": "A swirling cloud of smoke shot through with white-hot embers appears in a 20-foot-radius sphere centered on a point within range. The cloud spreads around corners and is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it. When the cloud appears, each creature in it must make a Dexterity saving throw. A creature takes 10d8 fire damage on a failed save, or half as much damage on a successful one. A creature must also make this saving throw when it enters the spell's area for the first time on a turn or ends its turn there. The cloud moves 10 feet directly away from you in a direction that you choose at the start of each of your turns.",
     "classes": [
       "Stregone",
-      "Mago"
+      "Mago",
+      "Druido"
     ],
     "classes_en": [
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Druid"
     ],
-    "source": "Druid [TCoE]",
+    "class_source_tags_en": {
+      "Druid": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -12242,6 +14803,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12268,6 +14831,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12294,6 +14859,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12322,6 +14889,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Bard",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12354,6 +14923,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12377,14 +14948,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Druido",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Chierico"
     ],
     "classes_en": [
       "Druid",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Cleric"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -12410,6 +14989,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -12436,6 +15017,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook",
     "aliases": [],
     "translated": true
@@ -12466,6 +15049,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12496,6 +15081,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Tasha's Cauldron of Everything",
     "aliases": [],
     "translated": true
@@ -12528,6 +15115,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12551,14 +15140,22 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes": [
       "Chierico",
       "Stregone",
-      "Mago"
+      "Mago",
+      "Warlock"
     ],
     "classes_en": [
       "Cleric",
       "Sorcerer",
-      "Wizard"
+      "Wizard",
+      "Warlock"
     ],
-    "source": "Warlock [TCoE]",
+    "class_source_tags_en": {
+      "Warlock": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -12586,6 +15183,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12612,6 +15211,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12638,6 +15239,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Cleric"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12668,6 +15271,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12696,6 +15301,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12717,12 +15324,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Un'onda di energia curativa investe una creatura che tocchi. Il bersaglio recupera tutti i suoi punti ferita. Se la creatura è ammaliata, spaventata, paralizzata o stordita, la condizione termina. Se la creatura è prona, può usare la sua reazione per alzarsi. L'incantesimo non ha effetto su non morti o costrutti.",
     "description_en": "A wave of healing energy washes over a creature you touch. The target regains all its hit points. If the creature is charmed, frightened, paralyzed, or stunned, the condition ends. If the creature is prone, it can use its reaction to stand up. This spell has no effect on undead or constructs.",
     "classes": [
-      "Bardo"
+      "Bardo",
+      "Chierico"
     ],
     "classes_en": [
-      "Bard"
+      "Bard",
+      "Cleric"
     ],
-    "source": "Cleric [TCoE]",
+    "class_source_tags_en": {
+      "Cleric": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook",
     "aliases": [],
     "translated": true
   },
@@ -12754,6 +15369,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12775,12 +15392,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Un piano di luce scintillante e multicolore forma un muro verticale opaco - lungo fino a 27 metri, alto 9 metri e spesso 2,5 cm - centrato su un punto che puoi vedere entro gittata. In alternativa, puoi modellare il muro in una sfera fino a 9 metri di diametro centrata su un punto a tua scelta entro gittata. Il muro rimane in posizione per la durata. Se posizioni il muro in modo che passi attraverso uno spazio occupato da una creatura, l'incantesimo fallisce, e la tua azione e lo slot incantesimo sono sprecati. Il muro emette luce intensa fino a una distanza di 30 metri e luce fioca per altri 30 metri. Tu e le creature che designi al momento del lancio dell'incantesimo potete attraversare e restare vicini al muro senza danno. Se un'altra creatura che può vedere il muro si sposta entro 6 metri da esso o vi inizia il turno, deve superare un tiro salvezza su Costituzione o diventare accecata per 1 minuto. Il muro consiste di sette strati, ciascuno di un colore diverso. Quando una creatura tenta di raggiungere o attraversare il muro, lo fa uno strato alla volta attraverso tutti gli strati del muro. Mentre passa o raggiunge attraverso ciascuno strato, la creatura deve effettuare un tiro salvezza su Destrezza o essere influenzata dalle proprietà di quello strato come descritto sotto. Il muro può essere distrutto, anche uno strato alla volta, in ordine dal rosso al viola, con mezzi specifici per ciascuno strato. Una volta che uno strato è distrutto, rimane tale per la durata dell'incantesimo. Campo antimagia non ha effetto sul muro e dissolvi magie può influenzare solo lo strato viola. 1. Rosso. La creatura subisce 10d6 danni da fuoco se fallisce, o la metà se lo supera. Mentre questo strato è in posizione, gli attacchi a distanza non magici non possono attraversare il muro. Lo strato può essere distrutto infliggendogli almeno 25 danni da freddo. 2. Arancione. La creatura subisce 10d6 danni da acido se fallisce, o la metà se lo supera. Mentre questo strato è in posizione, gli attacchi a distanza magici non possono attraversare il muro. Lo strato è distrutto da un vento forte. 3. Giallo. La creatura subisce 10d6 danni da fulmine se fallisce, o la metà se lo supera. Questo strato può essere distrutto infliggendogli almeno 60 danni da forza. 4. Verde. La creatura subisce 10d6 danni da veleno se fallisce, o la metà se lo supera. Un incantesimo passamuri, o un altro incantesimo di livello pari o superiore che può aprire un portale su una superficie solida, distrugge questo strato. 5. Blu. La creatura subisce 10d6 danni da freddo se fallisce, o la metà se lo supera. Questo strato può essere distrutto infliggendogli almeno 25 danni da fuoco. 6. Indaco. Se fallisce, la creatura è trattenuta. Deve poi effettuare un tiro salvezza su Costituzione alla fine di ciascuno dei suoi turni. Se ne supera tre, l'incantesimo termina. Se ne fallisce tre, è permanentemente trasformata in pietra ed è soggetta alla condizione di pietrificato. I successi e i fallimenti non devono essere consecutivi; tieni traccia di entrambi finché la creatura non ne accumula tre dello stesso tipo. Mentre questo strato è in posizione, gli incantesimi non possono essere lanciati attraverso il muro. Lo strato è distrutto dalla luce intensa emessa da un incantesimo luce solare o un incantesimo simile di livello pari o superiore. 7. Viola. Se fallisce, la creatura è accecata. Deve poi effettuare un tiro salvezza su Saggezza all'inizio del tuo prossimo turno. Un tiro salvezza superato termina la cecità. Se fallisce quel tiro, la creatura è trasportata su un altro piano a scelta del DM e non è più accecata. (Tipicamente, una creatura che si trova su un piano che non è il suo piano natale viene bandita a casa, mentre altre creature sono di solito gettate sui piani Astrale o Etereo.) Questo strato è distrutto da un incantesimo dissolvi magie o un incantesimo simile di livello pari o superiore che può terminare incantesimi ed effetti magici.",
     "description_en": "A shimmering, multicolored plane of light forms a vertical opaque wall—up to 90 feet long, 30 feet high, and 1 inch thick—centered on a point you can see within range. Alternatively, you can shape the wall into a sphere up to 30 feet in diameter centered on a point you choose within range. The wall remains in place for the duration. If you position the wall so that it passes through a space occupied by a creature, the spell fails, and your action and the spell slot are wasted. The wall sheds bright light out to a range of 100 feet and dim light for an additional 100 feet. You and creatures you designate at the time you cast the spell can pass through and remain near the wall without harm. If another creature that can see the wall moves to within 20 feet of it or starts its turn there, the creature must succeed on a Constitution saving throw or become blinded for 1 minute. The wall consists of seven layers, each with a different color. When a creature attempts to reach into or pass through the wall, it does so one layer at a time through all the wall's layers. As it passes or reaches through each layer, the creature must make a Dexterity saving throw or be affected by that layer's properties as described below. The wall can be destroyed, also one layer at a time, in order from red to violet, by means specific to each layer. Once a layer is destroyed, it remains so for the duration of the spell. Antimagic field has no effect on the wall and dispel magic can affect only the violet layer. 1. Red. The creature takes 10d6 fire damage on a failed save, or half as much damage on a successful one. While this layer is in place, nonmagical ranged attacks can't pass through the wall. The layer can be destroyed by dealing at least 25 cold damage to it. 2. Orange. The creature takes 10d6 acid damage on a failed save, or half as much damage on a successful one. While this layer is in place, magical ranged attacks can't pass through the wall. The layer is destroyed by a strong wind. 3. Yellow. The creature takes 10d6 lightning damage on a failed save, or half as much damage on a successful one. This layer can be destroyed by dealing at least 60 force damage to it. 4. Green. The creature takes 10d6 poison damage on a failed save, or half as much damage on a successful one. A passwall spell, or another spell of equal or greater level that can open a portal on a solid surface, destroys this layer. 5. Blue. The creature takes 10d6 cold damage on a failed save, or half as much damage on a successful one. This layer can be destroyed by dealing at least 25 fire damage to it. 6. Indigo. On a failed save, the creature is restrained. It must then make a Constitution saving throw at the end of each of its turns. If it successfully saves three times, the spell ends. If it fails its save three times, it permanently turns to stone and is subjected to the petrified condition. The successes and failures don't need to be consecutive; keep track of both until the creature collects three of a kind. While this layer is in place, spells can't be cast through the wall. The layer is destroyed by bright light shed by a daylight spell or a similar spell of equal or higher level. 7. Violet. On a failed save, the creature is blinded. It must then make a Wisdom saving throw at the start of your next turn. A successful save ends the blindness. If it fails that save, the creature is transported to another plane of the DM's choosing and is no longer blinded. (Typically, a creature that is on a plane that isn't its home plane is banished home, while other creatures are usually cast into the Astral or Ethereal planes.) This layer is destroyed by a dispel magic spell or a similar spell of equal or higher level that can end spells and magical effects.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Bardo"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Bard"
     ],
-    "source": "Bard [TCoE]",
+    "class_source_tags_en": {
+      "Bard": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -12812,6 +15437,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Xanathar's Guide to Everything",
     "aliases": [],
     "translated": true
@@ -12840,6 +15467,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Druid",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12866,6 +15495,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "classes_en": [
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12894,6 +15525,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12924,6 +15557,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Warlock",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12952,6 +15587,8 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Cleric",
       "Druid"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
@@ -12973,12 +15610,20 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
     "description": "Attingendo alle paure più profonde di un gruppo di creature, crei creature illusorie nelle loro menti, visibili solo a loro. Ogni creatura in una sfera con raggio di 9 metri centrata su un punto a tua scelta entro gittata deve effettuare un tiro salvezza su Saggezza. Se fallisce, una creatura diventa spaventata per la durata. L'illusione richiama le paure più profonde della creatura, manifestando i suoi peggiori incubi come una minaccia implacabile. Alla fine di ciascuno dei turni della creatura spaventata, deve superare un tiro salvezza su Saggezza o subire 4d10 danni psichici. Se lo supera, l'incantesimo termina per quella creatura.",
     "description_en": "Drawing on the deepest fears of a group of creatures, you create illusory creatures in their minds, visible only to them. Each creature in a 30-foot-radius sphere centered on a point of your choice within range must make a Wisdom saving throw. On a failed save, a creature becomes frightened for the duration. The illusion calls on the creature's deepest fears, manifesting its worst nightmares as an implacable threat. At the end of each of the frightened creature's turns, it must succeed on a Wisdom saving throw or take 4d10 psychic damage. On a successful save, the spell ends for that creature.",
     "classes": [
-      "Mago"
+      "Mago",
+      "Warlock"
     ],
     "classes_en": [
-      "Wizard"
+      "Wizard",
+      "Warlock"
     ],
-    "source": "Warlock [TCoE]",
+    "class_source_tags_en": {
+      "Warlock": [
+        "TCoE"
+      ]
+    },
+    "ritual": false,
+    "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
   },
@@ -13006,419 +15651,10 @@ window.SPELLS_DATA = Object.assign(window.SPELLS_DATA || {}, {
       "Sorcerer",
       "Wizard"
     ],
+    "class_source_tags_en": {},
+    "ritual": false,
     "source": "Player's Handbook (SRD)",
     "aliases": [],
-    "translated": true
-  },
-  "Comprensione dei Linguaggi": {
-    "name": "Comprensione dei Linguaggi",
-    "name_en": "Comprehend Languages",
-    "level": 1,
-    "school": "divination",
-    "school_it": "Divinazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "Incantatore",
-    "range_en": "Self",
-    "components": "V, S, M (un pizzico di fuliggine e sale)",
-    "components_en": "V, S, M (a pinch of soot and salt)",
-    "duration": "1 ora",
-    "duration_en": "1 hour",
-    "description": "Per la durata dell'incantesimo, comprendi il significato letterale di qualsiasi linguaggio parlato che senti. Comprendi anche qualsiasi linguaggio scritto che vedi, ma devi toccare la superficie sulla quale le parole sono scritte. Occorre circa 1 minuto per leggere una pagina di testo.\n\nQuesto incantesimo non decifra messaggi segreti in un testo o in un glifo, come un sigillo arcano, che non sia parte di un linguaggio scritto.\n\nRituale.",
-    "description_en": "For the duration, you understand the literal meaning of any spoken language that you hear. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text.\n\nThis spell doesn't decode secret messages in a text or glyph, such as an arcane sigil, that isn't part of a written language.\n\nRitual.",
-    "classes": [
-      "Bardo",
-      "Stregone",
-      "Warlock",
-      "Mago"
-    ],
-    "classes_en": [
-      "Bard",
-      "Sorcerer",
-      "Warlock",
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Trova Famiglio": {
-    "name": "Trova Famiglio",
-    "name_en": "Find Familiar",
-    "level": 1,
-    "school": "conjuration",
-    "school_it": "Evocazione",
-    "casting_time": "1 ora",
-    "casting_time_en": "1 hour",
-    "range": "3 metri",
-    "range_en": "10 feet",
-    "components": "V, S, M (10 mo di carbone, incenso ed erbe che devono essere consumati dal fuoco in un braciere d'ottone)",
-    "components_en": "V, S, M (10 gp worth of charcoal, incense, and herbs that must be consumed by fire in a brass brazier)",
-    "duration": "Istantanea",
-    "duration_en": "Instantaneous",
-    "description": "Ottieni il servizio di un famiglio, uno spirito che assume una forma animale di tua scelta: pipistrello, gatto, granchio, rana (rospo), falco, lucertola, polpo, gufo, serpente velenoso, pesce (chiappino), ratto, corvo, cavalluccio marino, ragno o donnola. Apparendo in uno spazio libero entro gittata, il famiglio ha le statistiche della forma scelta, anche se è un celestiale, un fatato o un immondo (a tua scelta) invece di una bestia.\n\nIl tuo famiglio agisce in modo indipendente da te, ma obbedisce sempre ai tuoi comandi. In combattimento, tira la propria iniziativa e agisce nel proprio turno. Un famiglio non può attaccare, ma può intraprendere altre azioni normalmente.\n\nQuando il famiglio scende a 0 punti ferita, scompare, senza lasciare alcuna forma fisica. Riappare dopo che lanci di nuovo questo incantesimo. Con un'azione, puoi temporaneamente congedare il tuo famiglio in una dimensione tascabile. In alternativa, puoi congedarlo per sempre. Con un'azione mentre è temporaneamente congedato, puoi farlo riapparire in qualsiasi spazio libero entro 9 metri da te. Ogni volta che il famiglio scende a 0 punti ferita o scompare nella dimensione tascabile, lascia nel suo spazio qualsiasi cosa indossasse o trasportasse.\n\nFinché il tuo famiglio si trova entro 30 metri da te, puoi comunicare con lui telepaticamente. Inoltre, con un'azione, puoi vedere attraverso gli occhi del tuo famiglio e udire ciò che ode fino all'inizio del tuo turno successivo, ottenendo i benefici dei sensi speciali che il famiglio possiede. Durante questo periodo, sei sordo e cieco riguardo ai tuoi sensi.\n\nNon puoi avere più di un famiglio alla volta. Se lanci questo incantesimo mentre hai già un famiglio, lo fai assumere una nuova forma. Scegli una delle forme dall'elenco soprastante. Il tuo famiglio si trasforma nella creatura scelta.\n\nInfine, quando lanci un incantesimo con gittata di Contatto, il tuo famiglio può consegnare l'incantesimo come se l'avesse lanciato lui stesso. Il tuo famiglio deve trovarsi entro 30 metri da te, e deve usare la propria reazione per consegnare l'incantesimo quando lo lanci. Se l'incantesimo richiede un tiro per colpire, usi il tuo modificatore di attacco per il tiro.\n\nRituale.",
-    "description_en": "You gain the service of a familiar, a spirit that takes an animal form you choose: bat, cat, crab, frog (toad), hawk, lizard, octopus, owl, poisonous snake, fish (quipper), rat, raven, sea horse, spider, or weasel. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a celestial, fey, or fiend (your choice) instead of a beast.\n\nYour familiar acts independently of you, but it always obeys your commands. In combat, it rolls its own initiative and acts on its own turn. A familiar can't attack, but it can take other actions as normal.\n\nWhen the familiar drops to 0 hit points, it disappears, leaving behind no physical form. It reappears after you cast this spell again. As an action, you can temporarily dismiss your familiar to a pocket dimension. Alternatively, you can dismiss it forever. As an action while it is temporarily dismissed, you can cause it to reappear in any unoccupied space within 30 feet of you. Whenever the familiar drops to 0 hit points or disappears into the pocket dimension, it leaves behind in its space anything it was wearing or carrying.\n\nWhile your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as an action, you can see through your familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the familiar has. During this time, you are deaf and blind with regard to your own senses.\n\nYou can't have more than one familiar at a time. If you cast this spell while you already have a familiar, you instead cause it to adopt a new form. Choose one of the forms from the above list. Your familiar transforms into the chosen creature.\n\nFinally, when you cast a spell with a range of touch, your familiar can deliver the spell as if it had cast the spell. Your familiar must be within 100 feet of you, and it must use its reaction to deliver the spell when you cast it. If the spell requires an attack roll, you use your attack modifier for the roll.\n\nRitual.",
-    "classes": [
-      "Mago"
-    ],
-    "classes_en": [
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Trovare Famiglio",
-      "Trovare il Famiglio"
-    ],
-    "translated": true
-  },
-  "Identificare": {
-    "name": "Identificare",
-    "name_en": "Identify",
-    "level": 1,
-    "school": "divination",
-    "school_it": "Divinazione",
-    "casting_time": "1 minuto",
-    "casting_time_en": "1 minute",
-    "range": "Contatto",
-    "range_en": "Touch",
-    "components": "V, S, M (una perla del valore di almeno 100 mo e una piuma di gufo)",
-    "components_en": "V, S, M (a pearl worth at least 100 gp and an owl feather)",
-    "duration": "Istantanea",
-    "duration_en": "Instantaneous",
-    "description": "Scegli un oggetto che devi toccare per tutta la durata del lancio dell'incantesimo. Se è un oggetto magico o un altro oggetto intriso di magia, ne apprendi le proprietà e come utilizzarle, se per essere usato richiede sintonia e quante cariche possiede, se ne ha. Apprendi se eventuali incantesimi stanno influenzando l'oggetto e quali sono. Se l'oggetto è stato creato da un incantesimo, apprendi quale incantesimo lo ha creato.\n\nSe invece tocchi una creatura per tutta la durata del lancio, apprendi quali incantesimi, se ce ne sono, la stanno attualmente influenzando.\n\nRituale.",
-    "description_en": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it.\n\nRitual.",
-    "classes": [
-      "Bardo",
-      "Mago",
-      "Artefice"
-    ],
-    "classes_en": [
-      "Bard",
-      "Wizard",
-      "Artificer"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Identifica",
-      "Identificazione"
-    ],
-    "translated": true
-  },
-  "Individuazione del Magico": {
-    "name": "Individuazione del Magico",
-    "name_en": "Detect Magic",
-    "level": 1,
-    "school": "divination",
-    "school_it": "Divinazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "Incantatore",
-    "range_en": "Self",
-    "components": "V, S",
-    "components_en": "V, S",
-    "duration": "Concentrazione, fino a 10 minuti",
-    "duration_en": "Concentration, up to 10 minutes",
-    "description": "Per la durata dell'incantesimo, percepisci la presenza di magia entro 9 metri da te. Se percepisci magia in questo modo, puoi usare la tua azione per vedere una debole aura attorno a qualsiasi creatura o oggetto visibile nell'area che reca della magia, e ne apprendi la scuola di magia, se ce n'è una.\n\nL'incantesimo può penetrare la maggior parte delle barriere, ma è bloccato da 30 centimetri di pietra, 2,5 centimetri di metallo comune, una sottile lastra di piombo o 90 centimetri di legno o terra.\n\nRituale.",
-    "description_en": "For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any.\n\nThe spell can penetrate most barriers, but is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.\n\nRitual.",
-    "classes": [
-      "Bardo",
-      "Chierico",
-      "Druido",
-      "Paladino",
-      "Ranger",
-      "Stregone",
-      "Warlock",
-      "Mago",
-      "Artefice"
-    ],
-    "classes_en": [
-      "Bard",
-      "Cleric",
-      "Druid",
-      "Paladin",
-      "Ranger",
-      "Sorcerer",
-      "Warlock",
-      "Wizard",
-      "Artificer"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Rilevamento del Magico",
-      "Rileva Magia"
-    ],
-    "translated": true
-  },
-  "Lancia Psichica di Raulothim": {
-    "name": "Lancia Psichica di Raulothim",
-    "name_en": "Raulothim's Psychic Lance",
-    "level": 4,
-    "school": "enchantment",
-    "school_it": "Ammaliamento",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "36 metri",
-    "range_en": "120 feet",
-    "components": "V",
-    "components_en": "V",
-    "duration": "Istantanea",
-    "duration_en": "Instantaneous",
-    "description": "Scagli una scintillante lancia di potere psichico dalla tua fronte contro una creatura che puoi vedere e che si trova a gittata. In alternativa, puoi pronunciare il nome di una creatura. Se il bersaglio con nome è entro la gittata, diventa il bersaglio dell'incantesimo anche se non puoi vederlo. Se il bersaglio nominato non è nel raggio d'azione, la lancia si dissipa senza effetto. Il bersaglio deve effettuare un tiro salvezza su Intelligenza. Se fallisce il Tiro Salvezza, il bersaglio subisce 7d6 danni psichici ed è incapacitato fino all'inizio del turno successivo dell'incantatore. Se il Tiro Salvezza riesce, la creatura subisce la metà dei danni e non diventa Incapacitato. Ai Livelli Superiori. Quando lanci questo incantesimo utilizzando uno slot incantesimo di 5° livello o superiore, il danno aumenta di 1d6 per ogni livello dello slot superiore al 4°.",
-    "description_en": "You unleash a shimmering lance of psychic power from your forehead at a creature that you can see within range. Alternatively, you can utter a creature’s name. If the named target is within range, it becomes the spell’s target even if you can’t see it. If the named target isn’t within range, the lance dissipates without effect. The target must make an Intelligence saving throw. On a failed save, the target takes 7d6 psychic damage and is incapacitated until the start of your next turn. On a successful save, the creature takes half as much damage and isn’t incapacitated. At Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d6 for each slot level above 4th.",
-    "classes": [
-      "Bardo",
-      "Mago",
-      "Stregone",
-      "Warlock"
-    ],
-    "classes_en": [
-      "Bard",
-      "Wizard",
-      "Sorcerer",
-      "Warlock"
-    ],
-    "source": "Fizban's Treasury of Dragons (TCoE)",
-    "aliases": [],
-    "translated": true
-  },
-  "Legame Telepatico di Rary": {
-    "name": "Legame Telepatico di Rary",
-    "name_en": "Rary's Telepathic Bond",
-    "level": 5,
-    "school": "divination",
-    "school_it": "Divinazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "9 metri",
-    "range_en": "30 feet",
-    "components": "V, S, M (due pezzi di guscio di uova di due differenti creature)",
-    "components_en": "V, S, M (pieces of eggshell from two different kinds of creatures)",
-    "duration": "1 ora",
-    "duration_en": "1 hour",
-    "description": "Crei un legame telepatico tra un massimo di otto creature consenzienti che puoi vedere entro gittata. Ogni creatura diventa legata a tutte le altre per la durata dell'incantesimo. Le reature con un punteggio di Intelligenza di 2 o inferiore non sono interessate da questo incantesimo. Fino al termine dell'incantesimo, le creature possono comunicare telepaticamente attraverso il legame, anche se non hanno un linguaggio comune. La comunicazione è possibile a distanza, anche se non può estendersi a altri piani di esistenza.",
-    "description_en": "You forge a telepathic link among up to eight willing creatures of your choice within range, psychically linking each creature to all the others for the duration. Creatures with Intelligence scores of 2 or less aren’t affected by this spell. Until the spell ends, the targets can communicate telepathically through the bond whether or not they have a common language. The communication is possible over any distance, though it can’t extend to other planes of existence.",
-    "classes": [
-      "Bardo",
-      "Mago"
-    ],
-    "classes_en": [
-      "Bard",
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Evoca Spirito Draconico": {
-    "name": "Evoca Spirito Draconico",
-    "name_en": "Summon Draconian",
-    "level": 5,
-    "school": "conjuration",
-    "school_it": "Evocazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "18 metri",
-    "range_en": "60 feet",
-    "components": "V, S, M (un oggetto con l'immagine di un drago inciso, del valore di almeno 500 mo)",
-    "components_en": "V, S, M (an object with the image of a dragon engraved on it, worth at least 500 gp)",
-    "duration": "Concentrazione, fino a 1 ora",
-    "duration_en": "Concentration, up to 1 hour",
-    "description": "Richiami uno spirito draconico. Si manifesta in uno spazio libero che puoi vedere entro gittata. Questa forma corporea usa il blocco statistiche dello Spirito Draconico. Quando lanci l'incantesimo, scegli una famiglia di draghi: Chromatico, Gemma o Metallico. La creatura assomiglia a un drago della famiglia prescelta, che determina certi tratti nel suo blocco statistiche. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata a te e ai tuoi compagni. In combattimento, la creatura condivide il tuo conteggio dell'iniziativa, ma agisce immediatamente dopo di te. Obbedisce ai tuoi comandi verbali (non è richiesta alcuna azione). Se non gliene impartisci nessuno, prende l'azione Schivare e usa il movimento per evitare il pericolo. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 6° livello o superiore, usa il livello più alto dove appare il livello dell'incantesimo nel blocco statistiche.",
-    "description_en": "You call forth a draconic spirit. It manifests in an unoccupied space that you can see within range. This corporeal form uses the Draconic Spirit stat block. When you cast this spell, choose a family of dragon: chromatic, gem, or metallic. The creature resembles a dragon of the chosen family, which determines certain traits in its stat block. The creature disappears when it drops to 0 hit points or when the spell ends. The creature is an ally to you and your companions. In combat, the creature shares your initiative count, but it takes its turn immediately after yours. It obeys your verbal commands (no action required by you). If you don’t issue any, it takes the Dodge action and uses its move to avoid danger. At Higher Levels. When you cast this spell using a spell slot of 6th level or higher, use the higher level wherever the spell’s level appears in the stat block.",
-    "classes": [
-      "Druido",
-      "Mago",
-      "Stregone"
-    ],
-    "classes_en": [
-      "Druid",
-      "Sorcerer",
-      "Wizard"
-    ],
-    "source": "Fizban's Treasury of Dragons (TCoE)",
-    "aliases": [],
-    "translated": true
-  },
-  "Allarme": {
-    "name": "Allarme",
-    "name_en": "Alarm",
-    "level": 1,
-    "school": "abjuration",
-    "school_it": "Abiurazione",
-    "casting_time": "1 minuto",
-    "casting_time_en": "1 minute",
-    "range": "9 metri",
-    "range_en": "30 feet",
-    "components": "V, S, M (una campanella minuscola e un pezzo di filo d'argento sottile)",
-    "components_en": "V, S, M (a tiny bell and a piece of fine silver wire)",
-    "duration": "8 ore",
-    "duration_en": "8 hours",
-    "description": "Imposti un allarme contro intrusioni indesiderate. Scegli una porta, una finestra o un'area entro gittata non piu' grande di un cubo di 6 metri. Finche' l'incantesimo termina, un allarme ti avvisa ogni volta che una creatura di taglia Minuscola o superiore tocca o entra nell'area protetta. Quando lanci l'incantesimo, puoi designare creature che non faranno scattare l'allarme. Scegli anche se l'allarme sia mentale o udibile.\nUn allarme mentale ti avvisa con un segnale nella mente se ti trovi entro 1,5 km dall'area. Questo segnale ti sveglia se stai dormendo. Un allarme udibile produce il suono di una campanella per 10 secondi entro 18 metri.",
-    "description_en": "You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible.\nA mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping. An audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
-    "classes": [
-      "Ranger",
-      "Mago"
-    ],
-    "classes_en": [
-      "Ranger",
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Bocca Magica": {
-    "name": "Bocca Magica",
-    "name_en": "Magic Mouth",
-    "level": 2,
-    "school": "illusion",
-    "school_it": "Illusione",
-    "casting_time": "1 minuto",
-    "casting_time_en": "1 minute",
-    "range": "9 metri",
-    "range_en": "30 feet",
-    "components": "V, S, M (un pezzetto di favo e polvere di giada del valore di almeno 10 mo, che l'incantesimo consuma)",
-    "components_en": "V, S, M (a small bit of honeycomb and jade dust worth at least 10 gp, which the spell consumes)",
-    "duration": "Finche' dissolto",
-    "duration_en": "Until dispelled",
-    "description": "Impianti un messaggio in un oggetto entro gittata, un messaggio che viene pronunciato quando si verifica una condizione di attivazione. Scegli un oggetto che puoi vedere e che non sia indossato o trasportato da un'altra creatura. Pronuncia poi il messaggio, composto al massimo da 25 parole, che puo' essere consegnato in un massimo di 10 minuti. Infine determini la circostanza che attivera' l'incantesimo.\nQuando la circostanza si verifica, sull'oggetto appare una bocca magica che pronuncia il messaggio con la tua voce e allo stesso volume con cui lo hai pronunciato. Se l'oggetto scelto ha una bocca o qualcosa che vi somiglia, la bocca magica appare in quel punto.\nLa circostanza di attivazione puo' essere generica o dettagliata quanto vuoi, ma deve basarsi su condizioni visive o udibili che si verificano entro 9 metri dall'oggetto. Per esempio, puoi ordinare alla bocca di parlare quando una creatura si avvicina entro 9 metri o quando una campanella d'argento suona entro 9 metri.",
-    "description_en": "You implant a message within an object in range, a message that is uttered when a trigger condition is met. Choose an object that you can see and that isn't being worn or carried by another creature. Then speak the message, which must be 25 words or less, though it can be delivered over as long as 10 minutes. Finally, determine the circumstance that will trigger the spell.\nWhen that circumstance occurs, a magical mouth appears on the object and recites the message in your voice and at the same volume you spoke. If the object has a mouth or something that looks like a mouth, the magical mouth appears there.\nThe triggering circumstance can be as general or detailed as you like, though it must be based on visual or audible conditions that occur within 30 feet of the object. For example, you could instruct the mouth to speak when any creature moves within 30 feet of the object or when a silver bell rings within 30 feet of it.",
-    "classes": [
-      "Bardo",
-      "Mago"
-    ],
-    "classes_en": [
-      "Bard",
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Purificare Cibo e Bevande": {
-    "name": "Purificare Cibo e Bevande",
-    "name_en": "Purify Food and Drink",
-    "level": 1,
-    "school": "transmutation",
-    "school_it": "Trasmutazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "3 metri",
-    "range_en": "10 feet",
-    "components": "V, S",
-    "components_en": "V, S",
-    "duration": "Istantanea",
-    "duration_en": "Instantaneous",
-    "description": "Tutto il cibo e le bevande non magici entro una sfera di raggio 1,5 metri centrata su un punto a tua scelta entro gittata vengono purificati e resi privi di veleno e malattie.",
-    "description_en": "All nonmagical food and drink within a 5-foot-radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.",
-    "classes": [
-      "Chierico",
-      "Druido",
-      "Paladino"
-    ],
-    "classes_en": [
-      "Cleric",
-      "Druid",
-      "Paladin"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Scritta Celeste": {
-    "name": "Scritta Celeste",
-    "name_en": "Skywrite",
-    "level": 2,
-    "school": "transmutation",
-    "school_it": "Trasmutazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "Vista",
-    "range_en": "Sight",
-    "components": "V, S",
-    "components_en": "V, S",
-    "duration": "Concentrazione, fino a 1 ora",
-    "duration_en": "Concentration, up to 1 hour",
-    "description": "Fino a dieci parole si formano in una parte del cielo che puoi vedere. Le parole sembrano composte da nuvole e rimangono al loro posto per la durata dell'incantesimo. Le parole si dissolvono quando l'incantesimo termina. Un vento forte puo' disperdere le nuvole e porre fine all'incantesimo in anticipo.",
-    "description_en": "You cause up to ten words to form in a part of the sky you can see. The words appear to be made of cloud and remain in place for the spell's duration. The words dissipate when the spell ends. A strong wind can disperse the clouds and end the spell early.",
-    "classes": [
-      "Bardo",
-      "Druido",
-      "Mago"
-    ],
-    "classes_en": [
-      "Bard",
-      "Druid",
-      "Wizard"
-    ],
-    "source": "Xanathar's Guide to Everything",
-    "aliases": [],
-    "translated": true
-  },
-  "Respirare sott'Acqua": {
-    "name": "Respirare sott'Acqua",
-    "name_en": "Water Breathing",
-    "level": 3,
-    "school": "transmutation",
-    "school_it": "Trasmutazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "9 metri",
-    "range_en": "30 feet",
-    "components": "V, S, M (una corta canna o un pezzo di paglia)",
-    "components_en": "V, S, M (a short reed or piece of straw)",
-    "duration": "24 ore",
-    "duration_en": "24 hours",
-    "description": "Questo incantesimo conferisce a un massimo di dieci creature consenzienti che puoi vedere entro gittata la capacita' di respirare sott'acqua fino al termine dell'incantesimo. Le creature influenzate conservano anche il loro normale modo di respirare.",
-    "description_en": "This spell grants up to ten willing creatures you can see within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
-    "classes": [
-      "Druido",
-      "Ranger",
-      "Stregone",
-      "Mago"
-    ],
-    "classes_en": [
-      "Druid",
-      "Ranger",
-      "Sorcerer",
-      "Wizard"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [],
-    "translated": true
-  },
-  "Camminare sull'Acqua": {
-    "name": "Camminare sull'Acqua",
-    "name_en": "Water Walk",
-    "level": 3,
-    "school": "transmutation",
-    "school_it": "Trasmutazione",
-    "casting_time": "1 azione",
-    "casting_time_en": "1 action",
-    "range": "9 metri",
-    "range_en": "30 feet",
-    "components": "V, S, M (un pezzo di sughero)",
-    "components_en": "V, S, M (a piece of cork)",
-    "duration": "1 ora",
-    "duration_en": "1 hour",
-    "description": "Questo incantesimo conferisce la capacita' di muoversi su qualsiasi superficie liquida come acqua, acido, fango, neve, sabbie mobili o lava come se fosse terreno solido innocuo. Le creature che attraversano lava fusa possono comunque subire danni dal calore. L'incantesimo puo' influenzare fino a dieci creature consenzienti che puoi vedere entro gittata.\nSe scegli una creatura sommersa in un liquido, l'incantesimo la trasporta in superficie alla velocita' di 18 metri per round.",
-    "description_en": "This spell grants the ability to move across any liquid surface, such as water, acid, mud, snow, quicksand, or lava, as if it were harmless solid ground. Creatures crossing molten lava can still take damage from the heat. Up to ten willing creatures you can see within range gain this ability for the duration.\nIf you target a creature submerged in a liquid, the spell carries the target to the surface of the liquid at a rate of 60 feet per round.",
-    "classes": [
-      "Chierico",
-      "Druido",
-      "Ranger",
-      "Stregone"
-    ],
-    "classes_en": [
-      "Cleric",
-      "Druid",
-      "Ranger",
-      "Sorcerer"
-    ],
-    "source": "Player's Handbook (SRD)",
-    "aliases": [
-      "Camminare sulle Acque"
-    ],
     "translated": true
   }
 });

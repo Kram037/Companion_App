@@ -24,9 +24,11 @@
     },
     "knowledge-domain": {
       "1": [
-        "Comando"
+        "Comando",
+        "Identificare"
       ],
       "3": [
+        "Presagio",
         "Suggestione"
       ],
       "5": [
@@ -66,7 +68,8 @@
     },
     "nature-domain": {
       "1": [
-        "Amicizia con gli Animali"
+        "Amicizia con gli Animali",
+        "Parlare con gli Animali"
       ],
       "3": [
         "Pelle di Corteccia",
@@ -175,6 +178,7 @@
     },
     "forge-domain": {
       "1": [
+        "Identificare",
         "Punizione Cocente"
       ],
       "3": [
@@ -330,7 +334,8 @@
     },
     "oath-of-the-ancients": {
       "3": [
-        "Colpo Intrappolante"
+        "Colpo Intrappolante",
+        "Parlare con gli Animali"
       ],
       "5": [
         "Passo Velato",
@@ -689,6 +694,7 @@
         "Silenzio"
       ],
       "5": [
+        "Fingere Morte",
         "Parlare con i Morti"
       ],
       "7": [

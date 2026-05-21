@@ -30,6 +30,7 @@ PDF_FILES = [HERE / "trucchetti.pdf"] + [
 OUT_JSON = HERE / "spells.json"
 OUT_JS = ROOT / "js" / "Personaggi" / "data" / "spells_data.js"
 TRANSLATIONS_FILE = HERE / "spell_translations.json"
+MANUAL_PATCHES_FILE = HERE / "spell_manual_patches.json"
 
 # ---------------------------------------------------------------------------
 # Tabelle di traduzione
@@ -107,7 +108,7 @@ SPELL_NAMES_IT = {
     "Sword Burst": "Esplosione di Spade",
     "Thaumaturgy": "Taumaturgia",
     "Thorn Whip": "Frusta di Spine",
-    "Thunderclap": "Tuono Fragoroso",
+    "Thunderclap": "Rombo di Tuono",
     "Toll the Dead": "Rintocco dei Morti",
     "True Strike": "Colpo Accurato",
     "Vicious Mockery": "Beffa Crudele",
@@ -149,7 +150,7 @@ SPELL_NAMES_IT = {
     "Guiding Bolt": "Dardo Tracciante",
     "Hail of Thorns": "Pioggia di Spine",
     "Healing Word": "Parola Guaritrice",
-    "Hellish Rebuke": "Rimprovero Infernale",
+    "Hellish Rebuke": "Intimidire Infernale",
     "Heroism": "Eroismo",
     "Hex": "Sortilegio",
     "Hunter's Mark": "Marchio del Cacciatore",
@@ -160,7 +161,7 @@ SPELL_NAMES_IT = {
     "Mage Armor": "Armatura Magica",
     "Magic Missile": "Dardo Incantato",
     "Protection from Evil and Good": "Protezione dal Bene e dal Male",
-    "Ray of Sickness": "Raggio della Malattia",
+    "Ray of Sickness": "Raggio di Infermità",
     "Sanctuary": "Santuario",
     "Searing Smite": "Punizione Cocente",
     "Shield": "Scudo",
@@ -175,6 +176,18 @@ SPELL_NAMES_IT = {
     "Witch Bolt": "Dardo Stregato",
     "Wrathful Smite": "Punizione Collerica",
     "Zephyr Strike": "Colpo dello Zefiro",
+    "Alarm": "Allarme",
+    "Ceremony": "Cerimonia",
+    "Comprehend Languages": "Comprensione dei Linguaggi",
+    "Detect Magic": "Individuazione del Magico",
+    "Detect Poison and Disease": "Individuazione di Veleni e Malattie",
+    "Find Familiar": "Trova Famiglio",
+    "Identify": "Identificare",
+    "Illusory Script": "Scrittura Illusoria",
+    "Purify Food and Drink": "Purificare Cibo e Bevande",
+    "Speak with Animals": "Parlare con gli Animali",
+    "Tenser's Floating Disk": "Disco Fluttuante di Tenser",
+    "Unseen Servant": "Servitore Inosservato",
 
     # --- Livello 2 ---
     "Aganazzar's Scorcher": "Bruciante di Aganazzar",
@@ -225,12 +238,13 @@ SPELL_NAMES_IT = {
     "Prayer of Healing": "Preghiera di Guarigione",
     "Protection from Poison": "Protezione dal Veleno",
     "Pyrotechnics": "Pirotecnica",
-    "Ray of Enfeeblement": "Raggio Indebolente",
+    "Ray of Enfeeblement": "Raggio di Affaticamento",
     "Rope Trick": "Trucco della Corda",
-    "Scorching Ray": "Raggio Cocente",
+    "Scorching Ray": "Raggio Rovente",
     "See Invisibility": "Vedere Invisibilità",
     "Shadow Blade": "Lama d'Ombra",
     "Shatter": "Frantumare",
+    "Skywrite": "Scritta Celeste",
     "Snilloc's Snowball Swarm": "Nuvola di Palle di Neve di Snilloc",
     "Spider Climb": "Camminare sulle Pareti",
     "Spike Growth": "Crescita di Spuntoni",
@@ -242,6 +256,14 @@ SPELL_NAMES_IT = {
     "Warding Wind": "Vento Protettore",
     "Web": "Ragnatela",
     "Zone of Truth": "Zona di Verità",
+
+    "Animal Messenger": "Messaggero Animale",
+    "Augury": "Presagio",
+    "Beast Sense": "Sensi Bestiali",
+    "Gentle Repose": "Riposo Inviolato",
+    "Locate Animals or Plants": "Localizza Animali o Vegetali",
+    "Magic Mouth": "Bocca Magica",
+    "Silence": "Silenzio",
 
     # --- Livello 3 ---
     "Animate Dead": "Animare Morti",
@@ -306,6 +328,13 @@ SPELL_NAMES_IT = {
     "Wall of Water": "Muro d'Acqua",
     "Wind Wall": "Muro di Vento",
 
+    "Feign Death": "Fingere Morte",
+    "Leomund's Tiny Hut": "Capanna Minuscola di Leomund",
+    "Meld into Stone": "Fondersi nella Pietra",
+    "Phantom Steed": "Destriero Fantomatico",
+    "Water Breathing": "Respirare sott'Acqua",
+    "Water Walk": "Camminare sull'Acqua",
+
     # --- Livello 4 ---
     "Arcane Eye": "Occhio Arcano",
     "Aura of Life": "Aura di Vita",
@@ -355,6 +384,8 @@ SPELL_NAMES_IT = {
     "Wall of Fire": "Muro di Fuoco",
     "Watery Sphere": "Sfera d'Acqua",
 
+    "Divination": "Divinazione",
+
     # --- Livello 5 ---
     "Animate Objects": "Animare Oggetti",
     "Antilife Shell": "Guscio Antivita",
@@ -402,7 +433,7 @@ SPELL_NAMES_IT = {
     "Steel Wind Strike": "Colpo di Vento d'Acciaio",
     "Summon Celestial": "Evocare Celestiale",
     "Swift Quiver": "Faretra Rapida",
-    "Synaptic Static": "Statica Sinaptica",
+    "Synaptic Static": "Scossa Sinaptica",
     "Telekinesis": "Telecinesi",
     "Teleportation Circle": "Cerchio di Teletrasporto",
     "Transmute Rock": "Trasmutazione della Pietra",
@@ -411,6 +442,11 @@ SPELL_NAMES_IT = {
     "Wall of Light": "Muro di Luce",
     "Wall of Stone": "Muro di Pietra",
     "Wrath of Nature": "Ira della Natura",
+
+    "Commune": "Comunione",
+    "Commune with Nature": "Comunione con la Natura",
+    "Contact Other Plane": "Contattare Altri Piani",
+    "Rary's Telepathic Bond": "Legame Telepatico di Rary",
 
     # --- Livello 6 ---
     "Arcane Gate": "Cancello Arcano",
@@ -423,6 +459,7 @@ SPELL_NAMES_IT = {
     "Create Homunculus": "Creare Homunculus",
     "Create Undead": "Creare Non Morti",
     "Disintegrate": "Disintegrazione",
+    "Drawmij's Instant Summons": "Evocazione Istantanea di Drawmij",
     "Druid Grove": "Bosco del Druido",
     "Eyebite": "Malocchio",
     "Find the Path": "Trovare il Cammino",
@@ -457,6 +494,8 @@ SPELL_NAMES_IT = {
     "Wall of Thorns": "Muro di Spine",
     "Wind Walk": "Camminare sul Vento",
     "Word of Recall": "Parola del Richiamo",
+
+    "Forbiddance": "Interdizione",
 
     # --- Livello 7 ---
     "Conjure Celestial": "Convocare Celestiale",
@@ -557,6 +596,14 @@ LEGACY_NAMES_IT = {
     "Castigo Cocente": "Punizione Cocente",
     "Castigo Tonante": "Punizione Tonante",
     "Castigo Iracondo": "Punizione Collerica",
+    "Auspicio": "Presagio",
+    "Comprendere Linguaggi": "Comprensione dei Linguaggi",
+    "Rimprovero Infernale": "Intimidire Infernale",
+    "Raggio della Malattia": "Raggio di Infermità",
+    "Raggio Indebolente": "Raggio di Affaticamento",
+    "Raggio Cocente": "Raggio Rovente",
+    "Statica Sinaptica": "Scossa Sinaptica",
+    "Tuono Fragoroso": "Rombo di Tuono",
     # Nota: "Shillelagh" (vecchio nome italiano) e "Folata di Vento" (vecchio
     # nome del trucchetto Gust, ora occupato dall'incantesimo di liv.2 Gust of Wind)
     # NON sono mappati per evitare collisioni: il primo si risolve via `name_en`,
@@ -1359,7 +1406,20 @@ def translate_components(s: str) -> str:
 # Estrazione PDF
 # ---------------------------------------------------------------------------
 
-LEVEL_RE = re.compile(r"^level (\d+) - (\w+)$", re.IGNORECASE)
+LEVEL_RE = re.compile(r"^level (\d+) - (\w+)(?: \(ritual\))?$", re.IGNORECASE)
+CLASS_REF_RE = re.compile(r"^(?P<class>.+?)(?:\s*\[(?P<source>[^\]]+)\])?$")
+
+
+def parse_class_reference(line: str) -> tuple[str, str | None] | None:
+    """Riconosce righe classe pure o classi con tag fonte, es. `Bard [TCoE]`."""
+    match = CLASS_REF_RE.match(line.strip())
+    if not match:
+        return None
+    class_name = match.group("class").strip()
+    if class_name not in CLASS_NAMES:
+        return None
+    source_tag = match.group("source")
+    return class_name, source_tag.strip() if source_tag else None
 FOOTER_DATE_RE = re.compile(r"^\d{2}/\d{2}/\d{2},\s*\d{1,2}:\d{2}\s+List")
 FOOTER_URL_RE = re.compile(r"^https?://")
 
@@ -1397,6 +1457,7 @@ def parse_spells(lines: list[str]) -> list[dict]:
         name_en = lines[i - 1]
         level = int(m.group(1))
         school = m.group(2).lower()
+        ritual = "(ritual)" in lines[i].lower()
 
         casting_time = range_ = components = duration = ""
         meta_keys = ("Casting Time:", "Range:", "Components:", "Duration:")
@@ -1441,11 +1502,19 @@ def parse_spells(lines: list[str]) -> list[dict]:
 
         desc_lines: list[str] = []
         classes: list[str] = []
+        class_source_tags: dict[str, list[str]] = {}
         source = ""
         while j < n:
             ln = lines[j]
-            if ln in CLASS_NAMES:
-                classes.append(ln)
+            class_ref = parse_class_reference(ln)
+            if class_ref:
+                class_name, source_tag = class_ref
+                if class_name not in classes:
+                    classes.append(class_name)
+                if source_tag:
+                    class_source_tags.setdefault(class_name, [])
+                    if source_tag not in class_source_tags[class_name]:
+                        class_source_tags[class_name].append(source_tag)
                 j += 1
                 continue
             if classes:
@@ -1465,6 +1534,7 @@ def parse_spells(lines: list[str]) -> list[dict]:
         spells.append({
             "_name_en_raw": name_en,
             "_level": level,
+            "_ritual": ritual,
             "_school": school,
             "_casting_time_en": casting_time,
             "_range_en": range_,
@@ -1472,6 +1542,7 @@ def parse_spells(lines: list[str]) -> list[dict]:
             "_duration_en": duration,
             "_description_en": description_en,
             "_classes_en": classes,
+            "_class_source_tags_en": class_source_tags,
             "_source": source,
         })
 
@@ -1540,10 +1611,64 @@ def localize(spell_raw: dict, translations: dict) -> dict:
         "description_en": description_en,
         "classes": [CLASS_IT.get(c, c) for c in spell_raw["_classes_en"]],
         "classes_en": spell_raw["_classes_en"],
+        "class_source_tags_en": spell_raw.get("_class_source_tags_en", {}),
+        "ritual": bool(spell_raw.get("_ritual")),
         "source": spell_raw["_source"],
         "aliases": aliases,
         "translated": bool(override.get("description")),
     }
+
+
+def load_manual_patches() -> dict:
+    if MANUAL_PATCHES_FILE.exists():
+        try:
+            return json.loads(MANUAL_PATCHES_FILE.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[WARN] Errore lettura {MANUAL_PATCHES_FILE.name}: {e}")
+    return {}
+
+
+def find_spell(by_id: dict[str, dict], key: str) -> dict | None:
+    if key in by_id:
+        return by_id[key]
+    key_norm = key.casefold()
+    for spell in by_id.values():
+        if str(spell.get("name_en", "")).casefold() == key_norm:
+            return spell
+        if str(spell.get("name", "")).casefold() == key_norm:
+            return spell
+        if key in spell.get("aliases", []):
+            return spell
+    return None
+
+
+def add_class_to_spell(spell: dict, class_en: str, source_tag: str | None = None) -> None:
+    class_it = CLASS_IT.get(class_en, class_en)
+    spell.setdefault("classes_en", [])
+    spell.setdefault("classes", [])
+    if class_en not in spell["classes_en"]:
+        spell["classes_en"].append(class_en)
+    if class_it not in spell["classes"]:
+        spell["classes"].append(class_it)
+    if source_tag:
+        tags = spell.setdefault("class_source_tags_en", {}).setdefault(class_en, [])
+        if source_tag not in tags:
+            tags.append(source_tag)
+
+
+def apply_manual_patches(by_id: dict[str, dict]) -> list[str]:
+    patches = load_manual_patches()
+    warnings: list[str] = []
+    for spell_key, patch in patches.get("add_classes", {}).items():
+        spell = find_spell(by_id, spell_key)
+        if not spell:
+            warnings.append(f"Spell non trovato per patch classi: {spell_key}")
+            continue
+        source_tag = patch.get("source_tag") if isinstance(patch, dict) else None
+        classes = patch.get("classes", []) if isinstance(patch, dict) else patch
+        for class_en in classes:
+            add_class_to_spell(spell, class_en, source_tag)
+    return warnings
 
 
 def main():
@@ -1566,6 +1691,9 @@ def main():
     by_id: dict[str, dict] = {}
     for s in all_spells:
         by_id[s["name"]] = s
+
+    for warning in apply_manual_patches(by_id):
+        print(f"[WARN] {warning}")
 
     print(f"Totale incantesimi: {len(by_id)}")
     translated = sum(1 for s in by_id.values() if s["translated"])

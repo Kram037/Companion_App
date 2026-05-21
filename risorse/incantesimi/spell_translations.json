@@ -1342,5 +1342,101 @@
   },
   "Evoca Spirito Draconico": {
     "description": "Richiami uno spirito draconico. Si manifesta in uno spazio libero che puoi vedere entro gittata. Questa forma corporea usa il blocco statistiche dello Spirito Draconico. Quando lanci l'incantesimo, scegli una famiglia di draghi: Chromatico, Gemma o Metallico. La creatura assomiglia a un drago della famiglia prescelta, che determina certi tratti nel suo blocco statistiche. La creatura scompare quando scende a 0 punti ferita o quando l'incantesimo termina. La creatura è alleata a te e ai tuoi compagni. In combattimento, la creatura condivide il tuo conteggio dell'iniziativa, ma agisce immediatamente dopo di te. Obbedisce ai tuoi comandi verbali (non è richiesta alcuna azione). Se non gliene impartisci nessuno, prende l'azione Schivare e usa il movimento per evitare il pericolo. Ai Livelli Superiori. Quando lanci questo incantesimo usando uno slot di 6° livello o superiore, usa il livello più alto dove appare il livello dell'incantesimo nel blocco statistiche."
+  },
+  "Alarm": {
+    "description": "Imposti una protezione su una porta, una finestra o un'area non piu' grande di un cubo di 6 metri. Finche' dura, una creatura Minuscola o piu' grande che entra o tocca l'area fa scattare l'allarme, salvo le creature che hai escluso al momento del lancio. Puoi scegliere un allarme mentale, percepibile da te entro 1,5 km e capace di svegliarti, oppure un allarme sonoro udibile entro 18 metri."
+  },
+  "Ceremony": {
+    "description": "Compi un rito religioso minore scegliendo uno degli effetti previsti, come espiazione, benedizione dell'acqua, passaggio all'eta' adulta, matrimonio, consacrazione funebre, dedicazione o investitura. Ogni rito applica il proprio beneficio o vincolo per la durata indicata dall'incantesimo; una creatura puo' beneficiare di alcuni riti una sola volta finche' le condizioni non cambiano."
+  },
+  "Comprehend Languages": {
+    "description": "Per la durata comprendi il significato letterale di qualunque lingua parlata che senti. Comprendi anche testi scritti che tocchi, leggendo circa una pagina al minuto. L'incantesimo non decifra messaggi segreti, simboli speciali o codici che non siano una lingua scritta."
+  },
+  "Detect Magic": {
+    "description": "Per la durata percepisci la presenza di magia entro 9 metri. Se la percepisci, puoi usare un'azione per vedere una tenue aura attorno a creature od oggetti visibili nell'area e conoscere la scuola di magia, se presente. L'effetto attraversa molte barriere, ma viene bloccato da pietra, metallo comune, piombo, legno o terra abbastanza spessi."
+  },
+  "Detect Poison and Disease": {
+    "description": "Per la durata percepisci presenza e posizione di veleni, creature velenose e malattie entro 9 metri, e ne identifichi il tipo. L'effetto puo' attraversare molte barriere, ma viene bloccato da pietra, metallo comune, piombo, legno o terra abbastanza spessi."
+  },
+  "Find Familiar": {
+    "description": "Ottieni il servizio di uno spirito che assume la forma di un piccolo animale a tua scelta. Il famiglio agisce indipendentemente ma obbedisce ai tuoi comandi, tira iniziativa propria e non puo' attaccare. Puoi comunicare telepaticamente con lui entro 30 metri, percepire attraverso i suoi sensi, congedarlo temporaneamente o definitivamente, e quando lanci un incantesimo a contatto puoi farlo trasmettere dal famiglio."
+  },
+  "Identify": {
+    "description": "Tocchi un oggetto per tutta la durata del lancio. Se e' magico o influenzato dalla magia, ne apprendi proprieta', uso, eventuale sintonia, cariche e incantesimi attivi; se e' stato creato da un incantesimo, scopri quale. Se tocchi una creatura, apprendi quali incantesimi la stanno influenzando."
+  },
+  "Illusory Script": {
+    "description": "Scrivi un messaggio su un supporto e lo avvolgi in un'illusione. Per te e per le creature designate il testo resta normale; per gli altri puo' apparire incomprensibile o come un messaggio diverso scritto in un'altra grafia o lingua. Chi possiede vera vista legge il messaggio nascosto, e l'incantesimo puo' essere dissolto."
+  },
+  "Purify Food and Drink": {
+    "description": "Tutto il cibo e le bevande non magici entro una sfera di 1,5 metri centrata su un punto entro gittata vengono purificati: veleni e malattie presenti vengono rimossi."
+  },
+  "Speak with Animals": {
+    "description": "Per la durata puoi comprendere verbalmente le bestie e comunicare con loro. La loro conoscenza resta limitata dalla loro intelligenza, ma possono condividere informazioni su luoghi, creature e pericoli percepiti di recente. A discrezione del DM, puoi convincerle a piccoli favori."
+  },
+  "Tenser's Floating Disk": {
+    "description": "Crei un disco di forza orizzontale che fluttua a circa 90 cm da terra e puo' sostenere fino a 250 kg. Il disco resta vicino a te, ti segue se ti allontani entro il limite previsto e svanisce se esci troppo dalla sua portata, se la durata termina o se viene sovraccaricato."
+  },
+  "Unseen Servant": {
+    "description": "Crei una forza invisibile, priva di mente e forma, che esegue compiti semplici a tuo comando entro gittata: recuperare oggetti, pulire, riparare, servire cibo o simili. Non puo' attaccare, ha CA e punti ferita minimi e scompare se scende a 0 punti ferita o se l'incantesimo termina."
+  },
+  "Animal Messenger": {
+    "description": "Affidi un breve messaggio a una bestia Minuscola entro gittata. Scegli un luogo e descrivi un destinatario; la bestia viaggia verso quel luogo per la durata e, se trova il bersaglio, gli comunica il messaggio con la tua voce. Ai livelli superiori aumentano distanza e durata."
+  },
+  "Augury": {
+    "description": "Interroghi un'entita' ultraterrena sul risultato di un'azione che intendi compiere entro i prossimi 30 minuti. Ricevi un presagio: beneficio, sventura, entrambi o nessuno. L'incantesimo non considera eventi successivi che potrebbero cambiare l'esito, e lanci ripetuti prima di un riposo lungo possono produrre risposte casuali."
+  },
+  "Beast Sense": {
+    "description": "Tocchi una bestia consenziente e, per la durata, puoi usare un'azione per vedere e sentire attraverso i suoi sensi finche' resta sul tuo stesso piano di esistenza. Durante questa percezione sei cieco e sordo rispetto ai tuoi sensi normali."
+  },
+  "Gentle Repose": {
+    "description": "Tocchi un cadavere o resti mortali e li proteggi dalla decomposizione per 10 giorni. Per la durata il bersaglio non puo' diventare non morto e il tempo trascorso non conta contro i limiti di incantesimi che riportano in vita i morti."
+  },
+  "Locate Animals or Plants": {
+    "description": "Descrivi o nomini un tipo specifico di bestia o pianta. Concentrandoti sulla natura circostante, apprendi direzione e distanza della creatura o pianta piu' vicina di quel tipo entro 7,5 km, se presente."
+  },
+  "Magic Mouth": {
+    "description": "Impianti un messaggio in un oggetto entro gittata e stabilisci una condizione osservabile che lo faccia pronunciare. Quando la condizione si verifica, una bocca magica appare sull'oggetto e recita il messaggio con la voce e il volume scelti; il messaggio puo' durare fino a 25 parole."
+  },
+  "Silence": {
+    "description": "Crei una sfera di 6 metri di raggio in cui nessun suono puo' essere prodotto o attraversare l'area. Le creature all'interno sono sorde e gli incantesimi con componente verbale non possono essere lanciati li'. L'area puo' essere centrata su un punto e resta immobile."
+  },
+  "Skywrite": {
+    "description": "Fino a dieci parole si formano come nuvole nel cielo in un punto che puoi vedere. Il messaggio resta visibile per la durata, poi si disperde. Un vento forte puo' disperderlo prima."
+  },
+  "Feign Death": {
+    "description": "Tocchi una creatura consenziente e la metti in uno stato indistinguibile dalla morte. Per la durata appare morta a esami non magici e agli effetti che determinano lo stato, e' accecata e incapacitata, la sua velocita' e' 0, ha resistenza a tutti i danni tranne quelli psichici, e malattie o veleni gia' presenti sono sospesi."
+  },
+  "Leomund's Tiny Hut": {
+    "description": "Crei una cupola immobile di forza, abbastanza grande da proteggere te e un gruppo ristretto di creature presenti al lancio. Creature e oggetti designati possono attraversarla liberamente; gli altri non possono entrare, incantesimi ed effetti magici non la attraversano, e l'interno resta confortevole e asciutto."
+  },
+  "Meld into Stone": {
+    "description": "Entri in un blocco o superficie di pietra abbastanza grande da contenerti, fondendoti con esso insieme all'equipaggiamento trasportato. Resti consapevole del passare del tempo ma non puoi vedere fuori; puoi uscire dove sei entrato. Danni o modifiche alla pietra possono ferirti o espellerti."
+  },
+  "Phantom Steed": {
+    "description": "Crei una creatura cavalcabile quasi reale, simile a un destriero, con aspetto scelto da te. Puo' essere cavalcata da te o da una creatura designata, ha velocita' elevata e svanisce gradualmente quando l'incantesimo termina o se subisce danni."
+  },
+  "Water Breathing": {
+    "description": "Fino a dieci creature consenzienti entro gittata ottengono la capacita' di respirare sott'acqua per 24 ore. Le creature influenzate conservano anche il loro normale modo di respirare."
+  },
+  "Water Walk": {
+    "description": "Fino a dieci creature consenzienti entro gittata possono muoversi su liquidi come se fossero terreno solido innocuo. Se una creatura bersaglio e' sommersa in un liquido, viene portata verso la superficie alla velocita' indicata dall'incantesimo."
+  },
+  "Divination": {
+    "description": "Offri una domanda riguardo un obiettivo, evento o attivita' che avverra' entro 7 giorni. Ricevi dal DM una risposta veritiera sotto forma di breve frase, rima o presagio. L'incantesimo non tiene conto di eventi che potrebbero cambiare l'esito, e lanci ripetuti prima di un riposo lungo possono dare risposte casuali."
+  },
+  "Commune": {
+    "description": "Contatti una divinita' o un suo emissario e puoi porre fino a tre domande a cui si possa rispondere si' o no. Le risposte sono corrette entro i limiti della conoscenza dell'entita'. Lanci ripetuti prima di un riposo lungo possono produrre risposte casuali."
+  },
+  "Commune with Nature": {
+    "description": "Entri in comunione con gli spiriti della natura e ottieni informazioni sul territorio entro 4,5 km all'aperto o 90 metri in ambienti sotterranei. Puoi apprendere dati su terreni, acque, piante, minerali, creature potenti, influenze planari, edifici o altri elementi naturali rilevanti."
+  },
+  "Contact Other Plane": {
+    "description": "Proietti la mente verso un'entita' extraplanare per porre fino a cinque domande. Prima devi superare un tiro salvezza su Intelligenza; se fallisci subisci danni psichici e sei mentalmente scosso fino a un riposo lungo. Se riesci, ricevi risposte brevi e veritiere, nei limiti della conoscenza dell'entita'."
+  },
+  "Drawmij's Instant Summons": {
+    "description": "Tocchi un oggetto e lo leghi a uno zaffiro usato come componente. In seguito puoi frantumare lo zaffiro per richiamare l'oggetto nella tua mano se non e' trasportato o indossato da un'altra creatura; se lo e', apprendi chi lo possiede e dove si trova in quel momento."
+  },
+  "Forbiddance": {
+    "description": "Consacri una vasta area contro il viaggio planare. Per la durata, creature non autorizzate non possono teletrasportarsi nell'area o entrarvi tramite mezzi planari. Scegli uno o piu' tipi di creature tra celestiali, elementali, fate, immondi e non morti: quelle creature subiscono danni radianti o necrotici quando entrano o iniziano il turno nell'area. Lanciandolo ogni giorno nello stesso luogo per 30 giorni, l'effetto diventa permanente."
   }
 }
