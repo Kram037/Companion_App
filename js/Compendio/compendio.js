@@ -786,6 +786,7 @@ function _compClassDetail(cls) {
             <div class="comp-rich">${_compRich(_compField(cls, 'equipment') || '')}</div>
         </section>
         ${_compFeaturesSection(cls.features || [])}
+        ${_compFeaturesSection(cls.optional_features || [], 'Privilegi opzionali')}
         ${_compClassSubclassesSection(cls)}
     `;
 }
@@ -1257,6 +1258,7 @@ function _compSubclassAccordionHtml(clsId, sub) {
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
             ${_compSubclassSpellListSection(clsId, sub)}
             ${_compFeaturesSection(features)}
+            ${_compFeaturesSection(sub.optional_features || [], 'Privilegi opzionali')}
         </div>
     </section>`;
 }
@@ -1415,13 +1417,15 @@ function _compSimpleDetail(item, boxes) {
     `;
 }
 
-function _compFeaturesSection(features) {
+function _compFeaturesSection(features, title = 'Privilegi') {
     if (!features || !features.length) return '';
     return `<section class="comp-detail-section">
-        <h3>Privilegi</h3>
+        <h3>${escapeHtml(title)}</h3>
         <div class="comp-feature-list">
             ${features.map(f => `<article class="comp-feature">
                 <h4 class="comp-feature-title">${escapeHtml(_compName(f) || 'Privilegio')}${f.level != null ? ` - Livello ${escapeHtml(String(f.level))}` : ''}</h4>
+                ${f.replaces?.length ? `<div class="comp-feature-note">Sostituisce: ${escapeHtml(_compArrayLabel(f.replaces))}</div>` : ''}
+                ${f.source_short ? `<div class="comp-feature-note">Fonte: ${escapeHtml(f.source_short)}</div>` : ''}
                 <div class="comp-rich">${_compRich(_compField(f, 'description') || f.description_it || f.description_en || '')}</div>
             </article>`).join('')}
         </div>

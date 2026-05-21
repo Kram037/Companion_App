@@ -745,6 +745,13 @@
     color: var(--accent);
 }
 
+.comp-feature-note {
+    margin: -2px 0 6px;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    line-height: 1.25;
+}
+
 .comp-subclass-accordion-list {
     display: flex;
     flex-direction: column;
