@@ -436,7 +436,7 @@
         "features": [
           {
             "name_en": "Expanded Spell List",
-            "name": "Lista Incantesimi Estesa",
+            "name": "Lista Ampliata degli Incantesimi",
             "level": 1,
             "description_en": "The Celestial lets you choose from an expanded list of spells: Cure Wounds/Guiding Bolt (1st), Flaming Sphere/Lesser Restoration (2nd), Daylight/Revivify (3rd), Guardian of Faith/Wall of Fire (4th), Flame Strike/Greater Restoration (5th).",
             "description": "Il Celestiale ti permette di scegliere da una lista estesa di incantesimi quando impari un incantesimo da Warlock. I seguenti incantesimi vengono aggiunti alla lista degli incantesimi da Warlock per te: 1° — Cure Wounds, Guiding Bolt; 2° — Flaming Sphere, Lesser Restoration; 3° — Daylight, Revivify; 4° — Guardian of Faith, Wall of Fire; 5° — Flame Strike, Greater Restoration.",
@@ -452,7 +452,7 @@
           },
           {
             "name_en": "Healing Light",
-            "name": "Luce Curativa",
+            "name": "Luce Guaritrice",
             "level": 1,
             "description_en": "At 1st level, gain a pool of d6s = 1 + warlock level. As a bonus action, heal one creature within 60 ft, spending dice (max per use = Cha mod, min 1). Roll dice, restore HP equal to total. Pool regains all dice at long rest.",
             "description": "Al 1° livello ottieni la capacita' di canalizzare l'energia celestiale per curare le ferite. Hai una riserva di d6 che spendi per alimentare questa cura. Il numero di dadi nella riserva e' pari a 1 + il tuo livello da Warlock. Come azione bonus, puoi curare una creatura che puoi vedere entro 60 piedi, spendendo dadi dalla riserva. Il numero massimo di dadi che puoi spendere in una volta e' pari al tuo modificatore di Carisma (minimo 1). Tira i dadi spesi, sommali e ripristina punti ferita pari al totale. La tua riserva recupera tutti i dadi spesi quando termini un riposo lungo.",
@@ -468,7 +468,7 @@
           },
           {
             "name_en": "Celestial Resistance",
-            "name": "Resistenza Celestiale",
+            "name": "Resilienza Celestiale",
             "level": 10,
             "description_en": "Starting at 10th level, gain temporary hit points whenever you finish a short or long rest equal to your warlock level + Cha mod. Choose up to five creatures you can see at end of rest; they each gain temp hp equal to half warlock level + Cha mod.",
             "description": "Dal 10° livello ottieni punti ferita temporanei ogni volta che termini un riposo breve o lungo. Questi punti ferita temporanei sono pari al tuo livello da Warlock + il tuo modificatore di Carisma. Inoltre, scegli fino a cinque creature che puoi vedere alla fine del riposo. Quelle creature ottengono ognuna punti ferita temporanei pari a meta' del tuo livello da Warlock + il tuo modificatore di Carisma.",
@@ -476,7 +476,7 @@
           },
           {
             "name_en": "Searing Vengeance",
-            "name": "Vendetta Cocente",
+            "name": "Vendetta Incandescente",
             "level": 14,
             "description_en": "Starting at 14th level, when you have to make a death saving throw at the start of your turn, you can instead spring back to your feet with a burst of radiant energy. Regain HP equal to half your hit point maximum, then stand up if you choose. Each creature of your choice within 30 ft takes radiant damage equal to 2d8 + Cha mod, and is blinded until end of current turn. Once per long rest.",
             "description": "Dal 14° livello l'energia radiosa che canalizzi ti permette di resistere alla morte. Quando devi effettuare un tiro salvezza contro morte all'inizio del tuo turno, puoi invece rialzarti in piedi con uno scoppio di energia radiosa. Recuperi punti ferita pari a meta' del tuo massimo dei punti ferita, e poi ti rialzi in piedi se vuoi. Ogni creatura a tua scelta entro 30 piedi subisce danni radiosi pari a 2d8 + il tuo modificatore di Carisma, ed e' accecata fino al termine del turno corrente. Una volta usata, non puoi rifarla finche' non termini un riposo lungo.",
@@ -652,11 +652,11 @@
       {
         "slug": "hexblade",
         "name_en": "The Hexblade",
-        "name": "La Lama Maledetta",
+        "name": "La Lama del Sortilegio",
         "features": [
           {
             "name_en": "Expanded Spell List",
-            "name": "Lista Incantesimi Estesa",
+            "name": "Lista Ampliata degli Incantesimi",
             "level": 1,
             "description_en": "The Hexblade lets you choose from an expanded list of spells: Shield/Wrathful Smite (1st), Blur/Branding Smite (2nd), Blink/Elemental Weapon (3rd), Phantasmal Killer/Staggering Smite (4th), Banishing Smite/Cone of Cold (5th).",
             "description": "La Lama Maledetta ti permette di scegliere da una lista estesa di incantesimi quando impari un incantesimo da Warlock. I seguenti incantesimi vengono aggiunti alla lista degli incantesimi da Warlock per te: 1° — Shield, Wrathful Smite; 2° — Blur, Branding Smite; 3° — Blink, Elemental Weapon; 4° — Phantasmal Killer, Staggering Smite; 5° — Banishing Smite, Cone of Cold.",
@@ -664,7 +664,7 @@
           },
           {
             "name_en": "Hexblade's Curse",
-            "name": "Maledizione della Lama Maledetta",
+            "name": "Maledizione della Lama del Sortilegio",
             "level": 1,
             "description_en": "Starting at 1st level, as a bonus action choose a creature within 30 ft. Cursed for 1 minute. Curse ends early if target dies, you die, or you are incapacitated. While cursed: bonus to damage rolls equal to PB; attack rolls against target are critical on 19 or 20; if target dies, regain HP equal to warlock level + Cha mod (min 1). Once per short or long rest.",
             "description": "Dal 1° livello ottieni la capacita' di scagliare una maledizione funesta su qualcuno. Come azione bonus, scegli una creatura che puoi vedere entro 30 piedi. Il bersaglio e' maledetto per 1 minuto. La maledizione termina prima se il bersaglio muore, tu muori o sei incapacitato. Finche' la maledizione dura, ottieni i seguenti benefici: ottieni un bonus ai tiri per danni contro il bersaglio maledetto pari al tuo bonus di competenza; qualunque tiro per colpire effettui contro il bersaglio maledetto e' un colpo critico con un risultato di 19 o 20 sul d20; se il bersaglio maledetto muore, recuperi punti ferita pari al tuo livello da Warlock + il tuo modificatore di Carisma (minimo 1). Non puoi riusare questa capacita' finche' non termini un riposo breve o lungo.",
@@ -672,7 +672,7 @@
           },
           {
             "name_en": "Hex Warrior",
-            "name": "Guerriero Maledetto",
+            "name": "Guerriero del Sortilegio",
             "level": 1,
             "description_en": "At 1st level, gain proficiency with medium armor, shields, and martial weapons. When you finish a long rest, touch one weapon you are proficient with that lacks the two-handed property: when you attack with it, use Cha instead of Str/Dex for attack and damage rolls. Lasts until next long rest. If you later gain Pact of the Blade, this extends to every pact weapon you conjure.",
             "description": "Al 1° livello acquisisci l'addestramento necessario per armarti efficacemente in battaglia. Ottieni la competenza in armature medie, scudi e armi da guerra. L'influenza del tuo patrono ti permette anche di canalizzare misticamente la tua volonta' attraverso un'arma particolare. Ogni volta che termini un riposo lungo, puoi toccare un'arma con cui sei competente che non abbia la proprieta' a due mani. Quando attacchi con quell'arma, puoi usare il tuo modificatore di Carisma, invece di Forza o Destrezza, per i tiri per colpire e per i danni. Questo beneficio dura finche' non termini un riposo lungo. Se in seguito ottieni la capacita' Patto della Lama, questo beneficio si estende a ogni arma del patto che evochi con quella capacita', indipendentemente dal tipo dell'arma.",
@@ -688,7 +688,7 @@
           },
           {
             "name_en": "Armor of Hexes",
-            "name": "Armatura di Maledizioni",
+            "name": "Armatura dei Sortilegi",
             "level": 10,
             "description_en": "At 10th level, if the target cursed by your Hexblade's Curse hits you with an attack, use your reaction to roll a d6. On a 4 or higher, the attack instead misses you, regardless of its roll.",
             "description": "Dal 10° livello la tua maledizione cresce in potere. Se il bersaglio maledetto dalla tua Maledizione della Lama Maledetta ti colpisce con un tiro per colpire, puoi usare la tua reazione per tirare un d6. Con un risultato di 4 o superiore, l'attacco invece ti manca, indipendentemente dal suo risultato.",
@@ -696,7 +696,7 @@
           },
           {
             "name_en": "Master of Hexes",
-            "name": "Maestro di Maledizioni",
+            "name": "Maestro dei Sortilegi",
             "level": 14,
             "description_en": "Starting at 14th level, when the creature cursed by your Hexblade's Curse dies, you can apply the curse to a different creature you can see within 30 ft, provided you aren't incapacitated. When you apply the curse this way, you don't regain hit points from the death of the previously cursed creature.",
             "description": "Dal 14° livello puoi diffondere la tua Maledizione della Lama Maledetta da una creatura uccisa a un'altra creatura. Quando la creatura maledetta dalla tua Maledizione della Lama Maledetta muore, puoi applicare la maledizione a una creatura diversa che puoi vedere entro 30 piedi, purche' tu non sia incapacitato. Quando applichi la maledizione in questo modo, non recuperi punti ferita dalla morte della creatura maledetta in precedenza.",
@@ -927,7 +927,7 @@
           },
           {
             "name_en": "Favored by the Gods",
-            "name": "Favorito dagli Dei",
+            "name": "Prescelto dagli D?i",
             "level": 1,
             "description_en": "Starting at 1st level, if you fail a saving throw or miss with an attack roll, roll 2d4 and add it to the total, possibly changing the outcome. Once per short or long rest.",
             "description": "Dal 1° livello il potere divino veglia sul tuo destino. Se fallisci un tiro salvezza o manchi con un tiro per colpire, puoi tirare 2d4 e aggiungerli al totale, eventualmente cambiando l'esito. Una volta usata, non puoi rifarla finche' non termini un riposo breve o lungo.",
@@ -935,7 +935,7 @@
           },
           {
             "name_en": "Empowered Healing",
-            "name": "Cura Potenziata",
+            "name": "Guarigione Potenziata",
             "level": 6,
             "description_en": "Starting at 6th level, when you or an ally within 5 ft rolls dice for hit points restored by a spell, spend 1 sorcery point to reroll any number of those dice once. Once per turn. Cannot use if incapacitated.",
             "description": "Dal 6° livello l'energia divina che scorre in te puo' potenziare gli incantesimi di cura. Ogni volta che tu o un alleato entro 5 piedi tirate dadi per determinare il numero di punti ferita ripristinati da un incantesimo, puoi spendere 1 punto stregoneria per ritirare un qualsiasi numero di quei dadi una sola volta, purche' tu non sia incapacitato. Puoi usare questa capacita' solo una volta per turno.",
@@ -943,7 +943,7 @@
           },
           {
             "name_en": "Angelic Form",
-            "name": "Forma Angelica",
+            "name": "Ali Ultraterrene",
             "level": 14,
             "description_en": "Starting at 14th level, as a bonus action manifest a pair of spectral wings from your back, gaining flying speed of 30 ft. Wings last until incapacitated, dead, or dismissed as a bonus action. Affinity determines wings appearance: eagle (good/law), bat (evil/chaos), dragonfly (neutrality).",
             "description": "Dal 14° livello puoi usare un'azione bonus per manifestare un paio di ali spettrali dalla tua schiena. Mentre le ali sono presenti, hai una velocita' di volo di 30 piedi. Le ali durano finche' non sei incapacitato, muori, o le congedi con un'azione bonus. L'affinita' scelta per la tua capacita' Magia Divina determina l'aspetto delle ali spettrali: ali d'aquila per bene o legge, ali di pipistrello per male o caos, ali di libellula per neutralita'.",
@@ -964,11 +964,11 @@
       {
         "slug": "shadow-magic",
         "name_en": "Shadow Magic",
-        "name": "Magia d'Ombra",
+        "name": "Magia delle Ombre",
         "features": [
           {
             "name_en": "Eyes of the Dark",
-            "name": "Occhi dell'Oscurita'",
+            "name": "Occhi dell'Oscuro",
             "level": 1,
             "description_en": "From 1st level, you have darkvision with a range of 120 feet. At 3rd level, you learn the Darkness spell (doesn't count against spells known). You can cast it by spending 2 sorcery points or expending a slot. If you cast it with sorcery points, you can see through the darkness.",
             "description": "Dal 1° livello hai la scurovisione con una portata di 120 piedi. Quando raggiungi il 3° livello in questa classe, impari l'incantesimo Darkness, che non conta nel numero di incantesimi da Stregone che conosci. Inoltre, puoi lanciarlo spendendo 2 punti stregoneria o spendendo uno slot incantesimo. Se lo lanci con i punti stregoneria, puoi vedere attraverso l'oscurita' creata dall'incantesimo.",
@@ -984,7 +984,7 @@
           },
           {
             "name_en": "Hound of Ill Omen",
-            "name": "Mastino dell'Ombra Funesta",
+            "name": "Segugio dei Presagi Nefasti",
             "level": 6,
             "description_en": "At 6th level, as a bonus action spend 3 sorcery points to summon a hound of ill omen targeting one creature within 120 ft. Uses dire wolf stats with changes: Medium monstrosity, temp hp = half sorcerer level, can move through creatures/objects (5 force damage if turn ends in object), automatically knows target's location, target has disadvantage on saves vs your spells while hound is within 5 ft. Disappears if reduced to 0 hp, target reaches 0 hp, or after 5 minutes.",
             "description": "Dal 6° livello ottieni la capacita' di richiamare una creatura ululante di tenebra per molestare i tuoi nemici. Come azione bonus, puoi spendere 3 punti stregoneria per evocare un mastino dell'ombra funesta che bersaglia una creatura che puoi vedere entro 120 piedi. Il mastino usa le statistiche del lupo terribile, con le seguenti modifiche: e' di taglia Media, non Grande, ed e' considerato un mostruosita', non una bestia; appare con punti ferita temporanei pari a meta' del tuo livello da Stregone; puo' muoversi attraverso altre creature e oggetti come se fossero terreno difficile; se termina il suo turno dentro un oggetto, subisce 5 danni da forza; all'inizio del suo turno, conosce automaticamente la posizione del bersaglio. Inoltre, mentre il mastino e' entro 5 piedi dal bersaglio, il bersaglio ha svantaggio ai tiri salvezza contro qualunque incantesimo tu lanci. Il mastino scompare se ridotto a 0 punti ferita, se il bersaglio e' ridotto a 0 punti ferita, o dopo 5 minuti.",
@@ -992,7 +992,7 @@
           },
           {
             "name_en": "Shadow Walk",
-            "name": "Cammino d'Ombra",
+            "name": "Camminare nelle Ombre",
             "level": 14,
             "description_en": "At 14th level, when you are in dim light or darkness, as a bonus action you can teleport up to 120 ft to an unoccupied space you can see that is also in dim light or darkness.",
             "description": "Dal 14° livello ottieni la capacita' di passare da un'ombra all'altra. Quando sei in luce fioca o nell'oscurita', come azione bonus puoi teletrasportarti fino a 120 piedi in uno spazio non occupato che puoi vedere e che si trova anch'esso in luce fioca o nell'oscurita'.",
@@ -1284,11 +1284,11 @@
       {
         "slug": "gloom-stalker",
         "name_en": "Gloom Stalker",
-        "name": "Cacciatore d'Ombre",
+        "name": "Cacciatore delle Tenebre",
         "features": [
           {
             "name_en": "Gloom Stalker Magic",
-            "name": "Magia del Cacciatore d'Ombre",
+            "name": "Magia del Cacciatore delle Tenebre",
             "level": 3,
             "description_en": "Starting at 3rd level, learn additional spells (don't count against your spells known): Disguise Self (3rd), Rope Trick (5th), Fear (9th), Greater Invisibility (13th), Seeming (17th).",
             "description": "Dal 3° livello impari un incantesimo aggiuntivo a determinati livelli in questa classe. Conta come un incantesimo da Ranger per te ma non nel numero di incantesimi che conosci: 3° — Disguise Self; 5° — Rope Trick; 9° — Fear; 13° — Greater Invisibility; 17° — Seeming.",
@@ -1296,7 +1296,7 @@
           },
           {
             "name_en": "Dread Ambusher",
-            "name": "Imboscatore Tremendo",
+            "name": "Imboscata Terrificante",
             "level": 3,
             "description_en": "At 3rd level, +Wisdom modifier bonus to initiative. At start of first turn of each combat, walking speed +10 ft for that turn. If you take the Attack action, make one additional weapon attack as part of that action; if it hits, +1d8 of weapon's damage type.",
             "description": "Al 3° livello padroneggi l'arte dell'imboscata. Puoi concederti un bonus ai tiri di iniziativa pari al tuo modificatore di Saggezza. All'inizio del tuo primo turno di ogni combattimento, la tua velocita' di camminata aumenta di 10 piedi, e dura fino al termine di quel turno. Se esegui l'azione Attaccare in quel turno, puoi effettuare un attacco con arma aggiuntivo come parte di quell'azione. Se quell'attacco colpisce, il bersaglio subisce 1d8 danni extra del tipo dell'arma.",
@@ -1304,7 +1304,7 @@
           },
           {
             "name_en": "Umbral Sight",
-            "name": "Vista d'Ombra",
+            "name": "Vista dell'Ombra",
             "level": 3,
             "description_en": "At 3rd level, gain darkvision out to 60 ft. If you already have darkvision, range increases by 30 ft. While in darkness, you are invisible to any creature that relies on darkvision to see you.",
             "description": "Al 3° livello ottieni scurovisione fino a 60 piedi. Se hai gia' la scurovisione dalla tua razza, la sua portata aumenta di 30 piedi. Sei anche abile nell'eludere le creature che si affidano alla scurovisione. Mentre sei nell'oscurita', sei invisibile a qualunque creatura che si affida alla scurovisione per vederti in quell'oscurita'.",
@@ -1328,7 +1328,7 @@
           },
           {
             "name_en": "Shadowy Dodge",
-            "name": "Schivata d'Ombra",
+            "name": "Schivata dell'Ombra",
             "level": 15,
             "description_en": "Starting at 15th level, when a creature makes an attack roll against you and doesn't have advantage, use your reaction to impose disadvantage on it. Decide before knowing the outcome.",
             "description": "Dal 15° livello puoi schivare in modi imprevisti, con volute di ombra soprannaturale attorno a te. Ogni volta che una creatura effettua un tiro per colpire contro di te e non ha vantaggio al tiro, puoi usare la tua reazione per imporvi svantaggio. Devi usare questa capacita' prima di conoscere l'esito del tiro per colpire.",
@@ -1341,11 +1341,11 @@
       {
         "slug": "horizon-walker",
         "name_en": "Horizon Walker",
-        "name": "Camminatore d'Orizzonti",
+        "name": "Viandante dell'Orizzonte",
         "features": [
           {
             "name_en": "Horizon Walker Magic",
-            "name": "Magia del Camminatore d'Orizzonti",
+            "name": "Magia del Viandante dell'Orizzonte",
             "level": 3,
             "description_en": "Starting at 3rd level, learn additional spells (don't count against your spells known): Protection from Evil and Good (3rd), Misty Step (5th), Haste (9th), Banishment (13th), Teleportation Circle (17th).",
             "description": "Dal 3° livello impari un incantesimo aggiuntivo a determinati livelli in questa classe. Conta come un incantesimo da Ranger per te ma non nel numero di incantesimi che conosci: 3° — Protection from Evil and Good; 5° — Misty Step; 9° — Haste; 13° — Banishment; 17° — Teleportation Circle.",
@@ -1353,7 +1353,7 @@
           },
           {
             "name_en": "Detect Portal",
-            "name": "Rilevare Portale",
+            "name": "Individuazione dei Portali",
             "level": 3,
             "description_en": "At 3rd level, as an action detect distance and direction to closest planar portal within 1 mile. Once per short or long rest.",
             "description": "Al 3° livello ottieni la capacita' di percepire magicamente la presenza di un portale planare. Con un'azione, rilevi la distanza e la direzione del portale planare piu' vicino entro 1 miglio. Una volta usata, non puoi riusarla finche' non termini un riposo breve o lungo.",
@@ -1361,7 +1361,7 @@
           },
           {
             "name_en": "Planar Warrior",
-            "name": "Guerriero Planare",
+            "name": "Combattente Planare",
             "level": 3,
             "description_en": "At 3rd level, as a bonus action choose a creature within 30 ft. The next time you hit it on this turn with a weapon attack, all damage becomes force damage and target takes an extra 1d8 force damage. Increases to 2d8 at 11th.",
             "description": "Al 3° livello impari ad attingere all'energia del multiverso per amplificare i tuoi attacchi. Come azione bonus, scegli una creatura che puoi vedere entro 30 piedi. La prossima volta che colpisci quella creatura in questo turno con un attacco con arma, tutti i danni inflitti dall'attacco diventano danni da forza, e la creatura subisce 1d8 danni da forza extra dall'attacco. Quando raggiungi l'11° livello in questa classe, i danni extra aumentano a 2d8.",
@@ -1369,7 +1369,7 @@
           },
           {
             "name_en": "Ethereal Step",
-            "name": "Passo Eterico",
+            "name": "Passo Etereo",
             "level": 7,
             "description_en": "At 7th level, as a bonus action cast Etherealness without a spell slot, but the spell ends at end of current turn. Once per short or long rest.",
             "description": "Dal 7° livello impari a passare attraverso il Piano Etereo. Come azione bonus nel tuo turno, puoi lanciare l'incantesimo Etherealness con questa capacita', senza spendere uno slot incantesimo, ma l'incantesimo termina al termine del turno corrente. Una volta usata, non puoi riusarla finche' non termini un riposo breve o lungo.",
@@ -1398,11 +1398,11 @@
       {
         "slug": "monster-slayer",
         "name_en": "Monster Slayer",
-        "name": "Cacciatore di Mostri",
+        "name": "Uccisore di Mostri",
         "features": [
           {
             "name_en": "Monster Slayer Magic",
-            "name": "Magia del Cacciatore di Mostri",
+            "name": "Magia dell'Uccisore di Mostri",
             "level": 3,
             "description_en": "Starting at 3rd level, learn additional spells (don't count against your spells known): Protection from Evil and Good (3rd), Zone of Truth (5th), Magic Circle (9th), Banishment (13th), Hold Monster (17th).",
             "description": "Dal 3° livello impari un incantesimo aggiuntivo a determinati livelli in questa classe. Conta come un incantesimo da Ranger per te ma non nel numero di incantesimi che conosci: 3° — Protection from Evil and Good; 5° — Zone of Truth; 9° — Magic Circle; 13° — Banishment; 17° — Hold Monster.",
@@ -1410,7 +1410,7 @@
           },
           {
             "name_en": "Hunter's Sense",
-            "name": "Senso del Cacciatore",
+            "name": "Percezione del Cacciatore",
             "level": 3,
             "description_en": "At 3rd level, as an action choose one creature within 60 ft and learn its damage immunities, resistances, and vulnerabilities. Hidden from divination magic = no immunities/resistances/vulnerabilities. Usable Wisdom mod times per long rest.",
             "description": "Al 3° livello ottieni la capacita' di scrutare una creatura e discernere magicamente come ferirla al meglio. Con un'azione, scegli una creatura che puoi vedere entro 60 piedi. Impari immediatamente se la creatura ha immunita', resistenze o vulnerabilita' ai danni e quali sono. Se la creatura e' nascosta da magia di divinazione, percepisci che non ha immunita', resistenze o vulnerabilita' ai danni. Usabile un numero di volte pari al tuo modificatore di Saggezza (minimo 1), recuperi gli usi a riposo lungo.",
@@ -1434,7 +1434,7 @@
           },
           {
             "name_en": "Magic-User's Nemesis",
-            "name": "Nemesi degli Utilizzatori di Magia",
+            "name": "Nemesi degli Incantatori",
             "level": 11,
             "description_en": "At 11th level, when you see a creature casting a spell or teleporting within 60 ft, use your reaction to try to magically foil it. Wisdom save vs your spell save DC or its spell or teleport fails and is wasted. Once per short or long rest.",
             "description": "Dal 11° livello ottieni la capacita' di sventare la magia di qualcun altro. Quando vedi una creatura lanciare un incantesimo o teletrasportarsi entro 60 piedi, puoi usare la tua reazione per tentare di sventarla magicamente. La creatura deve riuscire in un tiro salvezza su Saggezza contro la tua CD degli incantesimi, o il suo incantesimo o teletrasporto fallisce ed e' sprecato. Una volta usata, non puoi riusarla finche' non termini un riposo breve o lungo.",
@@ -1442,7 +1442,7 @@
           },
           {
             "name_en": "Slayer's Counter",
-            "name": "Contrattacco del Cacciatore",
+            "name": "Contrattacco dell'Uccisore",
             "level": 15,
             "description_en": "At 15th level, if the target of your Slayer's Prey forces you to make a saving throw, use your reaction to make one weapon attack against the quarry. Make this attack immediately before making the save. If the attack hits, your save automatically succeeds.",
             "description": "Dal 15° livello ottieni la capacita' di contrattaccare quando la tua preda cerca di sabotarti. Se il bersaglio della tua Preda del Cacciatore ti forza a effettuare un tiro salvezza, puoi usare la tua reazione per effettuare un attacco con arma contro la preda. Effettui l'attacco immediatamente prima di effettuare il tiro salvezza. Se l'attacco colpisce, il tuo tiro salvezza riesce automaticamente, in aggiunta agli effetti normali dell'attacco.",
@@ -1555,11 +1555,11 @@
       {
         "slug": "oath-of-conquest",
         "name_en": "Oath of Conquest",
-        "name": "Giuramento della Conquista",
+        "name": "Giuramento di Conquista",
         "features": [
           {
             "name_en": "Channel Divinity: Conquering Presence",
-            "name": "Incanalare Divinita': Presenza Conquistatrice",
+            "name": "Incanalare Divinit?: Presenza Conquistatrice",
             "level": 3,
             "description_en": "When you take this oath at 3rd level, as an action force each creature you can see within 30 ft to make a Wisdom save or become frightened of you for 1 minute. Repeat save at end of each turn.",
             "description": "Quando prendi questo giuramento al 3° livello, puoi usare la tua capacita' Incanalare Divinita' per emanare una presenza terrificante. Con un'azione costringi ogni creatura a tua scelta che puoi vedere entro 30 piedi a effettuare un tiro salvezza su Saggezza. Se fallisce, la creatura e' spaventata da te per 1 minuto. La creatura spaventata puo' ripetere il tiro salvezza al termine di ognuno dei suoi turni, terminando l'effetto su di se' con un successo.",
@@ -1567,7 +1567,7 @@
           },
           {
             "name_en": "Channel Divinity: Guided Strike",
-            "name": "Incanalare Divinita': Colpo Guidato",
+            "name": "Incanalare Divinit?: Colpo Guidato",
             "level": 3,
             "description_en": "When you make an attack roll, you can use your Channel Divinity to gain a +10 bonus to the roll. Decide after seeing the roll, before the DM declares hit/miss.",
             "description": "Quando effettui un tiro per colpire, puoi usare la tua capacita' Incanalare Divinita' per ottenere un bonus di +10 al tiro. Compi questa scelta dopo aver visto il tiro, ma prima che il DM dica se l'attacco colpisce o meno.",
@@ -1583,7 +1583,7 @@
           },
           {
             "name_en": "Scornful Rebuke",
-            "name": "Rimprovero Sprezzante",
+            "name": "Intimorire Sprezzante",
             "level": 15,
             "description_en": "Starting at 15th level, whenever a creature hits you with an attack, that creature takes psychic damage equal to your Charisma modifier (minimum +1) if you're not incapacitated.",
             "description": "Dal 15° livello chi osa colpirti viene psichicamente punito per la sua audacia. Ogni volta che una creatura ti colpisce con un attacco, quella creatura subisce danni psichici pari al tuo modificatore di Carisma (minimo +1) se non sei incapacitato.",
@@ -1706,7 +1706,7 @@
         "features": [
           {
             "name_en": "Channel Divinity: Emissary of Peace",
-            "name": "Incanalare Divinita': Emissario di Pace",
+            "name": "Incanalare Divinit?: Emissario di Pace",
             "level": 3,
             "description_en": "When you take this oath at 3rd level, as a bonus action grant yourself +5 to Charisma (Persuasion) checks for 10 minutes.",
             "description": "Quando prendi questo giuramento al 3° livello, puoi usare la tua capacita' Incanalare Divinita' per amplificare la tua presenza con potere divino. Come azione bonus, ti concedi un bonus di +5 alle prove di Carisma (Persuasione) per i prossimi 10 minuti.",
@@ -1714,7 +1714,7 @@
           },
           {
             "name_en": "Channel Divinity: Rebuke the Violent",
-            "name": "Incanalare Divinita': Rimproverare il Violento",
+            "name": "Incanalare Divinit?: Rimproverare il Violento",
             "level": 3,
             "description_en": "Immediately after an attacker within 30 ft deals damage with an attack against a creature other than you, use your reaction to force a Wisdom save. On fail, attacker takes radiant damage equal to damage just dealt. On success, half.",
             "description": "Puoi usare la tua capacita' Incanalare Divinita' per rimproverare chi usa la violenza. Subito dopo che un attaccante entro 30 piedi infligge danni con un attacco contro una creatura diversa da te, puoi usare la tua reazione per costringere l'attaccante a effettuare un tiro salvezza su Saggezza. Se fallisce, l'attaccante subisce danni radianti pari ai danni che ha appena inflitto. Se riesce, subisce la meta' dei danni.",
@@ -1941,7 +1941,7 @@
       {
         "slug": "way-of-the-drunken-master",
         "name_en": "Way of the Drunken Master",
-        "name": "Via dell'Ubriacone",
+        "name": "Via del Maestro Ubriaco",
         "features": [
           {
             "name_en": "Bonus Proficiencies",
@@ -1961,7 +1961,7 @@
           },
           {
             "name_en": "Tipsy Sway",
-            "name": "Ondeggio Brillo",
+            "name": "Andatura Ondeggiante",
             "level": 6,
             "description_en": "Starting at 6th level: Leap to Your Feet (when prone, stand by spending 5 ft of movement instead of half your speed); Redirect Attack (when a creature misses you with a melee attack roll, spend 1 ki point as reaction to cause that attack to hit one creature you can see within 5 ft of you, other than the attacker).",
             "description": "Dal 6° livello puoi muoverti in modi improvvisi e ondeggianti. **Saltare in Piedi** — quando sei prono, puoi alzarti spendendo 5 piedi di movimento, invece della meta' della tua velocita'. **Redirezionare Attacco** — quando una creatura ti manca con un tiro per colpire in mischia, puoi spendere 1 punto ki come reazione per far si' che quell'attacco colpisca una creatura a tua scelta, diversa dall'attaccante, che puoi vedere entro 5 piedi da te.",
@@ -1977,7 +1977,7 @@
           },
           {
             "name_en": "Intoxicated Frenzy",
-            "name": "Frenesia Inebriata",
+            "name": "Frenesia Intossicata",
             "level": 17,
             "description_en": "At 17th level, when you use Flurry of Blows, you can make up to three additional attacks (total of five) provided each attack targets a different creature this turn.",
             "description": "Dal 17° livello ottieni la capacita' di effettuare un numero soverchiante di attacchi contro un gruppo di nemici. Quando usi Raffica di Colpi, puoi effettuare fino a tre attacchi aggiuntivi con essa (fino a un totale di cinque attacchi di Raffica di Colpi), purche' ogni attacco di Raffica di Colpi bersagli una creatura diversa in questo turno.",
@@ -2191,7 +2191,7 @@
         "features": [
           {
             "name_en": "Radiant Sun Bolt",
-            "name": "Dardo Solare Radiante",
+            "name": "Dardo del Sole Radioso",
             "level": 3,
             "description_en": "At 3rd level, you gain a new attack option: a ranged spell attack with range 30 ft, Dex modifier to attack/damage, radiant damage, damage die = your Martial Arts die. When you take Attack action and use this special attack, spend 1 ki point as bonus action to make this special attack twice. Works with Extra Attack.",
             "description": "Dal 3° livello, quando scegli questa tradizione, puoi scagliare cocenti dardi di radianza magica. Ottieni una nuova opzione di attacco che puoi usare con l'azione Attaccare. Questo attacco speciale e' un attacco a distanza con incantesimo con una gittata di 30 piedi. Sei competente con esso e aggiungi il tuo modificatore di Destrezza ai suoi tiri per colpire e ai danni. I suoi danni sono radianti e il suo dado di danno e' un d4. Questo dado cambia man mano che ottieni livelli da Monaco, come mostrato nella colonna Arti Marziali della tabella del Monaco. Quando esegui l'azione Attaccare nel tuo turno e usi questo attacco speciale come parte di essa, puoi spendere 1 punto ki per effettuare l'attacco speciale due volte come azione bonus. Quando ottieni la capacita' Attacco Extra, questo attacco speciale puo' essere usato per uno qualunque degli attacchi che effettui come parte dell'azione Attaccare.",
@@ -2199,7 +2199,7 @@
           },
           {
             "name_en": "Searing Arc Strike",
-            "name": "Colpo ad Arco Cocente",
+            "name": "Colpo dell'Onda Incandescente",
             "level": 6,
             "description_en": "At 6th level, immediately after taking the Attack action, spend 2 ki points to cast Burning Hands as a bonus action. Spend additional ki points to upcast (max ki = half monk level).",
             "description": "Dal 6° livello ottieni la capacita' di incanalare il tuo ki in cocenti onde di energia. Subito dopo aver eseguito l'azione Attaccare nel tuo turno, puoi spendere 2 punti ki per lanciare Burning Hands come azione bonus. Puoi spendere punti ki aggiuntivi per lanciare Burning Hands a un livello superiore. Ogni punto ki aggiuntivo speso aumenta il livello dell'incantesimo di 1. Il numero massimo di punti ki (2 piu' eventuali punti aggiuntivi) che puoi spendere sull'incantesimo e' pari alla meta' del tuo livello da Monaco.",
@@ -2207,7 +2207,7 @@
           },
           {
             "name_en": "Searing Sunburst",
-            "name": "Esplosione Solare Cocente",
+            "name": "Esplosione Solare Incandescente",
             "level": 11,
             "description_en": "At 11th level, as an action create an orb hurled at a point within 150 ft. Each creature in 20-ft-radius sphere makes Constitution save or takes 2d6 radiant damage. Total cover negates. Spend up to 3 ki points; each adds 2d6.",
             "description": "Dal 11° livello ottieni la capacita' di creare un orbe di luce che esplode in una devastante esplosione. Con un'azione crei magicamente un orbe e lo scagli a un punto a tua scelta entro 150 piedi, dove esplode in una sfera di luce radiante per un istante breve ma letale. Ogni creatura in quella sfera con un raggio di 20 piedi deve riuscire in un tiro salvezza su Costituzione o subire 2d6 danni radianti. Una creatura non deve effettuare il tiro salvezza se si trova dietro copertura totale opaca. Puoi aumentare i danni della sfera spendendo punti ki. Ogni punto speso, fino a un massimo di 3, aumenta i danni di 2d6.",
@@ -2810,7 +2810,7 @@
       {
         "slug": "war-magic",
         "name_en": "War Magic",
-        "name": "Magia da Guerra",
+        "name": "Magia della Guerra",
         "features": [
           {
             "name_en": "Arcane Deflection",
@@ -2822,7 +2822,7 @@
           },
           {
             "name_en": "Tactical Wit",
-            "name": "Astuzia Tattica",
+            "name": "Ingegno Tattico",
             "level": 2,
             "description_en": "Starting at 2nd level, you can give yourself a bonus to your initiative rolls equal to your Intelligence modifier.",
             "description": "Dal 2° livello la tua acuta capacita' di valutare situazioni tattiche ti permette di agire rapidamente in battaglia. Puoi concederti un bonus ai tuoi tiri di iniziativa pari al tuo modificatore di Intelligenza.",
@@ -2830,7 +2830,7 @@
           },
           {
             "name_en": "Power Surge",
-            "name": "Picco di Potere",
+            "name": "Impulso di Potere",
             "level": 6,
             "description_en": "Starting at 6th level, store power surges (max = Int mod, min 1). After long rest = 1; gain one when ending a spell with Dispel Magic/Counterspell; if you end a short rest with none, gain one. Once per turn when dealing damage with a wizard spell, spend one to add force damage equal to half your wizard level.",
             "description": "Dal 6° livello puoi immagazzinare energia magica dentro di te per potenziare in seguito i tuoi incantesimi che infliggono danni. Puoi immagazzinare un numero massimo di picchi di potere pari al tuo modificatore di Intelligenza (minimo 1). Ogni volta che termini un riposo lungo, il tuo numero di picchi di potere si resetta a uno. Ogni volta che termini con successo un incantesimo con Dispel Magic o Counterspell, ottieni un picco di potere, mentre rubi magia dall'incantesimo che hai sventato. Se termini un riposo breve senza picchi di potere, ottieni un picco di potere. Una volta per turno, quando infliggi danni a una creatura o a un oggetto con un incantesimo da Mago, puoi spendere un picco di potere per infliggere danni da forza extra a quel bersaglio. I danni extra sono pari alla meta' del tuo livello da Mago.",
@@ -2838,7 +2838,7 @@
           },
           {
             "name_en": "Durable Magic",
-            "name": "Magia Duratura",
+            "name": "Magia Durevole",
             "level": 10,
             "description_en": "Beginning at 10th level, while you maintain concentration on a spell, you have a +2 bonus to AC and all saving throws.",
             "description": "Dal 10° livello la magia che incanali ti aiuta a difenderti dai danni. Mentre mantieni la concentrazione su un incantesimo, hai un bonus di +2 alla CA e a tutti i tiri salvezza.",
@@ -2846,7 +2846,7 @@
           },
           {
             "name_en": "Deflecting Shroud",
-            "name": "Manto Deflettente",
+            "name": "Sudario di Deviazione",
             "level": 14,
             "description_en": "At 14th level, when you use Arcane Deflection, magical energy arcs from you. Up to three creatures of your choice within 60 ft each take force damage equal to half your wizard level.",
             "description": "Dal 14° livello la tua Deflessione Arcana e' infusa di magia letale. Quando usi la tua capacita' Deflessione Arcana, puoi far si' che l'energia magica si propaghi da te. Fino a tre creature a tua scelta entro 60 piedi subiscono ognuna danni da forza pari alla meta' del tuo livello da Mago.",
@@ -2959,7 +2959,7 @@
       {
         "slug": "inquisitive",
         "name_en": "Inquisitive",
-        "name": "Investigatore",
+        "name": "Indagatore",
         "features": [
           {
             "name_en": "Ear for Deceit",
@@ -2987,7 +2987,7 @@
           },
           {
             "name_en": "Steady Eye",
-            "name": "Occhio Fermo",
+            "name": "Occhio di Lince",
             "level": 9,
             "description_en": "At 9th level, you have advantage on Wisdom (Perception) and Intelligence (Investigation) checks if you move no more than half your speed on the same turn.",
             "description": "Al 9° livello hai vantaggio a qualunque prova di Saggezza (Percezione) o Intelligenza (Indagare) se non ti muovi di piu' della meta' della tua velocita' nello stesso turno.",
@@ -3003,7 +3003,7 @@
           },
           {
             "name_en": "Eye for Weakness",
-            "name": "Occhio per le Debolezze",
+            "name": "Individuare il Punto Debole",
             "level": 17,
             "description_en": "At 17th level, while Insightful Fighting applies to a creature, your Sneak Attack damage against it increases by 3d6.",
             "description": "Al 17° livello impari a sfruttare le debolezze di una creatura studiandone attentamente le tattiche e i movimenti. Mentre la tua capacita' Combattimento Intuitivo si applica a una creatura, il danno del tuo Attacco Furtivo contro quella creatura aumenta di 3d6.",
@@ -3016,7 +3016,7 @@
       {
         "slug": "mastermind",
         "name_en": "Mastermind",
-        "name": "Mente Suprema",
+        "name": "Pianificatore",
         "features": [
           {
             "name_en": "Master of Intrigue",
@@ -3028,7 +3028,7 @@
           },
           {
             "name_en": "Master of Tactics",
-            "name": "Maestro di Tattica",
+            "name": "Maestro di Tattiche",
             "level": 3,
             "description_en": "Starting at 3rd level, you can use the Help action as a bonus action. When you use Help to aid an ally in attacking a creature, the target can be within 30 ft (instead of 5 ft) if they can see/hear you.",
             "description": "Dal 3° livello puoi usare l'azione Aiutare come azione bonus. Inoltre, quando usi l'azione Aiutare per assistere un alleato nell'attaccare una creatura, il bersaglio di quell'attacco puo' trovarsi entro 30 piedi da te, anziche' entro 5 piedi, se il bersaglio puo' vederti o sentirti.",
@@ -3044,7 +3044,7 @@
           },
           {
             "name_en": "Misdirection",
-            "name": "Diversivo",
+            "name": "Fuorviare",
             "level": 13,
             "description_en": "Beginning at 13th level, when you are targeted by an attack while a creature within 5 ft is granting you cover against that attack, use your reaction to have the attack target that creature instead.",
             "description": "Dal 13° livello puoi a volte far si' che un'altra creatura subisca un attacco destinato a te. Quando sei bersaglio di un attacco mentre una creatura entro 5 piedi ti sta concedendo copertura contro quell'attacco, puoi usare la tua reazione per far si' che l'attacco bersagli quella creatura invece di te.",
@@ -3052,7 +3052,7 @@
           },
           {
             "name_en": "Soul of Deceit",
-            "name": "Anima dell'Inganno",
+            "name": "Anima Ingannevole",
             "level": 17,
             "description_en": "Starting at 17th level, your thoughts can't be read by telepathy unless you allow it. Present false thoughts via Deception vs Insight. Magic determining truth indicates you are truthful if you choose; you can't be magically compelled to tell truth.",
             "description": "Dal 17° livello i tuoi pensieri non possono essere letti tramite telepatia o altri mezzi a meno che tu non lo permetta. Puoi presentare pensieri falsi effettuando una prova di Carisma (Inganno) contrapposta a una prova di Saggezza (Intuizione) del lettore. Inoltre, qualunque cosa tu dica, la magia che determinerebbe se stai dicendo la verita' indica che lo stai facendo se cosi' scegli, e non puoi essere costretto magicamente a dire la verita'.",
@@ -3126,7 +3126,7 @@
           },
           {
             "name_en": "Survivalist",
-            "name": "Sopravvivenza",
+            "name": "Survivalista",
             "level": 3,
             "description_en": "When you choose this archetype at 3rd level, you gain proficiency in Nature and Survival if you don't already have it. Your proficiency bonus is doubled for any check using either of those.",
             "description": "Quando scegli questo archetipo al 3° livello, ottieni la competenza nelle abilita' Natura e Sopravvivenza se non le hai gia'. Il tuo bonus di competenza e' raddoppiato per qualunque prova di caratteristica che effettui usando una di quelle competenze.",
@@ -3142,7 +3142,7 @@
           },
           {
             "name_en": "Ambush Master",
-            "name": "Maestro dell'Imboscata",
+            "name": "Maestro di Imboscate",
             "level": 13,
             "description_en": "Starting at 13th level, advantage on initiative rolls. The first creature you hit during the first round of a combat: attack rolls against that target have advantage until the start of your next turn.",
             "description": "Dal 13° livello eccelli nel guidare imboscate e nell'agire per primo in un combattimento. Hai vantaggio ai tiri di iniziativa. Inoltre, la prima creatura che colpisci durante il primo round di un combattimento diventa piu' facile da colpire per te e per gli altri: i tiri per colpire contro quel bersaglio hanno vantaggio fino all'inizio del tuo turno successivo.",
@@ -3216,7 +3216,7 @@
         "features": [
           {
             "name_en": "Fancy Footwork",
-            "name": "Passo Elegante",
+            "name": "Gioco di Gambe",
             "level": 3,
             "description_en": "When you choose this archetype at 3rd level, during your turn if you make a melee attack against a creature, that creature can't make opportunity attacks against you for the rest of your turn.",
             "description": "Quando scegli questo archetipo al 3° livello, impari a colpire e poi defilarti senza ritorsioni. Durante il tuo turno, se effettui un attacco in mischia contro una creatura, quella creatura non puo' effettuare attacchi di opportunita' contro di te per il resto del tuo turno.",
@@ -3224,7 +3224,7 @@
           },
           {
             "name_en": "Rakish Audacity",
-            "name": "Audacia Spavalda",
+            "name": "Audacia del Fanfarone",
             "level": 3,
             "description_en": "Starting at 3rd level, you can give yourself a bonus to initiative rolls equal to your Charisma modifier. You don't need advantage to use Sneak Attack against a creature if you are within 5 ft of it, no other creatures are within 5 ft of you, and you don't have disadvantage on the attack roll.",
             "description": "Dal 3° livello la tua sicurezza ti spinge in battaglia. Puoi concederti un bonus ai tiri di iniziativa pari al tuo modificatore di Carisma. Ottieni anche un modo aggiuntivo di usare il tuo Attacco Furtivo: non hai bisogno di vantaggio al tiro per colpire per usare l'Attacco Furtivo contro una creatura se sei entro 5 piedi da essa, nessun'altra creatura e' entro 5 piedi da te e non hai svantaggio al tiro per colpire. Tutte le altre regole dell'Attacco Furtivo si applicano comunque.",
@@ -3232,7 +3232,7 @@
           },
           {
             "name_en": "Panache",
-            "name": "Stile",
+            "name": "Spavalderia",
             "level": 9,
             "description_en": "At 9th level, as an action make a Charisma (Persuasion) check vs target's Wisdom (Insight). On success vs hostile: target has disadvantage on attacks against others and can't make opportunity attacks against others (1 minute, ends if companion attacks/affects target or 60 ft apart). On success vs non-hostile: charmed for 1 minute (friendly acquaintance), ends if you/companions harm it.",
             "description": "Al 9° livello il tuo fascino diventa straordinariamente avvincente. Con un'azione puoi effettuare una prova di Carisma (Persuasione) contrapposta a una prova di Saggezza (Intuizione) di una creatura. La creatura deve poterti sentire e dovete condividere una lingua. Se riesci e la creatura e' ostile, ha svantaggio ai tiri per colpire contro bersagli diversi da te e non puo' effettuare attacchi di opportunita' contro bersagli diversi da te. Questo effetto dura 1 minuto, finche' uno dei tuoi compagni attacca il bersaglio o lo colpisce con un incantesimo, o finche' tu e il bersaglio siete a piu' di 60 piedi di distanza. Se riesci e la creatura non e' ostile, e' affascinata per 1 minuto. Mentre e' affascinata, ti considera un amico di vecchia data. Questo effetto termina immediatamente se tu o i tuoi compagni le fate qualcosa di dannoso.",
@@ -3267,7 +3267,7 @@
         "features": [
           {
             "name_en": "Arcane Archer Lore",
-            "name": "Sapere dell'Arciere Arcano",
+            "name": "Conoscenze dell'Arciere Arcano",
             "level": 3,
             "description_en": "At 3rd level, gain proficiency in Arcana or Nature, and learn either Prestidigitation or Druidcraft.",
             "description": "Al 3° livello impari teoria magica o alcuni segreti della natura. Scegli di ottenere la competenza nell'abilita' Arcano o Natura, e scegli di imparare il trucchetto Prestidigitation o Druidcraft.",
@@ -3291,7 +3291,7 @@
           },
           {
             "name_en": "Curving Shot",
-            "name": "Tiro Curvante",
+            "name": "Tiro Curvo",
             "level": 7,
             "description_en": "At 7th level, when you make an attack roll with a magic arrow and miss, use a bonus action to reroll against a different target within 60 ft.",
             "description": "Al 7° livello impari a dirigere una freccia errante verso un nuovo bersaglio. Quando effettui un tiro per colpire con una freccia magica e fallisci, puoi usare un'azione bonus per ritirare il tiro per colpire contro un bersaglio diverso entro 60 piedi dal bersaglio originario.",
@@ -3402,7 +3402,7 @@
       {
         "slug": "cavalier",
         "name_en": "Cavalier",
-        "name": "Cavaliere",
+        "name": "Cavaliere Errante",
         "features": [
           {
             "name_en": "Bonus Proficiency",
@@ -3422,7 +3422,7 @@
           },
           {
             "name_en": "Unwavering Mark",
-            "name": "Marchio Inamovibile",
+            "name": "Marchio Incrollabile",
             "level": 3,
             "description_en": "At 3rd level, when you hit with a melee weapon attack, mark the creature until end of next turn. Marked creature within 5 ft has disadvantage on attacks not targeting you. If marked creature damages another, you can make a special melee attack as bonus action with advantage; on hit deals extra damage equal to half your fighter level. Usable Strength mod times per long rest.",
             "description": "Dal 3° livello puoi minacciare i tuoi nemici, frustrandone gli attacchi e punendoli per aver fatto del male agli altri. Quando colpisci una creatura con un attacco con arma da mischia, puoi marchiare la creatura fino al termine del tuo turno successivo. L'effetto termina prima se sei incapacitato o muori, o se qualcun altro la marchia. Mentre si trova entro 5 piedi da te, una creatura marchiata da te ha svantaggio a qualunque tiro per colpire che non bersagli te. Inoltre, se una creatura marchiata da te infligge danni a chiunque diverso da te, puoi effettuare un attacco speciale con arma da mischia contro la creatura marchiata come azione bonus nel tuo turno successivo. Hai vantaggio al tiro per colpire e, se colpisce, l'attacco infligge danni extra al bersaglio pari alla meta' del tuo livello da Guerriero. Puoi effettuare questo attacco speciale un numero di volte pari al tuo modificatore di Forza (minimo 1), recuperi tutti gli usi a riposo lungo.",
@@ -3446,7 +3446,7 @@
           },
           {
             "name_en": "Ferocious Charger",
-            "name": "Caricatore Feroce",
+            "name": "Carica Feroce",
             "level": 15,
             "description_en": "Starting at 15th level, if you move 10+ ft in a straight line right before attacking and hit, target makes a Strength save (DC 8+PB+Str) or be knocked prone. Once per turn.",
             "description": "Dal 15° livello puoi travolgere i tuoi nemici, sia a cavallo sia a piedi. Se ti muovi di almeno 10 piedi in linea retta poco prima di attaccare una creatura e la colpisci, il bersaglio deve riuscire in un tiro salvezza su Forza (CD 8 + bonus di competenza + modificatore di Forza) o cadere prono. Puoi usare questa capacita' solo una volta per turno.",
@@ -3739,7 +3739,7 @@
           },
           {
             "name_en": "Strength Before Death",
-            "name": "Forza Prima della Morte",
+            "name": "Forza di Fronte alla Morte",
             "level": 18,
             "description_en": "Starting at 18th level, if damage reduces you to 0 HP, use your reaction to delay falling unconscious and immediately take an extra turn. Death saves and damage at 0 HP work normally during it. Once per long rest.",
             "description": "Dal 18° livello il tuo spirito combattivo puo' ritardare la stretta della morte. Se subisci danni che ti riducono a 0 punti ferita, puoi usare la tua reazione per ritardare il cadere privo di sensi e puoi immediatamente eseguire un turno extra. Mentre hai 0 punti ferita durante quel turno extra, subire danni causa fallimenti ai tiri salvezza contro morte come al solito, e tre fallimenti possono comunque ucciderti. Quando il turno extra termina, cadi privo di sensi se hai ancora 0 punti ferita. Una volta usata, non puoi riutilizzarla finche' non termini un riposo lungo.",
@@ -3835,11 +3835,11 @@
       {
         "slug": "circle-of-dreams",
         "name_en": "Circle of Dreams",
-        "name": "Cerchio dei Sogni",
+        "name": "Circolo dei Sogni",
         "features": [
           {
             "name_en": "Balm of the Summer Court",
-            "name": "Balsamo della Corte Estiva",
+            "name": "Balsamo della Corte dell'Estate",
             "level": 2,
             "description_en": "At 2nd level, you have a pool of fey energy: a number of d6s equal to your druid level. As a bonus action, choose an ally within 120 ft and spend up to half your druid level dice. Roll them; ally regains HP equal to the total and gains 1 temp HP per die spent. Recover all dice on a long rest.",
             "description": "Al 2° livello sei imbevuto delle benedizioni della Corte Estiva. Sei una fonte di energia che offre sollievo dalle ferite. Hai una riserva di energia fatata rappresentata da un numero di d6 pari al tuo livello da Druido. Con un'azione bonus puoi scegliere un alleato che puoi vedere entro 120 piedi e spendere un numero di dadi pari o inferiore alla meta' del tuo livello da Druido. Tira i dadi spesi e somma i risultati. Il bersaglio recupera punti ferita pari al totale e ottiene 1 punto ferita temporaneo per ogni dado speso. Recuperi i dadi spesi al termine di un riposo lungo.",
@@ -3847,7 +3847,7 @@
           },
           {
             "name_en": "Hearth of Moonlight and Shadow",
-            "name": "Focolare di Luce Lunare e Ombra",
+            "name": "Focolare della Luce Lunare e dell'Ombra",
             "level": 6,
             "description_en": "At 6th level, during a short or long rest, touch a point in space; an invisible 30-ft radius sphere appears (total cover blocks). You and allies inside gain +5 to Stealth and Perception, and any open-flame light isn't visible outside. Vanishes at end of rest or when you leave.",
             "description": "Al 6° livello casa puo' essere ovunque tu sia. Durante un riposo breve o lungo puoi invocare il potere oscuro della Corte del Crepuscolo per aiutarti a proteggere la sosta. All'inizio del riposo tocchi un punto nello spazio e una sfera invisibile di 30 piedi di raggio appare centrata su quel punto (la copertura totale la blocca). Mentre sono dentro la sfera, tu e i tuoi alleati ottenete un bonus di +5 alle prove di Destrezza (Furtivita') e Saggezza (Percezione), e ogni luce proveniente da fiamme aperte all'interno (un fuoco da campo, torce, ecc.) non e' visibile dall'esterno. La sfera svanisce al termine del riposo o quando lasci la sfera.",
@@ -3863,7 +3863,7 @@
           },
           {
             "name_en": "Walker in Dreams",
-            "name": "Viaggiatore nei Sogni",
+            "name": "Viandante dei Sogni",
             "level": 14,
             "description_en": "At 14th level, when you finish a short rest, cast one of (without slot or material): Dream (with you as messenger), Scrying, or Teleportation Circle. The Teleportation Circle opens to the last location of your last long rest on this plane. Once per long rest.",
             "description": "Al 14° livello la magia della Selva Fatata ti concede la capacita' di viaggiare mentalmente o fisicamente attraverso le terre dei sogni. Quando termini un riposo breve, puoi lanciare uno dei seguenti incantesimi senza spendere uno slot ne' richiedere componenti materiali: Dream (con te come messaggero), Scrying o Teleportation Circle. Questo uso di Teleportation Circle e' speciale: invece di aprire un portale verso un cerchio di teletrasporto permanente, apre un portale verso l'ultima posizione in cui hai terminato un riposo lungo sul tuo piano d'esistenza attuale. Se non hai mai effettuato un riposo lungo sul tuo piano attuale, l'incantesimo fallisce ma non e' sprecato. Una volta usata, non puoi riutilizzarla finche' non termini un riposo lungo.",
@@ -3925,11 +3925,11 @@
       {
         "slug": "circle-of-the-shepherd",
         "name_en": "Circle of the Shepherd",
-        "name": "Cerchio del Pastore",
+        "name": "Circolo del Pastore",
         "features": [
           {
             "name_en": "Speech of the Woods",
-            "name": "Eloquio dei Boschi",
+            "name": "Lingua dei Boschi",
             "level": 2,
             "description_en": "At 2nd level, learn to speak/read/write Sylvan. Beasts can understand your speech, and you can decipher their noises. Friendly beasts can relay what they've seen recently.",
             "description": "Al 2° livello ottieni la capacita' di conversare con bestie e molte fatate. Impari a parlare, leggere e scrivere il Silvano. Inoltre le bestie possono comprendere il tuo eloquio e ottieni la capacita' di decifrare i loro versi e movimenti. La maggior parte delle bestie manca dell'intelligenza per comunicare o comprendere concetti sofisticati, ma una bestia amichevole puo' riferire cio' che ha visto o sentito di recente. Questa capacita' non concede di per se' una particolare amicizia con le bestie, ma puoi combinarla con doni per ottenerne i favori.",
@@ -3945,7 +3945,7 @@
           },
           {
             "name_en": "Mighty Summoner",
-            "name": "Potente Evocatore",
+            "name": "Evocatore Possente",
             "level": 6,
             "description_en": "At 6th level, beasts and fey you summon/conjure with a spell gain: 2 extra HP per Hit Die; their natural weapon damage counts as magical.",
             "description": "Dal 6° livello le bestie e le fatate che evochi sono piu' resistenti del normale. Qualunque bestia o fatata evocata o creata da un incantesimo che lanci ottiene due benefici: appare con punti ferita extra (2 in piu' per Dado Vita posseduto); i danni dei suoi attacchi naturali contano come magici per superare immunita' e resistenze agli attacchi e ai danni non magici.",
@@ -4257,7 +4257,7 @@
           },
           {
             "name_en": "Channel Divinity: Artisan's Blessing",
-            "name": "Incanalare Divinita': Benedizione dell'Artigiano",
+            "name": "Incanalare Divinit?: Benedizione dell'Artigiano",
             "level": 2,
             "description_en": "At 2nd level, conduct a 1-hour ritual to craft a nonmagical metal item (weapon, armor, 10 ammo, set of tools, etc.) worth up to 100 gp. You must lay out metal of equal value to be transformed.",
             "description": "Dal 2° livello puoi usare Incanalare Divinita' per creare oggetti semplici. Conduci un rituale di un'ora che crea un oggetto non magico che deve includere del metallo: un'arma semplice o da guerra, un'armatura, dieci pezzi di munizioni, un set di strumenti o un altro oggetto metallico. La creazione si completa al termine dell'ora coalescendo in uno spazio non occupato a tua scelta su una superficie entro 5 piedi da te. L'oggetto creato puo' valere fino a 100 mo. Come parte del rituale devi disporre del metallo (anche monete) di valore pari alla creazione. Il metallo si trasforma irrecuperabilmente nell'oggetto, formando magicamente anche le parti non metalliche. Il rituale puo' creare un duplicato di un oggetto non magico contenente metallo, come una chiave, se possiedi l'originale durante il rituale.",
@@ -4298,7 +4298,7 @@
         "features": [
           {
             "name_en": "Circle of Mortality",
-            "name": "Cerchio della Mortalita'",
+            "name": "Cerchio di Mortalit?",
             "level": 1,
             "description_en": "At 1st level, when you would normally roll dice to restore HP with a spell to a creature at 0 HP, instead use the highest number for each die. You also learn Spare the Dying (range 30 ft, bonus action; doesn't count against cantrips known).",
             "description": "Al 1° livello ottieni la capacita' di manipolare la linea fra la vita e la morte. Quando normalmente dovresti tirare uno o piu' dadi per ripristinare punti ferita con un incantesimo a una creatura a 0 pf, usi invece il risultato massimo per ogni dado. Inoltre impari il trucchetto Spare the Dying, che non conta nel numero di trucchetti da Chierico che conosci. Per te ha gittata di 30 piedi e puoi lanciarlo come azione bonus.",
@@ -4314,7 +4314,7 @@
           },
           {
             "name_en": "Channel Divinity: Path to the Grave",
-            "name": "Incanalare Divinita': Sentiero della Tomba",
+            "name": "Incanalare Divinit?: Verso la Tomba",
             "level": 2,
             "description_en": "At 2nd level, as an action choose one creature within 30 ft, cursing it until end of next turn. The next time you or an ally hits the cursed creature, it has vulnerability to all of that attack's damage, then the curse ends.",
             "description": "Dal 2° livello puoi usare Incanalare Divinita' per marchiare la forza vitale di una creatura per la distruzione. Con un'azione scegli una creatura che puoi vedere entro 30 piedi e la maledici fino al termine del tuo turno successivo. La prossima volta che tu o un tuo alleato colpite la creatura maledetta con un attacco, essa ha vulnerabilita' a tutti i danni inflitti da quell'attacco, e poi la maledizione termina.",
@@ -4322,7 +4322,7 @@
           },
           {
             "name_en": "Sentinel at Death's Door",
-            "name": "Sentinella alla Soglia della Morte",
+            "name": "Sentinella alla Porta della Morte",
             "level": 6,
             "description_en": "At 6th level, as a reaction when you or an ally within 30 ft suffers a critical hit, you can turn it into a normal hit (any crit-triggered effects canceled). Usable Wisdom mod times per long rest.",
             "description": "Al 6° livello ottieni la capacita' di ostacolare il progresso della morte. Come reazione, quando tu o un alleato che puoi vedere entro 30 piedi subite un colpo critico, puoi trasformare quell'attacco in un colpo normale. Eventuali effetti scatenati dal critico sono annullati. Usabile un numero di volte pari al tuo modificatore di Saggezza (minimo 1), recuperi tutti gli usi a riposo lungo.",
@@ -4330,7 +4330,7 @@
           },
           {
             "name_en": "Potent Spellcasting",
-            "name": "Lancio di Incantesimi Potenziato",
+            "name": "Incantesimi Potenti",
             "level": 8,
             "description_en": "Starting at 8th level, you add your Wisdom modifier to the damage you deal with any cleric cantrip.",
             "description": "Dall'8° livello, aggiungi il tuo modificatore di Saggezza ai danni che infliggi con qualunque trucchetto da Chierico.",
@@ -5013,7 +5013,7 @@
       {
         "slug": "college-of-glamour",
         "name_en": "College of Glamour",
-        "name": "Collegio del Lustro",
+        "name": "Collegio dell'Incanto",
         "features": [
           {
             "name_en": "Mantle of Inspiration",
@@ -5025,7 +5025,7 @@
           },
           {
             "name_en": "Enthralling Performance",
-            "name": "Performance Affascinante",
+            "name": "Esibizione Estasiante",
             "level": 3,
             "description_en": "Starting at 3rd level, after performing for 1 minute, choose up to your Charisma mod humanoids within 60 ft. Wisdom save vs your spell DC or charmed for 1 hour (idolizes you). Ends if attacked, damaged, or sees you attack its allies. Once per short or long rest.",
             "description": "Dal 3° livello puoi caricare la tua performance con magia fatata seducente. Se ti esibisci per almeno 1 minuto, puoi tentare di ispirare meraviglia nel tuo pubblico cantando, recitando una poesia o danzando. Al termine della performance, scegli un numero di umanoidi entro 60 piedi che hanno guardato e ascoltato l'intera esibizione, fino al tuo modificatore di Carisma (minimo 1). Ogni bersaglio deve riuscire in un tiro salvezza su Saggezza contro la tua CD degli incantesimi o essere affascinato da te. Mentre e' affascinato cosi', il bersaglio ti idolatra, parla bene di te a chiunque gli si rivolga e ostacola chi ti si oppone, evitando la violenza a meno che non fosse gia' propenso a combattere per te. L'effetto termina dopo 1 ora, se subisce danni, se tu lo attacchi o se vede te attaccare o ferire i suoi alleati. Se il tiro salvezza riesce, il bersaglio non ha alcun indizio del tuo tentativo. Una volta usata, non puoi riutilizzarla finche' non termini un riposo breve o lungo.",
@@ -5033,7 +5033,7 @@
           },
           {
             "name_en": "Mantle of Majesty",
-            "name": "Manto di Maesta'",
+            "name": "Manto di Maest?",
             "level": 6,
             "description_en": "At 6th level, as a bonus action cast Command without a slot and assume unearthly beauty for 1 minute (or until concentration ends). During this, cast Command as a bonus action each turn. Charmed creatures auto-fail saves vs your Command. Once per long rest.",
             "description": "Al 6° livello ottieni la capacita' di avvolgerti in una magia fatata che spinge gli altri a volerti servire. Con un'azione bonus, lanci Command senza spendere uno slot e assumi un aspetto di bellezza ultraterrena per 1 minuto o finche' la tua concentrazione termina (come se ti stessi concentrando su un incantesimo). Durante questo periodo puoi lanciare Command come azione bonus in ogni tuo turno senza spendere uno slot. Qualunque creatura affascinata da te fallisce automaticamente il tiro salvezza contro il Command lanciato con questa capacita'. Una volta usata, non puoi riutilizzarla finche' non termini un riposo lungo.",
@@ -5041,7 +5041,7 @@
           },
           {
             "name_en": "Unbreakable Majesty",
-            "name": "Maesta' Inscalfibile",
+            "name": "Maest? Inviolabile",
             "level": 14,
             "description_en": "At 14th level, you permanently appear more lovely. As a bonus action, assume majestic presence for 1 minute or until incapacitated. When a creature attacks you for the first time on a turn, it must succeed a Charisma save or can't attack you that turn (must choose new target or waste). On success, disadvantage on saves vs your spells next turn. Once per short or long rest.",
             "description": "Al 14° livello il tuo aspetto acquisisce permanentemente un tratto ultraterreno che ti fa sembrare piu' bello e fiero. Inoltre, con un'azione bonus, puoi assumere una presenza magicamente maestosa per 1 minuto o finche' non sei incapacitato. Per la durata, ogni volta che una creatura prova ad attaccarti per la prima volta in un turno, l'attaccante deve effettuare un tiro salvezza su Carisma contro la tua CD degli incantesimi. Con fallimento, non puo' attaccarti in quel turno e deve scegliere un nuovo bersaglio o l'attacco e' sprecato. Con successo, puo' attaccarti in quel turno, ma ha svantaggio a qualunque tiro salvezza contro i tuoi incantesimi nel tuo turno successivo. Una volta assunta questa presenza maestosa, non puoi farlo di nuovo finche' non termini un riposo breve o lungo.",
@@ -5074,7 +5074,7 @@
           },
           {
             "name_en": "Blade Flourish",
-            "name": "Virtuosismo della Spada",
+            "name": "Virtuosismo della Lama",
             "aliases": [
               "Stoccata di Lama"
             ],
@@ -5093,7 +5093,7 @@
           },
           {
             "name_en": "Master's Flourish",
-            "name": "Stoccata del Maestro",
+            "name": "Virtuosismo del Maestro",
             "level": 14,
             "description_en": "Starting at 14th level, whenever you use a Blade Flourish option, you can roll a d6 and use it instead of expending a Bardic Inspiration die.",
             "description": "Dal 14° livello, ogni volta che usi un'opzione di Virtuosismo della Spada puoi tirare 1d6 e usarlo al posto di spendere un dado di Ispirazione Bardica.",
@@ -5167,7 +5167,7 @@
           },
           {
             "name_en": "Mantle of Whispers",
-            "name": "Manto dei Sussurri",
+            "name": "Manto di Sussurri",
             "level": 6,
             "description_en": "At 6th level, when a humanoid dies within 30 ft, use your reaction to capture its shadow. As an action use the shadow to disguise yourself as the dead person for 1 hour (or end as bonus action). Gain general info about the person. Insight vs your Deception (+5) to see through. Once per short or long rest.",
             "description": "Al 6° livello ottieni la capacita' di adottare la persona di un umanoide. Quando un umanoide muore entro 30 piedi da te, puoi catturare magicamente la sua ombra usando la tua reazione. Mantieni questa ombra finche' non la usi o finche' non termini un riposo lungo. Puoi usare l'ombra con un'azione: scompare e si trasforma magicamente in un travestimento che ti appare addosso. Ora sembri la persona morta, ma sana e in vita. Il travestimento dura 1 ora o finche' non lo termini con un'azione bonus. Mentre indossi il travestimento, hai accesso a tutte le informazioni che l'umanoide condividerebbe liberamente con un conoscente occasionale. Tali informazioni includono dettagli generali su passato e vita personale, ma non i segreti. Sono sufficienti a farti spacciare per la persona attingendo ai suoi ricordi. Un'altra creatura puo' vedere oltre il travestimento riuscendo in una prova di Saggezza (Intuizione) contrapposta a una tua prova di Carisma (Inganno). Ottieni un bonus di +5 alla tua prova. Una volta catturata un'ombra, non puoi catturarne un'altra finche' non termini un riposo breve o lungo.",
@@ -5292,7 +5292,7 @@
           },
           {
             "name_en": "Spirit Shield",
-            "name": "Scudo degli Spiriti",
+            "name": "Spiriti Protettori",
             "level": 6,
             "description_en": "Beginning at 6th level, the guardian spirits can provide supernatural protection to those you defend. If you are raging and another creature you can see within 30 feet takes damage, you can use your reaction to reduce that damage by 2d6. The reduction increases to 3d6 at 10th level and 4d6 at 14th level.",
             "description": "Dal 6° livello, gli spiriti guardiani che ti aiutano possono offrire una protezione soprannaturale a coloro che difendi. Se sei in ira e un'altra creatura che puoi vedere entro 30 piedi subisce danni, puoi usare la tua reazione per ridurre quei danni di 2d6. La riduzione aumenta a 3d6 al 10° livello e a 4d6 al 14° livello.",
@@ -5300,7 +5300,7 @@
           },
           {
             "name_en": "Consult the Spirits",
-            "name": "Consulta gli Spiriti",
+            "name": "Consultare gli Spiriti",
             "level": 10,
             "description_en": "At 10th level, you can consult your ancestral spirits. You cast Augury or Clairvoyance without a spell slot or material components. Wisdom is your spellcasting ability for these spells. Once used, you must finish a short or long rest before using this feature again.",
             "description": "Al 10° livello ottieni la capacita' di consultare i tuoi spiriti ancestrali. Quando lo fai, lanci l'incantesimo Augury o Clairvoyance senza spendere uno slot e senza componenti materiali. Invece di creare un sensore sferico, questo uso di Clairvoyance evoca invisibilmente uno dei tuoi spiriti ancestrali nel luogo prescelto. Saggezza e' la tua caratteristica da incantatore per questi incantesimi. Dopo aver lanciato uno dei due in questo modo, non puoi riutilizzare questa capacita' finche' non termini un riposo breve o lungo.",
@@ -5407,7 +5407,7 @@
         "features": [
           {
             "name_en": "Storm Aura",
-            "name": "Aura di Tempesta",
+            "name": "Aura Tempestosa",
             "level": 3,
             "description_en": "At 3rd level, while raging you emanate a 10-ft stormy aura (not through total cover). Activate effect when entering rage and again as a bonus action each turn. Choose Desert/Sea/Tundra (changeable each level). Save DC = 8 + PB + Con. Desert: 2 fire damage to others (3 at 5, 4 at 10, 5 at 15, 6 at 20). Sea: target Dex save, 1d6 lightning (2d6/3d6/4d6 at 10/15/20). Tundra: chosen creatures gain 2 temp HP (3/4/5/6 at 5/10/15/20).",
             "description": "Quando scegli questo cammino al 3° livello, mentre sei in ira emani un'aura magica tempestosa. L'aura si estende per 10 piedi in ogni direzione, ma non attraverso la copertura totale. La tua aura ha un effetto che si attiva quando entri in ira e che puoi attivare nuovamente in ogni tuo turno come azione bonus. Scegli deserto, mare o tundra; puoi cambiare scelta ogni volta che sali di livello in questa classe. Se l'effetto richiede un tiro salvezza, la CD e' pari a 8 + il tuo bonus di competenza + il tuo modificatore di Costituzione. **Deserto**: quando l'effetto e' attivato, ogni altra creatura nell'aura subisce 2 danni da fuoco (3 al 5°, 4 al 10°, 5 al 15°, 6 al 20° livello). **Mare**: scegli un'altra creatura nell'aura che puoi vedere; deve effettuare un tiro salvezza su Destrezza, subisce 1d6 danni da fulmine con fallimento o meta' con successo (2d6 al 10°, 3d6 al 15°, 4d6 al 20° livello). **Tundra**: ogni creatura a tua scelta nell'aura ottiene 2 punti ferita temporanei mentre spiriti gelidi la rendono insensibile alla sofferenza (3 al 5°, 4 al 10°, 5 al 15°, 6 al 20° livello).",
@@ -5415,7 +5415,7 @@
           },
           {
             "name_en": "Storm Soul",
-            "name": "Anima di Tempesta",
+            "name": "Anima Tempestosa",
             "level": 6,
             "description_en": "At 6th level, the storm grants benefits even outside your aura, based on environment. Desert: fire resistance, immune to extreme heat, set flammable objects on fire as an action. Sea: lightning resistance, breathe underwater, swim 30 ft. Tundra: cold resistance, immune to extreme cold, freeze a 5-ft cube of water as an action.",
             "description": "Al 6° livello la tempesta ti concede benefici anche quando la tua aura non e' attiva. I benefici dipendono dall'ambiente scelto per la tua Aura di Tempesta. **Deserto**: ottieni resistenza ai danni da fuoco e non subisci gli effetti del caldo estremo (descritti nella Guida del Master); inoltre, con un'azione, puoi toccare un oggetto infiammabile non indossato o trasportato da nessun altro e dargli fuoco. **Mare**: ottieni resistenza ai danni da fulmine e puoi respirare sott'acqua; ottieni anche una velocita' di nuoto di 30 piedi. **Tundra**: ottieni resistenza ai danni da freddo e non subisci gli effetti del freddo estremo (descritti nella Guida del Master); inoltre, con un'azione, puoi toccare l'acqua e trasformare un cubo di 5 piedi di lato in ghiaccio, che si scioglie dopo 1 minuto. L'azione fallisce se nel cubo c'e' una creatura.",
@@ -5431,7 +5431,7 @@
           },
           {
             "name_en": "Raging Storm",
-            "name": "Tempesta Furiosa",
+            "name": "Tempesta Furibonda",
             "level": 14,
             "description_en": "At 14th level, the storm becomes mightier. Desert: when a creature in your aura hits you, reaction to force a Dex save; on fail, fire damage = half your barbarian level. Sea: when you hit a creature in your aura, reaction to force Strength save; on fail, knocked prone. Tundra: when you activate Storm Aura, choose one creature in the aura; on failed Strength save, speed reduced to 0 until start of your next turn.",
             "description": "Al 14° livello il potere della tempesta che incanali diventa piu' violento, scagliandosi contro i tuoi nemici. L'effetto dipende dall'ambiente scelto. **Deserto**: subito dopo che una creatura nella tua aura ti colpisce con un attacco, puoi usare la tua reazione per costringerla a un tiro salvezza su Destrezza; con fallimento, la creatura subisce danni da fuoco pari alla meta' del tuo livello da Barbaro. **Mare**: quando colpisci una creatura nella tua aura con un attacco, puoi usare la tua reazione per costringerla a un tiro salvezza su Forza; con fallimento, la creatura cade prona, come colpita da un'onda. **Tundra**: ogni volta che l'effetto della tua Aura di Tempesta viene attivato, puoi scegliere una creatura che puoi vedere nell'aura; deve riuscire in un tiro salvezza su Forza o la sua velocita' si riduce a 0 fino all'inizio del tuo turno successivo, mentre il gelo magico la avvolge.",
@@ -5554,7 +5554,7 @@
           },
           {
             "name_en": "Warrior of the Gods",
-            "name": "Guerriero degli Dei",
+            "name": "Guerriero degli D?i",
             "level": 3,
             "description_en": "At 3rd level, your soul is marked for endless battle. If a spell whose sole effect is restoring you to life (not undeath), like Raise Dead, is cast on you, the caster doesn't need material components.",
             "description": "Al 3° livello la tua anima e' marchiata per una battaglia infinita. Se un incantesimo che ha come unico effetto quello di riportarti in vita (ma non in non-morte), come Raise Dead, viene lanciato su di te, l'incantatore non ha bisogno di componenti materiali per lanciarlo.",
@@ -5570,7 +5570,7 @@
           },
           {
             "name_en": "Zealous Presence",
-            "name": "Presenza Zelosa",
+            "name": "Presenza Zelante",
             "level": 10,
             "description_en": "At 10th level, as a bonus action unleash a battle cry. Up to ten other creatures within 60 ft that can hear you gain advantage on attack rolls and saving throws until the start of your next turn. Usable once per long rest.",
             "description": "Al 10° livello impari a incanalare il potere divino per ispirare zelo negli altri. Con un'azione bonus, scateni un grido di battaglia infuso di energia divina. Fino a dieci altre creature a tua scelta entro 60 piedi che possano sentirti ottengono vantaggio ai tiri per colpire e ai tiri salvezza fino all'inizio del tuo turno successivo. Una volta usata, non puoi riutilizzare questa capacita' finche' non termini un riposo lungo.",
@@ -5578,7 +5578,7 @@
           },
           {
             "name_en": "Rage Beyond Death",
-            "name": "Ira Oltre la Morte",
+            "name": "Ira Imperitura",
             "level": 14,
             "description_en": "Beginning at 14th level, while raging, having 0 HP doesn't knock you unconscious. You still make death saves and suffer normal effects of damage at 0 HP. If you would die from failed death saves, you don't die until your rage ends, and only if you still have 0 HP then.",
             "description": "Dal 14° livello il potere divino che alimenta la tua ira ti permette di scrollarti di dosso colpi mortali. Mentre sei in ira, avere 0 punti ferita non ti fa cadere privo di sensi. Devi comunque effettuare tiri salvezza contro morte e subisci i normali effetti dei danni mentre hai 0 pf. Tuttavia, se moriresti per fallimento dei tiri salvezza contro morte, non muori finche' la tua ira non termina, e in quel momento muori solo se hai ancora 0 pf.",
