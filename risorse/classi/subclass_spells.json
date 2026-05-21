@@ -200,6 +200,7 @@
         "Vita Falsata"
       ],
       "3": [
+        "Riposo Inviolato",
         "Raggio di Affaticamento"
       ],
       "5": [
@@ -233,6 +234,7 @@
         "Localizza Creatura"
       ],
       "9": [
+        "Comunione",
         "Dominare Persona"
       ]
     },
@@ -251,10 +253,11 @@
       ],
       "7": [
         "Aura di Purezza",
-        "Sfera Elastica di Otiluke"
+        "Sfera Resiliente di Otiluke"
       ],
       "9": [
-        "Ristorare Superiore"
+        "Ristorare Superiore",
+        "Legame Telepatico di Rary"
       ]
     },
     "twilight-domain": {
@@ -267,7 +270,8 @@
         "Vedere Invisibilità"
       ],
       "5": [
-        "Aura di Vitalità"
+        "Aura di Vitalità",
+        "Capanna Minuscola di Leomund"
       ],
       "7": [
         "Aura di Vita",
@@ -280,6 +284,7 @@
     },
     "arcana-domain": {
       "1": [
+        "Individuazione del Magico",
         "Dardo Incantato"
       ],
       "3": [
@@ -319,6 +324,7 @@
         "Guardiano della Fede"
       ],
       "17": [
+        "Comunione",
         "Colonna di Fuoco"
       ]
     },
@@ -339,6 +345,7 @@
         "Pelle di Pietra"
       ],
       "17": [
+        "Comunione con la Natura",
         "Passo dell'Albero"
       ]
     },
@@ -400,7 +407,7 @@
         "Disegno Ipnotico"
       ],
       "13": [
-        "Sfera Elastica di Otiluke",
+        "Sfera Resiliente di Otiluke",
         "Pelle di Pietra"
       ],
       "17": [
@@ -426,11 +433,15 @@
         "Libertà di Movimento"
       ],
       "17": [
+        "Comunione",
         "Colonna di Fuoco"
       ]
     },
     "oath-of-the-watchers": {
-      "3": [],
+      "3": [
+        "Allarme",
+        "Individuazione del Magico"
+      ],
       "5": [
         "Raggio Lunare",
         "Vedere Invisibilità"
@@ -610,7 +621,8 @@
         "Onda Tonante"
       ],
       "3": [
-        "Folata di Vento"
+        "Folata di Vento",
+        "Silenzio"
       ],
       "5": [
         "Fulmine",
@@ -627,23 +639,22 @@
     },
     "genie": {
       "1": [
-        "Individuazione del Bene e del Male",
-        "Forza Fantasma"
+        "Individuazione del Bene e del Male"
       ],
       "3": [
-        "Protezione dal Bene e dal Male"
+        "Forza Fantasma"
       ],
       "5": [
-        "Creare Cibo e Acqua",
-        "Linguaggi"
+        "Creare Cibo e Acqua"
       ],
       "7": [
-        "Assassino Fantasma",
-        "Pelle di Pietra"
+        "Assassino Fantasma"
       ],
       "9": [
-        "Creazione",
-        "Muro di Pietra"
+        "Creazione"
+      ],
+      "17": [
+        "Desiderio"
       ]
     },
     "undead": {
@@ -656,6 +667,7 @@
         "Forza Fantasma"
       ],
       "5": [
+        "Destriero Fantomatico",
         "Parlare con i Morti"
       ],
       "7": [
@@ -673,7 +685,8 @@
         "Raggio di Infermità"
       ],
       "3": [
-        "Cecità/Sordità"
+        "Cecità/Sordità",
+        "Silenzio"
       ],
       "5": [
         "Parlare con i Morti"
@@ -708,11 +721,13 @@
         "Evocare Aberrazione"
       ],
       "9": [
+        "Legame Telepatico di Rary",
         "Telecinesi"
       ]
     },
     "clockwork-soul": {
       "1": [
+        "Allarme",
         "Protezione dal Bene e dal Male"
       ],
       "3": [
@@ -735,23 +750,22 @@
   },
   "druid": {
     "circle-of-spores": {
+      "2": [
+        "Tocco Gelido"
+      ],
       "3": [
-        "Tocco Gelido",
-        "Causare Paura",
-        "Infliggere Ferite"
+        "Cecità/Sordità",
+        "Riposo Inviolato"
       ],
       "5": [
-        "Cecità/Sordità"
-      ],
-      "7": [
         "Animare Morti",
         "Forma Gassosa"
       ],
-      "9": [
+      "7": [
         "Inaridire",
         "Confusione"
       ],
-      "11": [
+      "9": [
         "Nube Mortale",
         "Contagio"
       ]
@@ -879,7 +893,9 @@
       "13": [
         "Localizza Creatura"
       ],
-      "17": []
+      "17": [
+        "Comunione con la Natura"
+      ]
     }
   },
   "artificer": {
@@ -933,7 +949,7 @@
         "Onda Tonante"
       ],
       "5": [
-        "Raggio Cocente",
+        "Raggio Rovente",
         "Frantumare"
       ],
       "9": [
@@ -960,7 +976,7 @@
       ],
       "9": [
         "Aura di Vitalità",
-        "Evocare Sbarramento"
+        "Sbarramento Evocato"
       ],
       "13": [
         "Aura di Purezza",

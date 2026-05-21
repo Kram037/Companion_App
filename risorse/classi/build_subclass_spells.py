@@ -64,9 +64,16 @@ for it_name, sp in SPELLS.items():
 
 # Override per nomi con punteggiatura (Otiluke's, Rary's, etc.) o varianti
 SPELL_ALIAS: dict[str, str] = {
+    "Alarm": "Allarme",
+    "Commune": "Comunione",
+    "Commune with Nature": "Comunione con la Natura",
+    "Detect Magic": "Individuazione del Magico",
+    "Gentle Repose": "Riposo Inviolato",
+    "Silence": "Silenzio",
+    "Phantom Steed": "Destriero Fantomatico",
     "Otiluke's Resilient Sphere": "Sfera Resiliente di Otiluke",
     "Rary's Telepathic Bond": "Legame Telepatico di Rary",
-    "Leomund's Tiny Hut": "Piccola Capanna di Leomund",
+    "Leomund's Tiny Hut": "Capanna Minuscola di Leomund",
     "Mordenkainen's Faithful Hound": "Segugio Fedele di Mordenkainen",
     "Bigby's Hand": "Mano di Bigby",
     "Tasha's Hideous Laughter": "Risata Atroce di Tasha",
@@ -89,6 +96,7 @@ def s(en: str) -> str | None:
         candidate = SPELL_ALIAS[en]
         if candidate in SPELLS:
             return candidate
+        return candidate
     if en in EN_TO_IT:
         return EN_TO_IT[en]
     n = _norm(en)
@@ -336,11 +344,12 @@ add("warlock", "fathomless", {
     9: lst("Bigby's Hand", "Cone of Cold"),
 })
 add("warlock", "genie", {
-    1: lst("Detect Evil and Good", "Phantasmal Force"),
-    3: lst("Phantom Steed", "Protection from Evil and Good"),
-    5: lst("Create Food and Water", "Tongues"),
-    7: lst("Phantasmal Killer", "Stoneskin"),
-    9: lst("Creation", "Wall of Stone"),
+    1: lst("Detect Evil and Good"),
+    3: lst("Phantasmal Force"),
+    5: lst("Create Food and Water"),
+    7: lst("Phantasmal Killer"),
+    9: lst("Creation"),
+    17: lst("Wish"),
 })
 add("warlock", "undead", {
     1: lst("Bane", "False Life"),
@@ -376,11 +385,11 @@ add("sorcerer", "clockwork-soul", {
 # ── Druido: Cerchi che danno spell list (XGtE + TCoE) ──
 # Cerchio della Terra: dipende dalla scelta del terreno, lasciato fuori per ora
 add("druid", "circle-of-spores", {
-    3: lst("Chill Touch", "Cause Fear", "Inflict Wounds"),
-    5: lst("Blindness/Deafness", "Gentle Repose"),
-    7: lst("Animate Dead", "Gaseous Form"),
-    9: lst("Blight", "Confusion"),
-    11: lst("Cloudkill", "Contagion"),
+    2: lst("Chill Touch"),
+    3: lst("Blindness/Deafness", "Gentle Repose"),
+    5: lst("Animate Dead", "Gaseous Form"),
+    7: lst("Blight", "Confusion"),
+    9: lst("Cloudkill", "Contagion"),
 })
 add("druid", "circle-of-wildfire", {
     2: lst("Burning Hands", "Cure Wounds"),

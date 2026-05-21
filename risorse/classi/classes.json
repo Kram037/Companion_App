@@ -23,7 +23,7 @@
       {
         "Level": "1st",
         "Proficiency Bonus": "+2",
-        "Features": "Bricolage Magico, Lanciare Incantesimi",
+        "Features": "Invenzione Magica, Incantesimi",
         "Infusions Known": "-",
         "Infused Items": "-",
         "Cantrips Known": "2",
@@ -37,7 +37,7 @@
       {
         "Level": "2nd",
         "Proficiency Bonus": "+2",
-        "Features": "Infondere Oggetto",
+        "Features": "Infondere negli Oggetti",
         "Infusions Known": "4",
         "Infused Items": "2",
         "Cantrips Known": "2",
@@ -51,7 +51,7 @@
       {
         "Level": "3rd",
         "Proficiency Bonus": "+2",
-        "Features": "Specialista Artefice, L'Attrezzo Giusto per il Lavoro",
+        "Features": "Specializzazione da Artefice, Lo Strumento Pi? Adatto",
         "Infusions Known": "4",
         "Infused Items": "2",
         "Cantrips Known": "2",
@@ -79,7 +79,7 @@
       {
         "Level": "5th",
         "Proficiency Bonus": "+3",
-        "Features": "Specialista Artefice",
+        "Features": "Specializzazione da Artefice",
         "Infusions Known": "4",
         "Infused Items": "2",
         "Cantrips Known": "2",
@@ -93,7 +93,7 @@
       {
         "Level": "6th",
         "Proficiency Bonus": "+3",
-        "Features": "Maestria con gli Strumenti",
+        "Features": "Maestria negli Strumenti",
         "Infusions Known": "6",
         "Infused Items": "3",
         "Cantrips Known": "2",
@@ -135,7 +135,7 @@
       {
         "Level": "9th",
         "Proficiency Bonus": "+4",
-        "Features": "Specialista Artefice",
+        "Features": "Specializzazione da Artefice",
         "Infusions Known": "6",
         "Infused Items": "3",
         "Cantrips Known": "2",
@@ -163,7 +163,7 @@
       {
         "Level": "11th",
         "Proficiency Bonus": "+4",
-        "Features": "Oggetto Contenitore di Incantesimi",
+        "Features": "Oggetto che Custodisce l'Incantesimo",
         "Infusions Known": "8",
         "Infused Items": "4",
         "Cantrips Known": "3",
@@ -219,7 +219,7 @@
       {
         "Level": "15th",
         "Proficiency Bonus": "+5",
-        "Features": "Specialista Artefice",
+        "Features": "Specializzazione da Artefice",
         "Infusions Known": "10",
         "Infused Items": "5",
         "Cantrips Known": "4",
@@ -289,7 +289,7 @@
       {
         "Level": "20th",
         "Proficiency Bonus": "+6",
-        "Features": "Anima dell'Artefice",
+        "Features": "Anima dell'Artificio",
         "Infusions Known": "12",
         "Infused Items": "6",
         "Cantrips Known": "4",
@@ -304,7 +304,7 @@
     "features": [
       {
         "name_en": "Magical Tinkering",
-        "name": "Bricolage Magico",
+        "name": "Invenzione Magica",
         "level": 1,
         "description_en": "At 1st level, you've learned how to invest a spark of magic into mundane objects. To use this ability, you must have thieves' tools or artisan's tools in hand. You then touch a Tiny nonmagical object as an action and give it one of the following magical properties of your choice: light, recorded message, odor/sound or static visual effect. The maximum number of objects affected equals your Intelligence modifier (minimum 1).",
         "description": "Al 1° livello hai imparato a infondere una scintilla di magia in oggetti comuni. Per usare questa capacita' devi avere in mano arnesi da scasso o attrezzi da artigiano. Poi tocchi un oggetto Minuscolo non magico con un'azione e gli conferisci una delle seguenti proprieta' magiche a tua scelta: emette luce intensa entro 5 piedi e luce fioca per altri 5 piedi; emette un messaggio registrato (max 6 secondi) udibile entro 10 piedi quando viene toccato; emette continuamente un odore o un suono non verbale percepibile entro 10 piedi; mostra un effetto visivo statico su una sua superficie (immagine, fino a 25 parole, linee/forme). La proprieta' dura indefinitamente. Con un'azione puoi toccare l'oggetto e terminare l'effetto in anticipo. Puoi infondere magia su piu' oggetti ma ognuno puo' avere una sola proprieta' alla volta. Il numero massimo di oggetti affettati e' pari al tuo modificatore di Intelligenza (minimo 1).",
@@ -312,7 +312,7 @@
       },
       {
         "name_en": "Spellcasting",
-        "name": "Lanciare Incantesimi",
+        "name": "Incantesimi",
         "level": 1,
         "description_en": "Artificers cast spells through their tools. You must have a spellcasting focus (thieves' tools or artisan's tools) in hand to cast spells with a Material component. Intelligence is your spellcasting ability. You prepare a number of spells equal to Int mod + half your artificer level (minimum 1). You can cast artificer spells as rituals if you have them prepared.",
         "description": "Hai studiato il funzionamento della magia e impari a lanciare incantesimi incanalando la magia attraverso gli oggetti. Per gli osservatori non sembra che tu stia lanciando incantesimi in modo convenzionale: pari piuttosto produrre meraviglie da oggetti comuni. **Focus per gli incantesimi**: devi avere in mano arnesi da scasso o attrezzi da artigiano (in cui sei competente) come focus per gli incantesimi che hanno componente M. Dopo aver ottenuto Infondere Oggetto al 2° livello puoi anche usare come focus qualunque oggetto su cui hai applicato un'infusione. **Trucchetti**: al 1° livello conosci due trucchetti scelti dalla lista dell'artefice. Ne impari altri come indicato nella tabella. **Slot incantesimo**: la tabella mostra quanti slot hai. Recuperi tutti gli slot al termine di un riposo lungo. **Incantesimi preparati**: prepari una lista di incantesimi pari al tuo modificatore di Intelligenza + meta' del tuo livello da artefice (minimo 1). Puoi cambiare gli incantesimi preparati al termine di un riposo lungo (almeno 1 minuto per livello di incantesimo). **Caratteristica da incantatore**: Intelligenza. CD di tiro salvezza = 8 + bonus di competenza + modificatore di Intelligenza. Bonus di attacco con incantesimi = bonus di competenza + modificatore di Intelligenza. **Lancio rituale**: puoi lanciare un incantesimo da artefice come rituale se ha la qualita' rituale e ce l'hai preparato.",
@@ -320,7 +320,7 @@
       },
       {
         "name_en": "Infuse Item",
-        "name": "Infondere Oggetto",
+        "name": "Infondere negli Oggetti",
         "level": 2,
         "description_en": "At 2nd level, you can imbue mundane items with magical infusions. You learn 4 infusions and gain more at higher levels. After a long rest you can touch nonmagical objects and turn them into magic items. Each infusion works on specific item types. The maximum number of infused items at once is shown in the Infused Items column.",
         "description": "Al 2° livello ottieni la capacita' di infondere oggetti comuni con infusioni magiche, trasformandoli in oggetti magici. **Infusioni Conosciute**: scegli 4 infusioni da artefice e ne impari altre ai livelli indicati. Ogni volta che sali di livello puoi sostituire un'infusione conosciuta con una nuova. **Infondere un Oggetto**: al termine di un riposo lungo puoi toccare un oggetto non magico e infondergli una delle tue infusioni. Se l'oggetto richiede sintonizzazione puoi sintonizzarti istantaneamente. La tua infusione resta nell'oggetto a tempo indefinito ma quando muori scompare dopo un numero di giorni pari al tuo modificatore di Intelligenza (minimo 1). Scompare anche se sostituisci la conoscenza dell'infusione. Puoi infondere piu' oggetti contemporaneamente fino al massimo indicato nella colonna Oggetti Infusi. Ogni infusione puo' essere su un solo oggetto e ogni oggetto puo' avere una sola infusione. Se superi il massimo, l'infusione piu' vecchia termina.",
@@ -328,7 +328,7 @@
       },
       {
         "name_en": "Artificer Specialist",
-        "name": "Specialista Artefice",
+        "name": "Specializzazione da Artefice",
         "level": 3,
         "description_en": "At 3rd level, you choose a specialist subclass: Alchemist, Armorer, Artillerist, or Battle Smith. Your choice grants features at 3rd, 5th, 9th, and 15th level.",
         "description": "Al 3° livello scegli il tipo di specialista che diventerai: Alchimista, Armoriere, Artigliere o Forgia di Battaglia. La tua scelta ti concede privilegi al 3° livello e poi al 5°, 9° e 15° livello.",
@@ -336,7 +336,7 @@
       },
       {
         "name_en": "The Right Tool for the Job",
-        "name": "L'Attrezzo Giusto per il Lavoro",
+        "name": "Lo Strumento Pi? Adatto",
         "level": 3,
         "description_en": "At 3rd level, with thieves' tools or artisan's tools in hand, you can magically create one set of artisan's tools in an unoccupied space within 5 feet of you. The creation requires 1 hour of uninterrupted work, which can coincide with a short or long rest. The tools are nonmagical and vanish when you use this feature again.",
         "description": "Al 3° livello hai imparato a produrre esattamente l'attrezzo che ti serve. Avendo in mano arnesi da scasso o attrezzi da artigiano puoi creare magicamente un set di attrezzi da artigiano in uno spazio non occupato entro 5 piedi da te. La creazione richiede 1 ora di lavoro ininterrotto, che puo' coincidere con un riposo breve o lungo. Pur essendo prodotti dalla magia gli attrezzi sono non magici e scompaiono quando usi nuovamente questa capacita'.",
@@ -352,7 +352,7 @@
       },
       {
         "name_en": "Tool Expertise",
-        "name": "Maestria con gli Attrezzi",
+        "name": "Maestria negli Strumenti",
         "level": 6,
         "description_en": "Starting at 6th level, your proficiency bonus is doubled for any ability check you make that uses your proficiency with a tool.",
         "description": "A partire dal 6° livello, il tuo bonus di competenza e' raddoppiato per qualunque prova di caratteristica che effettui usando la tua competenza con uno strumento.",
@@ -368,7 +368,7 @@
       },
       {
         "name_en": "Magic Item Adept",
-        "name": "Adepto di Oggetti Magici",
+        "name": "Adepto degli Oggetti Magici",
         "level": 10,
         "description_en": "At 10th level, you can attune to up to 4 magic items at once. Crafting common or uncommon magic items takes you 1/4 the normal time and costs half the gold.",
         "description": "Al 10° livello raggiungi una profonda comprensione dell'uso e della creazione di oggetti magici: puoi sintonizzarti con un massimo di 4 oggetti magici contemporaneamente; se crei un oggetto magico di rarita' comune o non comune, ti richiede un quarto del tempo normale e ti costa la meta' delle monete d'oro abituali.",
@@ -376,7 +376,7 @@
       },
       {
         "name_en": "Spell-Storing Item",
-        "name": "Oggetto Contenitore di Incantesimi",
+        "name": "Oggetto che Custodisce l'Incantesimo",
         "level": 11,
         "description_en": "At 11th level, after a long rest you can store a 1st- or 2nd-level artificer spell (with casting time of 1 action) in a weapon or spellcasting focus. Anyone holding the object can use an action to cast the stored spell using your spell save DC. The spell can be used a number of times equal to twice your Intelligence modifier (minimum 2).",
         "description": "All'11° livello puoi immagazzinare un incantesimo in un oggetto. Al termine di un riposo lungo puoi toccare un'arma semplice o da guerra oppure un oggetto utilizzabile come focus per incantesimi e immagazzinarvi un incantesimo di 1° o 2° livello dalla lista dell'artefice che richieda 1 azione per essere lanciato (non e' necessario averlo preparato). Mentre tiene l'oggetto, una creatura puo' usare un'azione per produrre l'effetto dell'incantesimo, usando la tua caratteristica da incantatore. Se l'incantesimo richiede concentrazione, deve concentrarsi essa stessa. L'incantesimo resta nell'oggetto finche' non e' stato usato un numero di volte pari al doppio del tuo modificatore di Intelligenza (minimo 2) o finche' non utilizzi nuovamente questa capacita'.",
@@ -384,7 +384,7 @@
       },
       {
         "name_en": "Magic Item Savant",
-        "name": "Sapiente di Oggetti Magici",
+        "name": "Sapiente degli Oggetti Magici",
         "level": 14,
         "description_en": "At 14th level, you can attune to up to 5 magic items at once and you ignore all class, race, spell and level requirements on attuning to or using magic items.",
         "description": "Al 14° livello la tua abilita' con gli oggetti magici si approfondisce ulteriormente: puoi sintonizzarti con un massimo di 5 oggetti magici contemporaneamente; ignori tutti i requisiti di classe, razza, incantesimo e livello per sintonizzarti o usare un oggetto magico.",
@@ -392,7 +392,7 @@
       },
       {
         "name_en": "Magic Item Master",
-        "name": "Maestro di Oggetti Magici",
+        "name": "Maestro degli Oggetti Magici",
         "level": 18,
         "description_en": "Starting at 18th level, you can attune to up to 6 magic items at once.",
         "description": "A partire dal 18° livello puoi sintonizzarti con un massimo di 6 oggetti magici contemporaneamente.",
@@ -400,7 +400,7 @@
       },
       {
         "name_en": "Soul of Artifice",
-        "name": "Anima dell'Artefice",
+        "name": "Anima dell'Artificio",
         "level": 20,
         "description_en": "At 20th level, you develop a mystical connection to your magic items: you gain a +1 bonus to all saving throws per magic item you are attuned to. Also, when reduced to 0 hit points but not killed outright, you can use your reaction to end one of your infusions and drop to 1 hit point instead.",
         "description": "Al 20° livello sviluppi una connessione mistica con i tuoi oggetti magici, dalla quale puoi attingere protezione: ottieni un bonus di +1 a tutti i tiri salvezza per ogni oggetto magico al quale sei attualmente sintonizzato; se vieni ridotto a 0 punti ferita ma non immediatamente ucciso, puoi usare la tua reazione per terminare una delle tue infusioni da artefice riducendoti cosi' a 1 punto ferita invece che a 0.",
@@ -415,7 +415,7 @@
         "features": [
           {
             "name_en": "Tool Proficiency",
-            "name": "Competenza con Attrezzi",
+            "name": "Competenza negli Strumenti",
             "level": 3,
             "description_en": "When you adopt this specialization at 3rd level, you gain proficiency with alchemist's supplies. If you already have this proficiency, you gain proficiency with one other type of artisan's tools of your choice.",
             "description": "Quando adotti questa specializzazione al 3° livello ottieni la competenza nell'uso degli strumenti da alchimista. Se possiedi gia' questa competenza, ne ottieni una con un altro tipo di attrezzi da artigiano a tua scelta.",
@@ -423,7 +423,7 @@
           },
           {
             "name_en": "Alchemist Spells",
-            "name": "Incantesimi dell'Alchimista",
+            "name": "Incantesimi da Alchimista",
             "level": 3,
             "description_en": "Starting at 3rd level you always have certain spells prepared (Healing Word, Ray of Sickness at lvl 3; Flaming Sphere, Melf's Acid Arrow at 5; Gaseous Form, Mass Healing Word at 9; Death Ward, Stoneskin at 13; Cloudkill, Raise Dead at 17). They count as artificer spells but don't count against the number prepared.",
             "description": "A partire dal 3° livello hai sempre preparati certi incantesimi quando raggiungi i livelli indicati: 3° Healing Word, Ray of Sickness; 5° Flaming Sphere, Melf's Acid Arrow; 9° Gaseous Form, Mass Healing Word; 13° Death Ward, Stoneskin; 17° Cloudkill, Raise Dead. Questi incantesimi contano come incantesimi da artefice per te ma non contano nel numero di incantesimi che puoi preparare.",
@@ -439,7 +439,7 @@
           },
           {
             "name_en": "Alchemical Savant",
-            "name": "Sapiente Alchimista",
+            "name": "Alchemico Sapiente",
             "level": 5,
             "description_en": "At 5th level, when you cast a spell using your alchemist's supplies as the spellcasting focus, you gain a bonus to one roll of the spell. That roll must restore hit points or deal acid, fire, necrotic, or poison damage; the bonus equals your Intelligence modifier (minimum +1).",
             "description": "Al 5° livello hai sviluppato una padronanza magistrale dei composti chimici. Ogni volta che lanci un incantesimo usando gli strumenti da alchimista come focus, ottieni un bonus a un tiro dell'incantesimo che deve recuperare punti ferita o essere un tiro per i danni che infligga danni da acido, fuoco, necrotici o veleno. Il bonus e' pari al tuo modificatore di Intelligenza (minimo +1).",
@@ -447,7 +447,7 @@
           },
           {
             "name_en": "Restorative Reagents",
-            "name": "Reagenti Rigeneranti",
+            "name": "Reagenti Ristorativi",
             "level": 9,
             "description_en": "At 9th level, when a creature drinks an elixir you created it gains 2d6 + Int mod temporary HP. You can also cast Lesser Restoration without using a spell slot (must use alchemist's supplies as focus) a number of times equal to your Intelligence modifier, regaining uses on a long rest.",
             "description": "Dal 9° livello puoi inserire reagenti rigeneranti in alcune delle tue opere: ogni volta che una creatura beve un Elisir Sperimentale che hai creato, ottiene punti ferita temporanei pari a 2d6 + il tuo modificatore di Intelligenza (minimo 1); puoi inoltre lanciare Ristorare Inferiore senza spendere uno slot e senza averlo preparato, purche' usi gli strumenti da alchimista come focus. Puoi farlo un numero di volte pari al tuo modificatore di Intelligenza (minimo 1) e recuperi tutti gli usi al termine di un riposo lungo.",
@@ -455,7 +455,7 @@
           },
           {
             "name_en": "Chemical Mastery",
-            "name": "Maestria Chimica",
+            "name": "Maestria nella Chimica",
             "level": 15,
             "description_en": "By 15th level, you have resistance to acid and poison damage and immunity to the poisoned condition. You can also cast Greater Restoration and Heal once each per long rest without expending a spell slot or material components, using alchemist's supplies as focus.",
             "description": "Al 15° livello sei stato esposto a cosi' tante sostanze chimiche che ti pongono ben pochi rischi e puoi usarle per curare velocemente certi disturbi: ottieni resistenza ai danni da acido e ai danni da veleno e diventi immune alla condizione avvelenato; puoi lanciare Ristorare Superiore e Guarire senza spendere uno slot, senza averli preparati e senza componenti materiali, purche' usi gli strumenti da alchimista come focus. Una volta lanciato uno dei due con questa capacita', non puoi rilanciarlo finche' non termini un riposo lungo.",
@@ -468,7 +468,7 @@
       {
         "slug": "armorer",
         "name_en": "Armorer",
-        "name": "Armoriere",
+        "name": "Armaiolo",
         "features": [
           {
             "name_en": "Tools of the Trade",
@@ -480,7 +480,7 @@
           },
           {
             "name_en": "Armorer Spells",
-            "name": "Incantesimi dell'Armoriere",
+            "name": "Incantesimi da Armaiolo",
             "level": 3,
             "description_en": "Starting at 3rd level you always have certain spells prepared (Magic Missile, Thunderwave at 3; Mirror Image, Shatter at 5; Hypnotic Pattern, Lightning Bolt at 9; Fire Shield, Greater Invisibility at 13; Passwall, Wall of Force at 17). They don't count against the number prepared.",
             "description": "A partire dal 3° livello hai sempre preparati certi incantesimi: 3° Magic Missile, Thunderwave; 5° Mirror Image, Shatter; 9° Hypnotic Pattern, Lightning Bolt; 13° Fire Shield, Greater Invisibility; 17° Passwall, Wall of Force. Contano come incantesimi da artefice ma non nel numero di incantesimi che puoi preparare.",
@@ -537,7 +537,7 @@
         "features": [
           {
             "name_en": "Tool Proficiency",
-            "name": "Competenza con Attrezzi",
+            "name": "Competenza negli Strumenti",
             "level": 3,
             "description_en": "When you adopt this specialization at 3rd level, you gain proficiency with woodcarver's tools. If you already have this proficiency, you gain proficiency with another set of artisan's tools.",
             "description": "Quando adotti questa specializzazione al 3° livello ottieni la competenza nell'uso degli strumenti da intagliatore. Se possedevi gia' questa competenza, ne ottieni una con un altro tipo di attrezzi da artigiano a tua scelta.",
@@ -545,7 +545,7 @@
           },
           {
             "name_en": "Artillerist Spells",
-            "name": "Incantesimi dell'Artigliere",
+            "name": "Incantesimi da Artigliere",
             "level": 3,
             "description_en": "Starting at 3rd level you always have certain spells prepared (Shield, Thunderwave at 3; Scorching Ray, Shatter at 5; Fireball, Wind Wall at 9; Ice Storm, Wall of Fire at 13; Cone of Cold, Wall of Force at 17). They don't count against the number prepared.",
             "description": "A partire dal 3° livello hai sempre preparati certi incantesimi: 3° Shield, Thunderwave; 5° Scorching Ray, Shatter; 9° Fireball, Wind Wall; 13° Ice Storm, Wall of Fire; 17° Cone of Cold, Wall of Force. Contano come incantesimi da artefice ma non nel numero di incantesimi che puoi preparare.",
@@ -553,7 +553,7 @@
           },
           {
             "name_en": "Eldritch Cannon",
-            "name": "Cannone Mistico",
+            "name": "Cannone Occulto",
             "level": 3,
             "description_en": "At 3rd level, using woodcarver's or smith's tools, as an action you can magically create a Small or Tiny eldritch cannon in an unoccupied space within 5 ft. AC 18, HP equal to 5x your artificer level, immune to poison and psychic. Choose Flamethrower (15-ft cone, 2d8 fire, Dex save), Force Ballista (ranged spell attack, 2d8 force, push 5 ft) or Protector (10-ft burst, 1d8 + Int temp HP). Activate as a bonus action; lasts 1 hour or until destroyed; one cannon at a time, recharge on long rest or by spell slot.",
             "description": "Al 3° livello hai imparato a creare un cannone magico. Con strumenti da intagliatore o da fabbro puoi usare un'azione per creare magicamente un Cannone Mistico Piccolo o Minuscolo in uno spazio non occupato su una superficie orizzontale entro 5 piedi da te. Un Cannone Piccolo occupa il suo spazio, uno Minuscolo puo' essere tenuto in una mano. Una volta creato il cannone non puoi farlo di nuovo finche' non termini un riposo lungo o spendi uno slot incantesimo per crearlo. Puoi avere un solo cannone alla volta. **Statistiche**: oggetto magico, CA 18, pf pari a 5 volte il tuo livello da artefice, immune ai danni da veleno e psichici. Per prove o tiri salvezza tutti i punteggi di caratteristica sono 10. Mending lo cura di 2d6 pf. Scompare se ridotto a 0 pf o dopo 1 ora; puoi congedarlo prima con un'azione. **Tipi**: *Lanciafiamme* — emette fuoco in un cono di 15 piedi, ogni creatura nell'area effettua un TS su Destrezza contro la tua CD: 2d8 danni da fuoco (meta' con successo), incendia oggetti infiammabili non indossati; *Balestra di Forza* — effettua un attacco con incantesimo a distanza dal cannone contro un bersaglio entro 120 piedi, con successo infligge 2d8 danni da forza e spinge il bersaglio di 5 piedi se e' una creatura; *Protettore* — emette un'esplosione di energia positiva che concede a se stesso e a ogni creatura a tua scelta entro 10 piedi punti ferita temporanei pari a 1d8 + il tuo modificatore di Intelligenza (minimo +1). In ogni tuo turno puoi usare un'azione bonus per attivare il cannone se sei entro 60 piedi da esso; come parte della stessa azione bonus puoi farlo camminare o arrampicare fino a 15 piedi se ha gambe.",
@@ -590,11 +590,11 @@
       {
         "slug": "battle-smith",
         "name_en": "Battle Smith",
-        "name": "Forgia di Battaglia",
+        "name": "Fabbro da Battaglia",
         "features": [
           {
             "name_en": "Tool Proficiency",
-            "name": "Competenza con Attrezzi",
+            "name": "Competenza negli Strumenti",
             "level": 3,
             "description_en": "When you adopt this specialization at 3rd level, you gain proficiency with smith's tools. If you already have this proficiency, you gain proficiency with another set of artisan's tools.",
             "description": "Quando adotti questa specializzazione al 3° livello ottieni la competenza nell'uso degli strumenti da fabbro. Se possedevi gia' questa competenza, ne ottieni una con un altro tipo di attrezzi da artigiano a tua scelta.",
@@ -602,7 +602,7 @@
           },
           {
             "name_en": "Battle Smith Spells",
-            "name": "Incantesimi della Forgia di Battaglia",
+            "name": "Incantesimi da Fabbro da Battaglia",
             "level": 3,
             "description_en": "Starting at 3rd level you always have certain spells prepared (Heroism, Shield at 3; Branding Smite, Warding Bond at 5; Aura of Vitality, Conjure Barrage at 9; Aura of Purity, Fire Shield at 13; Banishing Smite, Mass Cure Wounds at 17). They don't count against the number prepared.",
             "description": "A partire dal 3° livello hai sempre preparati certi incantesimi: 3° Heroism, Shield; 5° Branding Smite, Warding Bond; 9° Aura of Vitality, Conjure Barrage; 13° Aura of Purity, Fire Shield; 17° Banishing Smite, Mass Cure Wounds. Contano come incantesimi da artefice ma non nel numero di incantesimi che puoi preparare.",
@@ -610,7 +610,7 @@
           },
           {
             "name_en": "Battle Ready",
-            "name": "Pronto alla Battaglia",
+            "name": "Pronto per la Battaglia",
             "level": 3,
             "description_en": "When you reach 3rd level, you gain proficiency with martial weapons. When you attack with a magic weapon, you can use your Intelligence modifier, instead of Strength or Dexterity, for the attack and damage rolls.",
             "description": "Al 3° livello l'addestramento al combattimento e gli esperimenti con la magia si ripagano in due modi: ottieni la competenza nelle armi da guerra; quando attacchi con un'arma magica puoi usare il tuo modificatore di Intelligenza, invece che Forza o Destrezza, per i tiri di attacco e di danno.",
@@ -1883,7 +1883,7 @@
           },
           {
             "name_en": "Performance of Creation",
-            "name": "Performance della Creazione",
+            "name": "Compimento della Creazione",
             "level": 3,
             "description_en": "At 3rd level, as an action you create one nonmagical item in an unoccupied space within 10 ft. Item gp value <= 20x bard level, Medium or smaller. Lasts a number of hours equal to your PB. Can be used once per long rest, or by spending a 2nd level+ spell slot. Size increases at 6th (Large) and 14th (Huge).",
             "description": "Al 3° livello, con un'azione puoi incanalare la magia del Canto della Creazione per creare un oggetto non magico a tua scelta in uno spazio non occupato entro 10 piedi da te. L'oggetto deve apparire su una superficie o in un liquido capace di sostenerlo. Il valore in mo dell'oggetto non puo' superare 20 volte il tuo livello da Bardo e l'oggetto deve essere di taglia Media o inferiore. L'oggetto luccica leggermente e una creatura puo' sentire flebile musica toccandolo. L'oggetto creato scompare dopo un numero di ore pari al tuo bonus di competenza. Una volta usata questa capacita', non puoi riutilizzarla finche' non termini un riposo lungo, a meno che tu non spenda uno slot di 2° livello o superiore. Puoi avere un solo oggetto creato alla volta. La taglia massima dell'oggetto aumenta a Grande al 6° livello e a Enorme al 14° livello.",
@@ -1891,7 +1891,7 @@
           },
           {
             "name_en": "Animating Performance",
-            "name": "Performance Animatrice",
+            "name": "Creazione Animata",
             "level": 6,
             "description_en": "At 6th level, as an action animate one Large or smaller nonmagical item within 30 ft (Dancing Item: AC 16, HP 10 + 5x bard level, fly 30 ft, Force-Empowered Slam 1d10+PB force). Lasts 1 hour. Once per long rest, or 3rd level+ spell slot. You can command it as part of the same bonus action you use for Bardic Inspiration.",
             "description": "Al 6° livello, con un'azione puoi animare un oggetto non magico Grande o piu' piccolo entro 30 piedi da te che non sia indossato o trasportato. L'oggetto animato usa il blocco statistiche dell'Oggetto Danzante (CA 16, pf 10 + 5 x livello da Bardo, velocita' 9 metri / volo 9 metri). E' amichevole con te e i tuoi compagni e obbedisce ai tuoi comandi. Vive per 1 ora, finche' non e' ridotto a 0 pf o finche' tu non muori. In combattimento condivide la tua iniziativa ma agisce subito dopo il tuo turno. L'unica azione che esegue e' Schivare a meno che tu non usi un'azione bonus per comandargli un'altra azione. Quando usi la tua Ispirazione Bardica, puoi comandare l'oggetto come parte della stessa azione bonus. Una volta animato un oggetto, non puoi rifarlo finche' non termini un riposo lungo, a meno che tu non spenda uno slot di 3° livello o superiore. Puoi avere un solo oggetto animato alla volta. **Statistiche**: costrutto Grande o piu' piccolo, CA 16 (armatura naturale), pf 10 + 5 x livello, velocita' 9 metri / volo 9 metri (sospeso). FOR 18 (+4), DES 14 (+2), COS 16 (+3), INT 4 (-3), SAG 10 (+0), CAR 6 (-2). Immune a danni da veleno e psichici e alle condizioni affascinato, esausto, avvelenato, spaventato. Scurovisione 18 metri, Percezione passiva 10. Forma Immutabile: e' immune a qualunque incantesimo o effetto che alteri la sua forma. Danza Irrefrenabile: quando una creatura inizia il turno entro 10 piedi dall'oggetto, questo puo' aumentare o diminuire (a tua scelta) la velocita' di camminata di 10 piedi fino al termine del turno. Azione: Colpo Potenziato dalla Forza, attacco con arma da mischia con il tuo bonus di attacco con incantesimi, gittata 1,5 metri, un bersaglio: 1d10 + bonus di competenza danni da forza.",
@@ -1916,7 +1916,7 @@
         "features": [
           {
             "name_en": "Silver Tongue",
-            "name": "Lingua d'Argento",
+            "name": "Arte Oratoria",
             "level": 3,
             "description_en": "Starting at 3rd level, when you make a Charisma (Persuasion) or (Deception) check, you can treat a d20 roll of 9 or lower as a 10.",
             "description": "Dal 3° livello sei un maestro nel dire la cosa giusta al momento giusto. Quando effettui una prova di Carisma (Persuasione) o di Carisma (Inganno), puoi trattare un risultato di 9 o inferiore sul d20 come se fosse un 10.",
@@ -1940,7 +1940,7 @@
           },
           {
             "name_en": "Universal Speech",
-            "name": "Lingua Universale",
+            "name": "Linguaggio Universale",
             "level": 6,
             "description_en": "At 6th level, as an action choose creatures within 60 ft up to your Charisma modifier. They magically understand you for 1 hour, regardless of language. Once per long rest, or by expending a spell slot.",
             "description": "Al 6° livello hai ottenuto la capacita' di rendere il tuo eloquio comprensibile a qualunque creatura. Con un'azione, scegli una o piu' creature entro 60 piedi da te, fino a un numero pari al tuo modificatore di Carisma (minimo 1). Le creature scelte possono comprenderti magicamente, indipendentemente dalla lingua che parli, per 1 ora. Una volta usata, non puoi riutilizzare questa capacita' finche' non termini un riposo lungo, a meno che tu non spenda uno slot incantesimo per riutilizzarla.",
@@ -3107,7 +3107,7 @@
           },
           {
             "name_en": "Voice of Authority",
-            "name": "Voce dell'Autorita'",
+            "name": "Voce dell'Autorit?",
             "level": 1,
             "description_en": "At 1st level, when you cast a spell using a 1st-level+ slot targeting an ally, that ally can use their reaction immediately to make one weapon attack against a creature you choose. If multiple allies are targeted, you choose which.",
             "description": "Dal 1° livello puoi invocare il potere della legge per spronare un alleato all'attacco. Se lanci un incantesimo con uno slot di 1° livello o superiore e bersagli un alleato con l'incantesimo, quell'alleato puo' usare la sua reazione subito dopo l'incantesimo per effettuare un attacco con arma contro una creatura a tua scelta che puoi vedere. Se l'incantesimo bersaglia piu' di un alleato, scegli tu chi puo' effettuare l'attacco.",
@@ -3115,7 +3115,7 @@
           },
           {
             "name_en": "Channel Divinity: Order's Demand",
-            "name": "Incanalare Divinita': Richiamo dell'Ordine",
+            "name": "Incanalare Divinit?: Pretesa dell'Ordine",
             "level": 2,
             "description_en": "At 2nd level, as an action present holy symbol; each creature within 30 ft that can see/hear you must succeed Wisdom save or be charmed until end of next turn (or until damaged). Failed creatures can be made to drop what they hold.",
             "description": "Dal 2° livello puoi usare Incanalare Divinita' per esercitare una presenza intimidatoria sugli altri. Con un'azione presenti il tuo simbolo sacro e ogni creatura a tua scelta entro 30 piedi che puo' vederti o sentirti deve riuscire in un tiro salvezza su Saggezza o essere affascinata da te fino al termine del tuo turno successivo o finche' non subisce danni. Puoi anche far cadere a una qualsiasi delle creature affascinate cio' che impugnano quando falliscono il tiro salvezza.",
@@ -3164,7 +3164,7 @@
           },
           {
             "name_en": "Emboldening Bond",
-            "name": "Vincolo Coraggioso",
+            "name": "Legame Incoraggiante",
             "level": 1,
             "description_en": "At 1st level, as an action choose up to PB willing creatures within 30 ft (incl yourself). Magical bond for 10 minutes (or until used again). While any bonded creature is within 30 ft of another, it can roll a d4 once per turn and add it to an attack, ability check, or saving throw. Usable PB times per long rest.",
             "description": "Dal 1° livello puoi forgiare un vincolo che da' coraggio tra persone in pace tra loro. Con un'azione, scegli un numero di creature volontarie entro 30 piedi (te stesso incluso) pari al tuo bonus di competenza. Crei un vincolo magico tra esse per 10 minuti o finche' non riutilizzi questa capacita'. Mentre una creatura legata e' entro 30 piedi da un'altra legata, puo' tirare 1d4 e aggiungerne il risultato a un tiro per colpire, una prova di caratteristica o un tiro salvezza che effettua. Ogni creatura puo' aggiungere il d4 al massimo una volta per turno. Usabile un numero di volte pari al tuo bonus di competenza, recuperi tutti gli usi a riposo lungo.",
@@ -3172,7 +3172,7 @@
           },
           {
             "name_en": "Channel Divinity: Balm of Peace",
-            "name": "Incanalare Divinita': Balsamo di Pace",
+            "name": "Incanalare Divinit?: Balsamo della Pace",
             "level": 2,
             "description_en": "At 2nd level, as an action move up to your speed without provoking opportunity attacks. When you move within 5 ft of a creature during this action, you can restore HP equal to 2d6 + Wisdom mod (min 1). Each creature can be healed only once per use of this action.",
             "description": "Dal 2° livello puoi usare Incanalare Divinita' per rendere la tua presenza un balsamo lenitivo. Con un'azione puoi muoverti fino alla tua velocita' senza provocare attacchi di opportunita', e quando entri entro 5 piedi da un'altra creatura durante questa azione, puoi ripristinarle un numero di punti ferita pari a 2d6 + il tuo modificatore di Saggezza (minimo 1). Una creatura puo' ricevere questa cura solo una volta per ogni uso di questa azione.",
@@ -3180,7 +3180,7 @@
           },
           {
             "name_en": "Protective Bond",
-            "name": "Vincolo Protettivo",
+            "name": "Legame Protettivo",
             "level": 6,
             "description_en": "At 6th level, when a creature affected by Emboldening Bond is about to take damage, a second bonded creature within 30 ft can use its reaction to teleport within 5 ft of the first and take all the damage instead.",
             "description": "Dal 6° livello, il vincolo che forgi tra le persone le aiuta a proteggersi a vicenda. Quando una creatura colpita dalla tua capacita' Vincolo Coraggioso sta per subire danni, una seconda creatura legata entro 30 piedi dalla prima puo' usare la sua reazione per teletrasportarsi in uno spazio non occupato entro 5 piedi dalla prima creatura. La seconda creatura subisce poi tutti i danni al posto della prima.",
@@ -3188,7 +3188,7 @@
           },
           {
             "name_en": "Potent Spellcasting",
-            "name": "Lancio di Incantesimi Potenziato",
+            "name": "Incantesimi Potenti",
             "level": 8,
             "description_en": "At 8th level, you add your Wisdom modifier to the damage you deal with any cleric cantrip.",
             "description": "Dall'8° livello, aggiungi il tuo modificatore di Saggezza ai danni che infliggi con qualunque trucchetto da Chierico.",
@@ -3196,7 +3196,7 @@
           },
           {
             "name_en": "Expansive Bond",
-            "name": "Vincolo Espansivo",
+            "name": "Legame Espansivo",
             "level": 17,
             "description_en": "At 17th level, Emboldening Bond and Protective Bond now work within 60 ft. When a creature uses Protective Bond to take damage, the creature has resistance to that damage.",
             "description": "Al 17° livello i benefici delle tue capacita' Vincolo Coraggioso e Vincolo Protettivo funzionano ora quando le creature sono entro 60 piedi l'una dall'altra. Inoltre, quando una creatura usa Vincolo Protettivo per subire i danni di qualcun altro, ha resistenza a quei danni.",
@@ -3343,7 +3343,7 @@
           },
           {
             "name_en": "Channel Divinity: Twilight Sanctuary",
-            "name": "Incanalare Divinita': Santuario Crepuscolare",
+            "name": "Incanalare Divinit?: Santuario del Crepuscolo",
             "level": 2,
             "description_en": "At 2nd level, as an action present holy symbol; sphere of twilight (30-ft radius, dim light, moves with you, lasts 1 minute). When a creature ends its turn in the sphere, grant: temp HP = 1d6 + cleric level; OR end one charmed/frightened effect on it.",
             "description": "Dal 2° livello puoi usare Incanalare Divinita' per ristorare i tuoi alleati con un crepuscolo lenitivo. Con un'azione presenti il tuo simbolo sacro: una sfera di crepuscolo si emana da te, ha un raggio di 30 piedi, e' centrata su di te, e' riempita di luce fioca, si muove con te e dura 1 minuto o finche' non sei incapacitato o muori. Ogni volta che una creatura (incluso te) termina il suo turno nella sfera, puoi concederle uno di questi benefici: punti ferita temporanei pari a 1d6 + il tuo livello da Chierico; oppure terminare su di lei un effetto che la rende affascinata o spaventata.",
@@ -3367,7 +3367,7 @@
           },
           {
             "name_en": "Twilight Shroud",
-            "name": "Sudario Crepuscolare",
+            "name": "Sudario del Crepuscolo",
             "level": 17,
             "description_en": "At 17th level, you and your allies have half cover while in the sphere created by your Twilight Sanctuary.",
             "description": "Al 17° livello, il crepuscolo che evochi offre un abbraccio protettivo: tu e i tuoi alleati avete copertura parziale mentre vi trovate nella sfera creata dal tuo Santuario Crepuscolare.",
@@ -4161,11 +4161,11 @@
       {
         "slug": "circle-of-spores",
         "name_en": "Circle of Spores",
-        "name": "Cerchio delle Spore",
+        "name": "Circolo delle Spore",
         "features": [
           {
             "name_en": "Circle Spells",
-            "name": "Incantesimi del Cerchio",
+            "name": "Incantesimi del Circolo",
             "level": 2,
             "description_en": "At 2nd level, you learn the Chill Touch cantrip. At 3rd, 5th, 7th, and 9th level you gain access to the Circle of Spores Spells, always prepared and not counting against your prepared spells limit.",
             "description": "Il tuo legame simbiotico con i funghi e la tua capacita' di attingere al ciclo di vita e morte ti concedono accesso a certi incantesimi. Al 2° livello impari il trucchetto Chill Touch. Al 3°, 5°, 7° e 9° livello ottieni accesso agli incantesimi del Cerchio delle Spore. Una volta ottenuto un incantesimo, lo hai sempre preparato e non conta nel numero di incantesimi che puoi preparare. Se ottieni un incantesimo non presente nella lista del Druido, e' comunque un incantesimo da Druido per te.",
@@ -4173,7 +4173,7 @@
           },
           {
             "name_en": "Halo of Spores",
-            "name": "Aureola di Spore",
+            "name": "Alone di Spore",
             "level": 2,
             "description_en": "At 2nd level, when a creature you can see moves into a space within 10 ft of you or starts its turn there, use your reaction to deal 1d4 necrotic damage unless it succeeds a Constitution save. Damage increases: 1d6 at 6th, 1d8 at 10th, 1d10 at 14th.",
             "description": "Dal 2° livello sei circondato da spore necrotiche invisibili, innocue finche' non le scateni su una creatura vicina. Quando una creatura che puoi vedere entra in uno spazio entro 10 piedi da te o inizia il turno li', puoi usare la tua reazione per infliggere 1d4 danni necrotici alla creatura, a meno che non riesca in un tiro salvezza su Costituzione contro la tua CD degli incantesimi. I danni necrotici aumentano a 1d6 al 6° livello, 1d8 al 10° livello e 1d10 al 14° livello.",
@@ -4181,7 +4181,7 @@
           },
           {
             "name_en": "Symbiotic Entity",
-            "name": "Entita' Simbiotica",
+            "name": "Entit? Simbiotica",
             "level": 2,
             "description_en": "At 2nd level, as an action expend Wild Shape to awaken spores: gain 4 temp HP per druid level. While active: Halo of Spores damage rolls a second die added to total; melee weapon attacks deal extra 1d6 necrotic. Lasts 10 minutes, until temp HP gone, or you Wild Shape again.",
             "description": "Al 2° livello ottieni la capacita' di incanalare la magia nelle tue spore. Con un'azione puoi spendere un uso di Forma Selvatica per risvegliare quelle spore, invece di trasformarti in una bestia, e ottieni 4 punti ferita temporanei per ogni tuo livello da Druido. Mentre questa capacita' e' attiva ottieni: quando infliggi i danni dell'Aureola di Spore, tira il dado dei danni una seconda volta e aggiungilo al totale; i tuoi attacchi con armi da mischia infliggono ulteriori 1d6 danni necrotici a ogni bersaglio colpito. I benefici durano 10 minuti, finche' non perdi tutti questi punti ferita temporanei o finche' non riusi Forma Selvatica.",
@@ -4197,7 +4197,7 @@
           },
           {
             "name_en": "Spreading Spores",
-            "name": "Spore Diffuse",
+            "name": "Diffusione di Spore",
             "level": 10,
             "description_en": "At 10th level, as a bonus action while Symbiotic Entity is active, hurl spores up to 30 ft into a 10-ft cube for 1 minute. A creature entering or starting turn there takes Halo of Spores damage (Constitution save). While active, you can't use Halo of Spores reaction.",
             "description": "Dal 10° livello ottieni la capacita' di seminare un'area con spore mortali. Come azione bonus, mentre la tua capacita' Entita' Simbiotica e' attiva, puoi scagliare spore fino a 30 piedi di distanza, dove vorticano in un cubo di 10 piedi per 1 minuto. Le spore scompaiono prima se riusi questa capacita', se le congedi come azione bonus o se la tua Entita' Simbiotica non e' piu' attiva. Ogni volta che una creatura entra nel cubo o inizia il turno li', subisce i danni della tua Aureola di Spore, a meno che non riesca in un tiro salvezza su Costituzione contro la tua CD. Una creatura puo' subire questi danni al massimo una volta per turno. Mentre il cubo di spore persiste, non puoi usare la reazione Aureola di Spore.",
@@ -4218,11 +4218,11 @@
       {
         "slug": "circle-of-stars",
         "name_en": "Circle of Stars",
-        "name": "Cerchio delle Stelle",
+        "name": "Circolo delle Stelle",
         "features": [
           {
             "name_en": "Star Map",
-            "name": "Mappa Stellare",
+            "name": "Carta Celeste",
             "level": 2,
             "description_en": "At 2nd level, you've created a star chart (Tiny object, spellcasting focus). While holding: you know Guidance; you have Guiding Bolt always prepared (counts as druid spell, doesn't count against prepared limit); you can cast Guiding Bolt without expending a slot PB times per long rest. If lost, 1-hour ceremony to replace.",
             "description": "Al 2° livello hai creato una mappa stellare come parte dei tuoi studi celesti. E' un oggetto Minuscolo e puo' fungere da focus per i tuoi incantesimi da Druido. Determini la sua forma tirando sulla tabella delle Forme di Mappa Stellare o scegliendola. Mentre impugni la mappa, ottieni i seguenti benefici: conosci il trucchetto Guidance; hai sempre l'incantesimo Guiding Bolt preparato (conta come incantesimo da Druido per te e non conta nel numero di incantesimi che puoi preparare); puoi lanciare Guiding Bolt senza spendere uno slot, un numero di volte pari al tuo bonus di competenza, recuperando tutti gli usi a riposo lungo. Se perdi la mappa, puoi eseguire una cerimonia di 1 ora per crearne magicamente una sostitutiva. La cerimonia puo' essere eseguita durante un riposo breve o lungo e distrugge la mappa precedente.",
@@ -4230,7 +4230,7 @@
           },
           {
             "name_en": "Starry Form",
-            "name": "Forma Stellata",
+            "name": "Forma Siderale",
             "level": 2,
             "description_en": "At 2nd level, as a bonus action expend Wild Shape to take a starry form (10 minutes). Choose constellation: Archer (bonus action ranged spell attack 60 ft, 1d8 + Wis radiant); Chalice (when you cast a spell with slot restoring HP, you or another within 30 ft regain 1d8 + Wis); Dragon (treat 9 or lower as 10 on Int/Wis checks and Con saves to maintain concentration).",
             "description": "Al 2° livello ottieni la capacita' di sfruttare il potere delle costellazioni per alterare la tua forma. Come azione bonus puoi spendere un uso di Forma Selvatica per assumere una forma stellata, invece di trasformarti in una bestia. Mentre sei in forma stellata, mantieni le tue statistiche di gioco ma il tuo corpo diventa luminoso: le tue articolazioni brillano come stelle e linee luminose le collegano come su una mappa stellare. La forma emette luce intensa entro 10 piedi e luce fioca per altri 10 piedi. Dura 10 minuti. Termina prima se la congedi (nessuna azione richiesta), sei incapacitato, muori o riusi questa capacita'. Quando assumi la forma stellata, scegli quale delle seguenti costellazioni brilli sul tuo corpo: **Arciere**: quando attivi questa forma e come azione bonus nei turni successivi, puoi effettuare un attacco con incantesimo a distanza scagliando una freccia luminosa contro una creatura entro 60 piedi; con un colpo, l'attacco infligge danni radiosi pari a 1d8 + il tuo modificatore di Saggezza. **Calice**: ogni volta che lanci un incantesimo con uno slot che ripristina punti ferita a una creatura, tu o un'altra creatura entro 30 piedi puo' recuperare punti ferita pari a 1d8 + il tuo modificatore di Saggezza. **Drago**: quando effettui una prova di Intelligenza o Saggezza o un tiro salvezza su Costituzione per mantenere la concentrazione, puoi trattare un risultato di 9 o inferiore sul d20 come fosse un 10.",
@@ -4238,7 +4238,7 @@
           },
           {
             "name_en": "Cosmic Omen",
-            "name": "Presagio Cosmico",
+            "name": "Profezia Cosmica",
             "level": 6,
             "description_en": "At 6th level, after a long rest consult your Star Map. Roll a die: even = Weal (reaction to add a d6 to a creature's attack/save/check within 30 ft); odd = Woe (reaction to subtract d6). Usable PB times per long rest.",
             "description": "Al 6° livello impari a usare la tua mappa stellare per divinare la volonta' del cosmo. Quando termini un riposo lungo, puoi consultare la tua Mappa Stellare per i presagi. Tira un dado. Fino al termine del prossimo riposo lungo ottieni accesso a una reazione speciale basata sul fatto che hai tirato un numero pari o dispari: **Buon Auspicio (pari)**: quando una creatura che puoi vedere entro 30 piedi sta per effettuare un tiro per colpire, un tiro salvezza o una prova di caratteristica, puoi usare la tua reazione per tirare 1d6 e aggiungere il risultato al totale. **Cattivo Auspicio (dispari)**: quando una creatura che puoi vedere entro 30 piedi sta per effettuare un tiro per colpire, un tiro salvezza o una prova di caratteristica, puoi usare la tua reazione per tirare 1d6 e sottrarre il risultato dal totale. Usabile un numero di volte pari al tuo bonus di competenza, recuperi gli usi a riposo lungo.",
@@ -4254,7 +4254,7 @@
           },
           {
             "name_en": "Full of Stars",
-            "name": "Pieno di Stelle",
+            "name": "Manto di Stelle",
             "level": 14,
             "description_en": "At 14th level, while in Starry Form, you become partially incorporeal: resistance to bludgeoning, piercing, and slashing damage.",
             "description": "Al 14° livello, mentre sei in Forma Stellata, diventi parzialmente incorporeo, ottenendo resistenza ai danni contundenti, perforanti e taglienti.",
@@ -4267,11 +4267,11 @@
       {
         "slug": "circle-of-wildfire",
         "name_en": "Circle of Wildfire",
-        "name": "Cerchio del Fuoco Selvaggio",
+        "name": "Circolo della Fiamma",
         "features": [
           {
             "name_en": "Circle Spells",
-            "name": "Incantesimi del Cerchio",
+            "name": "Incantesimi del Circolo",
             "level": 2,
             "description_en": "At 2nd level, your bond with a wildfire spirit grants access to certain spells at certain levels. Always prepared, don't count against prepared limit.",
             "description": "Quando ti unisci a questo cerchio al 2° livello, hai formato un legame con uno spirito del fuoco selvaggio, un essere primordiale di creazione e distruzione. Il tuo legame con questo spirito ti concede accesso ad alcuni incantesimi quando raggiungi certi livelli. Una volta ottenuto un incantesimo, lo hai sempre preparato e non conta nel numero di incantesimi che puoi preparare. Se ottieni un incantesimo non presente nella lista del Druido, e' comunque un incantesimo da Druido per te.",
@@ -4279,7 +4279,7 @@
           },
           {
             "name_en": "Summon Wildfire Spirit",
-            "name": "Evocare Spirito del Fuoco Selvaggio",
+            "name": "Evocare Spirito della Fiamma",
             "level": 2,
             "description_en": "At 2nd level, as an action expend Wild Shape to summon your wildfire spirit (Small elemental: AC 13, HP 5 + 5x druid level, 30 ft / fly 30 ft). Each creature within 10 ft (other than you) makes Dex save vs spell DC or takes 2d6 fire. Spirit lasts 1 hour. Actions: Flame Seed (ranged 60 ft, 1d6 + PB fire); Fiery Teleportation (spirit + willing creatures within 5 ft teleport 15 ft, then creatures near old space make Dex save or 1d6 + PB fire).",
             "description": "Al 2° livello puoi evocare lo spirito primordiale legato alla tua anima. Con un'azione puoi spendere un uso di Forma Selvatica per evocare il tuo spirito del fuoco selvaggio invece di assumere una forma bestiale. Lo spirito appare in uno spazio non occupato a tua scelta che puoi vedere entro 30 piedi. Ogni creatura entro 10 piedi dallo spirito (diversa da te) quando appare deve riuscire in un tiro salvezza su Destrezza contro la tua CD degli incantesimi o subire 2d6 danni da fuoco. Lo spirito e' amichevole verso te e i tuoi compagni e obbedisce ai tuoi comandi. In combattimento lo spirito condivide la tua iniziativa ma agisce subito dopo il tuo turno. L'unica azione che esegue e' Schivare a meno che tu non usi un'azione bonus per comandargli un'altra azione. Se sei incapacitato, puo' eseguire qualsiasi azione a sua scelta. Lo spirito si manifesta per 1 ora, finche' non e' ridotto a 0 pf, finche' non lo richiami o finche' tu non muori. **Statistiche**: elementale Piccolo, CA 13 (armatura naturale), pf 5 + 5 x livello da Druido, velocita' 9 metri / volo 9 metri (sospeso). FOR 10 (+0), DES 14 (+2), COS 14 (+2), INT 13 (+1), SAG 15 (+2), CAR 11 (+0). Immune a danni da fuoco e alle condizioni affascinato, spaventato, in lotta, prono, trattenuto. Scurovisione 18 metri, Percezione passiva 12. Azioni: **Seme di Fiamma**, attacco con arma a distanza con il tuo bonus di attacco con incantesimi, gittata 60 piedi, un bersaglio: 1d6 + bonus di competenza danni da fuoco. **Teletrasporto Infuocato**: lo spirito e ogni creatura volontaria a tua scelta entro 5 piedi si teletrasportano fino a 15 piedi in spazi non occupati che puoi vedere; poi ogni creatura entro 5 piedi dallo spazio che lo spirito ha lasciato deve riuscire in un tiro salvezza su Destrezza o subire 1d6 + bonus di competenza danni da fuoco.",
@@ -4287,7 +4287,7 @@
           },
           {
             "name_en": "Enhanced Bond",
-            "name": "Legame Potenziato",
+            "name": "Legame Migliorato",
             "level": 6,
             "description_en": "At 6th level, when you cast a spell that deals fire damage or restores HP while your wildfire spirit is summoned, roll a d8 and add to one damage or healing roll. Spells with range other than self can originate from you or your spirit.",
             "description": "Al 6° livello il legame con il tuo spirito del fuoco selvaggio potenzia i tuoi incantesimi distruttivi e ristoratori. Ogni volta che lanci un incantesimo che infligge danni da fuoco o ripristina punti ferita mentre il tuo spirito del fuoco selvaggio e' evocato, tira 1d8 e ottieni un bonus pari al risultato a un tiro per i danni o per la guarigione dell'incantesimo. Inoltre, quando lanci un incantesimo con gittata diversa da se stesso, l'incantesimo puo' originare da te o dal tuo spirito del fuoco selvaggio.",
@@ -4303,7 +4303,7 @@
           },
           {
             "name_en": "Blazing Revival",
-            "name": "Rinascita Fiammeggiante",
+            "name": "Recupero Ardente",
             "level": 14,
             "description_en": "At 14th level, if your spirit is within 120 ft when you drop to 0 HP and fall unconscious, you can cause the spirit to drop to 0 HP. You then regain half your HP and immediately rise to your feet. Once per long rest.",
             "description": "Al 14° livello il legame con il tuo spirito del fuoco selvaggio puo' salvarti dalla morte. Se lo spirito e' entro 120 piedi da te quando sei ridotto a 0 punti ferita e cadi privo di sensi, puoi far cadere lo spirito a 0 punti ferita. Recuperi quindi meta' dei tuoi punti ferita e ti rimetti immediatamente in piedi. Una volta usata, non puoi riutilizzarla finche' non termini un riposo lungo.",
@@ -5125,7 +5125,7 @@
           },
           {
             "name_en": "Guarded Mind",
-            "name": "Mente Protetta",
+            "name": "Scudo Mentale",
             "level": 10,
             "description_en": "Starting at 10th level, you have resistance to psychic damage. If you start your turn charmed or frightened, you can spend a Psionic Energy die and end every effect causing those conditions on yourself.",
             "description": "Dal 10° livello l'energia psionica che scorre in te ha rinvigorito la tua mente. Hai resistenza ai danni psichici. Inoltre, se inizi il turno affascinato o spaventato, puoi spendere un dado di Energia Psionica e terminare ogni effetto che ti soggetta a quelle condizioni.",
@@ -5141,7 +5141,7 @@
           },
           {
             "name_en": "Telekinetic Master",
-            "name": "Maestro Telecinetico",
+            "name": "Maestro della Telecinesi",
             "level": 18,
             "description_en": "By 18th level, you can cast Telekinesis without components (Int as casting ability). On each turn while concentrating, you can make one weapon attack as a bonus action. Once per long rest unless die spent.",
             "description": "Dal 18° livello la tua capacita' di muovere creature e oggetti con la mente e' eguagliata da pochi. Puoi lanciare l'incantesimo Telekinesis senza componenti, e la tua caratteristica da incantesimi per esso e' Intelligenza. In ognuno dei tuoi turni mentre ti concentri sull'incantesimo, incluso il turno in cui lo lanci, puoi effettuare un attacco con arma come azione bonus. Una volta lanciato l'incantesimo con questa capacita', non puoi rifarlo finche' non termini un riposo lungo, a meno che tu non spenda un dado di Energia Psionica.",
@@ -5154,7 +5154,7 @@
       {
         "slug": "rune-knight",
         "name_en": "Rune Knight",
-        "name": "Cavaliere delle Rune",
+        "name": "Cavaliere Runico",
         "features": [
           {
             "name_en": "Bonus Proficiencies",
@@ -5166,7 +5166,7 @@
           },
           {
             "name_en": "Rune Carver",
-            "name": "Incisore di Rune",
+            "name": "Intagliatore di Rune",
             "level": 3,
             "description_en": "At 3rd level, learn 2 runes (3 at 7th, 4 at 10th, 5 at 15th). After a long rest, inscribe each rune on a different object you wear/hold. Save DC = 8 + PB + Constitution. Runes available: Cloud (advantage on Sleight/Deception; reaction redirect attack); Fire (PB doubled for tool checks; +2d6 fire and Strength save or restrained); Frost (advantage on Animal Handling/Intimidation; bonus action +2 Str/Con checks/saves for 10 min); Stone (advantage on Insight; darkvision 120 ft; reaction Wisdom save or charmed/incapacitated for 1 min). 7th+: Hill (advantage vs poisoned, resistance to poison; bonus action resistance to bludgeoning/piercing/slashing for 1 min); Storm (advantage on Arcana, can't be surprised; bonus action prophecy state - reaction grant adv/disadv to roll within 60 ft).",
             "description": "Dal 3° livello puoi usare rune magiche per potenziare il tuo equipaggiamento. Impari due rune a tua scelta tra quelle descritte sotto, e ogni volta che ottieni un livello in questa classe puoi sostituirne una con un'altra. Impari rune aggiuntive: 3 al 7° livello, 4 al 10° e 5 al 15°. Ogni volta che termini un riposo lungo puoi toccare un numero di oggetti pari al numero di rune che conosci e inciderne una diversa su ciascuno. Per essere idoneo, l'oggetto deve essere un'arma, un'armatura, uno scudo, un gioiello o qualcosa che puoi indossare o impugnare. La runa rimane finche' non termini un riposo lungo. Un oggetto puo' portare solo una tua runa alla volta. CD dei tiri salvezza = 8 + bonus di competenza + modificatore di Costituzione. **Rune disponibili**: **Runa della Nuvola** — vantaggio a Rapidita' di Mano e Inganno; reazione: quando tu o una creatura entro 30 piedi venite colpiti, scegli un'altra creatura entro 30 piedi (non l'attaccante) come bersaglio dell'attacco usando lo stesso tiro. **Runa del Fuoco** — bonus di competenza raddoppiato per prove con strumenti; quando colpisci con un'arma, +2d6 fuoco e TS Forza o trattenuto per 1 minuto, +2d6 fuoco a inizio turno. **Runa del Gelo** — vantaggio ad Addestrare Animali e Intimidire; azione bonus: +2 a tutte le prove e TS di Forza/Costituzione per 10 minuti. **Runa della Pietra** — vantaggio a Intuizione, scurovisione 120 piedi; reazione quando una creatura entro 30 piedi termina il turno: TS Saggezza o affascinata, velocita' 0 e incapacitata per 1 minuto. **Runa della Collina** (7°+) — vantaggio ai TS contro avvelenato, resistenza al veleno; azione bonus: resistenza a contundenti, perforanti e taglienti per 1 minuto. **Runa della Tempesta** (7°+) — vantaggio ad Arcano, non puoi essere sorpreso; azione bonus: stato profetico per 1 minuto, reazione per dare vantaggio o svantaggio a un tiro entro 60 piedi. Tutte le rune si invocano una volta per riposo breve o lungo.",
@@ -5190,7 +5190,7 @@
           },
           {
             "name_en": "Great Stature",
-            "name": "Grande Statura",
+            "name": "Statura Torreggiante",
             "level": 10,
             "description_en": "By 10th level, runes alter you permanently. Roll 3d4: grow that many inches. Giant's Might extra damage becomes 1d8.",
             "description": "Dal 10° livello la magia delle tue rune ti altera permanentemente. Quando ottieni questa capacita', tira 3d4: cresci di un numero di pollici pari al risultato. Inoltre, il danno extra inflitto con la tua capacita' Potenza del Gigante aumenta a 1d8.",
@@ -6128,7 +6128,7 @@
           },
           {
             "name_en": "Ghost Walk",
-            "name": "Camminata Spettrale",
+            "name": "Cammino Fantasma",
             "level": 13,
             "description_en": "At 13th level, as a bonus action assume spectral form for 10 minutes (or end as bonus action): fly 10 ft, hover, attack rolls have disadvantage against you, can pass through creatures/objects as difficult terrain (1d10 force damage if you end turn inside one). Usable once per long rest, or by destroying a soul trinket as part of bonus action.",
             "description": "Al 13° livello puoi entrare parzialmente nel regno dei morti, diventando come un fantasma. Come azione bonus assumi una forma spettrale. Mentre sei in questa forma hai una velocita' di volo di 10 piedi, puoi librarti e i tiri per colpire contro di te hanno svantaggio. Puoi anche muoverti attraverso creature e oggetti come se fossero terreno difficile, ma subisci 1d10 danni da forza se termini il tuo turno dentro una creatura o un oggetto. Resti in questa forma per 10 minuti o finche' non la termini come azione bonus. Per usare di nuovo questa capacita' devi terminare un riposo lungo o distruggere uno dei tuoi pegni dell'anima come parte dell'azione bonus per attivare Camminata Spettrale.",
@@ -6136,7 +6136,7 @@
           },
           {
             "name_en": "Death's Friend",
-            "name": "Amico della Morte",
+            "name": "Compagno della Morte",
             "level": 17,
             "description_en": "At 17th level: Wails from the Grave deals necrotic damage to BOTH the first and second creature; at end of long rest, a soul trinket appears in your hand if you have none.",
             "description": "Al 17° livello la tua associazione con la morte e' diventata cosi' stretta da concederti i seguenti benefici: quando usi i tuoi Lamenti dalla Tomba, ora puoi infliggere i danni necrotici sia alla prima che alla seconda creatura; al termine di un riposo lungo, un pegno dell'anima appare nella tua mano se non ne hai nessuno, mentre gli spiriti dei morti sono attratti da te.",
@@ -6198,7 +6198,7 @@
       {
         "slug": "soulknife",
         "name_en": "Soulknife",
-        "name": "Lama dell'Anima",
+        "name": "Lama Spirituale",
         "features": [
           {
             "name_en": "Psionic Power",
@@ -6234,7 +6234,7 @@
           },
           {
             "name_en": "Rend Mind",
-            "name": "Squarcio della Mente",
+            "name": "Squarciare la Mente",
             "level": 17,
             "description_en": "At 17th level, when you use Psychic Blades to deal Sneak Attack damage, target makes a Wisdom save (DC 8 + PB + Dex). On fail, stunned for 1 minute. Repeats save at end of each turn. Once per long rest unless you expend three Psionic Energy dice.",
             "description": "Al 17° livello puoi spazzare la tua Lama Psichica direttamente attraverso la mente di una creatura. Quando usi le tue Lame Psichiche per infliggere i danni dell'Attacco Furtivo a una creatura, puoi forzare quel bersaglio a effettuare un tiro salvezza su Saggezza (CD pari a 8 + il tuo bonus di competenza + il tuo modificatore di Destrezza). Se fallisce, il bersaglio e' stordito per 1 minuto. Il bersaglio stordito puo' ripetere il tiro salvezza al termine di ognuno dei suoi turni, terminando l'effetto su di se' con un successo. Una volta usata, non puoi rifarla finche' non termini un riposo lungo, a meno che tu non spenda tre dadi di Energia Psionica per riutilizzarla.",
@@ -6804,11 +6804,11 @@
       {
         "slug": "bladesinging",
         "name_en": "Bladesinging",
-        "name": "Cantore di Lame",
+        "name": "Canto della Lama",
         "features": [
           {
             "name_en": "Training in War and Song",
-            "name": "Addestramento in Guerra e Canto",
+            "name": "Arte della Guerra e del Canto",
             "level": 2,
             "description_en": "When you adopt this tradition at 2nd level, gain proficiency with light armor, one type of one-handed melee weapon of your choice, and Performance.",
             "description": "Quando adotti questa tradizione al 2° livello, ottieni la competenza nelle armature leggere, in un tipo di arma da mischia a una mano a tua scelta e nell'abilita' Intrattenere se non l'hai gia'.",
@@ -6816,7 +6816,7 @@
           },
           {
             "name_en": "Bladesong",
-            "name": "Canto di Lama",
+            "name": "Melodia della Lama",
             "level": 2,
             "description_en": "Starting at 2nd level, as a bonus action you can start the Bladesong (1 minute, ends if incapacitated, wear medium/heavy armor or shield, or two-hand a weapon). Benefits: +Int mod (min +1) AC; +10 ft speed; advantage on Acrobatics; +Int mod (min +1) to Constitution saves to maintain concentration. Usable PB times per long rest.",
             "description": "Dal 2° livello puoi invocare una magia elfica chiamata Canto di Lama, purche' tu non indossi un'armatura media o pesante o non stia usando uno scudo. Ti concede velocita', agilita' e concentrazione soprannaturali. Puoi usare un'azione bonus per iniziare il Canto di Lama, che dura 1 minuto. Termina prima se sei incapacitato, se indossi un'armatura media o pesante o uno scudo, o se usi due mani per attaccare con un'arma. Puoi anche congedarlo in qualunque momento (nessuna azione richiesta). Mentre il Canto di Lama e' attivo ottieni: un bonus alla CA pari al tuo modificatore di Intelligenza (minimo +1); la tua velocita' di camminata aumenta di 10 piedi; vantaggio alle prove di Destrezza (Acrobazia); un bonus a qualunque tiro salvezza su Costituzione effettuato per mantenere la concentrazione su un incantesimo, pari al tuo modificatore di Intelligenza (minimo +1). Usabile un numero di volte pari al tuo bonus di competenza, recuperi tutti gli usi a riposo lungo.",
@@ -6832,7 +6832,7 @@
           },
           {
             "name_en": "Song of Defense",
-            "name": "Canto di Difesa",
+            "name": "Canzone di Difesa",
             "level": 10,
             "description_en": "Beginning at 10th level, when you take damage while Bladesong is active, use your reaction to expend a spell slot and reduce damage by 5 x the slot's level.",
             "description": "Dal 10° livello puoi dirigere la tua magia per assorbire i danni mentre il tuo Canto di Lama e' attivo. Quando subisci danni, puoi usare la tua reazione per spendere uno slot incantesimo e ridurre quei danni per te di un valore pari a cinque volte il livello dello slot.",
@@ -6840,7 +6840,7 @@
           },
           {
             "name_en": "Song of Victory",
-            "name": "Canto di Vittoria",
+            "name": "Canzone di Vittoria",
             "level": 14,
             "description_en": "Starting at 14th level, you can add your Intelligence modifier (minimum +1) to the damage of your melee weapon attacks while your Bladesong is active.",
             "description": "Dal 14° livello puoi aggiungere il tuo modificatore di Intelligenza (minimo +1) ai danni dei tuoi attacchi con armi da mischia mentre il tuo Canto di Lama e' attivo.",
@@ -7192,7 +7192,7 @@
         "features": [
           {
             "name_en": "Wizardly Quill",
-            "name": "Penna del Mago",
+            "name": "Calamo Incantato",
             "level": 2,
             "description_en": "At 2nd level, as a bonus action create a Tiny magic quill: produces ink in any color (no ink needed); copying spells into spellbook takes 2 minutes per spell level; can erase your text with bonus action (within 5 ft). Disappears if you create another or die.",
             "description": "Dal 2° livello, come azione bonus, puoi creare magicamente una penna Minuscola nella tua mano libera. La penna magica ha le seguenti proprieta': non richiede inchiostro; quando scrivi con essa produce inchiostro di un colore a tua scelta sulla superficie di scrittura; il tempo che devi spendere per copiare un incantesimo nel tuo libro degli incantesimi e' pari a 2 minuti per livello dell'incantesimo se usi la penna per la trascrizione; puoi cancellare qualunque cosa tu scriva con la penna agitando la piuma sopra il testo come azione bonus, purche' il testo sia entro 5 piedi da te. La penna scompare se ne crei un'altra o se muori.",
@@ -7208,7 +7208,7 @@
           },
           {
             "name_en": "Manifest Mind",
-            "name": "Manifestare Mente",
+            "name": "Mente Manifesta",
             "level": 6,
             "description_en": "At 6th level, as a bonus action while the book is on you, manifest the spectral mind in an unoccupied space within 60 ft (Tiny, intangible, dim light 10 ft, darkvision 60 ft, telepathy with you). When you cast a wizard spell on your turn you can cast it as if you were in the spectral mind's space (PB times per long rest). Bonus action: hover up to 30 ft. Stops if 300+ ft from you, dispelled, book destroyed, dismissed. Once per long rest unless you expend a spell slot.",
             "description": "Dal 6° livello puoi evocare la mente del tuo Libro degli Incantesimi Risvegliato. Come azione bonus mentre il libro e' su di te, puoi far manifestare la mente come oggetto spettrale Minuscolo, librato in uno spazio non occupato a tua scelta entro 60 piedi. La mente spettrale e' intangibile e non occupa il suo spazio, e irradia luce fioca in un raggio di 10 piedi. Sembra un tomo spettrale, una cascata di testo o uno studioso del passato (a tua scelta). Mentre e' manifestata, la mente spettrale puo' sentire e vedere, e ha scurovisione fino a 60 piedi. Puo' condividere telepaticamente con te cio' che vede e sente. Ogni volta che lanci un incantesimo da Mago nel tuo turno, puoi lanciarlo come se ti trovassi nello spazio della mente spettrale, usando i suoi sensi. Puoi farlo un numero di volte al giorno pari al tuo bonus di competenza, e recuperi tutti gli usi spesi a riposo lungo. Come azione bonus, puoi far librare la mente spettrale fino a 30 piedi in uno spazio non occupato che tu o lei possiate vedere. Puo' attraversare creature ma non oggetti. La mente spettrale smette di manifestarsi se si trova a piu' di 300 piedi da te, se qualcuno le lancia Dispel Magic, se il Libro degli Incantesimi Risvegliato e' distrutto, se muori o se la congedi come azione bonus. Una volta evocata, non puoi rifarlo finche' non termini un riposo lungo, a meno che tu non spenda uno slot incantesimo di qualunque livello per evocarla di nuovo.",
@@ -7216,7 +7216,7 @@
           },
           {
             "name_en": "Master Scrivener",
-            "name": "Maestro Scrivano",
+            "name": "Scrivano Arcano",
             "level": 10,
             "description_en": "At 10th level, when you finish a long rest, create one magic scroll by touching your Wizardly Quill to a blank paper and copying a 1st or 2nd level spell from your Awakened Spellbook (1 action casting time). Spell counts as one level higher. Cast as an action; vanishes after casting or next long rest. Halved gold/time for crafting normal spell scrolls if using your Quill.",
             "description": "Dal 10° livello, ogni volta che termini un riposo lungo, puoi creare una pergamena magica toccando la tua Penna del Mago a un foglio bianco e facendo copiare un incantesimo dal tuo Libro degli Incantesimi Risvegliato sulla pergamena. Il libro deve essere entro 5 piedi quando crei la pergamena. L'incantesimo scelto deve essere di 1° o 2° livello e deve avere un tempo di lancio di 1 azione. Una volta sulla pergamena, il potere dell'incantesimo e' migliorato, contando come un livello in piu' del normale. Puoi lanciare l'incantesimo dalla pergamena leggendolo come azione. La pergamena e' incomprensibile per chiunque altro e l'incantesimo svanisce dalla pergamena quando lo lanci o quando termini il prossimo riposo lungo. Sei anche abile nel creare pergamene magiche, descritte nella Guida del DM. L'oro e il tempo che devi spendere per creare una tale pergamena sono dimezzati se usi la tua Penna del Mago.",
@@ -7224,7 +7224,7 @@
           },
           {
             "name_en": "One with the Word",
-            "name": "Tutt'uno con la Parola",
+            "name": "Comunione con il Testo",
             "level": 14,
             "description_en": "At 14th level, while the book is on you, advantage on Arcana checks. If you take damage while spectral mind is manifested, prevent all damage by reaction dismissing the mind. Roll 3d6: book temporarily loses spells of combined level >= roll. If insufficient, you drop to 0 HP. Lost spells return after 1d6 long rests. Once per long rest.",
             "description": "Dal 14° livello la tua connessione con il tuo Libro degli Incantesimi Risvegliato e' diventata cosi' profonda che la tua anima si e' intrecciata con esso. Mentre il libro e' su di te, hai vantaggio a tutte le prove di Intelligenza (Arcano), poiche' il libro ti aiuta a ricordare il sapere magico. Inoltre, se subisci danni mentre la mente del tuo libro e' manifestata, puoi prevenire tutti quei danni a te stesso usando la tua reazione per congedare la mente spettrale, usando la sua magia per salvarti. Quindi tira 3d6. Il libro perde temporaneamente incantesimi a tua scelta che hanno un livello combinato pari o superiore al risultato del tiro. Se nel libro non ci sono abbastanza incantesimi per coprire questo costo, scendi a 0 punti ferita. Finche' non termini 1d6 riposi lunghi, sei incapace di lanciare gli incantesimi persi, anche se li trovi su una pergamena o in un altro libro. Una volta usata questa reazione, non puoi riusarla finche' non termini un riposo lungo.",
@@ -7765,7 +7765,7 @@
         "features": [
           {
             "name_en": "Arms of the Astral Self",
-            "name": "Braccia del Se' Astrale",
+            "name": "Braccia del S? Astrale",
             "level": 3,
             "description_en": "At 3rd level, as a bonus action spend 1 ki point to summon spectral arms (10 minutes). Each creature within 10 ft makes a Dex save or takes force damage equal to two rolls of your Martial Arts die. While arms are present: use Wis instead of Str for Strength checks/saves; spectral arms make unarmed strikes (reach +5 ft, force damage, can use Wis for attack/damage rolls).",
             "description": "Al 3° livello la tua maestria del ki ti permette di evocare una porzione del tuo se' astrale. Come azione bonus puoi spendere 1 punto ki per evocare le braccia del tuo se' astrale. Quando lo fai, ogni creatura a tua scelta che puoi vedere entro 10 piedi deve riuscire in un tiro salvezza su Destrezza o subire danni da forza pari a due tiri del tuo dado di Arti Marziali. Per 10 minuti queste braccia spettrali aleggiano vicino alle tue spalle o circondano le tue braccia (a tua scelta). Determini il loro aspetto e svaniscono prima se sei incapacitato o muori. Mentre le braccia spettrali sono presenti: puoi usare il tuo modificatore di Saggezza al posto di Forza per le prove e i tiri salvezza di Forza; puoi usare le braccia spettrali per effettuare attacchi senz'armi; quando effettui un attacco senz'armi con le braccia, la tua portata e' di 5 piedi maggiore del normale; gli attacchi senz'armi con le braccia possono usare il tuo modificatore di Saggezza al posto di Forza o Destrezza per i tiri per colpire e i danni, e il loro tipo di danno e' forza.",
@@ -7773,7 +7773,7 @@
           },
           {
             "name_en": "Visage of the Astral Self",
-            "name": "Volto del Se' Astrale",
+            "name": "Volto del S? Astrale",
             "level": 6,
             "description_en": "At 6th level, as a bonus action (or part of summoning the Arms) spend 1 ki point to summon spectral visage for 10 minutes. Benefits: Astral Sight (see in any darkness 120 ft); Wisdom of the Spirit (advantage on Insight and Intimidation); Word of the Spirit (whisper to a creature within 60 ft, or amplify voice 600 ft).",
             "description": "Dal 6° livello puoi evocare il volto del tuo se' astrale. Come azione bonus, o come parte dell'azione bonus per attivare Braccia del Se' Astrale, puoi spendere 1 punto ki per evocare questo volto per 10 minuti. Svanisce prima se sei incapacitato o muori. Il volto spettrale ti copre il viso come un elmo o una maschera (determini l'aspetto). Mentre il volto e' presente: **Vista Astrale** — puoi vedere normalmente nell'oscurita', sia magica che non magica, fino a 120 piedi; **Saggezza dello Spirito** — hai vantaggio alle prove di Saggezza (Intuizione) e Carisma (Intimidire); **Parola dello Spirito** — quando parli puoi dirigere le tue parole a una creatura entro 60 piedi facendo si' che solo essa ti senta, oppure amplificare la voce affinche' tutte le creature entro 600 piedi possano sentirti.",
@@ -7781,7 +7781,7 @@
           },
           {
             "name_en": "Body of the Astral Self",
-            "name": "Corpo del Se' Astrale",
+            "name": "Corpo del S? Astrale",
             "level": 11,
             "description_en": "Starting at 11th level, when arms and visage are summoned, the body of your astral self appears. Benefits: Deflect Energy (when you take acid/cold/fire/force/lightning/thunder damage, reaction reduces damage by 1d10 + Wis, min 1); Empowered Arms (once per turn add Martial Arts die damage to a hit with the astral arms).",
             "description": "Dal 11° livello, quando hai evocato sia le braccia astrali sia il volto astrale, puoi far apparire il corpo del tuo se' astrale (nessuna azione richiesta). Questo corpo spettrale ti copre la forma fisica come un'armatura, collegandosi con le braccia e il volto. Mentre il corpo spettrale e' presente: **Deflettere Energia** — quando subisci danni da acido, freddo, fuoco, forza, fulmine o tuono, puoi usare la tua reazione per deflettere i danni. I danni che subisci sono ridotti di 1d10 + il tuo modificatore di Saggezza (riduzione minima 1); **Braccia Potenziate** — una volta per turno, quando colpisci un bersaglio con le Braccia del Se' Astrale, puoi infliggere danni extra al bersaglio pari al tuo dado di Arti Marziali.",
@@ -7789,7 +7789,7 @@
           },
           {
             "name_en": "Awakened Astral Self",
-            "name": "Se' Astrale Risvegliato",
+            "name": "S? Astrale Risvegliato",
             "level": 17,
             "description_en": "At 17th level, as a bonus action spend 5 ki points to summon arms, visage, and body and awaken your astral self for 10 minutes. Benefits: Armor of the Spirit (+2 AC); Astral Barrage (when using Extra Attack to attack twice, you can attack three times if all attacks are with astral arms).",
             "description": "Dal 17° livello la tua connessione con il tuo se' astrale e' completa, permettendoti di scatenarne il pieno potenziale. Come azione bonus puoi spendere 5 punti ki per evocare braccia, volto e corpo del tuo se' astrale e risvegliarlo per 10 minuti. Termina prima se sei incapacitato o muori. Mentre il tuo se' astrale e' risvegliato: **Armatura dello Spirito** — ottieni un bonus di +2 alla Classe Armatura; **Barrage Astrale** — ogni volta che usi la capacita' Attacco Extra per attaccare due volte, puoi invece attaccare tre volte se tutti gli attacchi sono effettuati con le tue braccia astrali.",
@@ -7962,7 +7962,7 @@
           },
           {
             "name_en": "Hands of Healing",
-            "name": "Mani Risananti",
+            "name": "Mano Guaritrice",
             "level": 3,
             "description_en": "At 3rd level, as an action spend 1 ki point to touch a creature and restore HP equal to a roll of your Martial Arts die + Wisdom modifier. With Flurry of Blows, replace one unarmed strike with this without spending a ki point for the healing.",
             "description": "Dal 3° livello il tuo tocco mistico puo' rimarginare le ferite. Con un'azione, puoi spendere 1 punto ki per toccare una creatura e farle recuperare un numero di punti ferita pari a un tiro del tuo dado di Arti Marziali + il tuo modificatore di Saggezza. Quando usi Raffica di Colpi, puoi sostituire uno degli attacchi senz'armi con un uso di questa capacita' senza spendere un punto ki per la guarigione.",
@@ -7970,7 +7970,7 @@
           },
           {
             "name_en": "Hands of Harm",
-            "name": "Mani Lesive",
+            "name": "Mano del Dolore",
             "level": 3,
             "description_en": "At 3rd level, when you hit with an unarmed strike, you can spend 1 ki point to deal extra necrotic damage equal to one roll of your Martial Arts die + Wisdom modifier. Once per turn.",
             "description": "Dal 3° livello usi il tuo ki per infliggere ferite. Quando colpisci una creatura con un attacco senz'armi, puoi spendere 1 punto ki per infliggere danni necrotici extra pari a un tiro del tuo dado di Arti Marziali + il tuo modificatore di Saggezza. Puoi usare questa capacita' solo una volta per turno.",
@@ -7986,7 +7986,7 @@
           },
           {
             "name_en": "Flurry of Healing and Harm",
-            "name": "Raffica di Cure e Danni",
+            "name": "Raffica di Guarigione e Dolore",
             "level": 11,
             "description_en": "Starting at 11th level, when you use Flurry of Blows, you can replace each unarmed strike with a use of Hands of Healing without spending ki points. When you make an unarmed strike with Flurry of Blows, you can use Hand of Harm with that strike without spending the ki point for it (still once per turn).",
             "description": "Dal 11° livello puoi ora dispensare una raffica di conforto e dolore. Quando usi Raffica di Colpi, puoi ora sostituire ognuno degli attacchi senz'armi con un uso delle tue Mani Risananti, senza spendere punti ki per la guarigione. Inoltre, quando effettui un attacco senz'armi con Raffica di Colpi, puoi usare Mani Lesive con quell'attacco senza spendere il punto ki per Mani Lesive. Puoi comunque usare Mani Lesive solo una volta per turno.",
@@ -8741,11 +8741,11 @@
       {
         "slug": "oath-of-glory",
         "name_en": "Oath of Glory",
-        "name": "Giuramento della Gloria",
+        "name": "Giuramento di Gloria",
         "features": [
           {
             "name_en": "Channel Divinity: Peerless Athlete",
-            "name": "Incanalare Divinita': Atleta Senza Pari",
+            "name": "Incanalare Divinit?: Atleta Impareggiabile",
             "level": 3,
             "description_en": "When you take this oath at 3rd level, as a bonus action gain for 10 minutes: advantage on Athletics and Acrobatics; carry/push/drag/lift twice normal; long/high jumps +10 ft.",
             "description": "Quando prendi questo giuramento al 3° livello, come azione bonus puoi usare la tua capacita' Incanalare Divinita' per amplificare la tua atleticita'. Per i prossimi 10 minuti hai vantaggio alle prove di Forza (Atletica) e Destrezza (Acrobazia); puoi trasportare, spingere, trascinare e sollevare il doppio del peso normale; e la distanza dei tuoi salti in lungo e in alto aumenta di 10 piedi (questa distanza extra costa movimento come al solito).",
@@ -8753,7 +8753,7 @@
           },
           {
             "name_en": "Channel Divinity: Inspiring Smite",
-            "name": "Incanalare Divinita': Castigo Ispirante",
+            "name": "Incanalare Divinit?: Punizione Ispiratrice",
             "level": 3,
             "description_en": "Immediately after you deal damage with Divine Smite, as a bonus action distribute temporary HP to creatures of your choice within 30 ft (including you). Total temp HP = 2d8 + your paladin level.",
             "description": "Subito dopo aver inflitto danni a una creatura con la tua capacita' Castigo Divino, puoi usare la tua capacita' Incanalare Divinita' come azione bonus e distribuire punti ferita temporanei alle creature a tua scelta entro 30 piedi, che possono includere te. Il numero totale di punti ferita temporanei e' pari a 2d8 + il tuo livello in questa classe, divisi tra le creature scelte come preferisci.",
@@ -8761,7 +8761,7 @@
           },
           {
             "name_en": "Aura of Alacrity",
-            "name": "Aura di Alacrita'",
+            "name": "Aura di Alacrit?",
             "level": 7,
             "description_en": "At 7th level, your walking speed increases by 10 ft. If you aren't incapacitated, the walking speed of any ally who starts their turn within 5 ft increases by 10 ft until end of that turn. At 18th level, range increases to 10 ft.",
             "description": "Dal 7° livello emani un'aura che riempie te e i tuoi compagni di velocita' soprannaturale. La tua velocita' di camminata aumenta di 10 piedi. Inoltre, se non sei incapacitato, la velocita' di camminata di qualunque alleato che inizia il proprio turno entro 5 piedi da te aumenta di 10 piedi fino al termine di quel turno. Al 18° livello la portata dell'aura aumenta a 10 piedi.",
@@ -8888,11 +8888,11 @@
       {
         "slug": "oath-of-the-watchers",
         "name_en": "Oath of the Watchers",
-        "name": "Giuramento dei Vigilanti",
+        "name": "Giuramento delle Sentinelle",
         "features": [
           {
             "name_en": "Channel Divinity: Watcher's Will",
-            "name": "Incanalare Divinita': Volonta' del Vigilante",
+            "name": "Incanalare Divinit?: Volont? della Sentinella",
             "level": 3,
             "description_en": "When you take this oath at 3rd level, as an action choose creatures within 30 ft up to your Charisma modifier (min 1). For 1 minute, you and chosen creatures have advantage on Intelligence, Wisdom, and Charisma saves.",
             "description": "Quando prendi questo giuramento al 3° livello, puoi usare la tua capacita' Incanalare Divinita' per investire la tua presenza del potere protettivo della tua fede. Con un'azione puoi scegliere un numero di creature che puoi vedere entro 30 piedi, fino a un numero pari al tuo modificatore di Carisma (minimo 1). Per 1 minuto, tu e le creature scelte avete vantaggio ai tiri salvezza su Intelligenza, Saggezza e Carisma.",
@@ -8900,7 +8900,7 @@
           },
           {
             "name_en": "Channel Divinity: Abjure the Extraplanar",
-            "name": "Incanalare Divinita': Abiurare l'Extraplanare",
+            "name": "Incanalare Divinit?: Abiurare Creature Extraplanari",
             "level": 3,
             "description_en": "As an action, present your holy symbol; each aberration, celestial, elemental, fey, or fiend within 30 ft that can hear you must make a Wisdom save or be turned for 1 minute or until takes damage.",
             "description": "Con un'azione presenti il tuo simbolo sacro e ogni aberrazione, celestiale, elementale, folletto o immondo entro 30 piedi che puo' sentirti deve effettuare un tiro salvezza su Saggezza. Se fallisce, la creatura e' scacciata per 1 minuto o finche' non subisce danni. Una creatura scacciata deve passare i turni cercando di allontanarsi il piu' possibile da te e non puo' terminare volontariamente il movimento in uno spazio entro 30 piedi da te. Per la sua azione puo' usare solo l'azione Scattare o cercare di liberarsi da un effetto che le impedisce di muoversi. Se non c'e' nessun posto dove muoversi, puo' usare l'azione Schivare.",
@@ -8916,7 +8916,7 @@
           },
           {
             "name_en": "Vigilant Rebuke",
-            "name": "Rimprovero Vigile",
+            "name": "Punizione Solerte",
             "level": 15,
             "description_en": "At 15th level, whenever you or a creature you can see within 30 ft succeeds on an Int/Wis/Cha save, use your reaction to deal 2d8 + your Charisma modifier force damage to the creature that forced the save.",
             "description": "Dal 15° livello hai imparato a castigare chiunque osi usare incantamenti contro di te e i tuoi protetti. Ogni volta che tu o una creatura che puoi vedere entro 30 piedi riesce in un tiro salvezza su Intelligenza, Saggezza o Carisma, puoi usare la tua reazione per infliggere 2d8 + il tuo modificatore di Carisma danni da forza alla creatura che ha forzato il tiro salvezza.",
@@ -8924,7 +8924,7 @@
           },
           {
             "name_en": "Mortal Bulwark",
-            "name": "Baluardo Mortale",
+            "name": "Baluardo dei Mortali",
             "level": 20,
             "description_en": "At 20th level, as a bonus action gain for 1 minute: truesight 120 ft; advantage on attack rolls against aberrations, celestials, elementals, fey, and fiends; when you hit a creature and deal damage, force a Charisma save vs your spell save DC; on fail, banished to native plane (if not there). Once per long rest, or expend a 5th-level slot.",
             "description": "Al 20° livello manifesti una scintilla di potere divino in difesa dei regni mortali. Come azione bonus ottieni i seguenti benefici per 1 minuto: ottieni vista perfetta con una portata di 120 piedi; hai vantaggio ai tiri per colpire contro aberrazioni, celestiali, elementali, folletti e immondi; quando colpisci una creatura con un tiro per colpire e le infliggi danni, puoi anche costringerla a effettuare un tiro salvezza su Carisma contro la tua CD degli incantesimi. Se fallisce, la creatura e' bandita magicamente al suo piano nativo se non e' attualmente li'. Se riesce, non puo' essere bandita da questa capacita' per 24 ore. Una volta usata, non puoi rifarla finche' non termini un riposo lungo, a meno che tu non spenda uno slot incantesimo di 5° livello.",
@@ -9552,11 +9552,11 @@
       {
         "slug": "fey-wanderer",
         "name_en": "Fey Wanderer",
-        "name": "Vagabondo Fatato",
+        "name": "Viandante Fatato",
         "features": [
           {
             "name_en": "Dreadful Strikes",
-            "name": "Colpi Tremendi",
+            "name": "Colpi Terribili",
             "level": 3,
             "description_en": "At 3rd level, when you hit a creature with a weapon, you can deal an extra 1d4 psychic damage (once per turn per target). Increases to 1d6 at 11th level.",
             "description": "Al 3° livello puoi amplificare i tuoi colpi con magia che segna la mente, attinta dalle cupe radure del Reame Fatato. Quando colpisci una creatura con un'arma, puoi infliggere al bersaglio 1d4 danni psichici extra, e questa creatura puo' subire questi danni extra solo una volta per turno. I danni extra aumentano a 1d6 quando raggiungi l'11° livello in questa classe.",
@@ -9564,7 +9564,7 @@
           },
           {
             "name_en": "Fey Wanderer Magic",
-            "name": "Magia del Vagabondo Fatato",
+            "name": "Magia del Viandante Fatato",
             "level": 3,
             "description_en": "At 3rd level, learn additional ranger spells (don't count against your spells known): Charm Person (3rd), Misty Step (5th), Dispel Magic (9th), Dimension Door (13th), Mislead (17th).",
             "description": "Dal 3° livello impari un incantesimo aggiuntivo a determinati livelli in questa classe. Ciascuno conta come un incantesimo da Ranger per te, ma non conta nel numero di incantesimi da Ranger che conosci: 3° — Charm Person; 5° — Misty Step; 9° — Dispel Magic; 13° — Dimension Door; 17° — Mislead. Possiedi anche una benedizione preternaturale da un alleato fatato o da un luogo di potere fatato.",
@@ -9572,7 +9572,7 @@
           },
           {
             "name_en": "Otherworldly Glamour",
-            "name": "Incanto Ultraterreno",
+            "name": "Fascino Ultraterreno",
             "level": 3,
             "description_en": "At 3rd level, gain a bonus to all Charisma checks equal to your Wisdom modifier (min +1). Gain proficiency in one of: Deception, Performance, or Persuasion.",
             "description": "Dal 3° livello le tue qualita' fatate ti concedono un fascino soprannaturale. Di conseguenza, ogni volta che effettui una prova di Carisma, ottieni un bonus alla prova pari al tuo modificatore di Saggezza (minimo +1). Inoltre ottieni la competenza in una delle seguenti abilita' a tua scelta: Inganno, Intrattenere o Persuasione.",
@@ -9580,7 +9580,7 @@
           },
           {
             "name_en": "Beguiling Twist",
-            "name": "Svolta Ammaliante",
+            "name": "Scambio Seducente",
             "level": 7,
             "description_en": "At 7th level, advantage on saves against being charmed or frightened. When you or a creature within 120 ft succeeds on a save against charmed or frightened, use your reaction to force a different creature within 120 ft to make a Wisdom save vs your spell save DC; on fail, charmed or frightened by you (your choice) for 1 minute. Repeat save at end of each turn.",
             "description": "Dal 7° livello la magia del Reame Fatato protegge la tua mente. Hai vantaggio ai tiri salvezza contro l'essere affascinato o spaventato. Inoltre, ogni volta che tu o una creatura che puoi vedere entro 120 piedi riuscite in un tiro salvezza contro l'essere affascinati o spaventati, puoi usare la tua reazione per forzare una creatura diversa che puoi vedere entro 120 piedi a effettuare un tiro salvezza su Saggezza contro la tua CD degli incantesimi. Se fallisce, il bersaglio e' affascinato o spaventato da te (a tua scelta) per 1 minuto. Il bersaglio puo' ripetere il tiro salvezza al termine di ognuno dei suoi turni, terminando l'effetto su di se' con un successo.",
@@ -9596,7 +9596,7 @@
           },
           {
             "name_en": "Misty Wanderer",
-            "name": "Vagabondo nella Nebbia",
+            "name": "Viandante Velato",
             "level": 15,
             "description_en": "At 15th level, cast Misty Step without expending a spell slot. Usable Wisdom mod times per long rest (min 1). When you cast Misty Step, bring along one willing creature within 5 ft to an unoccupied space within 5 ft of your destination.",
             "description": "Dal 15° livello puoi entrare e uscire dal Reame Fatato per muoverti in un batter d'occhio: puoi lanciare Misty Step senza spendere uno slot incantesimo. Puoi farlo un numero di volte pari al tuo modificatore di Saggezza (minimo 1), recuperi gli usi a riposo lungo. Inoltre, ogni volta che lanci Misty Step, puoi portare con te una creatura volontaria che puoi vedere entro 5 piedi. Quella creatura si teletrasporta in uno spazio non occupato a tua scelta entro 5 piedi dallo spazio di destinazione.",
@@ -9780,11 +9780,11 @@
       {
         "slug": "swarmkeeper",
         "name_en": "Swarmkeeper",
-        "name": "Custode di Sciami",
+        "name": "Custode degli Sciami",
         "features": [
           {
             "name_en": "Gathered Swarm",
-            "name": "Sciame Radunato",
+            "name": "Sciame Riunito",
             "level": 3,
             "description_en": "At 3rd level, a swarm of nature spirits accompanies you. Once per turn after you hit with an attack, the swarm assists you in one of: target takes 1d6 piercing damage; target Strength save or moved up to 15 ft horizontally; you are moved 5 ft horizontally.",
             "description": "Al 3° livello uno sciame di spiriti della natura intangibili si e' legato a te e puo' assisterti in battaglia. Mentre sei in vita, lo sciame resta nel tuo spazio, strisciando su di te o volando e sgusciando attorno a te entro il tuo spazio. Determini il suo aspetto. Una volta in ognuno dei tuoi turni puoi far si' che lo sciame ti assista in uno dei seguenti modi, subito dopo aver colpito una creatura con un attacco: il bersaglio dell'attacco subisce 1d6 danni perforanti dallo sciame; il bersaglio dell'attacco deve riuscire in un tiro salvezza su Forza contro la tua CD degli incantesimi o essere mosso dallo sciame fino a 15 piedi orizzontalmente in una direzione a tua scelta; sei mosso dallo sciame di 5 piedi orizzontalmente in una direzione a tua scelta.",
@@ -9792,7 +9792,7 @@
           },
           {
             "name_en": "Swarmkeeper Magic",
-            "name": "Magia del Custode di Sciami",
+            "name": "Magia del Custode degli Sciami",
             "level": 3,
             "description_en": "At 3rd level, learn the Mage Hand cantrip if you don't know it (the hand takes form of your swarm). Learn additional spells (don't count against your spells known): Faerie Fire (3rd), Web (5th), Gaseous Form (9th), Arcane Eye (13th), Insect Plague (17th).",
             "description": "Dal 3° livello impari il trucchetto Mage Hand se non lo conosci gia'. Quando lo lanci, la mano prende la forma dei tuoi spiriti della natura sciamanti. Impari anche un incantesimo aggiuntivo di 1° livello o superiore a determinati livelli in questa classe. Conta come un incantesimo da Ranger per te ma non nel numero di incantesimi che conosci: 3° — Faerie Fire; 5° — Web; 9° — Gaseous Form; 13° — Arcane Eye; 17° — Insect Plague.",
@@ -9800,7 +9800,7 @@
           },
           {
             "name_en": "Writhing Tide",
-            "name": "Marea Contorcente",
+            "name": "Marea Avvolgente",
             "level": 7,
             "description_en": "At 7th level, as a bonus action gain a flying speed of 10 ft and ability to hover for 1 minute or until incapacitated. Usable PB times per long rest.",
             "description": "Dal 7° livello puoi condensare parte del tuo sciame in una massa concentrata che ti solleva. Come azione bonus ottieni una velocita' di volo di 10 piedi e puoi librarti. L'effetto dura per 1 minuto o finche' non sei incapacitato. Usabile un numero di volte pari al tuo bonus di competenza, recuperi gli usi a riposo lungo.",
@@ -9816,7 +9816,7 @@
           },
           {
             "name_en": "Swarming Dispersal",
-            "name": "Dispersione Sciamante",
+            "name": "Dispersione Brulicante",
             "level": 15,
             "description_en": "At 15th level, when you take damage, use your reaction to give yourself resistance to that damage. You vanish into your swarm and teleport to an unoccupied space you can see within 30 ft. Usable PB times per long rest.",
             "description": "Dal 15° livello puoi scorporare nel tuo sciame, evitando il pericolo. Quando subisci danni, puoi usare la tua reazione per concederti resistenza a quei danni. Svanisci nel tuo sciame e poi ti teletrasporti in uno spazio non occupato che puoi vedere entro 30 piedi, dove riappari con lo sciame. Usabile un numero di volte pari al tuo bonus di competenza, recuperi gli usi a riposo lungo.",
@@ -10429,7 +10429,7 @@
           },
           {
             "name_en": "Telepathic Speech",
-            "name": "Comunicazione Telepatica",
+            "name": "Conversazione Telepatica",
             "level": 1,
             "description_en": "At 1st level, as a bonus action choose one creature within 30 ft. You can speak telepathically with each other while within Cha mod miles (min 1). Lasts sorcerer level minutes. Each must speak mentally in a language the other knows.",
             "description": "Dal 1° livello puoi formare una connessione telepatica tra la tua mente e quella di un'altra creatura. Come azione bonus, scegli una creatura che puoi vedere entro 30 piedi. Tu e la creatura scelta potete parlarvi telepaticamente mentre vi trovate a una distanza in miglia pari al tuo modificatore di Carisma (minimo 1 miglio). Per capirvi a vicenda, ognuno di voi deve parlare mentalmente in una lingua nota all'altro. La connessione telepatica dura un numero di minuti pari al tuo livello da Stregone. Termina prima se sei incapacitato o muori, o se usi questa capacita' per formare una connessione con una creatura diversa.",
@@ -10453,7 +10453,7 @@
           },
           {
             "name_en": "Revelation in Flesh",
-            "name": "Rivelazione nella Carne",
+            "name": "Rivelazione della Carne",
             "level": 14,
             "description_en": "At 14th level, as a bonus action spend 1+ sorcery points to magically transform for 10 minutes. Each point grants one benefit: see invisible within 60 ft (no total cover); flying speed = walking speed and hover; swim speed = 2x walking and breathe underwater; body becomes pliable, can move through 1-inch space and use 5 ft of movement to escape nonmagical restraints/grapples.",
             "description": "Dal 14° livello puoi liberare la verita' aberrante nascosta dentro di te. Come azione bonus, puoi spendere 1 o piu' punti stregoneria per trasformare magicamente il tuo corpo per 10 minuti. Per ogni punto stregoneria speso ottieni uno dei seguenti benefici a tua scelta, gli effetti durano fino al termine della trasformazione: puoi vedere qualunque creatura invisibile entro 60 piedi, purche' non sia dietro copertura totale; ottieni una velocita' di volo pari alla tua velocita' di camminata e puoi librarti; ottieni una velocita' di nuoto pari al doppio della tua velocita' di camminata e puoi respirare sott'acqua; il tuo corpo, insieme all'equipaggiamento indossato o trasportato, diventa viscido e malleabile: puoi muoverti attraverso qualunque spazio largo almeno 1 pollice senza incepparti, e puoi spendere 5 piedi di movimento per liberarti da ostacoli non magici o dall'essere bloccato.",
@@ -10486,7 +10486,7 @@
           },
           {
             "name_en": "Restore Balance",
-            "name": "Ripristinare Equilibrio",
+            "name": "Ripristino dell'Equilibrio",
             "level": 1,
             "description_en": "From 1st level, when a creature within 60 ft is about to roll a d20 with advantage or disadvantage, use your reaction to prevent the roll from being affected by advantage or disadvantage. Usable PB times per long rest.",
             "description": "Dal 1° livello la tua connessione con il piano dell'ordine assoluto ti permette di equalizzare i momenti caotici. Quando una creatura che puoi vedere entro 60 piedi sta per tirare un d20 con vantaggio o svantaggio, puoi usare la tua reazione per impedire al tiro di essere influenzato da vantaggio o svantaggio. Usabile un numero di volte pari al tuo bonus di competenza, recuperi gli usi a riposo lungo.",
@@ -10510,7 +10510,7 @@
           },
           {
             "name_en": "Clockwork Cavalcade",
-            "name": "Cavalcata Meccanica",
+            "name": "Cavalleria Meccanica",
             "level": 18,
             "description_en": "At 18th level, as an action summon spirits in a 30-ft cube from you. Spirits are intangible and invulnerable, and create within the cube before vanishing: restore up to 100 hp divided as you choose; repair damaged objects entirely in the cube; end every spell of 6th level or lower on creatures and objects of your choice. Once per long rest, or spend 7 sorcery points.",
             "description": "Dal 18° livello evochi spiriti dell'ordine per espungere il disordine intorno a te. Con un'azione, evochi gli spiriti in un cubo di 30 piedi che ha origine da te. Gli spiriti hanno l'aspetto di modron o altri costrutti a tua scelta. Sono intangibili e invulnerabili e creano i seguenti effetti all'interno del cubo prima di svanire: ripristinano fino a 100 punti ferita, suddivisi a tua scelta tra un qualunque numero di creature a tua scelta nel cubo; tutti gli oggetti danneggiati interamente nel cubo vengono riparati istantaneamente; ogni incantesimo di 6° livello o inferiore termina su creature e oggetti a tua scelta nel cubo. Una volta usata, non puoi rifarla finche' non termini un riposo lungo, a meno che tu non spenda 7 punti stregoneria.",
@@ -11237,7 +11237,7 @@
         "features": [
           {
             "name_en": "Expanded Spell List",
-            "name": "Lista Incantesimi Estesa",
+            "name": "Lista degli Incantesimi Espansa",
             "level": 1,
             "description_en": "The Fathomless lets you choose from an expanded list of spells: Create or Destroy Water/Thunderwave (1st), Gust of Wind/Silence (2nd), Lightning Bolt/Sleet Storm (3rd), Control Water/Summon Elemental (Water only) (4th), Bigby's Hand (as tentacle)/Cone of Cold (5th).",
             "description": "L'Insondabile ti permette di scegliere da una lista estesa di incantesimi quando impari un incantesimo da Warlock: 1° — Create or Destroy Water, Thunderwave; 2° — Gust of Wind, Silence; 3° — Lightning Bolt, Sleet Storm; 4° — Control Water, Summon Elemental (solo Acqua); 5° — Bigby's Hand (appare come un tentacolo), Cone of Cold.",
@@ -11245,7 +11245,7 @@
           },
           {
             "name_en": "Tentacle of the Deep",
-            "name": "Tentacolo degli Abissi",
+            "name": "Tentacoli delle Profondit?",
             "level": 1,
             "description_en": "At 1st level, as a bonus action create a 10-ft long spectral tentacle at a point within 60 ft. Lasts 1 minute or until you create another. Make a melee spell attack against one creature within 10 ft of it; on hit, 1d8 cold damage and speed reduced by 10 ft until start of your next turn. Damage 2d8 at 10th level. As a bonus action, move the tentacle 30 ft and repeat the attack. Usable PB times per long rest.",
             "description": "Al 1° livello puoi evocare magicamente un tentacolo spettrale che colpisce i tuoi nemici. Come azione bonus, crei un tentacolo lungo 10 piedi in un punto che puoi vedere entro 60 piedi. Il tentacolo dura per 1 minuto o finche' non usi questa capacita' per creare un altro tentacolo. Quando crei il tentacolo, puoi effettuare un attacco con incantesimo in mischia contro una creatura entro 10 piedi da esso. Se colpisce, il bersaglio subisce 1d8 danni da freddo, e la sua velocita' e' ridotta di 10 piedi fino all'inizio del tuo turno successivo. Quando raggiungi il 10° livello in questa classe, i danni aumentano a 2d8. Come azione bonus nel tuo turno, puoi muovere il tentacolo fino a 30 piedi e ripetere l'attacco. Usabile un numero di volte pari al tuo bonus di competenza, recuperi gli usi a riposo lungo.",
@@ -11269,7 +11269,7 @@
           },
           {
             "name_en": "Guardian Coil",
-            "name": "Spira Guardiana",
+            "name": "Spirale Guardiana",
             "level": 6,
             "description_en": "At 6th level, when you or a creature you can see takes damage while within 10 ft of the tentacle, use your reaction to choose one of those creatures and reduce damage by 1d8. Increases to 2d8 at 10th level.",
             "description": "Dal 6° livello il tuo Tentacolo degli Abissi puo' difendere te e gli altri, interponendosi tra loro e il danno. Quando tu o una creatura che puoi vedere subite danni mentre vi trovate entro 10 piedi dal tentacolo, puoi usare la tua reazione per scegliere una di quelle creature e ridurre i danni a quella creatura di 1d8. Quando raggiungi il 10° livello in questa classe, i danni ridotti dal tentacolo aumentano a 2d8.",
@@ -11277,7 +11277,7 @@
           },
           {
             "name_en": "Grasping Tentacles",
-            "name": "Tentacoli Avvinghianti",
+            "name": "Presa dei Tentacoli",
             "level": 10,
             "description_en": "Starting at 10th level, learn the spell Evard's Black Tentacles. Doesn't count against spells known. Can also cast it once without a spell slot, regain at long rest. When you cast this spell, gain temporary hit points equal to your warlock level. Damage can't break your concentration on this spell.",
             "description": "Dal 10° livello impari l'incantesimo Evard's Black Tentacles. Conta come un incantesimo da Warlock per te ma non nel numero di incantesimi che conosci. Puoi anche lanciarlo una volta senza usare uno slot incantesimo, e recuperi la capacita' di farlo a riposo lungo. Ogni volta che lanci questo incantesimo, la magia del tuo patrono ti rinforza, concedendoti punti ferita temporanei pari al tuo livello da Warlock. Inoltre, i danni non possono interrompere la tua concentrazione su questo incantesimo.",
@@ -11285,7 +11285,7 @@
           },
           {
             "name_en": "Fathomless Plunge",
-            "name": "Tuffo Insondabile",
+            "name": "Immersione Insondabile",
             "level": 14,
             "description_en": "When you reach 14th level, as an action teleport yourself and up to 5 willing creatures within 30 ft. Reappear up to 1 mile away in or within 30 ft of a body of water you've seen (pond size or larger), each in unoccupied space within 30 ft of others. Once per short or long rest.",
             "description": "Dal 14° livello puoi aprire magicamente condotti temporanei verso destinazioni acquatiche. Con un'azione, puoi teletrasportare te stesso e fino a cinque altre creature volontarie che puoi vedere entro 30 piedi. In mezzo a un vortice di tentacoli, tutti voi sparite e poi riapparite fino a 1 miglio di distanza in uno specchio d'acqua che hai visto (grande almeno quanto uno stagno) o entro 30 piedi da esso, ciascuno apparendo in uno spazio non occupato entro 30 piedi dagli altri. Una volta usata, non puoi rifarla finche' non termini un riposo breve o lungo.",
@@ -11302,7 +11302,7 @@
         "features": [
           {
             "name_en": "Expanded Spell List",
-            "name": "Lista Incantesimi Estesa",
+            "name": "Lista degli Incantesimi Espansa",
             "level": 1,
             "description_en": "At 1st level, the Genie lets you choose from an expanded list of spells. The Genie Expanded Spells include both general genie spells and those associated with your patron's kind: dao, djinni, efreeti, or marid.",
             "description": "Al 1° livello il Genio ti permette di scegliere da una lista estesa di incantesimi quando impari un incantesimo da Warlock. La tabella Incantesimi Estesi del Genio mostra gli incantesimi che vengono aggiunti alla lista degli incantesimi da Warlock per te, insieme agli incantesimi associati nel tabella alla varieta' del tuo patrono: dao, djinni, efreeti o marid.",
@@ -11310,7 +11310,7 @@
           },
           {
             "name_en": "Genie's Vessel",
-            "name": "Vascello del Genio",
+            "name": "Recipiente del Genio",
             "level": 1,
             "description_en": "Also at 1st level, your patron gifts you a magical vessel (Tiny object) usable as spellcasting focus. While touching it: Bottled Respite (as an action vanish into vessel, extradimensional 20-ft radius cylinder, 20 ft high; remain up to 2x PB hours; once per long rest); Genie's Wrath (once per turn when you hit, deal extra damage equal to PB; type by patron: bludgeoning dao, thunder djinni, fire efreeti, cold marid). Vessel's AC = your spell save DC, hp = warlock level + PB, immune to poison and psychic damage.",
             "description": "Al 1° livello il tuo patrono ti dona un vascello magico che ti concede una porzione del potere del genio. Il vascello e' un oggetto Minuscolo e puoi usarlo come focus per i tuoi incantesimi da Warlock. Mentre lo tocchi, puoi usarlo nei seguenti modi: **Riposo in Bottiglia** — Con un'azione, puoi svanire magicamente ed entrare nel vascello, che resta nello spazio che hai lasciato. L'interno del vascello e' uno spazio extradimensionale a forma di cilindro del raggio di 20 piedi e alto 20 piedi. Puoi restare dentro fino a un numero di ore pari al doppio del tuo bonus di competenza. Esci prima se usi un'azione bonus per uscire, se muori, o se il vascello e' distrutto. Una volta entrato, non puoi rientrare finche' non termini un riposo lungo. **Ira del Genio** — Una volta in ognuno dei tuoi turni, quando colpisci con un tiro per colpire, puoi infliggere al bersaglio danni extra pari al tuo bonus di competenza. Il tipo dei danni e' determinato dal tuo patrono: contundenti (dao), tuono (djinni), fuoco (efreeti) o freddo (marid). La CA del vascello e' pari alla tua CD degli incantesimi. I suoi punti ferita sono pari al tuo livello da Warlock piu' il tuo bonus di competenza, ed e' immune a danni da veleno e psichici.",
@@ -11326,7 +11326,7 @@
           },
           {
             "name_en": "Sanctuary Vessel",
-            "name": "Vascello Santuario",
+            "name": "Santuario del Recipiente",
             "level": 10,
             "description_en": "At 10th level, when you enter your Genie's Vessel via Bottled Respite, you can choose up to 5 willing creatures within 30 ft to be drawn in with you. As a bonus action, eject any number. Anyone (including you) inside for at least 10 minutes gains the benefit of finishing a short rest, and can add your PB to HP regained from spent Hit Dice.",
             "description": "Dal 10° livello, quando entri nel tuo Vascello del Genio tramite la capacita' Riposo in Bottiglia, puoi ora scegliere fino a cinque creature volontarie che puoi vedere entro 30 piedi, e le creature scelte vengono attirate nel vascello con te. Come azione bonus, puoi espellere un qualunque numero di creature dal vascello, e tutte vengono espulse se esci o muori, o se il vascello e' distrutto. Inoltre, chiunque (incluso te) resti nel vascello per almeno 10 minuti ottiene il beneficio del termine di un riposo breve, e chiunque puo' aggiungere il tuo bonus di competenza al numero di punti ferita recuperati spendendo Dadi Vita li' come parte di un riposo breve.",
