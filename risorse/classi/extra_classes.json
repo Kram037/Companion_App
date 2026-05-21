@@ -146,8 +146,8 @@
               "name_en": "Alchemist Spells",
               "name": "Incantesimi da Alchimista",
               "level": 3,
-              "description_en": "Starting at 3rd level you always have certain spells prepared (Healing Word, Ray of Sickness at lvl 3; Flaming Sphere, Melf's Acid Arrow at 5; Gaseous Form, Mass Healing Word at 9; Death Ward, Stoneskin at 13; Cloudkill, Raise Dead at 17). They count as artificer spells but don't count against the number prepared.",
-              "description": "A partire dal 3° livello hai sempre preparati certi incantesimi quando raggiungi i livelli indicati: 3° Healing Word, Ray of Sickness; 5° Flaming Sphere, Melf's Acid Arrow; 9° Gaseous Form, Mass Healing Word; 13° Death Ward, Stoneskin; 17° Cloudkill, Raise Dead. Questi incantesimi contano come incantesimi da artefice per te ma non contano nel numero di incantesimi che puoi preparare.",
+              "description_en": "Starting at 3rd level you always have certain spells prepared (Healing Word, Ray of Sickness at lvl 3; Flaming Sphere, Melf's Acid Arrow at 5; Gaseous Form, Mass Healing Word at 9; Blight, Death Ward at 13; Cloudkill, Raise Dead at 17). They count as artificer spells but don't count against the number prepared.",
+              "description": "A partire dal 3° livello hai sempre preparati certi incantesimi quando raggiungi i livelli indicati: 3° Healing Word, Ray of Sickness; 5° Flaming Sphere, Melf's Acid Arrow; 9° Gaseous Form, Mass Healing Word; 13° Blight, Death Ward; 17° Cloudkill, Raise Dead. Questi incantesimi contano come incantesimi da artefice per te ma non contano nel numero di incantesimi che puoi preparare.",
               "translated": true
             },
             {

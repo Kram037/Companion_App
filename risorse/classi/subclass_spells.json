@@ -660,7 +660,77 @@
       ],
       "17": [
         "Desiderio"
-      ]
+      ],
+      "_variants": {
+        "Dao": {
+          "1": [
+            "Santuario"
+          ],
+          "3": [
+            "Crescita di Spuntoni"
+          ],
+          "5": [
+            "Fondersi nella Pietra"
+          ],
+          "7": [
+            "Modellare Pietra"
+          ],
+          "9": [
+            "Muro di Pietra"
+          ]
+        },
+        "Djinni": {
+          "1": [
+            "Onda Tonante"
+          ],
+          "3": [
+            "Folata di Vento"
+          ],
+          "5": [
+            "Muro di Vento"
+          ],
+          "7": [
+            "Invisibilità Superiore"
+          ],
+          "9": [
+            "Sembrare"
+          ]
+        },
+        "Efreeti": {
+          "1": [
+            "Mani Brucianti"
+          ],
+          "3": [
+            "Raggio Rovente"
+          ],
+          "5": [
+            "Palla di Fuoco"
+          ],
+          "7": [
+            "Scudo di Fuoco"
+          ],
+          "9": [
+            "Colonna di Fuoco"
+          ]
+        },
+        "Marid": {
+          "1": [
+            "Nube di Nebbia"
+          ],
+          "3": [
+            "Vista Offuscata"
+          ],
+          "5": [
+            "Tempesta di Nevischio"
+          ],
+          "7": [
+            "Controllare Acque"
+          ],
+          "9": [
+            "Cono di Freddo"
+          ]
+        }
+      }
     },
     "undead": {
       "1": [
@@ -752,9 +822,186 @@
         "Mano di Bigby",
         "Vincolo Planare"
       ]
+    },
+    "divine-soul": {
+      "_variants": {
+        "Bene": {
+          "1": [
+            "Cura Ferite"
+          ]
+        },
+        "Male": {
+          "1": [
+            "Infliggere Ferite"
+          ]
+        },
+        "Legge": {
+          "1": [
+            "Benedizione"
+          ]
+        },
+        "Caos": {
+          "1": [
+            "Anatema"
+          ]
+        },
+        "Neutralita": {
+          "1": [
+            "Protezione dal Bene e dal Male"
+          ]
+        }
+      }
     }
   },
   "druid": {
+    "circle-of-the-land": {
+      "_variants": {
+        "Artico": {
+          "3": [
+            "Bloccare Persone",
+            "Crescita di Spuntoni"
+          ],
+          "5": [
+            "Tempesta di Nevischio",
+            "Rallentare"
+          ],
+          "7": [
+            "Libertà di Movimento",
+            "Tempesta di Ghiaccio"
+          ],
+          "9": [
+            "Comunione con la Natura",
+            "Cono di Freddo"
+          ]
+        },
+        "Costa": {
+          "3": [
+            "Immagini Speculari",
+            "Passo Velato"
+          ],
+          "5": [
+            "Respirare sott'Acqua",
+            "Camminare sull'Acqua"
+          ],
+          "7": [
+            "Controllare Acque",
+            "Libertà di Movimento"
+          ],
+          "9": [
+            "Convocare Elementale",
+            "Scrutare"
+          ]
+        },
+        "Deserto": {
+          "3": [
+            "Vista Offuscata",
+            "Silenzio"
+          ],
+          "5": [
+            "Creare Cibo e Acqua",
+            "Protezione dall'Energia"
+          ],
+          "7": [
+            "Inaridire",
+            "Terreno Allucinatorio"
+          ],
+          "9": [
+            "Piaga d'Insetti",
+            "Muro di Pietra"
+          ]
+        },
+        "Foresta": {
+          "3": [
+            "Pelle di Corteccia",
+            "Camminare sulle Pareti"
+          ],
+          "5": [
+            "Evocare Fulmini",
+            "Crescita Vegetale"
+          ],
+          "7": [
+            "Divinazione",
+            "Libertà di Movimento"
+          ],
+          "9": [
+            "Comunione con la Natura",
+            "Passo dell'Albero"
+          ]
+        },
+        "Prateria": {
+          "3": [
+            "Invisibilità",
+            "Passare senza Tracce"
+          ],
+          "5": [
+            "Luce del Giorno",
+            "Velocità"
+          ],
+          "7": [
+            "Divinazione",
+            "Libertà di Movimento"
+          ],
+          "9": [
+            "Sogno",
+            "Piaga d'Insetti"
+          ]
+        },
+        "Montagna": {
+          "3": [
+            "Camminare sulle Pareti",
+            "Crescita di Spuntoni"
+          ],
+          "5": [
+            "Fulmine",
+            "Fondersi nella Pietra"
+          ],
+          "7": [
+            "Modellare Pietra",
+            "Pelle di Pietra"
+          ],
+          "9": [
+            "Passamuri",
+            "Muro di Pietra"
+          ]
+        },
+        "Palude": {
+          "3": [
+            "Oscurità",
+            "Freccia Acida di Melf"
+          ],
+          "5": [
+            "Camminare sull'Acqua",
+            "Nube Pestilenziale"
+          ],
+          "7": [
+            "Libertà di Movimento",
+            "Localizza Creatura"
+          ],
+          "9": [
+            "Piaga d'Insetti",
+            "Scrutare"
+          ]
+        },
+        "Sottosuolo": {
+          "3": [
+            "Camminare sulle Pareti",
+            "Ragnatela"
+          ],
+          "5": [
+            "Forma Gassosa",
+            "Nube Pestilenziale"
+          ],
+          "7": [
+            "Invisibilità Superiore",
+            "Modellare Pietra"
+          ],
+          "9": [
+            "Nube Mortale",
+            "Piaga d'Insetti"
+          ]
+        }
+      }
+    },
     "circle-of-spores": {
       "2": [
         "Tocco Gelido"
@@ -888,19 +1135,7 @@
     },
     "drakewarden": {
       "3": [
-        "Comando"
-      ],
-      "5": [
-        "Soffio del Drago"
-      ],
-      "9": [
-        "Parlare con i Vegetali"
-      ],
-      "13": [
-        "Localizza Creatura"
-      ],
-      "17": [
-        "Comunione con la Natura"
+        "Taumaturgia"
       ]
     }
   },

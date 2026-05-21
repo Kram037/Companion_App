@@ -10,6 +10,7 @@
 //
 // Schema (vedi script):
 //   { class_slug: { subclass_slug: { pgLvlMin: ["Nome IT", ...] } } }
+// Eventuali chiavi metadata, come _variants, sono solo per il compendio.
 //
 // Il PG ottiene una voce quando livello_classe >= pgLvlMin. La funzione
 // restituisce { name, source, source_label, sub_label } per ogni
@@ -77,9 +78,10 @@ function _pgSubclassGrantedSpells(pg) {
         const sub = (cls.subclasses || []).find(x => x.slug === subSlug);
         const subLabel = sub ? (sub.name || sub.name_en || c.sottoclasse) : (c.sottoclasse || subSlug);
         Object.entries(subData).forEach(([reqLvlStr, spellNames]) => {
+            if (reqLvlStr.startsWith('_') || !Array.isArray(spellNames)) return;
             const reqLvl = parseInt(reqLvlStr);
             if (lvl < reqLvl) return;
-            (spellNames || []).forEach(name => {
+            spellNames.forEach(name => {
                 const key = (name || '').toLowerCase();
                 if (seen.has(key)) return;
                 seen.add(key);

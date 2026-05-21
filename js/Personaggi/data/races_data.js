@@ -95,7 +95,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Nano",
+        "base_race_name_en": "Dwarf",
+        "version_source": "PHB",
+        "version_id": "dwarf-hill-dwarf-phb",
+        "version_label": "Nano della Collina (PHB)",
+        "version_group": "dwarf-hill-dwarf"
       },
       {
         "name": "Nano della Montagna",
@@ -113,7 +121,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Nano",
+        "base_race_name_en": "Dwarf",
+        "version_source": "PHB",
+        "version_id": "dwarf-mountain-dwarf-phb",
+        "version_label": "Nano della Montagna (PHB)",
+        "version_group": "dwarf-mountain-dwarf"
       },
       {
         "name": "Duergar",
@@ -175,9 +191,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Nano",
+        "base_race_name_en": "Dwarf",
+        "version_source": "MMM",
+        "version_id": "dwarf-duergar-mmm",
+        "version_label": "Duergar (MMM)",
+        "version_group": "dwarf-duergar"
       }
-    ]
+    ],
+    "name": "Nano",
+    "version_source": "PHB",
+    "version_id": "dwarf-phb",
+    "version_label": "Nano (PHB)",
+    "version_group": "dwarf"
   },
   "Elfo": {
     "name_en": "Elf",
@@ -267,7 +295,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "PHB",
+        "version_id": "elf-high-elf-phb",
+        "version_label": "Alto Elfo (PHB)",
+        "version_group": "elf-high-elf"
       },
       {
         "name": "Elfo dei Boschi",
@@ -299,7 +335,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "PHB",
+        "version_id": "elf-wood-elf-phb",
+        "version_label": "Elfo dei Boschi (PHB)",
+        "version_group": "elf-wood-elf"
       },
       {
         "name": "Drow",
@@ -366,7 +410,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "PHB",
+        "version_id": "elf-drow-phb",
+        "version_label": "Drow (PHB)",
+        "version_group": "elf-drow"
       },
       {
         "name": "Eladrin",
@@ -395,7 +447,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "MMM",
+        "version_id": "elf-eladrin-mmm",
+        "version_label": "Eladrin (MMM)",
+        "version_group": "elf-eladrin"
       },
       {
         "name": "Elfo del Mare",
@@ -435,7 +494,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "MMM",
+        "version_id": "elf-sea-elf-mmm",
+        "version_label": "Elfo del Mare (MMM)",
+        "version_group": "elf-sea-elf"
       },
       {
         "name": "Shadar-kai",
@@ -464,9 +530,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             },
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Elfo",
+        "base_race_name_en": "Elf",
+        "version_source": "MMM",
+        "version_id": "elf-shadar-kai-mmm",
+        "version_label": "Shadar-kai (MMM)",
+        "version_group": "elf-shadar-kai"
       }
-    ]
+    ],
+    "name": "Elfo",
+    "version_source": "PHB",
+    "version_id": "elf-phb",
+    "version_label": "Elfo (PHB)",
+    "version_group": "elf"
   },
   "Halfling": {
     "name_en": "Halfling",
@@ -533,7 +611,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Halfling",
+        "base_race_name_en": "Halfling",
+        "version_source": "PHB",
+        "version_id": "halfling-lightfoot-halfling-phb",
+        "version_label": "Piedelieve (PHB)",
+        "version_group": "halfling-lightfoot-halfling"
       },
       {
         "name": "Tozzo",
@@ -551,9 +637,22 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Halfling",
+        "base_race_name_en": "Halfling",
+        "version_source": "PHB",
+        "version_id": "halfling-stout-halfling-phb",
+        "version_label": "Tozzo (PHB)",
+        "version_group": "halfling-stout-halfling"
       }
-    ]
+    ],
+    "name": "Halfling",
+    "version_source": "PHB",
+    "version_id": "halfling-phb",
+    "version_label": "Halfling (PHB)",
+    "version_group": "halfling"
   },
   "Umano": {
     "name_en": "Human",
@@ -593,7 +692,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Umano",
+    "version_source": "PHB",
+    "version_id": "human-phb",
+    "version_label": "Umano (PHB)",
+    "version_group": "human"
   },
   "Umano Variante": {
     "name_en": "Human Variant",
@@ -635,7 +739,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Umano Variante",
+    "version_source": "PHB",
+    "version_id": "human-variant-phb",
+    "version_label": "Umano Variante (PHB)",
+    "version_group": "human-variant"
   },
   "Dragonide": {
     "name_en": "Dragonborn",
@@ -699,7 +808,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-black-dragonborn-phb",
+        "version_label": "Dragonide Nero (PHB)",
+        "version_group": "dragonborn-black-dragonborn"
       },
       {
         "name": "Dragonide Azzurro",
@@ -735,7 +852,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-blue-dragonborn-phb",
+        "version_label": "Dragonide Azzurro (PHB)",
+        "version_group": "dragonborn-blue-dragonborn"
       },
       {
         "name": "Dragonide Verde",
@@ -771,7 +896,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-green-dragonborn-phb",
+        "version_label": "Dragonide Verde (PHB)",
+        "version_group": "dragonborn-green-dragonborn"
       },
       {
         "name": "Dragonide Rosso",
@@ -807,7 +940,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-red-dragonborn-phb",
+        "version_label": "Dragonide Rosso (PHB)",
+        "version_group": "dragonborn-red-dragonborn"
       },
       {
         "name": "Dragonide Bianco",
@@ -843,7 +984,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-white-dragonborn-phb",
+        "version_label": "Dragonide Bianco (PHB)",
+        "version_group": "dragonborn-white-dragonborn"
       },
       {
         "name": "Dragonide d'Ottone",
@@ -879,7 +1028,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-brass-dragonborn-phb",
+        "version_label": "Dragonide d'Ottone (PHB)",
+        "version_group": "dragonborn-brass-dragonborn"
       },
       {
         "name": "Dragonide di Bronzo",
@@ -915,7 +1072,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-bronze-dragonborn-phb",
+        "version_label": "Dragonide di Bronzo (PHB)",
+        "version_group": "dragonborn-bronze-dragonborn"
       },
       {
         "name": "Dragonide di Rame",
@@ -951,7 +1116,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-copper-dragonborn-phb",
+        "version_label": "Dragonide di Rame (PHB)",
+        "version_group": "dragonborn-copper-dragonborn"
       },
       {
         "name": "Dragonide d'Oro",
@@ -987,7 +1160,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-gold-dragonborn-phb",
+        "version_label": "Dragonide d'Oro (PHB)",
+        "version_group": "dragonborn-gold-dragonborn"
       },
       {
         "name": "Dragonide d'Argento",
@@ -1023,9 +1204,22 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Dragonide",
+        "base_race_name_en": "Dragonborn",
+        "version_source": "PHB",
+        "version_id": "dragonborn-silver-dragonborn-phb",
+        "version_label": "Dragonide d'Argento (PHB)",
+        "version_group": "dragonborn-silver-dragonborn"
       }
-    ]
+    ],
+    "name": "Dragonide",
+    "version_source": "PHB",
+    "version_id": "dragonborn-phb",
+    "version_label": "Dragonide (PHB)",
+    "version_group": "dragonborn"
   },
   "Gnomo": {
     "name_en": "Gnome",
@@ -1102,7 +1296,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Gnomo",
+        "base_race_name_en": "Gnome",
+        "version_source": "PHB",
+        "version_id": "gnome-forest-gnome-phb",
+        "version_label": "Gnomo della Foresta (PHB)",
+        "version_group": "gnome-forest-gnome"
       },
       {
         "name": "Gnomo della Roccia",
@@ -1127,7 +1329,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source_short": "PHB",
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Gnomo",
+        "base_race_name_en": "Gnome",
+        "version_source": "PHB",
+        "version_id": "gnome-rock-gnome-phb",
+        "version_label": "Gnomo della Roccia (PHB)",
+        "version_group": "gnome-rock-gnome"
       },
       {
         "name": "Gnomo Svirfneblin",
@@ -1196,9 +1406,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Gnomo",
+        "base_race_name_en": "Gnome",
+        "version_source": "MMM",
+        "version_id": "gnome-deep-gnome-svirfneblin-mmm",
+        "version_label": "Gnomo Svirfneblin (MMM)",
+        "version_group": "gnome-deep-gnome-svirfneblin"
       }
-    ]
+    ],
+    "name": "Gnomo",
+    "version_source": "PHB",
+    "version_id": "gnome-phb",
+    "version_label": "Gnomo (PHB)",
+    "version_group": "gnome"
   },
   "Mezzelfo": {
     "name_en": "Half-Elf",
@@ -1249,7 +1471,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Mezzelfo",
+    "version_source": "PHB",
+    "version_id": "half-elf-phb",
+    "version_label": "Mezzelfo (PHB)",
+    "version_group": "half-elf"
   },
   "Mezzorco": {
     "name_en": "Half-Orc",
@@ -1309,7 +1536,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Mezzorco",
+    "version_source": "PHB",
+    "version_id": "half-orc-phb",
+    "version_label": "Mezzorco (PHB)",
+    "version_group": "half-orc"
   },
   "Tiefling": {
     "name_en": "Tiefling",
@@ -1399,7 +1631,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Manuale del Giocatore",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "PHB",
+        "version_id": "tiefling-bloodline-of-asmodeus-phb",
+        "version_label": "Stirpe di Asmodeus (PHB)",
+        "version_group": "tiefling-bloodline-of-asmodeus"
       },
       {
         "name": "Stirpe di Baalzebul",
@@ -1444,7 +1683,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-baalzebul-mtof",
+        "version_label": "Stirpe di Baalzebul (MToF)",
+        "version_group": "tiefling-bloodline-of-baalzebul"
       },
       {
         "name": "Stirpe di Dispater",
@@ -1489,7 +1735,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-dispater-mtof",
+        "version_label": "Stirpe di Dispater (MToF)",
+        "version_group": "tiefling-bloodline-of-dispater"
       },
       {
         "name": "Stirpe di Fierna",
@@ -1534,7 +1787,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-fierna-mtof",
+        "version_label": "Stirpe di Fierna (MToF)",
+        "version_group": "tiefling-bloodline-of-fierna"
       },
       {
         "name": "Stirpe di Glasya",
@@ -1579,7 +1839,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-glasya-mtof",
+        "version_label": "Stirpe di Glasya (MToF)",
+        "version_group": "tiefling-bloodline-of-glasya"
       },
       {
         "name": "Stirpe di Levistus",
@@ -1624,7 +1891,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-levistus-mtof",
+        "version_label": "Stirpe di Levistus (MToF)",
+        "version_group": "tiefling-bloodline-of-levistus"
       },
       {
         "name": "Stirpe di Mammon",
@@ -1669,7 +1943,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-mammon-mtof",
+        "version_label": "Stirpe di Mammon (MToF)",
+        "version_group": "tiefling-bloodline-of-mammon"
       },
       {
         "name": "Stirpe di Mefistofele",
@@ -1714,7 +1995,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-mephistopheles-mtof",
+        "version_label": "Stirpe di Mefistofele (MToF)",
+        "version_group": "tiefling-bloodline-of-mephistopheles"
       },
       {
         "name": "Stirpe di Zariel",
@@ -1759,7 +2047,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen's Tome of Foes",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "MToF",
+        "version_id": "tiefling-bloodline-of-zariel-mtof",
+        "version_label": "Stirpe di Zariel (MToF)",
+        "version_group": "tiefling-bloodline-of-zariel"
       },
       {
         "name": "Tiefling Lingua di Diavolo",
@@ -1804,7 +2099,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Sword Coast Adventurer's Guide",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "SCAG",
+        "version_id": "tiefling-devil-s-tongue-tiefling-scag",
+        "version_label": "Tiefling Lingua di Diavolo (SCAG)",
+        "version_group": "tiefling-devil-s-tongue-tiefling"
       },
       {
         "name": "Tiefling Fuoco Infernale",
@@ -1849,7 +2151,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Sword Coast Adventurer's Guide",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "SCAG",
+        "version_id": "tiefling-hellfire-tiefling-scag",
+        "version_label": "Tiefling Fuoco Infernale (SCAG)",
+        "version_group": "tiefling-hellfire-tiefling"
       },
       {
         "name": "Tiefling Alato",
@@ -1866,9 +2175,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Sword Coast Adventurer's Guide",
+        "base_race_name": "Tiefling",
+        "base_race_name_en": "Tiefling",
+        "version_source": "SCAG",
+        "version_id": "tiefling-winged-tiefling-scag",
+        "version_label": "Tiefling Alato (SCAG)",
+        "version_group": "tiefling-winged-tiefling"
       }
-    ]
+    ],
+    "name": "Tiefling",
+    "version_source": "PHB",
+    "version_id": "tiefling-phb",
+    "version_label": "Tiefling (PHB)",
+    "version_group": "tiefling"
   },
   "Aasimar": {
     "name_en": "Aasimar",
@@ -1950,7 +2271,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Aasimar",
+    "version_source": "MMM",
+    "version_id": "aasimar-mmm",
+    "version_label": "Aasimar (MMM)",
+    "version_group": "aasimar"
   },
   "Firbolg": {
     "name_en": "Firbolg",
@@ -2042,7 +2368,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Firbolg",
+    "version_source": "MMM",
+    "version_id": "firbolg-mmm",
+    "version_label": "Firbolg (MMM)",
+    "version_group": "firbolg"
   },
   "Goliath": {
     "name_en": "Goliath",
@@ -2097,7 +2428,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Goliath",
+    "version_source": "MMM",
+    "version_id": "goliath-mmm",
+    "version_label": "Goliath (MMM)",
+    "version_group": "goliath"
   },
   "Kenku": {
     "name_en": "Kenku",
@@ -2150,7 +2486,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Kenku",
+    "version_source": "MMM",
+    "version_id": "kenku-mmm",
+    "version_label": "Kenku (MMM)",
+    "version_group": "kenku"
   },
   "Uomo Lucertola": {
     "name_en": "Lizardfolk",
@@ -2224,7 +2565,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Uomo Lucertola",
+    "version_source": "MMM",
+    "version_id": "lizardfolk-mmm",
+    "version_label": "Uomo Lucertola (MMM)",
+    "version_group": "lizardfolk"
   },
   "Tabaxi": {
     "name_en": "Tabaxi",
@@ -2280,7 +2626,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Tabaxi",
+    "version_source": "MMM",
+    "version_id": "tabaxi-mmm",
+    "version_label": "Tabaxi (MMM)",
+    "version_group": "tabaxi"
   },
   "Triton": {
     "name_en": "Triton",
@@ -2377,7 +2728,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Triton",
+    "version_source": "MMM",
+    "version_id": "triton-mmm",
+    "version_label": "Triton (MMM)",
+    "version_group": "triton"
   },
   "Bugbear": {
     "name_en": "Bugbear",
@@ -2441,7 +2797,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Bugbear",
+    "version_source": "MMM",
+    "version_id": "bugbear-mmm",
+    "version_label": "Bugbear (MMM)",
+    "version_group": "bugbear"
   },
   "Goblin": {
     "name_en": "Goblin",
@@ -2494,7 +2855,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Goblin",
+    "version_source": "MMM",
+    "version_id": "goblin-mmm",
+    "version_label": "Goblin (MMM)",
+    "version_group": "goblin"
   },
   "Hobgoblin": {
     "name_en": "Hobgoblin",
@@ -2550,7 +2916,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Hobgoblin",
+    "version_source": "MMM",
+    "version_id": "hobgoblin-mmm",
+    "version_label": "Hobgoblin (MMM)",
+    "version_group": "hobgoblin"
   },
   "Coboldo": {
     "name_en": "Kobold",
@@ -2603,7 +2974,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Coboldo",
+    "version_source": "MMM",
+    "version_id": "kobold-mmm",
+    "version_label": "Coboldo (MMM)",
+    "version_group": "kobold"
   },
   "Orco": {
     "name_en": "Orc",
@@ -2666,7 +3042,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Orco",
+    "version_source": "MMM",
+    "version_id": "orc-mmm",
+    "version_label": "Orco (MMM)",
+    "version_group": "orc"
   },
   "Yuan-ti Purosangue": {
     "name_en": "Yuan-ti",
@@ -2752,7 +3133,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Yuan-ti Purosangue",
+    "version_source": "MMM",
+    "version_id": "yuan-ti-mmm",
+    "version_label": "Yuan-ti Purosangue (MMM)",
+    "version_group": "yuan-ti"
   },
   "Githyanki": {
     "name_en": "Githyanki",
@@ -2826,7 +3212,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         ]
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Githyanki",
+    "version_source": "MMM",
+    "version_id": "githyanki-mmm",
+    "version_label": "Githyanki (MMM)",
+    "version_group": "githyanki"
   },
   "Githzerai": {
     "name_en": "Githzerai",
@@ -2902,7 +3293,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         ]
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Githzerai",
+    "version_source": "MMM",
+    "version_id": "githzerai-mmm",
+    "version_label": "Githzerai (MMM)",
+    "version_group": "githzerai"
   },
   "Centauro": {
     "name_en": "Centaur",
@@ -2969,7 +3365,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Centauro",
+    "version_source": "MMM",
+    "version_id": "centaur-mmm",
+    "version_label": "Centauro (MMM)",
+    "version_group": "centaur"
   },
   "Leonino": {
     "name_en": "Leonin",
@@ -3029,7 +3430,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Leonino",
+    "version_source": "MMM",
+    "version_id": "leonin-mmm",
+    "version_label": "Leonino (MMM)",
+    "version_group": "leonin"
   },
   "Minotauro": {
     "name_en": "Minotaur",
@@ -3086,7 +3492,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Minotauro",
+    "version_source": "MMM",
+    "version_id": "minotaur-mmm",
+    "version_label": "Minotauro (MMM)",
+    "version_group": "minotaur"
   },
   "Satiro": {
     "name_en": "Satyr",
@@ -3150,7 +3561,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Satiro",
+    "version_source": "MMM",
+    "version_id": "satyr-mmm",
+    "version_label": "Satiro (MMM)",
+    "version_group": "satyr"
   },
   "Aarakocra": {
     "name_en": "Aarakocra",
@@ -3213,7 +3629,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         ]
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Aarakocra",
+    "version_source": "MMM",
+    "version_id": "aarakocra-mmm",
+    "version_label": "Aarakocra (MMM)",
+    "version_group": "aarakocra"
   },
   "Mutamorfo": {
     "name_en": "Changeling",
@@ -3262,7 +3683,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Mutamorfo",
+    "version_source": "MMM",
+    "version_id": "changeling-mmm",
+    "version_label": "Mutamorfo (MMM)",
+    "version_group": "changeling"
   },
   "Fata": {
     "name_en": "Fairy",
@@ -3349,7 +3775,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "uses": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Fata",
+    "version_source": "MMM",
+    "version_id": "fairy-mmm",
+    "version_label": "Fata (MMM)",
+    "version_group": "fairy"
   },
   "Harengon": {
     "name_en": "Harengon",
@@ -3409,7 +3840,12 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Harengon",
+    "version_source": "MMM",
+    "version_id": "harengon-mmm",
+    "version_label": "Harengon (MMM)",
+    "version_group": "harengon"
   },
   "Genasi": {
     "name_en": "Genasi",
@@ -3500,7 +3936,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         ],
         "resistances": [
           "fulmine"
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Genasi",
+        "base_race_name_en": "Genasi",
+        "version_source": "MMM",
+        "version_id": "genasi-air-genasi-mmm",
+        "version_label": "Genasi dell'Aria (MMM)",
+        "version_group": "genasi-air-genasi"
       },
       {
         "name": "Genasi della Terra",
@@ -3545,7 +3988,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             ],
             "uses": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Genasi",
+        "base_race_name_en": "Genasi",
+        "version_source": "MMM",
+        "version_id": "genasi-earth-genasi-mmm",
+        "version_label": "Genasi della Terra (MMM)",
+        "version_group": "genasi-earth-genasi"
       },
       {
         "name": "Genasi del Fuoco",
@@ -3601,7 +4051,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "resistances": [
           "fuoco"
         ],
-        "darkvision": 18
+        "darkvision": 18,
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Genasi",
+        "base_race_name_en": "Genasi",
+        "version_source": "MMM",
+        "version_id": "genasi-fire-genasi-mmm",
+        "version_label": "Genasi del Fuoco (MMM)",
+        "version_group": "genasi-fire-genasi"
       },
       {
         "name": "Genasi dell'Acqua",
@@ -3663,9 +4120,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         ],
         "resistances": [
           "acido"
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Genasi",
+        "base_race_name_en": "Genasi",
+        "version_source": "MMM",
+        "version_id": "genasi-water-genasi-mmm",
+        "version_label": "Genasi dell'Acqua (MMM)",
+        "version_group": "genasi-water-genasi"
       }
-    ]
+    ],
+    "name": "Genasi",
+    "version_source": "MMM",
+    "version_id": "genasi-mmm",
+    "version_label": "Genasi (MMM)",
+    "version_group": "genasi"
   },
   "Shifter": {
     "name_en": "Shifter",
@@ -3726,7 +4195,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Shifter",
+        "base_race_name_en": "Shifter",
+        "version_source": "MMM",
+        "version_id": "shifter-beasthide-shifter-mmm",
+        "version_label": "Pellebestia (Beasthide) (MMM)",
+        "version_group": "shifter-beasthide-shifter"
       },
       {
         "name": "Zannalunga (Longtooth)",
@@ -3743,7 +4219,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Shifter",
+        "base_race_name_en": "Shifter",
+        "version_source": "MMM",
+        "version_id": "shifter-longtooth-shifter-mmm",
+        "version_label": "Zannalunga (Longtooth) (MMM)",
+        "version_group": "shifter-longtooth-shifter"
       },
       {
         "name": "Falcatasvelta (Swiftstride)",
@@ -3760,7 +4243,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Shifter",
+        "base_race_name_en": "Shifter",
+        "version_source": "MMM",
+        "version_id": "shifter-swiftstride-shifter-mmm",
+        "version_label": "Falcatasvelta (Swiftstride) (MMM)",
+        "version_group": "shifter-swiftstride-shifter"
       },
       {
         "name": "Cacciatore Selvatico (Wildhunt)",
@@ -3777,9 +4267,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "uses": null,
             "innate_spells": null
           }
-        ]
+        ],
+        "source": "Mordenkainen presenta: Mostri del Multiverso",
+        "base_race_name": "Shifter",
+        "base_race_name_en": "Shifter",
+        "version_source": "MMM",
+        "version_id": "shifter-wildhunt-shifter-mmm",
+        "version_label": "Cacciatore Selvatico (Wildhunt) (MMM)",
+        "version_group": "shifter-wildhunt-shifter"
       }
-    ]
+    ],
+    "name": "Shifter",
+    "version_source": "MMM",
+    "version_id": "shifter-mmm",
+    "version_label": "Shifter (MMM)",
+    "version_group": "shifter"
   },
   "Tortle": {
     "name_en": "Tortle",
@@ -3844,6 +4346,11 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "innate_spells": null
       }
     ],
-    "subraces": []
+    "subraces": [],
+    "name": "Tortle",
+    "version_source": "ToA",
+    "version_id": "tortle-toa",
+    "version_label": "Tortle (ToA)",
+    "version_group": "tortle"
   }
 });

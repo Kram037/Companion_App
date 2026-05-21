@@ -70,6 +70,8 @@ innate_spells: lista di:
 """
 
 import json
+import re
+import unicodedata
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -895,6 +897,22 @@ def T(key_or_dict, **overrides):
 
 RACES = {}
 
+SOURCE_NAMES = {
+    "PHB": "Manuale del Giocatore",
+    "VGtM": "Volo's Guide to Monsters",
+    "MToF": "Mordenkainen's Tome of Foes",
+    "SCAG": "Sword Coast Adventurer's Guide",
+    "MMM": "Mordenkainen presenta: Mostri del Multiverso",
+    "ToA": "La Tomba dell'Annichilazione",
+}
+
+
+def _slug(value):
+    text = unicodedata.normalize("NFKD", str(value or ""))
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    text = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return text or "version"
+
 
 def _add_race(name_it, data):
     RACES[name_it] = data
@@ -907,6 +925,47 @@ def _add_subrace(parent_name_it, subrace):
     if parent is None:
         raise KeyError(f"Razza parent '{parent_name_it}' non trovata")
     parent.setdefault("subraces", []).append(subrace)
+
+
+def _source_name(short):
+    return SOURCE_NAMES.get(short, short or "")
+
+
+def _apply_version_metadata():
+    """Rende esplicita la fonte di ogni versione di razza e sottorazza.
+
+    Questo prepara i dati alla futura consultazione di versioni alternative
+    della stessa razza senza cambiare ancora la UI di selezione.
+    """
+    for key, race in RACES.items():
+        race.setdefault("name", key)
+        race_source_short = race.get("source_short") or ""
+        if race_source_short and not race.get("source"):
+            race["source"] = _source_name(race_source_short)
+        race["version_source"] = race_source_short
+        race["version_id"] = f"{_slug(race.get('name_en') or key)}-{_slug(race_source_short)}"
+        race["version_label"] = f"{race.get('name') or key} ({race_source_short})" if race_source_short else (race.get("name") or key)
+        race["version_group"] = _slug(race.get("name_en") or race.get("name") or key)
+
+        for subrace in race.get("subraces", []):
+            subrace_source_short = subrace.get("source_short") or race_source_short
+            subrace["source_short"] = subrace_source_short
+            if subrace_source_short and not subrace.get("source"):
+                subrace["source"] = _source_name(subrace_source_short)
+            subrace["base_race_name"] = race.get("name") or key
+            subrace["base_race_name_en"] = race.get("name_en") or key
+            subrace["version_source"] = subrace_source_short
+            subrace["version_id"] = "-".join([
+                _slug(race.get("name_en") or key),
+                _slug(subrace.get("name_en") or subrace.get("name")),
+                _slug(subrace_source_short),
+            ])
+            label = subrace.get("name") or subrace.get("name_en") or "Sottorazza"
+            subrace["version_label"] = f"{label} ({subrace_source_short})" if subrace_source_short else label
+            subrace["version_group"] = "-".join([
+                _slug(race.get("name_en") or key),
+                _slug(subrace.get("name_en") or subrace.get("name")),
+            ])
 
 
 # === Player's Handbook ===
@@ -2824,6 +2883,7 @@ _add_race("Tortle", {
 # ---------------------------------------------------------------------------
 
 def main():
+    _apply_version_metadata()
     print(f"Razze totali: {len(RACES)}")
     total_subraces = sum(len(r.get("subraces", [])) for r in RACES.values())
     print(f"Sottorazze totali: {total_subraces}")

@@ -390,18 +390,20 @@ function _compItems(tab) {
             const base = {
                 type: tab,
                 source: race.source_short || race.source || '',
-                search: [key, race.name, race.name_en, race.description, race.description_en, race.asi_text, race.asi_text_en, (race.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
+                search: [key, race.name, race.name_en, race.version_label, race.source_short, race.source, race.description, race.description_en, race.asi_text, race.asi_text_en, (race.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
             };
             if (Array.isArray(race.subraces) && race.subraces.length) {
                 return race.subraces.map(sub => ({
                     ...base,
+                    source: sub.source_short || sub.source || race.source_short || race.source || '',
                     id: `${key}:${sub.name || sub.name_en}`,
                     title: _compName(sub) || 'Sottorazza',
                     subtitle: raceLabel,
                     group: raceLabel,
-                    tags: [race.source_short || race.source].filter(Boolean),
+                    tags: [sub.source_short || sub.source || race.source_short || race.source].filter(Boolean),
                     desc: '',
                     data: { ...sub, baseRaceKey: key, baseRace: race, isSubrace: true },
+                    search: [base.search, sub.name, sub.name_en, sub.version_label, sub.source_short, sub.source, sub.description, sub.description_en, (sub.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
                 }));
             }
             return [{
@@ -1290,7 +1292,7 @@ function _compSubclassSpellListSection(clsId, sub) {
                 </thead>
                 <tbody>
                     ${rows.map(row => `<tr>
-                        <td>${escapeHtml(row.level)}</td>
+                        <td>${escapeHtml(row.variant ? `${row.variant} - ${row.level}` : row.level)}</td>
                         <td><div class="comp-spell-pill-list">${row.spells.map(name => `<span class="comp-spell-name-pill">${escapeHtml(name)}</span>`).join('')}</div></td>
                     </tr>`).join('')}
                 </tbody>
@@ -1312,13 +1314,26 @@ function _compSubclassSpellRows(clsId, sub) {
     const data = window.SUBCLASS_SPELLS_DATA || {};
     const table = classKeys.map(key => data[key]?.[subKey]).find(Boolean);
     if (!table || typeof table !== 'object') return [];
-    return Object.entries(table)
-        .map(([level, spells]) => ({
-            level,
-            spells: Array.isArray(spells) ? spells.filter(Boolean) : [],
-        }))
-        .filter(row => row.spells.length > 0)
-        .sort((a, b) => (parseInt(a.level) || 0) - (parseInt(b.level) || 0));
+    const rows = [];
+    Object.entries(table).forEach(([level, spells]) => {
+        if (String(level).startsWith('_') || !Array.isArray(spells)) return;
+        const clean = spells.filter(Boolean);
+        if (clean.length) rows.push({ level, spells: clean });
+    });
+    Object.entries(table._variants || {}).forEach(([variant, byLevel]) => {
+        if (!byLevel || typeof byLevel !== 'object') return;
+        Object.entries(byLevel).forEach(([level, spells]) => {
+            if (!Array.isArray(spells)) return;
+            const clean = spells.filter(Boolean);
+            if (clean.length) rows.push({ level, variant, spells: clean });
+        });
+    });
+    const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
+    return rows.sort((a, b) => {
+        const byLevel = (parseInt(a.level) || 0) - (parseInt(b.level) || 0);
+        if (byLevel !== 0) return byLevel;
+        return collator.compare(a.variant || '', b.variant || '');
+    });
 }
 
 function _compSortedSubclasses(subclasses) {
@@ -1350,6 +1365,7 @@ function _compFeatureDetail(title, subtitle, features, data) {
 
 function _compRaceDetail(race, title, subtitle) {
     const base = race.baseRace || race;
+    const sourceData = race.isSubrace ? race : base;
     const mergedTraits = [
         ...(base.traits || base.features || []),
         ...(race.isSubrace ? (race.traits || race.features || []) : []),
@@ -1358,7 +1374,7 @@ function _compRaceDetail(race, title, subtitle) {
         ? [_compField(base, 'description'), _compField(race, 'description')].filter(Boolean).join('\n\n')
         : _compField(base, 'description');
     return `
-        <div class="comp-detail-subtitle">${escapeHtml([subtitle, base.source_short || base.source].filter(Boolean).join(' - '))}</div>
+        <div class="comp-detail-subtitle">${escapeHtml([subtitle, sourceData.source_short || sourceData.source].filter(Boolean).join(' - '))}</div>
         ${_compBoxes([
             ['Taglia', base.size],
             ['Velocita', base.speed != null ? `${base.speed} m` : ''],

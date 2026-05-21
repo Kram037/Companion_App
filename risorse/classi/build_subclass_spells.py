@@ -125,11 +125,16 @@ def lst(*names: str) -> list[str]:
 # Dati hardcoded: { class_slug: { subclass_slug: { pgLvlMin: [spell_en] } } }
 # Usiamo l'helper `lst(*EN names)` per convertire al volo a IT.
 # ─────────────────────────────────────────────────────────────────────────
-DATA: dict[str, dict[str, dict[int, list[str]]]] = {}
+DATA: dict[str, dict[str, dict]] = {}
 
 
 def add(cls: str, sub: str, by_level: dict[int, list[str]]) -> None:
     DATA.setdefault(cls, {})[sub] = by_level
+
+
+def add_variants(cls: str, sub: str, variants: dict[str, dict[int, list[str]]]) -> None:
+    DATA.setdefault(cls, {}).setdefault(sub, {})
+    DATA[cls][sub]["_variants"] = variants
 
 
 # ── Chierico: Domain Spells (PHB + DMG + XGtE + TCoE + SCAG) ──
@@ -351,6 +356,36 @@ add("warlock", "genie", {
     9: lst("Creation"),
     17: lst("Wish"),
 })
+add_variants("warlock", "genie", {
+    "Dao": {
+        1: lst("Sanctuary"),
+        3: lst("Spike Growth"),
+        5: lst("Meld into Stone"),
+        7: lst("Stone Shape"),
+        9: lst("Wall of Stone"),
+    },
+    "Djinni": {
+        1: lst("Thunderwave"),
+        3: lst("Gust of Wind"),
+        5: lst("Wind Wall"),
+        7: lst("Greater Invisibility"),
+        9: lst("Seeming"),
+    },
+    "Efreeti": {
+        1: lst("Burning Hands"),
+        3: lst("Scorching Ray"),
+        5: lst("Fireball"),
+        7: lst("Fire Shield"),
+        9: lst("Flame Strike"),
+    },
+    "Marid": {
+        1: lst("Fog Cloud"),
+        3: lst("Blur"),
+        5: lst("Sleet Storm"),
+        7: lst("Control Water"),
+        9: lst("Cone of Cold"),
+    },
+})
 add("warlock", "undead", {
     1: lst("Bane", "False Life"),
     3: lst("Blindness/Deafness", "Phantasmal Force"),
@@ -381,9 +416,65 @@ add("sorcerer", "clockwork-soul", {
     7: lst("Freedom of Movement", "Summon Construct"),
     9: lst("Bigby's Hand", "Planar Binding"),
 })
+add_variants("sorcerer", "divine-soul", {
+    "Bene": {1: lst("Cure Wounds")},
+    "Male": {1: lst("Inflict Wounds")},
+    "Legge": {1: lst("Bless")},
+    "Caos": {1: lst("Bane")},
+    "Neutralita": {1: lst("Protection from Evil and Good")},
+})
 
 # ── Druido: Cerchi che danno spell list (XGtE + TCoE) ──
-# Cerchio della Terra: dipende dalla scelta del terreno, lasciato fuori per ora
+add_variants("druid", "circle-of-the-land", {
+    "Artico": {
+        3: lst("Hold Person", "Spike Growth"),
+        5: lst("Sleet Storm", "Slow"),
+        7: lst("Freedom of Movement", "Ice Storm"),
+        9: lst("Commune with Nature", "Cone of Cold"),
+    },
+    "Costa": {
+        3: lst("Mirror Image", "Misty Step"),
+        5: lst("Water Breathing", "Water Walk"),
+        7: lst("Control Water", "Freedom of Movement"),
+        9: lst("Conjure Elemental", "Scrying"),
+    },
+    "Deserto": {
+        3: lst("Blur", "Silence"),
+        5: lst("Create Food and Water", "Protection from Energy"),
+        7: lst("Blight", "Hallucinatory Terrain"),
+        9: lst("Insect Plague", "Wall of Stone"),
+    },
+    "Foresta": {
+        3: lst("Barkskin", "Spider Climb"),
+        5: lst("Call Lightning", "Plant Growth"),
+        7: lst("Divination", "Freedom of Movement"),
+        9: lst("Commune with Nature", "Tree Stride"),
+    },
+    "Prateria": {
+        3: lst("Invisibility", "Pass without Trace"),
+        5: lst("Daylight", "Haste"),
+        7: lst("Divination", "Freedom of Movement"),
+        9: lst("Dream", "Insect Plague"),
+    },
+    "Montagna": {
+        3: lst("Spider Climb", "Spike Growth"),
+        5: lst("Lightning Bolt", "Meld into Stone"),
+        7: lst("Stone Shape", "Stoneskin"),
+        9: lst("Passwall", "Wall of Stone"),
+    },
+    "Palude": {
+        3: lst("Darkness", "Melf's Acid Arrow"),
+        5: lst("Water Walk", "Stinking Cloud"),
+        7: lst("Freedom of Movement", "Locate Creature"),
+        9: lst("Insect Plague", "Scrying"),
+    },
+    "Sottosuolo": {
+        3: lst("Spider Climb", "Web"),
+        5: lst("Gaseous Form", "Stinking Cloud"),
+        7: lst("Greater Invisibility", "Stone Shape"),
+        9: lst("Cloudkill", "Insect Plague"),
+    },
+})
 add("druid", "circle-of-spores", {
     2: lst("Chill Touch"),
     3: lst("Blindness/Deafness", "Gentle Repose"),
@@ -436,11 +527,7 @@ add("ranger", "swarmkeeper", {
     17: lst("Insect Plague"),
 })
 add("ranger", "drakewarden", {
-    3: lst("Command"),
-    5: lst("Dragon's Breath"),
-    9: lst("Speak with Plants"),
-    13: lst("Locate Creature"),
-    17: lst("Commune with Nature"),
+    3: lst("Thaumaturgy"),
 })
 
 # ── Artificer: Specialist spells (TCoE) ──
@@ -480,7 +567,12 @@ def main() -> int:
     for cls, subs in DATA.items():
         for sub, lvls in subs.items():
             for lvl, names in lvls.items():
-                total += len(names)
+                if isinstance(lvl, int) and isinstance(names, list):
+                    total += len(names)
+                elif lvl == "_variants" and isinstance(names, dict):
+                    for variant_lvls in names.values():
+                        for variant_names in variant_lvls.values():
+                            total += len(variant_names)
     print(f"Sottoclassi configurate: {sum(len(v) for v in DATA.values())}")
     print(f"Voci totali: {total}")
     print(f"Spell mancanti unici: {len(_warned)}")
