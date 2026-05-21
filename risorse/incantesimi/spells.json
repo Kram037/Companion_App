@@ -15655,5 +15655,231 @@
     "source": "Player's Handbook (SRD)",
     "aliases": [],
     "translated": true
+  },
+  "Falcata di Ashardalon": {
+    "name_en": "Ashardalon's Stride",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "La tua velocita' aumenta di 6 metri e il tuo movimento non provoca attacchi di opportunita'. Una volta per turno, quando ti muovi entro 1,5 metri da una creatura o da un oggetto non indossato ne' trasportato, puoi lasciarti dietro una scia di fiamme che infligge 1d6 danni da fuoco a quel bersaglio. Ai livelli superiori aumentano sia il bonus di velocita' sia i danni da fuoco.",
+    "description_en": "Your speed increases, your movement does not provoke opportunity attacks, and you can burn nearby creatures or unattended objects once per turn as you move. Higher-level slots increase both speed and fire damage.",
+    "classes_en": [
+      "Artificer",
+      "Ranger",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Falcata di Ashardalon",
+    "classes": [
+      "Artefice",
+      "Ranger",
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
+  },
+  "Malizia di Nathair": {
+    "name_en": "Nathair's Mischief",
+    "level": 2,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "S, M (un pezzo di crosta di torta di mele)",
+    "components_en": "S, M (a piece of crust from an apple pie)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Riempi un cubo di 6 metri con magia fatata caotica. All'inizio di ogni tuo turno tiri per determinare l'effetto dell'area, poi puoi spostare il cubo. Le creature nell'area possono essere ammaliate, accecate, costrette a ridere o rese terreno difficile da una sostanza illusoria, in base al risultato.",
+    "description_en": "You fill a 20-foot cube with chaotic fey magic. Each turn a roll determines the effect in the area, and you can move the cube. Creatures can be charmed, blinded, incapacitated by laughter, or hindered by illusory difficult terrain.",
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Malizia di Nathair",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
+  },
+  "Gelo Vincolante di Rime": {
+    "name_en": "Rime's Binding Ice",
+    "level": 2,
+    "school": "evocation",
+    "school_it": "Invocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Incantatore (cono di 9 metri)",
+    "range_en": "Self (30-foot cone)",
+    "components": "S, M (una fiala di acqua di fusione)",
+    "components_en": "S, M (a vial of meltwater)",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Un cono di gelo esplode da te. Le creature nell'area effettuano un tiro salvezza su Costituzione: se falliscono subiscono 3d8 danni da freddo e vengono intrappolate dal ghiaccio, con velocita' ridotta a 0 finche' non usano un'azione per liberarsi o essere liberate. Se superano il tiro, subiscono meta' danni e non restano intrappolate. Ai livelli superiori i danni aumentano.",
+    "description_en": "Cold energy erupts in a cone. Failed Constitution saves take cold damage and are restrained by ice until freed with an action; successful saves take half damage and are not restrained. Higher-level slots increase the damage.",
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Gelo Vincolante di Rime",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
+  },
+  "Lancia Psichica di Raulothim": {
+    "name_en": "Raulothim's Psychic Lance",
+    "level": 4,
+    "school": "enchantment",
+    "school_it": "Ammaliamento",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "36 metri",
+    "range_en": "120 feet",
+    "components": "V",
+    "components_en": "V",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Scagli una lancia mentale contro una creatura che puoi vedere entro gittata, oppure contro una creatura di cui pronunci il nome se si trova entro gittata. Il bersaglio effettua un tiro salvezza su Intelligenza: se fallisce subisce 7d6 danni psichici ed e' incapacitato fino all'inizio del tuo prossimo turno; se supera il tiro subisce meta' danni. Ai livelli superiori i danni aumentano.",
+    "description_en": "You strike a creature you can see, or a named creature within range, with psychic force. A failed Intelligence save deals psychic damage and incapacitates the target until your next turn; a success halves the damage. Higher-level slots increase the damage.",
+    "classes_en": [
+      "Bard",
+      "Sorcerer",
+      "Warlock",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Lancia Psichica di Raulothim",
+    "classes": [
+      "Bardo",
+      "Stregone",
+      "Warlock",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
+  },
+  "Evoca Spirito Draconico": {
+    "name_en": "Summon Draconic Spirit",
+    "level": 5,
+    "school": "conjuration",
+    "school_it": "Evocazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (un oggetto con l'immagine di un drago del valore di almeno 500 mo)",
+    "components_en": "V, S, M (an object with the image of a dragon worth at least 500 gp)",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Evochi uno spirito draconico in uno spazio libero entro gittata. Quando lo evochi scegli una famiglia draconica che determina resistenze, immunita' e tipo di soffio. Lo spirito agisce dopo il tuo turno, obbedisce ai tuoi comandi e usa il blocco statistiche dell'incantesimo. Ai livelli superiori aumentano alcune statistiche e i danni.",
+    "description_en": "You summon a draconic spirit in an unoccupied space. Its draconic family determines defenses and breath type. The spirit acts after your turn, obeys your commands, and uses the spell's stat block. Higher-level slots improve its statistics and damage.",
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "aliases": [
+      "Evoca Spirito Draconiano"
+    ],
+    "name": "Evoca Spirito Draconico",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "translated": true
+  },
+  "Scudo di Platino di Fizban": {
+    "name_en": "Fizban's Platinum Shield",
+    "level": 6,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "18 metri",
+    "range_en": "60 feet",
+    "components": "V, S, M (una scaglia di drago placcata in platino del valore di almeno 500 mo)",
+    "components_en": "V, S, M (a platinum-plated dragon scale worth at least 500 gp)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Scegli te stesso o una creatura visibile entro gittata, avvolgendola in una protezione draconica. Il bersaglio ottiene mezza copertura, resistenza ad acido, freddo, fuoco, fulmine e veleno, e puo' evitare completamente certi effetti su un tiro salvezza su Destrezza riuscito. Come azione bonus puoi spostare lo scudo su un'altra creatura valida.",
+    "description_en": "You ward yourself or a creature you can see with draconic protection. The target gains half cover, resistance to common draconic damage types, and an evasion-like benefit. As a bonus action you can move the shield to another valid creature.",
+    "classes_en": [
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Scudo di Platino di Fizban",
+    "classes": [
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
+  },
+  "Trasformazione Draconica": {
+    "name_en": "Draconic Transformation",
+    "level": 7,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione bonus",
+    "casting_time_en": "1 bonus action",
+    "range": "Incantatore",
+    "range_en": "Self",
+    "components": "V, S, M (una statuetta di drago del valore di almeno 500 mo)",
+    "components_en": "V, S, M (a statuette of a dragon worth at least 500 gp)",
+    "duration": "Concentrazione, fino a 1 minuto",
+    "duration_en": "Concentration, up to 1 minute",
+    "description": "Assumi tratti draconici per la durata. Ottieni vista cieca entro 9 metri, ali spettrali che ti concedono velocita' di volo di 18 metri, e puoi usare un'azione bonus per emettere un soffio in un cono di 18 metri che infligge 6d8 danni da forza con tiro salvezza su Destrezza per dimezzare.",
+    "description_en": "You take on draconic traits for the duration: blindsight, spectral wings with a flying speed, and a bonus-action breath weapon in a large cone that deals force damage on a failed Dexterity save, half on success.",
+    "classes_en": [
+      "Druid",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Fizban's Treasury of Dragons",
+    "name": "Trasformazione Draconica",
+    "classes": [
+      "Druido",
+      "Stregone",
+      "Mago"
+    ],
+    "class_source_tags_en": {},
+    "ritual": false,
+    "aliases": [],
+    "translated": true
   }
 }

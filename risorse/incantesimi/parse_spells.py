@@ -1659,6 +1659,18 @@ def add_class_to_spell(spell: dict, class_en: str, source_tag: str | None = None
 def apply_manual_patches(by_id: dict[str, dict]) -> list[str]:
     patches = load_manual_patches()
     warnings: list[str] = []
+    for spell_id, spell_data in patches.get("spells", {}).items():
+        spell = dict(spell_data)
+        spell.setdefault("name", spell_id)
+        spell.setdefault("name_en", spell_id)
+        spell.setdefault("classes_en", [])
+        spell["classes"] = [CLASS_IT.get(c, c) for c in spell.get("classes_en", [])]
+        spell.setdefault("class_source_tags_en", {})
+        spell.setdefault("ritual", False)
+        spell.setdefault("aliases", _aliases_for(spell["name"]))
+        spell.setdefault("translated", True)
+        by_id[spell["name"]] = spell
+
     for spell_key, patch in patches.get("add_classes", {}).items():
         spell = find_spell(by_id, spell_key)
         if not spell:
