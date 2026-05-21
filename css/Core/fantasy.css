@@ -182,7 +182,7 @@ body {
 }
 
 .toolbar-icon-compendio {
-    --toolbar-icon-url: url("../../images/Toolbar/Compendio.svg");
+    --toolbar-icon-url: url("../../images/Toolbar/Compendio.svg?v=20260521A");
 }
 
 .toolbar-btn.active svg,
