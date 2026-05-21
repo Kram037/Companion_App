@@ -1,4 +1,45 @@
 // Initialize App
+function setupServiceWorkerAutoUpdate(registration) {
+    if (!registration || !('serviceWorker' in navigator)) return;
+
+    const activateWorker = (worker) => {
+        if (!worker || !navigator.serviceWorker.controller) return;
+        worker.postMessage({ type: 'SKIP_WAITING' });
+    };
+
+    if (registration.waiting) activateWorker(registration.waiting);
+
+    registration.addEventListener('updatefound', () => {
+        const worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed') activateWorker(worker);
+        });
+    });
+
+    registration.update().catch(e => console.warn('SW update check:', e));
+}
+
+function setupServiceWorkerReloadOnUpdate() {
+    if (!('serviceWorker' in navigator) || window.__companionSwReloadListener) return;
+    window.__companionSwReloadListener = true;
+    const hadController = !!navigator.serviceWorker.controller;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController) return;
+        if (sessionStorage.getItem('companion-sw-reloading') === 'true') return;
+        sessionStorage.setItem('companion-sw-reloading', 'true');
+        window.location.reload();
+    });
+    window.addEventListener('load', () => sessionStorage.removeItem('companion-sw-reloading'));
+}
+
+async function registerBaseServiceWorker() {
+    const registration = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+    setupServiceWorkerAutoUpdate(registration);
+    return registration;
+}
+
 async function init() {
     // Initialize DOM elements
     elements = {
@@ -242,10 +283,11 @@ async function init() {
     // Registra il Service Worker sempre (necessario per PWA install + future cache offline).
     // La sottoscrizione push avviene solo se le notifiche sono abilitate.
     if ('serviceWorker' in navigator) {
-        if (localStorage.getItem('notificheEnabled') === 'true') {
-            registerServiceWorker();
+        setupServiceWorkerReloadOnUpdate();
+        if (localStorage.getItem('notificheEnabled') === 'true' && typeof registerServiceWorker === 'function') {
+            registerServiceWorker().then(setupServiceWorkerAutoUpdate);
         } else {
-            navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW registration:', e));
+            registerBaseServiceWorker().catch(e => console.warn('SW registration:', e));
         }
     }
 

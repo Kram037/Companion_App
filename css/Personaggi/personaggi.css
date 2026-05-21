@@ -702,13 +702,14 @@
 .scheda-box.clickable:active { background: var(--accent-subtle); }
 
 /* HP Section */
-.scheda-hp-section { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
+.scheda-hp-section { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
 .scheda-hp-cell { text-align: center; padding: 8px 4px; }
 .scheda-hp-cell + .scheda-hp-cell { border-left: 1px solid var(--border); }
 .scheda-hp-input { width: 100%; text-align: center; background: transparent; color: var(--text); border: none; font-size: 1.3rem; font-weight: 800; padding: 4px 0; }
 .scheda-hp-input:focus { outline: none; color: var(--accent); }
 .scheda-hp-display { font-size: 1.3rem; font-weight: 800; color: var(--text); padding: 4px 0; }
 .scheda-hp-display.pv-current { color: var(--accent); }
+.scheda-hp-display.pv-max-temp { color: var(--accent); }
 .scheda-hp-cell.clickable { cursor: pointer; transition: background 0.15s; }
 .scheda-hp-cell.clickable:hover { background: var(--surface-hover); }
 .scheda-hp-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-top: 2px; }

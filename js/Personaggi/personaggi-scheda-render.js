@@ -75,7 +75,12 @@ async function renderSchedaPersonaggio(personaggioId) {
         const saves = pg.tiri_salvezza || [];
         const skillProf = pg.competenze_abilita || [];
         const skillExpert = pg.maestrie_abilita || [];
-        const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+        const pvMaxTemp = (typeof schedaGetPvMaxTemporaneo === 'function') ? schedaGetPvMaxTemporaneo(pg) : 0;
+        const pvMaxEffettivo = (typeof schedaGetPvMaxEffettivo === 'function')
+            ? schedaGetPvMaxEffettivo(pg)
+            : ((parseInt(pg.punti_vita_max) || 10) + pvMaxTemp);
+        const pvAttualiRaw = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+        const pvAttuali = Math.min(pvMaxEffettivo, parseInt(pvAttualiRaw) || 0);
 
         let classeDisplay = pg.classe || '';
         if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
@@ -399,6 +404,10 @@ async function renderSchedaPersonaggio(personaggioId) {
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
                         <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
                         <div class="scheda-hp-label">PV Max</div>
+                    </div>
+                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_max_temporaneo')">
+                        <div class="scheda-hp-display ${pvMaxTemp > 0 ? 'pv-max-temp' : ''}" id="schedaPvMaxTemp">${pvMaxTemp}</div>
+                        <div class="scheda-hp-label">PV Max Temp</div>
                     </div>
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_attuali')">
                         <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>

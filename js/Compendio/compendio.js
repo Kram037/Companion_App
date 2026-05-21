@@ -88,7 +88,7 @@ const COMP_CLASS_LABELS = {
     warlock: { it: 'Warlock', en: 'Warlock' },
 };
 
-const COMP_ARTIFICER_SPELLS = new Set([
+const COMP_ARTIFICER_SPELLS = window.COMPANION_ARTIFICER_SPELLS = new Set([
     'absorb elements',
     'acid splash',
     'aid',
@@ -381,7 +381,7 @@ function _compItems(tab) {
             search: [sub.name, sub.name_en, cls.name, cls.name_en, ...(sub.features || []).map(f => `${f.name} ${f.description}`)].join(' '),
             tags: [],
             desc: '',
-            data: { ...sub, className: cls.name, classNameEn: cls.name_en, classLabel: _compName(cls) },
+            data: { ...sub, parent_class_slug: cls.slug, className: cls.name, classNameEn: cls.name_en, classLabel: _compName(cls) },
         })));
     }
     if (tab === 'razze') {
@@ -1255,6 +1255,7 @@ function _compSubclassAccordionHtml(clsId, sub) {
         </button>
         <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
+            ${_compSubclassSpellListSection(clsId, sub)}
             ${_compFeaturesSection(features)}
         </div>
     </section>`;
@@ -1270,6 +1271,52 @@ window.compendioToggleClassSubclass = function(clsId, subId) {
 
 function _compSubclassOpenKey(clsId, subId) {
     return `${clsId}::${subId}`;
+}
+
+function _compSubclassSpellListSection(clsId, sub) {
+    const rows = _compSubclassSpellRows(clsId, sub);
+    if (!rows.length) return '';
+    return `<section class="comp-detail-section comp-subclass-spells-section">
+        <h3>Incantesimi concessi</h3>
+        <div class="comp-table-wrap">
+            <table class="comp-equipment-table comp-spell-offer-table comp-subclass-spell-table">
+                <thead>
+                    <tr>
+                        <th>Liv. classe</th>
+                        <th>Incantesimi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows.map(row => `<tr>
+                        <td>${escapeHtml(row.level)}</td>
+                        <td><div class="comp-spell-pill-list">${row.spells.map(name => `<span class="comp-spell-name-pill">${escapeHtml(name)}</span>`).join('')}</div></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+    </section>`;
+}
+
+function _compSubclassSpellRows(clsId, sub) {
+    const rawClassKey = String(clsId || '').trim();
+    const classKey = _compClassKey(rawClassKey);
+    const classKeys = _compUnique([
+        rawClassKey,
+        classKey,
+        ...(COMP_CLASS_ALIASES[classKey] || []),
+        ...(COMP_CLASS_ALIASES[rawClassKey] || []),
+    ].filter(Boolean));
+    const subKey = String(sub?.slug || sub?.name_en || sub?.name || '').trim();
+    const data = window.SUBCLASS_SPELLS_DATA || {};
+    const table = classKeys.map(key => data[key]?.[subKey]).find(Boolean);
+    if (!table || typeof table !== 'object') return [];
+    return Object.entries(table)
+        .map(([level, spells]) => ({
+            level,
+            spells: Array.isArray(spells) ? spells.filter(Boolean) : [],
+        }))
+        .filter(row => row.spells.length > 0)
+        .sort((a, b) => (parseInt(a.level) || 0) - (parseInt(b.level) || 0));
 }
 
 function _compSortedSubclasses(subclasses) {
@@ -1294,6 +1341,7 @@ function _compFeatureDetail(title, subtitle, features, data) {
     return `
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
         ${_compClassProgressionSection(data, 'Progressione incantesimi')}
+        ${_compSubclassSpellListSection(data.parent_class_slug || data.classSlug || _compClassKey(data.className || data.classNameEn || ''), data)}
         ${_compFeaturesSection(features)}
     `;
 }

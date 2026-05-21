@@ -4,18 +4,34 @@
 
 let _hpCalcState = null;
 
+function schedaGetPvMaxTemporaneo(pg) {
+    const bm = (pg?.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
+    return Math.max(0, parseInt(bm._pv_max_temporaneo) || 0);
+}
+
+function schedaGetPvMaxEffettivo(pg) {
+    const base = Math.max(1, parseInt(pg?.punti_vita_max) || 10);
+    return base + schedaGetPvMaxTemporaneo(pg);
+}
+
+window.schedaGetPvMaxTemporaneo = schedaGetPvMaxTemporaneo;
+window.schedaGetPvMaxEffettivo = schedaGetPvMaxEffettivo;
+
 window.schedaOpenHpCalcLive = function(pgId, field) {
     const pg = _schedaPgCache;
     if (!pg) return;
     let currentVal, maxVal;
     if (field === 'pv_attuali') {
-        currentVal = pg.pv_attuali != null ? pg.pv_attuali : (pg.punti_vita_max || 10);
-        maxVal = pg.punti_vita_max || 10;
+        maxVal = schedaGetPvMaxEffettivo(pg);
+        currentVal = Math.min(maxVal, pg.pv_attuali != null ? pg.pv_attuali : (pg.punti_vita_max || 10));
     } else if (field === 'pv_temporanei') {
         currentVal = pg.pv_temporanei || 0;
         maxVal = -1;
     } else if (field === 'punti_vita_max') {
         currentVal = pg.punti_vita_max || 10;
+        maxVal = -1;
+    } else if (field === 'pv_max_temporaneo') {
+        currentVal = schedaGetPvMaxTemporaneo(pg);
         maxVal = -1;
     }
     schedaOpenHpCalc(pgId, field, currentVal, maxVal);
@@ -23,7 +39,12 @@ window.schedaOpenHpCalcLive = function(pgId, field) {
 
 window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     _hpCalcState = { pgId, field, currentVal, maxVal, inputBuffer: '0' };
-    const labels = { pv_attuali: 'Punti Vita Attuali', pv_temporanei: 'Punti Vita Temporanei', punti_vita_max: 'Punti Vita Massimi' };
+    const labels = {
+        pv_attuali: 'Punti Vita Attuali',
+        pv_temporanei: 'Punti Vita Temporanei',
+        punti_vita_max: 'Punti Vita Massimi',
+        pv_max_temporaneo: 'Bonus PV Max Temporaneo',
+    };
     const label = labels[field] || 'Punti Vita';
     const maxDisplay = (maxVal > 0 && field !== 'punti_vita_max') ? `<span class="hp-calc-max">/ ${maxVal}</span>` : '';
 
@@ -34,30 +55,34 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
     overlay.id = 'hpCalcOverlay';
     overlay.className = 'hp-calc-overlay';
 
-    const isDirectEdit = field === 'punti_vita_max';
+    const isDirectEdit = field === 'punti_vita_max' || field === 'pv_max_temporaneo';
 
     let pvMedioHint = '';
     let actionButtons;
     if (isDirectEdit) {
-        const pgRef = _schedaPgCache;
-        const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pgRef) : 0;
-        const reale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pgRef) : 0;
-        const hintParts = [];
-        if (medio > 0) {
-            hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">PV medio</span><strong class="hp-calc-medio">${medio}</strong></div>`);
-        }
-        if (reale > 0) {
-            hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">Max reale</span><strong class="hp-calc-reale">${reale}</strong></div>`);
-        }
-        if (hintParts.length > 0) {
-            pvMedioHint = `<div class="hp-calc-hint hp-calc-hint-grid">${hintParts.join('')}</div>`;
+        let extraButtons = '';
+        if (field === 'punti_vita_max') {
+            const pgRef = _schedaPgCache;
+            const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pgRef) : 0;
+            const reale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pgRef) : 0;
+            const hintParts = [];
+            if (medio > 0) {
+                hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">PV medio</span><strong class="hp-calc-medio">${medio}</strong></div>`);
+            }
+            if (reale > 0) {
+                hintParts.push(`<div class="hp-calc-hint-cell"><span class="hp-calc-hint-lbl">Max reale</span><strong class="hp-calc-reale">${reale}</strong></div>`);
+            }
+            if (hintParts.length > 0) {
+                pvMedioHint = `<div class="hp-calc-hint hp-calc-hint-grid">${hintParts.join('')}</div>`;
+            }
+            extraButtons = `<div class="hp-calc-buttons hp-calc-buttons-extra">
+                <button class="hp-calc-btn neutral hp-calc-btn-full" onclick="schedaHpSetMaxReale()" title="Imposta il valore digitato come nuovo Max Reale">Imposta come Max Reale</button>
+            </div>`;
         }
         actionButtons = `<div class="hp-calc-buttons">
                 <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaHpSetDirect()">Conferma</button>
             </div>
-            <div class="hp-calc-buttons hp-calc-buttons-extra">
-                <button class="hp-calc-btn neutral hp-calc-btn-full" onclick="schedaHpSetMaxReale()" title="Imposta il valore digitato come nuovo Max Reale">Imposta come Max Reale</button>
-            </div>`;
+            ${extraButtons}`;
     } else {
         actionButtons = `<div class="hp-calc-buttons">
             <button class="hp-calc-btn damage" onclick="schedaHpApply(-1)">− Danno</button>
@@ -130,6 +155,9 @@ window.schedaHpSetMaxReale = async function() {
     bm._pv_max_reale = buf;
     pg.bonus_manuali = bm;
     pg.punti_vita_max = buf;
+    const effectiveMax = schedaGetPvMaxEffettivo(pg);
+    const clampedPv = Math.min(effectiveMax, Math.max(0, parseInt(pg.pv_attuali) || effectiveMax));
+    pg.pv_attuali = clampedPv;
 
     _hpCalcState.currentVal = buf;
     _hpCalcState.inputBuffer = '0';
@@ -141,11 +169,14 @@ window.schedaHpSetMaxReale = async function() {
     if (realeEl) realeEl.textContent = buf;
     const pgDisplay = document.getElementById('schedaPvMax');
     if (pgDisplay) pgDisplay.textContent = buf;
+    const pvAttualiDisplay = document.getElementById('schedaPvAttuali');
+    if (pvAttualiDisplay) pvAttualiDisplay.textContent = clampedPv;
 
     const supabase = getSupabaseClient();
     if (supabase) {
         await supabase.from('personaggi').update({
             punti_vita_max: buf,
+            pv_attuali: clampedPv,
             bonus_manuali: pg.bonus_manuali,
             updated_at: new Date().toISOString(),
         }).eq('id', _hpCalcState.pgId);
@@ -156,6 +187,47 @@ window.schedaHpSetMaxReale = async function() {
 window.schedaHpSetDirect = async function() {
     if (!_hpCalcState) return;
     const newVal = parseInt(_hpCalcState.inputBuffer) || 0;
+    const field = _hpCalcState.field;
+    const pg = _schedaPgCache;
+
+    if (field === 'pv_max_temporaneo') {
+        if (!pg) return;
+        const bonus = Math.max(0, newVal);
+        const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
+        if (bonus > 0) bm._pv_max_temporaneo = bonus;
+        else delete bm._pv_max_temporaneo;
+
+        pg.bonus_manuali = bm;
+        const effectiveMax = schedaGetPvMaxEffettivo(pg);
+        const curPv = pg.pv_attuali != null ? parseInt(pg.pv_attuali) || 0 : effectiveMax;
+        const clampedPv = Math.min(effectiveMax, Math.max(0, curPv));
+        pg.pv_attuali = clampedPv;
+
+        _hpCalcState.currentVal = bonus;
+        _hpCalcState.inputBuffer = '0';
+        const display = document.getElementById('hpCalcCurrent');
+        if (display) display.textContent = bonus;
+        const amountDisplay = document.getElementById('hpCalcAmountDisplay');
+        if (amountDisplay) amountDisplay.textContent = '0';
+        const maxTempDisplay = document.getElementById('schedaPvMaxTemp');
+        if (maxTempDisplay) {
+            maxTempDisplay.textContent = bonus;
+            maxTempDisplay.classList.toggle('pv-max-temp', bonus > 0);
+        }
+        const currentDisplay = document.getElementById('schedaPvAttuali');
+        if (currentDisplay) currentDisplay.textContent = clampedPv;
+
+        const supabase = getSupabaseClient();
+        if (supabase) {
+            await supabase.from('personaggi').update({
+                bonus_manuali: pg.bonus_manuali,
+                pv_attuali: clampedPv,
+                updated_at: new Date().toISOString(),
+            }).eq('id', _hpCalcState.pgId);
+        }
+        return;
+    }
+
     _hpCalcState.currentVal = newVal;
 
     const display = document.getElementById('hpCalcCurrent');
@@ -169,9 +241,20 @@ window.schedaHpSetDirect = async function() {
     if (pgDisplay) pgDisplay.textContent = newVal;
     if (_schedaPgCache) _schedaPgCache[_hpCalcState.field] = newVal;
 
+    const updates = { [_hpCalcState.field]: newVal, updated_at: new Date().toISOString() };
+    if (_hpCalcState.field === 'punti_vita_max' && _schedaPgCache) {
+        const effectiveMax = schedaGetPvMaxEffettivo(_schedaPgCache);
+        const currentPv = _schedaPgCache.pv_attuali != null ? parseInt(_schedaPgCache.pv_attuali) || 0 : effectiveMax;
+        const clampedPv = Math.min(effectiveMax, Math.max(0, currentPv));
+        _schedaPgCache.pv_attuali = clampedPv;
+        updates.pv_attuali = clampedPv;
+        const currentDisplay = document.getElementById('schedaPvAttuali');
+        if (currentDisplay) currentDisplay.textContent = clampedPv;
+    }
+
     const supabase = getSupabaseClient();
     if (supabase) {
-        await supabase.from('personaggi').update({ [_hpCalcState.field]: newVal, updated_at: new Date().toISOString() }).eq('id', _hpCalcState.pgId);
+        await supabase.from('personaggi').update(updates).eq('id', _hpCalcState.pgId);
     }
 }
 

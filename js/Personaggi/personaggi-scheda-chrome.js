@@ -150,14 +150,57 @@ function _refreshResImmInlineRow(dmgType) {
 /* ── Header scheda condiviso (foto a sx, identità a sx, level-up + ispirazione a dx) ── */
 function schedaSetPageTitle(pgOrTitle) {
     const titleEl = document.getElementById('schedaPageTitle');
-    if (!titleEl) return;
     const title = typeof pgOrTitle === 'string'
         ? pgOrTitle
         : (pgOrTitle?.nome || 'Scheda');
-    titleEl.textContent = title || 'Scheda';
+    if (titleEl) titleEl.textContent = title || 'Scheda';
+
+    const renameBtn = document.getElementById('schedaRenameBtn');
+    if (!renameBtn) return;
+    const pgId = typeof pgOrTitle === 'object' ? pgOrTitle?.id : (_schedaPgCache?.id || null);
+    if (pgId) {
+        renameBtn.style.display = '';
+        renameBtn.onclick = () => schedaRenameCharacter(pgId);
+    } else {
+        renameBtn.style.display = 'none';
+        renameBtn.onclick = null;
+    }
 }
 
 window.schedaSetPageTitle = schedaSetPageTitle;
+
+function _schedaRefreshCurrentTab(pgId) {
+    const tab = window._schedaCurrentTab;
+    if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') return schedaOpenSpellPage(pgId);
+    if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') return schedaOpenInventoryPage(pgId);
+    if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') return schedaOpenPrivilegesPage(pgId);
+    if (typeof renderMicroScheda === 'function' && _schedaPgCache?.tipo_scheda === 'micro') return renderMicroScheda(pgId);
+    return renderSchedaPersonaggio(pgId);
+}
+
+window.schedaRenameCharacter = async function(pgId) {
+    const pg = _schedaPgCache;
+    const currentName = (pg?.nome || '').trim();
+    const nextName = (await showPrompt('Nuovo nome', 'Rinomina personaggio', currentName) || '').trim();
+    if (!nextName || nextName === currentName) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase
+        .from('personaggi')
+        .update({ nome: nextName, updated_at: new Date().toISOString() })
+        .eq('id', pgId);
+    if (error) {
+        console.error('Errore rinomina personaggio:', error);
+        showNotification('Impossibile rinominare il personaggio');
+        return;
+    }
+
+    if (_schedaPgCache) _schedaPgCache.nome = nextName;
+    schedaSetPageTitle(_schedaPgCache || nextName);
+    showNotification('Nome aggiornato');
+    _schedaRefreshCurrentTab(pgId);
+};
 
 function _schedaCleanSubclassName(name) {
     const raw = String(name || '').trim();

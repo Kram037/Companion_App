@@ -699,7 +699,8 @@ async function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return null;
 
     try {
-        const registration = await navigator.serviceWorker.register('sw.js');
+        const registration = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+        registration.update().catch(e => console.warn('SW update check:', e));
         console.log('Service Worker registrato');
 
         if ('PushManager' in window && registration.pushManager) {

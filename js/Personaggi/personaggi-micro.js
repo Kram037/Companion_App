@@ -245,7 +245,11 @@ async function renderMicroScheda(personaggioId) {
         classeDisplay = pg.classi.map(c => `${c.nome} ${c.livello}`).join(' / ');
     }
 
-    const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+    const pvMaxTemp = (typeof schedaGetPvMaxTemporaneo === 'function') ? schedaGetPvMaxTemporaneo(pg) : 0;
+    const pvMaxEffettivo = (typeof schedaGetPvMaxEffettivo === 'function')
+        ? schedaGetPvMaxEffettivo(pg)
+        : ((parseInt(pg.punti_vita_max) || 10) + pvMaxTemp);
+    const pvAttuali = Math.min(pvMaxEffettivo, pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max);
     const pvTemp = pg.pv_temporanei || 0;
     const initDisplay = pg.iniziativa != null ? pg.iniziativa : 0;
     const initStr = initDisplay >= 0 ? `+${initDisplay}` : `${initDisplay}`;
@@ -407,19 +411,19 @@ async function renderMicroScheda(personaggioId) {
     </div>
 
     <div class="scheda-hp-section">
-        <div class="scheda-hp-left">
-            <div class="scheda-hp-pair">
-                <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','punti_vita_max',${pg.punti_vita_max},-1)">
-                    <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
-                    <div class="scheda-hp-label">PV Massimi</div>
-                </div>
-                <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max})">
-                    <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
-                    <div class="scheda-hp-label">PV Attuali</div>
-                </div>
-            </div>
+        <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
+            <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
+            <div class="scheda-hp-label">PV Max</div>
         </div>
-        <div class="scheda-hp-right clickable" onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pvTemp},-1)">
+        <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_max_temporaneo')">
+            <div class="scheda-hp-display ${pvMaxTemp > 0 ? 'pv-max-temp' : ''}" id="schedaPvMaxTemp">${pvMaxTemp}</div>
+            <div class="scheda-hp-label">PV Max Temp</div>
+        </div>
+        <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_attuali')">
+            <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
+            <div class="scheda-hp-label">PV Attuali</div>
+        </div>
+        <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
             <div class="scheda-hp-display" id="schedaPvTemp">${pvTemp}</div>
             <div class="scheda-hp-label">PV Temp</div>
         </div>

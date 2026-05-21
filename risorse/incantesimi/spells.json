@@ -12840,7 +12840,7 @@
       "Mago",
       "Stregone",
       "Warlock"
-      ],
+    ],
     "classes_en": [
       "Bard",
       "Wizard",
@@ -12870,7 +12870,7 @@
     "classes": [
       "Bardo",
       "Mago"
-      ],
+    ],
     "classes_en": [
       "Bard",
       "Wizard"
@@ -12907,6 +12907,188 @@
     ],
     "source": "Fizban's Treasury of Dragons (TCoE)",
     "aliases": [],
+    "translated": true
+  },
+  "Allarme": {
+    "name": "Allarme",
+    "name_en": "Alarm",
+    "level": 1,
+    "school": "abjuration",
+    "school_it": "Abiurazione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (una campanella minuscola e un pezzo di filo d'argento sottile)",
+    "components_en": "V, S, M (a tiny bell and a piece of fine silver wire)",
+    "duration": "8 ore",
+    "duration_en": "8 hours",
+    "description": "Imposti un allarme contro intrusioni indesiderate. Scegli una porta, una finestra o un'area entro gittata non piu' grande di un cubo di 6 metri. Finche' l'incantesimo termina, un allarme ti avvisa ogni volta che una creatura di taglia Minuscola o superiore tocca o entra nell'area protetta. Quando lanci l'incantesimo, puoi designare creature che non faranno scattare l'allarme. Scegli anche se l'allarme sia mentale o udibile.\nUn allarme mentale ti avvisa con un segnale nella mente se ti trovi entro 1,5 km dall'area. Questo segnale ti sveglia se stai dormendo. Un allarme udibile produce il suono di una campanella per 10 secondi entro 18 metri.",
+    "description_en": "You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible.\nA mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping. An audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
+    "classes": [
+      "Ranger",
+      "Mago"
+    ],
+    "classes_en": [
+      "Ranger",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Bocca Magica": {
+    "name": "Bocca Magica",
+    "name_en": "Magic Mouth",
+    "level": 2,
+    "school": "illusion",
+    "school_it": "Illusione",
+    "casting_time": "1 minuto",
+    "casting_time_en": "1 minute",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un pezzetto di favo e polvere di giada del valore di almeno 10 mo, che l'incantesimo consuma)",
+    "components_en": "V, S, M (a small bit of honeycomb and jade dust worth at least 10 gp, which the spell consumes)",
+    "duration": "Finche' dissolto",
+    "duration_en": "Until dispelled",
+    "description": "Impianti un messaggio in un oggetto entro gittata, un messaggio che viene pronunciato quando si verifica una condizione di attivazione. Scegli un oggetto che puoi vedere e che non sia indossato o trasportato da un'altra creatura. Pronuncia poi il messaggio, composto al massimo da 25 parole, che puo' essere consegnato in un massimo di 10 minuti. Infine determini la circostanza che attivera' l'incantesimo.\nQuando la circostanza si verifica, sull'oggetto appare una bocca magica che pronuncia il messaggio con la tua voce e allo stesso volume con cui lo hai pronunciato. Se l'oggetto scelto ha una bocca o qualcosa che vi somiglia, la bocca magica appare in quel punto.\nLa circostanza di attivazione puo' essere generica o dettagliata quanto vuoi, ma deve basarsi su condizioni visive o udibili che si verificano entro 9 metri dall'oggetto. Per esempio, puoi ordinare alla bocca di parlare quando una creatura si avvicina entro 9 metri o quando una campanella d'argento suona entro 9 metri.",
+    "description_en": "You implant a message within an object in range, a message that is uttered when a trigger condition is met. Choose an object that you can see and that isn't being worn or carried by another creature. Then speak the message, which must be 25 words or less, though it can be delivered over as long as 10 minutes. Finally, determine the circumstance that will trigger the spell.\nWhen that circumstance occurs, a magical mouth appears on the object and recites the message in your voice and at the same volume you spoke. If the object has a mouth or something that looks like a mouth, the magical mouth appears there.\nThe triggering circumstance can be as general or detailed as you like, though it must be based on visual or audible conditions that occur within 30 feet of the object. For example, you could instruct the mouth to speak when any creature moves within 30 feet of the object or when a silver bell rings within 30 feet of it.",
+    "classes": [
+      "Bardo",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Purificare Cibo e Bevande": {
+    "name": "Purificare Cibo e Bevande",
+    "name_en": "Purify Food and Drink",
+    "level": 1,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "3 metri",
+    "range_en": "10 feet",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Istantanea",
+    "duration_en": "Instantaneous",
+    "description": "Tutto il cibo e le bevande non magici entro una sfera di raggio 1,5 metri centrata su un punto a tua scelta entro gittata vengono purificati e resi privi di veleno e malattie.",
+    "description_en": "All nonmagical food and drink within a 5-foot-radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Paladino"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Paladin"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Scritta Celeste": {
+    "name": "Scritta Celeste",
+    "name_en": "Skywrite",
+    "level": 2,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "Vista",
+    "range_en": "Sight",
+    "components": "V, S",
+    "components_en": "V, S",
+    "duration": "Concentrazione, fino a 1 ora",
+    "duration_en": "Concentration, up to 1 hour",
+    "description": "Fino a dieci parole si formano in una parte del cielo che puoi vedere. Le parole sembrano composte da nuvole e rimangono al loro posto per la durata dell'incantesimo. Le parole si dissolvono quando l'incantesimo termina. Un vento forte puo' disperdere le nuvole e porre fine all'incantesimo in anticipo.",
+    "description_en": "You cause up to ten words to form in a part of the sky you can see. The words appear to be made of cloud and remain in place for the spell's duration. The words dissipate when the spell ends. A strong wind can disperse the clouds and end the spell early.",
+    "classes": [
+      "Bardo",
+      "Druido",
+      "Mago"
+    ],
+    "classes_en": [
+      "Bard",
+      "Druid",
+      "Wizard"
+    ],
+    "source": "Xanathar's Guide to Everything",
+    "aliases": [],
+    "translated": true
+  },
+  "Respirare sott'Acqua": {
+    "name": "Respirare sott'Acqua",
+    "name_en": "Water Breathing",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (una corta canna o un pezzo di paglia)",
+    "components_en": "V, S, M (a short reed or piece of straw)",
+    "duration": "24 ore",
+    "duration_en": "24 hours",
+    "description": "Questo incantesimo conferisce a un massimo di dieci creature consenzienti che puoi vedere entro gittata la capacita' di respirare sott'acqua fino al termine dell'incantesimo. Le creature influenzate conservano anche il loro normale modo di respirare.",
+    "description_en": "This spell grants up to ten willing creatures you can see within range the ability to breathe underwater until the spell ends. Affected creatures also retain their normal mode of respiration.",
+    "classes": [
+      "Druido",
+      "Ranger",
+      "Stregone",
+      "Mago"
+    ],
+    "classes_en": [
+      "Druid",
+      "Ranger",
+      "Sorcerer",
+      "Wizard"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [],
+    "translated": true
+  },
+  "Camminare sull'Acqua": {
+    "name": "Camminare sull'Acqua",
+    "name_en": "Water Walk",
+    "level": 3,
+    "school": "transmutation",
+    "school_it": "Trasmutazione",
+    "casting_time": "1 azione",
+    "casting_time_en": "1 action",
+    "range": "9 metri",
+    "range_en": "30 feet",
+    "components": "V, S, M (un pezzo di sughero)",
+    "components_en": "V, S, M (a piece of cork)",
+    "duration": "1 ora",
+    "duration_en": "1 hour",
+    "description": "Questo incantesimo conferisce la capacita' di muoversi su qualsiasi superficie liquida come acqua, acido, fango, neve, sabbie mobili o lava come se fosse terreno solido innocuo. Le creature che attraversano lava fusa possono comunque subire danni dal calore. L'incantesimo puo' influenzare fino a dieci creature consenzienti che puoi vedere entro gittata.\nSe scegli una creatura sommersa in un liquido, l'incantesimo la trasporta in superficie alla velocita' di 18 metri per round.",
+    "description_en": "This spell grants the ability to move across any liquid surface, such as water, acid, mud, snow, quicksand, or lava, as if it were harmless solid ground. Creatures crossing molten lava can still take damage from the heat. Up to ten willing creatures you can see within range gain this ability for the duration.\nIf you target a creature submerged in a liquid, the spell carries the target to the surface of the liquid at a rate of 60 feet per round.",
+    "classes": [
+      "Chierico",
+      "Druido",
+      "Ranger",
+      "Stregone"
+    ],
+    "classes_en": [
+      "Cleric",
+      "Druid",
+      "Ranger",
+      "Sorcerer"
+    ],
+    "source": "Player's Handbook (SRD)",
+    "aliases": [
+      "Camminare sulle Acque"
+    ],
     "translated": true
   }
 }

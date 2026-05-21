@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v104';
+const CACHE_NAME = 'companion-app-v108';
 
 const APP_SHELL_URLS = [
     './',
@@ -80,8 +80,7 @@ const DATA_URL_PREFIXES = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(APP_SHELL_URLS))
+        precacheAppShell()
             .then(() => self.skipWaiting())
     );
 });
@@ -110,14 +109,31 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    if (shouldNetworkFirst(url)) {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
     if (shouldCacheFirst(url)) {
         event.respondWith(cacheFirst(request));
     }
 });
 
-function shouldCacheFirst(url) {
+function managedPath(url) {
     const path = url.pathname.replace(self.location.pathname.replace(/sw\.js$/, ''), './');
-    return APP_SHELL_URLS.includes(path) || DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix));
+    return path;
+}
+
+function shouldNetworkFirst(url) {
+    const path = managedPath(url);
+    if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
+    if (!APP_SHELL_URLS.includes(path)) return false;
+    return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
+}
+
+function shouldCacheFirst(url) {
+    const path = managedPath(url);
+    return APP_SHELL_URLS.includes(path);
 }
 
 async function cacheFirst(request) {
@@ -132,20 +148,39 @@ async function cacheFirst(request) {
     return response;
 }
 
+async function precacheAppShell() {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.all(APP_SHELL_URLS.map(async (url) => {
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Precache fallita per ${url}`);
+        }
+        await cache.put(url, response);
+    }));
+}
+
 async function networkFirst(request, fallbackUrl) {
     try {
-        const response = await fetch(request);
+        const response = await fetch(request, { cache: 'no-store' });
         if (response.ok) {
             const cache = await caches.open(CACHE_NAME);
             cache.put(request, response.clone());
         }
         return response;
     } catch (error) {
-        return caches.match(request).then(cached => cached || caches.match(fallbackUrl));
+        return caches.match(request).then(cached => {
+            if (cached) return cached;
+            return fallbackUrl ? caches.match(fallbackUrl) : Response.error();
+        });
     }
 }
 
 self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+        return;
+    }
+
     if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
         self.registration.showNotification(event.data.title, {
             body: event.data.body,

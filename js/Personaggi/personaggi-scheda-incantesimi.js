@@ -381,13 +381,27 @@ function _pgSpellClasses(pg) {
     return out;
 }
 
-function _spellMatchesPg(spell, pgClasses) {
-    if (!pgClasses.size) return true;
-    // Confronta sia con classes IT che EN per matching robusto
+function _spellMatchesClassName(spell, className) {
+    const target = String(className || '').trim().toLowerCase();
+    if (!target) return false;
+
+    if ((target === 'artefice' || target === 'artificer') && window.COMPANION_ARTIFICER_SPELLS instanceof Set) {
+        const spellName = String(spell.name_en || spell.name || '').trim().toLowerCase();
+        if (window.COMPANION_ARTIFICER_SPELLS.has(spellName)) return true;
+    }
+
     const lists = [spell.classes || [], spell.classes_en || []];
     for (const list of lists) {
-        for (const c of list) if (pgClasses.has(c)) return true;
+        for (const c of list) {
+            if (String(c || '').trim().toLowerCase() === target) return true;
+        }
     }
+    return false;
+}
+
+function _spellMatchesPg(spell, pgClasses) {
+    if (!pgClasses.size) return true;
+    for (const c of pgClasses) if (_spellMatchesClassName(spell, c)) return true;
     return false;
 }
 
@@ -731,10 +745,7 @@ function _applySpellPickerFilters(spell, f) {
     // Classi — vuoto = nessun filtro (tutte le classi). Gli homebrew vivono
     // nel loro tab dedicato e non hanno classi associate, quindi bypassano.
     if (f.classes && f.classes.length > 0 && !spell._is_homebrew) {
-        const lists = [spell.classes || [], spell.classes_en || []];
-        let ok = false;
-        outer: for (const list of lists) for (const c of list) if (f.classes.includes(c)) { ok = true; break outer; }
-        if (!ok) return false;
+        if (!f.classes.some(c => _spellMatchesClassName(spell, c))) return false;
     }
     // Manuale (source)
     if (f.sources && f.sources.length > 0) {

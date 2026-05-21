@@ -526,6 +526,44 @@
     border-bottom: 0;
 }
 
+.comp-spell-offer-table {
+    min-width: 520px;
+}
+
+.comp-spell-offer-table td:nth-child(1) {
+    width: 84px;
+    font-weight: 800;
+    color: var(--accent);
+    white-space: nowrap;
+}
+
+.comp-spell-offer-table td:nth-child(2) {
+    font-weight: 700;
+}
+
+.comp-subclass-spell-table {
+    min-width: 420px;
+}
+
+.comp-spell-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.comp-spell-name-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
 .comp-level-table-wrap {
     width: 100%;
 }

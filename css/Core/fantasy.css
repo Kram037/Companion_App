@@ -212,13 +212,13 @@ body {
     text-shadow: 0 1px 12px rgba(var(--accent-rgb), 0.14);
 }
 
-.page-header-back {
+:is(.page-header-back, .page-header-action) {
     background: linear-gradient(145deg, var(--surface), var(--fantasy-card-deep));
     border-color: var(--fantasy-line);
     box-shadow: var(--shadow-xs);
 }
 
-.page-header-back:hover {
+:is(.page-header-back, .page-header-action):hover {
     border-color: var(--fantasy-gold-line);
     color: var(--fantasy-gold-strong);
     box-shadow: var(--fantasy-glow);
