@@ -387,13 +387,26 @@ function _compItems(tab) {
     if (tab === 'razze') {
         return Object.entries(window.RACES_DATA || {}).flatMap(([key, race]) => {
             const raceLabel = _compLang() === 'en' ? (race.name_en || key) : (race.name || key);
+            const baseSearch = [key, race.name, race.name_en, race.version_label, race.source_short, race.source, race.description, race.description_en, race.asi_text, race.asi_text_en, (race.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' ');
+            const items = [{
+                type: tab,
+                id: key,
+                title: raceLabel,
+                subtitle: '',
+                source: race.source_short || race.source || '',
+                group: Array.isArray(race.subraces) && race.subraces.length ? raceLabel : 'Razze senza sottorazze',
+                tags: [race.source_short || race.source].filter(Boolean),
+                desc: '',
+                data: { ...race, baseRaceKey: key, baseRace: race, isSubrace: false },
+                search: baseSearch,
+            }];
             const base = {
                 type: tab,
                 source: race.source_short || race.source || '',
-                search: [key, race.name, race.name_en, race.version_label, race.source_short, race.source, race.description, race.description_en, race.asi_text, race.asi_text_en, (race.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
+                search: baseSearch,
             };
             if (Array.isArray(race.subraces) && race.subraces.length) {
-                return race.subraces.map(sub => ({
+                items.push(...race.subraces.map(sub => ({
                     ...base,
                     source: sub.source_short || sub.source || race.source_short || race.source || '',
                     id: `${key}:${sub.name || sub.name_en}`,
@@ -404,18 +417,9 @@ function _compItems(tab) {
                     desc: '',
                     data: { ...sub, baseRaceKey: key, baseRace: race, isSubrace: true },
                     search: [base.search, sub.name, sub.name_en, sub.version_label, sub.source_short, sub.source, sub.description, sub.description_en, (sub.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
-                }));
+                })));
             }
-            return [{
-                ...base,
-                id: key,
-                title: raceLabel,
-                subtitle: '',
-                group: 'Razze senza sottorazze',
-                tags: [_compField(race, 'asi_text')].filter(Boolean),
-                desc: '',
-                data: { ...race, baseRaceKey: key, baseRace: race, isSubrace: false },
-            }];
+            return items;
         });
     }
     if (tab === 'background') {
@@ -698,6 +702,7 @@ function _compCardHtml(item) {
             <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
                 <div class="comp-card-main">
                     <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
+                    ${item.type === 'razze' && item.source ? `<span class="comp-card-source">${escapeHtml(item.source)}</span>` : ''}
                 </div>
             </article>
         `;
@@ -761,6 +766,10 @@ function _compDetailHtml(item) {
 }
 
 function _compClassDetail(cls) {
+    const clsId = _compClassId(cls);
+    const optionalFeatures = _compFilteredOptionalFeatures(cls.optional_features || []);
+    const showTasha = _compShowTashaFeatures(clsId);
+    const classFeatures = _compMergeFeatureLists(cls.features || [], showTasha ? optionalFeatures : []);
     const boxes = [
         ['Dado vita', cls.hit_dice],
         ['Tiri salvezza', _compField(cls, 'prof_saving_throws')],
@@ -787,20 +796,20 @@ function _compClassDetail(cls) {
             <h3>Equipaggiamento</h3>
             <div class="comp-rich">${_compRich(_compField(cls, 'equipment') || '')}</div>
         </section>
-        ${_compFeaturesSection(cls.features || [])}
-        ${_compFeaturesSection(cls.optional_features || [], 'Privilegi opzionali')}
-        ${_compClassSubclassesSection(cls)}
+        ${_compTashaToggleHtml(clsId, optionalFeatures, showTasha)}
+        ${_compFeaturesSection(classFeatures)}
+        ${_compClassSubclassesSection(cls, showTasha)}
     `;
 }
 
-function _compClassSubclassesSection(cls) {
+function _compClassSubclassesSection(cls, showTasha = false) {
     const subclasses = _compSortedSubclasses(cls.subclasses || []);
     if (!subclasses.length) return '';
     const clsId = cls.slug || cls.name || cls.name_en || 'classe';
     return `<section class="comp-detail-section">
         <h3>Sottoclassi</h3>
         <div class="comp-subclass-accordion-list">
-            ${subclasses.map(sub => _compSubclassAccordionHtml(clsId, sub)).join('')}
+            ${subclasses.map(sub => _compSubclassAccordionHtml(clsId, sub, showTasha)).join('')}
         </div>
     </section>`;
 }
@@ -1244,12 +1253,13 @@ function _compArmorClassLabel(armor) {
     return `${armor.ca_base} + Des`;
 }
 
-function _compSubclassAccordionHtml(clsId, sub) {
+function _compSubclassAccordionHtml(clsId, sub, showTasha = false) {
     const subId = sub.slug || sub.name || sub.name_en || _compName(sub);
     const key = _compSubclassOpenKey(clsId, subId);
     const state = _compStateFor('classi');
     const isOpen = !!state.openSubclasses?.[key];
-    const features = sub.features || [];
+    const optionalFeatures = _compFilteredOptionalFeatures(sub.optional_features || []);
+    const features = _compMergeFeatureLists(sub.features || [], showTasha ? optionalFeatures : []);
     return `<section class="comp-subclass-accordion">
         <button type="button" class="comp-group-divider comp-subclass-toggle ${isOpen ? 'open' : ''}" onclick="compendioToggleClassSubclass('${_compEscapeAttr(clsId)}','${_compEscapeAttr(subId)}')">
             ${_compIcon('chevron-right')}
@@ -1260,7 +1270,6 @@ function _compSubclassAccordionHtml(clsId, sub) {
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
             ${_compSubclassSpellListSection(clsId, sub)}
             ${_compFeaturesSection(features)}
-            ${_compFeaturesSection(sub.optional_features || [], 'Privilegi opzionali')}
         </div>
     </section>`;
 }
@@ -1275,6 +1284,61 @@ window.compendioToggleClassSubclass = function(clsId, subId) {
 
 function _compSubclassOpenKey(clsId, subId) {
     return `${clsId}::${subId}`;
+}
+
+function _compClassId(cls) {
+    return String(cls?.slug || cls?.name_en || cls?.name || 'classe');
+}
+
+function _compShowTashaFeatures(clsId) {
+    const state = _compStateFor('classi');
+    return !!state.showTashaFeatures?.[clsId];
+}
+
+window.compendioToggleTashaFeatures = function(clsId) {
+    const state = _compStateFor('classi');
+    state.showTashaFeatures = state.showTashaFeatures || {};
+    state.showTashaFeatures[clsId] = !state.showTashaFeatures[clsId];
+    compendioRenderTab();
+};
+
+function _compTashaToggleHtml(clsId, optionalFeatures, showTasha) {
+    if (!optionalFeatures.length) return '';
+    return `<section class="comp-tasha-toggle-row">
+        <button type="button" class="comp-filter-btn comp-tasha-toggle" onclick="compendioToggleTashaFeatures('${_compEscapeAttr(clsId)}')">
+            ${_compIcon(showTasha ? 'eye-off' : 'eye')}
+            <strong>${escapeHtml(showTasha ? 'Nascondi privilegi opzionali Tasha' : 'Mostra privilegi opzionali Tasha')}</strong>
+            <small>${optionalFeatures.length}</small>
+        </button>
+    </section>`;
+}
+
+function _compFilteredOptionalFeatures(features) {
+    return (features || []).filter(feature => !_compIsRedundantOptionalFeature(feature));
+}
+
+function _compIsRedundantOptionalFeature(feature) {
+    const nameEn = String(feature?.name_en || '').toLowerCase();
+    const nameIt = String(feature?.name || '').toLowerCase();
+    if (nameEn.startsWith('additional ') && nameEn.endsWith(' spells')) return true;
+    if (nameEn === 'fighting style options') return true;
+    if (nameIt.startsWith('incantesimi ') && nameIt.includes(' aggiuntivi')) return true;
+    if (nameIt === 'opzioni dello stile di combattimento') return true;
+    return false;
+}
+
+function _compMergeFeatureLists(baseFeatures, optionalFeatures) {
+    return [
+        ...(baseFeatures || []).map(f => ({ ...f, _compOptional: false })),
+        ...(optionalFeatures || []).map(f => ({ ...f, _compOptional: true })),
+    ].sort((a, b) => {
+        const al = parseInt(a.level);
+        const bl = parseInt(b.level);
+        const byLevel = (Number.isFinite(al) ? al : 999) - (Number.isFinite(bl) ? bl : 999);
+        if (byLevel !== 0) return byLevel;
+        if (!!a._compOptional !== !!b._compOptional) return a._compOptional ? 1 : -1;
+        return String(_compName(a) || '').localeCompare(String(_compName(b) || ''), _compLang() === 'en' ? 'en' : 'it');
+    });
 }
 
 function _compSubclassSpellListSection(clsId, sub) {
@@ -1438,7 +1502,7 @@ function _compFeaturesSection(features, title = 'Privilegi') {
     return `<section class="comp-detail-section">
         <h3>${escapeHtml(title)}</h3>
         <div class="comp-feature-list">
-            ${features.map(f => `<article class="comp-feature">
+            ${features.map(f => `<article class="comp-feature ${f._compOptional ? 'comp-feature-optional' : ''}">
                 <h4 class="comp-feature-title">${escapeHtml(_compName(f) || 'Privilegio')}${f.level != null ? ` - Livello ${escapeHtml(String(f.level))}` : ''}</h4>
                 ${f.replaces?.length ? `<div class="comp-feature-note">Sostituisce: ${escapeHtml(_compArrayLabel(f.replaces))}</div>` : ''}
                 ${f.source_short ? `<div class="comp-feature-note">Fonte: ${escapeHtml(f.source_short)}</div>` : ''}
@@ -1828,6 +1892,8 @@ function _compIcon(name) {
         sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>',
         'arrow-left': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>',
         'chevron-right': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>',
+        eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+        'eye-off': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"></path><path d="M10.6 10.6A3 3 0 0 0 13.4 13.4"></path><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c6.5 0 10 8 10 8a18.1 18.1 0 0 1-4.1 5.1"></path><path d="M6.1 6.1A18.1 18.1 0 0 0 2 12s3.5 8 10 8a10.7 10.7 0 0 0 4.8-1.1"></path></svg>',
     };
     return icons[name] || icons['book-open'];
 }

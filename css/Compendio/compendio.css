@@ -738,6 +738,11 @@
     background: var(--card-bg);
 }
 
+.comp-feature-optional {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--card-bg)) 0%, var(--card-bg) 58%);
+}
+
 .comp-feature-title {
     margin: 0 0 6px;
     font-weight: 700;
@@ -750,6 +755,29 @@
     color: var(--text-secondary);
     font-size: 0.74rem;
     line-height: 1.25;
+}
+
+.comp-tasha-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 4px 0 10px;
+}
+
+.comp-tasha-toggle {
+    min-height: 36px;
+}
+
+.comp-tasha-toggle small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    min-height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--text-on-accent, #fff);
+    font-size: 0.72rem;
 }
 
 .comp-subclass-accordion-list {

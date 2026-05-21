@@ -2234,17 +2234,6 @@
     "source_short": "PHB",
     "optional_features": [
       {
-        "name": "Incantesimi del Bardo Aggiuntivi",
-        "name_en": "Additional Bard Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da bardo con gli incantesimi opzionali indicati in Tasha. La lista resta organizzata per livello dell'incantesimo.",
-        "description_en": "Expands the bard spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
         "name": "Ispirazione Magica",
         "name_en": "Magical Inspiration",
         "level": 2,
@@ -3513,17 +3502,6 @@
     "source_short": "PHB",
     "optional_features": [
       {
-        "name": "Incantesimi del Chierico Aggiuntivi",
-        "name_en": "Additional Cleric Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da chierico con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the cleric spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
         "name": "Imbrigliare il Potere Divino",
         "name_en": "Harness Divine Power",
         "level": 2,
@@ -4326,17 +4304,6 @@
     "source": "Player's Handbook",
     "source_short": "PHB",
     "optional_features": [
-      {
-        "name": "Incantesimi del Druido Aggiuntivi",
-        "name_en": "Additional Druid Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da druido con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the druid spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
       {
         "name": "Compagno Selvatico",
         "name_en": "Wild Companion",
@@ -5367,17 +5334,6 @@
     "source": "Player's Handbook",
     "source_short": "PHB",
     "optional_features": [
-      {
-        "name": "Opzioni dello Stile di Combattimento",
-        "name_en": "Fighting Style Options",
-        "level": 1,
-        "description": "Aggiunge nuovi stili di combattimento alla lista del guerriero, tra cui Combattere alla Cieca, Combattere con Armi da Lancio, Combattere Disarmato, Intercettazione e Tecnica Superiore.",
-        "description_en": "Adds new fighting style choices to the fighter list, including Blind Fighting, Thrown Weapon Fighting, Unarmed Fighting, Interception, and Superior Technique.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
       {
         "name": "Opzioni di Manovra",
         "name_en": "Maneuver Options",
@@ -7346,17 +7302,6 @@
     "source_short": "PHB",
     "optional_features": [
       {
-        "name": "Incantesimi del Mago Aggiuntivi",
-        "name_en": "Additional Wizard Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da mago con gli incantesimi opzionali indicati in Tasha, inclusi diversi incantesimi del capitolo dedicato alla magia.",
-        "description_en": "Expands the wizard spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
         "name": "Formule dei Trucchetti",
         "name_en": "Cantrip Formulas",
         "level": 3,
@@ -8997,28 +8942,6 @@
     "source_short": "PHB",
     "optional_features": [
       {
-        "name": "Incantesimi del Paladino Aggiuntivi",
-        "name_en": "Additional Paladin Spells",
-        "level": 2,
-        "description": "Amplia la lista degli incantesimi da paladino con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the paladin spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
-        "name": "Opzioni dello Stile di Combattimento",
-        "name_en": "Fighting Style Options",
-        "level": 2,
-        "description": "Aggiunge nuovi stili di combattimento alla lista del paladino, tra cui Combattere alla Cieca, Guerriero Benedetto e Intercettazione.",
-        "description_en": "Adds new fighting style choices to the paladin list, including Blind Fighting, Blessed Warrior, and Interception.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
         "name": "Imbrigliare il Potere Divino",
         "name_en": "Harness Divine Power",
         "level": 3,
@@ -9866,28 +9789,6 @@
         "replaces": [
           "Nemico Prescelto"
         ]
-      },
-      {
-        "name": "Incantesimi del Ranger Aggiuntivi",
-        "name_en": "Additional Ranger Spells",
-        "level": 2,
-        "description": "Amplia la lista degli incantesimi da ranger con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the ranger spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
-        "name": "Opzioni dello Stile di Combattimento",
-        "name_en": "Fighting Style Options",
-        "level": 2,
-        "description": "Aggiunge nuovi stili di combattimento alla lista del ranger, tra cui Combattere alla Cieca, Combattere con Armi da Lancio, Combattere Disarmato, Intercettazione e Combattente Druidico.",
-        "description_en": "Adds new fighting style choices to the ranger list, including Blind Fighting, Thrown Weapon Fighting, Unarmed Fighting, Interception, and Druidic Warrior.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
       },
       {
         "name": "Focus da Incantatore",
@@ -10738,17 +10639,6 @@
     "source_short": "PHB",
     "optional_features": [
       {
-        "name": "Incantesimi dello Stregone Aggiuntivi",
-        "name_en": "Additional Sorcerer Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da stregone con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the sorcerer spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
-      {
         "name": "Opzioni di Metamagia",
         "name_en": "Metamagic Options",
         "level": 3,
@@ -11561,17 +11451,6 @@
     "source": "Player's Handbook",
     "source_short": "PHB",
     "optional_features": [
-      {
-        "name": "Incantesimi del Warlock Aggiuntivi",
-        "name_en": "Additional Warlock Spells",
-        "level": 1,
-        "description": "Amplia la lista degli incantesimi da warlock con gli incantesimi opzionali indicati in Tasha.",
-        "description_en": "Expands the warlock spell list with the optional spells presented in Tasha's Cauldron of Everything.",
-        "optional": true,
-        "source": "Tasha's Cauldron of Everything",
-        "source_short": "TCoE",
-        "translated": true
-      },
       {
         "name": "Opzioni delle Suppliche Occulte",
         "name_en": "Eldritch Invocation Options",
