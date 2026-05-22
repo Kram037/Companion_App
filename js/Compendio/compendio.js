@@ -385,42 +385,7 @@ function _compItems(tab) {
         })));
     }
     if (tab === 'razze') {
-        return Object.entries(window.RACES_DATA || {}).flatMap(([key, race]) => {
-            const raceLabel = _compLang() === 'en' ? (race.name_en || key) : (race.name || key);
-            const baseSearch = [key, race.name, race.name_en, race.version_label, race.source_short, race.source, race.description, race.description_en, race.asi_text, race.asi_text_en, (race.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' ');
-            const items = [{
-                type: tab,
-                id: key,
-                title: raceLabel,
-                subtitle: '',
-                source: race.source_short || race.source || '',
-                group: Array.isArray(race.subraces) && race.subraces.length ? raceLabel : 'Razze senza sottorazze',
-                tags: [race.source_short || race.source].filter(Boolean),
-                desc: '',
-                data: { ...race, baseRaceKey: key, baseRace: race, isSubrace: false },
-                search: baseSearch,
-            }];
-            const base = {
-                type: tab,
-                source: race.source_short || race.source || '',
-                search: baseSearch,
-            };
-            if (Array.isArray(race.subraces) && race.subraces.length) {
-                items.push(...race.subraces.map(sub => ({
-                    ...base,
-                    source: sub.source_short || sub.source || race.source_short || race.source || '',
-                    id: `${key}:${sub.name || sub.name_en}`,
-                    title: _compName(sub) || 'Sottorazza',
-                    subtitle: raceLabel,
-                    group: raceLabel,
-                    tags: [sub.source_short || sub.source || race.source_short || race.source].filter(Boolean),
-                    desc: '',
-                    data: { ...sub, baseRaceKey: key, baseRace: race, isSubrace: true },
-                    search: [base.search, sub.name, sub.name_en, sub.version_label, sub.source_short, sub.source, sub.description, sub.description_en, (sub.traits || []).map(t => `${t.name} ${t.name_en} ${t.description} ${t.description_en}`).join(' ')].join(' '),
-                })));
-            }
-            return items;
-        });
+        return _compRaceItems();
     }
     if (tab === 'background') {
         return Object.entries(window.BACKGROUNDS_DATA || {}).map(([key, bg]) => ({
@@ -490,6 +455,116 @@ function _compItems(tab) {
         }));
     }
     return [];
+}
+
+function _compRaceItems() {
+    const byRace = new Map();
+    let raceOrder = 0;
+    Object.entries(window.RACES_DATA || {}).forEach(([key, race]) => {
+        const raceLabel = _compRaceBaseLabel(race, key);
+        const groupKey = race.version_group || _compSlug(race.name_en || race.name || key);
+        const baseSearch = _compRaceSearchText(key, race);
+        const baseEntry = {
+            id: race.version_id || key,
+            key,
+            title: raceLabel,
+            subtitle: '',
+            source: race.source_short || race.source || '',
+            data: race,
+            baseRace: race,
+            baseRaceKey: key,
+            isSubrace: false,
+            order: raceOrder++,
+            search: baseSearch,
+        };
+        _compPushRaceVersion(byRace, groupKey, raceLabel, baseEntry);
+        (race.subraces || []).forEach(sub => {
+            const entry = {
+                id: sub.version_id || `${key}:${sub.name || sub.name_en}`,
+                key: `${key}:${sub.name || sub.name_en}`,
+                title: _compName(sub) || 'Sottorazza',
+                subtitle: raceLabel,
+                source: sub.source_short || sub.source || race.source_short || race.source || '',
+                data: sub,
+                baseRace: race,
+                baseRaceKey: key,
+                isSubrace: true,
+                order: raceOrder++,
+                search: [baseSearch, _compRaceSearchText(sub.name || sub.name_en || '', sub)].join(' '),
+            };
+            _compPushRaceVersion(byRace, groupKey, raceLabel, entry);
+        });
+    });
+    return Array.from(byRace.entries()).map(([id, raceGroup]) => {
+        const versions = _compSortRaceVersions(raceGroup.versions);
+        const sources = _compUnique(versions.map(version => version.source).filter(Boolean));
+        return {
+            type: 'razze',
+            id,
+            title: raceGroup.title,
+            subtitle: '',
+            source: sources.join(', '),
+            sources,
+            group: '',
+            tags: sources,
+            desc: '',
+            search: versions.map(version => version.search).join(' '),
+            data: { ...raceGroup, versions },
+        };
+    });
+}
+
+function _compPushRaceVersion(map, groupKey, raceLabel, entry) {
+    if (!map.has(groupKey)) map.set(groupKey, { title: raceLabel, versions: [] });
+    map.get(groupKey).versions.push(entry);
+}
+
+function _compRaceBaseLabel(race, fallback) {
+    if (_compLang() === 'en') return race.name_en || race.name || fallback;
+    return race.name || race.name_en || fallback;
+}
+
+function _compRaceSearchText(key, race) {
+    return [
+        key,
+        race.name,
+        race.name_en,
+        race.version_label,
+        race.source_short,
+        race.source,
+        race.description,
+        race.description_en,
+        race.asi_text,
+        race.asi_text_en,
+        (race.traits || race.features || []).map(t => `${t.name || ''} ${t.name_en || ''} ${t.description || ''} ${t.description_en || ''}`).join(' '),
+    ].join(' ');
+}
+
+function _compSortRaceVersions(versions) {
+    const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
+    return [...versions].sort((a, b) => {
+        const sourceOrder = _compRaceSourceOrder(a.source) - _compRaceSourceOrder(b.source);
+        if (sourceOrder !== 0) return sourceOrder;
+        const baseOrder = Number(a.isSubrace) - Number(b.isSubrace);
+        if (baseOrder !== 0) return baseOrder;
+        const manualOrder = (a.order || 0) - (b.order || 0);
+        if (manualOrder !== 0) return manualOrder;
+        return collator.compare(a.title || '', b.title || '');
+    });
+}
+
+function _compRaceSourceOrder(source) {
+    const order = { MMM: 0, PHB: 10, TCOE: 12, VGtM: 20, MToF: 30, SCAG: 40, ToA: 50 };
+    return order[String(source || '').trim()] ?? 99;
+}
+
+function _compSlug(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'elemento';
 }
 
 function _compToolbarHtml(tab, state, allItems) {
@@ -571,15 +646,14 @@ function _compFiltersHtml(tab, state, allItems) {
             _compSelect('source', f.source, [['', 'Tutte'], ...sources.map(v => [v, v])], 'Fonte'),
         ].join('');
     }
-    const sources = _compUnique(allItems.map(i => i.source).filter(Boolean));
+    const sources = _compUnique(allItems.flatMap(i => i.sources || i.source || []).filter(Boolean));
     const base = sources.length > 1 ? _compSelect('source', f.source, [['', 'Tutte'], ...sources.map(v => [v, v])], 'Fonte') : '';
     if (tab === 'sottoclassi') {
         const classes = _compUnique(allItems.map(i => i.data.className).filter(Boolean));
         return base + _compSelect('class', f.class, [['', 'Tutte'], ...classes.map(v => [v, v])], 'Classe');
     }
     if (tab === 'razze') {
-        const groups = _compUnique(allItems.map(i => i.group).filter(Boolean));
-        return base + _compSelect('group', f.group, [['', 'Tutti'], ...groups.map(v => [v, v])], 'Gruppo');
+        return base;
     }
     return base;
 }
@@ -608,8 +682,11 @@ function _compMatches(item, state) {
     const sources = _compFilterValues(f.source);
     const groups = _compFilterValues(f.group);
     const classes = _compFilterValues(f.class);
-    if (sources.length && !sources.includes(item.source)) return false;
-    if (groups.length && !groups.includes(item.group)) return false;
+    if (sources.length) {
+        const itemSources = item.sources || (item.source ? [item.source] : []);
+        if (!sources.some(source => itemSources.includes(source))) return false;
+    }
+    if (groups.length && item.type !== 'razze' && !groups.includes(item.group)) return false;
     if (classes.length) {
         if (item.type === 'sottoclassi' && !classes.some(cls => item.data.className === cls || item.data.classNameEn === cls)) return false;
         if (item.type === 'incantesimi' && !classes.some(cls => _compSpellMatchesClass(item.data, cls))) return false;
@@ -634,7 +711,7 @@ function _compMatches(item, state) {
 
 function _compListHtml(tab, items) {
     const sorted = _compSortItems(tab, items);
-    if (tab === 'sottoclassi' || tab === 'razze' || tab === 'incantesimi') {
+    if (tab === 'sottoclassi' || tab === 'incantesimi') {
         const groups = _compGroupItems(sorted);
         const state = _compStateFor(tab);
         return `<div class="comp-grouped-list">${groups.map(group => `
@@ -669,11 +746,6 @@ function _compSortItems(tab, items) {
         if (tab === 'incantesimi') {
             const lvl = (a.sortLevel || 0) - (b.sortLevel || 0);
             if (lvl !== 0) return lvl;
-        }
-        if (tab === 'razze') {
-            const aLoose = a.group === 'Razze senza sottorazze' ? 1 : 0;
-            const bLoose = b.group === 'Razze senza sottorazze' ? 1 : 0;
-            if (aLoose !== bLoose) return aLoose - bLoose;
         }
         const g = collator.compare(a.group || '', b.group || '');
         if (g !== 0) return g;
@@ -1428,27 +1500,101 @@ function _compFeatureDetail(title, subtitle, features, data) {
 }
 
 function _compRaceDetail(race, title, subtitle) {
-    const base = race.baseRace || race;
-    const sourceData = race.isSubrace ? race : base;
+    if (race?.versions?.length) {
+        const versions = _compVisibleRaceVersions(race.versions);
+        return `
+            <div class="comp-race-version-list">
+                ${versions.map(version => _compRaceVersionSection(version)).join('')}
+            </div>
+        `;
+    }
+    return _compRaceVersionBody({
+        title,
+        subtitle,
+        source: race.source_short || race.source || '',
+        data: race,
+        baseRace: race.baseRace || race,
+        isSubrace: !!race.isSubrace,
+    });
+}
+
+function _compVisibleRaceVersions(versions) {
+    const selectedSources = _compFilterValues(_compStateFor('razze').filters.source);
+    if (!selectedSources.length) return versions;
+    return versions.filter(version => selectedSources.includes(version.source));
+}
+
+function _compRaceVersionSection(version) {
+    const label = [
+        version.title,
+        version.subtitle && version.isSubrace ? version.subtitle : '',
+        version.source,
+    ].filter(Boolean).join(' - ');
+    return `
+        <section class="comp-race-version">
+            <div class="comp-race-version-divider">
+                <span>${escapeHtml(label)}</span>
+            </div>
+            ${_compRaceVersionBody(version)}
+        </section>
+    `;
+}
+
+function _compRaceVersionBody(version) {
+    const base = version.baseRace || version.data || {};
+    const race = version.data || {};
+    const sourceData = version.isSubrace ? race : base;
     const mergedTraits = [
         ...(base.traits || base.features || []),
-        ...(race.isSubrace ? (race.traits || race.features || []) : []),
+        ...(version.isSubrace ? (race.traits || race.features || []) : []),
     ];
-    const description = race.isSubrace
+    const description = version.isSubrace
         ? [_compField(base, 'description'), _compField(race, 'description')].filter(Boolean).join('\n\n')
         : _compField(base, 'description');
     return `
-        <div class="comp-detail-subtitle">${escapeHtml([subtitle, sourceData.source_short || sourceData.source].filter(Boolean).join(' - '))}</div>
+        <div class="comp-detail-subtitle">${escapeHtml([version.subtitle, sourceData.source_short || sourceData.source || version.source].filter(Boolean).join(' - '))}</div>
         ${_compBoxes([
             ['Taglia', base.size],
             ['Velocita', base.speed != null ? `${base.speed} m` : ''],
-            ['Incrementi', [base.asi_text, race.isSubrace ? race.asi_text : ''].filter(Boolean).join('; ')],
-            ['Linguaggi', _compArrayLabel([...(base.languages || []), ...(race.isSubrace ? (race.languages || []) : [])])],
+            ['Linguaggi', _compArrayLabel([...(base.languages || []), ...(version.isSubrace ? (race.languages || []) : [])])],
         ])}
+        ${_compRaceAsiSection(base, version.isSubrace ? race : null)}
         <section class="comp-detail-section"><h3>Descrizione</h3><div class="comp-rich">${_compRich(description || '')}</div></section>
         ${_compFeaturesSection(mergedTraits)}
     `;
 }
+
+function _compRaceAsiSection(base, subrace) {
+    const rows = _compRaceAsiRows(base, subrace);
+    if (!rows.length) return '';
+    return `<section class="comp-detail-section">
+        <h3>Incrementi dei punteggi di caratteristica</h3>
+        <div class="comp-table-wrap">
+            <table class="comp-race-asi-table">
+                <tbody>
+                    ${rows.map(row => `<tr><th>${escapeHtml(row.label)}</th><td>${escapeHtml(row.value)}</td></tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+    </section>`;
+}
+
+function _compRaceAsiRows(base, subrace) {
+    const rows = [];
+    const baseAsi = [base.asi_text, subrace ? subrace.asi_text : ''].filter(Boolean).join('; ');
+    if (baseAsi && !_compRaceAsiIsFloating(base, subrace)) {
+        rows.push({ label: 'Regole base', value: baseAsi });
+    }
+    rows.push({ label: 'Regole Tasha', value: '+2 a una caratteristica e +1 a un\'altra caratteristica a scelta' });
+    rows.push({ label: 'Regole MMM', value: '+2 a una caratteristica e +1 a un\'altra, oppure +1 a tre caratteristiche diverse' });
+    return rows;
+}
+
+function _compRaceAsiIsFloating(base, subrace) {
+    const asi = [base?.ability_score_increase, subrace?.ability_score_increase].filter(Boolean);
+    return asi.some(value => Object.prototype.hasOwnProperty.call(value, '_any'));
+}
+
 
 function _compBackgroundDetail(bg, title, subtitle) {
     return `

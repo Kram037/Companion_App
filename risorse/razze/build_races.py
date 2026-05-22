@@ -1650,6 +1650,98 @@ _add_subrace("Tiefling", {
 
 # === Volo's Guide to Monsters ===
 
+# --- Aasimar (VGtM) ---
+_add_race("Aasimar (VGtM)", {
+    "name": "Aasimar",
+    "name_en": "Aasimar",
+    "source": "Volo's Guide to Monsters",
+    "source_short": "VGtM",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {"Carisma": 2},
+    "asi_text": "+2 Carisma",
+    "age": "Gli aasimar maturano alla stessa velocita' degli umani, ma possono vivere fino a 160 anni.",
+    "alignment": "Infusi di potere celestiale, la maggior parte degli aasimar tende al bene. Gli aasimar reietti sono spesso neutrali o malvagi.",
+    "description": "Gli aasimar portano nell'anima la luce dei cieli. Discendono da umani toccati dal potere del Monte Celestia e sono spesso chiamati a opporsi al male e a servire ideali di giustizia.",
+    "languages": ["Comune", "Celestiale"],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": ["necrotico", "radiante"],
+    "darkvision": 18,
+    "creature_type": "Umanoide",
+    "traits": [
+        T("darkvision_60"),
+        T("celestial_resistance"),
+        T({
+            "name": "Mani Curatrici",
+            "name_en": "Healing Hands",
+            "description": "Come azione, puoi toccare una creatura e farle recuperare un numero di punti ferita pari al tuo livello. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+            "uses": {"amount": 1, "recharge": "long_rest"},
+        }),
+        T({
+            "name": "Portatore di Luce",
+            "name_en": "Light Bearer",
+            "description": "Conosci il trucchetto luce. Il Carisma e' la tua caratteristica da incantatore per esso.",
+            "innate_spells": [
+                {"name_en": "Light", "name": "Luce", "level": 0, "level_cast": 0, "min_pg_level": 1, "recharge": "at_will", "ability": "Carisma"},
+            ],
+        }),
+    ],
+    "subraces": [
+        {
+            "name": "Aasimar Protettore",
+            "name_en": "Protector Aasimar",
+            "source_short": "VGtM",
+            "ability_score_increase": {"Saggezza": 1},
+            "asi_text": "+1 Saggezza",
+            "description": "Gli aasimar protettori sono guidati a difendere i deboli, colpire il male e vegliare contro l'oscurita'.",
+            "traits": [
+                T({
+                    "name": "Anima Radiosa",
+                    "name_en": "Radiant Soul",
+                    "description": "Dal 3 livello, come azione, puoi sprigionare energia divina per 1 minuto o finche' non la termini con un'azione bonus. Ottieni una velocita' di volo di 9 metri e, una volta in ogni tuo turno, quando infliggi danni con un attacco o un incantesimo, puoi infliggere danni radiosi extra pari al tuo livello a un bersaglio. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+                    "uses": {"amount": 1, "recharge": "long_rest"},
+                }),
+            ],
+        },
+        {
+            "name": "Aasimar Sferzante",
+            "name_en": "Scourge Aasimar",
+            "source_short": "VGtM",
+            "ability_score_increase": {"Costituzione": 1},
+            "asi_text": "+1 Costituzione",
+            "description": "Gli aasimar sferzanti contengono un'energia divina intensa, capace di bruciare chi si trova troppo vicino.",
+            "traits": [
+                T({
+                    "name": "Consumo Radioso",
+                    "name_en": "Radiant Consumption",
+                    "description": "Dal 3 livello, come azione, puoi sprigionare energia divina per 1 minuto o finche' non la termini con un'azione bonus. Emani luce intensa entro 3 metri e luce fioca per altri 3 metri. Alla fine di ogni tuo turno, tu e ogni creatura entro 3 metri subite danni radiosi pari a meta' del tuo livello, arrotondata per eccesso. Inoltre, una volta in ogni tuo turno, quando infliggi danni con un attacco o un incantesimo, puoi infliggere danni radiosi extra pari al tuo livello a un bersaglio. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+                    "uses": {"amount": 1, "recharge": "long_rest"},
+                }),
+            ],
+        },
+        {
+            "name": "Aasimar Caduto",
+            "name_en": "Fallen Aasimar",
+            "source_short": "VGtM",
+            "ability_score_increase": {"Forza": 1},
+            "asi_text": "+1 Forza",
+            "description": "Gli aasimar caduti hanno sostituito la propria luce interiore con ombre e potere necrotico.",
+            "traits": [
+                T({
+                    "name": "Sudario Necrotico",
+                    "name_en": "Necrotic Shroud",
+                    "description": "Dal 3 livello, come azione, puoi sprigionare energia divina per 1 minuto o finche' non la termini con un'azione bonus. Quando ti trasformi, le creature entro 3 metri che possono vederti devono superare un tiro salvezza su Carisma (CD 8 + bonus di competenza + modificatore di Carisma) o essere spaventate da te fino alla fine del tuo turno successivo. Inoltre, una volta in ogni tuo turno, quando infliggi danni con un attacco o un incantesimo, puoi infliggere danni necrotici extra pari al tuo livello a un bersaglio. Una volta usato questo tratto, non puoi usarlo di nuovo finche' non termini un riposo lungo.",
+                    "uses": {"amount": 1, "recharge": "long_rest"},
+                }),
+            ],
+        },
+    ],
+})
+
 # --- Aasimar (MMM) ---
 # Versione aggiornata di "Mordenkainen presenta: Mostri del Multiverso" che
 # rimpiazza la versione VGtM con sottorazze. Niente sottorazze: la scelta
@@ -1661,7 +1753,7 @@ _add_race("Aasimar", {
     "name_en": "Aasimar",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {"_any": "+2/+1 o +1/+1/+1"},
     "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
