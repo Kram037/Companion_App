@@ -1574,11 +1574,8 @@ function _compRaceSubraceAccordion(race, subrace) {
 }
 
 function _compRaceVersionSection(version) {
-    const label = [
-        version.title,
-        version.subtitle && version.isSubrace ? version.subtitle : '',
-        version.source,
-    ].filter(Boolean).join(' - ');
+    const name = version.isSubrace && version.subtitle ? `${version.title} - ${version.subtitle}` : version.title;
+    const label = version.source ? `${name} (${version.source})` : name;
     return `
         <section class="comp-race-version">
             <div class="comp-race-version-divider">
@@ -1601,7 +1598,7 @@ function _compRaceVersionBody(version) {
         ? [_compField(base, 'description'), _compField(race, 'description')].filter(Boolean).join('\n\n')
         : _compField(base, 'description');
     return `
-        <div class="comp-detail-subtitle">${escapeHtml([version.subtitle, sourceData.source_short || sourceData.source || version.source].filter(Boolean).join(' - '))}</div>
+        ${version.subtitle ? `<div class="comp-detail-subtitle">${escapeHtml(version.subtitle)}</div>` : ''}
         ${_compRaceMetaBoxes(base, version.isSubrace ? race : null)}
         ${_compRaceAsiSection(base, version.isSubrace ? race : null)}
         <section class="comp-detail-section"><h3>Descrizione</h3><div class="comp-rich">${_compRich(description || '')}</div></section>
