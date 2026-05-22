@@ -619,6 +619,19 @@
     line-height: 1.2;
 }
 
+.comp-spell-name-pill-btn {
+    appearance: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.comp-spell-name-pill-btn:hover,
+.comp-spell-name-pill-btn:focus-visible {
+    border-color: rgba(234, 179, 8, 0.6);
+    color: #facc15;
+    outline: none;
+}
+
 .comp-level-table-wrap {
     width: 100%;
 }
@@ -876,6 +889,29 @@
 .comp-rich h5,
 .comp-rich h6 {
     color: var(--accent);
+}
+
+.comp-spell-ref {
+    display: inline;
+    appearance: none;
+    border: 0;
+    border-bottom: 1px solid rgba(234, 179, 8, 0.55);
+    border-radius: 0;
+    padding: 0 1px;
+    background: linear-gradient(180deg, rgba(234, 179, 8, 0.16), rgba(234, 179, 8, 0.04));
+    color: #facc15;
+    font: inherit;
+    font-weight: 700;
+    line-height: inherit;
+    cursor: pointer;
+    text-align: inherit;
+}
+
+.comp-spell-ref:hover,
+.comp-spell-ref:focus-visible {
+    color: #fde68a;
+    border-bottom-color: rgba(253, 230, 138, 0.9);
+    outline: none;
 }
 
 .comp-spell-detail {

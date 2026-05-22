@@ -3,6 +3,8 @@
 // ============================================================================
 
 let _compCurrentTab = 'classi';
+let _compSpellRefCache = null;
+let _compSpellRefCacheSize = 0;
 window._compState = window._compState || {};
 
 const COMP_TABS = {
@@ -1448,7 +1450,7 @@ function _compSubclassSpellListSection(clsId, sub) {
                 <tbody>
                     ${rows.map(row => `<tr>
                         <td>${escapeHtml(row.variant ? `${row.variant} - ${row.level}` : row.level)}</td>
-                        <td><div class="comp-spell-pill-list">${row.spells.map(name => `<span class="comp-spell-name-pill">${escapeHtml(name)}</span>`).join('')}</div></td>
+                        <td><div class="comp-spell-pill-list">${row.spells.map(name => `<button type="button" class="comp-spell-name-pill comp-spell-name-pill-btn" onclick="compendioOpenSpellRef('${_compEscapeAttr(name)}')">${escapeHtml(name)}</button>`).join('')}</div></td>
                     </tr>`).join('')}
                 </tbody>
             </table>
@@ -1687,7 +1689,7 @@ function _compSpellDetail(sp) {
                 <div><span class="spell-meta-label">Componenti</span><span>${escapeHtml(_compSpellField(sp, 'components'))}</span></div>
                 <div><span class="spell-meta-label">Durata</span><span>${escapeHtml(_compSpellField(sp, 'duration'))}</span></div>
             </div>
-            <div class="spell-detail-desc">${_compRich(_compSpellField(sp, 'description'))}</div>
+            <div class="spell-detail-desc">${_compRich(_compSpellField(sp, 'description'), { linkSpells: false })}</div>
             <div class="spell-detail-classes">${(_compSpellField(sp, 'classes') || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
             ${_compSpellSource(sp) ? `<div class="spell-detail-source">${escapeHtml(_compSpellSource(sp))}</div>` : ''}
         </article>
@@ -1863,15 +1865,104 @@ function _compClassCellValue(row, key) {
     return raw;
 }
 
-function _compRich(text) {
+function _compRich(text, options = {}) {
     const raw = String(text || '').trim();
     if (!raw) return '<p>Nessuna descrizione disponibile.</p>';
-    if (typeof window.formatRichText === 'function') return window.formatRichText(raw);
-    return raw.split(/\n{2,}/).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+    const html = typeof window.formatRichText === 'function'
+        ? window.formatRichText(raw)
+        : raw.split(/\n{2,}/).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+    if (options.linkSpells === false) return html;
+    return _compLinkSpellRefs(html);
 }
 
 function _compPlain(text) {
     return String(text || '').replace(/\*\*/g, '').replace(/\n+/g, ' ').trim();
+}
+
+function _compLinkSpellRefs(html) {
+    if (!html || !window.SPELLS_DATA) return html;
+    return String(html)
+        .split(/(<[^>]+>)/g)
+        .map(part => part.startsWith('<') ? part : _compLinkSpellRefsInText(part))
+        .join('');
+}
+
+function _compLinkSpellRefsInText(text) {
+    const entries = _compSpellRefEntries();
+    if (!entries.length || !text) return text;
+    const matches = [];
+    entries.forEach(entry => {
+        const label = escapeHtml(entry.label);
+        if (!label || label.length < 4) return;
+        const pattern = new RegExp(`(^|[^\\p{L}\\p{N}_])(${_compRegexEscape(label)})(?=$|[^\\p{L}\\p{N}_])`, 'gu');
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+            const start = match.index + match[1].length;
+            const value = match[2];
+            const end = start + value.length;
+            if (!_compRangesOverlap(matches, start, end)) matches.push({ start, end, id: entry.id });
+            if (pattern.lastIndex === match.index) pattern.lastIndex += 1;
+        }
+    });
+    if (!matches.length) return text;
+    matches.sort((a, b) => a.start - b.start);
+    let cursor = 0;
+    let out = '';
+    matches.forEach(match => {
+        out += text.slice(cursor, match.start);
+        const label = text.slice(match.start, match.end);
+        out += `<button type="button" class="comp-spell-ref" onclick="compendioOpenSpellRef('${_compEscapeAttr(match.id)}')">${label}</button>`;
+        cursor = match.end;
+    });
+    return out + text.slice(cursor);
+}
+
+function _compSpellRefEntries() {
+    const data = window.SPELLS_DATA || {};
+    const size = Object.keys(data).length;
+    if (_compSpellRefCache && _compSpellRefCacheSize === size) return _compSpellRefCache;
+    const seen = new Set();
+    const entries = [];
+    Object.entries(data).forEach(([id, spell]) => {
+        const labels = [
+            spell?.name,
+            spell?.name_en,
+            ...(Array.isArray(spell?.aliases) ? spell.aliases : []),
+        ];
+        labels.forEach(label => {
+            const clean = String(label || '').trim();
+            const key = clean.toLowerCase();
+            if (!clean || seen.has(key)) return;
+            seen.add(key);
+            entries.push({ id, label: clean });
+        });
+    });
+    _compSpellRefCache = entries.sort((a, b) => b.label.length - a.label.length);
+    _compSpellRefCacheSize = size;
+    return _compSpellRefCache;
+}
+
+function _compRangesOverlap(ranges, start, end) {
+    return ranges.some(range => start < range.end && end > range.start);
+}
+
+function _compRegexEscape(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+window.compendioOpenSpellRef = function(id) {
+    const spellId = _compFindSpellRefId(id);
+    if (spellId) window.compendioOpenDetail?.('incantesimi', spellId);
+};
+
+function _compFindSpellRefId(value) {
+    const ref = String(value || '').trim();
+    if (!ref) return '';
+    const data = window.SPELLS_DATA || {};
+    if (data[ref]) return ref;
+    const lowered = ref.toLowerCase();
+    const match = _compSpellRefEntries().find(entry => entry.label.toLowerCase() === lowered || String(entry.id).toLowerCase() === lowered);
+    return match?.id || '';
 }
 
 function _compScrollToTop() {

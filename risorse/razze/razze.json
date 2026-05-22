@@ -155,7 +155,7 @@
           {
             "name": "Magia Duergar",
             "name_en": "Duergar Magic",
-            "description": "A partire dal 3 livello puoi lanciare ingrandire/ridurre su te stesso (solo la versione 'ingrandire'). A partire dal 5 livello puoi lanciare invisibilita' su te stesso. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+            "description": "A partire dal 3 livello puoi lanciare Ingrandire/Ridurre su te stesso (solo la versione 'ingrandire'). A partire dal 5 livello puoi lanciare Invisibilità su te stesso. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
             "uses": {
               "amount": "prof_bonus",
               "recharge": "long_rest"
@@ -375,7 +375,7 @@
           {
             "name": "Magia Drow",
             "name_en": "Drow Magic",
-            "description": "Conosci il trucchetto luci danzanti. Quando raggiungi il 3 livello, puoi lanciare l'incantesimo charme su persone una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Quando raggiungi il 5 livello, puoi lanciare l'incantesimo oscurita' una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per questi incantesimi.",
+            "description": "Conosci il trucchetto Luci Danzanti. Quando raggiungi il 3 livello, puoi lanciare l'incantesimo Luminescenza una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Quando raggiungi il 5 livello, puoi lanciare l'incantesimo Oscurità una volta con questo tratto e riacquisti l'abilita' di farlo quando finisci un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per questi incantesimi.",
             "innate_spells": [
               {
                 "name_en": "Dancing Lights",
@@ -1266,7 +1266,7 @@
           {
             "name": "Illusionista Naturale",
             "name_en": "Natural Illusionist",
-            "description": "Conosci il trucchetto immagine minore. L'Intelligenza e' la tua caratteristica da incantatore per esso.",
+            "description": "Conosci il trucchetto Illusione Minore. L'Intelligenza e' la tua caratteristica da incantatore per esso.",
             "innate_spells": [
               {
                 "name_en": "Minor Illusion",
@@ -1362,7 +1362,7 @@
           {
             "name": "Magia degli Gnomi delle Profondita'",
             "name_en": "Gift of the Svirfneblin",
-            "description": "A partire dal 3 livello, puoi lanciare camuffare se' stesso. A partire dal 5 livello, puoi lanciare antidetezione (solo su te stesso). Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+            "description": "A partire dal 3 livello, puoi lanciare Camuffare Sé Stesso. A partire dal 5 livello, puoi lanciare Anti-Individuazione (solo su te stesso). Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
             "uses": {
               "amount": "prof_bonus",
               "recharge": "long_rest"
@@ -1379,7 +1379,7 @@
               },
               {
                 "name_en": "Nondetection",
-                "name": "Antidetezione",
+                "name": "Anti-Individuazione",
                 "level": 3,
                 "level_cast": 3,
                 "min_pg_level": 5,
@@ -1581,14 +1581,14 @@
         "name": "Stirpe di Asmodeus",
         "name_en": "Bloodline of Asmodeus",
         "source_short": "PHB",
-        "description": "La stirpe piu' diffusa: il tuo lignaggio risale al Signore dei Nove Inferi. Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello una volta per riposo lungo. Al 5 livello puoi lanciare oscurita' una volta per riposo lungo.",
+        "description": "La stirpe piu' diffusa: il tuo lignaggio risale al Signore dei Nove Inferi. Conosci il trucchetto Taumaturgia. Al 3 livello puoi lanciare Intimidire Infernale come incantesimo di 2 livello una volta per riposo lungo. Al 5 livello puoi lanciare Oscurità una volta per riposo lungo.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Infernale",
             "name_en": "Infernal Legacy",
-            "description": "Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare oscurita' (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Conosci il trucchetto Taumaturgia. Al 3 livello puoi lanciare Intimidire Infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare Oscurità (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Thaumaturgy",
@@ -1601,7 +1601,7 @@
               },
               {
                 "name_en": "Hellish Rebuke",
-                "name": "Rimprovero Infernale",
+                "name": "Intimidire Infernale",
                 "level": 1,
                 "level_cast": 2,
                 "min_pg_level": 3,
@@ -1633,14 +1633,14 @@
         "name": "Stirpe di Baalzebul",
         "name_en": "Bloodline of Baalzebul",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare raggio indebolente (1/riposo lungo); al 5 livello puoi lanciare corona della follia (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Raggio di Infermità (1/riposo lungo); al 5 livello puoi lanciare Corona di Follia (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Baalzebul",
             "name_en": "Legacy of Baalzebul",
-            "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare raggio indebolente (1/riposo lungo); al 5 livello puoi lanciare corona della follia (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Raggio di Infermità (1/riposo lungo); al 5 livello puoi lanciare Corona di Follia (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Thaumaturgy",
@@ -1653,7 +1653,7 @@
               },
               {
                 "name_en": "Ray of Sickness",
-                "name": "Raggio Indebolente",
+                "name": "Raggio di Infermità",
                 "level": 1,
                 "level_cast": 1,
                 "min_pg_level": 3,
@@ -1662,7 +1662,7 @@
               },
               {
                 "name_en": "Crown of Madness",
-                "name": "Corona della Follia",
+                "name": "Corona di Follia",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -1685,14 +1685,14 @@
         "name": "Stirpe di Dispater",
         "name_en": "Bloodline of Dispater",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare camuffare sé stesso (1/riposo lungo); al 5 livello puoi lanciare individuazione del pensiero (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Camuffare Sé Stesso (1/riposo lungo); al 5 livello puoi lanciare Individuazione del Pensiero (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Dispater",
             "name_en": "Legacy of Dispater",
-            "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare camuffare sé stesso (1/riposo lungo); al 5 livello puoi lanciare individuazione del pensiero (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Camuffare Sé Stesso (1/riposo lungo); al 5 livello puoi lanciare Individuazione del Pensiero (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Thaumaturgy",
@@ -1737,14 +1737,14 @@
         "name": "Stirpe di Fierna",
         "name_en": "Bloodline of Fierna",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto amicizia; al 3 livello puoi lanciare charme su persone (1/riposo lungo); al 5 livello puoi lanciare suggestione (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Amicizia; al 3 livello puoi lanciare Charme su Persone (1/riposo lungo); al 5 livello puoi lanciare Suggestione (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Fierna",
             "name_en": "Legacy of Fierna",
-            "description": "Stirpe MToF: conosci il trucchetto amicizia; al 3 livello puoi lanciare charme su persone (1/riposo lungo); al 5 livello puoi lanciare suggestione (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Amicizia; al 3 livello puoi lanciare Charme su Persone (1/riposo lungo); al 5 livello puoi lanciare Suggestione (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Friends",
@@ -1789,14 +1789,14 @@
         "name": "Stirpe di Glasya",
         "name_en": "Bloodline of Glasya",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto illusione minore; al 3 livello puoi lanciare camuffare sé stesso (1/riposo lungo); al 5 livello puoi lanciare invisibilità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Illusione Minore; al 3 livello puoi lanciare Camuffare Sé Stesso (1/riposo lungo); al 5 livello puoi lanciare Invisibilità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Glasya",
             "name_en": "Legacy of Glasya",
-            "description": "Stirpe MToF: conosci il trucchetto illusione minore; al 3 livello puoi lanciare camuffare sé stesso (1/riposo lungo); al 5 livello puoi lanciare invisibilità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Illusione Minore; al 3 livello puoi lanciare Camuffare Sé Stesso (1/riposo lungo); al 5 livello puoi lanciare Invisibilità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Minor Illusion",
@@ -1841,14 +1841,14 @@
         "name": "Stirpe di Levistus",
         "name_en": "Bloodline of Levistus",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto raggio di gelo; al 3 livello puoi lanciare armatura di agathys (1/riposo lungo); al 5 livello puoi lanciare oscurità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Raggio di Gelo; al 3 livello puoi lanciare Armatura di Agathys (1/riposo lungo); al 5 livello puoi lanciare Oscurità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Levistus",
             "name_en": "Legacy of Levistus",
-            "description": "Stirpe MToF: conosci il trucchetto raggio di gelo; al 3 livello puoi lanciare armatura di agathys (1/riposo lungo); al 5 livello puoi lanciare oscurità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Raggio di Gelo; al 3 livello puoi lanciare Armatura di Agathys (1/riposo lungo); al 5 livello puoi lanciare Oscurità (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Ray of Frost",
@@ -1893,14 +1893,14 @@
         "name": "Stirpe di Mammon",
         "name_en": "Bloodline of Mammon",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto mano magica; al 3 livello puoi lanciare disco fluttuante di tenser (1/riposo lungo); al 5 livello puoi lanciare chiusura arcana (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Mano Magica; al 3 livello puoi lanciare Disco Fluttuante di Tenser (1/riposo lungo); al 5 livello puoi lanciare Chiusura Arcana (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Mammon",
             "name_en": "Legacy of Mammon",
-            "description": "Stirpe MToF: conosci il trucchetto mano magica; al 3 livello puoi lanciare disco fluttuante di tenser (1/riposo lungo); al 5 livello puoi lanciare chiusura arcana (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Mano Magica; al 3 livello puoi lanciare Disco Fluttuante di Tenser (1/riposo lungo); al 5 livello puoi lanciare Chiusura Arcana (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Mage Hand",
@@ -1945,14 +1945,14 @@
         "name": "Stirpe di Mefistofele",
         "name_en": "Bloodline of Mephistopheles",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto mano magica; al 3 livello puoi lanciare mani brucianti (1/riposo lungo); al 5 livello puoi lanciare lama infuocata (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Mano Magica; al 3 livello puoi lanciare Mani Brucianti (1/riposo lungo); al 5 livello puoi lanciare Lama di Fuoco (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Mefistofele",
             "name_en": "Legacy of Mephistopheles",
-            "description": "Stirpe MToF: conosci il trucchetto mano magica; al 3 livello puoi lanciare mani brucianti (1/riposo lungo); al 5 livello puoi lanciare lama infuocata (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Mano Magica; al 3 livello puoi lanciare Mani Brucianti (1/riposo lungo); al 5 livello puoi lanciare Lama di Fuoco (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Mage Hand",
@@ -1974,7 +1974,7 @@
               },
               {
                 "name_en": "Flame Blade",
-                "name": "Lama Infuocata",
+                "name": "Lama di Fuoco",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -1997,14 +1997,14 @@
         "name": "Stirpe di Zariel",
         "name_en": "Bloodline of Zariel",
         "source_short": "MToF",
-        "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare castigo bruciante (1/riposo lungo); al 5 livello puoi lanciare castigo marchiante (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Punizione Cocente (1/riposo lungo); al 5 livello puoi lanciare Punizione Marchiante (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Eredita' Zariel",
             "name_en": "Legacy of Zariel",
-            "description": "Stirpe MToF: conosci il trucchetto taumaturgia; al 3 livello puoi lanciare castigo bruciante (1/riposo lungo); al 5 livello puoi lanciare castigo marchiante (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
+            "description": "Stirpe MToF: conosci il trucchetto Taumaturgia; al 3 livello puoi lanciare Punizione Cocente (1/riposo lungo); al 5 livello puoi lanciare Punizione Marchiante (1/riposo lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Thaumaturgy",
@@ -2017,7 +2017,7 @@
               },
               {
                 "name_en": "Searing Smite",
-                "name": "Castigo Bruciante",
+                "name": "Punizione Cocente",
                 "level": 1,
                 "level_cast": 1,
                 "min_pg_level": 3,
@@ -2026,7 +2026,7 @@
               },
               {
                 "name_en": "Branding Smite",
-                "name": "Castigo Marchiante",
+                "name": "Punizione Marchiante",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -2049,14 +2049,14 @@
         "name": "Tiefling Lingua di Diavolo",
         "name_en": "Devil's Tongue Tiefling",
         "source_short": "SCAG",
-        "description": "Variante SCAG: rinunci a Eredita' Infernale per ottenere altri incantesimi di influenza. Conosci il trucchetto motteggio crudele. Al 3 livello puoi lanciare charme su persone come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare ammaliare (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Variante SCAG: rinunci a Eredita' Infernale per ottenere altri incantesimi di influenza. Conosci il trucchetto Beffa Crudele. Al 3 livello puoi lanciare Charme su Persone come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare Soggiogare (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Lingua del Diavolo",
             "name_en": "Devil's Tongue",
-            "description": "Variante che sostituisce Eredita' Infernale.",
+            "description": "Variante che sostituisce Eredita' Infernale. Conosci il trucchetto Beffa Crudele. Al 3 livello puoi lanciare Charme su Persone come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare Soggiogare (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Vicious Mockery",
@@ -2078,7 +2078,7 @@
               },
               {
                 "name_en": "Enthrall",
-                "name": "Ammaliare",
+                "name": "Soggiogare",
                 "level": 2,
                 "level_cast": 2,
                 "min_pg_level": 5,
@@ -2101,14 +2101,14 @@
         "name": "Tiefling Fuoco Infernale",
         "name_en": "Hellfire Tiefling",
         "source_short": "SCAG",
-        "description": "Variante SCAG: sostituisci oscurita' con mani brucianti. Conosci il trucchetto taumaturgia. Al 3 livello puoi lanciare rimprovero infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare mani brucianti come incantesimo di 2 livello (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
+        "description": "Variante SCAG: sostituisci Oscurità con Mani Brucianti. Conosci il trucchetto Taumaturgia. Al 3 livello puoi lanciare Intimidire Infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare Mani Brucianti come incantesimo di 2 livello (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
           {
             "name": "Fuoco Infernale",
             "name_en": "Hellfire",
-            "description": "Variante che sostituisce l'incantesimo di 2 livello di Eredita' Infernale.",
+            "description": "Variante che sostituisce l'incantesimo di 2 livello di Eredita' Infernale. Conosci il trucchetto Taumaturgia. Al 3 livello puoi lanciare Intimidire Infernale come incantesimo di 2 livello (1/r. lungo). Al 5 livello puoi lanciare Mani Brucianti come incantesimo di 2 livello (1/r. lungo). Il Carisma e' la tua caratteristica da incantatore.",
             "innate_spells": [
               {
                 "name_en": "Thaumaturgy",
@@ -2121,7 +2121,7 @@
               },
               {
                 "name_en": "Hellish Rebuke",
-                "name": "Rimprovero Infernale",
+                "name": "Intimidire Infernale",
                 "level": 1,
                 "level_cast": 2,
                 "min_pg_level": 3,
@@ -2401,7 +2401,7 @@
       {
         "name": "Portatore di Luce",
         "name_en": "Light Bearer",
-        "description": "Conosci il trucchetto luce. Il Carisma e' la tua caratteristica da incantatore per esso.",
+        "description": "Conosci il trucchetto Luce. Il Carisma e' la tua caratteristica da incantatore per esso.",
         "innate_spells": [
           {
             "name_en": "Light",
@@ -2461,7 +2461,7 @@
       {
         "name": "Magia Firbolg",
         "name_en": "Firbolg Magic",
-        "description": "Puoi lanciare individuazione del magico e camuffare se' stesso con questo tratto. A partire dal 3 livello, puoi anche lanciare comprendere linguaggi. Puoi lanciare ognuno di questi incantesimi un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore per essi (a tua scelta).",
+        "description": "Puoi lanciare Individuazione del Magico e Camuffare Sé Stesso con questo tratto. A partire dal 3 livello, puoi anche lanciare Comprensione dei Linguaggi. Puoi lanciare ognuno di questi incantesimi un numero di volte pari al tuo bonus di competenza, e riacquisti tutti gli usi quando termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore per essi (a tua scelta).",
         "uses": {
           "amount": "prof_bonus",
           "recharge": "long_rest"
@@ -2487,7 +2487,7 @@
           },
           {
             "name_en": "Comprehend Languages",
-            "name": "Comprendere Linguaggi",
+            "name": "Comprensione dei Linguaggi",
             "level": 1,
             "level_cast": 1,
             "min_pg_level": 3,
@@ -2820,7 +2820,7 @@
       {
         "name": "Controllo dell'Aria e dell'Acqua",
         "name_en": "Control Air and Water",
-        "description": "Puoi lanciare nube di nebbia con questo tratto. A partire dal 3 livello, puoi lanciare anche folata di vento. A partire dal 5 livello, puoi lanciare muro d'acqua. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza, e riacquisti gli usi quando termini un riposo lungo. Il Carisma e' la tua caratteristica da incantatore per essi.",
+        "description": "Puoi lanciare Nube di Nebbia con questo tratto. A partire dal 3 livello, puoi lanciare anche Folata di Vento. A partire dal 5 livello, puoi lanciare anche Camminare sull'Acqua. Puoi lanciare ognuno di essi un numero di volte pari al tuo bonus di competenza, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore per essi (a tua scelta).",
         "uses": {
           "amount": "prof_bonus",
           "recharge": "long_rest"
@@ -2845,8 +2845,8 @@
             "ability": "Carisma"
           },
           {
-            "name_en": "Wall of Water",
-            "name": "Muro d'Acqua",
+            "name_en": "Water Walk",
+            "name": "Camminare sull'Acqua",
             "level": 3,
             "level_cast": 3,
             "min_pg_level": 5,
@@ -3229,7 +3229,7 @@
       {
         "name": "Incantesimi Innati Yuan-ti",
         "name_en": "Innate Spellcasting",
-        "description": "Conosci il trucchetto velenare. Quando raggiungi il 3 livello, puoi lanciare suggestione una volta con questo tratto. Quando raggiungi il 5 livello, puoi lanciare amicizia con gli animali un numero illimitato di volte ma solo a serpenti, e suggestione una volta con questo tratto. Devi terminare un riposo lungo per lanciare di nuovo suggestione con questo tratto. Il Carisma e' la tua caratteristica da incantatore per essi.",
+        "description": "Conosci il trucchetto Spruzzo Velenoso. Puoi lanciare Amicizia con gli Animali un numero illimitato di volte con questo tratto, ma solo sui serpenti. A partire dal 3 livello, puoi lanciare Suggestione una volta con questo tratto. Devi terminare un riposo lungo per lanciare di nuovo Suggestione con questo tratto. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore per essi (a tua scelta).",
         "innate_spells": [
           {
             "name_en": "Poison Spray",
@@ -3317,7 +3317,7 @@
       {
         "name": "Psionica Githyanki",
         "name_en": "Githyanki Psionics",
-        "description": "Conosci il trucchetto mano magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare salto. A partire dal 5 livello, puoi lanciare passo velato. Puoi lanciare ognuno di salto e passo velato un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "description": "Conosci il trucchetto Mano Magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare Saltare. A partire dal 5 livello, puoi lanciare Passo Velato. Puoi lanciare ognuno di Saltare e Passo Velato un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
         "uses": {
           "amount": "prof_bonus",
           "recharge": "long_rest"
@@ -3397,7 +3397,7 @@
       {
         "name": "Psionica Githzerai",
         "name_en": "Githzerai Psionics",
-        "description": "Conosci il trucchetto mano magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare scudo. A partire dal 5 livello, puoi lanciare detezione del pensiero. Puoi lanciare ognuno di scudo e detezione del pensiero un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
+        "description": "Conosci il trucchetto Mano Magica, e la mano e' invisibile quando lo lanci con questo tratto. A partire dal 3 livello, puoi lanciare Scudo. A partire dal 5 livello, puoi lanciare Individuazione del Pensiero. Puoi lanciare ognuno di Scudo e Individuazione del Pensiero un numero di volte pari al tuo bonus di competenza con questo tratto, e riacquisti gli usi quando termini un riposo lungo. L'Intelligenza, la Saggezza o il Carisma e' la tua caratteristica da incantatore (a tua scelta).",
         "uses": {
           "amount": "prof_bonus",
           "recharge": "long_rest"
@@ -3746,7 +3746,7 @@
       {
         "name": "Vento Folgorante (Wind Caller)",
         "name_en": "Wind Caller",
-        "description": "A partire dal 3 livello, puoi lanciare l'incantesimo folata di vento con questo tratto, senza richiedere componenti materiali. Una volta lanciato, non puoi farlo di nuovo finche' non termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore (a tua scelta) per esso.",
+        "description": "A partire dal 3 livello, puoi lanciare l'incantesimo Folata di Vento con questo tratto, senza richiedere componenti materiali. Una volta lanciato, non puoi farlo di nuovo finche' non termini un riposo lungo. La Saggezza, l'Intelligenza o il Carisma e' la tua caratteristica da incantatore (a tua scelta) per esso.",
         "uses": {
           "amount": 1,
           "recharge": "long_rest"
@@ -3867,11 +3867,11 @@
       {
         "name": "Magia Fatata",
         "name_en": "Fairy Magic",
-        "description": "Conosci il trucchetto luci danzanti. A partire dal 3 livello, puoi lanciare ingrandire/ridurre (solo la versione 'ridurre' su te stesso). A partire dal 5 livello, puoi lanciare invisibilita'. Una volta lanciato uno di questi due incantesimi con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
+        "description": "Conosci il trucchetto Druidismo. A partire dal 3 livello, puoi lanciare Luminescenza. A partire dal 5 livello, puoi lanciare anche Ingrandire/Ridurre su te stesso. Dopo aver lanciato Luminescenza o Ingrandire/Ridurre con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
         "innate_spells": [
           {
             "name_en": "Druidcraft",
-            "name": "Pratica Druidica",
+            "name": "Druidismo",
             "level": 0,
             "level_cast": 0,
             "min_pg_level": 1,
@@ -3883,22 +3883,13 @@
             "name": "Luminescenza",
             "level": 1,
             "level_cast": 1,
-            "min_pg_level": 1,
+            "min_pg_level": 3,
             "recharge": "long_rest",
             "ability": "Carisma"
           },
           {
             "name_en": "Enlarge/Reduce",
             "name": "Ingrandire/Ridurre",
-            "level": 2,
-            "level_cast": 2,
-            "min_pg_level": 3,
-            "recharge": "long_rest",
-            "ability": "Carisma"
-          },
-          {
-            "name_en": "Invisibility",
-            "name": "Invisibilità",
             "level": 2,
             "level_cast": 2,
             "min_pg_level": 5,
@@ -4011,7 +4002,7 @@
         "name_en": "Air Genasi",
         "source_short": "MMM",
         "speed": 10.5,
-        "description": "Discendi dai jinn dell'aria. Sei sempre circondato da una brezza leggera. Hai competenza con il trucchetto modellare l'aria e impari nuovi incantesimi di levitazione e folata di vento crescendo di livello.",
+        "description": "Discendi dai djinni dell'aria. Sei sempre circondato da una brezza leggera. Conosci Stretta Folgorante e impari Caduta Morbida e Levitazione crescendo di livello.",
         "ability_score_increase": {},
         "asi_text": "",
         "traits": [
@@ -4025,11 +4016,11 @@
           {
             "name": "Magia dell'Aria",
             "name_en": "Mingle with the Wind",
-            "description": "Conosci il trucchetto modellare l'aria. A partire dal 3 livello, puoi lanciare levitazione una volta con questo tratto, e riacquisti la capacita' di farlo quando termini un riposo lungo. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "description": "Conosci il trucchetto Stretta Folgorante. A partire dal 3 livello, puoi lanciare Caduta Morbida senza componenti materiali. A partire dal 5 livello, puoi lanciare Levitazione senza componenti materiali. Dopo aver lanciato Caduta Morbida o Levitazione con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
             "innate_spells": [
               {
                 "name_en": "Shocking Grasp",
-                "name": "Tocco Folgorante",
+                "name": "Stretta Folgorante",
                 "level": 0,
                 "level_cast": 0,
                 "min_pg_level": 1,
@@ -4094,11 +4085,11 @@
           {
             "name": "Fusione con la Pietra",
             "name_en": "Merge with Stone",
-            "description": "Puoi lanciare l'incantesimo passare senza traccia con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per esso.",
+            "description": "Conosci il trucchetto Interdizione alle Lame. A partire dal 5 livello, puoi lanciare Passare senza Tracce senza componenti materiali. Dopo aver lanciato Passare senza Tracce con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi anche lanciarlo usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per esso (scegli quando crei il personaggio).",
             "innate_spells": [
               {
                 "name_en": "Blade Ward",
-                "name": "Difesa dalle Lame",
+                "name": "Interdizione alle Lame",
                 "level": 0,
                 "level_cast": 0,
                 "min_pg_level": 1,
@@ -4107,10 +4098,10 @@
               },
               {
                 "name_en": "Pass without Trace",
-                "name": "Passare senza Traccia",
+                "name": "Passare senza Tracce",
                 "level": 2,
                 "level_cast": 2,
-                "min_pg_level": 3,
+                "min_pg_level": 5,
                 "recharge": "long_rest",
                 "ability": "Costituzione"
               }
@@ -4151,11 +4142,11 @@
           {
             "name": "Stirpe del Fuoco",
             "name_en": "Reach to the Blaze",
-            "description": "Conosci il trucchetto produrre fiamme. A partire dal 3 livello, puoi lanciare mani brucianti una volta con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "description": "Conosci il trucchetto Produrre Fiamma. A partire dal 3 livello, puoi lanciare Mani Brucianti. A partire dal 5 livello, puoi lanciare anche Lama di Fuoco senza componenti materiali. Dopo aver lanciato Mani Brucianti o Lama di Fuoco con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
             "innate_spells": [
               {
                 "name_en": "Produce Flame",
-                "name": "Produrre Fiamme",
+                "name": "Produrre Fiamma",
                 "level": 0,
                 "level_cast": 0,
                 "min_pg_level": 1,
@@ -4168,6 +4159,15 @@
                 "level": 1,
                 "level_cast": 1,
                 "min_pg_level": 3,
+                "recharge": "long_rest",
+                "ability": "Costituzione"
+              },
+              {
+                "name_en": "Flame Blade",
+                "name": "Lama di Fuoco",
+                "level": 2,
+                "level_cast": 2,
+                "min_pg_level": 5,
                 "recharge": "long_rest",
                 "ability": "Costituzione"
               }
@@ -4219,7 +4219,7 @@
           {
             "name": "Magia dell'Acqua",
             "name_en": "Call to the Wave",
-            "description": "Conosci il trucchetto modellare l'acqua. A partire dal 3 livello, puoi lanciare creare/distruggere acqua come incantesimo di 2 livello una volta con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per essi.",
+            "description": "Conosci il trucchetto Fiotto Acido. A partire dal 3 livello, puoi lanciare Creare o Distruggere Acqua. A partire dal 5 livello, puoi lanciare anche Camminare sull'Acqua senza componenti materiali. Dopo aver lanciato Creare o Distruggere Acqua o Camminare sull'Acqua con questo tratto, devi finire un riposo lungo prima di poterlo lanciare di nuovo in questo modo. Puoi anche lanciarli usando slot incantesimo che possiedi. Intelligenza, Saggezza o Carisma e' la tua caratteristica da incantatore per essi (scegli quando crei il personaggio).",
             "innate_spells": [
               {
                 "name_en": "Acid Splash",
