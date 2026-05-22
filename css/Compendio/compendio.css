@@ -914,6 +914,26 @@
     outline: none;
 }
 
+.comp-spell-ref-modal {
+    width: 520px;
+    max-width: calc(100vw - 28px);
+    max-height: min(720px, calc(100vh - 40px));
+    padding: 18px;
+    text-align: left;
+    overflow-y: auto;
+}
+
+.comp-spell-ref-title {
+    margin: 0 34px 12px 0;
+    color: var(--text);
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.comp-spell-ref-modal .comp-spell-detail {
+    padding: 12px;
+}
+
 .comp-spell-detail {
     background: var(--card-bg);
     border: 1px solid var(--border);

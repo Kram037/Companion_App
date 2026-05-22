@@ -1952,7 +1952,7 @@ function _compRegexEscape(text) {
 
 window.compendioOpenSpellRef = function(id) {
     const spellId = _compFindSpellRefId(id);
-    if (spellId) window.compendioOpenDetail?.('incantesimi', spellId);
+    if (spellId) _compOpenSpellRefModal(spellId);
 };
 
 function _compFindSpellRefId(value) {
@@ -1963,6 +1963,25 @@ function _compFindSpellRefId(value) {
     const lowered = ref.toLowerCase();
     const match = _compSpellRefEntries().find(entry => entry.label.toLowerCase() === lowered || String(entry.id).toLowerCase() === lowered);
     return match?.id || '';
+}
+
+function _compOpenSpellRefModal(spellId) {
+    const spell = (window.SPELLS_DATA || {})[spellId];
+    if (!spell) return;
+    document.querySelector('.comp-spell-ref-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-spell-ref-overlay';
+    overlay.onclick = event => {
+        if (event.target === overlay) overlay.remove();
+    };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-spell-ref-modal">
+            <button class="modal-close" type="button" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h3 class="comp-spell-ref-title">${escapeHtml(_compSpellField(spell, 'name'))}</h3>
+            ${_compSpellDetail(spell)}
+        </div>
+    `;
+    document.body.appendChild(overlay);
 }
 
 function _compScrollToTop() {
