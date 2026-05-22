@@ -1602,15 +1602,28 @@ function _compRaceVersionBody(version) {
         : _compField(base, 'description');
     return `
         <div class="comp-detail-subtitle">${escapeHtml([version.subtitle, sourceData.source_short || sourceData.source || version.source].filter(Boolean).join(' - '))}</div>
-        ${_compBoxes([
-            ['Taglia', base.size],
-            ['Velocita', base.speed != null ? `${base.speed} m` : ''],
-            ['Linguaggi', _compArrayLabel([...(base.languages || []), ...(version.isSubrace ? (race.languages || []) : [])])],
-        ])}
+        ${_compRaceMetaBoxes(base, version.isSubrace ? race : null)}
         ${_compRaceAsiSection(base, version.isSubrace ? race : null)}
         <section class="comp-detail-section"><h3>Descrizione</h3><div class="comp-rich">${_compRich(description || '')}</div></section>
         ${_compFeaturesSection(mergedTraits)}
     `;
+}
+
+function _compRaceMetaBoxes(base, subrace) {
+    const languages = _compArrayLabel([...(base.languages || []), ...(subrace ? (subrace.languages || []) : [])]);
+    return `<div class="comp-detail-grid comp-race-meta-grid">
+        ${_compRaceMetaBox('Taglia', base.size)}
+        ${_compRaceMetaBox('Velocita', base.speed != null ? `${base.speed} m` : '')}
+        ${_compRaceMetaBox('Linguaggi', languages, true)}
+    </div>`;
+}
+
+function _compRaceMetaBox(label, value, wide = false) {
+    if (value == null || String(value).trim() === '') return '';
+    return `<div class="comp-detail-box ${wide ? 'comp-race-meta-wide' : ''}">
+        <div class="comp-detail-box-label">${escapeHtml(label)}</div>
+        <div class="comp-detail-box-value">${escapeHtml(_compArrayLabel(value))}</div>
+    </div>`;
 }
 
 function _compRaceAsiSection(base, subrace) {

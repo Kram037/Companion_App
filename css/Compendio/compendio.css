@@ -499,6 +499,14 @@
     text-transform: uppercase;
 }
 
+.comp-race-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.comp-race-meta-wide {
+    grid-column: 1 / -1;
+}
+
 .comp-race-asi-table {
     width: 100%;
     border-collapse: collapse;
