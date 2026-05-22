@@ -477,7 +477,7 @@ function _compRaceItems() {
             order: raceOrder++,
             search: baseSearch,
         };
-        _compPushRaceVersion(byRace, groupKey, raceLabel, baseEntry);
+        _compPushRaceVersion(byRace, groupKey, raceLabel, baseEntry, false);
         (race.subraces || []).forEach(sub => {
             const entry = {
                 id: sub.version_id || `${key}:${sub.name || sub.name_en}`,
@@ -492,12 +492,17 @@ function _compRaceItems() {
                 order: raceOrder++,
                 search: [baseSearch, _compRaceSearchText(sub.name || sub.name_en || '', sub)].join(' '),
             };
-            _compPushRaceVersion(byRace, groupKey, raceLabel, entry);
+            _compPushRaceVersion(byRace, groupKey, raceLabel, entry, true);
         });
     });
     return Array.from(byRace.entries()).map(([id, raceGroup]) => {
         const versions = _compSortRaceVersions(raceGroup.versions);
-        const sources = _compUnique(versions.map(version => version.source).filter(Boolean));
+        const subraces = _compSortRaceSubraceGroups(Array.from(raceGroup.subraces.values()).map(subrace => ({
+            ...subrace,
+            versions: _compSortRaceVersions(subrace.versions),
+        })));
+        const allVersions = [...versions, ...subraces.flatMap(subrace => subrace.versions)];
+        const sources = _compUnique(allVersions.map(version => version.source).filter(Boolean));
         return {
             type: 'razze',
             id,
@@ -508,15 +513,24 @@ function _compRaceItems() {
             group: '',
             tags: sources,
             desc: '',
-            search: versions.map(version => version.search).join(' '),
-            data: { ...raceGroup, versions },
+            search: allVersions.map(version => version.search).join(' '),
+            data: { title: raceGroup.title, versions, subraces },
         };
     });
 }
 
-function _compPushRaceVersion(map, groupKey, raceLabel, entry) {
-    if (!map.has(groupKey)) map.set(groupKey, { title: raceLabel, versions: [] });
-    map.get(groupKey).versions.push(entry);
+function _compPushRaceVersion(map, groupKey, raceLabel, entry, isSubrace) {
+    if (!map.has(groupKey)) map.set(groupKey, { title: raceLabel, versions: [], subraces: new Map() });
+    const raceGroup = map.get(groupKey);
+    if (!isSubrace) {
+        raceGroup.versions.push(entry);
+        return;
+    }
+    const subraceKey = entry.data.version_group || _compSlug(entry.data.name_en || entry.data.name || entry.title);
+    if (!raceGroup.subraces.has(subraceKey)) {
+        raceGroup.subraces.set(subraceKey, { id: subraceKey, title: entry.title, versions: [] });
+    }
+    raceGroup.subraces.get(subraceKey).versions.push(entry);
 }
 
 function _compRaceBaseLabel(race, fallback) {
@@ -551,6 +565,11 @@ function _compSortRaceVersions(versions) {
         if (manualOrder !== 0) return manualOrder;
         return collator.compare(a.title || '', b.title || '');
     });
+}
+
+function _compSortRaceSubraceGroups(subraces) {
+    const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
+    return [...subraces].sort((a, b) => collator.compare(a.title || '', b.title || ''));
 }
 
 function _compRaceSourceOrder(source) {
@@ -1500,12 +1519,19 @@ function _compFeatureDetail(title, subtitle, features, data) {
 }
 
 function _compRaceDetail(race, title, subtitle) {
-    if (race?.versions?.length) {
-        const versions = _compVisibleRaceVersions(race.versions);
+    if (race?.versions || race?.subraces) {
+        const versions = _compVisibleRaceVersions(race.versions || []);
+        const subraces = _compVisibleRaceSubraces(race.subraces || []);
         return `
-            <div class="comp-race-version-list">
+            ${versions.length ? `<div class="comp-race-version-list">
                 ${versions.map(version => _compRaceVersionSection(version)).join('')}
-            </div>
+            </div>` : ''}
+            ${subraces.length ? `<section class="comp-detail-section">
+                <h3>Sottorazze</h3>
+                <div class="comp-subclass-accordion-list">
+                    ${subraces.map(subrace => _compRaceSubraceAccordion(race, subrace)).join('')}
+                </div>
+            </section>` : ''}
         `;
     }
     return _compRaceVersionBody({
@@ -1522,6 +1548,29 @@ function _compVisibleRaceVersions(versions) {
     const selectedSources = _compFilterValues(_compStateFor('razze').filters.source);
     if (!selectedSources.length) return versions;
     return versions.filter(version => selectedSources.includes(version.source));
+}
+
+function _compVisibleRaceSubraces(subraces) {
+    return subraces
+        .map(subrace => ({ ...subrace, versions: _compVisibleRaceVersions(subrace.versions || []) }))
+        .filter(subrace => subrace.versions.length);
+}
+
+function _compRaceSubraceAccordion(race, subrace) {
+    const state = _compStateFor('razze');
+    const key = `race-subrace:${race.title || 'race'}:${subrace.id}`;
+    const isOpen = _compGroupOpen('razze', key, state);
+    const sources = _compUnique(subrace.versions.map(version => version.source).filter(Boolean));
+    return `<section class="comp-subclass-accordion">
+        <button type="button" class="comp-group-divider comp-subclass-toggle ${isOpen ? 'open' : ''}" onclick="compendioToggleGroup('${_compEscapeAttr(key)}')">
+            ${_compIcon('chevron-right')}
+            <span>${escapeHtml(subrace.title)}</span>
+            <small>${escapeHtml(sources.join(', ') || String(subrace.versions.length))}</small>
+        </button>
+        <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
+            ${subrace.versions.map(version => _compRaceVersionSection(version)).join('')}
+        </div>
+    </section>`;
 }
 
 function _compRaceVersionSection(version) {
