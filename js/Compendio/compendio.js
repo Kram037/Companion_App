@@ -573,7 +573,7 @@ function _compSortRaceSubraceGroups(subraces) {
 }
 
 function _compRaceSourceOrder(source) {
-    const order = { MMM: 0, PHB: 10, TCOE: 12, VGtM: 20, MToF: 30, SCAG: 40, ToA: 50 };
+    const order = { MMM: 0, PHB: 10, TCOE: 12, VGtM: 20, ERLW: 25, MToF: 30, SCAG: 40, ToA: 50 };
     return order[String(source || '').trim()] ?? 99;
 }
 

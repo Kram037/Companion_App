@@ -135,10 +135,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Duergar",
         "name_en": "Duergar",
         "source_short": "MMM",
-        "ability_score_increase": {
-          "Forza": 1
-        },
-        "asi_text": "+1 Forza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "description": "Da duergar, sei un nano grigio dell'Underdark. La tua mente e' temprata dalla sofferenza, e sei abituato all'oscurita'. Versione MMM: piu' magia psionica, niente piu' debolezza alla luce solare.",
         "traits": [
           {
@@ -424,10 +422,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Eladrin",
         "name_en": "Eladrin",
         "source_short": "MMM",
-        "ability_score_increase": {
-          "Carisma": 1
-        },
-        "asi_text": "+1 Carisma",
+        "ability_score_increase": {},
+        "asi_text": "",
         "description": "Da eladrin, sei un elfo nativo del Reame Fatato. Esprimi una stagione associata al tuo umore, che puoi cambiare ogni volta che termini un riposo lungo. Versione MMM: Passo Fatato scalabile col bonus competenza.",
         "traits": [
           {
@@ -460,10 +456,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Elfo del Mare",
         "name_en": "Sea Elf",
         "source_short": "MMM",
-        "ability_score_increase": {
-          "Costituzione": 1
-        },
-        "asi_text": "+1 Costituzione",
+        "ability_score_increase": {},
+        "asi_text": "",
         "description": "Da elfo del mare, sei un elfo che vive nelle profondita' dell'oceano. Hai forte affinita' con la natura acquatica. Versione MMM: respiri sia aria che acqua e nuoti a 9m.",
         "traits": [
           {
@@ -507,10 +501,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Shadar-kai",
         "name_en": "Shadar-kai",
         "source_short": "MMM",
-        "ability_score_increase": {
-          "Costituzione": 1
-        },
-        "asi_text": "+1 Costituzione",
+        "ability_score_increase": {},
+        "asi_text": "",
         "description": "Da shadar-kai, sei un elfo legato al Piano dell'Ombra, servitore della Regina Corvo. Sei pallido, scuro come un cadavere e dotato di forte legame con la morte.",
         "traits": [
           {
@@ -1343,10 +1335,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Gnomo Svirfneblin",
         "name_en": "Deep Gnome (Svirfneblin)",
         "source_short": "MMM",
-        "ability_score_increase": {
-          "Destrezza": 1
-        },
-        "asi_text": "+1 Destrezza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "description": "Da svirfneblin (gnomo profondo), vivi nell'Underdark e sei piu' magro e duro dei tuoi cugini di superficie. Versione MMM: Astuzia Gnomesca + Magia degli Gnomi delle Profondita'.",
         "traits": [
           {
@@ -2366,7 +2356,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Gli aasimar maturano alla stessa velocita' degli umani ma vivono fino a 160 anni.",
     "alignment": "Per via della loro discendenza celestiale, gli aasimar tendono al bene. La maggior parte sono buoni, eppure alcuni cadono nel male, rifiutando il loro destino superiore.",
     "description": "Gli aasimar portano dentro di se' la luce divina di un essere celeste. Sono guidati spesso dall'idea di sconfiggere il male, agendo come un faro contro l'oscurita'.",
@@ -2453,16 +2443,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Come gli umani, i firbolg raggiungono la maturita' nei loro tardi adolescenti. Vivono notevolmente piu' a lungo degli umani, fino a 500 anni.",
     "alignment": "Spesso devoti al loro clan e alla loro foresta; tendenzialmente neutrali buoni.",
     "description": "I firbolg sono custodi della foresta che preferiscono inscenare elaborate frodi per spingere gli intrusi via dai loro boschi piuttosto che ricorrere alla violenza diretta.",
     "languages": [
-      "Comune",
-      "Elfico",
-      "Gigante"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2550,15 +2538,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I goliath hanno durate di vita simili agli umani. Entrano nell'eta' adulta a tarda adolescenza e di solito vivono meno di un secolo.",
     "alignment": "La cultura goliath e' fortemente comunitaria; spesso pendono al legale ma MMM lascia liberta' al giocatore.",
     "description": "I goliath vagano in un mondo solitario e selvaggio. Vivendo sui pendii ventosi delle piu' alte cime montuose, lontani dagli affari di mortali e divini, conoscono solo difficolta' e fatica.",
     "languages": [
-      "Comune",
-      "Gigante"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2605,20 +2592,19 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "name_en": "Kenku",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I kenku hanno una durata di vita simile a quella degli umani.",
     "alignment": "Spesso opportunisti; tendono al caotico neutrale, ma MMM lascia liberta' al giocatore.",
     "description": "I kenku sono umanoidi simili a uccelli, vagabondi che hanno perso da tempo la capacita' di volare. In MMM possono parlare e mimano suoni e voci con disinvoltura.",
     "languages": [
-      "Comune",
-      "Aurano"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2660,6 +2646,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "kenku"
   },
   "Uomo Lucertola": {
+    "name": "Lucertoloide",
     "name_en": "Lizardfolk",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
@@ -2668,15 +2655,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
-    "age": "Gli uomini lucertola raggiungono la maturita' intorno ai 14 anni e di rado vivono piu' di 60 anni.",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "I lucertoloidi raggiungono la maturita' intorno ai 14 anni e di rado vivono piu' di 60 anni.",
     "alignment": "Pragmatici e tribali, tendenzialmente neutrali; MMM lascia liberta' al giocatore.",
-    "description": "Gli uomini lucertola sono praticamente alieni alle altre razze umanoidi. Vivono nelle paludi e seguono valori tribali con una visione molto pratica e priva di emozioni.",
+    "description": "I lucertoloidi sono un popolo antico e pragmatico, dotato di difese naturali e di una forte connessione con il mondo naturale.",
     "languages": [
-      "Comune",
-      "Draconico"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2732,22 +2718,21 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       }
     ],
     "subraces": [],
-    "name": "Uomo Lucertola",
     "version_source": "MMM",
     "version_id": "lizardfolk-mmm",
-    "version_label": "Uomo Lucertola (MMM)",
+    "version_label": "Lucertoloide (MMM)",
     "version_group": "lizardfolk"
   },
   "Tabaxi": {
     "name_en": "Tabaxi",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I tabaxi hanno durata di vita comparabile agli umani.",
     "alignment": "Curiosi e irrequieti, raramente malvagi; MMM lascia liberta' al giocatore.",
     "description": "I tabaxi sono umanoidi felini, esploratori curiosi nati da terre tropicali distanti. La loro insaziabile curiosita' li porta a girovagare il mondo in cerca di reliquie, conoscenza e storie.",
@@ -2808,15 +2793,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I triton hanno durata di vita simile agli umani.",
     "alignment": "Spesso fieri custodi degli oceani; tendenzialmente legali buoni.",
     "description": "I triton sono custodi delle profondita' oceaniche, recentemente emersi dai loro mondi sottomarini per affrontare nuove minacce in superficie.",
     "languages": [
-      "Comune",
-      "Primordiale"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2902,6 +2886,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "triton"
   },
   "Bugbear": {
+    "name": "Urgoblin",
     "name_en": "Bugbear",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
@@ -2910,15 +2895,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
-    "age": "I bugbear hanno durata di vita comparabile agli umani.",
-    "alignment": "I bugbear sono spesso caotici malvagi, ma alcuni si liberano dal pugno di Hruggek, il loro dio.",
-    "description": "I bugbear sono i piu' grandi e forti dei goblinoidi. La loro furtivita' a dispetto della loro stazza li rende cacciatori e razziatori formidabili.",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "Gli urgoblin hanno durata di vita comparabile agli umani.",
+    "alignment": "Gli urgoblin sono spesso caotici malvagi, ma alcuni si liberano dal pugno di Hruggek, il loro dio.",
+    "description": "Gli urgoblin sono i piu' grandi e forti dei goblinoidi. La loro furtivita' a dispetto della loro stazza li rende cacciatori e razziatori formidabili.",
     "languages": [
-      "Comune",
-      "Goblin"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -2964,10 +2948,9 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       }
     ],
     "subraces": [],
-    "name": "Bugbear",
     "version_source": "MMM",
     "version_id": "bugbear-mmm",
-    "version_label": "Bugbear (MMM)",
+    "version_label": "Urgoblin (MMM)",
     "version_group": "bugbear"
   },
   "Goblin": {
@@ -2979,15 +2962,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I goblin raggiungono l'eta' adulta a 8 anni e vivono fino a 60.",
     "alignment": "Variano: la maggior parte e' opportunista, ma alcuni rinnegano la lealta' al loro signore.",
     "description": "I goblin sono creature aggressive, irascibili e codarde che vivono in colonie sotterranee, sempre in cerca di un capo piu' forte.",
     "languages": [
-      "Comune",
-      "Goblin"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3037,15 +3019,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Gli hobgoblin maturano alla stessa velocita' degli umani e hanno la stessa durata di vita.",
     "alignment": "Spesso disciplinati: apprezzano ordine, addestramento e onore in battaglia.",
     "description": "Gli hobgoblin sono goblinoidi grandi, marziali, organizzati in legioni rigidamente disciplinate. Apprezzano forza, abilita' e onore in battaglia.",
     "languages": [
-      "Comune",
-      "Goblin"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3098,15 +3079,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I coboldi raggiungono la maturita' a 6 anni e vivono fino a 120 anni.",
     "alignment": "Spesso astuti e leali al clan; molti restano devoti ai draghi venerati come divinita'.",
     "description": "I coboldi sono umanoidi rettiliani, ingegnosi nei loro modi sleali, e venerano i draghi come divinita'.",
     "languages": [
-      "Comune",
-      "Draconico"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3156,15 +3136,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Gli orchi raggiungono l'eta' adulta a 12 anni e vivono fino a 50 anni.",
     "alignment": "Gli orchi MMM hanno temperamenti molto vari: l'allineamento dipende dall'individuo e dalla cultura.",
     "description": "Gli orchi sono creature feroci e fiere, vincolate da forti legami tribali. La tradizione di MMM li presenta come popolo ricco e variegato che migra tra i piani.",
     "languages": [
-      "Comune",
-      "Orchesco"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3216,24 +3195,23 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "orc"
   },
   "Yuan-ti Purosangue": {
+    "name": "Yuan-ti",
     "name_en": "Yuan-ti",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Gli yuan-ti maturano alla stessa velocita' degli umani e hanno la stessa durata di vita.",
     "alignment": "Tipicamente freddi e calcolatori. MMM lascia liberta' al giocatore.",
     "description": "Gli yuan-ti sono umanoidi serpentini imbevuti di magia primordiale. In MMM la razza giocabile rappresenta gli yuan-ti che hanno mantenuto un aspetto piu' simile a quello umano.",
     "languages": [
-      "Comune",
-      "Abissale",
-      "Draconico"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3300,10 +3278,9 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       }
     ],
     "subraces": [],
-    "name": "Yuan-ti Purosangue",
     "version_source": "MMM",
     "version_id": "yuan-ti-mmm",
-    "version_label": "Yuan-ti Purosangue (MMM)",
+    "version_label": "Yuan-ti (MMM)",
     "version_group": "yuan-ti"
   },
   "Githyanki": {
@@ -3315,15 +3292,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I githyanki invecchiano molto lentamente; potrebbero vivere per secoli a meno di non essere uccisi.",
     "alignment": "Spesso militaristi e fieri; MMM lascia liberta' al giocatore.",
     "description": "I githyanki, predoni psionici dell'Astrale, conducono incursioni a cavallo di draghi rossi attraverso i piani per saccheggiare ricchezze e schiavi.",
     "languages": [
-      "Comune",
-      "Gith"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3394,15 +3370,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I githzerai possono vivere oltre il secolo. Maturano alla stessa velocita' degli umani.",
     "alignment": "Spesso disciplinati e meditativi; MMM lascia liberta' al giocatore.",
     "description": "I githzerai sono asceti monastici dei piani caotici, opposti ai loro cugini githyanki. Vivono in monasteri nel Limbo dove perfezionano corpo e mente.",
     "languages": [
-      "Comune",
-      "Gith"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3475,15 +3450,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I centauri maturano alla stessa velocita' degli umani e di solito vivono fino a un secolo.",
     "alignment": "Devoti alle tradizioni del proprio clan; MMM lascia liberta' al giocatore.",
     "description": "Esseri robusti e selvaggi, i centauri sono mezzi cavalli e mezzi umanoidi che vagano per pianure e foreste in branchi tribali, fieri della loro liberta'.",
     "languages": [
-      "Comune",
-      "Silvano"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3547,15 +3521,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I leonini maturano piu' velocemente degli umani, raggiungendo la maturita' a 16 anni. Vivono fino a 95 anni.",
     "alignment": "Spesso fieri e protettivi della loro tribu'; MMM lascia liberta' al giocatore.",
     "description": "Una razza umanoide felina nobile e fiera, i leonini vivono in tribu' nomadi nelle praterie sotto cieli aperti, dedicandosi alla protezione delle terre selvagge.",
     "languages": [
-      "Comune",
-      "Leonino"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3612,15 +3585,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I minotauri maturano alla stessa velocita' degli umani e hanno una durata di vita simile.",
     "alignment": "Spesso orgogliosi guerrieri devoti a codici d'onore; MMM lascia liberta' al giocatore.",
     "description": "Robusti, alti e cornuti, i minotauri sono guerrieri che vivono in tribu' guidate da forti tradizioni. Combinano forza fisica e abilita' tattica.",
     "languages": [
-      "Comune",
-      "Minotaurico"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3674,15 +3646,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I satiri maturano alla stessa velocita' degli umani ma vivono molto piu' a lungo, fino a 200 anni.",
     "alignment": "Spesso allegri e festosi; MMM lascia liberta' al giocatore.",
     "description": "I satiri sono creature fatate gioiose e festose, mezzi umanoidi e mezze capre, che vivono nei boschi godendo della musica, del vino e dei piaceri della natura.",
     "languages": [
-      "Comune",
-      "Silvano"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3739,19 +3710,18 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
     "size": "Media",
-    "speed": 7.5,
+    "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'origine dei personaggi').",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Gli aarakocra raggiungono la maturita' a 3 anni e vivono fino a 30.",
     "alignment": "Spesso caotici buoni: amano la liberta' e detestano la schiavitu'.",
     "description": "Aviari delle nubi, gli aarakocra hanno corpi simili a uomini-uccello con ali piumate, occhi di rapace e becchi affilati. Migrano per il Piano dell'Aria e per i picchi piu' alti del Multiverso.",
     "languages": [
-      "Comune",
-      "Auran"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3763,7 +3733,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       {
         "name": "Volo",
         "name_en": "Flight",
-        "description": "Hai una velocita' di volo di 15 metri. Per usarla, non puoi indossare armature mediane o pesanti.",
+        "description": "Hai una velocita' di volo pari alla tua velocita' base. Per usarla, non puoi indossare armature medie o pesanti.",
         "uses": null,
         "innate_spells": null
       },
@@ -3803,22 +3773,23 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "aarakocra"
   },
   "Mutamorfo": {
+    "name": "Cangiante",
     "name_en": "Changeling",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
-    "age": "Gli changeling raggiungono la maturita' a 20 anni e vivono fino a 100.",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "I cangianti raggiungono la maturita' a 20 anni e vivono fino a 100.",
     "alignment": "Variano ampiamente; spesso assumono identita' diverse a seconda della situazione.",
-    "description": "Mutaforma silenziosi e adattabili, gli changeling possono modificare il proprio aspetto a piacimento. Molti vivono come spie, attori o mediatori tra culture diverse.",
+    "description": "Mutaforma silenziosi e adattabili, i cangianti possono modificare il proprio aspetto a piacimento. Molti vivono come spie, attori o mediatori tra culture diverse.",
     "languages": [
       "Comune"
     ],
-    "languages_extra": 2,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3850,10 +3821,9 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       }
     ],
     "subraces": [],
-    "name": "Mutamorfo",
     "version_source": "MMM",
     "version_id": "changeling-mmm",
-    "version_label": "Mutamorfo (MMM)",
+    "version_label": "Cangiante (MMM)",
     "version_group": "changeling"
   },
   "Fata": {
@@ -3865,15 +3835,14 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "Le fate raggiungono la maturita' a 20 anni e vivono fino a circa 200.",
     "alignment": "Le fate tendono al caotico buono; aborrono la rigidita' e amano la liberta' e l'umorismo.",
     "description": "Piccole creature fatate dalle ali iridescenti, le fate vagano tra i piani in cerca di meraviglia e malizia. Bench'e' minute, posseggono potenti incantesimi innati.",
     "languages": [
-      "Comune",
-      "Silvano"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -3949,23 +3918,23 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "fairy"
   },
   "Harengon": {
+    "name": "Leporidion",
     "name_en": "Harengon",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Piccola o Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
-    "age": "Gli harengon raggiungono la maturita' a 20 anni e vivono fino a 100.",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "I leporidion raggiungono la maturita' a 20 anni e vivono fino a 100.",
     "alignment": "Spesso caotici neutrali o caotici buoni; vagabondi per natura.",
-    "description": "Lepri umanoidi influenzate dal tocco del Reame Fatato, gli harengon possiedono lunghe orecchie sensibili, riflessi fulminei e una notevole abilita' nel salto.",
+    "description": "Lepri umanoidi influenzate dal tocco del Reame Fatato, i leporidion possiedono lunghe orecchie sensibili, riflessi fulminei e una notevole abilita' nel salto.",
     "languages": [
-      "Comune",
-      "Silvano"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -4007,30 +3976,28 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
       }
     ],
     "subraces": [],
-    "name": "Harengon",
     "version_source": "MMM",
     "version_id": "harengon-mmm",
-    "version_label": "Harengon (MMM)",
+    "version_label": "Leporidion (MMM)",
     "version_group": "harengon"
   },
   "Genasi": {
     "name_en": "Genasi",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
-    "size": "Media",
+    "size": "Media o Piccola",
     "speed": 9,
     "ability_score_increase": {
-      "Costituzione": 2
+      "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "+2 Costituzione (PHB/MMM); la sottorazza determina l'aumento ulteriore.",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
     "age": "I genasi maturano alla stessa velocita' degli umani e raggiungono l'eta' adulta a 20 anni. Vivono leggermente piu' a lungo, fino a 120 anni.",
     "alignment": "I genasi tendono ad essere indipendenti e impulsivi, riflettendo il loro retaggio elementale.",
     "description": "I genasi sono i discendenti di unioni tra mortali e creature degli Elementali Interni. Ogni genasi reca in se' la traccia di uno dei quattro elementi: aria, terra, fuoco o acqua.",
     "languages": [
-      "Comune",
-      "Primordiale"
+      "Comune"
     ],
-    "languages_extra": 0,
+    "languages_extra": 1,
     "skill_proficiencies": [],
     "tool_proficiencies": [],
     "weapon_proficiencies": [],
@@ -4044,11 +4011,10 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name": "Genasi dell'Aria",
         "name_en": "Air Genasi",
         "source_short": "MMM",
+        "speed": 10.5,
         "description": "Discendi dai jinn dell'aria. Sei sempre circondato da una brezza leggera. Hai competenza con il trucchetto modellare l'aria e impari nuovi incantesimi di levitazione e folata di vento crescendo di livello.",
-        "ability_score_increase": {
-          "Destrezza": 1
-        },
-        "asi_text": "+1 Destrezza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "traits": [
           {
             "name": "Respiro Indipendente",
@@ -4116,10 +4082,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name_en": "Earth Genasi",
         "source_short": "MMM",
         "description": "Discendi dai dao della terra. La tua pelle ha venature simili al marmo e i tuoi capelli ricordano l'erba o l'argento. Puoi attraversare terreno difficile naturale senza penalita'.",
-        "ability_score_increase": {
-          "Forza": 1
-        },
-        "asi_text": "+1 Forza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "traits": [
           {
             "name": "Sentiero della Terra",
@@ -4168,10 +4132,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name_en": "Fire Genasi",
         "source_short": "MMM",
         "description": "Discendi dagli efreet del fuoco. La tua pelle ha sfumature rosse o cinerine, e i tuoi capelli somigliano a fiamme guizzanti. Hai resistenza al danno da fuoco e impari incantesimi a tema fiamma.",
-        "ability_score_increase": {
-          "Intelligenza": 1
-        },
-        "asi_text": "+1 Intelligenza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "traits": [
           {
             "name": "Vista del Fuoco",
@@ -4231,10 +4193,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "name_en": "Water Genasi",
         "source_short": "MMM",
         "description": "Discendi dai marid dell'acqua. La tua pelle ha sfumature blu o verdi, e ti muovi con la grazia delle correnti marine. Puoi nuotare e respirare sott'acqua.",
-        "ability_score_increase": {
-          "Saggezza": 1
-        },
-        "asi_text": "+1 Saggezza",
+        "ability_score_increase": {},
+        "asi_text": "",
         "traits": [
           {
             "name": "Acclimatamento Acquatico",
@@ -4263,8 +4223,8 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
             "description": "Conosci il trucchetto modellare l'acqua. A partire dal 3 livello, puoi lanciare creare/distruggere acqua come incantesimo di 2 livello una volta con questo tratto e riacquisti la capacita' di farlo quando termini un riposo lungo. Puoi anche lanciarlo usando slot incantesimo che possiedi. La Costituzione e' la tua caratteristica da incantatore per essi.",
             "innate_spells": [
               {
-                "name_en": "Shape Water",
-                "name": "Modellare l'Acqua",
+                "name_en": "Acid Splash",
+                "name": "Fiotto Acido",
                 "level": 0,
                 "level_cast": 0,
                 "min_pg_level": 1,
@@ -4277,6 +4237,15 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
                 "level": 1,
                 "level_cast": 2,
                 "min_pg_level": 3,
+                "recharge": "long_rest",
+                "ability": "Costituzione"
+              },
+              {
+                "name_en": "Water Walk",
+                "name": "Camminare sull'Acqua",
+                "level": 3,
+                "level_cast": 3,
+                "min_pg_level": 5,
                 "recharge": "long_rest",
                 "ability": "Costituzione"
               }
@@ -4303,6 +4272,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "version_group": "genasi"
   },
   "Shifter": {
+    "name": "Morfico",
     "name_en": "Shifter",
     "source": "Mordenkainen presenta: Mostri del Multiverso",
     "source_short": "MMM",
@@ -4311,10 +4281,10 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
     "ability_score_increase": {
       "_any": "+2/+1 o +1/+1/+1"
     },
-    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM).",
-    "age": "Gli shifter maturano a 10 anni e raramente vivono oltre i 70.",
-    "alignment": "Spesso neutrali; le diverse stirpi tirano lo shifter in direzioni differenti.",
-    "description": "Discendenti di mortali e creature licantrope, gli shifter possono attingere brevemente alla loro natura bestiale per ottenere caratteristiche animalesche. La sottorazza determina il tipo di trasformazione (Shifting Feature).",
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "I morfici maturano a 10 anni e raramente vivono oltre i 70.",
+    "alignment": "Spesso neutrali; le diverse stirpi tirano il morfico in direzioni differenti.",
+    "description": "Discendenti di mortali e creature licantrope, i morfici possono attingere brevemente alla loro natura bestiale per ottenere caratteristiche animalesche. La sottorazza determina il tipo di trasformazione (Shifting Feature).",
     "languages": [
       "Comune"
     ],
@@ -4363,7 +4333,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           }
         ],
         "source": "Mordenkainen presenta: Mostri del Multiverso",
-        "base_race_name": "Shifter",
+        "base_race_name": "Morfico",
         "base_race_name_en": "Shifter",
         "version_source": "MMM",
         "version_id": "shifter-beasthide-shifter-mmm",
@@ -4387,7 +4357,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           }
         ],
         "source": "Mordenkainen presenta: Mostri del Multiverso",
-        "base_race_name": "Shifter",
+        "base_race_name": "Morfico",
         "base_race_name_en": "Shifter",
         "version_source": "MMM",
         "version_id": "shifter-longtooth-shifter-mmm",
@@ -4411,7 +4381,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           }
         ],
         "source": "Mordenkainen presenta: Mostri del Multiverso",
-        "base_race_name": "Shifter",
+        "base_race_name": "Morfico",
         "base_race_name_en": "Shifter",
         "version_source": "MMM",
         "version_id": "shifter-swiftstride-shifter-mmm",
@@ -4435,7 +4405,7 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
           }
         ],
         "source": "Mordenkainen presenta: Mostri del Multiverso",
-        "base_race_name": "Shifter",
+        "base_race_name": "Morfico",
         "base_race_name_en": "Shifter",
         "version_source": "MMM",
         "version_id": "shifter-wildhunt-shifter-mmm",
@@ -4443,11 +4413,442 @@ window.RACES_DATA = Object.assign(window.RACES_DATA || {}, {
         "version_group": "shifter-wildhunt-shifter"
       }
     ],
-    "name": "Shifter",
     "version_source": "MMM",
     "version_id": "shifter-mmm",
-    "version_label": "Shifter (MMM)",
+    "version_label": "Morfico (MMM)",
     "version_group": "shifter"
+  },
+  "Cangiante (ERLW)": {
+    "name": "Cangiante",
+    "name_en": "Changeling",
+    "source": "Eberron: Rising from the Last War",
+    "source_short": "ERLW",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {
+      "Carisma": 2,
+      "_choose_1": 1
+    },
+    "asi_text": "+2 Carisma, +1 a una caratteristica a scelta",
+    "age": "I cangianti maturano leggermente piu' in fretta degli umani, ma hanno una durata di vita simile.",
+    "alignment": "I cangianti possono assumere molte identita' e inclinazioni; il loro allineamento varia ampiamente.",
+    "description": "I cangianti di Eberron cambiano aspetto e voce con naturalezza, costruendo maschere e identita' per adattarsi a ruoli e comunita' diverse.",
+    "languages": [
+      "Comune"
+    ],
+    "languages_extra": 2,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+      {
+        "name": "Istinti del Cangiante",
+        "name_en": "Changeling Instincts",
+        "description": "Ottieni competenza in due abilita' a scelta tra Inganno, Intuizione, Intimidire e Persuasione.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Mutaforma",
+        "name_en": "Shapechanger",
+        "description": "Come azione, puoi modificare il tuo aspetto e la tua voce. Puoi cambiare colore della pelle, lunghezza dei capelli, sesso, altezza e peso entro i limiti della tua taglia. Le statistiche non cambiano, vestiti ed equipaggiamento non vengono modificati, e non puoi duplicare una creatura che non hai mai visto.",
+        "uses": null,
+        "innate_spells": null
+      }
+    ],
+    "subraces": [],
+    "version_source": "ERLW",
+    "version_id": "changeling-erlw",
+    "version_label": "Cangiante (ERLW)",
+    "version_group": "changeling"
+  },
+  "Kalashtar": {
+    "name_en": "Kalashtar",
+    "source": "Eberron: Rising from the Last War",
+    "source_short": "ERLW",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {
+      "Saggezza": 2,
+      "Carisma": 1
+    },
+    "asi_text": "+2 Saggezza, +1 Carisma",
+    "age": "I kalashtar maturano fisicamente alla stessa velocita' degli umani, ma possiedono una notevole disciplina mentale.",
+    "alignment": "Il legame con uno spirito quori virtuoso spinge molti kalashtar verso il bene, ma l'allineamento resta personale.",
+    "description": "I kalashtar sono umanoidi legati a spiriti quori ribelli. La loro mente condivisa li rende empatici, disciplinati e difficili da manipolare nei sogni.",
+    "languages": [
+      "Comune",
+      "Quori"
+    ],
+    "languages_extra": 1,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [
+      "psichico"
+    ],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+      {
+        "name": "Doppia Mente",
+        "name_en": "Dual Mind",
+        "description": "Hai vantaggio a tutti i tiri salvezza su Saggezza.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Disciplina Mentale",
+        "name_en": "Mental Discipline",
+        "description": "Hai resistenza ai danni psichici.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Legame Mentale",
+        "name_en": "Mind Link",
+        "description": "Puoi parlare telepaticamente con una creatura che puoi vedere entro 3 metri moltiplicati per il tuo livello. La creatura deve capire almeno una lingua. Come azione, puoi permetterle di risponderti telepaticamente per 1 ora o finche' termini l'effetto.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Reciso dai Sogni",
+        "name_en": "Severed from Dreams",
+        "description": "Dormi, ma non ti connetti al piano dei sogni. Sei immune agli incantesimi e agli effetti magici che richiedono di sognare, ma non a quelli che ti fanno dormire.",
+        "uses": null,
+        "innate_spells": null
+      }
+    ],
+    "subraces": [],
+    "name": "Kalashtar",
+    "version_source": "ERLW",
+    "version_id": "kalashtar-erlw",
+    "version_label": "Kalashtar (ERLW)",
+    "version_group": "kalashtar"
+  },
+  "Morfico (ERLW)": {
+    "name": "Morfico",
+    "name_en": "Shifter",
+    "source": "Eberron: Rising from the Last War",
+    "source_short": "ERLW",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {
+      "Destrezza": 1
+    },
+    "asi_text": "+1 Destrezza; la sottorazza fornisce incrementi aggiuntivi",
+    "age": "I morfici maturano rapidamente, intorno ai 10 anni, e raramente vivono oltre i 70.",
+    "alignment": "I morfici tendono spesso alla neutralita', guidati dal proprio istinto e dal legame con il branco.",
+    "description": "I morfici di Eberron sono umanoidi con tratti bestiali, capaci di trasformarsi brevemente per manifestare il proprio retaggio ferino.",
+    "languages": [
+      "Comune"
+    ],
+    "languages_extra": 0,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 18,
+    "creature_type": "Umanoide",
+    "traits": [
+      {
+        "name": "Scurovisione",
+        "name_en": "Darkvision",
+        "description": "Hai una vista superiore in condizioni di buio e penombra. Puoi vedere in penombra entro 18 metri da te come se fosse luce intensa, e nel buio come se fosse penombra. Non puoi distinguere i colori al buio, solo sfumature di grigio.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Trasformazione",
+        "name_en": "Shifting",
+        "description": "Come azione bonus, puoi assumere un aspetto piu' bestiale per 1 minuto, finche' muori o finche' lo termini come azione bonus. Quando ti trasformi, ottieni punti ferita temporanei pari al tuo livello + il tuo modificatore di Costituzione (minimo 1). Recuperi l'uso dopo un riposo breve o lungo.",
+        "uses": {
+          "amount": 1,
+          "recharge": "short_rest"
+        },
+        "innate_spells": null
+      }
+    ],
+    "subraces": [
+      {
+        "name": "Pellebestia",
+        "name_en": "Beasthide Shifter",
+        "source_short": "ERLW",
+        "ability_score_increase": {
+          "Costituzione": 2,
+          "Forza": 1
+        },
+        "asi_text": "+2 Costituzione, +1 Forza",
+        "description": "Morfico robusto e resistente, legato a spiriti di orso, cinghiale o altre bestie tenaci.",
+        "traits": [
+          {
+            "name": "Atleta Naturale",
+            "name_en": "Natural Athlete",
+            "description": "Hai competenza nell'abilita' Atletica.",
+            "uses": null,
+            "innate_spells": null
+          },
+          {
+            "name": "Caratteristica di Trasformazione: Pellebestia",
+            "name_en": "Shifting Feature: Beasthide",
+            "description": "Mentre sei trasformato, ottieni 1d6 punti ferita temporanei aggiuntivi e un bonus di +1 alla CA.",
+            "uses": null,
+            "innate_spells": null
+          }
+        ],
+        "source": "Eberron: Rising from the Last War",
+        "base_race_name": "Morfico",
+        "base_race_name_en": "Shifter",
+        "version_source": "ERLW",
+        "version_id": "shifter-beasthide-shifter-erlw",
+        "version_label": "Pellebestia (ERLW)",
+        "version_group": "shifter-beasthide-shifter"
+      },
+      {
+        "name": "Zannalunga",
+        "name_en": "Longtooth Shifter",
+        "source_short": "ERLW",
+        "ability_score_increase": {
+          "Forza": 2,
+          "Destrezza": 1
+        },
+        "asi_text": "+2 Forza, +1 Destrezza",
+        "description": "Morfico aggressivo e fedele ai compagni, spesso associato a tratti canini o predatori.",
+        "traits": [
+          {
+            "name": "Feroce",
+            "name_en": "Fierce",
+            "description": "Hai competenza nell'abilita' Intimidire.",
+            "uses": null,
+            "innate_spells": null
+          },
+          {
+            "name": "Caratteristica di Trasformazione: Zannalunga",
+            "name_en": "Shifting Feature: Longtooth",
+            "description": "Mentre sei trasformato, puoi usare le zanne per effettuare un attacco senz'armi come azione bonus, infliggendo 1d6 + il tuo modificatore di Forza danni perforanti.",
+            "uses": null,
+            "innate_spells": null
+          }
+        ],
+        "source": "Eberron: Rising from the Last War",
+        "base_race_name": "Morfico",
+        "base_race_name_en": "Shifter",
+        "version_source": "ERLW",
+        "version_id": "shifter-longtooth-shifter-erlw",
+        "version_label": "Zannalunga (ERLW)",
+        "version_group": "shifter-longtooth-shifter"
+      },
+      {
+        "name": "Falcatasvelta",
+        "name_en": "Swiftstride Shifter",
+        "source_short": "ERLW",
+        "ability_score_increase": {
+          "Destrezza": 2,
+          "Carisma": 1
+        },
+        "asi_text": "+2 Destrezza, +1 Carisma",
+        "description": "Morfico rapido e sfuggente, spesso legato a spiriti felini o agili predatori.",
+        "traits": [
+          {
+            "name": "Agile",
+            "name_en": "Graceful",
+            "description": "Hai competenza nell'abilita' Acrobazia.",
+            "uses": null,
+            "innate_spells": null
+          },
+          {
+            "name": "Caratteristica di Trasformazione: Falcatasvelta",
+            "name_en": "Shifting Feature: Swiftstride",
+            "description": "Mentre sei trasformato, la tua velocita' aumenta di 3 metri. Inoltre, quando una creatura termina il suo turno entro 1,5 metri da te, puoi usare la tua reazione per muoverti di 3 metri senza provocare attacchi di opportunita'.",
+            "uses": null,
+            "innate_spells": null
+          }
+        ],
+        "source": "Eberron: Rising from the Last War",
+        "base_race_name": "Morfico",
+        "base_race_name_en": "Shifter",
+        "version_source": "ERLW",
+        "version_id": "shifter-swiftstride-shifter-erlw",
+        "version_label": "Falcatasvelta (ERLW)",
+        "version_group": "shifter-swiftstride-shifter"
+      },
+      {
+        "name": "Cacciatore Selvatico",
+        "name_en": "Wildhunt Shifter",
+        "source_short": "ERLW",
+        "ability_score_increase": {
+          "Saggezza": 2,
+          "Destrezza": 1
+        },
+        "asi_text": "+2 Saggezza, +1 Destrezza",
+        "description": "Morfico attento e intuitivo, legato all'istinto del cacciatore e alla percezione del branco.",
+        "traits": [
+          {
+            "name": "Segugio Naturale",
+            "name_en": "Natural Tracker",
+            "description": "Hai competenza nell'abilita' Sopravvivenza.",
+            "uses": null,
+            "innate_spells": null
+          },
+          {
+            "name": "Caratteristica di Trasformazione: Cacciatore Selvatico",
+            "name_en": "Shifting Feature: Wildhunt",
+            "description": "Mentre sei trasformato, hai vantaggio alle prove di Saggezza e nessuna creatura entro 9 metri da te puo' effettuare un tiro per colpire con vantaggio contro di te, a meno che tu non sia inabile.",
+            "uses": null,
+            "innate_spells": null
+          }
+        ],
+        "source": "Eberron: Rising from the Last War",
+        "base_race_name": "Morfico",
+        "base_race_name_en": "Shifter",
+        "version_source": "ERLW",
+        "version_id": "shifter-wildhunt-shifter-erlw",
+        "version_label": "Cacciatore Selvatico (ERLW)",
+        "version_group": "shifter-wildhunt-shifter"
+      }
+    ],
+    "version_source": "ERLW",
+    "version_id": "shifter-erlw",
+    "version_label": "Morfico (ERLW)",
+    "version_group": "shifter"
+  },
+  "Warforged": {
+    "name_en": "Warforged",
+    "source": "Eberron: Rising from the Last War",
+    "source_short": "ERLW",
+    "size": "Media",
+    "speed": 9,
+    "ability_score_increase": {
+      "Costituzione": 2,
+      "_choose_1": 1
+    },
+    "asi_text": "+2 Costituzione, +1 a una caratteristica a scelta",
+    "age": "I warforged hanno in genere tra 2 e 30 anni; la loro durata massima e' sconosciuta e non mostrano segni di decadimento per l'eta'.",
+    "alignment": "Molti warforged trovano conforto in ordine e disciplina, tendendo al legale o neutrale, ma l'allineamento varia secondo le esperienze vissute.",
+    "description": "Creati come soldati viventi, i warforged sono costrutti senzienti con corpo composito e volonta' propria.",
+    "languages": [
+      "Comune"
+    ],
+    "languages_extra": 1,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [
+      "veleno"
+    ],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+      {
+        "name": "Resilienza Costruita",
+        "name_en": "Constructed Resilience",
+        "description": "Hai vantaggio ai tiri salvezza contro l'avvelenamento, resistenza ai danni da veleno, immunita' alle malattie, non hai bisogno di mangiare, bere o respirare, non devi dormire e la magia non puo' farti addormentare.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Riposo della Sentinella",
+        "name_en": "Sentry's Rest",
+        "description": "Quando effettui un riposo lungo, rimani immobile ma cosciente per almeno 6 ore invece di dormire.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Protezione Integrata",
+        "name_en": "Integrated Protection",
+        "description": "Ottieni +1 alla Classe Armatura. Puoi incorporare un'armatura nel tuo corpo o rimuoverla nel corso di 1 ora, e non puoi essere separato da un'armatura incorporata contro la tua volonta'.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Progettazione Specializzata",
+        "name_en": "Specialized Design",
+        "description": "Ottieni competenza in un'abilita' e in uno strumento a tua scelta.",
+        "uses": null,
+        "innate_spells": null
+      }
+    ],
+    "subraces": [],
+    "name": "Warforged",
+    "version_source": "ERLW",
+    "version_id": "warforged-erlw",
+    "version_label": "Warforged (ERLW)",
+    "version_group": "warforged"
+  },
+  "Tortuga": {
+    "name_en": "Tortle",
+    "source": "Mordenkainen presenta: Mostri del Multiverso",
+    "source_short": "MMM",
+    "size": "Media o Piccola",
+    "speed": 9,
+    "ability_score_increase": {
+      "_any": "+2/+1 o +1/+1/+1"
+    },
+    "asi_text": "Aumenta una caratteristica di +2 e un'altra di +1, oppure tre caratteristiche di +1 (regola MMM 'creare il tuo personaggio').",
+    "age": "I tortuga hanno una durata di vita tipica di circa un secolo, salvo morti violente in avventura.",
+    "alignment": "I tortuga tendono a seguire il proprio senso di sicurezza e connessione col mondo naturale.",
+    "description": "I tortuga sono umanoidi simili a tartarughe, viaggiatori costieri e marini che portano sempre con se' il proprio rifugio.",
+    "languages": [
+      "Comune"
+    ],
+    "languages_extra": 1,
+    "skill_proficiencies": [],
+    "tool_proficiencies": [],
+    "weapon_proficiencies": [],
+    "armor_proficiencies": [],
+    "resistances": [],
+    "darkvision": 0,
+    "creature_type": "Umanoide",
+    "traits": [
+      {
+        "name": "Trattieni il Respiro",
+        "name_en": "Hold Breath",
+        "description": "Puoi trattenere il respiro fino a 1 ora alla volta. I tortle non sono creature acquatiche, ma possono restare a lungo sott'acqua.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Armatura Naturale",
+        "name_en": "Natural Armor",
+        "description": "Il tuo guscio ti fornisce una CA base pari a 17; il modificatore di Destrezza non influenza questo numero. Non puoi indossare armature leggere, medie o pesanti, ma puoi beneficiare normalmente di uno scudo.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Artigli",
+        "name_en": "Claws",
+        "description": "Puoi usare i tuoi artigli per effettuare colpi senz'armi. Quando colpisci, infliggi 1d6 + il tuo modificatore di Forza danni taglienti, invece dei normali danni contundenti.",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Difesa del Guscio",
+        "name_en": "Shell Defense",
+        "description": "Puoi ritirarti nel tuo guscio come azione. Fino a quando non emergi, ottieni +4 alla CA e hai vantaggio ai tiri salvezza su Forza e Costituzione. Mentre sei nel tuo guscio, sei prono, la tua velocita' e' 0 e non puoi aumentarla, hai svantaggio ai tiri salvezza su Destrezza, non puoi reagire e l'unica azione che puoi effettuare e' un'azione bonus per uscire dal guscio (utilizzabile a partire dal tuo prossimo turno).",
+        "uses": null,
+        "innate_spells": null
+      },
+      {
+        "name": "Intuizione della Natura",
+        "name_en": "Nature's Intuition",
+        "description": "Ottieni competenza in una delle seguenti abilita' a tua scelta: Addestrare Animali, Furtivita', Medicina, Natura, Percezione o Sopravvivenza.",
+        "uses": null,
+        "innate_spells": null
+      }
+    ],
+    "subraces": [],
+    "name": "Tortuga",
+    "version_source": "MMM",
+    "version_id": "tortle-mmm",
+    "version_label": "Tortuga (MMM)",
+    "version_group": "tortle"
   },
   "Tortle": {
     "name_en": "Tortle",

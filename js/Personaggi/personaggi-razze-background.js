@@ -29,7 +29,7 @@ function buildRaceOptionsLocal() {
         .sort((a, b) => a.localeCompare(b, 'it'))
         .map(name => {
             const r = RD[name];
-            return { value: name, label: name, source: r.source_short || '' };
+            return { value: name, label: r.name || name, source: r.source_short || '' };
         });
 }
 
@@ -104,7 +104,7 @@ function buildMergedRaceData(raceName, subraceName) {
         nome: race.name || raceName,
         sottorazza: sub ? sub.name : null,
         fonte: race.source_short || '',
-        velocita: race.speed || 9,
+        velocita: (sub && sub.speed != null) ? sub.speed : (race.speed || 9),
         resistenze: [...(race.resistances || []), ...((sub && sub.resistances) || [])],
         competenze_abilita: [
             ...((race.skill_proficiencies || []).map(_normSkillKey)),
