@@ -32,7 +32,7 @@ ENGLISH_RESIDUE_RE = re.compile(
     r"\b("
     r"starting|beginning|when you|you can|you gain|you have|choose|until|"
     r"short rest|long rest|saving throw|ability check|spell slot|cantrip|"
-    r"feet|within|bonus action|reaction|action|damage|creature|target"
+    r"feet|within|bonus action|reaction|action|damage|target"
     r")\b",
     re.IGNORECASE,
 )
