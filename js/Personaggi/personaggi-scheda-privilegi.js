@@ -15,6 +15,26 @@ function _getClassData(slug) {
     ) || null;
 }
 
+function _privSubclassHasGrantedSpellTable(classSlug, subclassSlug) {
+    const table = window.SUBCLASS_SPELLS_DATA?.[classSlug]?.[subclassSlug];
+    if (!table || typeof table !== 'object') return false;
+    return Object.entries(table).some(([level, spells]) =>
+        !String(level).startsWith('_') && Array.isArray(spells) && spells.some(Boolean)
+    ) || Object.values(table._variants || {}).some(byLevel =>
+        byLevel && typeof byLevel === 'object' && Object.values(byLevel).some(spells =>
+            Array.isArray(spells) && spells.some(Boolean)
+        )
+    );
+}
+
+function _privIsGrantedSpellFeature(feature) {
+    const name = `${feature?.name_en || ''} ${feature?.name || ''}`.toLowerCase();
+    if (!name.trim()) return false;
+    if (name.includes('spellcasting') || name.includes('lancio di incantesimi')) return false;
+    return /\b(domain spells|oath spells|circle spells|expanded spell list|psionic spells|clockwork magic|artificer spells|alchemist spells|armorer spells|artillerist spells|battle smith spells)\b/.test(name)
+        || /incantesimi (del|della|dello|dei|degli|delle|da|dell'|psionici|estesa|ampliata)|lista .*incantesimi|magia dell'orologeria/.test(name);
+}
+
 function _normalizePrivilegi(pg) {
     const p = pg.privilegi || {};
     let order = Array.isArray(p.custom_tabs_order)
@@ -97,8 +117,10 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
         const sub = cls.subclasses.find(s => s.slug === clsEntry.sottoclasseSlug);
         if (sub) {
             subclassName = _localizedClassName(sub);
+            const hasGrantedSpellTable = _privSubclassHasGrantedSpellTable(cls.slug, sub.slug);
             subFeatures = (sub.features || [])
                 .filter(f => !f.level || f.level <= lvl)
+                .filter(f => !(hasGrantedSpellTable && _privIsGrantedSpellFeature(f)))
                 .map(f => ({
                     source: cls.slug + ':' + sub.slug,
                     source_label: subclassName,

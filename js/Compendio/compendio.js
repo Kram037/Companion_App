@@ -7,6 +7,50 @@ let _compSpellRefCache = null;
 let _compSpellRefCacheSize = 0;
 window._compState = window._compState || {};
 
+const COMP_SPELL_REF_CONTEXT_RE = /\b(incantesim\w*|trucchett\w*|lanc\w*|conosc\w*|prepar\w*|slot|magia|magic\w*|spell\w*|cantrip\w*|cast\w*|learn\w*|known|prepared)\b/i;
+const COMP_AMBIGUOUS_SPELL_REF_LABELS = new Set([
+    'aiuto',
+    'anatema',
+    'amicizia',
+    'bane',
+    'bless',
+    'comando',
+    'command',
+    'confusione',
+    'confusion',
+    'creation',
+    'creazione',
+    'desiderio',
+    'fear',
+    'fly',
+    'friends',
+    'guidance',
+    'guida',
+    'haste',
+    'jump',
+    'light',
+    'luce',
+    'mending',
+    'message',
+    'messaggio',
+    'paura',
+    'resistance',
+    'resistenza',
+    'riparare',
+    'saltare',
+    'sanctuary',
+    'santuario',
+    'scudo',
+    'shield',
+    'silence',
+    'silenzio',
+    'sleep',
+    'sonno',
+    'velocita',
+    'volare',
+    'wish',
+]);
+
 const COMP_TABS = {
     classi: { label: 'Classi', icon: '📚' },
     oggetti: { label: 'Equipaggiamento', icon: '🎒' },
@@ -1352,7 +1396,11 @@ function _compSubclassAccordionHtml(clsId, sub, showTasha = false) {
     const state = _compStateFor('classi');
     const isOpen = !!state.openSubclasses?.[key];
     const optionalFeatures = _compFilteredOptionalFeatures(sub.optional_features || []);
-    const features = _compMergeFeatureLists(sub.features || [], showTasha ? optionalFeatures : []);
+    const spellRows = _compSubclassSpellRows(clsId, sub);
+    const features = _compRenderableFeatures(
+        _compMergeFeatureLists(sub.features || [], showTasha ? optionalFeatures : []),
+        { hideGrantedSpellFeatures: spellRows.length > 0 }
+    );
     return `<section class="comp-subclass-accordion">
         <button type="button" class="comp-group-divider comp-subclass-toggle ${isOpen ? 'open' : ''}" onclick="compendioToggleClassSubclass('${_compEscapeAttr(clsId)}','${_compEscapeAttr(subId)}')">
             ${_compIcon('chevron-right')}
@@ -1361,7 +1409,7 @@ function _compSubclassAccordionHtml(clsId, sub, showTasha = false) {
         </button>
         <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
-            ${_compSubclassSpellListSection(clsId, sub)}
+            ${_compSubclassSpellListSection(clsId, sub, spellRows)}
             ${_compFeaturesSection(features)}
         </div>
     </section>`;
@@ -1420,6 +1468,22 @@ function _compIsRedundantOptionalFeature(feature) {
     return false;
 }
 
+function _compRenderableFeatures(features, options = {}) {
+    let list = [...(features || [])];
+    if (options.hideGrantedSpellFeatures) {
+        list = list.filter(feature => !_compIsGrantedSpellFeature(feature));
+    }
+    return list;
+}
+
+function _compIsGrantedSpellFeature(feature) {
+    const name = `${feature?.name_en || ''} ${feature?.name || ''}`.toLowerCase();
+    if (!name.trim()) return false;
+    if (name.includes('spellcasting') || name.includes('lancio di incantesimi')) return false;
+    return /\b(domain spells|oath spells|circle spells|expanded spell list|psionic spells|clockwork magic|artificer spells|alchemist spells|armorer spells|artillerist spells|battle smith spells)\b/.test(name)
+        || /incantesimi (del|della|dello|dei|degli|delle|da|dell'|psionici|estesa|ampliata)|lista .*incantesimi|magia dell'orologeria/.test(name);
+}
+
 function _compMergeFeatureLists(baseFeatures, optionalFeatures) {
     return [
         ...(baseFeatures || []).map(f => ({ ...f, _compOptional: false })),
@@ -1434,8 +1498,8 @@ function _compMergeFeatureLists(baseFeatures, optionalFeatures) {
     });
 }
 
-function _compSubclassSpellListSection(clsId, sub) {
-    const rows = _compSubclassSpellRows(clsId, sub);
+function _compSubclassSpellListSection(clsId, sub, presetRows = null) {
+    const rows = Array.isArray(presetRows) ? presetRows : _compSubclassSpellRows(clsId, sub);
     if (!rows.length) return '';
     return `<section class="comp-detail-section comp-subclass-spells-section">
         <h3>Incantesimi concessi</h3>
@@ -1512,11 +1576,14 @@ function _compSubclassSortLabel(sub) {
 }
 
 function _compFeatureDetail(title, subtitle, features, data) {
+    const clsId = data.parent_class_slug || data.classSlug || _compClassKey(data.className || data.classNameEn || '');
+    const spellRows = _compSubclassSpellRows(clsId, data);
+    const visibleFeatures = _compRenderableFeatures(features, { hideGrantedSpellFeatures: spellRows.length > 0 });
     return `
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
         ${_compClassProgressionSection(data, 'Progressione incantesimi')}
-        ${_compSubclassSpellListSection(data.parent_class_slug || data.classSlug || _compClassKey(data.className || data.classNameEn || ''), data)}
-        ${_compFeaturesSection(features)}
+        ${_compSubclassSpellListSection(clsId, data, spellRows)}
+        ${_compFeaturesSection(visibleFeatures)}
     `;
 }
 
@@ -1900,7 +1967,9 @@ function _compLinkSpellRefsInText(text) {
             const start = match.index + match[1].length;
             const value = match[2];
             const end = start + value.length;
-            if (!_compRangesOverlap(matches, start, end)) matches.push({ start, end, id: entry.id });
+            if (_compShouldLinkSpellRef(text, start, end, entry) && !_compRangesOverlap(matches, start, end)) {
+                matches.push({ start, end, id: entry.id });
+            }
             if (pattern.lastIndex === match.index) pattern.lastIndex += 1;
         }
     });
@@ -1934,12 +2003,32 @@ function _compSpellRefEntries() {
             const key = clean.toLowerCase();
             if (!clean || seen.has(key)) return;
             seen.add(key);
-            entries.push({ id, label: clean });
+            entries.push({ id, label: clean, ambiguous: _compIsAmbiguousSpellRef(clean) });
         });
     });
     _compSpellRefCache = entries.sort((a, b) => b.label.length - a.label.length);
     _compSpellRefCacheSize = size;
     return _compSpellRefCache;
+}
+
+function _compShouldLinkSpellRef(text, start, end, entry) {
+    if (!entry.ambiguous) return true;
+    const context = `${text.slice(Math.max(0, start - 80), start)} ${text.slice(end, Math.min(text.length, end + 80))}`;
+    return COMP_SPELL_REF_CONTEXT_RE.test(context);
+}
+
+function _compIsAmbiguousSpellRef(label) {
+    const clean = String(label || '').trim();
+    if (!clean) return true;
+    const singleWord = !/[\s/,'-]/.test(clean);
+    return COMP_AMBIGUOUS_SPELL_REF_LABELS.has(_compSpellRefAmbiguousKey(clean)) || (singleWord && clean.length <= 7);
+}
+
+function _compSpellRefAmbiguousKey(text) {
+    return String(text || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
 }
 
 function _compRangesOverlap(ranges, start, end) {
