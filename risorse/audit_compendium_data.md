@@ -4,8 +4,8 @@ Report operativo generato senza riportare testo dei manuali.
 
 - Descrizioni mancanti: 0
 - Possibile inglese residuo: 73
-- Nomi inglesi di incantesimi in descrizioni IT: 58
-- Privilegi incantesimi duplicati da tabella: 19
+- Nomi inglesi di incantesimi in descrizioni IT: 0
+- Privilegi incantesimi duplicati da tabella: 0
 
 ## Descrizioni Mancanti
 - Nessun elemento rilevato.
@@ -86,82 +86,7 @@ Report operativo generato senza riportare testo dei manuali.
 - sottoclasse: Warlock / Il Non Morto - Proiezione Spirituale lv 14
 
 ## Nomi Inglesi Di Incantesimi
-- sottoclasse: Artefice / Alchimista - Incantesimi da Alchimista lv 3 -> Mass Healing Word, Melf's Acid Arrow, Ray of Sickness, Flaming Sphere, Gaseous Form, Healing Word, Death Ward, Raise Dead
-- sottoclasse: Artefice / Armaiolo - Incantesimi da Armaiolo lv 3 -> Greater Invisibility, Hypnotic Pattern, Lightning Bolt, Magic Missile, Wall of Force, Invisibility, Mirror Image, Thunderwave
-- sottoclasse: Artefice / Artigliere - Incantesimi da Artigliere lv 3 -> Scorching Ray, Wall of Force, Wall of Fire, Cone of Cold, Thunderwave, Ice Storm, Wind Wall, Fireball
-- sottoclasse: Artefice / Artigliere - Cannone Occulto lv 3 -> Mending
-- sottoclasse: Artefice / Fabbro da Battaglia - Incantesimi da Fabbro da Battaglia lv 3 -> Mass Cure Wounds, Aura of Vitality, Conjure Barrage, Banishing Smite, Aura of Purity, Branding Smite, Warding Bond, Fire Shield
-- sottoclasse: Artefice / Fabbro da Battaglia - Difensore d'Acciaio lv 3 -> Mending
-- sottoclasse: Barbaro / Cammino del Guardiano Ancestrale - Consultare gli Spiriti lv 10 -> Clairvoyance, Augury
-- sottoclasse: Barbaro / Cammino del Guerriero Totem - Cercatore di Spiriti lv 3 -> Speak with Animals, Beast Sense
-- sottoclasse: Barbaro / Cammino del Guerriero Totem - Camminatore Spirituale lv 10 -> Commune with Nature, Commune
-- sottoclasse: Barbaro / Cammino dello Zelota - Guerriero degli D?i lv 3 -> Raise Dead
-- sottoclasse: Barbaro / Cammino del Gigante - Potere del Gigante lv 3 -> Thaumaturgy, Druidcraft
-- sottoclasse: Bardo / Collegio dell'Incanto - Manto di Maest? lv 6 -> Command
-- sottoclasse: Bardo / Collegio degli Spiriti - Sussurri Guida lv 3 -> Guidance
-- sottoclasse: Chierico / Dominio dell'Arcano - Incanalare Divinita': Abiurazione Arcana lv 2 -> Banishment
-- sottoclasse: Chierico / Dominio della Tomba - Cerchio di Mortalit? lv 1 -> Spare the Dying
-- sottoclasse: Chierico / Dominio della Conoscenza - Incanalare Divinita': Leggere i Pensieri lv 6 -> Suggestion
-- sottoclasse: Chierico / Dominio della Luce - Trucchetto Bonus lv 1 -> Light
-- sottoclasse: Druido / Circolo dei Sogni - Viandante dei Sogni lv 14 -> Teleportation Circle, Scrying, Dream
-- sottoclasse: Druido / Cerchio della Luna - Mille Forme lv 14 -> Alter Self
-- sottoclasse: Druido / Circolo del Pastore - Evocazioni Fedeli lv 14 -> Conjure Animals
-- sottoclasse: Druido / Circolo delle Spore - Incantesimi del Circolo lv 2 -> Chill Touch
-- sottoclasse: Druido / Circolo delle Stelle - Carta Celeste lv 2 -> Guiding Bolt, Guidance
-- sottoclasse: Guerriero / Arciere Arcano - Conoscenze dell'Arciere Arcano lv 3 -> Prestidigitation, Druidcraft
-- sottoclasse: Guerriero / Guerriero Psionico - Maestro della Telecinesi lv 18 -> Telekinesis
-- sottoclasse: Ladro / Mistificatore Arcano - Lancio di Incantesimi lv 3 -> Mage Hand
-- sottoclasse: Ladro / Mistificatore Arcano - Mano Magica Prestigiata lv 3 -> Mage Hand
-- sottoclasse: Mago / Scuola di Abiurazione - Abiurazione Migliorata lv 10 -> Counterspell, Dispel Magic
-- sottoclasse: Mago / Scuola di Illusione - Illusione Minore Migliorata lv 2 -> Minor Illusion
-- sottoclasse: Mago / Scuola di Necromanzia - Schiavi Non Morti lv 6 -> Animate Dead
-- sottoclasse: Mago / Ordine degli Scrivani - Mente Manifesta lv 6 -> Dispel Magic
-- sottoclasse: Mago / Scuola di Trasmutazione - Mutaforma lv 10 -> Polymorph
-- sottoclasse: Mago / Scuola di Trasmutazione - Maestro Trasmutatore lv 14 -> Raise Dead
-- sottoclasse: Mago / Magia della Guerra - Impulso di Potere lv 6 -> Counterspell, Dispel Magic
-- sottoclasse: Monaco / Via dell'Ombra - Arti dell'Ombra lv 3 -> Minor Illusion, Darkvision, Darkness, Silence
-- sottoclasse: Monaco / Via dell'Anima del Sole - Colpo dell'Onda Incandescente lv 6 -> Burning Hands
-- sottoclasse: Ranger / Custode di Draghetti - Dono Draconico lv 3 -> Thaumaturgy
-- sottoclasse: Ranger / Viandante Fatato - Magia del Viandante Fatato lv 3 -> Dimension Door, Dispel Magic, Charm Person, Misty Step, Mislead
-- sottoclasse: Ranger / Viandante Fatato - Rinforzi Fatati lv 11 -> Summon Fey
-- sottoclasse: Ranger / Viandante Fatato - Viandante Velato lv 15 -> Misty Step
-- sottoclasse: Ranger / Cacciatore delle Tenebre - Magia del Cacciatore delle Tenebre lv 3 -> Greater Invisibility, Disguise Self, Invisibility, Rope Trick, Seeming, Fear
-- sottoclasse: Ranger / Viandante dell'Orizzonte - Magia del Viandante dell'Orizzonte lv 3 -> Protection from Evil and Good, Teleportation Circle, Misty Step, Banishment, Haste
-- sottoclasse: Ranger / Viandante dell'Orizzonte - Passo Etereo lv 7 -> Etherealness
-- sottoclasse: Ranger / Uccisore di Mostri - Magia dell'Uccisore di Mostri lv 3 -> Protection from Evil and Good, Zone of Truth, Magic Circle, Hold Monster, Banishment
-- sottoclasse: Ranger / Custode degli Sciami - Magia del Custode degli Sciami lv 3 -> Insect Plague, Gaseous Form, Faerie Fire, Arcane Eye, Mage Hand
-- sottoclasse: Stregone / Anima Divina - Magia Divina lv 1 -> Protection from Evil and Good, Inflict Wounds, Cure Wounds, Bless, Bane
-- sottoclasse: Stregone / Magia delle Ombre - Occhi dell'Oscuro lv 1 -> Darkness
-- sottoclasse: Warlock / L'Arcifata - Lista Incantesimi Estesa lv 1 -> Greater Invisibility, Phantasmal Force, Dominate Person, Dominate Beast, Calm Emotions, Plant Growth, Invisibility, Faerie Fire
-- sottoclasse: Warlock / Il Celestiale - Lista Ampliata degli Incantesimi lv 1 -> Greater Restoration, Lesser Restoration, Guardian of Faith, Flaming Sphere, Wall of Fire, Guiding Bolt, Flame Strike, Cure Wounds
-- sottoclasse: Warlock / Il Celestiale - Trucchetti Bonus lv 1 -> Sacred Flame, Light
-- sottoclasse: Warlock / L'Insondabile - Lista degli Incantesimi Espansa lv 1 -> Create or Destroy Water, Summon Elemental, Lightning Bolt, Control Water, Cone of Cold, Bigby's Hand, Gust of Wind, Thunderwave
-- sottoclasse: Warlock / L'Insondabile - Presa dei Tentacoli lv 10 -> Evard's Black Tentacles
-- sottoclasse: Warlock / Il Grande Antico - Lista Incantesimi Estesa lv 1 -> Tasha's Hideous Laughter, Evard's Black Tentacles, Dissonant Whispers, Phantasmal Force, Dominate Person, Detect Thoughts, Dominate Beast, Clairvoyance
-- sottoclasse: Warlock / Il Grande Antico - Creare Schiavo lv 14 -> Remove Curse
-- sottoclasse: Warlock / La Lama del Sortilegio - Lista Ampliata degli Incantesimi lv 1 -> Phantasmal Killer, Staggering Smite, Elemental Weapon, Banishing Smite, Wrathful Smite, Branding Smite, Cone of Cold, Shield
-- sottoclasse: Warlock / Il Non Morto - Lista Incantesimi Estesa lv 1 -> Greater Invisibility, Blindness/Deafness, Phantasmal Force, Speak with Dead, Antilife Shell, Phantom Steed, Invisibility, Death Ward
-- sottoclasse: Warlock / L'Imperituro - Lista Incantesimi Estesa lv 1 -> Blindness/Deafness, Ray of Sickness, Speak with Dead, Aura of Life, Legend Lore, Feign Death, Death Ward, False Life
-- sottoclasse: Warlock / L'Imperituro - Tra i Morti lv 1 -> Spare the Dying, Fireball
-- sottoclasse: Warlock / L'Imperituro - Sfidare la Morte lv 6 -> Spare the Dying
+- Nessun elemento rilevato.
 
 ## Privilegi Incantesimi Duplicati
-- sottoclasse: Artefice / Alchimista - Incantesimi da Alchimista lv 3
-- sottoclasse: Artefice / Armaiolo - Incantesimi da Armaiolo lv 3
-- sottoclasse: Artefice / Artigliere - Incantesimi da Artigliere lv 3
-- sottoclasse: Artefice / Fabbro da Battaglia - Incantesimi da Fabbro da Battaglia lv 3
-- sottoclasse: Druido / Circolo della Terra - Incantesimi del Circolo lv 9
-- sottoclasse: Druido / Circolo delle Spore - Incantesimi del Circolo lv 2
-- sottoclasse: Druido / Circolo della Fiamma - Incantesimi del Circolo lv 2
-- sottoclasse: Paladino / Giuramento di Devozione - Incantesimi del Giuramento
-- sottoclasse: Stregone / Mente Aberrante - Incantesimi Psionici lv 1
-- sottoclasse: Stregone / Anima Meccanica - Magia Meccanica lv 1
-- sottoclasse: Warlock / L'Immondo - Lista Incantesimi Estesa
-- sottoclasse: Warlock / L'Arcifata - Lista Incantesimi Estesa lv 1
-- sottoclasse: Warlock / Il Celestiale - Lista Ampliata degli Incantesimi lv 1
-- sottoclasse: Warlock / L'Insondabile - Lista degli Incantesimi Espansa lv 1
-- sottoclasse: Warlock / Il Genio - Lista degli Incantesimi Espansa lv 1
-- sottoclasse: Warlock / Il Grande Antico - Lista Incantesimi Estesa lv 1
-- sottoclasse: Warlock / La Lama del Sortilegio - Lista Ampliata degli Incantesimi lv 1
-- sottoclasse: Warlock / Il Non Morto - Lista Incantesimi Estesa lv 1
-- sottoclasse: Warlock / L'Imperituro - Lista Incantesimi Estesa lv 1
+- Nessun elemento rilevato.

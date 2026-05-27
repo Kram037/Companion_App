@@ -26,6 +26,16 @@ OUT_JSON = ROOT / "risorse" / "classi" / "classes.json"
 OUT_JS = ROOT / "js" / "Personaggi" / "data" / "classes_data.js"
 TRANSLATIONS = ROOT / "risorse" / "classi" / "class_translations.json"
 EXTRA_CLASSES = ROOT / "risorse" / "classi" / "extra_classes.json"
+SUBCLASS_SPELLS = ROOT / "risorse" / "classi" / "subclass_spells.json"
+
+GRANTED_SPELL_FEATURE_RE = re.compile(
+    r"\b(domain spells|oath spells|circle spells|expanded spell list|"
+    r"psionic spells|clockwork magic|artificer spells|alchemist spells|"
+    r"armorer spells|artillerist spells|battle smith spells)\b|"
+    r"incantesimi (del|della|dello|dei|degli|delle|da|dell'|psionici|estesa|ampliata)|"
+    r"lista .*incantesimi|magia dell'orologeria",
+    re.IGNORECASE,
+)
 
 # ─────────────────────────────────────────────────────────────────────────
 # Fetch
@@ -289,6 +299,51 @@ def load_extra_classes() -> dict:
     return json.loads(EXTRA_CLASSES.read_text(encoding="utf-8"))
 
 
+def load_subclass_spell_tables() -> dict:
+    if not SUBCLASS_SPELLS.exists():
+        return {}
+    return json.loads(SUBCLASS_SPELLS.read_text(encoding="utf-8"))
+
+
+def has_subclass_spell_table(spell_tables: dict, class_slug: str, subclass_slug: str) -> bool:
+    table = (spell_tables.get(class_slug, {}) or {}).get(subclass_slug)
+    if not isinstance(table, dict):
+        return False
+    for level, spells in table.items():
+        if str(level).startswith("_"):
+            continue
+        if isinstance(spells, list) and any(spells):
+            return True
+    variants = table.get("_variants", {})
+    if isinstance(variants, dict):
+        for by_level in variants.values():
+            if isinstance(by_level, dict) and any(isinstance(spells, list) and any(spells) for spells in by_level.values()):
+                return True
+    return False
+
+
+def is_granted_spell_feature(feature: dict) -> bool:
+    name = f"{feature.get('name_en', '')} {feature.get('name', '')}".lower()
+    if not name.strip():
+        return False
+    if "spellcasting" in name or "lancio di incantesimi" in name:
+        return False
+    return bool(GRANTED_SPELL_FEATURE_RE.search(name))
+
+
+def remove_subclass_spell_feature_duplicates(classes: list[dict], spell_tables: dict) -> None:
+    for cls in classes:
+        class_slug = cls.get("slug", "")
+        for sub in cls.get("subclasses", []) or []:
+            subclass_slug = sub.get("slug", "")
+            if not has_subclass_spell_table(spell_tables, class_slug, subclass_slug):
+                continue
+            sub["features"] = [
+                feature for feature in sub.get("features", [])
+                if not is_granted_spell_feature(feature)
+            ]
+
+
 def merge_extras(parsed: list[dict], extras: dict) -> list[dict]:
     """Aggiunge le classi extra (es. Artefice) e fonde le sottoclassi extra
     nelle classi gia' presenti."""
@@ -319,6 +374,7 @@ def main() -> int:
 
     extras = load_extra_classes()
     parsed = merge_extras(parsed, extras)
+    remove_subclass_spell_feature_duplicates(parsed, load_subclass_spell_tables())
 
     for cls in parsed:
         translated = sum(1 for f in cls["features"] if f.get("translated"))
