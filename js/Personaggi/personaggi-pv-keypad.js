@@ -172,6 +172,7 @@ window.pgRollHitDiceForCreation = function() {
     const rolls = levels.map((level, idx) => idx === 0 ? level.die : dieAvg(level.die));
     let step = 0;
     let buffer = String(rolls[step]);
+    let manualStarted = false;
 
     const overlay = document.createElement('div');
     overlay.id = 'pgHpRollWizard';
@@ -193,7 +194,7 @@ window.pgRollHitDiceForCreation = function() {
                 </div>
                 <div class="pg-hp-roll-preview">
                     <button type="button" class="levelup-pf-avg-btn" data-action="average" ${step === 0 ? 'disabled' : ''}>Tiro medio (${dieAvg(level.die)})</button>
-                    <button type="button" class="levelup-pf-roll-btn" data-action="roll" ${step === 0 ? 'disabled' : ''}>Tira d${level.die}</button>
+                    <button type="button" class="levelup-pf-roll-btn" data-action="${step === 0 ? 'max' : 'roll'}">${step === 0 ? `Massimo (${level.die})` : `Tira d${level.die}`}</button>
                 </div>
                 <div class="hp-calc-input-display" id="pgHpRollDisplay">${escapeHtml(String(roll))}</div>
                 <div class="hp-calc-hint">Dado ${roll} ${conLabel} COS = <strong>${gained}</strong> PF</div>
@@ -221,16 +222,30 @@ window.pgRollHitDiceForCreation = function() {
         } else if (action === 'average' && step > 0) {
             buffer = String(dieAvg(level.die));
             rolls[step] = parseInt(buffer);
+            manualStarted = false;
+            render();
+        } else if (action === 'max') {
+            buffer = String(level.die);
+            rolls[step] = parseInt(buffer);
+            manualStarted = false;
             render();
         } else if (action === 'roll' && step > 0) {
             buffer = String(1 + Math.floor(Math.random() * level.die));
             rolls[step] = parseInt(buffer);
+            manualStarted = false;
             render();
         } else if (action === 'key') {
             const key = btn.dataset.key || '';
-            if (key === 'C') buffer = '0';
-            else if (key === 'BS') buffer = buffer.length > 1 ? buffer.slice(0, -1) : '0';
-            else buffer = buffer === '0' ? key : buffer + key;
+            if (key === 'C') {
+                buffer = '0';
+                manualStarted = true;
+            } else if (key === 'BS') {
+                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '0';
+                manualStarted = true;
+            } else {
+                buffer = !manualStarted || buffer === '0' ? key : buffer + key;
+                manualStarted = true;
+            }
             rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
             buffer = String(rolls[step]);
             render();
@@ -242,12 +257,14 @@ window.pgRollHitDiceForCreation = function() {
             rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
             step -= 1;
             buffer = String(rolls[step]);
+            manualStarted = false;
             render();
         } else if (action === 'next') {
             rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
             if (step < levels.length - 1) {
                 step += 1;
                 buffer = String(rolls[step]);
+                manualStarted = false;
                 render();
                 return;
             }

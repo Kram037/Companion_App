@@ -171,7 +171,6 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
 
     const die = CLASS_HIT_DIE[cls.nome] || 8;
     const conMod = Math.floor((((pg.costituzione) || 10) - 10) / 2);
-    const avgGain = Math.max(1, dieAvg(die) + conMod);
     const conSign = conMod >= 0 ? '+' : '';
     const conLabel = `${conSign}${conMod}`;
     const newLvl = (parseInt(cls.livello) || 0) + 1;
@@ -183,11 +182,11 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 class="levelup-title">Punti Ferita</h3>
         <p class="levelup-sub">${escapeHtml(cls.nome)}: Liv ${cls.livello || 1} → ${newLvl}<br><small>Dado: 1d${die} · COS ${conLabel}</small></p>
-        <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (${dieAvg(die)})</button>
-        <div class="levelup-pf-roll-row">
-            <div class="levelup-pf-input levelup-pf-input-display" id="lupfInputDisplay">—</div>
-            <button type="button" class="levelup-pf-roll-btn" id="lupfRollBtn">Tira il dado</button>
+        <div class="pg-hp-roll-preview levelup-pf-choice-row">
+            <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (${dieAvg(die)})</button>
+            <button type="button" class="levelup-pf-roll-btn" id="lupfRollBtn">Tira d${die}</button>
         </div>
+        <div class="hp-calc-input-display levelup-pf-input-display" id="lupfInputDisplay">—</div>
         <div class="levelup-pf-detail" id="lupfDetail"></div>
         <div class="hp-calc-numpad levelup-pf-numpad">
             ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-lupf-key="${n}">${n}</button>`).join('')}
@@ -209,11 +208,13 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     let hpRollDetail = null;
     let rollValue = null;
     let method = 'manual';
+    let manualStarted = false;
 
-    const setRollValue = (value, nextMethod = 'manual') => {
+    const setRollValue = (value, nextMethod = 'manual', fromManual = false) => {
         const roll = Math.max(1, Math.min(die, parseInt(value) || 0));
         rollValue = roll;
         method = nextMethod;
+        manualStarted = fromManual;
         const gained = Math.max(1, roll + conMod);
         inputDisplay.textContent = roll;
         detail.textContent = `Dado ${roll} ${conLabel} COS = ${gained} PF`;
@@ -227,20 +228,27 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     };
 
     avgBtn.onclick = () => {
-        setRollValue(dieAvg(die), 'average');
+        setRollValue(dieAvg(die), 'average', false);
     };
     rollBtn.onclick = () => {
         const roll = 1 + Math.floor(Math.random() * die);
-        setRollValue(roll, 'roll');
+        setRollValue(roll, 'roll', false);
     };
     overlay.querySelectorAll('[data-lupf-key]').forEach(btn => {
         btn.onclick = () => {
             const key = btn.dataset.lupfKey || '';
-            let buffer = rollValue == null ? '0' : String(rollValue);
-            if (key === 'C') buffer = '0';
-            else if (key === 'BS') buffer = buffer.length > 1 ? buffer.slice(0, -1) : '0';
-            else buffer = buffer === '0' ? key : buffer + key;
-            setRollValue(buffer, 'manual');
+            let buffer = rollValue == null || !manualStarted ? '0' : String(rollValue);
+            if (key === 'C') {
+                buffer = '0';
+                manualStarted = true;
+            } else if (key === 'BS') {
+                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '0';
+                manualStarted = true;
+            } else {
+                buffer = !manualStarted || buffer === '0' ? key : buffer + key;
+                manualStarted = true;
+            }
+            setRollValue(buffer, 'manual', true);
         };
     });
     confirmBtn.onclick = async () => {
