@@ -19,15 +19,19 @@ function _pfHistoryFromBonusManuali(bm) {
 function _pfHistoryAppendLevelUp(pg, bm, detail, totalAfter, className, classLevel, characterLevel) {
     const history = _pfHistoryFromBonusManuali(bm);
     if (!history.start_level) history.start_level = characterLevel;
+    const die = detail?.die || (CLASS_HIT_DIE[className] || 8);
+    const conMod = detail?.con_mod ?? Math.floor((((pg?.costituzione) || 10) - 10) / 2);
+    const gained = Math.max(1, parseInt(detail?.gained) || 0);
+    const fallbackRoll = Math.max(1, Math.min(die, gained - conMod));
     history.entries.push({
         character_level: characterLevel,
         class_name: className,
         class_level: classLevel,
-        die: detail?.die || (CLASS_HIT_DIE[className] || 8),
-        roll: detail?.roll ?? null,
+        die,
+        roll: detail?.roll ?? fallbackRoll,
         method: detail?.method || 'manual',
-        con_mod: detail?.con_mod ?? Math.floor((((pg?.costituzione) || 10) - 10) / 2),
-        gained: detail?.gained || 0,
+        con_mod: conMod,
+        gained,
         total_after: totalAfter,
         source: 'levelup',
         created_at: new Date().toISOString(),
@@ -179,55 +183,71 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
         <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
         <h3 class="levelup-title">Punti Ferita</h3>
         <p class="levelup-sub">${escapeHtml(cls.nome)}: Liv ${cls.livello || 1} → ${newLvl}<br><small>Dado: 1d${die} · COS ${conLabel}</small></p>
-        <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (+${avgGain})</button>
+        <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (${dieAvg(die)})</button>
         <div class="levelup-pf-roll-row">
-            <input type="number" class="levelup-pf-input" id="lupfInput" placeholder="—" min="1" inputmode="numeric">
+            <div class="levelup-pf-input levelup-pf-input-display" id="lupfInputDisplay">—</div>
             <button type="button" class="levelup-pf-roll-btn" id="lupfRollBtn">Tira il dado</button>
         </div>
         <div class="levelup-pf-detail" id="lupfDetail"></div>
+        <div class="hp-calc-numpad levelup-pf-numpad">
+            ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-lupf-key="${n}">${n}</button>`).join('')}
+            <button class="hp-calc-numpad-btn" type="button" data-lupf-key="C">C</button>
+            <button class="hp-calc-numpad-btn" type="button" data-lupf-key="0">0</button>
+            <button class="hp-calc-numpad-btn" type="button" data-lupf-key="BS">⌫</button>
+        </div>
         <div class="levelup-pf-actions">
             <button type="button" class="levelup-pf-cancel" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
             <button type="button" class="levelup-pf-confirm" id="lupfConfirmBtn" disabled>Conferma</button>
         </div>
     </div>`;
 
-    const input = overlay.querySelector('#lupfInput');
+    const inputDisplay = overlay.querySelector('#lupfInputDisplay');
     const detail = overlay.querySelector('#lupfDetail');
     const avgBtn = overlay.querySelector('#lupfAvgBtn');
     const rollBtn = overlay.querySelector('#lupfRollBtn');
     const confirmBtn = overlay.querySelector('#lupfConfirmBtn');
     let hpRollDetail = null;
+    let rollValue = null;
+    let method = 'manual';
+
+    const setRollValue = (value, nextMethod = 'manual') => {
+        const roll = Math.max(1, Math.min(die, parseInt(value) || 0));
+        rollValue = roll;
+        method = nextMethod;
+        const gained = Math.max(1, roll + conMod);
+        inputDisplay.textContent = roll;
+        detail.textContent = `Dado ${roll} ${conLabel} COS = ${gained} PF`;
+        hpRollDetail = { method, die, roll, con_mod: conMod, gained };
+        refreshConfirm();
+    };
 
     const refreshConfirm = () => {
-        const v = parseInt(input.value);
+        const v = parseInt(rollValue);
         confirmBtn.disabled = !(Number.isFinite(v) && v >= 1);
     };
 
     avgBtn.onclick = () => {
-        input.value = avgGain;
-        hpRollDetail = { method: 'average', die, roll: dieAvg(die), con_mod: conMod, gained: avgGain };
-        detail.textContent = `Tiro medio: ${dieAvg(die)} ${conLabel} COS = ${avgGain} PF`;
-        refreshConfirm();
+        setRollValue(dieAvg(die), 'average');
     };
     rollBtn.onclick = () => {
         const roll = 1 + Math.floor(Math.random() * die);
-        const total = Math.max(1, roll + conMod);
-        input.value = total;
-        hpRollDetail = { method: 'roll', die, roll, con_mod: conMod, gained: total };
-        detail.textContent = `1d${die} = ${roll} ${conLabel} COS = ${total} PF`;
-        refreshConfirm();
+        setRollValue(roll, 'roll');
     };
-    input.addEventListener('input', () => {
-        // Se l'utente edita a mano, rimuovi il dettaglio (non corrisponde piu' al calcolo automatico).
-        if (detail.textContent && !detail.dataset.locked) detail.textContent = '';
-        hpRollDetail = null;
-        refreshConfirm();
+    overlay.querySelectorAll('[data-lupf-key]').forEach(btn => {
+        btn.onclick = () => {
+            const key = btn.dataset.lupfKey || '';
+            let buffer = rollValue == null ? '0' : String(rollValue);
+            if (key === 'C') buffer = '0';
+            else if (key === 'BS') buffer = buffer.length > 1 ? buffer.slice(0, -1) : '0';
+            else buffer = buffer === '0' ? key : buffer + key;
+            setRollValue(buffer, 'manual');
+        };
     });
     confirmBtn.onclick = async () => {
-        const pvGain = parseInt(input.value);
+        const pvGain = parseInt(hpRollDetail?.gained);
         if (!Number.isFinite(pvGain) || pvGain < 1) return;
         const extra = detail.textContent ? ` (${detail.textContent})` : '';
-        const historyDetail = hpRollDetail || { method: 'manual', die, roll: null, con_mod: conMod, gained: pvGain };
+        const historyDetail = hpRollDetail || { method: 'manual', die, roll: rollValue, con_mod: conMod, gained: pvGain };
         overlay.remove();
         await _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extra, { ...opts, hpRollDetail: historyDetail });
     };

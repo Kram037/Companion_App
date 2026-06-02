@@ -39,8 +39,8 @@ function schedaUpdateHpDisplays(pg) {
 }
 
 function schedaRefreshHpMaxPreview() {
-    const current = parseInt(document.getElementById('hpCalcCurrent')?.textContent) || 0;
-    const bonus = Math.max(0, parseInt(document.getElementById('hpMaxTempInput')?.value) || 0);
+    const current = parseInt(_hpCalcState?.maxBase ?? document.getElementById('hpCalcCurrent')?.textContent) || 0;
+    const bonus = Math.max(0, parseInt(_hpCalcState?.maxTemp ?? document.getElementById('hpCalcTempBonus')?.textContent) || 0);
     const el = document.getElementById('hpCalcEffectiveMax');
     if (el) el.textContent = current + bonus;
 }
@@ -63,28 +63,83 @@ function schedaFormatPfHistoryRoll(entry) {
     return '-';
 }
 
+function schedaBuildPfVirtualRows(pg) {
+    const classi = Array.isArray(pg?.classi) ? pg.classi.filter(Boolean) : [];
+    const rows = [];
+    let characterLevel = 0;
+    classi.forEach(cls => {
+        const die = CLASS_HIT_DIE?.[cls.nome] || 8;
+        const lvl = parseInt(cls.livello) || 0;
+        for (let classLevel = 1; classLevel <= lvl; classLevel++) {
+            characterLevel += 1;
+            rows.push({
+                character_level: characterLevel,
+                class_name: cls.nome,
+                class_level: classLevel,
+                die,
+                roll: characterLevel === 1 ? die : dieAvg(die),
+                method: characterLevel === 1 ? 'max' : 'average',
+                source: 'virtual',
+            });
+        }
+    });
+    return rows;
+}
+
+function schedaEntryRollValue(entry, fallback) {
+    const die = parseInt(entry?.die || fallback?.die) || 8;
+    const directRoll = parseInt(entry?.roll);
+    if (Number.isFinite(directRoll) && directRoll > 0) return Math.max(1, Math.min(die, directRoll));
+    const gained = parseInt(entry?.gained);
+    const oldCon = parseInt(entry?.con_mod) || 0;
+    if (Number.isFinite(gained) && gained > 0) return Math.max(1, Math.min(die, gained - oldCon));
+    const fallbackRoll = parseInt(fallback?.roll);
+    if (Number.isFinite(fallbackRoll) && fallbackRoll > 0) return Math.max(1, Math.min(die, fallbackRoll));
+    return dieAvg(die);
+}
+
+function schedaBuildPfHistoryRows(pg) {
+    const history = schedaGetPfHistory(pg);
+    const virtualRows = schedaBuildPfVirtualRows(pg);
+    const historyRows = [history.first_level, ...(history.entries || [])]
+        .filter(Boolean)
+        .filter(row => parseInt(row.character_level) > 0);
+    const byLevel = new Map(historyRows.map(row => [parseInt(row.character_level), row]));
+    const baseRows = virtualRows.length
+        ? virtualRows
+        : historyRows.sort((a, b) => (parseInt(a.character_level) || 0) - (parseInt(b.character_level) || 0));
+    const conMod = calcMod(parseInt(pg?.costituzione) || 10);
+    let cumulativeRoll = 0;
+    return baseRows.map(base => {
+        const characterLevel = parseInt(base.character_level) || 1;
+        const entry = byLevel.get(characterLevel) || base;
+        const die = parseInt(entry.die || base.die) || 8;
+        const roll = schedaEntryRollValue(entry, base);
+        cumulativeRoll += roll;
+        return {
+            character_level: characterLevel,
+            die,
+            roll,
+            total_with_con: Math.max(1, cumulativeRoll + (conMod * characterLevel)),
+        };
+    });
+}
+
 window.schedaOpenPfHistory = function() {
     const pg = _schedaPgCache;
     if (!pg) return;
     document.querySelector('.pf-history-overlay')?.remove();
-    const history = schedaGetPfHistory(pg);
-    const entries = history.entries;
-    const medio = (typeof _calcPVMedio === 'function') ? _calcPVMedio(pg) : 0;
-    const baseMax = Math.max(1, parseInt(pg.punti_vita_max) || 10);
-    const first = history.first_level || null;
-    const firstLine = first
-        ? `Il 1° livello usa sempre il massimo del dado vita: d${first.die} ${first.con_mod >= 0 ? '+' : ''}${first.con_mod} COS = ${first.gained} PF.`
-        : `Il 1° livello usa sempre il massimo del dado vita.`;
-    const startLine = history.start_level
-        ? `Tiri registrati a partire dal livello ${history.start_level}.`
-        : `Nessun livello di inizio registrato per questo personaggio.`;
-    const rows = entries.length ? entries.map(entry => `
-        <div class="pf-history-row">
-            <strong>Lv ${entry.character_level || '-'}</strong>
-            <span>${escapeHtml(entry.class_name || 'Classe')} ${entry.class_level ? `(${entry.class_level})` : ''}<br><small>${escapeHtml(schedaFormatPfHistoryRoll(entry))} ${entry.con_mod >= 0 ? '+' : ''}${entry.con_mod || 0} COS = ${entry.gained || 0} PF</small></span>
-            <small>${entry.total_after || '-'} PF</small>
-        </div>
-    `).join('') : '<p class="scheda-empty">Nessun tiro registrato. Lo storico iniziera dal prossimo tiro o dal prossimo level-up registrato.</p>';
+    const conMod = calcMod(parseInt(pg.costituzione) || 10);
+    const conLabel = conMod >= 0 ? `+${conMod}` : String(conMod);
+    const rows = schedaBuildPfHistoryRows(pg);
+    const rowsHtml = rows.length ? rows.map(row => `
+        <tr>
+            <td>${row.character_level}</td>
+            <td>d${row.die}</td>
+            <td>${row.roll}</td>
+            <td>${row.total_with_con}</td>
+        </tr>
+    `).join('') : '<tr><td colspan="4">Nessuno storico disponibile.</td></tr>';
 
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay pf-history-overlay';
@@ -93,13 +148,20 @@ window.schedaOpenPfHistory = function() {
         <div class="hp-calc-modal pf-history-modal">
             <button class="hp-calc-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
             <div class="hp-calc-title">Storico PF</div>
-            <p class="pf-history-summary">
-                ${escapeHtml(firstLine)}
-                <br>${escapeHtml(startLine)}
-                ${medio > 0 ? `<br>Con la media dei dadi vita questo personaggio avrebbe circa <strong>${medio} PF</strong>.` : ''}
-                <br>PF max attuali: <strong>${baseMax}</strong>.
-            </p>
-            <div class="pf-history-list">${rows}</div>
+            <p class="pf-history-summary">Costituzione attuale: <strong>${escapeHtml(conLabel)}</strong></p>
+            <div class="comp-table-wrap pf-history-table-wrap">
+                <table class="comp-equipment-table pf-history-table">
+                    <thead>
+                        <tr>
+                            <th>Liv. totale</th>
+                            <th>Dado vita</th>
+                            <th>Tiro dado</th>
+                            <th>Totale con COS</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
         </div>
     `;
     document.body.appendChild(overlay);
@@ -155,15 +217,18 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
             const pgRef = _schedaPgCache;
             const tempBonus = (typeof schedaGetPvMaxTemporaneo === 'function') ? schedaGetPvMaxTemporaneo(pgRef) : 0;
             const effectiveMax = (parseInt(currentVal) || 0) + tempBonus;
+            _hpCalcState.maxTarget = 'base';
+            _hpCalcState.maxBase = parseInt(currentVal) || 1;
+            _hpCalcState.maxTemp = tempBonus;
             currentDisplayHtml = `<div class="hp-calc-max-row">
-                <div class="hp-calc-max-box">
+                <button type="button" class="hp-calc-max-box hp-calc-max-choice selected" id="hpCalcMaxBaseBox" onclick="schedaHpSelectMaxTarget('base')">
                     <strong id="hpCalcCurrent">${currentVal}</strong>
                     <span>PF max</span>
-                </div>
-                <label class="hp-calc-max-box">
-                    <input type="number" class="hp-calc-max-temp-input" id="hpMaxTempInput" min="0" inputmode="numeric" value="${tempBonus}">
+                </button>
+                <button type="button" class="hp-calc-max-box hp-calc-max-choice" id="hpCalcMaxTempBox" onclick="schedaHpSelectMaxTarget('temp')">
+                    <strong id="hpCalcTempBonus">${tempBonus}</strong>
                     <span>Bonus temp</span>
-                </label>
+                </button>
             </div>
             <div class="hp-calc-hint">Massimo effettivo: <strong id="hpCalcEffectiveMax">${effectiveMax}</strong> PF</div>`;
             extraButtons = `<div class="hp-calc-buttons hp-calc-buttons-extra">
@@ -212,8 +277,16 @@ window.schedaOpenHpCalc = function(pgId, field, currentVal, maxVal) {
         </div>
     `;
     document.body.appendChild(overlay);
-    const tempInput = document.getElementById('hpMaxTempInput');
-    if (tempInput) tempInput.addEventListener('input', schedaRefreshHpMaxPreview);
+}
+
+window.schedaHpSelectMaxTarget = function(target) {
+    if (!_hpCalcState || _hpCalcState.field !== 'punti_vita_max') return;
+    _hpCalcState.maxTarget = target === 'temp' ? 'temp' : 'base';
+    _hpCalcState.inputBuffer = '0';
+    _hpCalcState.hasInput = false;
+    document.getElementById('hpCalcMaxBaseBox')?.classList.toggle('selected', _hpCalcState.maxTarget === 'base');
+    document.getElementById('hpCalcMaxTempBox')?.classList.toggle('selected', _hpCalcState.maxTarget === 'temp');
+    hpCalcRenderAmountDisplay();
 }
 
 window.hpCalcNumpad = function(key) {
@@ -231,6 +304,7 @@ window.hpCalcNumpad = function(key) {
 
 window.hpCalcNumpad = function(key) {
     if (!_hpCalcState) return;
+    _hpCalcState.hasInput = true;
     if (key === 'C') {
         _hpCalcState.inputBuffer = '0';
     } else if (key === 'âŒ«' || key === '⌫') {
@@ -333,12 +407,24 @@ window.schedaHpSetDirect = async function() {
 
     if (field === 'punti_vita_max') {
         if (!pg) return;
-        const baseMax = Math.max(1, newVal);
-        const bonus = Math.max(0, parseInt(document.getElementById('hpMaxTempInput')?.value) || 0);
+        const target = _hpCalcState.maxTarget === 'temp' ? 'temp' : 'base';
+        const typed = parseInt(_hpCalcState.inputBuffer) || 0;
+        const currentBase = Math.max(1, parseInt(_hpCalcState.maxBase ?? pg.punti_vita_max) || 1);
+        const currentTemp = Math.max(0, parseInt(_hpCalcState.maxTemp ?? schedaGetPvMaxTemporaneo(pg)) || 0);
+        const baseMax = target === 'base'
+            ? Math.max(1, _hpCalcState.hasInput ? typed : currentBase)
+            : currentBase;
+        const bonus = target === 'temp'
+            ? Math.max(0, _hpCalcState.hasInput ? typed : currentTemp)
+            : currentTemp;
         const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
-        bm._pv_max_reale = baseMax;
-        if (bonus > 0) bm._pv_max_temporaneo = bonus;
-        else delete bm._pv_max_temporaneo;
+        if (target === 'base') bm._pv_max_reale = baseMax;
+        if (target === 'temp') {
+            if (bonus > 0) bm._pv_max_temporaneo = bonus;
+            else delete bm._pv_max_temporaneo;
+        } else if (currentTemp > 0) {
+            bm._pv_max_temporaneo = currentTemp;
+        }
 
         pg.bonus_manuali = bm;
         pg.punti_vita_max = baseMax;
@@ -348,9 +434,14 @@ window.schedaHpSetDirect = async function() {
         pg.pv_attuali = clampedPv;
 
         _hpCalcState.currentVal = baseMax;
+        _hpCalcState.maxBase = baseMax;
+        _hpCalcState.maxTemp = bonus;
         _hpCalcState.inputBuffer = '0';
+        _hpCalcState.hasInput = false;
         const display = document.getElementById('hpCalcCurrent');
         if (display) display.textContent = baseMax;
+        const tempDisplay = document.getElementById('hpCalcTempBonus');
+        if (tempDisplay) tempDisplay.textContent = bonus;
         const amountDisplay = document.getElementById('hpCalcAmountDisplay');
         if (amountDisplay) amountDisplay.textContent = '0';
         const effectiveDisplay = document.getElementById('hpCalcEffectiveMax');

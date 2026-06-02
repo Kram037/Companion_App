@@ -99,6 +99,67 @@ function _pgBuildHpCreationPlan() {
     return levels;
 }
 
+function _pgConLabel(conMod) {
+    return conMod >= 0 ? `+${conMod}` : String(conMod);
+}
+
+function _pgHpGainFromRoll(roll, conMod) {
+    return Math.max(1, (parseInt(roll) || 0) + (parseInt(conMod) || 0));
+}
+
+function _pgBuildHpHistoryFromRolls(levels, rolls) {
+    let total = 0;
+    const rows = levels.map((level, idx) => {
+        const fallback = idx === 0 ? level.die : dieAvg(level.die);
+        const roll = Math.max(1, Math.min(level.die, parseInt(rolls[idx]) || fallback));
+        const gained = _pgHpGainFromRoll(roll, level.con_mod);
+        total += gained;
+        return {
+            ...level,
+            roll,
+            method: idx === 0 ? 'max' : (roll === dieAvg(level.die) ? 'average' : 'manual'),
+            gained,
+            total_after: total,
+            source: 'creation',
+            created_at: new Date().toISOString(),
+        };
+    });
+    return {
+        start_level: rows[0]?.character_level || null,
+        first_level: rows[0] || null,
+        entries: rows.slice(1),
+    };
+}
+
+function _pgApplyHpHistoryDraft(history) {
+    if (!history) return;
+    const rows = [history.first_level, ...(history.entries || [])].filter(Boolean);
+    const total = rows.length ? rows[rows.length - 1].total_after : 0;
+    const pvField = document.getElementById('pgPV');
+    if (pvField) {
+        pvField.value = Math.max(1, total);
+        pvField.dataset.autoHp = 'false';
+    }
+    const hintPV = document.getElementById('hintPV');
+    if (hintPV) hintPV.textContent = `(storico PF: totale ${Math.max(1, total)})`;
+}
+
+function _pgRecalculateHpHistoryDraftForCurrentCon() {
+    if (!window.pgHitPointHistoryDraft) return;
+    const levels = _pgBuildHpCreationPlan();
+    const savedRows = [
+        window.pgHitPointHistoryDraft.first_level,
+        ...(window.pgHitPointHistoryDraft.entries || []),
+    ].filter(Boolean);
+    if (levels.length !== savedRows.length) {
+        window.pgHitPointHistoryDraft = null;
+        return;
+    }
+    const rolls = savedRows.map((row, idx) => row.roll ?? (idx === 0 ? levels[idx].die : dieAvg(levels[idx].die)));
+    window.pgHitPointHistoryDraft = _pgBuildHpHistoryFromRolls(levels, rolls);
+    _pgApplyHpHistoryDraft(window.pgHitPointHistoryDraft);
+}
+
 window.pgRollHitDiceForCreation = function() {
     if (!pgSelectedClasses || pgSelectedClasses.length === 0) {
         showNotification('Seleziona una classe prima di tirare i dadi vita');
@@ -107,49 +168,97 @@ window.pgRollHitDiceForCreation = function() {
     const levels = _pgBuildHpCreationPlan();
     if (!levels.length) return;
 
-    const first = levels[0];
-    const firstGain = Math.max(1, first.die + first.con_mod);
-    let total = firstGain;
-    const entries = [];
-    levels.slice(1).forEach(level => {
-        const roll = 1 + Math.floor(Math.random() * level.die);
-        const gained = Math.max(1, roll + level.con_mod);
-        total += gained;
-        entries.push({
-            ...level,
-            roll,
-            method: 'roll',
-            gained,
-            total_after: total,
-            source: 'creation',
-            created_at: new Date().toISOString(),
-        });
-    });
+    document.getElementById('pgHpRollWizard')?.remove();
+    const rolls = levels.map((level, idx) => idx === 0 ? level.die : dieAvg(level.die));
+    let step = 0;
+    let buffer = String(rolls[step]);
 
-    window.pgHitPointHistoryDraft = {
-        start_level: entries[0]?.character_level || null,
-        first_level: {
-            ...first,
-            method: 'max',
-            roll: first.die,
-            gained: firstGain,
-            total_after: firstGain,
-            source: 'creation',
-            created_at: new Date().toISOString(),
-        },
-        entries,
+    const overlay = document.createElement('div');
+    overlay.id = 'pgHpRollWizard';
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = event => { if (event.target === overlay) overlay.remove(); };
+
+    const render = () => {
+        const level = levels[step];
+        const roll = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+        const gained = _pgHpGainFromRoll(roll, level.con_mod);
+        const conLabel = _pgConLabel(level.con_mod);
+        setSafeHtml(overlay, `
+            <div class="hp-calc-modal pg-hp-roll-modal">
+                <button class="hp-calc-close" type="button" data-action="close">&times;</button>
+                <div class="hp-calc-title">Dado vita ${step + 1}/${levels.length}</div>
+                <div class="pg-hp-roll-context">
+                    <strong>${escapeHtml(level.class_name)} ${level.class_level}</strong>
+                    <span>Livello totale ${level.character_level} · d${level.die} · COS ${conLabel}</span>
+                </div>
+                <div class="pg-hp-roll-preview">
+                    <button type="button" class="levelup-pf-avg-btn" data-action="average" ${step === 0 ? 'disabled' : ''}>Tiro medio (${dieAvg(level.die)})</button>
+                    <button type="button" class="levelup-pf-roll-btn" data-action="roll" ${step === 0 ? 'disabled' : ''}>Tira d${level.die}</button>
+                </div>
+                <div class="hp-calc-input-display" id="pgHpRollDisplay">${escapeHtml(String(roll))}</div>
+                <div class="hp-calc-hint">Dado ${roll} ${conLabel} COS = <strong>${gained}</strong> PF</div>
+                <div class="hp-calc-numpad">
+                    ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="${n}">${n}</button>`).join('')}
+                    <button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="C">C</button>
+                    <button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="0">0</button>
+                    <button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="BS">⌫</button>
+                </div>
+                <div class="levelup-pf-actions">
+                    <button type="button" class="levelup-pf-cancel" data-action="back">${step === 0 ? 'Annulla' : 'Indietro'}</button>
+                    <button type="button" class="levelup-pf-confirm" data-action="next">${step === levels.length - 1 ? 'Conferma' : 'Avanti'}</button>
+                </div>
+            </div>
+        `);
     };
 
-    const pvField = document.getElementById('pgPV');
-    if (pvField) {
-        pvField.value = total;
-        pvField.dataset.autoHp = 'false';
-    }
-    const hintPV = document.getElementById('hintPV');
-    if (hintPV) {
-        const rolls = entries.map(e => `Lv ${e.character_level}: d${e.die}=${e.roll}`).join(', ');
-        hintPV.textContent = entries.length ? `(tirati: ${rolls}; totale ${total})` : `(1° livello al massimo: ${total})`;
-    }
+    overlay.addEventListener('click', event => {
+        const btn = event.target.closest('[data-action]');
+        if (!btn || !overlay.contains(btn)) return;
+        const action = btn.dataset.action;
+        const level = levels[step];
+        if (action === 'close') {
+            overlay.remove();
+        } else if (action === 'average' && step > 0) {
+            buffer = String(dieAvg(level.die));
+            rolls[step] = parseInt(buffer);
+            render();
+        } else if (action === 'roll' && step > 0) {
+            buffer = String(1 + Math.floor(Math.random() * level.die));
+            rolls[step] = parseInt(buffer);
+            render();
+        } else if (action === 'key') {
+            const key = btn.dataset.key || '';
+            if (key === 'C') buffer = '0';
+            else if (key === 'BS') buffer = buffer.length > 1 ? buffer.slice(0, -1) : '0';
+            else buffer = buffer === '0' ? key : buffer + key;
+            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+            buffer = String(rolls[step]);
+            render();
+        } else if (action === 'back') {
+            if (step === 0) {
+                overlay.remove();
+                return;
+            }
+            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+            step -= 1;
+            buffer = String(rolls[step]);
+            render();
+        } else if (action === 'next') {
+            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+            if (step < levels.length - 1) {
+                step += 1;
+                buffer = String(rolls[step]);
+                render();
+                return;
+            }
+            window.pgHitPointHistoryDraft = _pgBuildHpHistoryFromRolls(levels, rolls);
+            _pgApplyHpHistoryDraft(window.pgHitPointHistoryDraft);
+            overlay.remove();
+        }
+    });
+
+    document.body.appendChild(overlay);
+    render();
 };
 
 function pgRenderDadiVita() {
@@ -261,12 +370,7 @@ window.pgKeypadConfirm = function() {
         }
         if (input.classList.contains('pg-ability-input')) {
             updateAllAbilityMods();
-            if (input.id === 'pgCostituzione' && window.pgHitPointHistoryDraft) {
-                window.pgHitPointHistoryDraft = null;
-                const pvField = document.getElementById('pgPV');
-                if (pvField) pvField.dataset.autoHp = 'true';
-                pgRenderDadiVita();
-            }
+            if (input.id === 'pgCostituzione' && window.pgHitPointHistoryDraft) _pgRecalculateHpHistoryDraftForCurrentCon();
         }
     }
     pgCloseKeypad();
