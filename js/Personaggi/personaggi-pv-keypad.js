@@ -174,6 +174,23 @@ window.pgRollHitDiceForCreation = function() {
     let buffer = String(rolls[step]);
     let manualStarted = false;
 
+    const parseRollBuffer = (value, die) => {
+        const text = String(value ?? '').trim();
+        if (!text) return null;
+        const parsed = parseInt(text, 10);
+        if (!Number.isFinite(parsed) || parsed < 1) return null;
+        return Math.min(die, parsed);
+    };
+
+    const normalizeRollBuffer = (value, die) => {
+        const text = String(value ?? '').trim();
+        if (!text) return '';
+        const parsed = parseInt(text, 10);
+        if (!Number.isFinite(parsed)) return '';
+        if (parsed < 1) return String(parsed);
+        return String(Math.min(die, parsed));
+    };
+
     const overlay = document.createElement('div');
     overlay.id = 'pgHpRollWizard';
     overlay.className = 'hp-calc-overlay';
@@ -181,8 +198,9 @@ window.pgRollHitDiceForCreation = function() {
 
     const render = () => {
         const level = levels[step];
-        const roll = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
-        const gained = _pgHpGainFromRoll(roll, level.con_mod);
+        const roll = parseRollBuffer(buffer, level.die);
+        const hasRoll = roll !== null;
+        const gained = hasRoll ? _pgHpGainFromRoll(roll, level.con_mod) : null;
         const conLabel = _pgConLabel(level.con_mod);
         setSafeHtml(overlay, `
             <div class="hp-calc-modal pg-hp-roll-modal">
@@ -196,8 +214,11 @@ window.pgRollHitDiceForCreation = function() {
                     <button type="button" class="levelup-pf-avg-btn" data-action="average" ${step === 0 ? 'disabled' : ''}>Tiro medio (${dieAvg(level.die)})</button>
                     <button type="button" class="levelup-pf-roll-btn" data-action="${step === 0 ? 'max' : 'roll'}">${step === 0 ? `Massimo (${level.die})` : `Tira d${level.die}`}</button>
                 </div>
-                <div class="hp-calc-input-display" id="pgHpRollDisplay">${escapeHtml(String(roll))}</div>
-                <div class="hp-calc-hint">Dado ${roll} ${conLabel} COS = <strong>${gained}</strong> PF</div>
+                <div class="hp-calc-input-display hp-roll-input-display" id="pgHpRollDisplay">
+                    <span class="hp-roll-value">${hasRoll ? escapeHtml(String(roll)) : ''}</span>
+                    <span class="hp-roll-con-badge">COS ${conLabel}</span>
+                </div>
+                <div class="hp-calc-hint">${hasRoll ? `Dado ${roll} ${conLabel} COS = <strong>${gained}</strong> PF` : 'Inserisci il risultato del dado, senza COS.'}</div>
                 <div class="hp-calc-numpad">
                     ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="${n}">${n}</button>`).join('')}
                     <button class="hp-calc-numpad-btn" type="button" data-action="key" data-key="C">C</button>
@@ -206,7 +227,7 @@ window.pgRollHitDiceForCreation = function() {
                 </div>
                 <div class="levelup-pf-actions">
                     <button type="button" class="levelup-pf-cancel" data-action="back">${step === 0 ? 'Annulla' : 'Indietro'}</button>
-                    <button type="button" class="levelup-pf-confirm" data-action="next">${step === levels.length - 1 ? 'Conferma' : 'Avanti'}</button>
+                    <button type="button" class="levelup-pf-confirm" data-action="next" ${hasRoll ? '' : 'disabled'}>${step === levels.length - 1 ? 'Conferma' : 'Avanti'}</button>
                 </div>
             </div>
         `);
@@ -237,33 +258,36 @@ window.pgRollHitDiceForCreation = function() {
         } else if (action === 'key') {
             const key = btn.dataset.key || '';
             if (key === 'C') {
-                buffer = '0';
+                buffer = '';
                 manualStarted = true;
             } else if (key === 'BS') {
-                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '0';
+                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '';
                 manualStarted = true;
             } else {
                 buffer = !manualStarted || buffer === '0' ? key : buffer + key;
                 manualStarted = true;
             }
-            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
-            buffer = String(rolls[step]);
+            buffer = normalizeRollBuffer(buffer, level.die);
+            rolls[step] = parseRollBuffer(buffer, level.die);
             render();
         } else if (action === 'back') {
             if (step === 0) {
                 overlay.remove();
                 return;
             }
-            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+            const currentRoll = parseRollBuffer(buffer, level.die);
+            if (currentRoll !== null) rolls[step] = currentRoll;
             step -= 1;
-            buffer = String(rolls[step]);
+            buffer = rolls[step] == null ? '' : String(rolls[step]);
             manualStarted = false;
             render();
         } else if (action === 'next') {
-            rolls[step] = Math.max(1, Math.min(level.die, parseInt(buffer) || 0));
+            const currentRoll = parseRollBuffer(buffer, level.die);
+            if (currentRoll === null) return;
+            rolls[step] = currentRoll;
             if (step < levels.length - 1) {
                 step += 1;
-                buffer = String(rolls[step]);
+                buffer = rolls[step] == null ? '' : String(rolls[step]);
                 manualStarted = false;
                 render();
                 return;

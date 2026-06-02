@@ -916,6 +916,31 @@
 .hp-calc-current { font-size: 2.5rem; font-weight: 900; color: var(--accent); }
 .hp-calc-max { font-size: 1.4rem; font-weight: 600; color: var(--text-muted); }
 .hp-calc-input-display { width: 100%; padding: 10px; text-align: center; font-size: 1.4rem; font-weight: 700; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; min-height: 44px; line-height: 1.4; }
+.hp-roll-input-display {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+}
+.hp-roll-value {
+    min-height: 1.4em;
+    min-width: 0;
+    text-align: center;
+    color: var(--text);
+}
+.hp-roll-con-badge {
+    justify-self: end;
+    padding: 4px 7px;
+    border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
 .hp-calc-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
 .hp-calc-numpad-btn { padding: 12px 0; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
 .hp-calc-numpad-btn:hover { background: var(--surface-hover, rgba(255,255,255,0.08)); }

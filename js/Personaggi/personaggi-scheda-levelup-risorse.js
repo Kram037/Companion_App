@@ -186,7 +186,10 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
             <button type="button" class="levelup-pf-avg-btn" id="lupfAvgBtn">Tiro medio (${dieAvg(die)})</button>
             <button type="button" class="levelup-pf-roll-btn" id="lupfRollBtn">Tira d${die}</button>
         </div>
-        <div class="hp-calc-input-display levelup-pf-input-display" id="lupfInputDisplay">—</div>
+        <div class="hp-calc-input-display hp-roll-input-display levelup-pf-input-display" id="lupfInputDisplay">
+            <span class="hp-roll-value"></span>
+            <span class="hp-roll-con-badge">COS ${conLabel}</span>
+        </div>
         <div class="levelup-pf-detail" id="lupfDetail"></div>
         <div class="hp-calc-numpad levelup-pf-numpad">
             ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-lupf-key="${n}">${n}</button>`).join('')}
@@ -201,6 +204,7 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     </div>`;
 
     const inputDisplay = overlay.querySelector('#lupfInputDisplay');
+    const inputValue = inputDisplay?.querySelector('.hp-roll-value');
     const detail = overlay.querySelector('#lupfDetail');
     const avgBtn = overlay.querySelector('#lupfAvgBtn');
     const rollBtn = overlay.querySelector('#lupfRollBtn');
@@ -210,13 +214,38 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     let method = 'manual';
     let manualStarted = false;
 
+    const parseRollBuffer = (value) => {
+        const text = String(value ?? '').trim();
+        if (!text) return null;
+        const parsed = parseInt(text, 10);
+        if (!Number.isFinite(parsed) || parsed < 1) return null;
+        return Math.min(die, parsed);
+    };
+
+    const normalizeRollBuffer = (value) => {
+        const text = String(value ?? '').trim();
+        if (!text) return '';
+        const parsed = parseInt(text, 10);
+        if (!Number.isFinite(parsed)) return '';
+        if (parsed < 1) return String(parsed);
+        return String(Math.min(die, parsed));
+    };
+
     const setRollValue = (value, nextMethod = 'manual', fromManual = false) => {
-        const roll = Math.max(1, Math.min(die, parseInt(value) || 0));
+        const normalized = normalizeRollBuffer(value);
+        const roll = parseRollBuffer(normalized);
         rollValue = roll;
         method = nextMethod;
         manualStarted = fromManual;
+        if (roll === null) {
+            if (inputValue) inputValue.textContent = normalized;
+            detail.textContent = 'Inserisci il risultato del dado, senza COS.';
+            hpRollDetail = null;
+            refreshConfirm();
+            return;
+        }
         const gained = Math.max(1, roll + conMod);
-        inputDisplay.textContent = roll;
+        if (inputValue) inputValue.textContent = roll;
         detail.textContent = `Dado ${roll} ${conLabel} COS = ${gained} PF`;
         hpRollDetail = { method, die, roll, con_mod: conMod, gained };
         refreshConfirm();
@@ -237,12 +266,12 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     overlay.querySelectorAll('[data-lupf-key]').forEach(btn => {
         btn.onclick = () => {
             const key = btn.dataset.lupfKey || '';
-            let buffer = rollValue == null || !manualStarted ? '0' : String(rollValue);
+            let buffer = rollValue == null || !manualStarted ? '' : String(rollValue);
             if (key === 'C') {
-                buffer = '0';
+                buffer = '';
                 manualStarted = true;
             } else if (key === 'BS') {
-                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '0';
+                buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '';
                 manualStarted = true;
             } else {
                 buffer = !manualStarted || buffer === '0' ? key : buffer + key;
