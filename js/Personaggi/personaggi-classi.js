@@ -38,6 +38,7 @@ window.pgUpdateClassLevel = function(index, value) {
 function pgResetAutoHP() {
     const pvField = document.getElementById('pgPV');
     if (pvField) pvField.dataset.autoHp = 'true';
+    window.pgHitPointHistoryDraft = null;
     pgRenderDadiVita();
 }
 

@@ -78,6 +78,80 @@ function pgCalcHP() {
     return Math.max(1, hp);
 }
 
+function _pgBuildHpCreationPlan() {
+    const cosMod = calcMod(parseInt(document.getElementById('pgCostituzione')?.value) || 10);
+    const levels = [];
+    let characterLevel = 0;
+    (pgSelectedClasses || []).forEach(cls => {
+        const die = CLASS_HIT_DIE[cls.nome] || 8;
+        const lvl = parseInt(cls.livello) || 0;
+        for (let classLevel = 1; classLevel <= lvl; classLevel++) {
+            characterLevel += 1;
+            levels.push({
+                character_level: characterLevel,
+                class_name: cls.nome,
+                class_level: classLevel,
+                die,
+                con_mod: cosMod,
+            });
+        }
+    });
+    return levels;
+}
+
+window.pgRollHitDiceForCreation = function() {
+    if (!pgSelectedClasses || pgSelectedClasses.length === 0) {
+        showNotification('Seleziona una classe prima di tirare i dadi vita');
+        return;
+    }
+    const levels = _pgBuildHpCreationPlan();
+    if (!levels.length) return;
+
+    const first = levels[0];
+    const firstGain = Math.max(1, first.die + first.con_mod);
+    let total = firstGain;
+    const entries = [];
+    levels.slice(1).forEach(level => {
+        const roll = 1 + Math.floor(Math.random() * level.die);
+        const gained = Math.max(1, roll + level.con_mod);
+        total += gained;
+        entries.push({
+            ...level,
+            roll,
+            method: 'roll',
+            gained,
+            total_after: total,
+            source: 'creation',
+            created_at: new Date().toISOString(),
+        });
+    });
+
+    window.pgHitPointHistoryDraft = {
+        start_level: entries[0]?.character_level || null,
+        first_level: {
+            ...first,
+            method: 'max',
+            roll: first.die,
+            gained: firstGain,
+            total_after: firstGain,
+            source: 'creation',
+            created_at: new Date().toISOString(),
+        },
+        entries,
+    };
+
+    const pvField = document.getElementById('pgPV');
+    if (pvField) {
+        pvField.value = total;
+        pvField.dataset.autoHp = 'false';
+    }
+    const hintPV = document.getElementById('hintPV');
+    if (hintPV) {
+        const rolls = entries.map(e => `Lv ${e.character_level}: d${e.die}=${e.roll}`).join(', ');
+        hintPV.textContent = entries.length ? `(tirati: ${rolls}; totale ${total})` : `(1° livello al massimo: ${total})`;
+    }
+};
+
 function pgRenderDadiVita() {
     const container = document.getElementById('pgDadiVitaList');
     if (!container) return;
@@ -181,8 +255,18 @@ window.pgKeypadConfirm = function() {
         input.value = val;
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
+        if (input.id === 'pgPV') {
+            input.dataset.autoHp = 'false';
+            window.pgHitPointHistoryDraft = null;
+        }
         if (input.classList.contains('pg-ability-input')) {
             updateAllAbilityMods();
+            if (input.id === 'pgCostituzione' && window.pgHitPointHistoryDraft) {
+                window.pgHitPointHistoryDraft = null;
+                const pvField = document.getElementById('pgPV');
+                if (pvField) pvField.dataset.autoHp = 'true';
+                pgRenderDadiVita();
+            }
         }
     }
     pgCloseKeypad();

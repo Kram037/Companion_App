@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
-    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260521A">
+    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260602A">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
     <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260519A">
     <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260519G">
@@ -847,6 +847,7 @@
                             <label for="pgPV">Punti Ferita Massimi</label>
                             <div class="pg-hp-row">
                                 <input type="number" id="pgPV" min="1" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
+                                <button type="button" class="pg-hp-roll-btn" onclick="pgRollHitDiceForCreation()">Tira dadi vita</button>
                                 <span class="pg-stat-hint" id="hintPV"></span>
                             </div>
                         </div>
@@ -934,7 +935,7 @@
                         <input type="number" id="microLivello" readonly class="pg-readonly-input" value="0">
                     </div>
                     <div class="form-group">
-                        <label for="microPVMax">PV Massimi</label>
+                        <label for="microPVMax">PF Massimi</label>
                         <input type="number" id="microPVMax" min="1" value="10" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                     </div>
                 </div>
@@ -1074,30 +1075,30 @@
     <script src="js/Personaggi/personaggi-razze-background.js?v=20260522A"></script>
     <script src="js/Personaggi/personaggi-sottoclassi.js?v=20260521A"></script>
     <script src="js/Personaggi/personaggi-invocazioni-stili.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-classi.js?v=20260519B"></script>
+    <script src="js/Personaggi/personaggi-classi.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-competenze.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-slot-incantesimo.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-pv-keypad.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-pv-keypad.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260519B"></script>
     <script src="js/Personaggi/personaggi-lista.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-core.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-risorse.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-incantesimi-preparati.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-scheda-render.js?v=20260521A"></script>
+    <script src="js/Personaggi/personaggi-scheda-render.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-scheda-abilita.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-chrome.js?v=20260521A"></script>
     <script src="js/Personaggi/personaggi-scheda-incantesimi.js?v=20260521A"></script>
     <script src="js/Personaggi/personaggi-scheda-inventario.js?v=20260517C"></script>
     <script src="js/Personaggi/personaggi-scheda-privilegi.js?v=20260527A"></script>
     <script src="js/Personaggi/personaggi-scheda-editor.js?v=20260517B"></script>
-    <script src="js/Personaggi/personaggi-scheda-calcolatori.js?v=20260521A"></script>
-    <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260519C"></script>
+    <script src="js/Personaggi/personaggi-scheda-calcolatori.js?v=20260602A"></script>
+    <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-scheda-bonus.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-equipaggiamento.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-form.js?v=20260519B"></script>
+    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260602A"></script>
+    <script src="js/Personaggi/personaggi-form.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-campagna-picker.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-micro.js?v=20260521A"></script>
+    <script src="js/Personaggi/personaggi-micro.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
     <script src="js/Sessioni/sessions.js?v=20260425F"></script>
     <script src="js/Combattimento/combat.js?v=20260425E"></script>

@@ -702,7 +702,7 @@
 .scheda-box.clickable:active { background: var(--accent-subtle); }
 
 /* HP Section */
-.scheda-hp-section { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
+.scheda-hp-section { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
 .scheda-hp-cell { text-align: center; padding: 8px 4px; }
 .scheda-hp-cell + .scheda-hp-cell { border-left: 1px solid var(--border); }
 .scheda-hp-input { width: 100%; text-align: center; background: transparent; color: var(--text); border: none; font-size: 1.3rem; font-weight: 800; padding: 4px 0; }
@@ -898,6 +898,23 @@
 .hp-calc-hint-grid .hp-calc-hint-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; }
 .hp-calc-hint-grid strong { font-size: 1.05rem; color: var(--accent); font-weight: 800; }
 .hp-calc-buttons.hp-calc-buttons-extra { margin-top: 8px; }
+.hp-calc-max-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.hp-calc-max-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; text-align: center; }
+.hp-calc-max-box strong { display: block; font-size: 1.45rem; color: var(--accent); line-height: 1.1; }
+.hp-calc-max-box span { display: block; margin-top: 3px; font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+.hp-calc-max-temp-input { width: 100%; min-width: 0; box-sizing: border-box; border: none; background: transparent; color: var(--accent); font-size: 1.45rem; font-weight: 900; text-align: center; padding: 0; line-height: 1.1; }
+.hp-calc-max-temp-input:focus { outline: none; color: var(--text); }
+.hp-calc-numpad.hp-calc-numpad-ops { grid-template-columns: repeat(4, 1fr); }
+.hp-calc-numpad-btn.operator { color: var(--accent); font-weight: 900; }
+.hp-calc-expression { display: block; font-size: 0.8rem; color: var(--text-muted); min-height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hp-calc-result { display: block; color: var(--text); font-size: 1.35rem; line-height: 1.2; }
+.pf-history-modal { width: 420px; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); overflow-y: auto; text-align: left; }
+.pf-history-summary { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 12px; }
+.pf-history-list { display: flex; flex-direction: column; gap: 6px; }
+.pf-history-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.pf-history-row strong { color: var(--accent); font-size: 0.85rem; }
+.pf-history-row span { color: var(--text); font-size: 0.82rem; min-width: 0; }
+.pf-history-row small { color: var(--text-muted); font-size: 0.74rem; text-align: right; }
 
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
@@ -1340,19 +1357,34 @@
 }
 
 .pg-hp-row {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
     gap: var(--spacing-sm);
 }
 
 .pg-hp-row input {
-    flex: 1;
+    min-width: 0;
 }
 
 .pg-hp-row .pg-stat-hint {
-    flex-shrink: 0;
-    white-space: nowrap;
+    grid-column: 1 / -1;
+    white-space: normal;
 }
+
+.pg-hp-roll-btn {
+    min-height: 42px;
+    padding: 0 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.pg-hp-roll-btn:hover { background: var(--surface-hover); border-color: var(--accent); }
 
 /* Hit dice display */
 .pg-dadi-vita-list {

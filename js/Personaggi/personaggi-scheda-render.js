@@ -79,6 +79,7 @@ async function renderSchedaPersonaggio(personaggioId) {
         const pvMaxEffettivo = (typeof schedaGetPvMaxEffettivo === 'function')
             ? schedaGetPvMaxEffettivo(pg)
             : ((parseInt(pg.punti_vita_max) || 10) + pvMaxTemp);
+        const pvMaxBase = parseInt(pg.punti_vita_max) || 10;
         const pvAttualiRaw = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
         const pvAttuali = Math.min(pvMaxEffettivo, parseInt(pvAttualiRaw) || 0);
 
@@ -402,20 +403,16 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
         <div class="scheda-hp-section">
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','punti_vita_max')">
-                        <div class="scheda-hp-display" id="schedaPvMax">${pg.punti_vita_max || 10}</div>
-                        <div class="scheda-hp-label">PV Max</div>
-                    </div>
-                    <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_max_temporaneo')">
-                        <div class="scheda-hp-display ${pvMaxTemp > 0 ? 'pv-max-temp' : ''}" id="schedaPvMaxTemp">${pvMaxTemp}</div>
-                        <div class="scheda-hp-label">PV Max Temp</div>
+                        <div class="scheda-hp-display ${pvMaxTemp > 0 ? 'pv-max-temp' : ''}" id="schedaPvMax" data-pf-base="${pvMaxBase}" data-pf-max-temp="${pvMaxTemp}">${pvMaxEffettivo}</div>
+                        <div class="scheda-hp-label">PF Max</div>
                     </div>
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_attuali')">
                         <div class="scheda-hp-display pv-current" id="schedaPvAttuali">${pvAttuali}</div>
-                        <div class="scheda-hp-label">PV Attuali</div>
+                        <div class="scheda-hp-label">PF Attuali</div>
                     </div>
                     <div class="scheda-hp-cell clickable" onclick="schedaOpenHpCalcLive('${pg.id}','pv_temporanei')">
                         <div class="scheda-hp-display" id="schedaPvTemp">${pg.pv_temporanei || 0}</div>
-                        <div class="scheda-hp-label">PV Temp</div>
+                        <div class="scheda-hp-label">PF Temp</div>
                 </div>
             </div>
                 <div class="scheda-subsection collapsed">

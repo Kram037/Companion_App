@@ -92,6 +92,14 @@ async function handleSavePersonaggio(e) {
         updated_at: new Date().toISOString()
     };
 
+    if (!editingPersonaggioId && window.pgHitPointHistoryDraft) {
+        pgData.bonus_manuali = {
+            ...(pgData.bonus_manuali || {}),
+            _pv_max_reale: pgData.punti_vita_max,
+            _pf_storico: window.pgHitPointHistoryDraft,
+        };
+    }
+
     if (!pgData.nome) {
         showNotification('Inserisci un nome per il personaggio');
         pgSaving = false;

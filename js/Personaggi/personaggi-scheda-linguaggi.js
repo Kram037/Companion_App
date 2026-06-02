@@ -322,6 +322,7 @@ window.openPersonaggioModal = function(personaggioId) {
 
                     const pvF = document.getElementById('pgPV');
                     if (pvF) { pvF.value = data.punti_vita_max || 10; pvF.dataset.autoHp = 'false'; }
+                    window.pgHitPointHistoryDraft = null;
                     document.getElementById('pgIniziativa').value = data.iniziativa != null ? data.iniziativa : calcMod(data.destrezza || 10);
                     document.getElementById('pgCA').value = data.classe_armatura || 10;
                     document.getElementById('pgVelocita').value = data.velocita || 9;
@@ -336,6 +337,7 @@ window.openPersonaggioModal = function(personaggioId) {
         document.getElementById('pgIniziativa').value = '';
         const pvField = document.getElementById('pgPV');
         if (pvField) { pvField.value = 10; pvField.dataset.autoHp = 'true'; }
+        window.pgHitPointHistoryDraft = null;
         updateAllAbilityMods();
         updateBonusCompetenza();
     }

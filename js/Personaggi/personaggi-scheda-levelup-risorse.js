@@ -8,6 +8,33 @@
    dadi vita disponibili, livello totale, e indirettamente risorse di classe
    e privilegi (calcolati dinamicamente in fase di render in base al livello).
    ────────────────────────────────────────────────────────────────────────── */
+function _pfHistoryFromBonusManuali(bm) {
+    const raw = bm && typeof bm === 'object' ? bm._pf_storico : null;
+    return {
+        ...(raw && typeof raw === 'object' ? raw : {}),
+        entries: Array.isArray(raw?.entries) ? [...raw.entries] : [],
+    };
+}
+
+function _pfHistoryAppendLevelUp(pg, bm, detail, totalAfter, className, classLevel, characterLevel) {
+    const history = _pfHistoryFromBonusManuali(bm);
+    if (!history.start_level) history.start_level = characterLevel;
+    history.entries.push({
+        character_level: characterLevel,
+        class_name: className,
+        class_level: classLevel,
+        die: detail?.die || (CLASS_HIT_DIE[className] || 8),
+        roll: detail?.roll ?? null,
+        method: detail?.method || 'manual',
+        con_mod: detail?.con_mod ?? Math.floor((((pg?.costituzione) || 10) - 10) / 2),
+        gained: detail?.gained || 0,
+        total_after: totalAfter,
+        source: 'levelup',
+        created_at: new Date().toISOString(),
+    });
+    bm._pf_storico = history;
+}
+
 window.schedaLevelUp = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) {
@@ -169,6 +196,7 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
     const avgBtn = overlay.querySelector('#lupfAvgBtn');
     const rollBtn = overlay.querySelector('#lupfRollBtn');
     const confirmBtn = overlay.querySelector('#lupfConfirmBtn');
+    let hpRollDetail = null;
 
     const refreshConfirm = () => {
         const v = parseInt(input.value);
@@ -177,27 +205,31 @@ function _showLevelUpHpChoice(pgId, classIdx, opts = {}) {
 
     avgBtn.onclick = () => {
         input.value = avgGain;
-        detail.textContent = `Tiro medio: ${dieAvg(die)} ${conLabel} COS = ${avgGain} PV`;
+        hpRollDetail = { method: 'average', die, roll: dieAvg(die), con_mod: conMod, gained: avgGain };
+        detail.textContent = `Tiro medio: ${dieAvg(die)} ${conLabel} COS = ${avgGain} PF`;
         refreshConfirm();
     };
     rollBtn.onclick = () => {
         const roll = 1 + Math.floor(Math.random() * die);
         const total = Math.max(1, roll + conMod);
         input.value = total;
-        detail.textContent = `1d${die} = ${roll} ${conLabel} COS = ${total} PV`;
+        hpRollDetail = { method: 'roll', die, roll, con_mod: conMod, gained: total };
+        detail.textContent = `1d${die} = ${roll} ${conLabel} COS = ${total} PF`;
         refreshConfirm();
     };
     input.addEventListener('input', () => {
         // Se l'utente edita a mano, rimuovi il dettaglio (non corrisponde piu' al calcolo automatico).
         if (detail.textContent && !detail.dataset.locked) detail.textContent = '';
+        hpRollDetail = null;
         refreshConfirm();
     });
     confirmBtn.onclick = async () => {
         const pvGain = parseInt(input.value);
         if (!Number.isFinite(pvGain) || pvGain < 1) return;
         const extra = detail.textContent ? ` (${detail.textContent})` : '';
+        const historyDetail = hpRollDetail || { method: 'manual', die, roll: null, con_mod: conMod, gained: pvGain };
         overlay.remove();
-        await _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extra, opts);
+        await _continueLevelUpAfterHpChoice(pgId, classIdx, pvGain, extra, { ...opts, hpRollDetail: historyDetail });
     };
 
     document.body.appendChild(overlay);
@@ -303,6 +335,7 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     const oldPvMax = parseInt(pg.punti_vita_max) || 0;
     const newPvMax = oldPvMax + pvGain;
     const newPvAttuali = (pg.pv_attuali != null ? parseInt(pg.pv_attuali) : oldPvMax) + pvGain;
+    const totalLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
 
     // Anche il "Max Reale" cresce del valore registrato al level-up.
     // Se non era ancora stato impostato esplicitamente, viene
@@ -312,13 +345,12 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     const storedReale = parseInt(bm._pv_max_reale);
     const baseReale = (Number.isFinite(storedReale) && storedReale > 0) ? storedReale : oldPvMax;
     bm._pv_max_reale = Math.max(1, baseReale + pvGain);
+    _pfHistoryAppendLevelUp(pg, bm, opts.hpRollDetail, newPvMax, cls.nome, newLvl, totalLevel);
     pg.bonus_manuali = bm;
 
     const dadi = { ...(pg.dadi_vita_disponibili || {}) };
     const currentDadi = dadi[cls.nome] != null ? parseInt(dadi[cls.nome]) : (newLvl - 1);
     dadi[cls.nome] = Math.min(newLvl, currentDadi + 1);
-
-    const totalLevel = classi.reduce((s, c) => s + (parseInt(c.livello) || 0), 0);
 
     // Ricalcola gli slot incantesimo in base al nuovo livello, preservando "used".
     const newAutoSlots = calcSpellSlotsFromClassi(classi);
@@ -356,9 +388,9 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
 
     await schedaInstantSave(pgId, updates);
     if (isNewClass) {
-        showNotification(`Aggiunto ${cls.nome} (multiclasse, liv 1) +${pvGain} PV${extraMsg}`);
+        showNotification(`Aggiunto ${cls.nome} (multiclasse, liv 1) +${pvGain} PF${extraMsg}`);
     } else {
-        showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PV${extraMsg})`);
+        showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PF${extraMsg})`);
     }
     await renderSchedaPersonaggio(pgId);
 }
