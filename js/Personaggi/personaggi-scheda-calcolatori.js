@@ -153,10 +153,10 @@ window.schedaOpenPfHistory = function() {
                 <table class="comp-equipment-table pf-history-table">
                     <thead>
                         <tr>
-                            <th>Liv. totale</th>
-                            <th>Dado vita</th>
-                            <th>Tiro dado</th>
-                            <th>Totale con COS</th>
+                            <th>Liv.</th>
+                            <th>Dado</th>
+                            <th>Tiro</th>
+                            <th>Tot. COS</th>
                         </tr>
                     </thead>
                     <tbody>${rowsHtml}</tbody>
