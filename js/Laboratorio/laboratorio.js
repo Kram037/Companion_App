@@ -63,6 +63,13 @@ const LAB_CATEGORIES = {
         iconFile: 'Talenti e Stili',
         fields: (data) => labFieldsTalenti(data)
     },
+    stili: {
+        table: 'homebrew_stili',
+        label: 'Stile',
+        labelPlural: 'Stili',
+        iconFile: 'Talenti e Stili',
+        fields: (data) => labFieldsStili(data)
+    },
     oggetti: {
         table: 'homebrew_oggetti',
         label: 'Oggetto',
@@ -94,6 +101,15 @@ function _labTabIcon(file, className = 'lab-hub-icon-img') {
 function _labCategoryIcon(cat, className = 'lab-card-icon-img') {
     if (cat?.iconFile) return _labTabIcon(cat.iconFile, className);
     return cat?.icon || '';
+}
+
+function _labActiveTab() {
+    if (_labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili') return 'stili';
+    return _labCurrentTab;
+}
+
+function _labActiveCategory() {
+    return LAB_CATEGORIES[_labActiveTab()];
 }
 
 // ============================================================================
@@ -154,11 +170,10 @@ window.labOpenCategory = function(tab) {
 };
 
 function _labSyncAddButton() {
-    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const cat = _labActiveCategory();
     const addBtn = document.getElementById('addHomebrewBtn');
     if (!addBtn || !cat) return;
-    const isReadOnlySubTab = _labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili';
-    addBtn.style.visibility = (cat.isSettings || cat.isReadOnly || isReadOnlySubTab) ? 'hidden' : '';
+    addBtn.style.visibility = (cat.isSettings || cat.isReadOnly) ? 'hidden' : '';
 }
 
 window.labBackToHub = function() {
@@ -286,14 +301,12 @@ function _labListGetFilterDefs(tab) {
     }
     if (tab === 'stili') {
         return [{
-            key: 'classe',
-            label: 'Classe',
-            options: (data) => {
-                const found = new Set();
-                (data || []).forEach(it => (it.classi || it.classes || []).forEach(cls => found.add(cls)));
-                return [{ value: '', label: 'Tutte' }, ...Array.from(found).sort((a, b) => a.localeCompare(b, 'it')).map(v => ({ value: v, label: v }))];
-            },
-            match: (item, value) => (item.classi || item.classes || []).map(String).includes(String(value)),
+            key: 'prerequisiti',
+            label: 'Prerequisiti',
+            options: () => [{ value: '', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
+            match: (item, value) => value === 'yes'
+                ? !!String(item.prerequisiti || '').trim()
+                : !String(item.prerequisiti || '').trim(),
         }];
     }
     if (tab === 'suppliche') {
@@ -745,10 +758,18 @@ async function _loadLabTalentiStiliSection() {
         return;
     }
 
-    const styles = _labStaticFightingStyleItems();
-    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.talenti, styles, 'stili', {
-        emptyHtml: '<div class="lab-empty">Nessuno stile disponibile.</div>',
-        render: _labRenderStaticInfoCard,
+    const { data, error } = await supabase
+        .from('homebrew_stili')
+        .select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('created_at', { ascending: false });
+    if (error) {
+        _labSetStickyTools('');
+        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>sql/add-homebrew-stili.sql</code>?</small></div>';
+        return;
+    }
+    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.stili, data || [], 'stili', {
+        emptyHtml: `<div class="lab-empty">Nessuno stile homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
     });
 }
 
@@ -853,12 +874,13 @@ window.labNemiciSetSubTab = function(sub) {
     loadLabContent();
 };
 
-function labRenderCard(item, cat) {
-    const detail = labGetCardDetail(item, _labCurrentTab);
+function labRenderCard(item, cat, tabOverride) {
+    const tab = tabOverride || _labActiveTab();
+    const detail = labGetCardDetail(item, tab);
     // Tutta la card e' cliccabile: per i nemici apre la scheda di
     // dettaglio (viewer dedicato), per tutto il resto apre direttamente
     // il dialog di modifica con lo stato attuale gia' caricato.
-    const cardOnClick = _labCurrentTab === 'nemici'
+    const cardOnClick = tab === 'nemici'
         ? `labViewNemico('${item.id}')`
         : `labEditItem('${item.id}')`;
     return `
@@ -901,6 +923,7 @@ function labGetCardDetail(item, tab) {
         }
         case 'nemici': return `CA ${item.classe_armatura || 10} · PV ${item.punti_vita_max || 10} · GS ${item.grado_sfida || '0'}`;
         case 'talenti': return item.prerequisiti || '';
+        case 'stili': return item.prerequisiti ? `Prerequisiti: ${item.prerequisiti}` : 'Nessun prerequisito';
         case 'oggetti': {
             // formatOggettoMeta gia' include il bonus +N nella posizione
             // canonica (subito dopo tipo/sotto-tipo, prima della rarita').
@@ -2969,6 +2992,22 @@ function labFieldsTalenti(data) {
     </div>`;
 }
 
+function labFieldsStili(data) {
+    return `
+    <div class="form-group">
+        <label for="hbNome">Nome</label>
+        <input type="text" id="hbNome" required placeholder="Nome dello stile" value="${escapeHtml(data?.nome || '')}">
+    </div>
+    <div class="form-group">
+        <label for="hbPrerequisiti">Prerequisito <span class="label-muted">(facoltativo)</span></label>
+        <input type="text" id="hbPrerequisiti" placeholder="Es. Competenza nelle armature leggere" value="${escapeHtml(data?.prerequisiti || '')}">
+    </div>
+    <div class="form-group">
+        <label for="hbDescrizione">Descrizione</label>
+        <textarea id="hbDescrizione" rows="5" placeholder="Descrivi lo stile di combattimento...">${escapeHtml(data?.descrizione || '')}</textarea>
+    </div>`;
+}
+
 // Tipologie e rarita' valide per oggetti homebrew. Le label coincidono
 // con i valori salvati su DB (italiano, no slug separato).
 const LAB_OGG_TIPI = [
@@ -3260,9 +3299,9 @@ window.labOggSelectEnch = function(btn, value) {
 
 window.openHomebrewModal = function(editData) {
     _labEditingId = editData?.id || null;
-    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const cat = _labActiveCategory();
     if (!cat) return;
-    if (cat.isReadOnly || (_labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili')) return;
+    if (cat.isReadOnly) return;
 
     if (_labCurrentTab === 'nemici') {
         if (_labNemiciSubTab === 'combattimenti') {
@@ -3403,7 +3442,7 @@ window.closeHomebrewModal = function() {
 window.labEditItem = async function(id) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const cat = _labActiveCategory();
     if (!cat) return;
     const { data, error } = await supabase.from(cat.table).select('*').eq('id', id).single();
     if (error || !data) { showNotification('Errore nel caricamento'); return; }
@@ -3415,7 +3454,7 @@ window.labDeleteItem = async function(id) {
     if (!confirmed) return;
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const cat = _labActiveCategory();
     if (!cat) return;
     const { error } = await supabase.from(cat.table).delete().eq('id', id);
     if (error) { showNotification('Errore nella cancellazione'); return; }
@@ -3430,13 +3469,17 @@ window.labDeleteItem = async function(id) {
     if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
         loadHomebrewIncantesimi();
     }
+    if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
+        loadHomebrewStili();
+    }
 };
 
 async function handleSaveHomebrew(e) {
     e.preventDefault();
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const activeTab = _labActiveTab();
+    const cat = _labActiveCategory();
     if (!cat) return;
 
     const nome = document.getElementById('hbNome')?.value?.trim();
@@ -3449,7 +3492,7 @@ async function handleSaveHomebrew(e) {
 
     let record = { nome, updated_at: new Date().toISOString() };
 
-    switch (_labCurrentTab) {
+    switch (activeTab) {
         case 'classi':
             // Le sottoclassi sono salvate dal wizard dedicato (labSaveSottoclasse)
             return;
@@ -3524,6 +3567,10 @@ async function handleSaveHomebrew(e) {
             record.prerequisiti = document.getElementById('hbPrerequisiti')?.value?.trim() || null;
             record.effetti = document.getElementById('hbEffetti')?.value?.trim() || null;
             break;
+        case 'stili':
+            record.prerequisiti = document.getElementById('hbPrerequisiti')?.value?.trim() || null;
+            record.descrizione = document.getElementById('hbDescrizione')?.value?.trim() || null;
+            break;
         case 'oggetti': {
             record.tipo = document.getElementById('hbTipoOgg')?.value || null;
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
@@ -3561,6 +3608,9 @@ async function handleSaveHomebrew(e) {
         }
         if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
             loadHomebrewIncantesimi();
+        }
+        if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
+            loadHomebrewStili();
         }
     } catch (err) {
         console.error('Errore salvataggio homebrew:', err);
@@ -3638,6 +3688,7 @@ window.labToggleHbEnabled = async function(cb) {
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
     if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
+    if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -3658,6 +3709,7 @@ window.labToggleFriendHb = async function(cb) {
     if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
     if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
+    if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
 };
 
 // ============================================================================

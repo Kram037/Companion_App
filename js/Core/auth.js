@@ -35,6 +35,7 @@ function setupSupabaseAuth() {
                     loadHomebrewSottoclassi();
                     loadHomebrewOggetti();
                     loadHomebrewIncantesimi();
+                    loadHomebrewStili();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -313,6 +314,57 @@ async function loadHomebrewIncantesimi() {
 }
 
 window.loadHomebrewIncantesimi = loadHomebrewIncantesimi;
+
+async function loadHomebrewStili() {
+    if (AppState._homebrewStiliLoadPromise) {
+        return AppState._homebrewStiliLoadPromise;
+    }
+    AppState._homebrewStiliLoadPromise = (async () => {
+        const supabase = getSupabaseClient();
+        if (!supabase || !AppState.currentUser?.uid) {
+            AppState.cachedHomebrewStili = [];
+            return [];
+        }
+        const ownUid = AppState.currentUser.uid;
+        try {
+            const { friendUids, friendInfoByUid, userData } = await _resolveHomebrewFriendUids();
+            const allUids = [ownUid, ...friendUids];
+            const { data, error } = await supabase
+                .from('homebrew_stili')
+                .select('*')
+                .in('user_id', allUids);
+            if (error) {
+                console.warn('[homebrew] errore SELECT stili:', error);
+                AppState.cachedHomebrewStili = [];
+                return [];
+            }
+            const ownName = userData?.nome_utente || 'Tuo';
+            const list = (data || []).map(r => {
+                const isOwn = r.user_id === ownUid;
+                return {
+                    ...r,
+                    _author_uid: r.user_id,
+                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                    _is_own: isOwn,
+                };
+            });
+            AppState.cachedHomebrewStili = list;
+            try {
+                window.dispatchEvent(new CustomEvent('homebrew:stili-loaded', { detail: { count: list.length } }));
+            } catch (_) {}
+            return list;
+        } catch (e) {
+            console.warn('Errore caricamento stili homebrew:', e);
+            AppState.cachedHomebrewStili = [];
+            return [];
+        }
+    })().finally(() => {
+        AppState._homebrewStiliLoadPromise = null;
+    });
+    return AppState._homebrewStiliLoadPromise;
+}
+
+window.loadHomebrewStili = loadHomebrewStili;
 
 async function loadHomebrewSottoclassi() {
     // Dedup: chiamate concorrenti restituiscono la stessa promise.

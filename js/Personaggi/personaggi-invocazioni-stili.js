@@ -20,7 +20,32 @@ function _invocationById(id) {
 }
 
 // ─── Stili di Combattimento (Fighting Styles) ───────────────────────────
-function _fightingStylesData() { return window.FIGHTING_STYLES_DATA || {}; }
+function _homebrewFightingStyleToCatalog(row) {
+    if (!row || !row.id) return null;
+    return {
+        slug: `hb:${row.id}`,
+        name: row.nome || 'Stile Homebrew',
+        name_en: row.nome || 'Homebrew Fighting Style',
+        source: 'Homebrew',
+        source_short: 'HB',
+        classes: [],
+        description: row.descrizione || '',
+        prerequisites: row.prerequisiti || '',
+        _is_homebrew: true,
+        _author_name: row._author_name || '',
+    };
+}
+
+function _fightingStylesData() {
+    const merged = { ...(window.FIGHTING_STYLES_DATA || {}) };
+    const hbList = (window.AppState?.cachedHomebrewStili) || [];
+    hbList.forEach(row => {
+        const item = _homebrewFightingStyleToCatalog(row);
+        if (item) merged[item.slug] = item;
+    });
+    return merged;
+}
+
 function _fightingStyleById(slug) {
     if (!slug) return null;
     return _fightingStylesData()[slug] || null;
@@ -111,7 +136,7 @@ function _pgFightingStylesAllowance(pg) {
 function _fightingStylesForClass(className) {
     const data = _fightingStylesData();
     return Object.values(data)
-        .filter(fs => Array.isArray(fs.classes) && fs.classes.includes(className))
+        .filter(fs => fs._is_homebrew || (Array.isArray(fs.classes) && fs.classes.includes(className)))
         .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 }
 // Stili effettivamente selezionabili per una "voce di allowance" del PG.

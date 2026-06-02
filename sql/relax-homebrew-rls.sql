@@ -19,7 +19,8 @@ DECLARE
 BEGIN
     FOR tbl IN SELECT unnest(ARRAY[
         'homebrew_classi','homebrew_razze','homebrew_background',
-        'homebrew_incantesimi','homebrew_nemici','homebrew_talenti','homebrew_oggetti'
+        'homebrew_incantesimi','homebrew_nemici','homebrew_talenti',
+        'homebrew_stili','homebrew_oggetti'
     ]) LOOP
         -- Drop la vecchia policy SELECT restrittiva (se esiste).
         EXECUTE format('DROP POLICY IF EXISTS %I ON %I', tbl || '_select', tbl);

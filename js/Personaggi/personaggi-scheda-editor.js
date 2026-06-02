@@ -833,7 +833,7 @@ window.schedaFsRenderList = function() {
         if (sourceFilters.length && !sourceFilters.includes(fs.source_short || '')) return false;
         if (slotFilters.length && !slots.some(slot => slotFilters.includes(slot))) return false;
         if (search) {
-            const txt = `${fs.name || ''} ${fs.name_en || ''} ${fs.description || ''}`.toLowerCase();
+            const txt = `${fs.name || ''} ${fs.name_en || ''} ${fs.prerequisites || ''} ${fs.description || ''}`.toLowerCase();
             if (!txt.includes(search)) return false;
         }
         return true;
@@ -864,6 +864,9 @@ window.schedaFsRenderList = function() {
             </button>`;
         }).join('');
         const slotBadgesHtml = slotBadges || '<span class="scheda-empty" style="font-size:0.78rem;padding:4px 8px;">Aumenta il massimo "Personalizzato" sopra per assegnare questo stile.</span>';
+        const prereqHtml = fs.prerequisites
+            ? `<div class="priv-feat-prereq"><strong>Prerequisiti:</strong> ${escapeHtml(fs.prerequisites)}</div>`
+            : '';
         return `<div class="fs-pick-row ${isSelected ? 'fs-pick-row-selected' : ''}">
             <div class="fs-pick-head" onclick="this.closest('.fs-pick-row').classList.toggle('fs-pick-open');">
                 <span class="fs-pick-name">${escapeHtml(fs.name)}</span>
@@ -871,6 +874,7 @@ window.schedaFsRenderList = function() {
                 <span class="fs-pick-arrow">▾</span>
             </div>
             <div class="fs-pick-slots">${slotBadgesHtml}</div>
+            ${prereqHtml}
             <div class="fs-pick-desc">${window.formatRichText(fs.description || '')}</div>
         </div>`;
     }).join('');
