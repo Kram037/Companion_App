@@ -77,8 +77,18 @@
 .comp-hub-card:active { transform: scale(0.97); }
 
 .comp-hub-card-icon {
-    font-size: 1.6rem;
+    width: 34px;
+    height: 34px;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comp-hub-card-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .comp-hub-card-label {
@@ -102,6 +112,10 @@
 
 .comp-equipment-main-tabs {
     margin: 0 0 12px;
+}
+
+.comp-inner-tabs {
+    margin: 0 0 10px;
 }
 
 .comp-object-kind-tabs {

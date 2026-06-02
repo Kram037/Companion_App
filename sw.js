@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v131';
+const CACHE_NAME = 'companion-app-v132';
 
 const APP_SHELL_URLS = [
     './',
@@ -70,6 +70,14 @@ const APP_SHELL_URLS = [
     './images/Scheda%20personaggio/Icona_scheda_combattimento.png',
     './images/Toolbar/Compendio-toolbar-20260521.svg',
     './images/Toolbar/Laboratorio.svg',
+    './images/Tabs/Background.svg',
+    './images/Tabs/Classi.svg',
+    './images/Tabs/Equipaggiamento.svg',
+    './images/Tabs/Incantesimi.svg',
+    './images/Tabs/Mostri%20e%20Combattimenti.svg',
+    './images/Tabs/Razze.svg',
+    './images/Tabs/Suppliche.svg',
+    './images/Tabs/Talenti%20e%20Stili.svg',
     './images/Logo Leggenda.jpeg'
 ];
 

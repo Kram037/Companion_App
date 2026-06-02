@@ -6,27 +6,39 @@ let _labCurrentTab = 'classi';
 let _labEditingId = null;
 // Sub-tab solo per la categoria "nemici": 'nemici' (default) | 'combattimenti'.
 let _labNemiciSubTab = 'nemici';
+let _labTalentiStiliSubTab = 'talenti';
+
+const LAB_HUB_ORDER = [
+    'razze',
+    'classi',
+    'background',
+    'oggetti',
+    'talenti',
+    'nemici',
+    'suppliche',
+    'incantesimi',
+];
 
 const LAB_CATEGORIES = {
     classi: {
         table: 'homebrew_classi',
         label: 'Sottoclasse',
-        labelPlural: 'Sottoclassi',
-        icon: '⚔',
+        labelPlural: 'Classi',
+        iconFile: 'Classi',
         fields: () => ''
     },
     razze: {
         table: 'homebrew_razze',
         label: 'Razza',
         labelPlural: 'Razze',
-        icon: '🧬',
+        iconFile: 'Razze',
         fields: () => ''
     },
     background: {
         table: 'homebrew_background',
         label: 'Background',
         labelPlural: 'Background',
-        icon: '📜',
+        iconFile: 'Background',
         // Passare data per pre-compilare i campi in modifica.
         fields: (data) => labFieldsBackground(data)
     },
@@ -34,39 +46,55 @@ const LAB_CATEGORIES = {
         table: 'homebrew_incantesimi',
         label: 'Incantesimo',
         labelPlural: 'Incantesimi',
-        icon: '✨',
+        iconFile: 'Incantesimi',
         fields: (data) => labFieldsIncantesimi(data)
     },
     nemici: {
         table: 'homebrew_nemici',
         label: 'Nemico',
-        labelPlural: 'Nemici e Combattimenti',
-        icon: '💀',
+        labelPlural: 'Mostri e Combattimenti',
+        iconFile: 'Mostri e Combattimenti',
         fields: (data) => labFieldsNemici(data)
     },
     talenti: {
         table: 'homebrew_talenti',
         label: 'Talento',
-        labelPlural: 'Talenti',
-        icon: '⭐',
+        labelPlural: 'Talenti e Stili',
+        iconFile: 'Talenti e Stili',
         fields: (data) => labFieldsTalenti(data)
     },
     oggetti: {
         table: 'homebrew_oggetti',
         label: 'Oggetto',
-        labelPlural: 'Oggetti',
-        icon: '🎒',
+        labelPlural: 'Equipaggiamento',
+        iconFile: 'Equipaggiamento',
         // Importante: passare editData a labFieldsOggetti per pre-compilare
         // tutti i campi quando si apre la modifica di un oggetto esistente.
         fields: (data) => labFieldsOggetti(data)
     },
+    suppliche: {
+        label: 'Supplica Occulta',
+        labelPlural: 'Suppliche Occulte',
+        iconFile: 'Suppliche',
+        isReadOnly: true
+    },
     impostazioni: {
         label: 'Impostazioni',
         labelPlural: 'Impostazioni',
-        icon: '⚙',
+        iconFile: null,
         isSettings: true
     }
 };
+
+function _labTabIcon(file, className = 'lab-hub-icon-img') {
+    if (!file) return '';
+    return `<img class="${className}" src="images/Tabs/${encodeURIComponent(file)}.svg" alt="" loading="lazy">`;
+}
+
+function _labCategoryIcon(cat, className = 'lab-card-icon-img') {
+    if (cat?.iconFile) return _labTabIcon(cat.iconFile, className);
+    return cat?.icon || '';
+}
 
 // ============================================================================
 // HUB & SUB-PAGE NAVIGATION
@@ -81,13 +109,15 @@ function labRenderHub() {
     grid.style.gridTemplateRows = '';
     grid.style.gridAutoFlow = '';
     const rows = [];
-    const categories = Object.entries(LAB_CATEGORIES);
+    const categories = LAB_HUB_ORDER
+        .map(key => [key, LAB_CATEGORIES[key]])
+        .filter(([, cat]) => !!cat);
     for (let i = 0; i < categories.length; i += 2) {
         rows.push(`
             <div class="lab-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
                 ${categories.slice(i, i + 2).map(([key, cat]) => `
                     <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
-                        <span class="lab-hub-card-icon" aria-hidden="true">${cat.icon}</span>
+                        <span class="lab-hub-card-icon" aria-hidden="true">${_labTabIcon(cat.iconFile)}</span>
                         <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
                     </button>
                 `).join('')}
@@ -111,8 +141,7 @@ window.labOpenCategory = function(tab) {
     if (title) title.textContent = cat.labelPlural || cat.label;
     _labScrollToTop();
 
-    const addBtn = document.getElementById('addHomebrewBtn');
-    if (addBtn) addBtn.style.visibility = cat.isSettings ? 'hidden' : '';
+    _labSyncAddButton();
 
     document.getElementById('labImportBtn')?.remove();
 
@@ -123,6 +152,14 @@ window.labOpenCategory = function(tab) {
         loadLabContent();
     }
 };
+
+function _labSyncAddButton() {
+    const cat = LAB_CATEGORIES[_labCurrentTab];
+    const addBtn = document.getElementById('addHomebrewBtn');
+    if (!addBtn || !cat) return;
+    const isReadOnlySubTab = _labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili';
+    addBtn.style.visibility = (cat.isSettings || cat.isReadOnly || isReadOnlySubTab) ? 'hidden' : '';
+}
 
 window.labBackToHub = function() {
     const hub = document.getElementById('labHub');
@@ -161,6 +198,14 @@ async function loadLabContent() {
     // La categoria "nemici" ha un selettore di sub-tab interno (Nemici / Combattimenti).
     if (_labCurrentTab === 'nemici') {
         await _loadLabNemiciSection();
+        return;
+    }
+    if (_labCurrentTab === 'talenti') {
+        await _loadLabTalentiStiliSection();
+        return;
+    }
+    if (_labCurrentTab === 'suppliche') {
+        _loadLabSupplicheSection();
         return;
     }
 
@@ -237,6 +282,28 @@ function _labListGetFilterDefs(tab) {
             label: 'Prerequisiti',
             options: () => [{ value: '', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
             match: (item, value) => value === 'yes' ? !!String(item.prerequisiti || '').trim() : !String(item.prerequisiti || '').trim(),
+        }];
+    }
+    if (tab === 'stili') {
+        return [{
+            key: 'classe',
+            label: 'Classe',
+            options: (data) => {
+                const found = new Set();
+                (data || []).forEach(it => (it.classi || it.classes || []).forEach(cls => found.add(cls)));
+                return [{ value: '', label: 'Tutte' }, ...Array.from(found).sort((a, b) => a.localeCompare(b, 'it')).map(v => ({ value: v, label: v }))];
+            },
+            match: (item, value) => (item.classi || item.classes || []).map(String).includes(String(value)),
+        }];
+    }
+    if (tab === 'suppliche') {
+        return [{
+            key: 'prerequisiti',
+            label: 'Prerequisiti',
+            options: () => [{ value: '', label: 'Tutti' }, { value: 'yes', label: 'Si' }, { value: 'no', label: 'No' }],
+            match: (item, value) => value === 'yes'
+                ? !!String(item.prerequisiti || '').trim()
+                : !String(item.prerequisiti || '').trim(),
         }];
     }
     if (tab === 'nemici') {
@@ -344,8 +411,10 @@ function _labListSearchPlaceholder(tab) {
     if (tab === 'razze') return 'Cerca razza...';
     if (tab === 'background') return 'Cerca background...';
     if (tab === 'talenti') return 'Cerca talento...';
+    if (tab === 'stili') return 'Cerca stile...';
     if (tab === 'nemici') return 'Cerca nemico...';
     if (tab === 'combattimenti') return 'Cerca combattimento...';
+    if (tab === 'suppliche') return 'Cerca supplica...';
     if (tab === 'incantesimi') return 'Cerca per nome o scuola...';
     if (tab === 'oggetti') return 'Cerca per nome o tipo...';
     return 'Cerca...';
@@ -367,6 +436,15 @@ function _labListItemMatchesSearch(tab, item, q) {
         item.parent_class_slug,
         item.taglia,
         item.prerequisiti,
+        item.prerequisites,
+        item.descrizione,
+        item.description,
+        item.name,
+        item.name_en,
+        item.source,
+        item.source_short,
+        Array.isArray(item.classi) ? item.classi.join(' ') : '',
+        Array.isArray(item.classes) ? item.classes.join(' ') : '',
         item.grado_sfida,
         combatNames,
     ];
@@ -593,10 +671,10 @@ async function _loadLabNemiciSection() {
     const tabsHtml = `
         <div class="lab-subtabs">
             <button type="button" class="lab-subtab ${sub==='nemici'?'active':''}" onclick="labNemiciSetSubTab('nemici')">
-                <span class="lab-subtab-icon">💀</span><span>Nemici</span>
+                <span class="lab-subtab-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-subtab-icon-img')}</span><span>Mostri</span>
             </button>
             <button type="button" class="lab-subtab ${sub==='combattimenti'?'active':''}" onclick="labNemiciSetSubTab('combattimenti')">
-                <span class="lab-subtab-icon">⚔</span><span>Combattimenti</span>
+                <span class="lab-subtab-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-subtab-icon-img')}</span><span>Combattimenti</span>
             </button>
         </div>
         <div id="labNemiciSubContent"></div>`;
@@ -632,6 +710,119 @@ async function _loadLabNemiciSection() {
     }
 }
 
+async function _loadLabTalentiStiliSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labTalentiStiliSubTab;
+    container.innerHTML = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub === 'talenti' ? 'active' : ''}" onclick="labTalentiStiliSetSubTab('talenti')">
+                <span class="lab-subtab-icon">${_labTabIcon('Talenti e Stili', 'lab-subtab-icon-img')}</span><span>Talenti</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub === 'stili' ? 'active' : ''}" onclick="labTalentiStiliSetSubTab('stili')">
+                <span class="lab-subtab-icon">${_labTabIcon('Talenti e Stili', 'lab-subtab-icon-img')}</span><span>Stili</span>
+            </button>
+        </div>
+        <div id="labTalentiStiliSubContent"></div>`;
+    _labSyncAddButton();
+
+    const sc = document.getElementById('labTalentiStiliSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    if (sub === 'talenti') {
+        const { data, error } = await supabase
+            .from('homebrew_talenti')
+            .select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) { sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>'; return; }
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.talenti, data || [], 'talenti', {
+            emptyHtml: `<div class="lab-empty">Nessun talento homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+        });
+        return;
+    }
+
+    const styles = _labStaticFightingStyleItems();
+    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.talenti, styles, 'stili', {
+        emptyHtml: '<div class="lab-empty">Nessuno stile disponibile.</div>',
+        render: _labRenderStaticInfoCard,
+    });
+}
+
+function _loadLabSupplicheSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    _labSyncAddButton();
+    const invocations = _labStaticInvocationItems();
+    _labRenderHomebrewListWithFilters(container, LAB_CATEGORIES.suppliche, invocations, 'suppliche', {
+        emptyHtml: '<div class="lab-empty">Nessuna supplica disponibile.</div>',
+        render: _labRenderStaticInfoCard,
+    });
+}
+
+window.labTalentiStiliSetSubTab = function(sub) {
+    _labTalentiStiliSubTab = sub === 'stili' ? 'stili' : 'talenti';
+    loadLabContent();
+};
+
+function _labStaticFightingStyleItems() {
+    return Object.values(window.FIGHTING_STYLES_DATA || {}).map(style => ({
+        id: style.slug || style.name || style.name_en,
+        nome: style.name || style.name_it || style.name_en || 'Stile',
+        name: style.name,
+        name_en: style.name_en,
+        classi: style.classes || [],
+        source: style.source || style.source_short || '',
+        source_short: style.source_short || '',
+        descrizione: style.description || '',
+    })).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
+}
+
+function _labStaticInvocationItems() {
+    return Object.values(window.INVOCATIONS_DATA || {}).map(inv => ({
+        id: inv.id || inv.slug || inv.name || inv.name_en,
+        nome: inv.name || inv.name_it || inv.name_en || 'Supplica',
+        name: inv.name,
+        name_en: inv.name_en,
+        prerequisiti: _labPrereqLabel(inv.prerequisites),
+        source: inv.source || inv.source_short || '',
+        source_short: inv.source_short || '',
+        descrizione: inv.description || '',
+    })).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
+}
+
+function _labPrereqLabel(value) {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (!Array.isArray(value)) return String(value || '');
+    return value.map(req => {
+        if (!req || typeof req !== 'object') return String(req || '');
+        if (req.type === 'level') return `Livello ${req.value}`;
+        if (req.value_it) return req.value_it;
+        if (req.value) return req.value;
+        return Object.values(req).filter(v => v != null && v !== '').join(' ');
+    }).filter(Boolean).join(', ');
+}
+
+function _labRenderStaticInfoCard(item) {
+    const meta = [
+        item.prerequisiti ? `Prereq: ${item.prerequisiti}` : '',
+        Array.isArray(item.classi) && item.classi.length ? item.classi.join(', ') : '',
+        item.source_short || item.source || '',
+    ].filter(Boolean).join(' · ');
+    return `
+    <div class="lab-card">
+        <div class="lab-card-info">
+            <p class="lab-card-name">${escapeHtml(item.nome)}</p>
+            ${meta ? `<p class="lab-card-detail">${escapeHtml(meta)}</p>` : ''}
+            ${item.descrizione ? `<p class="lab-card-detail">${escapeHtml(item.descrizione)}</p>` : ''}
+        </div>
+    </div>`;
+}
+
 function _labRenderCombatCard(item) {
     const arr = Array.isArray(item.mostri) ? item.mostri : [];
     const totMostri = arr.length;
@@ -644,7 +835,7 @@ function _labRenderCombatCard(item) {
         : 'Nessun mostro';
     return `
     <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="labEditCombatHomebrew('${item.id}')">
-        <div class="lab-card-icon">⚔</div>
+        <div class="lab-card-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-card-icon-img')}</div>
         <div class="lab-card-info">
             <p class="lab-card-name">${escapeHtml(item.nome)}</p>
             <p class="lab-card-detail">${detail}</p>
@@ -672,7 +863,7 @@ function labRenderCard(item, cat) {
         : `labEditItem('${item.id}')`;
     return `
     <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="${cardOnClick}">
-        <div class="lab-card-icon">${cat.icon}</div>
+        <div class="lab-card-icon">${_labCategoryIcon(cat)}</div>
         <div class="lab-card-info">
             <p class="lab-card-name">${escapeHtml(item.nome)}</p>
             ${detail ? `<p class="lab-card-detail">${escapeHtml(detail)}</p>` : ''}
@@ -3071,6 +3262,7 @@ window.openHomebrewModal = function(editData) {
     _labEditingId = editData?.id || null;
     const cat = LAB_CATEGORIES[_labCurrentTab];
     if (!cat) return;
+    if (cat.isReadOnly || (_labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili')) return;
 
     if (_labCurrentTab === 'nemici') {
         if (_labNemiciSubTab === 'combattimenti') {

@@ -52,15 +52,21 @@ const COMP_AMBIGUOUS_SPELL_REF_LABELS = new Set([
 ]);
 
 const COMP_TABS = {
-    classi: { label: 'Classi', icon: '📚' },
-    oggetti: { label: 'Equipaggiamento', icon: '🎒' },
-    razze: { label: 'Razze', icon: '🧬' },
-    background: { label: 'Background', icon: '📜' },
-    talenti: { label: 'Talenti', icon: '⭐' },
-    stili: { label: 'Stili di Combattimento', icon: '🛡️' },
-    suppliche: { label: 'Suppliche Occulte', icon: '🔮' },
-    incantesimi: { label: 'Incantesimi', icon: '✨' },
+    razze: { label: 'Razze', iconFile: 'Razze' },
+    classi: { label: 'Classi', iconFile: 'Classi' },
+    background: { label: 'Background', iconFile: 'Background' },
+    oggetti: { label: 'Equipaggiamento', iconFile: 'Equipaggiamento' },
+    talenti_stili: { label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
+    mostri: { label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
+    suppliche: { label: 'Suppliche Occulte', iconFile: 'Suppliche' },
+    incantesimi: { label: 'Incantesimi', iconFile: 'Incantesimi' },
 };
+
+function _compTabIcon(tab) {
+    const file = COMP_TABS[tab]?.iconFile;
+    if (!file) return '';
+    return `<img class="comp-hub-icon-img" src="images/Tabs/${encodeURIComponent(file)}.svg" alt="" loading="lazy">`;
+}
 
 const COMP_MULTICLASS_REQUIREMENTS = {
     Artefice: 'Intelligenza 13',
@@ -242,7 +248,7 @@ function compendioRenderHub() {
             <div class="comp-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
                 ${tabs.slice(i, i + 2).map(([key, tab]) => `
                     <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
-                        <span class="comp-hub-card-icon" aria-hidden="true">${tab.icon}</span>
+                        <span class="comp-hub-card-icon" aria-hidden="true">${_compTabIcon(key)}</span>
                         <span class="comp-hub-card-label">${escapeHtml(tab.label)}</span>
                     </button>
                 `).join('')}
@@ -416,6 +422,14 @@ function _compItems(tab) {
     if (tab === 'oggetti') {
         return [];
     }
+    if (tab === 'mostri') {
+        return [];
+    }
+    if (tab === 'talenti_stili') {
+        return _compTalentiStiliKind() === 'stili'
+            ? _compStyleItems('talenti_stili')
+            : _compFeatItems('talenti_stili');
+    }
     if (tab === 'sottoclassi') {
         return (window.CLASSES_DATA || []).flatMap(cls => (cls.subclasses || []).map(sub => ({
             type: tab,
@@ -447,30 +461,10 @@ function _compItems(tab) {
         }));
     }
     if (tab === 'talenti') {
-        return Object.entries(window.FEATS_DATA || {}).map(([key, feat]) => ({
-            type: tab,
-            id: key,
-            title: _compName(feat) || key,
-            subtitle: '',
-            source: feat.source_short || feat.source || '',
-            search: [feat.name, feat.name_en, feat.prerequisites, feat.description].join(' '),
-            tags: [feat.prerequisites ? `Prereq: ${feat.prerequisites}` : 'Nessun prerequisito'].filter(Boolean),
-            desc: '',
-            data: feat,
-        }));
+        return _compFeatItems('talenti');
     }
     if (tab === 'stili') {
-        return _compObjectValues(window.FIGHTING_STYLES_DATA).map(style => ({
-            type: tab,
-            id: style.slug || style.name || style.name_en,
-            title: _compName(style) || style.name_it || 'Stile',
-            subtitle: '',
-            source: style.source_short || style.source || '',
-            search: [style.name, style.name_it, style.name_en, style.description, style.classes].join(' '),
-            tags: [_compArrayLabel(style.classes)].filter(Boolean),
-            desc: '',
-            data: style,
-        }));
+        return _compStyleItems('stili');
     }
     if (tab === 'suppliche') {
         return _compObjectValues(window.INVOCATIONS_DATA).map(inv => ({
@@ -501,6 +495,41 @@ function _compItems(tab) {
         }));
     }
     return [];
+}
+
+function _compTalentiStiliKind() {
+    const state = _compStateFor('talenti_stili');
+    return state.kind === 'stili' ? 'stili' : 'talenti';
+}
+
+function _compFeatItems(tabKey = 'talenti') {
+    return Object.entries(window.FEATS_DATA || {}).map(([key, feat]) => ({
+        tab: tabKey,
+        type: 'talenti',
+        id: key,
+        title: _compName(feat) || key,
+        subtitle: '',
+        source: feat.source_short || feat.source || '',
+        search: [feat.name, feat.name_en, feat.prerequisites, feat.description].join(' '),
+        tags: [feat.prerequisites ? `Prereq: ${feat.prerequisites}` : 'Nessun prerequisito'].filter(Boolean),
+        desc: '',
+        data: feat,
+    }));
+}
+
+function _compStyleItems(tabKey = 'stili') {
+    return _compObjectValues(window.FIGHTING_STYLES_DATA).map(style => ({
+        tab: tabKey,
+        type: 'stili',
+        id: style.slug || style.name || style.name_en,
+        title: _compName(style) || style.name_it || 'Stile',
+        subtitle: '',
+        source: style.source_short || style.source || '',
+        search: [style.name, style.name_it, style.name_en, style.description, style.classes].join(' '),
+        tags: [_compArrayLabel(style.classes)].filter(Boolean),
+        desc: '',
+        data: style,
+    }));
 }
 
 function _compRaceItems() {
@@ -677,10 +706,33 @@ function _compRefreshStickyTools() {
 
 function _compListContentHtml(tab, filtered, total) {
     return `
+        ${tab === 'talenti_stili' ? _compTalentiStiliTabsHtml() : ''}
         <p class="comp-count">${filtered.length} risultati su ${total}</p>
         ${filtered.length ? _compListHtml(tab, filtered) : '<div class="comp-empty">Nessun elemento trovato</div>'}
     `;
 }
+
+function _compTalentiStiliTabsHtml() {
+    const kind = _compTalentiStiliKind();
+    return `
+        <div class="lab-subtabs comp-inner-tabs">
+            <button type="button" class="lab-subtab ${kind === 'talenti' ? 'active' : ''}" onclick="compendioTalentiStiliSetKind('talenti')">
+                <span>Talenti</span>
+            </button>
+            <button type="button" class="lab-subtab ${kind === 'stili' ? 'active' : ''}" onclick="compendioTalentiStiliSetKind('stili')">
+                <span>Stili di Combattimento</span>
+            </button>
+        </div>
+    `;
+}
+
+window.compendioTalentiStiliSetKind = function(kind) {
+    const state = _compStateFor('talenti_stili');
+    state.kind = kind === 'stili' ? 'stili' : 'talenti';
+    state.detail = null;
+    compendioRenderTab();
+    _compScrollToTop();
+};
 
 function _compRenderCurrentListContent() {
     if (_compCurrentTab === 'oggetti') {
@@ -834,9 +886,10 @@ function _compGroupItems(items) {
 
 function _compCardHtml(item) {
     if (item.type === 'incantesimi') return _compSpellCardHtml(item);
+    const tabKey = item.tab || item.type;
     if (item.type === 'sottoclassi' || item.type === 'razze') {
         return `
-            <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
+            <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
                 <div class="comp-card-main">
                     <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
                     ${item.type === 'razze' && item.source ? `<span class="comp-card-source">${escapeHtml(item.source)}</span>` : ''}
@@ -845,7 +898,7 @@ function _compCardHtml(item) {
         `;
     }
     return `
-        <article class="comp-card" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
+        <article class="comp-card" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
             <div class="comp-card-main">
                 <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
                 ${item.source ? `<span class="comp-card-source">${escapeHtml(item.source)}</span>` : ''}
@@ -858,8 +911,9 @@ function _compCardHtml(item) {
 
 function _compSpellCardHtml(item) {
     const sp = item.data;
+    const tabKey = item.tab || item.type;
     return `
-        <article class="comp-card comp-spell-card" onclick="compendioOpenDetail('${item.type}', '${_compEscapeAttr(item.id)}')">
+        <article class="comp-card comp-spell-card" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
             <div class="comp-spell-card-body">
                 <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
                 <div class="comp-spell-card-meta">
