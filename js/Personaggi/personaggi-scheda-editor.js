@@ -400,7 +400,7 @@ function _invocationMatchesFilters(inv, pg) {
 }
 function _invocationMatchesSearch(inv, q) {
     if (!q) return true;
-    const hay = `${inv.name || ''} ${inv.name_en || ''} ${inv.description || ''}`.toLowerCase();
+    const hay = `${inv.name || ''} ${inv.name_en || ''} ${_formatInvocationPrereqs(inv) || ''} ${inv.description || ''}`.toLowerCase();
     return hay.includes(q);
 }
 

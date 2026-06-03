@@ -90,6 +90,18 @@
     height: 100%;
     object-fit: contain;
 }
+.comp-hub-icon-img {
+    filter:
+        brightness(0) saturate(100%)
+        invert(76%) sepia(41%) saturate(742%) hue-rotate(358deg) brightness(101%) contrast(91%)
+        drop-shadow(0 0 3px rgba(229, 184, 103, 0.34));
+}
+.comp-hub-card:hover .comp-hub-icon-img {
+    filter:
+        brightness(0) saturate(100%)
+        invert(85%) sepia(52%) saturate(750%) hue-rotate(354deg) brightness(108%) contrast(96%)
+        drop-shadow(0 0 6px rgba(242, 209, 138, 0.5));
+}
 
 .comp-hub-card-label {
     font-weight: 600;

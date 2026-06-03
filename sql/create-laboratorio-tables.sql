@@ -102,6 +102,17 @@ CREATE TABLE IF NOT EXISTS homebrew_stili (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Homebrew Suppliche Occulte
+CREATE TABLE IF NOT EXISTS homebrew_suppliche (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    nome TEXT NOT NULL,
+    prerequisiti TEXT DEFAULT NULL,
+    descrizione TEXT DEFAULT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Homebrew Oggetti
 CREATE TABLE IF NOT EXISTS homebrew_oggetti (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -131,6 +142,7 @@ ALTER TABLE homebrew_incantesimi ENABLE ROW LEVEL SECURITY;
 ALTER TABLE homebrew_nemici ENABLE ROW LEVEL SECURITY;
 ALTER TABLE homebrew_talenti ENABLE ROW LEVEL SECURITY;
 ALTER TABLE homebrew_stili ENABLE ROW LEVEL SECURITY;
+ALTER TABLE homebrew_suppliche ENABLE ROW LEVEL SECURITY;
 ALTER TABLE homebrew_oggetti ENABLE ROW LEVEL SECURITY;
 
 DO $$
@@ -140,7 +152,7 @@ BEGIN
     FOR tbl IN SELECT unnest(ARRAY[
         'homebrew_classi','homebrew_razze','homebrew_background',
         'homebrew_incantesimi','homebrew_nemici','homebrew_talenti',
-        'homebrew_stili','homebrew_oggetti'
+        'homebrew_stili','homebrew_suppliche','homebrew_oggetti'
     ]) LOOP
         EXECUTE format('DROP POLICY IF EXISTS %I ON %I', tbl || '_select', tbl);
         EXECUTE format('CREATE POLICY %I ON %I FOR SELECT USING (auth.uid() = user_id)', tbl || '_select', tbl);

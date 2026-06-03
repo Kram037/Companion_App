@@ -36,6 +36,7 @@ function setupSupabaseAuth() {
                     loadHomebrewOggetti();
                     loadHomebrewIncantesimi();
                     loadHomebrewStili();
+                    loadHomebrewSuppliche();
                     if (AppState.cachedUserData?.nome_utente) {
                         AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
                         updateUIForLoggedIn();
@@ -365,6 +366,57 @@ async function loadHomebrewStili() {
 }
 
 window.loadHomebrewStili = loadHomebrewStili;
+
+async function loadHomebrewSuppliche() {
+    if (AppState._homebrewSupplicheLoadPromise) {
+        return AppState._homebrewSupplicheLoadPromise;
+    }
+    AppState._homebrewSupplicheLoadPromise = (async () => {
+        const supabase = getSupabaseClient();
+        if (!supabase || !AppState.currentUser?.uid) {
+            AppState.cachedHomebrewSuppliche = [];
+            return [];
+        }
+        const ownUid = AppState.currentUser.uid;
+        try {
+            const { friendUids, friendInfoByUid, userData } = await _resolveHomebrewFriendUids();
+            const allUids = [ownUid, ...friendUids];
+            const { data, error } = await supabase
+                .from('homebrew_suppliche')
+                .select('*')
+                .in('user_id', allUids);
+            if (error) {
+                console.warn('[homebrew] errore SELECT suppliche:', error);
+                AppState.cachedHomebrewSuppliche = [];
+                return [];
+            }
+            const ownName = userData?.nome_utente || 'Tuo';
+            const list = (data || []).map(r => {
+                const isOwn = r.user_id === ownUid;
+                return {
+                    ...r,
+                    _author_uid: r.user_id,
+                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                    _is_own: isOwn,
+                };
+            });
+            AppState.cachedHomebrewSuppliche = list;
+            try {
+                window.dispatchEvent(new CustomEvent('homebrew:suppliche-loaded', { detail: { count: list.length } }));
+            } catch (_) {}
+            return list;
+        } catch (e) {
+            console.warn('Errore caricamento suppliche homebrew:', e);
+            AppState.cachedHomebrewSuppliche = [];
+            return [];
+        }
+    })().finally(() => {
+        AppState._homebrewSupplicheLoadPromise = null;
+    });
+    return AppState._homebrewSupplicheLoadPromise;
+}
+
+window.loadHomebrewSuppliche = loadHomebrewSuppliche;
 
 async function loadHomebrewSottoclassi() {
     // Dedup: chiamate concorrenti restituiscono la stessa promise.

@@ -4,6 +4,7 @@
 
 let _labCurrentTab = 'classi';
 let _labEditingId = null;
+let _labClassiSubTab = 'classi';
 // Sub-tab solo per la categoria "nemici": 'nemici' (default) | 'combattimenti'.
 let _labNemiciSubTab = 'nemici';
 let _labTalentiStiliSubTab = 'talenti';
@@ -22,8 +23,15 @@ const LAB_HUB_ORDER = [
 const LAB_CATEGORIES = {
     classi: {
         table: 'homebrew_classi',
-        label: 'Sottoclasse',
+        label: 'Classe',
         labelPlural: 'Classi',
+        iconFile: 'Classi',
+        fields: (data) => labFieldsClassi(data)
+    },
+    sottoclassi: {
+        table: 'homebrew_classi',
+        label: 'Sottoclasse',
+        labelPlural: 'Sottoclassi',
         iconFile: 'Classi',
         fields: () => ''
     },
@@ -80,10 +88,11 @@ const LAB_CATEGORIES = {
         fields: (data) => labFieldsOggetti(data)
     },
     suppliche: {
+        table: 'homebrew_suppliche',
         label: 'Supplica Occulta',
         labelPlural: 'Suppliche Occulte',
         iconFile: 'Suppliche',
-        isReadOnly: true
+        fields: (data) => labFieldsSuppliche(data)
     },
     impostazioni: {
         label: 'Impostazioni',
@@ -104,6 +113,7 @@ function _labCategoryIcon(cat, className = 'lab-card-icon-img') {
 }
 
 function _labActiveTab() {
+    if (_labCurrentTab === 'classi' && _labClassiSubTab === 'sottoclassi') return 'sottoclassi';
     if (_labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili') return 'stili';
     return _labCurrentTab;
 }
@@ -187,6 +197,10 @@ window.labBackToHub = function() {
 
 window.laboratorioShowHub = window.labBackToHub;
 
+window.labOpenSettings = function() {
+    labOpenCategory('impostazioni');
+};
+
 function _labScrollToTop() {
     requestAnimationFrame(() => {
         document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });
@@ -210,6 +224,10 @@ async function loadLabContent() {
 
     if (!AppState.currentUser?.uid) return;
 
+    if (_labCurrentTab === 'classi') {
+        await _loadLabClassiSection();
+        return;
+    }
     // La categoria "nemici" ha un selettore di sub-tab interno (Nemici / Combattimenti).
     if (_labCurrentTab === 'nemici') {
         await _loadLabNemiciSection();
@@ -219,11 +237,6 @@ async function loadLabContent() {
         await _loadLabTalentiStiliSection();
         return;
     }
-    if (_labCurrentTab === 'suppliche') {
-        _loadLabSupplicheSection();
-        return;
-    }
-
     container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
 
     const { data, error } = await supabase
@@ -265,6 +278,9 @@ function _labListGetState(tab) {
 
 function _labListGetFilterDefs(tab) {
     if (tab === 'classi') {
+        return [];
+    }
+    if (tab === 'sottoclassi') {
         return [{
             key: 'classe',
             label: 'Classe',
@@ -420,7 +436,8 @@ function _labListGetFilterDefs(tab) {
 }
 
 function _labListSearchPlaceholder(tab) {
-    if (tab === 'classi') return 'Cerca sottoclasse...';
+    if (tab === 'classi') return 'Cerca classe...';
+    if (tab === 'sottoclassi') return 'Cerca sottoclasse...';
     if (tab === 'razze') return 'Cerca razza...';
     if (tab === 'background') return 'Cerca background...';
     if (tab === 'talenti') return 'Cerca talento...';
@@ -723,6 +740,59 @@ async function _loadLabNemiciSection() {
     }
 }
 
+async function _loadLabClassiSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labClassiSubTab;
+    container.innerHTML = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub === 'classi' ? 'active' : ''}" onclick="labClassiSetSubTab('classi')">
+                <span class="lab-subtab-icon">${_labTabIcon('Classi', 'lab-subtab-icon-img')}</span><span>Classi</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub === 'sottoclassi' ? 'active' : ''}" onclick="labClassiSetSubTab('sottoclassi')">
+                <span class="lab-subtab-icon">${_labTabIcon('Classi', 'lab-subtab-icon-img')}</span><span>Sottoclassi</span>
+            </button>
+        </div>
+        <div id="labClassiSubContent"></div>`;
+    _labSyncAddButton();
+
+    const sc = document.getElementById('labClassiSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const { data, error } = await supabase
+        .from('homebrew_classi')
+        .select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('created_at', { ascending: false });
+    if (error) {
+        _labSetStickyTools('');
+        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>';
+        return;
+    }
+
+    const rows = data || [];
+    if (sub === 'sottoclassi') {
+        const subclasses = rows.filter(row => String(row.parent_class_slug || '').trim());
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.sottoclassi, subclasses, 'sottoclassi', {
+            emptyHtml: `<div class="lab-empty">Nessuna sottoclasse homebrew. Premi <strong>+</strong> per crearne una!</div>`,
+        });
+        return;
+    }
+
+    const classes = rows.filter(row => !String(row.parent_class_slug || '').trim());
+    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.classi, classes, 'classi', {
+        emptyHtml: `<div class="lab-empty">Nessuna classe homebrew. Premi <strong>+</strong> per crearne una!</div>`,
+    });
+}
+
+window.labClassiSetSubTab = function(sub) {
+    _labClassiSubTab = sub === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    loadLabContent();
+};
+
 async function _loadLabTalentiStiliSection() {
     const container = document.getElementById('labContent');
     if (!container) return;
@@ -773,76 +843,10 @@ async function _loadLabTalentiStiliSection() {
     });
 }
 
-function _loadLabSupplicheSection() {
-    const container = document.getElementById('labContent');
-    if (!container) return;
-    _labSyncAddButton();
-    const invocations = _labStaticInvocationItems();
-    _labRenderHomebrewListWithFilters(container, LAB_CATEGORIES.suppliche, invocations, 'suppliche', {
-        emptyHtml: '<div class="lab-empty">Nessuna supplica disponibile.</div>',
-        render: _labRenderStaticInfoCard,
-    });
-}
-
 window.labTalentiStiliSetSubTab = function(sub) {
     _labTalentiStiliSubTab = sub === 'stili' ? 'stili' : 'talenti';
     loadLabContent();
 };
-
-function _labStaticFightingStyleItems() {
-    return Object.values(window.FIGHTING_STYLES_DATA || {}).map(style => ({
-        id: style.slug || style.name || style.name_en,
-        nome: style.name || style.name_it || style.name_en || 'Stile',
-        name: style.name,
-        name_en: style.name_en,
-        classi: style.classes || [],
-        source: style.source || style.source_short || '',
-        source_short: style.source_short || '',
-        descrizione: style.description || '',
-    })).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
-}
-
-function _labStaticInvocationItems() {
-    return Object.values(window.INVOCATIONS_DATA || {}).map(inv => ({
-        id: inv.id || inv.slug || inv.name || inv.name_en,
-        nome: inv.name || inv.name_it || inv.name_en || 'Supplica',
-        name: inv.name,
-        name_en: inv.name_en,
-        prerequisiti: _labPrereqLabel(inv.prerequisites),
-        source: inv.source || inv.source_short || '',
-        source_short: inv.source_short || '',
-        descrizione: inv.description || '',
-    })).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
-}
-
-function _labPrereqLabel(value) {
-    if (!value) return '';
-    if (typeof value === 'string') return value;
-    if (!Array.isArray(value)) return String(value || '');
-    return value.map(req => {
-        if (!req || typeof req !== 'object') return String(req || '');
-        if (req.type === 'level') return `Livello ${req.value}`;
-        if (req.value_it) return req.value_it;
-        if (req.value) return req.value;
-        return Object.values(req).filter(v => v != null && v !== '').join(' ');
-    }).filter(Boolean).join(', ');
-}
-
-function _labRenderStaticInfoCard(item) {
-    const meta = [
-        item.prerequisiti ? `Prereq: ${item.prerequisiti}` : '',
-        Array.isArray(item.classi) && item.classi.length ? item.classi.join(', ') : '',
-        item.source_short || item.source || '',
-    ].filter(Boolean).join(' · ');
-    return `
-    <div class="lab-card">
-        <div class="lab-card-info">
-            <p class="lab-card-name">${escapeHtml(item.nome)}</p>
-            ${meta ? `<p class="lab-card-detail">${escapeHtml(meta)}</p>` : ''}
-            ${item.descrizione ? `<p class="lab-card-detail">${escapeHtml(item.descrizione)}</p>` : ''}
-        </div>
-    </div>`;
-}
 
 function _labRenderCombatCard(item) {
     const arr = Array.isArray(item.mostri) ? item.mostri : [];
@@ -902,6 +906,15 @@ function labGetCardDetail(item, tab) {
     switch (tab) {
         case 'classi': {
             const parts = [];
+            const die = parseInt(item.dado_vita) || 8;
+            parts.push(`d${die}`);
+            const saves = Array.isArray(item.tiri_salvezza) ? item.tiri_salvezza.filter(Boolean) : [];
+            if (saves.length) parts.push(`TS ${saves.join(', ')}`);
+            if (item.tipo_caster) parts.push(item.tipo_caster);
+            return parts.join(' · ');
+        }
+        case 'sottoclassi': {
+            const parts = [];
             const cls = item.parent_class_name || item.parent_class_slug;
             if (cls) parts.push(`Classe: ${cls}`);
             const feats = Array.isArray(item.sottoclasse_features) ? item.sottoclasse_features : [];
@@ -924,6 +937,7 @@ function labGetCardDetail(item, tab) {
         case 'nemici': return `CA ${item.classe_armatura || 10} · PV ${item.punti_vita_max || 10} · GS ${item.grado_sfida || '0'}`;
         case 'talenti': return item.prerequisiti || '';
         case 'stili': return item.prerequisiti ? `Prerequisiti: ${item.prerequisiti}` : 'Nessun prerequisito';
+        case 'suppliche': return item.prerequisiti ? `Prerequisiti: ${item.prerequisiti}` : 'Nessun prerequisito';
         case 'oggetti': {
             // formatOggettoMeta gia' include il bonus +N nella posizione
             // canonica (subito dopo tipo/sotto-tipo, prima della rarita').
@@ -936,6 +950,43 @@ function labGetCardDetail(item, tab) {
 // ============================================================================
 // FORM FIELD GENERATORS
 // ============================================================================
+
+function labFieldsClassi(data) {
+    const currentDie = parseInt(data?.dado_vita) || 8;
+    const saves = Array.isArray(data?.tiri_salvezza) ? data.tiri_salvezza.join(', ') : '';
+    const caster = data?.tipo_caster || '';
+    return `
+    <div class="form-group">
+        <label for="hbNome">Nome</label>
+        <input type="text" id="hbNome" required placeholder="Nome della classe" value="${escapeHtml(data?.nome || '')}">
+    </div>
+    <div class="form-group">
+        <label>Dado vita</label>
+        <div class="custom-res-dice-row" id="hbClassDieBtns">
+            ${[6,8,10,12].map(die =>
+                `<button type="button" class="btn-secondary custom-res-dice-btn ${die === currentDie ? 'active' : ''}" onclick="window.labClassSelectHitDie(this,${die})">d${die}</button>`
+            ).join('')}
+        </div>
+        <input type="hidden" id="hbDadoVita" value="${currentDie}">
+    </div>
+    <div class="form-group">
+        <label for="hbTiriSalvezza">Tiri salvezza</label>
+        <input type="text" id="hbTiriSalvezza" placeholder="Es. Forza, Costituzione" value="${escapeHtml(saves)}">
+    </div>
+    <div class="form-group">
+        <label for="hbTipoCaster">Tipo caster <span class="label-muted">(facoltativo)</span></label>
+        <input type="text" id="hbTipoCaster" placeholder="Es. mezzo caster, pact magic..." value="${escapeHtml(caster)}">
+    </div>`;
+}
+
+window.labClassSelectHitDie = function(btn, value) {
+    const row = btn?.parentElement;
+    if (!row) return;
+    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('hbDadoVita');
+    if (hidden) hidden.value = String(value);
+};
 
 // ============================================================================
 // SOTTOCLASSI HOMEBREW - Wizard creazione sottoclassi (sostituisce classi)
@@ -3008,6 +3059,22 @@ function labFieldsStili(data) {
     </div>`;
 }
 
+function labFieldsSuppliche(data) {
+    return `
+    <div class="form-group">
+        <label for="hbNome">Nome</label>
+        <input type="text" id="hbNome" required placeholder="Nome della supplica" value="${escapeHtml(data?.nome || '')}">
+    </div>
+    <div class="form-group">
+        <label for="hbPrerequisiti">Prerequisito <span class="label-muted">(facoltativo)</span></label>
+        <input type="text" id="hbPrerequisiti" placeholder="Es. Warlock di 5° livello" value="${escapeHtml(data?.prerequisiti || '')}">
+    </div>
+    <div class="form-group">
+        <label for="hbDescrizione">Descrizione</label>
+        <textarea id="hbDescrizione" rows="5" placeholder="Descrivi la supplica occulta...">${escapeHtml(data?.descrizione || '')}</textarea>
+    </div>`;
+}
+
 // Tipologie e rarita' valide per oggetti homebrew. Le label coincidono
 // con i valori salvati su DB (italiano, no slug separato).
 const LAB_OGG_TIPI = [
@@ -3316,8 +3383,10 @@ window.openHomebrewModal = function(editData) {
         return;
     }
     if (_labCurrentTab === 'classi') {
-        _openLabSottoclasseWizard(editData);
-        return;
+        if (_labClassiSubTab === 'sottoclassi') {
+            _openLabSottoclasseWizard(editData);
+            return;
+        }
     }
 
     const modal = document.getElementById('homebrewModal');
@@ -3472,6 +3541,9 @@ window.labDeleteItem = async function(id) {
     if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
         loadHomebrewStili();
     }
+    if (cat.table === 'homebrew_suppliche' && typeof loadHomebrewSuppliche === 'function') {
+        loadHomebrewSuppliche();
+    }
 };
 
 async function handleSaveHomebrew(e) {
@@ -3494,8 +3566,13 @@ async function handleSaveHomebrew(e) {
 
     switch (activeTab) {
         case 'classi':
-            // Le sottoclassi sono salvate dal wizard dedicato (labSaveSottoclasse)
-            return;
+            record.dado_vita = parseInt(document.getElementById('hbDadoVita')?.value) || 8;
+            record.tiri_salvezza = (document.getElementById('hbTiriSalvezza')?.value || '')
+                .split(',')
+                .map(v => v.trim())
+                .filter(Boolean);
+            record.tipo_caster = document.getElementById('hbTipoCaster')?.value?.trim() || null;
+            break;
         case 'razze':
             break;
         case 'background':
@@ -3571,6 +3648,10 @@ async function handleSaveHomebrew(e) {
             record.prerequisiti = document.getElementById('hbPrerequisiti')?.value?.trim() || null;
             record.descrizione = document.getElementById('hbDescrizione')?.value?.trim() || null;
             break;
+        case 'suppliche':
+            record.prerequisiti = document.getElementById('hbPrerequisiti')?.value?.trim() || null;
+            record.descrizione = document.getElementById('hbDescrizione')?.value?.trim() || null;
+            break;
         case 'oggetti': {
             record.tipo = document.getElementById('hbTipoOgg')?.value || null;
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
@@ -3611,6 +3692,9 @@ async function handleSaveHomebrew(e) {
         }
         if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
             loadHomebrewStili();
+        }
+        if (cat.table === 'homebrew_suppliche' && typeof loadHomebrewSuppliche === 'function') {
+            loadHomebrewSuppliche();
         }
     } catch (err) {
         console.error('Errore salvataggio homebrew:', err);
@@ -3689,6 +3773,7 @@ window.labToggleHbEnabled = async function(cb) {
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
     if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
     if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
+    if (typeof loadHomebrewSuppliche === 'function') loadHomebrewSuppliche();
 };
 
 window.labToggleFriendHb = async function(cb) {
@@ -3710,6 +3795,7 @@ window.labToggleFriendHb = async function(cb) {
     if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
     if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
     if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
+    if (typeof loadHomebrewSuppliche === 'function') loadHomebrewSuppliche();
 };
 
 // ============================================================================

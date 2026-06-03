@@ -12,7 +12,29 @@
 //
 // pg.invocazioni: array di id (stringhe slug, es. "agonizing-blast").
 // ─────────────────────────────────────────────────────────────────────────
-function _invocationsAll() { return window.INVOCATIONS_DATA || []; }
+function _homebrewInvocationToCatalog(row) {
+    if (!row || !row.id) return null;
+    return {
+        id: `hb:${row.id}`,
+        name: row.nome || 'Supplica Homebrew',
+        name_en: row.nome || 'Homebrew Invocation',
+        source: 'Homebrew',
+        source_short: 'HB',
+        prerequisites: row.prerequisiti ? [{ type: 'text', value: row.prerequisiti }] : [],
+        description: row.descrizione || '',
+        effect: 'passive',
+        effect_data: {},
+        _is_homebrew: true,
+        _author_name: row._author_name || '',
+    };
+}
+
+function _invocationsAll() {
+    const base = Array.isArray(window.INVOCATIONS_DATA) ? window.INVOCATIONS_DATA : [];
+    const hbList = (window.AppState?.cachedHomebrewSuppliche) || [];
+    const hb = hbList.map(_homebrewInvocationToCatalog).filter(Boolean);
+    return base.concat(hb);
+}
 
 function _invocationById(id) {
     if (!id) return null;

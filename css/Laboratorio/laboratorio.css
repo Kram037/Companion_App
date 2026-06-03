@@ -26,13 +26,51 @@
     color: var(--text);
     flex-shrink: 0;
 }
+.lab-hub-subtitle-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    margin: 6px 0 12px;
+    flex-shrink: 0;
+}
 .lab-hub-subtitle {
     text-align: center;
     font-size: 0.82rem;
     color: var(--text-secondary);
-    margin: 10px 0 12px;
+    margin: 0;
     font-style: italic;
-    flex-shrink: 0;
+}
+.lab-settings-quick-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(214, 171, 91, 0.45);
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, rgba(214, 171, 91, 0.12), rgba(214, 171, 91, 0.02)),
+        var(--surface);
+    color: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(214, 171, 91, 0.08);
+    transition: border-color 0.16s, color 0.16s, transform 0.16s, box-shadow 0.16s;
+}
+.lab-settings-quick-btn:hover {
+    color: var(--accent-bright, #f2d18a);
+    border-color: rgba(242, 209, 138, 0.7);
+    box-shadow: 0 0 16px rgba(214, 171, 91, 0.18);
+    transform: translateY(-50%) scale(1.04);
+}
+.lab-settings-quick-btn svg {
+    width: 17px;
+    height: 17px;
 }
 .lab-hub-grid {
     display: flex;
@@ -81,6 +119,20 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+.lab-hub-icon-img,
+.lab-subtab-icon-img,
+.lab-card-icon-img {
+    filter:
+        brightness(0) saturate(100%)
+        invert(76%) sepia(41%) saturate(742%) hue-rotate(358deg) brightness(101%) contrast(91%)
+        drop-shadow(0 0 3px rgba(229, 184, 103, 0.34));
+}
+.lab-hub-card:hover .lab-hub-icon-img {
+    filter:
+        brightness(0) saturate(100%)
+        invert(85%) sepia(52%) saturate(750%) hue-rotate(354deg) brightness(108%) contrast(96%)
+        drop-shadow(0 0 6px rgba(242, 209, 138, 0.5));
 }
 .lab-hub-card-label {
     font-weight: 600;

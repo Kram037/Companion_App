@@ -26,8 +26,8 @@
     <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260602E">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
     <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260519A">
-    <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260602B">
-    <link rel="stylesheet" href="css/Compendio/compendio.css?v=20260602A">
+    <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260603A">
+    <link rel="stylesheet" href="css/Compendio/compendio.css?v=20260603A">
     <link rel="stylesheet" href="css/Core/fantasy.css?v=20260521C">
 </head>
 <body>
@@ -171,7 +171,15 @@
                             <h1>Laboratorio</h1>
                         </div>
                     </div>
-                    <p class="lab-hub-subtitle">Il tuo mondo, le tue regole</p>
+                    <div class="lab-hub-subtitle-row">
+                        <span class="lab-hub-subtitle">Il tuo mondo, le tue regole</span>
+                        <button type="button" class="lab-settings-quick-btn" onclick="labOpenSettings()" aria-label="Impostazioni homebrew" title="Impostazioni homebrew">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.08-.4H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .4-1.08V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15.4 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.1.34.32.66.6 1 .28.34.66.52 1.08.6H21a2 2 0 1 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                            </svg>
+                        </button>
+                    </div>
                     <div class="lab-hub-grid" id="labHubGrid" style="display:flex;flex-direction:column;"></div>
                 </div>
                 <!-- Sub-page view (hidden by default) -->
@@ -1052,7 +1060,7 @@
     <script src="js/Core/lang.js?v=1771800000"></script>
     <script src="js/Core/theme.js?v=1767900400"></script>
     <script src="js/Core/navigation.js?v=20260424I"></script>
-    <script src="js/Core/auth.js?v=20260602A"></script>
+    <script src="js/Core/auth.js?v=20260603A"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
     <script src="js/Campagna/campagne.js?v=20260517E"></script>
@@ -1074,7 +1082,7 @@
     <script src="js/Personaggi/personaggi-stats.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-razze-background.js?v=20260522A"></script>
     <script src="js/Personaggi/personaggi-sottoclassi.js?v=20260521A"></script>
-    <script src="js/Personaggi/personaggi-invocazioni-stili.js?v=20260602A"></script>
+    <script src="js/Personaggi/personaggi-invocazioni-stili.js?v=20260603A"></script>
     <script src="js/Personaggi/personaggi-classi.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi-competenze.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-slot-incantesimo.js?v=20260517A"></script>
@@ -1090,7 +1098,7 @@
     <script src="js/Personaggi/personaggi-scheda-incantesimi.js?v=20260521A"></script>
     <script src="js/Personaggi/personaggi-scheda-inventario.js?v=20260517C"></script>
     <script src="js/Personaggi/personaggi-scheda-privilegi.js?v=20260527A"></script>
-    <script src="js/Personaggi/personaggi-scheda-editor.js?v=20260602A"></script>
+    <script src="js/Personaggi/personaggi-scheda-editor.js?v=20260603A"></script>
     <script src="js/Personaggi/personaggi-scheda-calcolatori.js?v=20260602C"></script>
     <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260602D"></script>
     <script src="js/Personaggi/personaggi-scheda-bonus.js?v=20260517A"></script>
@@ -1102,7 +1110,7 @@
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
     <script src="js/Sessioni/sessions.js?v=20260425F"></script>
     <script src="js/Combattimento/combat.js?v=20260425E"></script>
-    <script src="js/Laboratorio/laboratorio.js?v=20260602B"></script>
+    <script src="js/Laboratorio/laboratorio.js?v=20260603A"></script>
     <script src="js/Core/realtime.js?v=20260521A"></script>
     <script src="js/Sessioni/initiative.js?v=20260425E"></script>
     <script src="js/Core/init.js?v=20260521A"></script>
