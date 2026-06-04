@@ -1523,9 +1523,13 @@ function _compGenericEquipmentItem(section, item, index) {
         source: item.fonte || item.source || '',
         cost,
         costLabel: item.costo || item.cost_label || item.prezzo || item.price || (Number.isFinite(cost) ? `${cost} mo` : ''),
+        costGroupLabel: item.costo_gruppo || item.cost_group || '',
         valueLabel: item.valore || item.value_label || (Number.isFinite(cost) && section === 'gemme' ? `${cost} mo` : ''),
         weight: item.peso || item.weight || '',
         costDetail: item.costo_dettaglio || item.cost_detail || '',
+        components: item.componenti || item.components || '',
+        color: item.colore || item.color || '',
+        properties: item.proprieta || item.properties || '',
         preparation: item.preparazione || item.preparation || '',
         part: item.parte || item.part || '',
         environment: item.ambiente || item.environment || '',
@@ -1541,6 +1545,7 @@ function _compGenericEquipmentItem(section, item, index) {
             item.reperibilita, item.availability, item.location, item.fonte, item.source, item.preparazione, item.preparation, item.parte,
             item.part, item.ambiente, item.environment, item.stagione, item.season,
             item.descrizione, item.description, item.valore, item.value_label, item.costo,
+            item.costo_gruppo, item.componenti, item.components, item.colore, item.color, item.proprieta, item.properties,
             item.cost_label, item.costo_dettaglio, item.cost_detail, item.peso, item.weight,
             item.potere, item.power, item.poteri, item.rarita, item.rarity,
         ].join(' ').toLowerCase(),
@@ -1572,7 +1577,7 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     const costLabels = _compFilterValues(filters.costLabel);
     const valueRange = filters.valueRange;
     if (rarities.length && !rarities.includes(item.rarity)) return false;
-    if (costLabels.length && !costLabels.includes(item.costLabel)) return false;
+    if (costLabels.length && !costLabels.includes(item.costGroupLabel || item.costLabel)) return false;
     if (categories.length && !categories.includes(item.categoryLabel || item.category)) return false;
     if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
     if (types.length && !types.includes(item.type)) return false;
@@ -1653,7 +1658,7 @@ function _compEquipmentFilterDefs(section) {
     if (section === 'metalli') {
         const rarities = _compUnique(items.map(i => i.rarity)).map(v => [v, v]);
         const costLabels = _compUnique(items
-            .map(i => i.costLabel)
+            .map(i => i.costGroupLabel || i.costLabel)
             .filter(label => String(label || '').includes('mo)')))
             .map(v => [v, v]);
         if (rarities.length) filters.push({ key: 'rarity', title: 'Rarita', options: rarities });
@@ -2129,6 +2134,10 @@ function _compGenericEquipmentPreviewData(section, item) {
             extras: _compEquipmentDetailExtras([
                 ['Range costi', item.costLabel],
                 ['Indicazioni', item.costDetail],
+                ['Componenti', item.components],
+                ['Colore', item.color],
+                ['Proprieta', item.properties],
+                ['Reperibilita', item.availability],
             ]),
             descrizione: item.description || '',
             pendingTr: false,

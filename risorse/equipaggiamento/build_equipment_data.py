@@ -5,6 +5,7 @@ import re
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "js" / "Compendio" / "data" / "equipaggiamento_data.js"
 REALMS_GEMS_FILE = ROOT / "risorse" / "equipaggiamento" / "realms_gems.json"
+REALMS_METALS_FILE = ROOT / "risorse" / "equipaggiamento" / "realms_metals.json"
 HERBS_TXT = ROOT / "risorse" / "erbe" / "erbe_extracted.txt"
 HERBS_PDF = ROOT / "risorse" / "erbe" / "erbe.pdf"
 
@@ -589,11 +590,17 @@ PRECIOUS_METAL_EQUIVALENCES = {
 }
 
 METAL_PROPERTIES = {
-    "Adamantine": "In gioco e' utile per armature e oggetti quasi impossibili da danneggiare: un'armatura di adamantio trasforma i colpi critici subiti in colpi normali. La sua durezza rende costrutti, porte o catene in adamantio difficili da rompere senza strumenti o armi adeguate; la lavorazione richiede fornaci e temperature eccezionali.",
-    "Adamant": "Versione leggendaria o nome alternativo legato a materiali quasi indistruttibili. Usalo come metallo da ricompensa epica, componente per sigilli, serrature, catene o nuclei di costrutti.",
-    "Mithral": "Metallo leggero e resistente, ideale per armature piu' maneggevoli e oggetti raffinati. In molte campagne riduce ingombro e rumorosita', rendendolo prezioso per esploratori e incantatori corazzati.",
+    "Adamant": "La fonte lo tratta come un metallo nero, ferromagnetico e raro: un quantitativo di adamante vale circa cinque volte lo stesso peso in oro. E' adatto a punte, stili, utensili fini e componenti per leghe quasi indistruttibili.",
+    "Adamantine": "L'adamantio e' una lega nera composta da adamante, elettro, argento e mithral. Richiede lavorazioni ad altissime temperature, resiste bene all'acqua marina, conduce bene la magia ed e' eccellente per armi, armature, manette, catene portuali e costrutti. In 5e resta il riferimento per armature che annullano i colpi critici e armi molto efficaci contro oggetti e materiali durissimi.",
+    "Arandur": "Metallo blu-verde che diventa blu-argento quando forgiato. Si lega molto bene ad altri metalli e facilita l'incantamento degli oggetti. Le lame tengono il filo anche dopo uso pesante; armature e scudi resistono a onde sonore, energia elementale, acido, forza magica e disintegrazione, e possono assorbire gli effetti di dardo incantato.",
+    "Baatorian green steel": "Acciaio verde infernale, piu' leggero, duro e tagliente dell'acciaio comune. Le armi hanno un'efficacia paragonabile a un bonus +1 pur non essendo magiche, quindi non perdono utilita' nelle zone di magia morta.",
+    "Darksteel": "Lega molto dura a base di metallo stellare e oli speciali, argentea con riflessi violacei. Assorbe elettricita' e fulmini senza trasferire la scarica al portatore; gli oggetti resistono a cadute, fiamme naturali, freddo, elettricita', acido, fuoco magico, schiacciamento, disintegrazione e fulmini. Le armi danno una lieve scossa; le armature offrono una piccola protezione dall'acido.",
+    "Dlarun": "Metallo bianco e leggero, chiamato anche acciaio di ghiaccio. Gioielli o oggetti decorativi a contatto con la pelle aiutano contro illusioni e certi effetti psionici; armature offrono una protezione limitata dal fuoco e le armi colpiscono con gelo. Non e' adatto a incantamenti legati alle fiamme.",
+    "Hellthorn": "Materiale infernale che accoglie molto bene incantamenti diabolici. E' adatto ad armi e strumenti tirannici: puo' amplificare resistenze al fuoco, incendiare il bersaglio e sostenere tattiche coordinate tra diavoli o portatori simili.",
+    "Hizagkuur": "Metallo rarissimo dell'Underdark, conduttivo e riflettente per energia magica. Riflette elettricita' e magia dirette contro la sua superficie. Non e' adatto a creare oggetti magici, ma e' perfetto per porte di caveau, sigilli, serrature e protezioni su oggetti importanti.",
+    "Mithral": "Metallo prezioso, leggero e flessibile: gli oggetti in mithral pesano circa la meta' degli equivalenti in acciaio. Le armature sono meno ingombranti e meno restrittive per incantatori e personaggi agili; gli oggetti colpiti da magia possono talvolta offrire una protezione temporanea al portatore.",
     "Silver": "L'argento e' il riferimento piu' comune per armi argentate: molte creature soprannaturali, come alcuni immondi, non morti o mutaforma, sono piu' vulnerabili o aggirano meno facilmente armi rivestite d'argento.",
-    "Iron": "Il ferro resta il materiale pratico di riferimento per armi, armature, chiodi, catene e strumenti. E' comune, riparabile quasi ovunque e utile come base per descrivere equipaggiamento non prezioso.",
+    "Iron": "Il ferro resta il materiale pratico per armi, armature, chiodi, catene, manette, pentole, serrature, secchi, trapani e utensili. Legato con carbonio diventa acciaio, piu' resistente e capace di mantenere meglio il filo.",
     "Cold iron": "Ferro lavorato a freddo o con tecniche tradizionali, spesso usato nelle leggende contro fate e creature extraplanari. E' un buon materiale speciale quando vuoi distinguere armi rituali o anti-folletto.",
     "Bronze": "Lega antica e resistente alla corrosione, utile per armi e armature di culture arcaiche, statue, campane e oggetti cerimoniali.",
     "Copper": "Il rame e' soprattutto valuta e metallo comune per conduttori, utensili, finiture e componenti alchemiche semplici.",
@@ -602,7 +609,79 @@ METAL_PROPERTIES = {
     "Platinum": "Il platino e' piu' raro e prestigioso dell'oro, adatto a tesori di alto rango, monete pregiate e componenti rituali ricercate.",
     "Infernal iron": "Metallo infernale legato ai Piani Inferiori, perfetto per armi, macchine da guerra e contratti diabolici. Trattalo come materiale raro o narrativo piu' che merce comune.",
     "Celestial steel": "Acciaio celestiale adatto a reliquie, armi sacre e protezioni contro creature empie. Funziona bene come ricompensa collegata a templi, ordini sacri o piani superiori.",
-    "Baatorian green steel": "Acciaio verde infernale, utile per equipaggiamento diabolico o mercati planari. Il colore e l'origine lo rendono subito riconoscibile come materiale non comune.",
+    "Lead": "Il piombo e' utile per pallini, pesi, pigmenti rossi e bianchi, sigilli, finestre piombate e tappi rinforzati. In magia compare come componente o materiale schermante, per esempio in inchiostri e strutture rituali.",
+    "Lithium": "Materiale raro utile a produzioni esplosive in tradizioni antiche o alchemiche.",
+    "Magnesium": "Usato per esplosivi, luce bianca intensa, strisce luminose, proiettili speciali e componenti di alcuni incantesimi o effetti alchemici.",
+    "Solanian truesteel": "Acciaio celestiale purissimo di Solania. Le armi forgiate con esso sono associate a un effetto simile a un bonus +1 nei momenti critici del combattimento.",
+    "Telstang": "Lega di rame, mithral, platino e argento, fragile ma durevole e non ferromagnetica. A contatto con la pelle impedisce trasformazioni o alterazioni di forma come paralisi, metamorfosi, pietrificazione o disintegrazione; pero' blocca anche magie benefiche che alterano il corpo. Gli oggetti resistono a fuoco, freddo, elettricita', acido, disintegrazione e fuoco o fulmine magico.",
+    "Zardazil": "Metallo morbido ma molto resistente, ambrato o rosso. Gli oggetti in zardazil diventano intangibili per il primo essere di cui versano il sangue, permettendo di nasconderli addosso senza rilevazione; in quello stato non subiscono effetti come riscaldare metallo o ingrandire per danneggiare il portatore.",
+}
+
+METAL_COST_OVERRIDES = {
+    "Adamant": "5x oro; stilo 35-50 mo",
+    "Adamantine": "200-2.000 mo",
+    "Arandur": "+2.000 mo",
+    "Cold iron": "arma x2",
+    "Darksteel": "+1.500-2.000 mo",
+    "Solanian truesteel": "+1.000 mo",
+}
+
+METAL_COST_DETAIL_OVERRIDES = {
+    "Adamant": "La fonte indica un valore pari a circa cinque volte lo stesso peso in oro; uno stilo in adamante viene venduto normalmente a 35-50 mo.",
+    "Adamantine": "Riferimenti di prezzo dalla fonte: trapano 200 mo, sega 600 mo, manette 650-2.000 mo, barra da 10 lb a Waterdeep 1.000 mo. Per armi e armature complete resta a discrezione del master e della disponibilita' locale.",
+    "Arandur": "Supplemento fonte: +2.000 mo per oggetti realizzati in arandur.",
+    "Cold iron": "Le armi in ferro freddo costano normalmente il doppio della versione standard; incantarle richiede un extra di 2.000 mo.",
+    "Darksteel": "Supplemento fonte: arma +1.500 mo, armatura metallica +2.000 mo; la massa grezza vale circa 10-12 volte lo stesso peso in oro.",
+    "Solanian truesteel": "Supplemento fonte: +1.000 mo per armi forgiate in vero acciaio solaniano.",
+}
+
+METAL_FIELD_TRANSLATIONS = {
+    "Jet black": "nero intenso",
+    "Black": "nero",
+    "Blue-green and silver-blue (when forged)": "blu-verde; blu-argento quando forgiato",
+    "Light, easy to smooth and sharpen": "leggero, facile da levigare e affilare",
+    "sharper and lighter weight than steel": "piu' tagliente e piu' leggero dell'acciaio",
+    "Reddish-yellow": "giallo-rossastro",
+    "reddish brown": "bruno rossastro",
+    "Silver": "argento",
+    "Shining": "lucente",
+    "Underground": "sottosuolo",
+    "Pink hue": "tonalita' rosa",
+    "Metallurgic purifier": "purificatore metallurgico",
+    "Silver with a purple sheen": "argento con riflessi violacei",
+    "Non-conductive": "non conduttivo",
+    "White": "bianco",
+    "Gold, silver": "oro, argento",
+    "Lightweight": "leggero",
+    "Metallic yellow": "giallo metallico",
+    "Conductive": "conduttivo",
+    "Red": "rosso",
+    "Green-gray (natural) Silver-gray (refined)": "verde-grigio naturale; grigio-argento raffinato",
+    "Conductive, magic-reflective": "conduttivo, riflette la magia",
+    "Gray": "grigio",
+    "Solid": "solido",
+    "Silver-black (ore) Silvery-blue (metal)": "argento-nero come minerale; blu-argento come metallo",
+    "Light, flexible": "leggero, flessibile",
+    "Soft, lustrous": "morbido, lucente",
+    "Dull gray": "grigio opaco",
+    "Silvery-white": "bianco argentato",
+    "Heavy, Malleable": "pesante, malleabile",
+    "Metallic grey/white": "grigio-bianco metallico",
+    "High conductivity and reflectivity": "alta conduttivita' e riflettivita'",
+    "Glassy, metallic": "vetroso, metallico",
+    "Shines with a silvery gleam": "brilla con bagliore argentato",
+    "Almost unbreakable": "quasi infrangibile",
+    "Copper, mithral, platinum, silver": "Rame, Mithral, Platino, Argento",
+    "Green shine under candlelight; purple-white shine under magic light": "riflessi verdi alla luce di candela; riflessi bianco-violacei alla luce magica",
+    "harder (and more brittle) than copper or brass": "piu' duro e piu' fragile di rame o ottone",
+    "Matte silver": "argento opaco",
+    "Non-ferromagnetic": "non ferromagnetico",
+    "various oils": "oli vari",
+    "White-gray": "bianco-grigio",
+    "Gray-white": "grigio-bianco",
+    "Amber or red": "ambrato o rosso",
+    "Ferromagnetic": "ferromagnetico",
+    "Brittle, toxic": "fragile, tossico",
 }
 
 METAL_TRANSLATIONS = {
@@ -768,21 +847,64 @@ def metal_cost_label(range_label):
     return f"{range_label} ({money})" if money else range_label
 
 
+def load_realms_metals():
+    if not REALMS_METALS_FILE.exists():
+        return {}
+    metals = json.loads(REALMS_METALS_FILE.read_text(encoding="utf-8"))
+    return {metal.get("nome"): metal for metal in metals if metal.get("nome")}
+
+
+def translate_metal_field(value):
+    value = str(value or "").strip()
+    if not value:
+        return ""
+
+    field_lookup = {key.lower(): translation for key, translation in METAL_FIELD_TRANSLATIONS.items()}
+    metal_lookup = {key.lower(): translation[0] for key, translation in METAL_TRANSLATIONS.items()}
+
+    direct = field_lookup.get(value.lower())
+    if direct:
+        return direct
+
+    parts = [part.strip() for part in value.split(",") if part.strip()]
+    if len(parts) > 1:
+        translated = [
+            metal_lookup.get(part.lower()) or field_lookup.get(part.lower()) or part
+            for part in parts
+        ]
+        return ", ".join(translated)
+
+    return metal_lookup.get(value.lower()) or value
+
+
 def enrich_metals(rows):
+    source_data = load_realms_metals()
     for row in rows:
         original_name = row.get("nome")
+        source = source_data.get(original_name, {})
         name, cost, description = METAL_TRANSLATIONS.get(
             original_name,
             (original_name, "Variabile", "Metallo o lega rara, utile come materiale speciale o componente di tesori."),
         )
         range_label = "Prezioso" if original_name in PRECIOUS_METAL_EQUIVALENCES else METAL_COST_RANGES.get(original_name, cost if cost != "Variabile" else "Raro")
-        cost_label = PRECIOUS_METAL_EQUIVALENCES.get(original_name) or metal_cost_label(range_label)
-        detail = METAL_COST_DETAILS.get(range_label, METAL_COST_DETAILS["Raro"])
+        group_label = metal_cost_label(range_label)
+        cost_label = PRECIOUS_METAL_EQUIVALENCES.get(original_name) or METAL_COST_OVERRIDES.get(original_name) or group_label
+        detail = METAL_COST_DETAIL_OVERRIDES.get(original_name) or METAL_COST_DETAILS.get(range_label, METAL_COST_DETAILS["Raro"])
         properties = METAL_PROPERTIES.get(original_name, "")
+        components = translate_metal_field(source.get("componenti"))
+        color = translate_metal_field(source.get("colore"))
+        source_properties = translate_metal_field(source.get("proprieta"))
+        availability = translate_metal_field(source.get("reperibilita"))
         row["nome"] = name
         row["costo"] = cost_label
+        row["costo_gruppo"] = group_label
         row["rarita"] = range_label
         row["costo_dettaglio"] = detail
+        row["componenti"] = components
+        row["colore"] = color
+        row["proprieta"] = source_properties
+        row["reperibilita"] = availability
+        row["fonte_url"] = source.get("fonte_url", "")
         row["descrizione"] = f"{description} {properties}".strip()
         row.pop("categoria", None)
     return rows
