@@ -64,13 +64,13 @@ const COMP_TABS = {
 
 const COMP_EQUIPMENT_SECTIONS = {
     armi: { label: 'Armi, Armature e Scudi', shortLabel: 'Armi e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
-    avventura: { label: 'Avventura', shortLabel: 'Avventura', iconFile: 'Equipaggiamento' },
-    strumenti: { label: 'Strumenti', shortLabel: 'Strumenti', iconFile: 'Equipaggiamento' },
+    avventura: { label: 'Avventura', shortLabel: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
+    strumenti: { label: 'Strumenti', shortLabel: 'Strumenti', iconFile: 'Equipaggiamento/Strumenti' },
     erbe: { label: 'Erbe', shortLabel: 'Erbe', iconFile: 'Equipaggiamento/Erbe' },
     metalli: { label: 'Metalli', shortLabel: 'Metalli', iconFile: 'Equipaggiamento/Metalli' },
     gemme: { label: 'Gemme', shortLabel: 'Gemme', iconFile: 'Equipaggiamento/Gemme' },
     veleni: { label: 'Veleni', shortLabel: 'Veleni', iconFile: 'Equipaggiamento/Veleni' },
-    oggetti: { label: 'Oggetti Magici', shortLabel: 'Oggetti Magici', iconFile: 'Equipaggiamento' },
+    oggetti: { label: 'Oggetti Magici', shortLabel: 'Oggetti Magici', iconFile: 'Equipaggiamento/Oggetti Magici' },
 };
 
 const COMP_EQUIPMENT_SECTION_ORDER = ['armi', 'avventura', 'strumenti', 'erbe', 'metalli', 'gemme', 'veleni', 'oggetti'];
