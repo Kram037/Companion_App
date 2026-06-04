@@ -1207,8 +1207,12 @@ function _compEquipmentCardsHtml(section, items) {
 function _compEquipmentCardHtml(section, item) {
     const meta = _compEquipmentCardMeta(section, item);
     const accent = _compEquipmentCardAccent(section, item);
-    const desc = _compPlain(item.description || '');
-    return `<article class="comp-card comp-inventory-card comp-equipment-card comp-equipment-card-${section}">
+    const desc = section === 'gemme' ? _compPlain(item.description || '') : '';
+    const clickable = ['avventura', 'erbe', 'metalli'].includes(section);
+    const clickAttrs = clickable
+        ? ` role="button" tabindex="0" onclick="compendioOpenEquipmentDetail('${section}','${_compEscapeAttr(item.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();compendioOpenEquipmentDetail('${section}','${_compEscapeAttr(item.id)}')}"`
+        : '';
+    return `<article class="comp-card comp-inventory-card comp-equipment-card comp-equipment-card-${section}${clickable ? ' clickable' : ''}"${clickAttrs}>
         <div class="comp-card-main">
             <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
             ${accent ? `<span class="comp-card-source comp-equipment-card-value">${escapeHtml(accent)}</span>` : ''}
@@ -1225,7 +1229,7 @@ function _compEquipmentCardAccent(section, item) {
 
 function _compEquipmentCardMeta(section, item) {
     if (section === 'erbe') {
-        return [item.categoryLabel, item.preparation, item.part, item.environment, item.season].filter(Boolean).join(' · ');
+        return [item.categoryLabel, item.part, item.preparation].filter(Boolean).join(' · ');
     }
     if (section === 'avventura') {
         return [item.categoryLabel || item.category, item.weight ? `Peso: ${item.weight}` : ''].filter(Boolean).join(' · ');
@@ -1418,6 +1422,7 @@ function _compGenericEquipmentItem(section, item, index) {
         costLabel: item.costo || item.cost_label || item.prezzo || item.price || (Number.isFinite(cost) ? `${cost} mo` : ''),
         valueLabel: item.valore || item.value_label || (Number.isFinite(cost) && section === 'gemme' ? `${cost} mo` : ''),
         weight: item.peso || item.weight || '',
+        costDetail: item.costo_dettaglio || item.cost_detail || '',
         preparation: item.preparazione || item.preparation || '',
         part: item.parte || item.part || '',
         environment: item.ambiente || item.environment || '',
@@ -1429,7 +1434,7 @@ function _compGenericEquipmentItem(section, item, index) {
             item.fonte, item.source, item.preparazione, item.preparation, item.parte,
             item.part, item.ambiente, item.environment, item.stagione, item.season,
             item.descrizione, item.description, item.valore, item.value_label, item.costo,
-            item.cost_label, item.peso, item.weight,
+            item.cost_label, item.costo_dettaglio, item.cost_detail, item.peso, item.weight,
         ].join(' ').toLowerCase(),
     };
 }
@@ -1715,7 +1720,20 @@ window.compendioOpenObjectDetail = function(source, id) {
     if (!item) return;
     const data = _compObjectPreviewData(source, item);
     if (!data) return;
-    const rarClass = typeof _invRarityClass === 'function' ? _invRarityClass(data.rarita) : '';
+    _compShowObjectPreview(data, typeof _invRarityClass === 'function' ? _invRarityClass(data.rarita) : '');
+};
+
+window.compendioOpenEquipmentDetail = function(section, id) {
+    if (!['avventura', 'erbe', 'metalli'].includes(section)) return;
+    const item = _compEquipmentSectionItems(section).find(entry => String(entry.id) === String(id));
+    if (!item) return;
+    const data = _compGenericEquipmentPreviewData(section, item);
+    if (!data) return;
+    _compShowObjectPreview(data, '');
+};
+
+function _compShowObjectPreview(data, modalClass = '') {
+    const rarClass = modalClass || (typeof _invRarityClass === 'function' ? _invRarityClass(data.rarita) : '');
     const descHtml = data.descrizione
         ? (typeof window.formatRichText === 'function'
             ? window.formatRichText(data.descrizione)
@@ -1744,7 +1762,70 @@ window.compendioOpenObjectDetail = function(source, id) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
-};
+}
+
+function _compGenericEquipmentPreviewData(section, item) {
+    if (section === 'avventura') {
+        return {
+            nome: item.title,
+            nomeAlt: '',
+            rarita: '',
+            meta: _compEquipmentDetailMeta([
+                ['Tipo', item.categoryLabel || item.category],
+                ['Costo', item.costLabel],
+                ['Peso', item.weight],
+            ]),
+            extras: '',
+            descrizione: item.description || '',
+            pendingTr: false,
+        };
+    }
+    if (section === 'erbe') {
+        return {
+            nome: item.title,
+            nomeAlt: '',
+            rarita: '',
+            meta: _compEquipmentDetailMeta([
+                ['Categoria', item.categoryLabel],
+                ['Costo', item.costLabel],
+            ]),
+            extras: _compEquipmentDetailExtras([
+                ['Parte utile', item.part],
+                ['Preparazione', item.preparation],
+                ['Ambiente', item.environment],
+                ['Stagione', item.season],
+            ]),
+            descrizione: item.description || '',
+            pendingTr: false,
+        };
+    }
+    if (section === 'metalli') {
+        return {
+            nome: item.title,
+            nomeAlt: '',
+            rarita: '',
+            meta: _compEquipmentDetailMeta([
+                ['Range costi', item.costLabel],
+            ]),
+            extras: _compEquipmentDetailExtras([
+                ['Indicazioni', item.costDetail],
+            ]),
+            descrizione: item.description || '',
+            pendingTr: false,
+        };
+    }
+    return null;
+}
+
+function _compEquipmentDetailMeta(rows) {
+    return rows.map(([label, value]) => value ? `${label}: ${value}` : '').filter(Boolean).join(' · ');
+}
+
+function _compEquipmentDetailExtras(rows) {
+    return rows
+        .map(([label, value]) => value ? `<div class="inv-preview-extra"><b>${escapeHtml(label)}:</b> ${escapeHtml(value)}</div>` : '')
+        .join('');
+}
 
 function _compFindInventoryData(source, id) {
     const list = source === 'veleni'

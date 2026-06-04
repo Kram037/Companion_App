@@ -1212,7 +1212,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite macerazione; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Alkanet",
@@ -1224,7 +1224,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite decotto; la parte utile e' radici; si trova in foresta; nella stagione: primavera, autunno."
   },
   {
     "nome": "Alleha",
@@ -1236,7 +1236,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Amrans",
@@ -1248,7 +1248,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Angelic",
@@ -1260,7 +1260,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Sottosuolo. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in sottosuolo; nella stagione: estate."
   },
   {
     "nome": "Anserke",
@@ -1272,7 +1272,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in deserto; nella stagione: primavera, autunno."
   },
   {
     "nome": "Archangelic",
@@ -1284,7 +1284,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' corteccia; si trova in artico; nella stagione: autunno."
   },
   {
     "nome": "Arkasu",
@@ -1296,7 +1296,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' corteccia; si trova in artico; nella stagione: autunno."
   },
   {
     "nome": "Arlan",
@@ -1308,7 +1308,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Arpusar",
@@ -1320,7 +1320,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Asarabacca",
@@ -1332,7 +1332,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Ashine",
@@ -1344,7 +1344,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Atigax",
@@ -1356,7 +1356,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite macerazione; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Attanar",
@@ -1368,7 +1368,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite decotto; la parte utile e' radici; si trova in artico; nella stagione: primavera, autunno."
   },
   {
     "nome": "Balme",
@@ -1380,7 +1380,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Sottosuolo. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' corteccia; si trova in sottosuolo; nella stagione: autunno."
   },
   {
     "nome": "Barr",
@@ -1392,7 +1392,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Bastit",
@@ -1404,7 +1404,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in palude; nella stagione: estate."
   },
   {
     "nome": "Belan",
@@ -1416,7 +1416,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' radici; si trova in deserto; nella stagione: primavera, autunno."
   },
   {
     "nome": "Belramba",
@@ -1428,7 +1428,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in foresta; nella stagione: primavera, autunno."
   },
   {
     "nome": "Birnot",
@@ -1440,7 +1440,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Biset",
@@ -1452,7 +1452,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Blabert",
@@ -1464,7 +1464,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Deserto. Stagione: Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite decotto; la parte utile e' corteccia; si trova in deserto; nella stagione: autunno."
   },
   {
     "nome": "Blarot",
@@ -1476,7 +1476,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' radici; si trova in palude; nella stagione: primavera, autunno."
   },
   {
     "nome": "Borage",
@@ -1488,7 +1488,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Breakthroughs",
@@ -1500,7 +1500,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Deserto. Stagione: Autunno."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite macerazione; la parte utile e' corteccia; si trova in deserto; nella stagione: autunno."
   },
   {
     "nome": "Bursthelas",
@@ -1512,7 +1512,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Calamus",
@@ -1524,7 +1524,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite macerazione; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Calcena",
@@ -1536,7 +1536,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Foresta. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite macerazione; la parte utile e' fungo; si trova in foresta; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Callin",
@@ -1548,7 +1548,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Chasground",
@@ -1560,7 +1560,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite decotto; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Cofrail",
@@ -1572,7 +1572,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Colerte",
@@ -1584,7 +1584,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Coparnia",
@@ -1596,7 +1596,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite macerazione; la parte utile e' radici; si trova in artico; nella stagione: primavera, autunno."
   },
   {
     "nome": "Covet",
@@ -1608,7 +1608,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Costa. Stagione: Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite decotto; la parte utile e' corteccia; si trova in costa; nella stagione: autunno."
   },
   {
     "nome": "Culkas",
@@ -1620,7 +1620,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in montagna; nella stagione: primavera, autunno."
   },
   {
     "nome": "Damater",
@@ -1632,7 +1632,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite macerazione; la parte utile e' pianta; si trova in palude; nella stagione: estate."
   },
   {
     "nome": "Darsurion",
@@ -1644,7 +1644,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite macerazione; la parte utile e' pianta; si trova in palude; nella stagione: estate."
   },
   {
     "nome": "Dechale",
@@ -1656,7 +1656,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Palude. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite macerazione; la parte utile e' fungo; si trova in palude; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Degiik",
@@ -1668,7 +1668,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite decotto; la parte utile e' corteccia; si trova in montagna; nella stagione: autunno."
   },
   {
     "nome": "Delrean",
@@ -1680,7 +1680,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite macerazione; la parte utile e' radici; si trova in artico; nella stagione: primavera, autunno."
   },
   {
     "nome": "Ditania",
@@ -1692,7 +1692,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Dorose",
@@ -1704,7 +1704,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Draffe",
@@ -1716,7 +1716,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Dramallon",
@@ -1728,7 +1728,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Foresta. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' corteccia; si trova in foresta; nella stagione: autunno."
   },
   {
     "nome": "Ebure",
@@ -1740,7 +1740,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite decotto; la parte utile e' radici; si trova in palude; nella stagione: primavera, autunno."
   },
   {
     "nome": "Eldas",
@@ -1752,7 +1752,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' corteccia; si trova in montagna; nella stagione: autunno."
   },
   {
     "nome": "Entrist",
@@ -1764,7 +1764,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite macerazione; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Falsifal",
@@ -1776,7 +1776,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Foresta. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' fungo; si trova in foresta; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Fennely",
@@ -1788,7 +1788,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Fetrefe",
@@ -1800,7 +1800,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in foresta; nella stagione: primavera, autunno."
   },
   {
     "nome": "Fiveleaves",
@@ -1812,7 +1812,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Floos",
@@ -1824,7 +1824,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Foulain",
@@ -1836,7 +1836,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Gabruche",
@@ -1848,7 +1848,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' corteccia; si trova in montagna; nella stagione: autunno."
   },
   {
     "nome": "Gardax",
@@ -1860,7 +1860,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' radici; si trova in foresta; nella stagione: primavera, autunno."
   },
   {
     "nome": "Garigne",
@@ -1872,7 +1872,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Prateria. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' corteccia; si trova in prateria; nella stagione: autunno."
   },
   {
     "nome": "Golcorone",
@@ -1884,7 +1884,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Gylvira",
@@ -1896,7 +1896,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite macerazione; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Haquedi",
@@ -1908,7 +1908,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Harir",
@@ -1920,7 +1920,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite infuso; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Helival",
@@ -1932,7 +1932,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Ironar",
@@ -1944,7 +1944,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in montagna; nella stagione: primavera, autunno."
   },
   {
     "nome": "Ironsplit",
@@ -1956,7 +1956,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Jaffray",
@@ -1968,7 +1968,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Jojopopo",
@@ -1980,7 +1980,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' radici; si trova in palude; nella stagione: primavera, autunno."
   },
   {
     "nome": "Kelventari",
@@ -1992,7 +1992,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Kilmatur",
@@ -2004,7 +2004,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite decotto; la parte utile e' radici; si trova in deserto; nella stagione: primavera, autunno."
   },
   {
     "nome": "Laumpor",
@@ -2016,7 +2016,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Lessentor",
@@ -2028,7 +2028,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Prateria. Stagione: Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' corteccia; si trova in prateria; nella stagione: autunno."
   },
   {
     "nome": "Lunort",
@@ -2040,7 +2040,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Macabate",
@@ -2052,7 +2052,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Costa. Stagione: Primavera, Autunno."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite decotto; la parte utile e' radici; si trova in costa; nella stagione: primavera, autunno."
   },
   {
     "nome": "Mandrake",
@@ -2064,7 +2064,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in montagna; nella stagione: primavera, autunno."
   },
   {
     "nome": "Marmallow",
@@ -2076,7 +2076,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite macerazione; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Maserote",
@@ -2088,7 +2088,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite macerazione; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Meland",
@@ -2100,7 +2100,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Milort",
@@ -2112,7 +2112,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Mirena",
@@ -2124,7 +2124,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Sottosuolo. Stagione: Autunno."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' corteccia; si trova in sottosuolo; nella stagione: autunno."
   },
   {
     "nome": "Mogarli",
@@ -2136,7 +2136,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' corteccia; si trova in montagna; nella stagione: autunno."
   },
   {
     "nome": "Navouh",
@@ -2148,7 +2148,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Oede",
@@ -2160,7 +2160,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in palude; nella stagione: estate."
   },
   {
     "nome": "Olus Veritis",
@@ -2172,7 +2172,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite decotto; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Olvar",
@@ -2184,7 +2184,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Palmath",
@@ -2196,7 +2196,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba destinata a preparazioni curative, lenitive o di recupero. Nel PDF e' indicata come curativa; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Parlas",
@@ -2208,7 +2208,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite infuso; la parte utile e' pianta; si trova in palude; nella stagione: estate."
   },
   {
     "nome": "Pattran",
@@ -2220,7 +2220,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' corteccia; si trova in montagna; nella stagione: autunno."
   },
   {
     "nome": "Qurl",
@@ -2232,7 +2232,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Montagna",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in montagna; nella stagione: estate."
   },
   {
     "nome": "Ribolan",
@@ -2244,7 +2244,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Sanilca",
@@ -2256,7 +2256,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Palude",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Palude. Stagione: Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite macerazione; la parte utile e' corteccia; si trova in palude; nella stagione: autunno."
   },
   {
     "nome": "Saraceco",
@@ -2268,7 +2268,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Sentaye",
@@ -2280,7 +2280,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Sottosuolo",
     "stagione": "Primavera, Estate, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
+    "descrizione": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura. Nel PDF e' indicata come alterante; si prepara tramite decotto; la parte utile e' fungo; si trova in sottosuolo; nella stagione: primavera, estate, autunno."
   },
   {
     "nome": "Sherpur",
@@ -2292,7 +2292,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Tamors",
@@ -2304,7 +2304,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Deserto",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' radici; si trova in deserto; nella stagione: primavera, autunno."
   },
   {
     "nome": "Tanarisk",
@@ -2316,7 +2316,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Toreape",
@@ -2328,7 +2328,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite macerazione; la parte utile e' pianta; si trova in costa; nella stagione: estate."
   },
   {
     "nome": "Trovas",
@@ -2340,7 +2340,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Prateria. Stagione: Primavera, Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' radici; si trova in prateria; nella stagione: primavera, autunno."
   },
   {
     "nome": "Ur",
@@ -2352,7 +2352,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite assorbimento diretto; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Vilerge",
@@ -2364,7 +2364,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite infuso; la parte utile e' pianta; si trova in foresta; nella stagione: estate."
   },
   {
     "nome": "Wodero",
@@ -2376,7 +2376,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Prateria",
     "stagione": "Estate",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
+    "descrizione": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'. Nel PDF e' indicata come potenziamento; si prepara tramite infuso; la parte utile e' pianta; si trova in prateria; nella stagione: estate."
   },
   {
     "nome": "Wolfhunter",
@@ -2388,7 +2388,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Costa",
     "stagione": "Primavera, Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Costa. Stagione: Primavera, Autunno."
+    "descrizione": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali. Nel PDF e' indicata come antiveleno; si prepara tramite decotto; la parte utile e' radici; si trova in costa; nella stagione: primavera, autunno."
   },
   {
     "nome": "Xosorrel",
@@ -2400,7 +2400,7 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Foresta",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Foresta. Stagione: Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' corteccia; si trova in foresta; nella stagione: autunno."
   },
   {
     "nome": "Yaretalion",
@@ -2412,344 +2412,400 @@ window.COMP_HERBS_DATA = [
     "ambiente": "Artico",
     "stagione": "Autunno",
     "fonte": "AideDD Herbs",
-    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
+    "descrizione": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili. Nel PDF e' indicata come fortificante; si prepara tramite decotto; la parte utile e' corteccia; si trova in artico; nella stagione: autunno."
   }
 ];
 window.COMP_METALS_DATA = [
   {
     "nome": "Adamante",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Molto raro",
+    "costo_dettaglio": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
     "descrizione": "Metallo estremamente duro, associato a lavorazioni leggendarie e materiali quasi indistruttibili."
   },
   {
     "nome": "Adamantio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Molto raro",
+    "costo_dettaglio": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
     "descrizione": "Lega rara e durissima, usata per armature e armi capaci di resistere a colpi devastanti."
   },
   {
     "nome": "Arambarium",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dei Reami, ricercato per lavorazioni speciali e oggetti preziosi."
   },
   {
     "nome": "Arandur",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Lega minerale rara, apprezzata per robustezza e lavorazioni arcane."
   },
   {
     "nome": "Arjale",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo esotico, adatto a comparire come materiale raro in tesori o componenti speciali."
   },
   {
     "nome": "Acciaio verde baatoriano",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Planare/leggendario",
+    "costo_dettaglio": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
     "descrizione": "Acciaio infernale dal colore verde, legato a forgia planare e manufatti dei Piani Inferiori."
   },
   {
     "nome": "Bario",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo comune nella realta', utile come riferimento minerario o materiale alchemico."
   },
   {
     "nome": "Ottone",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Lega di rame e zinco, usata per finiture, strumenti e componenti decorativi."
   },
   {
     "nome": "Argento brillante",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo prezioso e luminoso, adatto a gioielli, ornamenti e oggetti cerimoniali."
   },
   {
     "nome": "Bronzo",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Lega resistente di rame e stagno, comune in armi, armature antiche e decorazioni."
   },
   {
     "nome": "Acciaio celestiale",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Planare/leggendario",
+    "costo_dettaglio": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
     "descrizione": "Acciaio raro di origine celestiale, ideale per reliquie o armi sacre."
   },
   {
     "nome": "Cromo",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo duro e lucente, utile per rivestimenti e dettagli resistenti."
   },
   {
     "nome": "Cobalto",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo bluastro, prezioso per pigmenti, leghe e componenti speciali."
   },
   {
     "nome": "Ferro freddo",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Ferro lavorato con tecniche particolari, spesso associato a efficacia contro creature fatate o innaturali."
   },
   {
     "nome": "Rame",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo comune, duttile e diffuso in monete, utensili e componenti."
   },
   {
     "nome": "Dajavva",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dei Reami, utile come materiale esotico per forgia o tesori."
   },
   {
     "nome": "Acciaio scuro",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo scuro e resistente, adatto a equipaggiamenti rari e manufatti minacciosi."
   },
   {
     "nome": "Dlarun",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro e pallido, usato in lavorazioni speciali e oggetti di pregio."
   },
   {
     "nome": "Elettro",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Prezioso",
+    "costo_dettaglio": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
     "descrizione": "Lega naturale o artificiale di oro e argento, usata anche per monete e gioielli."
   },
   {
     "nome": "Acciaio elfico",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Acciaio raffinato di tradizione elfica, leggero ed elegante nelle lavorazioni."
   },
   {
     "nome": "Minerale favorito",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Minerale speciale legato a tradizioni o luoghi specifici dei Reami."
   },
   {
     "nome": "Oro",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Prezioso",
+    "costo_dettaglio": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
     "descrizione": "Metallo prezioso per eccellenza, usato per monete, gioielli e decorazioni."
   },
   {
     "nome": "Spina infernale",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Planare/leggendario",
+    "costo_dettaglio": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
     "descrizione": "Materiale infernale raro, adatto a oggetti sinistri o componenti planari."
   },
   {
     "nome": "Hizagkuur",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dei Reami, spesso trattato come materiale speciale per forgia avanzata."
   },
   {
     "nome": "Illithium",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dal nome legato agli illithid, utile per oggetti psionici o misteriosi."
   },
   {
     "nome": "Ferro infernale",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Planare/leggendario",
+    "costo_dettaglio": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
     "descrizione": "Ferro dei Piani Inferiori, associato a macchine, armi e manufatti infernali."
   },
   {
     "nome": "Ferro",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo comune e fondamentale per armi, armature, utensili e costruzioni."
   },
   {
     "nome": "Ironfell",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro e pesante, adatto a tesori minerari e leghe speciali."
   },
   {
     "nome": "Piombo",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo pesante e malleabile, usato in pesi, sigilli e schermature."
   },
   {
     "nome": "Litio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo leggero, utile come materiale raro in contesti alchemici o tecnologici."
   },
   {
     "nome": "Magnesio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo leggero e reattivo, interessante per lavorazioni alchemiche."
   },
   {
     "nome": "Manganese",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo usato in leghe e pigmenti, utile come risorsa mineraria."
   },
   {
     "nome": "Mercurio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo liquido a temperatura ordinaria, importante in alchimia e rituali."
   },
   {
     "nome": "Mithral",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Molto raro",
+    "costo_dettaglio": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
     "descrizione": "Metallo raro, leggero e resistente, ricercato per armature e oggetti di pregio."
   },
   {
     "nome": "Molibdeno",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo resistente, utile in leghe robuste e applicazioni specialistiche."
   },
   {
     "nome": "Nichel",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo resistente alla corrosione, usato in leghe e finiture."
   },
   {
     "nome": "Ammazzaorchi",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo o lega dal nome marziale, adatto a manufatti pensati per la guerra."
   },
   {
     "nome": "Palladio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Prezioso",
+    "costo_dettaglio": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
     "descrizione": "Metallo prezioso e raro, utile per gioielli e componenti di alto valore."
   },
   {
     "nome": "Peltro",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Lega tenera e comune, usata in stoviglie, contenitori e piccoli oggetti."
   },
   {
     "nome": "Platino",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Prezioso",
+    "costo_dettaglio": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
     "descrizione": "Metallo prezioso molto raro, usato per tesori, gioielli e oggetti nobili."
   },
   {
     "nome": "Pyrohydram",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo esotico dal nome legato al fuoco, adatto a forgia magica o planare."
   },
   {
     "nome": "Argento",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Prezioso",
+    "costo_dettaglio": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
     "descrizione": "Metallo prezioso usato per monete, gioielli e armi argentate."
   },
   {
     "nome": "Scoria",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Residuo di fusione, utile come materiale grezzo o dettaglio di forgia."
   },
   {
     "nome": "Vero acciaio solaniano",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Planare/leggendario",
+    "costo_dettaglio": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
     "descrizione": "Acciaio raro di origine celestiale, adatto a reliquie e manufatti puri."
   },
   {
     "nome": "Metallo stellare",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Molto raro",
+    "costo_dettaglio": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
     "descrizione": "Metallo meteorico, raro e ricercato per armi o oggetti straordinari."
   },
   {
     "nome": "Acciaio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Lega comune di ferro, base per molte armi, armature e utensili."
   },
   {
     "nome": "Tantulhor",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dei Reami, utile come materiale esotico o componente prezioso."
   },
   {
     "nome": "Telstang",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro e flessibile, adatto a lavorazioni speciali."
   },
   {
     "nome": "Stagno",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo tenero, spesso impiegato in leghe come il bronzo."
   },
   {
     "nome": "Titanio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo resistente e leggero, adatto a leghe avanzate."
   },
   {
     "nome": "Acciaio titanico",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Lega potente e rara, adatta a equipaggiamenti eccezionali."
   },
   {
     "nome": "Acciaio bianco",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Acciaio raro e chiaro, adatto a oggetti eleganti o sacri."
   },
   {
     "nome": "Acciaio wootz",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Acciaio pregiato noto per qualita' e venature, ideale per lame raffinate."
   },
   {
     "nome": "Zardazil",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Raro",
+    "costo_dettaglio": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
     "descrizione": "Metallo raro dei Reami, adatto a tesori e materiali speciali."
   },
   {
     "nome": "Zinco",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo comune impiegato in leghe, rivestimenti e piccoli oggetti."
   },
   {
     "nome": "Zirconio",
     "fonte": "Forgotten Realms Wiki",
-    "costo": "Variabile",
+    "costo": "Comune",
+    "costo_dettaglio": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
     "descrizione": "Metallo resistente e raro, utile in leghe pregiate o componenti speciali."
   }
 ];

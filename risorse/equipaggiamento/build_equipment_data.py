@@ -376,6 +376,14 @@ HERB_SEASON_IT = {
     "winter": "Inverno",
 }
 
+HERB_CATEGORY_DETAIL_IT = {
+    "Alterante": "Erba alchemica con effetti alteranti, pensata per preparazioni che modificano lo stato del bersaglio o della mistura.",
+    "Antiveleno": "Erba utile in preparazioni contro tossine, veleni o contaminazioni naturali.",
+    "Potenziamento": "Erba impiegata per preparazioni che rafforzano o amplificano temporaneamente una capacita'.",
+    "Curativa": "Erba destinata a preparazioni curative, lenitive o di recupero.",
+    "Fortificante": "Erba usata per preparazioni fortificanti, adatte a sostenere il corpo o resistere a condizioni difficili.",
+}
+
 ADVENTURING_DESCRIPTIONS = {
     "Acido (fiala)": "Liquido corrosivo contenuto in una fiala, utile come consumabile alchemico o materiale per situazioni di emergenza.",
     "Acqua santa (ampolla)": "Acqua consacrata conservata in un'ampolla, spesso usata contro creature empie o non morte.",
@@ -538,6 +546,72 @@ METAL_TRANSLATIONS = {
     "Zirconium": ("Zirconio", "Variabile", "Metallo resistente e raro, utile in leghe pregiate o componenti speciali."),
 }
 
+METAL_COST_RANGES = {
+    "Barium": "Comune",
+    "Brass": "Comune",
+    "Bronze": "Comune",
+    "Chromium": "Comune",
+    "Cobalt": "Comune",
+    "Copper": "Comune",
+    "Iron": "Comune",
+    "Lead": "Comune",
+    "Lithium": "Comune",
+    "Magnesium": "Comune",
+    "Manganese": "Comune",
+    "Molybdenum": "Comune",
+    "Nickel": "Comune",
+    "Pewter": "Comune",
+    "Slag": "Comune",
+    "Steel": "Comune",
+    "Tin": "Comune",
+    "Titanium": "Comune",
+    "Zinc": "Comune",
+    "Zirconium": "Comune",
+    "Electrum": "Prezioso",
+    "Gold": "Prezioso",
+    "Palladium": "Prezioso",
+    "Platinum": "Prezioso",
+    "Silver": "Prezioso",
+    "Adamant": "Molto raro",
+    "Adamantine": "Molto raro",
+    "Cold iron": "Raro",
+    "Mithral": "Molto raro",
+    "Star metal": "Molto raro",
+    "Arambarium": "Raro",
+    "Arandur": "Raro",
+    "Arjale": "Raro",
+    "Brightsilver": "Raro",
+    "Dajavva": "Raro",
+    "Darksteel": "Raro",
+    "Dlarun": "Raro",
+    "Elven steel": "Raro",
+    "Favored mineral": "Raro",
+    "Hizagkuur": "Raro",
+    "Illithium": "Raro",
+    "Ironfell": "Raro",
+    "Orcslayer": "Raro",
+    "Pyrohydram": "Raro",
+    "Tantulhor": "Raro",
+    "Telstang": "Raro",
+    "Titansteel": "Raro",
+    "Whitesteel": "Raro",
+    "Wootz steel": "Raro",
+    "Zardazil": "Raro",
+    "Baatorian green steel": "Planare/leggendario",
+    "Celestial steel": "Planare/leggendario",
+    "Hellthorn": "Planare/leggendario",
+    "Infernal iron": "Planare/leggendario",
+    "Solanian truesteel": "Planare/leggendario",
+}
+
+METAL_COST_DETAILS = {
+    "Comune": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
+    "Prezioso": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
+    "Raro": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
+    "Molto raro": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
+    "Planare/leggendario": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
+}
+
 
 def translate_joined(value, mapping):
     parts = [part.strip() for part in str(value or "").split(",") if part.strip()]
@@ -557,14 +631,15 @@ def enrich_herbs(rows):
         row["parte"] = HERB_PART_IT.get(str(row.get("parte", "")).lower(), row.get("parte", ""))
         row["ambiente"] = translate_joined(row.get("ambiente"), HERB_ENVIRONMENT_IT)
         row["stagione"] = translate_joined(row.get("stagione"), HERB_SEASON_IT)
+        intro = HERB_CATEGORY_DETAIL_IT.get(row.get("categoria"), "Erba catalogata dal PDF delle erbe.")
         bits = [
-            f"Tipo: {row['categoria']}" if row.get("categoria") else "",
-            f"Preparazione: {row['preparazione']}" if row.get("preparazione") else "",
-            f"Parte utile: {row['parte']}" if row.get("parte") else "",
-            f"Ambiente: {row['ambiente']}" if row.get("ambiente") else "",
-            f"Stagione: {row['stagione']}" if row.get("stagione") else "",
+            f"Nel PDF e' indicata come {row['categoria'].lower()}" if row.get("categoria") else "",
+            f"si prepara tramite {row['preparazione'].lower()}" if row.get("preparazione") else "",
+            f"la parte utile e' {row['parte'].lower()}" if row.get("parte") else "",
+            f"si trova in {row['ambiente'].lower()}" if row.get("ambiente") else "",
+            f"nella stagione: {row['stagione'].lower()}" if row.get("stagione") else "",
         ]
-        row["descrizione"] = ". ".join(bit for bit in bits if bit) + "."
+        row["descrizione"] = f"{intro} " + "; ".join(bit for bit in bits if bit) + "."
     return rows
 
 
@@ -578,12 +653,15 @@ def enrich_gems(rows):
 
 def enrich_metals(rows):
     for row in rows:
+        original_name = row.get("nome")
         name, cost, description = METAL_TRANSLATIONS.get(
-            row.get("nome"),
-            (row.get("nome"), "Variabile", "Metallo o lega rara, utile come materiale speciale o componente di tesori."),
+            original_name,
+            (original_name, "Variabile", "Metallo o lega rara, utile come materiale speciale o componente di tesori."),
         )
+        range_label = METAL_COST_RANGES.get(original_name, cost if cost != "Variabile" else "Raro")
         row["nome"] = name
-        row["costo"] = cost
+        row["costo"] = range_label
+        row["costo_dettaglio"] = METAL_COST_DETAILS.get(range_label, METAL_COST_DETAILS["Raro"])
         row["descrizione"] = description
         row.pop("categoria", None)
     return rows
