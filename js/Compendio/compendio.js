@@ -426,7 +426,7 @@ window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi'
         }, title || 'Filtro');
         return;
     }
-    openMultiSelect(options, current, values => {
+    _compOpenInstantMultiSelect(options, current, values => {
         window.compendioSetFilter(key, values);
         const overlay = document.querySelector('.comp-filter-overlay');
         if (overlay) {
@@ -439,6 +439,10 @@ window.compendioResetFilters = function() {
     _compStateFor(_compCurrentTab).filters = {};
     _compRenderCurrentListContent();
     _compRefreshStickyTools();
+    const overlay = document.querySelector('.comp-filter-overlay');
+    if (overlay) {
+        overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
+    }
 };
 
 window.compendioOpenFilters = function() {
@@ -453,8 +457,7 @@ window.compendioOpenFilters = function() {
             <h2 class="comp-filter-title">Filtri</h2>
             <div class="comp-filter-panel">${_compFiltersHtml(_compCurrentTab, state, items)}</div>
             <div class="comp-filter-actions">
-                <button type="button" class="btn-secondary" onclick="compendioResetFilters();this.closest('.hp-calc-overlay').remove()">Reset</button>
-                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+                <button type="button" class="btn-secondary" onclick="compendioResetFilters()">Reset</button>
             </div>
         </div>
     `;
@@ -1090,6 +1093,18 @@ window.compendioToggleGemTreasures = function() {
     _compRenderObjectsSectionContent();
 };
 
+window.compendioSetGemView = function(view) {
+    const state = _compStateFor('oggetti');
+    state.gemView = view === 'tesori' ? 'tesori' : 'lista';
+    if (state.gemView === 'tesori') {
+        const filters = _compEquipmentFilterState('gemme', state);
+        delete filters.type;
+        delete filters.availability;
+    }
+    _compRenderObjectsSectionContent();
+    _compRenderObjectsStickyTools();
+};
+
 window.compendioSetObjectsSearch = function(value) {
     const state = _compStateFor('oggetti');
     const section = state.equipmentSection || 'armi';
@@ -1153,14 +1168,18 @@ function _compEquipmentTablesHtml(state = _compStateFor('oggetti')) {
 }
 
 function _compGenericEquipmentListHtml(section, state = _compStateFor('oggetti')) {
+    if (section === 'gemme') {
+        return _compGemsListHtml(state);
+    }
     const total = _compEquipmentSectionItems(section).length;
-    const items = _compEquipmentFilteredItems(section, state);
+    let items = _compEquipmentFilteredItems(section, state);
+    if (section === 'metalli') {
+        items = items.sort((a, b) => a.title.localeCompare(b.title, 'it'));
+    }
     let content = '';
     if (section === 'strumenti') {
         content = _compToolsTablesHtml(items);
-    } else if (section === 'gemme') {
-        content = _compGemsListHtml(state, total, items);
-    } else if (['avventura', 'erbe', 'metalli', 'gemme'].includes(section)) {
+    } else if (['avventura', 'erbe', 'metalli'].includes(section)) {
         content = _compEquipmentCardsHtml(section, items);
     } else {
         content = _compGenericEquipmentTable(section, items);
@@ -1243,11 +1262,19 @@ function _compEquipmentCardMeta(section, item) {
     if (section === 'avventura') {
         return [item.categoryLabel || item.category, item.weight ? `Peso: ${item.weight}` : ''].filter(Boolean).join(' · ');
     }
+    if (section === 'gemme') {
+        return [item.type, item.availability].filter(Boolean).join(' · ');
+    }
     return '';
 }
 
-function _compGemsListHtml(state, total, items) {
-    const open = state.gemTreasureOpen === true;
+function _compGemsListHtml(state) {
+    state.gemView = state.gemView || 'lista';
+    const all = _compEquipmentSectionItems('gemme');
+    const filtered = _compEquipmentFilteredItems('gemme', state);
+    const isTreasure = state.gemView === 'tesori';
+    const base = all.filter(item => item.gemKind === (isTreasure ? 'tesoro' : 'reame'));
+    const items = filtered.filter(item => item.gemKind === (isTreasure ? 'tesoro' : 'reame'));
     const treasures = items.filter(item => item.gemKind === 'tesoro');
     const realms = items.filter(item => item.gemKind === 'reame')
         .sort((a, b) => a.title.localeCompare(b.title, 'it'));
@@ -1255,20 +1282,18 @@ function _compGemsListHtml(state, total, items) {
         ? _compGemTreasureTablesHtml(treasures)
         : '<div class="comp-empty">Nessuna gemma tesoro trovata</div>';
     const realmsHtml = realms.length
-        ? `<h3 class="comp-equipment-list-title">Gemme dei Reami</h3><div class="comp-list comp-equipment-card-list">${realms.map(item => _compEquipmentCardHtml('gemme', item)).join('')}</div>`
+        ? `<div class="comp-list comp-equipment-card-list">${realms.map(item => _compEquipmentCardHtml('gemme', item)).join('')}</div>`
         : '';
-    const emptyHtml = !treasures.length && !realms.length
+    const emptyHtml = !items.length
         ? '<div class="comp-empty">Nessuna gemma trovata</div>'
         : '';
     return `
-        <p class="comp-count">${items.length} risultati su ${total}</p>
-        <button type="button" class="comp-group-divider comp-gem-treasure-toggle ${open ? 'open' : ''}" onclick="compendioToggleGemTreasures()">
-            ${_compIcon('chevron-right')}
-            <span>Tesori</span>
-            <small>${treasures.length}</small>
-        </button>
-        ${open ? `<div class="comp-gem-treasure-body">${treasureHtml}</div>` : ''}
-        ${realmsHtml}
+        <div class="comp-gem-mode-switch" role="tablist" aria-label="Vista gemme">
+            <button type="button" class="${!isTreasure ? 'active' : ''}" onclick="compendioSetGemView('lista')">Lista</button>
+            <button type="button" class="${isTreasure ? 'active' : ''}" onclick="compendioSetGemView('tesori')">Tesori</button>
+        </div>
+        <p class="comp-count">${items.length} risultati su ${base.length}</p>
+        ${isTreasure ? treasureHtml : realmsHtml}
         ${emptyHtml}
     `;
 }
@@ -1490,6 +1515,7 @@ function _compGenericEquipmentItem(section, item, index) {
         category: item.categoria || item.category || item.tipo || item.type || '',
         categoryLabel: item.categoria || item.category || item.tipo || item.type || '',
         type: item.tipo || item.type || '',
+        availability: item.reperibilita || item.availability || item.location || '',
         source: item.fonte || item.source || '',
         cost,
         costLabel: item.costo || item.cost_label || item.prezzo || item.price || (Number.isFinite(cost) ? `${cost} mo` : ''),
@@ -1508,7 +1534,7 @@ function _compGenericEquipmentItem(section, item, index) {
         data: item,
         search: [
             title, item.name, item.categoria, item.category, item.tipo, item.type,
-            item.fonte, item.source, item.preparazione, item.preparation, item.parte,
+            item.reperibilita, item.availability, item.location, item.fonte, item.source, item.preparazione, item.preparation, item.parte,
             item.part, item.ambiente, item.environment, item.stagione, item.season,
             item.descrizione, item.description, item.valore, item.value_label, item.costo,
             item.cost_label, item.costo_dettaglio, item.cost_detail, item.peso, item.weight,
@@ -1537,15 +1563,24 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     const environments = _compFilterValues(filters.environment);
     const seasons = _compFilterValues(filters.season);
     const values = _compFilterValues(filters.value);
+    const availabilities = _compFilterValues(filters.availability);
+    const valueRange = filters.valueRange;
     if (categories.length && !categories.includes(item.categoryLabel || item.category)) return false;
     if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
     if (types.length && !types.includes(item.type)) return false;
+    if (availabilities.length && !availabilities.includes(item.availability)) return false;
     if (properties.length && !properties.some(prop => String(item.properties || '').includes(prop))) return false;
     if (preparations.length && !preparations.includes(item.preparation)) return false;
     if (parts.length && !parts.includes(item.part)) return false;
     if (environments.length && !environments.includes(item.environment)) return false;
     if (seasons.length && !seasons.some(season => String(item.season || '').split(',').map(s => s.trim()).includes(season))) return false;
     if (values.length && !values.includes(item.valueLabel || item.costLabel)) return false;
+    if (valueRange && (Number.isFinite(valueRange.min) || Number.isFinite(valueRange.max))) {
+        if (!Number.isFinite(item.cost)) return false;
+        const min = Number.isFinite(valueRange.min) ? valueRange.min : -Infinity;
+        const max = Number.isFinite(valueRange.max) ? valueRange.max : Infinity;
+        if (item.cost < min || item.cost > max) return false;
+    }
     if (costs.length) {
         if (!Number.isFinite(item.cost)) return false;
         if (!costs.some(range => _compCostInRange(item.cost, range))) return false;
@@ -1570,10 +1605,12 @@ function _compEquipmentFilterDefs(section) {
         }
         return filters;
     }
-    const filters = [
-        { key: 'category', title: 'Categoria', options: _compUnique(items.map(i => i.categoryLabel || i.category)).map(v => [v, v]) },
-        { key: 'type', title: 'Tipologia', options: _compUnique(items.map(i => i.type)).map(v => [v, v]) },
-    ].filter(def => def.options.length);
+    const filters = section === 'gemme'
+        ? []
+        : [
+            { key: 'category', title: 'Categoria', options: _compUnique(items.map(i => i.categoryLabel || i.category)).map(v => [v, v]) },
+            { key: 'type', title: 'Tipologia', options: _compUnique(items.map(i => i.type)).map(v => [v, v]) },
+        ].filter(def => def.options.length);
     if (section === 'armi') {
         filters.unshift({ key: 'kind', title: 'Tipo', options: [['weapon', 'Armi'], ['armor', 'Armature e Scudi']] });
         const props = _compUnique(items.flatMap(i => _compFilterValues(String(i.properties || '').split(',').map(x => x.trim()))));
@@ -1588,7 +1625,22 @@ function _compEquipmentFilterDefs(section) {
         );
     }
     if (section === 'gemme') {
-        filters.push({ key: 'value', title: 'Valore', options: _compUnique(items.map(i => i.valueLabel || i.costLabel)).map(v => [v, v]) });
+        const view = _compStateFor('oggetti').gemView === 'tesori' ? 'tesoro' : 'reame';
+        const scoped = items.filter(i => i.gemKind === view);
+        const types = _compUnique(scoped.map(i => i.type)).map(v => [v, v]);
+        const availability = _compUnique(scoped.map(i => i.availability)).map(v => [v, v]);
+        const costs = scoped.filter(i => Number.isFinite(i.cost)).map(i => i.cost);
+        if (view === 'reame' && types.length) filters.push({ key: 'type', title: 'Tipo', options: types });
+        if (view === 'reame' && availability.length) filters.push({ key: 'availability', title: 'Reperibilita', options: availability });
+        if (costs.length) {
+            filters.push({
+                key: 'valueRange',
+                title: 'Valore',
+                mode: 'range',
+                min: Math.min(...costs),
+                max: Math.max(...costs),
+            });
+        }
     }
     if (items.some(item => Number.isFinite(item.cost)) && section !== 'gemme') {
         filters.push({ key: 'cost', title: 'Costo', options: [['0-1', '0-1 mo'], ['1-10', '1-10 mo'], ['11-50', '11-50 mo'], ['51-100', '51-100 mo'], ['101+', '101+ mo']] });
@@ -1708,7 +1760,10 @@ function _compObjectMatchesFilters(item, state) {
 function _compObjectsActiveFilterCount() {
     const state = _compStateFor('oggetti');
     const f = _compEquipmentFilterState(state.equipmentSection || 'armi', state);
-    return Object.values(f).reduce((count, value) => count + _compFilterValues(value).length, 0);
+    return Object.values(f).reduce((count, value) => {
+        if (value && typeof value === 'object' && !Array.isArray(value)) return count + 1;
+        return count + _compFilterValues(value).length;
+    }, 0);
 }
 
 window.compendioOpenObjectsFilters = function() {
@@ -1722,7 +1777,6 @@ window.compendioOpenObjectsFilters = function() {
             <div class="comp-filter-panel">${_compObjectsFiltersHtml()}</div>
             <div class="comp-filter-actions">
                 <button type="button" class="btn-secondary" onclick="compendioResetObjectsFilters()">Reset</button>
-                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
             </div>
         </div>
     `;
@@ -1735,7 +1789,10 @@ function _compObjectsFiltersHtml() {
     const f = _compEquipmentFilterState(section, state);
     const defs = _compEquipmentFilterDefs(section);
     if (!defs.length) return '<div class="comp-empty">Nessun filtro disponibile</div>';
-    return defs.map(def => _compObjectSelect(def.key, f[def.key], def.options, def.title, def.mode || '')).join('');
+    return defs.map(def => def.mode === 'range'
+        ? _compObjectRangeFilter(def, f[def.key])
+        : _compObjectSelect(def.key, f[def.key], def.options, def.title, def.mode || '')
+    ).join('');
 }
 
 function _compObjectSelect(key, value, options, title, forcedMode = '') {
@@ -1753,6 +1810,37 @@ function _compObjectSelect(key, value, options, title, forcedMode = '') {
     </button>`;
 }
 
+function _compObjectRangeFilter(def, value) {
+    const minBound = Number(def.min || 0);
+    const maxBound = Number(def.max || minBound);
+    const rawMin = Number(value?.min);
+    const rawMax = Number(value?.max);
+    const min = Number.isFinite(rawMin) ? Math.max(minBound, Math.min(rawMin, maxBound)) : minBound;
+    const max = Number.isFinite(rawMax) ? Math.min(maxBound, Math.max(rawMax, minBound)) : maxBound;
+    const step = Math.max(1, Math.round((maxBound - minBound) / 200));
+    const active = min !== minBound || max !== maxBound;
+    return `<div class="comp-range-filter" data-range-key="${_compEscapeAttr(def.key)}">
+        <div class="comp-range-filter-head">
+            <span>${escapeHtml(def.title)}</span>
+            <small id="compRangeLabel-${_compEscapeAttr(def.key)}">${escapeHtml(_compMoneyRangeLabel(min, max))}</small>
+        </div>
+        <div class="comp-dual-range ${active ? 'active' : ''}">
+            <input type="range" min="${minBound}" max="${maxBound}" step="${step}" value="${min}"
+                oninput="compendioSetObjectRangeFilter('${_compEscapeAttr(def.key)}','min',this.value)">
+            <input type="range" min="${minBound}" max="${maxBound}" step="${step}" value="${max}"
+                oninput="compendioSetObjectRangeFilter('${_compEscapeAttr(def.key)}','max',this.value)">
+        </div>
+    </div>`;
+}
+
+function _compMoneyRangeLabel(min, max) {
+    return `${_compFormatGold(min)} - ${_compFormatGold(max)}`;
+}
+
+function _compFormatGold(value) {
+    return `${Number(value || 0).toLocaleString('it-IT')} mo`;
+}
+
 window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = 'multi') {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
     const state = _compStateFor('oggetti');
@@ -1768,13 +1856,92 @@ window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = '
         }, title || 'Filtro');
         return;
     }
-    openMultiSelect(options, _compFilterValues(filters[key]), values => {
+    _compOpenInstantMultiSelect(options, _compFilterValues(filters[key]), values => {
         filters[key] = values;
         _compRenderObjectsSectionContent();
         const overlay = document.querySelector('.comp-objects-filter-overlay');
         if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
     }, title || 'Filtro');
 };
+
+window.compendioSetObjectRangeFilter = function(key, bound, value) {
+    const state = _compStateFor('oggetti');
+    const section = state.equipmentSection || 'armi';
+    const filters = _compEquipmentFilterState(section, state);
+    const def = _compEquipmentFilterDefs(section).find(entry => entry.key === key);
+    if (!def) return;
+    const minBound = Number(def.min || 0);
+    const maxBound = Number(def.max || minBound);
+    const current = filters[key] && typeof filters[key] === 'object' ? { ...filters[key] } : { min: minBound, max: maxBound };
+    current[bound] = Number(value);
+    current.min = Math.max(minBound, Math.min(Number(current.min), maxBound));
+    current.max = Math.min(maxBound, Math.max(Number(current.max), minBound));
+    if (current.min > current.max) {
+        if (bound === 'min') current.max = current.min;
+        else current.min = current.max;
+    }
+    if (current.min === minBound && current.max === maxBound) delete filters[key];
+    else filters[key] = current;
+    _compRenderObjectsSectionContent();
+    const label = document.getElementById(`compRangeLabel-${key}`);
+    if (label) label.textContent = _compMoneyRangeLabel(current.min, current.max);
+    const badge = document.getElementById('compObjectsFiltersBadge');
+    if (badge) {
+        const n = _compObjectsActiveFilterCount();
+        badge.textContent = String(n);
+        badge.style.display = n ? 'inline-flex' : 'none';
+    }
+};
+
+function _compOpenInstantMultiSelect(options, currentSelected, callback, title) {
+    if (typeof closeCustomSelect === 'function') closeCustomSelect();
+    const state = new Set((currentSelected || []).map(String));
+    const overlay = document.createElement('div');
+    overlay.id = 'customSelectOverlay';
+    overlay.className = 'custom-select-overlay';
+    const html = `
+        <div class="custom-select-panel">
+            <div class="custom-select-header">
+                <span>${escapeHtml(title || 'Seleziona')}</span>
+                <button class="custom-select-close" data-custom-select-action="close">&times;</button>
+            </div>
+            <div class="custom-select-list">
+                ${options.map((o, i) => `
+                    <label class="custom-select-check-item">
+                        <input type="checkbox" data-idx="${i}" ${state.has(String(o.value)) ? 'checked' : ''}>
+                        <span>${escapeHtml(o.label)}</span>
+                    </label>
+                `).join('')}
+            </div>
+            <div class="custom-select-footer">
+                <button type="button" class="btn-secondary" data-custom-select-action="reset-multi">Reset</button>
+            </div>
+        </div>`;
+    if (typeof setSafeHtml === 'function') setSafeHtml(overlay, html);
+    else overlay.innerHTML = html;
+    const apply = () => callback([...state]);
+    overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const opt = options[parseInt(cb.dataset.idx, 10)];
+            if (!opt) return;
+            if (cb.checked) state.add(String(opt.value));
+            else state.delete(String(opt.value));
+            apply();
+        });
+    });
+    overlay.addEventListener('click', e => {
+        const action = e.target.closest('[data-custom-select-action]')?.dataset.customSelectAction;
+        if (e.target === overlay || action === 'close') {
+            if (typeof closeCustomSelect === 'function') closeCustomSelect();
+            else overlay.remove();
+        } else if (action === 'reset-multi') {
+            state.clear();
+            overlay.querySelectorAll('.custom-select-check-item input').forEach(cb => { cb.checked = false; });
+            apply();
+        }
+    });
+    document.body.appendChild(overlay);
+}
 
 window.compendioResetObjectsFilters = function() {
     const state = _compStateFor('oggetti');
@@ -1899,6 +2066,9 @@ function _compGenericEquipmentPreviewData(section, item) {
             rarita: '',
             meta: _compEquipmentDetailMeta([
                 ['Costo', item.costLabel || item.valueLabel],
+                ['Tipo', item.type],
+                ['Reperibilita', item.availability],
+                ['Peso', item.weight],
             ]),
             extras: _compEquipmentDetailExtras([
                 ['Poteri', item.power],

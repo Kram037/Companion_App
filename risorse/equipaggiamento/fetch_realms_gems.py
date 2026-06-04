@@ -132,13 +132,49 @@ def section_value(wikitext, section):
     return extract_value(text) if text else ""
 
 
+def item_template_params(wikitext):
+    params = {}
+    in_template = False
+    for line in wikitext.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("{{Item"):
+            in_template = True
+            continue
+        if in_template and stripped == "}}":
+            break
+        if not in_template or not stripped.startswith("|"):
+            continue
+        match = re.match(r"^\|\s*([A-Za-z0-9_]+)\s*=\s*(.*)$", stripped)
+        if match:
+            key, value = match.groups()
+            params[key.lower()] = clean_inline(value)
+    return params
+
+
 def extract_value(text):
-    matches = re.findall(r"^\|\s*(?:value|cost|price)\s*=\s*(.+)$", text or "", flags=re.I | re.M)
+    matches = re.findall(r"^\|[ \t]*(?:value|cost|price)[ \t]*=[ \t]*(.*)$", text or "", flags=re.I | re.M)
     for match in matches:
         value = clean_inline(match)
-        if value and value.lower() not in {"none", "n/a", "unknown", "varies"}:
+        if is_valid_money_label(value):
             return normalize_money(value)
     return ""
+
+
+def template_value(params):
+    for key in ("value5e", "value4e", "value3e", "value2e", "value1e", "value"):
+        value = params.get(key, "")
+        if is_valid_money_label(value):
+            return normalize_money(value)
+    return ""
+
+
+def is_valid_money_label(value):
+    value = clean_inline(value)
+    if not value or value.startswith("|"):
+        return False
+    if value.lower() in {"none", "n/a", "unknown", "varies", "variable", "—", "-"}:
+        return False
+    return bool(re.search(r"\d", value) or re.search(r"\b(?:gp|sp|cp|pp|gold|silver|copper|platinum)\b", value, re.I))
 
 
 def category_value(wikitext):
@@ -152,30 +188,36 @@ def category_value(wikitext):
 
 def normalize_money(value):
     value = clean_inline(value)
+    value = value.replace("–", "-").replace("—", "-")
     value = re.sub(r"\bgold pieces\b", "gp", value, flags=re.I)
     value = re.sub(r"\bgold piece\b", "gp", value, flags=re.I)
     value = re.sub(r"\bgp\b", "mo", value, flags=re.I)
     value = re.sub(r"\bsp\b", "ma", value, flags=re.I)
     value = re.sub(r"\bcp\b", "mr", value, flags=re.I)
     value = re.sub(r"\bpp\b", "mp", value, flags=re.I)
+    value = re.sub(r"(\d),(\d{3})", r"\1.\2", value)
     value = re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1.", value)
-    value = value.replace(" - ", "-").replace(" to ", "-")
+    value = value.replace(" - ", "-").replace(" to ", "-").replace(" -", "-").replace("- ", "-")
     return value
 
 
 def numeric_cost(value):
-    numbers = re.findall(r"\d[\d.]*", value or "")
+    numbers = re.findall(r"(\d[\d.,]*)\s*mo\b", value or "", flags=re.I)
+    if not numbers:
+        numbers = re.findall(r"\d[\d.,]*", value or "")
     if not numbers:
         return None
-    return int(numbers[-1].replace(".", ""))
+    return max(int(number.replace(".", "").replace(",", "")) for number in numbers)
 
 
 def page_to_gem(title):
     wikitext = page_wikitext(title)
+    params = item_template_params(wikitext)
     description = clean_section(section_text(wikitext, "Description"))
     powers = clean_section(section_text(wikitext, "Powers"))
     cost = (
-        section_value(wikitext, "5th Edition Statistics")
+        template_value(params)
+        or section_value(wikitext, "5th Edition Statistics")
         or section_value(wikitext, "4th Edition Statistics")
         or section_value(wikitext, "3rd Edition Statistics")
         or section_value(wikitext, "2nd Edition Statistics")
@@ -189,6 +231,9 @@ def page_to_gem(title):
         "nome": title,
         "costo": cost,
         "costo_mo": numeric_cost(cost),
+        "tipo": params.get("type", ""),
+        "reperibilita": params.get("location", ""),
+        "peso": params.get("weight", ""),
         "tipo_gemma": "reame",
         "fonte": "Forgotten Realms Wiki",
         "fonte_url": f"https://forgottenrealms.fandom.com/wiki/{urllib.parse.quote(title.replace(' ', '_'))}",
