@@ -8,7 +8,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Acido (fiala)",
@@ -16,7 +17,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Liquido corrosivo contenuto in una fiala, utile come consumabile alchemico o materiale per situazioni di emergenza."
   },
   {
     "nome": "Acqua santa (ampolla)",
@@ -24,7 +26,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Acqua consacrata conservata in un'ampolla, spesso usata contro creature empie o non morte."
   },
   {
     "nome": "Aghi da cerbottana (50)",
@@ -32,7 +35,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Munizioni per armi a distanza o da lancio."
   },
   {
     "nome": "Ampolla",
@@ -40,7 +44,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Antitossina (fiala)",
@@ -48,7 +53,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "50 mo",
     "costo_mo": 50,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Preparato da bere che aiuta a resistere agli effetti dei veleni per un breve periodo."
   },
   {
     "nome": "Ariete portatile",
@@ -56,7 +62,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "4 mo",
     "costo_mo": 4,
     "peso": "17,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Trave rinforzata impugnata da piu' creature per sfondare porte e barriere."
   },
   {
     "nome": "Attrezzatura da pesca",
@@ -64,7 +71,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Barile",
@@ -72,7 +80,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "35 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Bilancia da mercante",
@@ -80,7 +89,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Borsa",
@@ -88,7 +98,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Borsa per componenti",
@@ -96,7 +107,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Piccola borsa impermeabile con scomparti per componenti materiali degli incantesimi."
   },
   {
     "nome": "Bottiglia di vetro",
@@ -104,7 +116,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Brocca o caraffa",
@@ -112,7 +125,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mr",
     "costo_mo": 0.02,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Campanella",
@@ -120,7 +134,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Candela",
@@ -128,7 +143,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mr",
     "costo_mo": 0.01,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Piccola fonte di luce da viaggio, lenta da consumare e facile da trasportare."
   },
   {
     "nome": "Cannocchiale",
@@ -136,7 +152,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1000 mo",
     "costo_mo": 1000,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Strumento ottico prezioso per osservare bersagli e luoghi lontani."
   },
   {
     "nome": "Carrucola e paranco",
@@ -144,7 +161,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Sistema di funi e carrucole che facilita il sollevamento di carichi pesanti."
   },
   {
     "nome": "Carta (un foglio)",
@@ -152,7 +170,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 ma",
     "costo_mo": 0.2,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Cassa",
@@ -160,7 +179,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "12,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Catena (3 metri)",
@@ -168,7 +188,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Cera per sigilli",
@@ -176,7 +197,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Cestino",
@@ -184,7 +206,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "4 ma",
     "costo_mo": 0.4,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Chiodo da rocciatore",
@@ -192,7 +215,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mr",
     "costo_mo": 0.05,
     "peso": "0,1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Equipaggiamento utile per arrampicarsi, fissarsi o superare ostacoli verticali."
   },
   {
     "nome": "Clessidra",
@@ -200,7 +224,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Coperta",
@@ -208,7 +233,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Corda di canapa (15 metri)",
@@ -216,7 +242,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Corda robusta e comune per scalare, legare o assicurare carichi."
   },
   {
     "nome": "Corda di seta (15 metri)",
@@ -224,7 +251,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Corda leggera e resistente, piu' costosa della canapa."
   },
   {
     "nome": "Cristallo",
@@ -232,7 +260,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus usabile da un incantatore arcano come tramite per gli incantesimi."
   },
   {
     "nome": "Custodia per mappe o pergamene",
@@ -240,7 +269,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Custodia per quadrelli da balestra",
@@ -248,7 +278,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Emblema",
@@ -256,7 +287,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Simbolo religioso usabile come focus sacro."
   },
   {
     "nome": "Faretra",
@@ -264,7 +296,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Fiala",
@@ -272,7 +305,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Fiasca o boccale",
@@ -280,7 +314,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mr",
     "costo_mo": 0.02,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Fischietto da segnalazione",
@@ -288,7 +323,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mr",
     "costo_mo": 0.05,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Frecce (20)",
@@ -296,7 +332,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Munizioni per armi a distanza o da lancio."
   },
   {
     "nome": "Fuoco dell'alchimista (ampolla)",
@@ -304,7 +341,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "50 mo",
     "costo_mo": 50,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Sostanza appiccicosa che prende fuoco a contatto con l'aria."
   },
   {
     "nome": "Gavetta",
@@ -312,7 +350,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 ma",
     "costo_mo": 0.2,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Gessetto (1 pezzo)",
@@ -320,7 +359,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mr",
     "costo_mo": 0.01,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Giaciglio",
@@ -328,7 +368,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "3,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Rotolo da viaggio per dormire all'aperto o in accampamento."
   },
   {
     "nome": "Globo",
@@ -336,7 +377,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "20 mo",
     "costo_mo": 20,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus usabile da un incantatore arcano come tramite per gli incantesimi."
   },
   {
     "nome": "Inchiostro (ampolla da 30 g)",
@@ -344,7 +386,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Kit da arrampicata",
@@ -352,7 +395,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "6 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Imbracatura, chiodi e attrezzatura pensati per rendere piu' sicura una scalata."
   },
   {
     "nome": "Kit da guaritore",
@@ -360,7 +404,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Borsa con bende, unguenti e stecche per stabilizzare una creatura ferita."
   },
   {
     "nome": "Libro",
@@ -368,7 +413,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "25 mo",
     "costo_mo": 25,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Libro degli incantesimi",
@@ -376,7 +422,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "50 mo",
     "costo_mo": 50,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Lampada",
@@ -384,7 +431,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Fonte di luce alimentata a olio, adatta a illuminare una piccola area."
   },
   {
     "nome": "Lanterna a lente sporgente",
@@ -392,7 +440,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Lanterna che concentra la luce in un fascio piu' lungo e diretto."
   },
   {
     "nome": "Lanterna schermabile",
@@ -400,7 +449,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Lanterna con schermi mobili che permettono di coprire rapidamente la luce."
   },
   {
     "nome": "Lente d'ingrandimento",
@@ -408,7 +458,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "100 mo",
     "costo_mo": 100,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Lente utile per ispezionare dettagli minuti e accendere piccoli fuochi con la luce solare."
   },
   {
     "nome": "Manette",
@@ -416,7 +467,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "3 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Coppia di vincoli metallici con serratura, pensati per trattenere una creatura."
   },
   {
     "nome": "Martello",
@@ -424,7 +476,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Martello da demolizione",
@@ -432,7 +485,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Olio (ampolla)",
@@ -440,7 +494,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 ma",
     "costo_mo": 0.1,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Olio combustibile impiegato per lampade o come materiale improvvisato."
   },
   {
     "nome": "Otre",
@@ -448,7 +503,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 ma",
     "costo_mo": 0.2,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Acciarino e pietra focaia",
@@ -456,7 +512,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Equipaggiamento per illuminare, accendere o gestire una fonte di fuoco."
   },
   {
     "nome": "Bacchetta",
@@ -464,7 +521,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus usabile da un incantatore arcano come tramite per gli incantesimi."
   },
   {
     "nome": "Bacchetta di tasso",
@@ -472,7 +530,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus naturale usabile da un druido come tramite per gli incantesimi."
   },
   {
     "nome": "Bastone",
@@ -480,7 +539,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus usabile da un incantatore arcano come tramite per gli incantesimi."
   },
   {
     "nome": "Bastone di legno",
@@ -488,7 +548,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus naturale usabile da un druido come tramite per gli incantesimi."
   },
   {
     "nome": "Penna",
@@ -496,7 +557,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mr",
     "costo_mo": 0.02,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Piede di porco",
@@ -504,7 +566,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Leva di metallo utile per forzare porte, casse o oggetti incastrati."
   },
   {
     "nome": "Pala",
@@ -512,7 +575,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Pallini da fionda (20)",
@@ -520,7 +584,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "4 mr",
     "costo_mo": 0.04,
     "peso": "0,75 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Munizioni per armi a distanza o da lancio."
   },
   {
     "nome": "Palo (3 metri)",
@@ -528,7 +593,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mr",
     "costo_mo": 0.05,
     "peso": "3,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Pergamena (un foglio)",
@@ -536,7 +602,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 ma",
     "costo_mo": 0.1,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Materiali per scrivere, registrare informazioni o sigillare documenti."
   },
   {
     "nome": "Pentola di ferro",
@@ -544,7 +611,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Piccone da minatore",
@@ -552,7 +620,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Pietra per affilare",
@@ -560,7 +629,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mr",
     "costo_mo": 0.01,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Pozione di guarigione",
@@ -568,7 +638,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "50 mo",
     "costo_mo": 50,
     "peso": "0,25 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Pozione magica minore che ripristina punti ferita quando viene bevuta."
   },
   {
     "nome": "Profumo (fiala)",
@@ -576,7 +647,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Quadrelli da balestra (20)",
@@ -584,7 +656,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "0,75 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Munizioni per armi a distanza o da lancio."
   },
   {
     "nome": "Rametto di vischio",
@@ -592,7 +665,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus naturale usabile da un druido come tramite per gli incantesimi."
   },
   {
     "nome": "Rampino",
@@ -600,7 +674,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Gancio metallico legato a una corda, utile per ancorarsi o superare ostacoli."
   },
   {
     "nome": "Razioni (1 giorno)",
@@ -608,7 +683,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Cibo secco e compatto sufficiente per una giornata di viaggio."
   },
   {
     "nome": "Reliquiario",
@@ -616,7 +692,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Simbolo religioso usabile come focus sacro."
   },
   {
     "nome": "Vesti",
@@ -624,7 +701,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Indumenti e vestiario per viaggio, scena o occasioni formali."
   },
   {
     "nome": "Sacco",
@@ -632,7 +710,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mr",
     "costo_mo": 0.01,
     "peso": "0,25 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Sapone",
@@ -640,7 +719,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mr",
     "costo_mo": 0.02,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Scala (3 metri)",
@@ -648,7 +728,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 ma",
     "costo_mo": 0.1,
     "peso": "12,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Secchio",
@@ -656,7 +737,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mr",
     "costo_mo": 0.05,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Oggetto pensato per contenere, trasportare o proteggere materiale."
   },
   {
     "nome": "Serratura",
@@ -664,7 +746,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Serratura standard con chiave, usata per chiudere bauli, porte o contenitori."
   },
   {
     "nome": "Sfere metalliche (1000)",
@@ -672,7 +755,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Piccole sfere sparse a terra per rendere difficile il movimento."
   },
   {
     "nome": "Sigillo ad anello",
@@ -680,7 +764,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Simbolo sacro - amuleto",
@@ -688,7 +773,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Simbolo religioso usabile come focus sacro."
   },
   {
     "nome": "Specchio d'acciaio",
@@ -696,7 +782,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "0,25 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Spuntoni di ferro (10)",
@@ -704,7 +791,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Tagliola",
@@ -712,7 +800,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "12,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Trappola meccanica a molla che si chiude sulla creatura che la calpesta."
   },
   {
     "nome": "Tenda per due persone",
@@ -720,7 +809,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "10 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": ""
   },
   {
     "nome": "Torcia",
@@ -728,7 +818,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mr",
     "costo_mo": 0.01,
     "peso": "0,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Fonte di luce semplice e consumabile, adatta all'esplorazione."
   },
   {
     "nome": "Totem",
@@ -736,7 +827,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus naturale usabile da un druido come tramite per gli incantesimi."
   },
   {
     "nome": "Triboli (20)",
@@ -744,7 +836,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "1 mo",
     "costo_mo": 1,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Chiodi a quattro punte da spargere a terra per rallentare o ferire chi passa."
   },
   {
     "nome": "Veleno base (fiala)",
@@ -752,7 +845,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "100 mo",
     "costo_mo": 100,
     "peso": "-",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Veleno comune applicabile ad armi perforanti o taglienti."
   },
   {
     "nome": "Verga",
@@ -760,7 +854,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "10 mo",
     "costo_mo": 10,
     "peso": "1 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Focus usabile da un incantatore arcano come tramite per gli incantesimi."
   },
   {
     "nome": "Vestiti comuni",
@@ -768,7 +863,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 ma",
     "costo_mo": 0.5,
     "peso": "1,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Indumenti e vestiario per viaggio, scena o occasioni formali."
   },
   {
     "nome": "Vestiti da costume",
@@ -776,7 +872,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "5 mo",
     "costo_mo": 5,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Indumenti e vestiario per viaggio, scena o occasioni formali."
   },
   {
     "nome": "Vestiti da viaggiatore",
@@ -784,7 +881,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "2 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Indumenti e vestiario per viaggio, scena o occasioni formali."
   },
   {
     "nome": "Vestiti pregiati",
@@ -792,7 +890,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "15 mo",
     "costo_mo": 15,
     "peso": "3 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Indumenti e vestiario per viaggio, scena o occasioni formali."
   },
   {
     "nome": "Zaino",
@@ -800,7 +899,8 @@ window.COMP_ADVENTURING_GEAR_DATA = [
     "costo": "2 mo",
     "costo_mo": 2,
     "peso": "2,5 kg",
-    "fonte": "PHB p. 150"
+    "fonte": "PHB p. 150",
+    "descrizione": "Contenitore da viaggio con spazio per equipaggiamento essenziale."
   }
 ];
 window.COMP_TOOLS_DATA = [
@@ -1104,1761 +1204,1918 @@ window.COMP_TOOLS_DATA = [
 window.COMP_HERBS_DATA = [
   {
     "nome": "Aldaka",
-    "categoria": "altering",
-    "preparazione": "maceration",
+    "categoria": "Alterante",
+    "preparazione": "Macerazione",
     "costo": "100 mo",
     "costo_mo": 100,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Alkanet",
-    "categoria": "antipoison",
-    "preparazione": "decoction",
+    "categoria": "Antiveleno",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "forest",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Alleha",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Amrans",
-    "categoria": "curative",
-    "preparazione": "direct absorption",
+    "categoria": "Curativa",
+    "preparazione": "Assorbimento diretto",
     "costo": "5 mo",
     "costo_mo": 5,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Angelic",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "underdark",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Sottosuolo",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Sottosuolo. Stagione: Estate."
   },
   {
     "nome": "Anserke",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "desert",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Deserto",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Archangelic",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "bark",
-    "ambiente": "arctic",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Artico",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
   },
   {
     "nome": "Arkasu",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "15 mo",
     "costo_mo": 15,
-    "parte": "bark",
-    "ambiente": "arctic",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Artico",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
   },
   {
     "nome": "Arlan",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Arpusar",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Asarabacca",
-    "categoria": "altering",
-    "preparazione": "direct absorption",
+    "categoria": "Alterante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Ashine",
-    "categoria": "fortifying",
-    "preparazione": "infusion",
+    "categoria": "Fortificante",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Atigax",
-    "categoria": "altering",
-    "preparazione": "maceration",
+    "categoria": "Alterante",
+    "preparazione": "Macerazione",
     "costo": "100 mo",
     "costo_mo": 100,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Attanar",
-    "categoria": "boost",
-    "preparazione": "decoction",
+    "categoria": "Potenziamento",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "arctic",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Artico",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Balme",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "bark",
-    "ambiente": "underdark",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Sottosuolo",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Sottosuolo. Stagione: Autunno."
   },
   {
     "nome": "Barr",
-    "categoria": "fortifying",
-    "preparazione": "infusion",
+    "categoria": "Fortificante",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Bastit",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "swamp",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Palude",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
   },
   {
     "nome": "Belan",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "roots",
-    "ambiente": "desert",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Deserto",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Belramba",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "forest",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Birnot",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Biset",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Blabert",
-    "categoria": "boost",
-    "preparazione": "decoction",
+    "categoria": "Potenziamento",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "desert",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Deserto",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Deserto. Stagione: Autunno."
   },
   {
     "nome": "Blarot",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "roots",
-    "ambiente": "swamp",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Palude",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Borage",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Breakthroughs",
-    "categoria": "antipoison",
-    "preparazione": "maceration",
+    "categoria": "Antiveleno",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "bark",
-    "ambiente": "desert",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Deserto",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Deserto. Stagione: Autunno."
   },
   {
     "nome": "Bursthelas",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Calamus",
-    "categoria": "altering",
-    "preparazione": "maceration",
+    "categoria": "Alterante",
+    "preparazione": "Macerazione",
     "costo": "100 mo",
     "costo_mo": 100,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Calcena",
-    "categoria": "curative",
-    "preparazione": "maceration",
+    "categoria": "Curativa",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "mushroom",
-    "ambiente": "forest",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Foresta. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Callin",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Chasground",
-    "categoria": "antipoison",
-    "preparazione": "decoction",
+    "categoria": "Antiveleno",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Cofrail",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Colerte",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Coparnia",
-    "categoria": "boost",
-    "preparazione": "maceration",
+    "categoria": "Potenziamento",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "roots",
-    "ambiente": "arctic",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Artico",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Covet",
-    "categoria": "altering",
-    "preparazione": "decoction",
+    "categoria": "Alterante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "coast",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Costa",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Costa. Stagione: Autunno."
   },
   {
     "nome": "Culkas",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "mountain",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Montagna",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Damater",
-    "categoria": "curative",
-    "preparazione": "maceration",
+    "categoria": "Curativa",
+    "preparazione": "Macerazione",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "swamp",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Palude",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
   },
   {
     "nome": "Darsurion",
-    "categoria": "boost",
-    "preparazione": "maceration",
+    "categoria": "Potenziamento",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "swamp",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Palude",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
   },
   {
     "nome": "Dechale",
-    "categoria": "curative",
-    "preparazione": "maceration",
+    "categoria": "Curativa",
+    "preparazione": "Macerazione",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "mushroom",
-    "ambiente": "swamp",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Palude",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Palude. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Degiik",
-    "categoria": "boost",
-    "preparazione": "decoction",
+    "categoria": "Potenziamento",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "mountain",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Montagna",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
   },
   {
     "nome": "Delrean",
-    "categoria": "curative",
-    "preparazione": "maceration",
+    "categoria": "Curativa",
+    "preparazione": "Macerazione",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "roots",
-    "ambiente": "arctic",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Artico",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Radici. Ambiente: Artico. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Ditania",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Dorose",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Draffe",
-    "categoria": "curative",
-    "preparazione": "direct absorption",
+    "categoria": "Curativa",
+    "preparazione": "Assorbimento diretto",
     "costo": "5 mo",
     "costo_mo": 5,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Dramallon",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "bark",
-    "ambiente": "forest",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Foresta",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Foresta. Stagione: Autunno."
   },
   {
     "nome": "Ebure",
-    "categoria": "boost",
-    "preparazione": "decoction",
+    "categoria": "Potenziamento",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "swamp",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Palude",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Decotto. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Eldas",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "bark",
-    "ambiente": "mountain",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Montagna",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
   },
   {
     "nome": "Entrist",
-    "categoria": "antipoison",
-    "preparazione": "maceration",
+    "categoria": "Antiveleno",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Falsifal",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "mushroom",
-    "ambiente": "forest",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Foresta. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Fennely",
-    "categoria": "antipoison",
-    "preparazione": "infusion",
+    "categoria": "Antiveleno",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Fetrefe",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "forest",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Fiveleaves",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Floos",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Foulain",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Gabruche",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "mountain",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Montagna",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
   },
   {
     "nome": "Gardax",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "roots",
-    "ambiente": "forest",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Foresta",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Foresta. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Garigne",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "15 mo",
     "costo_mo": 15,
-    "parte": "bark",
-    "ambiente": "grassland",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Prateria",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Prateria. Stagione: Autunno."
   },
   {
     "nome": "Golcorone",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Gylvira",
-    "categoria": "altering",
-    "preparazione": "maceration",
+    "categoria": "Alterante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Haquedi",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Harir",
-    "categoria": "fortifying",
-    "preparazione": "infusion",
+    "categoria": "Fortificante",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Helival",
-    "categoria": "curative",
-    "preparazione": "direct absorption",
+    "categoria": "Curativa",
+    "preparazione": "Assorbimento diretto",
     "costo": "5 mo",
     "costo_mo": 5,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Ironar",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "25 mo",
     "costo_mo": 25,
-    "parte": "roots",
-    "ambiente": "mountain",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Montagna",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Ironsplit",
-    "categoria": "altering",
-    "preparazione": "infusion",
+    "categoria": "Alterante",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Jaffray",
-    "categoria": "antipoison",
-    "preparazione": "infusion",
+    "categoria": "Antiveleno",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Jojopopo",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "roots",
-    "ambiente": "swamp",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Palude",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Radici. Ambiente: Palude. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Kelventari",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Kilmatur",
-    "categoria": "curative",
-    "preparazione": "decoction",
+    "categoria": "Curativa",
+    "preparazione": "Decotto",
     "costo": "20 mo",
     "costo_mo": 20,
-    "parte": "roots",
-    "ambiente": "desert",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Deserto",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Decotto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Laumpor",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Lessentor",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "grassland",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Prateria",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Prateria. Stagione: Autunno."
   },
   {
     "nome": "Lunort",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Macabate",
-    "categoria": "antipoison",
-    "preparazione": "decoction",
+    "categoria": "Antiveleno",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "coast",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Costa",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Costa. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Mandrake",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "mountain",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Montagna",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Montagna. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Marmallow",
-    "categoria": "curative",
-    "preparazione": "maceration",
+    "categoria": "Curativa",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Maserote",
-    "categoria": "boost",
-    "preparazione": "maceration",
+    "categoria": "Potenziamento",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Meland",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Milort",
-    "categoria": "antipoison",
-    "preparazione": "infusion",
+    "categoria": "Antiveleno",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Mirena",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "bark",
-    "ambiente": "underdark",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Sottosuolo",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Sottosuolo. Stagione: Autunno."
   },
   {
     "nome": "Mogarli",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "bark",
-    "ambiente": "mountain",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Montagna",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
   },
   {
     "nome": "Navouh",
-    "categoria": "antipoison",
-    "preparazione": "infusion",
+    "categoria": "Antiveleno",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Oede",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "swamp",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Palude",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
   },
   {
     "nome": "Olus Veritis",
-    "categoria": "altering",
-    "preparazione": "decoction",
+    "categoria": "Alterante",
+    "preparazione": "Decotto",
     "costo": "100 mo",
     "costo_mo": 100,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Olvar",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Palmath",
-    "categoria": "curative",
-    "preparazione": "infusion",
+    "categoria": "Curativa",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Curativa. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Parlas",
-    "categoria": "altering",
-    "preparazione": "infusion",
+    "categoria": "Alterante",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "swamp",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Palude",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Palude. Stagione: Estate."
   },
   {
     "nome": "Pattran",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "mountain",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Montagna",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Montagna. Stagione: Autunno."
   },
   {
     "nome": "Qurl",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "mountain",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Montagna",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Montagna. Stagione: Estate."
   },
   {
     "nome": "Ribolan",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Sanilca",
-    "categoria": "altering",
-    "preparazione": "maceration",
+    "categoria": "Alterante",
+    "preparazione": "Macerazione",
     "costo": "100 mo",
     "costo_mo": 100,
-    "parte": "bark",
-    "ambiente": "swamp",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Palude",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Macerazione. Parte utile: Corteccia. Ambiente: Palude. Stagione: Autunno."
   },
   {
     "nome": "Saraceco",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Sentaye",
-    "categoria": "altering",
-    "preparazione": "decoction",
+    "categoria": "Alterante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "mushroom",
-    "ambiente": "underdark",
-    "stagione": "spring, summer, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Fungo",
+    "ambiente": "Sottosuolo",
+    "stagione": "Primavera, Estate, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Alterante. Preparazione: Decotto. Parte utile: Fungo. Ambiente: Sottosuolo. Stagione: Primavera, Estate, Autunno."
   },
   {
     "nome": "Sherpur",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Tamors",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "roots",
-    "ambiente": "desert",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Deserto",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Radici. Ambiente: Deserto. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Tanarisk",
-    "categoria": "boost",
-    "preparazione": "direct absorption",
+    "categoria": "Potenziamento",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Toreape",
-    "categoria": "fortifying",
-    "preparazione": "maceration",
+    "categoria": "Fortificante",
+    "preparazione": "Macerazione",
     "costo": "75 mo",
     "costo_mo": 75,
-    "parte": "plant",
-    "ambiente": "coast",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Costa",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Macerazione. Parte utile: Pianta. Ambiente: Costa. Stagione: Estate."
   },
   {
     "nome": "Trovas",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "grassland",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Prateria",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Radici. Ambiente: Prateria. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Ur",
-    "categoria": "fortifying",
-    "preparazione": "direct absorption",
+    "categoria": "Fortificante",
+    "preparazione": "Assorbimento diretto",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Assorbimento diretto. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Vilerge",
-    "categoria": "fortifying",
-    "preparazione": "infusion",
+    "categoria": "Fortificante",
+    "preparazione": "Infuso",
     "costo": "10 mo",
     "costo_mo": 10,
-    "parte": "plant",
-    "ambiente": "forest",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Foresta",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Foresta. Stagione: Estate."
   },
   {
     "nome": "Wodero",
-    "categoria": "boost",
-    "preparazione": "infusion",
+    "categoria": "Potenziamento",
+    "preparazione": "Infuso",
     "costo": "30 mo",
     "costo_mo": 30,
-    "parte": "plant",
-    "ambiente": "grassland",
-    "stagione": "summer",
-    "fonte": "AideDD Herbs"
+    "parte": "Pianta",
+    "ambiente": "Prateria",
+    "stagione": "Estate",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Potenziamento. Preparazione: Infuso. Parte utile: Pianta. Ambiente: Prateria. Stagione: Estate."
   },
   {
     "nome": "Wolfhunter",
-    "categoria": "antipoison",
-    "preparazione": "decoction",
+    "categoria": "Antiveleno",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "roots",
-    "ambiente": "coast",
-    "stagione": "spring, fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Radici",
+    "ambiente": "Costa",
+    "stagione": "Primavera, Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Antiveleno. Preparazione: Decotto. Parte utile: Radici. Ambiente: Costa. Stagione: Primavera, Autunno."
   },
   {
     "nome": "Xosorrel",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "forest",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Foresta",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Foresta. Stagione: Autunno."
   },
   {
     "nome": "Yaretalion",
-    "categoria": "fortifying",
-    "preparazione": "decoction",
+    "categoria": "Fortificante",
+    "preparazione": "Decotto",
     "costo": "50 mo",
     "costo_mo": 50,
-    "parte": "bark",
-    "ambiente": "arctic",
-    "stagione": "fall",
-    "fonte": "AideDD Herbs"
+    "parte": "Corteccia",
+    "ambiente": "Artico",
+    "stagione": "Autunno",
+    "fonte": "AideDD Herbs",
+    "descrizione": "Tipo: Fortificante. Preparazione: Decotto. Parte utile: Corteccia. Ambiente: Artico. Stagione: Autunno."
   }
 ];
 window.COMP_METALS_DATA = [
   {
-    "nome": "Adamant",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Adamante",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo estremamente duro, associato a lavorazioni leggendarie e materiali quasi indistruttibili."
   },
   {
-    "nome": "Adamantine",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Adamantio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega rara e durissima, usata per armature e armi capaci di resistere a colpi devastanti."
   },
   {
     "nome": "Arambarium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dei Reami, ricercato per lavorazioni speciali e oggetti preziosi."
   },
   {
     "nome": "Arandur",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega minerale rara, apprezzata per robustezza e lavorazioni arcane."
   },
   {
     "nome": "Arjale",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo esotico, adatto a comparire come materiale raro in tesori o componenti speciali."
   },
   {
-    "nome": "Baatorian green steel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio verde baatoriano",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio infernale dal colore verde, legato a forgia planare e manufatti dei Piani Inferiori."
   },
   {
-    "nome": "Barium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Bario",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo comune nella realta', utile come riferimento minerario o materiale alchemico."
   },
   {
-    "nome": "Brass",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Ottone",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega di rame e zinco, usata per finiture, strumenti e componenti decorativi."
   },
   {
-    "nome": "Brightsilver",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Argento brillante",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo prezioso e luminoso, adatto a gioielli, ornamenti e oggetti cerimoniali."
   },
   {
-    "nome": "Bronze",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Bronzo",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega resistente di rame e stagno, comune in armi, armature antiche e decorazioni."
   },
   {
-    "nome": "Celestial steel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio celestiale",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio raro di origine celestiale, ideale per reliquie o armi sacre."
   },
   {
-    "nome": "Chromium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Cromo",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo duro e lucente, utile per rivestimenti e dettagli resistenti."
   },
   {
-    "nome": "Cobalt",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Cobalto",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo bluastro, prezioso per pigmenti, leghe e componenti speciali."
   },
   {
-    "nome": "Cold iron",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Ferro freddo",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Ferro lavorato con tecniche particolari, spesso associato a efficacia contro creature fatate o innaturali."
   },
   {
-    "nome": "Copper",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Rame",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo comune, duttile e diffuso in monete, utensili e componenti."
   },
   {
     "nome": "Dajavva",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dei Reami, utile come materiale esotico per forgia o tesori."
   },
   {
-    "nome": "Darksteel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio scuro",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo scuro e resistente, adatto a equipaggiamenti rari e manufatti minacciosi."
   },
   {
     "nome": "Dlarun",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro e pallido, usato in lavorazioni speciali e oggetti di pregio."
   },
   {
-    "nome": "Electrum",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Elettro",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega naturale o artificiale di oro e argento, usata anche per monete e gioielli."
   },
   {
-    "nome": "Elven steel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio elfico",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio raffinato di tradizione elfica, leggero ed elegante nelle lavorazioni."
   },
   {
-    "nome": "Favored mineral",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Minerale favorito",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Minerale speciale legato a tradizioni o luoghi specifici dei Reami."
   },
   {
-    "nome": "Gold",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Oro",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo prezioso per eccellenza, usato per monete, gioielli e decorazioni."
   },
   {
-    "nome": "Hellthorn",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Spina infernale",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Materiale infernale raro, adatto a oggetti sinistri o componenti planari."
   },
   {
     "nome": "Hizagkuur",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dei Reami, spesso trattato come materiale speciale per forgia avanzata."
   },
   {
     "nome": "Illithium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dal nome legato agli illithid, utile per oggetti psionici o misteriosi."
   },
   {
-    "nome": "Infernal iron",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Ferro infernale",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Ferro dei Piani Inferiori, associato a macchine, armi e manufatti infernali."
   },
   {
-    "nome": "Iron",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Ferro",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo comune e fondamentale per armi, armature, utensili e costruzioni."
   },
   {
     "nome": "Ironfell",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro e pesante, adatto a tesori minerari e leghe speciali."
   },
   {
-    "nome": "Lead",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Piombo",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo pesante e malleabile, usato in pesi, sigilli e schermature."
   },
   {
-    "nome": "Lithium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Litio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo leggero, utile come materiale raro in contesti alchemici o tecnologici."
   },
   {
-    "nome": "Magnesium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Magnesio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo leggero e reattivo, interessante per lavorazioni alchemiche."
   },
   {
     "nome": "Manganese",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo usato in leghe e pigmenti, utile come risorsa mineraria."
   },
   {
-    "nome": "Mercury",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Mercurio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo liquido a temperatura ordinaria, importante in alchimia e rituali."
   },
   {
     "nome": "Mithral",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro, leggero e resistente, ricercato per armature e oggetti di pregio."
   },
   {
-    "nome": "Molybdenum",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Molibdeno",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo resistente, utile in leghe robuste e applicazioni specialistiche."
   },
   {
-    "nome": "Nickel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Nichel",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo resistente alla corrosione, usato in leghe e finiture."
   },
   {
-    "nome": "Orcslayer",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Ammazzaorchi",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo o lega dal nome marziale, adatto a manufatti pensati per la guerra."
   },
   {
-    "nome": "Palladium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Palladio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo prezioso e raro, utile per gioielli e componenti di alto valore."
   },
   {
-    "nome": "Pewter",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Peltro",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega tenera e comune, usata in stoviglie, contenitori e piccoli oggetti."
   },
   {
-    "nome": "Platinum",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Platino",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo prezioso molto raro, usato per tesori, gioielli e oggetti nobili."
   },
   {
     "nome": "Pyrohydram",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo esotico dal nome legato al fuoco, adatto a forgia magica o planare."
   },
   {
-    "nome": "Silver",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Argento",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo prezioso usato per monete, gioielli e armi argentate."
   },
   {
-    "nome": "Slag",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Scoria",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Residuo di fusione, utile come materiale grezzo o dettaglio di forgia."
   },
   {
-    "nome": "Solanian truesteel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Vero acciaio solaniano",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio raro di origine celestiale, adatto a reliquie e manufatti puri."
   },
   {
-    "nome": "Star metal",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Metallo stellare",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo meteorico, raro e ricercato per armi o oggetti straordinari."
   },
   {
-    "nome": "Steel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega comune di ferro, base per molte armi, armature e utensili."
   },
   {
     "nome": "Tantulhor",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dei Reami, utile come materiale esotico o componente prezioso."
   },
   {
     "nome": "Telstang",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro e flessibile, adatto a lavorazioni speciali."
   },
   {
-    "nome": "Tin",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Stagno",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo tenero, spesso impiegato in leghe come il bronzo."
   },
   {
-    "nome": "Titanium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Titanio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo resistente e leggero, adatto a leghe avanzate."
   },
   {
-    "nome": "Titansteel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio titanico",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Lega potente e rara, adatta a equipaggiamenti eccezionali."
   },
   {
-    "nome": "Whitesteel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio bianco",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio raro e chiaro, adatto a oggetti eleganti o sacri."
   },
   {
-    "nome": "Wootz steel",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Acciaio wootz",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Acciaio pregiato noto per qualita' e venature, ideale per lame raffinate."
   },
   {
     "nome": "Zardazil",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo raro dei Reami, adatto a tesori e materiali speciali."
   },
   {
-    "nome": "Zinc",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Zinco",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo comune impiegato in leghe, rivestimenti e piccoli oggetti."
   },
   {
-    "nome": "Zirconium",
-    "categoria": "Metallo",
-    "fonte": "Forgotten Realms Wiki"
+    "nome": "Zirconio",
+    "fonte": "Forgotten Realms Wiki",
+    "costo": "Variabile",
+    "descrizione": "Metallo resistente e raro, utile in leghe pregiate o componenti speciali."
   }
 ];
 window.COMP_GEMS_DATA = [
   {
-    "nome": "Azurite",
+    "nome": "Azzurrite",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "mottled deep blue",
+    "descrizione": "blu intenso screziato",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Banded agate",
+    "nome": "Agata fasciata",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "striped brown, blue, white, or red",
+    "descrizione": "striata di marrone, blu, bianco o rosso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Blue quartz",
+    "nome": "Quarzo blu",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "pale blue",
+    "descrizione": "blu pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Eye agate",
+    "nome": "Agata occhio",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "circles of gray, white, brown, blue, or green",
+    "descrizione": "cerchi grigi, bianchi, marroni, blu o verdi",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Hematite",
+    "nome": "Ematite",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "gray black",
+    "descrizione": "nero grigiastro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Lapis lazuli",
+    "nome": "Lapislazzuli",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "light and dark blue with yellow flecks",
+    "descrizione": "blu chiaro e scuro con pagliuzze gialle",
     "fonte": "Roll20 Gemstones"
   },
   {
     "nome": "Malachite",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "striated light and dark green",
+    "descrizione": "verde chiaro e scuro striato",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Moss agate",
+    "nome": "Agata muschiata",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "pink or yellow white with mossy gray or green markings",
+    "descrizione": "bianco rosato o giallastro con segni grigi o verdi",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Obsidian",
+    "nome": "Ossidiana",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "black",
+    "descrizione": "nera",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Rhodochrosite",
+    "nome": "Rodocrosite",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "light pink",
+    "descrizione": "rosa chiaro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Tiger eye",
+    "nome": "Occhio di tigre",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "brown with golden center",
+    "descrizione": "marrone con centro dorato",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Turquoise",
+    "nome": "Turchese",
     "valore": "10 mo",
     "valore_mo": 10,
-    "descrizione": "light blue green",
+    "descrizione": "verde-blu chiaro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Bloodstone",
+    "nome": "Eliotropio",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "dark gray with red flecks",
+    "descrizione": "grigio scuro con pagliuzze rosse",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Carnelian",
+    "nome": "Corniola",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "orange to red brown",
+    "descrizione": "dall'arancione al rosso-marrone",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Chalcedony",
+    "nome": "Calcedonio",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "white",
+    "descrizione": "bianco",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Chrysoprase",
+    "nome": "Crisoprasio",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "green",
+    "descrizione": "verde",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Citrine",
+    "nome": "Citrino",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "pale yellow brown",
+    "descrizione": "giallo-marrone pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Jasper",
+    "nome": "Diaspro",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "blue, black, or brown",
+    "descrizione": "blu, nero o marrone",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Moonstone",
+    "nome": "Pietra di luna",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "white with pale-blue glow",
+    "descrizione": "bianca con bagliore azzurro pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Onyx",
+    "nome": "Onice",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "bands of black and white, or pure black or white",
+    "descrizione": "fasce nere e bianche, oppure nero o bianco puro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Quartz",
+    "nome": "Quarzo",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "white, smoky gray, or yellow",
+    "descrizione": "bianco, grigio fumoso o giallo",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Sardonyx",
+    "nome": "Sardonica",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "bands of red and white",
+    "descrizione": "fasce rosse e bianche",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Star rose quartz",
+    "nome": "Quarzo rosa stellato",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "rosy stone with white star-shaped center",
+    "descrizione": "rosa con centro bianco a forma di stella",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Zircon",
+    "nome": "Zircone",
     "valore": "50 mo",
     "valore_mo": 50,
-    "descrizione": "pale blue green",
+    "descrizione": "verde-blu pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Amber",
+    "nome": "Ambra",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "watery gold to rich gold",
+    "descrizione": "dorata, da tenue ad intensa",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Amethyst",
+    "nome": "Ametista",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "deep purple",
+    "descrizione": "viola intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Chrysoberyl",
+    "nome": "Crisoberillo",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "yellow green to pale green",
+    "descrizione": "dal giallo-verde al verde pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Coral",
+    "nome": "Corallo",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "crimson",
+    "descrizione": "cremisi",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Garnet",
+    "nome": "Granato",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "red, brown green, or violet",
+    "descrizione": "rosso, marrone-verde o violetto",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Jade",
+    "nome": "Giada",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "light green, deep green, or white",
+    "descrizione": "verde chiaro, verde intenso o bianco",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Jet",
+    "nome": "Giaietto",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "deep black",
+    "descrizione": "nero intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Pearl",
+    "nome": "Perla",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "lustrous white, yellow, or pink",
+    "descrizione": "bianco, giallo o rosa lucente",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Spinel",
+    "nome": "Spinello",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "red, red brown, or deep green",
+    "descrizione": "rosso, rosso-marrone o verde intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Tourmaline",
+    "nome": "Tormalina",
     "valore": "100 mo",
     "valore_mo": 100,
-    "descrizione": "pale green, blue, brown, or red",
+    "descrizione": "verde pallido, blu, marrone o rossa",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Alexandrite",
+    "nome": "Alessandrite",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "dark green",
+    "descrizione": "verde scuro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Aquamarine",
+    "nome": "Acquamarina",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "pale blue green",
+    "descrizione": "verde-blu pallido",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Black pearl",
+    "nome": "Perla nera",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "pure black",
+    "descrizione": "nero puro",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Blue spinel",
+    "nome": "Spinello blu",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "deep blue",
+    "descrizione": "blu intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Peridot",
+    "nome": "Peridoto",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "rich olive green",
+    "descrizione": "verde oliva intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Topaz",
+    "nome": "Topazio",
     "valore": "500 mo",
     "valore_mo": 500,
-    "descrizione": "golden yellow",
+    "descrizione": "giallo dorato",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Black opal",
+    "nome": "Opale nero",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "dark green with black mottling and golden flecks",
+    "descrizione": "verde scuro con screziature nere e pagliuzze dorate",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Blue sapphire",
+    "nome": "Zaffiro blu",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "medium blue",
+    "descrizione": "blu medio",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Emerald",
+    "nome": "Smeraldo",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "deep bright green",
+    "descrizione": "verde brillante intenso",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Fire opal",
+    "nome": "Opale di fuoco",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "fiery red",
+    "descrizione": "rosso fiamma",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Opal",
+    "nome": "Opale",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "pale blue with green and golden mottling",
+    "descrizione": "blu pallido con screziature verdi e dorate",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Star ruby",
+    "nome": "Rubino stellato",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "ruby with white star-shaped center",
+    "descrizione": "rubino con centro bianco a forma di stella",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Star sapphire",
+    "nome": "Zaffiro stellato",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "blue sapphire with white star-shaped center",
+    "descrizione": "zaffiro blu con centro bianco a forma di stella",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Yellow sapphire",
+    "nome": "Zaffiro giallo",
     "valore": "1000 mo",
     "valore_mo": 1000,
-    "descrizione": "fiery yellow or yellow green",
+    "descrizione": "giallo fiamma o verde-giallo",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Black sapphire",
+    "nome": "Zaffiro nero",
     "valore": "5000 mo",
     "valore_mo": 5000,
-    "descrizione": "lustrous black with glowing highlights",
+    "descrizione": "nero lucente con riflessi luminosi",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Diamond",
+    "nome": "Diamante",
     "valore": "5000 mo",
     "valore_mo": 5000,
-    "descrizione": "blue white, canary, pink, brown, or blue",
+    "descrizione": "bianco-blu, canarino, rosa, marrone o blu",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Jacinth",
+    "nome": "Giacinto",
     "valore": "5000 mo",
     "valore_mo": 5000,
-    "descrizione": "fiery orange",
+    "descrizione": "arancione fiamma",
     "fonte": "Roll20 Gemstones"
   },
   {
-    "nome": "Ruby",
+    "nome": "Rubino",
     "valore": "5000 mo",
     "valore_mo": 5000,
-    "descrizione": "clear red to deep crimson",
+    "descrizione": "rosso limpido fino al cremisi intenso",
     "fonte": "Roll20 Gemstones"
   }
 ];

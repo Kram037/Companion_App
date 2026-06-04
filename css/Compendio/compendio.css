@@ -613,6 +613,23 @@
     font-size: 0.8rem;
 }
 
+.comp-tools-table {
+    min-width: 360px;
+}
+
+.comp-equipment-card {
+    border-left-color: color-mix(in srgb, var(--accent) 68%, var(--border));
+}
+
+.comp-equipment-card-value {
+    color: var(--accent);
+    font-weight: 800;
+}
+
+.comp-equipment-card-desc {
+    -webkit-line-clamp: 4;
+}
+
 .comp-equipment-table th,
 .comp-equipment-table td {
     padding: 8px 9px;

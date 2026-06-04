@@ -336,16 +336,269 @@ def convert_numbers(rows):
     return rows
 
 
+HERB_CATEGORY_IT = {
+    "altering": "Alterante",
+    "antipoison": "Antiveleno",
+    "boost": "Potenziamento",
+    "curative": "Curativa",
+    "fortifying": "Fortificante",
+}
+
+HERB_PREPARATION_IT = {
+    "maceration": "Macerazione",
+    "decoction": "Decotto",
+    "infusion": "Infuso",
+    "direct absorption": "Assorbimento diretto",
+}
+
+HERB_PART_IT = {
+    "bark": "Corteccia",
+    "mushroom": "Fungo",
+    "plant": "Pianta",
+    "roots": "Radici",
+}
+
+HERB_ENVIRONMENT_IT = {
+    "arctic": "Artico",
+    "coast": "Costa",
+    "desert": "Deserto",
+    "forest": "Foresta",
+    "grassland": "Prateria",
+    "mountain": "Montagna",
+    "swamp": "Palude",
+    "underdark": "Sottosuolo",
+}
+
+HERB_SEASON_IT = {
+    "spring": "Primavera",
+    "summer": "Estate",
+    "fall": "Autunno",
+    "winter": "Inverno",
+}
+
+ADVENTURING_DESCRIPTIONS = {
+    "Acido (fiala)": "Liquido corrosivo contenuto in una fiala, utile come consumabile alchemico o materiale per situazioni di emergenza.",
+    "Acqua santa (ampolla)": "Acqua consacrata conservata in un'ampolla, spesso usata contro creature empie o non morte.",
+    "Antitossina (fiala)": "Preparato da bere che aiuta a resistere agli effetti dei veleni per un breve periodo.",
+    "Ariete portatile": "Trave rinforzata impugnata da piu' creature per sfondare porte e barriere.",
+    "Borsa per componenti": "Piccola borsa impermeabile con scomparti per componenti materiali degli incantesimi.",
+    "Candela": "Piccola fonte di luce da viaggio, lenta da consumare e facile da trasportare.",
+    "Cannocchiale": "Strumento ottico prezioso per osservare bersagli e luoghi lontani.",
+    "Carrucola e paranco": "Sistema di funi e carrucole che facilita il sollevamento di carichi pesanti.",
+    "Corda di canapa (15 metri)": "Corda robusta e comune per scalare, legare o assicurare carichi.",
+    "Corda di seta (15 metri)": "Corda leggera e resistente, piu' costosa della canapa.",
+    "Fuoco dell'alchimista (ampolla)": "Sostanza appiccicosa che prende fuoco a contatto con l'aria.",
+    "Giaciglio": "Rotolo da viaggio per dormire all'aperto o in accampamento.",
+    "Kit da arrampicata": "Imbracatura, chiodi e attrezzatura pensati per rendere piu' sicura una scalata.",
+    "Kit da guaritore": "Borsa con bende, unguenti e stecche per stabilizzare una creatura ferita.",
+    "Lampada": "Fonte di luce alimentata a olio, adatta a illuminare una piccola area.",
+    "Lanterna a lente sporgente": "Lanterna che concentra la luce in un fascio piu' lungo e diretto.",
+    "Lanterna schermabile": "Lanterna con schermi mobili che permettono di coprire rapidamente la luce.",
+    "Lente d'ingrandimento": "Lente utile per ispezionare dettagli minuti e accendere piccoli fuochi con la luce solare.",
+    "Manette": "Coppia di vincoli metallici con serratura, pensati per trattenere una creatura.",
+    "Olio (ampolla)": "Olio combustibile impiegato per lampade o come materiale improvvisato.",
+    "Piede di porco": "Leva di metallo utile per forzare porte, casse o oggetti incastrati.",
+    "Pozione di guarigione": "Pozione magica minore che ripristina punti ferita quando viene bevuta.",
+    "Rampino": "Gancio metallico legato a una corda, utile per ancorarsi o superare ostacoli.",
+    "Razioni (1 giorno)": "Cibo secco e compatto sufficiente per una giornata di viaggio.",
+    "Serratura": "Serratura standard con chiave, usata per chiudere bauli, porte o contenitori.",
+    "Sfere metalliche (1000)": "Piccole sfere sparse a terra per rendere difficile il movimento.",
+    "Tagliola": "Trappola meccanica a molla che si chiude sulla creatura che la calpesta.",
+    "Torcia": "Fonte di luce semplice e consumabile, adatta all'esplorazione.",
+    "Triboli (20)": "Chiodi a quattro punte da spargere a terra per rallentare o ferire chi passa.",
+    "Veleno base (fiala)": "Veleno comune applicabile ad armi perforanti o taglienti.",
+    "Zaino": "Contenitore da viaggio con spazio per equipaggiamento essenziale.",
+}
+
+ADVENTURING_CATEGORY_DESCRIPTIONS = {
+    "Abiti": "Indumenti e vestiario per viaggio, scena o occasioni formali.",
+    "Consumabili": "Oggetto consumabile da usare una volta o in poche applicazioni.",
+    "Contenitori": "Oggetto pensato per contenere, trasportare o proteggere materiale.",
+    "Corde e scalata": "Equipaggiamento utile per arrampicarsi, fissarsi o superare ostacoli verticali.",
+    "Focus arcano": "Focus usabile da un incantatore arcano come tramite per gli incantesimi.",
+    "Focus druidico": "Focus naturale usabile da un druido come tramite per gli incantesimi.",
+    "Fuochi e illuminazione": "Equipaggiamento per illuminare, accendere o gestire una fonte di fuoco.",
+    "Kit": "Kit pratico con strumenti dedicati a una funzione specifica.",
+    "Munizioni": "Munizioni per armi a distanza o da lancio.",
+    "Scrittura": "Materiali per scrivere, registrare informazioni o sigillare documenti.",
+    "Simbolo sacro": "Simbolo religioso usabile come focus sacro.",
+}
+
+GEM_TRANSLATIONS = {
+    "Alexandrite": ("Alessandrite", "verde scuro"),
+    "Amber": ("Ambra", "dorata, da tenue ad intensa"),
+    "Amethyst": ("Ametista", "viola intenso"),
+    "Aquamarine": ("Acquamarina", "verde-blu pallido"),
+    "Azurite": ("Azzurrite", "blu intenso screziato"),
+    "Banded agate": ("Agata fasciata", "striata di marrone, blu, bianco o rosso"),
+    "Black opal": ("Opale nero", "verde scuro con screziature nere e pagliuzze dorate"),
+    "Black pearl": ("Perla nera", "nero puro"),
+    "Black sapphire": ("Zaffiro nero", "nero lucente con riflessi luminosi"),
+    "Bloodstone": ("Eliotropio", "grigio scuro con pagliuzze rosse"),
+    "Blue quartz": ("Quarzo blu", "blu pallido"),
+    "Blue sapphire": ("Zaffiro blu", "blu medio"),
+    "Blue spinel": ("Spinello blu", "blu intenso"),
+    "Carnelian": ("Corniola", "dall'arancione al rosso-marrone"),
+    "Chalcedony": ("Calcedonio", "bianco"),
+    "Chrysoberyl": ("Crisoberillo", "dal giallo-verde al verde pallido"),
+    "Chrysoprase": ("Crisoprasio", "verde"),
+    "Citrine": ("Citrino", "giallo-marrone pallido"),
+    "Coral": ("Corallo", "cremisi"),
+    "Diamond": ("Diamante", "bianco-blu, canarino, rosa, marrone o blu"),
+    "Emerald": ("Smeraldo", "verde brillante intenso"),
+    "Eye agate": ("Agata occhio", "cerchi grigi, bianchi, marroni, blu o verdi"),
+    "Fire opal": ("Opale di fuoco", "rosso fiamma"),
+    "Garnet": ("Granato", "rosso, marrone-verde o violetto"),
+    "Hematite": ("Ematite", "nero grigiastro"),
+    "Jacinth": ("Giacinto", "arancione fiamma"),
+    "Jade": ("Giada", "verde chiaro, verde intenso o bianco"),
+    "Jasper": ("Diaspro", "blu, nero o marrone"),
+    "Jet": ("Giaietto", "nero intenso"),
+    "Lapis lazuli": ("Lapislazzuli", "blu chiaro e scuro con pagliuzze gialle"),
+    "Malachite": ("Malachite", "verde chiaro e scuro striato"),
+    "Moonstone": ("Pietra di luna", "bianca con bagliore azzurro pallido"),
+    "Moss agate": ("Agata muschiata", "bianco rosato o giallastro con segni grigi o verdi"),
+    "Obsidian": ("Ossidiana", "nera"),
+    "Onyx": ("Onice", "fasce nere e bianche, oppure nero o bianco puro"),
+    "Opal": ("Opale", "blu pallido con screziature verdi e dorate"),
+    "Pearl": ("Perla", "bianco, giallo o rosa lucente"),
+    "Peridot": ("Peridoto", "verde oliva intenso"),
+    "Quartz": ("Quarzo", "bianco, grigio fumoso o giallo"),
+    "Rhodochrosite": ("Rodocrosite", "rosa chiaro"),
+    "Ruby": ("Rubino", "rosso limpido fino al cremisi intenso"),
+    "Sardonyx": ("Sardonica", "fasce rosse e bianche"),
+    "Spinel": ("Spinello", "rosso, rosso-marrone o verde intenso"),
+    "Star rose quartz": ("Quarzo rosa stellato", "rosa con centro bianco a forma di stella"),
+    "Star ruby": ("Rubino stellato", "rubino con centro bianco a forma di stella"),
+    "Star sapphire": ("Zaffiro stellato", "zaffiro blu con centro bianco a forma di stella"),
+    "Tiger eye": ("Occhio di tigre", "marrone con centro dorato"),
+    "Topaz": ("Topazio", "giallo dorato"),
+    "Tourmaline": ("Tormalina", "verde pallido, blu, marrone o rossa"),
+    "Turquoise": ("Turchese", "verde-blu chiaro"),
+    "Yellow sapphire": ("Zaffiro giallo", "giallo fiamma o verde-giallo"),
+    "Zircon": ("Zircone", "verde-blu pallido"),
+}
+
+METAL_TRANSLATIONS = {
+    "Adamant": ("Adamante", "Variabile", "Metallo estremamente duro, associato a lavorazioni leggendarie e materiali quasi indistruttibili."),
+    "Adamantine": ("Adamantio", "Variabile", "Lega rara e durissima, usata per armature e armi capaci di resistere a colpi devastanti."),
+    "Arambarium": ("Arambarium", "Variabile", "Metallo raro dei Reami, ricercato per lavorazioni speciali e oggetti preziosi."),
+    "Arandur": ("Arandur", "Variabile", "Lega minerale rara, apprezzata per robustezza e lavorazioni arcane."),
+    "Arjale": ("Arjale", "Variabile", "Metallo esotico, adatto a comparire come materiale raro in tesori o componenti speciali."),
+    "Baatorian green steel": ("Acciaio verde baatoriano", "Variabile", "Acciaio infernale dal colore verde, legato a forgia planare e manufatti dei Piani Inferiori."),
+    "Barium": ("Bario", "Variabile", "Metallo comune nella realta', utile come riferimento minerario o materiale alchemico."),
+    "Brass": ("Ottone", "Variabile", "Lega di rame e zinco, usata per finiture, strumenti e componenti decorativi."),
+    "Brightsilver": ("Argento brillante", "Variabile", "Metallo prezioso e luminoso, adatto a gioielli, ornamenti e oggetti cerimoniali."),
+    "Bronze": ("Bronzo", "Variabile", "Lega resistente di rame e stagno, comune in armi, armature antiche e decorazioni."),
+    "Celestial steel": ("Acciaio celestiale", "Variabile", "Acciaio raro di origine celestiale, ideale per reliquie o armi sacre."),
+    "Chromium": ("Cromo", "Variabile", "Metallo duro e lucente, utile per rivestimenti e dettagli resistenti."),
+    "Cobalt": ("Cobalto", "Variabile", "Metallo bluastro, prezioso per pigmenti, leghe e componenti speciali."),
+    "Cold iron": ("Ferro freddo", "Variabile", "Ferro lavorato con tecniche particolari, spesso associato a efficacia contro creature fatate o innaturali."),
+    "Copper": ("Rame", "Variabile", "Metallo comune, duttile e diffuso in monete, utensili e componenti."),
+    "Dajavva": ("Dajavva", "Variabile", "Metallo raro dei Reami, utile come materiale esotico per forgia o tesori."),
+    "Darksteel": ("Acciaio scuro", "Variabile", "Metallo scuro e resistente, adatto a equipaggiamenti rari e manufatti minacciosi."),
+    "Dlarun": ("Dlarun", "Variabile", "Metallo raro e pallido, usato in lavorazioni speciali e oggetti di pregio."),
+    "Electrum": ("Elettro", "Variabile", "Lega naturale o artificiale di oro e argento, usata anche per monete e gioielli."),
+    "Elven steel": ("Acciaio elfico", "Variabile", "Acciaio raffinato di tradizione elfica, leggero ed elegante nelle lavorazioni."),
+    "Favored mineral": ("Minerale favorito", "Variabile", "Minerale speciale legato a tradizioni o luoghi specifici dei Reami."),
+    "Gold": ("Oro", "Variabile", "Metallo prezioso per eccellenza, usato per monete, gioielli e decorazioni."),
+    "Hellthorn": ("Spina infernale", "Variabile", "Materiale infernale raro, adatto a oggetti sinistri o componenti planari."),
+    "Hizagkuur": ("Hizagkuur", "Variabile", "Metallo raro dei Reami, spesso trattato come materiale speciale per forgia avanzata."),
+    "Illithium": ("Illithium", "Variabile", "Metallo raro dal nome legato agli illithid, utile per oggetti psionici o misteriosi."),
+    "Infernal iron": ("Ferro infernale", "Variabile", "Ferro dei Piani Inferiori, associato a macchine, armi e manufatti infernali."),
+    "Iron": ("Ferro", "Variabile", "Metallo comune e fondamentale per armi, armature, utensili e costruzioni."),
+    "Ironfell": ("Ironfell", "Variabile", "Metallo raro e pesante, adatto a tesori minerari e leghe speciali."),
+    "Lead": ("Piombo", "Variabile", "Metallo pesante e malleabile, usato in pesi, sigilli e schermature."),
+    "Lithium": ("Litio", "Variabile", "Metallo leggero, utile come materiale raro in contesti alchemici o tecnologici."),
+    "Magnesium": ("Magnesio", "Variabile", "Metallo leggero e reattivo, interessante per lavorazioni alchemiche."),
+    "Manganese": ("Manganese", "Variabile", "Metallo usato in leghe e pigmenti, utile come risorsa mineraria."),
+    "Mercury": ("Mercurio", "Variabile", "Metallo liquido a temperatura ordinaria, importante in alchimia e rituali."),
+    "Mithral": ("Mithral", "Variabile", "Metallo raro, leggero e resistente, ricercato per armature e oggetti di pregio."),
+    "Molybdenum": ("Molibdeno", "Variabile", "Metallo resistente, utile in leghe robuste e applicazioni specialistiche."),
+    "Nickel": ("Nichel", "Variabile", "Metallo resistente alla corrosione, usato in leghe e finiture."),
+    "Orcslayer": ("Ammazzaorchi", "Variabile", "Metallo o lega dal nome marziale, adatto a manufatti pensati per la guerra."),
+    "Palladium": ("Palladio", "Variabile", "Metallo prezioso e raro, utile per gioielli e componenti di alto valore."),
+    "Pewter": ("Peltro", "Variabile", "Lega tenera e comune, usata in stoviglie, contenitori e piccoli oggetti."),
+    "Platinum": ("Platino", "Variabile", "Metallo prezioso molto raro, usato per tesori, gioielli e oggetti nobili."),
+    "Pyrohydram": ("Pyrohydram", "Variabile", "Metallo esotico dal nome legato al fuoco, adatto a forgia magica o planare."),
+    "Silver": ("Argento", "Variabile", "Metallo prezioso usato per monete, gioielli e armi argentate."),
+    "Slag": ("Scoria", "Variabile", "Residuo di fusione, utile come materiale grezzo o dettaglio di forgia."),
+    "Solanian truesteel": ("Vero acciaio solaniano", "Variabile", "Acciaio raro di origine celestiale, adatto a reliquie e manufatti puri."),
+    "Star metal": ("Metallo stellare", "Variabile", "Metallo meteorico, raro e ricercato per armi o oggetti straordinari."),
+    "Steel": ("Acciaio", "Variabile", "Lega comune di ferro, base per molte armi, armature e utensili."),
+    "Tantulhor": ("Tantulhor", "Variabile", "Metallo raro dei Reami, utile come materiale esotico o componente prezioso."),
+    "Telstang": ("Telstang", "Variabile", "Metallo raro e flessibile, adatto a lavorazioni speciali."),
+    "Tin": ("Stagno", "Variabile", "Metallo tenero, spesso impiegato in leghe come il bronzo."),
+    "Titanium": ("Titanio", "Variabile", "Metallo resistente e leggero, adatto a leghe avanzate."),
+    "Titansteel": ("Acciaio titanico", "Variabile", "Lega potente e rara, adatta a equipaggiamenti eccezionali."),
+    "Whitesteel": ("Acciaio bianco", "Variabile", "Acciaio raro e chiaro, adatto a oggetti eleganti o sacri."),
+    "Wootz steel": ("Acciaio wootz", "Variabile", "Acciaio pregiato noto per qualita' e venature, ideale per lame raffinate."),
+    "Zardazil": ("Zardazil", "Variabile", "Metallo raro dei Reami, adatto a tesori e materiali speciali."),
+    "Zinc": ("Zinco", "Variabile", "Metallo comune impiegato in leghe, rivestimenti e piccoli oggetti."),
+    "Zirconium": ("Zirconio", "Variabile", "Metallo resistente e raro, utile in leghe pregiate o componenti speciali."),
+}
+
+
+def translate_joined(value, mapping):
+    parts = [part.strip() for part in str(value or "").split(",") if part.strip()]
+    return ", ".join(mapping.get(part.lower(), part) for part in parts)
+
+
+def enrich_adventuring(rows):
+    for row in rows:
+        row["descrizione"] = ADVENTURING_DESCRIPTIONS.get(row.get("nome"), ADVENTURING_CATEGORY_DESCRIPTIONS.get(row.get("categoria"), ""))
+    return rows
+
+
+def enrich_herbs(rows):
+    for row in rows:
+        row["categoria"] = HERB_CATEGORY_IT.get(str(row.get("categoria", "")).lower(), row.get("categoria", ""))
+        row["preparazione"] = HERB_PREPARATION_IT.get(str(row.get("preparazione", "")).lower(), row.get("preparazione", ""))
+        row["parte"] = HERB_PART_IT.get(str(row.get("parte", "")).lower(), row.get("parte", ""))
+        row["ambiente"] = translate_joined(row.get("ambiente"), HERB_ENVIRONMENT_IT)
+        row["stagione"] = translate_joined(row.get("stagione"), HERB_SEASON_IT)
+        bits = [
+            f"Tipo: {row['categoria']}" if row.get("categoria") else "",
+            f"Preparazione: {row['preparazione']}" if row.get("preparazione") else "",
+            f"Parte utile: {row['parte']}" if row.get("parte") else "",
+            f"Ambiente: {row['ambiente']}" if row.get("ambiente") else "",
+            f"Stagione: {row['stagione']}" if row.get("stagione") else "",
+        ]
+        row["descrizione"] = ". ".join(bit for bit in bits if bit) + "."
+    return rows
+
+
+def enrich_gems(rows):
+    for row in rows:
+        name, description = GEM_TRANSLATIONS.get(row.get("nome"), (row.get("nome"), row.get("descrizione", "")))
+        row["nome"] = name
+        row["descrizione"] = description
+    return rows
+
+
+def enrich_metals(rows):
+    for row in rows:
+        name, cost, description = METAL_TRANSLATIONS.get(
+            row.get("nome"),
+            (row.get("nome"), "Variabile", "Metallo o lega rara, utile come materiale speciale o componente di tesori."),
+        )
+        row["nome"] = name
+        row["costo"] = cost
+        row["descrizione"] = description
+        row.pop("categoria", None)
+    return rows
+
+
 def js_assign(name, value):
     return f"window.{name} = {json.dumps(value, ensure_ascii=False, indent=2)};"
 
 
 def main():
-    adventuring = convert_numbers(parse_pipe_table(ADVENTURING_GEAR, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"]))
+    adventuring = enrich_adventuring(convert_numbers(parse_pipe_table(ADVENTURING_GEAR, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"])))
     tools = convert_numbers(parse_pipe_table(TOOLS, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"]))
-    metals = parse_pipe_table(METALS, ["nome", "categoria", "fonte"])
-    gems = convert_numbers(parse_pipe_table(GEMS, ["nome", "valore", "valore_mo", "descrizione", "fonte"]))
-    herbs = parse_herbs()
+    metals = enrich_metals(parse_pipe_table(METALS, ["nome", "categoria", "fonte"]))
+    gems = enrich_gems(convert_numbers(parse_pipe_table(GEMS, ["nome", "valore", "valore_mo", "descrizione", "fonte"])))
+    herbs = enrich_herbs(parse_herbs())
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(
         "// Dati tabellari del Compendio > Equipaggiamento.\n"

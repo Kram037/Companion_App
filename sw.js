@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v136';
+const CACHE_NAME = 'companion-app-v137';
 
 const APP_SHELL_URLS = [
     './',

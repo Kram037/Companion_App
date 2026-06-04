@@ -1148,11 +1148,89 @@ function _compEquipmentTablesHtml(state = _compStateFor('oggetti')) {
 function _compGenericEquipmentListHtml(section, state = _compStateFor('oggetti')) {
     const total = _compEquipmentSectionItems(section).length;
     const items = _compEquipmentFilteredItems(section, state);
-    const table = _compGenericEquipmentTable(section, items);
+    let content = '';
+    if (section === 'strumenti') {
+        content = _compToolsTablesHtml(items);
+    } else if (['avventura', 'erbe', 'metalli', 'gemme'].includes(section)) {
+        content = _compEquipmentCardsHtml(section, items);
+    } else {
+        content = _compGenericEquipmentTable(section, items);
+    }
     return `
         <p class="comp-count">${items.length} risultati su ${total}</p>
-        ${table || '<div class="comp-empty">Dati non ancora disponibili</div>'}
+        ${content || '<div class="comp-empty">Dati non ancora disponibili</div>'}
     `;
+}
+
+function _compToolsTablesHtml(items) {
+    if (!items.length) return '<div class="comp-empty">Nessuno strumento trovato</div>';
+    const order = ['Strumenti da artigiano', 'Strumento musicale', 'Set da gioco', 'Altri strumenti'];
+    const groups = order
+        .map(category => [category, items.filter(item => (item.categoryLabel || item.category) === category)])
+        .filter(([, rows]) => rows.length);
+    const remaining = items.filter(item => !order.includes(item.categoryLabel || item.category));
+    if (remaining.length) groups.push(['Altri', remaining]);
+    return groups.map(([category, rows]) => `
+        <div class="comp-equipment-subtable">
+            <h4>${escapeHtml(_compToolCategoryTitle(category))}</h4>
+            <div class="comp-table-wrap">
+                <table class="comp-equipment-table comp-tools-table">
+                    <thead><tr><th>Nome</th><th>Costo</th><th>Peso</th></tr></thead>
+                    <tbody>${rows.map(item => `
+                        <tr>
+                            <td>${escapeHtml(item.title || '-')}</td>
+                            <td>${escapeHtml(item.costLabel || '-')}</td>
+                            <td>${escapeHtml(item.weight || '-')}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>
+            </div>
+        </div>
+    `).join('');
+}
+
+function _compToolCategoryTitle(category) {
+    const labels = {
+        'Strumento musicale': 'Strumenti musicali',
+        'Set da gioco': 'Set da gioco',
+        'Strumenti da artigiano': 'Strumenti da artigiano',
+        'Altri strumenti': 'Altri strumenti',
+    };
+    return labels[category] || category || 'Strumenti';
+}
+
+function _compEquipmentCardsHtml(section, items) {
+    if (!items.length) return '<div class="comp-empty">Nessun elemento trovato</div>';
+    return `<div class="comp-list comp-equipment-card-list">${items.map(item => _compEquipmentCardHtml(section, item)).join('')}</div>`;
+}
+
+function _compEquipmentCardHtml(section, item) {
+    const meta = _compEquipmentCardMeta(section, item);
+    const accent = _compEquipmentCardAccent(section, item);
+    const desc = _compPlain(item.description || '');
+    return `<article class="comp-card comp-inventory-card comp-equipment-card comp-equipment-card-${section}">
+        <div class="comp-card-main">
+            <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
+            ${accent ? `<span class="comp-card-source comp-equipment-card-value">${escapeHtml(accent)}</span>` : ''}
+        </div>
+        ${meta ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(meta)}</div>` : ''}
+        ${desc ? `<p class="comp-card-desc comp-equipment-card-desc">${escapeHtml(desc)}</p>` : ''}
+    </article>`;
+}
+
+function _compEquipmentCardAccent(section, item) {
+    if (section === 'gemme') return item.valueLabel || item.costLabel || '';
+    return item.costLabel || item.valueLabel || '';
+}
+
+function _compEquipmentCardMeta(section, item) {
+    if (section === 'erbe') {
+        return [item.categoryLabel, item.preparation, item.part, item.environment, item.season].filter(Boolean).join(' · ');
+    }
+    if (section === 'avventura') {
+        return [item.categoryLabel || item.category, item.weight ? `Peso: ${item.weight}` : ''].filter(Boolean).join(' · ');
+    }
+    return '';
 }
 
 function _compGenericEquipmentTable(section, items) {
@@ -1184,7 +1262,6 @@ function _compGenericEquipmentColumns(section, items) {
             { label: 'Ambiente', value: item => item.environment },
             { label: 'Stagione', value: item => item.season },
             { label: 'Costo', value: item => item.costLabel },
-            { label: 'Fonte', value: item => item.source },
         ];
     }
     if (section === 'gemme') {
@@ -1192,14 +1269,13 @@ function _compGenericEquipmentColumns(section, items) {
             { label: 'Nome', value: item => item.title },
             { label: 'Valore', value: item => item.valueLabel || item.costLabel },
             { label: 'Descrizione', value: item => item.description },
-            { label: 'Fonte', value: item => item.source },
         ];
     }
     if (section === 'metalli') {
         return [
             { label: 'Nome', value: item => item.title },
-            { label: 'Categoria', value: item => item.categoryLabel || item.type },
-            { label: 'Fonte', value: item => item.source },
+            { label: 'Costo', value: item => item.costLabel },
+            { label: 'Descrizione', value: item => item.description },
         ];
     }
     return [
@@ -1207,7 +1283,6 @@ function _compGenericEquipmentColumns(section, items) {
         { label: 'Categoria', value: item => item.categoryLabel || item.type },
         { label: 'Costo', value: item => item.costLabel },
         { label: 'Peso', value: item => item.weight },
-        { label: 'Fonte', value: item => item.source },
     ].filter(col => col.label === 'Nome' || items.some(item => col.value(item)));
 }
 
@@ -1373,7 +1448,6 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     const kinds = _compFilterValues(filters.kind);
     const types = _compFilterValues(filters.type);
     const properties = _compFilterValues(filters.property);
-    const sources = _compFilterValues(filters.source);
     const costs = _compFilterValues(filters.cost);
     const preparations = _compFilterValues(filters.preparation);
     const parts = _compFilterValues(filters.part);
@@ -1384,7 +1458,6 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
     if (types.length && !types.includes(item.type)) return false;
     if (properties.length && !properties.some(prop => String(item.properties || '').includes(prop))) return false;
-    if (sources.length && !sources.includes(item.source)) return false;
     if (preparations.length && !preparations.includes(item.preparation)) return false;
     if (parts.length && !parts.includes(item.part)) return false;
     if (environments.length && !environments.includes(item.environment)) return false;
@@ -1417,7 +1490,6 @@ function _compEquipmentFilterDefs(section) {
     const filters = [
         { key: 'category', title: 'Categoria', options: _compUnique(items.map(i => i.categoryLabel || i.category)).map(v => [v, v]) },
         { key: 'type', title: 'Tipologia', options: _compUnique(items.map(i => i.type)).map(v => [v, v]) },
-        { key: 'source', title: 'Fonte', options: _compUnique(items.map(i => i.source)).map(v => [v, v]) },
     ].filter(def => def.options.length);
     if (section === 'armi') {
         filters.unshift({ key: 'kind', title: 'Tipo', options: [['weapon', 'Armi'], ['armor', 'Armature e Scudi']] });
