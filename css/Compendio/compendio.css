@@ -122,6 +122,32 @@
     padding: 0 var(--spacing-sm) 88px;
 }
 
+.comp-equipment-hub {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 520px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: min(620px, calc(100svh - 64px - 72px - 7rem));
+}
+
+.comp-equipment-hub-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    flex: 1;
+    min-height: 78px;
+}
+
+.comp-equipment-hub-card {
+    min-height: 78px;
+}
+
+.comp-equipment-hub-card .comp-hub-card-label {
+    font-size: 0.82rem;
+}
+
 .comp-equipment-main-tabs {
     margin: 0 0 12px;
 }

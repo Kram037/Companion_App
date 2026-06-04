@@ -62,10 +62,49 @@ const COMP_TABS = {
     incantesimi: { label: 'Incantesimi', iconFile: 'Incantesimi' },
 };
 
+const COMP_EQUIPMENT_SECTIONS = {
+    armi: { label: 'Armi, Armature e Scudi', shortLabel: 'Armi e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
+    avventura: { label: 'Avventura', shortLabel: 'Avventura', iconFile: 'Equipaggiamento' },
+    strumenti: { label: 'Strumenti', shortLabel: 'Strumenti', iconFile: 'Equipaggiamento' },
+    erbe: { label: 'Erbe', shortLabel: 'Erbe', iconFile: 'Equipaggiamento/Erbe' },
+    metalli: { label: 'Metalli', shortLabel: 'Metalli', iconFile: 'Equipaggiamento/Metalli' },
+    gemme: { label: 'Gemme', shortLabel: 'Gemme', iconFile: 'Equipaggiamento/Gemme' },
+    veleni: { label: 'Veleni', shortLabel: 'Veleni', iconFile: 'Equipaggiamento/Veleni' },
+    oggetti: { label: 'Oggetti Magici', shortLabel: 'Oggetti Magici', iconFile: 'Equipaggiamento' },
+};
+
+const COMP_EQUIPMENT_SECTION_ORDER = ['armi', 'avventura', 'strumenti', 'erbe', 'metalli', 'gemme', 'veleni', 'oggetti'];
+
+const COMP_WEAPON_GROUPS = [
+    ['semplice_mischia', 'Armi semplici da mischia'],
+    ['semplice_distanza', 'Armi semplici a distanza'],
+    ['guerra_mischia', 'Armi da guerra da mischia'],
+    ['guerra_distanza', 'Armi da guerra a distanza'],
+];
+
+const COMP_ARMOR_GROUPS = [
+    ['leggera', 'Armature leggere'],
+    ['media', 'Armature medie'],
+    ['pesante', 'Armature pesanti'],
+    ['scudo', 'Scudi'],
+];
+
+const COMP_ADVENTURING_GEAR_DATA = [];
+const COMP_TOOLS_DATA = [];
+const COMP_HERBS_DATA = [];
+const COMP_METALS_DATA = [];
+const COMP_GEMS_DATA = [];
+
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
     if (!file) return '';
     return `<img class="comp-hub-icon-img" src="images/Tabs/${encodeURIComponent(file)}.svg" alt="" loading="lazy">`;
+}
+
+function _compEquipmentSectionIcon(section) {
+    const file = COMP_EQUIPMENT_SECTIONS[section]?.iconFile || 'Equipaggiamento';
+    const src = `images/Tabs/${file.split('/').map(encodeURIComponent).join('/')}.svg`;
+    return `<img class="comp-hub-icon-img" src="${src}" alt="" loading="lazy">`;
 }
 
 const COMP_MULTICLASS_REQUIREMENTS = {
@@ -260,6 +299,14 @@ function compendioRenderHub() {
 
 window.compendioBackToHub = function() {
     const state = _compStateFor(_compCurrentTab);
+    if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
+        state.equipmentSection = '';
+        const title = document.getElementById('compendioSubTitle');
+        if (title) title.textContent = COMP_TABS.oggetti.label;
+        compendioRenderTab();
+        _compScrollToTop();
+        return;
+    }
     if (state.detail) {
         state.detail = null;
         const title = document.getElementById('compendioSubTitle');
@@ -292,6 +339,9 @@ window.compendioOpenTab = function(tab) {
     if (!COMP_TABS[tab]) return;
     _compCurrentTab = tab;
     _compStateFor(tab).detail = null;
+    if (tab === 'oggetti') {
+        _compStateFor(tab).equipmentSection = '';
+    }
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
     if (hub) hub.style.display = 'none';
@@ -320,6 +370,11 @@ function compendioRenderTab() {
     const container = document.getElementById('compendioContent');
     if (!container) return;
     if (_compCurrentTab === 'oggetti') {
+        const state = _compStateFor('oggetti');
+        const title = document.getElementById('compendioSubTitle');
+        if (title) title.textContent = state.equipmentSection
+            ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
+            : COMP_TABS.oggetti.label;
         container.innerHTML = _compObjectsPageHtml();
         _compRenderObjectsStickyTools();
         _compScrollToTop();
@@ -1007,90 +1062,143 @@ function _compClassSubclassesSection(cls, showTasha = false) {
 
 function _compObjectsPageHtml() {
     const state = _compStateFor('oggetti');
-    state.subTab = state.subTab || 'equipaggiamento';
-    return `
-        <div class="lab-subtabs comp-equipment-main-tabs">
-            <button type="button" class="lab-subtab ${state.subTab === 'equipaggiamento' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('equipaggiamento')">
-                <span class="lab-subtab-icon">🛡️</span><span>Equipaggiamento</span>
-            </button>
-            <button type="button" class="lab-subtab ${state.subTab === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectsSubTab('oggetti')">
-                <span class="lab-subtab-icon">🎒</span><span>Oggetti e Veleni</span>
-            </button>
-        </div>
-        ${state.subTab === 'oggetti' ? _compObjectsInventoryHtml(state) : _compEquipmentTablesHtml()}
-    `;
+    state.equipmentSection = state.equipmentSection || '';
+    if (!state.equipmentSection) return _compEquipmentHubHtml();
+    return `<div id="compEquipmentSectionContent">${_compEquipmentSectionHtml(state.equipmentSection, state)}</div>`;
 }
 
 window.compendioSetObjectsSubTab = function(tab) {
     const state = _compStateFor('oggetti');
-    state.subTab = tab === 'oggetti' ? 'oggetti' : 'equipaggiamento';
+    state.equipmentSection = tab === 'oggetti' ? 'oggetti' : 'armi';
+    compendioRenderTab();
+    _compScrollToTop();
+};
+
+window.compendioOpenEquipmentSection = function(section) {
+    if (!COMP_EQUIPMENT_SECTIONS[section]) return;
+    const state = _compStateFor('oggetti');
+    state.equipmentSection = section;
+    state.detail = null;
     compendioRenderTab();
     _compScrollToTop();
 };
 
 window.compendioSetObjectsSearch = function(value) {
     const state = _compStateFor('oggetti');
-    state.objectsSearch = value || '';
-    _compRenderObjectsInventoryList();
+    const section = state.equipmentSection || 'armi';
+    state.equipmentSearch = state.equipmentSearch || {};
+    state.equipmentSearch[section] = value || '';
+    _compRenderObjectsSectionContent();
 };
 
-function _compEquipmentTablesHtml() {
-    const weapons = typeof DND_ARMI !== 'undefined' && Array.isArray(DND_ARMI) ? DND_ARMI : [];
-    const armors = typeof DND_ARMATURE !== 'undefined' && Array.isArray(DND_ARMATURE) ? DND_ARMATURE : [];
-    const weaponGroups = [
-        ['semplice_mischia', 'Armi semplici da mischia'],
-        ['semplice_distanza', 'Armi semplici a distanza'],
-        ['guerra_mischia', 'Armi da guerra da mischia'],
-        ['guerra_distanza', 'Armi da guerra a distanza'],
-    ];
-    const armorGroups = [
-        ['leggera', 'Armature leggere'],
-        ['media', 'Armature medie'],
-        ['pesante', 'Armature pesanti'],
-        ['scudo', 'Scudi'],
-    ];
-    return `
+function _compEquipmentHubHtml() {
+    const rows = [];
+    for (let i = 0; i < COMP_EQUIPMENT_SECTION_ORDER.length; i += 2) {
+        rows.push(`
+            <div class="comp-equipment-hub-row">
+                ${COMP_EQUIPMENT_SECTION_ORDER.slice(i, i + 2).map(section => `
+                    <button type="button" class="comp-hub-card comp-equipment-hub-card" onclick="compendioOpenEquipmentSection('${section}')">
+                        <span class="comp-hub-card-icon" aria-hidden="true">${_compEquipmentSectionIcon(section)}</span>
+                        <span class="comp-hub-card-label">${escapeHtml(COMP_EQUIPMENT_SECTIONS[section].shortLabel || COMP_EQUIPMENT_SECTIONS[section].label)}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `);
+    }
+    return `<div class="comp-equipment-hub">${rows.join('')}</div>`;
+}
+
+function _compEquipmentSectionHtml(section, state = _compStateFor('oggetti')) {
+    if (section === 'armi') return _compEquipmentTablesHtml(state);
+    if (section === 'oggetti' || section === 'veleni') {
+        return `<div id="compObjectsListContent">${_compObjectsInventoryListHtml(state)}</div>`;
+    }
+    return _compGenericEquipmentListHtml(section, state);
+}
+
+function _compEquipmentSearchValue(section, state = _compStateFor('oggetti')) {
+    return (state.equipmentSearch && state.equipmentSearch[section]) || '';
+}
+
+function _compEquipmentFilterState(section, state = _compStateFor('oggetti')) {
+    state.equipmentFilters = state.equipmentFilters || {};
+    state.equipmentFilters[section] = state.equipmentFilters[section] || {};
+    return state.equipmentFilters[section];
+}
+
+function _compEquipmentTablesHtml(state = _compStateFor('oggetti')) {
+    const allItems = _compEquipmentSectionItems('armi');
+    const filtered = _compEquipmentFilteredItems('armi', state);
+    const weapons = filtered.filter(item => item.kind === 'weapon').map(item => item.data);
+    const armors = filtered.filter(item => item.kind === 'armor').map(item => item.data);
+    const content = `
+        <p class="comp-count">${filtered.length} risultati su ${allItems.length}</p>
         <section class="comp-detail-section">
             <h3>Armi</h3>
-            ${weaponGroups.map(([cat, label]) => _compWeaponTable(label, weapons.filter(w => w.cat === cat))).join('')}
+            ${COMP_WEAPON_GROUPS.map(([cat, label]) => _compWeaponTable(label, weapons.filter(w => w.cat === cat))).join('') || '<div class="comp-empty">Nessuna arma trovata</div>'}
         </section>
         <section class="comp-detail-section">
             <h3>Armature e Scudi</h3>
-            ${armorGroups.map(([cat, label]) => _compArmorTable(label, armors.filter(a => a.cat === cat))).join('')}
+            ${COMP_ARMOR_GROUPS.map(([cat, label]) => _compArmorTable(label, armors.filter(a => a.cat === cat))).join('') || '<div class="comp-empty">Nessuna armatura o scudo trovato</div>'}
         </section>
+    `;
+    return filtered.length ? content : `${content}<div class="comp-empty">Nessun elemento trovato</div>`;
+}
+
+function _compGenericEquipmentListHtml(section, state = _compStateFor('oggetti')) {
+    const total = _compEquipmentSectionItems(section).length;
+    const items = _compEquipmentFilteredItems(section, state);
+    const table = _compGenericEquipmentTable(section, items);
+    return `
+        <p class="comp-count">${items.length} risultati su ${total}</p>
+        ${table || '<div class="comp-empty">Dati non ancora disponibili</div>'}
     `;
 }
 
-function _compObjectsInventoryHtml(state) {
-    state.objectKind = state.objectKind || 'oggetti';
+function _compGenericEquipmentTable(section, items) {
+    if (!items.length) return '';
+    const hasCost = items.some(item => item.costLabel);
+    const hasWeight = items.some(item => item.weight);
+    const hasSource = items.some(item => item.source);
     return `
-        <div class="comp-object-kind-tabs">
-            <button type="button" class="comp-object-kind-tab ${state.objectKind === 'oggetti' ? 'active' : ''}" onclick="compendioSetObjectKind('oggetti')">
-                Oggetti
-            </button>
-            <button type="button" class="comp-object-kind-tab ${state.objectKind === 'veleni' ? 'active' : ''}" onclick="compendioSetObjectKind('veleni')">
-                Veleni
-            </button>
+        <div class="comp-table-wrap">
+            <table class="comp-equipment-table">
+                <thead><tr>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    ${hasCost ? '<th>Costo</th>' : ''}
+                    ${hasWeight ? '<th>Peso</th>' : ''}
+                    ${hasSource ? '<th>Fonte</th>' : ''}
+                </tr></thead>
+                <tbody>${items.map(item => `
+                    <tr>
+                        <td>${escapeHtml(item.title || '')}</td>
+                        <td>${escapeHtml(item.categoryLabel || item.type || '-')}</td>
+                        ${hasCost ? `<td>${escapeHtml(item.costLabel || '-')}</td>` : ''}
+                        ${hasWeight ? `<td>${escapeHtml(item.weight || '-')}</td>` : ''}
+                        ${hasSource ? `<td>${escapeHtml(item.source || '-')}</td>` : ''}
+                    </tr>
+                `).join('')}</tbody>
+            </table>
         </div>
-        <div id="compObjectsListContent">${_compObjectsInventoryListHtml(state)}</div>
     `;
 }
 
 function _compRenderObjectsStickyTools() {
     const state = _compStateFor('oggetti');
-    if (state.subTab !== 'oggetti') {
+    const section = state.equipmentSection || '';
+    if (!section) {
         _compSetStickyTools('');
         return;
     }
-    state.objectKind = state.objectKind || 'oggetti';
-    const searchLabel = state.objectKind === 'veleni' ? 'veleno' : 'oggetto';
+    const cfg = COMP_EQUIPMENT_SECTIONS[section] || {};
     const activeFilters = _compObjectsActiveFilterCount();
     _compSetStickyTools(`
         <div class="comp-toolbar page-tools-row">
             <label class="comp-search-wrap">
                 ${_compIcon('search')}
-                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca ${searchLabel}..."
-                    value="${escapeHtml(state.objectsSearch || '')}" oninput="compendioSetObjectsSearch(this.value)">
+                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca in ${escapeHtml((cfg.label || 'equipaggiamento').toLowerCase())}..."
+                    value="${escapeHtml(_compEquipmentSearchValue(section, state))}" oninput="compendioSetObjectsSearch(this.value)">
             </label>
             <button type="button" class="comp-filter-btn" onclick="compendioOpenObjectsFilters()" aria-label="Filtri">
                 ${_compIcon('sliders')}
@@ -1141,19 +1249,142 @@ function _compArmorTable(label, rows) {
     </div>`;
 }
 
+function _compEquipmentSectionItems(section) {
+    if (section === 'armi') return _compArmoryItems();
+    if (section === 'oggetti') {
+        return (Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [])
+            .map(item => _compInventoryItem('catalog', item))
+            .filter(Boolean);
+    }
+    if (section === 'veleni') {
+        return (Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [])
+            .map(item => _compInventoryItem('veleni', item))
+            .filter(Boolean);
+    }
+    const sourceMap = {
+        avventura: COMP_ADVENTURING_GEAR_DATA,
+        strumenti: COMP_TOOLS_DATA,
+        erbe: COMP_HERBS_DATA,
+        metalli: COMP_METALS_DATA,
+        gemme: COMP_GEMS_DATA,
+    };
+    return (sourceMap[section] || []).map((item, index) => _compGenericEquipmentItem(section, item, index)).filter(Boolean);
+}
+
+function _compArmoryItems() {
+    const weapons = typeof DND_ARMI !== 'undefined' && Array.isArray(DND_ARMI) ? DND_ARMI : [];
+    const armors = typeof DND_ARMATURE !== 'undefined' && Array.isArray(DND_ARMATURE) ? DND_ARMATURE : [];
+    return [
+        ...weapons.map(w => ({
+            kind: 'weapon',
+            title: w.nome || '',
+            category: w.cat || '',
+            categoryLabel: _compEquipmentGroupLabel(w.cat),
+            type: w.tipo_danno || '',
+            properties: _compArrayLabel(w.proprieta),
+            source: 'Armi',
+            data: w,
+            search: [w.nome, w.danni, w.tipo_danno, _compArrayLabel(w.proprieta), _compEquipmentGroupLabel(w.cat)].join(' ').toLowerCase(),
+        })),
+        ...armors.map(a => ({
+            kind: 'armor',
+            title: a.nome || '',
+            category: a.cat || '',
+            categoryLabel: _compEquipmentGroupLabel(a.cat),
+            type: a.cat === 'scudo' ? 'Scudo' : 'Armatura',
+            properties: a.furtivita || '',
+            source: a.cat === 'scudo' ? 'Scudi' : 'Armature',
+            data: a,
+            search: [a.nome, _compArmorClassLabel(a), a.furtivita, _compEquipmentGroupLabel(a.cat)].join(' ').toLowerCase(),
+        })),
+    ];
+}
+
+function _compGenericEquipmentItem(section, item, index) {
+    if (!item) return null;
+    const title = item.nome || item.name || item.nome_it || item.title || '';
+    if (!title) return null;
+    return {
+        id: item.id || `${section}-${index}`,
+        title,
+        category: item.categoria || item.category || item.tipo || item.type || '',
+        categoryLabel: item.categoria || item.category || item.tipo || item.type || '',
+        type: item.tipo || item.type || '',
+        source: item.fonte || item.source || '',
+        cost: Number(item.costo_mo ?? item.cost_gp ?? item.cost ?? NaN),
+        costLabel: item.costo || item.cost_label || item.prezzo || item.price || '',
+        weight: item.peso || item.weight || '',
+        data: item,
+        search: [title, item.name, item.categoria, item.category, item.tipo, item.type, item.fonte, item.source, item.descrizione, item.description].join(' ').toLowerCase(),
+    };
+}
+
+function _compEquipmentFilteredItems(section, state = _compStateFor('oggetti')) {
+    const q = String(_compEquipmentSearchValue(section, state)).trim().toLowerCase();
+    return _compEquipmentSectionItems(section)
+        .filter(item => !q || String(item.search || '').includes(q) || String(item.title || '').toLowerCase().includes(q))
+        .filter(item => _compEquipmentMatchesFilters(item, section, state));
+}
+
+function _compEquipmentMatchesFilters(item, section, state = _compStateFor('oggetti')) {
+    if (section === 'oggetti' || section === 'veleni') return _compObjectMatchesFilters(item, state);
+    const filters = _compEquipmentFilterState(section, state);
+    const categories = _compFilterValues(filters.category);
+    const kinds = _compFilterValues(filters.kind);
+    const types = _compFilterValues(filters.type);
+    const properties = _compFilterValues(filters.property);
+    const sources = _compFilterValues(filters.source);
+    const costs = _compFilterValues(filters.cost);
+    if (categories.length && !categories.includes(item.categoryLabel || item.category)) return false;
+    if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
+    if (types.length && !types.includes(item.type)) return false;
+    if (properties.length && !properties.some(prop => String(item.properties || '').includes(prop))) return false;
+    if (sources.length && !sources.includes(item.source)) return false;
+    if (costs.length) {
+        if (!Number.isFinite(item.cost)) return false;
+        if (!costs.some(range => _compCostInRange(item.cost, range))) return false;
+    }
+    return true;
+}
+
+function _compEquipmentFilterDefs(section) {
+    const items = _compEquipmentSectionItems(section);
+    if (section === 'oggetti' || section === 'veleni') {
+        const rarities = _compUnique(items.map(i => i.rarity));
+        const types = _compUnique(items.map(i => i.type));
+        const filters = [
+            { key: 'rarity', title: 'Rarita', options: rarities.map(v => [v, v]) },
+            { key: 'type', title: 'Tipologia', options: types.map(v => [v, v]) },
+        ].filter(def => def.options.length);
+        if (section === 'oggetti') {
+            filters.push({ key: 'attunement', title: 'Sintonia', mode: 'single', options: [['yes', 'Si'], ['no', 'No']] });
+        }
+        if (section === 'veleni') {
+            filters.push({ key: 'cost', title: 'Costo', options: [['0-100', '0-100 mo'], ['101-500', '101-500 mo'], ['501-1000', '501-1000 mo'], ['1001+', '1001+ mo']] });
+        }
+        return filters;
+    }
+    const filters = [
+        { key: 'category', title: 'Categoria', options: _compUnique(items.map(i => i.categoryLabel || i.category)).map(v => [v, v]) },
+        { key: 'type', title: 'Tipologia', options: _compUnique(items.map(i => i.type)).map(v => [v, v]) },
+        { key: 'source', title: 'Fonte', options: _compUnique(items.map(i => i.source)).map(v => [v, v]) },
+    ].filter(def => def.options.length);
+    if (section === 'armi') {
+        filters.unshift({ key: 'kind', title: 'Tipo', options: [['weapon', 'Armi'], ['armor', 'Armature e Scudi']] });
+        const props = _compUnique(items.flatMap(i => _compFilterValues(String(i.properties || '').split(',').map(x => x.trim()))));
+        if (props.length) filters.push({ key: 'property', title: 'Proprieta', options: props.map(v => [v, v]) });
+    }
+    return filters;
+}
+
+function _compEquipmentGroupLabel(cat) {
+    return [...COMP_WEAPON_GROUPS, ...COMP_ARMOR_GROUPS].find(([key]) => key === cat)?.[1] || cat || '';
+}
+
 function _compObjectsInventoryListHtml(state = _compStateFor('oggetti')) {
-    const magicItems = (Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [])
-        .map(item => _compInventoryItem('catalog', item))
-        .filter(Boolean);
-    const poisons = (Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : [])
-        .map(item => _compInventoryItem('veleni', item))
-        .filter(Boolean);
-    const kind = state.objectKind === 'veleni' ? 'veleni' : 'oggetti';
-    const baseItems = kind === 'veleni' ? poisons : magicItems;
-    const q = String(state.objectsSearch || '').trim().toLowerCase();
-    const all = baseItems
-        .filter(item => !q || item.search.includes(q))
-        .filter(item => _compObjectMatchesFilters(item, state))
+    const section = state.equipmentSection === 'veleni' ? 'veleni' : 'oggetti';
+    const baseItems = _compEquipmentSectionItems(section);
+    const all = _compEquipmentFilteredItems(section, state)
         .sort((a, b) => a.title.localeCompare(b.title, 'it'));
     return `
         <p class="comp-count">${all.length} risultati su ${baseItems.length}</p>
@@ -1213,8 +1444,19 @@ function _compInventoryCardHtml(item) {
 }
 
 function _compRenderObjectsInventoryList() {
+    _compRenderObjectsSectionContent();
+}
+
+function _compRenderObjectsSectionContent() {
+    const state = _compStateFor('oggetti');
+    const section = state.equipmentSection || '';
     const target = document.getElementById('compObjectsListContent');
-    if (target) target.innerHTML = _compObjectsInventoryListHtml();
+    if (target) {
+        target.innerHTML = _compObjectsInventoryListHtml(state);
+    } else {
+        const sectionTarget = document.getElementById('compEquipmentSectionContent');
+        if (sectionTarget && section) sectionTarget.innerHTML = _compEquipmentSectionHtml(section, state);
+    }
     const badge = document.getElementById('compObjectsFiltersBadge');
     if (badge) {
         const n = _compObjectsActiveFilterCount();
@@ -1224,14 +1466,12 @@ function _compRenderObjectsInventoryList() {
 }
 
 window.compendioSetObjectKind = function(kind) {
-    const state = _compStateFor('oggetti');
-    state.objectKind = kind === 'veleni' ? 'veleni' : 'oggetti';
-    state.objectFilters = {};
-    compendioRenderTab();
+    compendioOpenEquipmentSection(kind === 'veleni' ? 'veleni' : 'oggetti');
 };
 
 function _compObjectMatchesFilters(item, state) {
-    const f = state.objectFilters || {};
+    const section = state.equipmentSection || (item.source === 'veleni' ? 'veleni' : 'oggetti');
+    const f = _compEquipmentFilterState(section, state);
     const rarities = _compFilterValues(f.rarity);
     const types = _compFilterValues(f.type);
     const attunements = _compFilterValues(f.attunement);
@@ -1248,13 +1488,8 @@ function _compObjectMatchesFilters(item, state) {
 
 function _compObjectsActiveFilterCount() {
     const state = _compStateFor('oggetti');
-    const f = state.objectFilters || {};
-    let n = 0;
-    n += _compFilterValues(f.rarity).length;
-    n += _compFilterValues(f.type).length;
-    n += _compFilterValues(f.attunement).length;
-    n += _compFilterValues(f.cost).length;
-    return n;
+    const f = _compEquipmentFilterState(state.equipmentSection || 'armi', state);
+    return Object.values(f).reduce((count, value) => count + _compFilterValues(value).length, 0);
 }
 
 window.compendioOpenObjectsFilters = function() {
@@ -1277,24 +1512,11 @@ window.compendioOpenObjectsFilters = function() {
 
 function _compObjectsFiltersHtml() {
     const state = _compStateFor('oggetti');
-    const f = state.objectFilters || {};
-    const kind = state.objectKind === 'veleni' ? 'veleni' : 'oggetti';
-    const items = [...(Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : []).map(i => _compInventoryItem('catalog', i)),
-        ...(Array.isArray(window.VELENI_DATA) ? window.VELENI_DATA : []).map(i => _compInventoryItem('veleni', i))].filter(Boolean);
-    const filterPool = items.filter(i => kind === 'veleni' ? i.source === 'veleni' : i.source === 'catalog');
-    const rarities = _compUnique(filterPool.map(i => i.rarity));
-    const types = _compUnique(filterPool.map(i => i.type));
-    const filters = [
-        _compObjectSelect('rarity', f.rarity, rarities.map(v => [v, v]), 'Rarita'),
-        _compObjectSelect('type', f.type, types.map(v => [v, v]), 'Tipologia'),
-    ];
-    if (kind === 'oggetti') {
-        filters.push(_compObjectSelect('attunement', f.attunement, [['yes', 'Si'], ['no', 'No']], 'Sintonia', 'single'));
-    }
-    if (kind === 'veleni') {
-        filters.push(_compObjectSelect('cost', f.cost, [['0-100', '0-100 mo'], ['101-500', '101-500 mo'], ['501-1000', '501-1000 mo'], ['1001+', '1001+ mo']], 'Costo'));
-    }
-    return filters.join('');
+    const section = state.equipmentSection || 'armi';
+    const f = _compEquipmentFilterState(section, state);
+    const defs = _compEquipmentFilterDefs(section);
+    if (!defs.length) return '<div class="comp-empty">Nessun filtro disponibile</div>';
+    return defs.map(def => _compObjectSelect(def.key, f[def.key], def.options, def.title, def.mode || '')).join('');
 }
 
 function _compObjectSelect(key, value, options, title, forcedMode = '') {
@@ -1315,20 +1537,21 @@ function _compObjectSelect(key, value, options, title, forcedMode = '') {
 window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = 'multi') {
     const options = JSON.parse(decodeURIComponent(encodedOptions));
     const state = _compStateFor('oggetti');
-    state.objectFilters = state.objectFilters || {};
+    const section = state.equipmentSection || 'armi';
+    const filters = _compEquipmentFilterState(section, state);
     if (mode === 'single') {
         openCustomSelect(options, value => {
-            state.objectFilters[key] = value || '';
-            if (!value) delete state.objectFilters[key];
-            _compRenderObjectsInventoryList();
+            filters[key] = value || '';
+            if (!value) delete filters[key];
+            _compRenderObjectsSectionContent();
             const overlay = document.querySelector('.comp-objects-filter-overlay');
             if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
         }, title || 'Filtro');
         return;
     }
-    openMultiSelect(options, _compFilterValues(state.objectFilters[key]), values => {
-        state.objectFilters[key] = values;
-        _compRenderObjectsInventoryList();
+    openMultiSelect(options, _compFilterValues(filters[key]), values => {
+        filters[key] = values;
+        _compRenderObjectsSectionContent();
         const overlay = document.querySelector('.comp-objects-filter-overlay');
         if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
     }, title || 'Filtro');
@@ -1336,8 +1559,10 @@ window.compendioPickObjectFilter = function(key, encodedOptions, title, mode = '
 
 window.compendioResetObjectsFilters = function() {
     const state = _compStateFor('oggetti');
-    state.objectFilters = {};
-    _compRenderObjectsInventoryList();
+    const section = state.equipmentSection || 'armi';
+    state.equipmentFilters = state.equipmentFilters || {};
+    state.equipmentFilters[section] = {};
+    _compRenderObjectsSectionContent();
     const overlay = document.querySelector('.comp-objects-filter-overlay');
     if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _compObjectsFiltersHtml();
 };
