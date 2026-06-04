@@ -94,6 +94,7 @@ const COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
 const COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
 const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
 const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
+const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -1083,6 +1084,12 @@ window.compendioOpenEquipmentSection = function(section) {
     _compScrollToTop();
 };
 
+window.compendioToggleGemTreasures = function() {
+    const state = _compStateFor('oggetti');
+    state.gemTreasureOpen = state.gemTreasureOpen === false;
+    _compRenderObjectsSectionContent();
+};
+
 window.compendioSetObjectsSearch = function(value) {
     const state = _compStateFor('oggetti');
     const section = state.equipmentSection || 'armi';
@@ -1151,6 +1158,8 @@ function _compGenericEquipmentListHtml(section, state = _compStateFor('oggetti')
     let content = '';
     if (section === 'strumenti') {
         content = _compToolsTablesHtml(items);
+    } else if (section === 'gemme') {
+        content = _compGemsListHtml(state, total, items);
     } else if (['avventura', 'erbe', 'metalli', 'gemme'].includes(section)) {
         content = _compEquipmentCardsHtml(section, items);
     } else {
@@ -1207,8 +1216,8 @@ function _compEquipmentCardsHtml(section, items) {
 function _compEquipmentCardHtml(section, item) {
     const meta = _compEquipmentCardMeta(section, item);
     const accent = _compEquipmentCardAccent(section, item);
-    const desc = section === 'gemme' ? _compPlain(item.description || '') : '';
-    const clickable = ['avventura', 'erbe', 'metalli'].includes(section);
+    const desc = '';
+    const clickable = ['avventura', 'erbe', 'metalli'].includes(section) || (section === 'gemme' && item.gemKind === 'reame');
     const clickAttrs = clickable
         ? ` role="button" tabindex="0" onclick="compendioOpenEquipmentDetail('${section}','${_compEscapeAttr(item.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();compendioOpenEquipmentDetail('${section}','${_compEscapeAttr(item.id)}')}"`
         : '';
@@ -1235,6 +1244,65 @@ function _compEquipmentCardMeta(section, item) {
         return [item.categoryLabel || item.category, item.weight ? `Peso: ${item.weight}` : ''].filter(Boolean).join(' · ');
     }
     return '';
+}
+
+function _compGemsListHtml(state, total, items) {
+    const open = state.gemTreasureOpen === true;
+    const treasures = items.filter(item => item.gemKind === 'tesoro');
+    const realms = items.filter(item => item.gemKind === 'reame')
+        .sort((a, b) => a.title.localeCompare(b.title, 'it'));
+    const treasureHtml = treasures.length
+        ? _compGemTreasureTablesHtml(treasures)
+        : '<div class="comp-empty">Nessuna gemma tesoro trovata</div>';
+    const realmsHtml = realms.length
+        ? `<h3 class="comp-equipment-list-title">Gemme dei Reami</h3><div class="comp-list comp-equipment-card-list">${realms.map(item => _compEquipmentCardHtml('gemme', item)).join('')}</div>`
+        : '';
+    const emptyHtml = !treasures.length && !realms.length
+        ? '<div class="comp-empty">Nessuna gemma trovata</div>'
+        : '';
+    return `
+        <p class="comp-count">${items.length} risultati su ${total}</p>
+        <button type="button" class="comp-group-divider comp-gem-treasure-toggle ${open ? 'open' : ''}" onclick="compendioToggleGemTreasures()">
+            ${_compIcon('chevron-right')}
+            <span>Tesori</span>
+            <small>${treasures.length}</small>
+        </button>
+        ${open ? `<div class="comp-gem-treasure-body">${treasureHtml}</div>` : ''}
+        ${realmsHtml}
+        ${emptyHtml}
+    `;
+}
+
+function _compGemTreasureTablesHtml(items) {
+    const groups = new Map();
+    items.forEach(item => {
+        const key = item.valueLabel || item.costLabel || 'Valore variabile';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(item);
+    });
+    return Array.from(groups.entries())
+        .sort(([a], [b]) => _compGemValueSort(a) - _compGemValueSort(b))
+        .map(([value, group]) => `
+            <div class="comp-equipment-subtable comp-gem-treasure-table">
+                <h4>Gemme da ${escapeHtml(value)}</h4>
+                <div class="comp-table-wrap">
+                    <table class="comp-equipment-table comp-gems-table">
+                        <thead><tr><th>Gemma</th><th>Descrizione</th></tr></thead>
+                        <tbody>${group.sort((a, b) => a.title.localeCompare(b.title, 'it')).map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.title)}</td>
+                                <td>${escapeHtml(item.description || '-')}</td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>
+                </div>
+            </div>
+        `).join('');
+}
+
+function _compGemValueSort(value) {
+    const n = Number(String(value || '').replace(/[^\d]/g, ''));
+    return Number.isFinite(n) ? n : 999999;
 }
 
 function _compGenericEquipmentTable(section, items) {
@@ -1367,12 +1435,17 @@ function _compEquipmentSectionItems(section) {
             .map(item => _compInventoryItem('veleni', item))
             .filter(Boolean);
     }
+    if (section === 'gemme') {
+        return [
+            ...COMP_GEMS_DATA.map((item, index) => _compGenericEquipmentItem('gemme', item, index)),
+            ...COMP_REALMS_GEMS_DATA.map((item, index) => _compGenericEquipmentItem('gemme', item, `realms-${index}`)),
+        ].filter(Boolean);
+    }
     const sourceMap = {
         avventura: COMP_ADVENTURING_GEAR_DATA,
         strumenti: COMP_TOOLS_DATA,
         erbe: COMP_HERBS_DATA,
         metalli: COMP_METALS_DATA,
-        gemme: COMP_GEMS_DATA,
     };
     return (sourceMap[section] || []).map((item, index) => _compGenericEquipmentItem(section, item, index)).filter(Boolean);
 }
@@ -1428,6 +1501,10 @@ function _compGenericEquipmentItem(section, item, index) {
         environment: item.ambiente || item.environment || '',
         season: item.stagione || item.season || '',
         description: item.descrizione || item.description || '',
+        gemKind: item.tipo_gemma || item.gem_kind || '',
+        power: item.potere || item.power || item.poteri || '',
+        sourceUrl: item.fonte_url || item.source_url || '',
+        rarity: item.rarita || item.rarity || '',
         data: item,
         search: [
             title, item.name, item.categoria, item.category, item.tipo, item.type,
@@ -1435,6 +1512,7 @@ function _compGenericEquipmentItem(section, item, index) {
             item.part, item.ambiente, item.environment, item.stagione, item.season,
             item.descrizione, item.description, item.valore, item.value_label, item.costo,
             item.cost_label, item.costo_dettaglio, item.cost_detail, item.peso, item.weight,
+            item.potere, item.power, item.poteri, item.rarita, item.rarity,
         ].join(' ').toLowerCase(),
     };
 }
@@ -1724,7 +1802,7 @@ window.compendioOpenObjectDetail = function(source, id) {
 };
 
 window.compendioOpenEquipmentDetail = function(section, id) {
-    if (!['avventura', 'erbe', 'metalli'].includes(section)) return;
+    if (!['avventura', 'erbe', 'metalli', 'gemme'].includes(section)) return;
     const item = _compEquipmentSectionItems(section).find(entry => String(entry.id) === String(id));
     if (!item) return;
     const data = _compGenericEquipmentPreviewData(section, item);
@@ -1809,6 +1887,21 @@ function _compGenericEquipmentPreviewData(section, item) {
             ]),
             extras: _compEquipmentDetailExtras([
                 ['Indicazioni', item.costDetail],
+            ]),
+            descrizione: item.description || '',
+            pendingTr: false,
+        };
+    }
+    if (section === 'gemme' && item.gemKind === 'reame') {
+        return {
+            nome: item.title,
+            nomeAlt: '',
+            rarita: '',
+            meta: _compEquipmentDetailMeta([
+                ['Costo', item.costLabel || item.valueLabel],
+            ]),
+            extras: _compEquipmentDetailExtras([
+                ['Poteri', item.power],
             ]),
             descrizione: item.description || '',
             pendingTr: false,

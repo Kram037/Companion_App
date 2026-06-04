@@ -487,6 +487,119 @@ GEM_TRANSLATIONS = {
     "Zircon": ("Zircone", "verde-blu pallido"),
 }
 
+REALMS_GEMS = [
+    {
+        "id": "realms-chardalyn",
+        "nome": "Chardalyn",
+        "costo": "1.000-8.000 mo",
+        "costo_mo": 8000,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Chardalyn",
+        "descrizione": "Sostanza rara dei Reami, di colore nero e fragile come vetro. I frammenti piu' grandi erano preziosi per la loro affinita' naturale con la magia.",
+        "potere": "Puo' assorbire un singolo incantesimo e rilasciarlo quando la pietra viene frantumata o distrutta. Una chardalyn vuota puo' assorbire anche magie nell'area, mentre una gia' carica non accetta altri incantesimi.",
+    },
+    {
+        "id": "realms-bloodstone",
+        "nome": "Pietra sanguigna",
+        "costo": "50 mo",
+        "costo_mo": 50,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Bloodstone",
+        "descrizione": "Calcedonio verde-grigio con inclusioni rosse simili a gocce di sangue. Nei Reami veniva lavorato spesso come cabochon o in barre marcate da casate nobili.",
+        "potere": "Premuta su una ferita aperta, puo' coagulare il sangue, chiudere la ferita e rimuovere malattie del sangue o veleni senza ripristinare punti ferita. La gemma si dissolve dopo l'uso e lo stesso bersaglio non ne beneficia di nuovo prima di un ciclo lunare.",
+    },
+    {
+        "id": "realms-emerald",
+        "nome": "Smeraldo",
+        "costo": "1.000 mo",
+        "costo_mo": 1000,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Emerald",
+        "descrizione": "Gemma verde che si sfalda facilmente lungo linee ortogonali, motivo per cui viene spesso tagliata in forma rettangolare. Le tonalita' piu' limpide e brillanti sono le piu' pregiate.",
+        "potere": "Associato a salute, fertilita' e crescita. Intero o in polvere, e' usato in dispositivi e lavorazioni magiche di guarigione, crescita, portali e teletrasporto. Secondo la tradizione, puo' incrinarsi in presenza di tradimento o inganno.",
+    },
+    {
+        "id": "realms-sapphire",
+        "nome": "Zaffiro",
+        "costo": "1.000 mo",
+        "costo_mo": 1000,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Sapphire",
+        "descrizione": "Varieta' rara di corindone, trovata in tonalita' dal blu pallido all'azzurro intenso. La colorazione blu vivida puo' essere ottenuta anche tramite trattamento ad altissime temperature.",
+        "potere": "La tradizione dei Reami lo collega a perizia magica, mente ed elemento aria. Puo' attenuare paura, rabbia, disperazione o follia indotte magicamente e, come componente, favorisce durata ed effetto iniziale delle magie.",
+    },
+    {
+        "id": "realms-ruby",
+        "nome": "Rubino",
+        "costo": "5.000 mo",
+        "costo_mo": 5000,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Ruby",
+        "descrizione": "Varieta' di corindone che va da tonalita' quasi incolori al cremisi profondo. Piu' il colore e' scuro e piu' la pietra e' priva di inclusioni, maggiore e' il suo valore.",
+        "potere": "In polvere potenzia oggetti personali legati a abilita', resistenza o fortuna, e puo' essere usato in inchiostri magici. Rubini lavorati sono apprezzati in oggetti di guarigione e, con rituali adeguati, possono proteggere da fulmini e terremoti.",
+    },
+    {
+        "id": "realms-diamond",
+        "nome": "Diamante",
+        "costo": "5.000 mo",
+        "costo_mo": 5000,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Diamond",
+        "descrizione": "Gemma estremamente dura, traslucida o trasparente, spesso tagliata a faccette per rifrangere la luce. E' preziosa anche come materiale per incidere e realizzare utensili da taglio o perforazione molto fini.",
+        "potere": "Ha affinita' con divinazione, vista e localizzazione. Polvere e frammenti di diamante sono utili in inchiostri, immersioni magiche, neutralizzazione o creazione di veleni, protezioni contro charme e influssi psionici.",
+    },
+    {
+        "id": "realms-moonstone",
+        "nome": "Pietra di luna",
+        "costo": "50 mo",
+        "costo_mo": 50,
+        "tipo_gemma": "reame",
+        "fonte": "Forgotten Realms Wiki",
+        "fonte_url": "https://forgottenrealms.fandom.com/wiki/Moonstone",
+        "descrizione": "Feldspato opaco e bianco con riflessi lattiginosi e blu quando viene lucidato. E' comune in gioielleria e nelle tradizioni religiose legate alla luna.",
+        "potere": "Assorbe la luce e puo' brillare debolmente al buio dopo lo spegnimento delle fonti luminose. La polvere puo' sostituire componenti non organiche in alcune magie di abiurazione ed evocazione, se dosata con ricerca accurata.",
+    },
+]
+
+MAGIC_ITEM_RARITY_RANGES = {
+    "Comune": "50-100 mo",
+    "Non comune": "101-500 mo",
+    "Raro": "501-5.000 mo",
+    "Molto raro": "5.001-50.000 mo",
+    "Planare/leggendario": "50.001+ mo",
+}
+
+PRECIOUS_METAL_EQUIVALENCES = {
+    "Copper": "1 mr = 1/10 ma, 1/50 me, 1/100 mo, 1/1000 mp",
+    "Silver": "1 ma = 10 mr, 1/5 me, 1/10 mo, 1/100 mp",
+    "Electrum": "1 me = 50 mr, 5 ma, 1/2 mo, 1/20 mp",
+    "Gold": "1 mo = 100 mr, 10 ma, 2 me, 1/10 mp",
+    "Platinum": "1 mp = 1000 mr, 100 ma, 50 me, 10 mo",
+}
+
+METAL_PROPERTIES = {
+    "Adamantine": "In gioco e' utile per armature e oggetti quasi impossibili da danneggiare: un'armatura di adamantio trasforma i colpi critici subiti in colpi normali. La sua durezza rende costrutti, porte o catene in adamantio difficili da rompere senza strumenti o armi adeguate; la lavorazione richiede fornaci e temperature eccezionali.",
+    "Adamant": "Versione leggendaria o nome alternativo legato a materiali quasi indistruttibili. Usalo come metallo da ricompensa epica, componente per sigilli, serrature, catene o nuclei di costrutti.",
+    "Mithral": "Metallo leggero e resistente, ideale per armature piu' maneggevoli e oggetti raffinati. In molte campagne riduce ingombro e rumorosita', rendendolo prezioso per esploratori e incantatori corazzati.",
+    "Silver": "L'argento e' il riferimento piu' comune per armi argentate: molte creature soprannaturali, come alcuni immondi, non morti o mutaforma, sono piu' vulnerabili o aggirano meno facilmente armi rivestite d'argento.",
+    "Iron": "Il ferro resta il materiale pratico di riferimento per armi, armature, chiodi, catene e strumenti. E' comune, riparabile quasi ovunque e utile come base per descrivere equipaggiamento non prezioso.",
+    "Cold iron": "Ferro lavorato a freddo o con tecniche tradizionali, spesso usato nelle leggende contro fate e creature extraplanari. E' un buon materiale speciale quando vuoi distinguere armi rituali o anti-folletto.",
+    "Bronze": "Lega antica e resistente alla corrosione, utile per armi e armature di culture arcaiche, statue, campane e oggetti cerimoniali.",
+    "Copper": "Il rame e' soprattutto valuta e metallo comune per conduttori, utensili, finiture e componenti alchemiche semplici.",
+    "Electrum": "L'elettro e' una lega naturale o artificiale di oro e argento, adatta a monete, gioielli e tesori dall'aspetto antico.",
+    "Gold": "L'oro e' morbido, prezioso e molto lavorabile: e' ideale per monete, intarsi, reliquiari, gioielli e ricompense riconoscibili.",
+    "Platinum": "Il platino e' piu' raro e prestigioso dell'oro, adatto a tesori di alto rango, monete pregiate e componenti rituali ricercate.",
+    "Infernal iron": "Metallo infernale legato ai Piani Inferiori, perfetto per armi, macchine da guerra e contratti diabolici. Trattalo come materiale raro o narrativo piu' che merce comune.",
+    "Celestial steel": "Acciaio celestiale adatto a reliquie, armi sacre e protezioni contro creature empie. Funziona bene come ricompensa collegata a templi, ordini sacri o piani superiori.",
+    "Baatorian green steel": "Acciaio verde infernale, utile per equipaggiamento diabolico o mercati planari. Il colore e l'origine lo rendono subito riconoscibile come materiale non comune.",
+}
+
 METAL_TRANSLATIONS = {
     "Adamant": ("Adamante", "Variabile", "Metallo estremamente duro, associato a lavorazioni leggendarie e materiali quasi indistruttibili."),
     "Adamantine": ("Adamantio", "Variabile", "Lega rara e durissima, usata per armature e armi capaci di resistere a colpi devastanti."),
@@ -605,11 +718,11 @@ METAL_COST_RANGES = {
 }
 
 METAL_COST_DETAILS = {
-    "Comune": "Range indicativo: materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
-    "Prezioso": "Range indicativo: materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
-    "Raro": "Range indicativo: materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
-    "Molto raro": "Range indicativo: materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
-    "Planare/leggendario": "Range indicativo: materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
+    "Comune": "materiale acquistabile come merce comune; il prezzo dipende soprattutto da peso, purezza e forma lavorata.",
+    "Prezioso": "materiale prezioso; il valore cresce molto in base a purezza, peso e lavorazione, come per lingotti, monete e gioielli.",
+    "Raro": "materiale raro; di norma richiede mercati specializzati, miniere specifiche o contatti artigianali.",
+    "Molto raro": "materiale molto raro; il costo e' normalmente alto e spesso legato a disponibilita' locale, segreti di forgia o componenti magici.",
+    "Planare/leggendario": "materiale planare o leggendario; il prezzo non e' standardizzato e di solito viene gestito come ricompensa, componente unico o trattativa narrativa.",
 }
 
 
@@ -631,15 +744,7 @@ def enrich_herbs(rows):
         row["parte"] = HERB_PART_IT.get(str(row.get("parte", "")).lower(), row.get("parte", ""))
         row["ambiente"] = translate_joined(row.get("ambiente"), HERB_ENVIRONMENT_IT)
         row["stagione"] = translate_joined(row.get("stagione"), HERB_SEASON_IT)
-        intro = HERB_CATEGORY_DETAIL_IT.get(row.get("categoria"), "Erba catalogata dal PDF delle erbe.")
-        bits = [
-            f"Nel PDF e' indicata come {row['categoria'].lower()}" if row.get("categoria") else "",
-            f"si prepara tramite {row['preparazione'].lower()}" if row.get("preparazione") else "",
-            f"la parte utile e' {row['parte'].lower()}" if row.get("parte") else "",
-            f"si trova in {row['ambiente'].lower()}" if row.get("ambiente") else "",
-            f"nella stagione: {row['stagione'].lower()}" if row.get("stagione") else "",
-        ]
-        row["descrizione"] = f"{intro} " + "; ".join(bit for bit in bits if bit) + "."
+        row["descrizione"] = HERB_CATEGORY_DETAIL_IT.get(row.get("categoria"), "Erba catalogata dal PDF delle erbe.")
     return rows
 
 
@@ -648,7 +753,14 @@ def enrich_gems(rows):
         name, description = GEM_TRANSLATIONS.get(row.get("nome"), (row.get("nome"), row.get("descrizione", "")))
         row["nome"] = name
         row["descrizione"] = description
+        row["tipo_gemma"] = "tesoro"
+        row["gruppo"] = row.get("valore")
     return rows
+
+
+def metal_cost_label(range_label):
+    money = MAGIC_ITEM_RARITY_RANGES.get(range_label)
+    return f"{range_label} ({money})" if money else range_label
 
 
 def enrich_metals(rows):
@@ -658,11 +770,15 @@ def enrich_metals(rows):
             original_name,
             (original_name, "Variabile", "Metallo o lega rara, utile come materiale speciale o componente di tesori."),
         )
-        range_label = METAL_COST_RANGES.get(original_name, cost if cost != "Variabile" else "Raro")
+        range_label = "Prezioso" if original_name in PRECIOUS_METAL_EQUIVALENCES else METAL_COST_RANGES.get(original_name, cost if cost != "Variabile" else "Raro")
+        cost_label = PRECIOUS_METAL_EQUIVALENCES.get(original_name) or metal_cost_label(range_label)
+        detail = METAL_COST_DETAILS.get(range_label, METAL_COST_DETAILS["Raro"])
+        properties = METAL_PROPERTIES.get(original_name, "")
         row["nome"] = name
-        row["costo"] = range_label
-        row["costo_dettaglio"] = METAL_COST_DETAILS.get(range_label, METAL_COST_DETAILS["Raro"])
-        row["descrizione"] = description
+        row["costo"] = cost_label
+        row["rarita"] = range_label
+        row["costo_dettaglio"] = detail
+        row["descrizione"] = f"{description} {properties}".strip()
         row.pop("categoria", None)
     return rows
 
@@ -676,6 +792,7 @@ def main():
     tools = convert_numbers(parse_pipe_table(TOOLS, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"]))
     metals = enrich_metals(parse_pipe_table(METALS, ["nome", "categoria", "fonte"]))
     gems = enrich_gems(convert_numbers(parse_pipe_table(GEMS, ["nome", "valore", "valore_mo", "descrizione", "fonte"])))
+    realms_gems = REALMS_GEMS
     herbs = enrich_herbs(parse_herbs())
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(
@@ -687,11 +804,12 @@ def main():
         f"{js_assign('COMP_HERBS_DATA', herbs)}\n"
         f"{js_assign('COMP_METALS_DATA', metals)}\n"
         f"{js_assign('COMP_GEMS_DATA', gems)}\n"
+        f"{js_assign('COMP_REALMS_GEMS_DATA', realms_gems)}\n"
         "}());\n",
         encoding="utf-8",
     )
     print(f"wrote {OUT}")
-    print(f"adventuring={len(adventuring)} tools={len(tools)} herbs={len(herbs)} metals={len(metals)} gems={len(gems)}")
+    print(f"adventuring={len(adventuring)} tools={len(tools)} herbs={len(herbs)} metals={len(metals)} gems={len(gems)} realms_gems={len(realms_gems)}")
 
 
 if __name__ == "__main__":

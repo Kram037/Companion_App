@@ -606,6 +606,22 @@
     font-weight: 800;
 }
 
+.comp-equipment-list-title {
+    margin: 14px 0 8px;
+    color: var(--accent);
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.comp-gem-treasure-body {
+    margin: 8px 0 12px;
+}
+
+.comp-gems-table {
+    min-width: 420px;
+}
+
 .comp-equipment-table {
     width: 100%;
     border-collapse: collapse;
