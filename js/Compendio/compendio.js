@@ -89,11 +89,11 @@ const COMP_ARMOR_GROUPS = [
     ['scudo', 'Scudi'],
 ];
 
-const COMP_ADVENTURING_GEAR_DATA = [];
-const COMP_TOOLS_DATA = [];
-const COMP_HERBS_DATA = [];
-const COMP_METALS_DATA = [];
-const COMP_GEMS_DATA = [];
+const COMP_ADVENTURING_GEAR_DATA = window.COMP_ADVENTURING_GEAR_DATA || [];
+const COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
+const COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
+const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
+const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -1157,31 +1157,58 @@ function _compGenericEquipmentListHtml(section, state = _compStateFor('oggetti')
 
 function _compGenericEquipmentTable(section, items) {
     if (!items.length) return '';
-    const hasCost = items.some(item => item.costLabel);
-    const hasWeight = items.some(item => item.weight);
-    const hasSource = items.some(item => item.source);
+    const columns = _compGenericEquipmentColumns(section, items);
     return `
         <div class="comp-table-wrap">
             <table class="comp-equipment-table">
                 <thead><tr>
-                    <th>Nome</th>
-                    <th>Categoria</th>
-                    ${hasCost ? '<th>Costo</th>' : ''}
-                    ${hasWeight ? '<th>Peso</th>' : ''}
-                    ${hasSource ? '<th>Fonte</th>' : ''}
+                    ${columns.map(col => `<th>${escapeHtml(col.label)}</th>`).join('')}
                 </tr></thead>
                 <tbody>${items.map(item => `
                     <tr>
-                        <td>${escapeHtml(item.title || '')}</td>
-                        <td>${escapeHtml(item.categoryLabel || item.type || '-')}</td>
-                        ${hasCost ? `<td>${escapeHtml(item.costLabel || '-')}</td>` : ''}
-                        ${hasWeight ? `<td>${escapeHtml(item.weight || '-')}</td>` : ''}
-                        ${hasSource ? `<td>${escapeHtml(item.source || '-')}</td>` : ''}
+                        ${columns.map(col => `<td>${escapeHtml(col.value(item) || '-')}</td>`).join('')}
                     </tr>
                 `).join('')}</tbody>
             </table>
         </div>
     `;
+}
+
+function _compGenericEquipmentColumns(section, items) {
+    if (section === 'erbe') {
+        return [
+            { label: 'Nome', value: item => item.title },
+            { label: 'Tipo', value: item => item.categoryLabel },
+            { label: 'Preparazione', value: item => item.preparation },
+            { label: 'Parte', value: item => item.part },
+            { label: 'Ambiente', value: item => item.environment },
+            { label: 'Stagione', value: item => item.season },
+            { label: 'Costo', value: item => item.costLabel },
+            { label: 'Fonte', value: item => item.source },
+        ];
+    }
+    if (section === 'gemme') {
+        return [
+            { label: 'Nome', value: item => item.title },
+            { label: 'Valore', value: item => item.valueLabel || item.costLabel },
+            { label: 'Descrizione', value: item => item.description },
+            { label: 'Fonte', value: item => item.source },
+        ];
+    }
+    if (section === 'metalli') {
+        return [
+            { label: 'Nome', value: item => item.title },
+            { label: 'Categoria', value: item => item.categoryLabel || item.type },
+            { label: 'Fonte', value: item => item.source },
+        ];
+    }
+    return [
+        { label: 'Nome', value: item => item.title },
+        { label: 'Categoria', value: item => item.categoryLabel || item.type },
+        { label: 'Costo', value: item => item.costLabel },
+        { label: 'Peso', value: item => item.weight },
+        { label: 'Fonte', value: item => item.source },
+    ].filter(col => col.label === 'Nome' || items.some(item => col.value(item)));
 }
 
 function _compRenderObjectsStickyTools() {
@@ -1304,6 +1331,7 @@ function _compGenericEquipmentItem(section, item, index) {
     if (!item) return null;
     const title = item.nome || item.name || item.nome_it || item.title || '';
     if (!title) return null;
+    const cost = Number(item.costo_mo ?? item.cost_gp ?? item.cost ?? item.valore_mo ?? item.value_gp ?? NaN);
     return {
         id: item.id || `${section}-${index}`,
         title,
@@ -1311,11 +1339,23 @@ function _compGenericEquipmentItem(section, item, index) {
         categoryLabel: item.categoria || item.category || item.tipo || item.type || '',
         type: item.tipo || item.type || '',
         source: item.fonte || item.source || '',
-        cost: Number(item.costo_mo ?? item.cost_gp ?? item.cost ?? NaN),
-        costLabel: item.costo || item.cost_label || item.prezzo || item.price || '',
+        cost,
+        costLabel: item.costo || item.cost_label || item.prezzo || item.price || (Number.isFinite(cost) ? `${cost} mo` : ''),
+        valueLabel: item.valore || item.value_label || (Number.isFinite(cost) && section === 'gemme' ? `${cost} mo` : ''),
         weight: item.peso || item.weight || '',
+        preparation: item.preparazione || item.preparation || '',
+        part: item.parte || item.part || '',
+        environment: item.ambiente || item.environment || '',
+        season: item.stagione || item.season || '',
+        description: item.descrizione || item.description || '',
         data: item,
-        search: [title, item.name, item.categoria, item.category, item.tipo, item.type, item.fonte, item.source, item.descrizione, item.description].join(' ').toLowerCase(),
+        search: [
+            title, item.name, item.categoria, item.category, item.tipo, item.type,
+            item.fonte, item.source, item.preparazione, item.preparation, item.parte,
+            item.part, item.ambiente, item.environment, item.stagione, item.season,
+            item.descrizione, item.description, item.valore, item.value_label, item.costo,
+            item.cost_label, item.peso, item.weight,
+        ].join(' ').toLowerCase(),
     };
 }
 
@@ -1335,11 +1375,21 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     const properties = _compFilterValues(filters.property);
     const sources = _compFilterValues(filters.source);
     const costs = _compFilterValues(filters.cost);
+    const preparations = _compFilterValues(filters.preparation);
+    const parts = _compFilterValues(filters.part);
+    const environments = _compFilterValues(filters.environment);
+    const seasons = _compFilterValues(filters.season);
+    const values = _compFilterValues(filters.value);
     if (categories.length && !categories.includes(item.categoryLabel || item.category)) return false;
     if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
     if (types.length && !types.includes(item.type)) return false;
     if (properties.length && !properties.some(prop => String(item.properties || '').includes(prop))) return false;
     if (sources.length && !sources.includes(item.source)) return false;
+    if (preparations.length && !preparations.includes(item.preparation)) return false;
+    if (parts.length && !parts.includes(item.part)) return false;
+    if (environments.length && !environments.includes(item.environment)) return false;
+    if (seasons.length && !seasons.some(season => String(item.season || '').split(',').map(s => s.trim()).includes(season))) return false;
+    if (values.length && !values.includes(item.valueLabel || item.costLabel)) return false;
     if (costs.length) {
         if (!Number.isFinite(item.cost)) return false;
         if (!costs.some(range => _compCostInRange(item.cost, range))) return false;
@@ -1374,7 +1424,21 @@ function _compEquipmentFilterDefs(section) {
         const props = _compUnique(items.flatMap(i => _compFilterValues(String(i.properties || '').split(',').map(x => x.trim()))));
         if (props.length) filters.push({ key: 'property', title: 'Proprieta', options: props.map(v => [v, v]) });
     }
-    return filters;
+    if (section === 'erbe') {
+        filters.push(
+            { key: 'preparation', title: 'Preparazione', options: _compUnique(items.map(i => i.preparation)).map(v => [v, v]) },
+            { key: 'part', title: 'Parte', options: _compUnique(items.map(i => i.part)).map(v => [v, v]) },
+            { key: 'environment', title: 'Ambiente', options: _compUnique(items.map(i => i.environment)).map(v => [v, v]) },
+            { key: 'season', title: 'Stagione', options: _compUnique(items.flatMap(i => String(i.season || '').split(',').map(s => s.trim()))).map(v => [v, v]) },
+        );
+    }
+    if (section === 'gemme') {
+        filters.push({ key: 'value', title: 'Valore', options: _compUnique(items.map(i => i.valueLabel || i.costLabel)).map(v => [v, v]) });
+    }
+    if (items.some(item => Number.isFinite(item.cost)) && section !== 'gemme') {
+        filters.push({ key: 'cost', title: 'Costo', options: [['0-1', '0-1 mo'], ['1-10', '1-10 mo'], ['11-50', '11-50 mo'], ['51-100', '51-100 mo'], ['101+', '101+ mo']] });
+    }
+    return filters.filter(def => def.options.length);
 }
 
 function _compEquipmentGroupLabel(cat) {
@@ -1569,6 +1633,7 @@ window.compendioResetObjectsFilters = function() {
 
 function _compCostInRange(cost, range) {
     if (range === '1001+') return cost >= 1001;
+    if (range === '101+') return cost >= 101;
     const [min, max] = String(range).split('-').map(Number);
     return cost >= min && cost <= max;
 }
