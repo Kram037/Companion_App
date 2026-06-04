@@ -721,6 +721,17 @@
     -webkit-line-clamp: 4;
 }
 
+.comp-gem-card-meta {
+    display: grid;
+    gap: 3px;
+    line-height: 1.28;
+}
+
+.comp-gem-card-meta b {
+    color: var(--text);
+    font-weight: 800;
+}
+
 .comp-equipment-table th,
 .comp-equipment-table td {
     padding: 8px 9px;

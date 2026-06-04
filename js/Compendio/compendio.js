@@ -1234,6 +1234,7 @@ function _compEquipmentCardsHtml(section, items) {
 
 function _compEquipmentCardHtml(section, item) {
     const meta = _compEquipmentCardMeta(section, item);
+    const infoHtml = _compEquipmentCardInfoHtml(section, item, meta);
     const accent = _compEquipmentCardAccent(section, item);
     const desc = '';
     const clickable = ['avventura', 'erbe', 'metalli'].includes(section) || (section === 'gemme' && item.gemKind === 'reame');
@@ -1245,13 +1246,13 @@ function _compEquipmentCardHtml(section, item) {
             <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
             ${accent ? `<span class="comp-card-source comp-equipment-card-value">${escapeHtml(accent)}</span>` : ''}
         </div>
-        ${meta ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(meta)}</div>` : ''}
+        ${infoHtml}
         ${desc ? `<p class="comp-card-desc comp-equipment-card-desc">${escapeHtml(desc)}</p>` : ''}
     </article>`;
 }
 
 function _compEquipmentCardAccent(section, item) {
-    if (section === 'gemme') return item.valueLabel || item.costLabel || '';
+    if (section === 'gemme') return '';
     return item.costLabel || item.valueLabel || '';
 }
 
@@ -1266,6 +1267,21 @@ function _compEquipmentCardMeta(section, item) {
         return [item.type, item.availability].filter(Boolean).join(' · ');
     }
     return '';
+}
+
+function _compEquipmentCardInfoHtml(section, item, meta) {
+    if (section === 'gemme') {
+        const rows = [
+            ['Costo', item.costLabel || item.valueLabel],
+            ['Tipo', item.type],
+            ['Reperibilita', item.availability],
+        ].filter(([, value]) => value);
+        if (!rows.length) return '';
+        return `<div class="comp-card-meta comp-inventory-meta comp-gem-card-meta">
+            ${rows.map(([label, value]) => `<span><b>${escapeHtml(label)}:</b> ${escapeHtml(value)}</span>`).join('')}
+        </div>`;
+    }
+    return meta ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(meta)}</div>` : '';
 }
 
 function _compGemsListHtml(state) {
@@ -1564,7 +1580,11 @@ function _compEquipmentMatchesFilters(item, section, state = _compStateFor('ogge
     const seasons = _compFilterValues(filters.season);
     const values = _compFilterValues(filters.value);
     const availabilities = _compFilterValues(filters.availability);
+    const rarities = _compFilterValues(filters.rarity);
+    const costLabels = _compFilterValues(filters.costLabel);
     const valueRange = filters.valueRange;
+    if (rarities.length && !rarities.includes(item.rarity)) return false;
+    if (costLabels.length && !costLabels.includes(item.costLabel)) return false;
     if (categories.length && !categories.includes(item.categoryLabel || item.category)) return false;
     if (kinds.length && !kinds.includes(item.kind || item.type)) return false;
     if (types.length && !types.includes(item.type)) return false;
@@ -1642,10 +1662,16 @@ function _compEquipmentFilterDefs(section) {
             });
         }
     }
+    if (section === 'metalli') {
+        const rarities = _compUnique(items.map(i => i.rarity)).map(v => [v, v]);
+        const costLabels = _compUnique(items.map(i => i.costLabel)).map(v => [v, v]);
+        if (rarities.length) filters.push({ key: 'rarity', title: 'Rarita', options: rarities });
+        if (costLabels.length) filters.push({ key: 'costLabel', title: 'Range costo', options: costLabels });
+    }
     if (items.some(item => Number.isFinite(item.cost)) && section !== 'gemme') {
         filters.push({ key: 'cost', title: 'Costo', options: [['0-1', '0-1 mo'], ['1-10', '1-10 mo'], ['11-50', '11-50 mo'], ['51-100', '51-100 mo'], ['101+', '101+ mo']] });
     }
-    return filters.filter(def => def.options.length);
+    return filters.filter(def => def.mode === 'range' || def.options?.length);
 }
 
 function _compEquipmentGroupLabel(cat) {
@@ -2049,10 +2075,9 @@ function _compGenericEquipmentPreviewData(section, item) {
             nome: item.title,
             nomeAlt: '',
             rarita: '',
-            meta: _compEquipmentDetailMeta([
-                ['Range costi', item.costLabel],
-            ]),
+            meta: '',
             extras: _compEquipmentDetailExtras([
+                ['Range costi', item.costLabel],
                 ['Indicazioni', item.costDetail],
             ]),
             descrizione: item.description || '',
