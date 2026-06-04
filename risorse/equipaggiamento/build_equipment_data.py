@@ -4,6 +4,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "js" / "Compendio" / "data" / "equipaggiamento_data.js"
+REALMS_GEMS_FILE = ROOT / "risorse" / "equipaggiamento" / "realms_gems.json"
 HERBS_TXT = ROOT / "risorse" / "erbe" / "erbe_extracted.txt"
 HERBS_PDF = ROOT / "risorse" / "erbe" / "erbe.pdf"
 
@@ -787,12 +788,22 @@ def js_assign(name, value):
     return f"window.{name} = {json.dumps(value, ensure_ascii=False, indent=2)};"
 
 
+def load_realms_gems():
+    gems = []
+    if REALMS_GEMS_FILE.exists():
+        gems = json.loads(REALMS_GEMS_FILE.read_text(encoding="utf-8"))
+    by_id = {gem.get("id"): gem for gem in gems if gem.get("id")}
+    for gem in REALMS_GEMS:
+        by_id[gem["id"]] = gem
+    return sorted(by_id.values(), key=lambda item: str(item.get("nome", "")).lower())
+
+
 def main():
     adventuring = enrich_adventuring(convert_numbers(parse_pipe_table(ADVENTURING_GEAR, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"])))
     tools = convert_numbers(parse_pipe_table(TOOLS, ["nome", "categoria", "costo", "costo_mo", "peso", "fonte"]))
     metals = enrich_metals(parse_pipe_table(METALS, ["nome", "categoria", "fonte"]))
     gems = enrich_gems(convert_numbers(parse_pipe_table(GEMS, ["nome", "valore", "valore_mo", "descrizione", "fonte"])))
-    realms_gems = REALMS_GEMS
+    realms_gems = load_realms_gems()
     herbs = enrich_herbs(parse_herbs())
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(

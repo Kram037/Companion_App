@@ -1937,7 +1937,6 @@ function _compObjectDetailData(source, item) {
                 ['Categoria', item.categoria_it],
                 ['Rarita', item.rarita_it],
                 ['Costo', item.prezzo_mo != null ? `${item.prezzo_mo} mo` : ''],
-                ['Fonte', item.fonte],
             ],
             description: item.descrizione_it || item.descrizione_en || '',
         };

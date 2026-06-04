@@ -987,7 +987,7 @@ function _invPreviewExtract(source, it) {
             nomeAlt: (it.nome_en && it.nome_en !== it.nome_it) ? it.nome_en : '',
             rarita: it.rarita_it || 'Comune',
             meta,
-            extras: it.fonte ? `<div class="inv-preview-extra"><b>Fonte:</b> ${escapeHtml(it.fonte)}</div>` : '',
+            extras: '',
             descrizione: it.descrizione_it || it.descrizione_en || '',
             pendingTr: !!it._desc_pending,
         };
