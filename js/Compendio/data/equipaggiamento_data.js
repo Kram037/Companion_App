@@ -5467,20 +5467,6 @@ window.COMP_REALMS_GEMS_DATA = [
     "potere": "Ravenar, come tutte le tormaline, poteva assorbire qualsiasi incantesimo lanciato su di esso e convertirlo immediatamente in tre fulmini che esplodevano in linea retta dalle sfaccettature del cristallo nelle direzioni scelte dall'incantatore. Questo atto ha consumato la gemma nel processo."
   },
   {
-    "id": "realms-rayburton-jewels",
-    "nome": "Rayburton Jewels",
-    "costo": "6.300,000 mo (estimated)",
-    "costo_mo": 6300000,
-    "tipo": "Gemme",
-    "reperibilita": "",
-    "peso": "",
-    "tipo_gemma": "reame",
-    "fonte": "Forgotten Realms Wiki",
-    "fonte_url": "https://forgottenrealms.fandom.com/wiki/Rayburton_Jewels",
-    "descrizione": "I gioielli erano inizialmente conservati in due grandi scrigni. Uno scrigno conteneva circa mille zaffiri azzurri e \"due o tre manciate di zaffiri neri sopra altrettante lacrime rosse\". L'altro scrigno conteneva circa mille rubini. Il fratello di Belmer, Onkyl, descrisse il tesoro in una lettera a suo figlio Telarn. Telarn ha trovato la lettera solo dopo la morte di Onkyl.",
-    "potere": ""
-  },
-  {
     "id": "realms-recorder-stone",
     "nome": "Recorder stone",
     "costo": "Costo variabile",

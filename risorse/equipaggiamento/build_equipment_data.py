@@ -8,6 +8,10 @@ REALMS_GEMS_FILE = ROOT / "risorse" / "equipaggiamento" / "realms_gems.json"
 HERBS_TXT = ROOT / "risorse" / "erbe" / "erbe_extracted.txt"
 HERBS_PDF = ROOT / "risorse" / "erbe" / "erbe.pdf"
 
+EXCLUDED_REALMS_GEMS = {
+    "realms-rayburton-jewels",
+}
+
 
 ADVENTURING_GEAR = """
 nome|categoria|costo|costo_mo|peso|fonte
@@ -792,6 +796,7 @@ def load_realms_gems():
     gems = []
     if REALMS_GEMS_FILE.exists():
         gems = json.loads(REALMS_GEMS_FILE.read_text(encoding="utf-8"))
+    gems = [gem for gem in gems if gem.get("id") not in EXCLUDED_REALMS_GEMS]
     by_id = {gem.get("id"): gem for gem in gems if gem.get("id")}
     for gem in REALMS_GEMS:
         by_id[gem["id"]] = gem

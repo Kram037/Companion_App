@@ -1252,7 +1252,6 @@ function _compEquipmentCardHtml(section, item) {
 }
 
 function _compEquipmentCardAccent(section, item) {
-    if (section === 'gemme') return '';
     return item.costLabel || item.valueLabel || '';
 }
 
@@ -1270,17 +1269,6 @@ function _compEquipmentCardMeta(section, item) {
 }
 
 function _compEquipmentCardInfoHtml(section, item, meta) {
-    if (section === 'gemme') {
-        const rows = [
-            ['Costo', item.costLabel || item.valueLabel],
-            ['Tipo', item.type],
-            ['Reperibilita', item.availability],
-        ].filter(([, value]) => value);
-        if (!rows.length) return '';
-        return `<div class="comp-card-meta comp-inventory-meta comp-gem-card-meta">
-            ${rows.map(([label, value]) => `<span><b>${escapeHtml(label)}:</b> ${escapeHtml(value)}</span>`).join('')}
-        </div>`;
-    }
     return meta ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(meta)}</div>` : '';
 }
 
@@ -1656,7 +1644,7 @@ function _compEquipmentFilterDefs(section) {
             filters.push({
                 key: 'valueRange',
                 title: 'Valore',
-                mode: 'range',
+                mode: 'numberRange',
                 min: Math.min(...costs),
                 max: Math.max(...costs),
             });
@@ -1664,14 +1652,17 @@ function _compEquipmentFilterDefs(section) {
     }
     if (section === 'metalli') {
         const rarities = _compUnique(items.map(i => i.rarity)).map(v => [v, v]);
-        const costLabels = _compUnique(items.map(i => i.costLabel)).map(v => [v, v]);
+        const costLabels = _compUnique(items
+            .map(i => i.costLabel)
+            .filter(label => String(label || '').includes('mo)')))
+            .map(v => [v, v]);
         if (rarities.length) filters.push({ key: 'rarity', title: 'Rarita', options: rarities });
         if (costLabels.length) filters.push({ key: 'costLabel', title: 'Range costo', options: costLabels });
     }
     if (items.some(item => Number.isFinite(item.cost)) && section !== 'gemme') {
         filters.push({ key: 'cost', title: 'Costo', options: [['0-1', '0-1 mo'], ['1-10', '1-10 mo'], ['11-50', '11-50 mo'], ['51-100', '51-100 mo'], ['101+', '101+ mo']] });
     }
-    return filters.filter(def => def.mode === 'range' || def.options?.length);
+    return filters.filter(def => def.mode === 'range' || def.mode === 'numberRange' || def.options?.length);
 }
 
 function _compEquipmentGroupLabel(cat) {
@@ -1817,6 +1808,8 @@ function _compObjectsFiltersHtml() {
     if (!defs.length) return '<div class="comp-empty">Nessun filtro disponibile</div>';
     return defs.map(def => def.mode === 'range'
         ? _compObjectRangeFilter(def, f[def.key])
+        : def.mode === 'numberRange'
+            ? _compObjectNumberRangeFilter(def, f[def.key])
         : _compObjectSelect(def.key, f[def.key], def.options, def.title, def.mode || '')
     ).join('');
 }
@@ -1855,6 +1848,33 @@ function _compObjectRangeFilter(def, value) {
                 oninput="compendioSetObjectRangeFilter('${_compEscapeAttr(def.key)}','min',this.value)">
             <input type="range" min="${minBound}" max="${maxBound}" step="${step}" value="${max}"
                 oninput="compendioSetObjectRangeFilter('${_compEscapeAttr(def.key)}','max',this.value)">
+        </div>
+    </div>`;
+}
+
+function _compObjectNumberRangeFilter(def, value) {
+    const rawMin = Number(value?.min);
+    const rawMax = Number(value?.max);
+    const min = Number.isFinite(rawMin) ? rawMin : '';
+    const max = Number.isFinite(rawMax) ? rawMax : '';
+    return `<div class="comp-range-filter comp-number-range-filter" data-range-key="${_compEscapeAttr(def.key)}">
+        <div class="comp-range-filter-head">
+            <span>${escapeHtml(def.title)}</span>
+            <small>mo</small>
+        </div>
+        <div class="comp-number-range-inputs">
+            <label>
+                <span>Min</span>
+                <input type="number" inputmode="numeric" min="${Number(def.min || 0)}" max="${Number(def.max || 0)}"
+                    placeholder="${escapeHtml(_compFormatGold(def.min || 0))}" value="${escapeHtml(String(min))}"
+                    oninput="compendioSetObjectNumberRangeFilter('${_compEscapeAttr(def.key)}','min',this.value)">
+            </label>
+            <label>
+                <span>Max</span>
+                <input type="number" inputmode="numeric" min="${Number(def.min || 0)}" max="${Number(def.max || 0)}"
+                    placeholder="${escapeHtml(_compFormatGold(def.max || 0))}" value="${escapeHtml(String(max))}"
+                    oninput="compendioSetObjectNumberRangeFilter('${_compEscapeAttr(def.key)}','max',this.value)">
+            </label>
         </div>
     </div>`;
 }
@@ -1915,6 +1935,36 @@ window.compendioSetObjectRangeFilter = function(key, bound, value) {
     if (badge) {
         const n = _compObjectsActiveFilterCount();
         badge.textContent = String(n);
+        badge.style.display = n ? 'inline-flex' : 'none';
+    }
+};
+
+window.compendioSetObjectNumberRangeFilter = function(key, bound, value) {
+    const state = _compStateFor('oggetti');
+    const section = state.equipmentSection || 'armi';
+    const filters = _compEquipmentFilterState(section, state);
+    const def = _compEquipmentFilterDefs(section).find(entry => entry.key === key);
+    if (!def) return;
+    const minBound = Number(def.min || 0);
+    const maxBound = Number(def.max || minBound);
+    const current = filters[key] && typeof filters[key] === 'object' ? { ...filters[key] } : {};
+    const parsed = value === '' ? NaN : Number(value);
+    if (Number.isFinite(parsed)) {
+        current[bound] = Math.max(minBound, Math.min(parsed, maxBound));
+    } else {
+        delete current[bound];
+    }
+    if (Number.isFinite(current.min) && Number.isFinite(current.max) && current.min > current.max) {
+        if (bound === 'min') current.max = current.min;
+        else current.min = current.max;
+    }
+    if (Number.isFinite(current.min) || Number.isFinite(current.max)) filters[key] = current;
+    else delete filters[key];
+    _compRenderObjectsSectionContent();
+    const badge = document.getElementById('compObjectsFiltersBadge');
+    if (badge) {
+        const n = _compObjectsActiveFilterCount();
+        badge.textContent = n ? String(n) : '';
         badge.style.display = n ? 'inline-flex' : 'none';
     }
 };
@@ -2089,13 +2139,12 @@ function _compGenericEquipmentPreviewData(section, item) {
             nome: item.title,
             nomeAlt: '',
             rarita: '',
-            meta: _compEquipmentDetailMeta([
+            meta: '',
+            extras: _compEquipmentDetailExtras([
                 ['Costo', item.costLabel || item.valueLabel],
                 ['Tipo', item.type],
                 ['Reperibilita', item.availability],
                 ['Peso', item.weight],
-            ]),
-            extras: _compEquipmentDetailExtras([
                 ['Poteri', item.power],
             ]),
             descrizione: item.description || '',

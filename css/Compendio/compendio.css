@@ -697,6 +697,39 @@
     pointer-events: auto;
 }
 
+.comp-number-range-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.comp-number-range-inputs label {
+    display: grid;
+    gap: 5px;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.comp-number-range-inputs input {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 8px 10px;
+    font: inherit;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.comp-number-range-inputs input:focus {
+    border-color: var(--accent);
+    outline: 0;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
 .comp-equipment-table {
     width: 100%;
     border-collapse: collapse;
@@ -719,17 +752,6 @@
 
 .comp-equipment-card-desc {
     -webkit-line-clamp: 4;
-}
-
-.comp-gem-card-meta {
-    display: grid;
-    gap: 3px;
-    line-height: 1.28;
-}
-
-.comp-gem-card-meta b {
-    color: var(--text);
-    font-weight: 800;
 }
 
 .comp-equipment-table th,
