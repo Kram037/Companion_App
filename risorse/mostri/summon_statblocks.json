@@ -1,0 +1,679 @@
+[
+  {
+    "id": "evocare-aberrazione-spirito-aberrante",
+    "nome": "Spirito Aberrante",
+    "nome_en": "Aberrant Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 1,
+    "tipo_linea": "Medium aberration, -",
+    "taglia": "Medio",
+    "tipo": "Aberrazione",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor)",
+    "punti_ferita": "40 + 10 for each spell level above 4th",
+    "velocita": "30 ft.; fly 30 ft. (hover) (Beholderkin only)",
+    "caratteristiche": {
+      "forza": {
+        "score": 16,
+        "mod": 3
+      },
+      "destrezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "costituzione": {
+        "score": 15,
+        "mod": 2
+      },
+      "intelligenza": {
+        "score": 16,
+        "mod": 3
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 6,
+        "mod": -2
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "",
+    "resistenze": [],
+    "immunita_danni_testo": "psychic",
+    "immunita_danni": [
+      "psichico"
+    ],
+    "immunita_condizioni_testo": "",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "Deep Speech, understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Regeneration (Slaad Only).** The aberration regains 5 hit points at the start of its turn if it has at least 1 hit point.\n\n**Whispering Aura (Star Spawn Only).** At the start of each of the aberration's turns, each creature within 5 feet of the aberration must succeed on a Wisdom saving throw against your spell save DC or take 2d6 psychic damage, provided that the aberration isn't incapacitated.",
+    "azioni": "**Multiattack.** The aberration makes a number of attacks equal to half this spell's level (rounded down).\n\n**Claws (Slaad Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d10 + 3 + the spell's level slashing damage. If the target is a creature, it can't regain hit points until the start of the aberration's next turn.\n\n**Eye Ray (Beholderkin Only).** Ranged Spell Attack: your spell attack modifier to hit, range 150 ft., one creature. Hit: 1d8 + 3 + the spell's level psychic damage.\n\n**Psychic Slam (Star Spawn Only).** Melee Spell Attack: your spell attack modifier to hit, reach 5 ft., one creature. Hit: 1d8 + 3 + the spell's level psychic damage",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon aberration",
+    "spell_name": "Evocare Aberrazione"
+  },
+  {
+    "id": "evocare-bestia-spirito-bestiale",
+    "nome": "Spirito Bestiale",
+    "nome_en": "Bestial Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 56,
+    "tipo_linea": "Small beast, -",
+    "taglia": "Piccolo",
+    "tipo": "Bestia",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor)",
+    "punti_ferita": "20 (Air only) or 30 (Land and Water only) + 5 for",
+    "velocita": "30 ft.; climb 30 ft. (Land only); fly 60 ft. (Air only); swim",
+    "caratteristiche": {
+      "forza": {
+        "score": 18,
+        "mod": 4
+      },
+      "destrezza": {
+        "score": 11,
+        "mod": 0
+      },
+      "costituzione": {
+        "score": 16,
+        "mod": 3
+      },
+      "intelligenza": {
+        "score": 4,
+        "mod": -3
+      },
+      "saggezza": {
+        "score": 14,
+        "mod": 2
+      },
+      "carisma": {
+        "score": 5,
+        "mod": -3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "",
+    "resistenze": [],
+    "immunita_danni_testo": "",
+    "immunita_danni": [],
+    "immunita_condizioni_testo": "",
+    "sensi": "darkvision 60 ft., passive Perception 12",
+    "linguaggi": "understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Flyby (Air Only).** The beast doesn't provoke opportunity attacks when it flies out of an enemy's reach.\n\n**Pack Tactics (Land and Water Only).** The beast has advantage on an attack roll against a creature if at least one of the beast's allies is within 5 feet of the creature and the ally isn't incapacitated.\n\n**Water Breathing (Water Only).** The beast can breathe only underwater.",
+    "azioni": "**Multiattack.** The beast makes a number of attacks equal to half this spell's level (rounded down).\n\n**Maul.** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d8 + 4 + the spell's level piercing damage.",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon beast",
+    "spell_name": "Evocare Bestia"
+  },
+  {
+    "id": "evocare-celestiale-spirito-celestiale",
+    "nome": "Spirito Celestiale",
+    "nome_en": "Celestial Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 70,
+    "tipo_linea": "Large celestial, -",
+    "taglia": "Grande",
+    "tipo": "Celestiale",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor) + 2",
+    "punti_ferita": "40 + 10 for each spell level above 5th",
+    "velocita": "30 ft., fly 40 ft.",
+    "caratteristiche": {
+      "forza": {
+        "score": 16,
+        "mod": 3
+      },
+      "destrezza": {
+        "score": 14,
+        "mod": 2
+      },
+      "costituzione": {
+        "score": 16,
+        "mod": 3
+      },
+      "intelligenza": {
+        "score": 10,
+        "mod": 0
+      },
+      "saggezza": {
+        "score": 14,
+        "mod": 2
+      },
+      "carisma": {
+        "score": 16,
+        "mod": 3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "radiant",
+    "resistenze": [
+      "radioso"
+    ],
+    "immunita_danni_testo": "",
+    "immunita_danni": [],
+    "immunita_condizioni_testo": "charmed, frightened",
+    "sensi": "dark vision 60 ft., passive Perception 12",
+    "linguaggi": "Celestial, understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "",
+    "azioni": "**Multiattack.** The celestial makes a number of attacks equal to half this spell's level (rounded down).\n\n**Radiant Bow (Avenger Only).** Ranged Weapon Attack: your spell attack modifier to hit, reach 150/600 ft., one target. Hit: 2d6 + 2 + the spell's level radiant damage.\n\n**Radiant Mace (Defender Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d10 + 3 + the spell's level radiant damage, and the celestial can choose itself or another creature it can see within 10 feet of the target. The chosen creature gains 1d10 temporary hit points.\n\n**Healing Touch (1/Day).** The celestial touches another creature. The target magically regains hit points equal to 2d8 + the spell's level.",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon celestial",
+    "spell_name": "Evocare Celestiale"
+  },
+  {
+    "id": "evocare-costrutto-spirito-costrutto",
+    "nome": "Spirito Costrutto",
+    "nome_en": "Construct Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 81,
+    "tipo_linea": "Medium construct, -",
+    "taglia": "Medio",
+    "tipo": "Costrutto",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "13 + the level of the spell (natural armor)",
+    "punti_ferita": "40 + 15 for each spell level above 4th",
+    "velocita": "30 ft.",
+    "caratteristiche": {
+      "forza": {
+        "score": 18,
+        "mod": 4
+      },
+      "destrezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "costituzione": {
+        "score": 18,
+        "mod": 4
+      },
+      "intelligenza": {
+        "score": 14,
+        "mod": 2
+      },
+      "saggezza": {
+        "score": 11,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 5,
+        "mod": -3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "poison",
+    "resistenze": [
+      "veleno"
+    ],
+    "immunita_danni_testo": "",
+    "immunita_danni": [],
+    "immunita_condizioni_testo": "charmed, exhaustion, frightened, incapacitated, paralyzed, petrified, poisoned",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Heated Body (Metal Only).** A creature that touches the construct or hits it with a melee attack while within 5 feet of it takes 1d10 fire damage.\n\n**Stony Lethargy (Stone Only).** When a creature the construct can see starts its turn within 10 feet of the construct, the construct can force it to make a Wisdom saving throw against your spell save DC. On a failed save, the target can't use reactions and its speed is halved until the start of its next turn.",
+    "azioni": "**Multiattack.** The construct makes a number of attacks equal to half this spell's level (rounded down).\n\n**Slam.** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d8 + 4 + the spell's level bludgeoning damage.",
+    "azioni_bonus": "",
+    "reazioni": "**Berserk Lashing (Clay Only).** When the construct takes damage, it makes a slam attack against a random creature within 5 feet of it. If no creature is within reach, the construct moves up to half its speed toward an enemy it can see, without provoking opportunity attacks.",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon construct",
+    "spell_name": "Evocare Costrutto"
+  },
+  {
+    "id": "evocare-elementale-spirito-elementale",
+    "nome": "Spirito Elementale",
+    "nome_en": "Elemental Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 126,
+    "tipo_linea": "Medium elemental, -",
+    "taglia": "Medio",
+    "tipo": "Elementale",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor)",
+    "punti_ferita": "50 + 10 for each spell level above 4th",
+    "velocita": "40 ft.; burrow 40 ft. (Earth only); fly 40 ft. (hover) (Air",
+    "caratteristiche": {
+      "forza": {
+        "score": 18,
+        "mod": 4
+      },
+      "destrezza": {
+        "score": 15,
+        "mod": 2
+      },
+      "costituzione": {
+        "score": 17,
+        "mod": 3
+      },
+      "intelligenza": {
+        "score": 4,
+        "mod": -3
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 16,
+        "mod": 3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "acid (Water only); lightning and thunder (Air only); piercing and slashing (Earth only)",
+    "resistenze": [
+      "acido",
+      "fulmine",
+      "perforante",
+      "tagliente",
+      "tuono"
+    ],
+    "immunita_danni_testo": "poison; fire (Fire only)",
+    "immunita_danni": [
+      "fuoco",
+      "veleno"
+    ],
+    "immunita_condizioni_testo": "exhaustion, paralyzed, petrified, poisoned, unconscious",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "Primordial, understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "Amorphous Form (Air, Fire, and Water Only). The elemental can move through a space as narrow as 1 inch wide without squeezing.",
+    "azioni": "**Multiattack.** The elemental makes a number of attacks equal to half this spell's level (rounded down).\n\n**Slam.** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d10 + 4 + the spell's level bludgeoning damage (Air, Earth, and Water only) or fire damage (Fire only).",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon elemental",
+    "spell_name": "Evocare Elementale"
+  },
+  {
+    "id": "evocare-fata-spirito-fatato",
+    "nome": "Spirito Fatato",
+    "nome_en": "Fey Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 136,
+    "tipo_linea": "Small fey, -",
+    "taglia": "Piccolo",
+    "tipo": "Folletto",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "12 + the level of the spell (natural armor)",
+    "punti_ferita": "30 + 10 for each spell level above 3rd",
+    "velocita": "40 ft.",
+    "caratteristiche": {
+      "forza": {
+        "score": 13,
+        "mod": 1
+      },
+      "destrezza": {
+        "score": 16,
+        "mod": 3
+      },
+      "costituzione": {
+        "score": 14,
+        "mod": 2
+      },
+      "intelligenza": {
+        "score": 14,
+        "mod": 2
+      },
+      "saggezza": {
+        "score": 11,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 16,
+        "mod": 3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "",
+    "resistenze": [],
+    "immunita_danni_testo": "",
+    "immunita_danni": [],
+    "immunita_condizioni_testo": "charmed",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "Sylvan, understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "",
+    "azioni": "**Multiattack.** The Fey makes a number of attacks equal to half this spell's level (rounded down).\n\n**Shortsword.** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d6 + 3 + the spell's level piercing damage + 1d6 force damage.",
+    "azioni_bonus": "**Fey Step.** The fey magically teleports up to 30 feet to an unoccupied space it can see. Then one of the following effects occurs, based on the fey's chosen mood.\n\n**Fuming.** The fey has advantage on the next attack roll it makes before the end of this turn.\n\n**Mirthful.** The fey can force one creature it can see within 10 feet of it to make a Wisdom saving throw against your spell save DC. Unless the save succeeds, the target is charmed by you and the fey for 1 minute or until the target takes any damage.\n\n**Tricksy.** The fey can fill a 5-foot cube within 5 feet of it with magical darkness, which lasts until the end of its next turn.",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon fey",
+    "spell_name": "Evocare Fata"
+  },
+  {
+    "id": "evocare-immondo-spirito-immondo",
+    "nome": "Spirito Immondo",
+    "nome_en": "Fiendish Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 137,
+    "tipo_linea": "Large fiend, -",
+    "taglia": "Grande",
+    "tipo": "Immondo",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "12 + the level of the spell (natural armor)",
+    "punti_ferita": "50 (Demon only) or 40 (Devil only) or 60 (Yugoloth",
+    "velocita": "40 ft.; climb 40 ft. (Demon only); fly 60 ft. (Devil only)",
+    "caratteristiche": {
+      "forza": {
+        "score": 13,
+        "mod": 1
+      },
+      "destrezza": {
+        "score": 16,
+        "mod": 3
+      },
+      "costituzione": {
+        "score": 15,
+        "mod": 2
+      },
+      "intelligenza": {
+        "score": 10,
+        "mod": 0
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 16,
+        "mod": 3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "fire",
+    "resistenze": [
+      "fuoco"
+    ],
+    "immunita_danni_testo": "poison",
+    "immunita_danni": [
+      "veleno"
+    ],
+    "immunita_condizioni_testo": "poisoned",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "Abyssal, Infernal, telepathy 60 ft.",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Death Throes (Demon Only).** When the fiend drops to 0 hit points or the spell ends, the fiend explodes, and each creature within 10 feet of it must make a Dexterity saving throw against your spell save DC. A creature takes 2d10 + the spell's level fire damage on a failed save, or half as much damage on a successful one.\n\n**Devil's Sight (Devil Only).** Magical darkness doesn't impede the fiend's darkvision.\n\n**Magic Resistance.** The fiend has advantage on saving throws against spells and other magical effects.",
+    "azioni": "**Multiattack.** The fiend makes a number of attacks equal to half this spell's level (rounded down).\n\n**Bite (Demon Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d12 + 3 + the spell's level necrotic damage.\n\n**Claws (Yugoloth Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d8 + 3 + the spell's level slashing damage. Immediately after the attack hits or misses, the fiend can magically teleport up to 30 feet to an unoccupied space it can see.\n\n**Hurl Flame (Devil Only).** Ranged Spell Attack: your spell attack modifier to hit, range 150 ft., one target. Hit: 2d6 + 3 + the spell's level fire damage. If the target is a flammable object that isn't being worn or carried, it also catches fire.",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon fiend",
+    "spell_name": "Evocare Immondo"
+  },
+  {
+    "id": "evocare-non-morto-spirito-non-morto",
+    "nome": "Spirito Non Morto",
+    "nome_en": "Undead Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 331,
+    "tipo_linea": "Medium undead, -",
+    "taglia": "Medio",
+    "tipo": "Non morto",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor)",
+    "punti_ferita": "30 (Ghostly and Putrid only) or 20 (Skeletal only) +",
+    "velocita": "30 ft.; fly 40 ft. (hover) (Ghostly only)",
+    "caratteristiche": {
+      "forza": {
+        "score": 12,
+        "mod": 1
+      },
+      "destrezza": {
+        "score": 16,
+        "mod": 3
+      },
+      "costituzione": {
+        "score": 15,
+        "mod": 2
+      },
+      "intelligenza": {
+        "score": 4,
+        "mod": -3
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 9,
+        "mod": -1
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "",
+    "resistenze": [],
+    "immunita_danni_testo": "necrotic, poison",
+    "immunita_danni": [
+      "necrotico",
+      "veleno"
+    ],
+    "immunita_condizioni_testo": "exhaustion, frightened, paralyzed, poisoned",
+    "sensi": "darkvision 60 ft., passive Perception 10",
+    "linguaggi": "understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Festering Aura (Putrid Only).** Any creature, other than you, that starts its turn within 5 feet of the spirit must succeed on a Constitution saving throw against your spell save DC or be poisoned until the start of its next turn.\n\n**Incorporeal Passage (Ghostly Only).** The spirit can move through other creatures and objects as if they were difficult terrain. If it ends its turn inside an objects, it is shunted to the nearest unoccupied space and takes 1d10 force damage for every 5 feet traveled.",
+    "azioni": "**Multiattack.** The spirit makes a number of attacks equal to half this spell's level (rounded down).\n\n**Deathly Touch (Ghostly Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one creature. Hit: 1d8 + 3 + the spell's level necrotic damage, and the creature must succeed on a Wisdom saving throw against your spell save DC or be frightened of the undead until the end of the target's next turn.\n\n**Grave Bolt (Skeletal Only).** Ranged Spell Attack: your spell attack modifier to hit, range 150 ft., one target. Hit: 2d4 + 3 + the spell's level necrotic damage.\n\n**Rotting Claw (Putrid Only).** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d6 + 3 + the spell's level slashing damage. If the target is poisoned, it must succeed on a Constitution saving throw against your spell save DC or be paralyzed until the end of its next turn.",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon undead",
+    "spell_name": "Evocare Non Morto"
+  },
+  {
+    "id": "evocare-stirpe-d-ombra-spirito-d-ombra",
+    "nome": "Spirito d'Ombra",
+    "nome_en": "Shadow Spirit",
+    "fonte": "Rules (Tasha's Cauldron of Everything)",
+    "fonte_breve": "TCoE",
+    "pagina_pdf": 289,
+    "tipo_linea": "Medium monstrosity, -",
+    "taglia": "Medio",
+    "tipo": "Mostruosita",
+    "allineamento": "-",
+    "allineamento_breve": "",
+    "classe_armatura": "11 + the level of the spell (natural armor)",
+    "punti_ferita": "35 + 15 for each spell level above 3rd",
+    "velocita": "40 ft.",
+    "caratteristiche": {
+      "forza": {
+        "score": 13,
+        "mod": 1
+      },
+      "destrezza": {
+        "score": 16,
+        "mod": 3
+      },
+      "costituzione": {
+        "score": 15,
+        "mod": 2
+      },
+      "intelligenza": {
+        "score": 4,
+        "mod": -3
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 16,
+        "mod": 3
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "necrotic",
+    "resistenze": [
+      "necrotico"
+    ],
+    "immunita_danni_testo": "",
+    "immunita_danni": [],
+    "immunita_condizioni_testo": "frightened",
+    "sensi": "darkvision 120 ft., passive Perception 10",
+    "linguaggi": "understands the languages you speak",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "**Terror Frenzy (Fury Only).** The spirit has advantage on attack rolls against frightened creatures.\n\n**Weight of Sorrow (Despair Only).** Any creature, other than you, that starts its turn within 5 feet of the spirit has its speed reduced by 20 feet until the start of that creature's next turn.",
+    "azioni": "**Multiattack.** The spirit makes a number of attacks equal to half this spell's level (rounded down).\n\n**Chilling Hand.** Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d12 + 3 + the spell's level cold damage.\n\n**Dreadful Scream (1/Day).** The spirit screams. Each creature within 30 feet of it must succeed on a Wisdom saving throw against your spell save DC or be frightened of the spirit for 1 minute. The frightened creature can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success.",
+    "azioni_bonus": "**Shadow Stealth (Fear Only).** While in dim light or darkness, the spirit takes the Hide action.",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "summon shadowspawn",
+    "spell_name": "Evocare Stirpe d'Ombra"
+  },
+  {
+    "id": "servitore-minuscolo-servitore-minuscolo",
+    "nome": "Servitore Minuscolo",
+    "nome_en": "Tiny Servant",
+    "fonte": "Rules (Xanathar's Guide to Everything)",
+    "fonte_breve": "XGtE",
+    "pagina_pdf": 323,
+    "tipo_linea": "Tiny construct, unaligned",
+    "taglia": "Minuscolo",
+    "tipo": "Costrutto",
+    "allineamento": "unaligned",
+    "allineamento_breve": "SA",
+    "classe_armatura": "15 (natural armor)",
+    "punti_ferita": "10 (4d4)",
+    "velocita": "30 ft., climb 30 ft.",
+    "caratteristiche": {
+      "forza": {
+        "score": 4,
+        "mod": -3
+      },
+      "destrezza": {
+        "score": 16,
+        "mod": 3
+      },
+      "costituzione": {
+        "score": 10,
+        "mod": 0
+      },
+      "intelligenza": {
+        "score": 2,
+        "mod": -4
+      },
+      "saggezza": {
+        "score": 10,
+        "mod": 0
+      },
+      "carisma": {
+        "score": 1,
+        "mod": -5
+      }
+    },
+    "tiri_salvezza_testo": "",
+    "tiri_salvezza": [],
+    "abilita_testo": "",
+    "vulnerabilita_testo": "",
+    "vulnerabilita": [],
+    "resistenze_testo": "",
+    "resistenze": [],
+    "immunita_danni_testo": "poison, psychic",
+    "immunita_danni": [
+      "veleno",
+      "psichico"
+    ],
+    "immunita_condizioni_testo": "blinded, charmed, deafened, exhaustion, frightened, paralyzed, petrified, poisoned",
+    "sensi": "blindsight 60 ft. (blind beyond this radius), passive Perception 10",
+    "linguaggi": "—",
+    "grado_sfida": "Senza GS",
+    "pe": "",
+    "tratti": "",
+    "azioni": "**Slam.** Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 5 (1d4 + 3) bludgeoning damage.",
+    "azioni_bonus": "",
+    "reazioni": "",
+    "azioni_leggendarie": "",
+    "azioni_mitiche": "",
+    "azioni_tana": "",
+    "spell_name_en": "tiny servant",
+    "spell_name": "Servitore Minuscolo"
+  }
+]

@@ -96,6 +96,7 @@ const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
 const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 const COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+const COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -601,7 +602,7 @@ function _compMonsterItems() {
     if (_compMostriKind() === 'combattimenti') return [];
     return (COMP_MONSTERS_DATA || []).map(monster => {
         const source = monster.fonte_breve || monster.fonte || '';
-        const challenge = String(monster.grado_sfida || '').trim() || '?';
+        const challenge = String(monster.grado_sfida || '').trim() || 'Senza GS';
         return {
             type: 'mostri',
             id: monster.id || `${monster.nome}-${monster.pagina_pdf || ''}`,
@@ -1165,8 +1166,11 @@ function _compMonsterDetail(monster) {
         ${_compMonsterFactsSection(monster)}
         ${_compMonsterTextSection('Tratti', monster.tratti)}
         ${_compMonsterTextSection('Azioni', monster.azioni)}
+        ${_compMonsterTextSection('Azioni bonus', monster.azioni_bonus)}
         ${_compMonsterTextSection('Reazioni', monster.reazioni)}
         ${_compMonsterTextSection('Azioni leggendarie', monster.azioni_leggendarie)}
+        ${_compMonsterTextSection('Azioni mitiche', monster.azioni_mitiche)}
+        ${_compMonsterTextSection('Azioni di tana', monster.azioni_tana)}
     `;
 }
 
@@ -2829,10 +2833,40 @@ function _compSpellDetail(sp) {
                 <div><span class="spell-meta-label">Durata</span><span>${escapeHtml(_compSpellField(sp, 'duration'))}</span></div>
             </div>
             <div class="spell-detail-desc">${_compRich(_compSpellField(sp, 'description'), { linkSpells: false })}</div>
+            ${_compSpellSummonsSection(sp)}
             <div class="spell-detail-classes">${(_compSpellField(sp, 'classes') || []).map(c => `<span class="scheda-tag">${escapeHtml(c)}</span>`).join('')}</div>
             ${_compSpellSource(sp) ? `<div class="spell-detail-source">${escapeHtml(_compSpellSource(sp))}</div>` : ''}
         </article>
     `;
+}
+
+function _compSpellSummonsSection(sp) {
+    const blocks = _compSpellSummonsFor(sp);
+    if (!blocks.length) return '';
+    return `<section class="comp-detail-section comp-summon-statblock-section">
+        <h3>Statblock evocati</h3>
+        <div class="comp-summon-statblock-list">
+            ${blocks.map(block => `
+                <button type="button" class="scheda-tag comp-summon-statblock-link" onclick="compendioOpenSummonStatblock('${_compEscapeAttr(block.id)}')">
+                    ${escapeHtml(block.nome || block.nome_en || 'Statblock')}
+                </button>
+            `).join('')}
+        </div>
+    </section>`;
+}
+
+function _compSpellSummonsFor(sp) {
+    if (!sp || !COMP_SUMMON_STATBLOCKS_DATA.length) return [];
+    const spellKeys = [
+        _compSpellField(sp, 'name'),
+        sp.name,
+        sp.name_en,
+        ...(Array.isArray(sp.aliases) ? sp.aliases : []),
+    ].map(_compLookupKey).filter(Boolean);
+    return COMP_SUMMON_STATBLOCKS_DATA.filter(block => {
+        const blockKeys = [block.spell_name, block.spell_name_en].map(_compLookupKey).filter(Boolean);
+        return blockKeys.some(key => spellKeys.includes(key));
+    });
 }
 
 function _compSimpleDetail(item, boxes) {
@@ -3103,6 +3137,16 @@ function _compSpellRefAmbiguousKey(text) {
         .toLowerCase();
 }
 
+function _compLookupKey(text) {
+    return String(text || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/['’`]/g, '')
+        .replace(/[^a-z0-9]+/gi, ' ')
+        .trim()
+        .toLowerCase();
+}
+
 function _compRangesOverlap(ranges, start, end) {
     return ranges.some(range => start < range.end && end > range.start);
 }
@@ -3114,6 +3158,25 @@ function _compRegexEscape(text) {
 window.compendioOpenSpellRef = function(id) {
     const spellId = _compFindSpellRefId(id);
     if (spellId) _compOpenSpellRefModal(spellId);
+};
+
+window.compendioOpenSummonStatblock = function(id) {
+    const block = (COMP_SUMMON_STATBLOCKS_DATA || []).find(item => String(item.id) === String(id));
+    if (!block) return;
+    document.querySelector('.comp-summon-statblock-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-summon-statblock-overlay';
+    overlay.onclick = event => {
+        if (event.target === overlay) overlay.remove();
+    };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-spell-ref-modal comp-summon-statblock-modal">
+            <button class="modal-close" type="button" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h3 class="comp-spell-ref-title">${escapeHtml(block.nome || block.nome_en || 'Statblock')}</h3>
+            ${_compMonsterDetail(block)}
+        </div>
+    `;
+    document.body.appendChild(overlay);
 };
 
 function _compFindSpellRefId(value) {
@@ -3303,12 +3366,13 @@ function _compSigned(value) {
 
 function _compMonsterChallengeLabel(value) {
     const clean = String(value || '').trim();
+    if (!clean || clean === '?' || clean === '-' || clean.toLowerCase() === 'senza gs') return 'Senza GS';
     return `GS ${clean || '?'}`;
 }
 
 function _compMonsterChallengeValue(value) {
     const clean = String(value || '').trim();
-    if (!clean) return 999;
+    if (!clean || clean === '?' || clean === '-' || clean.toLowerCase() === 'senza gs') return 999;
     if (clean.includes('/')) {
         const [a, b] = clean.split('/').map(Number);
         if (Number.isFinite(a) && Number.isFinite(b) && b !== 0) return a / b;

@@ -1196,6 +1196,21 @@
     outline: none;
 }
 
+.comp-summon-statblock-section {
+    margin-top: 12px;
+}
+
+.comp-summon-statblock-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.comp-summon-statblock-link {
+    appearance: none;
+    cursor: pointer;
+}
+
 .comp-spell-ref-modal {
     width: 520px;
     max-width: calc(100vw - 28px);

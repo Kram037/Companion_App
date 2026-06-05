@@ -1,52 +1,12 @@
-[
-  {
-    "id": "mm",
-    "source": "Manuale dei Mostri",
-    "source_short": "MM",
-    "file": "Manuale dei Mostri.pdf",
-    "language": "it",
-    "status": "active",
-    "exists": true,
-    "page_count": 353
-  },
-  {
-    "id": "vgm",
-    "source": "Volo's Guide to Monsters",
-    "source_short": "VGM",
-    "file": "Volo's Guide to Monsters.pdf",
-    "language": "en",
-    "status": "pending",
-    "exists": true,
-    "page_count": 226
-  },
-  {
-    "id": "mpmm",
-    "source": "Mordenkainen Presents: Monsters of the Multiverse",
-    "source_short": "MPMM",
-    "file": "mosters of the multiverse ita.pdf",
-    "language": "it",
-    "status": "pending_ocr_review",
-    "exists": true,
-    "page_count": 294
-  },
-  {
-    "id": "ftd",
-    "source": "Fizban's Treasury of Dragons",
-    "source_short": "FTD",
-    "file": "fizban ita.pdf",
-    "language": "it",
-    "status": "pending_ocr",
-    "exists": true,
-    "page_count": 115
-  },
-  {
-    "id": "erlw",
-    "source": "Eberron: Rising from the Last War",
-    "source_short": "ERLW",
-    "file": "Eberron -Rising from the Last War.pdf",
-    "language": "en",
-    "status": "pending",
-    "exists": true,
-    "page_count": 324
-  }
-]
+{
+  "sources": [
+    {
+      "id": "lista-mostri",
+      "source": "Lista Mostri",
+      "file": "risorse\\mostri\\Lista Mostri.pdf",
+      "pages": 374,
+      "status": "active",
+      "notes": "PDF usato solo per statblock. I blocchi non OGL sono esclusi; gli statblock evocati da incantesimi sono separati."
+    }
+  ]
+}
