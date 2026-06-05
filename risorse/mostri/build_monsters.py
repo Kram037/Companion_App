@@ -19,7 +19,7 @@ SOURCES = [
         "source_short": "MM",
         "file": "Manuale dei Mostri.pdf",
         "language": "it",
-        "status": "pilot",
+        "status": "active",
     },
     {
         "id": "vgm",
@@ -35,7 +35,7 @@ SOURCES = [
         "source_short": "MPMM",
         "file": "mosters of the multiverse ita.pdf",
         "language": "it",
-        "status": "pending",
+        "status": "pending_ocr_review",
     },
     {
         "id": "ftd",
@@ -43,7 +43,7 @@ SOURCES = [
         "source_short": "FTD",
         "file": "fizban ita.pdf",
         "language": "it",
-        "status": "pending",
+        "status": "pending_ocr",
     },
     {
         "id": "erlw",
@@ -133,6 +133,15 @@ ALIGNMENT_SHORT = {
     "qualsiasi allineamento non legale": "QANL",
 }
 
+BAD_NAME_KEYS = {
+    "azioni",
+    "azioni bonus",
+    "reazioni",
+    "variante dragh i cr omatici",
+    "variante draghi cromatici",
+    "tormento telepatico",
+}
+
 
 OCR_FIXES = {
     "\ufb01": "fi",
@@ -201,7 +210,7 @@ def extract_field(linear, labels):
     stop_labels = (
         "Classe Armatura|Punti Ferita|Velocita|Velocità|Tiri Salvezza|Abilità|"
         "Vulnerabilità ai Danni|Resistenze ai Danni|Immunità ai Danni|"
-        "Immunità alle Condizioni|Sensi|Linguaggi|Sfida|AZIONI|REAZIONI|"
+        "Immunità alle Condizioni|Sensi|Linguaggi|Lingue|Sfida|Bonus di competenza|AZIONI|REAZIONI|"
         "AZIONI LEGGENDARIE|AZIONI DI TANA|FOR|DES|COS|INT|SAG|SAC|CAR"
     )
     pattern = re.compile(rf"(?:{label_re})\s+(.+?)(?=\s+(?:{stop_labels})\b|$)", re.IGNORECASE)
@@ -330,11 +339,18 @@ def parse_saves(value):
 
 
 def parse_challenge(text):
-    match = re.search(r"Sfida\s+([0-9O]+(?:/[0-9]+)?|[-—])\s*\(([^)]*PE)\)", text, flags=re.IGNORECASE)
+    match = re.search(r"Sfida\s+([0-9OIl]+(?:\s*/\s*[0-9OIl]+)?|[-—])\s*\(([^)]*PE)\)", text, flags=re.IGNORECASE)
     if not match:
         return "", ""
-    gs = match.group(1).replace("O", "0").replace("—", "-")
-    xp = match.group(2).replace("S.", "5.").replace("O", "0").strip()
+    gs = match.group(1).replace(" ", "").replace("O", "0").replace("I", "1").replace("l", "1").replace("—", "-")
+    xp = (
+        match.group(2)
+        .replace("S.", "5.")
+        .replace("SO", "50")
+        .replace("S0", "50")
+        .replace("O", "0")
+        .strip()
+    )
     return gs, xp
 
 
@@ -367,6 +383,131 @@ def trim_description_tail(chunk, name):
     return chunk
 
 
+def line_offsets(text):
+    offsets = []
+    cursor = 0
+    for line in text.splitlines():
+        offsets.append(cursor)
+        cursor += len(line) + 1
+    return offsets
+
+
+def is_plausible_name_line(line):
+    clean = normalize_text(line)
+    if not clean or len(clean) > 70:
+        return False
+    key = normalized_key(clean)
+    if not key or any(token in key for token in ["capitolo", "bestiario", "classe armatura", "punti ferita"]):
+        return False
+    if re.search(r"\d", clean):
+        return False
+    letters = re.findall(r"[A-Za-zÀ-ÿ]", clean)
+    if len(letters) < 3:
+        return False
+    punctuation = re.findall(r"[^A-Za-zÀ-ÿ '\-]", clean)
+    if len(punctuation) > max(2, len(letters) // 3):
+        return False
+    uppercase = sum(1 for char in letters if char.isupper())
+    return uppercase / max(len(letters), 1) >= 0.45
+
+
+def clean_statblock_name(value):
+    name = clean_name(value)
+    letters = re.findall(r"[A-Za-zÀ-ÿ]", name)
+    if letters:
+        uppercase = sum(1 for char in letters if char.isupper())
+        if uppercase / len(letters) >= 0.45:
+            name = name.title()
+    replacements = {
+        "'Tridrone": "Tridrone",
+        "(Svirfneblin)": "Gnomo delle Profondità (Svirfneblin)",
+        "Aq,Uila": "Aquila",
+        "De Lla": "Della",
+        "De L": "Del",
+        "Alli P": "Allip",
+        "Bove": "Bove",
+        "Bue": "Bue",
+        "Bug Bear": "Bugbear",
+        "Cocconrillo": "Coccodrillo",
+        "Fll.Ngo": "Fango",
+        "Gobli�": "Goblin",
+        "Kuo-Toa": "Kuo-toa",
+        "Lucertolol De": "Lucertoloide",
+        "Lmp": "Imp",
+        "Mepmit": "Mephit",
+        "Goblin": "Goblin",
+        "Q,Uipper": "Quipper",
+        "Tribal E": "Tribale",
+        "Yuan-Tisanguepuro": "Yuan-ti Purosangue",
+    }
+    for wrong, right in replacements.items():
+        name = re.sub(rf"\b{re.escape(wrong)}\b", right, name)
+    return re.sub(r"\s+", " ", name).strip()
+
+
+def is_bad_monster_name(name):
+    key = normalized_key(name)
+    return (
+        key in BAD_NAME_KEYS
+        or key.startswith("azioni ")
+        or key.startswith("variante ")
+        or key.startswith("di ")
+        or len(key.split()) > 5
+        or not re.match(r"^[A-Za-zÀ-ÿ]", name or "")
+        or bool(re.search(r"[•\\.,]", name or ""))
+    )
+
+
+def split_type_line(line):
+    type_pattern = "|".join(TYPE_WORDS)
+    size_pattern = "|".join(SIZE_WORDS)
+    match = re.search(
+        rf"(?P<prefix>.*?)\b(?P<type>(?:{type_pattern})\b[^\n]*\b(?:{size_pattern})\b[^\n]*,[^\n]+)$",
+        normalize_text(line),
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return "", ""
+    return match.group("prefix").strip(" -•*?§#;:.,'\""), match.group("type").strip()
+
+
+def find_statblock_headers(page_text, page_index, page_offset):
+    lines = page_text.splitlines()
+    offsets = line_offsets(page_text)
+    headers = []
+    for armor_idx, line in enumerate(lines):
+        if not re.search(r"\bClasse Armatura\b", line, flags=re.IGNORECASE):
+            continue
+        type_idx = None
+        raw_name = ""
+        type_line = ""
+        for idx in range(armor_idx - 1, max(-1, armor_idx - 10), -1):
+            prefix, candidate_type = split_type_line(lines[idx])
+            if not candidate_type:
+                continue
+            type_idx = idx
+            type_line = candidate_type
+            if prefix and is_plausible_name_line(prefix):
+                raw_name = prefix
+            break
+        if type_idx is None:
+            continue
+        name_idx = type_idx
+        if not raw_name:
+            for idx in range(type_idx - 1, max(-1, type_idx - 80), -1):
+                if is_plausible_name_line(lines[idx]):
+                    raw_name = lines[idx]
+                    name_idx = idx
+                    break
+        headers.append({
+            "page": page_index,
+            "name": clean_statblock_name(raw_name),
+            "type": type_line,
+            "start": page_offset + offsets[max(0, name_idx)],
+        })
+    return headers
+
+
 def parse_monster(match, chunk, source):
     page = int(match["page"])
     raw_name = match["name"].strip()
@@ -386,7 +527,7 @@ def parse_monster(match, chunk, source):
     damage_immunities_text = extract_field(linear, "Immunità ai Danni")
     condition_immunities_text = extract_field(linear, "Immunità alle Condizioni")
     senses = extract_field(linear, "Sensi")
-    languages = extract_field(linear, "Linguaggi")
+    languages = extract_field(linear, ["Linguaggi", "Lingue"])
     traits = section_text(
         chunk,
         r"Sfida\s+[0-9O]+(?:/[0-9]+)?\s*\([^)]*PE\)",
@@ -402,6 +543,7 @@ def parse_monster(match, chunk, source):
         or bool(re.search(r"[.!?]$", name))
         or raw_name.strip().isdigit()
         or raw_name[:1].islower()
+        or is_bad_monster_name(name)
     )
     review = []
     if name_suspect:
@@ -465,6 +607,32 @@ def source_inventory():
     return inventory
 
 
+def extract_italian_source(source):
+    path = MANUALS / source["file"]
+    reader = PdfReader(str(path))
+    page_texts = []
+    page_starts = []
+    cursor = 0
+    for index, page in enumerate(reader.pages, start=1):
+        text = normalize_text(page.extract_text() or "")
+        page_starts.append(cursor)
+        page_texts.append(text)
+        cursor += len(text) + 2
+    full_text = "\n\n".join(page_texts)
+    matches = []
+    for page_index, text in enumerate(page_texts, start=1):
+        page_offset = page_starts[page_index - 1]
+        matches.extend(find_statblock_headers(text, page_index, page_offset))
+    matches.sort(key=lambda item: item["start"])
+    monsters = []
+    for index, match in enumerate(matches):
+        start = match["start"]
+        end = matches[index + 1]["start"] if index + 1 < len(matches) else len(full_text)
+        chunk = full_text[start:end]
+        monsters.append(parse_monster(match, chunk, source))
+    return monsters
+
+
 def extract_manuale_mostri():
     source = SOURCES[0]
     path = MANUALS / source["file"]
@@ -492,7 +660,7 @@ def extract_manuale_mostri():
         for match in page_start_re.finditer(text):
             matches.append({
                 "page": page_index,
-                "name": match.group("name"),
+                "name": clean_statblock_name(match.group("name")),
                 "type": match.group("type"),
                 "start": page_offset + match.start("name"),
             })
@@ -503,8 +671,19 @@ def extract_manuale_mostri():
         end = matches[index + 1]["start"] if index + 1 < len(matches) else len(full_text)
         chunk = full_text[start:end]
         monsters.append(parse_monster(match, chunk, source))
-    monsters = sorted(monsters, key=lambda item: (challenge_sort_key(item["grado_sfida"]), item["nome"]))
     return monsters
+
+
+def extract_all_monsters():
+    monsters = []
+    for source in SOURCES:
+        if source.get("language") != "it" or source.get("status") != "active":
+            continue
+        path = MANUALS / source["file"]
+        if not path.exists():
+            continue
+        monsters.extend(extract_italian_source(source))
+    return sorted(monsters, key=lambda item: (challenge_sort_key(item["grado_sfida"]), item["nome"], item["fonte_breve"]))
 
 
 def challenge_sort_key(value):
@@ -521,7 +700,8 @@ def challenge_sort_key(value):
         return 999
 
 
-def validation_report(monsters, inventory):
+def validation_report(monsters, inventory, skipped=None):
+    skipped = skipped or []
     by_source = {}
     by_cr = {}
     review = []
@@ -542,6 +722,8 @@ def validation_report(monsters, inventory):
         "by_challenge": dict(sorted(by_cr.items(), key=lambda item: challenge_sort_key(item[0]))),
         "needs_review_count": len(review),
         "needs_review": review[:200],
+        "skipped_name_count": len(skipped),
+        "skipped_name": skipped[:200],
         "sources": inventory,
     }
 
@@ -561,12 +743,26 @@ def write_js(path, monsters):
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     inventory = source_inventory()
-    monsters = extract_manuale_mostri()
+    extracted = extract_all_monsters()
+    skipped = [
+        {
+            "id": monster["id"],
+            "nome": monster["nome"],
+            "fonte_breve": monster["fonte_breve"],
+            "pagina_pdf": monster["pagina_pdf"],
+            "tipo_linea": monster["tipo_linea"],
+        }
+        for monster in extracted
+        if "name" in monster["needs_review"]
+    ]
+    monsters = [monster for monster in extracted if "name" not in monster["needs_review"]]
     write_json(OUT_DIR / "sources_inventory.json", inventory)
     write_json(OUT_DIR / "monsters.json", monsters)
-    write_json(OUT_DIR / "monster_validation.json", validation_report(monsters, inventory))
+    write_json(OUT_DIR / "monster_validation.json", validation_report(monsters, inventory, skipped))
     write_js(JS_OUT, monsters)
+    print(f"extracted {len(extracted)} monsters")
     print(f"wrote {len(monsters)} monsters")
+    print(f"skipped {len(skipped)} name suspects")
     print(f"review {sum(1 for monster in monsters if monster['needs_review'])}")
 
 

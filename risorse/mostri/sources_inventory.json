@@ -5,7 +5,7 @@
     "source_short": "MM",
     "file": "Manuale dei Mostri.pdf",
     "language": "it",
-    "status": "pilot",
+    "status": "active",
     "exists": true,
     "page_count": 353
   },
@@ -25,7 +25,7 @@
     "source_short": "MPMM",
     "file": "mosters of the multiverse ita.pdf",
     "language": "it",
-    "status": "pending",
+    "status": "pending_ocr_review",
     "exists": true,
     "page_count": 294
   },
@@ -35,7 +35,7 @@
     "source_short": "FTD",
     "file": "fizban ita.pdf",
     "language": "it",
-    "status": "pending",
+    "status": "pending_ocr",
     "exists": true,
     "page_count": 115
   },
