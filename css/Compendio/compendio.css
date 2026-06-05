@@ -455,6 +455,41 @@
     flex-shrink: 0;
 }
 
+.comp-monster-card {
+    min-height: 72px;
+}
+
+.comp-monster-gs {
+    min-width: 48px;
+    min-height: 30px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    background: color-mix(in srgb, var(--accent) 78%, #000 12%);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.comp-monster-card-meta {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    line-height: 1.25;
+}
+
+.comp-monster-card-meta span + span::before {
+    content: "-";
+    margin-right: 10px;
+    color: var(--accent);
+}
+
 .comp-empty {
     color: var(--text-secondary);
     text-align: center;
@@ -772,6 +807,60 @@
 
 .comp-equipment-table tr:last-child td {
     border-bottom: 0;
+}
+
+.comp-monster-abilities-table {
+    min-width: 0;
+    table-layout: fixed;
+}
+
+.comp-monster-abilities-table th,
+.comp-monster-abilities-table td {
+    text-align: center;
+    padding: 7px 4px;
+}
+
+.comp-monster-abilities-table td strong {
+    display: block;
+    color: var(--text);
+}
+
+.comp-monster-abilities-table td span {
+    display: block;
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
+.comp-monster-facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.comp-monster-fact {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 9px;
+    background: var(--surface, rgba(0,0,0,0.03));
+    display: grid;
+    gap: 3px;
+}
+
+.comp-monster-fact strong {
+    color: var(--accent);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+}
+
+.comp-monster-fact span {
+    color: var(--text);
+    font-size: 0.86rem;
+    line-height: 1.35;
+}
+
+.comp-monster-text p {
+    margin-bottom: 0.65em;
 }
 
 .comp-spell-offer-table {

@@ -95,6 +95,7 @@ const COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
 const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
 const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
+const COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -482,7 +483,7 @@ function _compItems(tab) {
         return [];
     }
     if (tab === 'mostri') {
-        return [];
+        return _compMonsterItems();
     }
     if (tab === 'talenti_stili') {
         return _compTalentiStiliKind() === 'stili'
@@ -589,6 +590,60 @@ function _compStyleItems(tabKey = 'stili') {
         desc: '',
         data: style,
     }));
+}
+
+function _compMostriKind() {
+    const state = _compStateFor('mostri');
+    return state.kind === 'combattimenti' ? 'combattimenti' : 'mostri';
+}
+
+function _compMonsterItems() {
+    if (_compMostriKind() === 'combattimenti') return [];
+    return (COMP_MONSTERS_DATA || []).map(monster => {
+        const source = monster.fonte_breve || monster.fonte || '';
+        const challenge = String(monster.grado_sfida || '').trim() || '?';
+        return {
+            type: 'mostri',
+            id: monster.id || `${monster.nome}-${monster.pagina_pdf || ''}`,
+            title: monster.nome || 'Mostro',
+            subtitle: '',
+            source,
+            sources: source ? [source] : [],
+            group: _compMonsterChallengeLabel(challenge),
+            sortChallenge: _compMonsterChallengeValue(challenge),
+            search: _compMonsterSearchText(monster),
+            tags: [monster.tipo, monster.allineamento_breve].filter(Boolean),
+            desc: '',
+            data: monster,
+        };
+    });
+}
+
+function _compMonsterSearchText(monster) {
+    if (!monster) return '';
+    return [
+        monster.nome,
+        monster.fonte,
+        monster.fonte_breve,
+        monster.tipo_linea,
+        monster.tipo,
+        monster.taglia,
+        monster.allineamento,
+        monster.allineamento_breve,
+        monster.grado_sfida,
+        monster.tiri_salvezza_testo,
+        monster.abilita_testo,
+        monster.vulnerabilita_testo,
+        monster.resistenze_testo,
+        monster.immunita_danni_testo,
+        monster.immunita_condizioni_testo,
+        monster.sensi,
+        monster.linguaggi,
+        monster.tratti,
+        monster.azioni,
+        monster.reazioni,
+        monster.azioni_leggendarie,
+    ].join(' ');
 }
 
 function _compRaceItems() {
@@ -721,6 +776,7 @@ function _compSlug(value) {
 }
 
 function _compToolbarHtml(tab, state, allItems) {
+    if (tab === 'mostri' && _compMostriKind() === 'combattimenti') return '';
     const activeFilters = _compActiveFiltersCount(state);
     const filtersHtml = _compFiltersHtml(tab, state, allItems);
     return `
@@ -764,12 +820,41 @@ function _compRefreshStickyTools() {
 }
 
 function _compListContentHtml(tab, filtered, total) {
+    if (tab === 'mostri' && _compMostriKind() === 'combattimenti') {
+        return `
+            ${_compMostriTabsHtml()}
+            <div class="comp-empty">La sezione Combattimenti sara disponibile in un prossimo aggiornamento.</div>
+        `;
+    }
     return `
+        ${tab === 'mostri' ? _compMostriTabsHtml() : ''}
         ${tab === 'talenti_stili' ? _compTalentiStiliTabsHtml() : ''}
         <p class="comp-count">${filtered.length} risultati su ${total}</p>
         ${filtered.length ? _compListHtml(tab, filtered) : '<div class="comp-empty">Nessun elemento trovato</div>'}
     `;
 }
+
+function _compMostriTabsHtml() {
+    const kind = _compMostriKind();
+    return `
+        <div class="lab-subtabs comp-inner-tabs">
+            <button type="button" class="lab-subtab ${kind === 'mostri' ? 'active' : ''}" onclick="compendioMostriSetKind('mostri')">
+                <span>Mostri</span>
+            </button>
+            <button type="button" class="lab-subtab ${kind === 'combattimenti' ? 'active' : ''}" onclick="compendioMostriSetKind('combattimenti')">
+                <span>Combattimenti</span>
+            </button>
+        </div>
+    `;
+}
+
+window.compendioMostriSetKind = function(kind) {
+    const state = _compStateFor('mostri');
+    state.kind = kind === 'combattimenti' ? 'combattimenti' : 'mostri';
+    state.detail = null;
+    compendioRenderTab();
+    _compScrollToTop();
+};
 
 function _compTalentiStiliTabsHtml() {
     const kind = _compTalentiStiliKind();
@@ -808,6 +893,26 @@ function _compRenderCurrentListContent() {
 
 function _compFiltersHtml(tab, state, allItems) {
     const f = state.filters || {};
+    if (tab === 'mostri') {
+        if (_compMostriKind() === 'combattimenti') return '';
+        const challenges = _compUnique(allItems.map(i => i.data.grado_sfida).filter(Boolean))
+            .sort((a, b) => _compMonsterChallengeValue(a) - _compMonsterChallengeValue(b));
+        const types = _compUnique(allItems.map(i => i.data.tipo).filter(Boolean));
+        const sources = _compUnique(allItems.flatMap(i => i.sources || i.source || []).filter(Boolean));
+        const saves = _compUnique(allItems.flatMap(i => i.data.tiri_salvezza || []).filter(Boolean));
+        const resistances = _compUnique(allItems.flatMap(i => i.data.resistenze || []).filter(Boolean));
+        const immunities = _compUnique(allItems.flatMap(i => i.data.immunita_danni || []).filter(Boolean));
+        const vulnerabilities = _compUnique(allItems.flatMap(i => i.data.vulnerabilita || []).filter(Boolean));
+        return [
+            _compSelect('challenge', f.challenge, [['', 'Tutti'], ...challenges.map(v => [v, _compMonsterChallengeLabel(v)])], 'Grado sfida', 'multi'),
+            _compSelect('type', f.type, [['', 'Tutte'], ...types.map(v => [v, v])], 'Tipologia', 'multi'),
+            sources.length > 1 ? _compSelect('source', f.source, [['', 'Tutte'], ...sources.map(v => [v, v])], 'Fonte', 'multi') : '',
+            saves.length ? _compSelect('save', f.save, [['', 'Tutti'], ...saves.map(v => [v, v])], 'Tiri salvezza', 'multi') : '',
+            resistances.length ? _compSelect('resistance', f.resistance, [['', 'Tutte'], ...resistances.map(v => [v, v])], 'Resistenze', 'multi') : '',
+            immunities.length ? _compSelect('immunity', f.immunity, [['', 'Tutte'], ...immunities.map(v => [v, v])], 'Immunita', 'multi') : '',
+            vulnerabilities.length ? _compSelect('vulnerability', f.vulnerability, [['', 'Tutte'], ...vulnerabilities.map(v => [v, v])], 'Vulnerabilita', 'multi') : '',
+        ].join('');
+    }
     if (tab === 'incantesimi') {
         const schools = _compUnique(allItems.map(i => i.data.school_it || i.data.school).filter(Boolean));
         const classes = _compSpellClassOptions(allItems);
@@ -834,10 +939,10 @@ function _compFiltersHtml(tab, state, allItems) {
     return base;
 }
 
-function _compSelect(key, value, options, title) {
+function _compSelect(key, value, options, title, mode = '') {
     const selected = _compFilterValues(value);
     const nonEmpty = options.filter(([v]) => String(v || '') !== '');
-    const isSingle = nonEmpty.length === 2;
+    const isSingle = mode ? mode === 'single' : nonEmpty.length === 2;
     const normalized = (isSingle ? options : nonEmpty).map(([v, label]) => ({ value: String(v || ''), label }));
     const encoded = encodeURIComponent(JSON.stringify(normalized)).replace(/'/g, '%27');
     const selectedLabel = isSingle && selected.length
@@ -847,6 +952,12 @@ function _compSelect(key, value, options, title) {
         ${escapeHtml(title || 'Filtro')}
         ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
     </button>`;
+}
+
+function _compMatchesAnyFilter(selected, values) {
+    if (!selected.length) return true;
+    const normalized = new Set((values || []).map(v => String(v || '').trim().toLowerCase()).filter(Boolean));
+    return selected.some(value => normalized.has(String(value || '').trim().toLowerCase()));
 }
 
 function _compMatches(item, state) {
@@ -866,6 +977,21 @@ function _compMatches(item, state) {
     if (classes.length) {
         if (item.type === 'sottoclassi' && !classes.some(cls => item.data.className === cls || item.data.classNameEn === cls)) return false;
         if (item.type === 'incantesimi' && !classes.some(cls => _compSpellMatchesClass(item.data, cls))) return false;
+    }
+    if (item.type === 'mostri') {
+        const monster = item.data;
+        const challenges = _compFilterValues(f.challenge);
+        const types = _compFilterValues(f.type);
+        const saves = _compFilterValues(f.save);
+        const resistances = _compFilterValues(f.resistance);
+        const immunities = _compFilterValues(f.immunity);
+        const vulnerabilities = _compFilterValues(f.vulnerability);
+        if (challenges.length && !challenges.includes(String(monster.grado_sfida || '').trim())) return false;
+        if (types.length && !types.includes(monster.tipo)) return false;
+        if (!_compMatchesAnyFilter(saves, monster.tiri_salvezza)) return false;
+        if (!_compMatchesAnyFilter(resistances, monster.resistenze)) return false;
+        if (!_compMatchesAnyFilter(immunities, monster.immunita_danni)) return false;
+        if (!_compMatchesAnyFilter(vulnerabilities, monster.vulnerabilita)) return false;
     }
     if (item.type === 'incantesimi') {
         const sp = item.data;
@@ -887,7 +1013,7 @@ function _compMatches(item, state) {
 
 function _compListHtml(tab, items) {
     const sorted = _compSortItems(tab, items);
-    if (tab === 'sottoclassi' || tab === 'incantesimi') {
+    if (tab === 'sottoclassi' || tab === 'incantesimi' || tab === 'mostri') {
         const groups = _compGroupItems(sorted);
         const state = _compStateFor(tab);
         return `<div class="comp-grouped-list">${groups.map(group => `
@@ -919,6 +1045,10 @@ window.compendioToggleGroup = function(label) {
 function _compSortItems(tab, items) {
     const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
     return [...items].sort((a, b) => {
+        if (tab === 'mostri') {
+            const challenge = (a.sortChallenge ?? 999) - (b.sortChallenge ?? 999);
+            if (challenge !== 0) return challenge;
+        }
         if (tab === 'incantesimi') {
             const lvl = (a.sortLevel || 0) - (b.sortLevel || 0);
             if (lvl !== 0) return lvl;
@@ -944,6 +1074,7 @@ function _compGroupItems(items) {
 }
 
 function _compCardHtml(item) {
+    if (item.type === 'mostri') return _compMonsterCardHtml(item);
     if (item.type === 'incantesimi') return _compSpellCardHtml(item);
     const tabKey = item.tab || item.type;
     if (item.type === 'sottoclassi' || item.type === 'razze') {
@@ -1012,7 +1143,90 @@ function _compDetailHtml(item) {
     if (item.type === 'stili') return _compSimpleDetail(item, [['Classi', _compArrayLabel(d.classes) || ''], ['Fonte', d.source || d.source_short || '']]);
     if (item.type === 'suppliche') return _compSimpleDetail(item, [['Prerequisiti', _compPrereqLabel(d.prerequisites) || 'Nessuno'], ['Fonte', d.source || d.source_short || '']]);
     if (item.type === 'incantesimi') return _compSpellDetail(d);
+    if (item.type === 'mostri') return _compMonsterDetail(d);
     return _compSimpleDetail(item, []);
+}
+
+function _compMonsterDetail(monster) {
+    const source = [monster.fonte_breve || monster.fonte, monster.pagina_pdf ? `pag. ${monster.pagina_pdf}` : ''].filter(Boolean).join(' - ');
+    return `
+        ${_compBoxes([
+            ['Fonte', source],
+            ['Grado sfida', `${_compMonsterChallengeLabel(monster.grado_sfida)}${monster.pe ? ` (${monster.pe})` : ''}`],
+            ['Tipo', monster.tipo_linea || monster.tipo],
+            ['Allineamento', monster.allineamento || monster.allineamento_breve],
+        ])}
+        ${_compBoxes([
+            ['Classe Armatura', monster.classe_armatura],
+            ['Punti Ferita', monster.punti_ferita],
+            ['Velocita', monster.velocita],
+        ])}
+        ${_compMonsterAbilitiesTable(monster.caratteristiche)}
+        ${_compMonsterFactsSection(monster)}
+        ${_compMonsterTextSection('Tratti', monster.tratti)}
+        ${_compMonsterTextSection('Azioni', monster.azioni)}
+        ${_compMonsterTextSection('Reazioni', monster.reazioni)}
+        ${_compMonsterTextSection('Azioni leggendarie', monster.azioni_leggendarie)}
+    `;
+}
+
+function _compMonsterAbilitiesTable(abilities) {
+    const keys = [
+        ['forza', 'FOR'],
+        ['destrezza', 'DES'],
+        ['costituzione', 'COS'],
+        ['intelligenza', 'INT'],
+        ['saggezza', 'SAG'],
+        ['carisma', 'CAR'],
+    ];
+    if (!abilities || !keys.some(([key]) => abilities[key]?.score != null)) return '';
+    return `<section class="comp-detail-section">
+        <h3>Caratteristiche</h3>
+        <div class="comp-table-wrap">
+            <table class="comp-equipment-table comp-monster-abilities-table">
+                <thead><tr>${keys.map(([, label]) => `<th>${label}</th>`).join('')}</tr></thead>
+                <tbody>
+                    <tr>${keys.map(([key]) => {
+                        const stat = abilities[key] || {};
+                        return `<td><strong>${escapeHtml(String(stat.score ?? '-'))}</strong><span>${escapeHtml(_compSigned(stat.mod))}</span></td>`;
+                    }).join('')}</tr>
+                </tbody>
+            </table>
+        </div>
+    </section>`;
+}
+
+function _compMonsterFactsSection(monster) {
+    const rows = [
+        ['Tiri salvezza', monster.tiri_salvezza_testo],
+        ['Abilita', monster.abilita_testo],
+        ['Vulnerabilita ai danni', monster.vulnerabilita_testo],
+        ['Resistenze ai danni', monster.resistenze_testo],
+        ['Immunita ai danni', monster.immunita_danni_testo],
+        ['Immunita alle condizioni', monster.immunita_condizioni_testo],
+        ['Sensi', monster.sensi],
+        ['Linguaggi', monster.linguaggi],
+    ].filter(([, value]) => value != null && String(value).trim() !== '');
+    if (!rows.length) return '';
+    return `<section class="comp-detail-section">
+        <h3>Difese e sensi</h3>
+        <div class="comp-monster-facts">
+            ${rows.map(([label, value]) => `
+                <div class="comp-monster-fact">
+                    <strong>${escapeHtml(label)}</strong>
+                    <span>${escapeHtml(value)}</span>
+                </div>
+            `).join('')}
+        </div>
+    </section>`;
+}
+
+function _compMonsterTextSection(title, text) {
+    if (!text || !String(text).trim()) return '';
+    return `<section class="comp-detail-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="comp-rich comp-monster-text">${_compRich(text)}</div>
+    </section>`;
 }
 
 function _compClassDetail(cls) {
@@ -1049,6 +1263,22 @@ function _compClassDetail(cls) {
         ${_compTashaToggleHtml(clsId, optionalFeatures, showTasha)}
         ${_compFeaturesSection(classFeatures)}
         ${_compClassSubclassesSection(cls, showTasha)}
+    `;
+}
+
+function _compMonsterCardHtml(item) {
+    const monster = item.data;
+    return `
+        <article class="comp-card comp-monster-card" onclick="compendioOpenDetail('mostri', '${_compEscapeAttr(item.id)}')">
+            <div class="comp-card-main">
+                <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
+                <span class="comp-monster-gs">${escapeHtml(_compMonsterChallengeLabel(monster.grado_sfida))}</span>
+            </div>
+            <div class="comp-monster-card-meta">
+                <span>${escapeHtml(monster.tipo || 'Tipo non indicato')}</span>
+                <span>${escapeHtml(monster.allineamento_breve || '-')}</span>
+            </div>
+        </article>
     `;
 }
 
@@ -3062,6 +3292,29 @@ function _compObjectValues(value) {
     if (Array.isArray(value)) return value;
     if (typeof value === 'object') return Object.values(value);
     return [];
+}
+
+function _compSigned(value) {
+    if (value == null || value === '') return '-';
+    const num = Number(value);
+    if (!Number.isFinite(num)) return String(value);
+    return num >= 0 ? `+${num}` : String(num);
+}
+
+function _compMonsterChallengeLabel(value) {
+    const clean = String(value || '').trim();
+    return `GS ${clean || '?'}`;
+}
+
+function _compMonsterChallengeValue(value) {
+    const clean = String(value || '').trim();
+    if (!clean) return 999;
+    if (clean.includes('/')) {
+        const [a, b] = clean.split('/').map(Number);
+        if (Number.isFinite(a) && Number.isFinite(b) && b !== 0) return a / b;
+    }
+    const numeric = Number(clean.replace(',', '.'));
+    return Number.isFinite(numeric) ? numeric : 999;
 }
 
 function _compFilterValues(value) {
