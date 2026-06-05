@@ -1,0 +1,940 @@
+{
+  "total": 273,
+  "by_source": {
+    "MM": 273
+  },
+  "by_challenge": {
+    "0": 10,
+    "1/8": 9,
+    "1/4": 26,
+    "1/2": 16,
+    "1": 12,
+    "2": 41,
+    "3": 21,
+    "4": 17,
+    "5": 22,
+    "6": 9,
+    "7": 7,
+    "8": 10,
+    "9": 7,
+    "10": 5,
+    "11": 5,
+    "12": 2,
+    "13": 7,
+    "14": 3,
+    "15": 2,
+    "16": 2,
+    "17": 7,
+    "18": 1,
+    "19": 1,
+    "20": 3,
+    "21": 4,
+    "22": 2,
+    "24": 1,
+    "?": 21
+  },
+  "needs_review_count": 93,
+  "needs_review": [
+    {
+      "id": "mm-avvoltoio-gigante-318",
+      "nome": "Avvoltoio Gigante",
+      "pagina_pdf": 318,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Bestia Grande, neutrale malvagio"
+    },
+    {
+      "id": "mm-bandito-343",
+      "nome": "Bandito",
+      "pagina_pdf": 343,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento non legale"
+    },
+    {
+      "id": "mm-coboldo-43",
+      "nome": "Coboldo",
+      "pagina_pdf": 43,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Piccolo (coboldo), legale malvagio"
+    },
+    {
+      "id": "mm-guardia-348",
+      "nome": "Guardia",
+      "pagina_pdf": 348,
+      "issues": [
+        "velocita"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-mostro-12",
+      "nome": "",
+      "pagina_pdf": 12,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Umanoide Medio (aaralcocra), neutrale buono"
+    },
+    {
+      "id": "mm-duodrone-229",
+      "nome": "Duodrone",
+      "pagina_pdf": 229,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Costrutto Medio, legale neutrale"
+    },
+    {
+      "id": "mm-goblin-167",
+      "nome": "GoBLIN",
+      "pagina_pdf": 167,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Piccolo (goblinoide), neutrale malvagio"
+    },
+    {
+      "id": "mm-kuo-toa-187",
+      "nome": "Kuo-ToA",
+      "pagina_pdf": 187,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (kuo-toa), neutrale malvagio"
+    },
+    {
+      "id": "mm-sciame-di-corvi-335",
+      "nome": "Sciame Di Corvi",
+      "pagina_pdf": 335,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Sciame Medio di bestie Minuscole, senza allineamento"
+    },
+    {
+      "id": "mm-spiritello-281",
+      "nome": "Spiritello",
+      "pagina_pdf": 281,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Folletto Minuscolo, neutrale buono"
+    },
+    {
+      "id": "mm-esploratore-347",
+      "nome": "Esploratore",
+      "pagina_pdf": 347,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-malvivente-348",
+      "nome": "Malvivente",
+      "pagina_pdf": 348,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento non buono"
+    },
+    {
+      "id": "mm-mephit-della-polvere-218",
+      "nome": "Mephit Della Polvere",
+      "pagina_pdf": 218,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Elementale Piccolo, neutrule malvagw"
+    },
+    {
+      "id": "mm-sciame-di-insetti-335",
+      "nome": "Sciame Di Insetti",
+      "pagina_pdf": 335,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Sciame Medio di bestie Minuscole, senza allineamento"
+    },
+    {
+      "id": "mm-mostro-280",
+      "nome": "",
+      "pagina_pdf": 280,
+      "issues": [
+        "name",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Non morto Medio, caotico malvagio"
+    },
+    {
+      "id": "mm-drago-fatato-119",
+      "nome": "Drago Fatato",
+      "pagina_pdf": 119,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Minuscolo, caotico buono"
+    },
+    {
+      "id": "mm-iena-gigante-326",
+      "nome": "Iena Gigante",
+      "pagina_pdf": 326,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Bestia Grande, senza allineamento"
+    },
+    {
+      "id": "mm-lupo-feroce-327",
+      "nome": "Lupo Feroce",
+      "pagina_pdf": 327,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Bestia Grande, senza allineamento"
+    },
+    {
+      "id": "mm-ankheg-19",
+      "nome": "Ankheg",
+      "pagina_pdf": 19,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Mostruosità Grande, senza allineamento"
+    },
+    {
+      "id": "mm-berserker-344",
+      "nome": "Berserker",
+      "pagina_pdf": 344,
+      "issues": [
+        "punti_ferita"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento caotico"
+    },
+    {
+      "id": "mm-capo-dei-banditi-344",
+      "nome": "Capo Dei Banditi",
+      "pagina_pdf": 344,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento non legale"
+    },
+    {
+      "id": "mm-cubo-gelatinoso-214",
+      "nome": "Cubo Gelatinoso",
+      "pagina_pdf": 214,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Melma Grande, senza allineamento"
+    },
+    {
+      "id": "mm-drago-nero-cucc10lo-95",
+      "nome": "DRAGO NERO Cucc10Lo",
+      "pagina_pdf": 95,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Medio, caotico malvagio"
+    },
+    {
+      "id": "mm-drago-n1-bronzo-cucc10lo-109",
+      "nome": "DRAGO n1 BRONZO Cucc10Lo",
+      "pagina_pdf": 109,
+      "issues": [
+        "punti_ferita"
+      ],
+      "tipo_linea": "Drago Medio, legale buono"
+    },
+    {
+      "id": "mm-drago-nrgento-cucc10lo-106",
+      "nome": "DRAGO n�RGENTO Cucc10Lo",
+      "pagina_pdf": 106,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Medio, legale buono"
+    },
+    {
+      "id": "mm-diavolo-spinato-76",
+      "nome": "Diavolo Spinato",
+      "pagina_pdf": 76,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "immondo Piccolo (diavolo), legale malvagio"
+    },
+    {
+      "id": "mm-druido-346",
+      "nome": "Druido",
+      "pagina_pdf": 346,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-githzerai-monaco-162",
+      "nome": "Githzerai Monaco",
+      "pagina_pdf": 162,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (gith), legale neutrale"
+    },
+    {
+      "id": "mm-lucertoloide-sciamano-199",
+      "nome": "Lucertoloide Sciamano",
+      "pagina_pdf": 199,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (lucertoloide), neutrale"
+    },
+    {
+      "id": "mm-merrow-219",
+      "nome": "Merrow",
+      "pagina_pdf": 219,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Mostruosità Grande, wotico malvagio"
+    },
+    {
+      "id": "mm-rco-occh10-n1-gruumsh-247",
+      "nome": "Rco OccH10 n1 GRUUMSH",
+      "pagina_pdf": 247,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (orco), caotico malvagio"
+    },
+    {
+      "id": "mm-scheletro-minotauro-268",
+      "nome": "Scheletro Minotauro",
+      "pagina_pdf": 268,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Non morto Grande, legale malvagio"
+    },
+    {
+      "id": "mm-tappeto-soffocante-238",
+      "nome": "Tappeto Soffocante",
+      "pagina_pdf": 238,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Costrutto Grande, senza allineamento"
+    },
+    {
+      "id": "mm-in-mischia-247",
+      "nome": "in mischia.",
+      "pagina_pdf": 247,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Umanoide Medio (orco), caotico malvagio"
+    },
+    {
+      "id": "mm-drago-blu-cucc10lo-92",
+      "nome": "DRAGO BLu Cucc10Lo",
+      "pagina_pdf": 92,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Medio, legale malvagio"
+    },
+    {
+      "id": "mm-diavolo-barbuto-70",
+      "nome": "Diavolo Barbuto",
+      "pagina_pdf": 70,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Medio (diavolo), legale malvagio"
+    },
+    {
+      "id": "mm-lupo-invernale-r-328",
+      "nome": "LUPO INVERNALE ,....r.-_.",
+      "pagina_pdf": 328,
+      "issues": [
+        "name",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Mostruosità Grande, neutrale malvagio"
+    },
+    {
+      "id": "mm-scorpione-gigante-337",
+      "nome": "Scorpione Gigante",
+      "pagina_pdf": 337,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Bestia Grande, senza allineamento"
+    },
+    {
+      "id": "mm-veterano-350",
+      "nome": "Veterano",
+      "pagina_pdf": 350,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-chuul-41",
+      "nome": "Chuul",
+      "pagina_pdf": 41,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Aberrazione Grande, caotico malvagio"
+    },
+    {
+      "id": "mm-couatl-45",
+      "nome": "Couatl",
+      "pagina_pdf": 45,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Celestiale Medio, legale buono"
+    },
+    {
+      "id": "mm-demone-d-ombra-57",
+      "nome": "Demone D'Ombra",
+      "pagina_pdf": 57,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Medio (demone), caotico malvagio"
+    },
+    {
+      "id": "mm-nagad-ossa-234",
+      "nome": "NAGAD'OssA",
+      "pagina_pdf": 234,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Non morto Grande, legale malvagio"
+    },
+    {
+      "id": "mm-orco-capotribu-guerriero-246",
+      "nome": "Orco Capotribù Guerriero",
+      "pagina_pdf": 246,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (orco), caotico malvagio"
+    },
+    {
+      "id": "mm-protoplasma-nero-215",
+      "nome": "Protoplasma Nero",
+      "pagina_pdf": 215,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Melma Grande, senza allineamento"
+    },
+    {
+      "id": "mm-teschio-infuocato-285",
+      "nome": "Teschio Infuocato",
+      "pagina_pdf": 285,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Non morto Minuscolo, neutrale malvagio"
+    },
+    {
+      "id": "mm-sono-liberi-di-diffondere-la-malvagita-ovunque-desiderino-189",
+      "nome": "sono liberi di diffondere la malvagità ovunque desiderino.",
+      "pagina_pdf": 189,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Mostruosità Grande, caotico malvagio"
+    },
+    {
+      "id": "mm-drow-combattente-scelto-128",
+      "nome": "Drow Combattente Scelto",
+      "pagina_pdf": 128,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (elfo), neutrale malvagio"
+    },
+    {
+      "id": "mm-gigante-delle-colline-157",
+      "nome": "Gigante Delle Colline",
+      "pagina_pdf": 157,
+      "issues": [
+        "velocita"
+      ],
+      "tipo_linea": "Gigante Enorme, caotico malvagio"
+    },
+    {
+      "id": "mm-gladiatore-347",
+      "nome": "Gladiatore",
+      "pagina_pdf": 347,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-caccia-nel-resto-del-mondo-33",
+      "nome": "caccia nel resto del mondo.",
+      "pagina_pdf": 33,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Mostruosità Grande, senza allineamento"
+    },
+    {
+      "id": "mm-situato-entro-18-metri-e-che-egli-sia-in-grado-di-vedere-313",
+      "nome": "situato entro 18 metri e che egli sia in grado di vedere.",
+      "pagina_pdf": 313,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Immondo Medio (yugoloth), neutrale malvagio"
+    },
+    {
+      "id": "mm-mostro-251",
+      "nome": "�",
+      "pagina_pdf": 251,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Aberrazione Grande, neutrale"
+    },
+    {
+      "id": "mm-drider-121",
+      "nome": "Drider",
+      "pagina_pdf": 121,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Mostruosità Grande, caotico malvagio"
+    },
+    {
+      "id": "mm-mago-348",
+      "nome": "Mago",
+      "pagina_pdf": 348,
+      "issues": [
+        "velocita",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-gigante-delle-pietre-158",
+      "nome": "Gigante Delle Pietre",
+      "pagina_pdf": 158,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Gigante Enorme, neutrale"
+    },
+    {
+      "id": "mm-slaad-blu-276",
+      "nome": "Slaad Blu",
+      "pagina_pdf": 276,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Aberrazione Grande, caotico neutrale"
+    },
+    {
+      "id": "mm-diavolo-delle-catene-75",
+      "nome": "Diavolo Delle Catene",
+      "pagina_pdf": 75,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Medio (diavolo), legale malvagio"
+    },
+    {
+      "id": "mm-fomorian-137",
+      "nome": "Fomorian",
+      "pagina_pdf": 137,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Gigante Enorme, caotico malvagio"
+    },
+    {
+      "id": "mm-githyanki-cavaliere-161",
+      "nome": "Githyanki Cavaliere",
+      "pagina_pdf": 161,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (gith), legale malvagio"
+    },
+    {
+      "id": "mm-diavolo-n-ossa-72",
+      "nome": "'DIAVOLO n'OssA",
+      "pagina_pdf": 72,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Grande (diavolo), legale malvagio"
+    },
+    {
+      "id": "mm-drago-dgento-giovane-106",
+      "nome": "Drago D�Gento Giovane",
+      "pagina_pdf": 106,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Grande, legale buono"
+    },
+    {
+      "id": "mm-gigante-del-fuoco-156",
+      "nome": "GIGANTE DEL Fuoco",
+      "pagina_pdf": 156,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Gigante Enorme, fegale malvagio"
+    },
+    {
+      "id": "mm-golem-di-argilla-169",
+      "nome": "Golem Di Argilla",
+      "pagina_pdf": 169,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Costrutto Grande, senza allineamento"
+    },
+    {
+      "id": "mm-drago-rosso-giovane-98",
+      "nome": "DRAGO Rosso GIOVANE",
+      "pagina_pdf": 98,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Grande, caotico malvagio"
+    },
+    {
+      "id": "mm-yochlol-65",
+      "nome": "Yochlol",
+      "pagina_pdf": 65,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Medio (demone, mutaforma), caotico malvagio"
+    },
+    {
+      "id": "mm-arcimago-342",
+      "nome": "Arcimago",
+      "pagina_pdf": 342,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento"
+    },
+    {
+      "id": "mm-drago-verde-adulto-101",
+      "nome": "Drago Verde Adulto",
+      "pagina_pdf": 101,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Enorme, legale malvagio"
+    },
+    {
+      "id": "mm-demilich-48",
+      "nome": "Demilich",
+      "pagina_pdf": 48,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Non morto Minuscolo, neutrale malvagio"
+    },
+    {
+      "id": "mm-balor-55",
+      "nome": "Balor",
+      "pagina_pdf": 55,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Immondo Enorme (demone), caotico malvagio"
+    },
+    {
+      "id": "mm-drago-bianco-antico-87",
+      "nome": "Drago Bianco Antico",
+      "pagina_pdf": 87,
+      "issues": [
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Mastodontico, caotico malvagio"
+    },
+    {
+      "id": "mm-mostro-196",
+      "nome": "",
+      "pagina_pdf": 196,
+      "issues": [
+        "name"
+      ],
+      "tipo_linea": "Non morto Medio, qualsiasi allineamento malvagio"
+    },
+    {
+      "id": "mm-anchilosauro-79",
+      "nome": "Anchilosauro",
+      "pagina_pdf": 79,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Bestia Enorme, senza allineamento"
+    },
+    {
+      "id": "mm-bug-bear-32",
+      "nome": "Bug Bear",
+      "pagina_pdf": 32,
+      "issues": [
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (goblinoide), caotico malvagio"
+    },
+    {
+      "id": "mm-capra-gigante-320",
+      "nome": "Capra Gigante",
+      "pagina_pdf": 320,
+      "issues": [
+        "velocita",
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Bestia Grande, senza allineamento"
+    },
+    {
+      "id": "mm-cultista-fanatico-346",
+      "nome": "Cultista Fanatico",
+      "pagina_pdf": 346,
+      "issues": [
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (qualsiasi razza), qualsiasi allineamento non buono"
+    },
+    {
+      "id": "mm-drago-n-oro-giovane-115",
+      "nome": "DRAGO n'ORO GIOVANE",
+      "pagina_pdf": 115,
+      "issues": [
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Grande, fllgalll buono"
+    },
+    {
+      "id": "mm-dao-146",
+      "nome": "Dao",
+      "pagina_pdf": 146,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Elementale Grande, neutrale malvagio"
+    },
+    {
+      "id": "mm-drago-di-rame-cucciolo-112",
+      "nome": "Drago Di Rame Cucciolo",
+      "pagina_pdf": 112,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Drago Medio, caotico buono"
+    },
+    {
+      "id": "mm-drago-nero-giovane-95",
+      "nome": "Drago Nero Giovane",
+      "pagina_pdf": 95,
+      "issues": [
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Drago Grande, caotico malvagio"
+    },
+    {
+      "id": "mm-duergar-122",
+      "nome": "Duergar",
+      "pagina_pdf": 122,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Umanoide Medio {nano), legale malvagio"
+    },
+    {
+      "id": "mm-elementale-del-fuoco-124",
+      "nome": "ELEMENTALE DEL Fuoco",
+      "pagina_pdf": 124,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Elementale Grande, neutrale"
+    },
+    {
+      "id": "mm-githyanki-combattente-161",
+      "nome": "Githyanki Combattente",
+      "pagina_pdf": 161,
+      "issues": [
+        "grado_sfida",
+        "caratteristiche"
+      ],
+      "tipo_linea": "Umanoide Medio (gith), legale malvagio"
+    },
+    {
+      "id": "mm-gobli-capo-167",
+      "nome": "Gobli� Capo",
+      "pagina_pdf": 167,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Umanoide Piccolo (goblinoide), neutrale mal11agio"
+    },
+    {
+      "id": "mm-ocre-240",
+      "nome": "Ocre",
+      "pagina_pdf": 240,
+      "issues": [
+        "velocita",
+        "grado_sfida"
+      ],
+      "tipo_linea": "Gigante Grande, qualsiasi allineamento caotico"
+    },
+    {
+      "id": "mm-quadrone-230",
+      "nome": "Quadrone",
+      "pagina_pdf": 230,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Costrutto Medio, legale neutrale"
+    },
+    {
+      "id": "mm-sciacallo-mannaro-269",
+      "nome": "Sciacallo Mannaro",
+      "pagina_pdf": 269,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Umanoide Medio (mutaforma), caotico malvagio"
+    },
+    {
+      "id": "mm-spaventapasseri-279",
+      "nome": "Spaventapasseri",
+      "pagina_pdf": 279,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Costrutto Medio, caotico malvagio"
+    },
+    {
+      "id": "mm-thri-kreen-287",
+      "nome": "Thri-Kreen",
+      "pagina_pdf": 287,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Umanoide Medio (thri-kreen), caotico neutrale"
+    },
+    {
+      "id": "mm-wraith-303",
+      "nome": "Wraith",
+      "pagina_pdf": 303,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Non morto Medio, neutrale malvagio"
+    },
+    {
+      "id": "mm-xorn-304",
+      "nome": "Xorn",
+      "pagina_pdf": 304,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Elementale Medio, neutrale"
+    },
+    {
+      "id": "mm-yuan-tisanguepuro-310",
+      "nome": "Yuan-Tisanguepuro",
+      "pagina_pdf": 310,
+      "issues": [
+        "grado_sfida"
+      ],
+      "tipo_linea": "Umanoide Medio (yuan-ti), neutrale malvagio"
+    },
+    {
+      "id": "mm-lmp-78",
+      "nome": "lMP",
+      "pagina_pdf": 78,
+      "issues": [
+        "name",
+        "grado_sfida"
+      ],
+      "tipo_linea": "Immondo Minuscolo (diavolo, mutaforma), legale malvagio"
+    }
+  ],
+  "sources": [
+    {
+      "id": "mm",
+      "source": "Manuale dei Mostri",
+      "source_short": "MM",
+      "file": "Manuale dei Mostri.pdf",
+      "language": "it",
+      "status": "pilot",
+      "exists": true,
+      "page_count": 353
+    },
+    {
+      "id": "vgm",
+      "source": "Volo's Guide to Monsters",
+      "source_short": "VGM",
+      "file": "Volo's Guide to Monsters.pdf",
+      "language": "en",
+      "status": "pending",
+      "exists": true,
+      "page_count": 226
+    },
+    {
+      "id": "mpmm",
+      "source": "Mordenkainen Presents: Monsters of the Multiverse",
+      "source_short": "MPMM",
+      "file": "mosters of the multiverse ita.pdf",
+      "language": "it",
+      "status": "pending",
+      "exists": true,
+      "page_count": 294
+    },
+    {
+      "id": "ftd",
+      "source": "Fizban's Treasury of Dragons",
+      "source_short": "FTD",
+      "file": "fizban ita.pdf",
+      "language": "it",
+      "status": "pending",
+      "exists": true,
+      "page_count": 115
+    },
+    {
+      "id": "erlw",
+      "source": "Eberron: Rising from the Last War",
+      "source_short": "ERLW",
+      "file": "Eberron -Rising from the Last War.pdf",
+      "language": "en",
+      "status": "pending",
+      "exists": true,
+      "page_count": 324
+    }
+  ]
+}
