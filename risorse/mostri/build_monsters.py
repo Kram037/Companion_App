@@ -196,6 +196,232 @@ SUMMON_NAME_IT = {
     "Tiny Servant": "Servitore Minuscolo",
 }
 
+ABILITY_NAMES_IT = {
+    "Strength": "Forza",
+    "Dexterity": "Destrezza",
+    "Constitution": "Costituzione",
+    "Intelligence": "Intelligenza",
+    "Wisdom": "Saggezza",
+    "Charisma": "Carisma",
+}
+
+COMMON_TRANSLATIONS = [
+    ("Melee or Ranged Spell Attack", "Attacco con incantesimo da mischia o a distanza"),
+    ("Melee or Ranged Weapon Attack", "Attacco con arma da mischia o a distanza"),
+    ("Melee Spell Attack", "Attacco con incantesimo da mischia"),
+    ("Ranged Spell Attack", "Attacco con incantesimo a distanza"),
+    ("Melee Weapon Attack", "Attacco con arma da mischia"),
+    ("Ranged Weapon Attack", "Attacco con arma a distanza"),
+    ("spell attack modifier", "modificatore di attacco con incantesimo"),
+    ("spell save DC", "CD del tiro salvezza degli incantesimi"),
+    ("to hit", "al tiro per colpire"),
+    ("reach", "portata"),
+    ("range", "gittata"),
+    ("Hit:", "Colpito:"),
+    ("one target", "un bersaglio"),
+    ("one creature", "una creatura"),
+    ("one willing creature", "una creatura consenziente"),
+    ("one prone creature", "una creatura prona"),
+    ("each creature", "ogni creatura"),
+    ("the target", "il bersaglio"),
+    ("The target", "Il bersaglio"),
+    ("target", "bersaglio"),
+    ("creature", "creatura"),
+    ("ally", "alleato"),
+    ("allies", "alleati"),
+    ("enemy", "nemico"),
+    ("enemies", "nemici"),
+    ("within", "entro"),
+    ("must succeed on", "deve superare"),
+    ("saving throw", "tiro salvezza"),
+    ("on a failed save", "se fallisce"),
+    ("on a successful save", "se supera il tiro salvezza"),
+    ("on a successful one", "se lo supera"),
+    ("or half as much damage on a successful one", "o la meta dei danni se lo supera"),
+    ("damage", "danni"),
+    ("hit points", "punti ferita"),
+    ("hit point", "punto ferita"),
+    ("temporary hit points", "punti ferita temporanei"),
+    ("at the start of each of its turns", "all'inizio di ciascun suo turno"),
+    ("at the start of its turn", "all'inizio del suo turno"),
+    ("at the end of each of its turns", "alla fine di ciascun suo turno"),
+    ("until the start of its next turn", "fino all'inizio del suo prossimo turno"),
+    ("until the end of its next turn", "fino alla fine del suo prossimo turno"),
+    ("for 1 minute", "per 1 minuto"),
+    ("for 1 hour", "per 1 ora"),
+    ("is incapacitated", "e' incapacitato"),
+    ("isn't incapacitated", "non e' incapacitato"),
+    ("can't regain hit points", "non puo' recuperare punti ferita"),
+    ("can't speak", "non puo' parlare"),
+    ("can see", "puo' vedere"),
+    ("that it can see", "che puo' vedere"),
+    ("that can hear it", "che puo' sentirlo"),
+    ("against spells and other magical effects", "contro incantesimi e altri effetti magici"),
+    ("has advantage on", "ha vantaggio a"),
+    ("has disadvantage on", "ha svantaggio a"),
+    ("attack rolls", "tiri per colpire"),
+    ("ability checks", "prove di caratteristica"),
+    ("checks", "prove"),
+    ("saving throws", "tiri salvezza"),
+    ("weapon attack", "attacco con arma"),
+    ("spell attack", "attacco con incantesimo"),
+    ("half as much damage", "la meta dei danni"),
+    ("only half damage", "solo meta dei danni"),
+    ("plus", "piu"),
+    ("and", "e"),
+    ("or", "o"),
+    ("magical", "magico"),
+    ("nonmagical", "non magico"),
+    ("At will:", "A volonta:"),
+    ("Cantrips (at will):", "Trucchetti (a volonta):"),
+    ("1/day each:", "1/giorno ciascuno:"),
+    ("2/day each:", "2/giorno ciascuno:"),
+    ("3/day each:", "3/giorno ciascuno:"),
+    ("1/day:", "1/giorno:"),
+    ("2/day:", "2/giorno:"),
+    ("3/day:", "3/giorno:"),
+    ("1st level", "1° livello"),
+    ("2nd level", "2° livello"),
+    ("3rd level", "3° livello"),
+    ("4th level", "4° livello"),
+    ("5th level", "5° livello"),
+    ("6th level", "6° livello"),
+    ("7th level", "7° livello"),
+    ("8th level", "8° livello"),
+    ("9th level", "9° livello"),
+]
+
+TITLE_TRANSLATIONS = {
+    "Multiattack": "Multiattacco",
+    "Spellcasting": "Incantesimi",
+    "Innate Spellcasting": "Incantesimi Innati",
+    "Magic Resistance": "Resistenza alla Magia",
+    "Magic Weapons": "Armi Magiche",
+    "Legendary Resistance": "Resistenza Leggendaria",
+    "Keen Hearing and Smell": "Udito e Olfatto Acuti",
+    "Keen Sight": "Vista Acuta",
+    "Keen Smell": "Olfatto Acuto",
+    "Pack Tactics": "Tattiche di Branco",
+    "Pounce": "Balzo",
+    "Charge": "Carica",
+    "Amphibious": "Anfibio",
+    "Regeneration": "Rigenerazione",
+    "Spider Climb": "Movimenti del Ragno",
+    "Sunlight Sensitivity": "Sensibilita alla Luce del Sole",
+    "Bite": "Morso",
+    "Claw": "Artiglio",
+    "Claws": "Artigli",
+    "Slam": "Schianto",
+    "Tail": "Coda",
+    "Sting": "Pungiglione",
+    "Hooves": "Zoccoli",
+    "Horns": "Corna",
+    "Beak": "Becco",
+    "Talons": "Artigli",
+    "Longsword": "Spada Lunga",
+    "Shortsword": "Spada Corta",
+    "Scimitar": "Scimitarra",
+    "Dagger": "Pugnale",
+    "Spear": "Lancia",
+    "Javelin": "Giavellotto",
+    "Longbow": "Arco Lungo",
+    "Shortbow": "Arco Corto",
+    "Club": "Randello",
+    "Greatclub": "Randello Pesante",
+    "Rock": "Roccia",
+    "Fist": "Pugno",
+    "Ray": "Raggio",
+    "Teleport": "Teletrasporto",
+    "Attack": "Attacco",
+    "Move": "Movimento",
+}
+
+DAMAGE_TRANSLATIONS = {
+    "acid": "acido",
+    "bludgeoning": "contundenti",
+    "cold": "da freddo",
+    "fire": "da fuoco",
+    "force": "da forza",
+    "lightning": "da fulmine",
+    "necrotic": "necrotici",
+    "piercing": "perforanti",
+    "poison": "da veleno",
+    "psychic": "psichici",
+    "radiant": "radiosi",
+    "slashing": "taglienti",
+    "thunder": "da tuono",
+}
+
+CONDITION_TRANSLATIONS = {
+    "blinded": "accecato",
+    "charmed": "affascinato",
+    "deafened": "assordato",
+    "exhaustion": "indebolimento",
+    "frightened": "spaventato",
+    "grappled": "afferrato",
+    "incapacitated": "incapacitato",
+    "invisible": "invisibile",
+    "paralyzed": "paralizzato",
+    "petrified": "pietrificato",
+    "poisoned": "avvelenato",
+    "prone": "prono",
+    "restrained": "trattenuto",
+    "stunned": "stordito",
+    "unconscious": "privo di sensi",
+}
+
+SENSE_TRANSLATIONS = {
+    "blindsight": "vista cieca",
+    "darkvision": "scurovisione",
+    "tremorsense": "percezione tellurica",
+    "truesight": "vista pura",
+    "passive Perception": "Percezione passiva",
+}
+
+LANGUAGE_TRANSLATIONS = {
+    "Abyssal": "Abissale",
+    "Aquan": "Aquan",
+    "Auran": "Auran",
+    "Celestial": "Celestiale",
+    "Common": "Comune",
+    "Deep Speech": "Gergo delle Profondita",
+    "Draconic": "Draconico",
+    "Dwarvish": "Nanico",
+    "Elvish": "Elfico",
+    "Giant": "Gigante",
+    "Gnomish": "Gnomesco",
+    "Goblin": "Goblin",
+    "Ignan": "Ignan",
+    "Infernal": "Infernale",
+    "Orc": "Orchesco",
+    "Primordial": "Primordiale",
+    "Sylvan": "Silvano",
+    "Terran": "Terran",
+    "Undercommon": "Sottocomune",
+    "telepathy": "telepatia",
+    "understands": "comprende",
+    "but can't speak": "ma non parla",
+    "any one language": "un linguaggio qualsiasi",
+    "any two languages": "due linguaggi qualsiasi",
+    "all": "tutti",
+    "all the languages it knew in life": "tutti i linguaggi che conosceva in vita",
+    "the languages you speak": "i linguaggi che parli",
+    "the languages it knew in life": "i linguaggi che conosceva in vita",
+}
+
+SPEED_TRANSLATIONS = {
+    "fly": "volare",
+    "swim": "nuotare",
+    "climb": "scalare",
+    "burrow": "scavare",
+    "hover": "fluttuare",
+    "when rolling": "quando rotola",
+    "rolling downhill": "rotolando in discesa",
+}
+
+_SPELL_TRANSLATIONS = None
+_SPELL_PATTERN = None
+
 
 def normalize_spaces(value):
     value = str(value or "").replace("\u00a0", " ").replace("´", "'")
@@ -207,6 +433,230 @@ def slugify(value):
     text = "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
     text = re.sub(r"[^a-zA-Z0-9]+", "-", text.lower()).strip("-")
     return text or "monster"
+
+
+def spell_translations():
+    global _SPELL_TRANSLATIONS
+    if _SPELL_TRANSLATIONS is not None:
+        return _SPELL_TRANSLATIONS
+    path = ROOT / "risorse" / "incantesimi" / "spells.json"
+    translations = {}
+    if path.exists():
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for spell in data.values():
+            name = normalize_spaces(spell.get("name"))
+            name_en = normalize_spaces(spell.get("name_en"))
+            if name and name_en:
+                translations[name_en.lower()] = name
+    _SPELL_TRANSLATIONS = translations
+    return translations
+
+
+def spell_pattern():
+    global _SPELL_PATTERN
+    if _SPELL_PATTERN is not None:
+        return _SPELL_PATTERN
+    keys = sorted(spell_translations(), key=len, reverse=True)
+    if not keys:
+        _SPELL_PATTERN = re.compile(r"a^")
+    else:
+        _SPELL_PATTERN = re.compile(r"(?<![A-Za-z])(" + "|".join(re.escape(key) for key in keys) + r")(?![A-Za-z])", re.I)
+    return _SPELL_PATTERN
+
+
+def meters_from_feet(value):
+    meters = float(value) * 0.3
+    if abs(meters - round(meters)) < 0.0001:
+        return str(int(round(meters)))
+    return f"{meters:.1f}".replace(".", ",")
+
+
+def convert_feet_to_meters(value):
+    text = str(value or "")
+    text = re.sub(r"\b(\d+)O\s*ft\.?", lambda m: f"{m.group(1)}0 ft.", text)
+
+    def range_repl(match):
+        return f"{meters_from_feet(match.group(1))}/{meters_from_feet(match.group(2))} m"
+
+    def foot_repl(match):
+        suffix = "metri" if match.group(2) else "m"
+        return f"{meters_from_feet(match.group(1))} {suffix}"
+
+    text = re.sub(r"\b(\d+)\s*-\s*to\s+(\d+)\s*-\s*foot\b", lambda m: f"{meters_from_feet(m.group(1))}-{meters_from_feet(m.group(2))} metri", text, flags=re.I)
+    text = re.sub(r"\b(\d+)\s*/\s*(\d+)\s*ft\.?", range_repl, text, flags=re.I)
+    text = re.sub(r"\b(\d+)\s*-\s*foot\b", lambda m: f"{meters_from_feet(m.group(1))} metri", text, flags=re.I)
+    text = re.sub(r"\b(\d+)\s*(feet|foot)\b", foot_repl, text, flags=re.I)
+    text = re.sub(r"\b(\d+)\s*ft\.?", lambda m: f"{meters_from_feet(m.group(1))} m", text, flags=re.I)
+    text = replace_case_insensitive(text, "every foot", "ogni 30 cm")
+    text = replace_case_insensitive(text, "number of feet", "numero di metri")
+    text = replace_case_insensitive(text, "feet", "metri")
+    text = replace_case_insensitive(text, "foot", "30 cm")
+    return text
+
+
+def replace_case_insensitive(text, source, target):
+    escaped = re.escape(source)
+    if re.match(r"^\w", source) and re.search(r"\w$", source):
+        pattern = rf"\b{escaped}\b"
+    else:
+        pattern = escaped
+    return re.sub(pattern, target, text, flags=re.I)
+
+
+def translate_spell_names(text):
+    if not re.search(r"\b(spell|spells|spellcasting|Cantrips|At will|\d/day)\b", text, re.I):
+        return text
+    translations = spell_translations()
+    return spell_pattern().sub(lambda match: translations.get(match.group(1).lower(), match.group(1)), text)
+
+
+def translate_title(title):
+    clean = normalize_spaces(title).rstrip(".")
+    suffix = ""
+    match = re.match(r"^(.+?)(\s*\([^)]*\))$", clean)
+    if match:
+        clean, suffix = match.groups()
+    translated = TITLE_TRANSLATIONS.get(clean, clean)
+    return f"{translated}{suffix}."
+
+
+def translate_bold_titles(text):
+    def repl(match):
+        return f"**{translate_title(match.group(1))}**"
+
+    return re.sub(r"\*\*([^*]+?)\.\*\*", repl, text)
+
+
+def translate_saving_throws(text):
+    def repl(match):
+        ability = ABILITY_NAMES_IT.get(match.group(2), match.group(2))
+        return f"tiro salvezza su {ability} CD {match.group(1)}"
+
+    return re.sub(
+        r"DC\s+(\d+)\s+(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\s+saving throw",
+        repl,
+        text,
+        flags=re.I,
+    )
+
+
+def translate_word_map(text, mapping):
+    result = text
+    for source, target in sorted(mapping.items(), key=lambda item: len(item[0]), reverse=True):
+        result = replace_case_insensitive(result, source, target)
+    return result
+
+
+def translate_damage_phrases(text):
+    result = text
+    for source, target in sorted(DAMAGE_TRANSLATIONS.items(), key=lambda item: len(item[0]), reverse=True):
+        result = re.sub(
+            rf"\b{re.escape(source)}\s+damage\b",
+            f"danni {target}",
+            result,
+            flags=re.I,
+        )
+    return result
+
+
+def translate_common_text(value):
+    text = convert_feet_to_meters(str(value or ""))
+    text = translate_spell_names(text)
+    text = translate_bold_titles(text)
+    text = translate_saving_throws(text)
+    text = translate_damage_phrases(text)
+    text = re.sub(r"\btakes? ([^.;]*?danni[^.;]*)", r"subisce \1", text, flags=re.I)
+    text = re.sub(r"\btaking ([^.;]*?danni[^.;]*)", r"subendo \1", text, flags=re.I)
+    for source, target in sorted(COMMON_TRANSLATIONS, key=lambda item: len(item[0]), reverse=True):
+        text = replace_case_insensitive(text, source, target)
+    text = translate_word_map(text, DAMAGE_TRANSLATIONS)
+    text = translate_word_map(text, CONDITION_TRANSLATIONS)
+    text = re.sub(r"\s+([,.;:)])", r"\1", text)
+    text = re.sub(r"\(\s+", "(", text)
+    return text
+
+
+def translate_inline_field(value, mapping=None):
+    text = convert_feet_to_meters(str(value or ""))
+    if mapping:
+        text = translate_word_map(text, mapping)
+    text = translate_word_map(text, DAMAGE_TRANSLATIONS)
+    text = translate_word_map(text, CONDITION_TRANSLATIONS)
+    return text
+
+
+def translate_monster(monster):
+    monster["tipo_linea"] = translate_inline_field(monster.get("tipo_linea"), {**SIZE_IT, **TYPE_IT})
+    monster["allineamento"] = translate_alignment_label(monster.get("allineamento"))
+    monster["classe_armatura"] = translate_inline_field(monster.get("classe_armatura"), {"natural armor": "armatura naturale"})
+    monster["punti_ferita"] = translate_inline_field(monster.get("punti_ferita"))
+    monster["velocita"] = translate_inline_field(monster.get("velocita"), SPEED_TRANSLATIONS)
+    monster["tiri_salvezza_testo"] = translate_saves_label(monster.get("tiri_salvezza_testo"))
+    monster["abilita_testo"] = translate_skills_label(monster.get("abilita_testo"))
+    monster["vulnerabilita_testo"] = translate_inline_field(monster.get("vulnerabilita_testo"))
+    monster["resistenze_testo"] = translate_inline_field(monster.get("resistenze_testo"))
+    monster["immunita_danni_testo"] = translate_inline_field(monster.get("immunita_danni_testo"))
+    monster["immunita_condizioni_testo"] = translate_inline_field(monster.get("immunita_condizioni_testo"))
+    monster["sensi"] = translate_inline_field(monster.get("sensi"), SENSE_TRANSLATIONS)
+    monster["linguaggi"] = translate_inline_field(monster.get("linguaggi"), LANGUAGE_TRANSLATIONS)
+    for key in ("tratti", "azioni", "azioni_bonus", "reazioni", "azioni_leggendarie", "azioni_mitiche", "azioni_tana"):
+        monster[key] = translate_common_text(monster.get(key))
+    return monster
+
+
+def translate_alignment_label(value):
+    clean = normalize_spaces(value)
+    replacements = {
+        "lawful good": "legale buono",
+        "neutral good": "neutrale buono",
+        "chaotic good": "caotico buono",
+        "lawful neutral": "legale neutrale",
+        "neutral evil": "neutrale malvagio",
+        "lawful evil": "legale malvagio",
+        "chaotic evil": "caotico malvagio",
+        "chaotic neutral": "caotico neutrale",
+        "neutral": "neutrale",
+        "unaligned": "senza allineamento",
+        "any alignment": "qualsiasi allineamento",
+        "typically": "tipicamente",
+        "usually": "solitamente",
+    }
+    result = clean
+    for source, target in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
+        result = replace_case_insensitive(result, source, target)
+    return result
+
+
+def translate_saves_label(value):
+    text = normalize_spaces(value)
+    for source, target in SAVE_IT.items():
+        text = replace_case_insensitive(text, source, target)
+    return text
+
+
+def translate_skills_label(value):
+    text = normalize_spaces(value)
+    skills = {
+        "Acrobatics": "Acrobazia",
+        "Animal Handling": "Addestrare Animali",
+        "Arcana": "Arcano",
+        "Athletics": "Atletica",
+        "Deception": "Inganno",
+        "History": "Storia",
+        "Insight": "Intuizione",
+        "Intimidation": "Intimidire",
+        "Investigation": "Indagare",
+        "Medicine": "Medicina",
+        "Nature": "Natura",
+        "Perception": "Percezione",
+        "Performance": "Intrattenere",
+        "Persuasion": "Persuasione",
+        "Religion": "Religione",
+        "Sleight of Hand": "Rapidita di Mano",
+        "Stealth": "Furtivita",
+        "Survival": "Sopravvivenza",
+    }
+    return translate_word_map(text, skills)
 
 
 def source_short(source):
@@ -540,6 +990,8 @@ def format_section(lines, monster_name, trim_tail=True):
         if trim_tail and seen_entry and current.rstrip().endswith(".") and not entry_title_match(line) and not is_rules_continuation(line):
             break
         match = entry_title_match(line)
+        if match and current and not current.rstrip().endswith((".", "!", "?", ")", "]")):
+            match = None
         if match:
             if current:
                 paragraphs.append(current.strip())
@@ -659,9 +1111,9 @@ def parse_block(block):
         monster["spell_name_en"] = spell_name_en
         monster["spell_name"] = SPELL_NAME_IT.get(spell_name_en, spell_name_en.title())
         monster["id"] = slugify(f"{monster['spell_name']}-{display_name}")
-        return monster, "summon"
+        return translate_monster(monster), "summon"
 
-    return monster, "monster"
+    return translate_monster(monster), "monster"
 
 
 def challenge_sort_key(value):

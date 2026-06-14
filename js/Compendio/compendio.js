@@ -1229,8 +1229,20 @@ function _compMonsterTextSection(title, text) {
     if (!text || !String(text).trim()) return '';
     return `<section class="comp-detail-section">
         <h3>${escapeHtml(title)}</h3>
-        <div class="comp-rich comp-monster-text">${_compRich(text)}</div>
+        <div class="comp-rich comp-monster-text">${_compMonsterRich(text)}</div>
     </section>`;
+}
+
+function _compMonsterRich(text) {
+    const raw = String(text || '').trim();
+    if (!raw) return '<p>Nessuna descrizione disponibile.</p>';
+    return raw.split(/\n{2,}/)
+        .map(paragraph => _compRich(paragraph, { linkSpells: _compMonsterParagraphHasSpellList(paragraph) }))
+        .join('');
+}
+
+function _compMonsterParagraphHasSpellList(text) {
+    return /\*\*(Incantesimi|Incantesimi Innati|Spellcasting|Innate Spellcasting)[^*]*\.\*\*/i.test(String(text || ''));
 }
 
 function _compClassDetail(cls) {
@@ -3044,7 +3056,7 @@ function _compRich(text, options = {}) {
     const html = typeof window.formatRichText === 'function'
         ? window.formatRichText(raw)
         : raw.split(/\n{2,}/).map(p => `<p>${escapeHtml(p)}</p>`).join('');
-    if (options.linkSpells === false) return html;
+    if (options.linkSpells !== true) return html;
     return _compLinkSpellRefs(html);
 }
 
