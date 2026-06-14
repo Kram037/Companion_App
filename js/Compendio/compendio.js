@@ -182,6 +182,117 @@ const COMP_CLASS_LABELS = {
     warlock: { it: 'Warlock', en: 'Warlock' },
 };
 
+const COMP_CLASS_UTILITY_TABLES = {
+    chierico: [
+        {
+            title: 'Distruggere Non Morti',
+            columns: ['Livello da chierico', 'GS distrutti'],
+            rows: [
+                ['5', '1/2 o inferiore'],
+                ['8', '1 o inferiore'],
+                ['11', '2 o inferiore'],
+                ['14', '3 o inferiore'],
+                ['17', '4 o inferiore'],
+            ],
+        },
+    ],
+    druido: [
+        {
+            title: 'Forme Bestiali',
+            columns: ['Livello da druido', 'GS massimo', 'Limitazioni'],
+            rows: [
+                ['2', '1/4', 'Nessuna velocita di volare o nuotare'],
+                ['4', '1/2', 'Nessuna velocita di volare'],
+                ['8', '1', 'Nessuna'],
+            ],
+        },
+    ],
+    stregone: [
+        {
+            title: 'Creare Slot Incantesimo',
+            columns: ['Livello slot', 'Costo in punti stregoneria'],
+            rows: [
+                ['1°', '2'],
+                ['2°', '3'],
+                ['3°', '5'],
+                ['4°', '6'],
+                ['5°', '7'],
+            ],
+        },
+    ],
+};
+
+const COMP_CLASS_DETAIL_LISTS = {
+    stregone: [
+        {
+            title: 'Opzioni di Metamagia',
+            items: [
+                ['Incantesimo Accurato', 'Proteggi alcune creature dagli effetti pieni di un incantesimo che richiede un tiro salvezza.'],
+                ['Incantesimo Distante', 'Aumenta la gittata di un incantesimo, oppure trasforma contatto in una gittata di 9 metri.'],
+                ['Incantesimo Esteso', 'Raddoppia la durata di un incantesimo con durata di almeno 1 minuto, fino a 24 ore.'],
+                ['Incantesimo Gemellato', 'Fa bersagliare una seconda creatura a un incantesimo idoneo che normalmente bersaglia una sola creatura.'],
+                ['Incantesimo Intensificato', 'Imponi svantaggio al primo tiro salvezza di un bersaglio contro l\'incantesimo.'],
+                ['Incantesimo Potenziato', 'Ritira alcuni dadi di danno di un incantesimo.'],
+                ['Incantesimo Rapido', 'Trasforma il tempo di lancio di 1 azione in 1 azione bonus.'],
+                ['Incantesimo Silenzioso', 'Lancia un incantesimo senza componenti somatiche o verbali.'],
+                ['Incantesimo Cercatore (TCoE)', 'Ritira un attacco con incantesimo mancato.'],
+                ['Incantesimo Tramutato (TCoE)', 'Cambia il tipo di danno di un incantesimo idoneo.'],
+            ],
+        },
+    ],
+};
+
+const COMP_SUBCLASS_UTILITY_TABLES = {
+    'way-of-the-four-elements': [
+        {
+            title: 'Discipline Elementali',
+            columns: ['Disciplina', 'Prerequisito', 'Uso'],
+            rows: [
+                ['Sintonia Elementale', '-', 'Effetti elementali minori e utilita narrativa.'],
+                ['Artigli del Serpente di Fuoco', '-', "Portata aumentata e danni da fuoco con colpi senz'armi."],
+                ["Pugno dell'Aria Infranta", '-', 'Danni contundenti e spinta su tiro salvezza fallito.'],
+                ["Frusta d'Acqua", '-', 'Danni contundenti, trascina o butta a terra il bersaglio.'],
+                ['Forma del Fiume', '-', 'Manipola acqua e ghiaccio entro i limiti della disciplina.'],
+                ['Assalto dei Tizzoni Ardenti', '-', 'Lancia mani brucianti spendendo punti ki.'],
+                ['Pugno dei Quattro Tuoni', '-', 'Lancia onda tonante spendendo punti ki.'],
+                ['Soffio del Vento', '-', 'Lancia folata di vento spendendo punti ki.'],
+                ['Morsa del Vento del Nord', '6° livello', 'Lancia blocca persone spendendo punti ki.'],
+                ['Gong della Vetta', '6° livello', 'Lancia frantumare spendendo punti ki.'],
+                ['Fiamme della Fenice', '11° livello', 'Lancia palla di fuoco spendendo punti ki.'],
+                ['Cavalcare il Vento', '11° livello', 'Lancia volare su te stesso spendendo punti ki.'],
+                ['Posizione della Nebbia', '11° livello', 'Lancia forma gassosa spendendo punti ki.'],
+                ['Difesa della Montagna Eterna', '17° livello', 'Lancia pelle di pietra su te stesso spendendo punti ki.'],
+                ['Fiume di Fiamme Affamate', '17° livello', 'Lancia muro di fuoco spendendo punti ki.'],
+                ['Onda della Terra Rotolante', '17° livello', 'Lancia muro di pietra spendendo punti ki.'],
+                ['Respiro dell Inverno', '17° livello', 'Lancia cono di freddo spendendo punti ki.'],
+            ],
+        },
+    ],
+};
+
+const COMP_CLASS_STATBLOCK_LINKS = {
+    artefice: [
+        { monster: 'Homunculus Servant', label: 'Servitore Omuncolo' },
+    ],
+};
+
+const COMP_SUBCLASS_STATBLOCK_LINKS = {
+    'battle-smith': [
+        { monster: 'Steel Defender', label: 'Difensore d Acciaio' },
+    ],
+    'beast-master': [
+        { monster: 'Beast of the Land', label: 'Bestia della Terra' },
+        { monster: 'Beast of the Sea', label: 'Bestia del Mare' },
+        { monster: 'Beast of the Sky', label: 'Bestia del Cielo' },
+    ],
+    'circle-of-wildfire': [
+        { monster: 'Wildfire Spirit', label: 'Spirito della Fiamma' },
+    ],
+    drakewarden: [
+        { monster: 'Drake Companion', label: 'Compagno Draconico' },
+    ],
+};
+
 const COMP_ARTIFICER_SPELLS = window.COMPANION_ARTIFICER_SPELLS = new Set([
     'absorb elements',
     'acid splash',
@@ -1150,17 +1261,15 @@ function _compDetailHtml(item) {
 
 function _compMonsterDetail(monster) {
     const source = [monster.fonte_breve || monster.fonte, monster.pagina_pdf ? `pag. ${monster.pagina_pdf}` : ''].filter(Boolean).join(' - ');
+    const challenge = `${_compMonsterChallengeLabel(monster.grado_sfida)}${monster.pe ? ` (${monster.pe})` : ''}`;
     return `
-        ${_compBoxes([
-            ['Fonte', source],
-            ['Grado sfida', `${_compMonsterChallengeLabel(monster.grado_sfida)}${monster.pe ? ` (${monster.pe})` : ''}`],
+        ${_compMonsterSummaryBoxes([
             ['Tipo', monster.tipo_linea || monster.tipo],
             ['Allineamento', monster.allineamento || monster.allineamento_breve],
-        ])}
-        ${_compBoxes([
             ['Classe Armatura', monster.classe_armatura],
             ['Punti Ferita', monster.punti_ferita],
             ['Velocita', monster.velocita],
+            ['Grado sfida', challenge],
         ])}
         ${_compMonsterAbilitiesTable(monster.caratteristiche)}
         ${_compMonsterFactsSection(monster)}
@@ -1171,7 +1280,13 @@ function _compMonsterDetail(monster) {
         ${_compMonsterTextSection('Azioni leggendarie', monster.azioni_leggendarie)}
         ${_compMonsterTextSection('Azioni mitiche', monster.azioni_mitiche)}
         ${_compMonsterTextSection('Azioni di tana', monster.azioni_tana)}
+        ${source ? `<div class="comp-monster-source">Fonte: ${escapeHtml(source)}</div>` : ''}
     `;
+}
+
+function _compMonsterSummaryBoxes(boxes) {
+    const html = _compBoxes(boxes);
+    return html.replace('comp-detail-grid', 'comp-detail-grid comp-monster-summary-grid');
 }
 
 function _compMonsterAbilitiesTable(abilities) {
@@ -1268,6 +1383,8 @@ function _compClassDetail(cls) {
             ])}
         </section>
         ${_compClassProgressionSection(cls)}
+        ${_compClassUtilitySections(cls)}
+        ${_compLinkedStatblocksSection(_compClassStatblockLinks(cls))}
         <section class="comp-detail-section">
             <h3>Competenze iniziali</h3>
             <div class="comp-rich">${_compRich(_compField(cls, 'prof_skills') || '')}</div>
@@ -2498,6 +2615,8 @@ function _compSubclassAccordionHtml(clsId, sub, showTasha = false) {
         <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
             ${_compSubclassSpellListSection(clsId, sub, spellRows)}
+            ${_compSubclassUtilitySections(sub)}
+            ${_compLinkedStatblocksSection(_compSubclassStatblockLinks(sub))}
             ${_compFeaturesSection(features)}
         </div>
     </section>`;
@@ -2517,6 +2636,73 @@ function _compSubclassOpenKey(clsId, subId) {
 
 function _compClassId(cls) {
     return String(cls?.slug || cls?.name_en || cls?.name || 'classe');
+}
+
+function _compClassCanonicalKey(cls) {
+    return _compClassKey(cls?.slug || cls?.name || cls?.name_en || '');
+}
+
+function _compSubclassKey(sub) {
+    return _compLookupKey(sub?.slug || sub?.name_en || sub?.name || '').replace(/\s+/g, '-');
+}
+
+function _compClassUtilitySections(cls) {
+    const key = _compClassCanonicalKey(cls);
+    return [
+        _compUtilityTableSections(COMP_CLASS_UTILITY_TABLES[key]),
+        _compDetailListSections(COMP_CLASS_DETAIL_LISTS[key]),
+    ].filter(Boolean).join('');
+}
+
+function _compSubclassUtilitySections(sub) {
+    return _compUtilityTableSections(COMP_SUBCLASS_UTILITY_TABLES[_compSubclassKey(sub)]);
+}
+
+function _compUtilityTableSections(tables) {
+    if (!Array.isArray(tables) || !tables.length) return '';
+    return tables.map(table => {
+        const columns = Array.isArray(table.columns) ? table.columns : [];
+        const rows = Array.isArray(table.rows) ? table.rows : [];
+        if (!columns.length || !rows.length) return '';
+        return `<section class="comp-detail-section">
+            <h3>${escapeHtml(table.title || 'Tabella')}</h3>
+            <div class="comp-table-wrap comp-utility-table-wrap">
+                <table class="comp-utility-table">
+                    <thead>
+                        <tr>${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `<tr>${columns.map((_, index) => `<td>${escapeHtml(row[index] ?? '')}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </section>`;
+    }).filter(Boolean).join('');
+}
+
+function _compDetailListSections(sections) {
+    if (!Array.isArray(sections) || !sections.length) return '';
+    return sections.map(section => {
+        const items = Array.isArray(section.items) ? section.items : [];
+        if (!items.length) return '';
+        return `<section class="comp-detail-section">
+            <h3>${escapeHtml(section.title || 'Dettagli')}</h3>
+            <div class="comp-feature-list comp-reference-list">
+                ${items.map(([title, text]) => `<article class="comp-feature">
+                    <h4 class="comp-feature-title">${escapeHtml(title || '')}</h4>
+                    <div class="comp-rich"><p>${escapeHtml(text || '')}</p></div>
+                </article>`).join('')}
+            </div>
+        </section>`;
+    }).filter(Boolean).join('');
+}
+
+function _compClassStatblockLinks(cls) {
+    return COMP_CLASS_STATBLOCK_LINKS[_compClassCanonicalKey(cls)] || [];
+}
+
+function _compSubclassStatblockLinks(sub) {
+    return COMP_SUBCLASS_STATBLOCK_LINKS[_compSubclassKey(sub)] || [];
 }
 
 function _compShowTashaFeatures(clsId) {
@@ -2671,6 +2857,8 @@ function _compFeatureDetail(title, subtitle, features, data) {
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
         ${_compClassProgressionSection(data, 'Progressione incantesimi')}
         ${_compSubclassSpellListSection(clsId, data, spellRows)}
+        ${_compSubclassUtilitySections(data)}
+        ${_compLinkedStatblocksSection(_compSubclassStatblockLinks(data))}
         ${_compFeaturesSection(visibleFeatures)}
     `;
 }
@@ -2856,10 +3044,9 @@ function _compSpellSummonsSection(sp) {
     const blocks = _compSpellSummonsFor(sp);
     if (!blocks.length) return '';
     return `<section class="comp-detail-section comp-summon-statblock-section">
-        <h3>Statblock evocati</h3>
         <div class="comp-summon-statblock-list">
             ${blocks.map(block => `
-                <button type="button" class="scheda-tag comp-summon-statblock-link" onclick="compendioOpenSummonStatblock('${_compEscapeAttr(block.id)}')">
+                <button type="button" class="comp-statblock-link comp-summon-statblock-link" onclick="compendioOpenSummonStatblock('${_compEscapeAttr(block.id)}')">
                     ${escapeHtml(block.nome || block.nome_en || 'Statblock')}
                 </button>
             `).join('')}
@@ -2879,6 +3066,41 @@ function _compSpellSummonsFor(sp) {
         const blockKeys = [block.spell_name, block.spell_name_en].map(_compLookupKey).filter(Boolean);
         return blockKeys.some(key => spellKeys.includes(key));
     });
+}
+
+function _compLinkedStatblocksSection(links, title = 'Statblock collegati') {
+    const blocks = (Array.isArray(links) ? links : [])
+        .map(link => {
+            const block = _compFindMonsterStatblock(link.monster || link.name || link.id);
+            if (!block) return null;
+            return {
+                block,
+                label: link.label || block.nome || block.nome_en || 'Statblock',
+            };
+        })
+        .filter(Boolean);
+    if (!blocks.length) return '';
+    return `<section class="comp-detail-section comp-linked-statblock-section">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="comp-summon-statblock-list">
+            ${blocks.map(({ block, label }) => `
+                <button type="button" class="comp-statblock-link" onclick="compendioOpenLinkedStatblock('${_compEscapeAttr(block.id)}')">
+                    ${escapeHtml(label)}
+                </button>
+            `).join('')}
+        </div>
+    </section>`;
+}
+
+function _compFindMonsterStatblock(value) {
+    const ref = String(value || '').trim();
+    if (!ref) return null;
+    const key = _compLookupKey(ref);
+    return (COMP_MONSTERS_DATA || []).find(monster => (
+        String(monster.id || '') === ref ||
+        _compLookupKey(monster.nome) === key ||
+        _compLookupKey(monster.nome_en) === key
+    )) || null;
 }
 
 function _compSimpleDetail(item, boxes) {
@@ -2939,7 +3161,7 @@ function _compBoxValueHtml(value, preferList = false) {
 }
 
 function _compClassProgressionSection(cls, title = 'Progressione di classe') {
-    const rows = Array.isArray(cls.level_table) ? cls.level_table : [];
+    const rows = _compClassProgressionRows(cls);
     const columns = _compClassProgressionColumns(rows);
     const hasProgressionColumns = columns.some(key => key !== 'Level');
     if (!rows.length || !hasProgressionColumns) return '';
@@ -2966,10 +3188,30 @@ function _compClassProgressionSection(cls, title = 'Progressione di classe') {
     </section>`;
 }
 
+function _compClassProgressionRows(cls) {
+    const rows = Array.isArray(cls?.level_table) ? cls.level_table : [];
+    const key = _compClassCanonicalKey(cls);
+    if (key !== 'bardo') return rows;
+    return rows.map(row => ({
+        ...row,
+        'Bardic Inspiration': _compBardicInspirationDie(row?._level || row?.Level),
+    }));
+}
+
+function _compBardicInspirationDie(level) {
+    const numeric = Number(String(level || '').match(/\d+/)?.[0] || 0);
+    if (numeric >= 15) return 'd12';
+    if (numeric >= 10) return 'd10';
+    if (numeric >= 5) return 'd8';
+    if (numeric >= 1) return 'd6';
+    return '';
+}
+
 function _compClassProgressionColumns(rows) {
     if (!rows.length) return [];
     const preferred = [
         'Level',
+        'Bardic Inspiration',
         'Rages', 'Rage Damage', 'Sneak Attack', 'Martial Arts', 'Ki Points', 'Unarmored Movement',
         'Infusions Known', 'Infused Items',
         'Sorcery Points', 'Cantrips Known', 'Spells Known',
@@ -2999,7 +3241,7 @@ function _compIsSpellSlotColumn(key) {
 function _compProgressionColumnClass(key) {
     if (key === 'Level') return 'comp-level-col-level';
     if (_compIsSpellSlotColumn(key)) return 'comp-level-col-slot';
-    if (['Rages', 'Infused Items', 'Sorcery Points', 'Ki Points', 'Cantrips Known', 'Spell Slots'].includes(key)) return 'comp-level-col-short';
+    if (['Rages', 'Infused Items', 'Sorcery Points', 'Ki Points', 'Cantrips Known', 'Spell Slots', 'Bardic Inspiration'].includes(key)) return 'comp-level-col-short';
     if (['Rage Damage', 'Sneak Attack', 'Martial Arts', 'Slot Level', 'Invocations Known'].includes(key)) return 'comp-level-col-medium';
     return 'comp-level-col-wide';
 }
@@ -3008,6 +3250,7 @@ function _compClassColumnLabel(key) {
     const it = {
         Level: 'Liv.',
         'Proficiency Bonus': 'Bonus competenza',
+        'Bardic Inspiration': 'Ispirazione Bardica',
         Rages: 'Ire',
         'Rage Damage': 'Danno ira',
         'Sneak Attack': 'Attacco furtivo',
@@ -3175,6 +3418,16 @@ window.compendioOpenSpellRef = function(id) {
 window.compendioOpenSummonStatblock = function(id) {
     const block = (COMP_SUMMON_STATBLOCKS_DATA || []).find(item => String(item.id) === String(id));
     if (!block) return;
+    _compOpenStatblockModal(block);
+};
+
+window.compendioOpenLinkedStatblock = function(id) {
+    const block = _compFindMonsterStatblock(id);
+    if (!block) return;
+    _compOpenStatblockModal(block);
+};
+
+function _compOpenStatblockModal(block) {
     document.querySelector('.comp-summon-statblock-overlay')?.remove();
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay comp-summon-statblock-overlay';
@@ -3189,7 +3442,7 @@ window.compendioOpenSummonStatblock = function(id) {
         </div>
     `;
     document.body.appendChild(overlay);
-};
+}
 
 function _compFindSpellRefId(value) {
     const ref = String(value || '').trim();
