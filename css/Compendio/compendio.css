@@ -1137,6 +1137,85 @@
     line-height: 1.25;
 }
 
+.comp-feature .comp-detail-section {
+    margin-top: 12px;
+}
+
+.comp-inline-accordion {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+.comp-inline-accordion summary {
+    cursor: pointer;
+    padding: 10px 12px;
+    color: var(--accent);
+    font-weight: 800;
+    list-style: none;
+}
+
+.comp-inline-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.comp-inline-accordion summary::before {
+    content: ">";
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 160ms ease;
+}
+
+.comp-inline-accordion[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.comp-metamagic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    padding: 0 10px 10px;
+}
+
+.comp-metamagic-card {
+    appearance: none;
+    border: 1px solid rgba(234, 179, 8, 0.28);
+    border-radius: 8px;
+    padding: 9px;
+    background: linear-gradient(180deg, rgba(234, 179, 8, 0.12), rgba(0,0,0,0.08));
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.comp-metamagic-card span,
+.comp-metamagic-card strong {
+    display: block;
+}
+
+.comp-metamagic-card span {
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.comp-metamagic-card small {
+    color: var(--accent);
+    font-size: 0.68rem;
+}
+
+.comp-metamagic-card strong {
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+}
+
+.comp-metamagic-card:hover,
+.comp-metamagic-card:focus-visible {
+    border-color: rgba(253, 230, 138, 0.7);
+    outline: none;
+}
+
 .comp-tasha-toggle-row {
     display: flex;
     justify-content: flex-end;

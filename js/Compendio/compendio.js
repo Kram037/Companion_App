@@ -182,8 +182,8 @@ const COMP_CLASS_LABELS = {
     warlock: { it: 'Warlock', en: 'Warlock' },
 };
 
-const COMP_CLASS_UTILITY_TABLES = {
-    chierico: [
+const COMP_FEATURE_TABLES = {
+    'distruggere-non-morti': [
         {
             title: 'Distruggere Non Morti',
             columns: ['Livello da chierico', 'GS distrutti'],
@@ -196,7 +196,7 @@ const COMP_CLASS_UTILITY_TABLES = {
             ],
         },
     ],
-    druido: [
+    'forma-selvatica': [
         {
             title: 'Forme Bestiali',
             columns: ['Livello da druido', 'GS massimo', 'Limitazioni'],
@@ -207,7 +207,7 @@ const COMP_CLASS_UTILITY_TABLES = {
             ],
         },
     ],
-    stregone: [
+    'sorgente-di-magia': [
         {
             title: 'Creare Slot Incantesimo',
             columns: ['Livello slot', 'Costo in punti stregoneria'],
@@ -220,30 +220,7 @@ const COMP_CLASS_UTILITY_TABLES = {
             ],
         },
     ],
-};
-
-const COMP_CLASS_DETAIL_LISTS = {
-    stregone: [
-        {
-            title: 'Opzioni di Metamagia',
-            items: [
-                ['Incantesimo Accurato', 'Proteggi alcune creature dagli effetti pieni di un incantesimo che richiede un tiro salvezza.'],
-                ['Incantesimo Distante', 'Aumenta la gittata di un incantesimo, oppure trasforma contatto in una gittata di 9 metri.'],
-                ['Incantesimo Esteso', 'Raddoppia la durata di un incantesimo con durata di almeno 1 minuto, fino a 24 ore.'],
-                ['Incantesimo Gemellato', 'Fa bersagliare una seconda creatura a un incantesimo idoneo che normalmente bersaglia una sola creatura.'],
-                ['Incantesimo Intensificato', 'Imponi svantaggio al primo tiro salvezza di un bersaglio contro l\'incantesimo.'],
-                ['Incantesimo Potenziato', 'Ritira alcuni dadi di danno di un incantesimo.'],
-                ['Incantesimo Rapido', 'Trasforma il tempo di lancio di 1 azione in 1 azione bonus.'],
-                ['Incantesimo Silenzioso', 'Lancia un incantesimo senza componenti somatiche o verbali.'],
-                ['Incantesimo Cercatore (TCoE)', 'Ritira un attacco con incantesimo mancato.'],
-                ['Incantesimo Tramutato (TCoE)', 'Cambia il tipo di danno di un incantesimo idoneo.'],
-            ],
-        },
-    ],
-};
-
-const COMP_SUBCLASS_UTILITY_TABLES = {
-    'way-of-the-four-elements': [
+    'discepolo-degli-elementi': [
         {
             title: 'Discipline Elementali',
             columns: ['Disciplina', 'Prerequisito', 'Uso'],
@@ -270,25 +247,96 @@ const COMP_SUBCLASS_UTILITY_TABLES = {
     ],
 };
 
-const COMP_CLASS_STATBLOCK_LINKS = {
-    artefice: [
+const COMP_METAMAGIC_OPTIONS = [
+    {
+        id: 'accurato',
+        name: 'Incantesimo Accurato',
+        cost: '1 punto stregoneria',
+        description: 'Quando lanci un incantesimo che costringe altre creature a effettuare un tiro salvezza, puoi proteggere alcune di quelle creature dalla piena forza dell incantesimo. Spendendo 1 punto stregoneria, scegli un numero di creature fino al tuo modificatore di Carisma (minimo una): quelle creature superano automaticamente il tiro salvezza contro l incantesimo.',
+    },
+    {
+        id: 'distante',
+        name: 'Incantesimo Distante',
+        cost: '1 punto stregoneria',
+        description: 'Quando lanci un incantesimo con gittata di 1,5 metri o superiore, puoi spendere 1 punto stregoneria per raddoppiarne la gittata. Se l incantesimo ha gittata contatto, puoi spendere 1 punto stregoneria per renderla pari a 9 metri.',
+    },
+    {
+        id: 'esteso',
+        name: 'Incantesimo Esteso',
+        cost: '1 punto stregoneria',
+        description: 'Quando lanci un incantesimo con durata di 1 minuto o superiore, puoi spendere 1 punto stregoneria per raddoppiarne la durata, fino a una durata massima di 24 ore.',
+    },
+    {
+        id: 'gemellato',
+        name: 'Incantesimo Gemellato',
+        cost: 'Livello incantesimo in punti stregoneria',
+        description: 'Quando lanci un incantesimo che bersaglia una sola creatura e non ha gittata personale, puoi spendere un numero di punti stregoneria pari al livello dell incantesimo per bersagliare una seconda creatura entro gittata. Per un trucchetto il costo e 1 punto stregoneria. L incantesimo deve essere incapace di bersagliare piu di una creatura al livello a cui viene lanciato.',
+    },
+    {
+        id: 'intensificato',
+        name: 'Incantesimo Intensificato',
+        cost: '3 punti stregoneria',
+        description: 'Quando lanci un incantesimo che costringe una creatura a effettuare un tiro salvezza per resistere ai suoi effetti, puoi spendere 3 punti stregoneria per imporre svantaggio al primo tiro salvezza effettuato da un bersaglio contro l incantesimo.',
+    },
+    {
+        id: 'potenziato',
+        name: 'Incantesimo Potenziato',
+        cost: '1 punto stregoneria',
+        description: 'Quando tiri i danni di un incantesimo, puoi spendere 1 punto stregoneria per ritirare un numero di dadi di danno fino al tuo modificatore di Carisma (minimo uno). Devi usare i nuovi risultati. Puoi usare questa opzione anche se hai gia usato un altra opzione di Metamagia durante il lancio dello stesso incantesimo.',
+    },
+    {
+        id: 'rapido',
+        name: 'Incantesimo Rapido',
+        cost: '2 punti stregoneria',
+        description: 'Quando lanci un incantesimo con tempo di lancio di 1 azione, puoi spendere 2 punti stregoneria per cambiare il tempo di lancio in 1 azione bonus per quel lancio.',
+    },
+    {
+        id: 'silenzioso',
+        name: 'Incantesimo Silenzioso',
+        cost: '1 punto stregoneria',
+        description: 'Quando lanci un incantesimo, puoi spendere 1 punto stregoneria per lanciarlo senza componenti somatiche o verbali.',
+    },
+    {
+        id: 'cercatore',
+        name: 'Incantesimo Cercatore',
+        cost: '2 punti stregoneria',
+        source: 'TCoE',
+        description: 'Se effettui un tiro per colpire con un incantesimo e lo manchi, puoi spendere 2 punti stregoneria per ritirare il d20. Devi usare il nuovo risultato. Puoi usare questa opzione anche se hai gia usato un altra opzione di Metamagia durante il lancio dello stesso incantesimo.',
+    },
+    {
+        id: 'tramutato',
+        name: 'Incantesimo Tramutato',
+        cost: '1 punto stregoneria',
+        source: 'TCoE',
+        description: 'Quando lanci un incantesimo che infligge danni di un tipo tra acido, freddo, fuoco, fulmine, tuono o veleno, puoi spendere 1 punto stregoneria per sostituire quel tipo di danno con un altro della stessa lista.',
+    },
+];
+
+const COMP_FEATURE_STATBLOCK_LINKS = {
+    'infondere-negli-oggetti': [
         { monster: 'Homunculus Servant', label: 'Servitore Omuncolo' },
     ],
-};
-
-const COMP_SUBCLASS_STATBLOCK_LINKS = {
-    'battle-smith': [
+    'infuse-item': [
+        { monster: 'Homunculus Servant', label: 'Servitore Omuncolo' },
+    ],
+    'servitore-omuncolo': [
+        { monster: 'Homunculus Servant', label: 'Servitore Omuncolo' },
+    ],
+    'steel-defender': [
         { monster: 'Steel Defender', label: 'Difensore d Acciaio' },
     ],
-    'beast-master': [
+    'primal-companion': [
         { monster: 'Beast of the Land', label: 'Bestia della Terra' },
         { monster: 'Beast of the Sea', label: 'Bestia del Mare' },
         { monster: 'Beast of the Sky', label: 'Bestia del Cielo' },
     ],
-    'circle-of-wildfire': [
+    'evocare-spirito-della-fiamma': [
         { monster: 'Wildfire Spirit', label: 'Spirito della Fiamma' },
     ],
-    drakewarden: [
+    'summon-wildfire-spirit': [
+        { monster: 'Wildfire Spirit', label: 'Spirito della Fiamma' },
+    ],
+    'drake-companion': [
         { monster: 'Drake Companion', label: 'Compagno Draconico' },
     ],
 };
@@ -1285,7 +1333,7 @@ function _compMonsterDetail(monster) {
 }
 
 function _compMonsterSummaryBoxes(boxes) {
-    const html = _compBoxes(boxes);
+    const html = _compBoxes(boxes.map(([label, value]) => [label, _compMonsterTranslateText(value)]));
     return html.replace('comp-detail-grid', 'comp-detail-grid comp-monster-summary-grid');
 }
 
@@ -1333,7 +1381,7 @@ function _compMonsterFactsSection(monster) {
             ${rows.map(([label, value]) => `
                 <div class="comp-monster-fact">
                     <strong>${escapeHtml(label)}</strong>
-                    <span>${escapeHtml(value)}</span>
+                    <span>${escapeHtml(_compMonsterTranslateText(value))}</span>
                 </div>
             `).join('')}
         </div>
@@ -1351,9 +1399,206 @@ function _compMonsterTextSection(title, text) {
 function _compMonsterRich(text) {
     const raw = String(text || '').trim();
     if (!raw) return '<p>Nessuna descrizione disponibile.</p>';
-    return raw.split(/\n{2,}/)
+    const translated = _compMonsterTranslateText(raw);
+    return translated.split(/\n{2,}/)
         .map(paragraph => _compRich(paragraph, { linkSpells: _compMonsterParagraphHasSpellList(paragraph) }))
         .join('');
+}
+
+function _compMonsterTranslateText(text) {
+    let out = String(text || '');
+    if (!out) return '';
+    out = _compMonsterTranslateTitles(out);
+    const replacements = [
+        [/\bMelee or Ranged Weapon Attack\b/g, 'Attacco con arma da mischia o a distanza'],
+        [/\bMelee Weapon Attack\b/g, 'Attacco con arma da mischia'],
+        [/\bRanged Weapon Attack\b/g, 'Attacco con arma a distanza'],
+        [/\bMelee Spell Attack\b/g, 'Attacco con incantesimo da mischia'],
+        [/\bRanged Spell Attack\b/g, 'Attacco con incantesimo a distanza'],
+        [/\bHit:\b/g, 'Colpito:'],
+        [/\bto hit\b/g, 'al tiro per colpire'],
+        [/\breach\b/g, 'portata'],
+        [/\brange\b/g, 'gittata'],
+        [/\bone target\b/g, 'un bersaglio'],
+        [/\bone creature\b/g, 'una creatura'],
+        [/\ba target\b/g, 'un bersaglio'],
+        [/\bthe target\b/g, 'il bersaglio'],
+        [/\bThe target\b/g, 'Il bersaglio'],
+        [/\btarget\b/g, 'bersaglio'],
+        [/\bcreature\b/g, 'creatura'],
+        [/\bcreatures\b/g, 'creature'],
+        [/\ballied\b/g, 'alleato'],
+        [/\bUndead\b/g, 'Non Morto'],
+        [/\bundead\b/g, 'non morto'],
+        [/\bcan take (\d+) legendary actions\b/gi, 'puo effettuare $1 azioni leggendarie'],
+        [/\bchoosing from the options below\b/gi, 'scegliendo tra le opzioni seguenti'],
+        [/\bOnly one legendary action option can be used at a time\b/gi, 'Puo usare solo una opzione di azione leggendaria alla volta'],
+        [/\bonly at the end of another creature's turn\b/gi, 'solo alla fine del turno di un altra creatura'],
+        [/\bonly at the end of another creatura's turn\b/gi, 'solo alla fine del turno di un altra creatura'],
+        [/\bregains spent legendary actions at the start of (?:its|his|her) turn\b/gi, 'recupera le azioni leggendarie spese all inizio del suo turno'],
+        [/\bregains spent legendary actions all'inizio del suo turno\b/gi, 'recupera le azioni leggendarie spese all inizio del suo turno'],
+        [/\bThe ([^.]+?) makes one ([^.]+?) attack\b/g, 'Il $1 effettua un attacco con $2'],
+        [/\bThe ([^.]+?) makes two ([^.]+?) attacks\b/g, 'Il $1 effettua due attacchi con $2'],
+        [/\bThe ([^.]+?) makes three ([^.]+?) attacks\b/g, 'Il $1 effettua tre attacchi con $2'],
+        [/\bThe ([^.]+?) makes four ([^.]+?) attacks\b/g, 'Il $1 effettua quattro attacchi con $2'],
+        [/\bIt can replace one of the attacks with a use of Spellcasting\b/g, 'Puo sostituire uno degli attacchi con un uso di Incantesimi'],
+        [/\bIt can replace one attack with a use of Spellcasting\b/g, 'Puo sostituire un attacco con un uso di Incantesimi'],
+        [/\bcan replace one of the attacks with a use of Spellcasting\b/g, 'puo sostituire uno degli attacchi con un uso di Incantesimi'],
+        [/\bcan replace one attack with a use of Spellcasting\b/g, 'puo sostituire un attacco con un uso di Incantesimi'],
+        [/\bcasts one of the following spells\b/gi, 'lancia uno dei seguenti incantesimi'],
+        [/\brequiring no material components\b/gi, 'senza componenti materiali'],
+        [/\busing ([A-Za-z]+) as the spellcasting ability\b/g, 'usando $1 come caratteristica da incantatore'],
+        [/\bspellcasting ability is ([A-Za-z]+)\b/g, 'caratteristica da incantatore e $1'],
+        [/\bwith spell attacks\b/g, 'agli attacchi con incantesimo'],
+        [/\bmust make a tiro salvezza\b/g, 'deve effettuare un tiro salvezza'],
+        [/\bmust succeed on a tiro salvezza\b/g, 'deve superare un tiro salvezza'],
+        [/\bmust succeed on a\b/g, 'deve superare un'],
+        [/\bmust make a\b/g, 'deve effettuare un'],
+        [/\bIf the ([^,.]+?) fails\b/g, 'Se $1 fallisce'],
+        [/\bIf it fails\b/g, 'Se fallisce'],
+        [/\bif it fails\b/g, 'se fallisce'],
+        [/\bIf the ([^,.]+?) succeeds\b/g, 'Se $1 supera il tiro'],
+        [/\bon a success\b/g, 'se lo supera'],
+        [/\bon a failed save\b/g, 'se fallisce il tiro salvezza'],
+        [/\bor half as much damage on a successful one\b/g, 'o la meta dei danni se lo supera'],
+        [/\btakes no damage\b/g, 'non subisce danni'],
+        [/\btakes only half the damage\b/g, 'subisce solo meta dei danni'],
+        [/\btakes ([^,.]+?) damage\b/g, 'subisce $1 danni'],
+        [/\bdeals only half damage\b/g, 'infligge solo meta dei danni'],
+        [/\bdeals\b/g, 'infligge'],
+        [/\bdamage\b/g, 'danni'],
+        [/\badvantage\b/g, 'vantaggio'],
+        [/\bdisadvantage\b/g, 'svantaggio'],
+        [/\bchecks\b/g, 'prove'],
+        [/\bcheck\b/g, 'prova'],
+        [/\bsaving throws\b/g, 'tiri salvezza'],
+        [/\bsaving throw\b/g, 'tiro salvezza'],
+        [/\battack rolls\b/g, 'tiri per colpire'],
+        [/\battack roll\b/g, 'tiro per colpire'],
+        [/\bopportunity attacks\b/g, 'attacchi di opportunita'],
+        [/\bstart of (?:its|his|her) next turn\b/g, 'inizio del suo prossimo turno'],
+        [/\bend of (?:its|his|her) next turn\b/g, 'fine del suo prossimo turno'],
+        [/\bend of each of (?:its|his|her) turns\b/g, 'fine di ciascuno dei suoi turni'],
+        [/\buntil the start of\b/g, 'fino all inizio di'],
+        [/\buntil the end of\b/g, 'fino alla fine di'],
+        [/\bwithin\b/g, 'entro'],
+        [/\bwithout provoking\b/g, 'senza provocare'],
+        [/\bhas advantage on\b/g, 'ha vantaggio a'],
+        [/\bhas advantage\b/g, 'ha vantaggio'],
+        [/\bis immune to\b/g, 'e immune a'],
+        [/\bis incapacitated\b/g, 'e incapacitato'],
+        [/\bis blinded\b/g, 'e accecato'],
+        [/\bis stable\b/g, 'e stabile'],
+        [/\bis paralyzed\b/g, 'e paralizzato'],
+        [/\bis poisoned\b/g, 'e avvelenato'],
+        [/\bbecomes poisoned\b/g, 'diventa avvelenato'],
+        [/\bbecome poisoned\b/g, 'diventa avvelenato'],
+        [/\bending the effect on itself\b/g, 'terminando l effetto su se stesso'],
+        [/\bending the effect\b/g, 'terminando l effetto'],
+        [/\bThey remain until destroyed\b/g, 'Rimangono finche non vengono distrutti'],
+        [/\bThey remain\b/g, 'Rimangono'],
+        [/\bCosts (\d+) Actions\b/g, 'Costa $1 azioni'],
+        [/\bCosts 1 Action\b/g, 'Costa 1 azione'],
+        [/\bobey\b/g, 'obbediscono a'],
+        [/\broll initiative\b/g, 'tirano l iniziativa'],
+        [/\bSpeed\b/g, 'Velocita'],
+        [/\bArmor Class\b/g, 'Classe Armatura'],
+        [/\bHit Points\b/g, 'Punti Ferita'],
+        [/\bA volonta\b/g, 'A volonta'],
+        [/\bper day each\b/g, 'al giorno ciascuno'],
+        [/\b\/day each\b/g, '/giorno ciascuno'],
+        [/\bself only\b/g, 'solo se stesso'],
+        [/\bself\b/g, 'se stesso'],
+        [/\bLarge\b/g, 'Grande'],
+        [/\bMedium\b/g, 'Medio'],
+        [/\bSmall\b/g, 'Piccolo'],
+        [/\bTiny\b/g, 'Minuscolo'],
+        [/\bo\b/g, 'o'],
+        [/\be\b/g, 'e'],
+    ];
+    replacements.forEach(([pattern, replacement]) => {
+        out = out.replace(pattern, replacement);
+    });
+    out = out.replace(/\bThe ([A-Z][A-Za-z' -]+?)\b/g, 'Il $1');
+    out = out.replace(/\bthe ([A-Z][A-Za-z' -]+?)\b/g, 'il $1');
+    return out.replace(/[ \t]{2,}/g, ' ').replace(/\s+([,.;:])/g, '$1');
+}
+
+function _compMonsterTranslateTitles(text) {
+    const titles = {
+        'Multiattack': 'Multiattacco',
+        'Spellcasting': 'Incantesimi',
+        'Innate Spellcasting': 'Incantesimi Innati',
+        'InnateSpellcasting': 'Incantesimi Innati',
+        'Evasion': 'Elusione',
+        'Legendary Resistance': 'Resistenza Leggendaria',
+        'Legendary Resistenza': 'Resistenza Leggendaria',
+        'Magic Resistance': 'Resistenza alla Magia',
+        'Keen Senses': 'Sensi Acuti',
+        'Keen Sight': 'Vista Acuta',
+        'Keen Hearing and Smell': 'Udito e Olfatto Acuti',
+        'Stone Camouflage': 'Mimetismo nella Roccia',
+        'Blind Senses': 'Sensi Ciechi',
+        'Limited Telepathy': 'Telepatia Limitata',
+        'Unusual Nature': 'Natura Insolita',
+        'Master of the Grave': 'Signore della Tomba',
+        'Bone Staff': 'Bastone d Ossa',
+        'Deathly Ray': 'Raggio Mortale',
+        'Attack': 'Attacco',
+        'Move': 'Movimento',
+        'Summon Undead': 'Evoca Non Morti',
+        'Cast a Spell': 'Lancia un Incantesimo',
+        'Staff': 'Bastone',
+        'Claw': 'Artiglio',
+        'Claws': 'Artigli',
+        'Bite': 'Morso',
+        'Tail': 'Coda',
+        'Longsword': 'Spada Lunga',
+        'Shortsword': 'Spada Corta',
+        'Shortbow': 'Arco Corto',
+        'Longbow': 'Arco Lungo',
+        'Dagger': 'Pugnale',
+        'Scimitar': 'Scimitarra',
+        'Slam': 'Schianto',
+    };
+    return String(text || '').replace(/\*\*([^*.]+?)(?: \(([^*)]+)\))?\.\*\*/g, (match, title, suffix = '') => {
+        const translated = titles[title] || _compMonsterTranslateTitleWords(title);
+        const cleanSuffix = suffix ? ` (${_compMonsterTranslateText(suffix)})` : '';
+        return `**${translated}${cleanSuffix}.**`;
+    });
+}
+
+function _compMonsterTranslateTitleWords(title) {
+    const words = {
+        Fiendish: 'Immondo',
+        Deathly: 'Mortale',
+        Bone: 'Ossa',
+        Staff: 'Bastone',
+        Ray: 'Raggio',
+        Claw: 'Artiglio',
+        Claws: 'Artigli',
+        Bite: 'Morso',
+        Tail: 'Coda',
+        Poisonous: 'Velenoso',
+        Touch: 'Tocco',
+        Arcane: 'Arcana',
+        Eruption: 'Eruzione',
+        Gaze: 'Sguardo',
+        Weakening: 'Indebolente',
+        Spray: 'Spruzzo',
+        Bile: 'Bile',
+        Warp: 'Distorsione',
+        Demon: 'Demoniaco',
+        Scimitar: 'Scimitarra',
+        Longsword: 'Spada Lunga',
+        Shortbow: 'Arco Corto',
+        Shortword: 'Spada Corta',
+        Dagger: 'Pugnale',
+        Staff: 'Bastone',
+        Attack: 'Attacco',
+        Spell: 'Incantesimo',
+    };
+    return String(title || '').split(/\s+/).map(word => words[word] || word).join(' ');
 }
 
 function _compMonsterParagraphHasSpellList(text) {
@@ -1383,8 +1628,6 @@ function _compClassDetail(cls) {
             ])}
         </section>
         ${_compClassProgressionSection(cls)}
-        ${_compClassUtilitySections(cls)}
-        ${_compLinkedStatblocksSection(_compClassStatblockLinks(cls))}
         <section class="comp-detail-section">
             <h3>Competenze iniziali</h3>
             <div class="comp-rich">${_compRich(_compField(cls, 'prof_skills') || '')}</div>
@@ -2615,8 +2858,6 @@ function _compSubclassAccordionHtml(clsId, sub, showTasha = false) {
         <div class="comp-subclass-body" ${isOpen ? '' : 'style="display:none;"'}>
             ${_compClassProgressionSection(sub, 'Progressione incantesimi')}
             ${_compSubclassSpellListSection(clsId, sub, spellRows)}
-            ${_compSubclassUtilitySections(sub)}
-            ${_compLinkedStatblocksSection(_compSubclassStatblockLinks(sub))}
             ${_compFeaturesSection(features)}
         </div>
     </section>`;
@@ -2642,22 +2883,6 @@ function _compClassCanonicalKey(cls) {
     return _compClassKey(cls?.slug || cls?.name || cls?.name_en || '');
 }
 
-function _compSubclassKey(sub) {
-    return _compLookupKey(sub?.slug || sub?.name_en || sub?.name || '').replace(/\s+/g, '-');
-}
-
-function _compClassUtilitySections(cls) {
-    const key = _compClassCanonicalKey(cls);
-    return [
-        _compUtilityTableSections(COMP_CLASS_UTILITY_TABLES[key]),
-        _compDetailListSections(COMP_CLASS_DETAIL_LISTS[key]),
-    ].filter(Boolean).join('');
-}
-
-function _compSubclassUtilitySections(sub) {
-    return _compUtilityTableSections(COMP_SUBCLASS_UTILITY_TABLES[_compSubclassKey(sub)]);
-}
-
 function _compUtilityTableSections(tables) {
     if (!Array.isArray(tables) || !tables.length) return '';
     return tables.map(table => {
@@ -2678,31 +2903,6 @@ function _compUtilityTableSections(tables) {
             </div>
         </section>`;
     }).filter(Boolean).join('');
-}
-
-function _compDetailListSections(sections) {
-    if (!Array.isArray(sections) || !sections.length) return '';
-    return sections.map(section => {
-        const items = Array.isArray(section.items) ? section.items : [];
-        if (!items.length) return '';
-        return `<section class="comp-detail-section">
-            <h3>${escapeHtml(section.title || 'Dettagli')}</h3>
-            <div class="comp-feature-list comp-reference-list">
-                ${items.map(([title, text]) => `<article class="comp-feature">
-                    <h4 class="comp-feature-title">${escapeHtml(title || '')}</h4>
-                    <div class="comp-rich"><p>${escapeHtml(text || '')}</p></div>
-                </article>`).join('')}
-            </div>
-        </section>`;
-    }).filter(Boolean).join('');
-}
-
-function _compClassStatblockLinks(cls) {
-    return COMP_CLASS_STATBLOCK_LINKS[_compClassCanonicalKey(cls)] || [];
-}
-
-function _compSubclassStatblockLinks(sub) {
-    return COMP_SUBCLASS_STATBLOCK_LINKS[_compSubclassKey(sub)] || [];
 }
 
 function _compShowTashaFeatures(clsId) {
@@ -2857,8 +3057,6 @@ function _compFeatureDetail(title, subtitle, features, data) {
         <div class="comp-detail-subtitle">${escapeHtml(subtitle || data.name_en || '')}</div>
         ${_compClassProgressionSection(data, 'Progressione incantesimi')}
         ${_compSubclassSpellListSection(clsId, data, spellRows)}
-        ${_compSubclassUtilitySections(data)}
-        ${_compLinkedStatblocksSection(_compSubclassStatblockLinks(data))}
         ${_compFeaturesSection(visibleFeatures)}
     `;
 }
@@ -3121,9 +3319,45 @@ function _compFeaturesSection(features, title = 'Privilegi') {
                 ${f.replaces?.length ? `<div class="comp-feature-note">Sostituisce: ${escapeHtml(_compArrayLabel(f.replaces))}</div>` : ''}
                 ${f.source_short ? `<div class="comp-feature-note">Fonte: ${escapeHtml(f.source_short)}</div>` : ''}
                 <div class="comp-rich">${_compRich(_compField(f, 'description') || f.description_it || f.description_en || '')}</div>
+                ${_compFeatureInlineExtras(f)}
             </article>`).join('')}
         </div>
     </section>`;
+}
+
+function _compFeatureInlineExtras(feature) {
+    const keys = _compFeatureKeys(feature);
+    const tableKey = keys.find(key => COMP_FEATURE_TABLES[key]);
+    const statblockKey = keys.find(key => COMP_FEATURE_STATBLOCK_LINKS[key]);
+    return [
+        _compUtilityTableSections(tableKey ? COMP_FEATURE_TABLES[tableKey] : null),
+        keys.includes('metamagia') || keys.includes('metamagic') ? _compMetamagicOptionsHtml() : '',
+        _compLinkedStatblocksSection(statblockKey ? COMP_FEATURE_STATBLOCK_LINKS[statblockKey] : null, 'Statblock collegati'),
+    ].filter(Boolean).join('');
+}
+
+function _compFeatureKeys(feature) {
+    const keys = [
+        feature?.slug,
+        feature?.name,
+        feature?.name_en,
+        _compName(feature),
+    ];
+    return [...new Set(keys.map(value => _compLookupKey(value).replace(/\s+/g, '-')).filter(Boolean))];
+}
+
+function _compMetamagicOptionsHtml() {
+    return `<details class="comp-inline-accordion comp-metamagic-accordion">
+        <summary>Opzioni di Metamagia</summary>
+        <div class="comp-metamagic-grid">
+            ${COMP_METAMAGIC_OPTIONS.map(option => `
+                <button type="button" class="comp-metamagic-card" onclick="compendioOpenMetamagicOption('${_compEscapeAttr(option.id)}')">
+                    <span>${escapeHtml(option.name)}${option.source ? ` <small>${escapeHtml(option.source)}</small>` : ''}</span>
+                    <strong>${escapeHtml(option.cost)}</strong>
+                </button>
+            `).join('')}
+        </div>
+    </details>`;
 }
 
 function _compBoxes(boxes) {
@@ -3425,6 +3659,38 @@ window.compendioOpenLinkedStatblock = function(id) {
     const block = _compFindMonsterStatblock(id);
     if (!block) return;
     _compOpenStatblockModal(block);
+};
+
+window.compendioOpenMetamagicOption = function(id) {
+    const option = COMP_METAMAGIC_OPTIONS.find(item => item.id === id);
+    if (!option) return;
+    document.querySelector('.comp-metamagic-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-metamagic-overlay';
+    overlay.onclick = event => {
+        if (event.target === overlay) overlay.remove();
+    };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-spell-ref-modal comp-metamagic-modal">
+            <button class="modal-close" type="button" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h3 class="comp-spell-ref-title">${escapeHtml(option.name)}</h3>
+            <div class="comp-detail-grid comp-detail-grid-stacked">
+                <div class="comp-detail-box">
+                    <div class="comp-detail-box-label">Costo</div>
+                    <div class="comp-detail-box-value">${escapeHtml(option.cost)}</div>
+                </div>
+                ${option.source ? `<div class="comp-detail-box">
+                    <div class="comp-detail-box-label">Fonte</div>
+                    <div class="comp-detail-box-value">${escapeHtml(option.source)}</div>
+                </div>` : ''}
+            </div>
+            <section class="comp-detail-section">
+                <h3>Effetto</h3>
+                <div class="comp-rich"><p>${escapeHtml(option.description)}</p></div>
+            </section>
+        </div>
+    `;
+    document.body.appendChild(overlay);
 };
 
 function _compOpenStatblockModal(block) {
