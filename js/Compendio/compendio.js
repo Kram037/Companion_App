@@ -95,8 +95,13 @@ const COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
 const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
 const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
-const COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 const COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
+let _compMonsterDataPromise = null;
+let _compMonsterDataFailed = false;
+let _compMonsterItemsCache = null;
+let _compMonsterItemsSource = null;
+let _compSearchRenderTimer = null;
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -511,6 +516,7 @@ window.compendioOpenTab = function(tab) {
     const title = document.getElementById('compendioSubTitle');
     if (title) title.textContent = COMP_TABS[tab].label;
     compendioRenderTab();
+    if (tab === 'mostri') _compEnsureMonsterData({ rerender: true });
     _compScrollToTop();
 };
 
@@ -519,6 +525,61 @@ function loadCompendio() {
     if (document.getElementById('compendioSubPage')?.style.display !== 'none') {
         compendioRenderTab();
     }
+}
+
+function _compHasMonsterData() {
+    if (!COMP_MONSTERS_DATA.length && Array.isArray(window.COMP_MONSTERS_DATA)) {
+        COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA;
+    }
+    return Array.isArray(COMP_MONSTERS_DATA) && COMP_MONSTERS_DATA.length > 0;
+}
+
+function _compEnsureMonsterData({ rerender = false } = {}) {
+    if (_compHasMonsterData()) return Promise.resolve(COMP_MONSTERS_DATA);
+    if (_compMonsterDataPromise) return _compMonsterDataPromise;
+    _compMonsterDataFailed = false;
+    _compMonsterDataPromise = new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-comp-monsters-data="1"]');
+        if (existing) {
+            existing.addEventListener('load', () => {
+                COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+                resolve(COMP_MONSTERS_DATA);
+            }, { once: true });
+            existing.addEventListener('error', reject, { once: true });
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'js/Compendio/data/mostri_data.js?v=20260624A';
+        script.defer = true;
+        script.dataset.compMonstersData = '1';
+        script.onload = () => {
+            COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+            _compMonsterItemsCache = null;
+            _compMonsterItemsSource = null;
+            resolve(COMP_MONSTERS_DATA);
+        };
+        script.onerror = () => {
+            _compMonsterDataFailed = true;
+            reject(new Error('Impossibile caricare il bestiario'));
+        };
+        document.body.appendChild(script);
+    }).then(data => {
+        if (rerender && _compCurrentTab === 'mostri') compendioRenderTab();
+        return data;
+    }).catch(error => {
+        console.warn('[compendio] caricamento bestiario fallito:', error);
+        const container = document.getElementById('compendioContent');
+        if (rerender && _compCurrentTab === 'mostri' && container) {
+            container.innerHTML = `
+                ${_compMostriTabsHtml()}
+                <div class="comp-empty">Non riesco a caricare il bestiario. Riprova tra qualche secondo.</div>
+            `;
+        }
+        return [];
+    }).finally(() => {
+        _compMonsterDataPromise = null;
+    });
+    return _compMonsterDataPromise;
 }
 
 function _compStateFor(tab) {
@@ -542,6 +603,18 @@ function compendioRenderTab() {
         _compScrollToTop();
         return;
     }
+    if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            ${_compMostriTabsHtml()}
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento bestiario...</p>
+            </div>
+        `;
+        _compEnsureMonsterData({ rerender: true });
+        return;
+    }
     const items = _compItems(_compCurrentTab);
     const state = _compStateFor(_compCurrentTab);
     if (state.detail) {
@@ -562,7 +635,10 @@ function compendioRenderTab() {
 
 window.compendioSetSearch = function(value) {
     _compStateFor(_compCurrentTab).search = value || '';
-    _compRenderCurrentListContent();
+    clearTimeout(_compSearchRenderTimer);
+    _compSearchRenderTimer = setTimeout(() => {
+        _compRenderCurrentListContent();
+    }, 120);
 };
 
 window.compendioSetFilter = function(key, value) {
@@ -759,7 +835,10 @@ function _compMostriKind() {
 
 function _compMonsterItems() {
     if (_compMostriKind() === 'combattimenti') return [];
-    return (COMP_MONSTERS_DATA || []).map(monster => {
+    const data = COMP_MONSTERS_DATA || [];
+    if (_compMonsterItemsCache && _compMonsterItemsSource === data) return _compMonsterItemsCache;
+    _compMonsterItemsSource = data;
+    _compMonsterItemsCache = data.map(monster => {
         const source = monster.fonte_breve || monster.fonte || '';
         const challenge = String(monster.grado_sfida || '').trim() || 'Senza GS';
         return {
@@ -777,6 +856,7 @@ function _compMonsterItems() {
             data: monster,
         };
     });
+    return _compMonsterItemsCache;
 }
 
 function _compMonsterSearchText(monster) {
@@ -1013,6 +1093,7 @@ window.compendioMostriSetKind = function(kind) {
     state.kind = kind === 'combattimenti' ? 'combattimenti' : 'mostri';
     state.detail = null;
     compendioRenderTab();
+    if (state.kind === 'mostri') _compEnsureMonsterData({ rerender: true });
     _compScrollToTop();
 };
 
@@ -3267,22 +3348,18 @@ function _compSpellSummonsFor(sp) {
 }
 
 function _compLinkedStatblocksSection(links, title = 'Statblock collegati') {
-    const blocks = (Array.isArray(links) ? links : [])
-        .map(link => {
-            const block = _compFindMonsterStatblock(link.monster || link.name || link.id);
-            if (!block) return null;
-            return {
-                block,
-                label: link.label || block.nome || block.nome_en || 'Statblock',
-            };
-        })
-        .filter(Boolean);
-    if (!blocks.length) return '';
+    const items = (Array.isArray(links) ? links : [])
+        .map(link => ({
+            ref: link.monster || link.name || link.id || link.label,
+            label: link.label || link.monster || link.name || 'Statblock',
+        }))
+        .filter(link => link.ref);
+    if (!items.length) return '';
     return `<section class="comp-detail-section comp-linked-statblock-section">
         <h3>${escapeHtml(title)}</h3>
         <div class="comp-summon-statblock-list">
-            ${blocks.map(({ block, label }) => `
-                <button type="button" class="comp-statblock-link" onclick="compendioOpenLinkedStatblock('${_compEscapeAttr(block.id)}')">
+            ${items.map(({ ref, label }) => `
+                <button type="button" class="comp-statblock-link" onclick="compendioOpenLinkedStatblock('${_compEscapeAttr(ref)}')">
                     ${escapeHtml(label)}
                 </button>
             `).join('')}
@@ -3655,7 +3732,8 @@ window.compendioOpenSummonStatblock = function(id) {
     _compOpenStatblockModal(block);
 };
 
-window.compendioOpenLinkedStatblock = function(id) {
+window.compendioOpenLinkedStatblock = async function(id) {
+    await _compEnsureMonsterData();
     const block = _compFindMonsterStatblock(id);
     if (!block) return;
     _compOpenStatblockModal(block);

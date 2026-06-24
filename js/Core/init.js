@@ -2,36 +2,14 @@
 function setupServiceWorkerAutoUpdate(registration) {
     if (!registration || !('serviceWorker' in navigator)) return;
 
-    const activateWorker = (worker) => {
-        if (!worker || !navigator.serviceWorker.controller) return;
-        worker.postMessage({ type: 'SKIP_WAITING' });
-    };
-
-    if (registration.waiting) activateWorker(registration.waiting);
-
-    registration.addEventListener('updatefound', () => {
-        const worker = registration.installing;
-        if (!worker) return;
-        worker.addEventListener('statechange', () => {
-            if (worker.state === 'installed') activateWorker(worker);
-        });
-    });
-
+    // Non forziamo skipWaiting/reload mentre l'utente sta usando l'app:
+    // su mobile quel reload poteva interrompere un click e riportare alla home.
     registration.update().catch(e => console.warn('SW update check:', e));
 }
 
 function setupServiceWorkerReloadOnUpdate() {
-    if (!('serviceWorker' in navigator) || window.__companionSwReloadListener) return;
-    window.__companionSwReloadListener = true;
-    const hadController = !!navigator.serviceWorker.controller;
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!hadController) return;
-        if (sessionStorage.getItem('companion-sw-reloading') === 'true') return;
-        sessionStorage.setItem('companion-sw-reloading', 'true');
-        window.location.reload();
-    });
-    window.addEventListener('load', () => sessionStorage.removeItem('companion-sw-reloading'));
+    // Manteniamo la funzione per compatibilita, ma non ricarichiamo piu'
+    // automaticamente la pagina quando cambia il controller del service worker.
 }
 
 async function registerBaseServiceWorker() {
