@@ -183,8 +183,58 @@ function autoPopulateLinguaggi(razzaNome, sottorazzaNome) {
     return raceData.linguaggi && raceData.linguaggi.length > 0 ? [...raceData.linguaggi] : ['Comune'];
 }
 
+window.pgEnsureWizardPageMount = function() {
+    const mount = document.getElementById('personaggioCreateMount');
+    const modal = elements.personaggioModal || document.getElementById('personaggioModal');
+    if (!mount || !modal) return false;
+
+    const panel = document.getElementById('personaggioWizardPanel')
+        || modal.querySelector('.modal-content-lg');
+    if (!panel) return false;
+
+    panel.id = 'personaggioWizardPanel';
+    panel.classList.add('personaggio-create-panel');
+    if (panel.parentElement !== mount) {
+        mount.appendChild(panel);
+    }
+    return true;
+};
+
+function _pgSetWizardTitle(title) {
+    if (elements.personaggioModalTitle) elements.personaggioModalTitle.textContent = title;
+    if (elements.personaggioCreateTitle) elements.personaggioCreateTitle.textContent = title;
+}
+
+function _pgHasWizardDraftChanges() {
+    if (editingPersonaggioId) return true;
+    const valueOf = id => document.getElementById(id)?.value || '';
+    const defaultAbility = ['pgForza', 'pgDestrezza', 'pgCostituzione', 'pgIntelligenza', 'pgSaggezza', 'pgCarisma']
+        .every(id => (parseInt(valueOf(id)) || 10) === 10);
+    const hasIdentity = !!(
+        valueOf('pgNome').trim()
+        || valueOf('pgRazza')
+        || valueOf('pgSottorazza')
+        || valueOf('pgBackground')
+    );
+    return !!(
+        hasIdentity
+        || pgSelectedClasses.length
+        || pgSelectedEquipment.length
+        || pgCurrentTalenti.length
+        || pgCurrentResistenze.length
+        || pgCurrentImmunita.length
+        || !defaultAbility
+        || window.pgHitPointHistoryDraft
+    );
+}
+
 window.openPersonaggioModal = function(personaggioId) {
     editingPersonaggioId = personaggioId || null;
+    window.pgEnsureWizardPageMount?.();
+    if (AppState.currentPage !== 'personaggioCreate') {
+        window._pgWizardReturnPage = AppState.currentPage || 'personaggi';
+        window._pgWizardReturnPersonaggioId = AppState.currentPersonaggioId || null;
+    }
     const form = elements.personaggioForm;
     if (!form) return;
 
@@ -240,7 +290,7 @@ window.openPersonaggioModal = function(personaggioId) {
     });
 
     if (personaggioId) {
-        elements.personaggioModalTitle.textContent = 'Modifica Personaggio';
+        _pgSetWizardTitle('Modifica Personaggio');
         elements.savePersonaggioBtn.textContent = 'Salva';
 
         const supabase = getSupabaseClient();
@@ -331,7 +381,7 @@ window.openPersonaggioModal = function(personaggioId) {
             });
         }
     } else {
-        elements.personaggioModalTitle.textContent = 'Nuovo Personaggio';
+        _pgSetWizardTitle('Nuovo Personaggio');
         elements.savePersonaggioBtn.textContent = 'Crea';
         document.getElementById('pgCA').value = '';
         document.getElementById('pgIniziativa').value = '';
@@ -342,14 +392,26 @@ window.openPersonaggioModal = function(personaggioId) {
         updateBonusCompetenza();
     }
 
-    elements.personaggioModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    navigateToPage('personaggioCreate');
 }
 
-function closePersonaggioModal() {
+async function closePersonaggioModal({ force = false } = {}) {
+    if (!force && AppState.currentPage === 'personaggioCreate' && _pgHasWizardDraftChanges()) {
+        const confirmed = await showConfirm('Vuoi uscire dalla creazione del personaggio? Le modifiche non salvate andranno perse.');
+        if (!confirmed) return;
+    }
     if (elements.personaggioModal) {
         elements.personaggioModal.classList.remove('active');
-        document.body.style.overflow = '';
-        editingPersonaggioId = null;
+    }
+    document.body.style.overflow = '';
+    const returnPage = window._pgWizardReturnPage || 'personaggi';
+    const returnPersonaggioId = window._pgWizardReturnPersonaggioId || null;
+    editingPersonaggioId = null;
+
+    if (AppState.currentPage === 'personaggioCreate') {
+        if (returnPage === 'scheda' && returnPersonaggioId) {
+            AppState.currentPersonaggioId = returnPersonaggioId;
+        }
+        navigateToPage(returnPage);
     }
 }

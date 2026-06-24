@@ -11,6 +11,47 @@
     grid-column: 1 / -1;
 }
 
+.personaggio-create-content {
+    max-width: 720px;
+    min-height: calc(100dvh - var(--app-header-height) - var(--app-bottom-toolbar-height));
+    display: flex;
+    flex-direction: column;
+}
+
+.personaggio-create-mount {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+}
+
+#personaggioCreatePage .personaggio-create-panel {
+    width: 100%;
+    max-width: none;
+    height: calc(100dvh - var(--app-header-height) - var(--app-bottom-toolbar-height) - 82px);
+    max-height: none;
+    margin: 0 auto;
+    opacity: 1;
+    transform: none;
+    transition: none;
+}
+
+#personaggioCreatePage .personaggio-create-panel .modal-close,
+#personaggioCreatePage .personaggio-create-panel > h2 {
+    display: none;
+}
+
+#personaggioCreatePage .wizard-steps {
+    margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 520px) {
+    #personaggioCreatePage .personaggio-create-panel {
+        width: 100%;
+        padding: var(--spacing-md);
+        height: calc(100dvh - var(--app-header-height) - var(--app-bottom-toolbar-height) - 72px);
+    }
+}
+
 .pg-card {
     background: var(--surface);
     border: 1px solid var(--border);

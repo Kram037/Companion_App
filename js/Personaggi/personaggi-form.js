@@ -191,7 +191,7 @@ async function handleSavePersonaggio(e) {
         }
 
         const wasEditing = editingPersonaggioId;
-        closePersonaggioModal();
+        await closePersonaggioModal({ force: true });
         if (wasEditing && AppState.currentPage === 'scheda') {
             await renderSchedaPersonaggio(wasEditing);
         } else {

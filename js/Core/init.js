@@ -122,6 +122,9 @@ async function init() {
         submitRollRequestBtn: document.getElementById('submitRollRequestBtn'),
         personaggiList: document.getElementById('personaggiList'),
         personaggioModal: document.getElementById('personaggioModal'),
+        personaggioCreateMount: document.getElementById('personaggioCreateMount'),
+        personaggioCreateTitle: document.getElementById('personaggioCreateTitle'),
+        personaggioCreateBackBtn: document.getElementById('personaggioCreateBackBtn'),
         closePersonaggioModal: document.getElementById('closePersonaggioModal'),
         personaggioForm: document.getElementById('personaggioForm'),
         personaggioModalTitle: document.getElementById('personaggioModalTitle'),
@@ -569,6 +572,9 @@ function setupEventListeners() {
 
     if (elements.closePersonaggioModal) {
         elements.closePersonaggioModal.onclick = () => closePersonaggioModal();
+    }
+    if (elements.personaggioCreateBackBtn) {
+        elements.personaggioCreateBackBtn.onclick = () => closePersonaggioModal();
     }
     if (elements.cancelPersonaggioBtn) {
         elements.cancelPersonaggioBtn.onclick = () => closePersonaggioModal();

@@ -60,7 +60,7 @@ function pgWizardGoTo(step) {
     pgWizardCurrentStep = step;
 
     document.querySelectorAll('#personaggioForm .wizard-page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('#personaggioModal .wizard-step').forEach((s, i) => {
+    document.querySelectorAll('#personaggioCreatePage .wizard-step, #personaggioModal .wizard-step').forEach((s, i) => {
         s.classList.toggle('active', i <= step);
     });
 

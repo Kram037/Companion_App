@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
-    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260602E">
+    <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260624A">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
     <link rel="stylesheet" href="css/Combattimento/combat.css?v=20260519A">
     <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260603A">
@@ -216,6 +216,23 @@
                 </div>
             </div>
             <button class="btn-fab" id="addPersonaggioBtn" aria-label="Crea Personaggio">+</button>
+        </section>
+
+        <!-- Creazione Personaggio Page -->
+        <section class="page" id="personaggioCreatePage">
+            <div class="page-content personaggio-create-content">
+                <div class="page-top-stack">
+                    <div class="page-header page-header-with-back">
+                        <button class="page-header-back" id="personaggioCreateBackBtn" aria-label="Torna ai personaggi">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <h1 id="personaggioCreateTitle">Nuovo Personaggio</h1>
+                    </div>
+                </div>
+                <div id="personaggioCreateMount" class="personaggio-create-mount"></div>
+            </div>
         </section>
 
         <!-- Scheda Personaggio Page -->
@@ -1059,7 +1076,7 @@
     <script src="js/Core/utils.js?v=20260517A"></script>
     <script src="js/Core/lang.js?v=1771800000"></script>
     <script src="js/Core/theme.js?v=1767900400"></script>
-    <script src="js/Core/navigation.js?v=20260424I"></script>
+    <script src="js/Core/navigation.js?v=20260624A"></script>
     <script src="js/Core/auth.js?v=20260603A"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
@@ -1089,7 +1106,7 @@
     <script src="js/Personaggi/personaggi-competenze.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-slot-incantesimo.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-pv-keypad.js?v=20260602D"></script>
-    <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260519B"></script>
+    <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260624A"></script>
     <script src="js/Personaggi/personaggi-lista.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-core.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-risorse.js?v=20260517A"></script>
@@ -1105,8 +1122,8 @@
     <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260602D"></script>
     <script src="js/Personaggi/personaggi-scheda-bonus.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-equipaggiamento.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260602A"></script>
-    <script src="js/Personaggi/personaggi-form.js?v=20260602A"></script>
+    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260624A"></script>
+    <script src="js/Personaggi/personaggi-form.js?v=20260624A"></script>
     <script src="js/Personaggi/personaggi-campagna-picker.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-micro.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
@@ -1115,7 +1132,7 @@
     <script src="js/Laboratorio/laboratorio.js?v=20260603A"></script>
     <script src="js/Core/realtime.js?v=20260521A"></script>
     <script src="js/Sessioni/initiative.js?v=20260425E"></script>
-    <script src="js/Core/init.js?v=20260624A"></script>
+    <script src="js/Core/init.js?v=20260624B"></script>
     
     <!-- Cache busting script for development -->
     <script>

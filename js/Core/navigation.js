@@ -178,6 +178,8 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
         labBackToHub();
     } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
         loadPersonaggi();
+    } else if (pageName === 'personaggioCreate') {
+        if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
     } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
         loadCampagnaDetails(AppState.currentCampagnaId);
     } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
