@@ -8,6 +8,7 @@ let _bookmarkRefreshTimer = null;
 let _bookmarkAutoUpdateTimer = null;
 let _bookmarkRestoreInProgress = false;
 let _bookmarkSplitLocalActiveId = '';
+let _bookmarkFocusedPane = 'left';
 const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 
 function _bookmarksStorageKey() {
@@ -164,6 +165,37 @@ function _bookmarkIsDesktopLayout() {
     return typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 900px)').matches;
 }
 
+function _bookmarkSplitFrameWindow() {
+    return document.getElementById('desktopSplitPaneFrame')?.contentWindow || null;
+}
+
+function _bookmarkSetFocusedPane(pane) {
+    if (_bookmarkIsSplitPaneInstance) return;
+    _bookmarkFocusedPane = pane === 'right' ? 'right' : 'left';
+    document.body.classList.toggle('desktop-split-focus-right', _bookmarkFocusedPane === 'right');
+    document.body.classList.toggle('desktop-split-focus-left', _bookmarkFocusedPane !== 'right');
+    _bookmarkSplitFrameWindow()?.postMessage({
+        type: 'companion-pane-focus',
+        pane: _bookmarkFocusedPane,
+    }, window.location.origin);
+    renderDesktopBookmarkTabs();
+}
+
+function _bookmarkFocusCurrentPane() {
+    if (_bookmarkIsSplitPaneInstance) {
+        document.body.classList.add('split-pane-focused');
+        window.parent?.postMessage({ type: 'companion-split-focus' }, window.location.origin);
+        renderDesktopBookmarkTabs();
+        return;
+    }
+    _bookmarkSetFocusedPane('left');
+}
+
+function _bookmarkIsCurrentPaneFocused() {
+    if (_bookmarkIsSplitPaneInstance) return document.body.classList.contains('split-pane-focused');
+    return _bookmarkFocusedPane !== 'right';
+}
+
 function _bookmarkEnsureMinimumDesktopTab() {
     if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout() || !_bookmarkIsWritablePage()) return null;
     const list = _bookmarksRead();
@@ -310,6 +342,7 @@ function scheduleActiveBookmarkCapture(delay = 160) {
 }
 
 function createBookmarkTab() {
+    _bookmarkFocusCurrentPane();
     captureActiveBookmark({ silent: true });
     const snap = _bookmarkCurrentSnapshot();
     const list = _bookmarksRead().filter(item => item.id !== snap.id);
@@ -338,6 +371,7 @@ function removeBookmark(id) {
 async function openBookmark(id) {
     const item = _bookmarksRead().find(b => b.id === id);
     if (!item) return;
+    _bookmarkFocusCurrentPane();
     captureActiveBookmark({ silent: true });
     closeBookmarksSheet();
     _bookmarkRestoreInProgress = true;
@@ -420,11 +454,13 @@ function openBookmarkSplitPane(id) {
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
     setTimeout(postOpen, 220);
+    _bookmarkSetFocusedPane('right');
 }
 
 function closeBookmarkSplitPane() {
     document.getElementById('desktopSplitPane')?.remove();
     document.body.classList.remove('desktop-split-active');
+    _bookmarkSetFocusedPane('left');
 }
 
 function renderBookmarksSheet() {
@@ -540,8 +576,7 @@ function _bookmarkEnsureDesktopChrome() {
             }
             const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child');
             if (!btn) return;
-            captureActiveBookmark({ silent: true });
-            _openDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '');
+            _routeDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '');
         });
         document.body.appendChild(sidebar);
     }
@@ -552,6 +587,11 @@ function _bookmarkEnsureDesktopChrome() {
         rail.className = 'desktop-bookmark-tabs';
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
+    }
+    if (!window._bookmarkDesktopPaneFocusBound) {
+        window._bookmarkDesktopPaneFocusBound = true;
+        document.getElementById('mainContent')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left'), true);
+        document.getElementById('desktopBookmarkTabs')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left'), true);
     }
     renderDesktopSidebar();
 }
@@ -579,6 +619,21 @@ function _openDesktopSidebarTarget(page, tab = '') {
         return;
     }
     navigateToPage(page);
+}
+
+function _routeDesktopSidebarTarget(page, tab = '') {
+    const frameWindow = _bookmarkSplitFrameWindow();
+    if (_bookmarkFocusedPane === 'right' && frameWindow) {
+        frameWindow.postMessage({
+            type: 'companion-sidebar-target',
+            page,
+            tab,
+        }, window.location.origin);
+        return;
+    }
+    _bookmarkSetFocusedPane('left');
+    captureActiveBookmark({ silent: true });
+    _openDesktopSidebarTarget(page, tab);
 }
 
 function _desktopActiveChild(page) {
@@ -639,8 +694,9 @@ function renderDesktopBookmarkTabs() {
     if (!rail) return;
     const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
+    const paneFocused = _bookmarkIsCurrentPaneFocused();
     const tabsHtml = list.map(item => `
-        <button type="button" class="desktop-bookmark-tab ${item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
+        <button type="button" class="desktop-bookmark-tab ${paneFocused && item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
@@ -660,8 +716,17 @@ function initBookmarks() {
             if (event.origin !== window.location.origin) return;
             if (event.data?.type === 'companion-open-bookmark' && event.data.bookmarkId) {
                 openBookmark(event.data.bookmarkId);
+            } else if (event.data?.type === 'companion-pane-focus') {
+                document.body.classList.toggle('split-pane-focused', event.data.pane === 'right');
+                renderDesktopBookmarkTabs();
+            } else if (event.data?.type === 'companion-sidebar-target') {
+                _bookmarkFocusCurrentPane();
+                captureActiveBookmark({ silent: true });
+                _openDesktopSidebarTarget(event.data.page, event.data.tab || '');
             }
         });
+        document.addEventListener('pointerdown', _bookmarkFocusCurrentPane, true);
+        document.addEventListener('focusin', _bookmarkFocusCurrentPane, true);
         updateBookmarkChrome();
         return;
     }
@@ -708,6 +773,13 @@ function initBookmarks() {
         _bookmarkBindSheetDrag(document.getElementById('bookmarksSheetOverlay'));
     }
     _bookmarkEnsureDesktopChrome();
+    _bookmarkSetFocusedPane('left');
+    window.addEventListener('message', (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.data?.type === 'companion-split-focus') {
+            _bookmarkSetFocusedPane('right');
+        }
+    });
     if (!window._bookmarksInteractionRefreshBound) {
         window._bookmarksInteractionRefreshBound = true;
         const schedule = () => {
