@@ -52,6 +52,12 @@ function _bookmarkPaneItems(list = _bookmarksRead(), pane = _bookmarkCurrentPane
     return list.filter(item => _bookmarkItemPane(item) === pane);
 }
 
+function _bookmarkRemovePaneItems(pane) {
+    const kept = _bookmarksRead().filter(item => _bookmarkItemPane(item) !== pane);
+    _bookmarksWrite(kept);
+    return kept;
+}
+
 function _bookmarkActivePageEl() {
     return document.querySelector('.page.active');
 }
@@ -184,15 +190,17 @@ function _bookmarkSplitFrameWindow() {
 }
 
 function _bookmarkSetFocusedPane(pane, options = {}) {
-    const { render = true, deferRender = false } = options;
+    const { render = true, deferRender = false, notify = true } = options;
     if (_bookmarkIsSplitPaneInstance) return;
     _bookmarkFocusedPane = pane === 'right' ? 'right' : 'left';
     document.body.classList.toggle('desktop-split-focus-right', _bookmarkFocusedPane === 'right');
     document.body.classList.toggle('desktop-split-focus-left', _bookmarkFocusedPane !== 'right');
-    _bookmarkSplitFrameWindow()?.postMessage({
-        type: 'companion-pane-focus',
-        pane: _bookmarkFocusedPane,
-    }, window.location.origin);
+    if (notify) {
+        _bookmarkSplitFrameWindow()?.postMessage({
+            type: 'companion-pane-focus',
+            pane: _bookmarkFocusedPane,
+        }, window.location.origin);
+    }
     if (deferRender) setTimeout(renderDesktopBookmarkTabs, 0);
     else if (render) renderDesktopBookmarkTabs();
 }
@@ -457,7 +465,7 @@ function _bookmarkEnsureSplitPane() {
             <span id="desktopSplitPaneTitle">Scheda affiancata</span>
             <button type="button" class="desktop-split-pane-close" onclick="closeBookmarkSplitPane()" aria-label="Chiudi scheda affiancata">&times;</button>
         </div>
-        <iframe id="desktopSplitPaneFrame" title="Scheda affiancata" src="index.html?splitPane=1"></iframe>
+        <iframe id="desktopSplitPaneFrame" title="Scheda affiancata" src="index.html?splitPane=1" scrolling="no"></iframe>
     `;
     document.body.appendChild(pane);
     document.body.classList.add('desktop-split-active');
@@ -468,6 +476,9 @@ function openBookmarkSplitPane(id) {
     const item = _bookmarksRead().find(tab => tab.id === id);
     if (!item) return;
     captureActiveBookmark({ silent: true });
+    if (!document.getElementById('desktopSplitPane')) {
+        _bookmarkRemovePaneItems('right');
+    }
     const splitTab = {
         ...item,
         id: `bm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -492,6 +503,8 @@ function openBookmarkSplitPane(id) {
 
 function closeBookmarkSplitPane() {
     document.getElementById('desktopSplitPane')?.remove();
+    _bookmarkRemovePaneItems('right');
+    _bookmarkRightPaneState = { page: '', tab: '' };
     document.body.classList.remove('desktop-split-active');
     _bookmarkSetFocusedPane('left');
 }
@@ -620,6 +633,7 @@ function _bookmarkEnsureDesktopChrome() {
         rail.className = 'desktop-bookmark-tabs';
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
+        _bookmarkBindTabRailWheel(rail);
     }
     if (!window._bookmarkDesktopPaneFocusBound) {
         window._bookmarkDesktopPaneFocusBound = true;
@@ -638,6 +652,17 @@ function _bookmarkEnsureSplitInstanceChrome() {
     const main = document.getElementById('mainContent');
     if (main) main.insertAdjacentElement('beforebegin', rail);
     else document.body.appendChild(rail);
+    _bookmarkBindTabRailWheel(rail);
+}
+
+function _bookmarkBindTabRailWheel(rail) {
+    if (!rail || rail._bookmarkWheelBound) return;
+    rail._bookmarkWheelBound = true;
+    rail.addEventListener('wheel', (event) => {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        rail.scrollLeft += event.deltaY;
+        event.preventDefault();
+    }, { passive: false });
 }
 
 function _bookmarkPostCurrentPaneState() {
@@ -838,7 +863,7 @@ function initBookmarks() {
                 page: event.data.page || _bookmarkRightPaneState.page || '',
                 tab: event.data.tab || '',
             };
-            _bookmarkSetFocusedPane('right');
+            _bookmarkSetFocusedPane('right', { notify: false });
             updateDesktopSidebarActive();
         }
     });
