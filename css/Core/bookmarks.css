@@ -864,3 +864,35 @@ body.bookmark-split-instance .campagna-card {
 body.desktop-split-active .page.active .btn-fab {
     right: calc(min(46vw, 720px) + 14px);
 }
+
+body.desktop-split-active .scheda-page-grid,
+body.desktop-split-active .scheda-spells-grid,
+body.bookmark-split-instance .scheda-page-grid,
+body.bookmark-split-instance .scheda-spells-grid {
+    display: block !important;
+}
+
+body.desktop-split-active .scheda-page-grid > .scheda-divider,
+body.bookmark-split-instance .scheda-page-grid > .scheda-divider {
+    display: block !important;
+}
+
+body.desktop-split-active .scheda-tab-bar {
+    left: calc(var(--desktop-sidebar-width) + ((100vw - var(--desktop-sidebar-width) - min(46vw, 720px)) / 2));
+    max-width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px) - 28px);
+    bottom: 18px;
+}
+
+body.desktop-split-active .btn-scroll-stats {
+    right: calc(min(46vw, 720px) + 18px);
+    bottom: 18px;
+}
+
+body.bookmark-split-instance .scheda-tab-bar {
+    bottom: 18px;
+    max-width: calc(100vw - 28px);
+}
+
+body.bookmark-split-instance .btn-scroll-stats {
+    bottom: 18px;
+}

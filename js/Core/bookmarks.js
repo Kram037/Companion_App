@@ -169,7 +169,8 @@ function _bookmarkSplitFrameWindow() {
     return document.getElementById('desktopSplitPaneFrame')?.contentWindow || null;
 }
 
-function _bookmarkSetFocusedPane(pane) {
+function _bookmarkSetFocusedPane(pane, options = {}) {
+    const { render = true, deferRender = false } = options;
     if (_bookmarkIsSplitPaneInstance) return;
     _bookmarkFocusedPane = pane === 'right' ? 'right' : 'left';
     document.body.classList.toggle('desktop-split-focus-right', _bookmarkFocusedPane === 'right');
@@ -178,17 +179,19 @@ function _bookmarkSetFocusedPane(pane) {
         type: 'companion-pane-focus',
         pane: _bookmarkFocusedPane,
     }, window.location.origin);
-    renderDesktopBookmarkTabs();
+    if (deferRender) setTimeout(renderDesktopBookmarkTabs, 0);
+    else if (render) renderDesktopBookmarkTabs();
 }
 
-function _bookmarkFocusCurrentPane() {
+function _bookmarkFocusCurrentPane(options = {}) {
     if (_bookmarkIsSplitPaneInstance) {
         document.body.classList.add('split-pane-focused');
         window.parent?.postMessage({ type: 'companion-split-focus' }, window.location.origin);
-        renderDesktopBookmarkTabs();
+        if (options.deferRender) setTimeout(renderDesktopBookmarkTabs, 0);
+        else if (options.render !== false) renderDesktopBookmarkTabs();
         return;
     }
-    _bookmarkSetFocusedPane('left');
+    _bookmarkSetFocusedPane('left', options);
 }
 
 function _bookmarkIsCurrentPaneFocused() {
@@ -590,8 +593,8 @@ function _bookmarkEnsureDesktopChrome() {
     }
     if (!window._bookmarkDesktopPaneFocusBound) {
         window._bookmarkDesktopPaneFocusBound = true;
-        document.getElementById('mainContent')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left'), true);
-        document.getElementById('desktopBookmarkTabs')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left'), true);
+        document.getElementById('mainContent')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left', { render: false }), true);
+        document.getElementById('desktopBookmarkTabs')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left', { render: false }), true);
     }
     renderDesktopSidebar();
 }
@@ -725,8 +728,8 @@ function initBookmarks() {
                 _openDesktopSidebarTarget(event.data.page, event.data.tab || '');
             }
         });
-        document.addEventListener('pointerdown', _bookmarkFocusCurrentPane, true);
-        document.addEventListener('focusin', _bookmarkFocusCurrentPane, true);
+        document.addEventListener('pointerdown', () => _bookmarkFocusCurrentPane({ render: false }), true);
+        document.addEventListener('focusin', () => _bookmarkFocusCurrentPane({ render: false }), true);
         updateBookmarkChrome();
         return;
     }
