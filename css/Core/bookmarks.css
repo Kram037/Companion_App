@@ -674,11 +674,6 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         margin-right: min(46vw, 720px);
     }
 
-    body.desktop-split-active .header,
-    body.desktop-split-active .desktop-bookmark-tabs {
-        width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
-    }
-
     body.desktop-split-active .page-top-stack {
         width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
     }
@@ -719,11 +714,15 @@ body.bookmark-split-instance .bookmarks-tabs-fab {
 
 body.bookmark-split-instance .main-content {
     margin: 0 !important;
-    padding: 0 var(--main-content-padding) var(--main-content-padding);
+    padding: 0 var(--spacing-sm) var(--spacing-sm) !important;
     height: 100vh;
 }
 
 body.bookmark-split-instance .page-top-stack {
     width: 100vw !important;
     margin-left: calc(50% - 50vw) !important;
+}
+
+body.bookmark-split-instance .page-content {
+    padding-top: 0 !important;
 }
