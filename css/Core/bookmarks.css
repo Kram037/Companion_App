@@ -98,7 +98,7 @@
 
 body.bookmarks-over-scheda-tabs .bookmarks-fab,
 body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
-    bottom: calc(var(--app-bottom-toolbar-height) + 62px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--app-bottom-toolbar-height) + 48px + env(safe-area-inset-bottom, 0px));
 }
 
 .bookmarks-sheet-overlay {
@@ -302,6 +302,13 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .main-content {
         margin-left: var(--desktop-sidebar-width);
         padding-top: 0;
+        transition: margin-right 0.18s ease;
+    }
+
+    .header {
+        margin-left: var(--desktop-sidebar-width);
+        width: calc(100vw - var(--desktop-sidebar-width));
+        transition: width 0.18s ease;
     }
 
     .page-top-stack {
@@ -313,7 +320,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-sidebar-nav {
         position: fixed;
         left: 0;
-        top: calc(var(--app-header-height) + 42px);
+        top: 0;
         bottom: 0;
         z-index: 96;
         width: var(--desktop-sidebar-width);
@@ -470,7 +477,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         border: 1px solid var(--border);
         border-bottom-color: transparent;
         border-radius: 12px 12px 0 0;
-        padding: 4px 30px 4px 12px;
+        padding: 4px 54px 4px 12px;
         background: linear-gradient(180deg, var(--surface), rgba(255, 255, 255, 0.02));
         color: var(--text-secondary);
         display: grid;
@@ -557,6 +564,31 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         line-height: 1;
     }
 
+    .desktop-bookmark-tab-split {
+        position: absolute;
+        right: 29px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+        color: var(--text-muted);
+        line-height: 1;
+    }
+
+    .desktop-bookmark-tab-split svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .desktop-bookmark-tab-split:hover {
+        color: var(--fantasy-gold-strong, var(--accent));
+        background: rgba(198, 154, 74, 0.12);
+    }
+
     .desktop-bookmark-tab-close:hover {
         color: #ef4444;
         background: rgba(239, 68, 68, 0.10);
@@ -580,4 +612,104 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .bookmarks-sheet-overlay.active .bookmarks-sheet {
         transform: translateX(0);
     }
+
+    .desktop-split-pane {
+        position: fixed;
+        top: calc(var(--app-header-height) + 42px);
+        right: 0;
+        bottom: 0;
+        width: min(46vw, 720px);
+        min-width: 420px;
+        z-index: 95;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid var(--fantasy-chrome-border, var(--border));
+        background: var(--background);
+        box-shadow: -18px 0 34px rgba(0, 0, 0, 0.24);
+    }
+
+    .desktop-split-pane-head {
+        height: 34px;
+        flex: 0 0 34px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 10px 0 12px;
+        border-bottom: 1px solid var(--fantasy-chrome-border, var(--border));
+        background:
+            linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
+            var(--surface);
+        color: var(--text-secondary);
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .desktop-split-pane-head span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .desktop-split-pane-close {
+        width: 24px;
+        height: 24px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-full);
+        background: var(--surface);
+        color: var(--text-muted);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .desktop-split-pane-close:hover {
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.35);
+        background: rgba(239, 68, 68, 0.08);
+    }
+
+    .desktop-split-pane iframe {
+        flex: 1;
+        width: 100%;
+        border: 0;
+        background: var(--background);
+    }
+
+    body.desktop-split-active .main-content {
+        margin-right: min(46vw, 720px);
+    }
+
+    body.desktop-split-active .header,
+    body.desktop-split-active .desktop-bookmark-tabs {
+        width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
+    }
+
+    body.desktop-split-active .page-top-stack {
+        width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
+    }
+}
+
+body.bookmark-split-instance {
+    padding-bottom: 0;
+}
+
+body.bookmark-split-instance .header,
+body.bookmark-split-instance .bottom-toolbar,
+body.bookmark-split-instance .desktop-sidebar-nav,
+body.bookmark-split-instance .desktop-bookmark-tabs,
+body.bookmark-split-instance .bookmarks-fab,
+body.bookmark-split-instance .bookmarks-tabs-fab {
+    display: none !important;
+}
+
+body.bookmark-split-instance .main-content {
+    margin: 0 !important;
+    padding: 0 var(--main-content-padding) var(--main-content-padding);
+    height: 100vh;
+}
+
+body.bookmark-split-instance .page-top-stack {
+    width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
 }

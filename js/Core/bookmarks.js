@@ -7,6 +7,8 @@ const BOOKMARKS_MAX = 24;
 let _bookmarkRefreshTimer = null;
 let _bookmarkAutoUpdateTimer = null;
 let _bookmarkRestoreInProgress = false;
+let _bookmarkSplitLocalActiveId = '';
+const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 
 function _bookmarksStorageKey() {
     const uid = AppState?.currentUser?.uid || 'local';
@@ -135,10 +137,15 @@ function _bookmarkEscape(value) {
 }
 
 function _bookmarkGetActiveId() {
+    if (_bookmarkIsSplitPaneInstance) return _bookmarkSplitLocalActiveId || '';
     return localStorage.getItem(_bookmarksActiveKey()) || '';
 }
 
 function _bookmarkSetActiveId(id) {
+    if (_bookmarkIsSplitPaneInstance) {
+        _bookmarkSplitLocalActiveId = id || '';
+        return;
+    }
     if (id) localStorage.setItem(_bookmarksActiveKey(), id);
     else localStorage.removeItem(_bookmarksActiveKey());
 }
@@ -229,6 +236,7 @@ function _bookmarkEnsureHeaderButton() {
 
 function updateBookmarkChrome() {
     _bookmarkEnsureHeaderButton();
+    if (_bookmarkIsSplitPaneInstance) return;
     const list = _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
     const activeIndex = list.findIndex(item => item.id === activeId);
@@ -345,6 +353,46 @@ async function openBookmark(id) {
     };
     setTimeout(restore, 80);
     updateBookmarkChrome();
+}
+
+function _bookmarkSplitIconSvg() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1.5"></rect><rect x="14" y="4" width="7" height="16" rx="1.5"></rect></svg>`;
+}
+
+function _bookmarkEnsureSplitPane() {
+    let pane = document.getElementById('desktopSplitPane');
+    if (pane) return pane;
+    pane = document.createElement('aside');
+    pane.id = 'desktopSplitPane';
+    pane.className = 'desktop-split-pane';
+    pane.innerHTML = `
+        <div class="desktop-split-pane-head">
+            <span id="desktopSplitPaneTitle">Scheda affiancata</span>
+            <button type="button" class="desktop-split-pane-close" onclick="closeBookmarkSplitPane()" aria-label="Chiudi scheda affiancata">&times;</button>
+        </div>
+        <iframe id="desktopSplitPaneFrame" title="Scheda affiancata" src="index.html?splitPane=1"></iframe>
+    `;
+    document.body.appendChild(pane);
+    document.body.classList.add('desktop-split-active');
+    return pane;
+}
+
+function openBookmarkSplitPane(id) {
+    const item = _bookmarksRead().find(tab => tab.id === id);
+    if (!item) return;
+    captureActiveBookmark({ silent: true });
+    const pane = _bookmarkEnsureSplitPane();
+    const title = pane.querySelector('#desktopSplitPaneTitle');
+    if (title) title.textContent = item.title || 'Scheda affiancata';
+    const frame = pane.querySelector('#desktopSplitPaneFrame');
+    const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: id }, window.location.origin);
+    frame.addEventListener('load', postOpen, { once: true });
+    setTimeout(postOpen, 220);
+}
+
+function closeBookmarkSplitPane() {
+    document.getElementById('desktopSplitPane')?.remove();
+    document.body.classList.remove('desktop-split-active');
 }
 
 function renderBookmarksSheet() {
@@ -552,6 +600,7 @@ function renderDesktopBookmarkTabs() {
         <button type="button" class="desktop-bookmark-tab ${item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
+            <span type="button" class="desktop-bookmark-tab-split" aria-label="Apri scheda affiancata" onclick="event.stopPropagation(); openBookmarkSplitPane('${item.id}')">${_bookmarkSplitIconSvg()}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
         </button>
     `).join('');
@@ -561,6 +610,16 @@ function renderDesktopBookmarkTabs() {
 }
 
 function initBookmarks() {
+    if (_bookmarkIsSplitPaneInstance) {
+        document.body.classList.add('bookmark-split-instance');
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) return;
+            if (event.data?.type === 'companion-open-bookmark' && event.data.bookmarkId) {
+                openBookmark(event.data.bookmarkId);
+            }
+        });
+        return;
+    }
     if (!document.getElementById('bookmarksFab')) {
         const fab = document.createElement('button');
         fab.type = 'button';
@@ -627,6 +686,8 @@ window.scheduleActiveBookmarkCapture = scheduleActiveBookmarkCapture;
 window.createBookmarkTab = createBookmarkTab;
 window.saveCurrentBookmark = createBookmarkTab;
 window.openBookmark = openBookmark;
+window.openBookmarkSplitPane = openBookmarkSplitPane;
+window.closeBookmarkSplitPane = closeBookmarkSplitPane;
 window.removeBookmark = removeBookmark;
 window.openBookmarksSheet = openBookmarksSheet;
 window.closeBookmarksSheet = closeBookmarksSheet;
