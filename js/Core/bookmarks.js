@@ -233,6 +233,7 @@ function updateBookmarkChrome() {
     const activeId = _bookmarkGetActiveId();
     const activeIndex = list.findIndex(item => item.id === activeId);
     const positionLabel = list.length ? `${Math.max(activeIndex + 1, 1)}/${list.length}` : '0';
+    document.body.classList.toggle('bookmarks-over-scheda-tabs', AppState.currentPage === 'scheda');
 
     const fab = document.getElementById('bookmarksFab');
     const count = document.getElementById('bookmarksFabCount');
@@ -355,8 +356,9 @@ function renderBookmarksSheet() {
         body.innerHTML = '<div class="bookmarks-empty">Nessuna scheda aperta.</div>';
         return;
     }
-    body.innerHTML = list.map(item => `
+    body.innerHTML = list.map((item, index) => `
         <div class="bookmark-row ${item.id === activeId ? 'active' : ''}" role="button" tabindex="0" onclick="openBookmark('${item.id}')">
+            <div class="bookmark-row-index">${index + 1}</div>
             <div class="bookmark-row-main">
                 <div class="bookmark-row-title">${_bookmarkEscape(item.title)}</div>
                 <div class="bookmark-row-section">${_bookmarkEscape(item.section || item.page)}</div>
@@ -374,6 +376,45 @@ function openBookmarksSheet() {
 
 function closeBookmarksSheet() {
     document.getElementById('bookmarksSheetOverlay')?.classList.remove('active');
+}
+
+function _bookmarkBindSheetDrag(overlay) {
+    const sheet = overlay.querySelector('.bookmarks-sheet');
+    if (!sheet || sheet._bookmarkDragBound) return;
+    sheet._bookmarkDragBound = true;
+
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+
+    const begin = (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        startY = event.clientY;
+        currentY = 0;
+        dragging = true;
+        sheet.classList.add('dragging');
+        sheet.setPointerCapture?.(event.pointerId);
+    };
+    const move = (event) => {
+        if (!dragging) return;
+        currentY = Math.max(0, event.clientY - startY);
+        if (currentY > 0) {
+            sheet.style.transform = `translateY(${currentY}px)`;
+        }
+    };
+    const end = (event) => {
+        if (!dragging) return;
+        dragging = false;
+        sheet.releasePointerCapture?.(event.pointerId);
+        sheet.classList.remove('dragging');
+        sheet.style.transform = '';
+        if (currentY > 72) closeBookmarksSheet();
+    };
+
+    sheet.addEventListener('pointerdown', begin);
+    sheet.addEventListener('pointermove', move);
+    sheet.addEventListener('pointerup', end);
+    sheet.addEventListener('pointercancel', end);
 }
 
 function _desktopNavItems() {
@@ -558,6 +599,9 @@ function initBookmarks() {
             </section>
         `;
         document.body.appendChild(overlay);
+        _bookmarkBindSheetDrag(overlay);
+    } else {
+        _bookmarkBindSheetDrag(document.getElementById('bookmarksSheetOverlay'));
     }
     _bookmarkEnsureDesktopChrome();
     if (!window._bookmarksInteractionRefreshBound) {
