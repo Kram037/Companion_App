@@ -86,13 +86,20 @@ function _bookmarkSectionFallback(page) {
     return '';
 }
 
+function _bookmarkCurrentPoint(page, section) {
+    const clean = _bookmarkCleanText(section);
+    if (!clean) return _bookmarkSectionFallback(page);
+    const parts = clean.split('>').map(part => part.trim()).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : clean;
+}
+
 function _bookmarkCurrentSnapshot(existingId = null) {
     const page = AppState.currentPage || 'campagne';
     const hook = typeof window.getPageBookmarkState === 'function'
         ? (window.getPageBookmarkState(page) || {})
         : {};
     const title = hook.title || _bookmarkTitleFallback(page);
-    const section = hook.section || _bookmarkSectionFallback(page);
+    const section = _bookmarkCurrentPoint(page, hook.section || _bookmarkSectionFallback(page));
     const state = {
         page,
         campagnaId: AppState.currentCampagnaId || null,
@@ -215,39 +222,20 @@ function _bookmarkEnsureHeaderButton() {
     if (!active) return null;
     const header = active.querySelector('.page-top-stack .page-header, .page-header, .combat-header');
     if (!header) return null;
-
-    let btn = header.querySelector('.page-header-bookmark');
-    if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'page-header-action page-header-bookmark';
-        btn.setAttribute('aria-label', 'Crea scheda');
-        btn.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            createBookmarkTab();
-        });
-        header.insertBefore(btn, header.firstChild);
-    }
-    header.classList.add('page-header-has-bookmark');
-    return btn;
+    header.querySelector('.page-header-bookmark')?.remove();
+    header.classList.remove('page-header-has-bookmark');
+    return null;
 }
 
 function updateBookmarkChrome() {
-    const btn = _bookmarkEnsureHeaderButton();
+    _bookmarkEnsureHeaderButton();
     const list = _bookmarksRead();
-    const active = _bookmarkGetActive(list);
-
-    if (btn) {
-        btn.classList.toggle('is-saved', !!active);
-        btn.innerHTML = _bookmarkIconSvg(!!active);
-        btn.title = active ? 'Scheda attiva' : 'Crea scheda da questa pagina';
-        btn.setAttribute('aria-label', active ? 'Scheda attiva' : 'Crea scheda da questa pagina');
-    }
 
     const fab = document.getElementById('bookmarksFab');
     const count = document.getElementById('bookmarksFabCount');
-    if (fab) fab.style.display = list.length ? 'inline-flex' : 'none';
+    const tabsBtn = document.getElementById('bookmarksTabsFab');
+    if (fab) fab.style.display = 'inline-flex';
+    if (tabsBtn) tabsBtn.style.display = list.length ? 'inline-flex' : 'none';
     if (count) count.textContent = String(list.length);
 
     renderBookmarksSheet();
@@ -386,12 +374,32 @@ function closeBookmarksSheet() {
 }
 
 function _desktopNavItems() {
+    const labChildren = typeof window.labGetSidebarItems === 'function' ? window.labGetSidebarItems() : [];
+    const compChildren = typeof window.compGetSidebarItems === 'function' ? window.compGetSidebarItems() : [];
     return [
-        { page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
-        { page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>' },
-        { page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>' },
+        { type: 'link', page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
+        { type: 'link', page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { type: 'group', page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>', children: labChildren },
+        { type: 'group', page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>', children: compChildren },
     ];
+}
+
+function _desktopSidebarItemIcon(item) {
+    if (item.icon) return item.icon;
+    if (!item.iconFile) return '';
+    const src = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
+    return `<img class="desktop-sidebar-item-icon" src="${src}" alt="" loading="lazy">`;
+}
+
+function _desktopGroupOpen(page) {
+    if (AppState.currentPage === page) return true;
+    return localStorage.getItem(`companion_sidebar_group_${page}`) === 'open';
+}
+
+function _desktopToggleGroup(page) {
+    const isOpen = _desktopGroupOpen(page);
+    localStorage.setItem(`companion_sidebar_group_${page}`, isOpen ? 'closed' : 'open');
+    renderDesktopSidebar();
 }
 
 function _bookmarkEnsureDesktopChrome() {
@@ -400,17 +408,16 @@ function _bookmarkEnsureDesktopChrome() {
         sidebar.id = 'desktopSidebarNav';
         sidebar.className = 'desktop-sidebar-nav';
         sidebar.setAttribute('aria-label', 'Navigazione principale');
-        sidebar.innerHTML = _desktopNavItems().map(item => `
-            <button type="button" class="desktop-sidebar-btn" data-page="${item.page}" aria-label="${item.label}">
-                ${item.icon}
-                <span>${item.label}</span>
-            </button>
-        `).join('');
         sidebar.addEventListener('click', (event) => {
-            const btn = event.target.closest('.desktop-sidebar-btn');
+            const toggle = event.target.closest('.desktop-sidebar-group-toggle');
+            if (toggle) {
+                _desktopToggleGroup(toggle.dataset.page);
+                return;
+            }
+            const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child');
             if (!btn) return;
             captureActiveBookmark({ silent: true });
-            navigateToPage(btn.dataset.page);
+            _openDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '');
         });
         document.body.appendChild(sidebar);
     }
@@ -422,11 +429,73 @@ function _bookmarkEnsureDesktopChrome() {
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
     }
+    renderDesktopSidebar();
+}
+
+function _openDesktopSidebarTarget(page, tab = '') {
+    if (page === 'laboratorio') {
+        navigateToPage('laboratorio');
+        if (tab) setTimeout(() => window.labOpenCategory?.(tab), 80);
+        return;
+    }
+    if (page === 'compendio') {
+        navigateToPage('compendio');
+        if (tab) setTimeout(() => window.compendioOpenTab?.(tab), 80);
+        return;
+    }
+    navigateToPage(page);
+}
+
+function _desktopActiveChild(page) {
+    if (page === 'laboratorio' && typeof window.labGetCurrentSidebarTab === 'function') {
+        return window.labGetCurrentSidebarTab();
+    }
+    if (page === 'compendio' && typeof window.compGetCurrentSidebarTab === 'function') {
+        return window.compGetCurrentSidebarTab();
+    }
+    return '';
+}
+
+function renderDesktopSidebar() {
+    const sidebar = document.getElementById('desktopSidebarNav');
+    if (!sidebar) return;
+    sidebar.innerHTML = _desktopNavItems().map(item => {
+        if (item.type !== 'group') {
+            return `
+                <button type="button" class="desktop-sidebar-btn" data-page="${item.page}" aria-label="${item.label}">
+                    ${_desktopSidebarItemIcon(item)}
+                    <span>${_bookmarkEscape(item.label)}</span>
+                </button>
+            `;
+        }
+        const open = _desktopGroupOpen(item.page);
+        const activeChild = _desktopActiveChild(item.page);
+        return `
+            <div class="desktop-sidebar-group ${open ? 'open' : ''}" data-page="${item.page}">
+                <button type="button" class="desktop-sidebar-btn desktop-sidebar-group-toggle" data-page="${item.page}" aria-label="${item.label}" aria-expanded="${open ? 'true' : 'false'}">
+                    ${_desktopSidebarItemIcon(item)}
+                    <span>${_bookmarkEscape(item.label)}</span>
+                    <span class="desktop-sidebar-caret">⌄</span>
+                </button>
+                <div class="desktop-sidebar-children">
+                    ${(item.children || []).map(child => `
+                        <button type="button" class="desktop-sidebar-child ${AppState.currentPage === item.page && activeChild === child.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
+                            ${_desktopSidebarItemIcon(child)}
+                            <span>${_bookmarkEscape(child.label)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function updateDesktopSidebarActive() {
+    renderDesktopSidebar();
     document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === AppState.currentPage);
+        const isGroup = btn.classList.contains('desktop-sidebar-group-toggle');
+        btn.classList.toggle('active', btn.dataset.page === AppState.currentPage && !isGroup);
+        btn.classList.toggle('group-active', btn.dataset.page === AppState.currentPage && isGroup);
     });
 }
 
@@ -459,10 +528,20 @@ function initBookmarks() {
         fab.type = 'button';
         fab.id = 'bookmarksFab';
         fab.className = 'bookmarks-fab';
-        fab.setAttribute('aria-label', 'Schede aperte');
-        fab.innerHTML = `${_bookmarkIconSvg(true)}<span id="bookmarksFabCount">0</span>`;
-        fab.onclick = openBookmarksSheet;
+        fab.setAttribute('aria-label', 'Crea scheda');
+        fab.innerHTML = _bookmarkIconSvg(false);
+        fab.onclick = createBookmarkTab;
         document.body.appendChild(fab);
+    }
+    if (!document.getElementById('bookmarksTabsFab')) {
+        const tabsFab = document.createElement('button');
+        tabsFab.type = 'button';
+        tabsFab.id = 'bookmarksTabsFab';
+        tabsFab.className = 'bookmarks-tabs-fab';
+        tabsFab.setAttribute('aria-label', 'Schede aperte');
+        tabsFab.innerHTML = `<span id="bookmarksFabCount">0</span>`;
+        tabsFab.onclick = openBookmarksSheet;
+        document.body.appendChild(tabsFab);
     }
     if (!document.getElementById('bookmarksSheetOverlay')) {
         const overlay = document.createElement('div');

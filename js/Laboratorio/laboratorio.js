@@ -112,6 +112,22 @@ function _labCategoryIcon(cat, className = 'lab-card-icon-img') {
     return cat?.icon || '';
 }
 
+window.labGetSidebarItems = function() {
+    return LAB_HUB_ORDER
+        .map(key => [key, LAB_CATEGORIES[key]])
+        .filter(([, cat]) => !!cat)
+        .map(([key, cat]) => ({
+            key,
+            label: cat.labelPlural || cat.label,
+            iconFile: cat.iconFile,
+        }));
+};
+
+window.labGetCurrentSidebarTab = function() {
+    const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
+    return subVisible ? _labCurrentTab : '';
+};
+
 function _labActiveTab() {
     if (_labCurrentTab === 'classi' && _labClassiSubTab === 'sottoclassi') return 'sottoclassi';
     if (_labCurrentTab === 'talenti' && _labTalentiStiliSubTab === 'stili') return 'stili';

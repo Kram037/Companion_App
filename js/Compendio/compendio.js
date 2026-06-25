@@ -115,6 +115,19 @@ function _compEquipmentSectionIcon(section) {
     return `<img class="comp-hub-icon-img" src="${src}" alt="" loading="lazy">`;
 }
 
+window.compGetSidebarItems = function() {
+    return Object.entries(COMP_TABS).map(([key, tab]) => ({
+        key,
+        label: tab.label,
+        iconFile: tab.iconFile,
+    }));
+};
+
+window.compGetCurrentSidebarTab = function() {
+    const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
+    return subVisible ? _compCurrentTab : '';
+};
+
 const COMP_MULTICLASS_REQUIREMENTS = {
     Artefice: 'Intelligenza 13',
     Barbaro: 'Forza 13',
@@ -593,7 +606,7 @@ window.compGetBookmarkState = function() {
     if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
         sectionParts.push(COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || state.equipmentSection);
     }
-    if (state.detail?.id) sectionParts.push('Dettaglio');
+    if (state.detail?.id) sectionParts.push(state.detail.title || 'Dettaglio');
     return {
         title,
         section: sectionParts.join(' > '),
