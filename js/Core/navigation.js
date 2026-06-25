@@ -93,6 +93,10 @@ function updateScrollStatsBtn() {
 
 // Navigation
 function navigateToPage(pageName, { pushHistory = true } = {}) {
+    if (typeof captureActiveBookmark === 'function') {
+        captureActiveBookmark({ silent: true });
+    }
+
     const previousPage = AppState.currentPage;
 
     // Update active page
@@ -194,6 +198,9 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
 
     updateReturnToSessionBtn();
     updateScrollStatsBtn();
+    if (typeof scheduleActiveBookmarkCapture === 'function') {
+        scheduleActiveBookmarkCapture(220);
+    }
     if (typeof updateBookmarkChrome === 'function') {
         setTimeout(updateBookmarkChrome, 0);
     }

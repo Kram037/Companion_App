@@ -1,14 +1,21 @@
 // ============================================================================
-// BOOKMARKS - Saved navigation tabs / reading positions
+// BOOKMARKS - Navigation tabs / saved reading contexts
 // ============================================================================
 
 const BOOKMARKS_VERSION = 1;
 const BOOKMARKS_MAX = 24;
 let _bookmarkRefreshTimer = null;
+let _bookmarkAutoUpdateTimer = null;
+let _bookmarkRestoreInProgress = false;
 
 function _bookmarksStorageKey() {
     const uid = AppState?.currentUser?.uid || 'local';
     return `companion_bookmarks_v${BOOKMARKS_VERSION}_${uid}`;
+}
+
+function _bookmarksActiveKey() {
+    const uid = AppState?.currentUser?.uid || 'local';
+    return `companion_bookmarks_active_v${BOOKMARKS_VERSION}_${uid}`;
 }
 
 function _bookmarksRead() {
@@ -53,7 +60,7 @@ function _bookmarkCleanText(value) {
 
 function _bookmarkTitleFallback(page) {
     const active = _bookmarkActivePageEl();
-    const title = active?.querySelector('.page-top-stack .page-header h1, .page-header h1')?.textContent;
+    const title = active?.querySelector('.page-top-stack .page-header h1, .page-header h1, .combat-round-center')?.textContent;
     return _bookmarkCleanText(title) || ({
         campagne: 'Campagne',
         compendio: 'Compendio',
@@ -79,7 +86,7 @@ function _bookmarkSectionFallback(page) {
     return '';
 }
 
-function _bookmarkCurrentSnapshot() {
+function _bookmarkCurrentSnapshot(existingId = null) {
     const page = AppState.currentPage || 'campagne';
     const hook = typeof window.getPageBookmarkState === 'function'
         ? (window.getPageBookmarkState(page) || {})
@@ -103,7 +110,7 @@ function _bookmarkCurrentSnapshot() {
     ].join('|');
 
     return {
-        id: `bm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        id: existingId || `bm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         fingerprint,
         title,
         section,
@@ -112,6 +119,31 @@ function _bookmarkCurrentSnapshot() {
         createdAt: _bookmarkNow(),
         updatedAt: _bookmarkNow(),
     };
+}
+
+function _bookmarkEscape(value) {
+    return typeof escapeHtml === 'function' ? escapeHtml(value) : String(value || '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+}
+
+function _bookmarkGetActiveId() {
+    return localStorage.getItem(_bookmarksActiveKey()) || '';
+}
+
+function _bookmarkSetActiveId(id) {
+    if (id) localStorage.setItem(_bookmarksActiveKey(), id);
+    else localStorage.removeItem(_bookmarksActiveKey());
+}
+
+function _bookmarkGetActive(list = _bookmarksRead()) {
+    const id = _bookmarkGetActiveId();
+    return id ? list.find(item => item.id === id) || null : null;
+}
+
+function _bookmarkIsWritablePage() {
+    const active = _bookmarkActivePageEl();
+    return !!active;
 }
 
 window.getPageBookmarkState = function(page) {
@@ -172,11 +204,6 @@ window.restorePageBookmarkState = async function(page, saved) {
     }
 };
 
-function _bookmarkFindCurrent(list = _bookmarksRead()) {
-    const snap = _bookmarkCurrentSnapshot();
-    return list.find(b => b.fingerprint === snap.fingerprint) || null;
-}
-
 function _bookmarkIconSvg(filled = false) {
     return filled
         ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8"><path d="M6 3.5A2.5 2.5 0 0 1 8.5 1h7A2.5 2.5 0 0 1 18 3.5V22l-6-3.5L6 22V3.5Z"/></svg>`
@@ -186,78 +213,113 @@ function _bookmarkIconSvg(filled = false) {
 function _bookmarkEnsureHeaderButton() {
     const active = _bookmarkActivePageEl();
     if (!active) return null;
-    const header = active.querySelector('.page-top-stack .page-header, .page-header');
+    const header = active.querySelector('.page-top-stack .page-header, .page-header, .combat-header');
     if (!header) return null;
-    if (active.id === 'combattimentoPage') return null;
 
     let btn = header.querySelector('.page-header-bookmark');
     if (!btn) {
         btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'page-header-action page-header-bookmark';
-        btn.setAttribute('aria-label', 'Salva scheda');
+        btn.setAttribute('aria-label', 'Crea scheda');
         btn.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            saveCurrentBookmark();
+            createBookmarkTab();
         });
-        header.appendChild(btn);
+        header.insertBefore(btn, header.firstChild);
     }
     header.classList.add('page-header-has-bookmark');
-    header.querySelectorAll('.page-header-action:not(.page-header-bookmark)').forEach(action => {
-        action.classList.add('page-header-action-before-bookmark');
-    });
     return btn;
 }
 
 function updateBookmarkChrome() {
     const btn = _bookmarkEnsureHeaderButton();
     const list = _bookmarksRead();
-    const current = _bookmarkFindCurrent(list);
+    const active = _bookmarkGetActive(list);
+
     if (btn) {
-        btn.classList.toggle('is-saved', !!current);
-        btn.innerHTML = _bookmarkIconSvg(!!current);
-        btn.title = current ? 'Aggiorna scheda salvata' : 'Salva scheda';
-        btn.setAttribute('aria-label', current ? 'Aggiorna scheda salvata' : 'Salva scheda');
+        btn.classList.toggle('is-saved', !!active);
+        btn.innerHTML = _bookmarkIconSvg(!!active);
+        btn.title = active ? 'Scheda attiva' : 'Crea scheda da questa pagina';
+        btn.setAttribute('aria-label', active ? 'Scheda attiva' : 'Crea scheda da questa pagina');
     }
+
     const fab = document.getElementById('bookmarksFab');
     const count = document.getElementById('bookmarksFabCount');
     if (fab) fab.style.display = list.length ? 'inline-flex' : 'none';
     if (count) count.textContent = String(list.length);
+
     renderBookmarksSheet();
+    renderDesktopBookmarkTabs();
+    updateDesktopSidebarActive();
 }
 
-function saveCurrentBookmark() {
-    const snap = _bookmarkCurrentSnapshot();
+function captureActiveBookmark({ silent = true } = {}) {
+    if (_bookmarkRestoreInProgress || !_bookmarkIsWritablePage()) return;
+    const activeId = _bookmarkGetActiveId();
+    if (!activeId) return;
+
     const list = _bookmarksRead();
-    const idx = list.findIndex(b => b.fingerprint === snap.fingerprint);
-    if (idx >= 0) {
-        list[idx] = {
-            ...list[idx],
-            ...snap,
-            id: list[idx].id,
-            createdAt: list[idx].createdAt,
-            updatedAt: _bookmarkNow(),
-        };
-        showNotification?.('Scheda aggiornata');
-    } else {
-        list.unshift(snap);
-        showNotification?.('Scheda salvata');
+    const idx = list.findIndex(item => item.id === activeId);
+    if (idx < 0) {
+        _bookmarkSetActiveId('');
+        updateBookmarkChrome();
+        return;
     }
+
+    const old = list[idx];
+    const snap = _bookmarkCurrentSnapshot(old.id);
+    list[idx] = {
+        ...old,
+        ...snap,
+        id: old.id,
+        createdAt: old.createdAt,
+        updatedAt: _bookmarkNow(),
+    };
     _bookmarksWrite(list);
+    if (!silent) showNotification?.('Scheda aggiornata');
+    updateBookmarkChrome();
+}
+
+function scheduleActiveBookmarkCapture(delay = 160) {
+    clearTimeout(_bookmarkAutoUpdateTimer);
+    _bookmarkAutoUpdateTimer = setTimeout(() => captureActiveBookmark({ silent: true }), delay);
+}
+
+function createBookmarkTab() {
+    captureActiveBookmark({ silent: true });
+    const snap = _bookmarkCurrentSnapshot();
+    const list = _bookmarksRead().filter(item => item.id !== snap.id);
+    list.unshift(snap);
+    _bookmarksWrite(list);
+    _bookmarkSetActiveId(snap.id);
+    showNotification?.('Scheda creata');
     updateBookmarkChrome();
 }
 
 function removeBookmark(id) {
-    const list = _bookmarksRead().filter(b => b.id !== id);
+    const wasActive = _bookmarkGetActiveId() === id;
+    const list = _bookmarksRead().filter(item => item.id !== id);
     _bookmarksWrite(list);
+    if (wasActive) {
+        const nextId = list[0]?.id || '';
+        _bookmarkSetActiveId(nextId);
+        if (nextId) {
+            setTimeout(() => openBookmark(nextId), 0);
+            return;
+        }
+    }
     updateBookmarkChrome();
 }
 
 async function openBookmark(id) {
     const item = _bookmarksRead().find(b => b.id === id);
     if (!item) return;
+    captureActiveBookmark({ silent: true });
     closeBookmarksSheet();
+    _bookmarkRestoreInProgress = true;
+    _bookmarkSetActiveId(id);
 
     const st = item.state || {};
     AppState.currentCampagnaId = st.campagnaId || null;
@@ -265,49 +327,56 @@ async function openBookmark(id) {
     AppState.currentPersonaggioId = st.personaggioId || null;
 
     if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
+    else sessionStorage.removeItem('currentCampagnaId');
     if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
+    else sessionStorage.removeItem('currentSessioneId');
     if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
+    else sessionStorage.removeItem('currentPersonaggioId');
 
     navigateToPage(st.page || item.page || 'campagne');
 
     const restore = async () => {
-        if (typeof window.restorePageBookmarkState === 'function') {
-            await window.restorePageBookmarkState(st.page || item.page, st.hook || {}, item);
-        }
-        setTimeout(() => {
-            _bookmarkSetMainScrollTop(st.scrollTop);
+        try {
+            if (typeof window.restorePageBookmarkState === 'function') {
+                await window.restorePageBookmarkState(st.page || item.page, st.hook || {}, item);
+            }
+            setTimeout(() => {
+                _bookmarkSetMainScrollTop(st.scrollTop);
+                _bookmarkRestoreInProgress = false;
+                setTimeout(() => captureActiveBookmark({ silent: true }), 90);
+            }, 160);
+        } catch (error) {
+            console.error('Errore ripristino scheda:', error);
+            _bookmarkRestoreInProgress = false;
             updateBookmarkChrome();
-        }, 180);
+        }
     };
     setTimeout(restore, 80);
-}
-
-function _bookmarkEscape(value) {
-    return typeof escapeHtml === 'function' ? escapeHtml(value) : String(value || '').replace(/[&<>"']/g, ch => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-    }[ch]));
+    updateBookmarkChrome();
 }
 
 function renderBookmarksSheet() {
     const list = _bookmarksRead();
     const body = document.getElementById('bookmarksSheetList');
     if (!body) return;
+    const activeId = _bookmarkGetActiveId();
     if (!list.length) {
-        body.innerHTML = '<div class="bookmarks-empty">Nessuna scheda salvata.</div>';
+        body.innerHTML = '<div class="bookmarks-empty">Nessuna scheda aperta.</div>';
         return;
     }
     body.innerHTML = list.map(item => `
-        <div class="bookmark-row" role="button" tabindex="0" onclick="openBookmark('${item.id}')">
+        <div class="bookmark-row ${item.id === activeId ? 'active' : ''}" role="button" tabindex="0" onclick="openBookmark('${item.id}')">
             <div class="bookmark-row-main">
                 <div class="bookmark-row-title">${_bookmarkEscape(item.title)}</div>
                 <div class="bookmark-row-section">${_bookmarkEscape(item.section || item.page)}</div>
             </div>
-            <button type="button" class="bookmark-row-remove" aria-label="Rimuovi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</button>
+            <button type="button" class="bookmark-row-remove" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</button>
         </div>
     `).join('');
 }
 
 function openBookmarksSheet() {
+    captureActiveBookmark({ silent: true });
     renderBookmarksSheet();
     document.getElementById('bookmarksSheetOverlay')?.classList.add('active');
 }
@@ -316,13 +385,81 @@ function closeBookmarksSheet() {
     document.getElementById('bookmarksSheetOverlay')?.classList.remove('active');
 }
 
+function _desktopNavItems() {
+    return [
+        { page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
+        { page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>' },
+        { page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>' },
+    ];
+}
+
+function _bookmarkEnsureDesktopChrome() {
+    if (!document.getElementById('desktopSidebarNav')) {
+        const sidebar = document.createElement('aside');
+        sidebar.id = 'desktopSidebarNav';
+        sidebar.className = 'desktop-sidebar-nav';
+        sidebar.setAttribute('aria-label', 'Navigazione principale');
+        sidebar.innerHTML = _desktopNavItems().map(item => `
+            <button type="button" class="desktop-sidebar-btn" data-page="${item.page}" aria-label="${item.label}">
+                ${item.icon}
+                <span>${item.label}</span>
+            </button>
+        `).join('');
+        sidebar.addEventListener('click', (event) => {
+            const btn = event.target.closest('.desktop-sidebar-btn');
+            if (!btn) return;
+            captureActiveBookmark({ silent: true });
+            navigateToPage(btn.dataset.page);
+        });
+        document.body.appendChild(sidebar);
+    }
+
+    if (!document.getElementById('desktopBookmarkTabs')) {
+        const rail = document.createElement('div');
+        rail.id = 'desktopBookmarkTabs';
+        rail.className = 'desktop-bookmark-tabs';
+        rail.setAttribute('aria-label', 'Schede aperte');
+        document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
+    }
+}
+
+function updateDesktopSidebarActive() {
+    document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === AppState.currentPage);
+    });
+}
+
+function renderDesktopBookmarkTabs() {
+    const rail = document.getElementById('desktopBookmarkTabs');
+    if (!rail) return;
+    const list = _bookmarksRead();
+    const activeId = _bookmarkGetActiveId();
+    if (!list.length) {
+        rail.innerHTML = `
+            <button type="button" class="desktop-tab-empty" onclick="createBookmarkTab()">
+                ${_bookmarkIconSvg(false)}
+                <span>Crea una scheda</span>
+            </button>
+        `;
+        return;
+    }
+    rail.innerHTML = list.map(item => `
+        <button type="button" class="desktop-bookmark-tab ${item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
+            <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
+            <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
+            <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
+        </button>
+    `).join('');
+}
+
 function initBookmarks() {
     if (!document.getElementById('bookmarksFab')) {
         const fab = document.createElement('button');
         fab.type = 'button';
         fab.id = 'bookmarksFab';
         fab.className = 'bookmarks-fab';
-        fab.setAttribute('aria-label', 'Schede salvate');
+        fab.setAttribute('aria-label', 'Schede aperte');
         fab.innerHTML = `${_bookmarkIconSvg(true)}<span id="bookmarksFabCount">0</span>`;
         fab.onclick = openBookmarksSheet;
         document.body.appendChild(fab);
@@ -335,10 +472,10 @@ function initBookmarks() {
             if (event.target === overlay) closeBookmarksSheet();
         };
         overlay.innerHTML = `
-            <section class="bookmarks-sheet" aria-label="Schede salvate">
+            <section class="bookmarks-sheet" aria-label="Schede aperte">
                 <div class="bookmarks-sheet-handle"></div>
                 <div class="bookmarks-sheet-head">
-                    <h2>Schede salvate</h2>
+                    <h2>Schede aperte</h2>
                     <button type="button" class="bookmarks-sheet-close" onclick="closeBookmarksSheet()" aria-label="Chiudi">&times;</button>
                 </div>
                 <div id="bookmarksSheetList" class="bookmarks-sheet-list"></div>
@@ -346,21 +483,29 @@ function initBookmarks() {
         `;
         document.body.appendChild(overlay);
     }
+    _bookmarkEnsureDesktopChrome();
     if (!window._bookmarksInteractionRefreshBound) {
         window._bookmarksInteractionRefreshBound = true;
         const schedule = () => {
             clearTimeout(_bookmarkRefreshTimer);
-            _bookmarkRefreshTimer = setTimeout(updateBookmarkChrome, 180);
+            _bookmarkRefreshTimer = setTimeout(() => {
+                scheduleActiveBookmarkCapture(0);
+                updateBookmarkChrome();
+            }, 180);
         };
         document.addEventListener('click', schedule, true);
         document.addEventListener('input', schedule, true);
+        document.getElementById('mainContent')?.addEventListener('scroll', () => scheduleActiveBookmarkCapture(280), { passive: true });
     }
     updateBookmarkChrome();
 }
 
 window.initBookmarks = initBookmarks;
 window.updateBookmarkChrome = updateBookmarkChrome;
-window.saveCurrentBookmark = saveCurrentBookmark;
+window.captureActiveBookmark = captureActiveBookmark;
+window.scheduleActiveBookmarkCapture = scheduleActiveBookmarkCapture;
+window.createBookmarkTab = createBookmarkTab;
+window.saveCurrentBookmark = createBookmarkTab;
 window.openBookmark = openBookmark;
 window.removeBookmark = removeBookmark;
 window.openBookmarksSheet = openBookmarksSheet;
