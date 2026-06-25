@@ -160,6 +160,25 @@ function _bookmarkIsWritablePage() {
     return !!active;
 }
 
+function _bookmarkIsDesktopLayout() {
+    return typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 900px)').matches;
+}
+
+function _bookmarkEnsureMinimumDesktopTab() {
+    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout() || !_bookmarkIsWritablePage()) return null;
+    const list = _bookmarksRead();
+    if (list.length) {
+        if (!_bookmarkGetActiveId() || !list.some(item => item.id === _bookmarkGetActiveId())) {
+            _bookmarkSetActiveId(list[0].id);
+        }
+        return list;
+    }
+    const snap = _bookmarkCurrentSnapshot();
+    _bookmarksWrite([snap]);
+    _bookmarkSetActiveId(snap.id);
+    return [snap];
+}
+
 window.getPageBookmarkState = function(page) {
     if (page === 'compendio' && typeof window.compGetBookmarkState === 'function') {
         return window.compGetBookmarkState();
@@ -237,7 +256,7 @@ function _bookmarkEnsureHeaderButton() {
 function updateBookmarkChrome() {
     _bookmarkEnsureHeaderButton();
     if (_bookmarkIsSplitPaneInstance) return;
-    const list = _bookmarksRead();
+    const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
     const activeIndex = list.findIndex(item => item.id === activeId);
     const positionLabel = list.length ? `${Math.max(activeIndex + 1, 1)}/${list.length}` : '0';
@@ -357,6 +376,16 @@ async function openBookmark(id) {
 
 function _bookmarkSplitIconSvg() {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1.5"></rect><rect x="14" y="4" width="7" height="16" rx="1.5"></rect></svg>`;
+}
+
+function openActiveBookmarkSplitPane() {
+    const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
+    let id = _bookmarkGetActiveId();
+    if (!id && list[0]) {
+        id = list[0].id;
+        _bookmarkSetActiveId(id);
+    }
+    if (id) openBookmarkSplitPane(id);
 }
 
 function _bookmarkEnsureSplitPane() {
@@ -594,18 +623,18 @@ function updateDesktopSidebarActive() {
 function renderDesktopBookmarkTabs() {
     const rail = document.getElementById('desktopBookmarkTabs');
     if (!rail) return;
-    const list = _bookmarksRead();
+    const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
     const tabsHtml = list.map(item => `
         <button type="button" class="desktop-bookmark-tab ${item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
-            <span type="button" class="desktop-bookmark-tab-split" aria-label="Apri scheda affiancata" onclick="event.stopPropagation(); openBookmarkSplitPane('${item.id}')">${_bookmarkSplitIconSvg()}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
         </button>
     `).join('');
     rail.innerHTML = `${tabsHtml}
         <button type="button" class="desktop-bookmark-add-tab" onclick="createBookmarkTab()" aria-label="Crea nuova scheda" title="Crea nuova scheda">+</button>
+        <button type="button" class="desktop-bookmark-split-tab" onclick="openActiveBookmarkSplitPane()" aria-label="Dividi editor a destra" title="Dividi editor a destra">${_bookmarkSplitIconSvg()}</button>
     `;
 }
 
@@ -687,6 +716,7 @@ window.createBookmarkTab = createBookmarkTab;
 window.saveCurrentBookmark = createBookmarkTab;
 window.openBookmark = openBookmark;
 window.openBookmarkSplitPane = openBookmarkSplitPane;
+window.openActiveBookmarkSplitPane = openActiveBookmarkSplitPane;
 window.closeBookmarkSplitPane = closeBookmarkSplitPane;
 window.removeBookmark = removeBookmark;
 window.openBookmarksSheet = openBookmarksSheet;

@@ -456,6 +456,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-bookmark-tabs {
         height: 42px;
         margin-left: var(--desktop-sidebar-width);
+        width: calc(100vw - var(--desktop-sidebar-width));
         display: flex;
         align-items: flex-end;
         gap: 2px;
@@ -477,7 +478,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         border: 1px solid var(--border);
         border-bottom-color: transparent;
         border-radius: 12px 12px 0 0;
-        padding: 4px 54px 4px 12px;
+        padding: 4px 30px 4px 12px;
         background: linear-gradient(180deg, var(--surface), rgba(255, 255, 255, 0.02));
         color: var(--text-secondary);
         display: grid;
@@ -507,7 +508,29 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
-    .desktop-bookmark-add-tab:hover {
+    .desktop-bookmark-split-tab {
+        height: 34px;
+        width: 42px;
+        flex: 0 0 42px;
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: 10px 10px 0 0;
+        background: transparent;
+        color: var(--fantasy-gold-strong, var(--accent));
+        cursor: pointer;
+        transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .desktop-bookmark-split-tab svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .desktop-bookmark-add-tab:hover,
+    .desktop-bookmark-split-tab:hover {
         border-color: var(--fantasy-gold-line, var(--accent-light));
         background: rgba(198, 154, 74, 0.10);
         color: var(--text);
@@ -564,31 +587,6 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         line-height: 1;
     }
 
-    .desktop-bookmark-tab-split {
-        position: absolute;
-        right: 29px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--radius-full);
-        color: var(--text-muted);
-        line-height: 1;
-    }
-
-    .desktop-bookmark-tab-split svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    .desktop-bookmark-tab-split:hover {
-        color: var(--fantasy-gold-strong, var(--accent));
-        background: rgba(198, 154, 74, 0.12);
-    }
-
     .desktop-bookmark-tab-close:hover {
         color: #ef4444;
         background: rgba(239, 68, 68, 0.10);
@@ -629,27 +627,22 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-split-pane-head {
-        height: 34px;
-        flex: 0 0 34px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 3;
+        height: auto;
+        flex: 0 0 auto;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 0 10px 0 12px;
-        border-bottom: 1px solid var(--fantasy-chrome-border, var(--border));
-        background:
-            linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
-            var(--surface);
-        color: var(--text-secondary);
-        font-size: 0.78rem;
-        font-weight: 800;
+        justify-content: center;
+        padding: 0;
+        border: 0;
+        background: transparent;
     }
 
     .desktop-split-pane-head span {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: none;
     }
 
     .desktop-split-pane-close {
@@ -672,6 +665,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-split-pane iframe {
         flex: 1;
         width: 100%;
+        height: 100%;
         border: 0;
         background: var(--background);
     }
@@ -687,6 +681,26 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
 
     body.desktop-split-active .page-top-stack {
         width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
+    }
+
+    body.desktop-split-active .page-content,
+    body.bookmark-split-instance .page-content {
+        max-width: 620px;
+    }
+
+    body.desktop-split-active .campagne-list,
+    body.desktop-split-active .personaggi-list,
+    body.desktop-split-active .comp-list,
+    body.desktop-split-active .lab-list,
+    body.bookmark-split-instance .campagne-list,
+    body.bookmark-split-instance .personaggi-list,
+    body.bookmark-split-instance .comp-list,
+    body.bookmark-split-instance .lab-list {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body.desktop-split-active .campagna-card {
+        height: 140px;
     }
 }
 
