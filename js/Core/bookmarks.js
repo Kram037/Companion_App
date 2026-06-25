@@ -599,13 +599,17 @@ function _desktopSidebarItemIcon(item) {
 
 function _desktopGroupOpen(page) {
     if (_desktopSidebarFocusedPage() === page) return true;
-    return localStorage.getItem(`companion_sidebar_group_${page}`) === 'open';
+    return localStorage.getItem(_desktopGroupStorageKey(page)) === 'open';
 }
 
 function _desktopToggleGroup(page) {
     const isOpen = _desktopGroupOpen(page);
-    localStorage.setItem(`companion_sidebar_group_${page}`, isOpen ? 'closed' : 'open');
+    localStorage.setItem(_desktopGroupStorageKey(page), isOpen ? 'closed' : 'open');
     renderDesktopSidebar();
+}
+
+function _desktopGroupStorageKey(page) {
+    return `companion_sidebar_group_v2_${page}`;
 }
 
 function _bookmarkEnsureDesktopChrome() {

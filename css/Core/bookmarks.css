@@ -326,19 +326,23 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         width: var(--desktop-sidebar-width);
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        padding: 12px 10px;
+        gap: 4px;
+        padding: 8px 8px;
         border-right: 1px solid var(--fantasy-chrome-border, var(--border));
         background:
             linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
             var(--surface);
         box-shadow: 12px 0 28px rgba(0, 0, 0, 0.18);
         overflow-y: auto;
-        scrollbar-width: thin;
+        scrollbar-width: none;
+    }
+
+    .desktop-sidebar-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .desktop-sidebar-btn {
-        min-height: 46px;
+        min-height: 38px;
         border: 1px solid transparent;
         border-radius: var(--radius-md);
         background: transparent;
@@ -347,9 +351,9 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        gap: 10px;
+        gap: 8px;
         width: 100%;
-        padding: 8px 10px;
+        padding: 6px 8px;
         cursor: pointer;
         text-align: left;
         transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
@@ -369,24 +373,24 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-sidebar-btn svg {
-        width: 24px;
-        height: 24px;
+        width: 21px;
+        height: 21px;
         display: block;
-        flex: 0 0 24px;
+        flex: 0 0 21px;
     }
 
     .desktop-sidebar-btn .toolbar-icon {
-        width: 24px;
-        height: 24px;
+        width: 21px;
+        height: 21px;
         display: block;
         background-color: currentColor;
-        flex: 0 0 24px;
+        flex: 0 0 21px;
         -webkit-mask: var(--toolbar-icon-url) center / contain no-repeat;
         mask: var(--toolbar-icon-url) center / contain no-repeat;
     }
 
     .desktop-sidebar-btn span {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         font-weight: 800;
         line-height: 1.1;
     }
@@ -394,7 +398,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-sidebar-group {
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: 2px;
     }
 
     .desktop-sidebar-caret {
@@ -410,9 +414,9 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-sidebar-children {
         display: none;
         flex-direction: column;
-        gap: 4px;
-        margin-left: 12px;
-        padding-left: 10px;
+        gap: 2px;
+        margin-left: 10px;
+        padding-left: 8px;
         border-left: 1px solid var(--fantasy-gold-line, var(--border));
     }
 
@@ -421,12 +425,12 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-sidebar-child {
-        min-height: 34px;
+        min-height: 27px;
         width: 100%;
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 6px 8px;
+        gap: 6px;
+        padding: 3px 6px;
         border: 1px solid transparent;
         border-radius: var(--radius-sm);
         background: transparent;
@@ -437,9 +441,9 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-sidebar-item-icon {
-        width: 20px;
-        height: 20px;
-        flex: 0 0 20px;
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
         object-fit: contain;
         filter: brightness(1.45) sepia(0.5) saturate(1.25) drop-shadow(0 0 6px rgba(198, 154, 74, 0.18));
     }
@@ -449,7 +453,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 0.72rem;
+        font-size: 0.66rem;
         font-weight: 800;
     }
 
