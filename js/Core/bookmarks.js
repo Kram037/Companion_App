@@ -230,13 +230,16 @@ function _bookmarkEnsureHeaderButton() {
 function updateBookmarkChrome() {
     _bookmarkEnsureHeaderButton();
     const list = _bookmarksRead();
+    const activeId = _bookmarkGetActiveId();
+    const activeIndex = list.findIndex(item => item.id === activeId);
+    const positionLabel = list.length ? `${Math.max(activeIndex + 1, 1)}/${list.length}` : '0';
 
     const fab = document.getElementById('bookmarksFab');
     const count = document.getElementById('bookmarksFabCount');
     const tabsBtn = document.getElementById('bookmarksTabsFab');
     if (fab) fab.style.display = 'inline-flex';
     if (tabsBtn) tabsBtn.style.display = list.length ? 'inline-flex' : 'none';
-    if (count) count.textContent = String(list.length);
+    if (count) count.textContent = positionLabel;
 
     renderBookmarksSheet();
     renderDesktopBookmarkTabs();
@@ -434,13 +437,13 @@ function _bookmarkEnsureDesktopChrome() {
 
 function _openDesktopSidebarTarget(page, tab = '') {
     if (page === 'laboratorio') {
-        navigateToPage('laboratorio');
-        if (tab) setTimeout(() => window.labOpenCategory?.(tab), 80);
+        navigateToPage('laboratorio', { skipPageLoad: !!tab });
+        if (tab) window.labOpenCategory?.(tab);
         return;
     }
     if (page === 'compendio') {
-        navigateToPage('compendio');
-        if (tab) setTimeout(() => window.compendioOpenTab?.(tab), 80);
+        navigateToPage('compendio', { skipPageLoad: !!tab });
+        if (tab) window.compendioOpenTab?.(tab);
         return;
     }
     navigateToPage(page);
@@ -475,7 +478,7 @@ function renderDesktopSidebar() {
                 <button type="button" class="desktop-sidebar-btn desktop-sidebar-group-toggle" data-page="${item.page}" aria-label="${item.label}" aria-expanded="${open ? 'true' : 'false'}">
                     ${_desktopSidebarItemIcon(item)}
                     <span>${_bookmarkEscape(item.label)}</span>
-                    <span class="desktop-sidebar-caret">⌄</span>
+                    <span class="desktop-sidebar-caret">v</span>
                 </button>
                 <div class="desktop-sidebar-children">
                     ${(item.children || []).map(child => `
@@ -504,22 +507,16 @@ function renderDesktopBookmarkTabs() {
     if (!rail) return;
     const list = _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
-    if (!list.length) {
-        rail.innerHTML = `
-            <button type="button" class="desktop-tab-empty" onclick="createBookmarkTab()">
-                ${_bookmarkIconSvg(false)}
-                <span>Crea una scheda</span>
-            </button>
-        `;
-        return;
-    }
-    rail.innerHTML = list.map(item => `
+    const tabsHtml = list.map(item => `
         <button type="button" class="desktop-bookmark-tab ${item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
         </button>
     `).join('');
+    rail.innerHTML = `${tabsHtml}
+        <button type="button" class="desktop-bookmark-add-tab" onclick="createBookmarkTab()" aria-label="Crea nuova scheda" title="Crea nuova scheda">+</button>
+    `;
 }
 
 function initBookmarks() {

@@ -315,7 +315,13 @@
         transform: translateY(-1px);
     }
 
-    .desktop-sidebar-btn svg,
+    .desktop-sidebar-btn svg {
+        width: 24px;
+        height: 24px;
+        display: block;
+        flex: 0 0 24px;
+    }
+
     .desktop-sidebar-btn .toolbar-icon {
         width: 24px;
         height: 24px;
@@ -411,8 +417,7 @@
         scrollbar-width: thin;
     }
 
-    .desktop-bookmark-tab,
-    .desktop-tab-empty {
+    .desktop-bookmark-tab {
         height: 34px;
         min-width: 178px;
         max-width: 230px;
@@ -431,19 +436,28 @@
         transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, min-width 0.18s ease;
     }
 
-    .desktop-tab-empty {
+    .desktop-bookmark-add-tab {
+        height: 34px;
+        width: 42px;
+        flex: 0 0 42px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        min-width: 168px;
-        padding-right: 12px;
+        border: 1px solid transparent;
+        border-radius: 10px 10px 0 0;
+        background: transparent;
         color: var(--fantasy-gold-strong, var(--accent));
+        font-size: 1.35rem;
+        font-weight: 400;
+        line-height: 1;
+        cursor: pointer;
+        transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     }
 
-    .desktop-tab-empty svg {
-        width: 15px;
-        height: 15px;
+    .desktop-bookmark-add-tab:hover {
+        border-color: var(--fantasy-gold-line, var(--accent-light));
+        background: rgba(198, 154, 74, 0.10);
+        color: var(--text);
     }
 
     .desktop-bookmark-tab:hover,

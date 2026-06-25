@@ -92,7 +92,7 @@ function updateScrollStatsBtn() {
 }
 
 // Navigation
-function navigateToPage(pageName, { pushHistory = true } = {}) {
+function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } = {}) {
     if (typeof captureActiveBookmark === 'function') {
         captureActiveBookmark({ silent: true });
     }
@@ -169,31 +169,33 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
         stopCampagnaDetailsRealtime();
     }
     
-    if (pageName === 'amici' && AppState.isLoggedIn) {
-        loadAmici();
-    } else if (pageName === 'compendio') {
-        if (typeof compendioShowHub === 'function') compendioShowHub();
-        if (typeof loadCompendio === 'function') loadCompendio();
-    } else if (pageName === 'campagne') {
-        if (AppState.isLoggedIn && AppState.currentUser) {
-            loadCampagne(AppState.currentUser.uid);
-        }
-    } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
-        labBackToHub();
-    } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
-        loadPersonaggi();
-    } else if (pageName === 'personaggioCreate') {
-        if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
-    } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
-        loadCampagnaDetails(AppState.currentCampagnaId);
-    } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-        renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId).then(() => {
-            if (!window.combattimentoChannel) {
-                startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
+    if (!skipPageLoad) {
+        if (pageName === 'amici' && AppState.isLoggedIn) {
+            loadAmici();
+        } else if (pageName === 'compendio') {
+            if (typeof compendioShowHub === 'function') compendioShowHub();
+            if (typeof loadCompendio === 'function') loadCompendio();
+        } else if (pageName === 'campagne') {
+            if (AppState.isLoggedIn && AppState.currentUser) {
+                loadCampagne(AppState.currentUser.uid);
             }
-        });
-    } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
-        renderSchedaPersonaggio(AppState.currentPersonaggioId);
+        } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
+            labBackToHub();
+        } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
+            loadPersonaggi();
+        } else if (pageName === 'personaggioCreate') {
+            if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
+        } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
+            loadCampagnaDetails(AppState.currentCampagnaId);
+        } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId).then(() => {
+                if (!window.combattimentoChannel) {
+                    startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
+                }
+            });
+        } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
+            renderSchedaPersonaggio(AppState.currentPersonaggioId);
+        }
     }
 
     updateReturnToSessionBtn();
