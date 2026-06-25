@@ -255,7 +255,10 @@ function _bookmarkEnsureHeaderButton() {
 
 function updateBookmarkChrome() {
     _bookmarkEnsureHeaderButton();
-    if (_bookmarkIsSplitPaneInstance) return;
+    if (_bookmarkIsSplitPaneInstance) {
+        renderDesktopBookmarkTabs();
+        return;
+    }
     const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
     const activeId = _bookmarkGetActiveId();
     const activeIndex = list.findIndex(item => item.id === activeId);
@@ -553,6 +556,17 @@ function _bookmarkEnsureDesktopChrome() {
     renderDesktopSidebar();
 }
 
+function _bookmarkEnsureSplitInstanceChrome() {
+    if (document.getElementById('desktopBookmarkTabs')) return;
+    const rail = document.createElement('div');
+    rail.id = 'desktopBookmarkTabs';
+    rail.className = 'desktop-bookmark-tabs desktop-bookmark-tabs-split';
+    rail.setAttribute('aria-label', 'Schede aperte');
+    const main = document.getElementById('mainContent');
+    if (main) main.insertAdjacentElement('beforebegin', rail);
+    else document.body.appendChild(rail);
+}
+
 function _openDesktopSidebarTarget(page, tab = '') {
     if (page === 'laboratorio') {
         navigateToPage('laboratorio', { skipPageLoad: !!tab });
@@ -634,19 +648,21 @@ function renderDesktopBookmarkTabs() {
     `).join('');
     rail.innerHTML = `${tabsHtml}
         <button type="button" class="desktop-bookmark-add-tab" onclick="createBookmarkTab()" aria-label="Crea nuova scheda" title="Crea nuova scheda">+</button>
-        <button type="button" class="desktop-bookmark-split-tab" onclick="openActiveBookmarkSplitPane()" aria-label="Dividi editor a destra" title="Dividi editor a destra">${_bookmarkSplitIconSvg()}</button>
+        ${_bookmarkIsSplitPaneInstance ? '' : `<button type="button" class="desktop-bookmark-split-tab" onclick="openActiveBookmarkSplitPane()" aria-label="Dividi editor a destra" title="Dividi editor a destra">${_bookmarkSplitIconSvg()}</button>`}
     `;
 }
 
 function initBookmarks() {
     if (_bookmarkIsSplitPaneInstance) {
         document.body.classList.add('bookmark-split-instance');
+        _bookmarkEnsureSplitInstanceChrome();
         window.addEventListener('message', (event) => {
             if (event.origin !== window.location.origin) return;
             if (event.data?.type === 'companion-open-bookmark' && event.data.bookmarkId) {
                 openBookmark(event.data.bookmarkId);
             }
         });
+        updateBookmarkChrome();
         return;
     }
     if (!document.getElementById('bookmarksFab')) {
