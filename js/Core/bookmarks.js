@@ -22,6 +22,11 @@ function _bookmarksActiveKey() {
     return `companion_bookmarks_active_v${BOOKMARKS_VERSION}_${uid}`;
 }
 
+function _bookmarksActiveRightKey() {
+    const uid = AppState?.currentUser?.uid || 'local';
+    return `companion_bookmarks_active_right_v${BOOKMARKS_VERSION}_${uid}`;
+}
+
 function _bookmarksRead() {
     try {
         const raw = localStorage.getItem(_bookmarksStorageKey());
@@ -158,13 +163,17 @@ function _bookmarkEscape(value) {
 }
 
 function _bookmarkGetActiveId() {
-    if (_bookmarkIsSplitPaneInstance) return _bookmarkSplitLocalActiveId || '';
+    if (_bookmarkIsSplitPaneInstance) {
+        return _bookmarkSplitLocalActiveId || localStorage.getItem(_bookmarksActiveRightKey()) || '';
+    }
     return localStorage.getItem(_bookmarksActiveKey()) || '';
 }
 
 function _bookmarkSetActiveId(id) {
     if (_bookmarkIsSplitPaneInstance) {
         _bookmarkSplitLocalActiveId = id || '';
+        if (id) localStorage.setItem(_bookmarksActiveRightKey(), id);
+        else localStorage.removeItem(_bookmarksActiveRightKey());
         return;
     }
     if (id) localStorage.setItem(_bookmarksActiveKey(), id);
@@ -235,6 +244,31 @@ function _bookmarkEnsureMinimumDesktopTab() {
     _bookmarksWrite([snap, ...list]);
     _bookmarkSetActiveId(snap.id);
     return [snap];
+}
+
+function _bookmarkDefaultGroupTab(page) {
+    const items = page === 'laboratorio'
+        ? (typeof window.labGetSidebarItems === 'function' ? window.labGetSidebarItems() : [])
+        : (page === 'compendio'
+            ? (typeof window.compGetSidebarItems === 'function' ? window.compGetSidebarItems() : [])
+            : []);
+    return items.find(item => item?.key)?.key || (page === 'laboratorio' ? 'razze' : 'classi');
+}
+
+function _bookmarkNormalizeDesktopHook(page, hook = {}) {
+    if (!_bookmarkIsDesktopLayout() || !['laboratorio', 'compendio'].includes(page)) return hook || {};
+    const data = { ...(hook || {}) };
+    if (data.view !== 'sub') {
+        data.view = 'sub';
+    }
+    data.tab = data.tab || _bookmarkDefaultGroupTab(page);
+    return data;
+}
+
+function getDesktopDefaultGroupTab(page) {
+    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout()) return '';
+    if (!['laboratorio', 'compendio'].includes(page)) return '';
+    return _bookmarkDefaultGroupTab(page);
 }
 
 window.getPageBookmarkState = function(page) {
@@ -416,13 +450,16 @@ async function openBookmark(id) {
     if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
     else sessionStorage.removeItem('currentPersonaggioId');
 
-    navigateToPage(st.page || item.page || 'campagne');
+    const targetPage = st.page || item.page || 'campagne';
+    const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});
+
+    navigateToPage(targetPage, { skipPageLoad: ['laboratorio', 'compendio'].includes(targetPage) && targetHook.view === 'sub' });
     if (_bookmarkIsSplitPaneInstance) setTimeout(_bookmarkPostCurrentPaneState, 90);
 
     const restore = async () => {
         try {
             if (typeof window.restorePageBookmarkState === 'function') {
-                await window.restorePageBookmarkState(st.page || item.page, st.hook || {}, item);
+                await window.restorePageBookmarkState(targetPage, targetHook, item);
             }
             setTimeout(() => {
                 _bookmarkSetMainScrollTop(st.scrollTop);
@@ -487,6 +524,7 @@ function openBookmarkSplitPane(id) {
         updatedAt: _bookmarkNow(),
     };
     _bookmarksWrite([splitTab, ..._bookmarksRead()]);
+    localStorage.setItem(_bookmarksActiveRightKey(), splitTab.id);
     const pane = _bookmarkEnsureSplitPane();
     const title = pane.querySelector('#desktopSplitPaneTitle');
     if (title) title.textContent = item.title || 'Scheda affiancata';
@@ -504,9 +542,50 @@ function openBookmarkSplitPane(id) {
 function closeBookmarkSplitPane() {
     document.getElementById('desktopSplitPane')?.remove();
     _bookmarkRemovePaneItems('right');
+    localStorage.removeItem(_bookmarksActiveRightKey());
     _bookmarkRightPaneState = { page: '', tab: '' };
     document.body.classList.remove('desktop-split-active');
     _bookmarkSetFocusedPane('left');
+}
+
+function _bookmarkRestorePersistedSplitPane() {
+    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout()) return;
+    if (document.getElementById('desktopSplitPane')) return;
+    const rightItems = _bookmarkPaneItems(_bookmarksRead(), 'right');
+    if (!rightItems.length) {
+        localStorage.removeItem(_bookmarksActiveRightKey());
+        return;
+    }
+    let activeId = localStorage.getItem(_bookmarksActiveRightKey()) || '';
+    if (!rightItems.some(item => item.id === activeId)) {
+        activeId = rightItems[0].id;
+        localStorage.setItem(_bookmarksActiveRightKey(), activeId);
+    }
+    const active = rightItems.find(item => item.id === activeId) || rightItems[0];
+    const pane = _bookmarkEnsureSplitPane();
+    const title = pane.querySelector('#desktopSplitPaneTitle');
+    if (title) title.textContent = active.title || 'Scheda affiancata';
+    _bookmarkRightPaneState = {
+        page: active.state?.page || active.page || '',
+        tab: active.state?.hook?.tab || '',
+    };
+    const frame = pane.querySelector('#desktopSplitPaneFrame');
+    const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: active.id }, window.location.origin);
+    frame.addEventListener('load', postOpen, { once: true });
+    setTimeout(postOpen, 260);
+    _bookmarkSetFocusedPane('left');
+}
+
+function restoreInitialDesktopBookmark() {
+    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout()) return;
+    const active = _bookmarkGetActive(_bookmarksRead());
+    if (active) {
+        setTimeout(() => openBookmark(active.id), 40);
+    } else if (['laboratorio', 'compendio'].includes(AppState.currentPage)) {
+        const tab = _bookmarkDefaultGroupTab(AppState.currentPage);
+        setTimeout(() => _openDesktopSidebarTarget(AppState.currentPage, tab), 40);
+    }
+    setTimeout(_bookmarkRestorePersistedSplitPane, 280);
 }
 
 function renderBookmarksSheet() {
@@ -900,3 +979,5 @@ window.closeBookmarkSplitPane = closeBookmarkSplitPane;
 window.removeBookmark = removeBookmark;
 window.openBookmarksSheet = openBookmarksSheet;
 window.closeBookmarksSheet = closeBookmarksSheet;
+window.restoreInitialDesktopBookmark = restoreInitialDesktopBookmark;
+window.getDesktopDefaultGroupTab = getDesktopDefaultGroupTab;

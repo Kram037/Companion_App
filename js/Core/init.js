@@ -250,6 +250,9 @@ async function init() {
 
     appDebug('Navigazione alla pagina iniziale...');
     navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
+    if (typeof restoreInitialDesktopBookmark === 'function') {
+        restoreInitialDesktopBookmark();
+    }
     
     // Wait for Supabase to be ready (in background, non-blocking)
     waitForSupabase().then((success) => {

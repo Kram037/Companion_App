@@ -169,18 +169,30 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         stopCampagnaDetailsRealtime();
     }
     
+    const desktopGroupTab = !skipPageLoad && typeof getDesktopDefaultGroupTab === 'function'
+        ? getDesktopDefaultGroupTab(pageName)
+        : '';
+
     if (!skipPageLoad) {
         if (pageName === 'amici' && AppState.isLoggedIn) {
             loadAmici();
         } else if (pageName === 'compendio') {
-            if (typeof compendioShowHub === 'function') compendioShowHub();
             if (typeof loadCompendio === 'function') loadCompendio();
+            if (desktopGroupTab && typeof compendioOpenTab === 'function') {
+                compendioOpenTab(desktopGroupTab);
+            } else if (typeof compendioShowHub === 'function') {
+                compendioShowHub();
+            }
         } else if (pageName === 'campagne') {
             if (AppState.isLoggedIn && AppState.currentUser) {
                 loadCampagne(AppState.currentUser.uid);
             }
         } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
-            labBackToHub();
+            if (desktopGroupTab && typeof labOpenCategory === 'function') {
+                labOpenCategory(desktopGroupTab);
+            } else {
+                labBackToHub();
+            }
         } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
             loadPersonaggi();
         } else if (pageName === 'personaggioCreate') {
