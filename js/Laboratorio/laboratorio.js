@@ -201,6 +201,43 @@ window.labOpenSettings = function() {
     labOpenCategory('impostazioni');
 };
 
+window.labGetBookmarkState = function() {
+    const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
+    const active = _labActiveTab();
+    const cat = _labActiveCategory();
+    const title = subVisible
+        ? (document.getElementById('labSubTitle')?.textContent || cat?.labelPlural || 'Laboratorio')
+        : 'Laboratorio';
+    const sectionParts = ['Laboratorio'];
+    if (subVisible) sectionParts.push(cat?.labelPlural || cat?.label || active);
+    return {
+        title,
+        section: sectionParts.join(' > '),
+        key: subVisible ? `${_labCurrentTab}:${active}` : 'hub',
+        state: {
+            view: subVisible ? 'sub' : 'hub',
+            tab: _labCurrentTab,
+            classiSubTab: _labClassiSubTab,
+            nemiciSubTab: _labNemiciSubTab,
+            talentiStiliSubTab: _labTalentiStiliSubTab,
+            listState: JSON.parse(JSON.stringify(window._labListState || {})),
+        },
+    };
+};
+
+window.labRestoreBookmarkState = async function(saved) {
+    const data = saved || {};
+    if (data.classiSubTab) _labClassiSubTab = data.classiSubTab;
+    if (data.nemiciSubTab) _labNemiciSubTab = data.nemiciSubTab;
+    if (data.talentiStiliSubTab) _labTalentiStiliSubTab = data.talentiStiliSubTab;
+    if (data.listState) window._labListState = { ...window._labListState, ...data.listState };
+    if (data.view === 'sub' && LAB_CATEGORIES[data.tab]) {
+        await labOpenCategory(data.tab);
+    } else {
+        labBackToHub();
+    }
+};
+
 function _labScrollToTop() {
     requestAnimationFrame(() => {
         document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });

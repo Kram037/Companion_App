@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v151';
+const CACHE_NAME = 'companion-app-v152';
 
 const APP_SHELL_URLS = [
     './',
@@ -12,6 +12,7 @@ const APP_SHELL_URLS = [
     './js/Core/lang.js',
     './js/Core/theme.js',
     './js/Core/navigation.js',
+    './js/Core/bookmarks.js',
     './js/Core/auth.js',
     './js/Core/users.js',
     './js/Social/amici.js',
@@ -61,6 +62,7 @@ const APP_SHELL_URLS = [
     './css/Core/base.css',
     './css/Core/components.css',
     './css/Core/modals.css',
+    './css/Core/bookmarks.css',
     './css/Core/fantasy.css',
     './css/Campagna/campagne.css',
     './css/Personaggi/personaggi.css',

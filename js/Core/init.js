@@ -164,6 +164,9 @@ async function init() {
 
     // Load saved theme
     loadTheme();
+    if (typeof initBookmarks === 'function') {
+        initBookmarks();
+    }
     
     // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
     const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');

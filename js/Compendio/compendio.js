@@ -582,6 +582,60 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
     return _compMonsterDataPromise;
 }
 
+window.compGetBookmarkState = function() {
+    const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
+    const state = _compStateFor(_compCurrentTab);
+    const title = subVisible
+        ? (document.getElementById('compendioSubTitle')?.textContent || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
+        : 'Compendio';
+    const sectionParts = ['Compendio'];
+    if (subVisible) sectionParts.push(COMP_TABS[_compCurrentTab]?.label || _compCurrentTab);
+    if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
+        sectionParts.push(COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || state.equipmentSection);
+    }
+    if (state.detail?.id) sectionParts.push('Dettaglio');
+    return {
+        title,
+        section: sectionParts.join(' > '),
+        key: subVisible
+            ? `${_compCurrentTab}:${state.equipmentSection || ''}:${state.detail?.id || ''}`
+            : 'hub',
+        state: {
+            view: subVisible ? 'sub' : 'hub',
+            tab: _compCurrentTab,
+            tabState: JSON.parse(JSON.stringify(state || {})),
+        },
+    };
+};
+
+window.compRestoreBookmarkState = async function(saved) {
+    const data = saved || {};
+    _compCurrentTab = COMP_TABS[data.tab] ? data.tab : 'classi';
+    if (data.tabState) {
+        window._compState[_compCurrentTab] = {
+            ..._compStateFor(_compCurrentTab),
+            ...data.tabState,
+        };
+    }
+    if (data.view === 'sub') {
+        const hub = document.getElementById('compendioHub');
+        const sub = document.getElementById('compendioSubPage');
+        if (hub) hub.style.display = 'none';
+        if (sub) sub.style.display = '';
+        const title = document.getElementById('compendioSubTitle');
+        const state = _compStateFor(_compCurrentTab);
+        if (title) title.textContent = state.detail?.id
+            ? (state.detail.title || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
+            : (state.equipmentSection
+                ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS[_compCurrentTab]?.label)
+                : (COMP_TABS[_compCurrentTab]?.label || 'Compendio'));
+        compendioRenderTab();
+        if (_compCurrentTab === 'mostri') await _compEnsureMonsterData({ rerender: true });
+    } else {
+        compendioShowHub();
+    }
+};
+
 function _compStateFor(tab) {
     if (!window._compState[tab]) {
         window._compState[tab] = { search: '', filters: {}, detail: null, openGroups: {} };

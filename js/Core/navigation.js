@@ -194,6 +194,9 @@ function navigateToPage(pageName, { pushHistory = true } = {}) {
 
     updateReturnToSessionBtn();
     updateScrollStatsBtn();
+    if (typeof updateBookmarkChrome === 'function') {
+        setTimeout(updateBookmarkChrome, 0);
+    }
 }
 
 // Modal Functions
