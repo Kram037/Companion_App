@@ -1,11 +1,20 @@
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync('index.html', 'utf8');
-const forbidden = [...html.matchAll(/<script[^>]+src=["']([^"']*js\/(?:Personaggi|Compendio)\/data\/[^"']+)["']/g)]
+const scripts = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
   .map(match => match[1]);
+const lazyModules = [
+  'js/Combattimento/combat.js',
+  'js/Compendio/compendio.js',
+  'js/Laboratorio/laboratorio.js',
+];
+const forbidden = scripts.filter(src => (
+  /js\/(?:Personaggi|Compendio)\/data\//.test(src)
+  || lazyModules.some(module => src.includes(module))
+));
 
 if (forbidden.length) {
-  console.error(`Data runtime nel bootstrap iniziale:\n${forbidden.join('\n')}`);
+  console.error(`Script runtime nel bootstrap iniziale:\n${forbidden.join('\n')}`);
   process.exit(1);
 }
 
