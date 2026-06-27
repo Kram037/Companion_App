@@ -137,3 +137,14 @@ Applicare il minimo fix toolchain:
 - aggiungere script `audit`;
 - valutare upgrade Nx 23 in branch separato;
 - rieseguire `check`, `build`, `audit`.
+
+## Step toolchain - completato
+
+- Script Nx eseguiti tramite `tools/nx-run.mjs` con `NX_DAEMON=false`.
+- Aggiunto script npm `audit`.
+- Aggiornato Nx da `21.6.11` a `23.0.1`.
+- Verifiche:
+  - `npm.cmd run check`
+  - `npm.cmd run build`
+  - `npm.cmd run audit -- --audit-level=moderate`
+- Esito audit: `found 0 vulnerabilities`.

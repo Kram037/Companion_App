@@ -3,11 +3,12 @@
   "private": true,
   "scripts": {
     "nx": "nx",
-    "serve": "nx run companion-app:serve",
-    "build": "nx run companion-app:build",
-    "check": "nx run companion-app:check"
+    "serve": "node tools/nx-run.mjs companion-app:serve",
+    "build": "node tools/nx-run.mjs companion-app:build",
+    "check": "node tools/nx-run.mjs companion-app:check",
+    "audit": "npm audit"
   },
   "devDependencies": {
-    "nx": "^21.0.0"
+    "nx": "^23.0.1"
   }
 }
