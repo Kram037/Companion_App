@@ -98,21 +98,12 @@ let COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compEquipmentDataPromise = null;
-let _compBackgroundDataPromise = null;
-let _compRaceDataPromise = null;
-let _compClassDataPromise = null;
-let _compSpellDataPromise = null;
-let _compFeatDataPromise = null;
-let _compFightingStyleDataPromise = null;
-let _compInvocationDataPromise = null;
-let _compSubclassSpellDataPromise = null;
-let _compMagicItemDataPromise = null;
-let _compPoisonDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
 let _compSummonStatblockDataFailed = false;
 let _compSummonStatblockDataLoaded = !!COMP_SUMMON_STATBLOCKS_DATA.length;
+const _compRuntimeDataPromises = new Map();
 let _compMonsterItemsCache = null;
 let _compMonsterItemsSource = null;
 let _compSearchRenderTimer = null;
@@ -587,234 +578,136 @@ function _compHasEquipmentData() {
     return ready;
 }
 
-function _compHasBackgroundData() {
-    return typeof window.BACKGROUNDS_DATA !== 'undefined';
+function _compHasGlobalData(globalName) {
+    return typeof window[globalName] !== 'undefined';
 }
 
+function _compEnsureRuntimeDataBundle(key, globalName, { rerender = false, shouldRerender = () => false, label = key } = {}) {
+    if (_compHasGlobalData(globalName)) return Promise.resolve();
+    if (_compRuntimeDataPromises.has(key)) return _compRuntimeDataPromises.get(key);
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    const promise = window.ensureRuntimeData(key)
+        .then(() => {
+            if (rerender && shouldRerender()) compendioRenderTab();
+        })
+        .catch(error => console.warn(`[compendio] caricamento ${label} fallito:`, error))
+        .finally(() => {
+            _compRuntimeDataPromises.delete(key);
+        });
+
+    _compRuntimeDataPromises.set(key, promise);
+    return promise;
+}
+
+function _compHasBackgroundData() { return _compHasGlobalData('BACKGROUNDS_DATA'); }
 function _compEnsureBackgroundData({ rerender = false } = {}) {
-    if (_compHasBackgroundData()) return Promise.resolve();
-    if (_compBackgroundDataPromise) return _compBackgroundDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compBackgroundDataPromise = window.ensureRuntimeData('backgrounds')
-        .then(() => {
-            if (rerender && _compCurrentTab === 'background') compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento background fallito:', error))
-        .finally(() => {
-            _compBackgroundDataPromise = null;
-        });
-
-    return _compBackgroundDataPromise;
+    return _compEnsureRuntimeDataBundle('backgrounds', 'BACKGROUNDS_DATA', {
+        rerender,
+        shouldRerender: () => _compCurrentTab === 'background',
+        label: 'background',
+    });
 }
 
-function _compHasRaceData() {
-    return typeof window.RACES_DATA !== 'undefined';
-}
-
+function _compHasRaceData() { return _compHasGlobalData('RACES_DATA'); }
 function _compEnsureRaceData({ rerender = false } = {}) {
-    if (_compHasRaceData()) return Promise.resolve();
-    if (_compRaceDataPromise) return _compRaceDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compRaceDataPromise = window.ensureRuntimeData('races')
-        .then(() => {
-            if (rerender && _compCurrentTab === 'razze') compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento razze fallito:', error))
-        .finally(() => {
-            _compRaceDataPromise = null;
-        });
-
-    return _compRaceDataPromise;
+    return _compEnsureRuntimeDataBundle('races', 'RACES_DATA', {
+        rerender,
+        shouldRerender: () => _compCurrentTab === 'razze',
+        label: 'razze',
+    });
 }
 
 function _compNeedsClassData() {
     return _compCurrentTab === 'classi' || _compCurrentTab === 'sottoclassi';
 }
 
-function _compHasClassData() {
-    return typeof window.CLASSES_DATA !== 'undefined';
-}
-
+function _compHasClassData() { return _compHasGlobalData('CLASSES_DATA'); }
 function _compEnsureClassData({ rerender = false } = {}) {
-    if (_compHasClassData()) return Promise.resolve();
-    if (_compClassDataPromise) return _compClassDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compClassDataPromise = window.ensureRuntimeData('classes')
-        .then(() => {
-            if (rerender && _compNeedsClassData()) compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento classi fallito:', error))
-        .finally(() => {
-            _compClassDataPromise = null;
-        });
-
-    return _compClassDataPromise;
+    return _compEnsureRuntimeDataBundle('classes', 'CLASSES_DATA', {
+        rerender,
+        shouldRerender: _compNeedsClassData,
+        label: 'classi',
+    });
 }
 
 function _compNeedsSpellData() {
     return _compCurrentTab === 'incantesimi' || !!_compStateFor(_compCurrentTab).detail;
 }
 
-function _compHasSpellData() {
-    return typeof window.SPELLS_DATA !== 'undefined';
-}
-
+function _compHasSpellData() { return _compHasGlobalData('SPELLS_DATA'); }
 function _compEnsureSpellData({ rerender = false } = {}) {
-    if (_compHasSpellData()) return Promise.resolve();
-    if (_compSpellDataPromise) return _compSpellDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compSpellDataPromise = window.ensureRuntimeData('spells')
-        .then(() => {
-            if (rerender && _compNeedsSpellData()) compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento incantesimi fallito:', error))
-        .finally(() => {
-            _compSpellDataPromise = null;
-        });
-
-    return _compSpellDataPromise;
+    return _compEnsureRuntimeDataBundle('spells', 'SPELLS_DATA', {
+        rerender,
+        shouldRerender: _compNeedsSpellData,
+        label: 'incantesimi',
+    });
 }
 
 function _compNeedsFeatData() {
     return _compCurrentTab === 'talenti' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'talenti');
 }
 
-function _compHasFeatData() {
-    return typeof window.FEATS_DATA !== 'undefined';
-}
-
+function _compHasFeatData() { return _compHasGlobalData('FEATS_DATA'); }
 function _compEnsureFeatData({ rerender = false } = {}) {
-    if (_compHasFeatData()) return Promise.resolve();
-    if (_compFeatDataPromise) return _compFeatDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compFeatDataPromise = window.ensureRuntimeData('feats')
-        .then(() => {
-            if (rerender && _compNeedsFeatData()) compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento talenti fallito:', error))
-        .finally(() => {
-            _compFeatDataPromise = null;
-        });
-
-    return _compFeatDataPromise;
+    return _compEnsureRuntimeDataBundle('feats', 'FEATS_DATA', {
+        rerender,
+        shouldRerender: _compNeedsFeatData,
+        label: 'talenti',
+    });
 }
 
 function _compNeedsFightingStyleData() {
     return _compCurrentTab === 'stili' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'stili');
 }
 
-function _compHasFightingStyleData() {
-    return typeof window.FIGHTING_STYLES_DATA !== 'undefined';
-}
-
+function _compHasFightingStyleData() { return _compHasGlobalData('FIGHTING_STYLES_DATA'); }
 function _compEnsureFightingStyleData({ rerender = false } = {}) {
-    if (_compHasFightingStyleData()) return Promise.resolve();
-    if (_compFightingStyleDataPromise) return _compFightingStyleDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compFightingStyleDataPromise = window.ensureRuntimeData('fightingStyles')
-        .then(() => {
-            if (rerender && _compNeedsFightingStyleData()) compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento stili fallito:', error))
-        .finally(() => {
-            _compFightingStyleDataPromise = null;
-        });
-
-    return _compFightingStyleDataPromise;
+    return _compEnsureRuntimeDataBundle('fightingStyles', 'FIGHTING_STYLES_DATA', {
+        rerender,
+        shouldRerender: _compNeedsFightingStyleData,
+        label: 'stili',
+    });
 }
 
-function _compHasInvocationData() {
-    return typeof window.INVOCATIONS_DATA !== 'undefined';
-}
-
+function _compHasInvocationData() { return _compHasGlobalData('INVOCATIONS_DATA'); }
 function _compEnsureInvocationData({ rerender = false } = {}) {
-    if (_compHasInvocationData()) return Promise.resolve();
-    if (_compInvocationDataPromise) return _compInvocationDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compInvocationDataPromise = window.ensureRuntimeData('invocations')
-        .then(() => {
-            if (rerender && _compCurrentTab === 'suppliche') compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento suppliche fallito:', error))
-        .finally(() => {
-            _compInvocationDataPromise = null;
-        });
-
-    return _compInvocationDataPromise;
+    return _compEnsureRuntimeDataBundle('invocations', 'INVOCATIONS_DATA', {
+        rerender,
+        shouldRerender: () => _compCurrentTab === 'suppliche',
+        label: 'suppliche',
+    });
 }
 
 function _compNeedsSubclassSpellData() {
     return _compCurrentTab === 'classi' && !!_compStateFor('classi').detail;
 }
 
-function _compHasSubclassSpellData() {
-    return typeof window.SUBCLASS_SPELLS_DATA !== 'undefined';
-}
-
+function _compHasSubclassSpellData() { return _compHasGlobalData('SUBCLASS_SPELLS_DATA'); }
 function _compEnsureSubclassSpellData({ rerender = false } = {}) {
-    if (_compHasSubclassSpellData()) return Promise.resolve();
-    if (_compSubclassSpellDataPromise) return _compSubclassSpellDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compSubclassSpellDataPromise = window.ensureRuntimeData('subclassSpells')
-        .then(() => {
-            if (rerender && _compNeedsSubclassSpellData()) compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento incantesimi sottoclassi fallito:', error))
-        .finally(() => {
-            _compSubclassSpellDataPromise = null;
-        });
-
-    return _compSubclassSpellDataPromise;
+    return _compEnsureRuntimeDataBundle('subclassSpells', 'SUBCLASS_SPELLS_DATA', {
+        rerender,
+        shouldRerender: _compNeedsSubclassSpellData,
+        label: 'incantesimi sottoclassi',
+    });
 }
 
-function _compHasMagicItemData() {
-    return typeof window.OGGETTI_MAGICI_DATA !== 'undefined';
-}
-
+function _compHasMagicItemData() { return _compHasGlobalData('OGGETTI_MAGICI_DATA'); }
 function _compEnsureMagicItemData({ rerender = false } = {}) {
-    if (_compHasMagicItemData()) return Promise.resolve();
-    if (_compMagicItemDataPromise) return _compMagicItemDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compMagicItemDataPromise = window.ensureRuntimeData('magicItems')
-        .then(() => {
-            if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento oggetti magici fallito:', error))
-        .finally(() => {
-            _compMagicItemDataPromise = null;
-        });
-
-    return _compMagicItemDataPromise;
+    return _compEnsureRuntimeDataBundle('magicItems', 'OGGETTI_MAGICI_DATA', {
+        rerender,
+        shouldRerender: () => _compCurrentTab === 'oggetti',
+        label: 'oggetti magici',
+    });
 }
 
-function _compHasPoisonData() {
-    return typeof window.VELENI_DATA !== 'undefined';
-}
-
+function _compHasPoisonData() { return _compHasGlobalData('VELENI_DATA'); }
 function _compEnsurePoisonData({ rerender = false } = {}) {
-    if (_compHasPoisonData()) return Promise.resolve();
-    if (_compPoisonDataPromise) return _compPoisonDataPromise;
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    _compPoisonDataPromise = window.ensureRuntimeData('poisons')
-        .then(() => {
-            if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
-        })
-        .catch(error => console.warn('[compendio] caricamento veleni fallito:', error))
-        .finally(() => {
-            _compPoisonDataPromise = null;
-        });
-
-    return _compPoisonDataPromise;
+    return _compEnsureRuntimeDataBundle('poisons', 'VELENI_DATA', {
+        rerender,
+        shouldRerender: () => _compCurrentTab === 'oggetti',
+        label: 'veleni',
+    });
 }
 
 function _compEnsureEquipmentData({ rerender = false } = {}) {
