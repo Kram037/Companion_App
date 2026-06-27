@@ -160,3 +160,9 @@ Applicare il minimo fix toolchain:
   - esistenza di sorgenti e generatori dichiarati.
 
 Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati.
+
+## Step dati runtime - loader
+
+- Aggiunto `js/Core/data-loader.js`.
+- Espone `window.ensureRuntimeData(key)` per caricare un bundle dati solo quando serve.
+- Nessun dato e' stato ancora rimosso da `index.html`: il loader prepara il lazy load senza cambiare comportamento runtime.
