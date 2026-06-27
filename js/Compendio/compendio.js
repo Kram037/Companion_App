@@ -102,6 +102,7 @@ let _compBackgroundDataPromise = null;
 let _compRaceDataPromise = null;
 let _compFeatDataPromise = null;
 let _compFightingStyleDataPromise = null;
+let _compInvocationDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -673,6 +674,27 @@ function _compEnsureFightingStyleData({ rerender = false } = {}) {
     return _compFightingStyleDataPromise;
 }
 
+function _compHasInvocationData() {
+    return typeof window.INVOCATIONS_DATA !== 'undefined';
+}
+
+function _compEnsureInvocationData({ rerender = false } = {}) {
+    if (_compHasInvocationData()) return Promise.resolve();
+    if (_compInvocationDataPromise) return _compInvocationDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compInvocationDataPromise = window.ensureRuntimeData('invocations')
+        .then(() => {
+            if (rerender && _compCurrentTab === 'suppliche') compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento suppliche fallito:', error))
+        .finally(() => {
+            _compInvocationDataPromise = null;
+        });
+
+    return _compInvocationDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -855,6 +877,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureFightingStyleData({ rerender: true });
+        return;
+    }
+    if (_compCurrentTab === 'suppliche' && !_compHasInvocationData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento suppliche...</p>
+            </div>
+        `;
+        _compEnsureInvocationData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
