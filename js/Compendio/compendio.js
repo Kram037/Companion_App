@@ -100,6 +100,7 @@ let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compEquipmentDataPromise = null;
 let _compBackgroundDataPromise = null;
 let _compRaceDataPromise = null;
+let _compFeatDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -621,6 +622,31 @@ function _compEnsureRaceData({ rerender = false } = {}) {
     return _compRaceDataPromise;
 }
 
+function _compNeedsFeatData() {
+    return _compCurrentTab === 'talenti' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'talenti');
+}
+
+function _compHasFeatData() {
+    return typeof window.FEATS_DATA !== 'undefined';
+}
+
+function _compEnsureFeatData({ rerender = false } = {}) {
+    if (_compHasFeatData()) return Promise.resolve();
+    if (_compFeatDataPromise) return _compFeatDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compFeatDataPromise = window.ensureRuntimeData('feats')
+        .then(() => {
+            if (rerender && _compNeedsFeatData()) compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento talenti fallito:', error))
+        .finally(() => {
+            _compFeatDataPromise = null;
+        });
+
+    return _compFeatDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -781,6 +807,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureRaceData({ rerender: true });
+        return;
+    }
+    if (_compNeedsFeatData() && !_compHasFeatData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento talenti...</p>
+            </div>
+        `;
+        _compEnsureFeatData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {

@@ -195,3 +195,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Personaggi/data/races_data.js` dal caricamento iniziale.
 - La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
 - La tab Razze del compendio lo carica on demand.
+
+## Step preload pagina - talenti
+
+- Rimosso `js/Personaggi/data/feats_data.js` dal caricamento iniziale.
+- La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
+- La tab Talenti del compendio lo carica on demand.
