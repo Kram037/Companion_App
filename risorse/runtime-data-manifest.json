@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "output": "js/Personaggi/data/backgrounds_data.js",
+      "global": "BACKGROUNDS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/background/backgrounds.json"],
+      "generator": "risorse/background/build_backgrounds.py"
+    },
+    {
+      "output": "js/Personaggi/data/classes_data.js",
+      "global": "CLASSES_DATA",
+      "kind": "generated",
+      "sources": ["risorse/classi/classes.json", "risorse/classi/extra_classes.json"],
+      "generator": "risorse/classi/fetch_classes.py"
+    },
+    {
+      "output": "js/Personaggi/data/feats_data.js",
+      "global": "FEATS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/talenti/talenti.json"],
+      "generator": "risorse/talenti/parse_feats.py"
+    },
+    {
+      "output": "js/Personaggi/data/fighting_styles_data.js",
+      "global": "FIGHTING_STYLES_DATA",
+      "kind": "manual-runtime",
+      "sources": ["js/Personaggi/data/fighting_styles_data.js"]
+    },
+    {
+      "output": "js/Personaggi/data/invocations_data.js",
+      "global": "INVOCATIONS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/invocazioni/invocazioni.json"],
+      "generator": "risorse/invocazioni/build_invocations.py"
+    },
+    {
+      "output": "js/Personaggi/data/oggetti_magici_data.js",
+      "global": "OGGETTI_MAGICI_DATA",
+      "kind": "generated",
+      "sources": ["risorse/oggetti magici/oggetti_magici.json"],
+      "generator": "risorse/oggetti magici/build_oggetti_data.js"
+    },
+    {
+      "output": "js/Personaggi/data/races_data.js",
+      "global": "RACES_DATA",
+      "kind": "generated",
+      "sources": ["risorse/razze/razze.json"],
+      "generator": "risorse/razze/build_races.py"
+    },
+    {
+      "output": "js/Personaggi/data/spells_data.js",
+      "global": "SPELLS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/incantesimi/spells.json"],
+      "generator": "risorse/incantesimi/parse_spells.py"
+    },
+    {
+      "output": "js/Personaggi/data/subclass_spells_data.js",
+      "global": "SUBCLASS_SPELLS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/classi/subclass_spells.json"],
+      "generator": "risorse/classi/build_subclass_spells.py"
+    },
+    {
+      "output": "js/Personaggi/data/veleni_data.js",
+      "global": "VELENI_DATA",
+      "kind": "generated",
+      "sources": ["risorse/veleni/veleni.json"],
+      "generator": "risorse/veleni/build_veleni_data.js"
+    },
+    {
+      "output": "js/Compendio/data/equipaggiamento_data.js",
+      "global": "COMP_EQUIPMENT_DATA",
+      "kind": "generated",
+      "sources": [
+        "risorse/equipaggiamento/build_equipment_data.py",
+        "risorse/equipaggiamento/realms_gems.json",
+        "risorse/equipaggiamento/realms_metals.json",
+        "risorse/erbe/erbe.pdf"
+      ],
+      "generator": "risorse/equipaggiamento/build_equipment_data.py"
+    },
+    {
+      "output": "js/Compendio/data/mostri_data.js",
+      "global": "COMP_MONSTERS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/mostri/monsters.json"],
+      "generator": "risorse/mostri/build_monsters.py"
+    },
+    {
+      "output": "js/Compendio/data/summon_statblocks_data.js",
+      "global": "COMP_SUMMON_STATBLOCKS_DATA",
+      "kind": "generated",
+      "sources": ["risorse/mostri/summon_statblocks.json"],
+      "generator": "risorse/mostri/build_monsters.py"
+    }
+  ]
+}

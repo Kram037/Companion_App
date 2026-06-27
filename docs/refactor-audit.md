@@ -148,3 +148,15 @@ Applicare il minimo fix toolchain:
   - `npm.cmd run build`
   - `npm.cmd run audit -- --audit-level=moderate`
 - Esito audit: `found 0 vulnerabilities`.
+
+## Step dati runtime - primo confine
+
+- Aggiunto `risorse/runtime-data-manifest.json`.
+- Ogni output runtime in `js/Personaggi/data` e `js/Compendio/data` deve essere dichiarato nel manifest.
+- Aggiunto `tools/check-data-boundary.mjs`.
+- Il target Nx `check` ora verifica:
+  - sintassi JS;
+  - presenza nel manifest di tutti i data bundle runtime;
+  - esistenza di sorgenti e generatori dichiarati.
+
+Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati.
