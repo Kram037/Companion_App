@@ -242,3 +242,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 - Aggiunto `tools/check-index-bootstrap.mjs`.
 - Il target `check` fallisce se `index.html` carica direttamente `js/Personaggi/data` o `js/Compendio/data`.
+
+## Step lazy load - laboratorio
+
+- Rimosso `js/Laboratorio/laboratorio.js` dal caricamento iniziale.
+- Aggiunto `ensureRuntimeScript('laboratorio')` nel loader centrale.
+- La pagina Laboratorio inizializza il modulo on demand tramite navigation.

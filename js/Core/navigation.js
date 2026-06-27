@@ -223,9 +223,12 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
                 loadCampagne(AppState.currentUser.uid);
             }
         } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('laboratorio');
+            }
             if (desktopGroupTab && typeof labOpenCategory === 'function') {
                 labOpenCategory(desktopGroupTab);
-            } else {
+            } else if (typeof labBackToHub === 'function') {
                 labBackToHub();
             }
         } else if (pageName === 'personaggi' && AppState.isLoggedIn) {

@@ -28,7 +28,12 @@ const RUNTIME_DATA_BUNDLES = {
     summonStatblocks: { src: 'js/Compendio/data/summon_statblocks_data.js', globals: ['COMP_SUMMON_STATBLOCKS_DATA'] },
 };
 
+const RUNTIME_SCRIPT_BUNDLES = {
+    laboratorio: { src: 'js/Laboratorio/laboratorio.js', ready: 'labBackToHub', init: 'initLaboratorio' },
+};
+
 const _runtimeDataPromises = new Map();
+const _runtimeScriptPromises = new Map();
 
 function _runtimeDataReady(bundle) {
     return bundle.globals.every(name => typeof window[name] !== 'undefined');
@@ -88,5 +93,65 @@ function ensureRuntimeData(key) {
     return promise;
 }
 
+function _runtimeScriptReady(bundle) {
+    return !bundle.ready || typeof window[bundle.ready] === 'function';
+}
+
+function _initRuntimeScript(bundle) {
+    if (!bundle.init || typeof window[bundle.init] !== 'function') return;
+    window[bundle.init]();
+}
+
+function ensureRuntimeScript(key) {
+    const bundle = RUNTIME_SCRIPT_BUNDLES[key];
+
+    if (!bundle) {
+        return Promise.reject(new Error(`Runtime script sconosciuto: ${key}`));
+    }
+
+    if (_runtimeScriptReady(bundle)) {
+        _initRuntimeScript(bundle);
+        return Promise.resolve();
+    }
+
+    if (_runtimeScriptPromises.has(key)) {
+        return _runtimeScriptPromises.get(key);
+    }
+
+    const promise = new Promise((resolve, reject) => {
+        const finish = () => {
+            if (_runtimeScriptReady(bundle)) {
+                _initRuntimeScript(bundle);
+                resolve();
+                return;
+            }
+
+            reject(new Error(`Runtime script incompleto: ${key}`));
+        };
+
+        const existing = _findRuntimeDataScript(bundle.src);
+        if (existing) {
+            existing.addEventListener('load', finish, { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Caricamento script fallito: ${bundle.src}`)), { once: true });
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = bundle.src;
+        script.async = true;
+        script.dataset.runtimeScript = key;
+        script.onload = finish;
+        script.onerror = () => reject(new Error(`Caricamento script fallito: ${bundle.src}`));
+        document.head.appendChild(script);
+    }).finally(() => {
+        _runtimeScriptPromises.delete(key);
+    });
+
+    _runtimeScriptPromises.set(key, promise);
+    return promise;
+}
+
 window.RUNTIME_DATA_BUNDLES = RUNTIME_DATA_BUNDLES;
 window.ensureRuntimeData = ensureRuntimeData;
+window.RUNTIME_SCRIPT_BUNDLES = RUNTIME_SCRIPT_BUNDLES;
+window.ensureRuntimeScript = ensureRuntimeScript;

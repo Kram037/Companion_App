@@ -4056,6 +4056,9 @@ window.labMonsterToggleSpellSlot = async function(monsterId, level, pipIdx, ev) 
 // ============================================================================
 
 function initLaboratorio() {
+    if (initLaboratorio._done) return;
+    initLaboratorio._done = true;
+
     labRenderHub();
 
     const addBtn = document.getElementById('addHomebrewBtn');

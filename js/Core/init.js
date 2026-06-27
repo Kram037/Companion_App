@@ -544,7 +544,7 @@ function setupEventListeners() {
     }
     
     // Laboratorio init
-    initLaboratorio();
+    if (typeof initLaboratorio === 'function') initLaboratorio();
     
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.onclick = function(e) {
