@@ -104,6 +104,8 @@ let _compFeatDataPromise = null;
 let _compFightingStyleDataPromise = null;
 let _compInvocationDataPromise = null;
 let _compSubclassSpellDataPromise = null;
+let _compMagicItemDataPromise = null;
+let _compPoisonDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -721,6 +723,48 @@ function _compEnsureSubclassSpellData({ rerender = false } = {}) {
     return _compSubclassSpellDataPromise;
 }
 
+function _compHasMagicItemData() {
+    return typeof window.OGGETTI_MAGICI_DATA !== 'undefined';
+}
+
+function _compEnsureMagicItemData({ rerender = false } = {}) {
+    if (_compHasMagicItemData()) return Promise.resolve();
+    if (_compMagicItemDataPromise) return _compMagicItemDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compMagicItemDataPromise = window.ensureRuntimeData('magicItems')
+        .then(() => {
+            if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento oggetti magici fallito:', error))
+        .finally(() => {
+            _compMagicItemDataPromise = null;
+        });
+
+    return _compMagicItemDataPromise;
+}
+
+function _compHasPoisonData() {
+    return typeof window.VELENI_DATA !== 'undefined';
+}
+
+function _compEnsurePoisonData({ rerender = false } = {}) {
+    if (_compHasPoisonData()) return Promise.resolve();
+    if (_compPoisonDataPromise) return _compPoisonDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compPoisonDataPromise = window.ensureRuntimeData('poisons')
+        .then(() => {
+            if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento veleni fallito:', error))
+        .finally(() => {
+            _compPoisonDataPromise = null;
+        });
+
+    return _compPoisonDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -845,6 +889,28 @@ function compendioRenderTab() {
         if (title) title.textContent = state.equipmentSection
             ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
             : COMP_TABS.oggetti.label;
+        if (state.equipmentSection === 'oggetti' && !_compHasMagicItemData()) {
+            _compSetStickyTools('');
+            container.innerHTML = `
+                <div class="loading-placeholder comp-lazy-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Caricamento oggetti magici...</p>
+                </div>
+            `;
+            _compEnsureMagicItemData({ rerender: true });
+            return;
+        }
+        if (state.equipmentSection === 'veleni' && !_compHasPoisonData()) {
+            _compSetStickyTools('');
+            container.innerHTML = `
+                <div class="loading-placeholder comp-lazy-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Caricamento veleni...</p>
+                </div>
+            `;
+            _compEnsurePoisonData({ rerender: true });
+            return;
+        }
         if (_compEquipmentRequiresRuntimeData(state.equipmentSection) && !_compHasEquipmentData()) {
             _compSetStickyTools('');
             container.innerHTML = `
