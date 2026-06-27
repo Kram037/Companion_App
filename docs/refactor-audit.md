@@ -225,3 +225,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimossi `oggetti_magici_data.js` e `veleni_data.js` dal caricamento iniziale.
 - La scheda personaggio li pre-carica per inventario/catalogo.
 - Le sezioni Oggetti Magici e Veleni del compendio li caricano on demand.
+
+## Step preload pagina - classi
+
+- Rimosso `js/Personaggi/data/classes_data.js` dal caricamento iniziale.
+- La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
+- La tab Classi del compendio lo carica on demand.

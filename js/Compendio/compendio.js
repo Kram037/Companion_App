@@ -100,6 +100,7 @@ let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compEquipmentDataPromise = null;
 let _compBackgroundDataPromise = null;
 let _compRaceDataPromise = null;
+let _compClassDataPromise = null;
 let _compFeatDataPromise = null;
 let _compFightingStyleDataPromise = null;
 let _compInvocationDataPromise = null;
@@ -627,6 +628,31 @@ function _compEnsureRaceData({ rerender = false } = {}) {
     return _compRaceDataPromise;
 }
 
+function _compNeedsClassData() {
+    return _compCurrentTab === 'classi' || _compCurrentTab === 'sottoclassi';
+}
+
+function _compHasClassData() {
+    return typeof window.CLASSES_DATA !== 'undefined';
+}
+
+function _compEnsureClassData({ rerender = false } = {}) {
+    if (_compHasClassData()) return Promise.resolve();
+    if (_compClassDataPromise) return _compClassDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compClassDataPromise = window.ensureRuntimeData('classes')
+        .then(() => {
+            if (rerender && _compNeedsClassData()) compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento classi fallito:', error))
+        .finally(() => {
+            _compClassDataPromise = null;
+        });
+
+    return _compClassDataPromise;
+}
+
 function _compNeedsFeatData() {
     return _compCurrentTab === 'talenti' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'talenti');
 }
@@ -947,6 +973,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureRaceData({ rerender: true });
+        return;
+    }
+    if (_compNeedsClassData() && !_compHasClassData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento classi...</p>
+            </div>
+        `;
+        _compEnsureClassData({ rerender: true });
         return;
     }
     if (_compNeedsFeatData() && !_compHasFeatData()) {

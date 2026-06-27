@@ -191,7 +191,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
 
 function _pageRuntimeDataBundles(pageName) {
     if (pageName === 'personaggioCreate' || pageName === 'scheda') {
-        const bundles = ['backgrounds', 'races', 'feats', 'fightingStyles', 'invocations', 'subclassSpells'];
+        const bundles = ['backgrounds', 'races', 'feats', 'fightingStyles', 'invocations', 'subclassSpells', 'classes'];
         if (pageName === 'scheda') bundles.push('magicItems', 'poisons');
         return bundles;
     }
