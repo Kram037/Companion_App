@@ -96,9 +96,12 @@ const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
 const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
-const COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
+let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
+let _compSummonStatblockDataPromise = null;
+let _compSummonStatblockDataFailed = false;
+let _compSummonStatblockDataLoaded = !!COMP_SUMMON_STATBLOCKS_DATA.length;
 let _compMonsterItemsCache = null;
 let _compMonsterItemsSource = null;
 let _compSearchRenderTimer = null;
@@ -1424,9 +1427,10 @@ function _compSpellCardHtml(item) {
     `;
 }
 
-window.compendioOpenDetail = function(type, id) {
+window.compendioOpenDetail = async function(type, id) {
     const item = _compItems(type).find(x => String(x.id) === String(id));
     if (!item) return;
+    if (type === 'incantesimi') await _compEnsureSummonStatblockData();
     _compCurrentTab = type;
     _compStateFor(type).detail = { id };
     compendioRenderTab();
@@ -3387,6 +3391,12 @@ function _compSpellDetail(sp) {
 }
 
 function _compSpellSummonsSection(sp) {
+    if (!_compSummonStatblockDataLoaded && !_compSummonStatblockDataFailed) {
+        _compEnsureSummonStatblockData().then(data => {
+            if (data.length && _compCurrentTab === 'incantesimi') compendioRenderTab();
+        });
+    }
+
     const blocks = _compSpellSummonsFor(sp);
     if (!blocks.length) return '';
     return `<section class="comp-detail-section comp-summon-statblock-section">
@@ -3412,6 +3422,26 @@ function _compSpellSummonsFor(sp) {
         const blockKeys = [block.spell_name, block.spell_name_en].map(_compLookupKey).filter(Boolean);
         return blockKeys.some(key => spellKeys.includes(key));
     });
+}
+
+async function _compEnsureSummonStatblockData() {
+    if (COMP_SUMMON_STATBLOCKS_DATA.length || _compSummonStatblockDataFailed) return COMP_SUMMON_STATBLOCKS_DATA;
+    if (_compSummonStatblockDataPromise) return _compSummonStatblockDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return COMP_SUMMON_STATBLOCKS_DATA;
+
+    _compSummonStatblockDataPromise = window.ensureRuntimeData('summonStatblocks')
+        .then(() => {
+            COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
+            _compSummonStatblockDataLoaded = true;
+            return COMP_SUMMON_STATBLOCKS_DATA;
+        })
+        .catch(error => {
+            _compSummonStatblockDataFailed = true;
+            console.warn('Statblock evocati non caricati', error);
+            return COMP_SUMMON_STATBLOCKS_DATA;
+        });
+
+    return _compSummonStatblockDataPromise;
 }
 
 function _compLinkedStatblocksSection(links, title = 'Statblock collegati') {
@@ -3788,12 +3818,13 @@ function _compRegexEscape(text) {
     return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-window.compendioOpenSpellRef = function(id) {
+window.compendioOpenSpellRef = async function(id) {
     const spellId = _compFindSpellRefId(id);
-    if (spellId) _compOpenSpellRefModal(spellId);
+    if (spellId) await _compOpenSpellRefModal(spellId);
 };
 
-window.compendioOpenSummonStatblock = function(id) {
+window.compendioOpenSummonStatblock = async function(id) {
+    await _compEnsureSummonStatblockData();
     const block = (COMP_SUMMON_STATBLOCKS_DATA || []).find(item => String(item.id) === String(id));
     if (!block) return;
     _compOpenStatblockModal(block);
@@ -3865,9 +3896,10 @@ function _compFindSpellRefId(value) {
     return match?.id || '';
 }
 
-function _compOpenSpellRefModal(spellId) {
+async function _compOpenSpellRefModal(spellId) {
     const spell = (window.SPELLS_DATA || {})[spellId];
     if (!spell) return;
+    await _compEnsureSummonStatblockData();
     document.querySelector('.comp-spell-ref-overlay')?.remove();
     const overlay = document.createElement('div');
     overlay.className = 'hp-calc-overlay comp-spell-ref-overlay';

@@ -166,3 +166,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Aggiunto `js/Core/data-loader.js`.
 - Espone `window.ensureRuntimeData(key)` per caricare un bundle dati solo quando serve.
 - Nessun dato e' stato ancora rimosso da `index.html`: il loader prepara il lazy load senza cambiare comportamento runtime.
+
+## Step lazy load - statblock evocati
+
+- Rimosso `js/Compendio/data/summon_statblocks_data.js` dal caricamento iniziale.
+- Il compendio lo carica solo quando apre dettagli incantesimo o statblock evocati.
+- Il service worker lo tratta come dato runtime tramite `DATA_URL_PREFIXES`.
