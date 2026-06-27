@@ -101,6 +101,7 @@ let _compEquipmentDataPromise = null;
 let _compBackgroundDataPromise = null;
 let _compRaceDataPromise = null;
 let _compFeatDataPromise = null;
+let _compFightingStyleDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -647,6 +648,31 @@ function _compEnsureFeatData({ rerender = false } = {}) {
     return _compFeatDataPromise;
 }
 
+function _compNeedsFightingStyleData() {
+    return _compCurrentTab === 'stili' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'stili');
+}
+
+function _compHasFightingStyleData() {
+    return typeof window.FIGHTING_STYLES_DATA !== 'undefined';
+}
+
+function _compEnsureFightingStyleData({ rerender = false } = {}) {
+    if (_compHasFightingStyleData()) return Promise.resolve();
+    if (_compFightingStyleDataPromise) return _compFightingStyleDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compFightingStyleDataPromise = window.ensureRuntimeData('fightingStyles')
+        .then(() => {
+            if (rerender && _compNeedsFightingStyleData()) compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento stili fallito:', error))
+        .finally(() => {
+            _compFightingStyleDataPromise = null;
+        });
+
+    return _compFightingStyleDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -818,6 +844,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureFeatData({ rerender: true });
+        return;
+    }
+    if (_compNeedsFightingStyleData() && !_compHasFightingStyleData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento stili di combattimento...</p>
+            </div>
+        `;
+        _compEnsureFightingStyleData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {

@@ -201,3 +201,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Personaggi/data/feats_data.js` dal caricamento iniziale.
 - La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
 - La tab Talenti del compendio lo carica on demand.
+
+## Step preload pagina - stili combattimento
+
+- Rimosso `js/Personaggi/data/fighting_styles_data.js` dal caricamento iniziale.
+- La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
+- La vista Stili nel compendio lo carica on demand.
