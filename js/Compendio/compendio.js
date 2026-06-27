@@ -101,6 +101,7 @@ let _compEquipmentDataPromise = null;
 let _compBackgroundDataPromise = null;
 let _compRaceDataPromise = null;
 let _compClassDataPromise = null;
+let _compSpellDataPromise = null;
 let _compFeatDataPromise = null;
 let _compFightingStyleDataPromise = null;
 let _compInvocationDataPromise = null;
@@ -653,6 +654,31 @@ function _compEnsureClassData({ rerender = false } = {}) {
     return _compClassDataPromise;
 }
 
+function _compNeedsSpellData() {
+    return _compCurrentTab === 'incantesimi' || !!_compStateFor(_compCurrentTab).detail;
+}
+
+function _compHasSpellData() {
+    return typeof window.SPELLS_DATA !== 'undefined';
+}
+
+function _compEnsureSpellData({ rerender = false } = {}) {
+    if (_compHasSpellData()) return Promise.resolve();
+    if (_compSpellDataPromise) return _compSpellDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compSpellDataPromise = window.ensureRuntimeData('spells')
+        .then(() => {
+            if (rerender && _compNeedsSpellData()) compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento incantesimi fallito:', error))
+        .finally(() => {
+            _compSpellDataPromise = null;
+        });
+
+    return _compSpellDataPromise;
+}
+
 function _compNeedsFeatData() {
     return _compCurrentTab === 'talenti' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'talenti');
 }
@@ -1028,6 +1054,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureSubclassSpellData({ rerender: true });
+        return;
+    }
+    if (_compNeedsSpellData() && !_compHasSpellData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento incantesimi...</p>
+            </div>
+        `;
+        _compEnsureSpellData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
@@ -1787,6 +1824,7 @@ function _compSpellCardHtml(item) {
 window.compendioOpenDetail = async function(type, id) {
     const item = _compItems(type).find(x => String(x.id) === String(id));
     if (!item) return;
+    await _compEnsureSpellData();
     if (type === 'incantesimi') await _compEnsureSummonStatblockData();
     if (type === 'classi') await _compEnsureSubclassSpellData();
     _compCurrentTab = type;
