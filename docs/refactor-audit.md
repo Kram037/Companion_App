@@ -177,3 +177,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 - Il bestiario usa `ensureRuntimeData('monsters')`.
 - Rimosso il loader custom con creazione manuale dello script da `compendio.js`.
+
+## Step lazy load - equipaggiamento compendio
+
+- Rimosso `js/Compendio/data/equipaggiamento_data.js` dal caricamento iniziale.
+- Le sezioni Avventura, Strumenti, Erbe, Metalli e Gemme lo caricano tramite `ensureRuntimeData('equipment')`.
+- Armi, Oggetti Magici e Veleni restano sui dati gia presenti per evitare cambiamenti laterali.

@@ -89,14 +89,15 @@ const COMP_ARMOR_GROUPS = [
     ['scudo', 'Scudi'],
 ];
 
-const COMP_ADVENTURING_GEAR_DATA = window.COMP_ADVENTURING_GEAR_DATA || [];
-const COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
-const COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
-const COMP_METALS_DATA = window.COMP_METALS_DATA || [];
-const COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
-const COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
+let COMP_ADVENTURING_GEAR_DATA = window.COMP_ADVENTURING_GEAR_DATA || [];
+let COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
+let COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
+let COMP_METALS_DATA = window.COMP_METALS_DATA || [];
+let COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
+let COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
+let _compEquipmentDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -550,6 +551,52 @@ function _compHasMonsterData() {
     return Array.isArray(COMP_MONSTERS_DATA) && COMP_MONSTERS_DATA.length > 0;
 }
 
+function _compEquipmentRequiresRuntimeData(section) {
+    return ['avventura', 'strumenti', 'erbe', 'metalli', 'gemme'].includes(section);
+}
+
+function _compSyncEquipmentData() {
+    COMP_ADVENTURING_GEAR_DATA = window.COMP_ADVENTURING_GEAR_DATA || [];
+    COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
+    COMP_HERBS_DATA = window.COMP_HERBS_DATA || [];
+    COMP_METALS_DATA = window.COMP_METALS_DATA || [];
+    COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
+    COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
+}
+
+function _compHasEquipmentData() {
+    const ready = [
+        'COMP_ADVENTURING_GEAR_DATA',
+        'COMP_TOOLS_DATA',
+        'COMP_HERBS_DATA',
+        'COMP_METALS_DATA',
+        'COMP_GEMS_DATA',
+        'COMP_REALMS_GEMS_DATA',
+    ].every(name => typeof window[name] !== 'undefined');
+    if (ready) _compSyncEquipmentData();
+    return ready;
+}
+
+function _compEnsureEquipmentData({ rerender = false } = {}) {
+    if (_compHasEquipmentData()) return Promise.resolve();
+    if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
+
+    _compEquipmentDataPromise = (typeof window.ensureRuntimeData === 'function'
+        ? window.ensureRuntimeData('equipment')
+        : Promise.reject(new Error('Runtime data loader non disponibile'))
+    ).then(() => {
+        _compSyncEquipmentData();
+    }).then(() => {
+        if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
+    }).catch(error => {
+        console.warn('[compendio] caricamento equipaggiamento fallito:', error);
+    }).finally(() => {
+        _compEquipmentDataPromise = null;
+    });
+
+    return _compEquipmentDataPromise;
+}
+
 function _compEnsureMonsterData({ rerender = false } = {}) {
     if (_compHasMonsterData()) return Promise.resolve(COMP_MONSTERS_DATA);
     if (_compMonsterDataPromise) return _compMonsterDataPromise;
@@ -654,6 +701,17 @@ function compendioRenderTab() {
         if (title) title.textContent = state.equipmentSection
             ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
             : COMP_TABS.oggetti.label;
+        if (_compEquipmentRequiresRuntimeData(state.equipmentSection) && !_compHasEquipmentData()) {
+            _compSetStickyTools('');
+            container.innerHTML = `
+                <div class="loading-placeholder comp-lazy-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Caricamento equipaggiamento...</p>
+                </div>
+            `;
+            _compEnsureEquipmentData({ rerender: true });
+            return;
+        }
         container.innerHTML = _compObjectsPageHtml();
         _compRenderObjectsStickyTools();
         _compScrollToTop();
