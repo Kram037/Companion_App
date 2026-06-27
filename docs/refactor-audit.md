@@ -270,3 +270,4 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 - Rimossi log informativi dai modal utente/settings.
 - Convertiti i log realtime di flusso a `appDebug`.
+- Convertiti i log informativi auth/homebrew a `appDebug`.

@@ -227,7 +227,7 @@ async function loadHomebrewOggetti() {
             });
             AppState.cachedHomebrewOggetti = list;
             try {
-                console.log('[homebrew] oggetti caricati:', {
+                appDebug('[homebrew] oggetti caricati:', {
                     totale: list.length,
                     proprie: list.filter(x => x._is_own).length,
                     amici: list.filter(x => !x._is_own).length,
@@ -293,7 +293,7 @@ async function loadHomebrewIncantesimi() {
             });
             AppState.cachedHomebrewIncantesimi = list;
             try {
-                console.log('[homebrew] incantesimi caricati:', {
+                appDebug('[homebrew] incantesimi caricati:', {
                     totale: list.length,
                     proprie: list.filter(x => x._is_own).length,
                     amici: list.filter(x => !x._is_own).length,
@@ -443,10 +443,10 @@ async function loadHomebrewSottoclassi() {
             let friendUids = [];
             let friendInfoByUid = {};
             try {
-                console.log('[homebrew][debug] settings:', settings, 'masterEnabled:', masterEnabled);
+                appDebug('[homebrew][debug] settings:', settings, 'masterEnabled:', masterEnabled);
             } catch (_) {}
             if (masterEnabled && Array.isArray(settings.amici_abilitati) && settings.amici_abilitati.length > 0) {
-                try { console.log('[homebrew][debug] amici_abilitati IDs in settings:', settings.amici_abilitati); } catch (_) {}
+                try { appDebug('[homebrew][debug] amici_abilitati IDs in settings:', settings.amici_abilitati); } catch (_) {}
 
                 // Tentativo 1: SELECT diretta su `utenti`. Funziona solo se la
                 // RLS lo permette (di default su molti progetti Supabase NO).
@@ -457,7 +457,7 @@ async function loadHomebrewSottoclassi() {
                 if (friendErr) {
                     console.warn('[homebrew][debug] errore SELECT amici:', friendErr);
                 }
-                try { console.log('[homebrew][debug] friendRows risolti (via SELECT utenti):', friendRows); } catch (_) {}
+                try { appDebug('[homebrew][debug] friendRows risolti (via SELECT utenti):', friendRows); } catch (_) {}
 
                 // Fallback 1: se la SELECT diretta su utenti non torna righe
                 // (RLS bloccante), proviamo la RPC dedicata get_uids_by_user_ids
@@ -471,7 +471,7 @@ async function loadHomebrewSottoclassi() {
                         if (uidsErr) {
                             console.warn('[homebrew][debug] errore RPC get_uids_by_user_ids:', uidsErr);
                         } else {
-                            try { console.log('[homebrew][debug] get_uids_by_user_ids RPC:', uidsRpc); } catch (_) {}
+                            try { appDebug('[homebrew][debug] get_uids_by_user_ids RPC:', uidsRpc); } catch (_) {}
                             if (Array.isArray(uidsRpc) && uidsRpc.length > 0) {
                                 friendRows = uidsRpc.map(r => ({
                                     id: r.id,
@@ -493,7 +493,7 @@ async function loadHomebrewSottoclassi() {
                         if (rpcErr) {
                             console.warn('[homebrew][debug] errore RPC get_amici:', rpcErr);
                         } else {
-                            try { console.log('[homebrew][debug] get_amici RPC fallback:', amiciRpc); } catch (_) {}
+                            try { appDebug('[homebrew][debug] get_amici RPC fallback:', amiciRpc); } catch (_) {}
                             const setSel = new Set((settings.amici_abilitati || []).map(String));
                             const merged = (amiciRpc || [])
                                 .filter(a => setSel.has(String(a.amico_id || a.id)))
@@ -509,7 +509,7 @@ async function loadHomebrewSottoclassi() {
                         console.warn('[homebrew][debug] eccezione RPC get_amici:', eRpc);
                     }
                 }
-                try { console.log('[homebrew][debug] friendRows finali:', friendRows); } catch (_) {}
+                try { appDebug('[homebrew][debug] friendRows finali:', friendRows); } catch (_) {}
 
                 (friendRows || []).forEach(f => {
                     if (f.uid) {
@@ -521,7 +521,7 @@ async function loadHomebrewSottoclassi() {
                 });
             } else {
                 try {
-                    console.log('[homebrew][debug] skip risoluzione amici. master:', masterEnabled,
+                    appDebug('[homebrew][debug] skip risoluzione amici. master:', masterEnabled,
                         'amici_abilitati:', settings.amici_abilitati);
                 } catch (_) {}
             }
@@ -531,9 +531,9 @@ async function loadHomebrewSottoclassi() {
 
             // [DEBUG] Stato in ingresso.
             try {
-                console.log('[homebrew][debug] ownUid:', ownUid);
-                console.log('[homebrew][debug] friendUids:', friendUids);
-                console.log('[homebrew][debug] allUids per IN:', allUids);
+                appDebug('[homebrew][debug] ownUid:', ownUid);
+                appDebug('[homebrew][debug] friendUids:', friendUids);
+                appDebug('[homebrew][debug] allUids per IN:', allUids);
             } catch (_) {}
 
             const { data, error } = await supabase
@@ -549,9 +549,9 @@ async function loadHomebrewSottoclassi() {
 
             // [DEBUG] Cosa ha realmente risposto Supabase con il filtro IN.
             try {
-                console.log('[homebrew][debug] righe restituite (con IN):', (data || []).length);
+                appDebug('[homebrew][debug] righe restituite (con IN):', (data || []).length);
                 (data || []).forEach((r, i) => {
-                    console.log(`[homebrew][debug]  riga ${i}:`, {
+                    appDebug(`[homebrew][debug]  riga ${i}:`, {
                         id: r.id,
                         user_id: r.user_id,
                         nome: r.nome,
@@ -569,10 +569,10 @@ async function loadHomebrewSottoclassi() {
                 if (ctrl.error) {
                     console.warn('[homebrew][debug] CONTROL SELECT (senza IN) errore:', ctrl.error);
                 } else {
-                    console.log('[homebrew][debug] CONTROL SELECT (senza IN) totale visibile:',
+                    appDebug('[homebrew][debug] CONTROL SELECT (senza IN) totale visibile:',
                         (ctrl.data || []).length);
                     (ctrl.data || []).forEach((r, i) => {
-                        console.log(`[homebrew][debug]  ctrl ${i}:`, {
+                        appDebug(`[homebrew][debug]  ctrl ${i}:`, {
                             user_id: r.user_id,
                             nome: r.nome,
                             parent_class_slug: r.parent_class_slug,
@@ -598,7 +598,7 @@ async function loadHomebrewSottoclassi() {
 
             AppState.cachedHomebrewSottoclassi = list;
             try {
-                console.log('[homebrew] sottoclassi caricate:', {
+                appDebug('[homebrew] sottoclassi caricate:', {
                     totale: list.length,
                     proprie: list.filter(x => x._is_own).length,
                     amici: list.filter(x => !x._is_own).length,
@@ -870,7 +870,7 @@ async function handleLogin(e) {
         const originalText = elements.submitBtn.textContent;
         elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrazione...' : 'Accesso...';
 
-        console.log(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
+        appDebug(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
         
         if (AppState.isRegisterMode) {
             // Register new user
@@ -888,11 +888,11 @@ async function handleLogin(e) {
             
             if (error) throw error;
             
-            console.log('✅ Utente registrato con successo:', data.user?.id, data.user?.email);
+            appDebug('✅ Utente registrato con successo:', data.user?.id, data.user?.email);
             
             // Non inizializziamo qui perché onAuthStateChange lo farà automaticamente
             // Questo evita doppie inizializzazioni e race conditions
-            console.log('✅ Registrazione completata, onAuthStateChange gestirà l\'inizializzazione');
+            appDebug('✅ Registrazione completata, onAuthStateChange gestirà l\'inizializzazione');
             showNotification('Registrazione completata! Benvenuto!');
         } else {
             // Sign in existing user
@@ -903,7 +903,7 @@ async function handleLogin(e) {
             
             if (error) throw error;
             
-            console.log('✅ Utente autenticato con successo:', data.user?.id, data.user?.email);
+            appDebug('✅ Utente autenticato con successo:', data.user?.id, data.user?.email);
             showNotification('Accesso effettuato!');
         }
 
@@ -968,7 +968,7 @@ async function handleGoogleLogin() {
         
         // La redirect avverrà automaticamente, quindi non chiudiamo il modal qui
         // Il callback verrà gestito da onAuthStateChange
-        console.log('✅ Redirect a Google per autenticazione...');
+        appDebug('✅ Redirect a Google per autenticazione...');
         
     } catch (error) {
         console.error('Google Auth error:', error);
@@ -1039,12 +1039,12 @@ function hideRollNumber() {
 
 // Logout Handler
 async function handleLogout() {
-    console.log('🚪 handleLogout chiamato');
+    appDebug('🚪 handleLogout chiamato');
     try {
         const confirmed = await showConfirm('Sei sicuro di voler uscire?', 'Logout');
-        console.log('🚪 Conferma logout:', confirmed);
+        appDebug('🚪 Conferma logout:', confirmed);
         if (!confirmed) {
-            console.log('🚪 Logout annullato dall\'utente');
+            appDebug('🚪 Logout annullato dall\'utente');
             return;
         }
         try {
@@ -1071,7 +1071,7 @@ async function handleLogout() {
                     console.warn('⚠️ Errore durante signOut:', error);
                     // Continua comunque con il logout locale
             } else {
-                    console.log('✅ SignOut completato con successo');
+                    appDebug('✅ SignOut completato con successo');
                 }
                 
                 // Pulisci manualmente anche localStorage e sessionStorage per sicurezza
