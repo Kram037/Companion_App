@@ -237,3 +237,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Personaggi/data/spells_data.js` dal caricamento iniziale.
 - Scheda, creazione personaggio e laboratorio lo pre-caricano tramite navigation.
 - La tab Incantesimi e i dettagli del compendio lo caricano on demand.
+
+## Step check bootstrap
+
+- Aggiunto `tools/check-index-bootstrap.mjs`.
+- Il target `check` fallisce se `index.html` carica direttamente `js/Personaggi/data` o `js/Compendio/data`.

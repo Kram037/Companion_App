@@ -20,7 +20,7 @@
     "check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/check-js.mjs && node tools/check-data-boundary.mjs"
+        "command": "node tools/check-js.mjs && node tools/check-data-boundary.mjs && node tools/check-index-bootstrap.mjs"
       }
     }
   }
