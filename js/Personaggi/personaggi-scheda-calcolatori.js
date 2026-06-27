@@ -560,6 +560,9 @@ window.schedaCloseHpCalc = async function() {
     _hpCalcState = null;
     _hpCalcClosedAt = Date.now();
     if (wasMonster && campagnaId && sessioneId) {
+        if (typeof window.ensureRuntimeScript === 'function') {
+            await window.ensureRuntimeScript('combattimento');
+        }
         await renderCombattimentoContent(campagnaId, sessioneId);
         // Se il calcolatore HP era stato aperto dalla full-sheet del mostro
         // in combattimento, ricarichiamo quella modale per riflettere i PV

@@ -232,8 +232,6 @@ async function init() {
                 await loadCampagnaDetails(st.campagnaId);
             } else if (st.page === 'sessione' && st.campagnaId) {
                 await renderSessioneContent(st.campagnaId);
-            } else if (st.page === 'combattimento' && st.campagnaId && st.sessioneId) {
-                await renderCombattimentoContent(st.campagnaId, st.sessioneId);
             } else if (st.page === 'scheda' && st.personaggioId) {
                 await renderSchedaPersonaggio(st.personaggioId);
             }

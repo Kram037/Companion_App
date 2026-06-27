@@ -248,3 +248,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Laboratorio/laboratorio.js` dal caricamento iniziale.
 - Aggiunto `ensureRuntimeScript('laboratorio')` nel loader centrale.
 - La pagina Laboratorio inizializza il modulo on demand tramite navigation.
+
+## Step lazy load - combattimento
+
+- Rimosso `js/Combattimento/combat.js` dal caricamento iniziale.
+- Aggiunto `ensureRuntimeScript('combattimento')` nel loader centrale.
+- Navigation, realtime e refresh PF mostri caricano il modulo prima di renderizzare il combattimento.

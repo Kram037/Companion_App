@@ -776,7 +776,5 @@ window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     AppState.currentSessioneId = sessioneId;
     sessionStorage.setItem('currentCampagnaId', campagnaId);
     sessionStorage.setItem('currentSessioneId', sessioneId);
-    navigateToPage('combattimento');
-    await renderCombattimentoContent(campagnaId, sessioneId);
-    startCombattimentoRealtime(campagnaId, sessioneId);
+    await navigateToPage('combattimento');
 };

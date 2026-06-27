@@ -123,6 +123,9 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                 const combattimentoPage = document.getElementById('combattimentoPage');
                 if (combattimentoPage && combattimentoPage.classList.contains('active')) {
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        if (typeof window.ensureRuntimeScript === 'function') {
+                            await window.ensureRuntimeScript('combattimento');
+                        }
                         await renderCombattimentoContent(campagnaId, sessioneId);
                     }
                 }
@@ -145,6 +148,9 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
                         console.log('✅ [REALTIME] Ricarico contenuto combattimento');
                         // Ricarica il contenuto del combattimento
+                        if (typeof window.ensureRuntimeScript === 'function') {
+                            await window.ensureRuntimeScript('combattimento');
+                        }
                         await renderCombattimentoContent(campagnaId, sessioneId);
                     }
                 }
@@ -510,6 +516,9 @@ async function refreshCurrentPageData() {
                 await renderSessioneContent(AppState.currentCampagnaId);
             }
         } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('combattimento');
+            }
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
         } else if (page === 'scheda' && AppState.currentPersonaggioId) {
             // Mantieni la tab attualmente visualizzata: senza questo

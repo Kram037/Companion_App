@@ -238,11 +238,13 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
         } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
             loadCampagnaDetails(AppState.currentCampagnaId);
         } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId).then(() => {
-                if (!window.combattimentoChannel) {
-                    startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
-                }
-            });
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('combattimento');
+            }
+            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
+            if (!window.combattimentoChannel) {
+                startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
+            }
         } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
             renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
