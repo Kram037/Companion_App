@@ -554,35 +554,20 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
     if (_compHasMonsterData()) return Promise.resolve(COMP_MONSTERS_DATA);
     if (_compMonsterDataPromise) return _compMonsterDataPromise;
     _compMonsterDataFailed = false;
-    _compMonsterDataPromise = new Promise((resolve, reject) => {
-        const existing = document.querySelector('script[data-comp-monsters-data="1"]');
-        if (existing) {
-            existing.addEventListener('load', () => {
-                COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
-                resolve(COMP_MONSTERS_DATA);
-            }, { once: true });
-            existing.addEventListener('error', reject, { once: true });
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = 'js/Compendio/data/mostri_data.js?v=20260624A';
-        script.defer = true;
-        script.dataset.compMonstersData = '1';
-        script.onload = () => {
-            COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
-            _compMonsterItemsCache = null;
-            _compMonsterItemsSource = null;
-            resolve(COMP_MONSTERS_DATA);
-        };
-        script.onerror = () => {
-            _compMonsterDataFailed = true;
-            reject(new Error('Impossibile caricare il bestiario'));
-        };
-        document.body.appendChild(script);
+
+    _compMonsterDataPromise = (typeof window.ensureRuntimeData === 'function'
+        ? window.ensureRuntimeData('monsters')
+        : Promise.reject(new Error('Runtime data loader non disponibile'))
+    ).then(() => {
+        COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+        _compMonsterItemsCache = null;
+        _compMonsterItemsSource = null;
+        return COMP_MONSTERS_DATA;
     }).then(data => {
         if (rerender && _compCurrentTab === 'mostri') compendioRenderTab();
         return data;
     }).catch(error => {
+        _compMonsterDataFailed = true;
         console.warn('[compendio] caricamento bestiario fallito:', error);
         const container = document.getElementById('compendioContent');
         if (rerender && _compCurrentTab === 'mostri' && container) {
@@ -595,6 +580,7 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
     }).finally(() => {
         _compMonsterDataPromise = null;
     });
+
     return _compMonsterDataPromise;
 }
 

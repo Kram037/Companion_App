@@ -172,3 +172,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Compendio/data/summon_statblocks_data.js` dal caricamento iniziale.
 - Il compendio lo carica solo quando apre dettagli incantesimo o statblock evocati.
 - Il service worker lo tratta come dato runtime tramite `DATA_URL_PREFIXES`.
+
+## Step loader centrale - mostri
+
+- Il bestiario usa `ensureRuntimeData('monsters')`.
+- Rimosso il loader custom con creazione manuale dello script da `compendio.js`.
