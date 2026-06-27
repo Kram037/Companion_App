@@ -213,3 +213,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Personaggi/data/invocations_data.js` dal caricamento iniziale.
 - La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
 - La tab Suppliche del compendio lo carica on demand.
+
+## Step preload pagina - incantesimi sottoclassi
+
+- Rimosso `js/Personaggi/data/subclass_spells_data.js` dal caricamento iniziale.
+- La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
+- I dettagli classe del compendio lo caricano on demand.

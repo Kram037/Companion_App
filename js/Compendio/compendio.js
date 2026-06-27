@@ -103,6 +103,7 @@ let _compRaceDataPromise = null;
 let _compFeatDataPromise = null;
 let _compFightingStyleDataPromise = null;
 let _compInvocationDataPromise = null;
+let _compSubclassSpellDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -695,6 +696,31 @@ function _compEnsureInvocationData({ rerender = false } = {}) {
     return _compInvocationDataPromise;
 }
 
+function _compNeedsSubclassSpellData() {
+    return _compCurrentTab === 'classi' && !!_compStateFor('classi').detail;
+}
+
+function _compHasSubclassSpellData() {
+    return typeof window.SUBCLASS_SPELLS_DATA !== 'undefined';
+}
+
+function _compEnsureSubclassSpellData({ rerender = false } = {}) {
+    if (_compHasSubclassSpellData()) return Promise.resolve();
+    if (_compSubclassSpellDataPromise) return _compSubclassSpellDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compSubclassSpellDataPromise = window.ensureRuntimeData('subclassSpells')
+        .then(() => {
+            if (rerender && _compNeedsSubclassSpellData()) compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento incantesimi sottoclassi fallito:', error))
+        .finally(() => {
+            _compSubclassSpellDataPromise = null;
+        });
+
+    return _compSubclassSpellDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -888,6 +914,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureInvocationData({ rerender: true });
+        return;
+    }
+    if (_compNeedsSubclassSpellData() && !_compHasSubclassSpellData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento incantesimi di sottoclasse...</p>
+            </div>
+        `;
+        _compEnsureSubclassSpellData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
@@ -1648,6 +1685,7 @@ window.compendioOpenDetail = async function(type, id) {
     const item = _compItems(type).find(x => String(x.id) === String(id));
     if (!item) return;
     if (type === 'incantesimi') await _compEnsureSummonStatblockData();
+    if (type === 'classi') await _compEnsureSubclassSpellData();
     _compCurrentTab = type;
     _compStateFor(type).detail = { id };
     compendioRenderTab();
