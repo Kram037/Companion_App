@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "companion-app",
+  "projectType": "application",
+  "sourceRoot": ".",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/serve-static.mjs . 8000"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/companion-app"],
+      "options": {
+        "command": "node tools/build-static.mjs dist/apps/companion-app"
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node tools/check-js.mjs"
+      }
+    }
+  }
+}

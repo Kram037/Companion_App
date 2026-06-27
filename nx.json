@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "!{projectRoot}/.git/**",
+      "!{projectRoot}/.nx/**",
+      "!{projectRoot}/dist/**",
+      "!{projectRoot}/node_modules/**"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/risorse/Manuali/**",
+      "!{projectRoot}/risorse/mostri/Lista Mostri.pdf"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "inputs": ["production"],
+      "outputs": ["{workspaceRoot}/dist/apps/companion-app"]
+    },
+    "check": {
+      "cache": true
+    }
+  }
+}
