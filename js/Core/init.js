@@ -226,7 +226,7 @@ async function init() {
             if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
             if (st.personaggioId) AppState.currentPersonaggioId = st.personaggioId;
 
-            navigateToPage(st.page, { pushHistory: false });
+            await navigateToPage(st.page, { pushHistory: false });
 
             if (st.page === 'dettagli' && st.campagnaId) {
                 await loadCampagnaDetails(st.campagnaId);

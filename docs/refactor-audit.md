@@ -183,3 +183,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Compendio/data/equipaggiamento_data.js` dal caricamento iniziale.
 - Le sezioni Avventura, Strumenti, Erbe, Metalli e Gemme lo caricano tramite `ensureRuntimeData('equipment')`.
 - Armi, Oggetti Magici e Veleni restano sui dati gia presenti per evitare cambiamenti laterali.
+
+## Step preload pagina - background
+
+- Rimosso `js/Personaggi/data/backgrounds_data.js` dal caricamento iniziale.
+- La pagina creazione/scheda personaggio lo pre-carica tramite navigation.
+- La tab Background del compendio lo carica on demand.

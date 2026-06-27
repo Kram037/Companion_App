@@ -173,7 +173,37 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         ? getDesktopDefaultGroupTab(pageName)
         : '';
 
-    if (!skipPageLoad) {
+    const pageLoadPromise = skipPageLoad
+        ? Promise.resolve()
+        : _runPageLoad(pageName, desktopGroupTab);
+
+    updateReturnToSessionBtn();
+    updateScrollStatsBtn();
+    if (typeof scheduleActiveBookmarkCapture === 'function') {
+        scheduleActiveBookmarkCapture(220);
+    }
+    if (typeof updateBookmarkChrome === 'function') {
+        setTimeout(updateBookmarkChrome, 0);
+    }
+
+    return pageLoadPromise;
+}
+
+function _pageRuntimeDataBundles(pageName) {
+    if (pageName === 'personaggioCreate' || pageName === 'scheda') return ['backgrounds'];
+    return [];
+}
+
+async function _ensurePageRuntimeData(pageName) {
+    if (typeof window.ensureRuntimeData !== 'function') return;
+    const bundles = _pageRuntimeDataBundles(pageName);
+    if (!bundles.length) return;
+    await Promise.all(bundles.map(key => window.ensureRuntimeData(key)));
+}
+
+async function _runPageLoad(pageName, desktopGroupTab = '') {
+    try {
+        await _ensurePageRuntimeData(pageName);
         if (pageName === 'amici' && AppState.isLoggedIn) {
             loadAmici();
         } else if (pageName === 'compendio') {
@@ -208,15 +238,8 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
             renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
-    }
-
-    updateReturnToSessionBtn();
-    updateScrollStatsBtn();
-    if (typeof scheduleActiveBookmarkCapture === 'function') {
-        scheduleActiveBookmarkCapture(220);
-    }
-    if (typeof updateBookmarkChrome === 'function') {
-        setTimeout(updateBookmarkChrome, 0);
+    } catch (error) {
+        console.warn('[navigation] preload pagina fallito:', error);
     }
 }
 

@@ -98,6 +98,7 @@ let COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compEquipmentDataPromise = null;
+let _compBackgroundDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -577,6 +578,27 @@ function _compHasEquipmentData() {
     return ready;
 }
 
+function _compHasBackgroundData() {
+    return typeof window.BACKGROUNDS_DATA !== 'undefined';
+}
+
+function _compEnsureBackgroundData({ rerender = false } = {}) {
+    if (_compHasBackgroundData()) return Promise.resolve();
+    if (_compBackgroundDataPromise) return _compBackgroundDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compBackgroundDataPromise = window.ensureRuntimeData('backgrounds')
+        .then(() => {
+            if (rerender && _compCurrentTab === 'background') compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento background fallito:', error))
+        .finally(() => {
+            _compBackgroundDataPromise = null;
+        });
+
+    return _compBackgroundDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -715,6 +737,17 @@ function compendioRenderTab() {
         container.innerHTML = _compObjectsPageHtml();
         _compRenderObjectsStickyTools();
         _compScrollToTop();
+        return;
+    }
+    if (_compCurrentTab === 'background' && !_compHasBackgroundData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento background...</p>
+            </div>
+        `;
+        _compEnsureBackgroundData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
