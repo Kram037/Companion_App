@@ -271,10 +271,6 @@ function closeLoginModal() {
 }
 
 async function openUserModal() {
-    console.log('🔓 Apertura User Modal...');
-    console.log('AppState.isLoggedIn:', AppState.isLoggedIn);
-    console.log('AppState.currentUser:', AppState.currentUser);
-    console.log('elements.userModal:', elements.userModal);
     
     if (!elements.userModal) {
         console.error('❌ userModal non trovato!');
@@ -322,11 +318,9 @@ async function openUserModal() {
     
     elements.userModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    console.log('✅ User Modal aperto');
 }
 
 function closeUserModal() {
-    console.log('🔒 Chiusura User Modal...');
     if (!elements.userModal) {
         console.error('❌ userModal non trovato in closeUserModal!');
         return;
@@ -340,7 +334,6 @@ function closeUserModal() {
     }
     elements.userModal.classList.remove('active');
     document.body.style.overflow = '';
-    console.log('✅ User Modal chiuso');
 }
 
 function openSettingsModal() {
@@ -349,7 +342,6 @@ function openSettingsModal() {
         return;
     }
     
-    console.log('⚙️ Apertura Settings Modal');
     elements.settingsModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }

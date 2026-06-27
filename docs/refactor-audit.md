@@ -265,3 +265,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 - I moduli lazy `combat`, `compendio` e `laboratorio` restano fuori dall'app shell.
 - Il service worker li gestisce network-first, come i dati runtime.
+
+## Step log core
+
+- Rimossi log informativi dai modal utente/settings.
+- Convertiti i log realtime di flusso a `appDebug`.

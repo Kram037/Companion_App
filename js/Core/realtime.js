@@ -59,7 +59,7 @@ function startSessionRealtime() {
                     table: 'sessioni'
                 },
                 async (payload) => {
-                    console.log('🔔 Nuova sessione:', payload.new);
+                    appDebug('🔔 Nuova sessione:', payload.new);
                     // Filtra lato client: verifica che la sessione appartenga a una delle campagne dell'utente
                     if (campagnaIds.includes(payload.new.campagna_id) && !payload.new.data_fine) {
                         // Carica i dettagli della campagna
@@ -83,7 +83,7 @@ function startSessionRealtime() {
             .subscribe();
 
         window.sessionChannel = sessionChannel;
-        console.log('✅ Realtime subscription per sessioni avviata');
+        appDebug('✅ Realtime subscription per sessioni avviata');
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime sessioni:', error);
     });
@@ -119,7 +119,7 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
             'broadcast',
             { event: 'iniziativa_update' },
             async (payload) => {
-                console.log('🔔 [REALTIME] Broadcast iniziativa:', payload);
+                appDebug('🔔 [REALTIME] Broadcast iniziativa:', payload);
                 const combattimentoPage = document.getElementById('combattimentoPage');
                 if (combattimentoPage && combattimentoPage.classList.contains('active')) {
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
@@ -140,13 +140,13 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                 filter: `sessione_id=eq.${sessioneId}`
             },
             async (payload) => {
-                console.log('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
+                appDebug('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
                 // Verifica che siamo ancora nella pagina combattimento
                 const combattimentoPage = document.getElementById('combattimentoPage');
                 if (combattimentoPage && combattimentoPage.classList.contains('active')) {
                     // Verifica che la sessione sia ancora quella corrente
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
-                        console.log('✅ [REALTIME] Ricarico contenuto combattimento');
+                        appDebug('✅ [REALTIME] Ricarico contenuto combattimento');
                         // Ricarica il contenuto del combattimento
                         if (typeof window.ensureRuntimeScript === 'function') {
                             await window.ensureRuntimeScript('combattimento');
@@ -157,16 +157,16 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
             }
         )
         .subscribe((status) => {
-            console.log('📡 [REALTIME] Stato subscription combattimento:', status);
+            appDebug('📡 [REALTIME] Stato subscription combattimento:', status);
             if (status === 'SUBSCRIBED') {
-                console.log('✅ [REALTIME] Subscription combattimento attiva');
+                appDebug('✅ [REALTIME] Subscription combattimento attiva');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 console.error('❌ [REALTIME] Errore subscription combattimento');
             }
         });
 
     window.combattimentoChannel = combattimentoChannel;
-    console.log('✅ Realtime subscription per combattimento avviata');
+    appDebug('✅ Realtime subscription per combattimento avviata');
 }
 
 /**
@@ -257,7 +257,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 filter: `campagna_id=eq.${campagnaId}`
             },
             async (payload) => {
-                console.log('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
+                appDebug('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
                 // Verifica che la sessione non abbia data_fine (sia attiva)
                 if (!payload.new.data_fine) {
                     // Verifica che siamo ancora nella pagina dettagli
@@ -265,7 +265,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                     if (dettagliPage && dettagliPage.classList.contains('active')) {
                         // Verifica che la campagna sia ancora quella corrente
                         if (AppState.currentCampagnaId === campagnaId) {
-                            console.log('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
+                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
                             await loadCampagnaDetails(campagnaId);
                         }
@@ -282,7 +282,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 filter: `campagna_id=eq.${campagnaId}`
             },
             async (payload) => {
-                console.log('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
+                appDebug('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
                 // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
                 if (payload.new.data_fine) {
                     // Verifica che siamo ancora nella pagina dettagli
@@ -290,7 +290,7 @@ function startCampagnaDetailsRealtime(campagnaId) {
                     if (dettagliPage && dettagliPage.classList.contains('active')) {
                         // Verifica che la campagna sia ancora quella corrente
                         if (AppState.currentCampagnaId === campagnaId) {
-                            console.log('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
+                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
                             await loadCampagnaDetails(campagnaId);
                         }
@@ -299,16 +299,16 @@ function startCampagnaDetailsRealtime(campagnaId) {
             }
         )
         .subscribe((status) => {
-            console.log('📡 [REALTIME] Stato subscription dettagli campagna:', status);
+            appDebug('📡 [REALTIME] Stato subscription dettagli campagna:', status);
             if (status === 'SUBSCRIBED') {
-                console.log('✅ [REALTIME] Subscription dettagli campagna attiva');
+                appDebug('✅ [REALTIME] Subscription dettagli campagna attiva');
             } else if (status === 'CHANNEL_ERROR') {
                 console.error('❌ [REALTIME] Errore subscription dettagli campagna');
             }
         });
 
     window.campagnaDetailsChannel = campagnaDetailsChannel;
-    console.log('✅ Realtime subscription per dettagli campagna avviata');
+    appDebug('✅ Realtime subscription per dettagli campagna avviata');
 }
 
 /**
@@ -321,7 +321,7 @@ function stopCampagnaDetailsRealtime() {
     if (window.campagnaDetailsChannel) {
         supabase.removeChannel(window.campagnaDetailsChannel);
         window.campagnaDetailsChannel = null;
-        console.log('✅ Realtime subscription per dettagli campagna fermata');
+        appDebug('✅ Realtime subscription per dettagli campagna fermata');
     }
 }
 
@@ -442,7 +442,7 @@ function startAppEventsRealtime() {
         )
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') {
-                console.log('✅ Realtime subscription globale app attiva');
+                appDebug('✅ Realtime subscription globale app attiva');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 console.error('❌ Realtime subscription globale app in errore');
             }
@@ -463,7 +463,7 @@ function stopAppEventsRealtime() {
         supabase.removeChannel(appEventsChannel);
         appEventsChannel = null;
         window.appEventsChannel = null;
-        console.log('✅ Realtime subscription globale app fermata');
+        appDebug('✅ Realtime subscription globale app fermata');
     }
 
     if (appEventsRefreshTimeout) {
@@ -710,7 +710,7 @@ async function registerServiceWorker() {
     try {
         const registration = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
         registration.update().catch(e => console.warn('SW update check:', e));
-        console.log('Service Worker registrato');
+        appDebug('Service Worker registrato');
 
         if ('PushManager' in window && registration.pushManager) {
             const existingSub = await registration.pushManager.getSubscription();
