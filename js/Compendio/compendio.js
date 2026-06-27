@@ -99,6 +99,7 @@ let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
 let _compEquipmentDataPromise = null;
 let _compBackgroundDataPromise = null;
+let _compRaceDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
@@ -599,6 +600,27 @@ function _compEnsureBackgroundData({ rerender = false } = {}) {
     return _compBackgroundDataPromise;
 }
 
+function _compHasRaceData() {
+    return typeof window.RACES_DATA !== 'undefined';
+}
+
+function _compEnsureRaceData({ rerender = false } = {}) {
+    if (_compHasRaceData()) return Promise.resolve();
+    if (_compRaceDataPromise) return _compRaceDataPromise;
+    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
+
+    _compRaceDataPromise = window.ensureRuntimeData('races')
+        .then(() => {
+            if (rerender && _compCurrentTab === 'razze') compendioRenderTab();
+        })
+        .catch(error => console.warn('[compendio] caricamento razze fallito:', error))
+        .finally(() => {
+            _compRaceDataPromise = null;
+        });
+
+    return _compRaceDataPromise;
+}
+
 function _compEnsureEquipmentData({ rerender = false } = {}) {
     if (_compHasEquipmentData()) return Promise.resolve();
     if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
@@ -748,6 +770,17 @@ function compendioRenderTab() {
             </div>
         `;
         _compEnsureBackgroundData({ rerender: true });
+        return;
+    }
+    if (_compCurrentTab === 'razze' && !_compHasRaceData()) {
+        _compSetStickyTools('');
+        container.innerHTML = `
+            <div class="loading-placeholder comp-lazy-loading">
+                <div class="loading-spinner"></div>
+                <p>Caricamento razze...</p>
+            </div>
+        `;
+        _compEnsureRaceData({ rerender: true });
         return;
     }
     if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {

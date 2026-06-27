@@ -190,7 +190,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
 }
 
 function _pageRuntimeDataBundles(pageName) {
-    if (pageName === 'personaggioCreate' || pageName === 'scheda') return ['backgrounds'];
+    if (pageName === 'personaggioCreate' || pageName === 'scheda') return ['backgrounds', 'races'];
     return [];
 }
 
