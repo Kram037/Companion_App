@@ -11,6 +11,34 @@ let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '' };
 const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
+const DESKTOP_LAB_CHILDREN = [
+    { key: 'razze', label: 'Razze', iconFile: 'Razze' },
+    { key: 'classi', label: 'Classi', iconFile: 'Classi' },
+    { key: 'background', label: 'Background', iconFile: 'Background' },
+    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento' },
+    { key: 'talenti', label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
+    { key: 'nemici', label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
+    { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
+    { key: 'incantesimi', label: 'Incantesimi', iconFile: 'Incantesimi' },
+];
+const DESKTOP_COMP_CHILDREN = [
+    { key: 'razze', label: 'Razze', iconFile: 'Razze' },
+    { key: 'classi', label: 'Classi', iconFile: 'Classi' },
+    { key: 'background', label: 'Background', iconFile: 'Background' },
+    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento' },
+    { key: 'talenti_stili', label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
+    { key: 'mostri', label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
+    { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
+    { key: 'incantesimi', label: 'Incantesimi', iconFile: 'Incantesimi' },
+];
+
+function _desktopGroupChildren(page) {
+    if (page === 'laboratorio' && typeof window.labGetSidebarItems === 'function') return window.labGetSidebarItems();
+    if (page === 'compendio' && typeof window.compGetSidebarItems === 'function') return window.compGetSidebarItems();
+    if (page === 'laboratorio') return DESKTOP_LAB_CHILDREN;
+    if (page === 'compendio') return DESKTOP_COMP_CHILDREN;
+    return [];
+}
 
 function _bookmarksStorageKey() {
     const uid = AppState?.currentUser?.uid || 'local';
@@ -247,11 +275,7 @@ function _bookmarkEnsureMinimumDesktopTab() {
 }
 
 function _bookmarkDefaultGroupTab(page) {
-    const items = page === 'laboratorio'
-        ? (typeof window.labGetSidebarItems === 'function' ? window.labGetSidebarItems() : [])
-        : (page === 'compendio'
-            ? (typeof window.compGetSidebarItems === 'function' ? window.compGetSidebarItems() : [])
-            : []);
+    const items = _desktopGroupChildren(page);
     return items.find(item => item?.key)?.key || (page === 'laboratorio' ? 'razze' : 'classi');
 }
 
@@ -453,7 +477,7 @@ async function openBookmark(id) {
     const targetPage = st.page || item.page || 'campagne';
     const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});
 
-    navigateToPage(targetPage, { skipPageLoad: ['laboratorio', 'compendio'].includes(targetPage) && targetHook.view === 'sub' });
+    await navigateToPage(targetPage);
     if (_bookmarkIsSplitPaneInstance) setTimeout(_bookmarkPostCurrentPaneState, 90);
 
     const restore = async () => {
@@ -659,13 +683,11 @@ function _bookmarkBindSheetDrag(overlay) {
 }
 
 function _desktopNavItems() {
-    const labChildren = typeof window.labGetSidebarItems === 'function' ? window.labGetSidebarItems() : [];
-    const compChildren = typeof window.compGetSidebarItems === 'function' ? window.compGetSidebarItems() : [];
     return [
         { type: 'link', page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
         { type: 'link', page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { type: 'group', page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>', children: labChildren },
-        { type: 'group', page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>', children: compChildren },
+        { type: 'group', page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>', children: _desktopGroupChildren('laboratorio') },
+        { type: 'group', page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>', children: _desktopGroupChildren('compendio') },
     ];
 }
 
@@ -757,18 +779,18 @@ function _bookmarkPostCurrentPaneState() {
     }, window.location.origin);
 }
 
-function _openDesktopSidebarTarget(page, tab = '') {
+async function _openDesktopSidebarTarget(page, tab = '') {
     if (page === 'laboratorio') {
-        navigateToPage('laboratorio', { skipPageLoad: !!tab });
+        await navigateToPage('laboratorio');
         if (tab) window.labOpenCategory?.(tab);
         return;
     }
     if (page === 'compendio') {
-        navigateToPage('compendio', { skipPageLoad: !!tab });
+        await navigateToPage('compendio');
         if (tab) window.compendioOpenTab?.(tab);
         return;
     }
-    navigateToPage(page);
+    await navigateToPage(page);
 }
 
 function _routeDesktopSidebarTarget(page, tab = '') {

@@ -212,6 +212,9 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
         if (pageName === 'amici' && AppState.isLoggedIn) {
             loadAmici();
         } else if (pageName === 'compendio') {
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('compendio');
+            }
             if (typeof loadCompendio === 'function') loadCompendio();
             if (desktopGroupTab && typeof compendioOpenTab === 'function') {
                 compendioOpenTab(desktopGroupTab);

@@ -254,3 +254,9 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Combattimento/combat.js` dal caricamento iniziale.
 - Aggiunto `ensureRuntimeScript('combattimento')` nel loader centrale.
 - Navigation, realtime e refresh PF mostri caricano il modulo prima di renderizzare il combattimento.
+
+## Step lazy load - compendio
+
+- Rimosso `js/Compendio/compendio.js` dal caricamento iniziale.
+- Aggiunto `ensureRuntimeScript('compendio')` nel loader centrale.
+- La sidebar desktop usa fallback statici per i sotto-tab, cosi' resta navigabile anche prima del lazy load.
