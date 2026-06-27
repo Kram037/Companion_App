@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v181';
+const CACHE_NAME = 'companion-app-v182';
 
 const APP_SHELL_URLS = [
     './',
@@ -87,6 +87,12 @@ const DATA_URL_PREFIXES = [
     './risorse/'
 ];
 
+const RUNTIME_SCRIPT_URLS = [
+    './js/Combattimento/combat.js',
+    './js/Compendio/compendio.js',
+    './js/Laboratorio/laboratorio.js'
+];
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         precacheAppShell()
@@ -136,6 +142,7 @@ function managedPath(url) {
 function shouldNetworkFirst(url) {
     const path = managedPath(url);
     if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
+    if (RUNTIME_SCRIPT_URLS.includes(path)) return true;
     if (!APP_SHELL_URLS.includes(path)) return false;
     return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
 }

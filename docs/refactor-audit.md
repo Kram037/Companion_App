@@ -260,3 +260,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Rimosso `js/Compendio/compendio.js` dal caricamento iniziale.
 - Aggiunto `ensureRuntimeScript('compendio')` nel loader centrale.
 - La sidebar desktop usa fallback statici per i sotto-tab, cosi' resta navigabile anche prima del lazy load.
+
+## Step cache runtime script
+
+- I moduli lazy `combat`, `compendio` e `laboratorio` restano fuori dall'app shell.
+- Il service worker li gestisce network-first, come i dati runtime.
