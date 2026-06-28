@@ -265,7 +265,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 ## Step cache runtime script
 
 - I moduli lazy `combat`, `compendio` e `laboratorio` restano fuori dall'app shell.
-- Il service worker li gestisce network-first, come i dati runtime.
+- Il service worker li gestisce cache-first, come i dati runtime pesanti.
+- Le schede desktop auto-create non vengono mostrate tra i bookmark mobile.
 
 ## Step log core
 

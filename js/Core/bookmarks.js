@@ -81,8 +81,19 @@ function _bookmarkItemPane(item) {
     return item?.pane || 'left';
 }
 
+function _bookmarkIsAutoDesktopTab(item) {
+    return item?.autoDesktop === true;
+}
+
+function _bookmarkShouldShowInPane(item) {
+    if (_bookmarkIsDesktopLayout() || _bookmarkIsSplitPaneInstance) return true;
+    return item?.userCreated === true && !_bookmarkIsAutoDesktopTab(item);
+}
+
 function _bookmarkPaneItems(list = _bookmarksRead(), pane = _bookmarkCurrentPane()) {
-    return list.filter(item => _bookmarkItemPane(item) === pane);
+    return list
+        .filter(item => _bookmarkItemPane(item) === pane)
+        .filter(_bookmarkShouldShowInPane);
 }
 
 function _bookmarkRemovePaneItems(pane) {
@@ -269,6 +280,7 @@ function _bookmarkEnsureMinimumDesktopTab() {
         return paneList;
     }
     const snap = _bookmarkCurrentSnapshot();
+    snap.autoDesktop = true;
     _bookmarksWrite([snap, ...list]);
     _bookmarkSetActiveId(snap.id);
     return [snap];
@@ -413,6 +425,8 @@ function captureActiveBookmark({ silent = true } = {}) {
         ...snap,
         id: old.id,
         pane: _bookmarkItemPane(old),
+        autoDesktop: old.autoDesktop === true,
+        userCreated: old.userCreated === true,
         createdAt: old.createdAt,
         updatedAt: _bookmarkNow(),
     };
@@ -430,6 +444,8 @@ function createBookmarkTab() {
     _bookmarkFocusCurrentPane();
     captureActiveBookmark({ silent: true });
     const snap = _bookmarkCurrentSnapshot();
+    delete snap.autoDesktop;
+    snap.userCreated = true;
     const list = _bookmarksRead().filter(item => item.id !== snap.id);
     list.unshift(snap);
     _bookmarksWrite(list);

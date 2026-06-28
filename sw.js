@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v182';
+const CACHE_NAME = 'companion-app-v183';
 
 const APP_SHELL_URLS = [
     './',
@@ -141,14 +141,14 @@ function managedPath(url) {
 
 function shouldNetworkFirst(url) {
     const path = managedPath(url);
-    if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
-    if (RUNTIME_SCRIPT_URLS.includes(path)) return true;
     if (!APP_SHELL_URLS.includes(path)) return false;
     return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
 }
 
 function shouldCacheFirst(url) {
     const path = managedPath(url);
+    if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
+    if (RUNTIME_SCRIPT_URLS.includes(path)) return true;
     return APP_SHELL_URLS.includes(path);
 }
 
