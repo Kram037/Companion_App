@@ -61,7 +61,7 @@ async function _deleteOrphanRollRequest(req) {
     const table = req.tipo === 'iniziativa' ? 'richieste_tiro_iniziativa' : 'richieste_tiro_generico';
     try {
         await supabase.from(table).delete().eq('id', req.id);
-        console.log(`🧹 Richiesta tiro orfana cancellata (${table} id=${req.id})`);
+        appDebug(`🧹 Richiesta tiro orfana cancellata (${table} id=${req.id})`);
     } catch (e) {
         console.warn('⚠️ Cleanup richiesta orfana fallito:', e);
     }
@@ -79,11 +79,11 @@ async function checkPendingRollRequests(userId) {
     try {
         const userData = await findUserByUid(userId);
         if (!userData) {
-            console.log('⚠️ UserData non trovato per userId:', userId);
+            appDebug('⚠️ UserData non trovato per userId:', userId);
             return null;
         }
 
-        console.log('🔍 Controllo richieste tiro per giocatore:', userData.id);
+        appDebug('🔍 Controllo richieste tiro per giocatore:', userData.id);
 
         // Controlla richieste iniziativa pending
         const { data: iniziativaRequests, error: iniziativaError } = await supabase
@@ -97,17 +97,17 @@ async function checkPendingRollRequests(userId) {
         if (iniziativaError) {
             console.error('❌ Errore nel controllo richieste iniziativa:', iniziativaError);
         } else {
-            console.log('📊 Richieste iniziativa trovate:', iniziativaRequests?.length || 0);
+            appDebug('📊 Richieste iniziativa trovate:', iniziativaRequests?.length || 0);
         }
 
         if (iniziativaRequests && iniziativaRequests.length > 0) {
             for (const r of iniziativaRequests) {
                 const req = { id: r.id, tipo: 'iniziativa', sessione_id: r.sessione_id };
                 if (await _isRollRequestStillValid(req)) {
-                    console.log('✅ Trovata richiesta iniziativa valida:', r.id);
+                    appDebug('✅ Trovata richiesta iniziativa valida:', r.id);
                     return req;
                 } else {
-                    console.log('🧹 Richiesta iniziativa orfana ignorata e cancellata:', r.id);
+                    appDebug('🧹 Richiesta iniziativa orfana ignorata e cancellata:', r.id);
                     await _deleteOrphanRollRequest(req);
                 }
             }
@@ -125,17 +125,17 @@ async function checkPendingRollRequests(userId) {
         if (genericoError) {
             console.error('❌ Errore nel controllo richieste generico:', genericoError);
         } else {
-            console.log('📊 Richieste generico trovate:', genericoRequests?.length || 0);
+            appDebug('📊 Richieste generico trovate:', genericoRequests?.length || 0);
         }
 
         if (genericoRequests && genericoRequests.length > 0) {
             for (const r of genericoRequests) {
                 const req = { id: r.id, tipo: 'generico', sessione_id: r.sessione_id, richiesta_id: r.richiesta_id };
                 if (await _isRollRequestStillValid(req)) {
-                    console.log('✅ Trovata richiesta generico valida:', r.id);
+                    appDebug('✅ Trovata richiesta generico valida:', r.id);
                     return req;
                 } else {
-                    console.log('🧹 Richiesta generico orfana ignorata e cancellata:', r.id);
+                    appDebug('🧹 Richiesta generico orfana ignorata e cancellata:', r.id);
                     await _deleteOrphanRollRequest(req);
                 }
             }
@@ -179,7 +179,7 @@ function startRollRequestsRealtime() {
                     filter: `giocatore_id=eq.${giocatoreId}`
                 },
                 async (payload) => {
-                    console.log('🔔 [REALTIME] Nuova richiesta tiro iniziativa ricevuta:', payload.new);
+                    appDebug('🔔 [REALTIME] Nuova richiesta tiro iniziativa ricevuta:', payload.new);
                     if (payload.new.stato === 'pending' && !window.currentRollRequest) {
                         const request = {
                             id: payload.new.id,
@@ -187,19 +187,19 @@ function startRollRequestsRealtime() {
                             sessione_id: payload.new.sessione_id
                         };
                         if (!(await _isRollRequestStillValid(request))) {
-                            console.log('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro e cancello:', request);
+                            appDebug('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro e cancello:', request);
                             await _deleteOrphanRollRequest(request);
                             return;
                         }
-                        console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
+                        appDebug('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
                 }
             )
             .subscribe((status) => {
-                console.log('📡 [REALTIME] Stato subscription iniziativa:', status);
+                appDebug('📡 [REALTIME] Stato subscription iniziativa:', status);
                 if (status === 'SUBSCRIBED') {
-                    console.log('✅ [REALTIME] Subscription iniziativa attiva');
+                    appDebug('✅ [REALTIME] Subscription iniziativa attiva');
                 } else if (status === 'CHANNEL_ERROR') {
                     console.error('❌ [REALTIME] Errore subscription iniziativa');
                 }
@@ -217,7 +217,7 @@ function startRollRequestsRealtime() {
                     filter: `giocatore_id=eq.${giocatoreId}`
                 },
                 async (payload) => {
-                    console.log('🔔 [REALTIME] Nuova richiesta tiro generico ricevuta:', payload.new);
+                    appDebug('🔔 [REALTIME] Nuova richiesta tiro generico ricevuta:', payload.new);
                     if (payload.new.stato === 'pending' && !window.currentRollRequest) {
                         const request = {
                             id: payload.new.id,
@@ -226,19 +226,19 @@ function startRollRequestsRealtime() {
                             richiesta_id: payload.new.richiesta_id
                         };
                         if (!(await _isRollRequestStillValid(request))) {
-                            console.log('🧹 [REALTIME] Richiesta generico orfana, ignoro e cancello:', request);
+                            appDebug('🧹 [REALTIME] Richiesta generico orfana, ignoro e cancello:', request);
                             await _deleteOrphanRollRequest(request);
                             return;
                         }
-                        console.log('✅ [REALTIME] Mostro modal per richiesta:', request);
+                        appDebug('✅ [REALTIME] Mostro modal per richiesta:', request);
                         showRollRequestModal(request);
                     }
                 }
             )
             .subscribe((status) => {
-                console.log('📡 [REALTIME] Stato subscription generico:', status);
+                appDebug('📡 [REALTIME] Stato subscription generico:', status);
                 if (status === 'SUBSCRIBED') {
-                    console.log('✅ [REALTIME] Subscription generico attiva');
+                    appDebug('✅ [REALTIME] Subscription generico attiva');
                 } else if (status === 'CHANNEL_ERROR') {
                     console.error('❌ [REALTIME] Errore subscription generico');
                 }
@@ -250,7 +250,7 @@ function startRollRequestsRealtime() {
             generico: genericoChannel
         };
 
-        console.log('✅ Realtime subscriptions per roll requests avviate');
+        appDebug('✅ Realtime subscriptions per roll requests avviate');
     }).catch(error => {
         console.error('❌ Errore nell\'avvio Realtime roll requests:', error);
     });

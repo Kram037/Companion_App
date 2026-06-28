@@ -212,7 +212,7 @@ async function loadCampagne(userId, options = {}) {
             return new Date(b.data_creazione || 0) - new Date(a.data_creazione || 0);
         });
 
-        console.log('✅ Campagne caricate:', campagne?.length || 0);
+        appDebug('✅ Campagne caricate:', campagne?.length || 0);
         
         // Applica i filtri prima di renderizzare (passa l'ID utente per filtri ruolo)
         AppState.cachedCampagne = campagne || [];
@@ -236,12 +236,12 @@ async function loadCampagne(userId, options = {}) {
                             filter: `id_dm=eq.${utente.id}`
                         },
                         async (payload) => {
-                            console.log('🔄 Cambio rilevato nelle campagne:', payload);
+                            appDebug('🔄 Cambio rilevato nelle campagne:', payload);
                             await loadCampagne(userId, { skipRealtimeSetup: true });
                         }
                     )
                     .subscribe((status) => {
-                        if (status === 'SUBSCRIBED') console.log('✅ Realtime campagne attivo');
+                        if (status === 'SUBSCRIBED') appDebug('✅ Realtime campagne attivo');
                     });
             } catch (rtErr) {
                 console.warn('⚠️ Realtime campagne non disponibile:', rtErr.message);
@@ -305,9 +305,9 @@ async function loadInvitiRicevuti(userId) {
             } : null
         }));
 
-        console.log('✅ Inviti ricevuti caricati:', inviti?.length || 0);
+        appDebug('✅ Inviti ricevuti caricati:', inviti?.length || 0);
         if (inviti && inviti.length > 0) {
-            console.log('📋 Primo invito esempio:', JSON.stringify(inviti[0], null, 2));
+            appDebug('📋 Primo invito esempio:', JSON.stringify(inviti[0], null, 2));
         }
 
         return inviti || [];
@@ -1815,17 +1815,17 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
     }
 
     try {
-        console.log('🔄 selectNewDM: campagnaId =', campagnaId);
-        console.log('🔄 selectNewDM: giocatoreId =', giocatoreId, 'tipo:', typeof giocatoreId);
-        console.log('🔄 selectNewDM: giocatoreNome =', giocatoreNome);
+        appDebug('🔄 selectNewDM: campagnaId =', campagnaId);
+        appDebug('🔄 selectNewDM: giocatoreId =', giocatoreId, 'tipo:', typeof giocatoreId);
+        appDebug('🔄 selectNewDM: giocatoreNome =', giocatoreNome);
         
         // Verifica che il giocatoreId esista prima di aggiornare
         const currentUser = await findUserByUid(AppState.currentUser.uid);
-        console.log('🔄 selectNewDM: currentUser.id =', currentUser?.id);
+        appDebug('🔄 selectNewDM: currentUser.id =', currentUser?.id);
         
         // Aggiorna id_dm per trasferire i permessi
         // Usa la funzione RPC per bypassare RLS
-        console.log('🔄 selectNewDM: uso funzione RPC per aggiornare DM');
+        appDebug('🔄 selectNewDM: uso funzione RPC per aggiornare DM');
         const { error: rpcError } = await supabase.rpc('update_dm_campagna', {
             p_campagna_id: campagnaId,
             p_nuovo_dm_id: giocatoreId
@@ -1834,7 +1834,7 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         if (rpcError) {
             console.error('❌ selectNewDM: errore nella funzione RPC update_dm_campagna:', rpcError);
             // Fallback: prova con update normale
-            console.log('⚠️ selectNewDM: fallback all\'update normale');
+            appDebug('⚠️ selectNewDM: fallback all\'update normale');
             const { data, error } = await supabase
                 .from('campagne')
                 .update({ 
@@ -1847,9 +1847,9 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
                 console.error('❌ selectNewDM: errore nell\'update normale:', error);
                 throw error;
             }
-            console.log('✅ selectNewDM: campagna aggiornata (fallback):', data);
+            appDebug('✅ selectNewDM: campagna aggiornata (fallback):', data);
         } else {
-            console.log('✅ selectNewDM: campagna aggiornata tramite RPC');
+            appDebug('✅ selectNewDM: campagna aggiornata tramite RPC');
         }
 
         await sendAppEventBroadcast({ table: 'campagne', action: 'update', campagnaId });
@@ -1864,8 +1864,8 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         if (errorVerifica) {
             console.error('❌ selectNewDM: errore nella verifica:', errorVerifica);
         } else if (campagnaVerifica) {
-            console.log('✅ selectNewDM: verifica dopo update - id_dm =', campagnaVerifica.id_dm);
-            console.log('🔍 selectNewDM: confronto id_dm - atteso:', giocatoreId, 'trovato:', campagnaVerifica.id_dm, 'match:', campagnaVerifica.id_dm === giocatoreId);
+            appDebug('✅ selectNewDM: verifica dopo update - id_dm =', campagnaVerifica.id_dm);
+            appDebug('🔍 selectNewDM: confronto id_dm - atteso:', giocatoreId, 'trovato:', campagnaVerifica.id_dm, 'match:', campagnaVerifica.id_dm === giocatoreId);
         }
         
         // Chiudi il modal
@@ -1882,7 +1882,7 @@ async function selectNewDM(campagnaId, giocatoreId, giocatoreNome) {
         
         // Verifica che il DM sia stato cambiato correttamente
         const isNowDM = await isCurrentUserDM(campagnaId);
-        console.log('🔍 selectNewDM: verifica finale - isNowDM =', isNowDM);
+        appDebug('🔍 selectNewDM: verifica finale - isNowDM =', isNowDM);
         if (!isNowDM && giocatoreId === currentUser?.id) {
             console.warn('⚠️ selectNewDM: il DM non corrisponde dopo l\'update, potrebbe essere un problema di cache o RLS');
             // Forza un refresh completo ricaricando la pagina delle campagne
