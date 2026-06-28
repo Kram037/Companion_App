@@ -273,7 +273,7 @@ async function _p1Save(pgId, priv) {
             console.error('[p1 custom tabs] save failed', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes("'privilegi'") || msg.includes('"privilegi"') || msg.includes('column')) {
-                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui sql/add-all-missing-columns.sql');
+                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui backend/supabase/sql/add-all-missing-columns.sql');
             } else {
                 showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
             }
@@ -801,7 +801,7 @@ async function _privSave(pgId, priv) {
             console.error('[priv tabs] save failed', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes("'privilegi'") || msg.includes('"privilegi"') || msg.includes('column')) {
-                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui sql/add-all-missing-columns.sql');
+                showNotification && showNotification('Manca la colonna "privilegi" sul DB. Esegui backend/supabase/sql/add-all-missing-columns.sql');
             } else {
                 showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
             }

@@ -938,7 +938,7 @@ window.schedaSaveFightingStyles = async function(pgId) {
             console.error('[fighting styles] save failed', error);
             const msg = (error.message || '').toLowerCase();
             if (msg.includes('stile_combattimento') || msg.includes('column')) {
-                showNotification && showNotification('Manca la colonna "stile_combattimento" sul DB. Esegui sql/add-all-missing-columns.sql');
+                showNotification && showNotification('Manca la colonna "stile_combattimento" sul DB. Esegui backend/supabase/sql/add-all-missing-columns.sql');
             } else {
                 showNotification && showNotification('Salvataggio fallito: ' + (error.message || 'errore'));
             }

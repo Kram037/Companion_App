@@ -117,7 +117,7 @@ async function _schedaApplyResImmVulChange(pgId, kind, dmgType) {
         .update({ resistenze: res, immunita: imm, vulnerabilita: vul }).eq('id', pgId);
     if (error && /vulnerabilita/i.test(error.message || '')) {
         await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
-        console.warn('[scheda] Colonna "vulnerabilita" mancante a DB: esegui sql/add-vulnerabilita.sql');
+        console.warn('[scheda] Colonna "vulnerabilita" mancante a DB: esegui backend/supabase/sql/add-vulnerabilita.sql');
     }
 }
 

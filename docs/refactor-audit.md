@@ -14,7 +14,8 @@
 
 ## Struttura attuale
 
-- App statica root-based: `index.html`, `css/`, `js/`, `images/`, `risorse/`, `sql/`
+- App statica root-based: `index.html`, `css/`, `js/`, `images/`, `risorse/`
+- Backend repo-only: `backend/supabase/sql/`
 - Nx e' usato come orchestratore, non come struttura `apps/`/`libs/`
 - `index.html` carica 65 script JS statici
 - Payload JS iniziale stimato: circa 5.2 MB
@@ -281,5 +282,10 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 ## Step build output
 
-- Rimossi `docs`, `sql`, `TODO.md` e `update-version.js` dal build statico.
+- Rimossi `docs`, `backend/supabase/sql`, `TODO.md` e `update-version.js` dal build statico.
 - Il dist contiene solo file necessari al runtime dell'app.
+
+## Step frontend/backend
+
+- Spostati gli script Supabase da `sql/` a `backend/supabase/sql/`.
+- Non esiste un backend runtime nel repo: il backend operativo resta Supabase.

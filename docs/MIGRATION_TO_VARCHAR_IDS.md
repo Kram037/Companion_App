@@ -51,7 +51,7 @@ Il campo `numero_giocatori` viene automaticamente aggiornato come `array_length(
 1. **ESEGUI LO SCRIPT IN SUPABASE SQL EDITOR**:
    - Apri Supabase Dashboard
    - Vai a SQL Editor
-   - Copia e incolla il contenuto di `sql/clean-and-recreate-schema.sql`
+   - Copia e incolla il contenuto di `backend/supabase/sql/archive/clean-and-recreate-schema.sql`
    - **ATTENZIONE**: Questo cancellerà TUTTE le tabelle e i dati esistenti!
    - Esegui lo script
 

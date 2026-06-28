@@ -70,7 +70,7 @@ FOR SELECT USING (
 ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS combat_round INTEGER DEFAULT 1;
 ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS combat_turn_index INTEGER DEFAULT 0;
 
--- Estensioni schema mostri (idempotenti; vedi anche sql/patch-mostri-e-nemici-supabase.sql)
+-- Estensioni schema mostri (idempotenti; vedi anche backend/supabase/sql/patch-mostri-e-nemici-supabase.sql)
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS attacchi JSONB DEFAULT '[]';
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS azioni_leggendarie JSONB DEFAULT '[]';
 ALTER TABLE mostri_combattimento ADD COLUMN IF NOT EXISTS resistenze_leggendarie INTEGER DEFAULT 0;

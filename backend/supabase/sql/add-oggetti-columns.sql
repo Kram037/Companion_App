@@ -6,7 +6,7 @@
 --   - incantamento INT          : 0..3, valido solo per Arma/Armatura/Focus
 --
 -- Nota: i CAST e i tipi sono allineati allo schema esistente
--- (vedi sql/create-laboratorio-tables.sql).
+-- (vedi backend/supabase/sql/create-laboratorio-tables.sql).
 --
 -- Idempotente.
 -- ────────────────────────────────────────────────────────────────────────────

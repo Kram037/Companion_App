@@ -145,7 +145,7 @@ async function handleSavePersonaggio(e) {
     }
 
     // Helper: alcune colonne (es. 'sottorazza') potrebbero non esistere
-    // ancora a DB se l'utente non ha eseguito sql/add-sottorazza.sql.
+    // ancora a DB se l'utente non ha eseguito backend/supabase/sql/add-sottorazza.sql.
     // Riproviamo senza la colonna problematica per non bloccare il salvataggio.
     const _stripMissingColumns = (data, errMsg) => {
         const m = (errMsg || '').match(/'?([a-z_]+)'? column/i)
@@ -156,7 +156,7 @@ async function handleSavePersonaggio(e) {
         if (!(col in data)) return null;
         const cleaned = { ...data };
         delete cleaned[col];
-        console.warn(`[pg save] Colonna '${col}' mancante a DB: salvo senza. Esegui sql/add-${col.replace(/_/g, '-')}.sql per abilitarla.`);
+        console.warn(`[pg save] Colonna '${col}' mancante a DB: salvo senza. Esegui backend/supabase/sql/add-${col.replace(/_/g, '-')}.sql per abilitarla.`);
         return cleaned;
     };
 

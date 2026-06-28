@@ -783,7 +783,7 @@ async function _loadLabNemiciSection() {
             .eq('user_id', AppState.currentUser.uid)
             .order('created_at', { ascending: false });
         if (error) {
-            sc.innerHTML = `<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>sql/add-homebrew-combattimenti.sql</code>?</small></div>`;
+            sc.innerHTML = `<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>backend/supabase/sql/add-homebrew-combattimenti.sql</code>?</small></div>`;
             return;
         }
         _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.nemici, data || [], 'combattimenti', {
@@ -888,7 +888,7 @@ async function _loadLabTalentiStiliSection() {
         .order('created_at', { ascending: false });
     if (error) {
         _labSetStickyTools('');
-        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>sql/add-homebrew-stili.sql</code>?</small></div>';
+        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>backend/supabase/sql/add-homebrew-stili.sql</code>?</small></div>';
         return;
     }
     _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.stili, data || [], 'stili', {
@@ -2045,7 +2045,7 @@ window.labSaveSottoclasse = async function() {
         // Se le colonne non esistono ancora nel DB, mostra un messaggio chiaro.
         const msg = (err && err.message) || '';
         if (/column .* does not exist|schema cache/i.test(msg)) {
-            showNotification('Colonne mancanti su DB: esegui sql/add-sottoclassi-columns.sql');
+            showNotification('Colonne mancanti su DB: esegui backend/supabase/sql/add-sottoclassi-columns.sql');
         } else {
             showNotification('Errore nel salvataggio della sottoclasse');
         }
