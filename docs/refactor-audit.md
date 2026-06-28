@@ -273,3 +273,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Convertiti i log informativi auth/homebrew a `appDebug`.
 - Convertiti i log informativi campagne/iniziativa a `appDebug`.
 - Convertiti gli ultimi log informativi core a `appDebug`.
+
+## Step fonti locali
+
+- Aggiunti a `.gitignore` `risorse/Manuali/` e `risorse/mostri/Lista Mostri.pdf`.
+- I file restano disponibili localmente ma non sporcano i commit.
