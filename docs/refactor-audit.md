@@ -278,3 +278,8 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 
 - Aggiunti a `.gitignore` `risorse/Manuali/` e `risorse/mostri/Lista Mostri.pdf`.
 - I file restano disponibili localmente ma non sporcano i commit.
+
+## Step build output
+
+- Rimossi `docs`, `sql`, `TODO.md` e `update-version.js` dal build statico.
+- Il dist contiene solo file necessari al runtime dell'app.

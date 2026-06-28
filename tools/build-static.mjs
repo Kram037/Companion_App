@@ -5,16 +5,12 @@ const outDir = resolve(process.argv[2] || 'dist/apps/companion-app');
 const root = resolve('.');
 const include = [
   'css',
-  'docs',
   'images',
   'js',
   'risorse',
-  'sql',
   'index.html',
   'manifest.json',
   'sw.js',
-  'TODO.md',
-  'update-version.js',
 ];
 const exclude = [
   resolve('risorse', 'Manuali'),
