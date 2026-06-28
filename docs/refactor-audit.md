@@ -272,3 +272,4 @@ Questo non sposta ancora i file. Impedisce prima nuovi output dati non tracciati
 - Convertiti i log realtime di flusso a `appDebug`.
 - Convertiti i log informativi auth/homebrew a `appDebug`.
 - Convertiti i log informativi campagne/iniziativa a `appDebug`.
+- Convertiti gli ultimi log informativi core a `appDebug`.

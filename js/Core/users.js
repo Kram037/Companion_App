@@ -19,7 +19,7 @@ async function generateUniqueCid() {
         
         if (error) throw error;
         
-        console.log('✅ CID generato dalla funzione SQL:', data);
+        appDebug('✅ CID generato dalla funzione SQL:', data);
         return data;
     } catch (error) {
         console.error('❌ Errore nella generazione CID, uso fallback:', error);

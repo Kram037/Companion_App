@@ -2,10 +2,6 @@
 // Il client e' creato in index.html usando window.CompanionConfig.
 let supabaseReady = false;
 
-function isDebugEnabled() {
-    return !!window.CompanionConfig?.debug;
-}
-
 // Initialize Supabase (runs after the SDK module loads)
 function initSupabase() {
     try {
@@ -15,9 +11,7 @@ function initSupabase() {
         }
 
         supabaseReady = true;
-        if (isDebugEnabled()) {
-            console.log('Supabase verificato e pronto');
-        }
+        appDebug('Supabase verificato e pronto');
         return true;
     } catch (error) {
         console.error('Errore nella verifica Supabase:', error);
