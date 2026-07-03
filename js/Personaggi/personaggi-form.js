@@ -92,6 +92,8 @@ async function handleSavePersonaggio(e) {
         updated_at: new Date().toISOString()
     };
 
+    if (!editingPersonaggioId) pgData.esperienza = 0;
+
     if (!editingPersonaggioId && window.pgHitPointHistoryDraft) {
         pgData.bonus_manuali = {
             ...(pgData.bonus_manuali || {}),

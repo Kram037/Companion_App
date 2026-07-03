@@ -33,7 +33,10 @@ function schedaGetTotalLevel(pg) {
 
 function schedaGetEsperienza(pg) {
     const bm = (pg?.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
-    return Math.max(0, parseInt(bm._esperienza ?? pg?.esperienza) || 0);
+    if (pg && Object.prototype.hasOwnProperty.call(pg, 'esperienza')) {
+        return Math.max(0, parseInt(pg.esperienza) || 0);
+    }
+    return Math.max(0, parseInt(bm._esperienza) || 0);
 }
 
 function schedaGetXpSummary(pg, xpOverride = null) {
@@ -665,13 +668,14 @@ window.schedaSaveXp = async function() {
     const xp = Math.max(0, parseInt(_xpCalcState.inputBuffer) || 0);
     const pg = _schedaPgCache;
     const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
-    if (xp > 0) bm._esperienza = xp;
-    else delete bm._esperienza;
+    delete bm._esperienza;
     pg.bonus_manuali = bm;
+    pg.esperienza = xp;
 
     const supabase = getSupabaseClient();
     if (supabase) {
         const { error } = await supabase.from('personaggi').update({
+            esperienza: xp,
             bonus_manuali: pg.bonus_manuali,
             updated_at: new Date().toISOString(),
         }).eq('id', _xpCalcState.pgId);
