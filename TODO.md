@@ -5,3 +5,4 @@
 - Completato: standardizzare filtri di Campagne, Compendio e liste Homebrew del Laboratorio con bottone accanto alla ricerca, dialog dedicata e tendine custom senza prefissi ridondanti.
 - Completato: filtri multi-selezione per Campagne, Compendio e liste Homebrew del Laboratorio, con checkbox, Reset/Applica e conteggio delle scelte attive.
 - Completato: esteso lo stesso pattern ai filtri interni della pagina Personaggi: inventario scheda, picker oggetti, incantesimi, talenti, suppliche, stili e picker razza/background.
+- TODO combattimenti: assegnare PE a fine combattimento sommando i PE dei mostri uccisi e dividendoli equamente tra i membri del party.

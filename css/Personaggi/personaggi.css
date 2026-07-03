@@ -754,6 +754,26 @@
 .scheda-hp-cell.clickable { cursor: pointer; transition: background 0.15s; }
 .scheda-hp-cell.clickable:hover { background: var(--surface-hover); }
 .scheda-hp-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-light); font-weight: 600; margin-top: 2px; }
+.scheda-xp-card {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.scheda-xp-card:hover { border-color: var(--accent); background: var(--surface-hover); }
+.scheda-xp-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.72rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; }
+.scheda-xp-head strong { color: var(--accent); font-size: 1rem; text-transform: none; }
+.scheda-xp-meta { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 0.75rem; line-height: 1.25; }
+.scheda-xp-bar,
+.xp-calc-progress { display: block; height: 5px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.scheda-xp-bar span,
+.xp-calc-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--gold, #d4af37)); }
 
 /* Modal Level Up: scelta classe in caso di multiclasse.
    Override di .hp-calc-modal { overflow:hidden } cosi' con molte classi
@@ -1023,6 +1043,11 @@
 .hp-calc-numpad-btn.operator { color: var(--accent); font-weight: 900; }
 .hp-calc-expression { display: block; font-size: 0.8rem; color: var(--text-muted); min-height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hp-calc-result { display: block; color: var(--text); font-size: 1.35rem; line-height: 1.2; }
+.xp-calc-modal { width: 320px; }
+.xp-calc-current { margin-bottom: 8px; }
+.xp-calc-next { margin-bottom: 8px; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.35; }
+.xp-calc-next strong { color: var(--accent); }
+.xp-calc-progress { margin: 0 0 10px; }
 .pf-history-modal {
     width: 360px;
     max-width: calc(100vw - 24px);

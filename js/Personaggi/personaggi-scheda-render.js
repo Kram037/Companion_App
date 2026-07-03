@@ -82,6 +82,12 @@ async function renderSchedaPersonaggio(personaggioId) {
         const pvMaxBase = parseInt(pg.punti_vita_max) || 10;
         const pvAttualiRaw = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
         const pvAttuali = Math.min(pvMaxEffettivo, parseInt(pvAttualiRaw) || 0);
+        const xpSummary = typeof schedaGetXpSummary === 'function'
+            ? schedaGetXpSummary(pg)
+            : { current: 0, nextLevelXp: null, needed: 0, progress: 0 };
+        const formatXp = typeof schedaFormatNumber === 'function'
+            ? schedaFormatNumber
+            : (value) => String(parseInt(value) || 0);
 
         let classeDisplay = pg.classe || '';
         if (pg.classi && Array.isArray(pg.classi) && pg.classi.length > 0) {
@@ -415,6 +421,16 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PF Temp</div>
                 </div>
             </div>
+                <button type="button" class="scheda-xp-card" onclick="schedaOpenXpCalc('${pg.id}')">
+                    <span class="scheda-xp-head">
+                        <span>Punti Esperienza</span>
+                        <strong id="schedaXpCurrent">${formatXp(xpSummary.current)}</strong>
+                    </span>
+                    <span class="scheda-xp-meta" id="schedaXpNext">
+                        ${xpSummary.nextLevelXp == null ? 'Livello massimo' : `Prossimo livello: ${formatXp(xpSummary.nextLevelXp)} · Mancano ${formatXp(xpSummary.needed)}`}
+                    </span>
+                    <span class="scheda-xp-bar"><span id="schedaXpProgress" style="width:${xpSummary.progress}%"></span></span>
+                </button>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Difese</span>
