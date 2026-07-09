@@ -592,14 +592,15 @@ window.schedaHpApply = async function(direction) {
 function xpCalcRender() {
     if (!_xpCalcState) return;
     const pg = _schedaPgCache;
-    const xp = Math.max(0, parseInt(_xpCalcState.inputBuffer) || 0);
+    const xp = Math.max(0, parseInt(_xpCalcState.currentXp) || 0);
+    const delta = Math.max(0, parseInt(_xpCalcState.inputBuffer) || 0);
     const summary = schedaGetXpSummary(pg, xp);
     const current = document.getElementById('xpCalcCurrentPreview');
     const input = document.getElementById('xpCalcAmountDisplay');
     const next = document.getElementById('xpCalcNextInfo');
     const progress = document.getElementById('xpCalcProgress');
     if (current) current.textContent = schedaFormatNumber(summary.current);
-    if (input) input.textContent = schedaFormatNumber(xp);
+    if (input) input.textContent = schedaFormatNumber(delta);
     if (next) {
         next.innerHTML = summary.nextLevelXp == null
             ? 'Livello massimo'
@@ -613,7 +614,7 @@ window.schedaOpenXpCalc = function(pgId) {
     if (!pg) return;
     document.getElementById('xpCalcOverlay')?.remove();
     const current = schedaGetEsperienza(pg);
-    _xpCalcState = { pgId, currentXp: current, inputBuffer: String(current), manualStarted: false };
+    _xpCalcState = { pgId, currentXp: current, inputBuffer: '0', manualStarted: false };
 
     const overlay = document.createElement('div');
     overlay.id = 'xpCalcOverlay';
@@ -629,20 +630,16 @@ window.schedaOpenXpCalc = function(pgId) {
             </div>
             <div class="xp-calc-next" id="xpCalcNextInfo"></div>
             <div class="xp-calc-progress"><span id="xpCalcProgress"></span></div>
-            <div class="hp-calc-input-display" id="xpCalcAmountDisplay">${schedaFormatNumber(current)}</div>
+            <div class="hp-calc-input-display" id="xpCalcAmountDisplay">0</div>
             <div class="xp-calc-delta-actions">
-                <button type="button" class="levelup-pf-cancel" onclick="xpCalcApplyDelta(-1)">-</button>
                 <button type="button" class="levelup-pf-confirm" onclick="xpCalcApplyDelta(1)">+</button>
+                <button type="button" class="levelup-pf-cancel" onclick="xpCalcApplyDelta(-1)">-</button>
             </div>
             <div class="hp-calc-numpad">
                 ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('${n}')">${n}</button>`).join('')}
                 <button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('C')">C</button>
                 <button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('0')">0</button>
                 <button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('BS')">⌫</button>
-            </div>
-            <div class="levelup-pf-actions">
-                <button type="button" class="levelup-pf-cancel" onclick="schedaCloseXpCalc()">Annulla</button>
-                <button type="button" class="levelup-pf-confirm" onclick="schedaSaveXp()">Salva</button>
             </div>
             <button type="button" class="levelup-pf-confirm xp-levelup-btn" onclick="schedaStartLevelUpFromXp()">Avanzamento di livello</button>
         </div>`;
@@ -668,19 +665,9 @@ window.xpCalcNumpad = function(key) {
     xpCalcRender();
 };
 
-window.xpCalcApplyDelta = function(direction) {
-    if (!_xpCalcState) return;
-    const amount = _xpCalcState.manualStarted ? (parseInt(_xpCalcState.inputBuffer) || 0) : 0;
-    const next = Math.max(0, Math.min(999999999, (_xpCalcState.currentXp || 0) + (amount * direction)));
-    _xpCalcState.currentXp = next;
-    _xpCalcState.inputBuffer = String(next);
-    _xpCalcState.manualStarted = false;
-    xpCalcRender();
-};
-
-window.schedaSaveXp = async function() {
-    if (!_xpCalcState || !_schedaPgCache) return;
-    const xp = Math.max(0, parseInt(_xpCalcState.inputBuffer) || 0);
+async function xpCalcSaveCurrent() {
+    if (!_xpCalcState || !_schedaPgCache) return false;
+    const xp = Math.max(0, parseInt(_xpCalcState.currentXp) || 0);
     const pg = _schedaPgCache;
     const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
     delete bm._esperienza;
@@ -696,11 +683,27 @@ window.schedaSaveXp = async function() {
         }).eq('id', _xpCalcState.pgId);
         if (error) {
             showNotification?.('Errore salvataggio esperienza');
-            return;
+            return false;
         }
     }
 
-    schedaCloseXpCalc();
+    return true;
+}
+
+window.xpCalcApplyDelta = async function(direction) {
+    if (!_xpCalcState) return;
+    const amount = parseInt(_xpCalcState.inputBuffer) || 0;
+    if (amount <= 0) return;
+    const previous = _xpCalcState.currentXp || 0;
+    _xpCalcState.currentXp = Math.max(0, Math.min(999999999, previous + (amount * direction)));
+    _xpCalcState.inputBuffer = '0';
+    _xpCalcState.manualStarted = false;
+    xpCalcRender();
+    if (!await xpCalcSaveCurrent()) {
+        _xpCalcState.currentXp = previous;
+        if (_schedaPgCache) _schedaPgCache.esperienza = previous;
+        xpCalcRender();
+    }
 };
 
 window.schedaStartLevelUpFromXp = function() {
