@@ -268,8 +268,8 @@ function buildSchedaHeader(pg, pageLabel) {
         : `<span class="scheda-avatar-initials">${escapeHtml(initials)}</span>`;
     const quickInfo = _schedaBuildQuickInfo(pg);
     const hasClasses = pg.classi && pg.classi.length > 0;
-    const levelUpBtn = hasClasses
-        ? `<button class="scheda-levelup-top" onclick="schedaLevelUp('${pg.id}')" title="Level up">▲ Level Up</button>`
+    const xpBtn = hasClasses
+        ? `<button class="scheda-levelup-top" onclick="schedaOpenXpCalc('${pg.id}')" title="Punti esperienza">PE</button>`
         : '';
     const ispVal = pg.ispirazione || 0;
     const ispBox = `<div class="scheda-isp-box" title="Ispirazione">
@@ -288,7 +288,7 @@ function buildSchedaHeader(pg, pageLabel) {
             <div class="scheda-quick-line scheda-quick-razza">${escapeHtml(quickInfo.razza)}</div>
         </div>
         <div class="scheda-identity-actions">
-            ${levelUpBtn}
+            ${xpBtn}
             ${ispBox}
         </div>
     </div>`;

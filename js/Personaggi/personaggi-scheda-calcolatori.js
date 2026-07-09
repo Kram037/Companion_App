@@ -640,6 +640,7 @@ window.schedaOpenXpCalc = function(pgId) {
                 <button type="button" class="levelup-pf-cancel" onclick="schedaCloseXpCalc()">Annulla</button>
                 <button type="button" class="levelup-pf-confirm" onclick="schedaSaveXp()">Salva</button>
             </div>
+            <button type="button" class="levelup-pf-confirm xp-levelup-btn" onclick="schedaStartLevelUpFromXp()">Avanzamento di livello</button>
         </div>`;
     document.body.appendChild(overlay);
     xpCalcRender();
@@ -685,18 +686,13 @@ window.schedaSaveXp = async function() {
         }
     }
 
-    const summary = schedaGetXpSummary(pg);
-    const currentEl = document.getElementById('schedaXpCurrent');
-    const nextEl = document.getElementById('schedaXpNext');
-    const progressEl = document.getElementById('schedaXpProgress');
-    if (currentEl) currentEl.textContent = schedaFormatNumber(summary.current);
-    if (nextEl) {
-        nextEl.textContent = summary.nextLevelXp == null
-            ? 'Livello massimo'
-            : `Prossimo livello: ${schedaFormatNumber(summary.nextLevelXp)} · Mancano ${schedaFormatNumber(summary.needed)}`;
-    }
-    if (progressEl) progressEl.style.width = `${summary.progress}%`;
     schedaCloseXpCalc();
+};
+
+window.schedaStartLevelUpFromXp = function() {
+    const pgId = _xpCalcState?.pgId || _schedaPgCache?.id;
+    schedaCloseXpCalc();
+    if (pgId) schedaLevelUp(pgId);
 };
 
 window.schedaCloseXpCalc = function() {
