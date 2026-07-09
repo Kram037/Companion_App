@@ -1030,6 +1030,7 @@
 .xp-calc-next { margin-bottom: 8px; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.35; }
 .xp-calc-next strong { color: var(--accent); }
 .xp-calc-progress { margin: 0 0 10px; }
+.xp-calc-delta-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
 .xp-levelup-btn { width: 100%; margin-top: 8px; }
 .pf-history-modal {
     width: 360px;

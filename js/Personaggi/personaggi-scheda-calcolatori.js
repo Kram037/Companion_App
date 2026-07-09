@@ -613,7 +613,7 @@ window.schedaOpenXpCalc = function(pgId) {
     if (!pg) return;
     document.getElementById('xpCalcOverlay')?.remove();
     const current = schedaGetEsperienza(pg);
-    _xpCalcState = { pgId, inputBuffer: String(current), manualStarted: false };
+    _xpCalcState = { pgId, currentXp: current, inputBuffer: String(current), manualStarted: false };
 
     const overlay = document.createElement('div');
     overlay.id = 'xpCalcOverlay';
@@ -630,6 +630,10 @@ window.schedaOpenXpCalc = function(pgId) {
             <div class="xp-calc-next" id="xpCalcNextInfo"></div>
             <div class="xp-calc-progress"><span id="xpCalcProgress"></span></div>
             <div class="hp-calc-input-display" id="xpCalcAmountDisplay">${schedaFormatNumber(current)}</div>
+            <div class="xp-calc-delta-actions">
+                <button type="button" class="levelup-pf-cancel" onclick="xpCalcApplyDelta(-1)">-</button>
+                <button type="button" class="levelup-pf-confirm" onclick="xpCalcApplyDelta(1)">+</button>
+            </div>
             <div class="hp-calc-numpad">
                 ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('${n}')">${n}</button>`).join('')}
                 <button class="hp-calc-numpad-btn" type="button" onclick="xpCalcNumpad('C')">C</button>
@@ -661,6 +665,16 @@ window.xpCalcNumpad = function(key) {
         _xpCalcState.manualStarted = true;
     }
     _xpCalcState.inputBuffer = String(Math.min(999999999, Math.max(0, parseInt(_xpCalcState.inputBuffer) || 0)));
+    xpCalcRender();
+};
+
+window.xpCalcApplyDelta = function(direction) {
+    if (!_xpCalcState) return;
+    const amount = _xpCalcState.manualStarted ? (parseInt(_xpCalcState.inputBuffer) || 0) : 0;
+    const next = Math.max(0, Math.min(999999999, (_xpCalcState.currentXp || 0) + (amount * direction)));
+    _xpCalcState.currentXp = next;
+    _xpCalcState.inputBuffer = String(next);
+    _xpCalcState.manualStarted = false;
     xpCalcRender();
 };
 

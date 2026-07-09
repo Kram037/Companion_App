@@ -269,7 +269,7 @@ function buildSchedaHeader(pg, pageLabel) {
     const quickInfo = _schedaBuildQuickInfo(pg);
     const hasClasses = pg.classi && pg.classi.length > 0;
     const xpBtn = hasClasses
-        ? `<button class="scheda-levelup-top" onclick="schedaOpenXpCalc('${pg.id}')" title="Punti esperienza">PE</button>`
+        ? `<button class="scheda-levelup-top" onclick="schedaOpenXpCalc('${pg.id}')" title="Punti esperienza">Avanzamento</button>`
         : '';
     const ispVal = pg.ispirazione || 0;
     const ispBox = `<div class="scheda-isp-box" title="Ispirazione">
