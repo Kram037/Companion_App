@@ -176,28 +176,28 @@ Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX
 
 ## Fase 6 - Realtime disciplinato
 
-- [ ] Creare `src/realtime/realtimeClient.ts`.
-- [ ] Separare canali:
-  - [ ] auth/session lifecycle;
-  - [ ] campagne;
-  - [ ] sessioni;
-  - [ ] combattimento;
-  - [ ] richieste tiro;
-  - [ ] notifiche transitorie.
+- [x] Creare `src/realtime/realtimeClient.ts`.
+- [x] Separare canali:
+  - [x] auth/session lifecycle;
+  - [x] campagne;
+  - [x] sessioni;
+  - [x] combattimento;
+  - [x] richieste tiro;
+  - [x] notifiche transitorie.
 - [ ] Stabilire regole:
   - [ ] Postgres changes per dati persistenti;
   - [ ] Broadcast per eventi transitori;
   - [ ] Presence solo se servira' vedere utenti online/in sessione.
-- [ ] Ogni evento realtime deve produrre una delle seguenti azioni:
-  - [ ] invalidate query mirata;
-  - [ ] patch cache con `setQueryData`;
+- [x] Ogni evento realtime deve produrre una delle seguenti azioni:
+  - [x] invalidate query mirata;
+  - [x] patch cache con `setQueryData`;
   - [ ] mostra notifica/modal;
-  - [ ] nessuna azione se evento originato dallo stesso client.
-- [ ] Inserire deduplica eventi:
-  - [ ] `sourceClientId`;
-  - [ ] timestamp evento;
-  - [ ] chiave evento `table:action:id`;
-  - [ ] finestra anti-duplicato di pochi secondi.
+  - [x] nessuna azione se evento originato dallo stesso client.
+- [x] Inserire deduplica eventi:
+  - [x] `sourceClientId`;
+  - [x] timestamp evento;
+  - [x] chiave evento `table:action:id`;
+  - [x] finestra anti-duplicato di pochi secondi.
 - [ ] Evitare doppio evento `postgres_changes + broadcast` per la stessa azione, oppure deduplicarlo esplicitamente.
 
 Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render concorrenti.
