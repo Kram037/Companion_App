@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { realtimeEventKey, shouldProcessRealtimeEvent } from './realtimeClient';
+import {
+  applyRealtimeAction,
+  realtimeEventKey,
+  setRealtimeNotifyHandler,
+  shouldProcessRealtimeEvent,
+} from './realtimeClient';
 
 describe('realtimeClient', () => {
   it('builds deterministic event keys', () => {
@@ -13,5 +18,15 @@ describe('realtimeClient', () => {
     expect(shouldProcessRealtimeEvent(event, 10_000)).toBe(true);
     expect(shouldProcessRealtimeEvent(event, 10_500)).toBe(false);
     expect(shouldProcessRealtimeEvent(event, 13_500)).toBe(true);
+  });
+
+  it('dispatches transient notifications through an injected handler', () => {
+    const messages: string[] = [];
+
+    setRealtimeNotifyHandler(message => messages.push(message));
+    applyRealtimeAction({ type: 'notify', message: 'Nuovo evento' });
+    setRealtimeNotifyHandler(null);
+
+    expect(messages).toEqual(['Nuovo evento']);
   });
 });

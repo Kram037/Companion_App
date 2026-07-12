@@ -191,7 +191,7 @@ Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX
 - [x] Ogni evento realtime deve produrre una delle seguenti azioni:
   - [x] invalidate query mirata;
   - [x] patch cache con `setQueryData`;
-  - [ ] mostra notifica/modal;
+  - [x] mostra notifica/modal;
   - [x] nessuna azione se evento originato dallo stesso client.
 - [x] Inserire deduplica eventi:
   - [x] `sourceClientId`;

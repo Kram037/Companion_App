@@ -26,8 +26,13 @@ export interface RealtimeEventMeta {
 
 const DEDUPE_MS = 3000;
 const recentEvents = new Map<string, number>();
+let notifyHandler: ((message: string) => void) | null = null;
 
 export const realtimeClientId = globalThis.crypto?.randomUUID?.() ?? `client-${Date.now()}-${Math.random()}`;
+
+export function setRealtimeNotifyHandler(handler: ((message: string) => void) | null): void {
+  notifyHandler = handler;
+}
 
 export function realtimeEventKey(event: RealtimeEventMeta): string {
   return `${event.table}:${event.action}:${event.id ?? ''}`;
@@ -54,5 +59,9 @@ export function applyRealtimeAction(action: RealtimeAction): void {
   }
   if (action.type === 'patch') {
     queryClient.setQueryData(action.queryKey, action.updater);
+    return;
+  }
+  if (action.type === 'notify') {
+    notifyHandler?.(action.message);
   }
 }
