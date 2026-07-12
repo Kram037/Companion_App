@@ -77,7 +77,7 @@ Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi mod
   - [x] `@core`;
   - [x] `@features`;
   - [x] `@api`;
-  - [x] `@types`;
+  - [x] `@app-types` (al posto di `@types`, riservato da TypeScript);
   - [x] `@components`.
 - [ ] Portare il build Nx a chiamare Vite quando la compatibilita' e' pronta.
 - [ ] Garantire compatibilita' service worker/PWA:
@@ -91,22 +91,22 @@ Criterio di uscita: Vite serve/builda l'app senza rompere i flussi legacy.
 
 ## Fase 3 - Service layer Supabase
 
-- [ ] Creare `src/api/supabaseClient.ts`.
+- [x] Creare `src/api/supabaseClient.ts`.
 - [ ] Rimuovere accessi Supabase diretti dai nuovi componenti.
 - [ ] Creare API per dominio:
-  - [ ] `campaignsApi.ts`;
-  - [ ] `charactersApi.ts`;
-  - [ ] `sessionsApi.ts`;
-  - [ ] `combatApi.ts`;
-  - [ ] `homebrewApi.ts`;
-  - [ ] `usersApi.ts`;
-  - [ ] `runtimeDataApi.ts`.
-- [ ] Ogni funzione API deve:
-  - [ ] ricevere input espliciti;
-  - [ ] restituire dati normalizzati;
-  - [ ] non toccare DOM;
-  - [ ] non chiamare render;
-  - [ ] non modificare `AppState` direttamente.
+  - [x] `campaignsApi.ts`;
+  - [x] `charactersApi.ts`;
+  - [x] `sessionsApi.ts`;
+  - [x] `combatApi.ts`;
+  - [x] `homebrewApi.ts`;
+  - [x] `usersApi.ts`;
+  - [x] `runtimeDataApi.ts`.
+- [x] Ogni funzione API deve:
+  - [x] ricevere input espliciti;
+  - [x] restituire dati normalizzati;
+  - [x] non toccare DOM;
+  - [x] non chiamare render;
+  - [x] non modificare `AppState` direttamente.
 - [ ] Mappare progressivamente le vecchie funzioni:
   - [ ] `loadCampagne`;
   - [ ] `loadCampagnaDetails`;

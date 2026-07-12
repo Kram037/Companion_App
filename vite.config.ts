@@ -39,7 +39,7 @@ export default defineConfig({
       '@components': '/src/components',
       '@core': '/src/core',
       '@features': '/src/features',
-      '@types': '/src/types',
+      '@app-types': '/src/types',
     },
   },
   build: {
