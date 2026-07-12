@@ -12,23 +12,32 @@ window.openSchedaPersonaggio = async function(personaggioId, opts) {
         // alla scheda da una sessione/combattimento.
         window._schedaPendingScrollToStats = true;
     }
-    navigateToPage('scheda');
-    await renderSchedaPersonaggio(personaggioId);
+    // navigateToPage('scheda') esegue gia' il page-load e quindi il render.
+    // Chiamare renderSchedaPersonaggio subito dopo produceva due fetch/render
+    // concorrenti e poteva chiudere sezioni/tendine appena aperte.
+    return navigateToPage('scheda');
 }
 
 // Debounced save for scheda fields
-let _schedaSaveTimeout = null;
+// Una mappa per campo evita che il salvataggio di un campo cancelli il debounce
+// di un altro campo modificato subito prima.
+let _schedaSaveTimeout = null; // legacy: non usare per nuovi salvataggi
+let _schedaSaveTimeouts = new Map();
 let _schedaPgCache = null;
 
 function schedaDebouncedSave(personaggioId, field, value) {
-    if (_schedaSaveTimeout) clearTimeout(_schedaSaveTimeout);
-    _schedaSaveTimeout = setTimeout(async () => {
+    const key = `${personaggioId}:${field}`;
+    const existing = _schedaSaveTimeouts.get(key);
+    if (existing) clearTimeout(existing);
+    const timeout = setTimeout(async () => {
+        _schedaSaveTimeouts.delete(key);
         const supabase = getSupabaseClient();
         if (!supabase) return;
         try {
             await supabase.from('personaggi').update({ [field]: value, updated_at: new Date().toISOString() }).eq('id', personaggioId);
         } catch (e) { console.error('Errore salvataggio:', e); }
     }, 500);
+    _schedaSaveTimeouts.set(key, timeout);
 }
 
 async function schedaInstantSave(personaggioId, updates) {
