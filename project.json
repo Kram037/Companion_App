@@ -35,6 +35,12 @@
       "options": {
         "command": "npm run typecheck && node tools/check-js.mjs && node tools/check-data-boundary.mjs && node tools/check-index-bootstrap.mjs"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run test"
+      }
     }
   }
 }

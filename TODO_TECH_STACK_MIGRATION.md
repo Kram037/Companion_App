@@ -301,8 +301,8 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
 
 ## Fase 10 - Vitest
 
-- [ ] Installare `vitest`.
-- [ ] Aggiungere target Nx `test`.
+- [x] Installare `vitest`.
+- [x] Aggiungere target Nx `test`.
 - [ ] Testare funzioni pure:
   - [ ] calcoli modificatori D&D;
   - [ ] bonus competenza;
@@ -312,8 +312,8 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
   - [ ] normalizzazione URL immagini;
   - [ ] filtri campagne;
   - [ ] mapper Supabase -> dominio;
-  - [ ] schema Zod.
-- [ ] Aggiungere test per query key builder e invalidazioni realtime.
+  - [x] schema Zod.
+- [x] Aggiungere test per query key builder e invalidazioni realtime.
 
 Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di migrare componenti complessi.
 

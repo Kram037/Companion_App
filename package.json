@@ -14,6 +14,7 @@
     "serve": "node tools/nx-run.mjs companion-app:serve",
     "build": "node tools/nx-run.mjs companion-app:build",
     "check": "node tools/nx-run.mjs companion-app:check",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "vite:dev": "vite",
     "vite:build": "vite build",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "nx": "^23.0.1",
     "typescript": "^7.0.2",
-    "vite": "^8.1.4"
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   }
 }
