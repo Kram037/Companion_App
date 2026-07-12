@@ -95,7 +95,7 @@
             .pf-max-modal .bonus-list-header { margin-bottom: 5px; }
             .pf-max-modal .bonus-list-total-label { white-space: normal; text-align: right; }
             .pf-max-modal .bonus-list-container {
-                max-height: min(22dvh, 130px);
+                max-height: min(24dvh, 140px);
                 overflow-y: auto;
                 overflow-x: hidden;
                 display: flex;
@@ -132,35 +132,6 @@
                 color: var(--text-light, #888);
                 text-align: center;
             }
-            .pf-max-base-editor[hidden] { display: none !important; }
-            .pf-max-base-editor {
-                border-top: 1px solid var(--border);
-                padding-top: 8px;
-                display: flex;
-                flex-direction: column;
-                gap: 7px;
-            }
-            .pf-max-base-editor .hp-calc-input-display {
-                margin: 0;
-                min-height: 40px;
-                padding: 8px 10px;
-                font-size: 1.35rem;
-            }
-            .pf-max-base-editor .hp-calc-numpad,
-            .pf-max-value-keypad {
-                display: grid;
-                grid-template-columns: repeat(6, minmax(0, 1fr));
-                gap: 6px;
-            }
-            .pf-max-base-editor .hp-calc-numpad-btn,
-            .pf-max-value-keypad .hp-calc-numpad-btn {
-                min-height: 36px;
-                height: 36px;
-                padding: 0;
-                font-size: 1rem;
-            }
-            .pf-max-base-editor .hp-calc-buttons { margin-top: 0; }
-            .pf-max-base-editor .hp-calc-btn { padding: 9px 10px; }
             .pf-max-sign-row {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
@@ -189,9 +160,9 @@
                 border-color: var(--accent);
                 background: rgba(var(--accent-rgb, 139,92,246), 0.12);
             }
-            .pf-max-value-keypad[hidden] { display: none !important; }
-            .pf-max-value-keypad { margin-top: 8px; }
             .pf-max-edit-modal .bonus-edit-field { margin: 9px 0; }
+            .hp-calc-overlay.pf-max-keypad-overlay { z-index: 1600; }
+            .pf-max-keypad-overlay .hp-calc-modal { width: min(360px, 92vw); }
             @media (max-width: 380px) {
                 .hp-calc-modal.pf-max-modal { padding: 16px 12px 12px; gap: 7px; }
                 .pf-max-summary-grid { gap: 6px; }
@@ -375,6 +346,72 @@
         return true;
     }
 
+    function _openNumberKeypadDialog({ title, currentValue = 1, min = 1, max = 9999, confirmLabel = 'Conferma', onConfirm }) {
+        _ensurePfMaxStyles();
+        document.getElementById('pfMaxNumberKeypadOverlay')?.remove();
+        let buffer = String(Math.max(min, Math.min(max, parseInt(currentValue) || min)));
+        let manualStarted = false;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'pfMaxNumberKeypadOverlay';
+        overlay.className = 'hp-calc-overlay bonus-edit-overlay pf-max-keypad-overlay';
+        overlay.onclick = event => { if (event.target === overlay) overlay.remove(); };
+        overlay.innerHTML = `
+            <div class="hp-calc-modal">
+                <button class="hp-calc-close" type="button" onclick="document.getElementById('pfMaxNumberKeypadOverlay')?.remove()">&times;</button>
+                <div class="hp-calc-title">${escapeHtml(title)}</div>
+                <div class="hp-calc-hp-display"><span class="hp-calc-current" id="pfMaxNumberKeypadPreview">${buffer}</span></div>
+                <div class="hp-calc-input-display" id="pfMaxNumberKeypadDisplay">${buffer}</div>
+                <div class="hp-calc-numpad">
+                    ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" type="button" data-pfmax-key="${n}">${n}</button>`).join('')}
+                    <button class="hp-calc-numpad-btn" type="button" data-pfmax-key="C">C</button>
+                    <button class="hp-calc-numpad-btn" type="button" data-pfmax-key="0">0</button>
+                    <button class="hp-calc-numpad-btn" type="button" data-pfmax-key="BS">⌫</button>
+                </div>
+                <div class="hp-calc-buttons">
+                    <button class="hp-calc-btn damage" type="button" onclick="document.getElementById('pfMaxNumberKeypadOverlay')?.remove()">Annulla</button>
+                    <button class="hp-calc-btn heal" type="button" id="pfMaxNumberKeypadConfirm">${escapeHtml(confirmLabel)}</button>
+                </div>
+            </div>
+        `;
+
+        const render = () => {
+            const value = buffer || '0';
+            const preview = overlay.querySelector('#pfMaxNumberKeypadPreview');
+            const display = overlay.querySelector('#pfMaxNumberKeypadDisplay');
+            if (preview) preview.textContent = value;
+            if (display) display.textContent = value;
+        };
+
+        overlay.querySelectorAll('[data-pfmax-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.getAttribute('data-pfmax-key');
+                if (key === 'C') {
+                    buffer = '';
+                    manualStarted = true;
+                } else if (key === 'BS') {
+                    buffer = manualStarted && buffer.length > 1 ? buffer.slice(0, -1) : '';
+                    manualStarted = true;
+                } else {
+                    buffer = (!manualStarted || buffer === '0') ? key : `${buffer}${key}`;
+                    manualStarted = true;
+                }
+                const parsed = parseInt(buffer);
+                if (Number.isFinite(parsed) && parsed > max) buffer = String(max);
+                render();
+            });
+        });
+
+        overlay.querySelector('#pfMaxNumberKeypadConfirm')?.addEventListener('click', async () => {
+            const value = Math.max(min, Math.min(max, parseInt(buffer) || min));
+            overlay.remove();
+            await onConfirm?.(value);
+        });
+
+        document.body.appendChild(overlay);
+        render();
+    }
+
     function _openPfMaxDialog(pgId) {
         const pg = _schedaPgCache;
         if (!pg) return;
@@ -403,7 +440,7 @@
                 <button class="hp-calc-close" onclick="schedaCloseHpCalc()">&times;</button>
                 <div class="hp-calc-title">Punti Ferita Massimi</div>
                 <div class="pf-max-summary-grid">
-                    <button type="button" class="pf-max-summary-card" onclick="schedaPfMaxToggleBaseEditor()" title="Modifica PF max base">
+                    <button type="button" class="pf-max-summary-card" onclick="schedaPfMaxOpenBaseKeypad()" title="Modifica PF max base">
                         <strong id="hpCalcCurrent">${baseMax}</strong>
                         <span>PF max base</span>
                     </button>
@@ -429,58 +466,29 @@
                         <button class="hp-calc-btn neutral" onclick="schedaOpenPfHistory()">Storico PF</button>
                     </div>
                     <p class="pf-max-compact-hint">Tocca PF max base per modificarlo. I modificatori restano separati e possono essere bonus o malus.</p>
-                    <div class="pf-max-base-editor" id="pfMaxBaseEditor" hidden>
-                        <div class="hp-calc-input-display" id="hpCalcAmountDisplay">0</div>
-                        <div class="hp-calc-numpad">
-                            ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('${n}')">${n}</button>`).join('')}
-                            <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('C')">C</button>
-                            <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('0')">0</button>
-                            <button class="hp-calc-numpad-btn" onclick="hpCalcNumpad('⌫')">⌫</button>
-                        </div>
-                        <div class="hp-calc-buttons">
-                            <button class="hp-calc-btn heal hp-calc-btn-full" onclick="schedaPfMaxSetBase()">Conferma PF max base</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         `;
         document.body.appendChild(overlay);
     }
 
-    window.schedaPfMaxToggleBaseEditor = function() {
-        const editor = document.getElementById('pfMaxBaseEditor');
-        if (!editor) return;
-        const shouldShow = editor.hasAttribute('hidden');
-        editor.toggleAttribute('hidden', !shouldShow);
-        if (shouldShow) {
-            _hpCalcState.inputBuffer = '0';
-            _hpCalcState.hasInput = false;
-            const display = document.getElementById('hpCalcAmountDisplay');
-            if (display) display.textContent = '0';
-            setTimeout(() => editor.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 0);
-        }
-    };
-
-    window.schedaPfMaxSetBase = async function() {
-        if (!_hpCalcState || _hpCalcState.field !== 'punti_vita_max') return;
+    window.schedaPfMaxOpenBaseKeypad = function() {
         const pg = _schedaPgCache;
         if (!pg) return;
-        const typed = parseInt(_hpCalcState.inputBuffer) || 0;
-        if (!_hpCalcState.hasInput || typed <= 0) {
-            showNotification?.('Digita un valore PF max base valido');
-            return;
-        }
-        const baseMax = Math.max(1, typed);
-        _hpCalcState.currentVal = baseMax;
-        _hpCalcState.maxBase = baseMax;
-        _hpCalcState.inputBuffer = '0';
-        _hpCalcState.hasInput = false;
-        const current = document.getElementById('hpCalcCurrent');
-        if (current) current.textContent = baseMax;
-        const amount = document.getElementById('hpCalcAmountDisplay');
-        if (amount) amount.textContent = '0';
-        document.getElementById('pfMaxBaseEditor')?.setAttribute('hidden', '');
-        await _savePfMaxState({ baseMax, notify: 'PF max base aggiornati' });
+        _openNumberKeypadDialog({
+            title: 'PF max base',
+            currentValue: Math.max(1, parseInt(pg.punti_vita_max) || 10),
+            min: 1,
+            max: 9999,
+            confirmLabel: 'Conferma',
+            onConfirm: async (baseMax) => {
+                _hpCalcState.currentVal = baseMax;
+                _hpCalcState.maxBase = baseMax;
+                const current = document.getElementById('hpCalcCurrent');
+                if (current) current.textContent = baseMax;
+                await _savePfMaxState({ baseMax, notify: 'PF max base aggiornati' });
+            }
+        });
     };
 
     window.schedaPfMaxModifierAdd = function() {
@@ -538,14 +546,8 @@
                     <label>Valore</label>
                     <div class="bonus-edit-val-row">
                         <button type="button" class="bonus-modal-step" onclick="schedaPfMaxModifierStep(-1)">−</button>
-                        <button type="button" id="pfMaxModValueDisplay" class="pf-max-value-display" onclick="schedaPfMaxModifierToggleKeypad()">${amount}</button>
+                        <button type="button" id="pfMaxModValueDisplay" class="pf-max-value-display" onclick="schedaPfMaxModifierOpenValueKeypad()">${amount}</button>
                         <button type="button" class="bonus-modal-step" onclick="schedaPfMaxModifierStep(1)">+</button>
-                    </div>
-                    <div id="pfMaxModKeypad" class="pf-max-value-keypad" hidden>
-                        ${[1,2,3,4,5,6,7,8,9].map(n => `<button type="button" class="hp-calc-numpad-btn" onclick="schedaPfMaxModifierKeypad('${n}')">${n}</button>`).join('')}
-                        <button type="button" class="hp-calc-numpad-btn" onclick="schedaPfMaxModifierKeypad('C')">C</button>
-                        <button type="button" class="hp-calc-numpad-btn" onclick="schedaPfMaxModifierKeypad('0')">0</button>
-                        <button type="button" class="hp-calc-numpad-btn" onclick="schedaPfMaxModifierKeypad('BS')">⌫</button>
                     </div>
                 </div>
                 <div class="bonus-edit-field">
@@ -559,7 +561,7 @@
             </div>
         `;
         document.body.appendChild(overlay);
-        setTimeout(() => document.getElementById('pfMaxModName')?.focus(), 50);
+        // Nessun autofocus: il giocatore decide quando aprire la tastiera del telefono per il nome.
     }
 
     function _setPfMaxModifierDisplay(value) {
@@ -581,30 +583,20 @@
         _setPfMaxModifierDisplay(current + delta);
     };
 
-    window.schedaPfMaxModifierToggleKeypad = function() {
-        const keypad = document.getElementById('pfMaxModKeypad');
-        const display = document.getElementById('pfMaxModValueDisplay');
-        if (!keypad) return;
-        const show = keypad.hasAttribute('hidden');
-        keypad.toggleAttribute('hidden', !show);
-        display?.classList.toggle('active', show);
+    window.schedaPfMaxModifierOpenValueKeypad = function() {
+        if (!_pfMaxEditState) return;
+        _openNumberKeypadDialog({
+            title: 'Valore modificatore',
+            currentValue: Math.max(1, parseInt(_pfMaxEditState.valueBuffer) || 1),
+            min: 1,
+            max: 9999,
+            confirmLabel: 'Usa valore',
+            onConfirm: async (value) => _setPfMaxModifierDisplay(value)
+        });
     };
 
-    window.schedaPfMaxModifierKeypad = function(key) {
-        if (!_pfMaxEditState) return;
-        let buffer = String(_pfMaxEditState.valueBuffer || '1');
-        if (key === 'C') {
-            buffer = '1';
-        } else if (key === 'BS') {
-            buffer = buffer.length > 1 ? buffer.slice(0, -1) : '1';
-        } else {
-            buffer = buffer === '1' && !_pfMaxEditState.manualValueStarted ? String(key) : `${buffer}${key}`;
-            _pfMaxEditState.manualValueStarted = true;
-        }
-        const amount = Math.max(1, Math.min(9999, parseInt(buffer) || 1));
-        _pfMaxEditState.valueBuffer = String(amount);
-        _setPfMaxModifierDisplay(amount);
-    };
+    // Alias lasciato per eventuali handler rimasti in memoria dopo update.
+    window.schedaPfMaxModifierToggleKeypad = window.schedaPfMaxModifierOpenValueKeypad;
 
     window.schedaPfMaxModifierEditorClose = function() {
         document.getElementById('pfMaxModifierEditOverlay')?.remove();
