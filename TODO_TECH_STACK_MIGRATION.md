@@ -42,23 +42,23 @@ Criterio di uscita: flussi critici documentati e verificabili prima di introdurr
 
 ## Fase 1 - TypeScript graduale
 
-- [ ] Aggiungere TypeScript senza convertire subito tutto:
-  - [ ] installare `typescript`;
-  - [ ] creare `tsconfig.json` permissivo;
-  - [ ] abilitare `allowJs` e `checkJs` gradualmente;
-  - [ ] escludere temporaneamente file legacy troppo rumorosi.
-- [ ] Creare cartella `src/` per il nuovo codice typed.
-- [ ] Definire tipi dominio principali:
-  - [ ] `UserProfile`;
-  - [ ] `Campagna`;
-  - [ ] `Personaggio`;
-  - [ ] `Sessione`;
-  - [ ] `RichiestaTiro`;
-  - [ ] `MostroCombattimento`;
-  - [ ] `HomebrewItem`;
-  - [ ] `RuntimeDataBundle`.
-- [ ] Introdurre tipi per `AppState` attuale senza modificarne ancora il comportamento.
-- [ ] Aggiungere script di check TypeScript al target Nx `check`.
+- [x] Aggiungere TypeScript senza convertire subito tutto:
+  - [x] installare `typescript`;
+  - [x] creare `tsconfig.json` permissivo;
+  - [x] abilitare `allowJs` e `checkJs` gradualmente;
+  - [x] escludere temporaneamente file legacy troppo rumorosi.
+- [x] Creare cartella `src/` per il nuovo codice typed.
+- [x] Definire tipi dominio principali:
+  - [x] `UserProfile`;
+  - [x] `Campagna`;
+  - [x] `Personaggio`;
+  - [x] `Sessione`;
+  - [x] `RichiestaTiro`;
+  - [x] `MostroCombattimento`;
+  - [x] `HomebrewItem`;
+  - [x] `RuntimeDataBundle`.
+- [x] Introdurre tipi per `AppState` attuale senza modificarne ancora il comportamento.
+- [x] Aggiungere script di check TypeScript al target Nx `check`.
 
 Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi moduli possono essere scritti in `.ts`/`.tsx`.
 

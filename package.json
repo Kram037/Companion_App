@@ -6,9 +6,11 @@
     "serve": "node tools/nx-run.mjs companion-app:serve",
     "build": "node tools/nx-run.mjs companion-app:build",
     "check": "node tools/nx-run.mjs companion-app:check",
+    "typecheck": "tsc --noEmit",
     "audit": "npm audit"
   },
   "devDependencies": {
-    "nx": "^23.0.1"
+    "nx": "^23.0.1",
+    "typescript": "^7.0.2"
   }
 }
