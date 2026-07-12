@@ -206,24 +206,24 @@ Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render c
 
 ## Fase 7 - Zustand per UI state
 
-- [ ] Installare `zustand`.
-- [ ] Creare store piccoli e separati:
-  - [ ] `useNavigationStore`;
-  - [ ] `useModalStore`;
-  - [ ] `useCharacterSheetUiStore`;
-  - [ ] `useCombatUiStore`;
-  - [ ] `useFiltersStore`.
+- [x] Installare `zustand`.
+- [x] Creare store piccoli e separati:
+  - [x] `useNavigationStore`;
+  - [x] `useModalStore`;
+  - [x] `useCharacterSheetUiStore`;
+  - [x] `useCombatUiStore`;
+  - [x] `useFiltersStore`.
 - [ ] Spostare nello store solo stato UI locale:
-  - [ ] pagina/tab corrente;
+  - [x] pagina/tab corrente;
   - [ ] sezioni aperte/chiuse;
-  - [ ] filtri locali;
-  - [ ] modali aperti;
-  - [ ] selezioni temporanee;
+  - [x] filtri locali;
+  - [x] modali aperti;
+  - [x] selezioni temporanee;
   - [ ] stato wizard.
-- [ ] Non mettere in Zustand dati Supabase che appartengono a TanStack Query.
+- [x] Non mettere in Zustand dati Supabase che appartengono a TanStack Query.
 - [ ] Aggiungere persistenza selettiva dove serve:
-  - [ ] tab correnti;
-  - [ ] filtri campagne;
+  - [x] tab correnti;
+  - [x] filtri campagne;
   - [ ] preferenze UI;
   - [ ] stato navigazione sessione.
 
