@@ -1,4 +1,5 @@
-﻿import type { Id, MostroCombattimento } from '../types/domain';
+import type { Id, MostroCombattimento } from '../types/domain';
+import { combatMonsterSchema, parseArray } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchCombatMonsters(sessioneId: Id): Promise<MostroCombattimento[]> {
@@ -8,6 +9,6 @@ export async function fetchCombatMonsters(sessioneId: Id): Promise<MostroCombatt
     .eq('sessione_id', sessioneId)
     .order('iniziativa', { ascending: false, nullsFirst: false });
   throwIfSupabaseError(error);
-  return data ?? [];
+  return parseArray(combatMonsterSchema, data);
 }
 

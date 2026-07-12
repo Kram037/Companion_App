@@ -73,7 +73,7 @@ export interface MostroCombattimento {
 export interface HomebrewItem {
   id: Id;
   user_id?: Id | null;
-  tipo: string;
+  tipo?: string | null;
   nome: string;
   dati?: JsonRecord | null;
   created_at?: ISODateString | null;

@@ -1,4 +1,5 @@
-﻿import type { HomebrewItem, Id } from '../types/domain';
+import type { HomebrewItem, Id } from '../types/domain';
+import { homebrewItemSchema, parseArray } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export type HomebrewTable =
@@ -18,6 +19,6 @@ export async function fetchHomebrewByUser(table: HomebrewTable, userId: Id): Pro
     .eq('user_id', userId)
     .order('nome');
   throwIfSupabaseError(error);
-  return data ?? [];
+  return parseArray(homebrewItemSchema, data);
 }
 

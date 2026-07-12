@@ -1,4 +1,5 @@
-﻿import type { Id, UserProfile } from '../types/domain';
+import type { Id, UserProfile } from '../types/domain';
+import { parseNullable, userProfileSchema } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchUserById(userId: Id): Promise<UserProfile | null> {
@@ -8,7 +9,7 @@ export async function fetchUserById(userId: Id): Promise<UserProfile | null> {
     .eq('id', userId)
     .single();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(userProfileSchema, data);
 }
 
 export async function fetchUserByUid(uid: Id): Promise<UserProfile | null> {
@@ -18,6 +19,6 @@ export async function fetchUserByUid(uid: Id): Promise<UserProfile | null> {
     .eq('uid', uid)
     .single();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(userProfileSchema, data);
 }
 

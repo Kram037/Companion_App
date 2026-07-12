@@ -1,4 +1,5 @@
-﻿import type { Campagna, Id } from '../types/domain';
+import type { Campagna, Id } from '../types/domain';
+import { campaignSchema, parseArray, parseNullable } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchCampaignById(campagnaId: Id): Promise<Campagna | null> {
@@ -8,7 +9,7 @@ export async function fetchCampaignById(campagnaId: Id): Promise<Campagna | null
     .eq('id', campagnaId)
     .single();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(campaignSchema, data);
 }
 
 export async function fetchCampaignsByDm(dmId: Id): Promise<Campagna[]> {
@@ -18,6 +19,6 @@ export async function fetchCampaignsByDm(dmId: Id): Promise<Campagna[]> {
     .eq('id_dm', dmId)
     .order('data_creazione', { ascending: false });
   throwIfSupabaseError(error);
-  return data ?? [];
+  return parseArray(campaignSchema, data);
 }
 

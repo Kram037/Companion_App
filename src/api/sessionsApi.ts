@@ -1,4 +1,5 @@
-﻿import type { Id, Sessione } from '../types/domain';
+import type { Id, Sessione } from '../types/domain';
+import { parseNullable, sessionSchema } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null> {
@@ -8,7 +9,7 @@ export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null>
     .eq('id', sessioneId)
     .single();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(sessionSchema, data);
 }
 
 export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sessione | null> {
@@ -19,6 +20,6 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
     .eq('attiva', true)
     .maybeSingle();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(sessionSchema, data);
 }
 

@@ -120,21 +120,21 @@ Criterio di uscita: i nuovi moduli dati non dipendono da DOM, `window` o render 
 
 ## Fase 4 - Zod per validazione dati
 
-- [ ] Installare `zod`.
-- [ ] Creare `src/schemas/`.
-- [ ] Definire schema per:
-  - [ ] utente;
-  - [ ] campagna;
-  - [ ] personaggio;
-  - [ ] sessione;
-  - [ ] richiesta tiro iniziativa;
-  - [ ] richiesta tiro generico;
-  - [ ] mostro combattimento;
-  - [ ] oggetti homebrew;
-  - [ ] incantesimi homebrew;
-  - [ ] runtime data bundle.
-- [ ] Usare `safeParse` nel service layer per dati provenienti da Supabase.
-- [ ] Gestire fallback espliciti per colonne opzionali o migrazioni DB non ancora applicate.
+- [x] Installare `zod`.
+- [x] Creare `src/schemas/`.
+- [x] Definire schema per:
+  - [x] utente;
+  - [x] campagna;
+  - [x] personaggio;
+  - [x] sessione;
+  - [x] richiesta tiro iniziativa;
+  - [x] richiesta tiro generico;
+  - [x] mostro combattimento;
+  - [x] oggetti homebrew;
+  - [x] incantesimi homebrew;
+  - [x] runtime data bundle.
+- [x] Usare `safeParse` nel service layer per dati provenienti da Supabase.
+- [x] Gestire fallback espliciti per colonne opzionali o migrazioni DB non ancora applicate.
 - [ ] Derivare tipi TypeScript dagli schema quando utile.
 
 Criterio di uscita: i dati critici sono validati prima di entrare nello stato React/Query.

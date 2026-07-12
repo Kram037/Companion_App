@@ -1,4 +1,5 @@
-﻿import type { Id, Personaggio } from '../types/domain';
+import type { Id, Personaggio } from '../types/domain';
+import { characterSchema, parseArray, parseNullable } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio | null> {
@@ -8,7 +9,7 @@ export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio
     .eq('id', personaggioId)
     .single();
   throwIfSupabaseError(error);
-  return data ?? null;
+  return parseNullable(characterSchema, data);
 }
 
 export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> {
@@ -18,6 +19,6 @@ export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> 
     .eq('user_id', userId)
     .order('nome');
   throwIfSupabaseError(error);
-  return data ?? [];
+  return parseArray(characterSchema, data);
 }
 

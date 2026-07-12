@@ -1,6 +1,9 @@
 {
   "name": "companion-app-workspace",
   "private": true,
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
   "scripts": {
     "nx": "nx",
     "serve": "node tools/nx-run.mjs companion-app:serve",
