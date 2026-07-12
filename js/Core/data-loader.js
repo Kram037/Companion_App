@@ -37,6 +37,7 @@ const RUNTIME_SCRIPT_BUNDLES = {
 const _runtimeDataPromises = new Map();
 const _runtimeScriptPromises = new Map();
 let _contentLocalizationPromise = null;
+let _sessionNavigationFixPromise = null;
 
 function _runtimeDataReady(bundle) {
     return bundle.globals.every(name => typeof window[name] !== 'undefined');
@@ -49,45 +50,76 @@ function _findRuntimeDataScript(src) {
     });
 }
 
+function _loadUtilityScript({ src, version, ready, datasetKey, label }) {
+    if (typeof window[ready] !== 'undefined') {
+        return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+        const finish = () => {
+            if (typeof window[ready] !== 'undefined') {
+                resolve();
+                return;
+            }
+            reject(new Error(`Modulo ${label} incompleto`));
+        };
+
+        const existing = _findRuntimeDataScript(src);
+        if (existing) {
+            existing.addEventListener('load', finish, { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Caricamento ${label} fallito: ${src}`)), { once: true });
+            setTimeout(finish, 0);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `${src}?v=${version}`;
+        script.async = true;
+        script.dataset[datasetKey] = 'true';
+        script.onload = finish;
+        script.onerror = () => reject(new Error(`Caricamento ${label} fallito: ${src}`));
+        document.head.appendChild(script);
+    }).catch(error => {
+        console.warn(`[${label}]`, error);
+    });
+}
+
 function ensureContentLocalization() {
     if (typeof window.localizeRuntimeDataBundle === 'function') {
         return Promise.resolve();
     }
     if (_contentLocalizationPromise) return _contentLocalizationPromise;
 
-    _contentLocalizationPromise = new Promise((resolve, reject) => {
-        const src = 'js/Core/content-localization.js';
-        const finish = () => {
-            if (typeof window.localizeRuntimeDataBundle === 'function') {
-                resolve();
-                return;
-            }
-            reject(new Error('Modulo di localizzazione contenuti incompleto'));
-        };
-
-        const existing = _findRuntimeDataScript(src);
-        if (existing) {
-            existing.addEventListener('load', finish, { once: true });
-            existing.addEventListener('error', () => reject(new Error(`Caricamento localizzazione fallito: ${src}`)), { once: true });
-            // Uno script gia' eseguito non emettera' un nuovo evento load.
-            setTimeout(finish, 0);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = `${src}?v=20260712B`;
-        script.async = true;
-        script.dataset.contentLocalization = 'true';
-        script.onload = finish;
-        script.onerror = () => reject(new Error(`Caricamento localizzazione fallito: ${src}`));
-        document.head.appendChild(script);
-    }).catch(error => {
-        console.warn('[content-localization]', error);
+    _contentLocalizationPromise = _loadUtilityScript({
+        src: 'js/Core/content-localization.js',
+        version: '20260712B',
+        ready: 'localizeRuntimeDataBundle',
+        datasetKey: 'contentLocalization',
+        label: 'content-localization',
     }).finally(() => {
         _contentLocalizationPromise = null;
     });
 
     return _contentLocalizationPromise;
+}
+
+function ensureSessionNavigationFix() {
+    if (window.__sessionNavigationFixInstalled) {
+        return Promise.resolve();
+    }
+    if (_sessionNavigationFixPromise) return _sessionNavigationFixPromise;
+
+    _sessionNavigationFixPromise = _loadUtilityScript({
+        src: 'js/Core/session-navigation-fix.js',
+        version: '20260712A',
+        ready: '__sessionNavigationFixRegistered',
+        datasetKey: 'sessionNavigationFix',
+        label: 'session-navigation-fix',
+    }).finally(() => {
+        _sessionNavigationFixPromise = null;
+    });
+
+    return _sessionNavigationFixPromise;
 }
 
 function _localizedBundleValues(key, bundle) {
@@ -170,7 +202,7 @@ function ensureRuntimeScript(key) {
 
     if (_runtimeScriptReady(bundle)) {
         _initRuntimeScript(bundle);
-        return ensureContentLocalization();
+        return Promise.all([ensureContentLocalization(), ensureSessionNavigationFix()]).then(() => undefined);
     }
 
     if (_runtimeScriptPromises.has(key)) {
@@ -181,7 +213,7 @@ function ensureRuntimeScript(key) {
         const finish = () => {
             if (_runtimeScriptReady(bundle)) {
                 _initRuntimeScript(bundle);
-                ensureContentLocalization().then(resolve, reject);
+                Promise.all([ensureContentLocalization(), ensureSessionNavigationFix()]).then(() => resolve(), reject);
                 return;
             }
 
@@ -213,12 +245,14 @@ function ensureRuntimeScript(key) {
     return promise;
 }
 
-// Avvia presto la normalizzazione: corregge anche testi statici gia' presenti
-// nell'HTML e contenuti aggiunti successivamente da render legacy.
+// Avvia presto i moduli di compatibilita': correggono testi statici/dinamici e
+// garantiscono che la pagina sessione venga renderizzata da navigateToPage.
 ensureContentLocalization();
+ensureSessionNavigationFix();
 
 window.RUNTIME_DATA_BUNDLES = RUNTIME_DATA_BUNDLES;
 window.ensureRuntimeData = ensureRuntimeData;
 window.RUNTIME_SCRIPT_BUNDLES = RUNTIME_SCRIPT_BUNDLES;
 window.ensureRuntimeScript = ensureRuntimeScript;
 window.ensureContentLocalization = ensureContentLocalization;
+window.ensureSessionNavigationFix = ensureSessionNavigationFix;
