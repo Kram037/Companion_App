@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v188';
+const CACHE_NAME = 'companion-app-v191';
 
 const APP_SHELL_URLS = [
     './',
@@ -9,6 +9,7 @@ const APP_SHELL_URLS = [
     './js/Core/version.js',
     './js/Core/state.js',
     './js/Core/utils.js',
+    './js/Core/content-localization.js',
     './js/Core/lang.js',
     './js/Core/theme.js',
     './js/Core/data-loader.js',
@@ -43,6 +44,7 @@ const APP_SHELL_URLS = [
     './js/Personaggi/personaggi-scheda-privilegi.js',
     './js/Personaggi/personaggi-scheda-editor.js',
     './js/Personaggi/personaggi-scheda-calcolatori.js',
+    './js/Personaggi/personaggi-pf-max-modifiers.js',
     './js/Personaggi/personaggi-scheda-levelup-risorse.js',
     './js/Personaggi/personaggi-scheda-bonus.js',
     './js/Personaggi/personaggi-scheda-equipaggiamento.js',
