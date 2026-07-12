@@ -135,7 +135,7 @@ Criterio di uscita: i nuovi moduli dati non dipendono da DOM, `window` o render 
   - [x] runtime data bundle.
 - [x] Usare `safeParse` nel service layer per dati provenienti da Supabase.
 - [x] Gestire fallback espliciti per colonne opzionali o migrazioni DB non ancora applicate.
-- [ ] Derivare tipi TypeScript dagli schema quando utile.
+- [x] Derivare tipi TypeScript dagli schema quando utile.
 
 Criterio di uscita: i dati critici sono validati prima di entrare nello stato React/Query.
 

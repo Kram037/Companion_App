@@ -101,3 +101,12 @@ export const runtimeDataBundleSchema = z.object({
   source: z.string().nullish(),
   data: jsonValueSchema,
 }).passthrough();
+
+export type UserProfileFromSchema = z.infer<typeof userProfileSchema>;
+export type CampaignFromSchema = z.infer<typeof campaignSchema>;
+export type CharacterFromSchema = z.infer<typeof characterSchema>;
+export type SessionFromSchema = z.infer<typeof sessionSchema>;
+export type RollRequestFromSchema = z.infer<typeof rollRequestSchema>;
+export type CombatMonsterFromSchema = z.infer<typeof combatMonsterSchema>;
+export type HomebrewItemFromSchema = z.infer<typeof homebrewItemSchema>;
+export type RuntimeDataBundleFromSchema = z.infer<typeof runtimeDataBundleSchema>;
