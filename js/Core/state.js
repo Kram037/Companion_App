@@ -306,3 +306,47 @@ let elements = {};
         setTimeout(installRealtimeUxGuards, 0);
     }
 })();
+
+// ============================================================================
+// FEATURE MODULE LOADER
+// ============================================================================
+// Carichiamo il modulo PF max dopo gli script legacy della scheda. In questo
+// modo possiamo sostituire solo il comportamento della dialog PF max senza
+// toccare il bootstrap storico di index.html.
+(function registerPfMaxModifiersLoader() {
+    if (window.__pfMaxModifiersLoaderRegistered) return;
+    window.__pfMaxModifiersLoaderRegistered = true;
+
+    function loadPfMaxModifiersModule() {
+        if (window.__pfMaxModifiersFeatureLoaded) return;
+        if (document.querySelector('script[data-pf-max-modifiers]')) return;
+
+        const ready = typeof window.schedaOpenHpCalcLive === 'function'
+            && typeof window.schedaOpenHpCalc === 'function';
+        if (!ready) {
+            setTimeout(loadPfMaxModifiersModule, 120);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'js/Personaggi/personaggi-pf-max-modifiers.js?v=20260712A';
+        script.dataset.pfMaxModifiers = 'true';
+        script.onload = () => {
+            try {
+                if (typeof window.schedaUpdateHpDisplays === 'function' && typeof _schedaPgCache !== 'undefined' && _schedaPgCache) {
+                    window.schedaUpdateHpDisplays(_schedaPgCache);
+                }
+            } catch (_) {}
+        };
+        script.onerror = () => console.warn('[pf-max] Impossibile caricare il modulo modificatori PF max');
+        document.head.appendChild(script);
+    }
+
+    if (document.readyState === 'complete') {
+        setTimeout(loadPfMaxModifiersModule, 0);
+    } else {
+        window.addEventListener('load', () => setTimeout(loadPfMaxModifiersModule, 0), { once: true });
+        // Fallback per browser/PWA che possono avere timing particolari sul load.
+        setTimeout(loadPfMaxModifiersModule, 1800);
+    }
+})();
