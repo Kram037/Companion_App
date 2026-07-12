@@ -15,26 +15,26 @@ Obiettivo: preparare Companion App alla migrazione progressiva verso React senza
 
 ## Fase 0 - Baseline e protezione regressioni
 
-- [ ] Documentare i flussi critici attuali:
-  - [ ] login / ripristino sessione;
-  - [ ] lista campagne;
-  - [ ] dettaglio campagna;
-  - [ ] sessione attiva;
-  - [ ] combattimento;
-  - [ ] scheda personaggio;
-  - [ ] laboratorio;
-  - [ ] compendio.
-- [ ] Aggiungere casi QA manuali per i bug UX noti:
-  - [ ] aprire una tendina mentre arriva un realtime update;
-  - [ ] modificare un campo e verificare che non venga resettato;
-  - [ ] aprire un modal e verificare che un refetch non lo chiuda;
-  - [ ] usare sessione/combattimento con due browser aperti;
-  - [ ] verificare PWA/service worker dopo update.
-- [ ] Mantenere i fix anti-doppio-render e realtime guard finche' React Query non li sostituisce.
-- [ ] Definire convenzione branch:
-  - [ ] `develop` per integrazione;
-  - [ ] feature branch per ogni fase tecnica;
-  - [ ] PR piccole e verificabili.
+- [x] Documentare i flussi critici attuali:
+  - [x] login / ripristino sessione;
+  - [x] lista campagne;
+  - [x] dettaglio campagna;
+  - [x] sessione attiva;
+  - [x] combattimento;
+  - [x] scheda personaggio;
+  - [x] laboratorio;
+  - [x] compendio.
+- [x] Aggiungere casi QA manuali per i bug UX noti:
+  - [x] aprire una tendina mentre arriva un realtime update;
+  - [x] modificare un campo e verificare che non venga resettato;
+  - [x] aprire un modal e verificare che un refetch non lo chiuda;
+  - [x] usare sessione/combattimento con due browser aperti;
+  - [x] verificare PWA/service worker dopo update.
+- [x] Mantenere i fix anti-doppio-render e realtime guard finche' React Query non li sostituisce.
+- [x] Definire convenzione branch:
+  - [x] `develop` per integrazione;
+  - [x] feature branch per ogni fase tecnica;
+  - [x] PR piccole e verificabili.
 
 Criterio di uscita: flussi critici documentati e verificabili prima di introdurre dipendenze nuove.
 
@@ -364,18 +364,18 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 
 ### Milestone A - Fondamenta
 
-- [ ] TypeScript presente.
-- [ ] Vite presente.
-- [ ] Service layer Supabase presente.
-- [ ] Zod presente per dati critici.
-- [ ] Build/check verdi.
+- [x] TypeScript presente.
+- [x] Vite presente.
+- [x] Service layer Supabase presente.
+- [x] Zod presente per dati critici.
+- [x] Build/check verdi.
 
 ### Milestone B - Dati e realtime
 
-- [ ] TanStack Query configurato.
-- [ ] Query keys definite.
+- [x] TanStack Query configurato.
+- [x] Query keys definite.
 - [ ] Realtime convertito a invalidazioni mirate per campagne/sessioni/combattimento.
-- [ ] Zustand configurato per UI state.
+- [x] Zustand configurato per UI state.
 
 ### Milestone C - Prime pagine React
 
