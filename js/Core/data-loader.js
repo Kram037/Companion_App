@@ -36,6 +36,7 @@ const RUNTIME_SCRIPT_BUNDLES = {
 
 const _runtimeDataPromises = new Map();
 const _runtimeScriptPromises = new Map();
+let _contentLocalizationPromise = null;
 
 function _runtimeDataReady(bundle) {
     return bundle.globals.every(name => typeof window[name] !== 'undefined');
@@ -48,6 +49,59 @@ function _findRuntimeDataScript(src) {
     });
 }
 
+function ensureContentLocalization() {
+    if (typeof window.localizeRuntimeDataBundle === 'function') {
+        return Promise.resolve();
+    }
+    if (_contentLocalizationPromise) return _contentLocalizationPromise;
+
+    _contentLocalizationPromise = new Promise((resolve, reject) => {
+        const src = 'js/Core/content-localization.js';
+        const finish = () => {
+            if (typeof window.localizeRuntimeDataBundle === 'function') {
+                resolve();
+                return;
+            }
+            reject(new Error('Modulo di localizzazione contenuti incompleto'));
+        };
+
+        const existing = _findRuntimeDataScript(src);
+        if (existing) {
+            existing.addEventListener('load', finish, { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Caricamento localizzazione fallito: ${src}`)), { once: true });
+            // Uno script gia' eseguito non emettera' un nuovo evento load.
+            setTimeout(finish, 0);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `${src}?v=20260712A`;
+        script.async = true;
+        script.dataset.contentLocalization = 'true';
+        script.onload = finish;
+        script.onerror = () => reject(new Error(`Caricamento localizzazione fallito: ${src}`));
+        document.head.appendChild(script);
+    }).catch(error => {
+        console.warn('[content-localization]', error);
+    }).finally(() => {
+        _contentLocalizationPromise = null;
+    });
+
+    return _contentLocalizationPromise;
+}
+
+function _localizedBundleValues(key, bundle) {
+    const values = bundle.globals.map(name => window[name]);
+    return ensureContentLocalization().then(() => {
+        try {
+            window.localizeRuntimeDataBundle?.(key);
+        } catch (error) {
+            console.warn(`[content-localization] Normalizzazione bundle fallita (${key}):`, error);
+        }
+        return values;
+    });
+}
+
 function ensureRuntimeData(key) {
     const bundle = RUNTIME_DATA_BUNDLES[key];
 
@@ -56,7 +110,7 @@ function ensureRuntimeData(key) {
     }
 
     if (_runtimeDataReady(bundle)) {
-        return Promise.resolve(bundle.globals.map(name => window[name]));
+        return _localizedBundleValues(key, bundle);
     }
 
     if (_runtimeDataPromises.has(key)) {
@@ -66,7 +120,7 @@ function ensureRuntimeData(key) {
     const promise = new Promise((resolve, reject) => {
         const finish = () => {
             if (_runtimeDataReady(bundle)) {
-                resolve(bundle.globals.map(name => window[name]));
+                _localizedBundleValues(key, bundle).then(resolve, reject);
                 return;
             }
 
@@ -77,6 +131,9 @@ function ensureRuntimeData(key) {
         if (existing) {
             existing.addEventListener('load', finish, { once: true });
             existing.addEventListener('error', () => reject(new Error(`Caricamento dati fallito: ${bundle.src}`)), { once: true });
+            setTimeout(() => {
+                if (_runtimeDataReady(bundle)) finish();
+            }, 0);
             return;
         }
 
@@ -113,7 +170,7 @@ function ensureRuntimeScript(key) {
 
     if (_runtimeScriptReady(bundle)) {
         _initRuntimeScript(bundle);
-        return Promise.resolve();
+        return ensureContentLocalization();
     }
 
     if (_runtimeScriptPromises.has(key)) {
@@ -124,7 +181,7 @@ function ensureRuntimeScript(key) {
         const finish = () => {
             if (_runtimeScriptReady(bundle)) {
                 _initRuntimeScript(bundle);
-                resolve();
+                ensureContentLocalization().then(resolve, reject);
                 return;
             }
 
@@ -135,6 +192,9 @@ function ensureRuntimeScript(key) {
         if (existing) {
             existing.addEventListener('load', finish, { once: true });
             existing.addEventListener('error', () => reject(new Error(`Caricamento script fallito: ${bundle.src}`)), { once: true });
+            setTimeout(() => {
+                if (_runtimeScriptReady(bundle)) finish();
+            }, 0);
             return;
         }
 
@@ -153,7 +213,12 @@ function ensureRuntimeScript(key) {
     return promise;
 }
 
+// Avvia presto la normalizzazione: corregge anche testi statici gia' presenti
+// nell'HTML e contenuti aggiunti successivamente da render legacy.
+ensureContentLocalization();
+
 window.RUNTIME_DATA_BUNDLES = RUNTIME_DATA_BUNDLES;
 window.ensureRuntimeData = ensureRuntimeData;
 window.RUNTIME_SCRIPT_BUNDLES = RUNTIME_SCRIPT_BUNDLES;
 window.ensureRuntimeScript = ensureRuntimeScript;
+window.ensureContentLocalization = ensureContentLocalization;
