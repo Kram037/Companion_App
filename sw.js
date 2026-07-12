@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v189';
+const CACHE_NAME = 'companion-app-v190';
 
 const APP_SHELL_URLS = [
     './',
@@ -9,6 +9,7 @@ const APP_SHELL_URLS = [
     './js/Core/version.js',
     './js/Core/state.js',
     './js/Core/utils.js',
+    './js/Core/content-localization.js',
     './js/Core/lang.js',
     './js/Core/theme.js',
     './js/Core/data-loader.js',
