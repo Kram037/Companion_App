@@ -233,18 +233,18 @@ Criterio di uscita: `AppState` legacy puo' iniziare a essere svuotato e sostitui
 
 ## Fase 8 - React Router
 
-- [ ] Installare `react-router`.
-- [ ] Definire route progressive:
-  - [ ] `/campagne`;
-  - [ ] `/campagne/:campagnaId`;
-  - [ ] `/campagne/:campagnaId/sessione`;
-  - [ ] `/campagne/:campagnaId/sessione/:sessioneId/combattimento`;
-  - [ ] `/personaggi`;
-  - [ ] `/personaggi/:personaggioId`;
-  - [ ] `/compendio`;
-  - [ ] `/laboratorio`;
-  - [ ] `/amici`.
-- [ ] Creare bridge temporaneo tra `navigateToPage` legacy e router React.
+- [x] Installare `react-router`.
+- [x] Definire route progressive:
+  - [x] `/campagne`;
+  - [x] `/campagne/:campagnaId`;
+  - [x] `/campagne/:campagnaId/sessione`;
+  - [x] `/campagne/:campagnaId/sessione/:sessioneId/combattimento`;
+  - [x] `/personaggi`;
+  - [x] `/personaggi/:personaggioId`;
+  - [x] `/compendio`;
+  - [x] `/laboratorio`;
+  - [x] `/amici`.
+- [x] Creare bridge temporaneo tra `navigateToPage` legacy e router React.
 - [ ] Sostituire gradualmente `sessionStorage currentPage/currentCampagnaId/currentSessioneId` con URL params.
 - [ ] Gestire deep link e refresh pagina.
 - [ ] Mantenere compatibilita' PWA notification click.
