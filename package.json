@@ -14,6 +14,8 @@
     "serve": "node tools/nx-run.mjs companion-app:serve",
     "build": "node tools/nx-run.mjs companion-app:build",
     "check": "node tools/nx-run.mjs companion-app:check",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "vite:dev": "vite",
@@ -21,6 +23,7 @@
     "audit": "npm audit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "nx": "^23.0.1",

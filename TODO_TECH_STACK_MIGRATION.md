@@ -321,7 +321,7 @@ Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di m
 
 ## Fase 11 - Playwright E2E
 
-- [ ] Installare `@playwright/test`.
+- [x] Installare `@playwright/test`.
 - [ ] Creare ambiente test:
   - [ ] account test DM;
   - [ ] account test player;
@@ -329,6 +329,7 @@ Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di m
   - [ ] personaggio test;
   - [ ] sessione test.
 - [ ] Test E2E prioritari:
+  - [x] smoke test shell app;
   - [ ] login e navigazione base;
   - [ ] lista campagne visibile;
   - [ ] apertura dettaglio campagna;
