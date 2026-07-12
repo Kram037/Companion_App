@@ -143,17 +143,17 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
 
 ## Fase 5 - TanStack Query per server state
 
-- [ ] Installare `@tanstack/react-query`.
-- [ ] Creare `queryClient` centralizzato.
-- [ ] Definire query keys stabili:
-  - [ ] `['currentUser']`;
-  - [ ] `['campaigns', userId]`;
-  - [ ] `['campaign', campagnaId]`;
-  - [ ] `['session', campagnaId]`;
-  - [ ] `['combat', sessioneId]`;
-  - [ ] `['character', personaggioId]`;
-  - [ ] `['homebrew', userId]`;
-  - [ ] `['runtimeData', bundleKey]`.
+- [x] Installare `@tanstack/react-query`.
+- [x] Creare `queryClient` centralizzato.
+- [x] Definire query keys stabili:
+  - [x] `['currentUser']`;
+  - [x] `['campaigns', userId]`;
+  - [x] `['campaign', campagnaId]`;
+  - [x] `['session', campagnaId]`;
+  - [x] `['combat', sessioneId]`;
+  - [x] `['character', personaggioId]`;
+  - [x] `['homebrew', userId]`;
+  - [x] `['runtimeData', bundleKey]`.
 - [ ] Convertire fetching a query/mutation, iniziando da:
   - [ ] lista campagne;
   - [ ] dettaglio campagna;
@@ -163,11 +163,11 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [ ] `queryClient.invalidateQueries(...)`;
   - [ ] `queryClient.setQueryData(...)` per update ottimistici;
   - [ ] `queryClient.cancelQueries(...)` prima di mutation sensibili.
-- [ ] Configurare stale/cache time per dominio:
-  - [ ] campagne: medio;
-  - [ ] scheda personaggio: breve ma con optimistic update;
-  - [ ] combattimento: breve/realtime-driven;
-  - [ ] compendio/static data: lungo.
+- [x] Configurare stale/cache time per dominio:
+  - [x] campagne: medio;
+  - [x] scheda personaggio: breve ma con optimistic update;
+  - [x] combattimento: breve/realtime-driven;
+  - [x] compendio/static data: lungo.
 - [ ] Rimuovere progressivamente `_appRefreshRunning`, `_appRefreshQueued` e refresh globali quando non piu' necessari.
 
 Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX`; deve invalidare query mirate.

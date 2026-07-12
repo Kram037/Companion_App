@@ -2,6 +2,9 @@
   "name": "companion-app-workspace",
   "private": true,
   "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "zod": "^4.4.3"
   },
   "scripts": {
