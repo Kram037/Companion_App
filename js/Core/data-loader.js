@@ -75,7 +75,7 @@ function ensureContentLocalization() {
         }
 
         const script = document.createElement('script');
-        script.src = `${src}?v=20260712A`;
+        script.src = `${src}?v=20260712B`;
         script.async = true;
         script.dataset.contentLocalization = 'true';
         script.onload = finish;
