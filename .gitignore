@@ -23,6 +23,8 @@ npm-debug.log*
 node_modules/
 dist/
 .nx/
+test-results/
+playwright-report/
 
 # Python cache
 __pycache__/
