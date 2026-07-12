@@ -69,7 +69,7 @@ Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi mod
 - [x] Aggiungere Vite in modalita' compatibile.
 - [x] Creare entry dedicata:
   - [x] `src/main.ts` o `src/main.tsx`;
-  - [ ] bootstrap progressivo che convive con gli script legacy.
+  - [x] bootstrap progressivo che convive con gli script legacy.
 - [ ] Valutare due modalita' temporanee:
   - [x] mantenere `index.html` root-based;
   - [ ] oppure creare `index.vite.html` per sperimentazione.
