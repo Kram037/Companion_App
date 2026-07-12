@@ -29,6 +29,28 @@
         ['Â ', ' '], ['Â', ''],
     ];
 
+    // Casi in cui l'accento e' gia' stato perso ed e' rimasto un "?" dentro
+    // una parola italiana. La mappa e' volutamente chiusa: non tocchiamo i
+    // punti interrogativi reali, correggiamo solo parole note del lessico app.
+    const QUESTION_MARK_WORD_REPAIRS = new Map(Object.entries({
+        abilita: 'abilità', agilita: 'agilità', affinita: 'affinità', ambiguita: 'ambiguità',
+        attivita: 'attività', capacita: 'capacità', citta: 'città', comunita: 'comunità',
+        creativita: 'creatività', difficolta: 'difficoltà', divinita: 'divinità',
+        entita: 'entità', eredita: 'eredità', eta: 'età', facolta: 'facoltà',
+        fedelta: 'fedeltà', identita: 'identità', immunita: 'immunità', intensita: 'intensità',
+        lealta: 'lealtà', liberta: 'libertà', localita: 'località', longevita: 'longevità',
+        maesta: 'maestà', meta: 'metà', modalita: 'modalità', negativita: 'negatività',
+        opportunita: 'opportunità', possibilita: 'possibilità', proprieta: 'proprietà',
+        qualita: 'qualità', quantita: 'quantità', rarita: 'rarità', realta: 'realtà',
+        reperibilita: 'reperibilità', sanita: 'sanità', specialita: 'specialità',
+        utilita: 'utilità', velocita: 'velocità', verita: 'verità', vitalita: 'vitalità',
+        volonta: 'volontà', vulnerabilita: 'vulnerabilità',
+        affinche: 'affinché', anziche: 'anziché', benche: 'benché', finche: 'finché',
+        perche: 'perché', poiche: 'poiché', sicche: 'sicché',
+        cio: 'ciò', gia: 'già', giu: 'giù', piu: 'più', puo: 'può', quaggiu: 'quaggiù',
+        quassu: 'quassù', cosi: 'così', li: 'lì', la: 'là', si: 'sì', se: 'sé', ne: 'né',
+    }));
+
     const ITALIAN_TYPOGRAPHY_REPLACEMENTS = [
         [/\babilita(?:'|’)?\b/gi, 'abilità'],
         [/\bimmunita(?:'|’)?\b/gi, 'immunità'],
@@ -277,12 +299,29 @@
         }
     }
 
+    function _preserveWordCase(original, repaired) {
+        if (!original) return repaired;
+        if (original === original.toUpperCase()) return repaired.toUpperCase();
+        if (original[0] === original[0].toUpperCase()) return repaired[0].toUpperCase() + repaired.slice(1);
+        return repaired;
+    }
+
+    function repairSuspiciousQuestionMarks(value) {
+        if (value == null) return value;
+        return String(value).replace(/\b([A-Za-zÀ-ÖØ-öø-ÿ]{2,})\?(?=\b|[\s.,;:!\)\]\}\"'»]|$)/g, (match, word) => {
+            const key = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const repaired = QUESTION_MARK_WORD_REPAIRS.get(key);
+            return repaired ? _preserveWordCase(word, repaired) : match;
+        });
+    }
+
     function repairTextEncoding(value) {
         if (value == null) return value;
         let text = String(value);
         MOJIBAKE_REPLACEMENTS.forEach(([bad, good]) => {
             if (text.includes(bad)) text = text.split(bad).join(good);
         });
+        text = repairSuspiciousQuestionMarks(text);
         return text
             .replace(/\u00a0/g, ' ')
             .replace(/[ \t]+\n/g, '\n')
@@ -479,6 +518,7 @@
     }
 
     window.repairTextEncoding = repairTextEncoding;
+    window.repairSuspiciousQuestionMarks = repairSuspiciousQuestionMarks;
     window.normalizeItalianTypography = normalizeItalianTypography;
     window.translateSpellComponents = translateSpellComponents;
     window.translateStatblockText = translateStatblockText;
