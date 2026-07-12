@@ -7,10 +7,13 @@
     "build": "node tools/nx-run.mjs companion-app:build",
     "check": "node tools/nx-run.mjs companion-app:check",
     "typecheck": "tsc --noEmit",
+    "vite:dev": "vite",
+    "vite:build": "vite build",
     "audit": "npm audit"
   },
   "devDependencies": {
     "nx": "^23.0.1",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4"
   }
 }

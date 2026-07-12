@@ -66,19 +66,19 @@ Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi mod
 
 ## Fase 2 - Vite come runtime moderno
 
-- [ ] Aggiungere Vite in modalita' compatibile.
-- [ ] Creare entry dedicata:
-  - [ ] `src/main.ts` o `src/main.tsx`;
+- [x] Aggiungere Vite in modalita' compatibile.
+- [x] Creare entry dedicata:
+  - [x] `src/main.ts` o `src/main.tsx`;
   - [ ] bootstrap progressivo che convive con gli script legacy.
 - [ ] Valutare due modalita' temporanee:
-  - [ ] mantenere `index.html` root-based;
+  - [x] mantenere `index.html` root-based;
   - [ ] oppure creare `index.vite.html` per sperimentazione.
-- [ ] Configurare alias:
-  - [ ] `@core`;
-  - [ ] `@features`;
-  - [ ] `@api`;
-  - [ ] `@types`;
-  - [ ] `@components`.
+- [x] Configurare alias:
+  - [x] `@core`;
+  - [x] `@features`;
+  - [x] `@api`;
+  - [x] `@types`;
+  - [x] `@components`.
 - [ ] Portare il build Nx a chiamare Vite quando la compatibilita' e' pronta.
 - [ ] Garantire compatibilita' service worker/PWA:
   - [ ] asset versionati;

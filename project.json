@@ -17,6 +17,19 @@
         "command": "node tools/build-static.mjs dist/apps/companion-app"
       }
     },
+    "vite-serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run vite:dev"
+      }
+    },
+    "vite-build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/vite/companion-app"],
+      "options": {
+        "command": "npm run vite:build"
+      }
+    },
     "check": {
       "executor": "nx:run-commands",
       "options": {
