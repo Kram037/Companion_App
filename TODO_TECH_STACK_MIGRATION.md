@@ -349,6 +349,7 @@ Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 
 ## Fase 12 - Pulizia legacy post-migrazione
 
+- [x] Aggiungere guardia sui nuovi componenti React per evitare `innerHTML` e accessi Supabase diretti.
 - [ ] Rimuovere gradualmente globali `window.*` sostituiti.
 - [ ] Ridurre `AppState` fino a eliminarlo o mantenerlo come compatibility layer minimo.
 - [ ] Rimuovere render manuali `innerHTML` dalle pagine migrate.
