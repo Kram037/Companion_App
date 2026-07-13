@@ -242,6 +242,8 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
+    const data = event.notification.data || {};
+    const targetUrl = data.url || notificationRoute(data);
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
@@ -259,8 +261,18 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow(event.notification.data?.url || './index.html');
+                return clients.openWindow(targetUrl);
             }
         })
     );
 });
+
+function notificationRoute(data) {
+    if (data?.campagnaId && data?.sessioneId) {
+        return `./campagne/${data.campagnaId}/sessione/${data.sessioneId}/combattimento`;
+    }
+    if (data?.campagnaId) {
+        return `./campagne/${data.campagnaId}`;
+    }
+    return './index.html';
+}

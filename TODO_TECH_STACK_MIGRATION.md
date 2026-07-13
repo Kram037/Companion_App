@@ -247,7 +247,7 @@ Criterio di uscita: `AppState` legacy puo' iniziare a essere svuotato e sostitui
 - [x] Creare bridge temporaneo tra `navigateToPage` legacy e router React.
 - [ ] Sostituire gradualmente `sessionStorage currentPage/currentCampagnaId/currentSessioneId` con URL params.
 - [x] Gestire deep link e refresh pagina.
-- [ ] Mantenere compatibilita' PWA notification click.
+- [x] Mantenere compatibilita' PWA notification click.
 
 Criterio di uscita: le pagine React usano URL reali, non stato globale manuale.
 
