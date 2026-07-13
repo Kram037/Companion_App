@@ -156,9 +156,9 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [x] `['runtimeData', bundleKey]`.
 - [ ] Convertire fetching a query/mutation, iniziando da:
   - [x] lista campagne;
-  - [ ] dettaglio campagna;
-  - [ ] sessione;
-  - [ ] combattimento.
+  - [x] dettaglio campagna;
+  - [x] sessione;
+  - [x] combattimento.
 - [ ] Sostituire refresh diretti con invalidazioni:
   - [ ] `queryClient.invalidateQueries(...)`;
   - [ ] `queryClient.setQueryData(...)` per update ottimistici;
