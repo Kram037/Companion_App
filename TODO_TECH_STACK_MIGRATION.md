@@ -92,7 +92,7 @@ Criterio di uscita: Vite serve/builda l'app senza rompere i flussi legacy.
 ## Fase 3 - Service layer Supabase
 
 - [x] Creare `src/api/supabaseClient.ts`.
-- [ ] Rimuovere accessi Supabase diretti dai nuovi componenti.
+- [x] Rimuovere accessi Supabase diretti dai nuovi componenti.
 - [ ] Creare API per dominio:
   - [x] `campaignsApi.ts`;
   - [x] `charactersApi.ts`;
@@ -184,10 +184,10 @@ Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX
   - [x] combattimento;
   - [x] richieste tiro;
   - [x] notifiche transitorie.
-- [ ] Stabilire regole:
-  - [ ] Postgres changes per dati persistenti;
-  - [ ] Broadcast per eventi transitori;
-  - [ ] Presence solo se servira' vedere utenti online/in sessione.
+- [x] Stabilire regole:
+  - [x] Postgres changes per dati persistenti;
+  - [x] Broadcast per eventi transitori;
+  - [x] Presence solo se servira' vedere utenti online/in sessione.
 - [x] Ogni evento realtime deve produrre una delle seguenti azioni:
   - [x] invalidate query mirata;
   - [x] patch cache con `setQueryData`;
@@ -198,7 +198,7 @@ Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX
   - [x] timestamp evento;
   - [x] chiave evento `table:action:id`;
   - [x] finestra anti-duplicato di pochi secondi.
-- [ ] Evitare doppio evento `postgres_changes + broadcast` per la stessa azione, oppure deduplicarlo esplicitamente.
+- [x] Evitare doppio evento `postgres_changes + broadcast` per la stessa azione, oppure deduplicarlo esplicitamente.
 
 Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render concorrenti.
 
