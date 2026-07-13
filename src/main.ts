@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-window.CompanionReactPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento']);
+window.CompanionReactPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento', 'personaggi']);
 
 window.CompanionViteBootstrap = {
   loadedAt: new Date().toISOString(),

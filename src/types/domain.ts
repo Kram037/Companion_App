@@ -63,6 +63,10 @@ export interface Personaggio {
   classi?: ClassePersonaggio[] | null;
   razza?: string | null;
   background?: string | null;
+  classe?: string | null;
+  tipo_scheda?: string | null;
+  sottorazza?: string | null;
+  campagne?: string[];
   bonus_manuali?: JsonRecord | null;
   updated_at?: ISODateString | null;
 }

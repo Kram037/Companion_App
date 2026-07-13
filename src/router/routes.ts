@@ -6,6 +6,7 @@ export const appRoutes = {
   sessione: '/campagne/:campagnaId/sessione',
   combattimento: '/campagne/:campagnaId/sessione/:sessioneId/combattimento',
   personaggi: '/personaggi',
+  personaggioCreate: '/personaggi/nuovo',
   personaggio: '/personaggi/:personaggioId',
   compendio: '/compendio',
   laboratorio: '/laboratorio',

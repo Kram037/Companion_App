@@ -9,6 +9,7 @@ describe('legacy router bridge', () => {
     expect(pathFromLegacyNavigation({ page: 'combattimento', campagnaId: 'c1', sessioneId: 's1' }))
       .toBe('/campagne/c1/sessione/s1/combattimento');
     expect(pathFromLegacyNavigation({ page: 'scheda', personaggioId: 'p1' })).toBe('/personaggi/p1');
+    expect(pathFromLegacyNavigation({ page: 'personaggioCreate' })).toBe('/personaggi/nuovo');
   });
 
   it('falls back when required legacy ids are missing', () => {
@@ -23,5 +24,6 @@ describe('legacy router bridge', () => {
       sessioneId: 's1',
     });
     expect(legacyNavigationFromPath('/personaggi/p1')).toEqual({ page: 'scheda', personaggioId: 'p1' });
+    expect(legacyNavigationFromPath('/personaggi/nuovo')).toEqual({ page: 'personaggioCreate' });
   });
 });

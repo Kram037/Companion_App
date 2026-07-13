@@ -15,6 +15,7 @@ const legacyRouteByPage: Record<string, AppRouteId> = {
   sessione: 'sessione',
   combattimento: 'combattimento',
   personaggi: 'personaggi',
+  personaggioCreate: 'personaggioCreate',
   scheda: 'personaggio',
   compendio: 'compendio',
   laboratorio: 'laboratorio',
@@ -41,6 +42,7 @@ export function legacyNavigationFromPath(pathname: string): LegacyNavigationSnap
     ['combattimento', appRoutes.combattimento],
     ['sessione', appRoutes.sessione],
     ['campagnaDetails', appRoutes.campagnaDetails],
+    ['personaggioCreate', appRoutes.personaggioCreate],
     ['personaggio', appRoutes.personaggio],
     ['personaggi', appRoutes.personaggi],
     ['compendio', appRoutes.compendio],
@@ -54,6 +56,7 @@ export function legacyNavigationFromPath(pathname: string): LegacyNavigationSnap
     if (!match) continue;
 
     if (route === 'campagnaDetails') return { page: 'dettagli', campagnaId: match.params.campagnaId };
+    if (route === 'personaggioCreate') return { page: 'personaggioCreate' };
     if (route === 'personaggio') return { page: 'scheda', personaggioId: match.params.personaggioId };
 
     return {

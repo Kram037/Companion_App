@@ -10,6 +10,7 @@ describe('app routes', () => {
       sessione: '/campagne/:campagnaId/sessione',
       combattimento: '/campagne/:campagnaId/sessione/:sessioneId/combattimento',
       personaggi: '/personaggi',
+      personaggioCreate: '/personaggi/nuovo',
       personaggio: '/personaggi/:personaggioId',
       compendio: '/compendio',
       laboratorio: '/laboratorio',
@@ -22,6 +23,7 @@ describe('app routes', () => {
     expect(buildAppPath('combattimento', { campagnaId: 'abc', sessioneId: 's1' }))
       .toBe('/campagne/abc/sessione/s1/combattimento');
     expect(buildAppPath('personaggio', { personaggioId: 'p1' })).toBe('/personaggi/p1');
+    expect(buildAppPath('personaggioCreate')).toBe('/personaggi/nuovo');
   });
 
   it('detects the GitHub Pages repository basename', () => {

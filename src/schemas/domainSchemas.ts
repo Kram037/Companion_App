@@ -75,6 +75,10 @@ export const characterSchema = z.object({
   classi: z.array(characterClassSchema).nullish(),
   razza: z.string().nullish(),
   background: z.string().nullish(),
+  classe: z.string().nullish(),
+  tipo_scheda: z.string().nullish(),
+  sottorazza: z.string().nullish(),
+  campagne: z.array(z.string()).optional(),
   bonus_manuali: jsonRecordSchema.nullish(),
   updated_at: z.string().nullish(),
 }).passthrough();

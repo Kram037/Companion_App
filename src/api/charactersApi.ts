@@ -19,6 +19,26 @@ export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> 
     .eq('user_id', userId)
     .order('nome');
   throwIfSupabaseError(error);
-  return parseArray(characterSchema, data);
+  const characters = parseArray(characterSchema, data);
+  if (!characters.length) return characters;
+
+  const client = getSupabaseClient();
+  const { data: associations, error: associationError } = await client
+    .from('personaggi_campagna')
+    .select('personaggio_id,campagna_id')
+    .in('personaggio_id', characters.map(character => character.id));
+  throwIfSupabaseError(associationError);
+  const campaignIds = [...new Set((associations ?? []).map((row: Record<string, unknown>) => String(row.campagna_id)))];
+  if (!campaignIds.length) return characters.map(character => ({ ...character, campagne: [] }));
+  const { data: campaigns, error: campaignsError } = await client.from('campagne').select('id,nome_campagna').in('id', campaignIds);
+  throwIfSupabaseError(campaignsError);
+  const nameById = new Map<string, string>((campaigns ?? []).map((row: Record<string, unknown>) => [String(row.id), String(row.nome_campagna)]));
+  const namesByCharacter = new Map<string, string[]>();
+  (associations ?? []).forEach((row: Record<string, unknown>) => {
+    const characterId = String(row.personaggio_id);
+    const name = nameById.get(String(row.campagna_id));
+    if (name) namesByCharacter.set(characterId, [...(namesByCharacter.get(characterId) ?? []), name]);
+  });
+  return characters.map(character => ({ ...character, campagne: namesByCharacter.get(character.id) ?? [] }));
 }
 
