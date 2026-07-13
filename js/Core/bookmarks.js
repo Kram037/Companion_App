@@ -5,13 +5,13 @@
 const BOOKMARKS_VERSION = 1;
 const BOOKMARKS_MAX = 24;
 const DESKTOP_LAYOUT_QUERY = '(min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px)';
+const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 let _bookmarkRefreshTimer = null;
 let _bookmarkAutoUpdateTimer = null;
-let _bookmarkRestoreInProgress = false;
+let _bookmarkRestoreInProgress = _bookmarkIsSplitPaneInstance;
 let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
     { key: 'armi', label: 'Armi, Armature e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
     { key: 'avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
@@ -591,9 +591,32 @@ function _bookmarkEnsureSplitPane() {
     return pane;
 }
 
+function _bookmarkSplitSource(item) {
+    if (!item || item.id !== _bookmarkGetActiveId() || !_bookmarkIsWritablePage()) return item;
+    const live = _bookmarkCurrentSnapshot(item.id);
+    const hook = live.state?.hook || {};
+    if (['laboratorio', 'compendio'].includes(live.page) && (hook.view !== 'sub' || !hook.tab)) {
+        return {
+            ...live,
+            title: 'Campagne',
+            section: 'Campagne',
+            page: 'campagne',
+            state: { page: 'campagne', scrollTop: 0, hook: {} },
+        };
+    }
+    const source = {
+        ...item,
+        ...live,
+        id: item.id,
+        pane: _bookmarkItemPane(item),
+        createdAt: item.createdAt,
+    };
+    _bookmarksWrite(_bookmarksRead().map(tab => tab.id === item.id ? source : tab));
+    return source;
+}
+
 function openBookmarkSplitPane(id) {
-    captureActiveBookmark({ silent: true });
-    const item = _bookmarksRead().find(tab => tab.id === id);
+    const item = _bookmarkSplitSource(_bookmarksRead().find(tab => tab.id === id));
     if (!item) return;
     if (!document.getElementById('desktopSplitPane')) {
         _bookmarkRemovePaneItems('right');
@@ -613,7 +636,6 @@ function openBookmarkSplitPane(id) {
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: splitTab.id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
-    setTimeout(postOpen, 220);
     _bookmarkRightPaneState = {
         page: splitTab.state?.page || splitTab.page || '',
         tab: splitTab.state?.hook?.tab || '',
@@ -686,7 +708,6 @@ function _bookmarkRestorePersistedSplitPane() {
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: active.id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
-    setTimeout(postOpen, 260);
     _bookmarkSetFocusedPane('left');
 }
 
@@ -792,8 +813,8 @@ function _bookmarkTabMacroIcon(page) {
             : page;
     if (macroPage === 'campagne') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CAMPAIGNS_ICON}</span>`;
     if (macroPage === 'personaggi') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CHARACTERS_ICON}</span>`;
-    if (macroPage === 'laboratorio') return '<img class="desktop-bookmark-tab-icon" src="images/Toolbar/Laboratorio.svg" alt="">';
-    if (macroPage === 'compendio') return '<img class="desktop-bookmark-tab-icon" src="images/Toolbar/Compendio.svg" alt="">';
+    if (macroPage === 'laboratorio') return '<span class="desktop-bookmark-tab-icon desktop-bookmark-tab-icon-mask icon-laboratorio" aria-hidden="true"></span>';
+    if (macroPage === 'compendio') return '<span class="desktop-bookmark-tab-icon desktop-bookmark-tab-icon-mask icon-compendio" aria-hidden="true"></span>';
     return '';
 }
 
@@ -858,15 +879,16 @@ function _bookmarkEnsureDesktopChrome() {
         document.body.appendChild(sidebar);
     }
 
-    if (!document.getElementById('desktopBookmarkTabs')) {
-        const rail = document.createElement('div');
+    let rail = document.getElementById('desktopBookmarkTabs');
+    if (!rail) {
+        rail = document.createElement('div');
         rail.id = 'desktopBookmarkTabs';
         rail.className = 'desktop-bookmark-tabs';
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
-        _bookmarkBindTabRailWheel(rail);
-        _bookmarkBindTabRailDrag(rail);
     }
+    _bookmarkBindTabRailWheel(rail);
+    _bookmarkBindTabRailDrag(rail);
     if (!window._bookmarkDesktopPaneFocusBound) {
         window._bookmarkDesktopPaneFocusBound = true;
         document.getElementById('mainContent')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left', { render: false }), true);
@@ -876,14 +898,16 @@ function _bookmarkEnsureDesktopChrome() {
 }
 
 function _bookmarkEnsureSplitInstanceChrome() {
-    if (document.getElementById('desktopBookmarkTabs')) return;
-    const rail = document.createElement('div');
-    rail.id = 'desktopBookmarkTabs';
-    rail.className = 'desktop-bookmark-tabs desktop-bookmark-tabs-split';
-    rail.setAttribute('aria-label', 'Schede aperte');
-    const main = document.getElementById('mainContent');
-    if (main) main.insertAdjacentElement('beforebegin', rail);
-    else document.body.appendChild(rail);
+    let rail = document.getElementById('desktopBookmarkTabs');
+    if (!rail) {
+        rail = document.createElement('div');
+        rail.id = 'desktopBookmarkTabs';
+        rail.className = 'desktop-bookmark-tabs desktop-bookmark-tabs-split';
+        rail.setAttribute('aria-label', 'Schede aperte');
+        const main = document.getElementById('mainContent');
+        if (main) main.insertAdjacentElement('beforebegin', rail);
+        else document.body.appendChild(rail);
+    }
     _bookmarkBindTabRailWheel(rail);
     _bookmarkBindTabRailDrag(rail);
 }
@@ -912,7 +936,6 @@ function _bookmarkBindTabRailDrag(rail) {
             event.preventDefault();
             return;
         }
-        captureActiveBookmark({ silent: true });
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', tab.dataset.bookmarkId || '');
         tab.classList.add('dragging');

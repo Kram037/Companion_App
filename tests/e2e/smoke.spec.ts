@@ -57,7 +57,11 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   await expect(compendium.locator('.desktop-sidebar-grandchild[data-section="gemme"]')).toHaveClass(/active/);
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Equipaggiamento');
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-section')).toHaveText('Gemme');
-  await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-icon')).toBeVisible();
+  const activeTab = page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active');
+  await expect(activeTab).toHaveAttribute('draggable', 'true');
+  const tabIcon = activeTab.locator('.desktop-bookmark-tab-icon');
+  await expect(tabIcon).toBeVisible();
+  await expect.poll(() => tabIcon.evaluate((icon) => getComputedStyle(icon).maskImage !== 'none')).toBe(true);
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#compendioSubTitle')).toHaveText('Gemme');
@@ -71,9 +75,14 @@ test('moves tabs between panes and closes an empty source pane', async ({ page }
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
 
   await page.evaluate(() => (window as typeof window & { createBookmarkTab: () => void }).createBookmarkTab());
-  await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab')).toHaveCount(2);
+  const leftTabs = page.locator('#desktopBookmarkTabs .desktop-bookmark-tab');
+  await expect(leftTabs).toHaveCount(2);
 
-  const firstId = await page.locator('#desktopBookmarkTabs .desktop-bookmark-tab').first().getAttribute('data-bookmark-id');
+  const secondId = await leftTabs.nth(1).getAttribute('data-bookmark-id');
+  await leftTabs.nth(1).dragTo(leftTabs.nth(0));
+  await expect(leftTabs.first()).toHaveAttribute('data-bookmark-id', secondId!);
+
+  const firstId = await leftTabs.first().getAttribute('data-bookmark-id');
   await page.evaluate((id) => (window as typeof window & { _bookmarkMoveTab: (bookmarkId: string, pane: string) => Promise<void> })._bookmarkMoveTab(id!, 'right'), firstId);
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab')).toHaveCount(1);
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab')).toHaveCount(2);
