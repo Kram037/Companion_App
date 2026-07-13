@@ -80,10 +80,10 @@ Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi mod
   - [x] `@app-types` (al posto di `@types`, riservato da TypeScript);
   - [x] `@components`.
 - [x] Portare il build Nx a chiamare Vite quando la compatibilita' e' pronta.
-- [ ] Garantire compatibilita' service worker/PWA:
-  - [ ] asset versionati;
-  - [ ] cache dei runtime data bundle;
-  - [ ] nessun reload automatico durante uso attivo.
+- [x] Garantire compatibilita' service worker/PWA:
+  - [x] asset versionati;
+  - [x] cache dei runtime data bundle;
+  - [x] nessun reload automatico durante uso attivo.
 
 Criterio di uscita: Vite serve/builda l'app senza rompere i flussi legacy.
 
