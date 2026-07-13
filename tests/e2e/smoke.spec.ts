@@ -19,5 +19,5 @@ test('manifest does not lock tablet orientation', async ({ request }) => {
   const response = await request.get('/manifest.json');
   expect(response.ok()).toBe(true);
   const manifest = await response.json();
-  expect(manifest.orientation).not.toBe('portrait');
+  expect(manifest).not.toHaveProperty('orientation');
 });
