@@ -307,10 +307,10 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
   - [x] calcoli modificatori D&D;
   - [x] bonus competenza;
   - [x] Factotum;
-  - [ ] PF max/temporanei;
+  - [x] PF max/temporanei;
   - [x] ordinamento iniziativa;
   - [x] normalizzazione URL immagini;
-  - [ ] filtri campagne;
+  - [x] filtri campagne;
   - [ ] mapper Supabase -> dominio;
   - [x] schema Zod.
 - [x] Aggiungere test per query key builder e invalidazioni realtime.

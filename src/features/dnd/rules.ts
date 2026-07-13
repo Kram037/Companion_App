@@ -39,6 +39,14 @@ export function cumulativeHpFromHitDice(rolls: readonly number[], constitutionMo
   });
 }
 
+export function effectiveMaxHp(baseMaxHp: number, temporaryMaxBonus = 0) {
+  return Math.max(1, Math.trunc(baseMaxHp) || 1) + Math.max(0, Math.trunc(temporaryMaxBonus) || 0);
+}
+
+export function clampCurrentHp(currentHp: number, maxHp: number) {
+  return Math.max(0, Math.min(Math.trunc(currentHp) || 0, Math.max(1, Math.trunc(maxHp) || 1)));
+}
+
 function numericLevel(value: number | string | null | undefined) {
   return Math.max(0, Math.trunc(Number(value)) || 0);
 }

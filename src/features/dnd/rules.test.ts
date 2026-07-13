@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { abilityModifier, cumulativeHpFromHitDice, jackOfAllTradesBonus, proficiencyBonus, totalCharacterLevel } from './rules';
+import {
+  abilityModifier,
+  clampCurrentHp,
+  cumulativeHpFromHitDice,
+  effectiveMaxHp,
+  jackOfAllTradesBonus,
+  proficiencyBonus,
+  totalCharacterLevel,
+} from './rules';
 
 describe('D&D rules', () => {
   it('calculates ability modifiers', () => {
@@ -31,5 +39,12 @@ describe('D&D rules', () => {
 
   it('rebuilds HP history with current constitution modifier', () => {
     expect(cumulativeHpFromHitDice([10, 4, 9], 3)).toEqual([13, 20, 32]);
+  });
+
+  it('calculates effective max HP and clamps current HP', () => {
+    expect(effectiveMaxHp(32, 5)).toBe(37);
+    expect(effectiveMaxHp(0, -5)).toBe(1);
+    expect(clampCurrentHp(50, 37)).toBe(37);
+    expect(clampCurrentHp(-3, 37)).toBe(0);
   });
 });
