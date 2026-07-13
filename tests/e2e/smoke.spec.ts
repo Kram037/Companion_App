@@ -64,6 +64,9 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   await expect.poll(() => tabIcon.evaluate((icon) => getComputedStyle(icon).maskImage !== 'none')).toBe(true);
   const originalTabId = await activeTab.getAttribute('data-bookmark-id');
 
+  await page.evaluate(() => (window as typeof window & { navigateToPage: (page: string) => Promise<void> }).navigateToPage('compendio'));
+  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
   await expect(page.locator(`#desktopBookmarkTabs [data-bookmark-id="${originalTabId}"] .desktop-bookmark-tab-title`)).toHaveText('Equipaggiamento');

@@ -173,7 +173,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         stopCampagnaDetailsRealtime();
     }
     
-    const desktopGroupTab = !skipPageLoad && typeof getDesktopDefaultGroupTab === 'function'
+    const desktopGroupTab = !skipPageLoad && previousPage !== pageName && typeof getDesktopDefaultGroupTab === 'function'
         ? getDesktopDefaultGroupTab(pageName)
         : '';
 
