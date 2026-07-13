@@ -565,7 +565,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         border: 1px solid var(--border);
         border-bottom-color: transparent;
         border-radius: 12px 12px 0 0;
-        padding: 4px 30px 4px 12px;
+        padding: 4px 30px 4px 38px;
         background: linear-gradient(180deg, var(--surface), rgba(255, 255, 255, 0.02));
         color: var(--text-secondary);
         display: grid;
@@ -864,7 +864,7 @@ body.bookmark-split-instance .desktop-bookmark-tab {
     height: 34px;
     display: grid;
     align-content: center;
-    padding: 4px 30px 4px 12px;
+    padding: 4px 30px 4px 38px;
     border: 1px solid var(--border);
     border-bottom-color: transparent;
     border-radius: 12px 12px 0 0;
@@ -990,4 +990,57 @@ body.bookmark-split-instance .scheda-tab-bar {
 
 body.bookmark-split-instance .btn-scroll-stats {
     bottom: 18px;
+}
+
+.desktop-bookmark-tab-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.desktop-bookmark-tab-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+img.desktop-bookmark-tab-icon {
+    filter: invert(55%) sepia(8%) saturate(330%) hue-rotate(345deg) brightness(90%) contrast(88%);
+}
+
+.desktop-bookmark-tab.active img.desktop-bookmark-tab-icon,
+.desktop-bookmark-tab:hover img.desktop-bookmark-tab-icon {
+    filter: invert(78%) sepia(47%) saturate(606%) hue-rotate(358deg) brightness(91%) contrast(89%);
+}
+
+.desktop-bookmark-tab.dragging {
+    opacity: 0.45;
+}
+
+.desktop-bookmark-tab.drop-before::before,
+.desktop-bookmark-tab.drop-after::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--fantasy-gold-strong, var(--accent));
+    box-shadow: 0 0 6px rgba(198, 154, 74, 0.45);
+}
+
+.desktop-bookmark-tab.drop-before::before {
+    left: -2px;
+}
+
+.desktop-bookmark-tab.drop-after::after {
+    right: -2px;
 }

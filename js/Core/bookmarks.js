@@ -439,6 +439,9 @@ function captureActiveBookmark({ silent = true } = {}) {
 
     const old = list[idx];
     const snap = _bookmarkCurrentSnapshot(old.id);
+    const chromeChanged = old.title !== snap.title
+        || old.section !== snap.section
+        || old.page !== snap.page;
     list[idx] = {
         ...old,
         ...snap,
@@ -451,7 +454,7 @@ function captureActiveBookmark({ silent = true } = {}) {
     };
     _bookmarksWrite(list);
     if (!silent) showNotification?.('Scheda aggiornata');
-    updateBookmarkChrome();
+    if (chromeChanged) updateBookmarkChrome();
 }
 
 function scheduleActiveBookmarkCapture(delay = 160) {
@@ -460,7 +463,7 @@ function scheduleActiveBookmarkCapture(delay = 160) {
 }
 
 function createBookmarkTab() {
-    _bookmarkFocusCurrentPane();
+    _bookmarkFocusCurrentPane({ render: false });
     captureActiveBookmark({ silent: true });
     const snap = _bookmarkCurrentSnapshot();
     delete snap.autoDesktop;
@@ -511,7 +514,7 @@ function removeBookmark(id) {
 async function openBookmark(id) {
     const item = _bookmarksRead().find(b => b.id === id);
     if (!item) return;
-    _bookmarkFocusCurrentPane();
+    _bookmarkFocusCurrentPane({ render: false });
     captureActiveBookmark({ silent: true });
     closeBookmarksSheet();
     _bookmarkRestoreInProgress = true;
@@ -620,11 +623,8 @@ function openBookmarkSplitPane(id) {
 }
 
 function closeBookmarkSplitPane() {
-    document.getElementById('desktopSplitPane')?.remove();
     _bookmarkRemovePaneItems('right');
-    localStorage.removeItem(_bookmarksActiveRightKey());
-    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-    document.body.classList.remove('desktop-split-active');
+    _bookmarkCloseSplitShell();
     _bookmarkSetFocusedPane('left');
 }
 
@@ -772,13 +772,29 @@ function _bookmarkBindSheetDrag(overlay) {
     sheet.addEventListener('pointercancel', end);
 }
 
+const DESKTOP_CAMPAIGNS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+const DESKTOP_CHARACTERS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+
 function _desktopNavItems() {
     return [
-        { type: 'link', page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
-        { type: 'link', page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { type: 'link', page: 'campagne', label: 'Campagne', icon: DESKTOP_CAMPAIGNS_ICON },
+        { type: 'link', page: 'personaggi', label: 'Personaggi', icon: DESKTOP_CHARACTERS_ICON },
         { type: 'group', page: 'laboratorio', label: 'Laboratorio', iconSrc: 'images/Toolbar/Laboratorio.svg', children: _desktopGroupChildren('laboratorio') },
         { type: 'group', page: 'compendio', label: 'Compendio', iconSrc: 'images/Toolbar/Compendio.svg', children: _desktopGroupChildren('compendio') },
     ];
+}
+
+function _bookmarkTabMacroIcon(page) {
+    const macroPage = ['dettagli', 'sessione', 'combattimento'].includes(page)
+        ? 'campagne'
+        : ['personaggioCreate', 'scheda', 'amici'].includes(page)
+            ? 'personaggi'
+            : page;
+    if (macroPage === 'campagne') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CAMPAIGNS_ICON}</span>`;
+    if (macroPage === 'personaggi') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CHARACTERS_ICON}</span>`;
+    if (macroPage === 'laboratorio') return '<img class="desktop-bookmark-tab-icon" src="images/Toolbar/Laboratorio.svg" alt="">';
+    if (macroPage === 'compendio') return '<img class="desktop-bookmark-tab-icon" src="images/Toolbar/Compendio.svg" alt="">';
+    return '';
 }
 
 function _desktopSidebarItemIcon(item) {
@@ -849,6 +865,7 @@ function _bookmarkEnsureDesktopChrome() {
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
         _bookmarkBindTabRailWheel(rail);
+        _bookmarkBindTabRailDrag(rail);
     }
     if (!window._bookmarkDesktopPaneFocusBound) {
         window._bookmarkDesktopPaneFocusBound = true;
@@ -868,6 +885,7 @@ function _bookmarkEnsureSplitInstanceChrome() {
     if (main) main.insertAdjacentElement('beforebegin', rail);
     else document.body.appendChild(rail);
     _bookmarkBindTabRailWheel(rail);
+    _bookmarkBindTabRailDrag(rail);
 }
 
 function _bookmarkBindTabRailWheel(rail) {
@@ -878,6 +896,152 @@ function _bookmarkBindTabRailWheel(rail) {
         rail.scrollLeft += event.deltaY;
         event.preventDefault();
     }, { passive: false });
+}
+
+function _bookmarkClearDropIndicators(rail) {
+    rail?.classList.remove('drag-over');
+    rail?.querySelectorAll('.drop-before, .drop-after').forEach(tab => tab.classList.remove('drop-before', 'drop-after'));
+}
+
+function _bookmarkBindTabRailDrag(rail) {
+    if (!rail || rail._bookmarkDragBound) return;
+    rail._bookmarkDragBound = true;
+    rail.addEventListener('dragstart', (event) => {
+        const tab = event.target.closest('.desktop-bookmark-tab');
+        if (!tab || event.target.closest('.desktop-bookmark-tab-close')) {
+            event.preventDefault();
+            return;
+        }
+        captureActiveBookmark({ silent: true });
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', tab.dataset.bookmarkId || '');
+        tab.classList.add('dragging');
+    });
+    rail.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        _bookmarkClearDropIndicators(rail);
+        rail.classList.add('drag-over');
+        const tab = event.target.closest('.desktop-bookmark-tab');
+        if (!tab) return;
+        tab.classList.add(event.clientX <= tab.getBoundingClientRect().left + (tab.offsetWidth / 2) ? 'drop-before' : 'drop-after');
+    });
+    rail.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const id = event.dataTransfer.getData('text/plain');
+        const target = event.target.closest('.desktop-bookmark-tab');
+        let beforeId = '';
+        if (target) {
+            const after = event.clientX > target.getBoundingClientRect().left + (target.offsetWidth / 2);
+            beforeId = after
+                ? (target.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? target.nextElementSibling.dataset.bookmarkId : '')
+                : (target.dataset.bookmarkId || '');
+        }
+        _bookmarkClearDropIndicators(rail);
+        if (id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
+    });
+    rail.addEventListener('dragend', () => {
+        rail.querySelector('.desktop-bookmark-tab.dragging')?.classList.remove('dragging');
+        _bookmarkClearDropIndicators(rail);
+    });
+}
+
+function _bookmarkRequestTabMove(id, targetPane, beforeId = '') {
+    if (_bookmarkIsSplitPaneInstance) {
+        window.parent?.postMessage({
+            type: 'companion-move-bookmark',
+            bookmarkId: id,
+            targetPane,
+            beforeId,
+        }, window.location.origin);
+        return;
+    }
+    _bookmarkMoveTab(id, targetPane, beforeId);
+}
+
+function _bookmarkRenderAllRails() {
+    renderDesktopBookmarkTabs();
+    try {
+        _bookmarkSplitFrameWindow()?.renderDesktopBookmarkTabs?.();
+    } catch (_) { /* iframe in navigazione */ }
+}
+
+function _bookmarkCloseSplitShell() {
+    document.getElementById('desktopSplitPane')?.remove();
+    localStorage.removeItem(_bookmarksActiveRightKey());
+    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
+    document.body.classList.remove('desktop-split-active');
+}
+
+async function _bookmarkMoveTab(id, targetPane, beforeId = '') {
+    if (!['left', 'right'].includes(targetPane) || beforeId === id) return;
+    let list = _bookmarksRead();
+    let moving = list.find(item => item.id === id);
+    if (!moving) return;
+    const sourcePane = _bookmarkItemPane(moving);
+    if (targetPane === 'right' && !_bookmarkSplitFrameWindow()) return;
+
+    if (sourcePane === 'left') captureActiveBookmark({ silent: true });
+    else {
+        try { _bookmarkSplitFrameWindow()?.captureActiveBookmark?.({ silent: true }); } catch (_) { /* iframe in navigazione */ }
+    }
+    list = _bookmarksRead();
+    moving = list.find(item => item.id === id);
+    if (!moving) return;
+
+    const without = list.filter(item => item.id !== id);
+    const moved = { ...moving, pane: targetPane, autoDesktop: false, userCreated: true, updatedAt: _bookmarkNow() };
+    let insertAt = beforeId
+        ? without.findIndex(item => item.id === beforeId && _bookmarkItemPane(item) === targetPane)
+        : -1;
+    if (insertAt < 0) {
+        insertAt = without.length;
+        for (let i = without.length - 1; i >= 0; i -= 1) {
+            if (_bookmarkItemPane(without[i]) === targetPane) {
+                insertAt = i + 1;
+                break;
+            }
+        }
+    }
+    without.splice(insertAt, 0, moved);
+    _bookmarksWrite(without);
+
+    if (sourcePane === targetPane) {
+        _bookmarkRenderAllRails();
+        return;
+    }
+
+    const sourceItems = without.filter(item => _bookmarkItemPane(item) === sourcePane);
+    const sourceActiveId = sourcePane === 'right'
+        ? (localStorage.getItem(_bookmarksActiveRightKey()) || '')
+        : _bookmarkGetActiveId();
+    const sourceWasActive = sourceActiveId === id;
+
+    if (sourcePane === 'left') {
+        if (!sourceItems.length) {
+            _bookmarksWrite(without.map(item => _bookmarkItemPane(item) === 'right' ? { ...item, pane: 'left' } : item));
+            _bookmarkCloseSplitShell();
+            _bookmarkSetActiveId(id);
+            _bookmarkSetFocusedPane('left', { render: false });
+            updateBookmarkChrome();
+            return;
+        }
+        if (sourceWasActive) await openBookmark(sourceItems[0].id);
+        const frameWindow = _bookmarkSplitFrameWindow();
+        if (frameWindow?.openBookmark) await frameWindow.openBookmark(id);
+        else frameWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: id }, window.location.origin);
+        _bookmarkSetFocusedPane('right');
+        return;
+    }
+
+    const frameWindow = _bookmarkSplitFrameWindow();
+    if (sourceWasActive && sourceItems.length) await frameWindow?.openBookmark?.(sourceItems[0].id);
+    if (!sourceItems.length) {
+        _bookmarkCloseSplitShell();
+        _bookmarkSetFocusedPane('left', { render: false });
+    }
+    await openBookmark(id);
+    _bookmarkSetFocusedPane('left');
 }
 
 function _bookmarkPostCurrentPaneState() {
@@ -1034,7 +1198,8 @@ function renderDesktopBookmarkTabs() {
     const paneFocused = _bookmarkIsCurrentPaneFocused();
     const splitOpen = !_bookmarkIsSplitPaneInstance && !!document.getElementById('desktopSplitPane');
     const tabsHtml = list.map(item => `
-        <button type="button" class="desktop-bookmark-tab ${paneFocused && item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
+        <button type="button" class="desktop-bookmark-tab ${paneFocused && item.id === activeId ? 'active' : ''}" data-bookmark-id="${item.id}" draggable="true" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
+            ${_bookmarkTabMacroIcon(item.state?.page || item.page)}
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
@@ -1133,6 +1298,8 @@ function initBookmarks() {
             updateDesktopSidebarActive();
         } else if (event.data?.type === 'companion-close-empty-split-pane') {
             closeBookmarkSplitPane();
+        } else if (event.data?.type === 'companion-move-bookmark' && event.data.bookmarkId) {
+            _bookmarkMoveTab(event.data.bookmarkId, event.data.targetPane || 'left', event.data.beforeId || '');
         }
     });
     if (!window._bookmarksInteractionRefreshBound) {
