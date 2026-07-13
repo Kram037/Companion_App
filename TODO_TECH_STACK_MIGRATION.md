@@ -308,7 +308,7 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
   - [x] bonus competenza;
   - [x] Factotum;
   - [ ] PF max/temporanei;
-  - [ ] ordinamento iniziativa;
+  - [x] ordinamento iniziativa;
   - [x] normalizzazione URL immagini;
   - [ ] filtri campagne;
   - [ ] mapper Supabase -> dominio;
