@@ -14,7 +14,7 @@ const types = {
   '.webp': 'image/webp',
 };
 
-createServer((req, res) => {
+const server = createServer((req, res) => {
   const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const relative = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
   const file = resolve(join(root, relative));
@@ -40,3 +40,11 @@ createServer((req, res) => {
 }).listen(port, () => {
   console.log(`Companion App: http://127.0.0.1:${port}/`);
 });
+
+function shutdown() {
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 500).unref();
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

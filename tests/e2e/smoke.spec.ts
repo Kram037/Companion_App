@@ -14,3 +14,10 @@ test('uses desktop chrome on tablet landscape', async ({ page }) => {
   await expect(page.locator('#desktopSidebarNav')).toBeVisible();
   await expect(page.locator('.bottom-toolbar')).toBeHidden();
 });
+
+test('manifest does not lock tablet orientation', async ({ request }) => {
+  const response = await request.get('/manifest.json');
+  expect(response.ok()).toBe(true);
+  const manifest = await response.json();
+  expect(manifest.orientation).not.toBe('portrait');
+});
