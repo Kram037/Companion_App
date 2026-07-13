@@ -8,6 +8,15 @@ let _labClassiSubTab = 'classi';
 // Sub-tab solo per la categoria "nemici": 'nemici' (default) | 'combattimenti'.
 let _labNemiciSubTab = 'nemici';
 let _labTalentiStiliSubTab = 'talenti';
+let _labReactState = null;
+
+function _labReactOwnsPage() {
+    return window.CompanionReactPages?.has('laboratorio') && document.body.dataset.reactPage === 'laboratorio';
+}
+
+function _labNotifyReactRefresh() {
+    if (_labReactOwnsPage()) window.dispatchEvent(new CustomEvent('companion:laboratory-refresh'));
+}
 
 const LAB_HUB_ORDER = [
     'razze',
@@ -124,6 +133,7 @@ window.labGetSidebarItems = function() {
 };
 
 window.labGetCurrentSidebarTab = function() {
+    if (_labReactState?.view === 'sub') return _labReactState.tab || '';
     const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
     return subVisible ? _labCurrentTab : '';
 };
@@ -143,6 +153,7 @@ function _labActiveCategory() {
 // ============================================================================
 
 function labRenderHub() {
+    if (_labReactOwnsPage()) return;
     const grid = document.getElementById('labHubGrid');
     if (!grid) return;
     grid.style.display = 'flex';
@@ -170,9 +181,13 @@ function labRenderHub() {
 }
 
 window.labOpenCategory = function(tab) {
-    _labCurrentTab = tab;
     const cat = LAB_CATEGORIES[tab];
     if (!cat) return;
+    if (_labReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab } }));
+        return;
+    }
+    _labCurrentTab = tab;
 
     const hub = document.getElementById('labHub');
     const sub = document.getElementById('labSubPage');
@@ -203,6 +218,10 @@ function _labSyncAddButton() {
 }
 
 window.labBackToHub = function() {
+    if (_labReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'hub' } }));
+        return;
+    }
     const desktopTab = window.getDesktopDefaultGroupTab?.('laboratorio');
     if (desktopTab) {
         labOpenCategory(_labCurrentTab || desktopTab);
@@ -223,6 +242,24 @@ window.labOpenSettings = function() {
 };
 
 window.labGetBookmarkState = function() {
+    if (_labReactState) {
+        const tab = _labReactState.tab || 'razze';
+        const active = _labReactState.subtab || tab;
+        const cat = LAB_CATEGORIES[tab];
+        return {
+            title: _labReactState.view === 'hub' ? 'Laboratorio' : (cat?.labelPlural || cat?.label || 'Laboratorio'),
+            section: ['Laboratorio', _labReactState.view === 'sub' ? (LAB_CATEGORIES[active]?.labelPlural || LAB_CATEGORIES[active]?.label || active) : ''].filter(Boolean).join(' > '),
+            key: _labReactState.view === 'hub' ? 'hub' : `${tab}:${active}`,
+            state: {
+                view: _labReactState.view,
+                tab,
+                classiSubTab: _labClassiSubTab,
+                nemiciSubTab: _labNemiciSubTab,
+                talentiStiliSubTab: _labTalentiStiliSubTab,
+                listState: JSON.parse(JSON.stringify(window._labListState || {})),
+            },
+        };
+    }
     const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
     const active = _labActiveTab();
     const cat = _labActiveCategory();
@@ -252,6 +289,11 @@ window.labRestoreBookmarkState = async function(saved) {
     if (data.nemiciSubTab) _labNemiciSubTab = data.nemiciSubTab;
     if (data.talentiStiliSubTab) _labTalentiStiliSubTab = data.talentiStiliSubTab;
     if (data.listState) window._labListState = { ...window._labListState, ...data.listState };
+    if (_labReactOwnsPage()) {
+        const subtab = data.tab === 'classi' ? data.classiSubTab : data.tab === 'nemici' ? data.nemiciSubTab : data.tab === 'talenti' ? data.talentiStiliSubTab : data.tab;
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: data.view || 'hub', tab: data.tab || 'razze', subtab, state: data } }));
+        return;
+    }
     if (data.view === 'sub' && LAB_CATEGORIES[data.tab]) {
         await labOpenCategory(data.tab);
     } else {
@@ -267,6 +309,10 @@ function _labScrollToTop() {
 }
 
 async function loadLabContent() {
+    if (_labReactOwnsPage()) {
+        _labNotifyReactRefresh();
+        return;
+    }
     const container = document.getElementById('labContent');
     if (!container) return;
 
@@ -637,6 +683,10 @@ function _labRenderHomebrewListWithFilters(container, cat, data, tab, options = 
 }
 
 function _labListReRenderList(tab) {
+    if (_labReactOwnsPage()) {
+        _labNotifyReactRefresh();
+        return;
+    }
     const data = window._labListAllData[tab] || [];
     const state = _labListGetState(tab);
     const filtered = _labListApplyFilters(tab, data, state);
@@ -848,6 +898,10 @@ async function _loadLabClassiSection() {
 
 window.labClassiSetSubTab = function(sub) {
     _labClassiSubTab = sub === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    if (_labReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: 'classi', subtab: _labClassiSubTab } }));
+        return;
+    }
     loadLabContent();
 };
 
@@ -903,6 +957,10 @@ async function _loadLabTalentiStiliSection() {
 
 window.labTalentiStiliSetSubTab = function(sub) {
     _labTalentiStiliSubTab = sub === 'stili' ? 'stili' : 'talenti';
+    if (_labReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: 'talenti', subtab: _labTalentiStiliSubTab } }));
+        return;
+    }
     loadLabContent();
 };
 
@@ -933,6 +991,10 @@ function _labRenderCombatCard(item) {
 
 window.labNemiciSetSubTab = function(sub) {
     _labNemiciSubTab = (sub === 'combattimenti') ? 'combattimenti' : 'nemici';
+    if (_labReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: 'nemici', subtab: _labNemiciSubTab } }));
+        return;
+    }
     loadLabContent();
 };
 
@@ -4825,4 +4887,51 @@ window._labImportSave = async function() {
     if (typeof cat.cacheReload === 'function') {
         try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
     }
+};
+
+// React owns the page shell and lists; the mature legacy editors remain
+// available through this narrow bridge until their forms are migrated.
+window.getLaboratorioReactConfig = function() {
+    return LAB_HUB_ORDER.map(key => ({
+        key,
+        label: LAB_CATEGORIES[key].labelPlural || LAB_CATEGORIES[key].label,
+        iconFile: LAB_CATEGORIES[key].iconFile,
+    }));
+};
+
+window.setLaboratorioReactState = function(state) {
+    _labReactState = state || null;
+    if (!state) return;
+    _labCurrentTab = state.tab || 'razze';
+    if (state.tab === 'classi') _labClassiSubTab = state.subtab === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    if (state.tab === 'talenti') _labTalentiStiliSubTab = state.subtab === 'stili' ? 'stili' : 'talenti';
+    if (state.tab === 'nemici') _labNemiciSubTab = state.subtab === 'combattimenti' ? 'combattimenti' : 'nemici';
+};
+
+window.getLaboratorioReactList = function(tab, items, search) {
+    const rows = Array.isArray(items) ? items : [];
+    const state = _labListGetState(tab);
+    state.search = search || '';
+    window._labListAllData[tab] = rows;
+    return {
+        items: _labListApplyFilters(tab, rows, state),
+        activeFilters: _labListActiveFiltersCount(tab),
+        hasFilters: _labListGetFilterDefs(tab).length > 0,
+    };
+};
+
+window.getLaboratorioReactCardDetail = function(item, tab) {
+    return labGetCardDetail(item, tab);
+};
+
+window.openLaboratorioReactEditor = function(tab, activeTab, item) {
+    _labCurrentTab = tab || activeTab || 'razze';
+    if (_labCurrentTab === 'classi') _labClassiSubTab = activeTab === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    if (_labCurrentTab === 'talenti') _labTalentiStiliSubTab = activeTab === 'stili' ? 'stili' : 'talenti';
+    if (_labCurrentTab === 'nemici') _labNemiciSubTab = activeTab === 'combattimenti' ? 'combattimenti' : 'nemici';
+    if (activeTab === 'nemici' && item?.id) {
+        labViewNemico(item.id);
+        return;
+    }
+    openHomebrewModal(item);
 };

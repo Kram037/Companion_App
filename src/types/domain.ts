@@ -13,6 +13,12 @@ export interface UserProfile {
   displayName?: string | null;
   avatarUrl?: string | null;
   email?: string | null;
+  homebrew_settings?: HomebrewSettings | null;
+}
+
+export interface HomebrewSettings {
+  enabled: boolean;
+  amici_abilitati: Id[];
 }
 
 export interface Campagna {
@@ -147,6 +153,7 @@ export interface CombatSnapshot {
 }
 
 export interface HomebrewItem {
+  [key: string]: unknown;
   id: Id;
   user_id?: Id | null;
   tipo?: string | null;

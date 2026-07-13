@@ -290,10 +290,10 @@ Ordine consigliato:
   - [x] tabs;
   - [x] ricerca;
   - [x] lazy data bundle.
-- [ ] `LaboratoryPage`:
-  - [ ] homebrew list;
-  - [ ] editor;
-  - [ ] settings condivisione.
+- [x] `LaboratoryPage`:
+  - [x] homebrew list;
+  - [x] editor;
+  - [x] settings condivisione.
 
 Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per render principale.
 
@@ -395,7 +395,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 
 - [x] Scheda personaggio in React.
 - [x] Compendio in React.
-- [ ] Laboratorio in React.
+- [x] Laboratorio in React.
 - [ ] Legacy cleanup.
 
 ---

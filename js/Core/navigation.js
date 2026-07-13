@@ -167,12 +167,12 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
     }
     
     // Ferma Realtime subscription combattimento se si esce dalla pagina
-    if (pageName !== 'combattimento') {
+    if (pageName !== 'combattimento' && typeof stopCombattimentoRealtime === 'function') {
         stopCombattimentoRealtime();
     }
     
     // Ferma Realtime subscription dettagli campagna se si esce dalla pagina
-    if (pageName !== 'dettagli') {
+    if (pageName !== 'dettagli' && typeof stopCampagnaDetailsRealtime === 'function') {
         stopCampagnaDetailsRealtime();
     }
     

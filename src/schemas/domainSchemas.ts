@@ -22,6 +22,10 @@ export const userProfileSchema = z.object({
   displayName: z.string().nullish(),
   avatarUrl: z.string().nullish(),
   email: z.string().nullish(),
+  homebrew_settings: z.object({
+    enabled: z.boolean().default(true),
+    amici_abilitati: z.array(z.string()).default([]),
+  }).nullish(),
 }).passthrough();
 
 export const campaignSchema = z.object({

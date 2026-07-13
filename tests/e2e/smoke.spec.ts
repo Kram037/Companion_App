@@ -76,6 +76,22 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Campagne');
 });
 
+test('opens laboratory categories directly from the desktop sidebar', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const laboratory = page.locator('.desktop-sidebar-group[data-page="laboratorio"]');
+  await laboratory.locator('.desktop-sidebar-group-toggle').click();
+  await laboratory.locator('.desktop-sidebar-child[data-tab="incantesimi"]').click();
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'laboratorio');
+  await expect(page.locator('.react-laboratory-page .page-header h1')).toHaveText('Incantesimi');
+  await expect(laboratory.locator('.desktop-sidebar-child[data-tab="incantesimi"]')).toHaveClass(/active/);
+
+  await page.evaluate(() => (window as typeof window & { navigateToPage: (page: string) => Promise<void> }).navigateToPage('laboratorio'));
+  await expect(page.locator('.react-laboratory-page .page-header h1')).toHaveText('Incantesimi');
+});
+
 test('moves tabs between panes and closes an empty source pane', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
@@ -87,7 +103,7 @@ test('moves tabs between panes and closes an empty source pane', async ({ page }
   await expect(leftTabs).toHaveCount(2);
 
   const secondId = await leftTabs.nth(1).getAttribute('data-bookmark-id');
-  await leftTabs.nth(1).dragTo(leftTabs.nth(0));
+  await leftTabs.nth(1).dragTo(leftTabs.nth(0), { targetPosition: { x: 2, y: 20 } });
   await expect(leftTabs.first()).toHaveAttribute('data-bookmark-id', secondId!);
 
   const firstId = await leftTabs.first().getAttribute('data-bookmark-id');

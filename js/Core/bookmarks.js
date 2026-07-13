@@ -1062,6 +1062,14 @@ function _bookmarkPostCurrentPaneState() {
 
 async function _openDesktopSidebarTarget(page, tab = '', section = '') {
     if (page === 'laboratorio') {
+        if (window.CompanionReactPages?.has('laboratorio')) {
+            const changingPage = AppState.currentPage !== 'laboratorio';
+            if (changingPage) window.__pendingLaboratorioTarget = { tab };
+            if (changingPage) await navigateToPage('laboratorio');
+            window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: tab || 'razze' } }));
+            if (!changingPage) delete window.__pendingLaboratorioTarget;
+            return;
+        }
         if (AppState.currentPage !== 'laboratorio') await navigateToPage('laboratorio');
         if (tab) window.labOpenCategory?.(tab);
         scheduleActiveBookmarkCapture?.(0);

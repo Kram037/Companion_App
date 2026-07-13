@@ -48,6 +48,36 @@ body[data-react-page="compendio"] .main-content {
   min-height: 0;
 }
 
+body[data-react-page="laboratorio"] .main-content {
+  padding-bottom: 0;
+}
+
+.react-laboratory-hub {
+  display: flex;
+  flex-direction: column;
+  height: calc(100svh - 64px - 72px - 3rem);
+  overflow: hidden;
+}
+
+.react-laboratory-hub .lab-hub-grid {
+  width: 100%;
+}
+
+.react-laboratory-tools {
+  margin: 0;
+  padding: 8px var(--spacing-sm);
+}
+
+.react-laboratory-content {
+  min-height: 0;
+  padding-bottom: 88px;
+}
+
+.react-laboratory-page .lab-card-icon img {
+  width: 24px;
+  height: 24px;
+}
+
 body[data-react-page="combattimento"] .react-page-shell {
   display: flex;
   height: 100%;
