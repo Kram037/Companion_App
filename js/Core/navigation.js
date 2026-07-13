@@ -119,29 +119,33 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
 
     AppState.currentPage = pageName;
     
-    // Salva la pagina corrente nel sessionStorage
-    sessionStorage.setItem('currentPage', pageName);
+    const persistSessionState = new URLSearchParams(window.location.search).get('splitPane') !== '1';
+
+    // L'iframe della split view condivide sessionStorage con la view principale.
+    if (persistSessionState) sessionStorage.setItem('currentPage', pageName);
     
     // Salva currentCampagnaId e currentSessioneId solo per pagine che lo richiedono
     if (pageName === 'dettagli' || pageName === 'sessione' || pageName === 'combattimento') {
-        if (AppState.currentCampagnaId) {
+        if (persistSessionState && AppState.currentCampagnaId) {
             sessionStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
         }
         if (pageName === 'combattimento' && AppState.currentSessioneId) {
-            sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
+            if (persistSessionState) sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
         } else {
-            sessionStorage.removeItem('currentSessioneId');
+            if (persistSessionState) sessionStorage.removeItem('currentSessioneId');
             AppState.currentSessioneId = null;
         }
     } else if (pageName === 'scheda') {
-        if (AppState.currentPersonaggioId) {
+        if (persistSessionState && AppState.currentPersonaggioId) {
             sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
         }
     } else {
         if (pageName === 'campagne' || pageName === 'amici' || pageName === 'compendio' || pageName === 'personaggi' || pageName === 'laboratorio') {
-            sessionStorage.removeItem('currentCampagnaId');
-            sessionStorage.removeItem('currentSessioneId');
-            sessionStorage.removeItem('currentPersonaggioId');
+            if (persistSessionState) {
+                sessionStorage.removeItem('currentCampagnaId');
+                sessionStorage.removeItem('currentSessioneId');
+                sessionStorage.removeItem('currentPersonaggioId');
+            }
             AppState.currentCampagnaId = null;
             AppState.currentSessioneId = null;
             AppState.currentPersonaggioId = null;

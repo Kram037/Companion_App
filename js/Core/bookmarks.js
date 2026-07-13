@@ -525,12 +525,14 @@ async function openBookmark(id) {
     AppState.currentSessioneId = st.sessioneId || null;
     AppState.currentPersonaggioId = st.personaggioId || null;
 
-    if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
-    else sessionStorage.removeItem('currentCampagnaId');
-    if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
-    else sessionStorage.removeItem('currentSessioneId');
-    if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
-    else sessionStorage.removeItem('currentPersonaggioId');
+    if (!_bookmarkIsSplitPaneInstance) {
+        if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
+        else sessionStorage.removeItem('currentCampagnaId');
+        if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
+        else sessionStorage.removeItem('currentSessioneId');
+        if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
+        else sessionStorage.removeItem('currentPersonaggioId');
+    }
 
     const targetPage = st.page || item.page || 'campagne';
     const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});
@@ -564,13 +566,7 @@ function _bookmarkSplitIconSvg() {
 }
 
 function openActiveBookmarkSplitPane() {
-    const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
-    let id = _bookmarkGetActiveId();
-    if (!id && list[0]) {
-        id = list[0].id;
-        _bookmarkSetActiveId(id);
-    }
-    if (id) openBookmarkSplitPane(id);
+    openBookmarkSplitPane();
 }
 
 function _bookmarkEnsureSplitPane() {
@@ -591,55 +587,42 @@ function _bookmarkEnsureSplitPane() {
     return pane;
 }
 
-function _bookmarkSplitSource(item) {
-    if (!item || item.id !== _bookmarkGetActiveId() || !_bookmarkIsWritablePage()) return item;
-    const live = _bookmarkCurrentSnapshot(item.id);
-    const hook = live.state?.hook || {};
-    if (['laboratorio', 'compendio'].includes(live.page) && (hook.view !== 'sub' || !hook.tab)) {
-        return {
-            ...live,
-            title: 'Campagne',
-            section: 'Campagne',
-            page: 'campagne',
-            state: { page: 'campagne', scrollTop: 0, hook: {} },
-        };
-    }
-    const source = {
-        ...item,
-        ...live,
-        id: item.id,
-        pane: _bookmarkItemPane(item),
-        createdAt: item.createdAt,
-    };
-    _bookmarksWrite(_bookmarksRead().map(tab => tab.id === item.id ? source : tab));
-    return source;
-}
-
-function openBookmarkSplitPane(id) {
-    const item = _bookmarkSplitSource(_bookmarksRead().find(tab => tab.id === id));
-    if (!item) return;
+function openBookmarkSplitPane() {
     if (!document.getElementById('desktopSplitPane')) {
         _bookmarkRemovePaneItems('right');
     }
+    const now = _bookmarkNow();
     const splitTab = {
-        ...item,
         id: `bm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         pane: 'right',
-        createdAt: _bookmarkNow(),
-        updatedAt: _bookmarkNow(),
+        fingerprint: 'campagne||||',
+        title: 'Campagne',
+        section: 'Campagne',
+        page: 'campagne',
+        state: {
+            page: 'campagne',
+            campagnaId: null,
+            sessioneId: null,
+            personaggioId: null,
+            scrollTop: 0,
+            hook: {},
+        },
+        userCreated: true,
+        createdAt: now,
+        updatedAt: now,
     };
     _bookmarksWrite([splitTab, ..._bookmarksRead()]);
     localStorage.setItem(_bookmarksActiveRightKey(), splitTab.id);
     const pane = _bookmarkEnsureSplitPane();
     const title = pane.querySelector('#desktopSplitPaneTitle');
-    if (title) title.textContent = item.title || 'Scheda affiancata';
+    if (title) title.textContent = splitTab.title;
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: splitTab.id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
     _bookmarkRightPaneState = {
-        page: splitTab.state?.page || splitTab.page || '',
-        tab: splitTab.state?.hook?.tab || '',
-        section: splitTab.state?.hook?.tabState?.equipmentSection || '',
+        page: 'campagne',
+        tab: '',
+        section: '',
     };
     _bookmarkSetFocusedPane('right');
 }

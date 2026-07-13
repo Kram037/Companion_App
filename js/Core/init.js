@@ -19,6 +19,7 @@ async function registerBaseServiceWorker() {
 }
 
 async function init() {
+    const isSplitPane = new URLSearchParams(window.location.search).get('splitPane') === '1';
     // Initialize DOM elements
     elements = {
         userBtn: document.getElementById('userBtn'),
@@ -169,33 +170,33 @@ async function init() {
     }
     
     // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');
+    const savedCampagnaId = isSplitPane ? null : sessionStorage.getItem('currentCampagnaId');
     if (savedCampagnaId) {
         AppState.currentCampagnaId = savedCampagnaId;
         appDebug('Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
     }
     
     // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedSessioneId = sessionStorage.getItem('currentSessioneId');
+    const savedSessioneId = isSplitPane ? null : sessionStorage.getItem('currentSessioneId');
     if (savedSessioneId) {
         AppState.currentSessioneId = savedSessioneId;
         appDebug('Sessione salvata ripristinata dalla sessione:', savedSessioneId);
     }
     
-    const savedPersonaggioId = sessionStorage.getItem('currentPersonaggioId');
+    const savedPersonaggioId = isSplitPane ? null : sessionStorage.getItem('currentPersonaggioId');
     if (savedPersonaggioId) {
         AppState.currentPersonaggioId = savedPersonaggioId;
         appDebug('Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
     }
 
     // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedPage = sessionStorage.getItem('currentPage');
+    const savedPage = isSplitPane ? null : sessionStorage.getItem('currentPage');
     if (savedPage) {
         AppState.currentPage = savedPage;
         appDebug('Pagina salvata ripristinata dalla sessione:', savedPage);
     }
 
-    const savedActiveSession = sessionStorage.getItem('activeSessionCampagnaId');
+    const savedActiveSession = isSplitPane ? null : sessionStorage.getItem('activeSessionCampagnaId');
     if (savedActiveSession) {
         AppState.activeSessionCampagnaId = savedActiveSession;
     }
@@ -244,10 +245,11 @@ async function init() {
     });
 
     // Replace current history entry with initial state
-    history.replaceState({ page: AppState.currentPage || 'campagne' }, '', null);
+    const initialPage = isSplitPane ? 'campagne' : (AppState.currentPage || 'campagne');
+    history.replaceState({ page: initialPage }, '', null);
 
     appDebug('Navigazione alla pagina iniziale...');
-    navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
+    navigateToPage(initialPage, { pushHistory: false, skipPageLoad: isSplitPane });
     if (typeof restoreInitialDesktopBookmark === 'function') {
         restoreInitialDesktopBookmark();
     }

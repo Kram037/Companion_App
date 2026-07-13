@@ -62,10 +62,13 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   const tabIcon = activeTab.locator('.desktop-bookmark-tab-icon');
   await expect(tabIcon).toBeVisible();
   await expect.poll(() => tabIcon.evaluate((icon) => getComputedStyle(icon).maskImage !== 'none')).toBe(true);
+  const originalTabId = await activeTab.getAttribute('data-bookmark-id');
 
   await page.locator('.desktop-bookmark-split-tab').click();
-  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#compendioSubTitle')).toHaveText('Gemme');
-  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#compendioHub')).toBeHidden();
+  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+  await expect(page.locator(`#desktopBookmarkTabs [data-bookmark-id="${originalTabId}"] .desktop-bookmark-tab-title`)).toHaveText('Equipaggiamento');
+  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#campagnePage')).toHaveClass(/active/);
+  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Campagne');
 });
 
 test('moves tabs between panes and closes an empty source pane', async ({ page }) => {
