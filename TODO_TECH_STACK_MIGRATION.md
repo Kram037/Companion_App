@@ -356,7 +356,7 @@ Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 - [ ] Rimuovere guardie temporanee se non piu' necessarie.
 - [ ] Eliminare script legacy non importati da Vite.
 - [ ] Consolidare service worker con output build Vite.
-- [ ] Aggiornare documentazione architetturale.
+- [x] Aggiornare documentazione architetturale.
 
 Criterio di uscita: React, query, router e store governano l'app; il legacy resta solo dove non ancora migrato.
 
