@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
-import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import {
@@ -24,7 +23,6 @@ declare global {
 export function SessionPage() {
   const { campagnaId = '' } = useParams();
   const navigate = useNavigate();
-  const client = useQueryClient();
   const campaign = useQuery(campaignByIdQuery(campagnaId));
   const session = useQuery(activeSessionByCampaignQuery(campagnaId));
   const characters = useQuery(campaignCharactersQuery(campagnaId));
@@ -40,19 +38,6 @@ export function SessionPage() {
     sessionStorage.setItem('currentCampagnaId', campagnaId);
     if (session.data?.id) sessionStorage.setItem('currentSessioneId', session.data.id);
   }, [campagnaId, session.data?.id]);
-
-  useEffect(() => {
-    const refresh = (event: Event) => {
-      const detail = (event as CustomEvent<{ campagnaId?: string; sessioneId?: string }>).detail;
-      if (detail?.campagnaId && detail.campagnaId !== campagnaId) return;
-      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
-      client.invalidateQueries({ queryKey: queryKeys.campaign(campagnaId) });
-      client.invalidateQueries({ queryKey: queryKeys.campaignCharacters(campagnaId) });
-      if (session.data?.id) client.invalidateQueries({ queryKey: queryKeys.initiativeRequests(session.data.id) });
-    };
-    window.addEventListener('companion:data-changed', refresh);
-    return () => window.removeEventListener('companion:data-changed', refresh);
-  }, [campagnaId, client, session.data?.id]);
 
   useEffect(() => () => {
     const legacy = window as Window & { tiroGenericoPollingInterval?: number | null };

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyRealtimeAction,
+  realtimeQueryPrefixes,
   realtimeEventKey,
   setRealtimeNotifyHandler,
   shouldProcessRealtimeEvent,
@@ -28,5 +29,13 @@ describe('realtimeClient', () => {
     setRealtimeNotifyHandler(null);
 
     expect(messages).toEqual(['Nuovo evento']);
+  });
+
+  it('maps realtime tables to targeted query prefixes', () => {
+    expect(realtimeQueryPrefixes({ table: 'sessioni', action: 'update' })).toEqual([
+      ['session'], ['campaign'], ['campaigns'], ['combat'],
+    ]);
+    expect(realtimeQueryPrefixes({ table: 'homebrew_oggetti', action: 'insert' })).toEqual([['homebrew']]);
+    expect(realtimeQueryPrefixes({ table: 'unknown', action: 'update' })).toEqual([]);
   });
 });

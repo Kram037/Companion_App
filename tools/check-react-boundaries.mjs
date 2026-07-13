@@ -32,6 +32,14 @@ for (const file of files) {
   }
 }
 
+const realtime = readFileSync('js/Core/realtime.js', 'utf8');
+if (/_appRefresh(?:Running|Queued)|refreshCurrentPageData|scheduleAppEventsRefresh/.test(realtime)) {
+  errors.push('js/Core/realtime.js: refresh globale legacy non consentito');
+}
+if (/\b(?:renderCombattimentoContent|renderSessioneContent|renderSchedaPersonaggio|loadCampagnaDetails|loadCampagne)\s*\(/.test(realtime)) {
+  errors.push('js/Core/realtime.js: realtime deve invalidare query, non renderizzare pagine');
+}
+
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);

@@ -88,10 +88,8 @@ export function CombatPage() {
       if (detail?.sessioneId && detail.sessioneId !== sessioneId) return;
       client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
     };
-    window.addEventListener('companion:data-changed', refresh);
     window.addEventListener('companion:combat-refresh', refresh);
     return () => {
-      window.removeEventListener('companion:data-changed', refresh);
       window.removeEventListener('companion:combat-refresh', refresh);
     };
   }, [campagnaId, client, sessioneId]);

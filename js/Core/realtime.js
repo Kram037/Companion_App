@@ -3,7 +3,6 @@
 // ============================================================
 
 let appEventsChannel = null;
-let appEventsRefreshTimeout = null;
 
 /**
  * Avvia Realtime subscription per le nuove sessioni
@@ -123,10 +122,9 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                 const combattimentoPage = document.getElementById('combattimentoPage');
                 if (combattimentoPage && combattimentoPage.classList.contains('active')) {
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
-                        if (typeof window.ensureRuntimeScript === 'function') {
-                            await window.ensureRuntimeScript('combattimento');
-                        }
-                        await renderCombattimentoContent(campagnaId, sessioneId);
+                        window.dispatchEvent(new CustomEvent('companion:data-changed', {
+                            detail: { table: 'richieste_tiro_iniziativa', action: 'update', campagnaId, sessioneId }
+                        }));
                     }
                 }
             }
@@ -148,10 +146,9 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
                     if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
                         appDebug('✅ [REALTIME] Ricarico contenuto combattimento');
                         // Ricarica il contenuto del combattimento
-                        if (typeof window.ensureRuntimeScript === 'function') {
-                            await window.ensureRuntimeScript('combattimento');
-                        }
-                        await renderCombattimentoContent(campagnaId, sessioneId);
+                        window.dispatchEvent(new CustomEvent('companion:data-changed', {
+                            detail: { table: 'richieste_tiro_iniziativa', action: payload.eventType || 'update', campagnaId, sessioneId }
+                        }));
                     }
                 }
             }
@@ -267,7 +264,9 @@ function startCampagnaDetailsRealtime(campagnaId) {
                         if (AppState.currentCampagnaId === campagnaId) {
                             appDebug('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
-                            await loadCampagnaDetails(campagnaId);
+                            window.dispatchEvent(new CustomEvent('companion:data-changed', {
+                                detail: { table: 'sessioni', action: 'insert', campagnaId, sessioneId: payload.new.id }
+                            }));
                         }
                     }
                 }
@@ -292,7 +291,9 @@ function startCampagnaDetailsRealtime(campagnaId) {
                         if (AppState.currentCampagnaId === campagnaId) {
                             appDebug('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
                             // Ricarica i dettagli della campagna per aggiornare il bottone
-                            await loadCampagnaDetails(campagnaId);
+                            window.dispatchEvent(new CustomEvent('companion:data-changed', {
+                                detail: { table: 'sessioni', action: 'update', campagnaId, sessioneId: payload.new.id }
+                            }));
                         }
                     }
                 }
@@ -379,8 +380,7 @@ function startAppEventsRealtime() {
                     closeRollRequestModal();
                     if (AppState.currentPage === 'combattimento' && data.campagnaId) {
                         showNotification('Il combattimento è terminato');
-                        navigateToPage('sessione');
-                        renderSessioneContent(data.campagnaId);
+                        await navigateToPage('sessione');
                     }
                 }
 
@@ -425,19 +425,13 @@ function startAppEventsRealtime() {
                         if (AppState.currentPage === 'sessione') {
                             stopSessioneTimer();
                             showNotification('La sessione è terminata');
-                            navigateToPage('dettagli');
-                            loadCampagnaDetails(data.campagnaId);
+                            await navigateToPage('dettagli');
                         }
                     }
                 }
 
-                const skipRefreshTables = [
-                    'richieste_tiro_iniziativa',
-                    'richieste_tiro_generico'
-                ];
-                const needsRefresh = !skipRefreshTables.includes(data.table);
-                if (needsRefresh) {
-                    scheduleAppEventsRefresh();
+                if (data.table === 'richieste_amicizia' && AppState.currentPage === 'amici') {
+                    await loadAmici({ silent: true });
                 }
             }
         )
@@ -467,87 +461,6 @@ function stopAppEventsRealtime() {
         appDebug('✅ Realtime subscription globale app fermata');
     }
 
-    if (appEventsRefreshTimeout) {
-        clearTimeout(appEventsRefreshTimeout);
-        appEventsRefreshTimeout = null;
-    }
-}
-
-let _appRefreshRunning = false;
-let _appRefreshQueued = false;
-
-function scheduleAppEventsRefresh() {
-    if (appEventsRefreshTimeout) {
-        clearTimeout(appEventsRefreshTimeout);
-    }
-    if (_appRefreshRunning) {
-        _appRefreshQueued = true;
-        return;
-    }
-    appEventsRefreshTimeout = setTimeout(() => {
-        refreshCurrentPageData();
-    }, 800);
-}
-
-async function refreshCurrentPageData() {
-    if (!AppState.isLoggedIn) return;
-    if (_appRefreshRunning) { _appRefreshQueued = true; return; }
-    _appRefreshRunning = true;
-    _appRefreshQueued = false;
-
-    if (_hpCalcState || (Date.now() - _hpCalcClosedAt < 2000)) { _appRefreshRunning = false; return; }
-
-    const page = AppState.currentPage;
-    try {
-        if (page === 'campagne' && AppState.currentUser?.uid) {
-            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
-        } else if (page === 'personaggi') {
-            await loadPersonaggi({ silent: true });
-        } else if (page === 'amici') {
-            await loadAmici({ silent: true });
-        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
-            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
-        } else if (page === 'sessione' && AppState.currentCampagnaId) {
-            if (window.currentTiroGenericoRichiestaId) {
-                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
-                if (sessione) {
-                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
-                }
-            } else {
-                await renderSessioneContent(AppState.currentCampagnaId);
-            }
-        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('combattimento');
-            }
-            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
-        } else if (page === 'scheda' && AppState.currentPersonaggioId) {
-            // Mantieni la tab attualmente visualizzata: senza questo
-            // controllo qualunque evento realtime (anche generato da un
-            // altro utente nella stessa campagna) riportava l'utente
-            // alla "Pagina 1" della scheda mentre stava navigando in
-            // Inventario / Incantesimi / Privilegi.
-            const tab = window._schedaCurrentTab;
-            const pgId = AppState.currentPersonaggioId;
-            if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') {
-                await schedaOpenInventoryPage(pgId);
-            } else if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
-                await schedaOpenSpellPage(pgId);
-            } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
-                await schedaOpenPrivilegesPage(pgId);
-            } else {
-                await renderSchedaPersonaggio(pgId);
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ Errore refresh pagina corrente:', error);
-    } finally {
-        _appRefreshRunning = false;
-        if (_appRefreshQueued) {
-            _appRefreshQueued = false;
-            scheduleAppEventsRefresh();
-        }
-    }
 }
 
 /**

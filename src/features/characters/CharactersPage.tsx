@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
-import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import { charactersQuery } from './characterQueries';
@@ -18,17 +16,8 @@ declare global {
 
 export function CharactersPage() {
   const navigate = useNavigate();
-  const client = useQueryClient();
   const user = useQuery(currentUserQuery());
   const characters = useQuery(charactersQuery(user.data?.id ?? ''));
-
-  useEffect(() => {
-    const refresh = () => {
-      if (user.data?.id) client.invalidateQueries({ queryKey: queryKeys.characters(user.data.id) });
-    };
-    window.addEventListener('companion:data-changed', refresh);
-    return () => window.removeEventListener('companion:data-changed', refresh);
-  }, [client, user.data?.id]);
 
   return <ReactPage name="personaggi"><div className="page-content">
     <div className="page-top-stack"><div className="page-header"><h1>Personaggi</h1></div></div>

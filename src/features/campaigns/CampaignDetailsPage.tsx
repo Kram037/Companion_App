@@ -46,10 +46,8 @@ export function CampaignDetailsPage() {
       client.invalidateQueries({ queryKey: queryKeys.campaignCharacters(campagnaId) });
       client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
     };
-    window.addEventListener('companion:data-changed', refresh);
     window.addEventListener('companion:campaigns-changed', refresh);
     return () => {
-      window.removeEventListener('companion:data-changed', refresh);
       window.removeEventListener('companion:campaigns-changed', refresh);
     };
   }, [campagnaId, client]);

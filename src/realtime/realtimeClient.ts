@@ -24,6 +24,13 @@ export interface RealtimeEventMeta {
   timestamp?: number | string | null;
 }
 
+export interface RealtimeDataChange extends RealtimeEventMeta {
+  campagnaId?: string | null;
+  sessioneId?: string | null;
+  personaggioId?: string | null;
+  userId?: string | null;
+}
+
 const DEDUPE_MS = 3000;
 const recentEvents = new Map<string, number>();
 let notifyHandler: ((message: string) => void) | null = null;
@@ -63,5 +70,32 @@ export function applyRealtimeAction(action: RealtimeAction): void {
   }
   if (action.type === 'notify') {
     notifyHandler?.(action.message);
+  }
+}
+
+export function realtimeQueryPrefixes(event: RealtimeDataChange): QueryKey[] {
+  const table = event.table || '';
+  if (table.startsWith('homebrew_')) return [['homebrew']];
+  if (['campagne', 'inviti_campagna', 'richieste_campagna'].includes(table)) {
+    return [['campaigns'], ['campaignInvites'], ['campaign']];
+  }
+  if (['personaggi', 'personaggi_campagna'].includes(table)) {
+    return [['characters'], ['character'], ['campaign']];
+  }
+  if (table === 'sessioni') {
+    return [['session'], ['campaign'], ['campaigns'], ['combat']];
+  }
+  if (['combattimento', 'mostri_combattimento', 'iniziativa', 'richieste_tiro_iniziativa', 'richieste_tiro_generico', 'combat_timers'].includes(table)) {
+    return [['combat'], ['session']];
+  }
+  if (['utenti', 'richieste_amicizia'].includes(table)) {
+    return [['currentUser'], ['campaigns'], ['homebrew']];
+  }
+  return [];
+}
+
+export function invalidateRealtimeEvent(event: RealtimeDataChange): void {
+  for (const queryKey of realtimeQueryPrefixes(event)) {
+    queryClient.invalidateQueries({ queryKey });
   }
 }

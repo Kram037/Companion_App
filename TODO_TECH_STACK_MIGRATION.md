@@ -168,7 +168,7 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [x] scheda personaggio: breve ma con optimistic update;
   - [x] combattimento: breve/realtime-driven;
   - [x] compendio/static data: lungo.
-- [ ] Rimuovere progressivamente `_appRefreshRunning`, `_appRefreshQueued` e refresh globali quando non piu' necessari.
+- [x] Rimuovere progressivamente `_appRefreshRunning`, `_appRefreshQueued` e refresh globali quando non piu' necessari.
 
 Criterio di uscita: nessun realtime update deve chiamare direttamente `renderXXX`; deve invalidare query mirate.
 
@@ -376,7 +376,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 
 - [x] TanStack Query configurato.
 - [x] Query keys definite.
-- [ ] Realtime convertito a invalidazioni mirate per campagne/sessioni/combattimento.
+- [x] Realtime convertito a invalidazioni mirate per campagne/sessioni/combattimento.
 - [x] Zustand configurato per UI state.
 
 ### Milestone C - Prime pagine React
@@ -389,7 +389,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 
 - [x] Combattimento in React.
 - [ ] Test Playwright per realtime DM/player.
-- [ ] Nessun render diretto da eventi realtime.
+- [x] Nessun render diretto da eventi realtime.
 
 ### Milestone E - Migrazione completa
 

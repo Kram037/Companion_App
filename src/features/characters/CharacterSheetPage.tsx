@@ -113,10 +113,8 @@ export function CharacterSheetPage() {
       if (detail?.tab && detail.tab !== 'micro') setTab(personaggioId, detail.tab);
       client.invalidateQueries({ queryKey: queryKeys.character(personaggioId) });
     };
-    window.addEventListener('companion:data-changed', refresh);
     window.addEventListener('companion:character-refresh', refresh);
     return () => {
-      window.removeEventListener('companion:data-changed', refresh);
       window.removeEventListener('companion:character-refresh', refresh);
     };
   }, [client, personaggioId, setTab]);
