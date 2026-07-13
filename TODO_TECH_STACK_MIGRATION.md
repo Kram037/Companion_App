@@ -215,16 +215,16 @@ Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render c
   - [x] `useFiltersStore`.
 - [ ] Spostare nello store solo stato UI locale:
   - [x] pagina/tab corrente;
-  - [ ] sezioni aperte/chiuse;
+  - [x] sezioni aperte/chiuse;
   - [x] filtri locali;
   - [x] modali aperti;
   - [x] selezioni temporanee;
-  - [ ] stato wizard.
+  - [x] stato wizard.
 - [x] Non mettere in Zustand dati Supabase che appartengono a TanStack Query.
 - [ ] Aggiungere persistenza selettiva dove serve:
   - [x] tab correnti;
   - [x] filtri campagne;
-  - [ ] preferenze UI;
+  - [x] preferenze UI;
   - [ ] stato navigazione sessione.
 
 Criterio di uscita: `AppState` legacy puo' iniziare a essere svuotato e sostituito da store mirati.
