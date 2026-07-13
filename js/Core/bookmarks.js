@@ -4,6 +4,7 @@
 
 const BOOKMARKS_VERSION = 1;
 const BOOKMARKS_MAX = 24;
+const DESKTOP_LAYOUT_QUERY = '(min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px)';
 let _bookmarkRefreshTimer = null;
 let _bookmarkAutoUpdateTimer = null;
 let _bookmarkRestoreInProgress = false;
@@ -231,7 +232,7 @@ function _bookmarkIsWritablePage() {
 
 function _bookmarkIsDesktopLayout() {
     return typeof window.matchMedia === 'function'
-        && window.matchMedia('(min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px)').matches;
+        && window.matchMedia(DESKTOP_LAYOUT_QUERY).matches;
 }
 
 function _bookmarkSplitFrameWindow() {
@@ -293,7 +294,7 @@ function _bookmarkDefaultGroupTab(page) {
 }
 
 function _bookmarkNormalizeDesktopHook(page, hook = {}) {
-    if (!_bookmarkIsDesktopLayout() || !['laboratorio', 'compendio'].includes(page)) return hook || {};
+    if ((!_bookmarkIsDesktopLayout() && !_bookmarkIsSplitPaneInstance) || !['laboratorio', 'compendio'].includes(page)) return hook || {};
     const data = { ...(hook || {}) };
     if (data.view !== 'sub') {
         data.view = 'sub';
@@ -303,7 +304,7 @@ function _bookmarkNormalizeDesktopHook(page, hook = {}) {
 }
 
 function getDesktopDefaultGroupTab(page) {
-    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout()) return '';
+    if (!_bookmarkIsSplitPaneInstance && !_bookmarkIsDesktopLayout()) return '';
     if (!['laboratorio', 'compendio'].includes(page)) return '';
     return _bookmarkDefaultGroupTab(page);
 }
@@ -571,9 +572,9 @@ function _bookmarkEnsureSplitPane() {
 }
 
 function openBookmarkSplitPane(id) {
+    captureActiveBookmark({ silent: true });
     const item = _bookmarksRead().find(tab => tab.id === id);
     if (!item) return;
-    captureActiveBookmark({ silent: true });
     if (!document.getElementById('desktopSplitPane')) {
         _bookmarkRemovePaneItems('right');
     }
@@ -607,6 +608,39 @@ function closeBookmarkSplitPane() {
     _bookmarkRightPaneState = { page: '', tab: '' };
     document.body.classList.remove('desktop-split-active');
     _bookmarkSetFocusedPane('left');
+}
+
+function _bookmarkMergeSplitPaneForMobile() {
+    const pane = document.getElementById('desktopSplitPane');
+    if (_bookmarkIsSplitPaneInstance || _bookmarkIsDesktopLayout() || !pane) return;
+
+    captureActiveBookmark({ silent: true });
+    try {
+        pane.querySelector('iframe')?.contentWindow?.captureActiveBookmark?.({ silent: true });
+    } catch (_) { /* iframe in chiusura */ }
+
+    const list = _bookmarksRead();
+    const rightItems = list.filter(item => _bookmarkItemPane(item) === 'right');
+    const storedRightId = localStorage.getItem(_bookmarksActiveRightKey()) || '';
+    const rightId = rightItems.some(item => item.id === storedRightId) ? storedRightId : (rightItems[0]?.id || '');
+    const focusWasRight = _bookmarkFocusedPane === 'right';
+    const targetId = focusWasRight && rightId ? rightId : _bookmarkGetActiveId();
+    _bookmarksWrite(list.map(item => ({
+        ...item,
+        pane: 'left',
+        autoDesktop: false,
+        userCreated: true,
+    })));
+
+    pane.remove();
+    localStorage.removeItem(_bookmarksActiveRightKey());
+    document.body.classList.remove('desktop-split-active');
+    _bookmarkRightPaneState = { page: '', tab: '' };
+    _bookmarkSetActiveId(targetId || '');
+    _bookmarkSetFocusedPane('left', { render: false });
+
+    if (targetId && focusWasRight) setTimeout(() => openBookmark(targetId), 0);
+    else updateBookmarkChrome();
 }
 
 function _bookmarkRestorePersistedSplitPane() {
@@ -1002,6 +1036,15 @@ function initBookmarks() {
     }
     _bookmarkEnsureDesktopChrome();
     _bookmarkSetFocusedPane('left');
+    if (!window._bookmarkDesktopLayoutBound) {
+        window._bookmarkDesktopLayoutBound = true;
+        const media = window.matchMedia(DESKTOP_LAYOUT_QUERY);
+        const syncLayout = () => {
+            if (!media.matches) _bookmarkMergeSplitPaneForMobile();
+        };
+        if (typeof media.addEventListener === 'function') media.addEventListener('change', syncLayout);
+        else media.addListener?.(syncLayout);
+    }
     window.addEventListener('message', (event) => {
         if (event.origin !== window.location.origin) return;
         if (event.data?.type === 'companion-split-focus') {
