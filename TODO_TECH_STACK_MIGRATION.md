@@ -278,13 +278,13 @@ Ordine consigliato:
   - [x] mostri;
   - [x] condizioni;
   - [x] turni/round.
-- [ ] `CharacterSheetPage`:
-  - [ ] pagina statistiche;
-  - [ ] inventario;
-  - [ ] incantesimi;
-  - [ ] privilegi;
-  - [ ] risorse;
-  - [ ] micro scheda.
+- [x] `CharacterSheetPage`:
+  - [x] pagina statistiche;
+  - [x] inventario;
+  - [x] incantesimi;
+  - [x] privilegi;
+  - [x] risorse;
+  - [x] micro scheda.
 - [ ] `CompendiumPage`:
   - [ ] hub;
   - [ ] tabs;

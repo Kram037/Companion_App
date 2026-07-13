@@ -288,6 +288,10 @@ function _invListFilterValues(value) {
 // nell'ordine in cui sono stati aggiunti.
 
 window.schedaOpenInventoryPage = async function(pgId) {
+    if (typeof _schedaReactOwnsPage === 'function' && _schedaReactOwnsPage()) {
+        _schedaRequestReactRefresh(pgId, 'inventario');
+        return;
+    }
     const content = document.getElementById('schedaContent');
     if (!content) return;
     const supabase = getSupabaseClient();

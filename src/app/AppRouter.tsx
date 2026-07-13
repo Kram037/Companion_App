@@ -5,6 +5,7 @@ import { CampaignDetailsPage } from '../features/campaigns/CampaignDetailsPage';
 import { SessionPage } from '../features/campaigns/SessionPage';
 import { CombatPage } from '../features/combat/CombatPage';
 import { CharactersPage } from '../features/characters/CharactersPage';
+import { CharacterSheetPage } from '../features/characters/CharacterSheetPage';
 import { appBasenameFromPath } from '../router';
 import { CampaignRedirect, LegacyPageAdapter } from './LegacyPageAdapter';
 
@@ -19,7 +20,7 @@ export function AppRouter() {
         <Route path="/campagne/:campagnaId/sessione/:sessioneId/combattimento" element={<CombatPage />} />
         <Route path="/personaggi" element={<CharactersPage />} />
         <Route path="/personaggi/nuovo" element={<LegacyPageAdapter page="personaggioCreate" />} />
-        <Route path="/personaggi/:personaggioId" element={<LegacyPageAdapter page="scheda" />} />
+        <Route path="/personaggi/:personaggioId" element={<CharacterSheetPage />} />
         <Route path="/compendio" element={<LegacyPageAdapter page="compendio" />} />
         <Route path="/laboratorio" element={<LegacyPageAdapter page="laboratorio" />} />
         <Route path="/amici" element={<LegacyPageAdapter page="amici" />} />

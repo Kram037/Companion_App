@@ -229,6 +229,10 @@ async function handleSaveMicroScheda(e) {
 // ============================================================================
 
 async function renderMicroScheda(personaggioId) {
+    if (typeof _schedaReactOwnsPage === 'function' && _schedaReactOwnsPage()) {
+        _schedaRequestReactRefresh(personaggioId, 'micro');
+        return;
+    }
     const content = document.getElementById('schedaContent');
     if (!content) return;
 

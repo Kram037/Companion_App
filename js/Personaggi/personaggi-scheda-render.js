@@ -3,6 +3,10 @@
 // ============================================================================
 
 async function renderSchedaPersonaggio(personaggioId) {
+    if (typeof _schedaReactOwnsPage === 'function' && _schedaReactOwnsPage()) {
+        _schedaRequestReactRefresh(personaggioId, 'scheda');
+        return;
+    }
     const content = document.getElementById('schedaContent');
     if (!content) return;
 

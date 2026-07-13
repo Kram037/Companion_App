@@ -466,6 +466,10 @@ window.schedaP1TabResDelete = async function(pgId, tabName, index) {
 };
 
 window.schedaOpenPrivilegesPage = async function(pgId) {
+    if (typeof _schedaReactOwnsPage === 'function' && _schedaReactOwnsPage()) {
+        _schedaRequestReactRefresh(pgId, 'privilegi');
+        return;
+    }
     const content = document.getElementById('schedaContent');
     if (!content) return;
     const supabase = getSupabaseClient();

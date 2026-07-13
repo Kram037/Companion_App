@@ -4,6 +4,10 @@
 
 // Spell Page
 window.schedaOpenSpellPage = async function(pgId) {
+    if (typeof _schedaReactOwnsPage === 'function' && _schedaReactOwnsPage()) {
+        _schedaRequestReactRefresh(pgId, 'incantesimi');
+        return;
+    }
     const content = document.getElementById('schedaContent');
     if (!content) return;
 

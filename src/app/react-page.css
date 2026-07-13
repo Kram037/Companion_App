@@ -16,6 +16,14 @@ body[data-react-page="combattimento"] .main-content {
   padding: 0;
 }
 
+body[data-react-page="scheda"] .main-content {
+  padding-bottom: 132px;
+}
+
+body[data-react-page="scheda"] .react-page-shell {
+  min-height: 100%;
+}
+
 body[data-react-page="combattimento"] .react-page-shell {
   display: flex;
   height: 100%;
