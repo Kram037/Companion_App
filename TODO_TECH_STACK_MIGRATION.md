@@ -311,7 +311,7 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
   - [x] ordinamento iniziativa;
   - [x] normalizzazione URL immagini;
   - [x] filtri campagne;
-  - [ ] mapper Supabase -> dominio;
+  - [x] mapper Supabase -> dominio;
   - [x] schema Zod.
 - [x] Aggiungere test per query key builder e invalidazioni realtime.
 
