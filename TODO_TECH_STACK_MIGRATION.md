@@ -93,7 +93,7 @@ Criterio di uscita: Vite serve/builda l'app senza rompere i flussi legacy.
 
 - [x] Creare `src/api/supabaseClient.ts`.
 - [x] Rimuovere accessi Supabase diretti dai nuovi componenti.
-- [ ] Creare API per dominio:
+- [x] Creare API per dominio:
   - [x] `campaignsApi.ts`;
   - [x] `charactersApi.ts`;
   - [x] `sessionsApi.ts`;
@@ -154,12 +154,12 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [x] `['character', personaggioId]`;
   - [x] `['homebrew', userId]`;
   - [x] `['runtimeData', bundleKey]`.
-- [ ] Convertire fetching a query/mutation, iniziando da:
+- [x] Convertire fetching a query/mutation, iniziando da:
   - [x] lista campagne;
   - [x] dettaglio campagna;
   - [x] sessione;
   - [x] combattimento.
-- [ ] Sostituire refresh diretti con invalidazioni:
+- [x] Sostituire refresh diretti con invalidazioni:
   - [x] `queryClient.invalidateQueries(...)`;
   - [x] `queryClient.setQueryData(...)` per update ottimistici;
   - [x] `queryClient.cancelQueries(...)` prima di mutation sensibili.
@@ -213,7 +213,7 @@ Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render c
   - [x] `useCharacterSheetUiStore`;
   - [x] `useCombatUiStore`;
   - [x] `useFiltersStore`.
-- [ ] Spostare nello store solo stato UI locale:
+- [x] Spostare nello store solo stato UI locale:
   - [x] pagina/tab corrente;
   - [x] sezioni aperte/chiuse;
   - [x] filtri locali;
@@ -221,7 +221,7 @@ Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render c
   - [x] selezioni temporanee;
   - [x] stato wizard.
 - [x] Non mettere in Zustand dati Supabase che appartengono a TanStack Query.
-- [ ] Aggiungere persistenza selettiva dove serve:
+- [x] Aggiungere persistenza selettiva dove serve:
   - [x] tab correnti;
   - [x] filtri campagne;
   - [x] preferenze UI;
