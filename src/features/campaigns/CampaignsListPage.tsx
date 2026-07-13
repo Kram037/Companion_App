@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchCampaignsByDm } from '../../api';
-import { queryKeys, queryTimings } from '../../query';
 import type { Id } from '../../types/domain';
 import { filterCampaigns } from './campaignFilters';
+import { campaignsByDmQuery } from './campaignQueries';
 
 interface CampaignsListPageProps {
   currentUserId: Id;
@@ -25,11 +24,7 @@ export function CampaignsListPage({
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const favoriteIds = useMemo(() => new Set(favoriteCampaignIds), [favoriteCampaignIds]);
 
-  const campaignsQuery = useQuery({
-    queryKey: queryKeys.campaigns(currentUserId),
-    queryFn: () => fetchCampaignsByDm(currentUserId),
-    ...queryTimings.campaigns,
-  });
+  const campaignsQuery = useQuery(campaignsByDmQuery(currentUserId));
 
   const campaigns = filterCampaigns(campaignsQuery.data ?? [], {
     searchText,

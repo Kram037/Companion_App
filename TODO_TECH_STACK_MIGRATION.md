@@ -155,7 +155,7 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [x] `['homebrew', userId]`;
   - [x] `['runtimeData', bundleKey]`.
 - [ ] Convertire fetching a query/mutation, iniziando da:
-  - [ ] lista campagne;
+  - [x] lista campagne;
   - [ ] dettaglio campagna;
   - [ ] sessione;
   - [ ] combattimento.
