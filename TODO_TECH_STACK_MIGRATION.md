@@ -309,7 +309,7 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
   - [x] Factotum;
   - [ ] PF max/temporanei;
   - [ ] ordinamento iniziativa;
-  - [ ] normalizzazione URL immagini;
+  - [x] normalizzazione URL immagini;
   - [ ] filtri campagne;
   - [ ] mapper Supabase -> dominio;
   - [x] schema Zod.
