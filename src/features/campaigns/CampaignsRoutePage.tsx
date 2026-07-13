@@ -1,10 +1,7 @@
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
-import { subscribeToCurrentUser } from '../../api/usersApi';
-import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import { CampaignsListPage } from './CampaignsListPage';
@@ -19,12 +16,7 @@ declare global {
 
 export function CampaignsRoutePage() {
   const navigate = useNavigate();
-  const client = useQueryClient();
   const user = useQuery(currentUserQuery());
-
-  useEffect(() => subscribeToCurrentUser(() => {
-    client.invalidateQueries({ queryKey: queryKeys.currentUser() });
-  }), [client]);
 
   return <ReactPage name="campagne">
     {user.isLoading && <div className="content-placeholder"><p>Caricamento...</p></div>}

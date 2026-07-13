@@ -210,6 +210,10 @@
     padding-bottom: 120px;
 }
 
+.danger-text {
+    color: #dc3545;
+}
+
 .dettagli-header {
     display: flex;
     flex-direction: column;

@@ -17,7 +17,8 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
     .from('sessioni')
     .select('*')
     .eq('campagna_id', campagnaId)
-    .eq('attiva', true)
+    .is('data_fine', null)
+    .limit(1)
     .maybeSingle();
   throwIfSupabaseError(error);
   return parseNullable(sessionSchema, data);

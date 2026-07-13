@@ -25,6 +25,9 @@ export interface Campagna {
   data_creazione?: ISODateString | null;
   dm_nome?: string | null;
   isPreferito?: boolean;
+  numero_sessioni?: number | null;
+  tempo_di_gioco?: number | null;
+  note?: string[] | null;
   created_at?: ISODateString | null;
   updated_at?: ISODateString | null;
 }
@@ -70,8 +73,22 @@ export interface Sessione {
   stato?: string | null;
   round_corrente?: number | null;
   turno_corrente?: number | null;
+  data_inizio?: ISODateString | null;
+  data_fine?: ISODateString | null;
   created_at?: ISODateString | null;
   updated_at?: ISODateString | null;
+}
+
+export interface CampaignPlayer {
+  id: Id;
+  nome_utente?: string | null;
+  cid?: string | null;
+}
+
+export interface CampaignCharacter {
+  id: Id;
+  nome: string;
+  player_user_id?: Id | null;
 }
 
 export interface RichiestaTiro {

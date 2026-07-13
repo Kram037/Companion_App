@@ -262,11 +262,11 @@ Ordine consigliato:
   - [x] filtri;
   - [x] preferiti;
   - [x] inviti.
-- [ ] `CampagnaDetailsPage`:
-  - [ ] header;
-  - [ ] azioni sessione;
-  - [ ] gestione giocatori;
-  - [ ] scelta personaggio.
+- [x] `CampagnaDetailsPage`:
+  - [x] header;
+  - [x] azioni sessione;
+  - [x] gestione giocatori;
+  - [x] scelta personaggio.
 - [ ] `SessionPage`:
   - [ ] timer;
   - [ ] personaggi in sessione;

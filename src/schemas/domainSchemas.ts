@@ -34,6 +34,9 @@ export const campaignSchema = z.object({
   data_creazione: z.string().nullish(),
   dm_nome: z.string().nullish(),
   isPreferito: z.boolean().optional(),
+  numero_sessioni: z.number().nullish(),
+  tempo_di_gioco: z.number().nullish(),
+  note: z.array(z.string()).nullish(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
 }).passthrough();
@@ -82,6 +85,8 @@ export const sessionSchema = z.object({
   stato: z.string().nullish(),
   round_corrente: z.number().nullish(),
   turno_corrente: z.number().nullish(),
+  data_inizio: z.string().nullish(),
+  data_fine: z.string().nullish(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
 }).passthrough();

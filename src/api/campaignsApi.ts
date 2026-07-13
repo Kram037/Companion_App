@@ -1,4 +1,4 @@
-import type { Campagna, CampaignInvite, Id } from '../types/domain';
+import type { Campagna, CampaignCharacter, CampaignInvite, CampaignPlayer, Id } from '../types/domain';
 import { campaignInviteSchema, campaignSchema, parseArray, parseNullable } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
@@ -9,7 +9,39 @@ export async function fetchCampaignById(campagnaId: Id): Promise<Campagna | null
     .eq('id', campagnaId)
     .single();
   throwIfSupabaseError(error);
-  return parseNullable(campaignSchema, data);
+  const campaign = parseNullable(campaignSchema, data);
+  if (!campaign) return null;
+  const { data: dm, error: dmError } = await getSupabaseClient()
+    .from('utenti')
+    .select('nome_utente')
+    .eq('id', campaign.id_dm)
+    .maybeSingle();
+  throwIfSupabaseError(dmError);
+  return { ...campaign, dm_nome: dm?.nome_utente ? String(dm.nome_utente) : null };
+}
+
+export async function fetchCampaignPlayers(campagnaId: Id): Promise<CampaignPlayer[]> {
+  const { data, error } = await getSupabaseClient().rpc('get_giocatori_campagna', {
+    campagna_id_param: campagnaId,
+  });
+  throwIfSupabaseError(error);
+  return (data ?? []).map((row: Record<string, unknown>) => ({
+    id: String(row.id),
+    nome_utente: row.nome_utente ? String(row.nome_utente) : null,
+    cid: row.cid ? String(row.cid) : null,
+  }));
+}
+
+export async function fetchCampaignCharacters(campagnaId: Id): Promise<CampaignCharacter[]> {
+  const { data, error } = await getSupabaseClient().rpc('get_personaggi_in_campagna', {
+    p_campagna_id: campagnaId,
+  });
+  throwIfSupabaseError(error);
+  return (data ?? []).filter((row: Record<string, unknown>) => row.personaggio_id).map((row: Record<string, unknown>) => ({
+    id: String(row.personaggio_id),
+    nome: String(row.nome ?? '?'),
+    player_user_id: row.player_user_id ? String(row.player_user_id) : null,
+  }));
 }
 
 export async function fetchCampaignsByDm(dmId: Id): Promise<Campagna[]> {
