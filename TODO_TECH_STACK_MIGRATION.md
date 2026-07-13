@@ -303,7 +303,7 @@ Criterio di uscita: ogni pagina migrata non deve piu' usare `innerHTML` per rend
 
 - [x] Installare `vitest`.
 - [x] Aggiungere target Nx `test`.
-- [ ] Testare funzioni pure:
+- [x] Testare funzioni pure:
   - [x] calcoli modificatori D&D;
   - [x] bonus competenza;
   - [x] Factotum;
