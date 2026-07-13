@@ -156,7 +156,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
             sessioneId: AppState.currentSessioneId || null,
             personaggioId: AppState.currentPersonaggioId || null
         };
-        history.pushState(stateObj, '', null);
+        history.pushState(stateObj, '', legacyPathFromNavigationState(stateObj));
     }
     
     // Ferma Realtime subscription combattimento se si esce dalla pagina
@@ -187,6 +187,33 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
     }
 
     return pageLoadPromise;
+}
+
+function legacyPathFromNavigationState(state) {
+    const page = state?.page || 'campagne';
+    const campagnaId = encodeURIComponent(state?.campagnaId || '');
+    const sessioneId = encodeURIComponent(state?.sessioneId || '');
+    const personaggioId = encodeURIComponent(state?.personaggioId || '');
+    const base = legacyAppBasePath();
+
+    if (page === 'dettagli' && campagnaId) return `${base}campagne/${campagnaId}`;
+    if (page === 'sessione' && campagnaId) return `${base}campagne/${campagnaId}/sessione`;
+    if (page === 'combattimento' && campagnaId && sessioneId) return `${base}campagne/${campagnaId}/sessione/${sessioneId}/combattimento`;
+    if (page === 'scheda' && personaggioId) return `${base}personaggi/${personaggioId}`;
+    if (['campagne', 'personaggi', 'compendio', 'laboratorio', 'amici'].includes(page)) return `${base}${page}`;
+    return `${base}campagne`;
+}
+
+function legacyAppBasePath() {
+    const routeRoots = ['campagne', 'personaggi', 'compendio', 'laboratorio', 'amici'];
+    const segments = location.pathname.split('/').filter(Boolean);
+    const routeIndex = segments.findIndex(segment => routeRoots.includes(segment));
+    if (routeIndex >= 0) {
+        return `/${segments.slice(0, routeIndex).join('/')}${routeIndex ? '/' : ''}`;
+    }
+    return location.pathname.endsWith('/index.html')
+        ? location.pathname.replace(/index\.html$/, '')
+        : location.pathname.replace(/[^/]*$/, '');
 }
 
 function _pageRuntimeDataBundles(pageName) {
