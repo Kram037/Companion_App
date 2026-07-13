@@ -12,9 +12,9 @@
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/apps/companion-app"],
+      "outputs": ["{workspaceRoot}/dist/apps/companion-app", "{workspaceRoot}/dist/vite/companion-app"],
       "options": {
-        "command": "node tools/build-static.mjs dist/apps/companion-app"
+        "command": "node tools/build-static.mjs dist/apps/companion-app && npm run vite:build"
       }
     },
     "vite-serve": {
