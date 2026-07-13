@@ -8,6 +8,7 @@ export const queryKeys = {
   campaignPlayers: (campagnaId: Id) => ['campaign', campagnaId, 'players'] as const,
   campaignCharacters: (campagnaId: Id) => ['campaign', campagnaId, 'characters'] as const,
   session: (campagnaId: Id) => ['session', campagnaId] as const,
+  initiativeRequests: (sessioneId: Id) => ['session', sessioneId, 'initiativeRequests'] as const,
   combat: (sessioneId: Id) => ['combat', sessioneId] as const,
   character: (personaggioId: Id) => ['character', personaggioId] as const,
   homebrew: (userId: Id) => ['homebrew', userId] as const,

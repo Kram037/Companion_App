@@ -267,11 +267,11 @@ Ordine consigliato:
   - [x] azioni sessione;
   - [x] gestione giocatori;
   - [x] scelta personaggio.
-- [ ] `SessionPage`:
-  - [ ] timer;
-  - [ ] personaggi in sessione;
-  - [ ] richiesta tiri;
-  - [ ] stato sessione.
+- [x] `SessionPage`:
+  - [x] timer;
+  - [x] personaggi in sessione;
+  - [x] richiesta tiri;
+  - [x] stato sessione.
 - [ ] `CombatPage`:
   - [ ] ordine iniziativa;
   - [ ] toolbar DM/player;

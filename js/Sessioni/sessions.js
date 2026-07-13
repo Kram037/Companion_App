@@ -184,7 +184,7 @@ window.openSessionePage = async function(campagnaId) {
     AppState.activeSessionCampagnaId = campagnaId;
     sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
     navigateToPage('sessione');
-    await renderSessioneContent(campagnaId);
+    if (!window.CompanionReactPages?.has('sessione')) await renderSessioneContent(campagnaId);
 };
 
 /**
@@ -423,7 +423,7 @@ window.finisciSessione = async function(sessioneId, campagnaId) {
         
         // Torna ai dettagli campagna
         navigateToPage('dettagli');
-        await loadCampagnaDetails(campagnaId);
+        if (!window.CompanionReactPages?.has('dettagli')) await loadCampagnaDetails(campagnaId);
     } catch (error) {
         console.error('❌ Errore nella fine sessione:', error);
         showNotification('Errore nella fine della sessione: ' + (error.message || error));

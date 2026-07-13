@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { fetchActiveSessionByCampaign, fetchCampaignById, fetchCampaignCharacters, fetchCampaignPlayers } from '../../api';
+import { fetchActiveSessionByCampaign, fetchCampaignById, fetchCampaignCharacters, fetchCampaignPlayers, fetchHasInitiativeRequest } from '../../api';
 import { queryKeys, queryTimings } from '../../query';
 import type { Id } from '../../types/domain';
 
@@ -33,5 +33,14 @@ export function campaignCharactersQuery(campagnaId: Id) {
     queryKey: queryKeys.campaignCharacters(campagnaId),
     queryFn: () => fetchCampaignCharacters(campagnaId),
     ...queryTimings.character,
+  });
+}
+
+export function initiativeRequestsQuery(sessioneId: Id) {
+  return queryOptions({
+    queryKey: queryKeys.initiativeRequests(sessioneId),
+    queryFn: () => fetchHasInitiativeRequest(sessioneId),
+    enabled: Boolean(sessioneId),
+    ...queryTimings.combat,
   });
 }

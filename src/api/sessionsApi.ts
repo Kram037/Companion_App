@@ -24,3 +24,12 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
   return parseNullable(sessionSchema, data);
 }
 
+export async function fetchHasInitiativeRequest(sessioneId: Id): Promise<boolean> {
+  const { count, error } = await getSupabaseClient()
+    .from('richieste_tiro_iniziativa')
+    .select('id', { count: 'exact', head: true })
+    .eq('sessione_id', sessioneId);
+  throwIfSupabaseError(error);
+  return (count ?? 0) > 0;
+}
+
