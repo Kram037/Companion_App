@@ -21,6 +21,22 @@ export interface Campagna {
   updated_at?: ISODateString | null;
 }
 
+export interface CampaignInvite {
+  id: Id;
+  campagna_id: Id;
+  inviante_id?: Id | null;
+  invitato_id?: Id | null;
+  stato?: string | null;
+  created_at?: ISODateString | null;
+  updated_at?: ISODateString | null;
+  campagna?: Pick<Campagna, 'id' | 'nome_campagna'> | null;
+  inviante?: {
+    id: Id;
+    nome_utente?: string | null;
+    cid?: string | null;
+  } | null;
+}
+
 export interface ClassePersonaggio {
   nome: string;
   livello: number;

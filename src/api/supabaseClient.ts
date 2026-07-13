@@ -1,5 +1,6 @@
 type SupabaseClientLike = {
   from(table: string): any;
+  rpc(functionName: string, args?: Record<string, unknown>): any;
   auth?: any;
   channel?: any;
   removeChannel?: any;

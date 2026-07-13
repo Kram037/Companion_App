@@ -30,6 +30,25 @@ export const campaignSchema = z.object({
   updated_at: z.string().nullish(),
 }).passthrough();
 
+export const campaignInviteSchema = z.object({
+  id: z.string(),
+  campagna_id: z.string(),
+  inviante_id: z.string().nullish(),
+  invitato_id: z.string().nullish(),
+  stato: z.string().nullish(),
+  created_at: z.string().nullish(),
+  updated_at: z.string().nullish(),
+  campagna: z.object({
+    id: z.string(),
+    nome_campagna: z.string(),
+  }).nullish(),
+  inviante: z.object({
+    id: z.string(),
+    nome_utente: z.string().nullish(),
+    cid: z.string().nullish(),
+  }).nullish(),
+}).passthrough();
+
 export const characterClassSchema = z.object({
   nome: z.string(),
   livello: z.number(),
@@ -104,6 +123,7 @@ export const runtimeDataBundleSchema = z.object({
 
 export type UserProfileFromSchema = z.infer<typeof userProfileSchema>;
 export type CampaignFromSchema = z.infer<typeof campaignSchema>;
+export type CampaignInviteFromSchema = z.infer<typeof campaignInviteSchema>;
 export type CharacterFromSchema = z.infer<typeof characterSchema>;
 export type SessionFromSchema = z.infer<typeof sessionSchema>;
 export type RollRequestFromSchema = z.infer<typeof rollRequestSchema>;

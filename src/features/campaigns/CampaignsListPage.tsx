@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { Id } from '../../types/domain';
 import { filterCampaigns } from './campaignFilters';
-import { campaignsByDmQuery } from './campaignQueries';
+import { receivedCampaignInvitesQuery, visibleCampaignsQuery } from './campaignQueries';
 
 interface CampaignsListPageProps {
   currentUserId: Id;
@@ -11,6 +11,8 @@ interface CampaignsListPageProps {
   onCreateCampaign?: () => void;
   onOpenCampaign?: (campaignId: Id) => void;
   onToggleFavorite?: (campaignId: Id) => void;
+  onAcceptInvite?: (inviteId: Id) => void;
+  onRejectInvite?: (inviteId: Id) => void;
 }
 
 export function CampaignsListPage({
@@ -19,12 +21,15 @@ export function CampaignsListPage({
   onCreateCampaign,
   onOpenCampaign,
   onToggleFavorite,
+  onAcceptInvite,
+  onRejectInvite,
 }: CampaignsListPageProps) {
   const [searchText, setSearchText] = useState('');
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const favoriteIds = useMemo(() => new Set(favoriteCampaignIds), [favoriteCampaignIds]);
 
-  const campaignsQuery = useQuery(campaignsByDmQuery(currentUserId));
+  const campaignsQuery = useQuery(visibleCampaignsQuery(currentUserId));
+  const invitesQuery = useQuery(receivedCampaignInvitesQuery(currentUserId));
 
   const campaigns = filterCampaigns(campaignsQuery.data ?? [], {
     searchText,
@@ -61,6 +66,23 @@ export function CampaignsListPage({
 
       {campaignsQuery.isLoading && <p className="content-placeholder">Caricamento campagne...</p>}
       {campaignsQuery.isError && <p className="content-placeholder">Impossibile caricare le campagne.</p>}
+
+      {!!invitesQuery.data?.length && (
+        <section className="campaigns-grid" aria-label="Inviti ricevuti">
+          {invitesQuery.data.map(invite => (
+            <article className="campagna-card invito-card" key={invite.id}>
+              <div className="card-main-action">
+                <strong>{invite.campagna?.nome_campagna ?? 'Campagna sconosciuta'}</strong>
+                <span>DM: {invite.inviante?.nome_utente ?? 'DM sconosciuto'}{invite.inviante?.cid ? ` (${invite.inviante.cid})` : ''}</span>
+              </div>
+              <div className="invito-actions">
+                <button className="btn-primary btn-small" onClick={() => onAcceptInvite?.(invite.id)} type="button">Accetta</button>
+                <button className="btn-secondary btn-small" onClick={() => onRejectInvite?.(invite.id)} type="button">Rifiuta</button>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
 
       <section className="campaigns-grid" aria-label="Lista campagne">
         {campaigns.map(campaign => (
