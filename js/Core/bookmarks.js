@@ -712,7 +712,7 @@ function _desktopSidebarItemIcon(item) {
     if (item.icon) return item.icon;
     if (!item.iconFile) return '';
     const src = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
-    return `<img class="desktop-sidebar-item-icon" src="${src}" alt="" loading="lazy">`;
+    return `<span class="desktop-sidebar-item-icon" style="--desktop-sidebar-icon:url('${src}')" aria-hidden="true"></span>`;
 }
 
 function _desktopGroupOpen(page) {
