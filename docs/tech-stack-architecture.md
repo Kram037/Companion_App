@@ -4,6 +4,7 @@
 
 - Legacy app: `index.html`, `js/`, `css/`, `images/`, `risorse/`.
 - New typed layer: `src/`.
+- Vite usa `index.html` root-based: un `index.vite.html` separato aggiungerebbe drift senza beneficio.
 - Build principale: `npm run build`, che produce:
   - `dist/apps/companion-app` per runtime statico legacy;
   - `dist/vite/companion-app` per runtime Vite compatibile.

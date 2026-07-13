@@ -70,9 +70,9 @@ Criterio di uscita: il repo compila/checka con TypeScript presente e i nuovi mod
 - [x] Creare entry dedicata:
   - [x] `src/main.ts` o `src/main.tsx`;
   - [x] bootstrap progressivo che convive con gli script legacy.
-- [ ] Valutare due modalita' temporanee:
+- [x] Valutare due modalita' temporanee:
   - [x] mantenere `index.html` root-based;
-  - [ ] oppure creare `index.vite.html` per sperimentazione.
+  - [x] non creare `index.vite.html`: evitato per non duplicare bootstrap e cache PWA.
 - [x] Configurare alias:
   - [x] `@core`;
   - [x] `@features`;
@@ -107,12 +107,12 @@ Criterio di uscita: Vite serve/builda l'app senza rompere i flussi legacy.
   - [x] non toccare DOM;
   - [x] non chiamare render;
   - [x] non modificare `AppState` direttamente.
-- [ ] Mappare progressivamente le vecchie funzioni:
-  - [ ] `loadCampagne`;
-  - [ ] `loadCampagnaDetails`;
-  - [ ] `renderSessioneContent`;
-  - [ ] `renderCombattimentoContent`;
-  - [ ] `renderSchedaPersonaggio`.
+- [x] Mappare progressivamente le vecchie funzioni:
+  - [x] `loadCampagne`;
+  - [x] `loadCampagnaDetails`;
+  - [x] `renderSessioneContent`;
+  - [x] `renderCombattimentoContent`;
+  - [x] `renderSchedaPersonaggio`.
 
 Criterio di uscita: i nuovi moduli dati non dipendono da DOM, `window` o render function.
 
