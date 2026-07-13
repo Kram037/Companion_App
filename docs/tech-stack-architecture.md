@@ -5,9 +5,9 @@
 - Legacy app: `index.html`, `js/`, `css/`, `images/`, `risorse/`.
 - New typed layer: `src/`.
 - Vite usa `index.html` root-based: un `index.vite.html` separato aggiungerebbe drift senza beneficio.
-- Build principale: `npm run build`, che produce:
-  - `dist/apps/companion-app` per runtime statico legacy;
-  - `dist/vite/companion-app` per runtime Vite compatibile.
+- Runtime locale: `npm run serve`, servito da Vite sulla porta `8000`.
+- Build e deploy usano lo stesso output: `dist/apps/companion-app`.
+- Il markup e gli asset legacy restano inclusi da Vite finche' la relativa pagina non viene migrata.
 
 ## Confini
 

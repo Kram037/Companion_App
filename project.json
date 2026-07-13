@@ -7,14 +7,14 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node tools/serve-static.mjs . 8000"
+        "command": "vite --host 127.0.0.1 --port 8000"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/apps/companion-app", "{workspaceRoot}/dist/vite/companion-app"],
+      "outputs": ["{workspaceRoot}/dist/apps/companion-app"],
       "options": {
-        "command": "node tools/build-static.mjs dist/apps/companion-app && npm run vite:build"
+        "command": "npm run vite:build"
       }
     },
     "vite-serve": {
@@ -25,7 +25,7 @@
     },
     "vite-build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/vite/companion-app"],
+      "outputs": ["{workspaceRoot}/dist/apps/companion-app"],
       "options": {
         "command": "npm run vite:build"
       }

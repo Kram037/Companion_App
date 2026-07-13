@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { basename, join, resolve } from 'node:path';
 import { copyFileSync, cpSync, existsSync } from 'node:fs';
 
-const viteOutDir = 'dist/vite/companion-app';
+const viteOutDir = 'dist/apps/companion-app';
 
 function copyLegacyAssets() {
   const include = ['css', 'images', 'js', 'risorse', 'manifest.json', 'sw.js'];
@@ -30,6 +30,7 @@ function copyLegacyAssets() {
 
 export default defineConfig({
   plugins: [copyLegacyAssets()],
+  base: './',
   server: {
     host: '127.0.0.1',
     port: 5173,

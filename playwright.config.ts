@@ -10,7 +10,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'node tools/serve-static.mjs . 8000',
+    command: 'vite --host 127.0.0.1 --port 8000',
     url: 'http://127.0.0.1:8000',
     reuseExistingServer: true,
     timeout: 15_000,
