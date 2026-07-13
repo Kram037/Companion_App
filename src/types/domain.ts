@@ -75,6 +75,8 @@ export interface Sessione {
   turno_corrente?: number | null;
   data_inizio?: ISODateString | null;
   data_fine?: ISODateString | null;
+  combat_round?: number | null;
+  combat_turn_index?: number | null;
   created_at?: ISODateString | null;
   updated_at?: ISODateString | null;
 }
@@ -108,7 +110,36 @@ export interface MostroCombattimento {
   iniziativa?: number | null;
   pv_attuali?: number | null;
   pv_max?: number | null;
+  punti_vita_max?: number | null;
+  created_at?: ISODateString | null;
+  is_placeholder?: boolean | null;
+  resistenze_leggendarie?: number | null;
+  azioni_legg_max?: number | null;
   dati?: JsonRecord | null;
+}
+
+export interface InitiativeRoll {
+  id?: Id | null;
+  giocatore_id: Id;
+  giocatore_nome?: string | null;
+  valore?: number | null;
+  stato?: string | null;
+  created_at?: ISODateString | null;
+  completed_at?: ISODateString | null;
+}
+
+export interface CombatCharacter extends CampaignCharacter {
+  immagine_url?: string | null;
+  punti_vita_max?: number | null;
+  pv_attuali?: number | null;
+  condizioni: string[];
+}
+
+export interface CombatSnapshot {
+  sessione: Sessione | null;
+  tiri: InitiativeRoll[];
+  mostri: MostroCombattimento[];
+  personaggi: CombatCharacter[];
 }
 
 export interface HomebrewItem {

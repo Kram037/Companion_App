@@ -1,13 +1,14 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { fetchCombatMonsters } from '../../api';
+import { fetchCombatSnapshot } from '../../api';
 import { queryKeys, queryTimings } from '../../query';
 import type { Id } from '../../types/domain';
 
-export function combatMonstersQuery(sessioneId: Id) {
+export function combatSnapshotQuery(campagnaId: Id, sessioneId: Id) {
   return queryOptions({
     queryKey: queryKeys.combat(sessioneId),
-    queryFn: () => fetchCombatMonsters(sessioneId),
+    queryFn: () => fetchCombatSnapshot(campagnaId, sessioneId),
+    enabled: Boolean(campagnaId && sessioneId),
     ...queryTimings.combat,
   });
 }

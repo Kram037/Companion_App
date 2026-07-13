@@ -87,6 +87,8 @@ export const sessionSchema = z.object({
   turno_corrente: z.number().nullish(),
   data_inizio: z.string().nullish(),
   data_fine: z.string().nullish(),
+  combat_round: z.number().nullish(),
+  combat_turn_index: z.number().nullish(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
 }).passthrough();
@@ -111,6 +113,11 @@ export const combatMonsterSchema = z.object({
   iniziativa: z.number().nullish(),
   pv_attuali: z.number().nullish(),
   pv_max: z.number().nullish(),
+  punti_vita_max: z.number().nullish(),
+  created_at: z.string().nullish(),
+  is_placeholder: z.boolean().nullish(),
+  resistenze_leggendarie: z.number().nullish(),
+  azioni_legg_max: z.number().nullish(),
   dati: jsonRecordSchema.nullish(),
 }).passthrough();
 

@@ -272,12 +272,12 @@ Ordine consigliato:
   - [x] personaggi in sessione;
   - [x] richiesta tiri;
   - [x] stato sessione.
-- [ ] `CombatPage`:
-  - [ ] ordine iniziativa;
-  - [ ] toolbar DM/player;
-  - [ ] mostri;
-  - [ ] condizioni;
-  - [ ] turni/round.
+- [x] `CombatPage`:
+  - [x] ordine iniziativa;
+  - [x] toolbar DM/player;
+  - [x] mostri;
+  - [x] condizioni;
+  - [x] turni/round.
 - [ ] `CharacterSheetPage`:
   - [ ] pagina statistiche;
   - [ ] inventario;

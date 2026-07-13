@@ -8,6 +8,10 @@ let _combatSelectedId = null;
 let _combatSelectedType = null; // 'player' or 'monster'
 
 async function renderCombattimentoContent(campagnaId, sessioneId) {
+    if (window.CompanionReactPages?.has('combattimento') && document.body.dataset.reactPage === 'combattimento') {
+        window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
+        return;
+    }
     const cardsCol = document.getElementById('combattimentoContent');
     const initCol = document.getElementById('combatInitCol');
     const roundInfo = document.getElementById('combatRoundInfo');
@@ -255,6 +259,10 @@ async function renderCombattimentoContent(campagnaId, sessioneId) {
         cardsCol.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
     }
 }
+
+window.setCombatInitiativeOrder = function(order) {
+    _combatInitiativeOrder = Array.isArray(order) ? order : [];
+};
 
 // Allinea lo scroll delle due colonne del combat (icone a sx, card a dx)
 // in modo che le righe restino visivamente sincronizzate. Senza questa
@@ -2190,7 +2198,7 @@ window.terminaCombattimento = async function(campagnaId, sessioneId) {
         showNotification('Combattimento terminato');
 
         navigateToPage('sessione');
-        await renderSessioneContent(campagnaId);
+        if (!window.CompanionReactPages?.has('sessione')) await renderSessioneContent(campagnaId);
     } catch (error) {
         console.error('❌ Errore nella terminazione combattimento:', error);
         showNotification('Errore nella terminazione del combattimento: ' + (error.message || error));
