@@ -203,6 +203,11 @@ function _labSyncAddButton() {
 }
 
 window.labBackToHub = function() {
+    const desktopTab = window.getDesktopDefaultGroupTab?.('laboratorio');
+    if (desktopTab) {
+        labOpenCategory(_labCurrentTab || desktopTab);
+        return;
+    }
     const hub = document.getElementById('labHub');
     const sub = document.getElementById('labSubPage');
     if (hub) hub.style.display = '';

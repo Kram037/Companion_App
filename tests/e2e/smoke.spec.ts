@@ -44,6 +44,21 @@ test('keeps desktop split panes stable', async ({ page }) => {
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active')).toBeVisible();
 });
 
+test('opens equipment sections directly from the desktop sidebar', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const compendium = page.locator('.desktop-sidebar-group[data-page="compendio"]');
+  await compendium.locator('.desktop-sidebar-group-toggle').click();
+  await compendium.locator('.desktop-sidebar-subgroup-toggle[data-tab="oggetti"]').click();
+  await compendium.locator('.desktop-sidebar-grandchild[data-section="gemme"]').click();
+
+  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+  await expect(compendium.locator('.desktop-sidebar-grandchild[data-section="gemme"]')).toHaveClass(/active/);
+  await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Equipaggiamento');
+  await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-section')).toHaveText('Gemme');
+});
+
 test('manifest does not lock tablet orientation', async ({ request }) => {
   const response = await request.get('/manifest.json');
   expect(response.ok()).toBe(true);

@@ -125,6 +125,13 @@ window.compGetSidebarItems = function() {
         key,
         label: tab.label,
         iconFile: tab.iconFile,
+        ...(key === 'oggetti' ? {
+            children: COMP_EQUIPMENT_SECTION_ORDER.map(section => ({
+                key: section,
+                label: COMP_EQUIPMENT_SECTIONS[section].label,
+                iconFile: COMP_EQUIPMENT_SECTIONS[section].iconFile,
+            })),
+        } : {}),
     }));
 };
 
@@ -132,6 +139,15 @@ window.compGetCurrentSidebarTab = function() {
     const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
     return subVisible ? _compCurrentTab : '';
 };
+
+window.compGetCurrentSidebarSection = function() {
+    return _compCurrentTab === 'oggetti' ? (_compStateFor('oggetti').equipmentSection || '') : '';
+};
+
+function _compUsesDesktopSidebar() {
+    return new URLSearchParams(window.location.search).get('splitPane') === '1'
+        || !!window.getDesktopDefaultGroupTab?.('compendio');
+}
 
 const COMP_MULTICLASS_REQUIREMENTS = {
     Artefice: 'Intelligenza 13',
@@ -484,7 +500,21 @@ function compendioRenderHub() {
 
 window.compendioBackToHub = function() {
     const state = _compStateFor(_compCurrentTab);
+    if (state.detail) {
+        state.detail = null;
+        const title = document.getElementById('compendioSubTitle');
+        if (title) title.textContent = _compCurrentTab === 'oggetti' && state.equipmentSection
+            ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
+            : (COMP_TABS[_compCurrentTab]?.label || 'Compendio');
+        compendioRenderTab();
+        _compScrollToTop();
+        return;
+    }
     if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
+        if (_compUsesDesktopSidebar()) {
+            compendioOpenTab('razze');
+            return;
+        }
         state.equipmentSection = '';
         const title = document.getElementById('compendioSubTitle');
         if (title) title.textContent = COMP_TABS.oggetti.label;
@@ -492,12 +522,8 @@ window.compendioBackToHub = function() {
         _compScrollToTop();
         return;
     }
-    if (state.detail) {
-        state.detail = null;
-        const title = document.getElementById('compendioSubTitle');
-        if (title) title.textContent = COMP_TABS[_compCurrentTab]?.label || 'Compendio';
-        compendioRenderTab();
-        _compScrollToTop();
+    if (_compUsesDesktopSidebar()) {
+        compendioOpenTab('razze');
         return;
     }
     _compSetStickyTools('');
@@ -509,6 +535,10 @@ window.compendioBackToHub = function() {
 };
 
 window.compendioShowHub = function() {
+    if (_compUsesDesktopSidebar()) {
+        compendioOpenTab(_compCurrentTab || 'razze');
+        return;
+    }
     Object.keys(COMP_TABS).forEach(tab => {
         _compStateFor(tab).detail = null;
     });
@@ -520,12 +550,14 @@ window.compendioShowHub = function() {
     _compScrollToTop();
 };
 
-window.compendioOpenTab = function(tab) {
+window.compendioOpenTab = function(tab, equipmentSection = '') {
     if (!COMP_TABS[tab]) return;
     _compCurrentTab = tab;
     _compStateFor(tab).detail = null;
     if (tab === 'oggetti') {
-        _compStateFor(tab).equipmentSection = '';
+        _compStateFor(tab).equipmentSection = COMP_EQUIPMENT_SECTIONS[equipmentSection]
+            ? equipmentSection
+            : (_compUsesDesktopSidebar() ? (_compStateFor(tab).equipmentSection || COMP_EQUIPMENT_SECTION_ORDER[0]) : '');
     }
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
@@ -767,7 +799,9 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
 window.compGetBookmarkState = function() {
     const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
     const state = _compStateFor(_compCurrentTab);
-    const title = subVisible
+    const title = subVisible && _compCurrentTab === 'oggetti' && state.equipmentSection
+        ? COMP_TABS.oggetti.label
+        : subVisible
         ? (document.getElementById('compendioSubTitle')?.textContent || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
         : 'Compendio';
     const sectionParts = ['Compendio'];
@@ -775,7 +809,7 @@ window.compGetBookmarkState = function() {
     if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
         sectionParts.push(COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || state.equipmentSection);
     }
-    if (state.detail?.id) sectionParts.push(state.detail.title || 'Dettaglio');
+    if (state.detail?.id && _compCurrentTab !== 'oggetti') sectionParts.push(state.detail.title || 'Dettaglio');
     return {
         title,
         section: sectionParts.join(' > '),
@@ -813,6 +847,8 @@ window.compRestoreBookmarkState = async function(saved) {
                 : (COMP_TABS[_compCurrentTab]?.label || 'Compendio'));
         compendioRenderTab();
         if (_compCurrentTab === 'mostri') await _compEnsureMonsterData({ rerender: true });
+    } else if (_compUsesDesktopSidebar()) {
+        compendioOpenTab(_compCurrentTab);
     } else {
         compendioShowHub();
     }
@@ -2114,6 +2150,7 @@ function _compClassSubclassesSection(cls, showTasha = false) {
 function _compObjectsPageHtml() {
     const state = _compStateFor('oggetti');
     state.equipmentSection = state.equipmentSection || '';
+    if (!state.equipmentSection && _compUsesDesktopSidebar()) state.equipmentSection = COMP_EQUIPMENT_SECTION_ORDER[0];
     if (!state.equipmentSection) return _compEquipmentHubHtml();
     return `<div id="compEquipmentSectionContent">${_compEquipmentSectionHtml(state.equipmentSection, state)}</div>`;
 }

@@ -10,8 +10,18 @@ let _bookmarkAutoUpdateTimer = null;
 let _bookmarkRestoreInProgress = false;
 let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
-let _bookmarkRightPaneState = { page: '', tab: '' };
+let _bookmarkRightPaneState = { page: '', tab: '', section: '' };
 const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
+const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
+    { key: 'armi', label: 'Armi, Armature e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
+    { key: 'avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
+    { key: 'strumenti', label: 'Strumenti', iconFile: 'Equipaggiamento/Strumenti' },
+    { key: 'erbe', label: 'Erbe', iconFile: 'Equipaggiamento/Erbe' },
+    { key: 'metalli', label: 'Metalli', iconFile: 'Equipaggiamento/Metalli' },
+    { key: 'gemme', label: 'Gemme', iconFile: 'Equipaggiamento/Gemme' },
+    { key: 'veleni', label: 'Veleni', iconFile: 'Equipaggiamento/Veleni' },
+    { key: 'oggetti', label: 'Oggetti Magici', iconFile: 'Equipaggiamento/Oggetti Magici' },
+];
 const DESKTOP_LAB_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
     { key: 'classi', label: 'Classi', iconFile: 'Classi' },
@@ -26,7 +36,7 @@ const DESKTOP_COMP_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
     { key: 'classi', label: 'Classi', iconFile: 'Classi' },
     { key: 'background', label: 'Background', iconFile: 'Background' },
-    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento' },
+    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento', children: DESKTOP_COMP_EQUIPMENT_CHILDREN },
     { key: 'talenti_stili', label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
     { key: 'mostri', label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
     { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
@@ -300,6 +310,13 @@ function _bookmarkNormalizeDesktopHook(page, hook = {}) {
         data.view = 'sub';
     }
     data.tab = data.tab || _bookmarkDefaultGroupTab(page);
+    if (page === 'compendio' && data.tab === 'oggetti') {
+        const equipment = _desktopGroupChildren('compendio').find(item => item.key === 'oggetti')?.children || [];
+        data.tabState = {
+            ...(data.tabState || {}),
+            equipmentSection: data.tabState?.equipmentSection || equipment[0]?.key || 'armi',
+        };
+    }
     return data;
 }
 
@@ -481,7 +498,7 @@ function removeBookmark(id) {
                 localStorage.removeItem(_bookmarksActiveRightKey());
                 document.getElementById('desktopSplitPane')?.remove();
                 document.body.classList.remove('desktop-split-active');
-                _bookmarkRightPaneState = { page: '', tab: '' };
+                _bookmarkRightPaneState = { page: '', tab: '', section: '' };
                 _bookmarkSetFocusedPane('left', { render: false });
                 setTimeout(() => openBookmark(rightId), 0);
                 return;
@@ -597,6 +614,7 @@ function openBookmarkSplitPane(id) {
     _bookmarkRightPaneState = {
         page: splitTab.state?.page || splitTab.page || '',
         tab: splitTab.state?.hook?.tab || '',
+        section: splitTab.state?.hook?.tabState?.equipmentSection || '',
     };
     _bookmarkSetFocusedPane('right');
 }
@@ -605,7 +623,7 @@ function closeBookmarkSplitPane() {
     document.getElementById('desktopSplitPane')?.remove();
     _bookmarkRemovePaneItems('right');
     localStorage.removeItem(_bookmarksActiveRightKey());
-    _bookmarkRightPaneState = { page: '', tab: '' };
+    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
     document.body.classList.remove('desktop-split-active');
     _bookmarkSetFocusedPane('left');
 }
@@ -635,7 +653,7 @@ function _bookmarkMergeSplitPaneForMobile() {
     pane.remove();
     localStorage.removeItem(_bookmarksActiveRightKey());
     document.body.classList.remove('desktop-split-active');
-    _bookmarkRightPaneState = { page: '', tab: '' };
+    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
     _bookmarkSetActiveId(targetId || '');
     _bookmarkSetFocusedPane('left', { render: false });
 
@@ -663,6 +681,7 @@ function _bookmarkRestorePersistedSplitPane() {
     _bookmarkRightPaneState = {
         page: active.state?.page || active.page || '',
         tab: active.state?.hook?.tab || '',
+        section: active.state?.hook?.tabState?.equipmentSection || '',
     };
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: active.id }, window.location.origin);
@@ -783,6 +802,18 @@ function _desktopToggleGroup(page) {
     group?.querySelector('.desktop-sidebar-group-toggle')?.setAttribute('aria-expanded', String(!isOpen));
 }
 
+function _desktopSubgroupOpen(page, tab) {
+    return localStorage.getItem(`${_desktopGroupStorageKey(page)}_${tab}`) === 'open';
+}
+
+function _desktopToggleSubgroup(page, tab) {
+    const group = document.querySelector(`.desktop-sidebar-subgroup[data-page="${page}"][data-tab="${tab}"]`);
+    const isOpen = group?.classList.contains('open') ?? _desktopSubgroupOpen(page, tab);
+    localStorage.setItem(`${_desktopGroupStorageKey(page)}_${tab}`, isOpen ? 'closed' : 'open');
+    group?.classList.toggle('open', !isOpen);
+    group?.querySelector('.desktop-sidebar-subgroup-toggle')?.setAttribute('aria-expanded', String(!isOpen));
+}
+
 function _desktopGroupStorageKey(page) {
     return `companion_sidebar_group_v2_${page}`;
 }
@@ -799,9 +830,14 @@ function _bookmarkEnsureDesktopChrome() {
                 _desktopToggleGroup(toggle.dataset.page);
                 return;
             }
-            const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child');
+            const subgroup = event.target.closest('.desktop-sidebar-subgroup-toggle');
+            if (subgroup) {
+                _desktopToggleSubgroup(subgroup.dataset.page, subgroup.dataset.tab);
+                return;
+            }
+            const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child, .desktop-sidebar-grandchild');
             if (!btn) return;
-            _routeDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '');
+            _routeDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '', btn.dataset.section || '');
         });
         document.body.appendChild(sidebar);
     }
@@ -850,37 +886,41 @@ function _bookmarkPostCurrentPaneState() {
         type: 'companion-split-focus',
         page: AppState.currentPage || '',
         tab: _desktopActiveChild(AppState.currentPage || ''),
+        section: _desktopActiveSection(AppState.currentPage || ''),
     }, window.location.origin);
 }
 
-async function _openDesktopSidebarTarget(page, tab = '') {
+async function _openDesktopSidebarTarget(page, tab = '', section = '') {
     if (page === 'laboratorio') {
-        await navigateToPage('laboratorio');
+        if (AppState.currentPage !== 'laboratorio') await navigateToPage('laboratorio');
         if (tab) window.labOpenCategory?.(tab);
+        scheduleActiveBookmarkCapture?.(0);
         return;
     }
     if (page === 'compendio') {
-        await navigateToPage('compendio');
-        if (tab) window.compendioOpenTab?.(tab);
+        if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
+        if (tab) window.compendioOpenTab?.(tab, section);
+        scheduleActiveBookmarkCapture?.(0);
         return;
     }
-    await navigateToPage(page);
+    if (AppState.currentPage !== page) await navigateToPage(page);
 }
 
-function _routeDesktopSidebarTarget(page, tab = '') {
+function _routeDesktopSidebarTarget(page, tab = '', section = '') {
     const frameWindow = _bookmarkSplitFrameWindow();
     if (_bookmarkFocusedPane === 'right' && frameWindow) {
-        _bookmarkRightPaneState = { page, tab };
+        _bookmarkRightPaneState = { page, tab, section };
         updateDesktopSidebarActive();
         frameWindow.postMessage({
             type: 'companion-sidebar-target',
             page,
             tab,
+            section,
         }, window.location.origin);
         return;
     }
     _bookmarkSetFocusedPane('left', { render: false });
-    _openDesktopSidebarTarget(page, tab);
+    _openDesktopSidebarTarget(page, tab, section);
 }
 
 function _desktopActiveChild(page) {
@@ -896,6 +936,16 @@ function _desktopActiveChild(page) {
     return '';
 }
 
+function _desktopActiveSection(page) {
+    if (!_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right') {
+        return _bookmarkRightPaneState.page === page ? (_bookmarkRightPaneState.section || '') : '';
+    }
+    if (page === 'compendio' && typeof window.compGetCurrentSidebarSection === 'function') {
+        return window.compGetCurrentSidebarSection();
+    }
+    return '';
+}
+
 function _desktopSidebarFocusedPage() {
     return !_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right'
         ? (_bookmarkRightPaneState.page || '')
@@ -906,6 +956,7 @@ function renderDesktopSidebar() {
     const sidebar = document.getElementById('desktopSidebarNav');
     if (!sidebar) return;
     const focusedPage = _desktopSidebarFocusedPage();
+    const activeSection = _desktopActiveSection(focusedPage);
     sidebar.innerHTML = _desktopNavItems().map(item => {
         if (item.type !== 'group') {
             return `
@@ -925,12 +976,33 @@ function renderDesktopSidebar() {
                     <span class="desktop-sidebar-caret">v</span>
                 </button>
                 <div class="desktop-sidebar-children">
-                    ${(item.children || []).map(child => `
-                        <button type="button" class="desktop-sidebar-child ${focusedPage === item.page && activeChild === child.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
-                            ${_desktopSidebarItemIcon(child)}
-                            <span>${_bookmarkEscape(child.label)}</span>
-                        </button>
-                    `).join('')}
+                    ${(item.children || []).map(child => {
+                        const active = focusedPage === item.page && activeChild === child.key;
+                        if (!child.children?.length) return `
+                            <button type="button" class="desktop-sidebar-child ${active ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
+                                ${_desktopSidebarItemIcon(child)}
+                                <span>${_bookmarkEscape(child.label)}</span>
+                            </button>
+                        `;
+                        const subOpen = _desktopSubgroupOpen(item.page, child.key);
+                        return `
+                            <div class="desktop-sidebar-subgroup ${subOpen ? 'open' : ''}" data-page="${item.page}" data-tab="${child.key}">
+                                <button type="button" class="desktop-sidebar-child desktop-sidebar-subgroup-toggle ${active ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" aria-expanded="${subOpen ? 'true' : 'false'}">
+                                    ${_desktopSidebarItemIcon(child)}
+                                    <span>${_bookmarkEscape(child.label)}</span>
+                                    <span class="desktop-sidebar-subgroup-caret">v</span>
+                                </button>
+                                <div class="desktop-sidebar-grandchildren">
+                                    ${child.children.map(section => `
+                                        <button type="button" class="desktop-sidebar-grandchild ${active && activeSection === section.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" data-section="${section.key}" title="${_bookmarkEscape(section.label)}">
+                                            ${_desktopSidebarItemIcon(section)}
+                                            <span>${_bookmarkEscape(section.label)}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -940,6 +1012,7 @@ function renderDesktopSidebar() {
 function updateDesktopSidebarActive() {
     const focusedPage = _desktopSidebarFocusedPage();
     const activeChild = _desktopActiveChild(focusedPage);
+    const activeSection = _desktopActiveSection(focusedPage);
     document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
         const isGroup = btn.classList.contains('desktop-sidebar-group-toggle');
         btn.classList.toggle('active', btn.dataset.page === focusedPage && !isGroup);
@@ -947,6 +1020,9 @@ function updateDesktopSidebarActive() {
     });
     document.querySelectorAll('.desktop-sidebar-child').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.page === focusedPage && btn.dataset.tab === activeChild);
+    });
+    document.querySelectorAll('.desktop-sidebar-grandchild').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === focusedPage && btn.dataset.tab === activeChild && btn.dataset.section === activeSection);
     });
 }
 
@@ -983,7 +1059,7 @@ function initBookmarks() {
                 renderDesktopBookmarkTabs();
             } else if (event.data?.type === 'companion-sidebar-target') {
                 _bookmarkFocusCurrentPane({ render: false });
-                _openDesktopSidebarTarget(event.data.page, event.data.tab || '');
+                _openDesktopSidebarTarget(event.data.page, event.data.tab || '', event.data.section || '');
                 setTimeout(_bookmarkPostCurrentPaneState, 80);
             }
         });
@@ -1051,6 +1127,7 @@ function initBookmarks() {
             _bookmarkRightPaneState = {
                 page: event.data.page || _bookmarkRightPaneState.page || '',
                 tab: event.data.tab || '',
+                section: event.data.section || '',
             };
             _bookmarkSetFocusedPane('right', { notify: false });
             updateDesktopSidebarActive();

@@ -247,6 +247,17 @@
     margin-bottom: 10px;
 }
 .lab-list-toolbar .filter-search-wrap { flex: 1; }
+.lab-list-toolbar .filter-search {
+    min-height: 36px;
+    padding: 8px 10px 8px 34px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.lab-list-toolbar .filter-search-icon {
+    left: 10px;
+    width: 17px;
+    height: 17px;
+}
 .lab-list-search-bar {
     margin: 0 0 10px;
     border: 1px solid var(--border);
