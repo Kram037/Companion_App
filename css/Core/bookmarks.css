@@ -446,10 +446,21 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         height: 17px;
         display: block;
         flex: 0 0 17px;
-        background: currentColor;
-        -webkit-mask: var(--desktop-sidebar-icon) center / contain no-repeat;
-        mask: var(--desktop-sidebar-icon) center / contain no-repeat;
-        filter: drop-shadow(0 0 6px rgba(198, 154, 74, 0.18));
+        object-fit: contain;
+        filter: invert(55%) sepia(8%) saturate(330%) hue-rotate(345deg) brightness(90%) contrast(88%);
+    }
+
+    .desktop-sidebar-btn .desktop-sidebar-item-icon {
+        width: 21px;
+        height: 21px;
+        flex-basis: 21px;
+    }
+
+    .desktop-sidebar-btn:hover .desktop-sidebar-item-icon,
+    .desktop-sidebar-btn.group-active .desktop-sidebar-item-icon,
+    .desktop-sidebar-child:hover .desktop-sidebar-item-icon,
+    .desktop-sidebar-child.active .desktop-sidebar-item-icon {
+        filter: invert(78%) sepia(47%) saturate(606%) hue-rotate(358deg) brightness(91%) contrast(89%) drop-shadow(0 0 6px rgba(198, 154, 74, 0.22));
     }
 
     .desktop-sidebar-child span {
@@ -507,7 +518,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         cursor: pointer;
         position: relative;
         flex: 0 0 auto;
-        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, min-width 0.18s ease;
+        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
 
     .desktop-bookmark-add-tab {
@@ -566,7 +577,6 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-bookmark-tab.active {
-        min-width: 214px;
         box-shadow: inset 0 2px 0 var(--fantasy-gold-strong, var(--accent));
     }
 
@@ -809,7 +819,6 @@ body.bookmark-split-instance .desktop-bookmark-tab {
 }
 
 body.bookmark-split-instance .desktop-bookmark-tab.active {
-    min-width: 176px;
     color: var(--text);
     border-color: var(--fantasy-gold-line, var(--accent-light));
     background:

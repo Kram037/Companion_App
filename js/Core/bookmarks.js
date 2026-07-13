@@ -466,6 +466,26 @@ function removeBookmark(id) {
             setTimeout(() => openBookmark(nextId), 0);
             return;
         }
+        if (_bookmarkIsSplitPaneInstance) {
+            window.parent?.postMessage({ type: 'companion-close-empty-split-pane' }, window.location.origin);
+            return;
+        }
+        if (document.getElementById('desktopSplitPane')) {
+            const rightItems = _bookmarkPaneItems(list, 'right');
+            const storedRightId = localStorage.getItem(_bookmarksActiveRightKey()) || '';
+            const rightId = rightItems.some(item => item.id === storedRightId) ? storedRightId : (rightItems[0]?.id || '');
+            if (rightId) {
+                _bookmarksWrite(list.map(item => _bookmarkItemPane(item) === 'right' ? { ...item, pane: 'left' } : item));
+                _bookmarkSetActiveId('');
+                localStorage.removeItem(_bookmarksActiveRightKey());
+                document.getElementById('desktopSplitPane')?.remove();
+                document.body.classList.remove('desktop-split-active');
+                _bookmarkRightPaneState = { page: '', tab: '' };
+                _bookmarkSetFocusedPane('left', { render: false });
+                setTimeout(() => openBookmark(rightId), 0);
+                return;
+            }
+        }
     }
     updateBookmarkChrome();
 }
@@ -703,16 +723,17 @@ function _desktopNavItems() {
     return [
         { type: 'link', page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
         { type: 'link', page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { type: 'group', page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>', children: _desktopGroupChildren('laboratorio') },
-        { type: 'group', page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>', children: _desktopGroupChildren('compendio') },
+        { type: 'group', page: 'laboratorio', label: 'Laboratorio', iconSrc: 'images/Toolbar/Laboratorio.svg', children: _desktopGroupChildren('laboratorio') },
+        { type: 'group', page: 'compendio', label: 'Compendio', iconSrc: 'images/Toolbar/Compendio.svg', children: _desktopGroupChildren('compendio') },
     ];
 }
 
 function _desktopSidebarItemIcon(item) {
     if (item.icon) return item.icon;
-    if (!item.iconFile) return '';
-    const src = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
-    return `<span class="desktop-sidebar-item-icon" style="--desktop-sidebar-icon:url('${src}')" aria-hidden="true"></span>`;
+    const src = item.iconSrc || (item.iconFile
+        ? `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`
+        : '');
+    return src ? `<img class="desktop-sidebar-item-icon" src="${src}" alt="">` : '';
 }
 
 function _desktopGroupOpen(page) {
@@ -721,9 +742,11 @@ function _desktopGroupOpen(page) {
 }
 
 function _desktopToggleGroup(page) {
-    const isOpen = _desktopGroupOpen(page);
+    const group = document.querySelector(`.desktop-sidebar-group[data-page="${page}"]`);
+    const isOpen = group?.classList.contains('open') ?? _desktopGroupOpen(page);
     localStorage.setItem(_desktopGroupStorageKey(page), isOpen ? 'closed' : 'open');
-    renderDesktopSidebar();
+    group?.classList.toggle('open', !isOpen);
+    group?.querySelector('.desktop-sidebar-group-toggle')?.setAttribute('aria-expanded', String(!isOpen));
 }
 
 function _desktopGroupStorageKey(page) {
@@ -822,8 +845,7 @@ function _routeDesktopSidebarTarget(page, tab = '') {
         }, window.location.origin);
         return;
     }
-    _bookmarkSetFocusedPane('left');
-    captureActiveBookmark({ silent: true });
+    _bookmarkSetFocusedPane('left', { render: false });
     _openDesktopSidebarTarget(page, tab);
 }
 
@@ -882,12 +904,15 @@ function renderDesktopSidebar() {
 }
 
 function updateDesktopSidebarActive() {
-    renderDesktopSidebar();
     const focusedPage = _desktopSidebarFocusedPage();
+    const activeChild = _desktopActiveChild(focusedPage);
     document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
         const isGroup = btn.classList.contains('desktop-sidebar-group-toggle');
         btn.classList.toggle('active', btn.dataset.page === focusedPage && !isGroup);
         btn.classList.toggle('group-active', btn.dataset.page === focusedPage && isGroup);
+    });
+    document.querySelectorAll('.desktop-sidebar-child').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === focusedPage && btn.dataset.tab === activeChild);
     });
 }
 
@@ -923,8 +948,7 @@ function initBookmarks() {
                 document.body.classList.toggle('split-pane-focused', event.data.pane === 'right');
                 renderDesktopBookmarkTabs();
             } else if (event.data?.type === 'companion-sidebar-target') {
-                _bookmarkFocusCurrentPane();
-                captureActiveBookmark({ silent: true });
+                _bookmarkFocusCurrentPane({ render: false });
                 _openDesktopSidebarTarget(event.data.page, event.data.tab || '');
                 setTimeout(_bookmarkPostCurrentPaneState, 80);
             }
@@ -987,16 +1011,16 @@ function initBookmarks() {
             };
             _bookmarkSetFocusedPane('right', { notify: false });
             updateDesktopSidebarActive();
+        } else if (event.data?.type === 'companion-close-empty-split-pane') {
+            closeBookmarkSplitPane();
         }
     });
     if (!window._bookmarksInteractionRefreshBound) {
         window._bookmarksInteractionRefreshBound = true;
-        const schedule = () => {
+        const schedule = (event) => {
+            if (event.target?.closest?.('.desktop-sidebar-nav, .desktop-bookmark-tabs')) return;
             clearTimeout(_bookmarkRefreshTimer);
-            _bookmarkRefreshTimer = setTimeout(() => {
-                scheduleActiveBookmarkCapture(0);
-                updateBookmarkChrome();
-            }, 180);
+            _bookmarkRefreshTimer = setTimeout(() => scheduleActiveBookmarkCapture(0), 180);
         };
         document.addEventListener('click', schedule, true);
         document.addEventListener('input', schedule, true);
