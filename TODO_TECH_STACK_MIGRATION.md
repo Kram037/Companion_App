@@ -160,9 +160,9 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
   - [x] sessione;
   - [x] combattimento.
 - [ ] Sostituire refresh diretti con invalidazioni:
-  - [ ] `queryClient.invalidateQueries(...)`;
-  - [ ] `queryClient.setQueryData(...)` per update ottimistici;
-  - [ ] `queryClient.cancelQueries(...)` prima di mutation sensibili.
+  - [x] `queryClient.invalidateQueries(...)`;
+  - [x] `queryClient.setQueryData(...)` per update ottimistici;
+  - [x] `queryClient.cancelQueries(...)` prima di mutation sensibili.
 - [x] Configurare stale/cache time per dominio:
   - [x] campagne: medio;
   - [x] scheda personaggio: breve ma con optimistic update;
