@@ -230,7 +230,8 @@ function _bookmarkIsWritablePage() {
 }
 
 function _bookmarkIsDesktopLayout() {
-    return typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 900px)').matches;
+    return typeof window.matchMedia === 'function'
+        && window.matchMedia('(min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px)').matches;
 }
 
 function _bookmarkSplitFrameWindow() {

@@ -230,7 +230,12 @@ async function _ensurePageRuntimeData(pageName) {
     if (typeof window.ensureRuntimeData !== 'function') return;
     const bundles = _pageRuntimeDataBundles(pageName);
     if (!bundles.length) return;
-    await Promise.all(bundles.map(key => window.ensureRuntimeData(key)));
+    const results = await Promise.allSettled(bundles.map(key => window.ensureRuntimeData(key)));
+    results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+            console.warn(`[navigation] bundle dati non caricato (${bundles[index]}):`, result.reason);
+        }
+    });
 }
 
 async function _runPageLoad(pageName, desktopGroupTab = '') {

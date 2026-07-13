@@ -284,7 +284,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     display: none;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px) {
     :root {
         --desktop-sidebar-width: 228px;
     }
