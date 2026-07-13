@@ -222,7 +222,9 @@ function _pageRuntimeDataBundles(pageName) {
         if (pageName === 'scheda') bundles.push('magicItems', 'poisons');
         return bundles;
     }
-    if (pageName === 'laboratorio') return ['spells'];
+    if (pageName === 'laboratorio') {
+        return ['backgrounds', 'races', 'feats', 'fightingStyles', 'invocations', 'classes', 'spells', 'magicItems', 'poisons', 'equipment', 'monsters'];
+    }
     return [];
 }
 
