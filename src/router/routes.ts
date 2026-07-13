@@ -25,3 +25,11 @@ export function buildAppPath(route: AppRouteId, params: RouteParams = {}) {
 
   return generatePath(appRoutes[route], normalized);
 }
+
+export function appBasenameFromPath(pathname: string) {
+  const roots = ['campagne', 'personaggi', 'compendio', 'laboratorio', 'amici'];
+  const segments = pathname.split('/').filter(Boolean);
+  const routeIndex = segments.findIndex(segment => roots.includes(segment));
+  const baseSegments = routeIndex >= 0 ? segments.slice(0, routeIndex) : segments;
+  return baseSegments.length ? `/${baseSegments.join('/')}` : undefined;
+}

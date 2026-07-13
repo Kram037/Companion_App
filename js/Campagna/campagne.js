@@ -1016,6 +1016,7 @@ async function handleCampagnaSubmit(e) {
             showNotification('Campagna creata con successo!');
         }
         closeCampagnaModal();
+        window.dispatchEvent(new CustomEvent('companion:campaigns-changed'));
         
         // Ricarica le campagne dopo creazione/modifica
         if (session?.user) {
@@ -2098,6 +2099,7 @@ window.deleteCampagna = async function(campagnaId) {
         await sendAppEventBroadcast({ table: 'campagne', action: 'delete', campagnaId });
         
         showNotification('Campagna eliminata con successo!');
+        window.dispatchEvent(new CustomEvent('companion:campaigns-changed'));
         
         // Ricarica le campagne dopo eliminazione
         const { data: { session } } = await supabase.auth.getSession();

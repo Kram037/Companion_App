@@ -1,0 +1,12 @@
+#react-root {
+  display: contents;
+}
+
+body[data-react-page] #mainContent > .page {
+  display: none !important;
+}
+
+.react-page-shell {
+  display: block;
+  min-height: 100%;
+}

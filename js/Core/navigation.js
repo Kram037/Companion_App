@@ -100,7 +100,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
     const previousPage = AppState.currentPage;
 
     // Update active page
-    elements.pages.forEach(page => {
+    (elements.pages || document.querySelectorAll('.page')).forEach(page => {
         page.classList.remove('active');
     });
     
@@ -110,7 +110,7 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
     }
 
     // Update active toolbar button
-    elements.toolbarBtns.forEach(btn => {
+    (elements.toolbarBtns || document.querySelectorAll('.toolbar-btn')).forEach(btn => {
         btn.classList.remove('active');
         if (btn.getAttribute('data-page') === pageName) {
             btn.classList.add('active');
@@ -161,6 +161,9 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
             personaggioId: AppState.currentPersonaggioId || null
         };
         history.pushState(stateObj, '', legacyPathFromNavigationState(stateObj));
+        window.dispatchEvent(new PopStateEvent('popstate', {
+            state: { ...stateObj, __reactSync: true }
+        }));
     }
     
     // Ferma Realtime subscription combattimento se si esce dalla pagina
@@ -246,6 +249,7 @@ async function _ensurePageRuntimeData(pageName) {
 
 async function _runPageLoad(pageName, desktopGroupTab = '') {
     try {
+        if (window.CompanionReactPages?.has(pageName)) return;
         await _ensurePageRuntimeData(pageName);
         if (pageName === 'amici' && AppState.isLoggedIn) {
             loadAmici();

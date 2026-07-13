@@ -1,13 +1,15 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
+import { CampaignsRoutePage } from '../features/campaigns/CampaignsRoutePage';
+import { appBasenameFromPath } from '../router';
 import { CampaignRedirect, LegacyPageAdapter } from './LegacyPageAdapter';
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={appBasenameFromPath(window.location.pathname)}>
       <Routes>
         <Route path="/" element={<CampaignRedirect />} />
-        <Route path="/campagne" element={<LegacyPageAdapter page="campagne" />} />
+        <Route path="/campagne" element={<CampaignsRoutePage />} />
         <Route path="/campagne/:campagnaId" element={<LegacyPageAdapter page="dettagli" />} />
         <Route path="/campagne/:campagnaId/sessione" element={<LegacyPageAdapter page="sessione" />} />
         <Route path="/campagne/:campagnaId/sessione/:sessioneId/combattimento" element={<LegacyPageAdapter page="combattimento" />} />

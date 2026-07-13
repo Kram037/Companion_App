@@ -14,6 +14,10 @@ export const jsonRecordSchema = z.record(z.string(), jsonValueSchema);
 
 export const userProfileSchema = z.object({
   id: z.string(),
+  uid: z.string().nullish(),
+  nome_utente: z.string().nullish(),
+  cid: z.string().nullish(),
+  campagne_preferite: z.array(z.string()).nullish(),
   username: z.string().nullish(),
   displayName: z.string().nullish(),
   avatarUrl: z.string().nullish(),
@@ -26,6 +30,10 @@ export const campaignSchema = z.object({
   id_dm: z.string(),
   descrizione: z.string().nullish(),
   icona_name: z.string().nullish(),
+  giocatori: z.array(z.string()).nullish(),
+  data_creazione: z.string().nullish(),
+  dm_nome: z.string().nullish(),
+  isPreferito: z.boolean().optional(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
 }).passthrough();

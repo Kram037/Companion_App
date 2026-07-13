@@ -5,6 +5,10 @@ export type JsonRecord = Record<string, JsonValue>;
 
 export interface UserProfile {
   id: Id;
+  uid?: Id | null;
+  nome_utente?: string | null;
+  cid?: string | null;
+  campagne_preferite?: Id[] | null;
   username?: string | null;
   displayName?: string | null;
   avatarUrl?: string | null;
@@ -17,6 +21,10 @@ export interface Campagna {
   id_dm: Id;
   descrizione?: string | null;
   icona_name?: string | null;
+  giocatori?: Id[] | null;
+  data_creazione?: ISODateString | null;
+  dm_nome?: string | null;
+  isPreferito?: boolean;
   created_at?: ISODateString | null;
   updated_at?: ISODateString | null;
 }

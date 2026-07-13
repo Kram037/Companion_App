@@ -5,6 +5,8 @@ test('loads the app shell', async ({ page }) => {
 
   await expect(page).toHaveTitle('Companion App - D&D Helper');
   await expect(page.locator('.header')).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
+  await expect(page.locator('#campagnePage')).toBeHidden();
 });
 
 test('uses desktop chrome on tablet landscape', async ({ page }) => {

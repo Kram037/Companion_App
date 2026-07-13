@@ -37,16 +37,54 @@ export async function fetchAcceptedCampaignsByPlayer(userTableId: Id): Promise<C
 }
 
 export async function fetchVisibleCampaigns(userTableId: Id): Promise<Campagna[]> {
-  const [owned, joined] = await Promise.all([
+  const [owned, joined, user] = await Promise.all([
     fetchCampaignsByDm(userTableId),
     fetchAcceptedCampaignsByPlayer(userTableId),
+    getSupabaseClient().from('utenti').select('campagne_preferite').eq('id', userTableId).single(),
   ]);
 
   const byId = new Map<Id, Campagna>();
   [...owned, ...joined].forEach(campaign => byId.set(campaign.id, campaign));
-  return Array.from(byId.values()).sort((a, b) => {
-    return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
+  const campaigns = Array.from(byId.values());
+  const dmIds = [...new Set(campaigns.map(campaign => campaign.id_dm))];
+  const { data: dms, error: dmsError } = dmIds.length
+    ? await getSupabaseClient().from('utenti').select('id,nome_utente').in('id', dmIds)
+    : { data: [], error: null };
+  throwIfSupabaseError(user.error);
+  throwIfSupabaseError(dmsError);
+
+  const favoriteIds = new Set<Id>(user.data?.campagne_preferite ?? []);
+  const dmNames = new Map<Id, string>((dms ?? []).map(dm => [String(dm.id), String(dm.nome_utente ?? '')]));
+  return campaigns.map(campaign => ({
+    ...campaign,
+    dm_nome: dmNames.get(campaign.id_dm) ?? null,
+    isPreferito: favoriteIds.has(campaign.id),
+  })).sort((a, b) => {
+    return new Date(b.data_creazione ?? b.created_at ?? 0).getTime()
+      - new Date(a.data_creazione ?? a.created_at ?? 0).getTime();
   });
+}
+
+export async function toggleCampaignFavorite(userTableId: Id, campaignId: Id): Promise<Id[]> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
+    .from('utenti')
+    .select('campagne_preferite')
+    .eq('id', userTableId)
+    .single();
+  throwIfSupabaseError(error);
+
+  const favorites = new Set<Id>(data?.campagne_preferite ?? []);
+  if (favorites.has(campaignId)) favorites.delete(campaignId);
+  else favorites.add(campaignId);
+
+  const next = [...favorites];
+  const { error: updateError } = await client
+    .from('utenti')
+    .update({ campagne_preferite: next })
+    .eq('id', userTableId);
+  throwIfSupabaseError(updateError);
+  return next;
 }
 
 export function mapReceivedCampaignInviteRow(row: Record<string, unknown>): CampaignInvite {

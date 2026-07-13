@@ -8,6 +8,15 @@ declare global {
 }
 
 import { mountReactBridge } from './app';
+import './app/react-page.css';
+
+declare global {
+  interface Window {
+    CompanionReactPages?: Set<string>;
+  }
+}
+
+window.CompanionReactPages = new Set(['campagne']);
 
 window.CompanionViteBootstrap = {
   loadedAt: new Date().toISOString(),

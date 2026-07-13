@@ -221,6 +221,7 @@ async function init() {
 
     // Browser back/forward navigation
     window.addEventListener('popstate', async (event) => {
+        if (event.state?.__reactSync) return;
         if (event.state && event.state.page) {
             const st = event.state;
             if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;

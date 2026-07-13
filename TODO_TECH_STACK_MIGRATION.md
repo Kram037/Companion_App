@@ -257,11 +257,11 @@ Criterio di uscita: le pagine React usano URL reali, non stato globale manuale.
 
 Ordine consigliato:
 
-- [ ] `CampagneListPage`:
+- [x] `CampagneListPage`:
   - [x] lista campagne;
   - [x] filtri;
   - [x] preferiti;
-  - [ ] inviti.
+  - [x] inviti.
 - [ ] `CampagnaDetailsPage`:
   - [ ] header;
   - [ ] azioni sessione;
