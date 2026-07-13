@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 
 const outDir = resolve(process.argv[2] || 'dist/apps/companion-app');
@@ -28,5 +28,7 @@ for (const item of include) {
     filter: path => !exclude.includes(resolve(path).toLowerCase()),
   });
 }
+
+copyFileSync(join(root, 'index.html'), join(outDir, '404.html'));
 
 console.log(`Built static app in ${outDir}`);

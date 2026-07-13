@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { basename, join, resolve } from 'node:path';
-import { cpSync, existsSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync } from 'node:fs';
 
 const viteOutDir = 'dist/vite/companion-app';
 
@@ -23,6 +23,7 @@ function copyLegacyAssets() {
           filter: path => !exclude.includes(resolve(path).toLowerCase()),
         });
       }
+      copyFileSync(join(outDir, 'index.html'), join(outDir, '404.html'));
     },
   };
 }

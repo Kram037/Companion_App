@@ -246,7 +246,7 @@ Criterio di uscita: `AppState` legacy puo' iniziare a essere svuotato e sostitui
   - [x] `/amici`.
 - [x] Creare bridge temporaneo tra `navigateToPage` legacy e router React.
 - [ ] Sostituire gradualmente `sessionStorage currentPage/currentCampagnaId/currentSessioneId` con URL params.
-- [ ] Gestire deep link e refresh pagina.
+- [x] Gestire deep link e refresh pagina.
 - [ ] Mantenere compatibilita' PWA notification click.
 
 Criterio di uscita: le pagine React usano URL reali, non stato globale manuale.
@@ -381,7 +381,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 
 ### Milestone C - Prime pagine React
 
-- [ ] Campagne in React.
+- [x] Campagne in React.
 - [ ] Dettaglio campagna in React.
 - [ ] Sessione in React.
 

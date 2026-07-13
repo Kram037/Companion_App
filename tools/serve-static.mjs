@@ -26,6 +26,11 @@ createServer((req, res) => {
 
   const target = existsSync(file) && statSync(file).isDirectory() ? join(file, 'index.html') : file;
   if (!existsSync(target)) {
+    if ((req.headers.accept || '').includes('text/html')) {
+      res.writeHead(200, { 'Content-Type': types['.html'] });
+      createReadStream(join(root, 'index.html')).pipe(res);
+      return;
+    }
     res.writeHead(404).end('Not found');
     return;
   }

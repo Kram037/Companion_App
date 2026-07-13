@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
 import { AppProviders } from './AppProviders';
+import { AppRouter } from './AppRouter';
 
 export function mountReactBridge(element: HTMLElement): Root {
   const root = createRoot(element);
@@ -9,7 +10,7 @@ export function mountReactBridge(element: HTMLElement): Root {
   root.render(
     <StrictMode>
       <AppProviders>
-        <div data-react-bridge="ready" hidden />
+        <AppRouter />
       </AppProviders>
     </StrictMode>,
   );
