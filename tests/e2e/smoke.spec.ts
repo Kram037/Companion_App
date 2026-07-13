@@ -55,7 +55,7 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   await compendium.locator('.desktop-sidebar-subgroup-toggle[data-tab="oggetti"]').click();
   await compendium.locator('.desktop-sidebar-grandchild[data-section="gemme"]').click();
 
-  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+  await expect(page.locator('.react-compendium-page .page-header h1')).toHaveText('Gemme');
   await expect(compendium.locator('.desktop-sidebar-grandchild[data-section="gemme"]')).toHaveClass(/active/);
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Equipaggiamento');
   await expect(page.locator('#desktopBookmarkTabs .desktop-bookmark-tab.active .desktop-bookmark-tab-section')).toHaveText('Gemme');
@@ -67,10 +67,10 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   const originalTabId = await activeTab.getAttribute('data-bookmark-id');
 
   await page.evaluate(() => (window as typeof window & { navigateToPage: (page: string) => Promise<void> }).navigateToPage('compendio'));
-  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+  await expect(page.locator('.react-compendium-page .page-header h1')).toHaveText('Gemme');
 
   await page.locator('.desktop-bookmark-split-tab').click();
-  await expect(page.locator('#compendioSubTitle')).toHaveText('Gemme');
+  await expect(page.locator('.react-compendium-page .page-header h1')).toHaveText('Gemme');
   await expect(page.locator(`#desktopBookmarkTabs [data-bookmark-id="${originalTabId}"] .desktop-bookmark-tab-title`)).toHaveText('Equipaggiamento');
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#campagnePage')).toHaveClass(/active/);
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Campagne');

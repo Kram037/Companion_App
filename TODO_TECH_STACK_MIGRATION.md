@@ -285,11 +285,11 @@ Ordine consigliato:
   - [x] privilegi;
   - [x] risorse;
   - [x] micro scheda.
-- [ ] `CompendiumPage`:
-  - [ ] hub;
-  - [ ] tabs;
-  - [ ] ricerca;
-  - [ ] lazy data bundle.
+- [x] `CompendiumPage`:
+  - [x] hub;
+  - [x] tabs;
+  - [x] ricerca;
+  - [x] lazy data bundle.
 - [ ] `LaboratoryPage`:
   - [ ] homebrew list;
   - [ ] editor;
@@ -382,19 +382,19 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 ### Milestone C - Prime pagine React
 
 - [x] Campagne in React.
-- [ ] Dettaglio campagna in React.
-- [ ] Sessione in React.
+- [x] Dettaglio campagna in React.
+- [x] Sessione in React.
 
 ### Milestone D - Area critica realtime
 
-- [ ] Combattimento in React.
+- [x] Combattimento in React.
 - [ ] Test Playwright per realtime DM/player.
 - [ ] Nessun render diretto da eventi realtime.
 
 ### Milestone E - Migrazione completa
 
-- [ ] Scheda personaggio in React.
-- [ ] Compendio in React.
+- [x] Scheda personaggio in React.
+- [x] Compendio in React.
 - [ ] Laboratorio in React.
 - [ ] Legacy cleanup.
 

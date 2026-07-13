@@ -107,6 +107,15 @@ const _compRuntimeDataPromises = new Map();
 let _compMonsterItemsCache = null;
 let _compMonsterItemsSource = null;
 let _compSearchRenderTimer = null;
+let _compReactState = null;
+
+function _compReactOwnsPage() {
+    return window.CompanionReactPages?.has('compendio') && document.body.dataset.reactPage === 'compendio';
+}
+
+function _compNotifyReactRefresh() {
+    if (_compReactOwnsPage()) window.dispatchEvent(new CustomEvent('companion:compendium-refresh'));
+}
 
 function _compTabIcon(tab) {
     const file = COMP_TABS[tab]?.iconFile;
@@ -136,11 +145,13 @@ window.compGetSidebarItems = function() {
 };
 
 window.compGetCurrentSidebarTab = function() {
+    if (_compReactState?.view === 'sub') return _compReactState.tab || '';
     const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
     return subVisible ? _compCurrentTab : '';
 };
 
 window.compGetCurrentSidebarSection = function() {
+    if (_compReactState?.view === 'sub') return _compReactState.tabState?.equipmentSection || '';
     return _compCurrentTab === 'oggetti' ? (_compStateFor('oggetti').equipmentSection || '') : '';
 };
 
@@ -499,6 +510,15 @@ function compendioRenderHub() {
 }
 
 window.compendioBackToHub = function() {
+    if (_compReactOwnsPage()) {
+        const state = _compReactState || {};
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
+            view: state.tabState?.detail || state.tabState?.equipmentSection ? 'sub' : 'hub',
+            tab: state.tab || '',
+            section: state.tabState?.detail ? (state.tabState?.equipmentSection || '') : '',
+        } }));
+        return;
+    }
     const state = _compStateFor(_compCurrentTab);
     if (state.detail) {
         state.detail = null;
@@ -535,6 +555,10 @@ window.compendioBackToHub = function() {
 };
 
 window.compendioShowHub = function() {
+    if (_compReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'hub' } }));
+        return;
+    }
     if (_compUsesDesktopSidebar()) {
         compendioOpenTab(_compCurrentTab || 'razze');
         return;
@@ -552,6 +576,10 @@ window.compendioShowHub = function() {
 
 window.compendioOpenTab = function(tab, equipmentSection = '') {
     if (!COMP_TABS[tab]) return;
+    if (_compReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab, section: equipmentSection } }));
+        return;
+    }
     _compCurrentTab = tab;
     _compStateFor(tab).detail = null;
     if (tab === 'oggetti') {
@@ -571,6 +599,7 @@ window.compendioOpenTab = function(tab, equipmentSection = '') {
 };
 
 function loadCompendio() {
+    if (_compReactOwnsPage()) return;
     compendioRenderHub();
     if (document.getElementById('compendioSubPage')?.style.display !== 'none') {
         compendioRenderTab();
@@ -797,6 +826,19 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
 }
 
 window.compGetBookmarkState = function() {
+    if (_compReactState) {
+        const tab = _compReactState.tab || 'razze';
+        const tabState = _compReactState.tabState || {};
+        const title = tab === 'oggetti'
+            ? COMP_TABS.oggetti.label
+            : (tabState.detail?.title || COMP_TABS[tab]?.label || 'Compendio');
+        return {
+            title: _compReactState.view === 'hub' ? 'Compendio' : title,
+            section: ['Compendio', _compReactState.view === 'sub' ? COMP_TABS[tab]?.label : '', tabState.equipmentSection ? COMP_EQUIPMENT_SECTIONS[tabState.equipmentSection]?.label : ''].filter(Boolean).join(' > '),
+            key: _compReactState.view === 'hub' ? 'hub' : `${tab}:${tabState.equipmentSection || ''}:${tabState.detail?.id || ''}`,
+            state: JSON.parse(JSON.stringify(_compReactState)),
+        };
+    }
     const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
     const state = _compStateFor(_compCurrentTab);
     const title = subVisible && _compCurrentTab === 'oggetti' && state.equipmentSection
@@ -826,6 +868,14 @@ window.compGetBookmarkState = function() {
 
 window.compRestoreBookmarkState = async function(saved) {
     const data = saved || {};
+    if (_compReactOwnsPage()) {
+        if (data.tabState) window._compState[data.tab || 'razze'] = { ..._compStateFor(data.tab || 'razze'), ...data.tabState };
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
+            view: data.view || 'hub', tab: data.tab || 'razze', section: data.tabState?.equipmentSection || '',
+            detail: data.tabState?.detail?.id || '', state: data.tabState || {},
+        } }));
+        return;
+    }
     _compCurrentTab = COMP_TABS[data.tab] ? data.tab : 'classi';
     if (data.tabState) {
         window._compState[_compCurrentTab] = {
@@ -862,6 +912,10 @@ function _compStateFor(tab) {
 }
 
 function compendioRenderTab() {
+    if (_compReactOwnsPage()) {
+        _compNotifyReactRefresh();
+        return;
+    }
     const container = document.getElementById('compendioContent');
     if (!container) return;
     if (_compCurrentTab === 'oggetti') {
@@ -1513,6 +1567,10 @@ window.compendioTalentiStiliSetKind = function(kind) {
 };
 
 function _compRenderCurrentListContent() {
+    if (_compReactOwnsPage()) {
+        _compNotifyReactRefresh();
+        return;
+    }
     if (_compCurrentTab === 'oggetti') {
         _compRenderObjectsInventoryList();
         return;
@@ -1756,6 +1814,10 @@ window.compendioOpenDetail = async function(type, id) {
     await _compEnsureSpellData();
     if (type === 'incantesimi') await _compEnsureSummonStatblockData();
     if (type === 'classi') await _compEnsureSubclassSpellData();
+    if (_compReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: type, detail: id } }));
+        return;
+    }
     _compCurrentTab = type;
     _compStateFor(type).detail = { id };
     compendioRenderTab();
@@ -2164,6 +2226,10 @@ window.compendioSetObjectsSubTab = function(tab) {
 
 window.compendioOpenEquipmentSection = function(section) {
     if (!COMP_EQUIPMENT_SECTIONS[section]) return;
+    if (_compReactOwnsPage()) {
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: 'oggetti', section } }));
+        return;
+    }
     const state = _compStateFor('oggetti');
     state.equipmentSection = section;
     state.detail = null;
@@ -2825,6 +2891,10 @@ function _compRenderObjectsInventoryList() {
 }
 
 function _compRenderObjectsSectionContent() {
+    if (_compReactOwnsPage()) {
+        _compNotifyReactRefresh();
+        return;
+    }
     const state = _compStateFor('oggetti');
     const section = state.equipmentSection || '';
     const target = document.getElementById('compObjectsListContent');
@@ -4494,6 +4564,107 @@ function _compIcon(name) {
     };
     return icons[name] || icons['book-open'];
 }
+
+async function _compLoadReactBundles(tab, section = '') {
+    const bundles = {
+        razze: ['races', 'spells'],
+        classi: ['classes', 'spells', 'subclassSpells', 'monsters'],
+        background: ['backgrounds'],
+        talenti_stili: ['feats', 'fightingStyles'],
+        mostri: ['monsters', 'spells'],
+        suppliche: ['invocations'],
+        incantesimi: ['spells', 'summonStatblocks'],
+    }[tab] || [];
+    if (tab === 'oggetti') {
+        if (['avventura', 'strumenti', 'erbe', 'metalli', 'gemme'].includes(section)) bundles.push('equipment');
+        if (section === 'oggetti') bundles.push('magicItems');
+        if (section === 'veleni') bundles.push('poisons');
+    }
+    if (typeof window.ensureRuntimeData === 'function') await Promise.all(bundles.map(key => window.ensureRuntimeData(key)));
+    if (bundles.includes('equipment')) _compSyncEquipmentData();
+    if (bundles.includes('monsters')) {
+        COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
+        _compMonsterItemsCache = null;
+        _compMonsterItemsSource = null;
+    }
+    if (bundles.includes('summonStatblocks')) {
+        COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
+        _compSummonStatblockDataLoaded = true;
+    }
+}
+
+window.getCompendioReactConfig = function() {
+    return {
+        tabs: Object.entries(COMP_TABS).map(([key, value]) => ({ key, ...value })),
+        equipment: COMP_EQUIPMENT_SECTION_ORDER.map(key => ({ key, ...COMP_EQUIPMENT_SECTIONS[key] })),
+    };
+};
+
+window.setCompendioReactState = function(state) {
+    const tab = COMP_TABS[state?.tab] ? state.tab : 'razze';
+    const legacyState = _compStateFor(tab);
+    _compReactState = {
+        ...(state || {}),
+        tab,
+        tabState: {
+            ...(state?.tabState || {}),
+            filters: legacyState.filters || {},
+            equipmentFilters: legacyState.equipmentFilters || {},
+        },
+    };
+    _compCurrentTab = tab;
+};
+
+window.getCompendioReactData = async function({ tab, section = '', kind = '', search = '' } = {}) {
+    if (!COMP_TABS[tab]) return { items: [], total: 0, activeFilters: 0, hasFilters: false };
+    _compCurrentTab = tab;
+    const state = _compStateFor(tab);
+    state.search = search;
+    if (tab === 'talenti_stili') state.kind = kind === 'stili' ? 'stili' : 'talenti';
+    if (tab === 'mostri') state.kind = kind === 'combattimenti' ? 'combattimenti' : 'mostri';
+    if (tab === 'oggetti') {
+        state.equipmentSection = COMP_EQUIPMENT_SECTIONS[section] ? section : '';
+        state.equipmentSearch = state.equipmentSearch || {};
+        if (section) state.equipmentSearch[section] = search;
+    }
+    await _compLoadReactBundles(tab, section);
+
+    if (tab === 'oggetti') {
+        if (!section) return { items: [], total: 0, activeFilters: 0, hasFilters: false };
+        const all = _compEquipmentSectionItems(section);
+        const items = _compEquipmentFilteredItems(section, state);
+        return {
+            items,
+            total: all.length,
+            activeFilters: _compObjectsActiveFilterCount(),
+            hasFilters: _compEquipmentFilterDefs(section).length > 0,
+            content: _compEquipmentSectionHtml(section, state),
+        };
+    }
+
+    const all = _compItems(tab);
+    const items = all.filter(item => _compMatches(item, state));
+    return {
+        items,
+        total: all.length,
+        activeFilters: _compActiveFiltersCount(state),
+        hasFilters: Boolean(_compFiltersHtml(tab, state, all)),
+    };
+};
+
+window.getCompendioReactDetail = async function(tab, id) {
+    if (!COMP_TABS[tab]) return null;
+    _compCurrentTab = tab;
+    await _compLoadReactBundles(tab, _compStateFor(tab).equipmentSection || '');
+    const item = _compItems(tab).find(entry => String(entry.id) === String(id));
+    if (!item) return null;
+    _compStateFor(tab).detail = { id };
+    if (_compReactState?.tab === tab) {
+        _compReactState.tabState = _compReactState.tabState || {};
+        _compReactState.tabState.detail = { id, title: item.title };
+    }
+    return { title: item.title, content: _compDetailHtml(item) };
+};
 
 document.addEventListener('appLangChanged', () => {
     if (window.AppState?.currentPage === 'compendio') loadCompendio();

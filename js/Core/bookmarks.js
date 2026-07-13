@@ -1068,6 +1068,12 @@ async function _openDesktopSidebarTarget(page, tab = '', section = '') {
         return;
     }
     if (page === 'compendio') {
+        if (window.CompanionReactPages?.has('compendio')) {
+            window.__pendingCompendioTarget = { tab, section };
+            if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
+            window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: tab || 'razze', section } }));
+            return;
+        }
         if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
         if (tab) window.compendioOpenTab?.(tab, section);
         scheduleActiveBookmarkCapture?.(0);
