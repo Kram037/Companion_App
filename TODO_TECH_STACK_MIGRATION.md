@@ -225,7 +225,7 @@ Criterio di uscita: realtime non puo' piu' causare reset di UI locale o render c
   - [x] tab correnti;
   - [x] filtri campagne;
   - [x] preferenze UI;
-  - [ ] stato navigazione sessione.
+  - [x] stato navigazione sessione.
 
 Criterio di uscita: `AppState` legacy puo' iniziare a essere svuotato e sostituito da store mirati.
 
