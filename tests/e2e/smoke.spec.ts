@@ -6,7 +6,7 @@ test('loads the app shell', async ({ page }) => {
   await expect(page).toHaveTitle('Companion App - D&D Helper');
   await expect(page.locator('.header')).toBeVisible();
   await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
-  await expect(page.locator('#campagnePage')).toBeHidden();
+  await expect(page.locator('#react-root .react-page-shell')).toBeVisible();
 });
 
 test('uses the URL as navigation source after refresh', async ({ page }) => {
@@ -94,7 +94,7 @@ test('opens equipment sections directly from the desktop sidebar', async ({ page
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('.react-compendium-page .page-header h1')).toHaveText('Gemme');
   await expect(page.locator(`#desktopBookmarkTabs [data-bookmark-id="${originalTabId}"] .desktop-bookmark-tab-title`)).toHaveText('Equipaggiamento');
-  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#campagnePage')).toHaveClass(/active/);
+  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('body')).toHaveAttribute('data-react-page', 'campagne');
   await expect(page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab.active .desktop-bookmark-tab-title')).toHaveText('Campagne');
 });
 

@@ -117,7 +117,7 @@ function _bookmarkRemovePaneItems(pane) {
 }
 
 function _bookmarkActivePageEl() {
-    return document.querySelector('.page.active');
+    return document.querySelector('#react-root .react-page-shell') || document.querySelector('.page.active');
 }
 
 function _bookmarkMainScrollTop() {
