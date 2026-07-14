@@ -7,8 +7,6 @@ const AppState = {
     currentCampagnaId: null,
     currentSessioneId: null,
     currentPersonaggioId: null,
-    currentCampagnaDetails: null,
-    campagnaGiocatori: [],
     cachedUserData: null,
     cachedCampagne: null,
     cachedRazze: null,

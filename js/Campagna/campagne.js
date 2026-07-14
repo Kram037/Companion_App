@@ -1336,10 +1336,6 @@ async function renderCampagnaDetailsContent(campagna) {
             ` : ''}
         `);
 
-        // Salva i dati della campagna nello state per uso futuro
-        AppState.currentCampagnaDetails = campagna;
-        AppState.campagnaGiocatori = giocatoriCampagna;
-
         // Render asincrono delle card personaggi (sotto le statistiche).
         if (typeof renderCampagnaPersonaggiCards === 'function') {
             renderCampagnaPersonaggiCards(campagna.id);

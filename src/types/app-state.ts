@@ -15,8 +15,6 @@ export interface LegacyAppState {
   currentCampagnaId: Id | null;
   currentSessioneId: Id | null;
   currentPersonaggioId: Id | null;
-  currentCampagnaDetails: Campagna | JsonValue | null;
-  campagnaGiocatori: JsonValue[];
   cachedUserData: UserProfile | JsonValue | null;
   cachedCampagne: Campagna[] | null;
   cachedRazze: JsonValue | null;
