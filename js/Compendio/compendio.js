@@ -106,7 +106,6 @@ let _compSummonStatblockDataLoaded = !!COMP_SUMMON_STATBLOCKS_DATA.length;
 const _compRuntimeDataPromises = new Map();
 let _compMonsterItemsCache = null;
 let _compMonsterItemsSource = null;
-let _compSearchRenderTimer = null;
 let _compReactState = null;
 
 function _compReactOwnsPage() {
@@ -115,18 +114,6 @@ function _compReactOwnsPage() {
 
 function _compNotifyReactRefresh() {
     if (_compReactOwnsPage()) window.dispatchEvent(new CustomEvent('companion:compendium-refresh'));
-}
-
-function _compTabIcon(tab) {
-    const file = COMP_TABS[tab]?.iconFile;
-    if (!file) return '';
-    return `<img class="comp-hub-icon-img" src="images/Tabs/${encodeURIComponent(file)}.svg" alt="" loading="lazy">`;
-}
-
-function _compEquipmentSectionIcon(section) {
-    const file = COMP_EQUIPMENT_SECTIONS[section]?.iconFile || 'Equipaggiamento';
-    const src = `images/Tabs/${file.split('/').map(encodeURIComponent).join('/')}.svg`;
-    return `<img class="comp-hub-icon-img" src="${src}" alt="" loading="lazy">`;
 }
 
 window.compGetSidebarItems = function() {
@@ -145,20 +132,12 @@ window.compGetSidebarItems = function() {
 };
 
 window.compGetCurrentSidebarTab = function() {
-    if (_compReactState?.view === 'sub') return _compReactState.tab || '';
-    const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
-    return subVisible ? _compCurrentTab : '';
+    return _compReactState?.view === 'sub' ? (_compReactState.tab || '') : '';
 };
 
 window.compGetCurrentSidebarSection = function() {
-    if (_compReactState?.view === 'sub') return _compReactState.tabState?.equipmentSection || '';
-    return _compCurrentTab === 'oggetti' ? (_compStateFor('oggetti').equipmentSection || '') : '';
+    return _compReactState?.view === 'sub' ? (_compReactState.tabState?.equipmentSection || '') : '';
 };
-
-function _compUsesDesktopSidebar() {
-    return new URLSearchParams(window.location.search).get('splitPane') === '1'
-        || !!window.getDesktopDefaultGroupTab?.('compendio');
-}
 
 const COMP_MULTICLASS_REQUIREMENTS = {
     Artefice: 'Intelligenza 13',
@@ -484,127 +463,27 @@ const COMP_ARTIFICER_SPELLS = window.COMPANION_ARTIFICER_SPELLS = new Set([
     'web',
 ]);
 
-function compendioRenderHub() {
-    const grid = document.getElementById('compendioHubGrid');
-    if (!grid) return;
-    grid.style.display = 'flex';
-    grid.style.flexDirection = 'column';
-    grid.style.gridTemplateColumns = '';
-    grid.style.gridTemplateRows = '';
-    grid.style.gridAutoFlow = '';
-    const rows = [];
-    const tabs = Object.entries(COMP_TABS);
-    for (let i = 0; i < tabs.length; i += 2) {
-        rows.push(`
-            <div class="comp-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
-                ${tabs.slice(i, i + 2).map(([key, tab]) => `
-                    <button type="button" class="comp-hub-card" onclick="compendioOpenTab('${key}')">
-                        <span class="comp-hub-card-icon" aria-hidden="true">${_compTabIcon(key)}</span>
-                        <span class="comp-hub-card-label">${escapeHtml(tab.label)}</span>
-                    </button>
-                `).join('')}
-            </div>
-        `);
-    }
-    grid.innerHTML = rows.join('');
-}
+
 
 window.compendioBackToHub = function() {
-    if (_compReactOwnsPage()) {
-        const state = _compReactState || {};
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
-            view: state.tabState?.detail || state.tabState?.equipmentSection ? 'sub' : 'hub',
-            tab: state.tab || '',
-            section: state.tabState?.detail ? (state.tabState?.equipmentSection || '') : '',
-        } }));
-        return;
-    }
-    const state = _compStateFor(_compCurrentTab);
-    if (state.detail) {
-        state.detail = null;
-        const title = document.getElementById('compendioSubTitle');
-        if (title) title.textContent = _compCurrentTab === 'oggetti' && state.equipmentSection
-            ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
-            : (COMP_TABS[_compCurrentTab]?.label || 'Compendio');
-        compendioRenderTab();
-        _compScrollToTop();
-        return;
-    }
-    if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
-        if (_compUsesDesktopSidebar()) {
-            compendioOpenTab('razze');
-            return;
-        }
-        state.equipmentSection = '';
-        const title = document.getElementById('compendioSubTitle');
-        if (title) title.textContent = COMP_TABS.oggetti.label;
-        compendioRenderTab();
-        _compScrollToTop();
-        return;
-    }
-    if (_compUsesDesktopSidebar()) {
-        compendioOpenTab('razze');
-        return;
-    }
-    _compSetStickyTools('');
-    const hub = document.getElementById('compendioHub');
-    const sub = document.getElementById('compendioSubPage');
-    if (hub) hub.style.display = '';
-    if (sub) sub.style.display = 'none';
-    _compScrollToTop();
+    const state = _compReactState || {};
+    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
+        view: state.tabState?.detail || state.tabState?.equipmentSection ? 'sub' : 'hub',
+        tab: state.tab || '',
+        section: state.tabState?.detail ? (state.tabState?.equipmentSection || '') : '',
+    } }));
 };
 
 window.compendioShowHub = function() {
-    if (_compReactOwnsPage()) {
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'hub' } }));
-        return;
-    }
-    if (_compUsesDesktopSidebar()) {
-        compendioOpenTab(_compCurrentTab || 'razze');
-        return;
-    }
-    Object.keys(COMP_TABS).forEach(tab => {
-        _compStateFor(tab).detail = null;
-    });
-    _compSetStickyTools('');
-    const hub = document.getElementById('compendioHub');
-    const sub = document.getElementById('compendioSubPage');
-    if (hub) hub.style.display = '';
-    if (sub) sub.style.display = 'none';
-    _compScrollToTop();
+    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'hub' } }));
 };
 
 window.compendioOpenTab = function(tab, equipmentSection = '') {
     if (!COMP_TABS[tab]) return;
-    if (_compReactOwnsPage()) {
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab, section: equipmentSection } }));
-        return;
-    }
-    _compCurrentTab = tab;
-    _compStateFor(tab).detail = null;
-    if (tab === 'oggetti') {
-        _compStateFor(tab).equipmentSection = COMP_EQUIPMENT_SECTIONS[equipmentSection]
-            ? equipmentSection
-            : (_compUsesDesktopSidebar() ? (_compStateFor(tab).equipmentSection || COMP_EQUIPMENT_SECTION_ORDER[0]) : '');
-    }
-    const hub = document.getElementById('compendioHub');
-    const sub = document.getElementById('compendioSubPage');
-    if (hub) hub.style.display = 'none';
-    if (sub) sub.style.display = '';
-    const title = document.getElementById('compendioSubTitle');
-    if (title) title.textContent = COMP_TABS[tab].label;
-    compendioRenderTab();
-    if (tab === 'mostri') _compEnsureMonsterData({ rerender: true });
-    _compScrollToTop();
+    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab, section: equipmentSection } }));
 };
 
-function loadCompendio() {
-    if (_compReactOwnsPage()) return;
-    compendioRenderHub();
-    if (document.getElementById('compendioSubPage')?.style.display !== 'none') {
-        compendioRenderTab();
-    }
-}
+
 
 function _compHasMonsterData() {
     if (!COMP_MONSTERS_DATA.length && Array.isArray(window.COMP_MONSTERS_DATA)) {
@@ -810,13 +689,7 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
     }).catch(error => {
         _compMonsterDataFailed = true;
         console.warn('[compendio] caricamento bestiario fallito:', error);
-        const container = document.getElementById('compendioContent');
-        if (rerender && _compCurrentTab === 'mostri' && container) {
-            container.innerHTML = `
-                ${_compMostriTabsHtml()}
-                <div class="comp-empty">Non riesco a caricare il bestiario. Riprova tra qualche secondo.</div>
-            `;
-        }
+        if (rerender && _compCurrentTab === 'mostri') _compNotifyReactRefresh();
         return [];
     }).finally(() => {
         _compMonsterDataPromise = null;
@@ -826,82 +699,28 @@ function _compEnsureMonsterData({ rerender = false } = {}) {
 }
 
 window.compGetBookmarkState = function() {
-    if (_compReactState) {
-        const tab = _compReactState.tab || 'razze';
-        const tabState = _compReactState.tabState || {};
-        const title = tab === 'oggetti'
-            ? COMP_TABS.oggetti.label
-            : (tabState.detail?.title || COMP_TABS[tab]?.label || 'Compendio');
-        return {
-            title: _compReactState.view === 'hub' ? 'Compendio' : title,
-            section: ['Compendio', _compReactState.view === 'sub' ? COMP_TABS[tab]?.label : '', tabState.equipmentSection ? COMP_EQUIPMENT_SECTIONS[tabState.equipmentSection]?.label : ''].filter(Boolean).join(' > '),
-            key: _compReactState.view === 'hub' ? 'hub' : `${tab}:${tabState.equipmentSection || ''}:${tabState.detail?.id || ''}`,
-            state: JSON.parse(JSON.stringify(_compReactState)),
-        };
-    }
-    const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
-    const state = _compStateFor(_compCurrentTab);
-    const title = subVisible && _compCurrentTab === 'oggetti' && state.equipmentSection
+    const current = _compReactState || { view: 'hub', tab: 'razze', tabState: {} };
+    const tab = current.tab || 'razze';
+    const tabState = current.tabState || {};
+    const title = tab === 'oggetti'
         ? COMP_TABS.oggetti.label
-        : subVisible
-        ? (document.getElementById('compendioSubTitle')?.textContent || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
-        : 'Compendio';
-    const sectionParts = ['Compendio'];
-    if (subVisible) sectionParts.push(COMP_TABS[_compCurrentTab]?.label || _compCurrentTab);
-    if (_compCurrentTab === 'oggetti' && state.equipmentSection) {
-        sectionParts.push(COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || state.equipmentSection);
-    }
-    if (state.detail?.id && _compCurrentTab !== 'oggetti') sectionParts.push(state.detail.title || 'Dettaglio');
+        : (tabState.detail?.title || COMP_TABS[tab]?.label || 'Compendio');
     return {
-        title,
-        section: sectionParts.join(' > '),
-        key: subVisible
-            ? `${_compCurrentTab}:${state.equipmentSection || ''}:${state.detail?.id || ''}`
-            : 'hub',
-        state: {
-            view: subVisible ? 'sub' : 'hub',
-            tab: _compCurrentTab,
-            tabState: JSON.parse(JSON.stringify(state || {})),
-        },
+        title: current.view === 'hub' ? 'Compendio' : title,
+        section: ['Compendio', current.view === 'sub' ? COMP_TABS[tab]?.label : '', tabState.equipmentSection ? COMP_EQUIPMENT_SECTIONS[tabState.equipmentSection]?.label : ''].filter(Boolean).join(' > '),
+        key: current.view === 'hub' ? 'hub' : `${tab}:${tabState.equipmentSection || ''}:${tabState.detail?.id || ''}`,
+        state: JSON.parse(JSON.stringify(current)),
     };
 };
 
 window.compRestoreBookmarkState = async function(saved) {
     const data = saved || {};
-    if (_compReactOwnsPage()) {
-        if (data.tabState) window._compState[data.tab || 'razze'] = { ..._compStateFor(data.tab || 'razze'), ...data.tabState };
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
-            view: data.view || 'hub', tab: data.tab || 'razze', section: data.tabState?.equipmentSection || '',
-            detail: data.tabState?.detail?.id || '', state: data.tabState || {},
-        } }));
-        return;
-    }
-    _compCurrentTab = COMP_TABS[data.tab] ? data.tab : 'classi';
-    if (data.tabState) {
-        window._compState[_compCurrentTab] = {
-            ..._compStateFor(_compCurrentTab),
-            ...data.tabState,
-        };
-    }
-    if (data.view === 'sub') {
-        const hub = document.getElementById('compendioHub');
-        const sub = document.getElementById('compendioSubPage');
-        if (hub) hub.style.display = 'none';
-        if (sub) sub.style.display = '';
-        const title = document.getElementById('compendioSubTitle');
-        const state = _compStateFor(_compCurrentTab);
-        if (title) title.textContent = state.detail?.id
-            ? (state.detail.title || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
-            : (state.equipmentSection
-                ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS[_compCurrentTab]?.label)
-                : (COMP_TABS[_compCurrentTab]?.label || 'Compendio'));
-        compendioRenderTab();
-        if (_compCurrentTab === 'mostri') await _compEnsureMonsterData({ rerender: true });
-    } else if (_compUsesDesktopSidebar()) {
-        compendioOpenTab(_compCurrentTab);
-    } else {
-        compendioShowHub();
-    }
+    const tab = COMP_TABS[data.tab] ? data.tab : 'razze';
+    if (data.tabState) window._compState[tab] = { ..._compStateFor(tab), ...data.tabState };
+    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
+        view: data.view || 'hub', tab, section: data.tabState?.equipmentSection || '',
+        detail: data.tabState?.detail?.id || '', state: data.tabState || {},
+    } }));
 };
 
 function _compStateFor(tab) {
@@ -912,189 +731,15 @@ function _compStateFor(tab) {
 }
 
 function compendioRenderTab() {
-    if (_compReactOwnsPage()) {
-        _compNotifyReactRefresh();
-        return;
-    }
-    const container = document.getElementById('compendioContent');
-    if (!container) return;
-    if (_compCurrentTab === 'oggetti') {
-        const state = _compStateFor('oggetti');
-        const title = document.getElementById('compendioSubTitle');
-        if (title) title.textContent = state.equipmentSection
-            ? (COMP_EQUIPMENT_SECTIONS[state.equipmentSection]?.label || COMP_TABS.oggetti.label)
-            : COMP_TABS.oggetti.label;
-        if (state.equipmentSection === 'oggetti' && !_compHasMagicItemData()) {
-            _compSetStickyTools('');
-            container.innerHTML = `
-                <div class="loading-placeholder comp-lazy-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Caricamento oggetti magici...</p>
-                </div>
-            `;
-            _compEnsureMagicItemData({ rerender: true });
-            return;
-        }
-        if (state.equipmentSection === 'veleni' && !_compHasPoisonData()) {
-            _compSetStickyTools('');
-            container.innerHTML = `
-                <div class="loading-placeholder comp-lazy-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Caricamento veleni...</p>
-                </div>
-            `;
-            _compEnsurePoisonData({ rerender: true });
-            return;
-        }
-        if (_compEquipmentRequiresRuntimeData(state.equipmentSection) && !_compHasEquipmentData()) {
-            _compSetStickyTools('');
-            container.innerHTML = `
-                <div class="loading-placeholder comp-lazy-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Caricamento equipaggiamento...</p>
-                </div>
-            `;
-            _compEnsureEquipmentData({ rerender: true });
-            return;
-        }
-        container.innerHTML = _compObjectsPageHtml();
-        _compRenderObjectsStickyTools();
-        _compScrollToTop();
-        return;
-    }
-    if (_compCurrentTab === 'background' && !_compHasBackgroundData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento background...</p>
-            </div>
-        `;
-        _compEnsureBackgroundData({ rerender: true });
-        return;
-    }
-    if (_compCurrentTab === 'razze' && !_compHasRaceData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento razze...</p>
-            </div>
-        `;
-        _compEnsureRaceData({ rerender: true });
-        return;
-    }
-    if (_compNeedsClassData() && !_compHasClassData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento classi...</p>
-            </div>
-        `;
-        _compEnsureClassData({ rerender: true });
-        return;
-    }
-    if (_compNeedsFeatData() && !_compHasFeatData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento talenti...</p>
-            </div>
-        `;
-        _compEnsureFeatData({ rerender: true });
-        return;
-    }
-    if (_compNeedsFightingStyleData() && !_compHasFightingStyleData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento stili di combattimento...</p>
-            </div>
-        `;
-        _compEnsureFightingStyleData({ rerender: true });
-        return;
-    }
-    if (_compCurrentTab === 'suppliche' && !_compHasInvocationData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento suppliche...</p>
-            </div>
-        `;
-        _compEnsureInvocationData({ rerender: true });
-        return;
-    }
-    if (_compNeedsSubclassSpellData() && !_compHasSubclassSpellData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento incantesimi di sottoclasse...</p>
-            </div>
-        `;
-        _compEnsureSubclassSpellData({ rerender: true });
-        return;
-    }
-    if (_compNeedsSpellData() && !_compHasSpellData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento incantesimi...</p>
-            </div>
-        `;
-        _compEnsureSpellData({ rerender: true });
-        return;
-    }
-    if (_compCurrentTab === 'mostri' && _compMostriKind() === 'mostri' && !_compHasMonsterData()) {
-        _compSetStickyTools('');
-        container.innerHTML = `
-            ${_compMostriTabsHtml()}
-            <div class="loading-placeholder comp-lazy-loading">
-                <div class="loading-spinner"></div>
-                <p>Caricamento bestiario...</p>
-            </div>
-        `;
-        _compEnsureMonsterData({ rerender: true });
-        return;
-    }
-    const items = _compItems(_compCurrentTab);
-    const state = _compStateFor(_compCurrentTab);
-    if (state.detail) {
-        const item = items.find(x => String(x.id) === String(state.detail.id));
-        if (item) {
-            const title = document.getElementById('compendioSubTitle');
-            if (title) title.textContent = item.title;
-            _compSetStickyTools('');
-            container.innerHTML = _compDetailPageHtml(item);
-            return;
-        }
-        state.detail = null;
-    }
-    const filtered = items.filter(item => _compMatches(item, state));
-    _compRenderStickyTools(_compCurrentTab, state, items);
-    container.innerHTML = _compListContentHtml(_compCurrentTab, filtered, items.length);
+    _compNotifyReactRefresh();
 }
-
-window.compendioSetSearch = function(value) {
-    _compStateFor(_compCurrentTab).search = value || '';
-    clearTimeout(_compSearchRenderTimer);
-    _compSearchRenderTimer = setTimeout(() => {
-        _compRenderCurrentListContent();
-    }, 120);
-};
 
 window.compendioSetFilter = function(key, value) {
     const filters = _compStateFor(_compCurrentTab).filters;
     const values = _compFilterValues(value).filter(Boolean);
     if (values.length) filters[key] = values;
     else delete filters[key];
-    _compRenderCurrentListContent();
-    _compRefreshStickyTools();
+    _compNotifyReactRefresh();
 };
 
 window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi') {
@@ -1121,8 +766,7 @@ window.compendioPickFilter = function(key, encodedOptions, title, mode = 'multi'
 
 window.compendioResetFilters = function() {
     _compStateFor(_compCurrentTab).filters = {};
-    _compRenderCurrentListContent();
-    _compRefreshStickyTools();
+    _compNotifyReactRefresh();
     const overlay = document.querySelector('.comp-filter-overlay');
     if (overlay) {
         overlay.querySelector('.comp-filter-panel').innerHTML = _compFiltersHtml(_compCurrentTab, _compStateFor(_compCurrentTab), _compItems(_compCurrentTab));
@@ -1462,125 +1106,8 @@ function _compSlug(value) {
         .replace(/^-+|-+$/g, '') || 'elemento';
 }
 
-function _compToolbarHtml(tab, state, allItems) {
-    if (tab === 'mostri' && _compMostriKind() === 'combattimenti') return '';
-    const activeFilters = _compActiveFiltersCount(state);
-    const filtersHtml = _compFiltersHtml(tab, state, allItems);
-    return `
-        <div class="comp-toolbar page-tools-row">
-            <label class="comp-search-wrap">
-                ${_compIcon('search')}
-                <input class="comp-search" type="search" placeholder="Cerca in ${escapeHtml(COMP_TABS[tab].label.toLowerCase())}..."
-                    value="${escapeHtml(state.search || '')}" oninput="compendioSetSearch(this.value)">
-            </label>
-            ${filtersHtml ? `<button type="button" class="comp-filter-btn" onclick="compendioOpenFilters()">
-                ${_compIcon('sliders')}
-                <span>Filtri</span>
-                ${activeFilters ? `<strong id="compFiltersBadge">${activeFilters}</strong>` : '<strong id="compFiltersBadge" style="display:none;"></strong>'}
-            </button>` : ''}
-        </div>
-    `;
-}
-
 function _compActiveFiltersCount(state) {
     return Object.values(state?.filters || {}).reduce((count, value) => count + _compFilterValues(value).length, 0);
-}
-
-function _compSetStickyTools(html) {
-    const target = document.getElementById('compendioStickyTools');
-    if (target) target.innerHTML = html || '';
-}
-
-function _compRenderStickyTools(tab, state, items) {
-    _compSetStickyTools(_compToolbarHtml(tab, state, items));
-}
-
-function _compRefreshStickyTools() {
-    if (_compCurrentTab === 'oggetti') {
-        _compRenderObjectsStickyTools();
-        return;
-    }
-    const items = _compItems(_compCurrentTab);
-    const state = _compStateFor(_compCurrentTab);
-    if (state.detail) return;
-    _compRenderStickyTools(_compCurrentTab, state, items);
-}
-
-function _compListContentHtml(tab, filtered, total) {
-    if (tab === 'mostri' && _compMostriKind() === 'combattimenti') {
-        return `
-            ${_compMostriTabsHtml()}
-            <div class="comp-empty">La sezione Combattimenti sara disponibile in un prossimo aggiornamento.</div>
-        `;
-    }
-    return `
-        ${tab === 'mostri' ? _compMostriTabsHtml() : ''}
-        ${tab === 'talenti_stili' ? _compTalentiStiliTabsHtml() : ''}
-        <p class="comp-count">${filtered.length} risultati su ${total}</p>
-        ${filtered.length ? _compListHtml(tab, filtered) : '<div class="comp-empty">Nessun elemento trovato</div>'}
-    `;
-}
-
-function _compMostriTabsHtml() {
-    const kind = _compMostriKind();
-    return `
-        <div class="lab-subtabs comp-inner-tabs">
-            <button type="button" class="lab-subtab ${kind === 'mostri' ? 'active' : ''}" onclick="compendioMostriSetKind('mostri')">
-                <span>Mostri</span>
-            </button>
-            <button type="button" class="lab-subtab ${kind === 'combattimenti' ? 'active' : ''}" onclick="compendioMostriSetKind('combattimenti')">
-                <span>Combattimenti</span>
-            </button>
-        </div>
-    `;
-}
-
-window.compendioMostriSetKind = function(kind) {
-    const state = _compStateFor('mostri');
-    state.kind = kind === 'combattimenti' ? 'combattimenti' : 'mostri';
-    state.detail = null;
-    compendioRenderTab();
-    if (state.kind === 'mostri') _compEnsureMonsterData({ rerender: true });
-    _compScrollToTop();
-};
-
-function _compTalentiStiliTabsHtml() {
-    const kind = _compTalentiStiliKind();
-    return `
-        <div class="lab-subtabs comp-inner-tabs">
-            <button type="button" class="lab-subtab ${kind === 'talenti' ? 'active' : ''}" onclick="compendioTalentiStiliSetKind('talenti')">
-                <span>Talenti</span>
-            </button>
-            <button type="button" class="lab-subtab ${kind === 'stili' ? 'active' : ''}" onclick="compendioTalentiStiliSetKind('stili')">
-                <span>Stili di Combattimento</span>
-            </button>
-        </div>
-    `;
-}
-
-window.compendioTalentiStiliSetKind = function(kind) {
-    const state = _compStateFor('talenti_stili');
-    state.kind = kind === 'stili' ? 'stili' : 'talenti';
-    state.detail = null;
-    compendioRenderTab();
-    _compScrollToTop();
-};
-
-function _compRenderCurrentListContent() {
-    if (_compReactOwnsPage()) {
-        _compNotifyReactRefresh();
-        return;
-    }
-    if (_compCurrentTab === 'oggetti') {
-        _compRenderObjectsInventoryList();
-        return;
-    }
-    const container = document.getElementById('compendioContent');
-    const state = _compStateFor(_compCurrentTab);
-    if (!container || state.detail) return;
-    const items = _compItems(_compCurrentTab);
-    const filtered = items.filter(item => _compMatches(item, state));
-    container.innerHTML = _compListContentHtml(_compCurrentTab, filtered, items.length);
 }
 
 function _compFiltersHtml(tab, state, allItems) {
@@ -1703,25 +1230,6 @@ function _compMatches(item, state) {
     return true;
 }
 
-function _compListHtml(tab, items) {
-    const sorted = _compSortItems(tab, items);
-    if (tab === 'sottoclassi' || tab === 'incantesimi' || tab === 'mostri') {
-        const groups = _compGroupItems(sorted);
-        const state = _compStateFor(tab);
-        return `<div class="comp-grouped-list">${groups.map(group => `
-            <section class="comp-group">
-                <button type="button" class="comp-group-divider ${_compGroupOpen(tab, group.label, state) ? 'open' : ''}" onclick="compendioToggleGroup('${_compEscapeAttr(group.label)}')">
-                    ${_compIcon('chevron-right')}
-                    <span>${escapeHtml(group.label)}</span>
-                    <small>${group.items.length}</small>
-                </button>
-                <div class="comp-list" ${_compGroupOpen(tab, group.label, state) ? '' : 'style="display:none;"'}>${group.items.map(item => _compCardHtml(item)).join('')}</div>
-            </section>
-        `).join('')}</div>`;
-    }
-    return `<div class="comp-list">${sorted.map(item => _compCardHtml(item)).join('')}</div>`;
-}
-
 function _compGroupOpen(tab, label, state) {
     if (Object.prototype.hasOwnProperty.call(state.openGroups || {}, label)) return !!state.openGroups[label];
     return tab === 'incantesimi';
@@ -1733,104 +1241,6 @@ window.compendioToggleGroup = function(label) {
     state.openGroups[label] = !_compGroupOpen(_compCurrentTab, label, state);
     compendioRenderTab();
 };
-
-function _compSortItems(tab, items) {
-    const collator = new Intl.Collator(_compLang() === 'en' ? 'en' : 'it');
-    return [...items].sort((a, b) => {
-        if (tab === 'mostri') {
-            const challenge = (a.sortChallenge ?? 999) - (b.sortChallenge ?? 999);
-            if (challenge !== 0) return challenge;
-        }
-        if (tab === 'incantesimi') {
-            const lvl = (a.sortLevel || 0) - (b.sortLevel || 0);
-            if (lvl !== 0) return lvl;
-        }
-        const g = collator.compare(a.group || '', b.group || '');
-        if (g !== 0) return g;
-        return collator.compare(a.title || '', b.title || '');
-    });
-}
-
-function _compGroupItems(items) {
-    const groups = [];
-    items.forEach(item => {
-        const label = item.group || 'Altro';
-        let group = groups.find(g => g.label === label);
-        if (!group) {
-            group = { label, items: [] };
-            groups.push(group);
-        }
-        group.items.push(item);
-    });
-    return groups;
-}
-
-function _compCardHtml(item) {
-    if (item.type === 'mostri') return _compMonsterCardHtml(item);
-    if (item.type === 'incantesimi') return _compSpellCardHtml(item);
-    const tabKey = item.tab || item.type;
-    if (item.type === 'sottoclassi' || item.type === 'razze') {
-        return `
-            <article class="comp-card comp-card-compact" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
-                <div class="comp-card-main">
-                    <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
-                    ${item.type === 'razze' && item.source ? `<span class="comp-card-source">${escapeHtml(item.source)}</span>` : ''}
-                </div>
-            </article>
-        `;
-    }
-    return `
-        <article class="comp-card" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
-            <div class="comp-card-main">
-                <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
-                ${item.source ? `<span class="comp-card-source">${escapeHtml(item.source)}</span>` : ''}
-            </div>
-            <div class="comp-card-meta">${(item.tags || []).slice(0, item.type === 'classi' ? 2 : 4).map(t => `<span class="comp-tag">${escapeHtml(t)}</span>`).join('')}</div>
-            ${item.desc ? `<p class="comp-card-desc">${escapeHtml(_compPlain(item.desc))}</p>` : ''}
-        </article>
-    `;
-}
-
-function _compSpellCardHtml(item) {
-    const sp = item.data;
-    const tabKey = item.tab || item.type;
-    return `
-        <article class="comp-card comp-spell-card" onclick="compendioOpenDetail('${tabKey}', '${_compEscapeAttr(item.id)}')">
-            <div class="comp-spell-card-body">
-                <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
-                <div class="comp-spell-card-meta">
-                    <span>${escapeHtml(_compSpellField(sp, 'school'))}</span>
-                    <span>${escapeHtml(_compSpellField(sp, 'duration'))}</span>
-                </div>
-            </div>
-            <div class="comp-spell-level">${escapeHtml(_compSpellLevelShort(sp.level))}</div>
-        </article>
-    `;
-}
-
-window.compendioOpenDetail = async function(type, id) {
-    const item = _compItems(type).find(x => String(x.id) === String(id));
-    if (!item) return;
-    await _compEnsureSpellData();
-    if (type === 'incantesimi') await _compEnsureSummonStatblockData();
-    if (type === 'classi') await _compEnsureSubclassSpellData();
-    if (_compReactOwnsPage()) {
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: type, detail: id } }));
-        return;
-    }
-    _compCurrentTab = type;
-    _compStateFor(type).detail = { id };
-    compendioRenderTab();
-    _compScrollToTop();
-};
-
-function _compDetailPageHtml(item) {
-    return `
-        <div class="comp-detail-page">
-            ${_compDetailHtml(item)}
-        </div>
-    `;
-}
 
 function _compDetailHtml(item) {
     const d = item.data;
@@ -2181,22 +1591,6 @@ function _compClassDetail(cls) {
     `;
 }
 
-function _compMonsterCardHtml(item) {
-    const monster = item.data;
-    return `
-        <article class="comp-card comp-monster-card" onclick="compendioOpenDetail('mostri', '${_compEscapeAttr(item.id)}')">
-            <div class="comp-card-main">
-                <h2 class="comp-card-title">${escapeHtml(item.title)}</h2>
-                <span class="comp-monster-gs">${escapeHtml(_compMonsterChallengeLabel(monster.grado_sfida))}</span>
-            </div>
-            <div class="comp-monster-card-meta">
-                <span>${escapeHtml(monster.tipo || 'Tipo non indicato')}</span>
-                <span>${escapeHtml(monster.allineamento_breve || '-')}</span>
-            </div>
-        </article>
-    `;
-}
-
 function _compClassSubclassesSection(cls, showTasha = false) {
     const subclasses = _compSortedSubclasses(cls.subclasses || []);
     if (!subclasses.length) return '';
@@ -2209,38 +1603,9 @@ function _compClassSubclassesSection(cls, showTasha = false) {
     </section>`;
 }
 
-function _compObjectsPageHtml() {
-    const state = _compStateFor('oggetti');
-    state.equipmentSection = state.equipmentSection || '';
-    if (!state.equipmentSection && _compUsesDesktopSidebar()) state.equipmentSection = COMP_EQUIPMENT_SECTION_ORDER[0];
-    if (!state.equipmentSection) return _compEquipmentHubHtml();
-    return `<div id="compEquipmentSectionContent">${_compEquipmentSectionHtml(state.equipmentSection, state)}</div>`;
-}
-
-window.compendioSetObjectsSubTab = function(tab) {
-    const state = _compStateFor('oggetti');
-    state.equipmentSection = tab === 'oggetti' ? 'oggetti' : 'armi';
-    compendioRenderTab();
-    _compScrollToTop();
-};
-
 window.compendioOpenEquipmentSection = function(section) {
     if (!COMP_EQUIPMENT_SECTIONS[section]) return;
-    if (_compReactOwnsPage()) {
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: 'oggetti', section } }));
-        return;
-    }
-    const state = _compStateFor('oggetti');
-    state.equipmentSection = section;
-    state.detail = null;
-    compendioRenderTab();
-    _compScrollToTop();
-};
-
-window.compendioToggleGemTreasures = function() {
-    const state = _compStateFor('oggetti');
-    state.gemTreasureOpen = state.gemTreasureOpen === false;
-    _compRenderObjectsSectionContent();
+    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: 'oggetti', section } }));
 };
 
 window.compendioSetGemView = function(view) {
@@ -2252,33 +1617,7 @@ window.compendioSetGemView = function(view) {
         delete filters.availability;
     }
     _compRenderObjectsSectionContent();
-    _compRenderObjectsStickyTools();
 };
-
-window.compendioSetObjectsSearch = function(value) {
-    const state = _compStateFor('oggetti');
-    const section = state.equipmentSection || 'armi';
-    state.equipmentSearch = state.equipmentSearch || {};
-    state.equipmentSearch[section] = value || '';
-    _compRenderObjectsSectionContent();
-};
-
-function _compEquipmentHubHtml() {
-    const rows = [];
-    for (let i = 0; i < COMP_EQUIPMENT_SECTION_ORDER.length; i += 2) {
-        rows.push(`
-            <div class="comp-equipment-hub-row">
-                ${COMP_EQUIPMENT_SECTION_ORDER.slice(i, i + 2).map(section => `
-                    <button type="button" class="comp-hub-card comp-equipment-hub-card" onclick="compendioOpenEquipmentSection('${section}')">
-                        <span class="comp-hub-card-icon" aria-hidden="true">${_compEquipmentSectionIcon(section)}</span>
-                        <span class="comp-hub-card-label">${escapeHtml(COMP_EQUIPMENT_SECTIONS[section].shortLabel || COMP_EQUIPMENT_SECTIONS[section].label)}</span>
-                    </button>
-                `).join('')}
-            </div>
-        `);
-    }
-    return `<div class="comp-equipment-hub">${rows.join('')}</div>`;
-}
 
 function _compEquipmentSectionHtml(section, state = _compStateFor('oggetti')) {
     if (section === 'armi') return _compEquipmentTablesHtml(state);
@@ -2535,31 +1874,6 @@ function _compGenericEquipmentColumns(section, items) {
         { label: 'Costo', value: item => item.costLabel },
         { label: 'Peso', value: item => item.weight },
     ].filter(col => col.label === 'Nome' || items.some(item => col.value(item)));
-}
-
-function _compRenderObjectsStickyTools() {
-    const state = _compStateFor('oggetti');
-    const section = state.equipmentSection || '';
-    if (!section) {
-        _compSetStickyTools('');
-        return;
-    }
-    const cfg = COMP_EQUIPMENT_SECTIONS[section] || {};
-    const activeFilters = _compObjectsActiveFilterCount();
-    _compSetStickyTools(`
-        <div class="comp-toolbar page-tools-row">
-            <label class="comp-search-wrap">
-                ${_compIcon('search')}
-                <input id="compObjectsSearch" class="comp-search" type="search" placeholder="Cerca in ${escapeHtml((cfg.label || 'equipaggiamento').toLowerCase())}..."
-                    value="${escapeHtml(_compEquipmentSearchValue(section, state))}" oninput="compendioSetObjectsSearch(this.value)">
-            </label>
-            <button type="button" class="comp-filter-btn" onclick="compendioOpenObjectsFilters()" aria-label="Filtri">
-                ${_compIcon('sliders')}
-                <span>Filtri</span>
-                ${activeFilters ? `<strong id="compObjectsFiltersBadge">${activeFilters}</strong>` : '<strong id="compObjectsFiltersBadge" style="display:none;"></strong>'}
-            </button>
-        </div>
-    `);
 }
 
 function _compWeaponTable(label, rows) {
@@ -2886,30 +2200,8 @@ function _compInventoryCardHtml(item) {
     </article>`;
 }
 
-function _compRenderObjectsInventoryList() {
-    _compRenderObjectsSectionContent();
-}
-
 function _compRenderObjectsSectionContent() {
-    if (_compReactOwnsPage()) {
-        _compNotifyReactRefresh();
-        return;
-    }
-    const state = _compStateFor('oggetti');
-    const section = state.equipmentSection || '';
-    const target = document.getElementById('compObjectsListContent');
-    if (target) {
-        target.innerHTML = _compObjectsInventoryListHtml(state);
-    } else {
-        const sectionTarget = document.getElementById('compEquipmentSectionContent');
-        if (sectionTarget && section) sectionTarget.innerHTML = _compEquipmentSectionHtml(section, state);
-    }
-    const badge = document.getElementById('compObjectsFiltersBadge');
-    if (badge) {
-        const n = _compObjectsActiveFilterCount();
-        badge.textContent = n ? String(n) : '';
-        badge.style.display = n ? 'inline-flex' : 'none';
-    }
+    _compNotifyReactRefresh();
 }
 
 window.compendioSetObjectKind = function(kind) {
@@ -4312,14 +3604,6 @@ async function _compOpenSpellRefModal(spellId) {
     document.body.appendChild(overlay);
 }
 
-function _compScrollToTop() {
-    requestAnimationFrame(() => {
-        document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });
-        document.getElementById('compendioContent')?.scrollTo?.({ top: 0, left: 0 });
-        window.scrollTo?.({ top: 0, left: 0 });
-    });
-}
-
 function _compLang() {
     try { return typeof getAppLang === 'function' ? getAppLang() : 'it'; }
     catch { return 'it'; }
@@ -4667,5 +3951,5 @@ window.getCompendioReactDetail = async function(tab, id) {
 };
 
 document.addEventListener('appLangChanged', () => {
-    if (window.AppState?.currentPage === 'compendio') loadCompendio();
+    if (window.AppState?.currentPage === 'compendio') _compNotifyReactRefresh();
 });

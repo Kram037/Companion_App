@@ -239,7 +239,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('compendio');
             }
-            if (typeof loadCompendio === 'function') loadCompendio();
             if (desktopGroupTab && typeof compendioOpenTab === 'function') {
                 compendioOpenTab(desktopGroupTab);
             } else if (typeof compendioShowHub === 'function') {
