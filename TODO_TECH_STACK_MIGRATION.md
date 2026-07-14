@@ -340,7 +340,7 @@ Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di m
   - [ ] apertura tendina durante refetch senza chiusura;
   - [ ] modal aperto durante realtime senza reset;
   - [ ] combattimento round/turno;
-  - [ ] PWA/service worker smoke test.
+  - [x] PWA/service worker smoke test.
 - [ ] Integrare test E2E in CI solo dopo stabilizzazione ambiente.
 
 Criterio di uscita: i bug UX storici sono coperti da test browser reali.
@@ -355,7 +355,7 @@ Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 - [ ] Rimuovere render manuali `innerHTML` dalle pagine migrate.
 - [ ] Rimuovere guardie temporanee se non piu' necessarie.
 - [ ] Eliminare script legacy non importati da Vite.
-- [ ] Consolidare service worker con output build Vite.
+- [x] Consolidare service worker con output build Vite.
 - [x] Aggiornare documentazione architetturale.
 
 Criterio di uscita: React, query, router e store governano l'app; il legacy resta solo dove non ancora migrato.

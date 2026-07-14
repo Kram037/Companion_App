@@ -1,6 +1,7 @@
 const CACHE_NAME = 'companion-app-v204';
+const BUILD_ASSET_URLS = [];
 
-const APP_SHELL_URLS = [
+const LEGACY_APP_SHELL_URLS = [
     './',
     './index.html',
     './manifest.json',
@@ -85,6 +86,10 @@ const APP_SHELL_URLS = [
     './images/Logo Leggenda.jpeg'
 ];
 
+const APP_SHELL_URLS = BUILD_ASSET_URLS.length
+    ? BUILD_ASSET_URLS
+    : LEGACY_APP_SHELL_URLS;
+
 const DATA_URL_PREFIXES = [
     './js/Compendio/data/',
     './js/Personaggi/data/',
@@ -98,10 +103,7 @@ const RUNTIME_SCRIPT_URLS = [
 ];
 
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        precacheAppShell()
-            .then(() => self.skipWaiting())
-    );
+    event.waitUntil(precacheAppShell());
 });
 
 self.addEventListener('activate', (event) => {
@@ -157,7 +159,7 @@ function shouldCacheFirst(url) {
 }
 
 async function cacheFirst(request) {
-    const cached = await caches.match(request);
+    const cached = await caches.match(request, { ignoreSearch: true });
     if (cached) return cached;
 
     const response = await fetch(request);
@@ -188,9 +190,9 @@ async function networkFirst(request, fallbackUrl) {
         }
         return response;
     } catch (error) {
-        return caches.match(request).then(cached => {
+        return caches.match(request, { ignoreSearch: true }).then(cached => {
             if (cached) return cached;
-            return fallbackUrl ? caches.match(fallbackUrl) : Response.error();
+            return fallbackUrl ? caches.match(fallbackUrl, { ignoreSearch: true }) : Response.error();
         });
     }
 }

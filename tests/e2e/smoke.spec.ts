@@ -145,3 +145,23 @@ test('manifest does not lock tablet orientation', async ({ request }) => {
   const manifest = await response.json();
   expect(manifest).not.toHaveProperty('orientation');
 });
+
+test('precache keeps the production shell available offline', async ({ page, context }) => {
+  await page.goto('/');
+  const cache = await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+    const key = (await caches.keys()).find(name => name.startsWith('companion-app-')) ?? '';
+    const urls = key ? (await (await caches.open(key)).keys()).map(request => request.url) : [];
+    return { key, urls };
+  });
+
+  expect(cache.key).toMatch(/^companion-app-[a-f0-9]{12}$/);
+  expect(cache.urls.some(url => /\/assets\/index-.*\.js$/.test(url))).toBe(true);
+  expect(cache.urls.some(url => /\/assets\/index-.*\.css$/.test(url))).toBe(true);
+
+  await page.reload();
+  await context.setOffline(true);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
+  await context.setOffline(false);
+});
