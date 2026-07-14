@@ -341,7 +341,7 @@ Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di m
   - [ ] modal aperto durante realtime senza reset;
   - [ ] combattimento round/turno;
   - [x] PWA/service worker smoke test.
-- [ ] Integrare test E2E in CI solo dopo stabilizzazione ambiente.
+- [x] Integrare test E2E in CI solo dopo stabilizzazione ambiente.
 
 Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 

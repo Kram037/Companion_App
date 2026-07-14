@@ -33,5 +33,6 @@ Le pagine esistenti restano operative tramite `LegacyPageAdapter`. Le URL React 
 
 - `npm run check`: typecheck + guardie legacy/React.
 - `npm run test`: Vitest su logica typed.
-- `npm run e2e -- --list`: verifica discovery Playwright.
-- `npm run e2e`: richiede browser installati con `npm run e2e:install`.
+- `npm run e2e -- --list`: verifica discovery Playwright sulla build production.
+- `npm run e2e`: genera la build, avvia il preview e chiude il server al termine; richiede browser installati con `npm run e2e:install`.
+- GitHub Pages esegue check, unit test e Playwright prima del deploy.
