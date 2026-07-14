@@ -89,9 +89,7 @@ async function checkStartupNotifications() {
                     AppState.activeSessionCampagnaId = sess.campagna_id;
                     sessionStorage.setItem('activeSessionCampagnaId', sess.campagna_id);
                     AppState.currentCampagnaId = sess.campagna_id;
-                    sessionStorage.setItem('currentCampagnaId', sess.campagna_id);
                     AppState.currentSessioneId = sess.id;
-                    sessionStorage.setItem('currentSessioneId', sess.id);
                     updateReturnToSessionBtn();
                 }
             }
@@ -180,7 +178,6 @@ window.playerJoinSession = async function(campagnaId) {
  */
 window.openSessionePage = async function(campagnaId) {
     AppState.currentCampagnaId = campagnaId;
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
     AppState.activeSessionCampagnaId = campagnaId;
     sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
     navigateToPage('sessione');
@@ -774,7 +771,5 @@ window.aggiungiIniziativa = async function(sessioneId) {
 window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     AppState.currentCampagnaId = campagnaId;
     AppState.currentSessioneId = sessioneId;
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
-    sessionStorage.setItem('currentSessioneId', sessioneId);
     await navigateToPage('combattimento');
 };

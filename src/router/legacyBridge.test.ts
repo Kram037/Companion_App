@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { legacyNavigationFromPath, pathFromLegacyNavigation } from './legacyBridge';
+import { legacyNavigationFromLocation, legacyNavigationFromPath, pathFromLegacyNavigation } from './legacyBridge';
 
 describe('legacy router bridge', () => {
   it('builds paths from legacy navigation state', () => {
@@ -25,5 +25,13 @@ describe('legacy router bridge', () => {
     });
     expect(legacyNavigationFromPath('/personaggi/p1')).toEqual({ page: 'scheda', personaggioId: 'p1' });
     expect(legacyNavigationFromPath('/personaggi/nuovo')).toEqual({ page: 'personaggioCreate' });
+  });
+
+  it('maps deployed deep links independently from the app basename', () => {
+    expect(legacyNavigationFromLocation('/Companion_App/personaggi/p1')).toEqual({
+      page: 'scheda',
+      personaggioId: 'p1',
+    });
+    expect(legacyNavigationFromLocation('/Companion_App/compendio')).toEqual({ page: 'compendio' });
   });
 });

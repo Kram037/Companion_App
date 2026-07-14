@@ -464,7 +464,6 @@ async function showRollRequestModal(request) {
             if (sess) {
                 campagnaId = sess.campagna_id;
                 AppState.currentCampagnaId = campagnaId;
-                sessionStorage.setItem('currentCampagnaId', campagnaId);
             }
         }
         if (supabase && userData && campagnaId) {

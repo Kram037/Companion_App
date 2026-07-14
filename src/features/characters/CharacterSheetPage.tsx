@@ -99,14 +99,6 @@ export function CharacterSheetPage() {
   const setTab = useCharacterSheetUiStore(state => state.setCharacterTab);
 
   useEffect(() => {
-    if (window.AppState) {
-      (window.AppState as typeof window.AppState & { currentPage?: string }).currentPage = 'scheda';
-      window.AppState.currentPersonaggioId = personaggioId;
-    }
-    sessionStorage.setItem('currentPersonaggioId', personaggioId);
-  }, [personaggioId]);
-
-  useEffect(() => {
     const refresh = (event: Event) => {
       const detail = (event as CustomEvent<{ personaggioId?: string; tab?: string }>).detail;
       if (detail?.personaggioId && detail.personaggioId !== personaggioId) return;

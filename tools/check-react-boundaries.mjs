@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 
 const roots = ['src/app', 'src/components', 'src/features'];
 const files = [];
+const routeFiles = [];
 const errors = [];
 
 function collect(path) {
@@ -19,6 +20,18 @@ function collect(path) {
 }
 
 for (const root of roots) collect(root);
+
+function collectRouteFiles(path) {
+  const stat = statSync(path);
+  if (stat.isDirectory()) {
+    for (const entry of readdirSync(path)) collectRouteFiles(join(path, entry));
+  } else if (/\.(?:js|ts|tsx)$/.test(path)) {
+    routeFiles.push(path);
+  }
+}
+
+collectRouteFiles('js');
+collectRouteFiles('src');
 
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
@@ -38,6 +51,13 @@ if (/_appRefresh(?:Running|Queued)|refreshCurrentPageData|scheduleAppEventsRefre
 }
 if (/\b(?:renderCombattimentoContent|renderSessioneContent|renderSchedaPersonaggio|loadCampagnaDetails|loadCampagne)\s*\(/.test(realtime)) {
   errors.push('js/Core/realtime.js: realtime deve invalidare query, non renderizzare pagine');
+}
+
+for (const file of routeFiles) {
+  const text = readFileSync(file, 'utf8');
+  if (/sessionStorage\.(?:getItem|setItem|removeItem)\(['"]current(?:Page|CampagnaId|SessioneId|PersonaggioId)['"]/.test(text)) {
+    errors.push(`${relative('.', file)}: la navigazione deve usare URL params, non sessionStorage`);
+  }
 }
 
 if (errors.length) {

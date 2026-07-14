@@ -241,7 +241,6 @@ let elements = {};
         if (typeof window.openSchedaPersonaggio === 'function' && !window.openSchedaPersonaggio.__realtimeGuardNoDoubleRender) {
             const patchedOpenScheda = async function(personaggioId, opts) {
                 AppState.currentPersonaggioId = personaggioId;
-                sessionStorage.setItem('currentPersonaggioId', personaggioId);
                 if (opts && opts.scrollToStats) {
                     window._schedaPendingScrollToStats = true;
                 }
@@ -254,7 +253,6 @@ let elements = {};
         if (typeof window.openSessionePage === 'function' && !window.openSessionePage.__realtimeGuardNoDoubleRender) {
             const patchedOpenSessione = async function(campagnaId) {
                 AppState.currentCampagnaId = campagnaId;
-                sessionStorage.setItem('currentCampagnaId', campagnaId);
                 AppState.activeSessionCampagnaId = campagnaId;
                 sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
                 return navigateToPage('sessione');

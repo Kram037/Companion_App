@@ -10,10 +10,12 @@ import { CompendiumPage } from '../features/compendium/CompendiumPage';
 import { LaboratoryPage } from '../features/laboratory/LaboratoryPage';
 import { appBasenameFromPath } from '../router';
 import { CampaignRedirect, LegacyPageAdapter } from './LegacyPageAdapter';
+import { LegacyNavigationSync } from './LegacyNavigationSync';
 
 export function AppRouter() {
   return (
     <BrowserRouter basename={appBasenameFromPath(window.location.pathname)}>
+      <LegacyNavigationSync />
       <Routes>
         <Route path="/" element={<CampaignRedirect />} />
         <Route path="/campagne" element={<CampaignsRoutePage />} />

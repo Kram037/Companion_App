@@ -1038,36 +1038,19 @@
 
     <script src="js/Core/config.js?v=20260516A"></script>
 
-    <!-- Supabase SDK -->
-    <script type="module">
-        // Carica Supabase come ES module
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-        
-        const config = window.CompanionConfig || {};
-        const SUPABASE_URL = config.supabaseUrl;
-        const SUPABASE_ANON_KEY = config.supabaseAnonKey;
-        
-        // Crea il client e rendilo disponibile globalmente
-        window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        window.supabaseCreateClient = createClient; // Per compatibilitÃ 
-        
-        if (config.debug) {
-            console.log('Supabase caricato e inizializzato (ES Module)');
-        }
-    </script>
     <script src="js/Core/supabase.js?v=1767900400"></script>
     <script src="js/Core/version.js?v=20260427A"></script>
-    <script src="js/Core/state.js?v=20260423E"></script>
+    <script src="js/Core/state.js?v=20260713A"></script>
     <script src="js/Core/utils.js?v=20260517A"></script>
     <script src="js/Core/lang.js?v=1771800000"></script>
     <script src="js/Core/theme.js?v=1767900400"></script>
     <script src="js/Core/data-loader.js?v=20260627A"></script>
-    <script src="js/Core/navigation.js?v=20260713E"></script>
-    <script src="js/Core/bookmarks.js?v=20260713I"></script>
-    <script src="js/Core/auth.js?v=20260603A"></script>
+    <script src="js/Core/navigation.js?v=20260713F"></script>
+    <script src="js/Core/bookmarks.js?v=20260713J"></script>
+    <script src="js/Core/auth.js?v=20260713A"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
-    <script src="js/Campagna/campagne.js?v=20260517E"></script>
+    <script src="js/Campagna/campagne.js?v=20260713A"></script>
     <script src="js/Personaggi/personaggi-catalog.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-state.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-talenti.js?v=20260517B"></script>
@@ -1082,7 +1065,7 @@
     <script src="js/Personaggi/personaggi-pv-keypad.js?v=20260602D"></script>
     <script src="js/Personaggi/personaggi-wizard-navigation.js?v=20260624A"></script>
     <script src="js/Personaggi/personaggi-lista.js?v=20260517A"></script>
-    <script src="js/Personaggi/personaggi-scheda-core.js?v=20260517A"></script>
+    <script src="js/Personaggi/personaggi-scheda-core.js?v=20260713A"></script>
     <script src="js/Personaggi/personaggi-scheda-risorse.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-incantesimi-preparati.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-render.js?v=20260602A"></script>
@@ -1101,10 +1084,10 @@
     <script src="js/Personaggi/personaggi-campagna-picker.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-micro.js?v=20260602A"></script>
     <script src="js/Personaggi/personaggi.js?v=20260428B"></script>
-    <script src="js/Sessioni/sessions.js?v=20260425F"></script>
+    <script src="js/Sessioni/sessions.js?v=20260713A"></script>
     <script src="js/Core/realtime.js?v=20260713A"></script>
-    <script src="js/Sessioni/initiative.js?v=20260425E"></script>
-    <script src="js/Core/init.js?v=20260713A"></script>
+    <script src="js/Sessioni/initiative.js?v=20260713A"></script>
+    <script src="js/Core/init.js?v=20260713B"></script>
     <script type="module" src="/src/main.ts"></script>
     
     <!-- Cache busting script for development -->

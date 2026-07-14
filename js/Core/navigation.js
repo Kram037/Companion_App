@@ -59,8 +59,6 @@ async function _returnToActiveSessionOrCombat() {
     if (inCombat) {
         AppState.currentCampagnaId = campagnaId;
         AppState.currentSessioneId = sessione.id;
-        sessionStorage.setItem('currentCampagnaId', campagnaId);
-        sessionStorage.setItem('currentSessioneId', sessione.id);
         navigateToPage('combattimento');
     } else {
         if (typeof openSessionePage === 'function') {
@@ -68,6 +66,19 @@ async function _returnToActiveSessionOrCombat() {
         }
     }
     return true;
+}
+
+function navigationStateFromCurrentUrl() {
+    return window.CompanionRouterBridge?.legacyNavigationFromLocation(location.pathname)
+        || { page: 'campagne' };
+}
+
+function applyNavigationState(state) {
+    AppState.currentPage = state?.page || 'campagne';
+    AppState.currentCampagnaId = state?.campagnaId || null;
+    AppState.currentSessioneId = state?.sessioneId || null;
+    AppState.currentPersonaggioId = state?.personaggioId || null;
+    return state;
 }
 
 // Click sul bottone globale "Sessione": redirect alla sessione/combat.
@@ -119,47 +130,28 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
 
     AppState.currentPage = pageName;
     
-    const persistSessionState = new URLSearchParams(window.location.search).get('splitPane') !== '1';
-
-    // L'iframe della split view condivide sessionStorage con la view principale.
-    if (persistSessionState) sessionStorage.setItem('currentPage', pageName);
-    
-    // Salva currentCampagnaId e currentSessioneId solo per pagine che lo richiedono
+    // Mantieni solo lo specchio legacy necessario a editor e dialog non ancora migrati.
     if (pageName === 'dettagli' || pageName === 'sessione' || pageName === 'combattimento') {
-        if (persistSessionState && AppState.currentCampagnaId) {
-            sessionStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
-        }
-        if (pageName === 'combattimento' && AppState.currentSessioneId) {
-            if (persistSessionState) sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
-        } else {
-            if (persistSessionState) sessionStorage.removeItem('currentSessioneId');
+        if (pageName !== 'combattimento') {
             AppState.currentSessioneId = null;
-        }
-    } else if (pageName === 'scheda') {
-        if (persistSessionState && AppState.currentPersonaggioId) {
-            sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
         }
     } else {
         if (pageName === 'campagne' || pageName === 'amici' || pageName === 'compendio' || pageName === 'personaggi' || pageName === 'laboratorio') {
-            if (persistSessionState) {
-                sessionStorage.removeItem('currentCampagnaId');
-                sessionStorage.removeItem('currentSessioneId');
-                sessionStorage.removeItem('currentPersonaggioId');
-            }
             AppState.currentCampagnaId = null;
             AppState.currentSessioneId = null;
             AppState.currentPersonaggioId = null;
         }
     }
 
-    // Push to browser history so back/forward buttons work within the app
-    if (pushHistory && previousPage !== pageName) {
-        const stateObj = {
-            page: pageName,
-            campagnaId: AppState.currentCampagnaId || null,
-            sessioneId: AppState.currentSessioneId || null,
-            personaggioId: AppState.currentPersonaggioId || null
-        };
+    // Push to browser history so back/forward buttons work within the app.
+    const stateObj = {
+        page: pageName,
+        campagnaId: AppState.currentCampagnaId || null,
+        sessioneId: AppState.currentSessioneId || null,
+        personaggioId: AppState.currentPersonaggioId || null
+    };
+    const nextPath = legacyPathFromNavigationState(stateObj);
+    if (pushHistory && location.pathname !== nextPath) {
         history.pushState(stateObj, '', legacyPathFromNavigationState(stateObj));
         window.dispatchEvent(new PopStateEvent('popstate', {
             state: { ...stateObj, __reactSync: true }

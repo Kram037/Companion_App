@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router';
 
-import { appRoutes, buildAppPath, type AppRouteId } from './routes';
+import { appBasenameFromPath, appRoutes, buildAppPath, type AppRouteId } from './routes';
 
 export interface LegacyNavigationSnapshot {
   page?: string | null;
@@ -67,4 +67,10 @@ export function legacyNavigationFromPath(pathname: string): LegacyNavigationSnap
   }
 
   return null;
+}
+
+export function legacyNavigationFromLocation(pathname: string): LegacyNavigationSnapshot | null {
+  const basename = appBasenameFromPath(pathname);
+  const appPath = basename ? pathname.slice(basename.length) || '/' : pathname;
+  return legacyNavigationFromPath(appPath);
 }

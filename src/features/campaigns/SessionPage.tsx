@@ -35,8 +35,6 @@ export function SessionPage() {
       window.AppState.currentCampagnaId = campagnaId;
       window.AppState.currentSessioneId = session.data?.id ?? null;
     }
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
-    if (session.data?.id) sessionStorage.setItem('currentSessioneId', session.data.id);
   }, [campagnaId, session.data?.id]);
 
   useEffect(() => () => {

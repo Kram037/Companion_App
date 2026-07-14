@@ -9,12 +9,6 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:8000',
     trace: 'on-first-retry',
   },
-  webServer: {
-    command: 'vite --host 127.0.0.1 --port 8000',
-    url: 'http://127.0.0.1:8000',
-    reuseExistingServer: true,
-    timeout: 15_000,
-  },
   projects: [
     {
       name: 'chromium',

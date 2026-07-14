@@ -169,32 +169,7 @@ async function init() {
         initBookmarks();
     }
     
-    // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedCampagnaId = isSplitPane ? null : sessionStorage.getItem('currentCampagnaId');
-    if (savedCampagnaId) {
-        AppState.currentCampagnaId = savedCampagnaId;
-        appDebug('Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
-    }
-    
-    // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedSessioneId = isSplitPane ? null : sessionStorage.getItem('currentSessioneId');
-    if (savedSessioneId) {
-        AppState.currentSessioneId = savedSessioneId;
-        appDebug('Sessione salvata ripristinata dalla sessione:', savedSessioneId);
-    }
-    
-    const savedPersonaggioId = isSplitPane ? null : sessionStorage.getItem('currentPersonaggioId');
-    if (savedPersonaggioId) {
-        AppState.currentPersonaggioId = savedPersonaggioId;
-        appDebug('Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
-    }
-
-    // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedPage = isSplitPane ? null : sessionStorage.getItem('currentPage');
-    if (savedPage) {
-        AppState.currentPage = savedPage;
-        appDebug('Pagina salvata ripristinata dalla sessione:', savedPage);
-    }
+    const initialNavigation = applyNavigationState(navigationStateFromCurrentUrl());
 
     const savedActiveSession = isSplitPane ? null : sessionStorage.getItem('activeSessionCampagnaId');
     if (savedActiveSession) {
@@ -222,14 +197,10 @@ async function init() {
     // Browser back/forward navigation
     window.addEventListener('popstate', async (event) => {
         if (event.state?.__reactSync) return;
-        if (event.state && event.state.page) {
-            const st = event.state;
-            if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;
-            if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
-            if (st.personaggioId) AppState.currentPersonaggioId = st.personaggioId;
+        const st = applyNavigationState(navigationStateFromCurrentUrl());
+        await navigateToPage(st.page, { pushHistory: false });
 
-            await navigateToPage(st.page, { pushHistory: false });
-
+        if (!window.CompanionReactPages?.has(st.page)) {
             if (st.page === 'dettagli' && st.campagnaId) {
                 await loadCampagnaDetails(st.campagnaId);
             } else if (st.page === 'sessione' && st.campagnaId) {
@@ -237,17 +208,12 @@ async function init() {
             } else if (st.page === 'scheda' && st.personaggioId) {
                 await renderSchedaPersonaggio(st.personaggioId);
             }
-        } else {
-            // No state = initial page, go to campagne
-            AppState.currentCampagnaId = null;
-            AppState.currentSessioneId = null;
-            navigateToPage('campagne', { pushHistory: false });
         }
     });
 
     // Replace current history entry with initial state
-    const initialPage = isSplitPane ? 'campagne' : (AppState.currentPage || 'campagne');
-    history.replaceState({ page: initialPage }, '', null);
+    const initialPage = initialNavigation.page || 'campagne';
+    history.replaceState({ ...history.state, ...initialNavigation }, '', location.href);
 
     appDebug('Navigazione alla pagina iniziale...');
     navigateToPage(initialPage, { pushHistory: false, skipPageLoad: isSplitPane });
@@ -728,7 +694,6 @@ function setupEventListeners() {
             e.stopPropagation();
             // Reset currentCampagnaId per tornare alla lista
             AppState.currentCampagnaId = null;
-            sessionStorage.removeItem('currentCampagnaId');
             navigateToPage('campagne');
         };
         appDebug('Event listener aggiunto a backToCampagneBtn');

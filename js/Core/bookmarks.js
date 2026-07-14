@@ -525,15 +525,6 @@ async function openBookmark(id) {
     AppState.currentSessioneId = st.sessioneId || null;
     AppState.currentPersonaggioId = st.personaggioId || null;
 
-    if (!_bookmarkIsSplitPaneInstance) {
-        if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
-        else sessionStorage.removeItem('currentCampagnaId');
-        if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
-        else sessionStorage.removeItem('currentSessioneId');
-        if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
-        else sessionStorage.removeItem('currentPersonaggioId');
-    }
-
     const targetPage = st.page || item.page || 'campagne';
     const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});
 

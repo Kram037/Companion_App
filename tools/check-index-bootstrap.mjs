@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync('index.html', 'utf8');
+if (/cdn\.jsdelivr\.net\/npm\/@supabase/.test(html)) {
+  console.error('Supabase deve essere incluso nel bundle Vite, non caricato da CDN');
+  process.exit(1);
+}
 const scripts = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
   .map(match => match[1]);
 const lazyModules = [

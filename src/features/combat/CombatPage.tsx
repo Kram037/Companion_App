@@ -77,8 +77,6 @@ export function CombatPage() {
       state.currentCampagnaId = campagnaId;
       state.currentSessioneId = sessioneId;
     }
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
-    sessionStorage.setItem('currentSessioneId', sessioneId);
   }, [campagnaId, sessioneId]);
 
   useEffect(() => {

@@ -58,8 +58,9 @@ async function fetchCombatCharacters(campagnaId: Id): Promise<CombatCharacter[]>
     .select(`id,nome,immagine_url,punti_vita_max,pv_attuali,${CONDITION_KEYS.join(',')}`)
     .in('id', ids);
   throwIfSupabaseError(error);
-  const playerByCharacter = new Map((links ?? []).map((row: Record<string, unknown>) => [String(row.personaggio_id), row.player_user_id ? String(row.player_user_id) : null]));
-  return (data ?? []).map((row: Record<string, unknown>) => ({
+  const playerByCharacter = new Map<string, string | null>((links ?? []).map((row: Record<string, unknown>) => [String(row.personaggio_id), row.player_user_id ? String(row.player_user_id) : null]));
+  const rows = (data ?? []) as unknown as Array<Record<string, unknown>>;
+  return rows.map(row => ({
     id: String(row.id),
     nome: String(row.nome ?? '?'),
     player_user_id: playerByCharacter.get(String(row.id)) ?? null,

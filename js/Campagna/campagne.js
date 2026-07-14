@@ -1034,10 +1034,7 @@ window.editCampagna = function(campagnaId) {
 };
 
 window.openCampagnaDetails = function(campagnaId) {
-    // Salva l'ID della campagna corrente
     AppState.currentCampagnaId = campagnaId;
-    // Salva nel sessionStorage per persistenza al refresh (si cancella alla chiusura del browser)
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
     navigateToPage('dettagli');
 };
 

@@ -9,6 +9,28 @@ test('loads the app shell', async ({ page }) => {
   await expect(page.locator('#campagnePage')).toBeHidden();
 });
 
+test('uses the URL as navigation source after refresh', async ({ page }) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('currentPage', 'scheda');
+    sessionStorage.setItem('currentCampagnaId', 'stale-campaign');
+    sessionStorage.setItem('currentSessioneId', 'stale-session');
+    sessionStorage.setItem('currentPersonaggioId', 'stale-character');
+  });
+  await page.goto('/compendio', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'compendio');
+  await expect.poll(() => page.evaluate(() => ({
+    page: window.AppState?.currentPage,
+    campagnaId: window.AppState?.currentCampagnaId,
+    sessioneId: window.AppState?.currentSessioneId,
+    personaggioId: window.AppState?.currentPersonaggioId,
+  }))).toEqual({ page: 'compendio', campagnaId: null, sessioneId: null, personaggioId: null });
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page).toHaveURL(/\/compendio(?:\?.*)?$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'compendio');
+});
+
 test('uses desktop chrome on tablet landscape', async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 600 });
   await page.goto('/');
