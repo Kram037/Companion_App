@@ -74,9 +74,7 @@ function setupSupabaseAuth() {
                 stopAppEventsRealtime();
                 
                 // Pulisci i dati quando l'utente esce
-                if (AppState.currentPage === 'campagne') {
-                    renderCampagne([], false);
-                } else if (AppState.currentPage === 'amici') {
+                if (AppState.currentPage === 'amici') {
                     renderAmici([], [], []);
                 }
             }
@@ -678,9 +676,7 @@ async function checkAuthState() {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
             
-            if (AppState.currentPage === 'campagne') {
-                renderCampagne([], false);
-            } else if (AppState.currentPage === 'amici') {
+            if (AppState.currentPage === 'amici') {
                 renderAmici([], [], []);
             }
         }
@@ -753,9 +749,7 @@ function updateUIForLoggedOut() {
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = 'none';
     }
-    // Show login message in campagne list
-    renderCampagne([], false);
-    // Aggiorna i placeholder per amici, laboratorio e personaggi
+    // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(false);
 }
 
@@ -1050,12 +1044,6 @@ async function handleLogout() {
             AppState.isLoggedIn = false;
             
             if (supabase) {
-                // Disconnetti da eventuali subscription
-                if (campagneChannel) {
-                    supabase.removeChannel(campagneChannel);
-                    campagneChannel = null;
-                }
-                
                 // Esegui logout da Supabase (senza scope per pulire tutto)
                 const { error } = await supabase.auth.signOut();
                 if (error) {

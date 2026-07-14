@@ -255,10 +255,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             } else if (typeof compendioShowHub === 'function') {
                 compendioShowHub();
             }
-        } else if (pageName === 'campagne') {
-            if (AppState.isLoggedIn && AppState.currentUser) {
-                loadCampagne(AppState.currentUser.uid);
-            }
         } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('laboratorio');
@@ -270,8 +266,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             }
         } else if (pageName === 'personaggioCreate') {
             if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
-        } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
-            loadCampagnaDetails(AppState.currentCampagnaId);
         } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('combattimento');

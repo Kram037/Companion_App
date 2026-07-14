@@ -8,17 +8,10 @@ const AppState = {
     currentSessioneId: null,
     currentPersonaggioId: null,
     cachedUserData: null,
-    cachedCampagne: null,
     cachedRazze: null,
     cachedBackground: null,
     cachedHomebrewSottoclassi: null,
-    cachedHomebrewOggetti: null,
-    campagneFilters: {
-        searchText: '',
-        tipologia: 'all',
-        dm: 'all',
-        soloPreferiti: false
-    }
+    cachedHomebrewOggetti: null
 };
 
 // Gli script classici condividono ancora questo compatibility layer.

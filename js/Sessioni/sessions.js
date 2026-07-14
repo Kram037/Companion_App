@@ -420,7 +420,6 @@ window.finisciSessione = async function(sessioneId, campagnaId) {
         
         // Torna ai dettagli campagna
         navigateToPage('dettagli');
-        if (!window.CompanionReactPages?.has('dettagli')) await loadCampagnaDetails(campagnaId);
     } catch (error) {
         console.error('❌ Errore nella fine sessione:', error);
         showNotification('Errore nella fine della sessione: ' + (error.message || error));

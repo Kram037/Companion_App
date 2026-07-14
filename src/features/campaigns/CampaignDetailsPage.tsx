@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
-import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import {
@@ -30,27 +28,11 @@ declare global {
 export function CampaignDetailsPage() {
   const { campagnaId = '' } = useParams();
   const navigate = useNavigate();
-  const client = useQueryClient();
   const campaign = useQuery(campaignByIdQuery(campagnaId));
   const session = useQuery(activeSessionByCampaignQuery(campagnaId));
   const players = useQuery(campaignPlayersQuery(campagnaId));
   const characters = useQuery(campaignCharactersQuery(campagnaId));
   const user = useQuery(currentUserQuery());
-
-  useEffect(() => {
-    const refresh = (event: Event) => {
-      const detail = (event as CustomEvent<{ table?: string; campagnaId?: string }>).detail;
-      if (detail?.campagnaId && detail.campagnaId !== campagnaId) return;
-      client.invalidateQueries({ queryKey: queryKeys.campaign(campagnaId) });
-      client.invalidateQueries({ queryKey: queryKeys.campaignPlayers(campagnaId) });
-      client.invalidateQueries({ queryKey: queryKeys.campaignCharacters(campagnaId) });
-      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
-    };
-    window.addEventListener('companion:campaigns-changed', refresh);
-    return () => {
-      window.removeEventListener('companion:campaigns-changed', refresh);
-    };
-  }, [campagnaId, client]);
 
   const data = campaign.data;
   if (campaign.isLoading) return <ReactPage name="dettagli"><Placeholder text="Caricamento dettagli..." /></ReactPage>;

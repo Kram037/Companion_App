@@ -12,6 +12,7 @@ let _bookmarkRestoreInProgress = _bookmarkIsSplitPaneInstance;
 let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '', section: '' };
+let _bookmarkDraggedTabId = '';
 const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
     { key: 'armi', label: 'Armi, Armature e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
     { key: 'avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
@@ -911,7 +912,8 @@ function _bookmarkBindTabRailDrag(rail) {
             return;
         }
         event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('text/plain', tab.dataset.bookmarkId || '');
+        _bookmarkDraggedTabId = tab.dataset.bookmarkId || '';
+        event.dataTransfer.setData('text/plain', _bookmarkDraggedTabId);
         tab.classList.add('dragging');
     });
     rail.addEventListener('dragover', (event) => {
@@ -925,7 +927,7 @@ function _bookmarkBindTabRailDrag(rail) {
     });
     rail.addEventListener('drop', (event) => {
         event.preventDefault();
-        const id = event.dataTransfer.getData('text/plain');
+        const id = event.dataTransfer.getData('text/plain') || _bookmarkDraggedTabId;
         const target = event.target.closest('.desktop-bookmark-tab');
         let beforeId = '';
         if (target) {
@@ -938,6 +940,7 @@ function _bookmarkBindTabRailDrag(rail) {
         if (id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
     });
     rail.addEventListener('dragend', () => {
+        _bookmarkDraggedTabId = '';
         rail.querySelector('.desktop-bookmark-tab.dragging')?.classList.remove('dragging');
         _bookmarkClearDropIndicators(rail);
     });

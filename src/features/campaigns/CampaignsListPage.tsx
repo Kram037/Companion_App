@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toggleCampaignFavorite, updateCampaignInviteStatus } from '../../api';
@@ -22,12 +22,6 @@ export function CampaignsListPage({ currentUserId, onCreate, onDelete, onEdit, o
   const campaignsQuery = useQuery(visibleCampaignsQuery(currentUserId));
   const invitesQuery = useQuery(receivedCampaignInvitesQuery(currentUserId));
   const campaignsKey = queryKeys.campaigns(currentUserId);
-
-  useEffect(() => {
-    const refresh = () => client.invalidateQueries({ queryKey: campaignsKey });
-    window.addEventListener('companion:campaigns-changed', refresh);
-    return () => window.removeEventListener('companion:campaigns-changed', refresh);
-  }, [client, currentUserId]);
 
   const favorites = useMemo(() => new Set(
     (campaignsQuery.data ?? []).filter(item => item.isPreferito).map(item => item.id),

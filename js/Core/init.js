@@ -52,9 +52,6 @@ async function init() {
         backToCampagneBtn: document.getElementById('backToCampagneBtn'),
         backToDettagliBtn: document.getElementById('backToDettagliBtn'),
         backToSessioneBtn: document.getElementById('backToSessioneBtn'),
-        dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
-        dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
-        dettagliIconContainer: document.getElementById('dettagliIconContainer'),
         editUserNameBtn: document.getElementById('editUserNameBtn'),
         editUserNameForm: document.getElementById('editUserNameForm'),
         editUserNameInput: document.getElementById('editUserNameInput'),
@@ -64,7 +61,6 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         langIt: document.getElementById('langIt'),
         langEn: document.getElementById('langEn'),
-        campagneList: document.getElementById('campagneList'),
         addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
         openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
@@ -199,15 +195,6 @@ async function init() {
         const st = applyNavigationState(navigationStateFromCurrentUrl());
         await navigateToPage(st.page, { pushHistory: false });
 
-        if (!window.CompanionReactPages?.has(st.page)) {
-            if (st.page === 'dettagli' && st.campagnaId) {
-                await loadCampagnaDetails(st.campagnaId);
-            } else if (st.page === 'sessione' && st.campagnaId) {
-                await renderSessioneContent(st.campagnaId);
-            } else if (st.page === 'scheda' && st.personaggioId) {
-                await renderSchedaPersonaggio(st.personaggioId);
-            }
-        }
     });
 
     // Replace current history entry with initial state
@@ -447,17 +434,6 @@ function setupEventListeners() {
         };
     }
 
-    // Filtri campagne
-    setupCampagneFilters();
-    if (typeof setupCampagneEventDelegation === 'function') {
-        setupCampagneEventDelegation();
-    }
-    if (typeof setupCampagnaDetailsActionsDelegation === 'function') {
-        setupCampagnaDetailsActionsDelegation();
-    }
-    if (typeof setupCampagnaDetailsContentDelegation === 'function') {
-        setupCampagnaDetailsContentDelegation();
-    }
     if (typeof setupGiocatoriCampagnaDelegation === 'function') {
         setupGiocatoriCampagnaDelegation();
     }
@@ -702,7 +678,6 @@ function setupEventListeners() {
             const campagnaId = AppState.currentCampagnaId;
             if (campagnaId) {
                 navigateToPage('dettagli');
-                await loadCampagnaDetails(campagnaId);
             }
         };
         appDebug('Event listener aggiunto a backToDettagliBtn');
