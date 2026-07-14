@@ -47,7 +47,6 @@ function setupSupabaseAuth() {
                         navigateToPage('combattimento');
                     } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                         navigateToPage('sessione');
-                        renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
                     } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
@@ -659,7 +658,6 @@ async function checkAuthState() {
                 navigateToPage('combattimento');
             } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                 navigateToPage('sessione');
-                renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 navigateToPage('dettagli');
             } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {

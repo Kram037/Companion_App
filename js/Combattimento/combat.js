@@ -2198,7 +2198,6 @@ window.terminaCombattimento = async function(campagnaId, sessioneId) {
         showNotification('Combattimento terminato');
 
         navigateToPage('sessione');
-        if (!window.CompanionReactPages?.has('sessione')) await renderSessioneContent(campagnaId);
     } catch (error) {
         console.error('❌ Errore nella terminazione combattimento:', error);
         showNotification('Errore nella terminazione del combattimento: ' + (error.message || error));
@@ -2225,17 +2224,6 @@ window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
         await sendAppEventBroadcast({ table: 'iniziativa', action: 'delete', sessioneId, iniziativaId });
 
         showNotification('Iniziativa rimossa!');
-        
-        // Ricarica la sessione
-        const { data: sessione } = await supabase
-            .from('sessioni')
-            .select('campagna_id')
-            .eq('id', sessioneId)
-            .single();
-
-        if (sessione) {
-            await renderSessioneContent(sessione.campagna_id);
-        }
     } catch (error) {
         console.error('❌ Errore nella rimozione iniziativa:', error);
         showNotification('Errore nella rimozione dell\'iniziativa: ' + (error.message || error));

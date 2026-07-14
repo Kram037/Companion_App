@@ -685,13 +685,12 @@ function setupEventListeners() {
 
     // Back to sessione button (from combattimento page)
     if (elements.backToSessioneBtn) {
-        elements.backToSessioneBtn.onclick = async function(e) {
+        elements.backToSessioneBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
             const campagnaId = AppState.currentCampagnaId;
             if (campagnaId) {
                 navigateToPage('sessione');
-                await renderSessioneContent(campagnaId);
             }
         };
         appDebug('Event listener aggiunto a backToSessioneBtn');
