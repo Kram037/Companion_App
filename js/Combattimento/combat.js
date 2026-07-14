@@ -3,289 +3,14 @@ const MONSTER_SIZES = ['Minuscola','Piccola','Media','Grande','Enorme','Mastodon
 const MONSTER_ALIGNMENTS = ['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Senza allineamento'];
 
 let _combatInitiativeOrder = [];
-let _combatMonsters = [];
-let _combatSelectedId = null;
-let _combatSelectedType = null; // 'player' or 'monster'
 
-async function renderCombattimentoContent(campagnaId, sessioneId) {
-    if (window.CompanionReactPages?.has('combattimento') && document.body.dataset.reactPage === 'combattimento') {
-        window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
-        return;
-    }
-    const cardsCol = document.getElementById('combattimentoContent');
-    const initCol = document.getElementById('combatInitCol');
-    const roundInfo = document.getElementById('combatRoundInfo');
-    const nextBtn = document.getElementById('combatNextTurnBtn');
-    const toolbar = document.getElementById('combatToolbar');
-    if (!cardsCol) return;
-
-    const supabase = getSupabaseClient();
-    if (!supabase) { cardsCol.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
-
-    try {
-        const [sessioneResult, tiriResult, monstersResult, charData, isDM, currentUserId] = await Promise.all([
-            supabase.from('sessioni').select('combat_round, combat_turn_index').eq('id', sessioneId).single(),
-            supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId }),
-            supabase.from('mostri_combattimento').select('*').eq('sessione_id', sessioneId).order('iniziativa', { ascending: false, nullsFirst: false }),
-            getCampaignCharacterData(campagnaId),
-            isCurrentUserDM(campagnaId),
-            getCurrentInternalUserId()
-        ]);
-
-        const sessione = sessioneResult.data;
-        const combatRound = sessione?.combat_round || 1;
-        const combatTurnIdx = sessione?.combat_turn_index || 0;
-
-        let tiriIniziativa = tiriResult.data;
-        if (tiriResult.error || !tiriIniziativa) {
-            const fallback = await supabase.from('richieste_tiro_iniziativa')
-                .select(`*, utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)`)
-                .eq('sessione_id', sessioneId).order('valore', { ascending: false });
-            tiriIniziativa = fallback.data;
-        }
-        const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
-
-        _combatMonsters = monstersResult.data || [];
-
-        const pgNamesMap = charData.namesMap;
-        const pgConditionsMap = charData.conditionsMap;
-
-        // Build initiative order
-        // Tiebreak deterministico: a parità d'iniziativa l'ordine viene fissato
-        // dal momento in cui la creatura è entrata nel giro (created_at delle
-        // tiri_iniziativa per i player, created_at del mostro per i mostri).
-        // In questo modo, una volta deciso l'ordine, non cambia mai più anche
-        // quando vengono aggiunte nuove creature con lo stesso valore.
-        const _ts = (s) => { const t = s ? Date.parse(s) : NaN; return isNaN(t) ? 0 : t; };
-        const order = [];
-        tiriCompleted.forEach(t => {
-            const pgName = pgNamesMap[t.giocatore_id];
-            const cond = pgConditionsMap[t.giocatore_id];
-            order.push({
-                type: 'player', id: t.giocatore_id, pgId: cond?.id || null,
-                name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?',
-                init: t.valore,
-                tiebreak: _ts(t.created_at) || _ts(t.completed_at) || 0,
-                conditions: cond
-            });
-        });
-        _combatMonsters.forEach(m => {
-            order.push({
-                type: 'monster', id: m.id, name: m.nome,
-                init: m.iniziativa ?? 0,
-                tiebreak: _ts(m.created_at),
-                monster: m
-            });
-        });
-        order.sort((a, b) => {
-            if ((b.init || 0) !== (a.init || 0)) return (b.init || 0) - (a.init || 0);
-            // Stesso valore d'iniziativa: chi è stato aggiunto prima agisce prima.
-            if (a.tiebreak !== b.tiebreak) return a.tiebreak - b.tiebreak;
-            // Ulteriore fallback: id stringa, per evitare riordini casuali
-            // se due creature hanno timestamp identici.
-            return String(a.id).localeCompare(String(b.id));
-        });
-        _combatInitiativeOrder = order;
-
-        const turnIdx = Math.min(combatTurnIdx, Math.max(0, order.length - 1));
-
-        // Round/turn header
-        if (roundInfo) {
-            const currentName = order[turnIdx]?.name || 'In attesa...';
-            roundInfo.innerHTML = `<div class="combat-round-num">Round ${combatRound}</div><div class="combat-turn-name">${escapeHtml(currentName)}</div>`;
-        }
-        if (nextBtn) {
-            nextBtn.style.display = isDM && order.length > 0 ? '' : 'none';
-            nextBtn.onclick = () => combatNextTurn(campagnaId, sessioneId, order.length, combatRound, turnIdx);
-        }
-
-        // Helper: produce the click handler attribute for a given entry,
-        // applying access rules (player can only open their own sheet; non-DM
-        // cannot open monster sheets at all).
-        const buildClickHandler = (entry) => {
-            const isMonster = entry.type === 'monster';
-            if (isMonster) {
-                if (!isDM) return '';
-                if (_isPlaceholderMonster(entry.monster)) {
-                    return `onclick="combatOpenPlaceholderDialog('${entry.id}','${campagnaId}','${sessioneId}')"`;
-                }
-                return `onclick="combatOpenMonsterFullSheet('${entry.id}','${campagnaId}','${sessioneId}')"`;
-            }
-            const isOwner = entry.id === currentUserId;
-            if (!isDM && !isOwner) return '';
-            if (!entry.pgId) return '';
-            // Apri la scheda PG e centra automaticamente la tabella
-            // statistiche (PV / PV temp / CA) cosi' il DM/player vede subito
-            // i dati piu' rilevanti durante il combattimento.
-            return `onclick="openSchedaPersonaggio('${entry.pgId}',{scrollToStats:true})"`;
-        };
-
-        // Left icons column (square portraits, no initiative number).
-        // Per i player mostriamo l'immagine del personaggio se presente
-        // (immagine_url, normalizzata via _normalizeImageUrl per supportare
-        // gli URL di Google Drive); fallback alle iniziali del nome.
-        if (initCol) {
-            initCol.innerHTML = order.map((entry, idx) => {
-                const initials = entry.name.substring(0, 2).toUpperCase();
-                const isTurn = idx === turnIdx;
-                const click = buildClickHandler(entry);
-                const clickable = click ? 'is-clickable' : 'is-locked';
-                const initialsHtml = `<span class="combat-icon-initials">${escapeHtml(initials)}</span>`;
-                let portraitInner = initialsHtml;
-                if (entry.type === 'player' && entry.conditions?.immagine_url) {
-                    const rawUrl = entry.conditions.immagine_url;
-                    const url = (typeof window._normalizeImageUrl === 'function')
-                        ? window._normalizeImageUrl(rawUrl) : rawUrl;
-                    const safeUrl = String(url).replace(/"/g, '&quot;');
-                    const safeAlt = String(entry.name || '').replace(/"/g, '&quot;');
-                    portraitInner = `<img src="${safeUrl}" alt="${safeAlt}" class="combat-icon-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.parentElement.classList.add('combat-icon-img-error');this.remove();" data-fallback-initials="${escapeHtml(initials)}">${initialsHtml}`;
-                }
-                return `<div class="combat-icon ${isTurn ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${clickable}" data-idx="${idx}" ${click}>
-                    ${portraitInner}
-                </div>`;
-            }).join('');
-        }
-
-        // Right cards column - always show all cards (no inline expansion)
-        if (order.length === 0) {
-            cardsCol.innerHTML = '<div class="content-placeholder"><p>In attesa dei tiri iniziativa...</p></div>';
-        } else {
-            cardsCol.innerHTML = order.map((entry, idx) => {
-                const isTurn = idx === turnIdx;
-                const isMonster = entry.type === 'monster';
-
-                let condBadges = '';
-                if (isMonster && entry.monster) {
-                    const active = ALL_CONDITIONS.filter(c => entry.monster[c.key]);
-                    if (active.length > 0) condBadges = active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('');
-                } else if (entry.conditions) {
-                    const active = ALL_CONDITIONS.filter(c => entry.conditions[c.key]);
-                    if (active.length > 0) condBadges = active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('');
-                }
-
-                // Players can only see HP of fellow party members (not monsters).
-                let hpDisplay = '';
-                if (isMonster && isDM && entry.monster) {
-                    const mHp = entry.monster.pv_attuali ?? entry.monster.punti_vita_max;
-                    hpDisplay = `<span class="combat-card-hp">${mHp}/${entry.monster.punti_vita_max}</span>`;
-                } else if (!isMonster && entry.conditions) {
-                    const pHp = entry.conditions.pv_attuali != null ? entry.conditions.pv_attuali : entry.conditions.punti_vita_max;
-                    const pMax = entry.conditions.punti_vita_max || '?';
-                    hpDisplay = `<span class="combat-card-hp">${pHp}/${pMax}</span>`;
-                }
-
-                const click = buildClickHandler(entry);
-                const clickable = click ? 'is-clickable' : 'is-locked';
-
-                return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''} ${clickable}" ${click}>
-                    <span class="combat-card-init" title="Iniziativa">${entry.init}</span>
-                    <div class="combat-card-center">
-                        <span class="combat-card-name">${escapeHtml(entry.name)}</span>
-                        ${condBadges ? `<div class="combat-card-badges">${condBadges}</div>` : ''}
-                    </div>
-                    ${hpDisplay}
-                </div>`;
-            }).join('');
-        }
-
-        // Trova il personaggio del player corrente in questa campagna (per i timer
-        // personali). Per il DM resta null: la dialog timer chiede di scegliere
-        // il target tra i mostri o "globale".
-        let myPgId = null;
-        if (!isDM && currentUserId) {
-            for (const e of order) {
-                if (e.type === 'player' && e.id === currentUserId && e.pgId) { myPgId = e.pgId; break; }
-            }
-        }
-
-        // Toolbar: DM ha gli strumenti del master, i player hanno una toolbar
-        // ridotta con calcolatrice, timer (personale) e tira-dadi (placeholder).
-        if (toolbar) {
-            if (isDM) {
-                toolbar.style.display = 'flex';
-                toolbar.innerHTML = `
-                    <button class="combat-toolbar-btn" onclick="openMonsterCreationModal('${campagnaId}','${sessioneId}')" title="Aggiungi mostro">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                        <span>Mostro</span>
-                    </button>
-                    <button class="combat-toolbar-btn" onclick="combatDiceRoll()" title="Tira dadi">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
-                        <span>Dadi</span>
-                    </button>
-                    <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-                        <span>Calc</span>
-                    </button>
-                    <button class="combat-toolbar-btn" onclick="combatOpenTimerDialog('${campagnaId}','${sessioneId}','dm', null)" title="Timer combattimento">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
-                        <span>Timer</span>
-                    </button>
-                    <button class="combat-toolbar-btn danger" onclick="terminaCombattimento('${campagnaId}','${sessioneId}')" title="Termina combattimento">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        <span>Fine</span>
-                    </button>`;
-            } else {
-                toolbar.style.display = 'flex';
-                const timerOnclick = myPgId
-                    ? `combatOpenTimerDialog('${campagnaId}','${sessioneId}','player','${myPgId}')`
-                    : `showNotification('Nessun personaggio collegato al combattimento')`;
-                toolbar.innerHTML = `
-                    <button class="combat-toolbar-btn" onclick="combatDiceRoll()" title="Tira dadi (in arrivo)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
-                        <span>Dadi</span>
-                    </button>
-                    <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-                        <span>Calc</span>
-                    </button>
-                    <button class="combat-toolbar-btn" onclick="${timerOnclick}" title="Timer personale">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
-                        <span>Timer</span>
-                    </button>`;
-            }
-        }
-
-        // Render del pannello timer (visibile a tutti, ma con regole di filtro
-        // diverse per DM e player).
-        await renderCombatTimers(sessioneId, isDM, myPgId);
-
-        // Sincronizza lo scroll verticale tra la colonna delle icone (sx) e
-        // quella delle card (dx) in modo che le righe restino sempre
-        // allineate anche quando ci sono molte creature in iniziativa.
-        _attachCombatScrollSync();
-
-    } catch (error) {
-        console.error('Errore rendering combattimento:', error);
-        cardsCol.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
-    }
+function renderCombattimentoContent(campagnaId, sessioneId) {
+    window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
 }
 
 window.setCombatInitiativeOrder = function(order) {
     _combatInitiativeOrder = Array.isArray(order) ? order : [];
 };
-
-// Allinea lo scroll delle due colonne del combat (icone a sx, card a dx)
-// in modo che le righe restino visivamente sincronizzate. Senza questa
-// sync, scrollando una colonna l'altra resta ferma e i due lati si
-// disallineano. Idempotente: riattacca i listener solo una volta.
-let _combatScrollSyncAttached = false;
-function _attachCombatScrollSync() {
-    if (_combatScrollSyncAttached) return;
-    const initCol = document.getElementById('combatInitCol');
-    const cardsCol = document.getElementById('combattimentoContent');
-    if (!initCol || !cardsCol) return;
-    let lock = false;
-    const sync = (src, dst) => {
-        if (lock) return;
-        lock = true;
-        dst.scrollTop = src.scrollTop;
-        // Sblocca al frame successivo per evitare loop reciproci.
-        requestAnimationFrame(() => { lock = false; });
-    };
-    initCol.addEventListener('scroll', () => sync(initCol, cardsCol), { passive: true });
-    cardsCol.addEventListener('scroll', () => sync(cardsCol, initCol), { passive: true });
-    _combatScrollSyncAttached = true;
-}
 
 async function getCurrentInternalUserId() {
     if (AppState.cachedUserData?.id) return AppState.cachedUserData.id;
@@ -330,23 +55,6 @@ window.combatNextTurn = async function(campagnaId, sessioneId, orderLen, round, 
     }
 
     await sendAppEventBroadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
-}
-
-window.combatSelectEntry = async function(type, id, campagnaId, sessioneId, isDM, isOwner) {
-    if (_combatSelectedId === id && _combatSelectedType === type) {
-        _combatSelectedId = null;
-        _combatSelectedType = null;
-    } else {
-        _combatSelectedId = id;
-        _combatSelectedType = type;
-    }
-    await renderCombattimentoContent(campagnaId, sessioneId);
-}
-
-window.combatCloseSheet = async function(campagnaId, sessioneId) {
-    _combatSelectedId = null;
-    _combatSelectedType = null;
     await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
@@ -1087,8 +795,6 @@ window.removeMonster = async function(mId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
     await supabase.from('mostri_combattimento').delete().eq('id', mId);
-    _combatSelectedId = null;
-    _combatSelectedType = null;
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
     await renderCombattimentoContent(campagnaId, sessioneId);
 }
@@ -1097,11 +803,14 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
-    const { data: original } = await supabase.from('mostri_combattimento').select('*').eq('id', mId).single();
+    const [{ data: original }, { data: monsters }] = await Promise.all([
+        supabase.from('mostri_combattimento').select('*').eq('id', mId).single(),
+        supabase.from('mostri_combattimento').select('nome').eq('sessione_id', sessioneId)
+    ]);
     if (!original) { showNotification('Mostro non trovato'); return; }
 
     const baseName = original.nome.replace(/\s*#\d+$/, '');
-    const existing = _combatMonsters.filter(m => {
+    const existing = (monsters || []).filter(m => {
         const b = m.nome.replace(/\s*#\d+$/, '');
         return b === baseName;
     });
