@@ -915,7 +915,6 @@ window.schedaStatConfirm = async function() {
             }
         }
 
-        schedaRecalcAbility(field, clampedVal, pgId);
         await schedaInstantSave(pgId, updates);
         _recalcEquipFromStats(pgId);
     } else {

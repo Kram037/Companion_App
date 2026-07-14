@@ -864,28 +864,6 @@ window.privConfirmEdit = async function(tabName, mode, index) {
     schedaOpenPrivilegesPage(pg.id);
 };
 
-function schedaSetActiveTab(tab) {
-    const mainTab = document.getElementById('schedaTabMain');
-    const spellTab = document.getElementById('schedaTabSpell');
-    const invTab = document.getElementById('schedaTabInventory');
-    const privTab = document.getElementById('schedaTabPrivileges');
-    if (mainTab) mainTab.classList.toggle('active', tab === 'scheda');
-    if (spellTab) spellTab.classList.toggle('active', tab === 'incantesimi');
-    if (invTab) invTab.classList.toggle('active', tab === 'inventario');
-    if (privTab) privTab.classList.toggle('active', tab === 'privilegi');
-}
-
-function schedaWireTabBar(pgId) {
-    const mainTab = document.getElementById('schedaTabMain');
-    const spellTab = document.getElementById('schedaTabSpell');
-    const invTab = document.getElementById('schedaTabInventory');
-    const privTab = document.getElementById('schedaTabPrivileges');
-    if (mainTab) mainTab.onclick = () => renderSchedaPersonaggio(pgId);
-    if (spellTab) spellTab.onclick = () => schedaOpenSpellPage(pgId);
-    if (invTab) invTab.onclick = () => schedaOpenInventoryPage(pgId);
-    if (privTab) privTab.onclick = () => schedaOpenPrivilegesPage(pgId);
-}
-
 function schedaSlotToggleInline(pgId, level, index) {
     const pg = _schedaPgCache;
     if (!pg || !pg.slot_incantesimo) return;

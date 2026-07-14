@@ -330,9 +330,6 @@ window.saveConditions = async function(personaggioId) {
         if (error) throw error;
         showNotification('Stato aggiornato');
         closeConditionsModal();
-        if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
-            await renderSchedaPersonaggio(AppState.currentPersonaggioId);
-        }
         await sendAppEventBroadcast({ table: 'personaggi', action: 'update' });
     } catch (e) {
         console.error('Errore aggiornamento condizioni:', e);

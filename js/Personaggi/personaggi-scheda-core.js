@@ -11,9 +11,7 @@ window.openSchedaPersonaggio = async function(personaggioId, opts) {
         // alla scheda da una sessione/combattimento.
         window._schedaPendingScrollToStats = true;
     }
-    // navigateToPage('scheda') esegue gia' il page-load e quindi il render.
-    // Chiamare renderSchedaPersonaggio subito dopo produceva due fetch/render
-    // concorrenti e poteva chiudere sezioni/tendine appena aperte.
+    // La route React carica direttamente la scheda richiesta.
     return navigateToPage('scheda');
 }
 

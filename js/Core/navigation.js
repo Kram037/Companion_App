@@ -261,8 +261,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
                 await window.ensureRuntimeScript('combattimento');
             }
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
-        } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
-            renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
     } catch (error) {
         console.warn('[navigation] preload pagina fallito:', error);

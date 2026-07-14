@@ -224,14 +224,6 @@ async function handleSaveMicroScheda(e) {
     }
 }
 
-// ============================================================================
-// MICRO SCHEDA RENDERING
-// ============================================================================
-
-async function renderMicroScheda(personaggioId) {
-    _schedaRequestReactRefresh(personaggioId, 'micro');
-}
-
 window.microSlotToggle = async function(pgId, level, index) {
     const pg = _schedaPgCache;
     if (!pg?.slot_incantesimo?.[level]) return;
@@ -240,7 +232,6 @@ window.microSlotToggle = async function(pgId, level, index) {
     slot.current = index < currentAvail ? index : index + 1;
     slot.used = slot.max - slot.current;
     await schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
-    renderMicroScheda(pgId);
 }
 
 window.microHdChange = async function(pgId, key, delta, max) {
@@ -252,7 +243,7 @@ window.microHdChange = async function(pgId, key, delta, max) {
     const newVal = Math.max(0, Math.min(max, current + delta));
     dadiDisp[key] = newVal;
     await supabase.from('personaggi').update({ dadi_vita_disponibili: dadiDisp, updated_at: new Date().toISOString() }).eq('id', pgId);
-    renderMicroScheda(pgId);
+    _schedaRequestReactRefresh(pgId, 'micro');
 };
 
 window.microToggleCondition = async function(pgId, key, el) {
@@ -261,6 +252,7 @@ window.microToggleCondition = async function(pgId, key, el) {
     const isActive = el.classList.contains('active');
     await supabase.from('personaggi').update({ [key]: !isActive, updated_at: new Date().toISOString() }).eq('id', pgId);
     el.classList.toggle('active');
+    _schedaRequestReactRefresh(pgId, 'micro');
 };
 
 window.microSlotChange = async function(pgId, level, delta, max) {
@@ -273,7 +265,6 @@ window.microSlotChange = async function(pgId, level, delta, max) {
     slots[level].current = newAvail;
     slots[level].used = max - newAvail;
     await schedaInstantSave(pgId, { slot_incantesimo: slots });
-    renderMicroScheda(pgId);
 };
 
 window.microOpenSlotConfig = async function(pgId) {
@@ -334,6 +325,6 @@ window.saveMicroSlotConfig = async function(pgId) {
 
     await supabase.from('personaggi').update({ slot_incantesimo: slots, updated_at: new Date().toISOString() }).eq('id', pgId);
     closeMicroSlotConfig();
-    renderMicroScheda(pgId);
+    _schedaRequestReactRefresh(pgId, 'micro');
     showNotification('Slot incantesimo aggiornati');
 };

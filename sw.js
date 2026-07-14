@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v212';
+const CACHE_NAME = 'companion-app-v213';
 const BUILD_ASSET_URLS = [];
 
 const LEGACY_APP_SHELL_URLS = [
@@ -36,7 +36,6 @@ const LEGACY_APP_SHELL_URLS = [
     './js/Personaggi/personaggi-scheda-core.js',
     './js/Personaggi/personaggi-scheda-risorse.js',
     './js/Personaggi/personaggi-incantesimi-preparati.js',
-    './js/Personaggi/personaggi-scheda-render.js',
     './js/Personaggi/personaggi-scheda-abilita.js',
     './js/Personaggi/personaggi-scheda-chrome.js',
     './js/Personaggi/personaggi-scheda-incantesimi.js',

@@ -205,7 +205,6 @@ window.schedaAddFocus = async function(pgId, nome) {
         categoria: focus.cat,
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${focus.nome} aggiunto`);
@@ -231,7 +230,6 @@ window.schedaAddFocusAltro = async function(pgId) {
         categoria: 'altro',
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${trimmed} aggiunto`);
@@ -265,7 +263,6 @@ window.schedaAddArma = async function(pgId, nome) {
         proprieta: arma.proprieta, bonus_colpire: profBonus + atkMod, bonus_danno: dmgMod
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${arma.nome} aggiunta`);
@@ -289,7 +286,6 @@ window.schedaAddArmatura = async function(pgId, nome) {
     const newCA = calcCAFromEquip(pg);
     pg.classe_armatura = newCA;
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA });
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${arm.nome} equipaggiata — CA: ${newCA}`);
@@ -549,7 +545,6 @@ window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
     const updates = { equipaggiamento: pg.equipaggiamento };
     if (treasureUid) updates.inventario = pg.inventario;
     await schedaInstantSave(pgId, updates);
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${view.nome} equipaggiata`);
@@ -588,7 +583,6 @@ window._schedaApplyInvArmaturaEquip = async function(pgId, invIndex, dndArmNome)
     const updates = { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA };
     if (treasureUid) updates.inventario = pg.inventario;
     await schedaInstantSave(pgId, updates);
-    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${view.nome} equipaggiata — CA: ${newCA}`);
@@ -607,7 +601,6 @@ window.schedaRemoveEquip = async function(pgId, index) {
         updates.classe_armatura = newCA;
     }
     await schedaInstantSave(pgId, updates);
-    renderSchedaPersonaggio(pgId);
     showNotification('Oggetto rimosso');
 }
 
@@ -697,7 +690,6 @@ window.schedaSaveEquipDesc = async function(pgId, index) {
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
     document.getElementById('editEquipModal')?.remove();
     document.body.style.overflow = '';
-    renderSchedaPersonaggio(pgId);
     showNotification('Descrizione aggiornata');
 }
 
@@ -859,7 +851,6 @@ window.schedaSaveCustomWeapon = async function(pgId, invIndex) {
     document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
-    renderSchedaPersonaggio(pgId);
     showNotification(`${nome} aggiunta all'equipaggiamento`);
 };
 

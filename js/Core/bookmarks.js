@@ -379,8 +379,7 @@ window.restorePageBookmarkState = async function(page, saved) {
         if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') return schedaOpenSpellPage(pgId);
         if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') return schedaOpenInventoryPage(pgId);
         if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') return schedaOpenPrivilegesPage(pgId);
-        if (typeof renderSchedaPersonaggio === 'function') return renderSchedaPersonaggio(pgId);
-        return;
+        return _schedaRequestReactRefresh(pgId, 'scheda');
     }
     if (page === 'personaggioCreate' && typeof pgWizardGoTo === 'function') {
         pgWizardGoTo(parseInt(saved.step, 10) || 0);
