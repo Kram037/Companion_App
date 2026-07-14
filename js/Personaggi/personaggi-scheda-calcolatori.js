@@ -732,7 +732,7 @@ window.schedaCloseHpCalc = async function() {
         if (typeof window.ensureRuntimeScript === 'function') {
             await window.ensureRuntimeScript('combattimento');
         }
-        await renderCombattimentoContent(campagnaId, sessioneId);
+        window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
         // Se il calcolatore HP era stato aperto dalla full-sheet del mostro
         // in combattimento, ricarichiamo quella modale per riflettere i PV
         // aggiornati senza chiuderla.

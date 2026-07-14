@@ -4,10 +4,6 @@ const MONSTER_ALIGNMENTS = ['Legale Buono','Neutrale Buono','Caotico Buono','Leg
 
 let _combatInitiativeOrder = [];
 
-function renderCombattimentoContent(campagnaId, sessioneId) {
-    window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
-}
-
 window.setCombatInitiativeOrder = function(order) {
     _combatInitiativeOrder = Array.isArray(order) ? order : [];
 };
@@ -55,7 +51,6 @@ window.combatNextTurn = async function(campagnaId, sessioneId, orderLen, round, 
     }
 
     await sendAppEventBroadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 // ===========================================================================
@@ -282,7 +277,6 @@ window.combatMonsterEditCa = async function(mId, campagnaId, sessioneId) {
     } else {
         combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
     }
-    renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Dialog rapida per i mostri "placeholder": stessa estetica della full
@@ -369,7 +363,6 @@ window.placeholderEditPvMax = async function(monsterId, campagnaId, sessioneId) 
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
     combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
-    renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Apre il modale condizioni per il placeholder. Le condizioni vengono
@@ -400,7 +393,6 @@ window.combatPlaceholderDelete = async function(monsterId, campagnaId, sessioneI
     if (error) { showNotification('Errore eliminazione: ' + error.message); return; }
     closeCombatPlaceholderModal();
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessioneId) {
@@ -706,7 +698,7 @@ window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
     const cur = m.res_legg_attuali ?? m.resistenze_leggendarie;
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ res_legg_attuali: newVal }).eq('id', mId);
-    await renderCombattimentoContent(campagnaId, sessioneId);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
 };
 
 window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
@@ -717,7 +709,7 @@ window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
     const cur = m.azioni_legg_attuali ?? m.azioni_legg_max;
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ azioni_legg_attuali: newVal }).eq('id', mId);
-    await renderCombattimentoContent(campagnaId, sessioneId);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
 };
 
 window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaId, sessioneId) {
@@ -731,7 +723,7 @@ window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaI
     const updated = [...m.attacchi];
     updated[actionIdx] = action;
     await supabase.from('mostri_combattimento').update({ attacchi: updated }).eq('id', mId);
-    await renderCombattimentoContent(campagnaId, sessioneId);
+    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
 };
 
 // Monster HP Calculator (reuses the same overlay UI)
@@ -796,7 +788,6 @@ window.removeMonster = async function(mId, campagnaId, sessioneId) {
     if (!supabase) return;
     await supabase.from('mostri_combattimento').delete().eq('id', mId);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
@@ -861,7 +852,6 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
 
     showNotification(`${clone.nome} aggiunto!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Combat toolbar placeholders
@@ -948,7 +938,6 @@ window.monsterConditionToggle = async function(mId, condKey, value, campagnaId, 
     const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', mId);
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
-    renderCombattimentoContent(campagnaId, sessioneId);
     if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
 };
 
@@ -959,7 +948,6 @@ window.monsterExhaustionChange = async function(mId, raw, campagnaId, sessioneId
     const { error } = await supabase.from('mostri_combattimento').update({ esaustione: v }).eq('id', mId);
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
-    renderCombattimentoContent(campagnaId, sessioneId);
     if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
 };
 
@@ -975,7 +963,6 @@ window.closeMonsterConditionsModal = function() {
 // onclick potrebbero ancora chiamarla). Ora salva e chiude.
 window.saveMonsterConditions = function(mId, campagnaId, sessioneId) {
     closeMonsterConditionsModal();
-    renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 // Monster creation modal
@@ -1124,7 +1111,6 @@ window.monsterQuickAddHomebrew = async function(campagnaId, sessioneId) {
     closeMonsterModal();
     showNotification(`${monster.nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // ===========================================================================
@@ -1192,7 +1178,6 @@ window.monsterImportCombatHomebrew = async function(combatId, campagnaId, sessio
     closeMonsterModal();
     showNotification(`${added} mostr${added===1?'o':'i'} aggiunt${added===1?'o':'i'} al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 function _buildMonsterPayloadFromSnapshot(snap, campagnaId, sessioneId) {
@@ -1329,7 +1314,6 @@ window.monsterSavePlaceholder = async function(campagnaId, sessioneId) {
     closeMonsterModal();
     showNotification(`${nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 const MONSTER_SIZE_DIE = { 'Minuscola': 4, 'Piccola': 6, 'Media': 8, 'Grande': 10, 'Enorme': 12, 'Mastodontica': 20 };
@@ -1871,7 +1855,6 @@ window.saveMonster = async function() {
     closeMonsterModal();
     showNotification(`${nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
-    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 window.terminaCombattimento = async function(campagnaId, sessioneId) {
@@ -2206,7 +2189,6 @@ window.combatSaveTimer = async function(campagnaId, sessioneId, mode, forcedPgId
 
         combatCloseTimerDialog();
         showNotification('Timer avviato');
-        await renderCombattimentoContent(campagnaId, sessioneId);
         try { await sendAppEventBroadcast({ table: 'combat_timers', action: 'insert', sessioneId, campagnaId }); } catch (_) {}
     } catch (e) {
         console.error('Errore salvataggio timer:', e);
@@ -2222,7 +2204,7 @@ window.combatRemoveTimer = async function(timerId) {
     await _combatExpireOrDeleteTimer(timerId, /*removeConditions*/ true, /*deleteRow*/ true);
     const cId = window.AppState?.currentCampagnaId;
     const sId = window.AppState?.currentSessioneId;
-    if (cId && sId) await renderCombattimentoContent(cId, sId);
+    if (cId && sId) await sendAppEventBroadcast({ table: 'combat_timers', action: 'delete', sessioneId: sId, campagnaId: cId });
 };
 
 // Esegue la "scadenza" o eliminazione di un timer:

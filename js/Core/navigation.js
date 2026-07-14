@@ -260,7 +260,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('combattimento');
             }
-            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
         }
     } catch (error) {
         console.warn('[navigation] preload pagina fallito:', error);

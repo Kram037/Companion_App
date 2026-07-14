@@ -29,7 +29,7 @@ const RUNTIME_DATA_BUNDLES = {
 };
 
 const RUNTIME_SCRIPT_BUNDLES = {
-    combattimento: { src: 'js/Combattimento/combat.js', ready: 'renderCombattimentoContent' },
+    combattimento: { src: 'js/Combattimento/combat.js', ready: 'setCombatInitiativeOrder' },
     compendio: { src: 'js/Compendio/compendio.js', ready: 'loadCompendio' },
     laboratorio: { src: 'js/Laboratorio/laboratorio.js', ready: 'labBackToHub', init: 'initLaboratorio' },
 };
