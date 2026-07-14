@@ -11,7 +11,6 @@ const LEGACY_APP_SHELL_URLS = [
     './js/Core/state.js',
     './js/Core/utils.js',
     './js/Core/content-localization.js',
-    './js/Core/session-navigation-fix.js',
     './js/Core/lang.js',
     './js/Core/theme.js',
     './js/Core/data-loader.js',

@@ -37,7 +37,6 @@ const RUNTIME_SCRIPT_BUNDLES = {
 const _runtimeDataPromises = new Map();
 const _runtimeScriptPromises = new Map();
 let _contentLocalizationPromise = null;
-let _sessionNavigationFixPromise = null;
 
 function _runtimeDataReady(bundle) {
     return bundle.globals.every(name => typeof window[name] !== 'undefined');
@@ -101,25 +100,6 @@ function ensureContentLocalization() {
     });
 
     return _contentLocalizationPromise;
-}
-
-function ensureSessionNavigationFix() {
-    if (window.__sessionNavigationFixInstalled) {
-        return Promise.resolve();
-    }
-    if (_sessionNavigationFixPromise) return _sessionNavigationFixPromise;
-
-    _sessionNavigationFixPromise = _loadUtilityScript({
-        src: 'js/Core/session-navigation-fix.js',
-        version: '20260712A',
-        ready: '__sessionNavigationFixRegistered',
-        datasetKey: 'sessionNavigationFix',
-        label: 'session-navigation-fix',
-    }).finally(() => {
-        _sessionNavigationFixPromise = null;
-    });
-
-    return _sessionNavigationFixPromise;
 }
 
 function _localizedBundleValues(key, bundle) {
@@ -202,7 +182,7 @@ function ensureRuntimeScript(key) {
 
     if (_runtimeScriptReady(bundle)) {
         _initRuntimeScript(bundle);
-        return Promise.all([ensureContentLocalization(), ensureSessionNavigationFix()]).then(() => undefined);
+        return ensureContentLocalization();
     }
 
     if (_runtimeScriptPromises.has(key)) {
@@ -213,7 +193,7 @@ function ensureRuntimeScript(key) {
         const finish = () => {
             if (_runtimeScriptReady(bundle)) {
                 _initRuntimeScript(bundle);
-                Promise.all([ensureContentLocalization(), ensureSessionNavigationFix()]).then(() => resolve(), reject);
+                ensureContentLocalization().then(() => resolve(), reject);
                 return;
             }
 
@@ -245,14 +225,11 @@ function ensureRuntimeScript(key) {
     return promise;
 }
 
-// Avvia presto i moduli di compatibilita': correggono testi statici/dinamici e
-// garantiscono che la pagina sessione venga renderizzata da navigateToPage.
+// Avvia presto la normalizzazione dei testi statici e dinamici.
 ensureContentLocalization();
-ensureSessionNavigationFix();
 
 window.RUNTIME_DATA_BUNDLES = RUNTIME_DATA_BUNDLES;
 window.ensureRuntimeData = ensureRuntimeData;
 window.RUNTIME_SCRIPT_BUNDLES = RUNTIME_SCRIPT_BUNDLES;
 window.ensureRuntimeScript = ensureRuntimeScript;
 window.ensureContentLocalization = ensureContentLocalization;
-window.ensureSessionNavigationFix = ensureSessionNavigationFix;
