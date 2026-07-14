@@ -49,9 +49,6 @@ async function init() {
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         userCID: document.getElementById('userCID'),
-        backToCampagneBtn: document.getElementById('backToCampagneBtn'),
-        backToDettagliBtn: document.getElementById('backToDettagliBtn'),
-        backToSessioneBtn: document.getElementById('backToSessioneBtn'),
         editUserNameBtn: document.getElementById('editUserNameBtn'),
         editUserNameForm: document.getElementById('editUserNameForm'),
         editUserNameInput: document.getElementById('editUserNameInput'),
@@ -61,11 +58,8 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         langIt: document.getElementById('langIt'),
         langEn: document.getElementById('langEn'),
-        addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
         openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
-        addHomebrewBtn: document.getElementById('addHomebrewBtn'),
-        addPersonaggioBtn: document.getElementById('addPersonaggioBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
@@ -172,17 +166,8 @@ async function init() {
     }
     
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = 'none';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
-    }
-    if (elements.addHomebrewBtn) {
-        elements.addHomebrewBtn.style.display = 'none';
-    }
-    if (elements.addPersonaggioBtn) {
-        elements.addPersonaggioBtn.style.display = 'none';
     }
     
     // Setup event listeners immediately (don't wait for Supabase)
@@ -426,14 +411,6 @@ function setupEventListeners() {
         appDebug('Event listener aggiunto a googleLoginBtn');
     }
 
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            openCampagnaModal();
-        };
-    }
-
     if (typeof setupGiocatoriCampagnaDelegation === 'function') {
         setupGiocatoriCampagnaDelegation();
     }
@@ -484,14 +461,6 @@ function setupEventListeners() {
     // Laboratorio init
     if (typeof initLaboratorio === 'function') initLaboratorio();
     
-    if (elements.addPersonaggioBtn) {
-        elements.addPersonaggioBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            openTipoSchedaModal();
-        };
-    }
-
     const closeTipoSchedaBtn = document.getElementById('closeTipoSchedaModal');
     if (closeTipoSchedaBtn) closeTipoSchedaBtn.addEventListener('click', closeTipoSchedaModal);
     const tipoSchedaModalEl = document.getElementById('tipoSchedaModal');
@@ -658,44 +627,6 @@ function setupEventListeners() {
         });
     }
     
-    // Back to campagne button
-    if (elements.backToCampagneBtn) {
-        elements.backToCampagneBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            // Reset currentCampagnaId per tornare alla lista
-            AppState.currentCampagnaId = null;
-            navigateToPage('campagne');
-        };
-        appDebug('Event listener aggiunto a backToCampagneBtn');
-    }
-
-    // Back to dettagli button (from sessione page)
-    if (elements.backToDettagliBtn) {
-        elements.backToDettagliBtn.onclick = async function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const campagnaId = AppState.currentCampagnaId;
-            if (campagnaId) {
-                navigateToPage('dettagli');
-            }
-        };
-        appDebug('Event listener aggiunto a backToDettagliBtn');
-    }
-
-    // Back to sessione button (from combattimento page)
-    if (elements.backToSessioneBtn) {
-        elements.backToSessioneBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const campagnaId = AppState.currentCampagnaId;
-            if (campagnaId) {
-                navigateToPage('sessione');
-            }
-        };
-        appDebug('Event listener aggiunto a backToSessioneBtn');
-    }
-
     // Edit user name button
     if (elements.editUserNameBtn) {
         elements.editUserNameBtn.onclick = function(e) {

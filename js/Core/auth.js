@@ -692,17 +692,8 @@ function updateUIForLoggedIn() {
         headerUserName.textContent = dbName || AppState.currentUser?.displayName || '';
     }
     // Mostra i pulsanti quando l'utente è loggato
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = '';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = '';
-    }
-    if (elements.addHomebrewBtn) {
-        elements.addHomebrewBtn.style.display = '';
-    }
-    if (elements.addPersonaggioBtn) {
-        elements.addPersonaggioBtn.style.display = '';
     }
     // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(true);
@@ -735,17 +726,8 @@ function updatePlaceholderMessages(isLoggedIn) {
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
     // Nascondi i pulsanti quando l'utente non è loggato
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = 'none';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
-    }
-    if (elements.addHomebrewBtn) {
-        elements.addHomebrewBtn.style.display = 'none';
-    }
-    if (elements.addPersonaggioBtn) {
-        elements.addPersonaggioBtn.style.display = 'none';
     }
     // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(false);
