@@ -353,7 +353,7 @@ Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 - [ ] Rimuovere gradualmente globali `window.*` sostituiti.
 - [ ] Ridurre `AppState` fino a eliminarlo o mantenerlo come compatibility layer minimo.
 - [ ] Rimuovere render manuali `innerHTML` dalle pagine migrate.
-- [ ] Rimuovere guardie temporanee se non piu' necessarie.
+- [x] Rimuovere guardie temporanee se non piu' necessarie.
 - [ ] Eliminare script legacy non importati da Vite.
 - [x] Consolidare service worker con output build Vite.
 - [x] Aggiornare documentazione architetturale.
