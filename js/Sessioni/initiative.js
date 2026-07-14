@@ -588,9 +588,6 @@ window.submitRollRequest = async function(requestId, tipo, valore, tiroNaturale)
                     await openCombattimentoPage(sessione.campagna_id, richiesta.sessione_id);
                 }
 
-                // Notifica subito il DM tramite broadcast realtime
-                await sendCombattimentoUpdateBroadcast(richiesta.sessione_id);
-
                 await checkAllIniziativaCompleted(richiesta.sessione_id);
             }
         }

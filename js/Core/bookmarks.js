@@ -13,6 +13,8 @@ let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '', section: '' };
 let _bookmarkDraggedTabId = '';
+let _bookmarkDragBeforeId = '';
+let _bookmarkDropHandled = false;
 const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
     { key: 'armi', label: 'Armi, Armature e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
     { key: 'avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
@@ -913,6 +915,8 @@ function _bookmarkBindTabRailDrag(rail) {
         }
         event.dataTransfer.effectAllowed = 'move';
         _bookmarkDraggedTabId = tab.dataset.bookmarkId || '';
+        _bookmarkDragBeforeId = '';
+        _bookmarkDropHandled = false;
         event.dataTransfer.setData('text/plain', _bookmarkDraggedTabId);
         tab.classList.add('dragging');
     });
@@ -922,27 +926,34 @@ function _bookmarkBindTabRailDrag(rail) {
         _bookmarkClearDropIndicators(rail);
         rail.classList.add('drag-over');
         const tab = event.target.closest('.desktop-bookmark-tab');
-        if (!tab) return;
-        tab.classList.add(event.clientX <= tab.getBoundingClientRect().left + (tab.offsetWidth / 2) ? 'drop-before' : 'drop-after');
+        if (!tab) {
+            _bookmarkDragBeforeId = '';
+            return;
+        }
+        const after = event.clientX > tab.getBoundingClientRect().left + (tab.offsetWidth / 2);
+        _bookmarkDragBeforeId = after
+            ? (tab.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? tab.nextElementSibling.dataset.bookmarkId : '')
+            : (tab.dataset.bookmarkId || '');
+        tab.classList.add(after ? 'drop-after' : 'drop-before');
     });
     rail.addEventListener('drop', (event) => {
         event.preventDefault();
         const id = event.dataTransfer.getData('text/plain') || _bookmarkDraggedTabId;
-        const target = event.target.closest('.desktop-bookmark-tab');
-        let beforeId = '';
-        if (target) {
-            const after = event.clientX > target.getBoundingClientRect().left + (target.offsetWidth / 2);
-            beforeId = after
-                ? (target.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? target.nextElementSibling.dataset.bookmarkId : '')
-                : (target.dataset.bookmarkId || '');
-        }
+        const beforeId = _bookmarkDragBeforeId;
+        _bookmarkDropHandled = true;
         _bookmarkClearDropIndicators(rail);
         if (id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
     });
     rail.addEventListener('dragend', () => {
+        const id = _bookmarkDraggedTabId;
+        const beforeId = _bookmarkDragBeforeId;
+        const handled = _bookmarkDropHandled;
         _bookmarkDraggedTabId = '';
+        _bookmarkDragBeforeId = '';
+        _bookmarkDropHandled = false;
         rail.querySelector('.desktop-bookmark-tab.dragging')?.classList.remove('dragging');
         _bookmarkClearDropIndicators(rail);
+        if (!handled && id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
     });
 }
 

@@ -158,16 +158,6 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         }));
     }
     
-    // Ferma Realtime subscription combattimento se si esce dalla pagina
-    if (pageName !== 'combattimento' && typeof stopCombattimentoRealtime === 'function') {
-        stopCombattimentoRealtime();
-    }
-    
-    // Ferma Realtime subscription dettagli campagna se si esce dalla pagina
-    if (pageName !== 'dettagli' && typeof stopCampagnaDetailsRealtime === 'function') {
-        stopCampagnaDetailsRealtime();
-    }
-    
     const desktopGroupTab = !skipPageLoad && previousPage !== pageName && typeof getDesktopDefaultGroupTab === 'function'
         ? getDesktopDefaultGroupTab(pageName)
         : '';
@@ -271,9 +261,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
                 await window.ensureRuntimeScript('combattimento');
             }
             await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
-            if (!window.combattimentoChannel) {
-                startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
-            }
         } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
             renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
