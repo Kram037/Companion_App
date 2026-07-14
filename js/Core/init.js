@@ -121,7 +121,6 @@ async function init() {
         rollRequestForm: document.getElementById('rollRequestForm'),
         cancelRollRequestBtn: document.getElementById('cancelRollRequestBtn'),
         submitRollRequestBtn: document.getElementById('submitRollRequestBtn'),
-        personaggiList: document.getElementById('personaggiList'),
         personaggioModal: document.getElementById('personaggioModal'),
         personaggioCreateMount: document.getElementById('personaggioCreateMount'),
         personaggioCreateTitle: document.getElementById('personaggioCreateTitle'),
@@ -506,10 +505,6 @@ function setupEventListeners() {
     if (typeof setupAmiciEventDelegation === 'function') {
         setupAmiciEventDelegation();
     }
-    if (typeof setupPersonaggiListDelegation === 'function') {
-        setupPersonaggiListDelegation();
-    }
-    
     // Laboratorio init
     if (typeof initLaboratorio === 'function') initLaboratorio();
     

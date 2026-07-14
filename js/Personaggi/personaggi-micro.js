@@ -215,7 +215,7 @@ async function handleSaveMicroScheda(e) {
             showNotification('Micro Scheda creata');
         }
         closeMicroSchedaModal();
-        loadPersonaggi();
+        await sendAppEventBroadcast({ table: 'personaggi', action: 'update' });
     } catch (err) {
         console.error('Errore salvataggio micro scheda:', err);
         showNotification('Errore nel salvataggio');

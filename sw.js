@@ -33,7 +33,6 @@ const LEGACY_APP_SHELL_URLS = [
     './js/Personaggi/personaggi-slot-incantesimo.js',
     './js/Personaggi/personaggi-pv-keypad.js',
     './js/Personaggi/personaggi-wizard-navigation.js',
-    './js/Personaggi/personaggi-lista.js',
     './js/Personaggi/personaggi-scheda-core.js',
     './js/Personaggi/personaggi-scheda-risorse.js',
     './js/Personaggi/personaggi-incantesimi-preparati.js',

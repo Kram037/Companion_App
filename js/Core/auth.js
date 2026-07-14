@@ -710,7 +710,7 @@ function updateUIForLoggedIn() {
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = '';
     }
-    // Aggiorna i placeholder per amici, laboratorio e personaggi (nessun dato ancora)
+    // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(true);
 }
 
@@ -718,7 +718,6 @@ function updateUIForLoggedIn() {
 function updatePlaceholderMessages(isLoggedIn) {
     const amiciPlaceholder = document.getElementById('amiciPlaceholder');
     const labPlaceholder = document.getElementById('laboratorioPlaceholder');
-    const personaggiList = document.getElementById('personaggiList');
     
     if (isLoggedIn) {
         if (amiciPlaceholder) {
@@ -727,9 +726,6 @@ function updatePlaceholderMessages(isLoggedIn) {
         if (labPlaceholder) {
             labPlaceholder.style.display = 'none';
         }
-        if (personaggiList) {
-            personaggiList.innerHTML = '<div class="content-placeholder"><p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p></div>';
-        }
     } else {
         if (amiciPlaceholder) {
             amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
@@ -737,9 +733,6 @@ function updatePlaceholderMessages(isLoggedIn) {
         if (labPlaceholder) {
             labPlaceholder.style.display = 'block';
             labPlaceholder.innerHTML = '<p>Accedi per creare i tuoi contenuti homebrew</p>';
-        }
-        if (personaggiList) {
-            personaggiList.innerHTML = '<div class="content-placeholder"><p>Accedi per vedere e creare i tuoi personaggi</p></div>';
         }
     }
 }

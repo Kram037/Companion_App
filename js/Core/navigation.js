@@ -268,8 +268,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             } else if (typeof labBackToHub === 'function') {
                 labBackToHub();
             }
-        } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
-            loadPersonaggi();
         } else if (pageName === 'personaggioCreate') {
             if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
         } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
