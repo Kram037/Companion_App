@@ -16,6 +16,13 @@ function copyLegacyAssets() {
 
   return {
     name: 'copy-legacy-assets',
+    transformIndexHtml: {
+      order: 'post',
+      handler: html => html.replace(
+        /(<link rel="manifest" href=")[^"?]+(\?[^\"]*)?/,
+        (_match, prefix, query = '') => `${prefix}${viteBase}manifest.json${query}`,
+      ),
+    },
     writeBundle() {
       const outDir = resolve(viteOutDir);
       for (const item of include) {

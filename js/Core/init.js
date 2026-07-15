@@ -851,6 +851,18 @@ function startApp() {
    ============================================ */
 let __deferredInstallPrompt = null;
 
+// Cattura l'evento appena lo espone il browser: aspettare init() puo' perderlo.
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    __deferredInstallPrompt = event;
+    if (!_isPwaInstalled()) _setPwaBtnState('available');
+});
+
+window.addEventListener('appinstalled', () => {
+    __deferredInstallPrompt = null;
+    _setPwaBtnState('installed');
+});
+
 function _isPwaInstalled() {
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
     if (window.navigator.standalone === true) return true; // iOS Safari
@@ -992,6 +1004,8 @@ function setupPwaInstall() {
 
     if (_isPwaInstalled()) {
         _setPwaBtnState('installed');
+    } else if (__deferredInstallPrompt) {
+        _setPwaBtnState('available');
     } else if (_isIOS()) {
         // iOS: nessun browser su iPhone/iPad supporta beforeinstallprompt
         // (sia Safari sia Chrome/Firefox/Edge iOS). Mostriamo le istruzioni
@@ -1004,17 +1018,6 @@ function setupPwaInstall() {
         // mostra le istruzioni generiche al posto di un disabled muto.
         _setPwaBtnState('manual');
     }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        __deferredInstallPrompt = e;
-        if (!_isPwaInstalled()) _setPwaBtnState('available');
-    });
-
-    window.addEventListener('appinstalled', () => {
-        __deferredInstallPrompt = null;
-        _setPwaBtnState('installed');
-    });
 
     btn.addEventListener('click', async () => {
         if (btn.disabled) return;

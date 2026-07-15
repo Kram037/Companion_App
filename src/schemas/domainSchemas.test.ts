@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { campaignSchema, characterSchema, combatMonsterSchema } from './domainSchemas';
+import { campaignSchema, characterSchema, combatMonsterSchema, userProfileSchema } from './domainSchemas';
 import { parseData } from './parse';
 
 describe('domain schemas', () => {
@@ -23,6 +23,12 @@ describe('domain schemas', () => {
 
     expect(character.livello).toBe(1);
     expect(character.classi).toBeUndefined();
+  });
+
+  it('normalizes the numeric CID returned by Supabase', () => {
+    const user = parseData(userProfileSchema, { id: 'u1', cid: 1234 });
+
+    expect(user.cid).toBe('1234');
   });
 
   it('rejects malformed combat monsters before they enter app state', () => {

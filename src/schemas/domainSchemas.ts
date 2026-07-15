@@ -12,11 +12,13 @@ export const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() => z.union([
 
 export const jsonRecordSchema = z.record(z.string(), jsonValueSchema);
 
+const cidSchema = z.union([z.string(), z.number().transform(String)]).nullish();
+
 export const userProfileSchema = z.object({
   id: z.string(),
   uid: z.string().nullish(),
   nome_utente: z.string().nullish(),
-  cid: z.string().nullish(),
+  cid: cidSchema,
   campagne_preferite: z.array(z.string()).nullish(),
   username: z.string().nullish(),
   displayName: z.string().nullish(),
@@ -60,7 +62,7 @@ export const campaignInviteSchema = z.object({
   inviante: z.object({
     id: z.string(),
     nome_utente: z.string().nullish(),
-    cid: z.string().nullish(),
+    cid: cidSchema,
   }).nullish(),
 }).passthrough();
 

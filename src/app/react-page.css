@@ -33,6 +33,7 @@ body[data-react-page="compendio"] .main-content {
   flex-direction: column;
   height: calc(100svh - 64px - 72px - 3rem);
   overflow: hidden;
+  padding-top: 0;
 }
 
 .react-compendium-hub .comp-hub-grid {
@@ -57,6 +58,7 @@ body[data-react-page="laboratorio"] .main-content {
   flex-direction: column;
   height: calc(100svh - 64px - 72px - 3rem);
   overflow: hidden;
+  padding-top: 0;
 }
 
 .react-laboratory-hub .lab-hub-grid {

@@ -27,6 +27,38 @@ test('processes toolbar navigation once', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => (window as typeof window & { __navigationCalls: number }).__navigationCalls)).toBe(1);
 });
 
+test('keeps the mobile page titles aligned', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const titleTops: number[] = [];
+
+  for (const path of ['/campagne', '/laboratorio', '/compendio']) {
+    await page.goto(path);
+    const title = page.locator('#react-root .page-header h1');
+    await expect(title).toBeVisible();
+    titleTops.push((await title.boundingBox())!.y);
+  }
+
+  expect(Math.max(...titleTops) - Math.min(...titleTops)).toBeLessThan(1);
+});
+
+test('opens the native PWA prompt from the install button', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    const app = window as typeof window & { __installPrompted?: boolean };
+    const event = new Event('beforeinstallprompt', { cancelable: true }) as Event & {
+      prompt: () => Promise<void>;
+      userChoice: Promise<{ outcome: 'accepted' }>;
+    };
+    event.prompt = async () => { app.__installPrompted = true; };
+    event.userChoice = Promise.resolve({ outcome: 'accepted' });
+    window.dispatchEvent(event);
+  });
+
+  await page.locator('#settingsBtn').click();
+  await page.locator('#installPwaBtn').click();
+  await expect.poll(() => page.evaluate(() => Boolean((window as typeof window & { __installPrompted?: boolean }).__installPrompted))).toBe(true);
+});
+
 test('uses the URL as navigation source after refresh', async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('currentPage', 'scheda');
@@ -179,7 +211,13 @@ test('moves tabs between panes and closes an empty source pane', async ({ page }
 });
 
 test('manifest does not lock tablet orientation', async ({ request }) => {
-  const response = await request.get('/manifest.json');
+  const pageResponse = await request.get('/');
+  const html = await pageResponse.text();
+  const manifestHref = html.match(/<link rel="manifest" href="([^"]+)"/)?.[1] ?? '';
+  expect(manifestHref).toMatch(/\/manifest\.json(?:\?|$)/);
+  expect(manifestHref).not.toContain('/assets/');
+
+  const response = await request.get(manifestHref);
   expect(response.ok()).toBe(true);
   const manifest = await response.json();
   expect(manifest).not.toHaveProperty('orientation');

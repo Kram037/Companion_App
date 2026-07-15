@@ -19,7 +19,10 @@ export function CampaignsRoutePage() {
   const user = useQuery(currentUserQuery());
 
   return <ReactPage name="campagne">
-    {user.isLoading && <div className="content-placeholder"><p>Caricamento...</p></div>}
+    {user.isLoading && <div className="page-content">
+      <div className="page-top-stack"><div className="page-header"><h1>Campagne</h1></div></div>
+      <div className="content-placeholder"><p>Caricamento...</p></div>
+    </div>}
     {user.data ? <CampaignsListPage
       currentUserId={user.data.id}
       onCreate={() => window.openCampagnaModal?.()}
