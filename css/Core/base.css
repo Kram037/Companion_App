@@ -455,8 +455,7 @@ body.global-return-active .back-button-floating { display: none !important; }
 }
 
 @media (max-width: 899px) {
-    body:has(.bookmarks-fab[style*="display: flex"]) .global-session-return-btn,
-    body:has(.bookmarks-tabs-fab[style*="display: flex"]) .global-session-return-btn {
+    .global-session-return-btn {
         bottom: calc(var(--app-bottom-toolbar-height) + env(safe-area-inset-bottom, 0px) + 62px);
     }
 }

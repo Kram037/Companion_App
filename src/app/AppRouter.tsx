@@ -10,7 +10,7 @@ import { CharacterSheetPage } from '../features/characters/CharacterSheetPage';
 import { CompendiumPage } from '../features/compendium/CompendiumPage';
 import { LaboratoryPage } from '../features/laboratory/LaboratoryPage';
 import { FriendsPage } from '../features/friends/FriendsPage';
-import { appBasenameFromPath } from '../router';
+import { appBasenameFromPath, appRoutes } from '../router';
 import { LegacyNavigationSync } from './LegacyNavigationSync';
 
 export function AppRouter() {
@@ -18,17 +18,17 @@ export function AppRouter() {
     <BrowserRouter basename={appBasenameFromPath(window.location.pathname)}>
       <LegacyNavigationSync />
       <Routes>
-        <Route path="/" element={<Navigate replace to="/campagne" />} />
-        <Route path="/campagne" element={<CampaignsRoutePage />} />
-        <Route path="/campagne/:campagnaId" element={<CampaignDetailsPage />} />
-        <Route path="/campagne/:campagnaId/sessione" element={<SessionPage />} />
-        <Route path="/campagne/:campagnaId/sessione/:sessioneId/combattimento" element={<CombatPage />} />
-        <Route path="/personaggi" element={<CharactersPage />} />
-        <Route path="/personaggi/nuovo" element={<CharacterCreationPage />} />
-        <Route path="/personaggi/:personaggioId" element={<CharacterSheetPage />} />
-        <Route path="/compendio" element={<CompendiumPage />} />
-        <Route path="/laboratorio" element={<LaboratoryPage />} />
-        <Route path="/amici" element={<FriendsPage />} />
+        <Route path="/" element={<Navigate replace to={appRoutes.campagne} />} />
+        <Route path={appRoutes.campagne} element={<CampaignsRoutePage />} />
+        <Route path={appRoutes.campagnaDetails} element={<CampaignDetailsPage />} />
+        <Route path={appRoutes.sessione} element={<SessionPage />} />
+        <Route path={appRoutes.combattimento} element={<CombatPage />} />
+        <Route path={appRoutes.personaggi} element={<CharactersPage />} />
+        <Route path={appRoutes.personaggioCreate} element={<CharacterCreationPage />} />
+        <Route path={appRoutes.personaggio} element={<CharacterSheetPage />} />
+        <Route path={appRoutes.compendio} element={<CompendiumPage />} />
+        <Route path={appRoutes.laboratorio} element={<LaboratoryPage />} />
+        <Route path={appRoutes.amici} element={<FriendsPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -655,7 +655,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
 
     .desktop-split-pane {
         position: fixed;
-        top: 42px;
+        top: 0;
         right: 0;
         bottom: 0;
         width: var(--desktop-split-pane-width);

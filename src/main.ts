@@ -1,11 +1,14 @@
 import { mountReactBridge } from './app';
 import { initializeSupabaseClient } from './api/supabaseClient';
-import { legacyNavigationFromLocation } from './router';
+import { legacyNavigationFromLocation, type LegacyNavigationSnapshot } from './router';
 import './app/react-page.css';
 
 declare global {
   interface Window {
-    CompanionRouterBridge?: { legacyNavigationFromLocation: typeof legacyNavigationFromLocation };
+    CompanionRouterBridge?: {
+      legacyNavigationFromLocation?: typeof legacyNavigationFromLocation;
+      navigateToLegacy?: (snapshot: LegacyNavigationSnapshot) => boolean;
+    };
   }
 }
 

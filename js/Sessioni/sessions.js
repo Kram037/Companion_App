@@ -183,6 +183,9 @@ window.openSessionePage = async function(campagnaId) {
     sessionStorage.setItem('currentCampagnaId', campagnaId);
     AppState.activeSessionCampagnaId = campagnaId;
     sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
+    if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {
+        return;
+    }
     navigateToPage('sessione');
     await renderSessioneContent(campagnaId);
 };
@@ -776,5 +779,8 @@ window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     AppState.currentSessioneId = sessioneId;
     sessionStorage.setItem('currentCampagnaId', campagnaId);
     sessionStorage.setItem('currentSessioneId', sessioneId);
+    if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'combattimento', campagnaId, sessioneId })) {
+        return;
+    }
     await navigateToPage('combattimento');
 };

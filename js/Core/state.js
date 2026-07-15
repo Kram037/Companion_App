@@ -257,6 +257,9 @@ let elements = {};
                 sessionStorage.setItem('currentCampagnaId', campagnaId);
                 AppState.activeSessionCampagnaId = campagnaId;
                 sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
+                if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {
+                    return;
+                }
                 return navigateToPage('sessione');
             };
             patchedOpenSessione.__realtimeGuardNoDoubleRender = true;

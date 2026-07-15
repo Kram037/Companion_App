@@ -1,16 +1,31 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
-import { legacyNavigationFromPath } from '../router';
+import { legacyNavigationFromPath, pathFromLegacyNavigation, type LegacyNavigationSnapshot } from '../router';
 
 declare global {
   interface Window {
+    CompanionRouterBridge?: {
+      legacyNavigationFromLocation?: (pathname: string) => LegacyNavigationSnapshot | null;
+      navigateToLegacy?: (snapshot: LegacyNavigationSnapshot) => boolean;
+    };
     updateBookmarkChrome?: () => void;
   }
 }
 
 export function LegacyNavigationSync() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.CompanionRouterBridge = {
+      ...window.CompanionRouterBridge,
+      navigateToLegacy(snapshot) {
+        navigate(pathFromLegacyNavigation(snapshot));
+        return true;
+      },
+    };
+  }, [navigate]);
 
   useEffect(() => {
     const navigation = legacyNavigationFromPath(pathname);

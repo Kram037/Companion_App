@@ -61,6 +61,13 @@ async function _returnToActiveSessionOrCombat() {
         AppState.currentSessioneId = sessione.id;
         sessionStorage.setItem('currentCampagnaId', campagnaId);
         sessionStorage.setItem('currentSessioneId', sessione.id);
+        if (window.CompanionRouterBridge?.navigateToLegacy?.({
+            page: 'combattimento',
+            campagnaId,
+            sessioneId: sessione.id
+        })) {
+            return true;
+        }
         navigateToPage('combattimento');
     } else {
         if (typeof openSessionePage === 'function') {
