@@ -38,6 +38,8 @@ export function pathFromLegacyNavigation(snapshot: LegacyNavigationSnapshot) {
 }
 
 export function legacyNavigationFromPath(pathname: string): LegacyNavigationSnapshot | null {
+  if (pathname === '/') return { page: 'campagne' };
+
   const orderedRoutes: Array<[AppRouteId, string]> = [
     ['combattimento', appRoutes.combattimento],
     ['sessione', appRoutes.sessione],

@@ -2,9 +2,24 @@
 // Il client e' creato in index.html usando window.CompanionConfig.
 let supabaseReady = false;
 
+function canInitSupabaseClient() {
+    return typeof window.supabaseClient !== 'undefined' || (
+        typeof window.supabaseCreateClient === 'function' &&
+        !!window.CompanionConfig?.supabaseUrl &&
+        !!window.CompanionConfig?.supabaseAnonKey
+    );
+}
+
 // Initialize Supabase (runs after the SDK module loads)
 function initSupabase() {
     try {
+        if (typeof window.supabaseClient === 'undefined' && typeof window.supabaseCreateClient === 'function') {
+            const { supabaseUrl, supabaseAnonKey } = window.CompanionConfig || {};
+            if (supabaseUrl && supabaseAnonKey) {
+                window.supabaseClient = window.supabaseCreateClient(supabaseUrl, supabaseAnonKey);
+            }
+        }
+
         if (typeof window.supabaseClient === 'undefined') {
             console.error('Supabase client non disponibile. Verifica config e caricamento SDK.');
             return false;
@@ -23,7 +38,7 @@ function initSupabase() {
 // Wait for DOM and Supabase to be ready
 function waitForSupabase() {
     return new Promise((resolve) => {
-        if (typeof window.supabaseClient !== 'undefined') {
+        if (canInitSupabaseClient()) {
             resolve(initSupabase());
             return;
         }
@@ -32,7 +47,7 @@ function waitForSupabase() {
         const maxAttempts = 50;
         const checkInterval = setInterval(() => {
             attempts++;
-            if (typeof window.supabaseClient !== 'undefined') {
+            if (canInitSupabaseClient()) {
                 clearInterval(checkInterval);
                 resolve(initSupabase());
             } else if (attempts >= maxAttempts) {

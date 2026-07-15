@@ -18,7 +18,7 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "inputs": ["production"],
+      "inputs": ["production", { "env": "VITE_BASE" }, { "env": "GITHUB_ACTIONS" }, { "env": "GITHUB_REPOSITORY" }],
       "outputs": ["{workspaceRoot}/dist/apps/companion-app"]
     },
     "check": {

@@ -13,7 +13,20 @@ function setupServiceWorkerReloadOnUpdate() {
 }
 
 async function registerBaseServiceWorker() {
-    const registration = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+    const scriptHref = document.currentScript?.src || Array.from(document.scripts).find(script => {
+        try {
+            return new URL(script.src, window.location.href).pathname.endsWith('/js/Core/init.js');
+        } catch (_) {
+            return false;
+        }
+    })?.src;
+    const appRootUrl = scriptHref
+        ? new URL(scriptHref, window.location.href)
+        : new URL('/', window.location.href);
+    appRootUrl.pathname = appRootUrl.pathname.replace(/js\/Core\/init\.js$/, '');
+    appRootUrl.search = '';
+    appRootUrl.hash = '';
+    const registration = await navigator.serviceWorker.register(new URL('sw.js', appRootUrl), { updateViaCache: 'none' });
     setupServiceWorkerAutoUpdate(registration);
     return registration;
 }
@@ -200,6 +213,14 @@ async function init() {
         AppState.activeSessionCampagnaId = savedActiveSession;
     }
 
+    const routeState = window.CompanionRouterBridge?.legacyNavigationFromLocation?.(window.location.pathname);
+    if (routeState?.page) {
+        AppState.currentPage = routeState.page;
+        AppState.currentCampagnaId = routeState.campagnaId || null;
+        AppState.currentSessioneId = routeState.sessioneId || null;
+        AppState.currentPersonaggioId = routeState.personaggioId || null;
+    }
+
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
     if (elements.addCampagnaBtn) {
         elements.addCampagnaBtn.style.display = 'none';
@@ -244,7 +265,12 @@ async function init() {
     });
 
     // Replace current history entry with initial state
-    history.replaceState({ page: AppState.currentPage || 'campagne' }, '', null);
+    history.replaceState({
+        page: AppState.currentPage || 'campagne',
+        campagnaId: AppState.currentCampagnaId || null,
+        sessioneId: AppState.currentSessioneId || null,
+        personaggioId: AppState.currentPersonaggioId || null
+    }, '', null);
 
     appDebug('Navigazione alla pagina iniziale...');
     navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });

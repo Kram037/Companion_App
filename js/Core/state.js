@@ -332,7 +332,20 @@ let elements = {};
         }
 
         const script = document.createElement('script');
-        script.src = 'js/Personaggi/personaggi-pf-max-modifiers.js?v=20260712A';
+        const stateScriptHref = document.currentScript?.src || Array.from(document.scripts).find(script => {
+            try {
+                return new URL(script.src, window.location.href).pathname.endsWith('/js/Core/state.js');
+            } catch (_) {
+                return false;
+            }
+        })?.src;
+        const appRootUrl = stateScriptHref
+            ? new URL(stateScriptHref, window.location.href)
+            : new URL('/', window.location.href);
+        appRootUrl.pathname = appRootUrl.pathname.replace(/js\/Core\/state\.js$/, '');
+        appRootUrl.search = '';
+        appRootUrl.hash = '';
+        script.src = new URL('js/Personaggi/personaggi-pf-max-modifiers.js?v=20260712A', appRootUrl);
         script.dataset.pfMaxModifiers = 'true';
         script.onload = () => {
             try {

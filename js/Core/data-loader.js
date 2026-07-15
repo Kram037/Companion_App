@@ -38,6 +38,38 @@ const _runtimeDataPromises = new Map();
 const _runtimeScriptPromises = new Map();
 let _contentLocalizationPromise = null;
 
+const DATA_LOADER_APP_ROOT_URL = (() => {
+    const scriptHref = document.currentScript?.src || Array.from(document.scripts).find(script => {
+        try {
+            return new URL(script.src, window.location.href).pathname.endsWith('/js/Core/data-loader.js');
+        } catch (_) {
+            return false;
+        }
+    })?.src;
+    if (scriptHref) {
+        const url = new URL(scriptHref, window.location.href);
+        url.pathname = url.pathname.replace(/js\/Core\/data-loader\.js$/, '');
+        url.search = '';
+        url.hash = '';
+        return url.toString();
+    }
+
+    const manifestHref = document.querySelector('link[rel="manifest"]')?.href;
+    if (manifestHref) {
+        const url = new URL(manifestHref, window.location.href);
+        url.pathname = url.pathname.replace(/(?:assets\/)?manifest(?:-[^/]+)?\.json$/, '');
+        url.search = '';
+        url.hash = '';
+        return url.toString();
+    }
+
+    return `${window.location.origin}/`;
+})();
+
+function _appAssetUrl(src) {
+    return new URL(src, DATA_LOADER_APP_ROOT_URL).toString();
+}
+
 function _runtimeDataReady(bundle) {
     return bundle.globals.every(name => typeof window[name] !== 'undefined');
 }
@@ -75,7 +107,7 @@ function ensureContentLocalization() {
         }
 
         const script = document.createElement('script');
-        script.src = `${src}?v=20260712B`;
+        script.src = _appAssetUrl(`${src}?v=20260712B`);
         script.async = true;
         script.dataset.contentLocalization = 'true';
         script.onload = finish;
@@ -138,7 +170,7 @@ function ensureRuntimeData(key) {
         }
 
         const script = document.createElement('script');
-        script.src = bundle.src;
+        script.src = _appAssetUrl(bundle.src);
         script.async = true;
         script.dataset.runtimeData = key;
         script.onload = finish;
@@ -199,7 +231,7 @@ function ensureRuntimeScript(key) {
         }
 
         const script = document.createElement('script');
-        script.src = bundle.src;
+        script.src = _appAssetUrl(bundle.src);
         script.async = true;
         script.dataset.runtimeScript = key;
         script.onload = finish;

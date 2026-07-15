@@ -18,6 +18,7 @@ describe('legacy router bridge', () => {
   });
 
   it('maps paths back to legacy page names', () => {
+    expect(legacyNavigationFromPath('/')).toEqual({ page: 'campagne' });
     expect(legacyNavigationFromPath('/campagne/c1/sessione/s1/combattimento')).toEqual({
       page: 'combattimento',
       campagnaId: 'c1',

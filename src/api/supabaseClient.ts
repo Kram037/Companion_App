@@ -10,11 +10,11 @@ declare global {
 
 export function initializeSupabaseClient(): SupabaseClient | null {
   if (window.supabaseClient) return window.supabaseClient;
+  window.supabaseCreateClient = createClient;
   const { supabaseUrl, supabaseAnonKey, debug } = window.CompanionConfig ?? {};
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
   window.supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-  window.supabaseCreateClient = createClient;
   if (debug) console.log('Supabase caricato e inizializzato');
   return window.supabaseClient;
 }

@@ -19,8 +19,13 @@ function copyLegacyAssets() {
     transformIndexHtml: {
       order: 'post',
       handler: html => html.replace(
-        /(<link rel="manifest" href=")[^"?]+(\?[^\"]*)?/,
-        (_match, prefix, query = '') => `${prefix}${viteBase}manifest.json${query}`,
+        /\b(src|href)=["']([^"']+)["']/g,
+        (match, attr, ref) => {
+          if (attr === 'href' && /\/assets\/manifest-[^"']+\.json$/.test(ref)) return `${attr}="${viteBase}manifest.json"`;
+          if (/^(?:https?:|data:|#|\/)/.test(ref)) return match;
+          if (!/^(?:css|images|js|manifest\.json|risorse|sw\.js)(?:\/|\?|$)/.test(ref)) return match;
+          return `${attr}="${viteBase}${ref}"`;
+        },
       ),
     },
     writeBundle() {
@@ -33,10 +38,18 @@ function copyLegacyAssets() {
           filter: path => !exclude.includes(resolve(path).toLowerCase()),
         });
       }
+      normalizeBuiltIndexHtml(outDir);
       injectServiceWorkerManifest(outDir);
       copyFileSync(join(outDir, 'index.html'), join(outDir, '404.html'));
     },
   };
+}
+
+function normalizeBuiltIndexHtml(outDir: string) {
+  const indexPath = join(outDir, 'index.html');
+  const html = readFileSync(indexPath, 'utf8');
+  const normalized = html.replace(/\bhref=["'][^"']*\/assets\/manifest-[^"']+\.json["']/, `href="${viteBase}manifest.json"`);
+  if (normalized !== html) writeFileSync(indexPath, normalized);
 }
 
 function injectServiceWorkerManifest(outDir: string) {
