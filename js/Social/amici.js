@@ -218,10 +218,9 @@ async function handleInvitaAmico(e) {
         showNotification(`Richiesta di amicizia inviata a ${searchedUser.nome_utente}!`);
         closeAddAmicoModal();
         
-        // Ricarica gli amici per mostrare eventuali aggiornamenti
-        if (AppState.currentPage === 'amici') {
-            loadAmici();
-        }
+        window.dispatchEvent(new CustomEvent('companion:data-changed', {
+            detail: { table: 'richieste_amicizia', action: 'upsert' }
+        }));
     } catch (error) {
         console.error('❌ Errore nell\'invio richiesta amicizia:', error);
         if (error.code === '23505') {

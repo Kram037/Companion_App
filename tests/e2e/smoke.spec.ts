@@ -31,6 +31,14 @@ test('uses the URL as navigation source after refresh', async ({ page }) => {
   await expect(page.locator('body')).toHaveAttribute('data-react-page', 'compendio');
 });
 
+test('renders the friends route through React', async ({ page }) => {
+  await page.goto('/amici');
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'amici');
+  await expect(page.locator('#react-root .page-header h1')).toHaveText('Amici');
+  await expect(page.locator('#react-root .content-placeholder')).toContainText('Accedi');
+});
+
 test('uses desktop chrome on tablet landscape', async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 600 });
   await page.goto('/');

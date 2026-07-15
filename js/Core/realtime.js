@@ -205,9 +205,6 @@ function startAppEventsRealtime() {
                     }
                 }
 
-                if (data.table === 'richieste_amicizia' && AppState.currentPage === 'amici') {
-                    await loadAmici({ silent: true });
-                }
             }
         )
         .subscribe((status) => {

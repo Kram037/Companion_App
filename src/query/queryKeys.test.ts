@@ -11,6 +11,7 @@ describe('queryKeys', () => {
     expect(queryKeys.initiativeRequests('session-1')).toEqual(['session', 'session-1', 'initiativeRequests']);
     expect(queryKeys.combat('session-1')).toEqual(['combat', 'session-1']);
     expect(queryKeys.characters('user-1')).toEqual(['characters', 'user-1']);
+    expect(queryKeys.friends('user-1')).toEqual(['friends', 'user-1']);
     expect(queryKeys.runtimeData('spells')).toEqual(['runtimeData', 'spells']);
   });
 });

@@ -36,6 +36,9 @@ describe('realtimeClient', () => {
       ['session'], ['campaign'], ['campaigns'], ['combat'],
     ]);
     expect(realtimeQueryPrefixes({ table: 'homebrew_oggetti', action: 'insert' })).toEqual([['homebrew']]);
+    expect(realtimeQueryPrefixes({ table: 'richieste_amicizia', action: 'update' })).toEqual([
+      ['currentUser'], ['friends'], ['campaigns'], ['homebrew'],
+    ]);
     expect(realtimeQueryPrefixes({ table: 'unknown', action: 'update' })).toEqual([]);
   });
 });

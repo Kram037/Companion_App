@@ -8,6 +8,7 @@ import { CharactersPage } from '../features/characters/CharactersPage';
 import { CharacterSheetPage } from '../features/characters/CharacterSheetPage';
 import { CompendiumPage } from '../features/compendium/CompendiumPage';
 import { LaboratoryPage } from '../features/laboratory/LaboratoryPage';
+import { FriendsPage } from '../features/friends/FriendsPage';
 import { appBasenameFromPath } from '../router';
 import { CampaignRedirect, LegacyPageAdapter } from './LegacyPageAdapter';
 import { LegacyNavigationSync } from './LegacyNavigationSync';
@@ -27,7 +28,7 @@ export function AppRouter() {
         <Route path="/personaggi/:personaggioId" element={<CharacterSheetPage />} />
         <Route path="/compendio" element={<CompendiumPage />} />
         <Route path="/laboratorio" element={<LaboratoryPage />} />
-        <Route path="/amici" element={<LegacyPageAdapter page="amici" />} />
+        <Route path="/amici" element={<FriendsPage />} />
       </Routes>
     </BrowserRouter>
   );

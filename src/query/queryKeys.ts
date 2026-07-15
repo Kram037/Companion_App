@@ -12,6 +12,7 @@ export const queryKeys = {
   combat: (sessioneId: Id) => ['combat', sessioneId] as const,
   character: (personaggioId: Id) => ['character', personaggioId] as const,
   characters: (userId: Id) => ['characters', userId] as const,
+  friends: (userId: Id) => ['friends', userId] as const,
   homebrew: (userId: Id) => ['homebrew', userId] as const,
   runtimeData: (bundleKey: string) => ['runtimeData', bundleKey] as const,
 };

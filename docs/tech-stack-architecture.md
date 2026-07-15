@@ -21,7 +21,7 @@
 
 ## Regola legacy
 
-Le pagine principali sono renderizzate da React. `LegacyPageAdapter` resta solo per Amici e per il wizard di creazione personaggio; `navigateToPage` mantiene sincronizzati i dialog e gli editor non ancora migrati.
+Le pagine principali sono renderizzate da React. `LegacyPageAdapter` resta solo per il wizard di creazione personaggio; `navigateToPage` mantiene sincronizzati i dialog e gli editor non ancora migrati.
 
 ## Guardie
 

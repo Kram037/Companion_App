@@ -89,7 +89,7 @@ export function realtimeQueryPrefixes(event: RealtimeDataChange): QueryKey[] {
     return [['combat'], ['session']];
   }
   if (['utenti', 'richieste_amicizia'].includes(table)) {
-    return [['currentUser'], ['campaigns'], ['homebrew']];
+    return [['currentUser'], ['friends'], ['campaigns'], ['homebrew']];
   }
   return [];
 }
