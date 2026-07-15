@@ -233,9 +233,7 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
     try {
         if (window.CompanionReactPages?.has(pageName)) return;
         await _ensurePageRuntimeData(pageName);
-        if (pageName === 'amici' && AppState.isLoggedIn) {
-            loadAmici();
-        } else if (pageName === 'compendio') {
+        if (pageName === 'compendio') {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('compendio');
             }

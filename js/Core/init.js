@@ -58,7 +58,6 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         langIt: document.getElementById('langIt'),
         langEn: document.getElementById('langEn'),
-        addAmicoBtn: document.getElementById('addAmicoBtn'),
         openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
@@ -69,9 +68,6 @@ async function init() {
         cercaUtenteBtn: document.getElementById('cercaUtenteBtn'),
         invitaAmicoBtn: document.getElementById('invitaAmicoBtn'),
         cancelAddAmicoBtn: document.getElementById('cancelAddAmicoBtn'),
-        amiciList: document.getElementById('amiciList'),
-        richiesteInEntrataList: document.getElementById('richiesteInEntrataList'),
-        richiesteInEntrataSection: document.getElementById('richiesteInEntrataSection'),
         campagnaModalTitle: document.getElementById('campagnaModalTitle'),
         cancelCampagnaBtn: document.getElementById('cancelCampagnaBtn'),
         saveCampagnaBtn: document.getElementById('saveCampagnaBtn'),
@@ -166,10 +162,6 @@ async function init() {
     }
     
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
-    if (elements.addAmicoBtn) {
-        elements.addAmicoBtn.style.display = 'none';
-    }
-    
     // Setup event listeners immediately (don't wait for Supabase)
     appDebug('Setup event listeners...');
     setupEventListeners();
@@ -425,16 +417,6 @@ function setupEventListeners() {
         };
     }
 
-    if (elements.addAmicoBtn) {
-        elements.addAmicoBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            appDebug('Click su Aggiungi Amico');
-            openAddAmicoModal();
-        };
-        appDebug('Event listener aggiunto a addAmicoBtn');
-    }
-    
     // Add Amico Modal listeners
     if (elements.closeAddAmicoModal) {
         elements.closeAddAmicoModal.addEventListener('click', closeAddAmicoModal);
@@ -454,9 +436,6 @@ function setupEventListeners() {
     }
     if (elements.invitaAmicoBtn) {
         elements.invitaAmicoBtn.addEventListener('click', handleInvitaAmico);
-    }
-    if (typeof setupAmiciEventDelegation === 'function') {
-        setupAmiciEventDelegation();
     }
     // Laboratorio init
     if (typeof initLaboratorio === 'function') initLaboratorio();

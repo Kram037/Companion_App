@@ -73,9 +73,6 @@ function setupSupabaseAuth() {
                 stopAppEventsRealtime();
                 
                 // Pulisci i dati quando l'utente esce
-                if (AppState.currentPage === 'amici') {
-                    renderAmici([], [], []);
-                }
             }
         });
     } catch (error) {
@@ -674,9 +671,6 @@ async function checkAuthState() {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
             
-            if (AppState.currentPage === 'amici') {
-                renderAmici([], [], []);
-            }
         }
     } catch (error) {
         console.error('❌ Errore nel controllo stato auth:', error);
@@ -692,29 +686,19 @@ function updateUIForLoggedIn() {
         headerUserName.textContent = dbName || AppState.currentUser?.displayName || '';
     }
     // Mostra i pulsanti quando l'utente è loggato
-    if (elements.addAmicoBtn) {
-        elements.addAmicoBtn.style.display = '';
-    }
     // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(true);
 }
 
 // Aggiorna i messaggi dei placeholder in base allo stato di login
 function updatePlaceholderMessages(isLoggedIn) {
-    const amiciPlaceholder = document.getElementById('amiciPlaceholder');
     const labPlaceholder = document.getElementById('laboratorioPlaceholder');
     
     if (isLoggedIn) {
-        if (amiciPlaceholder) {
-            amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
-        }
         if (labPlaceholder) {
             labPlaceholder.style.display = 'none';
         }
     } else {
-        if (amiciPlaceholder) {
-            amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
-        }
         if (labPlaceholder) {
             labPlaceholder.style.display = 'block';
             labPlaceholder.innerHTML = '<p>Accedi per creare i tuoi contenuti homebrew</p>';
@@ -726,9 +710,6 @@ function updatePlaceholderMessages(isLoggedIn) {
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
     // Nascondi i pulsanti quando l'utente non è loggato
-    if (elements.addAmicoBtn) {
-        elements.addAmicoBtn.style.display = 'none';
-    }
     // Aggiorna i placeholder delle sezioni legacy.
     updatePlaceholderMessages(false);
 }
