@@ -61,12 +61,37 @@ test('desktop split panes divide the workspace in half', async ({ page }) => {
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
+  await expect(page.locator('.desktop-bookmark-tab').first()).toHaveAttribute('draggable', 'true');
 
   await expect.poll(() => page.evaluate(() => {
     const left = document.querySelector<HTMLElement>('#mainContent')?.getBoundingClientRect().width || 0;
     const right = document.querySelector<HTMLElement>('#desktopSplitPane')?.getBoundingClientRect().width || 0;
     return Math.abs(left - right);
   })).toBeLessThan(2);
+});
+
+test('closing the only right split tab closes the split pane', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await page.locator('.desktop-bookmark-split-tab').click();
+  await expect(page.locator('#desktopSplitPane')).toBeVisible();
+  await page.frameLocator('#desktopSplitPaneFrame').locator('.desktop-bookmark-tab-close').first().click();
+  await expect(page.locator('#desktopSplitPane')).toHaveCount(0);
+});
+
+test('desktop compendium sidebar opens equipment sections directly', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await page.locator('.desktop-sidebar-group-toggle[data-page="compendio"]').click();
+  const compendioSidebar = page.locator('.desktop-sidebar-group[data-page="compendio"]');
+  await expect(compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti"]')).toHaveCount(0);
+  await compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti:armi"]').click();
+
+  await expect(page.locator('#compendioPage')).toHaveClass(/active/);
+  await expect(page.locator('#compendioHub')).toBeHidden();
+  await expect(page.locator('#compendioSubTitle')).toHaveText('Armi, Armature e Scudi');
 });
 
 test('desktop split panes can use two columns on wide screens', async ({ page }) => {

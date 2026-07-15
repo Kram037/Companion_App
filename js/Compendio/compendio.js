@@ -121,16 +121,25 @@ function _compEquipmentSectionIcon(section) {
 }
 
 window.compGetSidebarItems = function() {
-    return Object.entries(COMP_TABS).map(([key, tab]) => ({
-        key,
-        label: tab.label,
-        iconFile: tab.iconFile,
-    }));
+    return Object.entries(COMP_TABS).flatMap(([key, tab]) => {
+        if (key !== 'oggetti') {
+            return [{ key, label: tab.label, iconFile: tab.iconFile }];
+        }
+        return COMP_EQUIPMENT_SECTION_ORDER.map(section => ({
+            key: `oggetti:${section}`,
+            label: COMP_EQUIPMENT_SECTIONS[section].shortLabel || COMP_EQUIPMENT_SECTIONS[section].label,
+            iconFile: COMP_EQUIPMENT_SECTIONS[section].iconFile,
+        }));
+    });
 };
 
 window.compGetCurrentSidebarTab = function() {
     const subVisible = document.getElementById('compendioSubPage')?.style.display !== 'none';
-    return subVisible ? _compCurrentTab : '';
+    if (!subVisible) return '';
+    if (_compCurrentTab === 'oggetti') {
+        return `oggetti:${_compStateFor('oggetti').equipmentSection || 'armi'}`;
+    }
+    return _compCurrentTab;
 };
 
 const COMP_MULTICLASS_REQUIREMENTS = {
