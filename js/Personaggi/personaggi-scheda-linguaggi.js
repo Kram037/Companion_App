@@ -2,40 +2,6 @@
 // CHARACTER SHEET LANGUAGES AND TOOL PROFICIENCIES
 // ============================================================================
 
-function buildLangProfSection(pg) {
-    const linguaggi = pg.linguaggi || [];
-    const compStrum = pg.competenze_strumenti || [];
-    const langHtml = linguaggi.length > 0 ?
-        linguaggi.map(l => `<span class="scheda-tag">${escapeHtml(l)}</span>`).join('') :
-        '<span class="scheda-empty">Nessuno</span>';
-
-    const grouped = _toolsByGroup(compStrum);
-    let toolSectionsHtml = '';
-    if (Object.keys(grouped).length > 0) {
-        for (const [groupName, items] of Object.entries(grouped)) {
-            const tags = items.map(t => {
-                const cls = t.maestria ? 'scheda-tag scheda-tag-mastery' : 'scheda-tag';
-                return `<span class="${cls}">${escapeHtml(t.nome)}${t.maestria ? ' ★' : ''}</span>`;
-            }).join('');
-            toolSectionsHtml += `<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">${escapeHtml(groupName)}</span><div class="scheda-tags">${tags}</div></div>`;
-        }
-    } else {
-        toolSectionsHtml = '<div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Strumenti</span><div class="scheda-tags"><span class="scheda-empty">Nessuna</span></div></div>';
-    }
-
-    return `<div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Linguaggi e Competenze
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenLangProfEdit('${pg.id}')" title="Modifica">&#9998;</button>
-        </div>
-        <div class="scheda-section-body">
-            <div class="scheda-res-imm-display" id="schedaLangProfDisplay">
-                <div class="scheda-res-imm-row"><span class="scheda-res-imm-label">Linguaggi</span><div class="scheda-tags" id="schedaLangDisplay">${langHtml}</div></div>
-                ${toolSectionsHtml}
-            </div>
-        </div>
-    </div>`;
-}
-
 window.schedaOpenLangProfEdit = function(pgId) {
     const pg = _schedaPgCache;
     if (!pg) return;

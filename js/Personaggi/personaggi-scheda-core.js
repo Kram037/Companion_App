@@ -23,7 +23,6 @@ window.openSchedaPersonaggio = async function(personaggioId, opts) {
 // Debounced save for scheda fields
 // Una mappa per campo evita che il salvataggio di un campo cancelli il debounce
 // di un altro campo modificato subito prima.
-let _schedaSaveTimeouts = new Map();
 let _schedaPgCache = null;
 
 function _schedaReactOwnsPage() {
@@ -89,22 +88,6 @@ window.getSchedaReactModel = function(pg) {
         inventory: (pg?.inventario || []).map(item => typeof _invResolveLive === 'function' ? _invResolveLive(item) : item),
     };
 };
-
-function schedaDebouncedSave(personaggioId, field, value) {
-    const key = `${personaggioId}:${field}`;
-    const existing = _schedaSaveTimeouts.get(key);
-    if (existing) clearTimeout(existing);
-    const timeout = setTimeout(async () => {
-        _schedaSaveTimeouts.delete(key);
-        const supabase = getSupabaseClient();
-        if (!supabase) return;
-        try {
-            await supabase.from('personaggi').update({ [field]: value, updated_at: new Date().toISOString() }).eq('id', personaggioId);
-            if (_schedaReactOwnsPage()) _schedaRequestReactRefresh(personaggioId, window._schedaCurrentTab);
-        } catch (e) { console.error('Errore salvataggio:', e); }
-    }, 500);
-    _schedaSaveTimeouts.set(key, timeout);
-}
 
 async function schedaInstantSave(personaggioId, updates) {
     const supabase = getSupabaseClient();

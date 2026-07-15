@@ -44,12 +44,6 @@ function _getBonusManuali(pg) {
     };
 }
 
-function _getCasterBonusFor(pg, classeNome) {
-    const inc = _getBonusManuali(pg).incantatori;
-    const e = inc[classeNome] || { atk: [], dc: [] };
-    return { atk: _sumBonusList(e.atk), dc: _sumBonusList(e.dc) };
-}
-
 function _getSaveBonusFor(pg, abilityKey) {
     const ts = _getBonusManuali(pg).tiri_salvezza;
     return _sumBonusList(ts[abilityKey] || []) + _sumBonusList(ts._all || []);

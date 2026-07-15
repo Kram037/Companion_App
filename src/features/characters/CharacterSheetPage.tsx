@@ -64,6 +64,7 @@ declare global {
     schedaOpenAddEquip?: (id: string) => void;
     schedaEditEquip?: (id: string, index: number) => void;
     schedaRemoveEquip?: (id: string, index: number) => void;
+    schedaOpenLangProfEdit?: (id: string) => void;
     invOpenCoinKeypad?: (input: HTMLInputElement) => void;
     invEditAttune?: (id: string, index: number) => void;
     invAddItem?: (id: string) => void;
@@ -228,7 +229,7 @@ function Skills({ character }: { character: CharacterData }) {
 function Languages({ character }: { character: CharacterData }) {
   const languages = stringList(character, 'linguaggi');
   const tools = stringList(character, 'competenze_strumenti');
-  return <Section id={`${character.id}:languages`} title="Linguaggi e Competenze" defaultOpen={false}>
+  return <Section id={`${character.id}:languages`} title="Linguaggi e Competenze" defaultOpen={false} action={<EditButton label="Modifica linguaggi e competenze" onClick={() => window.schedaOpenLangProfEdit?.(character.id)} />}>
     <CompactList label="Linguaggi" values={languages} />
     <CompactList label="Strumenti" values={tools} />
   </Section>;

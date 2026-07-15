@@ -7,8 +7,6 @@ window.schedaOpenSpellPage = function(pgId) {
     _schedaRequestReactRefresh(pgId, 'incantesimi');
 };
 
-function _spellsDataNative() { return window.SPELLS_DATA || {}; }
-
 // Adatta una riga di homebrew_incantesimi al formato usato dal picker
 // (chiavi: name, name_en, school, school_it, casting_time, range,
 //  components, duration, description, classes, source, ...).
@@ -297,9 +295,6 @@ function buildSpellLevelSection(pg, level) {
         </div>
     </div>`;
 }
-
-// Backward compat (mantiene il nome storico)
-function buildCantripsSection(pg) { return buildSpellLevelSection(pg, 0); }
 
 function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
