@@ -54,3 +54,17 @@ test('manifest does not lock tablet orientation', async ({ request }) => {
   const manifest = await response.json();
   expect(manifest).not.toHaveProperty('orientation');
 });
+
+test('desktop split panes divide the workspace in half', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await page.locator('.desktop-bookmark-split-tab').click();
+  await expect(page.locator('#desktopSplitPane')).toBeVisible();
+
+  await expect.poll(() => page.evaluate(() => {
+    const left = document.querySelector<HTMLElement>('#mainContent')?.getBoundingClientRect().width || 0;
+    const right = document.querySelector<HTMLElement>('#desktopSplitPane')?.getBoundingClientRect().width || 0;
+    return Math.abs(left - right);
+  })).toBeLessThan(2);
+});

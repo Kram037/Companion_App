@@ -287,6 +287,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
 @media (min-width: 900px) {
     :root {
         --desktop-sidebar-width: 228px;
+        --desktop-split-pane-width: calc((100vw - var(--desktop-sidebar-width)) / 2);
     }
 
     body {
@@ -476,7 +477,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     body.desktop-split-active .desktop-bookmark-tabs {
-        width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
+        width: var(--desktop-split-pane-width);
     }
 
     .desktop-bookmark-tabs::-webkit-scrollbar {
@@ -632,8 +633,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         top: var(--app-header-height);
         right: 0;
         bottom: 0;
-        width: min(46vw, 720px);
-        min-width: 420px;
+        width: var(--desktop-split-pane-width);
         z-index: 95;
         display: flex;
         flex-direction: column;
@@ -687,7 +687,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     body.desktop-split-active .main-content {
-        margin-right: min(46vw, 720px);
+        margin-right: var(--desktop-split-pane-width);
         padding-left: 0;
         padding-right: 0;
         scrollbar-width: none;
@@ -888,7 +888,7 @@ body.bookmark-split-instance .campagna-card {
 }
 
 body.desktop-split-active .page.active .btn-fab {
-    right: calc(min(46vw, 720px) + 14px);
+    right: calc(var(--desktop-split-pane-width) + 14px);
 }
 
 body.desktop-split-active .scheda-page-grid,
@@ -904,13 +904,13 @@ body.bookmark-split-instance .scheda-page-grid > .scheda-divider {
 }
 
 body.desktop-split-active .scheda-tab-bar {
-    left: calc(var(--desktop-sidebar-width) + ((100vw - var(--desktop-sidebar-width) - min(46vw, 720px)) / 2));
-    max-width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px) - 28px);
+    left: calc(var(--desktop-sidebar-width) + (var(--desktop-split-pane-width) / 2));
+    max-width: calc(var(--desktop-split-pane-width) - 28px);
     bottom: 18px;
 }
 
 body.desktop-split-active .btn-scroll-stats {
-    right: calc(min(46vw, 720px) + 18px);
+    right: calc(var(--desktop-split-pane-width) + 18px);
     bottom: 18px;
 }
 
