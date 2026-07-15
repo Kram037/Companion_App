@@ -125,11 +125,16 @@ window.compGetSidebarItems = function() {
         if (key !== 'oggetti') {
             return [{ key, label: tab.label, iconFile: tab.iconFile }];
         }
-        return COMP_EQUIPMENT_SECTION_ORDER.map(section => ({
-            key: `oggetti:${section}`,
-            label: COMP_EQUIPMENT_SECTIONS[section].shortLabel || COMP_EQUIPMENT_SECTIONS[section].label,
-            iconFile: COMP_EQUIPMENT_SECTIONS[section].iconFile,
-        }));
+        return [{
+            key,
+            label: tab.label,
+            iconFile: tab.iconFile,
+            children: COMP_EQUIPMENT_SECTION_ORDER.map(section => ({
+                key: `oggetti:${section}`,
+                label: COMP_EQUIPMENT_SECTIONS[section].shortLabel || COMP_EQUIPMENT_SECTIONS[section].label,
+                iconFile: COMP_EQUIPMENT_SECTIONS[section].iconFile,
+            })),
+        }];
     });
 };
 

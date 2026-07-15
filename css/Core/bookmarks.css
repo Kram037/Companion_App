@@ -458,6 +458,34 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         font-weight: 800;
     }
 
+    .desktop-sidebar-child-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .desktop-sidebar-child-toggle .desktop-sidebar-caret {
+        margin-left: auto;
+        font-size: 0.62rem;
+    }
+
+    .desktop-sidebar-child-group.open > .desktop-sidebar-child-toggle .desktop-sidebar-caret {
+        transform: rotate(180deg);
+    }
+
+    .desktop-sidebar-grandchildren {
+        display: none;
+        flex-direction: column;
+        gap: 2px;
+        margin-left: 14px;
+        padding-left: 7px;
+        border-left: 1px solid color-mix(in srgb, var(--fantasy-gold-line, var(--border)) 70%, transparent);
+    }
+
+    .desktop-sidebar-child-group.open > .desktop-sidebar-grandchildren {
+        display: flex;
+    }
+
     .desktop-bookmark-tabs {
         height: 42px;
         margin-left: var(--desktop-sidebar-width);
@@ -725,6 +753,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     body.desktop-split-active .campagna-card {
         height: 140px;
     }
+
 }
 
 body.bookmark-split-instance {

@@ -21,10 +21,7 @@ const DESKTOP_LAB_CHILDREN = [
     { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
     { key: 'incantesimi', label: 'Incantesimi', iconFile: 'Incantesimi' },
 ];
-const DESKTOP_COMP_CHILDREN = [
-    { key: 'razze', label: 'Razze', iconFile: 'Razze' },
-    { key: 'classi', label: 'Classi', iconFile: 'Classi' },
-    { key: 'background', label: 'Background', iconFile: 'Background' },
+const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
     { key: 'oggetti:armi', label: 'Armi e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
     { key: 'oggetti:avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
     { key: 'oggetti:strumenti', label: 'Strumenti', iconFile: 'Equipaggiamento/Strumenti' },
@@ -33,6 +30,12 @@ const DESKTOP_COMP_CHILDREN = [
     { key: 'oggetti:gemme', label: 'Gemme', iconFile: 'Equipaggiamento/Gemme' },
     { key: 'oggetti:veleni', label: 'Veleni', iconFile: 'Equipaggiamento/Veleni' },
     { key: 'oggetti:oggetti', label: 'Oggetti Magici', iconFile: 'Equipaggiamento/Oggetti Magici' },
+];
+const DESKTOP_COMP_CHILDREN = [
+    { key: 'razze', label: 'Razze', iconFile: 'Razze' },
+    { key: 'classi', label: 'Classi', iconFile: 'Classi' },
+    { key: 'background', label: 'Background', iconFile: 'Background' },
+    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento', children: DESKTOP_COMP_EQUIPMENT_CHILDREN },
     { key: 'talenti_stili', label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
     { key: 'mostri', label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
     { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
@@ -785,6 +788,18 @@ function _desktopGroupStorageKey(page) {
     return `companion_sidebar_group_v2_${page}`;
 }
 
+function _desktopNestedGroupOpen(page, key, activeChild = '') {
+    if (activeChild && (activeChild === key || activeChild.startsWith(`${key}:`))) return true;
+    return localStorage.getItem(`${_desktopGroupStorageKey(page)}_${key}`) === 'open';
+}
+
+function _desktopToggleNestedGroup(page, key) {
+    const storageKey = `${_desktopGroupStorageKey(page)}_${key}`;
+    const isOpen = localStorage.getItem(storageKey) === 'open';
+    localStorage.setItem(storageKey, isOpen ? 'closed' : 'open');
+    renderDesktopSidebar();
+}
+
 function _bookmarkEnsureDesktopChrome() {
     if (!document.getElementById('desktopSidebarNav')) {
         const sidebar = document.createElement('aside');
@@ -795,6 +810,11 @@ function _bookmarkEnsureDesktopChrome() {
             const toggle = event.target.closest('.desktop-sidebar-group-toggle');
             if (toggle) {
                 _desktopToggleGroup(toggle.dataset.page);
+                return;
+            }
+            const nestedToggle = event.target.closest('.desktop-sidebar-child-toggle');
+            if (nestedToggle) {
+                _desktopToggleNestedGroup(nestedToggle.dataset.page, nestedToggle.dataset.tab);
                 return;
             }
             const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child');
@@ -983,16 +1003,37 @@ function renderDesktopSidebar() {
                     <span class="desktop-sidebar-caret">v</span>
                 </button>
                 <div class="desktop-sidebar-children">
-                    ${(item.children || []).map(child => `
-                        <button type="button" class="desktop-sidebar-child ${focusedPage === item.page && activeChild === child.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
-                            ${_desktopSidebarItemIcon(child)}
-                            <span>${_bookmarkEscape(child.label)}</span>
-                        </button>
-                    `).join('')}
+                    ${(item.children || []).map(child => _desktopSidebarChildHtml(item.page, child, focusedPage, activeChild)).join('')}
                 </div>
             </div>
         `;
     }).join('');
+}
+
+function _desktopSidebarChildHtml(page, child, focusedPage, activeChild) {
+    const active = focusedPage === page && activeChild === child.key;
+    if (Array.isArray(child.children) && child.children.length) {
+        const nestedOpen = _desktopNestedGroupOpen(page, child.key, activeChild);
+        const nestedActive = focusedPage === page && activeChild.startsWith(`${child.key}:`);
+        return `
+            <div class="desktop-sidebar-child-group ${nestedOpen ? 'open' : ''}">
+                <button type="button" class="desktop-sidebar-child desktop-sidebar-child-toggle ${nestedActive ? 'active' : ''}" data-page="${page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
+                    ${_desktopSidebarItemIcon(child)}
+                    <span>${_bookmarkEscape(child.label)}</span>
+                    <span class="desktop-sidebar-caret">v</span>
+                </button>
+                <div class="desktop-sidebar-grandchildren">
+                    ${child.children.map(grandchild => _desktopSidebarChildHtml(page, grandchild, focusedPage, activeChild)).join('')}
+                </div>
+            </div>
+        `;
+    }
+    return `
+        <button type="button" class="desktop-sidebar-child ${active ? 'active' : ''}" data-page="${page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
+            ${_desktopSidebarItemIcon(child)}
+            <span>${_bookmarkEscape(child.label)}</span>
+        </button>
+    `;
 }
 
 function updateDesktopSidebarActive() {

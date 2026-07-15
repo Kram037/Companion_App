@@ -86,12 +86,21 @@ test('desktop compendium sidebar opens equipment sections directly', async ({ pa
 
   await page.locator('.desktop-sidebar-group-toggle[data-page="compendio"]').click();
   const compendioSidebar = page.locator('.desktop-sidebar-group[data-page="compendio"]');
-  await expect(compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti"]')).toHaveCount(0);
+  await expect(compendioSidebar.locator('.desktop-sidebar-child-toggle[data-tab="oggetti"]')).toHaveCount(1);
+  await expect(compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti:armi"]')).toBeHidden();
+  await compendioSidebar.locator('.desktop-sidebar-child-toggle[data-tab="oggetti"]').click();
   await compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti:armi"]').click();
 
   await expect(page.locator('#compendioPage')).toHaveClass(/active/);
   await expect(page.locator('#compendioHub')).toBeHidden();
   await expect(page.locator('#compendioSubTitle')).toHaveText('Armi, Armature e Scudi');
+});
+
+test('desktop character sheet toolbar sits near the viewport bottom', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await expect.poll(() => page.locator('#schedaTabBar').evaluate(el => getComputedStyle(el).bottom)).toBe('18px');
 });
 
 test('desktop split panes can use two columns on wide screens', async ({ page }) => {

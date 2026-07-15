@@ -968,6 +968,13 @@ body {
     --scheda-tab-active-x: 0%;
 }
 
+@media (min-width: 900px) {
+    .scheda-tab-bar,
+    .btn-scroll-stats {
+        bottom: 18px;
+    }
+}
+
 .scheda-tab-bar:has(.scheda-tab:nth-child(2).active) { --scheda-tab-active-x: 100%; }
 .scheda-tab-bar:has(.scheda-tab:nth-child(3).active) { --scheda-tab-active-x: 200%; }
 .scheda-tab-bar:has(.scheda-tab:nth-child(4).active) { --scheda-tab-active-x: 300%; }
