@@ -3093,6 +3093,7 @@
     font-weight: 800;
     cursor: pointer;
 }
+.react-section-actions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
 .react-character-sheet .scheda-section-title::after { display: none; }
 .react-character-sheet .scheda-section-title:has(.react-section-toggle)::after { display: block; }
 .react-character-sheet .scheda-section.collapsed .scheda-section-title:has(.react-section-toggle)::after { transform: rotate(-90deg); }

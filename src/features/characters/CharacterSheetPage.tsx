@@ -9,7 +9,7 @@ import { useCharacterSheetUiStore } from '../../store';
 import { characterQuery } from './characterQueries';
 import {
   ABILITIES, CONDITIONS, HIT_DICE, SKILLS, SPELL_ABILITIES, classLine, hpValues, inventoryMeta,
-  inventoryName, modifier, numberField, objectList, proficiency, raceLine, recordField, signed,
+  inventoryName, modifier, numberField, objectList, pageOneResourceTables, proficiency, raceLine, recordField, signed,
   spellName, stringList, subclassLine, type CharacterData,
 } from './characterSheetModel';
 
@@ -57,6 +57,10 @@ declare global {
     schedaInvocationSlotChange?: (id: string, key: string, current: number, delta: number, max: number) => void;
     schedaCustomResChange?: (id: string, index: number, current: number, delta: number, max: number) => void;
     schedaOpenAddCustomRes?: (id: string, index?: number) => void;
+    p1AddTab?: () => void;
+    p1RemoveTab?: (name: string) => void;
+    schedaOpenP1TabRes?: (id: string, name: string, index?: number) => void;
+    schedaP1TabResChange?: (id: string, name: string, index: number, current: number, delta: number, max: number) => void;
     schedaOpenAddEquip?: (id: string) => void;
     schedaEditEquip?: (id: string, index: number) => void;
     schedaRemoveEquip?: (id: string, index: number) => void;
@@ -288,6 +292,7 @@ function Resources({ character, model }: { character: CharacterData; model: Lega
   (model.raceResources ?? []).forEach(item => rows.push({ key: item.key, label: `${item.nome} (razza)`, current: item.current, max: item.max, kind: 'race' }));
   (model.invocationSlots ?? []).filter(item => !item.is_spell).forEach(item => rows.push({ key: item.key, label: `${item.nome} (supplica)`, current: item.current, max: item.max, kind: 'invocation' }));
   const custom = Array.isArray(stored._custom) ? stored._custom as Record<string, any>[] : [];
+  const pageOneTables = pageOneResourceTables(character);
   custom.forEach((item, index) => rows.push({ key: `custom-${index}`, label: `${item.nome || 'Risorsa'}${item.dado ? ` (${item.dado})` : ''}`, current: Number(item.current ?? item.max ?? 0), max: Number(item.max ?? 0), kind: 'custom', index }));
   const change = (row: typeof rows[number], delta: number) => {
     if (row.kind === 'class') window.schedaClassResChange?.(character.id, row.key, row.current, delta, row.max);
@@ -296,9 +301,15 @@ function Resources({ character, model }: { character: CharacterData; model: Lega
     else if (row.kind === 'invocation') window.schedaInvocationSlotChange?.(character.id, row.key, row.current, delta, row.max);
     else window.schedaCustomResChange?.(character.id, row.index || 0, row.current, delta, row.max);
   };
-  return <Section id={`${character.id}:resources`} title="Risorse" action={<EditButton label="Aggiungi risorsa" onClick={() => window.schedaOpenAddCustomRes?.(character.id)} />}>
-    {!rows.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{rows.map(row => <CounterRow key={row.key} label={row.label} current={row.current} max={row.max} onChange={delta => change(row, delta)} />)}</div>}
-  </Section>;
+  return <>
+    <Section id={`${character.id}:resources`} title="Risorse" action={<EditButton label="Aggiungi risorsa" onClick={() => window.schedaOpenAddCustomRes?.(character.id)} />}>
+      {!rows.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{rows.map(row => <CounterRow key={row.key} label={row.label} current={row.current} max={row.max} onChange={delta => change(row, delta)} />)}</div>}
+    </Section>
+    {pageOneTables.map(table => <Section key={table.name} id={`${character.id}:resource-table:${table.name}`} title={table.name} action={<div className="react-section-actions"><EditButton label={`Aggiungi a ${table.name}`} onClick={() => window.schedaOpenP1TabRes?.(character.id, table.name)} /><button type="button" className="scheda-edit-btn" title={`Rimuovi ${table.name}`} aria-label={`Rimuovi ${table.name}`} onClick={event => { event.stopPropagation(); window.p1RemoveTab?.(table.name); }}>×</button></div>}>
+      {!table.items.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{table.items.map(item => <CounterRow key={`${table.name}-${item.index}`} label={`${item.name}${item.die ? ` (${item.die})` : ''}`} current={item.current} max={item.max} onEdit={() => window.schedaOpenP1TabRes?.(character.id, table.name, item.index)} onChange={delta => window.schedaP1TabResChange?.(character.id, table.name, item.index, item.current, delta, item.max)} />)}</div>}
+    </Section>)}
+    <div className="priv-add-tab-wrap"><button className="btn-secondary priv-add-tab-btn" type="button" onClick={() => window.p1AddTab?.()}><span className="priv-add-tab-plus">+</span> Nuova tabella risorse</button></div>
+  </>;
 }
 
 function InventoryTab({ character, model }: { character: CharacterData; model: LegacySheetModel }) {
@@ -428,8 +439,8 @@ function backgroundFeatures(background?: Record<string, any> | null): LegacyFeat
   return [{ name: background.privilegio_nome, description: background.privilegio_descrizione || '' }];
 }
 
-function CounterRow({ label, current, max, onChange }: { label: string; current: number; max: number; onChange: (delta: number) => void }) {
-  return <div className="scheda-hd-row"><span className="scheda-hd-total">{label}</span><div className="scheda-hd-avail"><button className="scheda-hd-btn" type="button" onClick={() => onChange(-1)}>−</button><span className="scheda-hd-val">{current}</span><span className="scheda-hd-max">/ {max}</span><button className="scheda-hd-btn" type="button" onClick={() => onChange(1)}>+</button></div></div>;
+function CounterRow({ label, current, max, onChange, onEdit }: { label: string; current: number; max: number; onChange: (delta: number) => void; onEdit?: () => void }) {
+  return <div className="scheda-hd-row">{onEdit ? <button type="button" className="scheda-hd-total scheda-hd-total-clickable" onClick={onEdit}>{label}</button> : <span className="scheda-hd-total">{label}</span>}<div className="scheda-hd-avail"><button className="scheda-hd-btn" type="button" onClick={() => onChange(-1)}>−</button><span className="scheda-hd-val">{current}</span><span className="scheda-hd-max">/ {max}</span><button className="scheda-hd-btn" type="button" onClick={() => onChange(1)}>+</button></div></div>;
 }
 
 function StatBox({ label, value, onClick }: { label: string; value: ReactNode; onClick?: () => void }) {

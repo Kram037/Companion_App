@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classLine, hpValues, modifier, raceLine, subclassLine, type CharacterData } from './characterSheetModel';
+import { classLine, hpValues, modifier, pageOneResourceTables, raceLine, subclassLine, type CharacterData } from './characterSheetModel';
 
 const character = {
   id: 'pg-1', nome: 'Aldren', livello: 5, razza: 'Tiefling', sottorazza: 'Tiefling di Dispater',
@@ -18,5 +18,19 @@ describe('character sheet model', () => {
   it('clamps current hit points to the effective maximum', () => {
     expect(hpValues(character)).toEqual({ base: 30, bonus: 5, max: 35, current: 35, temporary: 4 });
     expect(modifier(18)).toBe(4);
+  });
+
+  it('keeps legacy page-one resource tables available to React', () => {
+    const withResources = {
+      ...character,
+      privilegi: {
+        p1_tabs_order: ['Cariche'],
+        p1_features: { Cariche: [{ nome: 'Rune', tipo: 'dadi', dado: 'd8', max: 3, current: 8 }] },
+      },
+    } as CharacterData;
+
+    expect(pageOneResourceTables(withResources)).toEqual([
+      { name: 'Cariche', items: [{ index: 0, name: 'Rune', die: 'd8', max: 3, current: 3 }] },
+    ]);
   });
 });

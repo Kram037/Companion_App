@@ -4,6 +4,8 @@
 
 // --- Scheda Personaggio Page ---
 window.openSchedaPersonaggio = async function(personaggioId, opts) {
+    const refreshCurrent = AppState.currentPage === 'scheda'
+        && String(AppState.currentPersonaggioId || '') === String(personaggioId || '');
     AppState.currentPersonaggioId = personaggioId;
     if (opts && opts.scrollToStats) {
         // Flag consumato dopo il render della Pagina 1 per centrare la tabella
@@ -11,14 +13,16 @@ window.openSchedaPersonaggio = async function(personaggioId, opts) {
         // alla scheda da una sessione/combattimento.
         window._schedaPendingScrollToStats = true;
     }
-    // La route React carica direttamente la scheda richiesta.
+    if (refreshCurrent) {
+        _schedaRequestReactRefresh(personaggioId, window._schedaCurrentTab);
+        return;
+    }
     return navigateToPage('scheda');
 }
 
 // Debounced save for scheda fields
 // Una mappa per campo evita che il salvataggio di un campo cancelli il debounce
 // di un altro campo modificato subito prima.
-let _schedaSaveTimeout = null; // legacy: non usare per nuovi salvataggi
 let _schedaSaveTimeouts = new Map();
 let _schedaPgCache = null;
 

@@ -67,6 +67,31 @@ export function objectList(character: CharacterData, key: string): Record<string
   return Array.isArray(value) ? value.filter(item => item && typeof item === 'object') as Record<string, any>[] : [];
 }
 
+export function pageOneResourceTables(character: CharacterData) {
+  const privileges = recordField(character, 'privilegi');
+  const order = Array.isArray(privileges.p1_tabs_order) ? privileges.p1_tabs_order.map(String) : [];
+  const groups = privileges.p1_features && typeof privileges.p1_features === 'object'
+    ? privileges.p1_features as Record<string, unknown>
+    : {};
+
+  return order.map(name => ({
+    name,
+    items: (Array.isArray(groups[name]) ? groups[name] : [])
+      .filter(item => item && typeof item === 'object')
+      .map((item, index) => {
+        const value = item as Record<string, unknown>;
+        const max = Math.max(1, Number(value.max) || 1);
+        return {
+          index,
+          name: String(value.nome || 'Risorsa'),
+          die: value.tipo === 'dadi' ? String(value.dado || '') : '',
+          max,
+          current: Math.max(0, Math.min(max, Number(value.current ?? max) || 0)),
+        };
+      }),
+  }));
+}
+
 export function modifier(score: number) { return Math.floor((score - 10) / 2); }
 export function signed(value: number) { return value >= 0 ? `+${value}` : String(value); }
 export function proficiency(level: number) { return Math.floor((Math.max(1, level) - 1) / 4) + 2; }
