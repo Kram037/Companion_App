@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 
 import { deleteHomebrewItem, updateUserHomebrewSettings, type HomebrewTable } from '../../api';
 import { ReactPage } from '../../app/ReactPage';
+import { SearchToolbar } from '../../components/SearchToolbar';
 import { queryKeys } from '../../query';
 import type { HomebrewItem, HomebrewSettings, UserProfile } from '../../types/domain';
 import { currentUserQuery } from '../auth/currentUserQuery';
@@ -177,8 +178,8 @@ function LaboratoryCard({ item, category, onOpen, onDelete }: { item: HomebrewIt
 }
 
 function SearchTools({ value, onChange, list, onFilters }: { value: string; onChange: (value: string) => void; list: LabList; onFilters: () => void }) {
-  return <div className="comp-toolbar page-tools-row react-laboratory-tools"><label className="comp-search-wrap"><Search /><input className="comp-search" type="search" value={value} onChange={event => onChange(event.target.value)} placeholder="Cerca..." /></label>
-    {list.hasFilters && <button className="comp-filter-btn" type="button" onClick={onFilters}><Sliders /><span>Filtri</span>{list.activeFilters > 0 && <strong>{list.activeFilters}</strong>}</button>}</div>;
+  return <SearchToolbar value={value} onChange={onChange} className="react-laboratory-tools"
+    onFilters={list.hasFilters ? onFilters : undefined} activeFilters={list.activeFilters} />;
 }
 
 function SubTabs({ options, value, onChange }: { options: string[][]; value: string; onChange: (value: string) => void }) {
@@ -207,7 +208,5 @@ function LaboratorySettings({ user }: { user?: UserProfile | null }) {
 function pairRows<T>(items: T[]) { return Array.from({ length: Math.ceil(items.length / 2) }, (_, index) => items.slice(index * 2, index * 2 + 2)); }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>; }
-function Search() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>; }
-function Sliders() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6" /></svg>; }
 function Cog() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.63 15 1.7 1.7 0 0 0 3.07 14H3v-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.63 1.7 1.7 0 0 0 10 3.07V3h4v.09A1.7 1.7 0 0 0 15 4.64a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.37 9 1.7 1.7 0 0 0 20.93 10H21v4h-.09A1.7 1.7 0 0 0 19.4 15Z" /></svg>; }
 function Trash() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M3 6h18M8 6V4h8v2m3 0-1 16H6L5 6" /></svg>; }

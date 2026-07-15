@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toggleCampaignFavorite, updateCampaignInviteStatus } from '../../api';
+import { SearchToolbar } from '../../components/SearchToolbar';
 import { queryKeys } from '../../query';
 import type { Campagna, Id } from '../../types/domain';
 import { filterCampaigns } from './campaignFilters';
@@ -56,13 +57,9 @@ export function CampaignsListPage({ currentUserId, onCreate, onDelete, onEdit, o
   return <div className="page-content">
     <div className="page-top-stack">
       <div className="page-header"><h1>Campagne</h1></div>
-      <div className="filters-bar page-tools-row">
-        <div className="filter-search-wrap">
-          <svg className="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
-          <input className="filter-search" type="search" value={searchText} onChange={event => setSearchText(event.target.value)} placeholder="Cerca campagna..." aria-label="Cerca campagna" />
-        </div>
+      <SearchToolbar value={searchText} onChange={setSearchText} placeholder="Cerca campagna..." ariaLabel="Cerca campagna" className="react-campaign-tools">
         <button className="comp-filter-btn" type="button" aria-pressed={onlyFavorites} onClick={() => setOnlyFavorites(value => !value)}><Star filled={onlyFavorites} /><span>Preferite</span></button>
-      </div>
+      </SearchToolbar>
     </div>
 
     {loading && <Placeholder text="Caricamento campagne..." />}

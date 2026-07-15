@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
 import { LegacyFragment } from '../../components/LegacyFragment';
+import { SearchToolbar } from '../../components/SearchToolbar';
 import { compendiumDataQuery, type CompendiumData } from './compendiumQueries';
 import { filterCompendiumItems, groupCompendiumItems, sortCompendiumItems, type CompendiumItem } from './compendiumModel';
 
@@ -174,10 +175,8 @@ function HubCard({ entry, onClick, equipment = false }: { entry: HubEntry; onCli
 }
 
 function SearchTools({ value, setValue, data, onFilters }: { value: string; setValue: (value: string) => void; data?: CompendiumData; onFilters: () => void }) {
-  return <div className="comp-toolbar page-tools-row react-compendium-tools">
-    <label className="comp-search-wrap"><Search /><input className="comp-search" type="search" value={value} onChange={event => setValue(event.target.value)} placeholder="Cerca..." /></label>
-    {data?.hasFilters && <button className="comp-filter-btn" type="button" onClick={onFilters}><Sliders /><span>Filtri</span>{data.activeFilters > 0 && <strong>{data.activeFilters}</strong>}</button>}
-  </div>;
+  return <SearchToolbar value={value} onChange={setValue} className="react-compendium-tools"
+    onFilters={data?.hasFilters ? onFilters : undefined} activeFilters={data?.activeFilters ?? 0} />;
 }
 
 function ListContent({ tab, section, data, loading, kind, setKind, search, openGroups, setOpenGroups, onOpen, refresh }: {
@@ -248,6 +247,4 @@ function useDeferredValue(value: string, delay: number) {
 function pairRows<T>(items: T[]) { return Array.from({ length: Math.ceil(items.length / 2) }, (_, index) => items.slice(index * 2, index * 2 + 2)); }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>; }
-function Search() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>; }
-function Sliders() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6" /></svg>; }
 function Chevron() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>; }

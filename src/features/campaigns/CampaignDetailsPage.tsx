@@ -1,7 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
+import { startCampaignSession } from '../../api';
 import { ReactPage } from '../../app/ReactPage';
+import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import {
@@ -28,6 +30,7 @@ declare global {
 export function CampaignDetailsPage() {
   const { campagnaId = '' } = useParams();
   const navigate = useNavigate();
+  const client = useQueryClient();
   const campaign = useQuery(campaignByIdQuery(campagnaId));
   const session = useQuery(activeSessionByCampaignQuery(campagnaId));
   const players = useQuery(campaignPlayersQuery(campagnaId));
@@ -40,9 +43,25 @@ export function CampaignDetailsPage() {
 
   const isDm = data.id_dm === user.data?.id;
   const currentCharacter = characters.data?.find(character => character.player_user_id === user.data?.id);
+  const startSession = useMutation({
+    mutationFn: () => startCampaignSession(campagnaId),
+    onSuccess: async started => {
+      client.setQueryData(queryKeys.session(campagnaId), started);
+      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
+      window.AppState.currentCampagnaId = campagnaId;
+      window.AppState.currentSessioneId = started.id;
+      window.AppState.activeSessionCampagnaId = campagnaId;
+      sessionStorage.setItem('currentCampagnaId', campagnaId);
+      sessionStorage.setItem('currentSessioneId', started.id);
+      sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
+      window.sendAppEventBroadcast?.({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: started.id });
+      navigate(buildAppPath('sessione', { campagnaId }));
+    },
+  });
+
   const openSession = () => session.data
     ? navigate(buildAppPath('sessione', { campagnaId }))
-    : isDm ? window.iniziaSessione?.(campagnaId) : window.playerJoinSession?.(campagnaId);
+    : isDm ? startSession.mutate() : window.playerJoinSession?.(campagnaId);
 
   return <ReactPage name="dettagli"><div className="page-content dettagli-content">
     <div className="page-top-stack"><div className="page-header page-header-with-back">
@@ -58,7 +77,7 @@ export function CampaignDetailsPage() {
             ? <><button className="btn-secondary btn-small" type="button" onClick={() => window.openCampagnaModal?.(campagnaId)}>Modifica</button><button className="btn-secondary btn-small danger-text" type="button" onClick={() => window.deleteCampagna?.(campagnaId)}>Elimina</button></>
             : <button className="btn-secondary btn-small" type="button" onClick={() => window.openScegliPersonaggioModal?.(campagnaId)}>{currentCharacter?.nome ?? 'Scegli personaggio'}</button>}
         </div>
-        {(isDm || session.data) && <div className="dettagli-actions-start"><button className="btn-primary btn-small" type="button" onClick={openSession}>{session.data ? 'Sessione Attiva' : 'Inizia Sessione'}</button></div>}
+        {(isDm || session.data) && <div className="dettagli-actions-start"><button className="btn-primary btn-small" type="button" disabled={startSession.isPending} onClick={openSession}>{session.data ? 'Sessione Attiva' : 'Inizia Sessione'}</button></div>}
       </div>
     </div>
 

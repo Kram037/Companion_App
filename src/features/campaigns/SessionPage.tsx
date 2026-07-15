@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
+import { startCampaignSession } from '../../api';
+import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import {
@@ -23,12 +25,27 @@ declare global {
 export function SessionPage() {
   const { campagnaId = '' } = useParams();
   const navigate = useNavigate();
+  const client = useQueryClient();
   const campaign = useQuery(campaignByIdQuery(campagnaId));
   const session = useQuery(activeSessionByCampaignQuery(campagnaId));
   const characters = useQuery(campaignCharactersQuery(campagnaId));
   const user = useQuery(currentUserQuery());
   const initiative = useQuery(initiativeRequestsQuery(session.data?.id ?? ''));
   const now = useSessionClock(Boolean(session.data));
+  const startSession = useMutation({
+    mutationFn: () => startCampaignSession(campagnaId),
+    onSuccess: async started => {
+      client.setQueryData(queryKeys.session(campagnaId), started);
+      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
+      window.AppState.currentCampagnaId = campagnaId;
+      window.AppState.currentSessioneId = started.id;
+      window.AppState.activeSessionCampagnaId = campagnaId;
+      sessionStorage.setItem('currentCampagnaId', campagnaId);
+      sessionStorage.setItem('currentSessioneId', started.id);
+      sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
+      window.sendAppEventBroadcast?.({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: started.id });
+    },
+  });
 
   useEffect(() => {
     if (window.AppState) {
@@ -62,7 +79,7 @@ export function SessionPage() {
 
     {!activeSession ? <div className="content-placeholder">
       <p>Nessuna sessione attiva</p>
-      {isDm && <button className="btn-primary" type="button" onClick={() => window.iniziaSessione?.(campagnaId)}>Inizia Sessione</button>}
+      {isDm && <button className="btn-primary" type="button" disabled={startSession.isPending} onClick={() => startSession.mutate()}>Inizia Sessione</button>}
     </div> : <>
       <div className="sessione-timer">
         <div className="timer-display"><span className="timer-value">{formatDuration(activeSession.data_inizio, now)}</span><span className="timer-label">Durata</span></div>

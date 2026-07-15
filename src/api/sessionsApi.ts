@@ -1,5 +1,5 @@
 import type { Id, Sessione } from '../types/domain';
-import { parseNullable, sessionSchema } from '../schemas';
+import { parseData, parseNullable, sessionSchema } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null> {
@@ -22,6 +22,19 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
     .maybeSingle();
   throwIfSupabaseError(error);
   return parseNullable(sessionSchema, data);
+}
+
+export async function startCampaignSession(campagnaId: Id): Promise<Sessione> {
+  const active = await fetchActiveSessionByCampaign(campagnaId);
+  if (active) return active;
+
+  const { data, error } = await getSupabaseClient()
+    .from('sessioni')
+    .insert({ campagna_id: campagnaId, data_inizio: new Date().toISOString() })
+    .select('*')
+    .single();
+  throwIfSupabaseError(error);
+  return parseData(sessionSchema, data);
 }
 
 export async function fetchHasInitiativeRequest(sessioneId: Id): Promise<boolean> {

@@ -6,6 +6,7 @@ export interface LegacyAppState {
   isLoggedIn: boolean;
   isRegisterMode: boolean;
   currentCampagnaId: Id | null;
+  activeSessionCampagnaId: Id | null;
   currentSessioneId: Id | null;
   currentPersonaggioId: Id | null;
   cachedUserData: UserProfile | JsonValue | null;

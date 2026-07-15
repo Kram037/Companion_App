@@ -307,9 +307,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .header {
-        margin-left: var(--desktop-sidebar-width);
-        width: calc(100vw - var(--desktop-sidebar-width));
-        transition: width 0.18s ease;
+        width: var(--desktop-sidebar-width);
     }
 
     .page-top-stack {
@@ -328,7 +326,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        padding: 8px 8px;
+        padding: 84px 8px 68px;
         border-right: 1px solid var(--fantasy-chrome-border, var(--border));
         background:
             linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
@@ -657,7 +655,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
 
     .desktop-split-pane {
         position: fixed;
-        top: var(--app-header-height);
+        top: 42px;
         right: 0;
         bottom: 0;
         width: var(--desktop-split-pane-width);

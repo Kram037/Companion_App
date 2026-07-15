@@ -454,6 +454,13 @@ body.global-return-active .back-button-floating { display: none !important; }
     .global-session-return-btn { width: 36px; height: 36px; bottom: 68px; left: 10px; }
 }
 
+@media (max-width: 899px) {
+    body:has(.bookmarks-fab[style*="display: flex"]) .global-session-return-btn,
+    body:has(.bookmarks-tabs-fab[style*="display: flex"]) .global-session-return-btn {
+        bottom: calc(var(--app-bottom-toolbar-height) + env(safe-area-inset-bottom, 0px) + 62px);
+    }
+}
+
 /* ============================================
    FAB (Floating Action Button) - bottom-right
    ============================================ */
