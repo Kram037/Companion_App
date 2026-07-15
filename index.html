@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <base href="%BASE_URL%">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
@@ -70,23 +71,6 @@
     <!-- Main Content Area -->
     <main class="main-content" id="mainContent">
         <div id="react-root"></div>
-        <!-- Creazione Personaggio Page -->
-        <section class="page" id="personaggioCreatePage">
-            <div class="page-content personaggio-create-content">
-                <div class="page-top-stack">
-                    <div class="page-header page-header-with-back">
-                        <button class="page-header-back" id="personaggioCreateBackBtn" aria-label="Torna ai personaggi">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </button>
-                        <h1 id="personaggioCreateTitle">Nuovo Personaggio</h1>
-                    </div>
-                </div>
-                <div id="personaggioCreateMount" class="personaggio-create-mount"></div>
-            </div>
-        </section>
-
     </main>
 
     <!-- Bottone globale "Torna alla sessione/combattimento": fluttuante in
@@ -848,7 +832,7 @@
     <script src="js/Personaggi/personaggi-scheda-levelup-risorse.js?v=20260714A"></script>
     <script src="js/Personaggi/personaggi-scheda-bonus.js?v=20260517A"></script>
     <script src="js/Personaggi/personaggi-scheda-equipaggiamento.js?v=20260714A"></script>
-    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260624A"></script>
+    <script src="js/Personaggi/personaggi-scheda-linguaggi.js?v=20260715A"></script>
     <script src="js/Personaggi/personaggi-form.js?v=20260714B"></script>
     <script src="js/Personaggi/personaggi-campagna-picker.js?v=20260714A"></script>
     <script src="js/Personaggi/personaggi-micro.js?v=20260714C"></script>
@@ -856,7 +840,7 @@
     <script src="js/Sessioni/sessions.js?v=20260714C"></script>
     <script src="js/Core/realtime.js?v=20260714A"></script>
     <script src="js/Sessioni/initiative.js?v=20260714A"></script>
-    <script src="js/Core/init.js?v=20260715A"></script>
+    <script src="js/Core/init.js?v=20260715B"></script>
     <script type="module" src="/src/main.ts"></script>
     
     <!-- Cache busting script for development -->

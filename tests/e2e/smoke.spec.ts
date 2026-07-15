@@ -39,6 +39,19 @@ test('renders the friends route through React', async ({ page }) => {
   await expect(page.locator('#react-root .content-placeholder')).toContainText('Accedi');
 });
 
+test('mounts the character wizard inside its React route', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  await page.goto('/personaggi/nuovo');
+
+  await expect.poll(() => pageErrors).toEqual([]);
+  await expect(page).toHaveURL(/\/personaggi\/nuovo$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'personaggioCreate');
+  await expect.poll(() => page.evaluate(() => window.AppState?.currentPage)).toBe('personaggioCreate');
+  await expect(page.locator('#personaggioCreateMount #personaggioWizardPanel')).toBeVisible();
+  await expect(page.locator('#personaggioCreatePage .page-header h1')).toHaveText('Nuovo Personaggio');
+});
+
 test('uses desktop chrome on tablet landscape', async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 600 });
   await page.goto('/');

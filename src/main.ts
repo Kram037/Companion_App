@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-window.CompanionReactPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento', 'personaggi', 'scheda', 'compendio', 'laboratorio', 'amici']);
+window.CompanionReactPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento', 'personaggi', 'personaggioCreate', 'scheda', 'compendio', 'laboratorio', 'amici']);
 window.CompanionRouterBridge = { legacyNavigationFromLocation };
 initializeSupabaseClient();
 

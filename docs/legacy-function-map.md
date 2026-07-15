@@ -11,5 +11,6 @@ Questa mappa registra i renderer principali sostituiti durante la migrazione.
 | `loadCompendio` e renderer di liste/card | `src/features/compendium/CompendiumPage.tsx` + adapter `getCompendioReact*` |
 | renderer hub/lista/impostazioni Laboratorio | `src/features/laboratory/LaboratoryPage.tsx` + adapter `getLaboratorioReact*` |
 | `loadAmici` e `renderAmici` | `src/features/friends/FriendsPage.tsx` + `src/api/friendsApi.ts` |
+| pagina statica `personaggioCreatePage` | `src/features/characters/CharacterCreationPage.tsx` |
 
 Il combattimento e' gestito da `CombatPage`; il runtime legacy conserva solo dialog e mutazioni ancora richiamate dalla pagina React.

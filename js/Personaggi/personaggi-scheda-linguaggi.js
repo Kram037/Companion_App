@@ -202,7 +202,8 @@ window.pgEnsureWizardPageMount = function() {
 
 function _pgSetWizardTitle(title) {
     if (elements.personaggioModalTitle) elements.personaggioModalTitle.textContent = title;
-    if (elements.personaggioCreateTitle) elements.personaggioCreateTitle.textContent = title;
+    window._pgWizardPageTitle = title;
+    window.dispatchEvent(new CustomEvent('companion:character-wizard-title', { detail: { title } }));
 }
 
 function _pgHasWizardDraftChanges() {

@@ -7,6 +7,7 @@
 - Vite usa `index.html` root-based: un `index.vite.html` separato aggiungerebbe drift senza beneficio.
 - Runtime locale: `npm run serve`, servito da Vite sulla porta `8000`.
 - Build e deploy usano lo stesso output: `dist/apps/companion-app`.
+- Vite usa base `/` in locale e il prefisso del repository durante il deploy GitHub Pages, cosi' anche le route profonde caricano gli asset corretti.
 - Il markup e gli asset legacy restano inclusi da Vite finche' la relativa pagina non viene migrata.
 
 ## Confini
@@ -21,7 +22,7 @@
 
 ## Regola legacy
 
-Le pagine principali sono renderizzate da React. `LegacyPageAdapter` resta solo per il wizard di creazione personaggio; `navigateToPage` mantiene sincronizzati i dialog e gli editor non ancora migrati.
+Tutte le route sono renderizzate da React. `navigateToPage` mantiene sincronizzati i dialog e gli editor non ancora migrati; il form del wizard personaggio viene montato nel contenitore React senza duplicarne lo stato.
 
 ## Guardie
 

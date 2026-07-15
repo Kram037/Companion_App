@@ -4,6 +4,8 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, cpSync, existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 
 const viteOutDir = 'dist/apps/companion-app';
+const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1];
+const viteBase = process.env.GITHUB_ACTIONS === 'true' && repositoryName ? `/${repositoryName}/` : '/';
 
 function copyLegacyAssets() {
   const include = ['css', 'images', 'js', 'risorse', 'manifest.json', 'sw.js'];
@@ -38,7 +40,9 @@ function injectServiceWorkerManifest(outDir: string) {
   for (const match of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
     const ref = match[1];
     if (/^(?:https?:|data:|#)/.test(ref)) continue;
-    urls.add(`./${decodeURIComponent(ref.replace(/^\.?\//, '').split('?')[0])}`);
+    const decoded = decodeURIComponent(ref.split('?')[0]);
+    const relative = decoded.startsWith(viteBase) ? decoded.slice(viteBase.length) : decoded.replace(/^\.?\//, '');
+    urls.add(`./${relative}`);
   }
   const assetsDir = join(outDir, 'assets');
   if (existsSync(assetsDir)) {
@@ -61,7 +65,7 @@ function injectServiceWorkerManifest(outDir: string) {
 
 export default defineConfig({
   plugins: [copyLegacyAssets()],
-  base: './',
+  base: viteBase,
   server: {
     host: '127.0.0.1',
     port: 5173,

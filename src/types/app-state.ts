@@ -14,3 +14,10 @@ export interface LegacyAppState {
   cachedHomebrewSottoclassi: JsonValue | null;
   cachedHomebrewOggetti: JsonValue | null;
 }
+
+declare global {
+  interface Window {
+    AppState?: Partial<LegacyAppState>;
+    navigateToPage?: (page: string, options?: { pushHistory?: boolean; skipPageLoad?: boolean }) => unknown;
+  }
+}
