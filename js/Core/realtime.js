@@ -672,13 +672,13 @@ function sendBrowserNotification(title, body) {
                 type: 'SHOW_NOTIFICATION',
                 title,
                 body,
-                icon: 'images/icon d20.png'
+                icon: 'images/app-icon-192.png'
             });
         } else {
             new Notification(title, {
                 body,
-                icon: 'images/icon d20.png',
-                badge: 'images/icon d20.png',
+                icon: 'images/app-icon-192.png',
+                badge: 'images/app-icon-192.png',
                 tag: 'companion-app-' + Date.now(),
                 requireInteraction: true
             });

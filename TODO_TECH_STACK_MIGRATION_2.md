@@ -1,0 +1,84 @@
+# TODO - Tech migration 2 remediation
+
+Obiettivo: correggere le falle emerse dopo la prima migrazione React/TypeScript, senza aprire un secondo rewrite. Ogni step deve chiudere un rischio reale e lasciare `npm.cmd run check` e `npm.cmd run test` verdi.
+
+Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
+
+## Priorita 0 - Sicurezza Supabase/RLS
+
+- [ ] Verificare tutte le funzioni `SECURITY DEFINER` in `backend/supabase/sql`.
+- [ ] Bloccare `update_dm_campagna` al solo DM corrente o a una policy amministrativa esplicita.
+- [ ] Vincolare `invia_invito_campagna` a `auth.uid() = p_inviante_id`.
+- [ ] Vincolare le RPC dei personaggi a proprietario, DM o membro autorizzato della campagna.
+- [ ] Sostituire policy `USING (true) WITH CHECK (true)` su `combat_timers` con scope per campagna/sessione.
+- [ ] Rivedere le policy homebrew pubbliche: distinguere privato, amici, campagna e pubblico.
+- [ ] Aggiungere una checklist SQL manuale per ogni migrazione RLS prima del deploy.
+
+## Priorita 1 - Guardie nel check standard
+
+- [ ] Inserire `tools/check-index-bootstrap.mjs` nel target `check`.
+- [ ] Inserire `tools/check-react-boundaries.mjs` nel target `check`.
+- [ ] Decidere se `tools/check-legacy-symbols.mjs` deve essere bloccante o solo report.
+- [ ] Far fallire la build se Supabase torna caricato da CDN.
+- [ ] Far fallire la build se realtime legacy chiama render/load diretti.
+- [ ] Far fallire la build se nuove pagine React aggiungono dipendenze da `window.*` non autorizzate.
+
+## Priorita 2 - Supabase client unico
+
+- [ ] Rimuovere il bootstrap Supabase da CDN in `index.html`.
+- [ ] Usare solo `src/api/supabaseClient.ts` come entry client.
+- [ ] Mantenere `window.supabaseClient` solo come compat layer temporaneo.
+- [ ] Documentare quando il compat layer potra essere cancellato.
+
+## Priorita 3 - Navigazione e stato
+
+- [ ] Scegliere React Router come fonte primaria di URL e pagina corrente.
+- [ ] Ridurre `js/Core/navigation.js` a bridge legacy senza `history.pushState(..., null)`.
+- [ ] Eliminare `sessionStorage currentPage/currentCampagnaId/currentSessioneId` dai flussi React.
+- [ ] Spostare `AppState.current*` dietro helper compatibili e tracciabili.
+- [ ] Aggiungere test smoke per deep link, refresh e back/forward browser.
+
+## Priorita 4 - Realtime disciplinato
+
+- [ ] Sostituire in `js/Core/realtime.js` i render/load diretti con invalidazioni React Query.
+- [ ] Centralizzare deduplica eventi in `src/realtime/realtimeClient.ts`.
+- [ ] Verificare che realtime non chiuda modal, tendine o input attivi.
+- [ ] Coprire DM/player in due browser con Playwright quando la fixture Supabase e' pronta.
+
+## Priorita 5 - Pagine React ancora dipendenti dal legacy
+
+- [ ] Ridurre `CombatPage` a componenti React che chiamano API typed, non funzioni globali.
+- [ ] Ridurre `CharacterSheetPage` a modello React/Zustand, lasciando legacy solo come fallback.
+- [ ] Spostare modali e action handler piu usati fuori da `window.*`.
+- [ ] Tenere una allowlist corta dei globali legacy ancora necessari.
+
+## Priorita 6 - PWA, service worker e icone
+
+- [x] Creare icone home screen quadrate con sfondo trasparente.
+- [x] Rimuovere `maskable` dal manifest per evitare sfondo launcher imposto.
+- [ ] Correggere `sw.js` aggiungendo il placeholder `BUILD_ASSET_URLS` o cambiando l'iniezione Vite.
+- [ ] Verificare che gli asset hashati Vite vengano precacheati.
+- [ ] Testare install/update PWA dopo build.
+
+## Priorita 7 - TypeScript, Zod e API
+
+- [ ] Portare `strict` a `true` per i nuovi moduli `src/`.
+- [ ] Ridurre `.passthrough()` negli schema Zod dove il dominio e' stabile.
+- [ ] Sostituire `select('*')` con colonne esplicite nelle API typed.
+- [ ] Aggiungere fallback solo dove esiste una migrazione DB non ancora garantita.
+- [ ] Estendere `checkJs` a piccoli gruppi legacy solo quando il rumore e' gestibile.
+
+## Priorita 8 - Pulizia legacy
+
+- [ ] Risolvere o cancellare i simboli segnalati da `check-legacy-symbols`.
+- [ ] Rimuovere script legacy non piu caricati da `index.html`.
+- [ ] Tenere `LegacyFragment` solo per contenuti che non meritano ancora una conversione React.
+- [ ] Bloccare nuovi `innerHTML` fuori dai file legacy esplicitamente permessi.
+
+## Criterio di uscita
+
+- [ ] `npm.cmd run check` include tutte le guardie architetturali.
+- [ ] `npm.cmd run test` verde.
+- [ ] Build Vite verde.
+- [ ] Nessuna policy/RPC Supabase critica senza controllo `auth.uid()`.
+- [ ] PWA installabile con icona trasparente e service worker coerente con gli asset buildati.

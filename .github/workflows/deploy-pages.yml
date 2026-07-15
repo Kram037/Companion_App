@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main, tech_migration]
+    branches: [main, tech_migration, tech_migration_2]
   workflow_dispatch:
 
 permissions:

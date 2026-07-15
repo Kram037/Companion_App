@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v191';
+const CACHE_NAME = 'companion-app-v192';
 
 const APP_SHELL_URLS = [
     './',
@@ -68,6 +68,9 @@ const APP_SHELL_URLS = [
     './css/Combattimento/combat.css',
     './css/Laboratorio/laboratorio.css',
     './css/Compendio/compendio.css',
+    './images/app-icon-180.png',
+    './images/app-icon-192.png',
+    './images/app-icon-512.png',
     './images/icon d20.png',
     './images/Scheda%20personaggio/Icona_scheda_combattimento.png',
     './images/Toolbar/Compendio-toolbar-20260521.svg',
@@ -202,8 +205,8 @@ self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
         self.registration.showNotification(event.data.title, {
             body: event.data.body,
-            icon: event.data.icon || 'images/icon d20.png',
-            badge: 'images/icon d20.png',
+            icon: event.data.icon || 'images/app-icon-192.png',
+            badge: 'images/app-icon-192.png',
             tag: 'companion-app-' + Date.now(),
             requireInteraction: true,
             vibrate: [200, 100, 200]
@@ -225,8 +228,8 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
         self.registration.showNotification(data.title, {
             body: data.body,
-            icon: data.icon || 'images/icon d20.png',
-            badge: 'images/icon d20.png',
+            icon: data.icon || 'images/app-icon-192.png',
+            badge: 'images/app-icon-192.png',
             tag: data.tag || 'companion-app-push',
             requireInteraction: true,
             vibrate: [200, 100, 200],
