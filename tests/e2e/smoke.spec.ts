@@ -9,6 +9,24 @@ test('loads the app shell', async ({ page }) => {
   await expect(page.locator('#react-root .react-page-shell')).toBeVisible();
 });
 
+test('processes toolbar navigation once', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.evaluate(() => {
+    const app = window as typeof window & { __navigationCalls: number };
+    const navigate = window.navigateToPage!;
+    app.__navigationCalls = 0;
+    window.navigateToPage = (...args) => {
+      app.__navigationCalls += 1;
+      return navigate(...args);
+    };
+  });
+
+  await page.locator('.toolbar-btn[data-page="personaggi"]').click();
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'personaggi');
+  await expect.poll(() => page.evaluate(() => (window as typeof window & { __navigationCalls: number }).__navigationCalls)).toBe(1);
+});
+
 test('uses the URL as navigation source after refresh', async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('currentPage', 'scheda');

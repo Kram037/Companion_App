@@ -126,11 +126,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    if (shouldNetworkFirst(url)) {
-        event.respondWith(networkFirst(request));
-        return;
-    }
-
     if (shouldCacheFirst(url)) {
         event.respondWith(cacheFirst(request));
     }
@@ -139,12 +134,6 @@ self.addEventListener('fetch', (event) => {
 function managedPath(url) {
     const path = url.pathname.replace(self.location.pathname.replace(/sw\.js$/, ''), './');
     return path;
-}
-
-function shouldNetworkFirst(url) {
-    const path = managedPath(url);
-    if (!APP_SHELL_URLS.includes(path)) return false;
-    return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
 }
 
 function shouldCacheFirst(url) {
