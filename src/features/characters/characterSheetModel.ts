@@ -47,6 +47,20 @@ export const SPELL_ABILITIES: Record<string, string> = {
   Mago: 'intelligenza', Paladino: 'carisma', Ranger: 'saggezza', Stregone: 'carisma', Warlock: 'carisma',
 };
 
+const SUBCLASS_AUTO_RESISTANCES: Record<string, { level: number; values: string[] }> = {
+  'aberrant-mind': { level: 6, values: ['psichico'] },
+  'storm-sorcery': { level: 6, values: ['fulmine', 'tuono'] },
+};
+
+export function subclassAutoResistances(character: CharacterData): string[] {
+  const values = new Set<string>();
+  (character.classi ?? []).forEach(item => {
+    const effect = item.sottoclasseSlug ? SUBCLASS_AUTO_RESISTANCES[item.sottoclasseSlug] : undefined;
+    if (effect && item.livello >= effect.level) effect.values.forEach(value => values.add(value));
+  });
+  return [...values];
+}
+
 export function numberField(character: CharacterData, key: string, fallback = 0) {
   const value = Number(character[key]);
   return Number.isFinite(value) ? value : fallback;

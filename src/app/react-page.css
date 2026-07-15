@@ -92,3 +92,43 @@ body[data-react-page="combattimento"] .react-page-shell {
   overflow: hidden;
   position: relative;
 }
+
+.react-filter-groups {
+  display: grid;
+  gap: 16px;
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+
+.react-filter-group {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.react-filter-group legend {
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.react-filter-options {
+  display: grid;
+  gap: 4px;
+}
+
+.react-filter-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  min-height: 34px;
+}
+
+.react-filter-option input {
+  accent-color: var(--accent);
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}

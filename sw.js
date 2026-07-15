@@ -1,4 +1,4 @@
-const CACHE_NAME = 'companion-app-v228';
+const CACHE_NAME = 'companion-app-v229';
 const BUILD_ASSET_URLS = [];
 
 const LEGACY_APP_SHELL_URLS = [

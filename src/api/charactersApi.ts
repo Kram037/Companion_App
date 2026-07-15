@@ -42,3 +42,14 @@ export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> 
   return characters.map(character => ({ ...character, campagne: namesByCharacter.get(character.id) ?? [] }));
 }
 
+export async function updateCharacterResistances(personaggioId: Id, resistenze: string[]): Promise<string[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('personaggi')
+    .update({ resistenze, updated_at: new Date().toISOString() })
+    .eq('id', personaggioId)
+    .select('resistenze')
+    .single();
+  throwIfSupabaseError(error);
+  return Array.isArray(data?.resistenze) ? data.resistenze.map(String) : resistenze;
+}
+

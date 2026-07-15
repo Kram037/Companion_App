@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classLine, hpValues, modifier, pageOneResourceTables, raceLine, subclassLine, type CharacterData } from './characterSheetModel';
+import { classLine, hpValues, modifier, pageOneResourceTables, raceLine, subclassAutoResistances, subclassLine, type CharacterData } from './characterSheetModel';
 
 const character = {
   id: 'pg-1', nome: 'Aldren', livello: 5, razza: 'Tiefling', sottorazza: 'Tiefling di Dispater',
@@ -32,5 +32,15 @@ describe('character sheet model', () => {
     expect(pageOneResourceTables(withResources)).toEqual([
       { name: 'Cariche', items: [{ index: 0, name: 'Rune', die: 'd8', max: 3, current: 3 }] },
     ]);
+  });
+
+  it('derives automatic subclass resistances at the required level', () => {
+    const sorcerer = {
+      ...character,
+      classi: [{ nome: 'Stregone', livello: 6, sottoclasseSlug: 'aberrant-mind' }],
+    } as CharacterData;
+
+    expect(subclassAutoResistances(sorcerer)).toEqual(['psichico']);
+    expect(subclassAutoResistances({ ...sorcerer, classi: [{ ...sorcerer.classi![0], livello: 5 }] })).toEqual([]);
   });
 });

@@ -58,6 +58,9 @@ export interface ClassePersonaggio {
   nome: string;
   livello: number;
   sottoclasse?: string | null;
+  sottoclasseSlug?: string | null;
+  sottoclasseNome?: string | null;
+  sottoclasse_homebrew_id?: string | null;
 }
 
 export interface Personaggio {

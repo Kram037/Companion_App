@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
+import { updateCharacterResistances } from '../../api';
 import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { useCharacterSheetUiStore } from '../../store';
@@ -10,13 +11,14 @@ import { characterQuery } from './characterQueries';
 import {
   ABILITIES, CONDITIONS, HIT_DICE, SKILLS, SPELL_ABILITIES, classLine, hpValues, inventoryMeta,
   inventoryName, modifier, numberField, objectList, pageOneResourceTables, proficiency, raceLine, recordField, signed,
-  spellName, stringList, subclassLine, type CharacterData,
+  spellName, stringList, subclassAutoResistances, subclassLine, type CharacterData,
 } from './characterSheetModel';
 
 type LegacyFeature = { name?: string; name_en?: string; description?: string; description_en?: string; level?: number | null; source_label?: string };
-type LegacyResource = { key: string; nome: string; current: number; max: number; die?: string; recharge?: string; classeNome?: string };
+type LegacyResource = { key: string; nome?: string; name?: string; current: number; max: number; die?: string; recharge?: string; classeNome?: string; sottoclasseNome?: string; tipo?: string; defaultMax?: number };
+type ClassResource = { nome: string; fromLevel: number; usaMod?: string; perLivello?: number[]; hpPool?: boolean; dado?: string; recharge?: string };
 type LegacySheetModel = {
-  classResources?: Record<string, { nome: string; fromLevel: number; usaMod?: string; perLivello?: number[]; hpPool?: boolean }[]>;
+  classResources?: Record<string, ClassResource[]>;
   subclassResources?: LegacyResource[];
   raceResources?: LegacyResource[];
   invocationSlots?: (LegacyResource & { is_spell?: boolean; level_label?: string })[];
@@ -57,6 +59,9 @@ declare global {
     schedaInvocationSlotChange?: (id: string, key: string, current: number, delta: number, max: number) => void;
     schedaCustomResChange?: (id: string, index: number, current: number, delta: number, max: number) => void;
     schedaOpenAddCustomRes?: (id: string, index?: number) => void;
+    schedaOpenEditClassRes?: (id: string, key: string, defaultName: string, defaultMax: number) => void;
+    schedaPortentSlotClick?: (id: string, key: string, index: number, max: number) => void;
+    schedaPortentRollAll?: (id: string, key: string, max: number) => void;
     p1AddTab?: () => void;
     p1RemoveTab?: (name: string) => void;
     schedaOpenP1TabRes?: (id: string, name: string, index?: number) => void;
@@ -102,6 +107,10 @@ export function CharacterSheetPage() {
   const query = useQuery(characterQuery(personaggioId));
   const activeTab = useCharacterSheetUiStore(state => state.activeTabByCharacter[personaggioId] || 'scheda');
   const setTab = useCharacterSheetUiStore(state => state.setCharacterTab);
+  const { mutate: persistAutoResistances } = useMutation({
+    mutationFn: (resistenze: string[]) => updateCharacterResistances(personaggioId, resistenze),
+    onSuccess: resistenze => client.setQueryData(queryKeys.character(personaggioId), (current: CharacterData | null | undefined) => current ? { ...current, resistenze } : current),
+  });
 
   useEffect(() => {
     const refresh = (event: Event) => {
@@ -120,6 +129,13 @@ export function CharacterSheetPage() {
   useEffect(() => {
     if (character) window.setSchedaReactCharacter?.(character, character.tipo_scheda === 'micro' ? 'micro' : activeTab);
   }, [activeTab, character]);
+
+  useEffect(() => {
+    if (!character) return;
+    const stored = new Set(stringList(character, 'resistenze'));
+    const missing = subclassAutoResistances(character).filter(value => !stored.has(value));
+    if (missing.length) persistAutoResistances([...stored, ...missing]);
+  }, [character, persistAutoResistances]);
 
   if (query.isLoading) return <ReactPage name="scheda"><Placeholder text="Caricamento scheda..." /></ReactPage>;
   if (!character || query.isError) return <ReactPage name="scheda"><Placeholder text="Personaggio non trovato." /></ReactPage>;
@@ -238,7 +254,8 @@ function Languages({ character }: { character: CharacterData }) {
 function Statistics({ character }: { character: CharacterData }) {
   const hp = hpValues(character);
   const conditions = CONDITIONS.filter(([key]) => Boolean(character[key]));
-  const defenses = [...stringList(character, 'resistenze'), ...stringList(character, 'immunita'), ...stringList(character, 'vulnerabilita')];
+  const resistances = [...new Set([...stringList(character, 'resistenze'), ...subclassAutoResistances(character)])];
+  const defenses = [...resistances, ...stringList(character, 'immunita'), ...stringList(character, 'vulnerabilita')];
   return <Section id={`${character.id}:statistics`} title="Statistiche">
     <div className="scheda-three-boxes">
       <StatBox label="CA" value={numberField(character, 'classe_armatura', 10)} onClick={() => window.schedaOpenCABonus?.(character.id)} />
@@ -281,17 +298,24 @@ function Equipment({ character }: { character: CharacterData }) {
 
 function Resources({ character, model }: { character: CharacterData; model: LegacySheetModel }) {
   const stored = recordField(character, 'risorse_classe');
-  const rows: { key: string; label: string; current: number; max: number; kind: 'class' | 'subclass' | 'race' | 'invocation' | 'custom'; index?: number }[] = [];
+  const overrides = stored._overrides && typeof stored._overrides === 'object' ? stored._overrides as Record<string, { nome?: string; max?: number }> : {};
+  const rows: { key: string; label: string; current: number; max: number; kind: 'class' | 'subclass' | 'race' | 'invocation' | 'custom'; index?: number; defaultName?: string; defaultMax?: number; tipo?: string; portent?: unknown[] }[] = [];
   (character.classi ?? []).forEach(item => (model.classResources?.[item.nome] ?? []).forEach((resource, index) => {
     if (item.livello < resource.fromLevel) return;
-    const max = resource.hpPool ? item.livello * 5 : resource.usaMod ? Math.max(1, modifier(numberField(character, resource.usaMod, 10))) : resource.perLivello?.[Math.min(item.livello, 20)] || 0;
-    if (!max) return;
+    const defaultMax = resource.hpPool ? item.livello * 5 : resource.usaMod ? Math.max(1, modifier(numberField(character, resource.usaMod, 10))) : resource.perLivello?.[Math.min(item.livello, 20)] || 0;
+    if (!defaultMax) return;
     const key = index ? `${item.nome}_res_${index}` : `${item.nome}_res`;
-    rows.push({ key, label: `${resource.nome} (${item.nome})`, current: Math.min(max, Number(stored[key] ?? max)), max, kind: 'class' });
+    const override = overrides[key] || {};
+    const max = Number(override.max) > 0 ? Number(override.max) : defaultMax;
+    rows.push({ key, label: `${override.nome || resource.nome}${resource.dado ? ` (${resource.dado})` : ''} (${item.nome}${resource.recharge ? `, ${resource.recharge}` : ''})`, current: Math.min(max, Number(stored[key] ?? max)), max, kind: 'class', defaultName: resource.nome, defaultMax });
   }));
-  (model.subclassResources ?? []).forEach(item => rows.push({ key: item.key, label: `${item.nome}${item.die ? ` (${item.die})` : ''}`, current: item.current, max: item.max, kind: 'subclass' }));
-  (model.raceResources ?? []).forEach(item => rows.push({ key: item.key, label: `${item.nome} (razza)`, current: item.current, max: item.max, kind: 'race' }));
-  (model.invocationSlots ?? []).filter(item => !item.is_spell).forEach(item => rows.push({ key: item.key, label: `${item.nome} (supplica)`, current: item.current, max: item.max, kind: 'invocation' }));
+  (model.subclassResources ?? []).forEach(item => {
+    const override = overrides[item.key] || {};
+    const max = Number(override.max) > 0 ? Number(override.max) : item.max;
+    rows.push({ key: item.key, label: `${override.nome || item.nome || item.name || 'Risorsa'}${item.die ? ` (${item.die})` : ''}${item.sottoclasseNome ? ` (${item.sottoclasseNome}${item.recharge ? `, ${item.recharge}` : ''})` : ''}`, current: Math.min(max, item.current), max, kind: 'subclass', defaultName: item.nome || item.name || 'Risorsa', defaultMax: item.defaultMax || item.max, tipo: item.tipo, portent: Array.isArray(stored._portent?.[item.key]) ? stored._portent[item.key] : [] });
+  });
+  (model.raceResources ?? []).forEach(item => rows.push({ key: item.key, label: `${item.nome || item.name || 'Risorsa'} (razza${item.recharge ? `, ${item.recharge}` : ''})`, current: item.current, max: item.max, kind: 'race' }));
+  (model.invocationSlots ?? []).filter(item => !item.is_spell).forEach(item => rows.push({ key: item.key, label: `${item.nome || item.name || 'Risorsa'} (supplica${item.recharge ? `, ${item.recharge}` : ''})`, current: item.current, max: item.max, kind: 'invocation' }));
   const custom = Array.isArray(stored._custom) ? stored._custom as Record<string, any>[] : [];
   const pageOneTables = pageOneResourceTables(character);
   custom.forEach((item, index) => rows.push({ key: `custom-${index}`, label: `${item.nome || 'Risorsa'}${item.dado ? ` (${item.dado})` : ''}`, current: Number(item.current ?? item.max ?? 0), max: Number(item.max ?? 0), kind: 'custom', index }));
@@ -302,9 +326,15 @@ function Resources({ character, model }: { character: CharacterData; model: Lega
     else if (row.kind === 'invocation') window.schedaInvocationSlotChange?.(character.id, row.key, row.current, delta, row.max);
     else window.schedaCustomResChange?.(character.id, row.index || 0, row.current, delta, row.max);
   };
+  const edit = (row: typeof rows[number]) => {
+    if (row.kind === 'custom') window.schedaOpenAddCustomRes?.(character.id, row.index);
+    else if ((row.kind === 'class' || row.kind === 'subclass') && row.defaultName && row.defaultMax) window.schedaOpenEditClassRes?.(character.id, row.key, row.defaultName, row.defaultMax);
+  };
   return <>
     <Section id={`${character.id}:resources`} title="Risorse" action={<EditButton label="Aggiungi risorsa" onClick={() => window.schedaOpenAddCustomRes?.(character.id)} />}>
-      {!rows.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{rows.map(row => <CounterRow key={row.key} label={row.label} current={row.current} max={row.max} onChange={delta => change(row, delta)} />)}</div>}
+      {!rows.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{rows.map(row => row.tipo === 'portent'
+        ? <PortentRow key={row.key} label={row.label} values={row.portent || []} max={row.max} onEdit={() => edit(row)} onSlot={index => window.schedaPortentSlotClick?.(character.id, row.key, index, row.max)} onRoll={() => window.schedaPortentRollAll?.(character.id, row.key, row.max)} />
+        : <CounterRow key={row.key} label={row.label} current={row.current} max={row.max} onEdit={row.kind === 'class' || row.kind === 'subclass' || row.kind === 'custom' ? () => edit(row) : undefined} onChange={delta => change(row, delta)} />)}</div>}
     </Section>
     {pageOneTables.map(table => <Section key={table.name} id={`${character.id}:resource-table:${table.name}`} title={table.name} action={<div className="react-section-actions"><EditButton label={`Aggiungi a ${table.name}`} onClick={() => window.schedaOpenP1TabRes?.(character.id, table.name)} /><button type="button" className="scheda-edit-btn" title={`Rimuovi ${table.name}`} aria-label={`Rimuovi ${table.name}`} onClick={event => { event.stopPropagation(); window.p1RemoveTab?.(table.name); }}>×</button></div>}>
       {!table.items.length ? <span className="scheda-empty">Nessuna risorsa</span> : <div className="scheda-hd-table">{table.items.map(item => <CounterRow key={`${table.name}-${item.index}`} label={`${item.name}${item.die ? ` (${item.die})` : ''}`} current={item.current} max={item.max} onEdit={() => window.schedaOpenP1TabRes?.(character.id, table.name, item.index)} onChange={delta => window.schedaP1TabResChange?.(character.id, table.name, item.index, item.current, delta, item.max)} />)}</div>}
@@ -315,9 +345,21 @@ function Resources({ character, model }: { character: CharacterData; model: Lega
 
 function InventoryTab({ character, model }: { character: CharacterData; model: LegacySheetModel }) {
   const [search, setSearch] = useState('');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [rarities, setRarities] = useState<string[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
   const coins = recordField(character, 'monete');
   const items = model.inventory ?? objectList(character, 'inventario');
-  const visible = items.map((item, index) => ({ item, index })).filter(({ item }) => `${inventoryName(item)} ${inventoryMeta(item)}`.toLowerCase().includes(search.toLowerCase()));
+  const rarityOf = (item: Record<string, any>) => String(item.rarita || item.rarity || '').trim();
+  const typeOf = (item: Record<string, any>) => String(item.tipo || item.type || item.sotto_tipo || '').trim();
+  const rarityOptions = [...new Set(items.map(rarityOf).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
+  const typeOptions = [...new Set(items.map(typeOf).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
+  const visible = items.map((item, index) => ({ item, index })).filter(({ item }) => {
+    if (!`${inventoryName(item)} ${inventoryMeta(item)}`.toLowerCase().includes(search.toLowerCase())) return false;
+    if (rarities.length && !rarities.includes(rarityOf(item))) return false;
+    return !types.length || types.includes(typeOf(item));
+  });
+  const toggle = (values: string[], value: string, setter: (next: string[]) => void) => setter(values.includes(value) ? values.filter(item => item !== value) : [...values, value]);
   const attunement = Array.isArray(character.sintonia) ? character.sintonia as any[] : [];
   return <>
     <Section id={`${character.id}:coins`} title="Monete">
@@ -331,13 +373,24 @@ function InventoryTab({ character, model }: { character: CharacterData; model: L
       <div className="inv-attune-grid">{[0, 1, 2].map(index => <button type="button" className={`inv-attune-slot ${attunement[index] ? 'filled' : 'empty'}`} key={index} onClick={() => window.invEditAttune?.(character.id, index)}><span className="inv-attune-icon">◆</span><span className="inv-attune-name">{attunement[index] ? inventoryName(typeof attunement[index] === 'object' ? attunement[index] : { nome: attunement[index] }) : 'Slot vuoto'}</span></button>)}</div>
     </Section>
     <section className="scheda-section inv-section-fixed"><div className="scheda-section-title inv-section-title-fixed"><span>Inventario</span><EditButton label="Aggiungi oggetto" onClick={() => window.invAddItem?.(character.id)} /></div>
-      <div className="scheda-section-body"><div className="filters-bar inv-list-toolbar"><div className="filter-search-wrap"><Search /><input className="filter-search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Cerca per nome o tipo..." /></div></div>
+      <div className="scheda-section-body"><div className="filters-bar inv-list-toolbar"><div className="filter-search-wrap"><Search /><input className="filter-search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Cerca per nome o tipo..." /></div><button className="comp-filter-btn" type="button" onClick={() => setFiltersOpen(true)}><Sliders /><span>Filtri</span>{rarities.length + types.length > 0 && <strong>{rarities.length + types.length}</strong>}</button></div>
         <div className="inv-items-grid inv-items-grid-2col">{visible.length ? visible.map(({ item, index }) => <article className="inv-item-row inv-item-card" key={`${inventoryName(item)}-${index}`}>
           <button type="button" className="inv-item-main react-inventory-main" onClick={() => window.invEditItem?.(character.id, index)}><span className="inv-item-name">{inventoryName(item)}</span>{inventoryMeta(item) && <span className="inv-item-meta">{inventoryMeta(item)}</span>}</button>
           <label className="inv-item-qty-edit"><span className="inv-item-qty-x">×</span><input className="inv-item-qty-input" type="number" min="1" value={Number(item.quantita || 1)} onChange={event => window.invQtyInlineUpdate?.(character.id, index, event.target.value)} /></label>
         </article>) : <span className="scheda-empty">Nessun oggetto</span>}</div>
       </div>
     </section>
+    {filtersOpen && <div className="hp-calc-overlay comp-filter-overlay" onMouseDown={event => { if (event.target === event.currentTarget) setFiltersOpen(false); }}>
+      <div className="hp-calc-modal comp-filter-modal" role="dialog" aria-modal="true" aria-labelledby="inventoryFiltersTitle">
+        <button type="button" className="modal-close" onClick={() => setFiltersOpen(false)} aria-label="Chiudi">×</button>
+        <h2 className="comp-filter-title" id="inventoryFiltersTitle">Filtri</h2>
+        <div className="comp-filter-panel react-filter-groups">
+          <FilterChoices title="Rarita" options={rarityOptions} selected={rarities} onToggle={value => toggle(rarities, value, setRarities)} />
+          <FilterChoices title="Tipologia" options={typeOptions} selected={types} onToggle={value => toggle(types, value, setTypes)} />
+        </div>
+        <div className="comp-filter-actions"><button type="button" className="btn-secondary" onClick={() => { setRarities([]); setTypes([]); }}>Reset</button></div>
+      </div>
+    </div>}
   </>;
 }
 
@@ -444,6 +497,17 @@ function CounterRow({ label, current, max, onChange, onEdit }: { label: string; 
   return <div className="scheda-hd-row">{onEdit ? <button type="button" className="scheda-hd-total scheda-hd-total-clickable" onClick={onEdit}>{label}</button> : <span className="scheda-hd-total">{label}</span>}<div className="scheda-hd-avail"><button className="scheda-hd-btn" type="button" onClick={() => onChange(-1)}>−</button><span className="scheda-hd-val">{current}</span><span className="scheda-hd-max">/ {max}</span><button className="scheda-hd-btn" type="button" onClick={() => onChange(1)}>+</button></div></div>;
 }
 
+function PortentRow({ label, values, max, onEdit, onSlot, onRoll }: { label: string; values: unknown[]; max: number; onEdit: () => void; onSlot: (index: number) => void; onRoll: () => void }) {
+  return <div className="scheda-hd-row scheda-hd-row-portent">
+    <button type="button" className="scheda-hd-total scheda-hd-total-clickable" onClick={onEdit}>{label}</button>
+    <div className="scheda-hd-avail scheda-portent-slots">{Array.from({ length: max }, (_, index) => {
+      const value = Number(values[index]);
+      const filled = value >= 1 && value <= 20;
+      return <button type="button" className={`scheda-portent-slot${filled ? ' filled' : ''}`} key={index} onClick={() => onSlot(index)} title="Imposta o usa Portento">{filled ? value : '—'}</button>;
+    })}<button type="button" className="scheda-portent-roll" onClick={onRoll} title="Tira tutti i Portenti" aria-label="Tira tutti i Portenti">↻</button></div>
+  </div>;
+}
+
 function StatBox({ label, value, onClick }: { label: string; value: ReactNode; onClick?: () => void }) {
   const content = <><div className="scheda-box-val">{value}</div><div className="scheda-box-label">{label}</div></>;
   return onClick ? <button type="button" className="scheda-box clickable" onClick={onClick}>{content}</button> : <div className="scheda-box">{content}</div>;
@@ -454,8 +518,12 @@ function HpBox({ label, value, className = '', onClick }: { label: string; value
 }
 
 function CompactList({ label, values }: { label: string; values: string[] }) { return <div className="react-compact-list"><strong>{label}</strong><span>{values.length ? values.join(', ') : 'Nessuno'}</span></div>; }
+function FilterChoices({ title, options, selected, onToggle }: { title: string; options: string[]; selected: string[]; onToggle: (value: string) => void }) {
+  return <fieldset className="react-filter-group"><legend>{title}</legend><div className="react-filter-options">{options.length ? options.map(option => <label className="react-filter-option" key={option}><input type="checkbox" checked={selected.includes(option)} onChange={() => onToggle(option)} /><span>{option}</span></label>) : <span className="scheda-empty">Nessuna opzione</span>}</div></fieldset>;
+}
 function EditButton({ label, onClick }: { label: string; onClick: () => void }) { return <button type="button" className="scheda-edit-btn" title={label} aria-label={label} onClick={event => { event.stopPropagation(); onClick(); }}><Edit /></button>; }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>; }
 function Edit() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>; }
 function Search() { return <svg className="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>; }
+function Sliders() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6" /></svg>; }
