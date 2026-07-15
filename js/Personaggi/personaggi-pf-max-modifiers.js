@@ -12,7 +12,6 @@
 
     const originalOpenHpCalcLive = window.schedaOpenHpCalcLive;
     const originalOpenHpCalc = window.schedaOpenHpCalc;
-    const originalBuildBonusManualiPayload = window._buildBonusManualiPayload || (typeof _buildBonusManualiPayload === 'function' ? _buildBonusManualiPayload : null);
 
     let _pfMaxEditState = null;
 
@@ -595,9 +594,6 @@
         });
     };
 
-    // Alias lasciato per eventuali handler rimasti in memoria dopo update.
-    window.schedaPfMaxModifierToggleKeypad = window.schedaPfMaxModifierOpenValueKeypad;
-
     window.schedaPfMaxModifierEditorClose = function() {
         document.getElementById('pfMaxModifierEditOverlay')?.remove();
         _pfMaxEditState = null;
@@ -673,10 +669,4 @@
     _assignGlobal('schedaOpenHpCalc', patchedOpenHpCalc);
     _assignGlobal('_buildBonusManualiPayload', patchedBuildBonusManualiPayload);
 
-    // Keep a handle for debugging without changing the public API.
-    window.__pfMaxModifiersFeature = {
-        originalOpenHpCalcLive,
-        originalOpenHpCalc,
-        originalBuildBonusManualiPayload,
-    };
 })();

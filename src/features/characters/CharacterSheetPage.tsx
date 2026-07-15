@@ -86,6 +86,7 @@ declare global {
     schedaOpenFightingStylesEdit?: (id: string) => void;
     schedaOpenInvocationsEdit?: (id: string) => void;
     privAddCustom?: (tab: string) => void;
+    privEditCustom?: (tab: string, index: number) => void;
     privOpenCustomTabEdit?: (tab: string) => void;
     privAddTab?: () => void;
     microOpenSlotConfig?: (id: string) => void;
@@ -449,12 +450,12 @@ function PrivilegesTab({ character, model }: { character: CharacterData; model: 
   return <>
     <Section id={`${character.id}:class-features`} title="Classe" defaultOpen={false}>{(model.classFeatures ?? []).map(group => <FeatureGroup key={group.className} title={group.className} features={group.features} />)}</Section>
     {(model.classFeatures ?? []).some(group => group.subFeatures?.length) && <Section id={`${character.id}:subclass-features`} title="Sottoclasse" defaultOpen={false}>{(model.classFeatures ?? []).filter(group => group.subFeatures?.length).map(group => <FeatureGroup key={`${group.className}-sub`} title={`${group.subclassName} (${group.className})`} features={group.subFeatures} />)}</Section>}
-    <Section id={`${character.id}:race-features`} title="Razza" defaultOpen={false} action={<EditButton label="Aggiungi privilegio" onClick={() => window.privAddCustom?.('Razza')} />}><FeatureGroup title={raceLine(character)} features={[...(model.raceTraits ?? []), ...(custom.Razza ?? [])]} /></Section>
-    <Section id={`${character.id}:background-features`} title="Background" defaultOpen={false} action={<EditButton label="Aggiungi privilegio" onClick={() => window.privAddCustom?.('Background')} />}><FeatureGroup title={String(character.background || '-')} features={[...(backgroundFeatures(model.background)), ...(custom.Background ?? [])]} /></Section>
+    <Section id={`${character.id}:race-features`} title="Razza" defaultOpen={false} action={<EditButton label="Aggiungi privilegio" onClick={() => window.privAddCustom?.('Razza')} />}><FeatureGroup title={raceLine(character)} features={model.raceTraits ?? []} />{!!custom.Razza?.length && <FeatureGroup features={custom.Razza} onEdit={index => window.privEditCustom?.('Razza', index)} />}</Section>
+    <Section id={`${character.id}:background-features`} title="Background" defaultOpen={false} action={<EditButton label="Aggiungi privilegio" onClick={() => window.privAddCustom?.('Background')} />}><FeatureGroup title={String(character.background || '-')} features={backgroundFeatures(model.background)} />{!!custom.Background?.length && <FeatureGroup features={custom.Background} onEdit={index => window.privEditCustom?.('Background', index)} />}</Section>
     <Section id={`${character.id}:fighting-styles`} title={`Stili di Combattimento (${model.fightingStyles?.length || 0})`} defaultOpen={false} action={<EditButton label="Modifica stili" onClick={() => window.schedaOpenFightingStylesEdit?.(character.id)} />}><FeatureGroup features={model.fightingStyles ?? []} /></Section>
     {!!model.invocations?.length && <Section id={`${character.id}:invocations`} title={`Suppliche Occulte (${model.invocations.length})`} defaultOpen={false} action={<EditButton label="Modifica suppliche" onClick={() => window.schedaOpenInvocationsEdit?.(character.id)} />}><FeatureGroup features={model.invocations} /></Section>}
     <Section id={`${character.id}:feats`} title={`Talenti (${model.feats?.length || 0})`} defaultOpen={false} action={<EditButton label="Modifica talenti" onClick={() => window.schedaOpenTalentiEdit?.(character.id)} />}><FeatureGroup features={model.feats ?? []} /></Section>
-    {customOrder.filter(name => name !== 'Razza' && name !== 'Background').map(name => <Section key={name} id={`${character.id}:custom:${name}`} title={name} defaultOpen={false} action={<EditButton label={`Modifica ${name}`} onClick={() => window.privOpenCustomTabEdit?.(name)} />}><FeatureGroup features={custom[name] ?? []} /></Section>)}
+    {customOrder.filter(name => name !== 'Razza' && name !== 'Background').map(name => <Section key={name} id={`${character.id}:custom:${name}`} title={name} defaultOpen={false} action={<EditButton label={`Modifica ${name}`} onClick={() => window.privOpenCustomTabEdit?.(name)} />}><FeatureGroup features={custom[name] ?? []} onEdit={index => window.privEditCustom?.(name, index)} /></Section>)}
     <div className="priv-add-tab-wrap"><button className="btn-secondary priv-add-tab-btn" type="button" onClick={() => window.privAddTab?.()}><span className="priv-add-tab-plus">+</span> Nuova tabella</button></div>
   </>;
 }
@@ -484,8 +485,8 @@ function Section({ id, title, action, defaultOpen = true, children }: { id: stri
   </section>;
 }
 
-function FeatureGroup({ title, features }: { title?: string; features: LegacyFeature[] }) {
-  return <div className="priv-subblock">{title && <div className="priv-subblock-title">{title}</div>}<div className="priv-feat-list-wrap">{features.length ? features.map((feature, index) => <details className="priv-feat-row" key={`${feature.name || feature.name_en}-${index}`}><summary className="priv-feat-header"><span className="priv-feat-level">{feature.level ? `Lv ${feature.level}` : '—'}</span><span className="priv-feat-name">{feature.name || feature.name_en || 'Privilegio'}</span><span className="priv-feat-arrow">⌄</span></summary><div className="priv-feat-body">{feature.description || feature.description_en || 'Nessuna descrizione.'}</div></details>) : <span className="scheda-empty">Nessun privilegio</span>}</div></div>;
+function FeatureGroup({ title, features, onEdit }: { title?: string; features: LegacyFeature[]; onEdit?: (index: number) => void }) {
+  return <div className="priv-subblock">{title && <div className="priv-subblock-title">{title}</div>}<div className="priv-feat-list-wrap">{features.length ? features.map((feature, index) => <details className="priv-feat-row" key={`${feature.name || feature.name_en}-${index}`}><summary className="priv-feat-header"><span className="priv-feat-level">{feature.level ? `Lv ${feature.level}` : '—'}</span><span className="priv-feat-name">{feature.name || feature.name_en || 'Privilegio'}</span><span className="priv-feat-arrow">⌄</span>{onEdit && <button type="button" className="priv-feat-edit-btn" title="Modifica" aria-label="Modifica privilegio" onClick={event => { event.preventDefault(); event.stopPropagation(); onEdit(index); }}>✎</button>}</summary><div className="priv-feat-body">{feature.description || feature.description_en || 'Nessuna descrizione.'}</div></details>) : <span className="scheda-empty">Nessun privilegio</span>}</div></div>;
 }
 
 function backgroundFeatures(background?: Record<string, any> | null): LegacyFeature[] {

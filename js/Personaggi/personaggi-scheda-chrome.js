@@ -8,23 +8,6 @@
 window._schedaOpenSections = window._schedaOpenSections || new Set();
 window._schedaClosedSections = window._schedaClosedSections || new Set();
 
-window.schedaToggleSection = function(titleEl) {
-    const section = titleEl.closest('.scheda-section');
-    if (!section) return;
-    section.classList.toggle('collapsed');
-    const key = section.getAttribute('data-section-key');
-    if (key) {
-        const isCollapsed = section.classList.contains('collapsed');
-        if (isCollapsed) {
-            window._schedaOpenSections.delete(key);
-            window._schedaClosedSections.add(key);
-        } else {
-            window._schedaOpenSections.add(key);
-            window._schedaClosedSections.delete(key);
-        }
-    }
-};
-
 /* ── Bottone "Vai a Statistiche" (icona spada) ─────────────────────────
    - Visibile mentre si e' nella scheda di un PG (gestito in navigation.js).
    - Click: porta alla Pagina 1 e scrolla al divisore appena prima della sezione Statistiche.
@@ -54,65 +37,6 @@ window.schedaScrollToStats = function() {
         setTimeout(tryScroll, 80);
     }
 };
-
-async function _schedaApplyResImmVulChange(pgId, kind, dmgType) {
-    // kind: 'res' | 'imm' | 'vul'  – tre liste mutuamente esclusive sul singolo dmgType.
-    const supabase = getSupabaseClient();
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
-    let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
-    let vul = Array.isArray(pg.vulnerabilita) ? [...pg.vulnerabilita] : [];
-    const isOn = (kind === 'res' && res.includes(dmgType))
-              || (kind === 'imm' && imm.includes(dmgType))
-              || (kind === 'vul' && vul.includes(dmgType));
-    res = res.filter(x => x !== dmgType);
-    imm = imm.filter(x => x !== dmgType);
-    vul = vul.filter(x => x !== dmgType);
-    if (!isOn) {
-        if (kind === 'res') res.push(dmgType);
-        else if (kind === 'imm') imm.push(dmgType);
-        else if (kind === 'vul') vul.push(dmgType);
-    }
-    pg.resistenze = res;
-    pg.immunita = imm;
-    pg.vulnerabilita = vul;
-    _refreshResImmInlineRow(dmgType);
-    if (!supabase) return;
-    // Salva tutto insieme; se la colonna 'vulnerabilita' non esiste ancora a DB, fallback senza di essa.
-    const { error } = await supabase.from('personaggi')
-        .update({ resistenze: res, immunita: imm, vulnerabilita: vul }).eq('id', pgId);
-    if (error && /vulnerabilita/i.test(error.message || '')) {
-        await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
-        console.warn('[scheda] Colonna "vulnerabilita" mancante a DB: esegui backend/supabase/sql/add-vulnerabilita.sql');
-    }
-}
-
-window.schedaToggleResInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'res', dmgType); };
-window.schedaToggleImmInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'imm', dmgType); };
-window.schedaToggleVulInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'vul', dmgType); };
-
-function _refreshResImmInlineRow(dmgType) {
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const isRes = (pg.resistenze || []).includes(dmgType);
-    const isImm = (pg.immunita || []).includes(dmgType);
-    const isVul = (pg.vulnerabilita || []).includes(dmgType);
-    const row = document.getElementById('sResImmRow_' + dmgType);
-    if (row) {
-        const r = row.querySelector('.scheda-resimm-marker.res');
-        const i = row.querySelector('.scheda-resimm-marker.imm');
-        const v = row.querySelector('.scheda-resimm-marker.vul');
-        if (r) r.classList.toggle('active', isRes);
-        if (i) i.classList.toggle('active', isImm);
-        if (v) v.classList.toggle('active', isVul);
-    }
-    const badge = document.getElementById('sResImmCount');
-    if (badge) {
-        const tot = (pg.resistenze || []).length + (pg.immunita || []).length + (pg.vulnerabilita || []).length;
-        badge.textContent = tot > 0 ? tot : '';
-    }
-}
 
 /* ── Header scheda condiviso (foto a sx, identità a sx, level-up + ispirazione a dx) ── */
 function _schedaRefreshCurrentTab(pgId) {

@@ -656,12 +656,6 @@ window.closeMonsterConditionsModal = function() {
     if (typeof cb === 'function') cb();
 };
 
-// Compat: vecchia firma "Salva" del modale condizioni (alcuni vecchi
-// onclick potrebbero ancora chiamarla). Ora salva e chiude.
-window.saveMonsterConditions = function(mId, campagnaId, sessioneId) {
-    closeMonsterConditionsModal();
-}
-
 // Monster creation modal
 window.openMonsterCreationModal = function(campagnaId, sessioneId) {
     _monsterFromHomebrew = null;

@@ -160,142 +160,6 @@ const SPELL_LEVEL_LABELS = {
     9: 'Incantesimi di Livello 9'
 };
 
-function _spellIsConcentration(sp) {
-    if (!sp) return false;
-    const d = String(sp.duration || sp.duration_en || '').toLowerCase();
-    return d.includes('concentr');
-}
-
-function _spellConcMark(sp) {
-    return _spellIsConcentration(sp)
-        ? '<span class="spell-card-conc" title="Richiede concentrazione">C</span>'
-        : '';
-}
-
-// Toggle "preparato" per le spell card. Visibile solo per le classi
-// che usano la preparazione e per gli incantesimi conosciuti di livello >= 1
-// (i trucchetti e gli incantesimi razziali/sottoclasse/invocazione sono
-// sempre attivi).
-function _spellPrepToggle(pg, sp) {
-    if (!sp || sp.level === 0) return '';
-    if (!_pgUsesPreparedSystem(pg)) return '';
-    const prepared = _spellIsPrepared(pg, sp.name, sp.level);
-    const cls = prepared ? 'is-prepared' : '';
-    const tip = prepared ? 'Preparato (clicca per smarcare)' : 'Non preparato (clicca per preparare)';
-    const safeName = escapeAttr(sp.name);
-    return `<button type="button" class="spell-card-prep-btn ${cls}"
-        onclick="event.stopPropagation();schedaTogglePrepared('${pg.id}','${safeName}')"
-        title="${tip}" aria-label="${tip}"></button>`;
-}
-
-function buildSpellLevelSection(pg, level) {
-    const known = (pg.incantesimi_conosciuti || [])
-        .map(n => ({ raw: n, sp: _resolveSpell(n) }))
-        .filter(x => x.sp && x.sp.level === level);
-    const knownNames = new Set(known.map(x => x.sp.name));
-
-    // Incantesimi razziali innati per questo livello, deduplicati e non
-    // sovrapposti agli "incantesimi conosciuti" (in tal caso prevale
-    // l'entry razziale che e' read-only).
-    const innate = _pgRaceInnateSpells(pg)
-        .map(s => ({ src: s, sp: _resolveSpell(s.name) || _resolveSpell(s.name_en) }))
-        .filter(x => x.sp && x.sp.level === level);
-    const seenInnate = new Set();
-    const innateUnique = [];
-    innate.forEach(x => {
-        const key = x.sp.name;
-        if (seenInnate.has(key)) return;
-        seenInnate.add(key);
-        innateUnique.push(x);
-    });
-
-    // Incantesimi auto-garantiti da sottoclasse (Dominio Vita, Giuramento
-    // di Devozione, Patrono Demonio, ecc.). Anche questi sono "locked":
-    // non si possono rimuovere dal picker ma compaiono in lista come carte
-    // con tag della sottoclasse.
-    const subclassGranted = _pgSubclassGrantedSpells(pg)
-        .map(g => ({ src: g, sp: _resolveSpell(g.name) }))
-        .filter(x => x.sp && x.sp.level === level);
-    const seenSubclass = new Set();
-    const subclassUnique = [];
-    subclassGranted.forEach(x => {
-        const key = x.sp.name;
-        if (seenInnate.has(key)) return; // razza ha priorita'
-        if (seenSubclass.has(key)) return;
-        seenSubclass.add(key);
-        subclassUnique.push(x);
-    });
-
-    // Incantesimi conferiti dalle invocazioni del Warlock (a volonta' o
-    // 1/lungo). Anche questi sono "locked" (derivati dalla scelta delle
-    // invocazioni nella pagina dei privilegi).
-    const invocationGranted = _pgInvocationGrantedSpells(pg)
-        .map(g => ({ src: g, sp: _resolveSpell(g.name) || _resolveSpell(g.name_en) }))
-        .filter(x => x.sp && x.sp.level === level);
-    const seenInvocation = new Set();
-    const invocationUnique = [];
-    invocationGranted.forEach(x => {
-        const key = x.sp.name;
-        if (seenInnate.has(key) || seenSubclass.has(key)) return;
-        if (seenInvocation.has(key)) return;
-        seenInvocation.add(key);
-        invocationUnique.push(x);
-    });
-
-    const knownCards = known
-        .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name) && !seenInvocation.has(sp.name))
-        .map(({ sp }) => {
-            const id = sp.name;
-            const prepared = _spellIsPrepared(pg, sp.name, sp.level);
-            const prepCls = (sp.level > 0 && _pgUsesPreparedSystem(pg) && !prepared) ? 'spell-card-unprepared' : '';
-            return `<div class="spell-card ${prepCls}" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-                <div class="spell-card-name">${_spellPrepToggle(pg, sp)}${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)}</div>
-                <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
-            </div>`;
-        }).join('');
-
-    const innateCards = innateUnique.map(({ src, sp }) => {
-        const id = sp.name;
-        const tag = src.recharge === 'at_will' ? 'a volontà' : (sp.level === 0 ? 'razza' : `razza · ${src.ability}`);
-        return `<div class="spell-card spell-card-innate" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag">${escapeHtml(tag)}</span></div>
-            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
-        </div>`;
-    }).join('');
-
-    const subclassCards = subclassUnique.map(({ src, sp }) => {
-        const id = sp.name;
-        const label = src.source_label || 'sottoclasse';
-        return `<div class="spell-card spell-card-subclass" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-subclass" title="Garantito da: ${escapeHtml(label)}">${escapeHtml(label)}</span></div>
-            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
-        </div>`;
-    }).join('');
-
-    const invocationCards = invocationUnique.map(({ src, sp }) => {
-        const id = sp.name;
-        const tag = src.recharge === 'at_will' ? 'supplica · a volontà' : 'supplica · 1/lungo';
-        return `<div class="spell-card spell-card-invocation" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
-            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
-            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
-        </div>`;
-    }).join('');
-
-    const cardsHtml = (knownCards + innateCards + subclassCards + invocationCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
-
-    const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
-    const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
-    return `<div class="scheda-section">
-        <div class="scheda-section-title" onclick="schedaToggleSection(this)">
-            ${escapeHtml(label)}
-            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">&#9998;</button>
-        </div>
-        <div class="scheda-section-body">
-            <div class="spell-cards-grid">${cardsHtml}</div>
-        </div>
-    </div>`;
-}
-
 function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
 window.schedaShowSpellDetail = function(spellName) {
@@ -920,9 +784,6 @@ window.spellFilterReset = function() {
     _spellFilterRerenderDialog();
 };
 
-// Alias storico
-window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };
-
 window.schedaSaveSpellsForLevel = async function(pgId, level) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
@@ -975,6 +836,3 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenSpellPage(pgId);
 };
-
-// Alias storico
-window.schedaSaveCantrips = function(pgId) { return window.schedaSaveSpellsForLevel(pgId, 0); };

@@ -520,8 +520,6 @@ window.schedaOpenFightingStylesEdit = function(pgId) {
     window._fsPickerSlotKeys = slotKeys;
     window._fsPickerAllStyles = allStyles;
     window._fsPickerOverrides = initOverrides;
-    window._fsPickerPgId = pgId;
-
     let modal = document.getElementById('fsPickerModal');
     if (modal) modal.remove();
     modal = document.createElement('div');

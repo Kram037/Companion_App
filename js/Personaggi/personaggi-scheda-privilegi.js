@@ -368,17 +368,6 @@ async function _privSave(pgId, priv) {
     }
 }
 
-window.privToggleAutoFeature = async function(featKey) {
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const priv = _normalizePrivilegi(pg);
-    const i = priv.hidden_auto.indexOf(featKey);
-    if (i >= 0) priv.hidden_auto.splice(i, 1);
-    else priv.hidden_auto.push(featKey);
-    await _privSave(pg.id, priv);
-    schedaOpenPrivilegesPage(pg.id);
-};
-
 window.privAddCustom = function(tabName) {
     const pg = _schedaPgCache;
     if (!pg) return;

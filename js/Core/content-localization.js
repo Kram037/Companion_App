@@ -523,11 +523,6 @@
     window.translateSpellComponents = translateSpellComponents;
     window.translateStatblockText = translateStatblockText;
     window.localizeRuntimeDataBundle = localizeRuntimeDataBundle;
-    window.normalizeAppContent = () => {
-        localizeRuntimeDataBundle('all');
-        normalizeDomTree(document.body);
-    };
-
     function start() {
         localizeRuntimeDataBundle('all');
         normalizeDomTree(document.body);
@@ -536,7 +531,6 @@
             queueDomScan(root instanceof Element ? root : document.body);
         });
         observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-        window.__contentLocalizationObserver = observer;
     }
 
     document.addEventListener('appLangChanged', () => {

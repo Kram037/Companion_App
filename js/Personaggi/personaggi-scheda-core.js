@@ -3,16 +3,10 @@
 // ============================================================================
 
 // --- Scheda Personaggio Page ---
-window.openSchedaPersonaggio = async function(personaggioId, opts) {
+window.openSchedaPersonaggio = async function(personaggioId) {
     const refreshCurrent = AppState.currentPage === 'scheda'
         && String(AppState.currentPersonaggioId || '') === String(personaggioId || '');
     AppState.currentPersonaggioId = personaggioId;
-    if (opts && opts.scrollToStats) {
-        // Flag consumato dopo il render della Pagina 1 per centrare la tabella
-        // delle statistiche (PV, PV temp, CA, ecc.). Usato quando si torna
-        // alla scheda da una sessione/combattimento.
-        window._schedaPendingScrollToStats = true;
-    }
     if (refreshCurrent) {
         _schedaRequestReactRefresh(personaggioId, window._schedaCurrentTab);
         return;

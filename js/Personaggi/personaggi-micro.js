@@ -234,39 +234,6 @@ window.microSlotToggle = async function(pgId, level, index) {
     await schedaInstantSave(pgId, { slot_incantesimo: pg.slot_incantesimo });
 }
 
-window.microHdChange = async function(pgId, key, delta, max) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { data: pg } = await supabase.from('personaggi').select('dadi_vita_disponibili').eq('id', pgId).single();
-    const dadiDisp = pg?.dadi_vita_disponibili || {};
-    const current = dadiDisp[key] != null ? dadiDisp[key] : max;
-    const newVal = Math.max(0, Math.min(max, current + delta));
-    dadiDisp[key] = newVal;
-    await supabase.from('personaggi').update({ dadi_vita_disponibili: dadiDisp, updated_at: new Date().toISOString() }).eq('id', pgId);
-    _schedaRequestReactRefresh(pgId, 'micro');
-};
-
-window.microToggleCondition = async function(pgId, key, el) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const isActive = el.classList.contains('active');
-    await supabase.from('personaggi').update({ [key]: !isActive, updated_at: new Date().toISOString() }).eq('id', pgId);
-    el.classList.toggle('active');
-    _schedaRequestReactRefresh(pgId, 'micro');
-};
-
-window.microSlotChange = async function(pgId, level, delta, max) {
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const slots = pg.slot_incantesimo || {};
-    if (!slots[level]) slots[level] = { max, current: max, used: 0 };
-    const avail = slots[level].current != null ? slots[level].current : (max - (slots[level].used || 0));
-    const newAvail = Math.max(0, Math.min(max, avail - delta));
-    slots[level].current = newAvail;
-    slots[level].used = max - newAvail;
-    await schedaInstantSave(pgId, { slot_incantesimo: slots });
-};
-
 window.microOpenSlotConfig = async function(pgId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;

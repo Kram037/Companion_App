@@ -369,60 +369,6 @@ function hpCalcGetAmount() {
     }
 }
 
-// Imposta il valore digitato come nuovo "Max Reale" del PG.
-// Salva sia bonus_manuali._pv_max_reale sia pg.punti_vita_max,
-// chiedendo prima conferma all'utente.
-window.schedaHpSetMaxReale = async function() {
-    if (!_hpCalcState) return;
-    if (_hpCalcState.field !== 'punti_vita_max') return;
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const buf = parseInt(_hpCalcState.inputBuffer) || 0;
-    if (buf <= 0) {
-        showNotification('Digita un valore valido nel tastierino prima di impostare il Max Reale');
-        return;
-    }
-    const oldReale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pg) : (parseInt(pg.punti_vita_max) || 0);
-    const ok = await _schedaShowConfirmDialog({
-        title: 'Aggiornare il Max Reale?',
-        message: `Il Max Reale passera' da ${oldReale} a ${buf} PF. Anche il valore di PF massimi corrente verra' impostato a ${buf}.`,
-        confirmLabel: 'Conferma',
-    });
-    if (!ok) return;
-
-    const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
-    bm._pv_max_reale = buf;
-    pg.bonus_manuali = bm;
-    pg.punti_vita_max = buf;
-    const effectiveMax = schedaGetPvMaxEffettivo(pg);
-    const clampedPv = Math.min(effectiveMax, Math.max(0, parseInt(pg.pv_attuali) || effectiveMax));
-    pg.pv_attuali = clampedPv;
-
-    _hpCalcState.currentVal = buf;
-    _hpCalcState.inputBuffer = '0';
-    const cur = document.getElementById('hpCalcCurrent');
-    if (cur) cur.textContent = buf;
-    const amt = document.getElementById('hpCalcAmountDisplay');
-    if (amt) amt.textContent = '0';
-    const realeEl = document.querySelector('#hpCalcOverlay .hp-calc-reale');
-    if (realeEl) realeEl.textContent = buf;
-    const pgDisplay = document.getElementById('schedaPvMax');
-    if (pgDisplay) pgDisplay.textContent = buf;
-    const pvAttualiDisplay = document.getElementById('schedaPvAttuali');
-    if (pvAttualiDisplay) pvAttualiDisplay.textContent = clampedPv;
-
-    const supabase = getSupabaseClient();
-    if (supabase) {
-        await supabase.from('personaggi').update({
-            punti_vita_max: buf,
-            pv_attuali: clampedPv,
-            bonus_manuali: pg.bonus_manuali,
-            updated_at: new Date().toISOString(),
-        }).eq('id', _hpCalcState.pgId);
-    }
-    showNotification('Max Reale aggiornato');
-};
-
 window.schedaHpSetDirect = async function() {
     if (!_hpCalcState) return;
     const field = _hpCalcState.field;

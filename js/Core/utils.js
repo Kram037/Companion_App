@@ -324,63 +324,6 @@ function closePromptDialog(result) {
 // CUSTOM DROPDOWN COMPONENT
 // ============================================================================
 
-window.openCustomDropdown = function(options, { selected, multi, title, onConfirm, onSelect }) {
-    const existing = document.getElementById('customDropdownOverlay');
-    if (existing) existing.remove();
-
-    const selectedSet = new Set(Array.isArray(selected) ? selected : (selected ? [selected] : []));
-
-    const overlay = document.createElement('div');
-    overlay.id = 'customDropdownOverlay';
-    overlay.className = 'custom-dd-overlay';
-
-    const optionsHtml = options.map(opt => {
-        const val = typeof opt === 'string' ? opt : opt.value;
-        const label = typeof opt === 'string' ? opt : opt.label;
-        const isSelected = selectedSet.has(val);
-        if (multi) {
-            return `<label class="custom-dd-option" data-value="${escapeHtml(val)}">
-                <input type="checkbox" ${isSelected ? 'checked' : ''} value="${escapeHtml(val)}">
-                <span>${escapeHtml(label)}</span>
-            </label>`;
-        }
-        return `<div class="custom-dd-option ${isSelected ? 'active' : ''}" data-value="${escapeHtml(val)}">${escapeHtml(label)}</div>`;
-    }).join('');
-
-    overlay.innerHTML = `
-        <div class="custom-dd-modal">
-            <div class="custom-dd-header">
-                <span class="custom-dd-title">${escapeHtml(title || 'Seleziona')}</span>
-                <button class="custom-dd-close" onclick="closeCustomDropdown()">&times;</button>
-            </div>
-            <div class="custom-dd-options">${optionsHtml}</div>
-            ${multi ? '<div class="custom-dd-footer"><button class="btn-primary btn-small custom-dd-confirm">Aggiungi</button></div>' : ''}
-        </div>`;
-
-    if (multi) {
-        overlay.querySelector('.custom-dd-confirm').addEventListener('click', () => {
-            const checked = [...overlay.querySelectorAll('.custom-dd-option input:checked')].map(cb => cb.value);
-            closeCustomDropdown();
-            if (onConfirm) onConfirm(checked);
-        });
-    } else {
-        overlay.querySelectorAll('.custom-dd-option').forEach(el => {
-            el.addEventListener('click', () => {
-                closeCustomDropdown();
-                if (onSelect) onSelect(el.dataset.value);
-            });
-        });
-    }
-
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCustomDropdown(); });
-    document.body.appendChild(overlay);
-}
-
-window.closeCustomDropdown = function() {
-    const overlay = document.getElementById('customDropdownOverlay');
-    if (overlay) overlay.remove();
-}
-
 // ============================================================================
 // CUSTOM SELECT COMPONENT
 // ============================================================================
