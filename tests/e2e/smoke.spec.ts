@@ -68,3 +68,15 @@ test('desktop split panes divide the workspace in half', async ({ page }) => {
     return Math.abs(left - right);
   })).toBeLessThan(2);
 });
+
+test('desktop split panes can use two columns on wide screens', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1000 });
+  await page.goto('/');
+
+  await page.locator('.desktop-bookmark-split-tab').click();
+  await expect(page.locator('#desktopSplitPane')).toBeVisible();
+
+  await expect.poll(() => page.locator('#campagnePage.active .campagne-list').evaluate((el) => {
+    return getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
+  })).toBeGreaterThanOrEqual(2);
+});

@@ -719,7 +719,8 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     body.bookmark-split-instance .personaggi-list,
     body.bookmark-split-instance .comp-list,
     body.bookmark-split-instance .lab-list {
-        grid-template-columns: minmax(0, 1fr) !important;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     }
 
     body.desktop-split-active .campagna-card {
@@ -880,7 +881,8 @@ body.bookmark-split-instance .campagne-list,
 body.bookmark-split-instance .personaggi-list,
 body.bookmark-split-instance .comp-list,
 body.bookmark-split-instance .lab-list {
-    grid-template-columns: minmax(0, 1fr) !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
 }
 
 body.bookmark-split-instance .campagna-card {
