@@ -9,5 +9,6 @@ Questa mappa registra i renderer principali sostituiti durante la migrazione.
 | `renderSessioneContent` | `src/api/sessionsApi.ts` + `activeSessionByCampaignQuery` |
 | `renderSchedaPersonaggio` | `src/features/characters/CharacterSheetPage.tsx` + `characterQuery` |
 | `loadCompendio` e renderer di liste/card | `src/features/compendium/CompendiumPage.tsx` + adapter `getCompendioReact*` |
+| renderer hub/lista/impostazioni Laboratorio | `src/features/laboratory/LaboratoryPage.tsx` + adapter `getLaboratorioReact*` |
 
 Il combattimento e' gestito da `CombatPage`; il runtime legacy conserva solo dialog e mutazioni ancora richiamate dalla pagina React.
