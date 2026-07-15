@@ -463,26 +463,6 @@ const COMP_ARTIFICER_SPELLS = window.COMPANION_ARTIFICER_SPELLS = new Set([
 
 
 
-window.compendioBackToHub = function() {
-    const state = _compReactState || {};
-    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: {
-        view: state.tabState?.detail || state.tabState?.equipmentSection ? 'sub' : 'hub',
-        tab: state.tab || '',
-        section: state.tabState?.detail ? (state.tabState?.equipmentSection || '') : '',
-    } }));
-};
-
-window.compendioShowHub = function() {
-    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'hub' } }));
-};
-
-window.compendioOpenTab = function(tab, equipmentSection = '') {
-    if (!COMP_TABS[tab]) return;
-    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab, section: equipmentSection } }));
-};
-
-
-
 function _compHasMonsterData() {
     if (!COMP_MONSTERS_DATA.length && Array.isArray(window.COMP_MONSTERS_DATA)) {
         COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA;
@@ -1432,11 +1412,6 @@ function _compClassSubclassesSection(cls, showTasha = false) {
     </section>`;
 }
 
-window.compendioOpenEquipmentSection = function(section) {
-    if (!COMP_EQUIPMENT_SECTIONS[section]) return;
-    window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: 'oggetti', section } }));
-};
-
 window.compendioSetGemView = function(view) {
     const state = _compStateFor('oggetti');
     state.gemView = view === 'tesori' ? 'tesori' : 'lista';
@@ -2032,10 +2007,6 @@ function _compInventoryCardHtml(item) {
 function _compRenderObjectsSectionContent() {
     _compNotifyReactRefresh();
 }
-
-window.compendioSetObjectKind = function(kind) {
-    compendioOpenEquipmentSection(kind === 'veleni' ? 'veleni' : 'oggetti');
-};
 
 function _compObjectMatchesFilters(item, state) {
     const section = state.equipmentSection || (item.source === 'veleni' ? 'veleni' : 'oggetti');

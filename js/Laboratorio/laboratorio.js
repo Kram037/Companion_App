@@ -140,21 +140,6 @@ function _labActiveCategory() {
 // HUB & SUB-PAGE NAVIGATION
 // ============================================================================
 
-window.labOpenCategory = function(tab) {
-    if (!LAB_CATEGORIES[tab]) return;
-    window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab } }));
-};
-
-window.labBackToHub = function() {
-    window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'hub' } }));
-};
-
-window.laboratorioShowHub = window.labBackToHub;
-
-window.labOpenSettings = function() {
-    labOpenCategory('impostazioni');
-};
-
 window.labGetBookmarkState = function() {
     const current = _labReactState || { view: 'hub', tab: 'razze', subtab: 'razze' };
     const tab = current.tab || 'razze';
@@ -441,10 +426,6 @@ function _labListBuildFiltersPanelHtml(tab, data) {
 function _labListReRenderList(tab) {
     _labNotifyReactRefresh();
 }
-
-window.labListToggleFilters = function(tab) {
-    labListOpenFiltersDialog(tab);
-};
 
 window.labListOpenFiltersDialog = function(tab) {
     const overlay = document.createElement('div');
@@ -2161,24 +2142,6 @@ window.labCombatSave = async function() {
     loadLabContent();
 };
 
-window.labEditCombatHomebrew = async function(id) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { data, error } = await supabase.from('homebrew_combattimenti').select('*').eq('id', id).single();
-    if (error || !data) { showNotification('Errore nel caricamento'); return; }
-    _openLabCombatHomebrewWizard(data);
-};
-
-window.labDeleteCombatHomebrew = async function(id) {
-    const confirmed = await showConfirm('Eliminare questo combattimento homebrew?');
-    if (!confirmed) return;
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { error } = await supabase.from('homebrew_combattimenti').delete().eq('id', id);
-    if (error) { showNotification('Errore nella cancellazione'); return; }
-    loadLabContent();
-};
-
 function _openLabNemiciWizard(data) {
     const modal = document.getElementById('homebrewModal');
     if (!modal) return;
@@ -3116,43 +3079,6 @@ window.closeHomebrewModal = function() {
     }
 };
 
-window.labEditItem = async function(id) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const cat = _labActiveCategory();
-    if (!cat) return;
-    const { data, error } = await supabase.from(cat.table).select('*').eq('id', id).single();
-    if (error || !data) { showNotification('Errore nel caricamento'); return; }
-    openHomebrewModal(data);
-};
-
-window.labDeleteItem = async function(id) {
-    const confirmed = await showConfirm('Eliminare questo contenuto homebrew?');
-    if (!confirmed) return;
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const cat = _labActiveCategory();
-    if (!cat) return;
-    const { error } = await supabase.from(cat.table).delete().eq('id', id);
-    if (error) { showNotification('Errore nella cancellazione'); return; }
-    showNotification('Eliminato');
-    loadLabContent();
-    if (cat.table === 'homebrew_classi' && typeof loadHomebrewSottoclassi === 'function') {
-        loadHomebrewSottoclassi();
-    }
-    if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
-        loadHomebrewOggetti();
-    }
-    if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
-        loadHomebrewIncantesimi();
-    }
-    if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
-        loadHomebrewStili();
-    }
-    if (cat.table === 'homebrew_suppliche' && typeof loadHomebrewSuppliche === 'function') {
-        loadHomebrewSuppliche();
-    }
-};
 
 async function handleSaveHomebrew(e) {
     e.preventDefault();
@@ -4100,24 +4026,6 @@ function _labImportUpdateAnalyzeState(root) {
 
 // Apre la dialog di importazione bulk per la categoria specificata
 // ('oggetti' o 'incantesimi'). Usa _LAB_IMPORT_CONFIGS per i contenuti.
-window.labOpenImportDialog = function(category) {
-    const cat = _LAB_IMPORT_CONFIGS[category];
-    if (!cat) {
-        console.warn('[lab-import] categoria non supportata:', category);
-        return;
-    }
-    const overlay = document.createElement('div');
-    overlay.className = 'hp-calc-overlay lab-import-overlay';
-    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `
-        <div class="hp-calc-modal lab-import-modal">
-            ${_labImportContentHtml(cat, "this.closest('.hp-calc-overlay').remove()", true)}
-        </div>`;
-    document.body.appendChild(overlay);
-    overlay._parsed = [];
-    overlay._cat = cat;
-    _labWireImportControls(overlay);
-};
 
 window._labImportFileChanged = async function(ev) {
     const root = ev.target?.closest?.('.lab-import-overlay, .lab-import-host') || _labImportRoot();
