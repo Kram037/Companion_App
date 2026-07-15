@@ -893,16 +893,15 @@ body.desktop-split-active .page.active .btn-fab {
     right: calc(var(--desktop-split-pane-width) + 14px);
 }
 
-body.desktop-split-active .scheda-page-grid,
-body.desktop-split-active .scheda-spells-grid,
-body.bookmark-split-instance .scheda-page-grid,
-body.bookmark-split-instance .scheda-spells-grid {
-    display: block !important;
-}
+@media (min-width: 900px) and (max-width: 1747px) {
+    body.desktop-split-active .scheda-page-grid,
+    body.desktop-split-active .scheda-spells-grid {
+        display: block !important;
+    }
 
-body.desktop-split-active .scheda-page-grid > .scheda-divider,
-body.bookmark-split-instance .scheda-page-grid > .scheda-divider {
-    display: block !important;
+    body.desktop-split-active .scheda-page-grid > .scheda-divider {
+        display: block !important;
+    }
 }
 
 body.desktop-split-active .scheda-tab-bar {

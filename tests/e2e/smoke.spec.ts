@@ -80,3 +80,19 @@ test('desktop split panes can use two columns on wide screens', async ({ page })
     return getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
   })).toBeGreaterThanOrEqual(2);
 });
+
+test('character sheet split layout uses columns only when there is room', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.evaluate(() => {
+    document.body.classList.add('desktop-split-active');
+    const grid = document.createElement('div');
+    grid.className = 'scheda-page-grid';
+    grid.innerHTML = '<div></div><div class="scheda-divider"></div><div></div>';
+    document.body.appendChild(grid);
+  });
+  await expect.poll(() => page.locator('.scheda-page-grid').evaluate(el => getComputedStyle(el).display)).toBe('block');
+
+  await page.setViewportSize({ width: 1920, height: 1000 });
+  await expect.poll(() => page.locator('.scheda-page-grid').evaluate(el => getComputedStyle(el).display)).toBe('grid');
+});
