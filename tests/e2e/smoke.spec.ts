@@ -96,11 +96,35 @@ test('desktop compendium sidebar opens equipment sections directly', async ({ pa
   await expect(page.locator('#compendioSubTitle')).toHaveText('Armi, Armature e Scudi');
 });
 
-test('desktop character sheet toolbar sits near the viewport bottom', async ({ page }) => {
+test('desktop character sheet toolbar is centered in the content area', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  await page.evaluate(() => {
+    const bar = document.createElement('div');
+    bar.id = 'testSchedaTabBar';
+    bar.className = 'scheda-tab-bar';
+    document.body.appendChild(bar);
+    const button = document.createElement('div');
+    button.id = 'testCombatButton';
+    button.className = 'btn-scroll-stats';
+    button.style.display = 'inline-flex';
+    document.body.appendChild(button);
+  });
 
-  await expect.poll(() => page.locator('#schedaTabBar').evaluate(el => getComputedStyle(el).bottom)).toBe('18px');
+  await expect.poll(() => page.locator('#testSchedaTabBar').evaluate(el => getComputedStyle(el).bottom)).toBe('18px');
+  await expect.poll(() => page.evaluate(() => {
+    const sidebarWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--desktop-sidebar-width')) || 0;
+    const bar = document.querySelector<HTMLElement>('#testSchedaTabBar')?.getBoundingClientRect();
+    if (!bar) return 999;
+    const expectedCenter = sidebarWidth + ((window.innerWidth - sidebarWidth) / 2);
+    return Math.abs((bar.left + bar.width / 2) - expectedCenter);
+  })).toBeLessThan(2);
+  await expect.poll(() => page.evaluate(() => {
+    const bar = document.querySelector<HTMLElement>('#testSchedaTabBar')?.getBoundingClientRect();
+    const button = document.querySelector<HTMLElement>('#testCombatButton')?.getBoundingClientRect();
+    if (!bar || !button) return 999;
+    return Math.abs(button.left - bar.right - 10);
+  })).toBeLessThan(2);
 });
 
 test('desktop split panes can use two columns on wide screens', async ({ page }) => {

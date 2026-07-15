@@ -969,6 +969,21 @@ body {
 }
 
 @media (min-width: 900px) {
+    body:not(.desktop-split-active):not(.bookmark-split-instance) {
+        --scheda-desktop-area-width: calc(100vw - var(--desktop-sidebar-width, 0px));
+        --scheda-desktop-bar-width: min(560px, calc(var(--scheda-desktop-area-width) - 28px));
+    }
+
+    body:not(.desktop-split-active):not(.bookmark-split-instance) .scheda-tab-bar {
+        left: calc(var(--desktop-sidebar-width, 0px) + (var(--scheda-desktop-area-width) / 2));
+        width: var(--scheda-desktop-bar-width);
+        max-width: var(--scheda-desktop-bar-width);
+    }
+
+    body:not(.desktop-split-active):not(.bookmark-split-instance) .btn-scroll-stats {
+        right: max(18px, calc(((var(--scheda-desktop-area-width) - var(--scheda-desktop-bar-width)) / 2) - 54px));
+    }
+
     .scheda-tab-bar,
     .btn-scroll-stats {
         bottom: 18px;
