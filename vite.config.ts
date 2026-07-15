@@ -5,7 +5,7 @@ import { copyFileSync, cpSync, existsSync, readFileSync, readdirSync, statSync, 
 
 const viteOutDir = 'dist/apps/companion-app';
 const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1];
-const viteBase = process.env.GITHUB_ACTIONS === 'true' && repositoryName ? `/${repositoryName}/` : '/';
+const viteBase = process.env.VITE_BASE || (process.env.GITHUB_ACTIONS === 'true' && repositoryName ? `/${repositoryName}/` : '/');
 
 function copyLegacyAssets() {
   const include = ['css', 'images', 'js', 'risorse', 'manifest.json', 'sw.js'];

@@ -41,6 +41,7 @@ jobs:
           E2E_CHARACTER_ID: ${{ secrets.E2E_CHARACTER_ID }}
           E2E_EMPTY_CAMPAIGN_ID: ${{ secrets.E2E_EMPTY_CAMPAIGN_ID }}
           E2E_MUTATION_TESTS: ${{ secrets.E2E_MUTATION_TESTS }}
+      - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
