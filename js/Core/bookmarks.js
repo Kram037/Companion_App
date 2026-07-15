@@ -926,7 +926,9 @@ function _bookmarkBindTabRailDrag(rail) {
         rail.classList.add('drag-over');
         const tab = event.target.closest('.desktop-bookmark-tab');
         if (!tab) {
-            _bookmarkDragBeforeId = '';
+            const tabs = rail.querySelectorAll('.desktop-bookmark-tab');
+            const lastTab = tabs[tabs.length - 1];
+            if (!lastTab || event.clientX >= lastTab.getBoundingClientRect().right) _bookmarkDragBeforeId = '';
             return;
         }
         const after = event.clientX > tab.getBoundingClientRect().left + (tab.offsetWidth / 2);
@@ -938,7 +940,11 @@ function _bookmarkBindTabRailDrag(rail) {
     rail.addEventListener('drop', (event) => {
         event.preventDefault();
         const id = event.dataTransfer.getData('text/plain') || _bookmarkDraggedTabId;
-        const beforeId = _bookmarkDragBeforeId;
+        const tab = event.target.closest('.desktop-bookmark-tab');
+        const after = tab && event.clientX > tab.getBoundingClientRect().left + (tab.offsetWidth / 2);
+        const beforeId = tab
+            ? (after ? (tab.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? tab.nextElementSibling.dataset.bookmarkId : '') : (tab.dataset.bookmarkId || ''))
+            : _bookmarkDragBeforeId;
         _bookmarkDropHandled = true;
         _bookmarkClearDropIndicators(rail);
         if (id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
