@@ -97,13 +97,11 @@ let COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
 let COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
 let COMP_MONSTERS_DATA = window.COMP_MONSTERS_DATA || [];
 let COMP_SUMMON_STATBLOCKS_DATA = window.COMP_SUMMON_STATBLOCKS_DATA || [];
-let _compEquipmentDataPromise = null;
 let _compMonsterDataPromise = null;
 let _compMonsterDataFailed = false;
 let _compSummonStatblockDataPromise = null;
 let _compSummonStatblockDataFailed = false;
 let _compSummonStatblockDataLoaded = !!COMP_SUMMON_STATBLOCKS_DATA.length;
-const _compRuntimeDataPromises = new Map();
 let _compMonsterItemsCache = null;
 let _compMonsterItemsSource = null;
 let _compReactState = null;
@@ -492,10 +490,6 @@ function _compHasMonsterData() {
     return Array.isArray(COMP_MONSTERS_DATA) && COMP_MONSTERS_DATA.length > 0;
 }
 
-function _compEquipmentRequiresRuntimeData(section) {
-    return ['avventura', 'strumenti', 'erbe', 'metalli', 'gemme'].includes(section);
-}
-
 function _compSyncEquipmentData() {
     COMP_ADVENTURING_GEAR_DATA = window.COMP_ADVENTURING_GEAR_DATA || [];
     COMP_TOOLS_DATA = window.COMP_TOOLS_DATA || [];
@@ -503,171 +497,6 @@ function _compSyncEquipmentData() {
     COMP_METALS_DATA = window.COMP_METALS_DATA || [];
     COMP_GEMS_DATA = window.COMP_GEMS_DATA || [];
     COMP_REALMS_GEMS_DATA = window.COMP_REALMS_GEMS_DATA || [];
-}
-
-function _compHasEquipmentData() {
-    const ready = [
-        'COMP_ADVENTURING_GEAR_DATA',
-        'COMP_TOOLS_DATA',
-        'COMP_HERBS_DATA',
-        'COMP_METALS_DATA',
-        'COMP_GEMS_DATA',
-        'COMP_REALMS_GEMS_DATA',
-    ].every(name => typeof window[name] !== 'undefined');
-    if (ready) _compSyncEquipmentData();
-    return ready;
-}
-
-function _compHasGlobalData(globalName) {
-    return typeof window[globalName] !== 'undefined';
-}
-
-function _compEnsureRuntimeDataBundle(key, globalName, { rerender = false, shouldRerender = () => false, label = key } = {}) {
-    if (_compHasGlobalData(globalName)) return Promise.resolve();
-    if (_compRuntimeDataPromises.has(key)) return _compRuntimeDataPromises.get(key);
-    if (typeof window.ensureRuntimeData !== 'function') return Promise.resolve();
-
-    const promise = window.ensureRuntimeData(key)
-        .then(() => {
-            if (rerender && shouldRerender()) compendioRenderTab();
-        })
-        .catch(error => console.warn(`[compendio] caricamento ${label} fallito:`, error))
-        .finally(() => {
-            _compRuntimeDataPromises.delete(key);
-        });
-
-    _compRuntimeDataPromises.set(key, promise);
-    return promise;
-}
-
-function _compHasBackgroundData() { return _compHasGlobalData('BACKGROUNDS_DATA'); }
-function _compEnsureBackgroundData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('backgrounds', 'BACKGROUNDS_DATA', {
-        rerender,
-        shouldRerender: () => _compCurrentTab === 'background',
-        label: 'background',
-    });
-}
-
-function _compHasRaceData() { return _compHasGlobalData('RACES_DATA'); }
-function _compEnsureRaceData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('races', 'RACES_DATA', {
-        rerender,
-        shouldRerender: () => _compCurrentTab === 'razze',
-        label: 'razze',
-    });
-}
-
-function _compNeedsClassData() {
-    return _compCurrentTab === 'classi' || _compCurrentTab === 'sottoclassi';
-}
-
-function _compHasClassData() { return _compHasGlobalData('CLASSES_DATA'); }
-function _compEnsureClassData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('classes', 'CLASSES_DATA', {
-        rerender,
-        shouldRerender: _compNeedsClassData,
-        label: 'classi',
-    });
-}
-
-function _compNeedsSpellData() {
-    return _compCurrentTab === 'incantesimi' || !!_compStateFor(_compCurrentTab).detail;
-}
-
-function _compHasSpellData() { return _compHasGlobalData('SPELLS_DATA'); }
-function _compEnsureSpellData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('spells', 'SPELLS_DATA', {
-        rerender,
-        shouldRerender: _compNeedsSpellData,
-        label: 'incantesimi',
-    });
-}
-
-function _compNeedsFeatData() {
-    return _compCurrentTab === 'talenti' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'talenti');
-}
-
-function _compHasFeatData() { return _compHasGlobalData('FEATS_DATA'); }
-function _compEnsureFeatData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('feats', 'FEATS_DATA', {
-        rerender,
-        shouldRerender: _compNeedsFeatData,
-        label: 'talenti',
-    });
-}
-
-function _compNeedsFightingStyleData() {
-    return _compCurrentTab === 'stili' || (_compCurrentTab === 'talenti_stili' && _compTalentiStiliKind() === 'stili');
-}
-
-function _compHasFightingStyleData() { return _compHasGlobalData('FIGHTING_STYLES_DATA'); }
-function _compEnsureFightingStyleData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('fightingStyles', 'FIGHTING_STYLES_DATA', {
-        rerender,
-        shouldRerender: _compNeedsFightingStyleData,
-        label: 'stili',
-    });
-}
-
-function _compHasInvocationData() { return _compHasGlobalData('INVOCATIONS_DATA'); }
-function _compEnsureInvocationData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('invocations', 'INVOCATIONS_DATA', {
-        rerender,
-        shouldRerender: () => _compCurrentTab === 'suppliche',
-        label: 'suppliche',
-    });
-}
-
-function _compNeedsSubclassSpellData() {
-    return _compCurrentTab === 'classi' && !!_compStateFor('classi').detail;
-}
-
-function _compHasSubclassSpellData() { return _compHasGlobalData('SUBCLASS_SPELLS_DATA'); }
-function _compEnsureSubclassSpellData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('subclassSpells', 'SUBCLASS_SPELLS_DATA', {
-        rerender,
-        shouldRerender: _compNeedsSubclassSpellData,
-        label: 'incantesimi sottoclassi',
-    });
-}
-
-function _compHasMagicItemData() { return _compHasGlobalData('OGGETTI_MAGICI_DATA'); }
-function _compEnsureMagicItemData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('magicItems', 'OGGETTI_MAGICI_DATA', {
-        rerender,
-        shouldRerender: () => _compCurrentTab === 'oggetti',
-        label: 'oggetti magici',
-    });
-}
-
-function _compHasPoisonData() { return _compHasGlobalData('VELENI_DATA'); }
-function _compEnsurePoisonData({ rerender = false } = {}) {
-    return _compEnsureRuntimeDataBundle('poisons', 'VELENI_DATA', {
-        rerender,
-        shouldRerender: () => _compCurrentTab === 'oggetti',
-        label: 'veleni',
-    });
-}
-
-function _compEnsureEquipmentData({ rerender = false } = {}) {
-    if (_compHasEquipmentData()) return Promise.resolve();
-    if (_compEquipmentDataPromise) return _compEquipmentDataPromise;
-
-    _compEquipmentDataPromise = (typeof window.ensureRuntimeData === 'function'
-        ? window.ensureRuntimeData('equipment')
-        : Promise.reject(new Error('Runtime data loader non disponibile'))
-    ).then(() => {
-        _compSyncEquipmentData();
-    }).then(() => {
-        if (rerender && _compCurrentTab === 'oggetti') compendioRenderTab();
-    }).catch(error => {
-        console.warn('[compendio] caricamento equipaggiamento fallito:', error);
-    }).finally(() => {
-        _compEquipmentDataPromise = null;
-    });
-
-    return _compEquipmentDataPromise;
 }
 
 function _compEnsureMonsterData({ rerender = false } = {}) {
@@ -3399,10 +3228,6 @@ function _compRich(text, options = {}) {
     return _compLinkSpellRefs(html);
 }
 
-function _compPlain(text) {
-    return String(text || '').replace(/\*\*/g, '').replace(/\n+/g, ' ').trim();
-}
-
 function _compLinkSpellRefs(html) {
     if (!html || !window.SPELLS_DATA) return html;
     return String(html)
@@ -3797,11 +3622,6 @@ function _compPrereqLabel(value) {
         }).filter(Boolean).join(', ');
     }
     return value || 'Nessuno';
-}
-
-function _compFeatureLevels(features) {
-    const levels = _compUnique((features || []).map(f => f.level != null ? String(f.level) : ''));
-    return levels.length ? `Livelli ${levels.join(', ')}` : '';
 }
 
 function _compSpellLevel(level) {
