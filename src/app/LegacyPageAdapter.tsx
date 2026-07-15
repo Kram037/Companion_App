@@ -16,7 +16,8 @@ interface LegacyPageAdapterProps {
 }
 
 export function LegacyPageAdapter({ page }: LegacyPageAdapterProps) {
-  return <div data-legacy-page={page} hidden />;
+  void page;
+  return null;
 }
 
 export function CampaignRedirect() {

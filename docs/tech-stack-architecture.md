@@ -21,7 +21,7 @@
 
 ## Regola legacy
 
-Le pagine esistenti restano operative tramite `LegacyPageAdapter`. Le URL React chiamano ancora `navigateToPage` finche' la singola pagina non viene migrata a componenti React reali.
+Le pagine principali sono renderizzate da React. `LegacyPageAdapter` resta solo per Amici e per il wizard di creazione personaggio; `navigateToPage` mantiene sincronizzati i dialog e gli editor non ancora migrati.
 
 ## Guardie
 
