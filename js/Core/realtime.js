@@ -3,6 +3,7 @@
 // ============================================================
 
 let appEventsChannel = null;
+let appEventsRefreshTimeout = null;
 
 /**
  * Avvia Realtime subscription per le nuove sessioni
@@ -102,6 +103,229 @@ function stopSessionRealtime() {
 }
 
 /**
+ * Avvia Realtime subscription per la pagina combattimento
+ */
+function startCombattimentoRealtime(campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    // Ferma subscription esistente se presente
+    stopCombattimentoRealtime();
+
+    // Subscription per aggiornamenti ai tiri iniziativa
+    const combattimentoChannel = supabase
+        .channel(`combattimento-${sessioneId}`)
+        .on(
+            'broadcast',
+            { event: 'iniziativa_update' },
+            async (payload) => {
+                appDebug('🔔 [REALTIME] Broadcast iniziativa:', payload);
+                const combattimentoPage = document.getElementById('combattimentoPage');
+                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
+                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        if (typeof window.ensureRuntimeScript === 'function') {
+                            await window.ensureRuntimeScript('combattimento');
+                        }
+                        await renderCombattimentoContent(campagnaId, sessioneId);
+                    }
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: '*', // INSERT, UPDATE, DELETE
+                schema: 'public',
+                table: 'richieste_tiro_iniziativa',
+                filter: `sessione_id=eq.${sessioneId}`
+            },
+            async (payload) => {
+                appDebug('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
+                // Verifica che siamo ancora nella pagina combattimento
+                const combattimentoPage = document.getElementById('combattimentoPage');
+                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
+                    // Verifica che la sessione sia ancora quella corrente
+                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
+                        appDebug('✅ [REALTIME] Ricarico contenuto combattimento');
+                        // Ricarica il contenuto del combattimento
+                        if (typeof window.ensureRuntimeScript === 'function') {
+                            await window.ensureRuntimeScript('combattimento');
+                        }
+                        await renderCombattimentoContent(campagnaId, sessioneId);
+                    }
+                }
+            }
+        )
+        .subscribe((status) => {
+            appDebug('📡 [REALTIME] Stato subscription combattimento:', status);
+            if (status === 'SUBSCRIBED') {
+                appDebug('✅ [REALTIME] Subscription combattimento attiva');
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.error('❌ [REALTIME] Errore subscription combattimento');
+            }
+        });
+
+    window.combattimentoChannel = combattimentoChannel;
+    appDebug('✅ Realtime subscription per combattimento avviata');
+}
+
+/**
+ * Invia un broadcast per aggiornare il combattimento in tempo reale
+ */
+async function sendCombattimentoUpdateBroadcast(sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase || !sessioneId) return;
+
+    // Se siamo già in combattimento, usa il canale esistente
+    if (window.combattimentoChannel && AppState.currentSessioneId === sessioneId) {
+        try {
+            await window.combattimentoChannel.send({
+                type: 'broadcast',
+                event: 'iniziativa_update',
+                payload: { sessioneId, ts: Date.now() }
+            });
+        } catch (error) {
+            console.warn('⚠️ Errore invio broadcast combattimento:', error);
+        }
+        return;
+    }
+
+    // Altrimenti crea un canale temporaneo per il broadcast
+    const tempChannel = supabase.channel(`combattimento-${sessioneId}`);
+    tempChannel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+            tempChannel.send({
+                type: 'broadcast',
+                event: 'iniziativa_update',
+                payload: { sessioneId, ts: Date.now() }
+            }).catch((error) => {
+                console.warn('⚠️ Errore invio broadcast combattimento:', error);
+            }).finally(() => {
+                setTimeout(() => {
+                    supabase.removeChannel(tempChannel);
+                }, 300);
+            });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            supabase.removeChannel(tempChannel);
+        }
+    });
+}
+
+/**
+ * Ferma Realtime subscription per la pagina combattimento
+ */
+function stopCombattimentoRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.combattimentoChannel) {
+        supabase.removeChannel(window.combattimentoChannel);
+        window.combattimentoChannel = null;
+    }
+}
+
+/**
+ * Avvia Realtime subscription per aggiornare la pagina dettagli quando viene avviata una sessione
+ */
+function startCampagnaDetailsRealtime(campagnaId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    // Ferma subscription esistente se presente
+    stopCampagnaDetailsRealtime();
+
+    // Verifica che siamo ancora nella pagina dettagli
+    const dettagliPage = document.getElementById('dettagliPage');
+    if (!dettagliPage || !dettagliPage.classList.contains('active')) {
+        return;
+    }
+
+    // Verifica che la campagna sia ancora quella corrente
+    if (AppState.currentCampagnaId !== campagnaId) {
+        return;
+    }
+
+    // Subscription per nuove sessioni per questa campagna
+    const campagnaDetailsChannel = supabase
+        .channel(`campagna-details-${campagnaId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'sessioni',
+                filter: `campagna_id=eq.${campagnaId}`
+            },
+            async (payload) => {
+                appDebug('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
+                // Verifica che la sessione non abbia data_fine (sia attiva)
+                if (!payload.new.data_fine) {
+                    // Verifica che siamo ancora nella pagina dettagli
+                    const dettagliPage = document.getElementById('dettagliPage');
+                    if (dettagliPage && dettagliPage.classList.contains('active')) {
+                        // Verifica che la campagna sia ancora quella corrente
+                        if (AppState.currentCampagnaId === campagnaId) {
+                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
+                            // Ricarica i dettagli della campagna per aggiornare il bottone
+                            await loadCampagnaDetails(campagnaId);
+                        }
+                    }
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'sessioni',
+                filter: `campagna_id=eq.${campagnaId}`
+            },
+            async (payload) => {
+                appDebug('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
+                // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
+                if (payload.new.data_fine) {
+                    // Verifica che siamo ancora nella pagina dettagli
+                    const dettagliPage = document.getElementById('dettagliPage');
+                    if (dettagliPage && dettagliPage.classList.contains('active')) {
+                        // Verifica che la campagna sia ancora quella corrente
+                        if (AppState.currentCampagnaId === campagnaId) {
+                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
+                            // Ricarica i dettagli della campagna per aggiornare il bottone
+                            await loadCampagnaDetails(campagnaId);
+                        }
+                    }
+                }
+            }
+        )
+        .subscribe((status) => {
+            appDebug('📡 [REALTIME] Stato subscription dettagli campagna:', status);
+            if (status === 'SUBSCRIBED') {
+                appDebug('✅ [REALTIME] Subscription dettagli campagna attiva');
+            } else if (status === 'CHANNEL_ERROR') {
+                console.error('❌ [REALTIME] Errore subscription dettagli campagna');
+            }
+        });
+
+    window.campagnaDetailsChannel = campagnaDetailsChannel;
+    appDebug('✅ Realtime subscription per dettagli campagna avviata');
+}
+
+/**
+ * Ferma Realtime subscription per la pagina dettagli campagna
+ */
+function stopCampagnaDetailsRealtime() {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    if (window.campagnaDetailsChannel) {
+        supabase.removeChannel(window.campagnaDetailsChannel);
+        window.campagnaDetailsChannel = null;
+        appDebug('✅ Realtime subscription per dettagli campagna fermata');
+    }
+}
+
+/**
  * Avvia Realtime subscription globale per eventi app
  */
 function startAppEventsRealtime() {
@@ -121,7 +345,6 @@ function startAppEventsRealtime() {
                 if (data.sourceUid && data.sourceUid === AppState.currentUser?.uid) {
                     return;
                 }
-                window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: data }));
 
                 if (data.table === 'richieste_tiro_iniziativa' && data.action === 'insert') {
                     setTimeout(async () => {
@@ -155,7 +378,8 @@ function startAppEventsRealtime() {
                     closeRollRequestModal();
                     if (AppState.currentPage === 'combattimento' && data.campagnaId) {
                         showNotification('Il combattimento è terminato');
-                        await navigateToPage('sessione');
+                        navigateToPage('sessione');
+                        renderSessioneContent(data.campagnaId);
                     }
                 }
 
@@ -200,11 +424,20 @@ function startAppEventsRealtime() {
                         if (AppState.currentPage === 'sessione') {
                             stopSessioneTimer();
                             showNotification('La sessione è terminata');
-                            await navigateToPage('dettagli');
+                            navigateToPage('dettagli');
+                            loadCampagnaDetails(data.campagnaId);
                         }
                     }
                 }
 
+                const skipRefreshTables = [
+                    'richieste_tiro_iniziativa',
+                    'richieste_tiro_generico'
+                ];
+                const needsRefresh = !skipRefreshTables.includes(data.table);
+                if (needsRefresh) {
+                    scheduleAppEventsRefresh();
+                }
             }
         )
         .subscribe((status) => {
@@ -233,13 +466,93 @@ function stopAppEventsRealtime() {
         appDebug('✅ Realtime subscription globale app fermata');
     }
 
+    if (appEventsRefreshTimeout) {
+        clearTimeout(appEventsRefreshTimeout);
+        appEventsRefreshTimeout = null;
+    }
+}
+
+let _appRefreshRunning = false;
+let _appRefreshQueued = false;
+
+function scheduleAppEventsRefresh() {
+    if (appEventsRefreshTimeout) {
+        clearTimeout(appEventsRefreshTimeout);
+    }
+    if (_appRefreshRunning) {
+        _appRefreshQueued = true;
+        return;
+    }
+    appEventsRefreshTimeout = setTimeout(() => {
+        refreshCurrentPageData();
+    }, 800);
+}
+
+async function refreshCurrentPageData() {
+    if (!AppState.isLoggedIn) return;
+    if (_appRefreshRunning) { _appRefreshQueued = true; return; }
+    _appRefreshRunning = true;
+    _appRefreshQueued = false;
+
+    if (_hpCalcState || (Date.now() - _hpCalcClosedAt < 2000)) { _appRefreshRunning = false; return; }
+
+    const page = AppState.currentPage;
+    try {
+        if (page === 'campagne' && AppState.currentUser?.uid) {
+            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
+        } else if (page === 'personaggi') {
+            await loadPersonaggi({ silent: true });
+        } else if (page === 'amici') {
+            await loadAmici({ silent: true });
+        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
+            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
+        } else if (page === 'sessione' && AppState.currentCampagnaId) {
+            if (window.currentTiroGenericoRichiestaId) {
+                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
+                if (sessione) {
+                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
+                }
+            } else {
+                await renderSessioneContent(AppState.currentCampagnaId);
+            }
+        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('combattimento');
+            }
+            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
+        } else if (page === 'scheda' && AppState.currentPersonaggioId) {
+            // Mantieni la tab attualmente visualizzata: senza questo
+            // controllo qualunque evento realtime (anche generato da un
+            // altro utente nella stessa campagna) riportava l'utente
+            // alla "Pagina 1" della scheda mentre stava navigando in
+            // Inventario / Incantesimi / Privilegi.
+            const tab = window._schedaCurrentTab;
+            const pgId = AppState.currentPersonaggioId;
+            if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') {
+                await schedaOpenInventoryPage(pgId);
+            } else if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
+                await schedaOpenSpellPage(pgId);
+            } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
+                await schedaOpenPrivilegesPage(pgId);
+            } else {
+                await renderSchedaPersonaggio(pgId);
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Errore refresh pagina corrente:', error);
+    } finally {
+        _appRefreshRunning = false;
+        if (_appRefreshQueued) {
+            _appRefreshQueued = false;
+            scheduleAppEventsRefresh();
+        }
+    }
 }
 
 /**
  * Invia un broadcast globale per notificare cambiamenti app
  */
 async function sendAppEventBroadcast(change) {
-    window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
     const supabase = getSupabaseClient();
     if (!supabase) return;
 

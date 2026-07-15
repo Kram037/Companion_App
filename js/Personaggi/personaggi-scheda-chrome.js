@@ -8,27 +8,72 @@
 window._schedaOpenSections = window._schedaOpenSections || new Set();
 window._schedaClosedSections = window._schedaClosedSections || new Set();
 
+window.schedaToggleSection = function(titleEl) {
+    const section = titleEl.closest('.scheda-section');
+    if (!section) return;
+    section.classList.toggle('collapsed');
+    const key = section.getAttribute('data-section-key');
+    if (key) {
+        const isCollapsed = section.classList.contains('collapsed');
+        if (isCollapsed) {
+            window._schedaOpenSections.delete(key);
+            window._schedaClosedSections.add(key);
+        } else {
+            window._schedaOpenSections.add(key);
+            window._schedaClosedSections.delete(key);
+        }
+    }
+};
+
 /* ── Bottone "Vai a Statistiche" (icona spada) ─────────────────────────
    - Visibile mentre si e' nella scheda di un PG (gestito in navigation.js).
    - Click: porta alla Pagina 1 e scrolla al divisore appena prima della sezione Statistiche.
    - Su Pagina 2/Inventario/Incantesimi: prima naviga a Pagina 1 e poi scrolla. */
+function _scrollSchedaDividerIntoView() {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    // Il primo divisore di Pagina 1 e' quello prima della sezione "Statistiche".
+    const divider = content.querySelector('.scheda-divider');
+    if (divider) {
+        divider.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        // Fallback: scrolla in cima alla sezione Statistiche cercando per testo del titolo.
+        const titles = content.querySelectorAll('.scheda-section-title');
+        for (const t of titles) {
+            if (t.textContent.trim().startsWith('Statistiche')) {
+                t.closest('.scheda-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
+            }
+        }
+    }
+}
+
 window.schedaScrollToStats = function() {
     const pgId = window._schedaCurrentPgId || AppState.currentPersonaggioId;
     const tab = window._schedaCurrentTab;
     const tryScroll = () => {
-        const target = pgId ? document.getElementById(`${pgId}:statistics`) : null;
+        const content = document.getElementById('schedaContent');
+        if (!content) return false;
+        const target = content.querySelector('.scheda-divider')
+                    || Array.from(content.querySelectorAll('.scheda-section-title'))
+                            .find(t => t.textContent.trim().startsWith('Statistiche'));
         if (!target) return false;
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return true;
     };
     if (tab && tab !== 'scheda' && pgId) {
-        _schedaRequestReactRefresh(pgId, 'scheda');
-        let tries = 0;
-        const tick = () => {
-            if (tryScroll() || tries++ > 25) return;
-            setTimeout(tick, 60);
-        };
-        setTimeout(tick, 30);
+        // Naviga a Pagina 1 e attende che il divider/sezione "Statistiche"
+        // appaia nel DOM (polling) prima di eseguire lo scroll. Questo
+        // risolve il bug per cui il pulsante non funzionava da Inventario o
+        // da altre tab perche' il render era ancora in corso.
+        renderSchedaPersonaggio(pgId).then(() => {
+            let tries = 0;
+            const tick = () => {
+                if (tryScroll() || tries++ > 25) return;
+                setTimeout(tick, 60);
+            };
+            setTimeout(tick, 30);
+        });
         return;
     }
     if (!tryScroll()) {
@@ -38,10 +83,99 @@ window.schedaScrollToStats = function() {
     }
 };
 
+window.schedaToggleSubsection = function(titleEl) {
+    const sub = titleEl.closest('.scheda-subsection');
+    if (sub) sub.classList.toggle('collapsed');
+};
+
+async function _schedaApplyResImmVulChange(pgId, kind, dmgType) {
+    // kind: 'res' | 'imm' | 'vul'  – tre liste mutuamente esclusive sul singolo dmgType.
+    const supabase = getSupabaseClient();
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    let res = Array.isArray(pg.resistenze) ? [...pg.resistenze] : [];
+    let imm = Array.isArray(pg.immunita) ? [...pg.immunita] : [];
+    let vul = Array.isArray(pg.vulnerabilita) ? [...pg.vulnerabilita] : [];
+    const isOn = (kind === 'res' && res.includes(dmgType))
+              || (kind === 'imm' && imm.includes(dmgType))
+              || (kind === 'vul' && vul.includes(dmgType));
+    res = res.filter(x => x !== dmgType);
+    imm = imm.filter(x => x !== dmgType);
+    vul = vul.filter(x => x !== dmgType);
+    if (!isOn) {
+        if (kind === 'res') res.push(dmgType);
+        else if (kind === 'imm') imm.push(dmgType);
+        else if (kind === 'vul') vul.push(dmgType);
+    }
+    pg.resistenze = res;
+    pg.immunita = imm;
+    pg.vulnerabilita = vul;
+    _refreshResImmInlineRow(dmgType);
+    if (!supabase) return;
+    // Salva tutto insieme; se la colonna 'vulnerabilita' non esiste ancora a DB, fallback senza di essa.
+    const { error } = await supabase.from('personaggi')
+        .update({ resistenze: res, immunita: imm, vulnerabilita: vul }).eq('id', pgId);
+    if (error && /vulnerabilita/i.test(error.message || '')) {
+        await supabase.from('personaggi').update({ resistenze: res, immunita: imm }).eq('id', pgId);
+        console.warn('[scheda] Colonna "vulnerabilita" mancante a DB: esegui backend/supabase/sql/add-vulnerabilita.sql');
+    }
+}
+
+window.schedaToggleResInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'res', dmgType); };
+window.schedaToggleImmInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'imm', dmgType); };
+window.schedaToggleVulInline = function(pgId, dmgType) { return _schedaApplyResImmVulChange(pgId, 'vul', dmgType); };
+
+function _refreshResImmInlineRow(dmgType) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const isRes = (pg.resistenze || []).includes(dmgType);
+    const isImm = (pg.immunita || []).includes(dmgType);
+    const isVul = (pg.vulnerabilita || []).includes(dmgType);
+    const row = document.getElementById('sResImmRow_' + dmgType);
+    if (row) {
+        const r = row.querySelector('.scheda-resimm-marker.res');
+        const i = row.querySelector('.scheda-resimm-marker.imm');
+        const v = row.querySelector('.scheda-resimm-marker.vul');
+        if (r) r.classList.toggle('active', isRes);
+        if (i) i.classList.toggle('active', isImm);
+        if (v) v.classList.toggle('active', isVul);
+    }
+    const badge = document.getElementById('sResImmCount');
+    if (badge) {
+        const tot = (pg.resistenze || []).length + (pg.immunita || []).length + (pg.vulnerabilita || []).length;
+        badge.textContent = tot > 0 ? tot : '';
+    }
+}
+
 /* ── Header scheda condiviso (foto a sx, identità a sx, level-up + ispirazione a dx) ── */
+function schedaSetPageTitle(pgOrTitle) {
+    const titleEl = document.getElementById('schedaPageTitle');
+    const title = typeof pgOrTitle === 'string'
+        ? pgOrTitle
+        : (pgOrTitle?.nome || 'Scheda');
+    if (titleEl) titleEl.textContent = title || 'Scheda';
+
+    const renameBtn = document.getElementById('schedaRenameBtn');
+    if (!renameBtn) return;
+    const pgId = typeof pgOrTitle === 'object' ? pgOrTitle?.id : (_schedaPgCache?.id || null);
+    if (pgId) {
+        renameBtn.style.display = '';
+        renameBtn.onclick = () => schedaRenameCharacter(pgId);
+    } else {
+        renameBtn.style.display = 'none';
+        renameBtn.onclick = null;
+    }
+}
+
+window.schedaSetPageTitle = schedaSetPageTitle;
+
 function _schedaRefreshCurrentTab(pgId) {
     const tab = window._schedaCurrentTab;
-    _schedaRequestReactRefresh(pgId, _schedaPgCache?.tipo_scheda === 'micro' ? 'micro' : (tab || 'scheda'));
+    if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') return schedaOpenSpellPage(pgId);
+    if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') return schedaOpenInventoryPage(pgId);
+    if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') return schedaOpenPrivilegesPage(pgId);
+    if (typeof renderMicroScheda === 'function' && _schedaPgCache?.tipo_scheda === 'micro') return renderMicroScheda(pgId);
+    return renderSchedaPersonaggio(pgId);
 }
 
 window.schedaRenameCharacter = async function(pgId) {
@@ -63,10 +197,106 @@ window.schedaRenameCharacter = async function(pgId) {
     }
 
     if (_schedaPgCache) _schedaPgCache.nome = nextName;
+    schedaSetPageTitle(_schedaPgCache || nextName);
     showNotification('Nome aggiornato');
     _schedaRefreshCurrentTab(pgId);
 };
 
+function _schedaCleanSubclassName(name) {
+    const raw = String(name || '').trim();
+    if (!raw) return '';
+    const cleaned = raw
+        .replace(/^(via|cammino|sentiero|giuramento|circolo|dominio|collegio|scuola|tradizione|archetipo)\s+(dell'|della|dello|degli|delle|del|dei|di|de)\s*/i, '')
+        .replace(/^(way|path|oath|circle|domain|college|school|tradition|archetype)\s+of\s+(the\s+)?/i, '')
+        .trim();
+    return cleaned || raw;
+}
+
+function _schedaBuildClassLine(pg) {
+    if (Array.isArray(pg?.classi) && pg.classi.length > 0) {
+        return pg.classi
+            .map(c => {
+                const name = String(c?.nome || '').trim();
+                if (!name) return '';
+                const level = parseInt(c?.livello, 10) || 1;
+                return `${name} ${level}`;
+            })
+            .filter(Boolean)
+            .join(' / ');
+    }
+    return String(pg?.classe || '').trim();
+}
+
+function _schedaBuildSubclassLine(pg) {
+    if (!Array.isArray(pg?.classi)) return '';
+    return pg.classi
+        .map(c => _schedaCleanSubclassName(c?.sottoclasse))
+        .filter(Boolean)
+        .join(' / ');
+}
+
+function _schedaBuildRaceLine(pg) {
+    const race = String(pg?.razza || '').trim();
+    const subrace = String(pg?.sottorazza || '').trim();
+    if (!race && !subrace) return '';
+    if (!subrace) return race;
+    if (!race) return subrace;
+    const raceKey = race.toLowerCase();
+    const subraceKey = subrace.toLowerCase();
+    return subraceKey.includes(raceKey) ? subrace : `${race} ${subrace}`;
+}
+
+function _schedaBuildQuickInfo(pg) {
+    return {
+        classi: _schedaBuildClassLine(pg) || '-',
+        sottoclassi: _schedaBuildSubclassLine(pg) || '-',
+        razza: _schedaBuildRaceLine(pg) || '-',
+    };
+}
+
+function buildSchedaHeader(pg, pageLabel) {
+    if (!pg) return '';
+    schedaSetPageTitle(pg);
+    const initials = (pg.nome || '?').trim().split(/\s+/).slice(0, 2).map(s => s.charAt(0).toUpperCase()).join('') || '?';
+    const rawUrl = pg.immagine_url || '';
+    // Normalizza on-the-fly: copre eventuali URL Drive salvati prima
+    // dell'introduzione del normalizzatore (es. link "/file/d/.../view"
+    // che il browser non puo' embeddare).
+    const imgUrl = rawUrl ? (typeof _normalizeImageUrl === 'function' ? _normalizeImageUrl(rawUrl) : rawUrl) : '';
+    const avatarInner = imgUrl
+        ? `<img src="${escapeAttr(imgUrl)}" alt="${escapeAttr(pg.nome || '')}" class="scheda-avatar-img" referrerpolicy="no-referrer" loading="lazy">`
+        : `<span class="scheda-avatar-initials">${escapeHtml(initials)}</span>`;
+    const quickInfo = _schedaBuildQuickInfo(pg);
+    const hasClasses = pg.classi && pg.classi.length > 0;
+    const xpBtn = hasClasses
+        ? `<button class="scheda-levelup-top" onclick="schedaOpenXpCalc('${pg.id}')" title="Punti esperienza">Avanzamento</button>`
+        : '';
+    const ispVal = pg.ispirazione || 0;
+    const ispBox = `<div class="scheda-isp-box" title="Ispirazione">
+        <button class="scheda-isp-btn" onclick="schedaIspChange('${pg.id}',-1)" aria-label="Diminuisci ispirazione">−</button>
+        <div class="scheda-isp-display"><span class="scheda-isp-star" aria-hidden="true">★</span><span id="sIsp">${ispVal}</span></div>
+        <button class="scheda-isp-btn" onclick="schedaIspChange('${pg.id}',1)" aria-label="Aumenta ispirazione">+</button>
+    </div>`;
+    return `
+    <div class="scheda-identity">
+        <button type="button" class="scheda-avatar" onclick="schedaEditAvatar('${pg.id}')" title="Cambia immagine">
+            ${avatarInner}
+        </button>
+        <div class="scheda-identity-info">
+            <div class="scheda-quick-line scheda-quick-classi">${escapeHtml(quickInfo.classi)}</div>
+            <div class="scheda-quick-line scheda-quick-sottoclassi">${escapeHtml(quickInfo.sottoclassi)}</div>
+            <div class="scheda-quick-line scheda-quick-razza">${escapeHtml(quickInfo.razza)}</div>
+        </div>
+        <div class="scheda-identity-actions">
+            ${xpBtn}
+            ${ispBox}
+        </div>
+    </div>`;
+}
+
+// Estrae il file ID da un URL Google Drive in qualsiasi formato comune
+// (sharing link, open link, uc?id=, ecc) e lo restituisce, o null se
+// non e' un URL Drive riconosciuto.
 function _extractGoogleDriveFileId(url) {
     if (!url || typeof url !== 'string') return null;
     const u = url.trim();
@@ -188,5 +418,9 @@ async function _schedaPersistAvatar(pgId, urlOrNull) {
             showNotification && showNotification('Impossibile salvare l\'immagine (manca colonna immagine_url?)');
         }
     }
-    _schedaRefreshCurrentTab(pgId);
+    const tab = window._schedaCurrentTab;
+    if (tab === 'incantesimi') schedaOpenSpellPage(pgId);
+    else if (tab === 'inventario') schedaOpenInventoryPage(pgId);
+    else if (tab === 'privilegi') schedaOpenPrivilegesPage(pgId);
+    else renderSchedaPersonaggio(pgId);
 }

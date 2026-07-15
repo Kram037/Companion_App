@@ -103,4 +103,72 @@ function _pgSubclassGrantedSpells(pg) {
 //
 // Mappa: classe slug -> sottoclasse slug -> array di
 //   { level, resistances?: [...], immunities?: [...] }
+const SUBCLASS_AUTO_EFFECTS = {
+    sorcerer: {
+        'aberrant-mind': [
+            { level: 6, resistances: ['psichico'] },  // Difese Psichiche
+        ],
+        'storm-sorcery': [
+            { level: 6, resistances: ['fulmine', 'tuono'] },  // Heart of the Storm
+        ],
+        'divine-soul': [],
+    },
+    barbarian: {
+        'path-of-the-totem-warrior': [
+            { level: 3, resistances: [] }, // Spirit Seeker - resistance only while raging (gestito separatamente)
+        ],
+    },
+    monk: {
+        'way-of-the-sun-soul': [],
+    },
+    paladin: {
+        'oath-of-the-ancients': [
+            { level: 7, resistances: [] }, // Aura of Warding - aura, gestita separatamente
+        ],
+    },
+};
+
+// Restituisce i tipi di danno a cui il PG ottiene resistenza
+// automaticamente in base ai privilegi delle sue sottoclassi e al
+// livello attuale.
+function _pgSubclassAutoResistances(pg) {
+    const out = new Set();
+    if (!pg || !Array.isArray(pg.classi)) return [];
+    pg.classi.forEach(c => {
+        const cls = _getClassData(c?.nome || '');
+        if (!cls) return;
+        const subSlug = c.sottoclasseSlug;
+        if (!subSlug) return;
+        const map = SUBCLASS_AUTO_EFFECTS[cls.slug];
+        if (!map) return;
+        const entries = map[subSlug];
+        if (!entries) return;
+        const lvl = parseInt(c.livello) || 0;
+        entries.forEach(e => {
+            if (lvl >= (e.level || 0)) {
+                (e.resistances || []).forEach(r => out.add(r));
+            }
+        });
+    });
+    return Array.from(out);
+}
+
+// Inietta in pg.resistenze (e analogamente immunita') eventuali
+// resistenze auto-derivate da privilegi di sottoclasse mancanti.
+// Idempotente: aggiunge solo cio' che manca.
+function _ensureSubclassAutoEffectsApplied(pg) {
+    if (!pg) return false;
+    const auto = _pgSubclassAutoResistances(pg);
+    if (auto.length === 0) return false;
+    if (!Array.isArray(pg.resistenze)) pg.resistenze = [];
+    let changed = false;
+    auto.forEach(r => {
+        if (!pg.resistenze.includes(r)) {
+            pg.resistenze.push(r);
+            changed = true;
+        }
+    });
+    return changed;
+}
+
 // ─────────────────────────────────────────────────────────────────────────

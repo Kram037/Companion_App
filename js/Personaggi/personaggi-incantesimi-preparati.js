@@ -36,3 +36,10 @@ function _calcMaxPreparedAuto(pg) {
     }
     return total;
 }
+
+function _spellIsPrepared(pg, spellName, spellLevel) {
+    if (spellLevel === 0) return true;
+    if (!_pgUsesPreparedSystem(pg)) return true;
+    const list = Array.isArray(pg.incantesimi_preparati) ? pg.incantesimi_preparati : [];
+    return list.includes(spellName);
+}

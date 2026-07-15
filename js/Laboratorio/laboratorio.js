@@ -8,15 +8,6 @@ let _labClassiSubTab = 'classi';
 // Sub-tab solo per la categoria "nemici": 'nemici' (default) | 'combattimenti'.
 let _labNemiciSubTab = 'nemici';
 let _labTalentiStiliSubTab = 'talenti';
-let _labReactState = null;
-
-function _labReactOwnsPage() {
-    return document.body.dataset.reactPage === 'laboratorio';
-}
-
-function _labNotifyReactRefresh() {
-    if (_labReactOwnsPage()) window.dispatchEvent(new CustomEvent('companion:laboratory-refresh'));
-}
 
 const LAB_HUB_ORDER = [
     'razze',
@@ -111,6 +102,16 @@ const LAB_CATEGORIES = {
     }
 };
 
+function _labTabIcon(file, className = 'lab-hub-icon-img') {
+    if (!file) return '';
+    return `<img class="${className}" src="images/Tabs/${encodeURIComponent(file)}.svg" alt="" loading="lazy">`;
+}
+
+function _labCategoryIcon(cat, className = 'lab-card-icon-img') {
+    if (cat?.iconFile) return _labTabIcon(cat.iconFile, className);
+    return cat?.icon || '';
+}
+
 window.labGetSidebarItems = function() {
     return LAB_HUB_ORDER
         .map(key => [key, LAB_CATEGORIES[key]])
@@ -123,7 +124,8 @@ window.labGetSidebarItems = function() {
 };
 
 window.labGetCurrentSidebarTab = function() {
-    return _labReactState?.view === 'sub' ? (_labReactState.tab || '') : '';
+    const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
+    return subVisible ? _labCurrentTab : '';
 };
 
 function _labActiveTab() {
@@ -140,18 +142,97 @@ function _labActiveCategory() {
 // HUB & SUB-PAGE NAVIGATION
 // ============================================================================
 
-window.labGetBookmarkState = function() {
-    const current = _labReactState || { view: 'hub', tab: 'razze', subtab: 'razze' };
-    const tab = current.tab || 'razze';
-    const active = current.subtab || tab;
+function labRenderHub() {
+    const grid = document.getElementById('labHubGrid');
+    if (!grid) return;
+    grid.style.display = 'flex';
+    grid.style.flexDirection = 'column';
+    grid.style.gridTemplateColumns = '';
+    grid.style.gridTemplateRows = '';
+    grid.style.gridAutoFlow = '';
+    const rows = [];
+    const categories = LAB_HUB_ORDER
+        .map(key => [key, LAB_CATEGORIES[key]])
+        .filter(([, cat]) => !!cat);
+    for (let i = 0; i < categories.length; i += 2) {
+        rows.push(`
+            <div class="lab-hub-row" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:1;min-height:0;">
+                ${categories.slice(i, i + 2).map(([key, cat]) => `
+                    <button type="button" class="lab-hub-card" onclick="labOpenCategory('${key}')">
+                        <span class="lab-hub-card-icon" aria-hidden="true">${_labTabIcon(cat.iconFile)}</span>
+                        <span class="lab-hub-card-label">${cat.labelPlural || cat.label + 'i'}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `);
+    }
+    grid.innerHTML = rows.join('');
+}
+
+window.labOpenCategory = function(tab) {
+    _labCurrentTab = tab;
     const cat = LAB_CATEGORIES[tab];
+    if (!cat) return;
+
+    const hub = document.getElementById('labHub');
+    const sub = document.getElementById('labSubPage');
+    if (hub) hub.style.display = 'none';
+    if (sub) sub.style.display = '';
+
+    const title = document.getElementById('labSubTitle');
+    if (title) title.textContent = cat.labelPlural || cat.label;
+    _labScrollToTop();
+
+    _labSyncAddButton();
+
+    document.getElementById('labImportBtn')?.remove();
+
+    if (cat.isSettings) {
+        _labSetStickyTools('');
+        labRenderSettings();
+    } else {
+        loadLabContent();
+    }
+};
+
+function _labSyncAddButton() {
+    const cat = _labActiveCategory();
+    const addBtn = document.getElementById('addHomebrewBtn');
+    if (!addBtn || !cat) return;
+    addBtn.style.visibility = (cat.isSettings || cat.isReadOnly) ? 'hidden' : '';
+}
+
+window.labBackToHub = function() {
+    const hub = document.getElementById('labHub');
+    const sub = document.getElementById('labSubPage');
+    if (hub) hub.style.display = '';
+    if (sub) sub.style.display = 'none';
+    _labSetStickyTools('');
+    _labScrollToTop();
+};
+
+window.laboratorioShowHub = window.labBackToHub;
+
+window.labOpenSettings = function() {
+    labOpenCategory('impostazioni');
+};
+
+window.labGetBookmarkState = function() {
+    const subVisible = document.getElementById('labSubPage')?.style.display !== 'none';
+    const active = _labActiveTab();
+    const cat = _labActiveCategory();
+    const title = subVisible
+        ? (document.getElementById('labSubTitle')?.textContent || cat?.labelPlural || 'Laboratorio')
+        : 'Laboratorio';
+    const sectionParts = ['Laboratorio'];
+    if (subVisible) sectionParts.push(cat?.labelPlural || cat?.label || active);
     return {
-        title: current.view === 'hub' ? 'Laboratorio' : (cat?.labelPlural || cat?.label || 'Laboratorio'),
-        section: ['Laboratorio', current.view === 'sub' ? (LAB_CATEGORIES[active]?.labelPlural || LAB_CATEGORIES[active]?.label || active) : ''].filter(Boolean).join(' > '),
-        key: current.view === 'hub' ? 'hub' : `${tab}:${active}`,
+        title,
+        section: sectionParts.join(' > '),
+        key: subVisible ? `${_labCurrentTab}:${active}` : 'hub',
         state: {
-            view: current.view,
-            tab,
+            view: subVisible ? 'sub' : 'hub',
+            tab: _labCurrentTab,
             classiSubTab: _labClassiSubTab,
             nemiciSubTab: _labNemiciSubTab,
             talentiStiliSubTab: _labTalentiStiliSubTab,
@@ -166,12 +247,71 @@ window.labRestoreBookmarkState = async function(saved) {
     if (data.nemiciSubTab) _labNemiciSubTab = data.nemiciSubTab;
     if (data.talentiStiliSubTab) _labTalentiStiliSubTab = data.talentiStiliSubTab;
     if (data.listState) window._labListState = { ...window._labListState, ...data.listState };
-    const subtab = data.tab === 'classi' ? data.classiSubTab : data.tab === 'nemici' ? data.nemiciSubTab : data.tab === 'talenti' ? data.talentiStiliSubTab : data.tab;
-    window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: data.view || 'hub', tab: data.tab || 'razze', subtab, state: data } }));
+    if (data.view === 'sub' && LAB_CATEGORIES[data.tab]) {
+        await labOpenCategory(data.tab);
+    } else {
+        labBackToHub();
+    }
 };
 
+function _labScrollToTop() {
+    requestAnimationFrame(() => {
+        document.getElementById('mainContent')?.scrollTo({ top: 0, left: 0 });
+        window.scrollTo?.({ top: 0, left: 0 });
+    });
+}
+
 async function loadLabContent() {
-    _labNotifyReactRefresh();
+    const container = document.getElementById('labContent');
+    if (!container) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn) {
+        _labSetStickyTools('');
+        container.innerHTML = '<div class="content-placeholder"><p>Accedi per creare i tuoi contenuti homebrew</p></div>';
+        return;
+    }
+
+    const cat = LAB_CATEGORIES[_labCurrentTab];
+    if (!cat) return;
+
+    if (!AppState.currentUser?.uid) return;
+
+    if (_labCurrentTab === 'classi') {
+        await _loadLabClassiSection();
+        return;
+    }
+    // La categoria "nemici" ha un selettore di sub-tab interno (Nemici / Combattimenti).
+    if (_labCurrentTab === 'nemici') {
+        await _loadLabNemiciSection();
+        return;
+    }
+    if (_labCurrentTab === 'talenti') {
+        await _loadLabTalentiStiliSection();
+        return;
+    }
+    container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const { data, error } = await supabase
+        .from(cat.table)
+        .select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Errore caricamento laboratorio:', error);
+        container.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        _labRenderHomebrewListWithFilters(container, cat, [], _labCurrentTab, {
+            emptyHtml: `<div class="lab-empty">Nessun contenuto homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+        });
+        return;
+    }
+
+    _labRenderHomebrewListWithFilters(container, cat, data, _labCurrentTab);
 }
 
 // ============================================================================
@@ -180,6 +320,7 @@ async function loadLabContent() {
 
 window._labListState = window._labListState || {};
 window._labListAllData = window._labListAllData || {};
+window._labListRenderers = window._labListRenderers || {};
 
 function _labListGetState(tab) {
     if (!window._labListState[tab]) {
@@ -347,6 +488,21 @@ function _labListGetFilterDefs(tab) {
     return [];
 }
 
+function _labListSearchPlaceholder(tab) {
+    if (tab === 'classi') return 'Cerca classe...';
+    if (tab === 'sottoclassi') return 'Cerca sottoclasse...';
+    if (tab === 'razze') return 'Cerca razza...';
+    if (tab === 'background') return 'Cerca background...';
+    if (tab === 'talenti') return 'Cerca talento...';
+    if (tab === 'stili') return 'Cerca stile...';
+    if (tab === 'nemici') return 'Cerca nemico...';
+    if (tab === 'combattimenti') return 'Cerca combattimento...';
+    if (tab === 'suppliche') return 'Cerca supplica...';
+    if (tab === 'incantesimi') return 'Cerca per nome o scuola...';
+    if (tab === 'oggetti') return 'Cerca per nome o tipo...';
+    return 'Cerca...';
+}
+
 function _labListItemMatchesSearch(tab, item, q) {
     if (!q) return true;
     const needle = q.toLowerCase();
@@ -423,9 +579,83 @@ function _labListBuildFiltersPanelHtml(tab, data) {
     return fields || '<div class="comp-empty">Nessun filtro disponibile per questa lista.</div>';
 }
 
-function _labListReRenderList(tab) {
-    _labNotifyReactRefresh();
+function _labListBuildToolbarHtml(tab, data) {
+    const state = _labListGetState(tab);
+    const activeN = _labListActiveFiltersCount(tab);
+    return `
+    <div class="filters-bar lab-list-toolbar page-tools-row">
+        <div class="filter-search-wrap">
+            <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="labListSearch" class="filter-search"
+                placeholder="${escapeHtml(_labListSearchPlaceholder(tab))}"
+                value="${escapeHtml(state.search || '')}"
+                oninput="labListOnSearch('${tab}', this.value)">
+        </div>
+        <button type="button" id="labListFiltersBtn" class="comp-filter-btn" onclick="labListOpenFiltersDialog('${tab}')" aria-label="Filtri">
+            ${_labFilterIcon()}
+            <span>Filtri</span>
+            ${activeN ? `<strong id="labListFiltersBadge">${activeN}</strong>` : '<strong id="labListFiltersBadge" style="display:none;"></strong>'}
+        </button>
+    </div>`;
 }
+
+function _labSetStickyTools(html) {
+    const target = document.getElementById('labStickyTools');
+    if (target) target.innerHTML = html || '';
+}
+
+function _labRenderStickyTools(tab, data) {
+    if (!tab || LAB_CATEGORIES[tab]?.isSettings) {
+        _labSetStickyTools('');
+        return;
+    }
+    _labSetStickyTools(_labListBuildToolbarHtml(tab, data || []));
+}
+
+function _labRenderHomebrewListWithFilters(container, cat, data, tab, options = {}) {
+    window._labListAllData[tab] = data;
+    window._labListRenderers[tab] = {
+        render: options.render || ((item) => labRenderCard(item, cat)),
+        emptyHtml: options.emptyHtml || '<div class="lab-empty">Nessun risultato per i filtri impostati</div>',
+    };
+    const state = _labListGetState(tab);
+    const filtered = _labListApplyFilters(tab, data, state);
+    _labRenderStickyTools(tab, data);
+    const renderer = window._labListRenderers[tab];
+    const listHtml = filtered.length === 0
+        ? renderer.emptyHtml
+        : `<div class="lab-list">${filtered.map(renderer.render).join('')}</div>`;
+    container.innerHTML = `<div id="labListContainer">${listHtml}</div>`;
+}
+
+function _labListReRenderList(tab) {
+    const data = window._labListAllData[tab] || [];
+    const state = _labListGetState(tab);
+    const filtered = _labListApplyFilters(tab, data, state);
+    const wrap = document.getElementById('labListContainer');
+    if (!wrap) return;
+    const renderer = window._labListRenderers[tab] || {};
+    const render = renderer.render || ((item) => labRenderCard(item, LAB_CATEGORIES[tab]));
+    wrap.innerHTML = filtered.length === 0
+        ? (renderer.emptyHtml || '<div class="lab-empty">Nessun risultato per i filtri impostati</div>')
+        : `<div class="lab-list">${filtered.map(render).join('')}</div>`;
+    _labListRefreshBadge(tab);
+}
+
+function _labListRefreshBadge(tab) {
+    const badge = document.getElementById('labListFiltersBadge');
+    if (!badge) return;
+    const n = _labListActiveFiltersCount(tab);
+    badge.textContent = n || '';
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+}
+
+window.labListToggleFilters = function(tab) {
+    labListOpenFiltersDialog(tab);
+};
 
 window.labListOpenFiltersDialog = function(tab) {
     const overlay = document.createElement('div');
@@ -443,6 +673,12 @@ window.labListOpenFiltersDialog = function(tab) {
         </div>
     `;
     document.body.appendChild(overlay);
+};
+
+window.labListOnSearch = function(tab, value) {
+    const state = _labListGetState(tab);
+    state.search = value || '';
+    _labListReRenderList(tab);
 };
 
 window.labListSetFilter = function(tab, key, value) {
@@ -475,7 +711,10 @@ window.labListPickFilter = function(tab, key, encodedOptions, title, mode = 'mul
 
 window.labListResetFilters = function(tab) {
     const state = _labListGetState(tab);
+    state.search = '';
     state.filters = {};
+    const inp = document.getElementById('labListSearch');
+    if (inp) inp.value = '';
     const panel = document.querySelector('.lab-filter-overlay .comp-filter-panel');
     if (panel) panel.innerHTML = _labListBuildFiltersPanelHtml(tab, window._labListAllData[tab] || []);
     _labListReRenderList(tab);
@@ -489,6 +728,231 @@ function _labListFilterValues(value) {
 
 function _labEscapeAttr(value) {
     return String(value || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function _labFilterIcon() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="21" x2="4" y2="14"></line>
+        <line x1="4" y1="10" x2="4" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12" y2="3"></line>
+        <line x1="20" y1="21" x2="20" y2="16"></line>
+        <line x1="20" y1="12" x2="20" y2="3"></line>
+        <line x1="1" y1="14" x2="7" y2="14"></line>
+        <line x1="9" y1="8" x2="15" y2="8"></line>
+        <line x1="17" y1="16" x2="23" y2="16"></line>
+    </svg>`;
+}
+
+async function _loadLabNemiciSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labNemiciSubTab;
+    const tabsHtml = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub==='nemici'?'active':''}" onclick="labNemiciSetSubTab('nemici')">
+                <span class="lab-subtab-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-subtab-icon-img')}</span><span>Mostri</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub==='combattimenti'?'active':''}" onclick="labNemiciSetSubTab('combattimenti')">
+                <span class="lab-subtab-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-subtab-icon-img')}</span><span>Combattimenti</span>
+            </button>
+        </div>
+        <div id="labNemiciSubContent"></div>`;
+    container.innerHTML = tabsHtml;
+    _labSetStickyTools('');
+    const sc = document.getElementById('labNemiciSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    if (sub === 'nemici') {
+        const { data, error } = await supabase
+            .from('homebrew_nemici').select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) { sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>'; return; }
+        const cat = LAB_CATEGORIES.nemici;
+        _labRenderHomebrewListWithFilters(sc, cat, data || [], 'nemici', {
+            emptyHtml: `<div class="lab-empty">Nessun nemico homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+            render: (item) => labRenderCard(item, cat),
+        });
+    } else {
+        const { data, error } = await supabase
+            .from('homebrew_combattimenti').select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) {
+            sc.innerHTML = `<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>backend/supabase/sql/add-homebrew-combattimenti.sql</code>?</small></div>`;
+            return;
+        }
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.nemici, data || [], 'combattimenti', {
+            emptyHtml: `<div class="lab-empty">Nessun combattimento. Premi <strong>+</strong> per crearne uno!</div>`,
+            render: _labRenderCombatCard,
+        });
+    }
+}
+
+async function _loadLabClassiSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labClassiSubTab;
+    container.innerHTML = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub === 'classi' ? 'active' : ''}" onclick="labClassiSetSubTab('classi')">
+                <span class="lab-subtab-icon">${_labTabIcon('Classi', 'lab-subtab-icon-img')}</span><span>Classi</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub === 'sottoclassi' ? 'active' : ''}" onclick="labClassiSetSubTab('sottoclassi')">
+                <span class="lab-subtab-icon">${_labTabIcon('Classi', 'lab-subtab-icon-img')}</span><span>Sottoclassi</span>
+            </button>
+        </div>
+        <div id="labClassiSubContent"></div>`;
+    _labSyncAddButton();
+
+    const sc = document.getElementById('labClassiSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const { data, error } = await supabase
+        .from('homebrew_classi')
+        .select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('created_at', { ascending: false });
+    if (error) {
+        _labSetStickyTools('');
+        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>';
+        return;
+    }
+
+    const rows = data || [];
+    if (sub === 'sottoclassi') {
+        const subclasses = rows.filter(row => String(row.parent_class_slug || '').trim());
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.sottoclassi, subclasses, 'sottoclassi', {
+            emptyHtml: `<div class="lab-empty">Nessuna sottoclasse homebrew. Premi <strong>+</strong> per crearne una!</div>`,
+        });
+        return;
+    }
+
+    const classes = rows.filter(row => !String(row.parent_class_slug || '').trim());
+    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.classi, classes, 'classi', {
+        emptyHtml: `<div class="lab-empty">Nessuna classe homebrew. Premi <strong>+</strong> per crearne una!</div>`,
+    });
+}
+
+window.labClassiSetSubTab = function(sub) {
+    _labClassiSubTab = sub === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    loadLabContent();
+};
+
+async function _loadLabTalentiStiliSection() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) return;
+
+    const sub = _labTalentiStiliSubTab;
+    container.innerHTML = `
+        <div class="lab-subtabs">
+            <button type="button" class="lab-subtab ${sub === 'talenti' ? 'active' : ''}" onclick="labTalentiStiliSetSubTab('talenti')">
+                <span class="lab-subtab-icon">${_labTabIcon('Talenti e Stili', 'lab-subtab-icon-img')}</span><span>Talenti</span>
+            </button>
+            <button type="button" class="lab-subtab ${sub === 'stili' ? 'active' : ''}" onclick="labTalentiStiliSetSubTab('stili')">
+                <span class="lab-subtab-icon">${_labTabIcon('Talenti e Stili', 'lab-subtab-icon-img')}</span><span>Stili</span>
+            </button>
+        </div>
+        <div id="labTalentiStiliSubContent"></div>`;
+    _labSyncAddButton();
+
+    const sc = document.getElementById('labTalentiStiliSubContent');
+    sc.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    if (sub === 'talenti') {
+        const { data, error } = await supabase
+            .from('homebrew_talenti')
+            .select('*')
+            .eq('user_id', AppState.currentUser.uid)
+            .order('created_at', { ascending: false });
+        if (error) { sc.innerHTML = '<div class="lab-empty">Errore nel caricamento</div>'; return; }
+        _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.talenti, data || [], 'talenti', {
+            emptyHtml: `<div class="lab-empty">Nessun talento homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+        });
+        return;
+    }
+
+    const { data, error } = await supabase
+        .from('homebrew_stili')
+        .select('*')
+        .eq('user_id', AppState.currentUser.uid)
+        .order('created_at', { ascending: false });
+    if (error) {
+        _labSetStickyTools('');
+        sc.innerHTML = '<div class="lab-empty">Errore nel caricamento.<br><small>Hai eseguito <code>backend/supabase/sql/add-homebrew-stili.sql</code>?</small></div>';
+        return;
+    }
+    _labRenderHomebrewListWithFilters(sc, LAB_CATEGORIES.stili, data || [], 'stili', {
+        emptyHtml: `<div class="lab-empty">Nessuno stile homebrew. Premi <strong>+</strong> per crearne uno!</div>`,
+    });
+}
+
+window.labTalentiStiliSetSubTab = function(sub) {
+    _labTalentiStiliSubTab = sub === 'stili' ? 'stili' : 'talenti';
+    loadLabContent();
+};
+
+function _labRenderCombatCard(item) {
+    const arr = Array.isArray(item.mostri) ? item.mostri : [];
+    const totMostri = arr.length;
+    const list = arr.slice(0, 3)
+        .map(m => escapeHtml(m?.snapshot?.nome || m?.nome || 'Mostro'))
+        .join(', ');
+    const more = totMostri > 3 ? ` +${totMostri - 3}` : '';
+    const detail = totMostri
+        ? `${totMostri} mostri · ${list}${more}`
+        : 'Nessun mostro';
+    return `
+    <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="labEditCombatHomebrew('${item.id}')">
+        <div class="lab-card-icon">${_labTabIcon('Mostri e Combattimenti', 'lab-card-icon-img')}</div>
+        <div class="lab-card-info">
+            <p class="lab-card-name">${escapeHtml(item.nome)}</p>
+            <p class="lab-card-detail">${detail}</p>
+        </div>
+        <div class="lab-card-actions">
+            <button class="lab-delete" onclick="event.stopPropagation();labDeleteCombatHomebrew('${item.id}')" title="Elimina">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+    </div>`;
+}
+
+window.labNemiciSetSubTab = function(sub) {
+    _labNemiciSubTab = (sub === 'combattimenti') ? 'combattimenti' : 'nemici';
+    loadLabContent();
+};
+
+function labRenderCard(item, cat, tabOverride) {
+    const tab = tabOverride || _labActiveTab();
+    const detail = labGetCardDetail(item, tab);
+    // Tutta la card e' cliccabile: per i nemici apre la scheda di
+    // dettaglio (viewer dedicato), per tutto il resto apre direttamente
+    // il dialog di modifica con lo stato attuale gia' caricato.
+    const cardOnClick = tab === 'nemici'
+        ? `labViewNemico('${item.id}')`
+        : `labEditItem('${item.id}')`;
+    return `
+    <div class="lab-card lab-card-clickable" data-id="${item.id}" onclick="${cardOnClick}">
+        <div class="lab-card-icon">${_labCategoryIcon(cat)}</div>
+        <div class="lab-card-info">
+            <p class="lab-card-name">${escapeHtml(item.nome)}</p>
+            ${detail ? `<p class="lab-card-detail">${escapeHtml(detail)}</p>` : ''}
+        </div>
+        <div class="lab-card-actions">
+            <button class="lab-delete" onclick="event.stopPropagation();labDeleteItem('${item.id}')" title="Elimina">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+    </div>`;
 }
 
 function labGetCardDetail(item, tab) {
@@ -2142,6 +2606,24 @@ window.labCombatSave = async function() {
     loadLabContent();
 };
 
+window.labEditCombatHomebrew = async function(id) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data, error } = await supabase.from('homebrew_combattimenti').select('*').eq('id', id).single();
+    if (error || !data) { showNotification('Errore nel caricamento'); return; }
+    _openLabCombatHomebrewWizard(data);
+};
+
+window.labDeleteCombatHomebrew = async function(id) {
+    const confirmed = await showConfirm('Eliminare questo combattimento homebrew?');
+    if (!confirmed) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { error } = await supabase.from('homebrew_combattimenti').delete().eq('id', id);
+    if (error) { showNotification('Errore nella cancellazione'); return; }
+    loadLabContent();
+};
+
 function _openLabNemiciWizard(data) {
     const modal = document.getElementById('homebrewModal');
     if (!modal) return;
@@ -3079,6 +3561,43 @@ window.closeHomebrewModal = function() {
     }
 };
 
+window.labEditItem = async function(id) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const cat = _labActiveCategory();
+    if (!cat) return;
+    const { data, error } = await supabase.from(cat.table).select('*').eq('id', id).single();
+    if (error || !data) { showNotification('Errore nel caricamento'); return; }
+    openHomebrewModal(data);
+};
+
+window.labDeleteItem = async function(id) {
+    const confirmed = await showConfirm('Eliminare questo contenuto homebrew?');
+    if (!confirmed) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const cat = _labActiveCategory();
+    if (!cat) return;
+    const { error } = await supabase.from(cat.table).delete().eq('id', id);
+    if (error) { showNotification('Errore nella cancellazione'); return; }
+    showNotification('Eliminato');
+    loadLabContent();
+    if (cat.table === 'homebrew_classi' && typeof loadHomebrewSottoclassi === 'function') {
+        loadHomebrewSottoclassi();
+    }
+    if (cat.table === 'homebrew_oggetti' && typeof loadHomebrewOggetti === 'function') {
+        loadHomebrewOggetti();
+    }
+    if (cat.table === 'homebrew_incantesimi' && typeof loadHomebrewIncantesimi === 'function') {
+        loadHomebrewIncantesimi();
+    }
+    if (cat.table === 'homebrew_stili' && typeof loadHomebrewStili === 'function') {
+        loadHomebrewStili();
+    }
+    if (cat.table === 'homebrew_suppliche' && typeof loadHomebrewSuppliche === 'function') {
+        loadHomebrewSuppliche();
+    }
+};
 
 async function handleSaveHomebrew(e) {
     e.preventDefault();
@@ -3237,6 +3756,100 @@ async function handleSaveHomebrew(e) {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = _labEditingId ? 'Salva' : 'Crea'; }
     }
 }
+
+// ============================================================================
+// SETTINGS PAGE
+// ============================================================================
+
+async function labRenderSettings() {
+    const container = document.getElementById('labContent');
+    if (!container) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.currentUser?.uid) {
+        container.innerHTML = '<div class="lab-empty">Accedi per gestire le impostazioni</div>';
+        return;
+    }
+
+    container.innerHTML = '<div class="lab-empty">Caricamento...</div>';
+
+    const userData = await findUserByUid(AppState.currentUser.uid);
+    if (!userData) { container.innerHTML = '<div class="lab-empty">Errore</div>'; return; }
+
+    const hbSettings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    const isEnabled = hbSettings.enabled !== false;
+
+    const { data: amici } = await supabase.rpc('get_amici');
+    const amiciList = amici || [];
+
+    const amiciHtml = amiciList.length > 0 ? amiciList.map(a => {
+        const checked = (hbSettings.amici_abilitati || []).includes(a.amico_id) ? 'checked' : '';
+        return `<label class="lab-settings-friend">
+            <input type="checkbox" value="${a.amico_id}" ${checked} onchange="labToggleFriendHb(this)">
+            <span>${escapeHtml(a.nome_utente || 'Amico')}${a.cid ? ' #' + a.cid : ''}</span>
+        </label>`;
+    }).join('') : '<p class="lab-empty" style="padding:8px 0;">Nessun amico aggiunto</p>';
+
+    container.innerHTML = `
+    <div class="lab-settings">
+        <div class="lab-settings-section">
+            <div class="lab-settings-row">
+                <span class="lab-settings-label">Mostra contenuti homebrew</span>
+                <label class="lab-toggle">
+                    <input type="checkbox" id="labHbEnabled" ${isEnabled ? 'checked' : ''} onchange="labToggleHbEnabled(this)">
+                    <span class="lab-toggle-slider"></span>
+                </label>
+            </div>
+            <p class="lab-settings-hint">Quando attivo, i contenuti homebrew tuoi e degli amici selezionati saranno visibili durante la creazione dei personaggi.</p>
+        </div>
+
+        <div class="lab-settings-section">
+            <div class="lab-settings-section-title">Homebrew degli amici</div>
+            <p class="lab-settings-hint">Seleziona gli amici di cui vuoi visualizzare i contenuti homebrew.</p>
+            <div class="lab-settings-friends" id="labFriendsList">
+                ${amiciHtml}
+            </div>
+        </div>
+    </div>`;
+}
+
+window.labToggleHbEnabled = async function(cb) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) return;
+    const settings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    settings.enabled = cb.checked;
+    await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
+    userData.homebrew_settings = settings;
+    if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
+    if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
+    if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
+    if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
+    if (typeof loadHomebrewSuppliche === 'function') loadHomebrewSuppliche();
+};
+
+window.labToggleFriendHb = async function(cb) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const userData = await findUserByUid(AppState.currentUser?.uid);
+    if (!userData) return;
+    const settings = userData.homebrew_settings || { enabled: false, amici_abilitati: [] };
+    if (!settings.amici_abilitati) settings.amici_abilitati = [];
+    const friendId = cb.value;
+    if (cb.checked) {
+        if (!settings.amici_abilitati.includes(friendId)) settings.amici_abilitati.push(friendId);
+    } else {
+        settings.amici_abilitati = settings.amici_abilitati.filter(id => id !== friendId);
+    }
+    await supabase.from('utenti').update({ homebrew_settings: settings, updated_at: new Date().toISOString() }).eq('id', userData.id);
+    userData.homebrew_settings = settings;
+    if (typeof loadHomebrewSottoclassi === 'function') loadHomebrewSottoclassi();
+    if (typeof loadHomebrewOggetti === 'function') loadHomebrewOggetti();
+    if (typeof loadHomebrewIncantesimi === 'function') loadHomebrewIncantesimi();
+    if (typeof loadHomebrewStili === 'function') loadHomebrewStili();
+    if (typeof loadHomebrewSuppliche === 'function') loadHomebrewSuppliche();
+};
 
 // ============================================================================
 // VIEW NEMICO (scheda read-only in modal)
@@ -3445,6 +4058,13 @@ window.labMonsterToggleSpellSlot = async function(monsterId, level, pipIdx, ev) 
 function initLaboratorio() {
     if (initLaboratorio._done) return;
     initLaboratorio._done = true;
+
+    labRenderHub();
+
+    const addBtn = document.getElementById('addHomebrewBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', () => openHomebrewModal());
+    }
 
     const closeBtn = document.getElementById('closeHomebrewModal');
     if (closeBtn) closeBtn.addEventListener('click', closeHomebrewModal);
@@ -4026,6 +4646,24 @@ function _labImportUpdateAnalyzeState(root) {
 
 // Apre la dialog di importazione bulk per la categoria specificata
 // ('oggetti' o 'incantesimi'). Usa _LAB_IMPORT_CONFIGS per i contenuti.
+window.labOpenImportDialog = function(category) {
+    const cat = _LAB_IMPORT_CONFIGS[category];
+    if (!cat) {
+        console.warn('[lab-import] categoria non supportata:', category);
+        return;
+    }
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay lab-import-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal lab-import-modal">
+            ${_labImportContentHtml(cat, "this.closest('.hp-calc-overlay').remove()", true)}
+        </div>`;
+    document.body.appendChild(overlay);
+    overlay._parsed = [];
+    overlay._cat = cat;
+    _labWireImportControls(overlay);
+};
 
 window._labImportFileChanged = async function(ev) {
     const root = ev.target?.closest?.('.lab-import-overlay, .lab-import-host') || _labImportRoot();
@@ -4182,51 +4820,4 @@ window._labImportSave = async function() {
     if (typeof cat.cacheReload === 'function') {
         try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
     }
-};
-
-// React owns the page shell and lists; the mature legacy editors remain
-// available through this narrow bridge until their forms are migrated.
-window.getLaboratorioReactConfig = function() {
-    return LAB_HUB_ORDER.map(key => ({
-        key,
-        label: LAB_CATEGORIES[key].labelPlural || LAB_CATEGORIES[key].label,
-        iconFile: LAB_CATEGORIES[key].iconFile,
-    }));
-};
-
-window.setLaboratorioReactState = function(state) {
-    _labReactState = state || null;
-    if (!state) return;
-    _labCurrentTab = state.tab || 'razze';
-    if (state.tab === 'classi') _labClassiSubTab = state.subtab === 'sottoclassi' ? 'sottoclassi' : 'classi';
-    if (state.tab === 'talenti') _labTalentiStiliSubTab = state.subtab === 'stili' ? 'stili' : 'talenti';
-    if (state.tab === 'nemici') _labNemiciSubTab = state.subtab === 'combattimenti' ? 'combattimenti' : 'nemici';
-};
-
-window.getLaboratorioReactList = function(tab, items, search) {
-    const rows = Array.isArray(items) ? items : [];
-    const state = _labListGetState(tab);
-    state.search = search || '';
-    window._labListAllData[tab] = rows;
-    return {
-        items: _labListApplyFilters(tab, rows, state),
-        activeFilters: _labListActiveFiltersCount(tab),
-        hasFilters: _labListGetFilterDefs(tab).length > 0,
-    };
-};
-
-window.getLaboratorioReactCardDetail = function(item, tab) {
-    return labGetCardDetail(item, tab);
-};
-
-window.openLaboratorioReactEditor = function(tab, activeTab, item) {
-    _labCurrentTab = tab || activeTab || 'razze';
-    if (_labCurrentTab === 'classi') _labClassiSubTab = activeTab === 'sottoclassi' ? 'sottoclassi' : 'classi';
-    if (_labCurrentTab === 'talenti') _labTalentiStiliSubTab = activeTab === 'stili' ? 'stili' : 'talenti';
-    if (_labCurrentTab === 'nemici') _labNemiciSubTab = activeTab === 'combattimenti' ? 'combattimenti' : 'nemici';
-    if (activeTab === 'nemici' && item?.id) {
-        labViewNemico(item.id);
-        return;
-    }
-    openHomebrewModal(item);
 };

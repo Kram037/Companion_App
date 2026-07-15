@@ -4,27 +4,13 @@
 
 const BOOKMARKS_VERSION = 1;
 const BOOKMARKS_MAX = 24;
-const DESKTOP_LAYOUT_QUERY = '(min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px)';
-const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 let _bookmarkRefreshTimer = null;
 let _bookmarkAutoUpdateTimer = null;
-let _bookmarkRestoreInProgress = _bookmarkIsSplitPaneInstance;
+let _bookmarkRestoreInProgress = false;
 let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
-let _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-let _bookmarkDraggedTabId = '';
-let _bookmarkDragBeforeId = '';
-let _bookmarkDropHandled = false;
-const DESKTOP_COMP_EQUIPMENT_CHILDREN = [
-    { key: 'armi', label: 'Armi, Armature e Scudi', iconFile: 'Equipaggiamento/Armi_Armature_Scudi' },
-    { key: 'avventura', label: 'Avventura', iconFile: 'Equipaggiamento/Avventura' },
-    { key: 'strumenti', label: 'Strumenti', iconFile: 'Equipaggiamento/Strumenti' },
-    { key: 'erbe', label: 'Erbe', iconFile: 'Equipaggiamento/Erbe' },
-    { key: 'metalli', label: 'Metalli', iconFile: 'Equipaggiamento/Metalli' },
-    { key: 'gemme', label: 'Gemme', iconFile: 'Equipaggiamento/Gemme' },
-    { key: 'veleni', label: 'Veleni', iconFile: 'Equipaggiamento/Veleni' },
-    { key: 'oggetti', label: 'Oggetti Magici', iconFile: 'Equipaggiamento/Oggetti Magici' },
-];
+let _bookmarkRightPaneState = { page: '', tab: '' };
+const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 const DESKTOP_LAB_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
     { key: 'classi', label: 'Classi', iconFile: 'Classi' },
@@ -39,7 +25,7 @@ const DESKTOP_COMP_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
     { key: 'classi', label: 'Classi', iconFile: 'Classi' },
     { key: 'background', label: 'Background', iconFile: 'Background' },
-    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento', children: DESKTOP_COMP_EQUIPMENT_CHILDREN },
+    { key: 'oggetti', label: 'Equipaggiamento', iconFile: 'Equipaggiamento' },
     { key: 'talenti_stili', label: 'Talenti e Stili', iconFile: 'Talenti e Stili' },
     { key: 'mostri', label: 'Mostri e Combattimenti', iconFile: 'Mostri e Combattimenti' },
     { key: 'suppliche', label: 'Suppliche Occulte', iconFile: 'Suppliche' },
@@ -117,7 +103,7 @@ function _bookmarkRemovePaneItems(pane) {
 }
 
 function _bookmarkActivePageEl() {
-    return document.querySelector('#react-root .react-page-shell') || document.querySelector('.page.active');
+    return document.querySelector('.page.active');
 }
 
 function _bookmarkMainScrollTop() {
@@ -244,8 +230,7 @@ function _bookmarkIsWritablePage() {
 }
 
 function _bookmarkIsDesktopLayout() {
-    return typeof window.matchMedia === 'function'
-        && window.matchMedia(DESKTOP_LAYOUT_QUERY).matches;
+    return typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 900px)').matches;
 }
 
 function _bookmarkSplitFrameWindow() {
@@ -307,24 +292,17 @@ function _bookmarkDefaultGroupTab(page) {
 }
 
 function _bookmarkNormalizeDesktopHook(page, hook = {}) {
-    if ((!_bookmarkIsDesktopLayout() && !_bookmarkIsSplitPaneInstance) || !['laboratorio', 'compendio'].includes(page)) return hook || {};
+    if (!_bookmarkIsDesktopLayout() || !['laboratorio', 'compendio'].includes(page)) return hook || {};
     const data = { ...(hook || {}) };
     if (data.view !== 'sub') {
         data.view = 'sub';
     }
     data.tab = data.tab || _bookmarkDefaultGroupTab(page);
-    if (page === 'compendio' && data.tab === 'oggetti') {
-        const equipment = _desktopGroupChildren('compendio').find(item => item.key === 'oggetti')?.children || [];
-        data.tabState = {
-            ...(data.tabState || {}),
-            equipmentSection: data.tabState?.equipmentSection || equipment[0]?.key || 'armi',
-        };
-    }
     return data;
 }
 
 function getDesktopDefaultGroupTab(page) {
-    if (!_bookmarkIsSplitPaneInstance && !_bookmarkIsDesktopLayout()) return '';
+    if (_bookmarkIsSplitPaneInstance || !_bookmarkIsDesktopLayout()) return '';
     if (!['laboratorio', 'compendio'].includes(page)) return '';
     return _bookmarkDefaultGroupTab(page);
 }
@@ -379,7 +357,8 @@ window.restorePageBookmarkState = async function(page, saved) {
         if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') return schedaOpenSpellPage(pgId);
         if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') return schedaOpenInventoryPage(pgId);
         if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') return schedaOpenPrivilegesPage(pgId);
-        return _schedaRequestReactRefresh(pgId, 'scheda');
+        if (typeof renderSchedaPersonaggio === 'function') return renderSchedaPersonaggio(pgId);
+        return;
     }
     if (page === 'personaggioCreate' && typeof pgWizardGoTo === 'function') {
         pgWizardGoTo(parseInt(saved.step, 10) || 0);
@@ -441,9 +420,6 @@ function captureActiveBookmark({ silent = true } = {}) {
 
     const old = list[idx];
     const snap = _bookmarkCurrentSnapshot(old.id);
-    const chromeChanged = old.title !== snap.title
-        || old.section !== snap.section
-        || old.page !== snap.page;
     list[idx] = {
         ...old,
         ...snap,
@@ -456,7 +432,7 @@ function captureActiveBookmark({ silent = true } = {}) {
     };
     _bookmarksWrite(list);
     if (!silent) showNotification?.('Scheda aggiornata');
-    if (chromeChanged) updateBookmarkChrome();
+    updateBookmarkChrome();
 }
 
 function scheduleActiveBookmarkCapture(delay = 160) {
@@ -465,7 +441,7 @@ function scheduleActiveBookmarkCapture(delay = 160) {
 }
 
 function createBookmarkTab() {
-    _bookmarkFocusCurrentPane({ render: false });
+    _bookmarkFocusCurrentPane();
     captureActiveBookmark({ silent: true });
     const snap = _bookmarkCurrentSnapshot();
     delete snap.autoDesktop;
@@ -489,26 +465,6 @@ function removeBookmark(id) {
             setTimeout(() => openBookmark(nextId), 0);
             return;
         }
-        if (_bookmarkIsSplitPaneInstance) {
-            window.parent?.postMessage({ type: 'companion-close-empty-split-pane' }, window.location.origin);
-            return;
-        }
-        if (document.getElementById('desktopSplitPane')) {
-            const rightItems = _bookmarkPaneItems(list, 'right');
-            const storedRightId = localStorage.getItem(_bookmarksActiveRightKey()) || '';
-            const rightId = rightItems.some(item => item.id === storedRightId) ? storedRightId : (rightItems[0]?.id || '');
-            if (rightId) {
-                _bookmarksWrite(list.map(item => _bookmarkItemPane(item) === 'right' ? { ...item, pane: 'left' } : item));
-                _bookmarkSetActiveId('');
-                localStorage.removeItem(_bookmarksActiveRightKey());
-                document.getElementById('desktopSplitPane')?.remove();
-                document.body.classList.remove('desktop-split-active');
-                _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-                _bookmarkSetFocusedPane('left', { render: false });
-                setTimeout(() => openBookmark(rightId), 0);
-                return;
-            }
-        }
     }
     updateBookmarkChrome();
 }
@@ -516,7 +472,7 @@ function removeBookmark(id) {
 async function openBookmark(id) {
     const item = _bookmarksRead().find(b => b.id === id);
     if (!item) return;
-    _bookmarkFocusCurrentPane({ render: false });
+    _bookmarkFocusCurrentPane();
     captureActiveBookmark({ silent: true });
     closeBookmarksSheet();
     _bookmarkRestoreInProgress = true;
@@ -526,6 +482,13 @@ async function openBookmark(id) {
     AppState.currentCampagnaId = st.campagnaId || null;
     AppState.currentSessioneId = st.sessioneId || null;
     AppState.currentPersonaggioId = st.personaggioId || null;
+
+    if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
+    else sessionStorage.removeItem('currentCampagnaId');
+    if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
+    else sessionStorage.removeItem('currentSessioneId');
+    if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
+    else sessionStorage.removeItem('currentPersonaggioId');
 
     const targetPage = st.page || item.page || 'campagne';
     const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});
@@ -559,7 +522,13 @@ function _bookmarkSplitIconSvg() {
 }
 
 function openActiveBookmarkSplitPane() {
-    openBookmarkSplitPane();
+    const list = _bookmarkEnsureMinimumDesktopTab() || _bookmarksRead();
+    let id = _bookmarkGetActiveId();
+    if (!id && list[0]) {
+        id = list[0].id;
+        _bookmarkSetActiveId(id);
+    }
+    if (id) openBookmarkSplitPane(id);
 }
 
 function _bookmarkEnsureSplitPane() {
@@ -580,83 +549,43 @@ function _bookmarkEnsureSplitPane() {
     return pane;
 }
 
-function openBookmarkSplitPane() {
+function openBookmarkSplitPane(id) {
+    const item = _bookmarksRead().find(tab => tab.id === id);
+    if (!item) return;
+    captureActiveBookmark({ silent: true });
     if (!document.getElementById('desktopSplitPane')) {
         _bookmarkRemovePaneItems('right');
     }
-    const now = _bookmarkNow();
     const splitTab = {
+        ...item,
         id: `bm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         pane: 'right',
-        fingerprint: 'campagne||||',
-        title: 'Campagne',
-        section: 'Campagne',
-        page: 'campagne',
-        state: {
-            page: 'campagne',
-            campagnaId: null,
-            sessioneId: null,
-            personaggioId: null,
-            scrollTop: 0,
-            hook: {},
-        },
-        userCreated: true,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: _bookmarkNow(),
+        updatedAt: _bookmarkNow(),
     };
     _bookmarksWrite([splitTab, ..._bookmarksRead()]);
     localStorage.setItem(_bookmarksActiveRightKey(), splitTab.id);
     const pane = _bookmarkEnsureSplitPane();
     const title = pane.querySelector('#desktopSplitPaneTitle');
-    if (title) title.textContent = splitTab.title;
+    if (title) title.textContent = item.title || 'Scheda affiancata';
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: splitTab.id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
+    setTimeout(postOpen, 220);
     _bookmarkRightPaneState = {
-        page: 'campagne',
-        tab: '',
-        section: '',
+        page: splitTab.state?.page || splitTab.page || '',
+        tab: splitTab.state?.hook?.tab || '',
     };
     _bookmarkSetFocusedPane('right');
 }
 
 function closeBookmarkSplitPane() {
+    document.getElementById('desktopSplitPane')?.remove();
     _bookmarkRemovePaneItems('right');
-    _bookmarkCloseSplitShell();
-    _bookmarkSetFocusedPane('left');
-}
-
-function _bookmarkMergeSplitPaneForMobile() {
-    const pane = document.getElementById('desktopSplitPane');
-    if (_bookmarkIsSplitPaneInstance || _bookmarkIsDesktopLayout() || !pane) return;
-
-    captureActiveBookmark({ silent: true });
-    try {
-        pane.querySelector('iframe')?.contentWindow?.captureActiveBookmark?.({ silent: true });
-    } catch (_) { /* iframe in chiusura */ }
-
-    const list = _bookmarksRead();
-    const rightItems = list.filter(item => _bookmarkItemPane(item) === 'right');
-    const storedRightId = localStorage.getItem(_bookmarksActiveRightKey()) || '';
-    const rightId = rightItems.some(item => item.id === storedRightId) ? storedRightId : (rightItems[0]?.id || '');
-    const focusWasRight = _bookmarkFocusedPane === 'right';
-    const targetId = focusWasRight && rightId ? rightId : _bookmarkGetActiveId();
-    _bookmarksWrite(list.map(item => ({
-        ...item,
-        pane: 'left',
-        autoDesktop: false,
-        userCreated: true,
-    })));
-
-    pane.remove();
     localStorage.removeItem(_bookmarksActiveRightKey());
+    _bookmarkRightPaneState = { page: '', tab: '' };
     document.body.classList.remove('desktop-split-active');
-    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-    _bookmarkSetActiveId(targetId || '');
-    _bookmarkSetFocusedPane('left', { render: false });
-
-    if (targetId && focusWasRight) setTimeout(() => openBookmark(targetId), 0);
-    else updateBookmarkChrome();
+    _bookmarkSetFocusedPane('left');
 }
 
 function _bookmarkRestorePersistedSplitPane() {
@@ -679,11 +608,11 @@ function _bookmarkRestorePersistedSplitPane() {
     _bookmarkRightPaneState = {
         page: active.state?.page || active.page || '',
         tab: active.state?.hook?.tab || '',
-        section: active.state?.hook?.tabState?.equipmentSection || '',
     };
     const frame = pane.querySelector('#desktopSplitPaneFrame');
     const postOpen = () => frame.contentWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: active.id }, window.location.origin);
     frame.addEventListener('load', postOpen, { once: true });
+    setTimeout(postOpen, 260);
     _bookmarkSetFocusedPane('left');
 }
 
@@ -769,37 +698,20 @@ function _bookmarkBindSheetDrag(overlay) {
     sheet.addEventListener('pointercancel', end);
 }
 
-const DESKTOP_CAMPAIGNS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
-const DESKTOP_CHARACTERS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-
 function _desktopNavItems() {
     return [
-        { type: 'link', page: 'campagne', label: 'Campagne', icon: DESKTOP_CAMPAIGNS_ICON },
-        { type: 'link', page: 'personaggi', label: 'Personaggi', icon: DESKTOP_CHARACTERS_ICON },
-        { type: 'group', page: 'laboratorio', label: 'Laboratorio', iconSrc: 'images/Toolbar/Laboratorio.svg', children: _desktopGroupChildren('laboratorio') },
-        { type: 'group', page: 'compendio', label: 'Compendio', iconSrc: 'images/Toolbar/Compendio.svg', children: _desktopGroupChildren('compendio') },
+        { type: 'link', page: 'campagne', label: 'Campagne', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>' },
+        { type: 'link', page: 'personaggi', label: 'Personaggi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { type: 'group', page: 'laboratorio', label: 'Laboratorio', icon: '<span class="toolbar-icon toolbar-icon-laboratorio" aria-hidden="true"></span>', children: _desktopGroupChildren('laboratorio') },
+        { type: 'group', page: 'compendio', label: 'Compendio', icon: '<span class="toolbar-icon toolbar-icon-compendio" aria-hidden="true"></span>', children: _desktopGroupChildren('compendio') },
     ];
-}
-
-function _bookmarkTabMacroIcon(page) {
-    const macroPage = ['dettagli', 'sessione', 'combattimento'].includes(page)
-        ? 'campagne'
-        : ['personaggioCreate', 'scheda', 'amici'].includes(page)
-            ? 'personaggi'
-            : page;
-    if (macroPage === 'campagne') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CAMPAIGNS_ICON}</span>`;
-    if (macroPage === 'personaggi') return `<span class="desktop-bookmark-tab-icon" aria-hidden="true">${DESKTOP_CHARACTERS_ICON}</span>`;
-    if (macroPage === 'laboratorio') return '<span class="desktop-bookmark-tab-icon desktop-bookmark-tab-icon-mask icon-laboratorio" aria-hidden="true"></span>';
-    if (macroPage === 'compendio') return '<span class="desktop-bookmark-tab-icon desktop-bookmark-tab-icon-mask icon-compendio" aria-hidden="true"></span>';
-    return '';
 }
 
 function _desktopSidebarItemIcon(item) {
     if (item.icon) return item.icon;
-    const src = item.iconSrc || (item.iconFile
-        ? `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`
-        : '');
-    return src ? `<img class="desktop-sidebar-item-icon" src="${src}" alt="">` : '';
+    if (!item.iconFile) return '';
+    const src = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
+    return `<img class="desktop-sidebar-item-icon" src="${src}" alt="" loading="lazy">`;
 }
 
 function _desktopGroupOpen(page) {
@@ -808,23 +720,9 @@ function _desktopGroupOpen(page) {
 }
 
 function _desktopToggleGroup(page) {
-    const group = document.querySelector(`.desktop-sidebar-group[data-page="${page}"]`);
-    const isOpen = group?.classList.contains('open') ?? _desktopGroupOpen(page);
+    const isOpen = _desktopGroupOpen(page);
     localStorage.setItem(_desktopGroupStorageKey(page), isOpen ? 'closed' : 'open');
-    group?.classList.toggle('open', !isOpen);
-    group?.querySelector('.desktop-sidebar-group-toggle')?.setAttribute('aria-expanded', String(!isOpen));
-}
-
-function _desktopSubgroupOpen(page, tab) {
-    return localStorage.getItem(`${_desktopGroupStorageKey(page)}_${tab}`) === 'open';
-}
-
-function _desktopToggleSubgroup(page, tab) {
-    const group = document.querySelector(`.desktop-sidebar-subgroup[data-page="${page}"][data-tab="${tab}"]`);
-    const isOpen = group?.classList.contains('open') ?? _desktopSubgroupOpen(page, tab);
-    localStorage.setItem(`${_desktopGroupStorageKey(page)}_${tab}`, isOpen ? 'closed' : 'open');
-    group?.classList.toggle('open', !isOpen);
-    group?.querySelector('.desktop-sidebar-subgroup-toggle')?.setAttribute('aria-expanded', String(!isOpen));
+    renderDesktopSidebar();
 }
 
 function _desktopGroupStorageKey(page) {
@@ -843,28 +741,21 @@ function _bookmarkEnsureDesktopChrome() {
                 _desktopToggleGroup(toggle.dataset.page);
                 return;
             }
-            const subgroup = event.target.closest('.desktop-sidebar-subgroup-toggle');
-            if (subgroup) {
-                _desktopToggleSubgroup(subgroup.dataset.page, subgroup.dataset.tab);
-                return;
-            }
-            const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child, .desktop-sidebar-grandchild');
+            const btn = event.target.closest('.desktop-sidebar-btn, .desktop-sidebar-child');
             if (!btn) return;
-            _routeDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '', btn.dataset.section || '');
+            _routeDesktopSidebarTarget(btn.dataset.page, btn.dataset.tab || '');
         });
         document.body.appendChild(sidebar);
     }
 
-    let rail = document.getElementById('desktopBookmarkTabs');
-    if (!rail) {
-        rail = document.createElement('div');
+    if (!document.getElementById('desktopBookmarkTabs')) {
+        const rail = document.createElement('div');
         rail.id = 'desktopBookmarkTabs';
         rail.className = 'desktop-bookmark-tabs';
         rail.setAttribute('aria-label', 'Schede aperte');
         document.querySelector('.header')?.insertAdjacentElement('afterend', rail);
+        _bookmarkBindTabRailWheel(rail);
     }
-    _bookmarkBindTabRailWheel(rail);
-    _bookmarkBindTabRailDrag(rail);
     if (!window._bookmarkDesktopPaneFocusBound) {
         window._bookmarkDesktopPaneFocusBound = true;
         document.getElementById('mainContent')?.addEventListener('pointerdown', () => _bookmarkSetFocusedPane('left', { render: false }), true);
@@ -874,18 +765,15 @@ function _bookmarkEnsureDesktopChrome() {
 }
 
 function _bookmarkEnsureSplitInstanceChrome() {
-    let rail = document.getElementById('desktopBookmarkTabs');
-    if (!rail) {
-        rail = document.createElement('div');
-        rail.id = 'desktopBookmarkTabs';
-        rail.className = 'desktop-bookmark-tabs desktop-bookmark-tabs-split';
-        rail.setAttribute('aria-label', 'Schede aperte');
-        const main = document.getElementById('mainContent');
-        if (main) main.insertAdjacentElement('beforebegin', rail);
-        else document.body.appendChild(rail);
-    }
+    if (document.getElementById('desktopBookmarkTabs')) return;
+    const rail = document.createElement('div');
+    rail.id = 'desktopBookmarkTabs';
+    rail.className = 'desktop-bookmark-tabs desktop-bookmark-tabs-split';
+    rail.setAttribute('aria-label', 'Schede aperte');
+    const main = document.getElementById('mainContent');
+    if (main) main.insertAdjacentElement('beforebegin', rail);
+    else document.body.appendChild(rail);
     _bookmarkBindTabRailWheel(rail);
-    _bookmarkBindTabRailDrag(rail);
 }
 
 function _bookmarkBindTabRailWheel(rail) {
@@ -898,211 +786,44 @@ function _bookmarkBindTabRailWheel(rail) {
     }, { passive: false });
 }
 
-function _bookmarkClearDropIndicators(rail) {
-    rail?.classList.remove('drag-over');
-    rail?.querySelectorAll('.drop-before, .drop-after').forEach(tab => tab.classList.remove('drop-before', 'drop-after'));
-}
-
-function _bookmarkBindTabRailDrag(rail) {
-    if (!rail || rail._bookmarkDragBound) return;
-    rail._bookmarkDragBound = true;
-    rail.addEventListener('dragstart', (event) => {
-        const tab = event.target.closest('.desktop-bookmark-tab');
-        if (!tab || event.target.closest('.desktop-bookmark-tab-close')) {
-            event.preventDefault();
-            return;
-        }
-        event.dataTransfer.effectAllowed = 'move';
-        _bookmarkDraggedTabId = tab.dataset.bookmarkId || '';
-        _bookmarkDragBeforeId = '';
-        _bookmarkDropHandled = false;
-        event.dataTransfer.setData('text/plain', _bookmarkDraggedTabId);
-        tab.classList.add('dragging');
-    });
-    rail.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-        _bookmarkClearDropIndicators(rail);
-        rail.classList.add('drag-over');
-        const tab = event.target.closest('.desktop-bookmark-tab');
-        if (!tab) {
-            const tabs = rail.querySelectorAll('.desktop-bookmark-tab');
-            const lastTab = tabs[tabs.length - 1];
-            if (!lastTab || event.clientX >= lastTab.getBoundingClientRect().right) _bookmarkDragBeforeId = '';
-            return;
-        }
-        const after = event.clientX > tab.getBoundingClientRect().left + (tab.offsetWidth / 2);
-        _bookmarkDragBeforeId = after
-            ? (tab.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? tab.nextElementSibling.dataset.bookmarkId : '')
-            : (tab.dataset.bookmarkId || '');
-        tab.classList.add(after ? 'drop-after' : 'drop-before');
-    });
-    rail.addEventListener('drop', (event) => {
-        event.preventDefault();
-        const id = event.dataTransfer.getData('text/plain') || _bookmarkDraggedTabId;
-        const tab = event.target.closest('.desktop-bookmark-tab');
-        const after = tab && event.clientX > tab.getBoundingClientRect().left + (tab.offsetWidth / 2);
-        const beforeId = tab
-            ? (after ? (tab.nextElementSibling?.classList.contains('desktop-bookmark-tab') ? tab.nextElementSibling.dataset.bookmarkId : '') : (tab.dataset.bookmarkId || ''))
-            : _bookmarkDragBeforeId;
-        _bookmarkDropHandled = true;
-        _bookmarkClearDropIndicators(rail);
-        if (id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
-    });
-    rail.addEventListener('dragend', () => {
-        const id = _bookmarkDraggedTabId;
-        const beforeId = _bookmarkDragBeforeId;
-        const handled = _bookmarkDropHandled;
-        _bookmarkDraggedTabId = '';
-        _bookmarkDragBeforeId = '';
-        _bookmarkDropHandled = false;
-        rail.querySelector('.desktop-bookmark-tab.dragging')?.classList.remove('dragging');
-        _bookmarkClearDropIndicators(rail);
-        if (!handled && id) _bookmarkRequestTabMove(id, _bookmarkCurrentPane(), beforeId);
-    });
-}
-
-function _bookmarkRequestTabMove(id, targetPane, beforeId = '') {
-    if (_bookmarkIsSplitPaneInstance) {
-        window.parent?.postMessage({
-            type: 'companion-move-bookmark',
-            bookmarkId: id,
-            targetPane,
-            beforeId,
-        }, window.location.origin);
-        return;
-    }
-    _bookmarkMoveTab(id, targetPane, beforeId);
-}
-
-function _bookmarkRenderAllRails() {
-    renderDesktopBookmarkTabs();
-    try {
-        _bookmarkSplitFrameWindow()?.renderDesktopBookmarkTabs?.();
-    } catch (_) { /* iframe in navigazione */ }
-}
-
-function _bookmarkCloseSplitShell() {
-    document.getElementById('desktopSplitPane')?.remove();
-    localStorage.removeItem(_bookmarksActiveRightKey());
-    _bookmarkRightPaneState = { page: '', tab: '', section: '' };
-    document.body.classList.remove('desktop-split-active');
-}
-
-async function _bookmarkMoveTab(id, targetPane, beforeId = '') {
-    if (!['left', 'right'].includes(targetPane) || beforeId === id) return;
-    let list = _bookmarksRead();
-    let moving = list.find(item => item.id === id);
-    if (!moving) return;
-    const sourcePane = _bookmarkItemPane(moving);
-    if (targetPane === 'right' && !_bookmarkSplitFrameWindow()) return;
-
-    if (sourcePane === 'left') captureActiveBookmark({ silent: true });
-    else {
-        try { _bookmarkSplitFrameWindow()?.captureActiveBookmark?.({ silent: true }); } catch (_) { /* iframe in navigazione */ }
-    }
-    list = _bookmarksRead();
-    moving = list.find(item => item.id === id);
-    if (!moving) return;
-
-    const without = list.filter(item => item.id !== id);
-    const moved = { ...moving, pane: targetPane, autoDesktop: false, userCreated: true, updatedAt: _bookmarkNow() };
-    let insertAt = beforeId
-        ? without.findIndex(item => item.id === beforeId && _bookmarkItemPane(item) === targetPane)
-        : -1;
-    if (insertAt < 0) {
-        insertAt = without.length;
-        for (let i = without.length - 1; i >= 0; i -= 1) {
-            if (_bookmarkItemPane(without[i]) === targetPane) {
-                insertAt = i + 1;
-                break;
-            }
-        }
-    }
-    without.splice(insertAt, 0, moved);
-    _bookmarksWrite(without);
-
-    if (sourcePane === targetPane) {
-        _bookmarkRenderAllRails();
-        return;
-    }
-
-    const sourceItems = without.filter(item => _bookmarkItemPane(item) === sourcePane);
-    const sourceActiveId = sourcePane === 'right'
-        ? (localStorage.getItem(_bookmarksActiveRightKey()) || '')
-        : _bookmarkGetActiveId();
-    const sourceWasActive = sourceActiveId === id;
-
-    if (sourcePane === 'left') {
-        if (!sourceItems.length) {
-            _bookmarksWrite(without.map(item => _bookmarkItemPane(item) === 'right' ? { ...item, pane: 'left' } : item));
-            _bookmarkCloseSplitShell();
-            _bookmarkSetActiveId(id);
-            _bookmarkSetFocusedPane('left', { render: false });
-            updateBookmarkChrome();
-            return;
-        }
-        if (sourceWasActive) await openBookmark(sourceItems[0].id);
-        const frameWindow = _bookmarkSplitFrameWindow();
-        if (frameWindow?.openBookmark) await frameWindow.openBookmark(id);
-        else frameWindow?.postMessage({ type: 'companion-open-bookmark', bookmarkId: id }, window.location.origin);
-        _bookmarkSetFocusedPane('right');
-        return;
-    }
-
-    const frameWindow = _bookmarkSplitFrameWindow();
-    if (sourceWasActive && sourceItems.length) await frameWindow?.openBookmark?.(sourceItems[0].id);
-    if (!sourceItems.length) {
-        _bookmarkCloseSplitShell();
-        _bookmarkSetFocusedPane('left', { render: false });
-    }
-    await openBookmark(id);
-    _bookmarkSetFocusedPane('left');
-}
-
 function _bookmarkPostCurrentPaneState() {
     if (!_bookmarkIsSplitPaneInstance) return;
     window.parent?.postMessage({
         type: 'companion-split-focus',
         page: AppState.currentPage || '',
         tab: _desktopActiveChild(AppState.currentPage || ''),
-        section: _desktopActiveSection(AppState.currentPage || ''),
     }, window.location.origin);
 }
 
-async function _openDesktopSidebarTarget(page, tab = '', section = '') {
+async function _openDesktopSidebarTarget(page, tab = '') {
     if (page === 'laboratorio') {
-        const changingPage = AppState.currentPage !== 'laboratorio';
-        if (changingPage) window.__pendingLaboratorioTarget = { tab };
-        if (changingPage) await navigateToPage('laboratorio');
-        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: tab || 'razze' } }));
-        if (!changingPage) delete window.__pendingLaboratorioTarget;
+        await navigateToPage('laboratorio');
+        if (tab) window.labOpenCategory?.(tab);
         return;
     }
     if (page === 'compendio') {
-        window.__pendingCompendioTarget = { tab, section };
-        if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
-        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: tab || 'razze', section } }));
+        await navigateToPage('compendio');
+        if (tab) window.compendioOpenTab?.(tab);
         return;
     }
-    if (AppState.currentPage !== page) await navigateToPage(page);
+    await navigateToPage(page);
 }
 
-function _routeDesktopSidebarTarget(page, tab = '', section = '') {
+function _routeDesktopSidebarTarget(page, tab = '') {
     const frameWindow = _bookmarkSplitFrameWindow();
     if (_bookmarkFocusedPane === 'right' && frameWindow) {
-        _bookmarkRightPaneState = { page, tab, section };
+        _bookmarkRightPaneState = { page, tab };
         updateDesktopSidebarActive();
         frameWindow.postMessage({
             type: 'companion-sidebar-target',
             page,
             tab,
-            section,
         }, window.location.origin);
         return;
     }
-    _bookmarkSetFocusedPane('left', { render: false });
-    _openDesktopSidebarTarget(page, tab, section);
+    _bookmarkSetFocusedPane('left');
+    captureActiveBookmark({ silent: true });
+    _openDesktopSidebarTarget(page, tab);
 }
 
 function _desktopActiveChild(page) {
@@ -1118,16 +839,6 @@ function _desktopActiveChild(page) {
     return '';
 }
 
-function _desktopActiveSection(page) {
-    if (!_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right') {
-        return _bookmarkRightPaneState.page === page ? (_bookmarkRightPaneState.section || '') : '';
-    }
-    if (page === 'compendio' && typeof window.compGetCurrentSidebarSection === 'function') {
-        return window.compGetCurrentSidebarSection();
-    }
-    return '';
-}
-
 function _desktopSidebarFocusedPage() {
     return !_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right'
         ? (_bookmarkRightPaneState.page || '')
@@ -1138,7 +849,6 @@ function renderDesktopSidebar() {
     const sidebar = document.getElementById('desktopSidebarNav');
     if (!sidebar) return;
     const focusedPage = _desktopSidebarFocusedPage();
-    const activeSection = _desktopActiveSection(focusedPage);
     sidebar.innerHTML = _desktopNavItems().map(item => {
         if (item.type !== 'group') {
             return `
@@ -1158,33 +868,12 @@ function renderDesktopSidebar() {
                     <span class="desktop-sidebar-caret">v</span>
                 </button>
                 <div class="desktop-sidebar-children">
-                    ${(item.children || []).map(child => {
-                        const active = focusedPage === item.page && activeChild === child.key;
-                        if (!child.children?.length) return `
-                            <button type="button" class="desktop-sidebar-child ${active ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
-                                ${_desktopSidebarItemIcon(child)}
-                                <span>${_bookmarkEscape(child.label)}</span>
-                            </button>
-                        `;
-                        const subOpen = _desktopSubgroupOpen(item.page, child.key);
-                        return `
-                            <div class="desktop-sidebar-subgroup ${subOpen ? 'open' : ''}" data-page="${item.page}" data-tab="${child.key}">
-                                <button type="button" class="desktop-sidebar-child desktop-sidebar-subgroup-toggle ${active ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" aria-expanded="${subOpen ? 'true' : 'false'}">
-                                    ${_desktopSidebarItemIcon(child)}
-                                    <span>${_bookmarkEscape(child.label)}</span>
-                                    <span class="desktop-sidebar-subgroup-caret">v</span>
-                                </button>
-                                <div class="desktop-sidebar-grandchildren">
-                                    ${child.children.map(section => `
-                                        <button type="button" class="desktop-sidebar-grandchild ${active && activeSection === section.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" data-section="${section.key}" title="${_bookmarkEscape(section.label)}">
-                                            ${_desktopSidebarItemIcon(section)}
-                                            <span>${_bookmarkEscape(section.label)}</span>
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                    ${(item.children || []).map(child => `
+                        <button type="button" class="desktop-sidebar-child ${focusedPage === item.page && activeChild === child.key ? 'active' : ''}" data-page="${item.page}" data-tab="${child.key}" title="${_bookmarkEscape(child.label)}">
+                            ${_desktopSidebarItemIcon(child)}
+                            <span>${_bookmarkEscape(child.label)}</span>
+                        </button>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -1192,19 +881,12 @@ function renderDesktopSidebar() {
 }
 
 function updateDesktopSidebarActive() {
+    renderDesktopSidebar();
     const focusedPage = _desktopSidebarFocusedPage();
-    const activeChild = _desktopActiveChild(focusedPage);
-    const activeSection = _desktopActiveSection(focusedPage);
     document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
         const isGroup = btn.classList.contains('desktop-sidebar-group-toggle');
         btn.classList.toggle('active', btn.dataset.page === focusedPage && !isGroup);
         btn.classList.toggle('group-active', btn.dataset.page === focusedPage && isGroup);
-    });
-    document.querySelectorAll('.desktop-sidebar-child').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === focusedPage && btn.dataset.tab === activeChild);
-    });
-    document.querySelectorAll('.desktop-sidebar-grandchild').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === focusedPage && btn.dataset.tab === activeChild && btn.dataset.section === activeSection);
     });
 }
 
@@ -1216,8 +898,7 @@ function renderDesktopBookmarkTabs() {
     const paneFocused = _bookmarkIsCurrentPaneFocused();
     const splitOpen = !_bookmarkIsSplitPaneInstance && !!document.getElementById('desktopSplitPane');
     const tabsHtml = list.map(item => `
-        <button type="button" class="desktop-bookmark-tab ${paneFocused && item.id === activeId ? 'active' : ''}" data-bookmark-id="${item.id}" draggable="true" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
-            ${_bookmarkTabMacroIcon(item.state?.page || item.page)}
+        <button type="button" class="desktop-bookmark-tab ${paneFocused && item.id === activeId ? 'active' : ''}" onclick="openBookmark('${item.id}')" title="${_bookmarkEscape(item.title)}">
             <span class="desktop-bookmark-tab-title">${_bookmarkEscape(item.title)}</span>
             <span class="desktop-bookmark-tab-section">${_bookmarkEscape(item.section || item.page)}</span>
             <span type="button" class="desktop-bookmark-tab-close" aria-label="Chiudi scheda" onclick="event.stopPropagation(); removeBookmark('${item.id}')">&times;</span>
@@ -1241,8 +922,9 @@ function initBookmarks() {
                 document.body.classList.toggle('split-pane-focused', event.data.pane === 'right');
                 renderDesktopBookmarkTabs();
             } else if (event.data?.type === 'companion-sidebar-target') {
-                _bookmarkFocusCurrentPane({ render: false });
-                _openDesktopSidebarTarget(event.data.page, event.data.tab || '', event.data.section || '');
+                _bookmarkFocusCurrentPane();
+                captureActiveBookmark({ silent: true });
+                _openDesktopSidebarTarget(event.data.page, event.data.tab || '');
                 setTimeout(_bookmarkPostCurrentPaneState, 80);
             }
         });
@@ -1295,37 +977,25 @@ function initBookmarks() {
     }
     _bookmarkEnsureDesktopChrome();
     _bookmarkSetFocusedPane('left');
-    if (!window._bookmarkDesktopLayoutBound) {
-        window._bookmarkDesktopLayoutBound = true;
-        const media = window.matchMedia(DESKTOP_LAYOUT_QUERY);
-        const syncLayout = () => {
-            if (!media.matches) _bookmarkMergeSplitPaneForMobile();
-        };
-        if (typeof media.addEventListener === 'function') media.addEventListener('change', syncLayout);
-        else media.addListener?.(syncLayout);
-    }
     window.addEventListener('message', (event) => {
         if (event.origin !== window.location.origin) return;
         if (event.data?.type === 'companion-split-focus') {
             _bookmarkRightPaneState = {
                 page: event.data.page || _bookmarkRightPaneState.page || '',
                 tab: event.data.tab || '',
-                section: event.data.section || '',
             };
             _bookmarkSetFocusedPane('right', { notify: false });
             updateDesktopSidebarActive();
-        } else if (event.data?.type === 'companion-close-empty-split-pane') {
-            closeBookmarkSplitPane();
-        } else if (event.data?.type === 'companion-move-bookmark' && event.data.bookmarkId) {
-            _bookmarkMoveTab(event.data.bookmarkId, event.data.targetPane || 'left', event.data.beforeId || '');
         }
     });
     if (!window._bookmarksInteractionRefreshBound) {
         window._bookmarksInteractionRefreshBound = true;
-        const schedule = (event) => {
-            if (event.target?.closest?.('.desktop-sidebar-nav, .desktop-bookmark-tabs')) return;
+        const schedule = () => {
             clearTimeout(_bookmarkRefreshTimer);
-            _bookmarkRefreshTimer = setTimeout(() => scheduleActiveBookmarkCapture(0), 180);
+            _bookmarkRefreshTimer = setTimeout(() => {
+                scheduleActiveBookmarkCapture(0);
+                updateBookmarkChrome();
+            }, 180);
         };
         document.addEventListener('click', schedule, true);
         document.addEventListener('input', schedule, true);
@@ -1339,6 +1009,7 @@ window.updateBookmarkChrome = updateBookmarkChrome;
 window.captureActiveBookmark = captureActiveBookmark;
 window.scheduleActiveBookmarkCapture = scheduleActiveBookmarkCapture;
 window.createBookmarkTab = createBookmarkTab;
+window.saveCurrentBookmark = createBookmarkTab;
 window.openBookmark = openBookmark;
 window.openBookmarkSplitPane = openBookmarkSplitPane;
 window.openActiveBookmarkSplitPane = openActiveBookmarkSplitPane;

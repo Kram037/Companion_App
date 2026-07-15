@@ -449,6 +449,7 @@ async function _doLevelUp(pgId, classIdx, pvGain, extraMsg = '', opts = {}) {
     } else {
         showNotification(`${cls.nome} salito al livello ${newLvl} (+${pvGain} PF${extraMsg})`);
     }
+    await renderSchedaPersonaggio(pgId);
 }
 
 window.schedaHdChange = function(pgId, className, current, delta, max) {
@@ -831,6 +832,11 @@ window.schedaConfirmCustomRes = async function(pgId, editIndex) {
     await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
     schedaCloseCustomResModal();
 
+    if (pg.tipo_scheda === 'micro') {
+        renderMicroScheda(pgId);
+    } else {
+        renderSchedaPersonaggio(pgId);
+    }
     showNotification(editing ? 'Risorsa aggiornata' : 'Risorsa aggiunta');
 }
 
@@ -852,6 +858,11 @@ window.schedaDeleteCustomRes = async function(pgId, index) {
 
     await schedaInstantSave(pgId, { risorse_classe: pg.risorse_classe });
 
+    if (pg.tipo_scheda === 'micro') {
+        renderMicroScheda(pgId);
+    } else {
+        renderSchedaPersonaggio(pgId);
+    }
     showNotification('Risorsa rimossa');
 }
 
@@ -900,6 +911,7 @@ async function _recalcEquipFromStats(pgId) {
         const updates = { classe_armatura: pg.classe_armatura };
         if (equipChanged) updates.equipaggiamento = pg.equipaggiamento;
         await schedaInstantSave(pgId, updates);
+        if (equipChanged) renderSchedaPersonaggio(pgId);
     }
 }
 

@@ -1,7 +1,6 @@
-const CACHE_NAME = 'companion-app-v232';
-const BUILD_ASSET_URLS = [];
+const CACHE_NAME = 'companion-app-v191';
 
-const LEGACY_APP_SHELL_URLS = [
+const APP_SHELL_URLS = [
     './',
     './index.html',
     './manifest.json',
@@ -33,9 +32,11 @@ const LEGACY_APP_SHELL_URLS = [
     './js/Personaggi/personaggi-slot-incantesimo.js',
     './js/Personaggi/personaggi-pv-keypad.js',
     './js/Personaggi/personaggi-wizard-navigation.js',
+    './js/Personaggi/personaggi-lista.js',
     './js/Personaggi/personaggi-scheda-core.js',
     './js/Personaggi/personaggi-scheda-risorse.js',
     './js/Personaggi/personaggi-incantesimi-preparati.js',
+    './js/Personaggi/personaggi-scheda-render.js',
     './js/Personaggi/personaggi-scheda-abilita.js',
     './js/Personaggi/personaggi-scheda-chrome.js',
     './js/Personaggi/personaggi-scheda-incantesimi.js',
@@ -51,6 +52,7 @@ const LEGACY_APP_SHELL_URLS = [
     './js/Personaggi/personaggi-form.js',
     './js/Personaggi/personaggi-campagna-picker.js',
     './js/Personaggi/personaggi-micro.js',
+    './js/Personaggi/personaggi.js',
     './js/Sessioni/sessions.js',
     './js/Core/realtime.js',
     './js/Sessioni/initiative.js',
@@ -68,7 +70,6 @@ const LEGACY_APP_SHELL_URLS = [
     './css/Compendio/compendio.css',
     './images/icon d20.png',
     './images/Scheda%20personaggio/Icona_scheda_combattimento.png',
-    './images/Toolbar/Compendio.svg',
     './images/Toolbar/Compendio-toolbar-20260521.svg',
     './images/Toolbar/Laboratorio.svg',
     './images/Tabs/Background.svg',
@@ -81,10 +82,6 @@ const LEGACY_APP_SHELL_URLS = [
     './images/Tabs/Talenti%20e%20Stili.svg',
     './images/Logo Leggenda.jpeg'
 ];
-
-const APP_SHELL_URLS = BUILD_ASSET_URLS.length
-    ? BUILD_ASSET_URLS
-    : LEGACY_APP_SHELL_URLS;
 
 const DATA_URL_PREFIXES = [
     './js/Compendio/data/',
@@ -99,7 +96,10 @@ const RUNTIME_SCRIPT_URLS = [
 ];
 
 self.addEventListener('install', (event) => {
-    event.waitUntil(precacheAppShell());
+    event.waitUntil(
+        precacheAppShell()
+            .then(() => self.skipWaiting())
+    );
 });
 
 self.addEventListener('activate', (event) => {
@@ -126,6 +126,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    if (shouldNetworkFirst(url)) {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
     if (shouldCacheFirst(url)) {
         event.respondWith(cacheFirst(request));
     }
@@ -136,6 +141,12 @@ function managedPath(url) {
     return path;
 }
 
+function shouldNetworkFirst(url) {
+    const path = managedPath(url);
+    if (!APP_SHELL_URLS.includes(path)) return false;
+    return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
+}
+
 function shouldCacheFirst(url) {
     const path = managedPath(url);
     if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
@@ -144,7 +155,7 @@ function shouldCacheFirst(url) {
 }
 
 async function cacheFirst(request) {
-    const cached = await caches.match(request, { ignoreSearch: true });
+    const cached = await caches.match(request);
     if (cached) return cached;
 
     const response = await fetch(request);
@@ -175,9 +186,9 @@ async function networkFirst(request, fallbackUrl) {
         }
         return response;
     } catch (error) {
-        return caches.match(request, { ignoreSearch: true }).then(cached => {
+        return caches.match(request).then(cached => {
             if (cached) return cached;
-            return fallbackUrl ? caches.match(fallbackUrl, { ignoreSearch: true }) : Response.error();
+            return fallbackUrl ? caches.match(fallbackUrl) : Response.error();
         });
     }
 }
@@ -230,8 +241,6 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    const data = event.notification.data || {};
-    const targetUrl = data.url || notificationRoute(data);
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
@@ -249,18 +258,8 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow(targetUrl);
+                return clients.openWindow(event.notification.data?.url || './index.html');
             }
         })
     );
 });
-
-function notificationRoute(data) {
-    if (data?.campagnaId && data?.sessioneId) {
-        return `./campagne/${data.campagnaId}/sessione/${data.sessioneId}/combattimento`;
-    }
-    if (data?.campagnaId) {
-        return `./campagne/${data.campagnaId}`;
-    }
-    return './index.html';
-}

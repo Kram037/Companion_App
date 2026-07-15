@@ -3,9 +3,285 @@
 // ============================================================================
 
 // Spell Page
-window.schedaOpenSpellPage = function(pgId) {
-    _schedaRequestReactRefresh(pgId, 'incantesimi');
-};
+window.schedaOpenSpellPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+
+    const bonusComp = Math.floor(((pg.livello || 1) - 1) / 4) + 2;
+    const classi = pg.classi || [];
+
+    // Aggrega per caratteristica (come prima) ma mantieni TUTTI i nomi delle classi
+    // che condividono quella caratteristica: l'utente potrebbe voler aggiungere bonus
+    // separati per classi diverse (es. oggetto che potenzia solo gli incantesimi da Mago).
+    const spellAbilities = [];
+    classi.forEach(c => {
+        const ab = CLASS_SPELL_ABILITY[c.nome];
+        if (!ab) return;
+        const existing = spellAbilities.find(s => s.ability === ab);
+        if (existing) {
+            if (!existing.classi.includes(c.nome)) existing.classi.push(c.nome);
+        } else {
+            const val = pg[ab] || 10;
+            const m = Math.floor((val - 10) / 2);
+            spellAbilities.push({ classi: [c.nome], ability: ab, mod: m });
+        }
+    });
+
+    const spellStatsHtml = spellAbilities.length > 0 ? spellAbilities.map(sa => {
+        const atkBase = sa.mod + bonusComp;
+        const dcBase = 8 + bonusComp + sa.mod;
+        // Somma bonus manuali di tutte le classi che condividono questa caratteristica.
+        let atkExtra = 0, dcExtra = 0;
+        sa.classi.forEach(cn => {
+            const b = _getCasterBonusFor(pg, cn);
+            atkExtra += b.atk;
+            dcExtra += b.dc;
+        });
+        const atkTot = atkBase + atkExtra;
+        const dcTot = dcBase + dcExtra;
+        const atkStr = atkTot >= 0 ? `+${atkTot}` : `${atkTot}`;
+        const modStr = sa.mod >= 0 ? `+${sa.mod}` : `${sa.mod}`;
+        const atkMark = atkExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+        const dcMark = dcExtra ? '<span class="scheda-bonus-mark" title="Bonus extra applicato">*</span>' : '';
+        const classiArg = encodeURIComponent(JSON.stringify(sa.classi));
+        const onAtk = `onclick="schedaOpenSpellAtkBonus('${pg.id}','${classiArg}')"`;
+        const onDc = `onclick="schedaOpenSpellDcBonus('${pg.id}','${classiArg}')"`;
+        const classesLabel = sa.classi.join(' / ');
+        const titleAtk = `title="${escapeHtml(classesLabel)} – bonus tiro per colpire"`;
+        const titleDc = `title="${escapeHtml(classesLabel)} – bonus CD"`;
+        return `
+        <div class="scheda-spell-stats-row" data-classi="${escapeHtml(classesLabel)}">
+            <div class="scheda-box"><div class="scheda-box-val">${modStr}</div><div class="scheda-box-label">Car. (${sa.ability.substring(0,3).toUpperCase()})</div></div>
+            <div class="scheda-box clickable" ${onAtk} ${titleAtk}><div class="scheda-box-val">${atkStr}${atkMark}</div><div class="scheda-box-label">Attacco Inc.</div></div>
+            <div class="scheda-box clickable" ${onDc} ${titleDc}><div class="scheda-box-val">${dcTot}${dcMark}</div><div class="scheda-box-label">CD Inc.</div></div>
+        </div>`;
+    }).join('') : '<p class="scheda-empty">Nessuna classe incantatrice</p>';
+
+    // Counter "Incantesimi preparati": visibile solo per le classi che usano
+    // la preparazione (Mago/Chierico/Druido/Paladino/Artefice). Il conteggio
+    // include solo gli incantesimi marcati come preparati di livello >= 1
+    // (i trucchetti non si preparano). Il massimo e' precompilato con la
+    // formula standard (mod + livello), sovrascrivibile manualmente.
+    const usesPrepared = _pgUsesPreparedSystem(pg);
+    const preparedCount = usesPrepared
+        ? (pg.incantesimi_preparati || [])
+            .map(n => _resolveSpell(n))
+            .filter(sp => sp && sp.level > 0).length
+        : 0;
+    const autoMax = _calcMaxPreparedAuto(pg);
+    const overrideMax = parseInt(_getBonusManuali(pg).spells_prepared_max) || 0;
+    const preparedMax = overrideMax > 0 ? overrideMax : autoMax;
+    const preparedRatio = preparedMax > 0 ? `${preparedCount} / ${preparedMax}` : `${preparedCount} / —`;
+    const preparedOver = preparedMax > 0 && preparedCount > preparedMax;
+    const preparedHint = overrideMax > 0
+        ? '<span class="scheda-prepared-hint">manuale</span>'
+        : (autoMax > 0 ? '<span class="scheda-prepared-hint">auto</span>' : '');
+    const preparedBlock = usesPrepared ? `
+        <div class="scheda-prepared-block ${preparedOver ? 'over' : ''}" onclick="schedaOpenPreparedMax('${pg.id}')" title="Clicca per modificare il massimo">
+            <div class="scheda-prepared-label">Incantesimi preparati ${preparedHint}</div>
+            <div class="scheda-prepared-value" id="schedaPreparedRatio">${preparedRatio}</div>
+        </div>` : '';
+
+    // Sincronizza gli slot salvati con quelli calcolati dalle classi correnti.
+    // Necessario per allineare PG esistenti dopo modifiche alle regole di calcolo
+    // (es. aggiunta Mystic Arcanum del Warlock o tabelle half/third caster fixate).
+    // Preserva "used" clampato al nuovo max e salva solo se ci sono differenze.
+    const expectedSlots = calcSpellSlotsFromClassi(classi);
+    const prevSlots = (pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object') ? pg.slot_incantesimo : {};
+    const reconciled = {};
+    let needsSync = false;
+    Object.keys(expectedSlots).forEach(lvKey => {
+        const lv = String(lvKey);
+        const max = expectedSlots[lvKey];
+        const prev = prevSlots[lv] || prevSlots[parseInt(lv)] || null;
+        const prevUsed = prev && Number.isFinite(parseInt(prev.used)) ? Math.min(parseInt(prev.used), max) : 0;
+        reconciled[lv] = { max, current: Math.max(0, max - prevUsed), used: prevUsed };
+        if (!prev || parseInt(prev.max) !== max) needsSync = true;
+    });
+    Object.keys(prevSlots).forEach(lv => { if (!(lv in reconciled)) needsSync = true; });
+    if (needsSync) {
+        pg.slot_incantesimo = reconciled;
+        schedaInstantSave(pgId, { slot_incantesimo: reconciled });
+    }
+
+    const slots = pg.slot_incantesimo || {};
+    const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
+    const slotsHtml = levels.length > 0 ? levels.map(lvl => {
+        const s = slots[lvl];
+        const pips = [];
+        for (let i = 0; i < s.max; i++) {
+            pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+        }
+        return `
+        <div class="scheda-slot-row">
+            <span class="scheda-slot-level">Lv ${lvl}</span>
+            <div class="scheda-slot-pips">${pips.join('')}</div>
+            <span class="scheda-slot-count" id="sSlotCount_${lvl}">${s.current}/${s.max}</span>
+        </div>`;
+    }).join('') : '<p class="scheda-empty">Nessuno slot disponibile</p>';
+
+    // Sezione "Slot magia innata" (solo se la razza fornisce incantesimi
+    // innati con ricarica, esclusi i trucchetti / a volonta').
+    const innateSlots = _pgRaceInnateSlots(pg);
+    let innateSlotsBlock = '';
+    if (innateSlots.length > 0) {
+        const rows = innateSlots.map(is => {
+            const lvlLabel = `Lv ${is.level_cast}`;
+            const sub = is.recharge ? ` <small>(${is.recharge})</small>` : '';
+            return `<div class="scheda-hd-row">
+                <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${lvlLabel}</small>${sub}</span>
+                <div class="scheda-hd-avail">
+                    <button class="scheda-hd-btn" onclick="schedaInnateSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                    <span class="scheda-hd-val" id="sInnSlot_${is.key}">${is.current}</span>
+                    <span class="scheda-hd-max">/ ${is.max}</span>
+                    <button class="scheda-hd-btn" onclick="schedaInnateSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        innateSlotsBlock = `
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot magia innata</div>
+        <div class="scheda-section-body">
+            <div class="scheda-hd-list">${rows}</div>
+        </div>
+    </div>`;
+    }
+
+    // Slot invocazioni 1/lungo (Warlock).
+    const invocationSlots = _pgInvocationSlots(pg);
+    let invocationSlotsBlock = '';
+    if (invocationSlots.length > 0) {
+        // Sulla pagina incantesimi mostra solo gli "slot invocazione"
+        // che corrispondono a un incantesimo (1/lungo). Le altre risorse
+        // limitate (es. Cloak of Flies, Tomb of Levistus) sono trattate
+        // come "risorse" e mostrate sulla pagina 1.
+        const spellInvSlots = invocationSlots.filter(is => is.is_spell);
+        if (spellInvSlots.length > 0) {
+            const rows = spellInvSlots.map(is => {
+                return `<div class="scheda-hd-row">
+                    <span class="scheda-hd-total">${escapeHtml(is.name)} <small class="scheda-innate-lvl">${escapeHtml(is.level_label)}</small> <small>(${escapeHtml(is.recharge)})</small></span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
+                        <span class="scheda-hd-val" id="sInvSlot_${is.key}">${is.current}</span>
+                        <span class="scheda-hd-max">/ ${is.max}</span>
+                        <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+            invocationSlotsBlock = `
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot suppliche</div>
+        <div class="scheda-section-body">
+            <div class="scheda-hd-list">${rows}</div>
+        </div>
+    </div>`;
+        }
+    }
+
+    const classeDisplay = classi.map(c => c.nome + (c.livello ? ' ' + c.livello : '')).join(' / ') || pg.classe || '';
+
+    // Determina quali livelli mostrare:
+    //   - trucchetti sempre,
+    //   - ogni livello con slot,
+    //   - ogni livello con almeno un incantesimo conosciuto,
+    //   - tutti i livelli da 0 al massimo conoscibile per le classi del PG
+    //     (fondamentale per il Warlock: ha solo slot di liv 5 ma conosce
+    //     incantesimi 1-5, e con il Mystic Arcanum 6/7/8/9 a partire da lv 11).
+    const ALL_DATA = _spellsData();
+    const knownLevels = new Set();
+    (pg.incantesimi_conosciuti || []).forEach(n => {
+        const sp = _resolveSpell(n);
+        if (sp) knownLevels.add(sp.level);
+    });
+    // Livelli con incantesimi razziali innati (devono apparire anche se la
+    // classe del PG non darebbe accesso a quel livello).
+    const innateLevels = new Set();
+    _pgRaceInnateSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name) || _resolveSpell(s.name_en);
+        if (sp) innateLevels.add(sp.level);
+    });
+    // Livelli con incantesimi auto-garantiti da sottoclasse (Domini,
+    // Giuramenti, Patroni con lista espansa, ecc.).
+    const subclassLevels = new Set();
+    _pgSubclassGrantedSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name);
+        if (sp) subclassLevels.add(sp.level);
+    });
+    // Livelli con incantesimi conferiti dalle invocazioni del Warlock.
+    const invocationLevels = new Set();
+    _pgInvocationGrantedSpells(pg).forEach(s => {
+        const sp = _resolveSpell(s.name) || _resolveSpell(s.name_en);
+        if (sp) invocationLevels.add(sp.level);
+    });
+    const maxKnowableLevel = _maxKnownSpellLevel(classi);
+    const knowableLevels = [];
+    for (let l = 0; l <= maxKnowableLevel; l++) knowableLevels.push(l);
+    const levelsToShow = new Set([0, ...knowableLevels, ...levels, ...knownLevels, ...innateLevels, ...subclassLevels, ...invocationLevels]);
+    // Mostra fino al massimo livello disponibile nel dataset
+    const maxAvail = Math.max(0, ...Object.values(ALL_DATA).map(s => s.level));
+    const orderedLevels = Array.from(levelsToShow)
+        .filter(l => l <= maxAvail)
+        .sort((a, b) => a - b);
+    // Split per layout 2-colonne su tablet/desktop:
+    //   colonna sinistra = trucchetti + livelli 1..4
+    //   colonna destra   = livelli 5..9 (+ eventuali successivi)
+    const leftLevels = orderedLevels.filter(l => l <= 4);
+    const rightLevels = orderedLevels.filter(l => l > 4);
+    const spellsLeftHtml = leftLevels.map(l => buildSpellLevelSection(pg, l)).join('');
+    const spellsRightHtml = rightLevels.map(l => buildSpellLevelSection(pg, l)).join('');
+
+    // Memorizza tab/personaggio corrente per il rerender al cambio lingua
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'incantesimi';
+
+    content.innerHTML = `
+    ${buildSchedaHeader(pg, 'Incantesimi')}
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Statistiche Incantatore</div>
+        <div class="scheda-section-body">${spellStatsHtml}${preparedBlock}</div>
+    </div>
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Slot Incantesimo</div>
+        <div class="scheda-section-body">
+        <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>
+    </div>
+    ${innateSlotsBlock}
+    ${invocationSlotsBlock}
+
+    <hr class="scheda-divider">
+
+    <div class="scheda-spells-grid">
+        <div class="scheda-spells-col scheda-spells-col-left">${spellsLeftHtml}</div>
+        <div class="scheda-spells-col scheda-spells-col-right">${spellsRightHtml || ''}</div>
+    </div>
+    `;
+
+    content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+        pip.addEventListener('click', () => {
+            const lvl = parseInt(pip.dataset.lvl);
+            const idx = parseInt(pip.dataset.idx);
+            schedaSlotToggleInline(pgId, lvl, idx);
+        });
+    });
+
+    const backBtn = document.getElementById('schedaBackBtn');
+    if (backBtn) backBtn.onclick = () => navigateToPage('personaggi');
+
+    schedaSetActiveTab('incantesimi');
+    schedaWireTabBar(pgId);
+}
+
+/* ── Spells / Trucchetti ── */
+// Restituisce SOLO gli incantesimi del catalogo "ufficiale" (file js/Personaggi/data/spells_data.js).
+function _spellsDataNative() { return window.SPELLS_DATA || {}; }
 
 // Adatta una riga di homebrew_incantesimi al formato usato dal picker
 // (chiavi: name, name_en, school, school_it, casting_time, range,
@@ -159,6 +435,145 @@ const SPELL_LEVEL_LABELS = {
     8: 'Incantesimi di Livello 8',
     9: 'Incantesimi di Livello 9'
 };
+
+function _spellIsConcentration(sp) {
+    if (!sp) return false;
+    const d = String(sp.duration || sp.duration_en || '').toLowerCase();
+    return d.includes('concentr');
+}
+
+function _spellConcMark(sp) {
+    return _spellIsConcentration(sp)
+        ? '<span class="spell-card-conc" title="Richiede concentrazione">C</span>'
+        : '';
+}
+
+// Toggle "preparato" per le spell card. Visibile solo per le classi
+// che usano la preparazione e per gli incantesimi conosciuti di livello >= 1
+// (i trucchetti e gli incantesimi razziali/sottoclasse/invocazione sono
+// sempre attivi).
+function _spellPrepToggle(pg, sp) {
+    if (!sp || sp.level === 0) return '';
+    if (!_pgUsesPreparedSystem(pg)) return '';
+    const prepared = _spellIsPrepared(pg, sp.name, sp.level);
+    const cls = prepared ? 'is-prepared' : '';
+    const tip = prepared ? 'Preparato (clicca per smarcare)' : 'Non preparato (clicca per preparare)';
+    const safeName = escapeAttr(sp.name);
+    return `<button type="button" class="spell-card-prep-btn ${cls}"
+        onclick="event.stopPropagation();schedaTogglePrepared('${pg.id}','${safeName}')"
+        title="${tip}" aria-label="${tip}"></button>`;
+}
+
+function buildSpellLevelSection(pg, level) {
+    const known = (pg.incantesimi_conosciuti || [])
+        .map(n => ({ raw: n, sp: _resolveSpell(n) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const knownNames = new Set(known.map(x => x.sp.name));
+
+    // Incantesimi razziali innati per questo livello, deduplicati e non
+    // sovrapposti agli "incantesimi conosciuti" (in tal caso prevale
+    // l'entry razziale che e' read-only).
+    const innate = _pgRaceInnateSpells(pg)
+        .map(s => ({ src: s, sp: _resolveSpell(s.name) || _resolveSpell(s.name_en) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenInnate = new Set();
+    const innateUnique = [];
+    innate.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key)) return;
+        seenInnate.add(key);
+        innateUnique.push(x);
+    });
+
+    // Incantesimi auto-garantiti da sottoclasse (Dominio Vita, Giuramento
+    // di Devozione, Patrono Demonio, ecc.). Anche questi sono "locked":
+    // non si possono rimuovere dal picker ma compaiono in lista come carte
+    // con tag della sottoclasse.
+    const subclassGranted = _pgSubclassGrantedSpells(pg)
+        .map(g => ({ src: g, sp: _resolveSpell(g.name) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenSubclass = new Set();
+    const subclassUnique = [];
+    subclassGranted.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key)) return; // razza ha priorita'
+        if (seenSubclass.has(key)) return;
+        seenSubclass.add(key);
+        subclassUnique.push(x);
+    });
+
+    // Incantesimi conferiti dalle invocazioni del Warlock (a volonta' o
+    // 1/lungo). Anche questi sono "locked" (derivati dalla scelta delle
+    // invocazioni nella pagina dei privilegi).
+    const invocationGranted = _pgInvocationGrantedSpells(pg)
+        .map(g => ({ src: g, sp: _resolveSpell(g.name) || _resolveSpell(g.name_en) }))
+        .filter(x => x.sp && x.sp.level === level);
+    const seenInvocation = new Set();
+    const invocationUnique = [];
+    invocationGranted.forEach(x => {
+        const key = x.sp.name;
+        if (seenInnate.has(key) || seenSubclass.has(key)) return;
+        if (seenInvocation.has(key)) return;
+        seenInvocation.add(key);
+        invocationUnique.push(x);
+    });
+
+    const knownCards = known
+        .filter(({ sp }) => !seenInnate.has(sp.name) && !seenSubclass.has(sp.name) && !seenInvocation.has(sp.name))
+        .map(({ sp }) => {
+            const id = sp.name;
+            const prepared = _spellIsPrepared(pg, sp.name, sp.level);
+            const prepCls = (sp.level > 0 && _pgUsesPreparedSystem(pg) && !prepared) ? 'spell-card-unprepared' : '';
+            return `<div class="spell-card ${prepCls}" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+                <div class="spell-card-name">${_spellPrepToggle(pg, sp)}${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)}</div>
+                <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+            </div>`;
+        }).join('');
+
+    const innateCards = innateUnique.map(({ src, sp }) => {
+        const id = sp.name;
+        const tag = src.recharge === 'at_will' ? 'a volontà' : (sp.level === 0 ? 'razza' : `razza · ${src.ability}`);
+        return `<div class="spell-card spell-card-innate" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag">${escapeHtml(tag)}</span></div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+        </div>`;
+    }).join('');
+
+    const subclassCards = subclassUnique.map(({ src, sp }) => {
+        const id = sp.name;
+        const label = src.source_label || 'sottoclasse';
+        return `<div class="spell-card spell-card-subclass" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-subclass" title="Garantito da: ${escapeHtml(label)}">${escapeHtml(label)}</span></div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+        </div>`;
+    }).join('');
+
+    const invocationCards = invocationUnique.map(({ src, sp }) => {
+        const id = sp.name;
+        const tag = src.recharge === 'at_will' ? 'supplica · a volontà' : 'supplica · 1/lungo';
+        return `<div class="spell-card spell-card-invocation" onclick="schedaShowSpellDetail('${escapeAttr(id)}')">
+            <div class="spell-card-name">${escapeHtml(_spellField(sp, 'name'))}${_spellConcMark(sp)} <span class="spell-card-tag spell-card-tag-invocation" title="Conferito da: ${escapeHtml(src.invocation_name)}">${escapeHtml(tag)}</span></div>
+            <div class="spell-card-meta">${escapeHtml(_spellField(sp, 'school'))} · ${escapeHtml(_spellField(sp, 'casting_time'))} · ${escapeHtml(_spellField(sp, 'range'))}</div>
+        </div>`;
+    }).join('');
+
+    const cardsHtml = (knownCards + innateCards + subclassCards + invocationCards) || `<span class="scheda-empty">Nessun ${level === 0 ? 'trucchetto' : 'incantesimo'} scelto</span>`;
+
+    const label = SPELL_LEVEL_LABELS[level] || `Livello ${level}`;
+    const title = level === 0 ? 'Scegli trucchetti' : `Scegli incantesimi di livello ${level}`;
+    return `<div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">
+            ${escapeHtml(label)}
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenSpellPicker('${pg.id}', ${level})" title="${title}">&#9998;</button>
+        </div>
+        <div class="scheda-section-body">
+            <div class="spell-cards-grid">${cardsHtml}</div>
+        </div>
+    </div>`;
+}
+
+// Backward compat (mantiene il nome storico)
+function buildCantripsSection(pg) { return buildSpellLevelSection(pg, 0); }
 
 function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
@@ -784,6 +1199,9 @@ window.spellFilterReset = function() {
     _spellFilterRerenderDialog();
 };
 
+// Alias storico
+window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };
+
 window.schedaSaveSpellsForLevel = async function(pgId, level) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
@@ -836,3 +1254,6 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenSpellPage(pgId);
 };
+
+// Alias storico
+window.schedaSaveCantrips = function(pgId) { return window.schedaSaveSpellsForLevel(pgId, 0); };

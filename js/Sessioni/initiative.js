@@ -257,6 +257,100 @@ function startRollRequestsRealtime() {
 }
 
 /**
+ * Verifica se ci sono nuove sessioni attive per campagne dell'utente
+ */
+async function checkNewSessions(userId) {
+    if (!AppState.isLoggedIn || !userId) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    try {
+        const userData = await findUserByUid(userId);
+        if (!userData) return;
+
+        // Carica tutte le campagne dove l'utente è DM o giocatore
+        const { data: campagneDM, error: errorDM } = await supabase
+            .from('campagne')
+            .select('id')
+            .eq('id_dm', userData.id);
+
+        // Per le campagne dove l'utente è giocatore, carica tutte le campagne e filtra lato client
+        // (Supabase non supporta direttamente "array contains" nelle query)
+        const { data: tutteCampagne, error: errorTutte } = await supabase
+            .from('campagne')
+            .select('id, giocatori');
+
+        let campagnePlayer = [];
+        if (!errorTutte && tutteCampagne) {
+            campagnePlayer = tutteCampagne
+                .filter(c => Array.isArray(c.giocatori) && c.giocatori.includes(userData.id))
+                .map(c => ({ id: c.id }));
+        }
+
+        if (errorDM || errorTutte) {
+            console.error('❌ Errore nel caricamento campagne per sessioni:', errorDM || errorTutte);
+            return;
+        }
+
+        const campagnaIds = [
+            ...(campagneDM || []).map(c => c.id),
+            ...(campagnePlayer || []).map(c => c.id)
+        ].filter((id, index, self) => self.indexOf(id) === index); // Rimuovi duplicati
+
+        if (campagnaIds.length === 0) return;
+
+        // Carica sessioni attive per queste campagne
+        const { data: sessioniAttive, error: errorSessioni } = await supabase
+            .from('sessioni')
+            .select('id, campagna_id, data_inizio')
+            .in('campagna_id', campagnaIds)
+            .is('data_fine', null)
+            .order('data_inizio', { ascending: false });
+
+        if (errorSessioni) {
+            console.error('❌ Errore nel caricamento sessioni attive:', errorSessioni);
+            return;
+        }
+
+        if (!sessioniAttive || sessioniAttive.length === 0) return;
+
+        // Controlla se ci sono sessioni nuove (non ancora notificate)
+        const lastCheckKey = 'lastSessionCheck';
+        const lastCheck = localStorage.getItem(lastCheckKey);
+        const lastCheckTime = lastCheck ? parseInt(lastCheck) : 0;
+
+        for (const sessione of sessioniAttive) {
+            const sessioneTime = new Date(sessione.data_inizio).getTime();
+
+            // Se la sessione è più recente dell'ultimo check, notifica
+            if (sessioneTime > lastCheckTime) {
+                // Carica i dettagli della campagna
+                const { data: campagna, error: errorCampagna } = await supabase
+                    .from('campagne')
+                    .select('nome_campagna')
+                    .eq('id', sessione.campagna_id)
+                    .single();
+
+                if (!errorCampagna && campagna) {
+                    showInAppNotification({
+                        title: 'Sessione Attiva',
+                        message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
+                        campagnaId: sessione.campagna_id,
+                        sessioneId: sessione.id
+                    });
+                }
+            }
+        }
+
+        // Aggiorna il timestamp dell'ultimo check
+        localStorage.setItem(lastCheckKey, Date.now().toString());
+    } catch (error) {
+        console.error('❌ Errore nel controllo nuove sessioni:', error);
+    }
+}
+
+/**
  * Ferma Realtime subscriptions per le richieste tiro
  */
 function stopRollRequestsRealtime() {
@@ -370,6 +464,7 @@ async function showRollRequestModal(request) {
             if (sess) {
                 campagnaId = sess.campagna_id;
                 AppState.currentCampagnaId = campagnaId;
+                sessionStorage.setItem('currentCampagnaId', campagnaId);
             }
         }
         if (supabase && userData && campagnaId) {
@@ -453,11 +548,11 @@ window.submitRollRequest = async function(requestId, tipo, valore, tiroNaturale)
     }
 
     try {
-        const tableName = tipo === 'iniziativa' 
-            ? 'richieste_tiro_iniziativa' 
+        const tableName = tipo === 'iniziativa'
+            ? 'richieste_tiro_iniziativa'
             : 'richieste_tiro_generico';
 
-        const updateData = { 
+        const updateData = {
             valore: valore,
             stato: 'completed',
             timestamp: new Date().toISOString()
@@ -493,6 +588,9 @@ window.submitRollRequest = async function(requestId, tipo, valore, tiroNaturale)
                 if (sessione?.campagna_id) {
                     await openCombattimentoPage(sessione.campagna_id, richiesta.sessione_id);
                 }
+
+                // Notifica subito il DM tramite broadcast realtime
+                await sendCombattimentoUpdateBroadcast(richiesta.sessione_id);
 
                 await checkAllIniziativaCompleted(richiesta.sessione_id);
             }
@@ -595,7 +693,7 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
 
         // Crea richieste solo per i giocatori (escludi il DM)
         const partecipanti = (campagna.giocatori || []).filter(Boolean);
-        
+
         const richieste = partecipanti.map(giocatoreId => ({
             sessione_id: sessioneId,
             giocatore_id: giocatoreId,
@@ -610,7 +708,7 @@ window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
         await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'insert', sessioneId });
 
         showNotification('Richieste tiro iniziativa inviate!');
-        
+
         // Apri pagina combattimento per il DM (imposta anche stato e realtime)
         await openCombattimentoPage(campagnaId, sessioneId);
     } catch (error) {
@@ -839,7 +937,7 @@ async function updateTiroGenericoTable(sessioneId, richiestaId) {
         }
 
         const pgNamesMap = await getCharacterNamesMap(AppState.currentCampagnaId);
-        
+
         const giocatoreIds = [...new Set(tiri.map(t => t.giocatore_id).filter(Boolean))];
         let utentiMap = {};
         if (giocatoreIds.length > 0) {

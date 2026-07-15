@@ -19,7 +19,6 @@ async function registerBaseServiceWorker() {
 }
 
 async function init() {
-    const isSplitPane = new URLSearchParams(window.location.search).get('splitPane') === '1';
     // Initialize DOM elements
     elements = {
         userBtn: document.getElementById('userBtn'),
@@ -49,6 +48,12 @@ async function init() {
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         userCID: document.getElementById('userCID'),
+        backToCampagneBtn: document.getElementById('backToCampagneBtn'),
+        backToDettagliBtn: document.getElementById('backToDettagliBtn'),
+        backToSessioneBtn: document.getElementById('backToSessioneBtn'),
+        dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
+        dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
+        dettagliIconContainer: document.getElementById('dettagliIconContainer'),
         editUserNameBtn: document.getElementById('editUserNameBtn'),
         editUserNameForm: document.getElementById('editUserNameForm'),
         editUserNameInput: document.getElementById('editUserNameInput'),
@@ -58,7 +63,12 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         langIt: document.getElementById('langIt'),
         langEn: document.getElementById('langEn'),
+        campagneList: document.getElementById('campagneList'),
+        addCampagnaBtn: document.getElementById('addCampagnaBtn'),
+        addAmicoBtn: document.getElementById('addAmicoBtn'),
         openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
+        addHomebrewBtn: document.getElementById('addHomebrewBtn'),
+        addPersonaggioBtn: document.getElementById('addPersonaggioBtn'),
         campagnaModal: document.getElementById('campagnaModal'),
         closeCampagnaModal: document.getElementById('closeCampagnaModal'),
         campagnaForm: document.getElementById('campagnaForm'),
@@ -68,6 +78,9 @@ async function init() {
         cercaUtenteBtn: document.getElementById('cercaUtenteBtn'),
         invitaAmicoBtn: document.getElementById('invitaAmicoBtn'),
         cancelAddAmicoBtn: document.getElementById('cancelAddAmicoBtn'),
+        amiciList: document.getElementById('amiciList'),
+        richiesteInEntrataList: document.getElementById('richiesteInEntrataList'),
+        richiesteInEntrataSection: document.getElementById('richiesteInEntrataSection'),
         campagnaModalTitle: document.getElementById('campagnaModalTitle'),
         cancelCampagnaBtn: document.getElementById('cancelCampagnaBtn'),
         saveCampagnaBtn: document.getElementById('saveCampagnaBtn'),
@@ -107,7 +120,11 @@ async function init() {
         rollRequestForm: document.getElementById('rollRequestForm'),
         cancelRollRequestBtn: document.getElementById('cancelRollRequestBtn'),
         submitRollRequestBtn: document.getElementById('submitRollRequestBtn'),
+        personaggiList: document.getElementById('personaggiList'),
         personaggioModal: document.getElementById('personaggioModal'),
+        personaggioCreateMount: document.getElementById('personaggioCreateMount'),
+        personaggioCreateTitle: document.getElementById('personaggioCreateTitle'),
+        personaggioCreateBackBtn: document.getElementById('personaggioCreateBackBtn'),
         closePersonaggioModal: document.getElementById('closePersonaggioModal'),
         personaggioForm: document.getElementById('personaggioForm'),
         personaggioModalTitle: document.getElementById('personaggioModalTitle'),
@@ -125,7 +142,7 @@ async function init() {
     appDebug('loginModal:', elements.loginModal);
     appDebug('userModal:', elements.userModal);
     appDebug('toolbarBtns:', elements.toolbarBtns?.length || 0);
-    
+
     if (!elements.userBtn || !elements.settingsBtn || !elements.loginModal || !elements.userModal) {
         console.error('❌ Alcuni elementi DOM non sono stati trovati');
         console.error('Elementi mancanti:', {
@@ -150,37 +167,91 @@ async function init() {
     if (typeof initBookmarks === 'function') {
         initBookmarks();
     }
-    
-    const initialNavigation = applyNavigationState(navigationStateFromCurrentUrl());
 
-    const savedActiveSession = isSplitPane ? null : sessionStorage.getItem('activeSessionCampagnaId');
+    // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');
+    if (savedCampagnaId) {
+        AppState.currentCampagnaId = savedCampagnaId;
+        appDebug('Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
+    }
+
+    // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedSessioneId = sessionStorage.getItem('currentSessioneId');
+    if (savedSessioneId) {
+        AppState.currentSessioneId = savedSessioneId;
+        appDebug('Sessione salvata ripristinata dalla sessione:', savedSessioneId);
+    }
+
+    const savedPersonaggioId = sessionStorage.getItem('currentPersonaggioId');
+    if (savedPersonaggioId) {
+        AppState.currentPersonaggioId = savedPersonaggioId;
+        appDebug('Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
+    }
+
+    // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
+    const savedPage = sessionStorage.getItem('currentPage');
+    if (savedPage) {
+        AppState.currentPage = savedPage;
+        appDebug('Pagina salvata ripristinata dalla sessione:', savedPage);
+    }
+
+    const savedActiveSession = sessionStorage.getItem('activeSessionCampagnaId');
     if (savedActiveSession) {
         AppState.activeSessionCampagnaId = savedActiveSession;
     }
-    
+
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = 'none';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = 'none';
+    }
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = 'none';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = 'none';
+    }
+
     // Setup event listeners immediately (don't wait for Supabase)
     appDebug('Setup event listeners...');
     setupEventListeners();
 
     // Browser back/forward navigation
     window.addEventListener('popstate', async (event) => {
-        if (event.state?.__reactSync) return;
-        const st = applyNavigationState(navigationStateFromCurrentUrl());
-        await navigateToPage(st.page, { pushHistory: false });
+        if (event.state && event.state.page) {
+            const st = event.state;
+            if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;
+            if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
+            if (st.personaggioId) AppState.currentPersonaggioId = st.personaggioId;
 
+            await navigateToPage(st.page, { pushHistory: false });
+
+            if (st.page === 'dettagli' && st.campagnaId) {
+                await loadCampagnaDetails(st.campagnaId);
+            } else if (st.page === 'sessione' && st.campagnaId) {
+                await renderSessioneContent(st.campagnaId);
+            } else if (st.page === 'scheda' && st.personaggioId) {
+                await renderSchedaPersonaggio(st.personaggioId);
+            }
+        } else {
+            // No state = initial page, go to campagne
+            AppState.currentCampagnaId = null;
+            AppState.currentSessioneId = null;
+            navigateToPage('campagne', { pushHistory: false });
+        }
     });
 
     // Replace current history entry with initial state
-    const initialPage = initialNavigation.page || 'campagne';
-    history.replaceState({ ...history.state, ...initialNavigation }, '', location.href);
+    history.replaceState({ page: AppState.currentPage || 'campagne' }, '', null);
 
     appDebug('Navigazione alla pagina iniziale...');
-    navigateToPage(initialPage, { pushHistory: false });
+    navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
     if (typeof restoreInitialDesktopBookmark === 'function') {
         restoreInitialDesktopBookmark();
     }
-    
+
     // Wait for Supabase to be ready (in background, non-blocking)
     waitForSupabase().then((success) => {
         if (success) {
@@ -400,10 +471,29 @@ function setupEventListeners() {
         appDebug('Event listener aggiunto a googleLoginBtn');
     }
 
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openCampagnaModal();
+        };
+    }
+
+    // Filtri campagne
+    setupCampagneFilters();
+    if (typeof setupCampagneEventDelegation === 'function') {
+        setupCampagneEventDelegation();
+    }
+    if (typeof setupCampagnaDetailsActionsDelegation === 'function') {
+        setupCampagnaDetailsActionsDelegation();
+    }
+    if (typeof setupCampagnaDetailsContentDelegation === 'function') {
+        setupCampagnaDetailsContentDelegation();
+    }
     if (typeof setupGiocatoriCampagnaDelegation === 'function') {
         setupGiocatoriCampagnaDelegation();
     }
-    
+
     // Amici button
     if (elements.openAmiciFromUserBtn) {
         elements.openAmiciFromUserBtn.onclick = function(e) {
@@ -412,6 +502,16 @@ function setupEventListeners() {
             closeUserModal();
             navigateToPage('amici');
         };
+    }
+
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            appDebug('Click su Aggiungi Amico');
+            openAddAmicoModal();
+        };
+        appDebug('Event listener aggiunto a addAmicoBtn');
     }
 
     // Add Amico Modal listeners
@@ -434,9 +534,24 @@ function setupEventListeners() {
     if (elements.invitaAmicoBtn) {
         elements.invitaAmicoBtn.addEventListener('click', handleInvitaAmico);
     }
+    if (typeof setupAmiciEventDelegation === 'function') {
+        setupAmiciEventDelegation();
+    }
+    if (typeof setupPersonaggiListDelegation === 'function') {
+        setupPersonaggiListDelegation();
+    }
+
     // Laboratorio init
     if (typeof initLaboratorio === 'function') initLaboratorio();
-    
+
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openTipoSchedaModal();
+        };
+    }
+
     const closeTipoSchedaBtn = document.getElementById('closeTipoSchedaModal');
     if (closeTipoSchedaBtn) closeTipoSchedaBtn.addEventListener('click', closeTipoSchedaModal);
     const tipoSchedaModalEl = document.getElementById('tipoSchedaModal');
@@ -461,6 +576,9 @@ function setupEventListeners() {
 
     if (elements.closePersonaggioModal) {
         elements.closePersonaggioModal.onclick = () => closePersonaggioModal();
+    }
+    if (elements.personaggioCreateBackBtn) {
+        elements.personaggioCreateBackBtn.onclick = () => closePersonaggioModal();
     }
     if (elements.cancelPersonaggioBtn) {
         elements.cancelPersonaggioBtn.onclick = () => closePersonaggioModal();
@@ -488,7 +606,7 @@ function setupEventListeners() {
             input.addEventListener('input', () => updateAbilityMod(input, modEl));
         }
     });
-    
+
     ['Forza','Destrezza','Costituzione','Intelligenza','Saggezza','Carisma'].forEach(name => {
         const cb = document.getElementById(`save${name}`);
         if (cb) cb.addEventListener('change', () => updateAllSaveValues());
@@ -558,7 +676,7 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     // D20 Logo roll functionality
     if (elements.d20Logo) {
         elements.d20Logo.addEventListener('click', (e) => {
@@ -567,7 +685,7 @@ function setupEventListeners() {
             rollD20();
         });
     }
-    
+
     // Hide roll number when clicking elsewhere
     document.addEventListener('click', (e) => {
         if (elements.d20RollNumber && elements.d20RollNumber.classList.contains('show')) {
@@ -576,7 +694,7 @@ function setupEventListeners() {
             }
         }
     });
-    
+
     // Icon selector popup
     if (elements.openIconSelectorBtn) {
         elements.openIconSelectorBtn.onclick = function(e) {
@@ -599,7 +717,48 @@ function setupEventListeners() {
             }
         });
     }
-    
+
+    // Back to campagne button
+    if (elements.backToCampagneBtn) {
+        elements.backToCampagneBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Reset currentCampagnaId per tornare alla lista
+            AppState.currentCampagnaId = null;
+            sessionStorage.removeItem('currentCampagnaId');
+            navigateToPage('campagne');
+        };
+        appDebug('Event listener aggiunto a backToCampagneBtn');
+    }
+
+    // Back to dettagli button (from sessione page)
+    if (elements.backToDettagliBtn) {
+        elements.backToDettagliBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                navigateToPage('dettagli');
+                await loadCampagnaDetails(campagnaId);
+            }
+        };
+        appDebug('Event listener aggiunto a backToDettagliBtn');
+    }
+
+    // Back to sessione button (from combattimento page)
+    if (elements.backToSessioneBtn) {
+        elements.backToSessioneBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const campagnaId = AppState.currentCampagnaId;
+            if (campagnaId) {
+                navigateToPage('sessione');
+                await renderSessioneContent(campagnaId);
+            }
+        };
+        appDebug('Event listener aggiunto a backToSessioneBtn');
+    }
+
     // Edit user name button
     if (elements.editUserNameBtn) {
         elements.editUserNameBtn.onclick = function(e) {
@@ -675,7 +834,7 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     // Tab navigation per gestione giocatori modal
     if (elements.gestisciGiocatoriTab) {
         elements.gestisciGiocatoriTab.onclick = function(e) {
@@ -704,7 +863,7 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     // Icon selector setup
     setupIconSelector();
 
@@ -825,20 +984,20 @@ function setupEventListeners() {
             }
         });
     }
-    
+
 }
 
 function startApp() {
     try {
         appDebug('Inizializzazione app...');
         appDebug('Document readyState:', document.readyState);
-        
+
         // Call init synchronously first to set up event listeners
         init().catch(error => {
             console.error('❌ Errore durante l\'inizializzazione:', error);
             console.error('Stack:', error.stack);
         });
-        
+
         appDebug('Inizializzazione avviata');
     } catch (error) {
         console.error('❌ Errore critico durante l\'inizializzazione:', error);
@@ -850,18 +1009,6 @@ function startApp() {
    PWA install (Add to Home Screen)
    ============================================ */
 let __deferredInstallPrompt = null;
-
-// Cattura l'evento appena lo espone il browser: aspettare init() puo' perderlo.
-window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    __deferredInstallPrompt = event;
-    if (!_isPwaInstalled()) _setPwaBtnState('available');
-});
-
-window.addEventListener('appinstalled', () => {
-    __deferredInstallPrompt = null;
-    _setPwaBtnState('installed');
-});
 
 function _isPwaInstalled() {
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
@@ -1004,8 +1151,6 @@ function setupPwaInstall() {
 
     if (_isPwaInstalled()) {
         _setPwaBtnState('installed');
-    } else if (__deferredInstallPrompt) {
-        _setPwaBtnState('available');
     } else if (_isIOS()) {
         // iOS: nessun browser su iPhone/iPad supporta beforeinstallprompt
         // (sia Safari sia Chrome/Firefox/Edge iOS). Mostriamo le istruzioni
@@ -1018,6 +1163,17 @@ function setupPwaInstall() {
         // mostra le istruzioni generiche al posto di un disabled muto.
         _setPwaBtnState('manual');
     }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        __deferredInstallPrompt = e;
+        if (!_isPwaInstalled()) _setPwaBtnState('available');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        __deferredInstallPrompt = null;
+        _setPwaBtnState('installed');
+    });
 
     btn.addEventListener('click', async () => {
         if (btn.disabled) return;

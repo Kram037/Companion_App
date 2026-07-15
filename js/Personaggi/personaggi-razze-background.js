@@ -190,6 +190,47 @@ function _pgRaceInnateSpells(pg) {
     return out;
 }
 
+// Chiave stabile per tracciare gli usi di un incantesimo innato a slot.
+// Basata su nome inglese (canonico) + ricarica, evitando collisioni quando
+// piu' tratti danno lo stesso spell con ricariche diverse.
+function _pgInnateSpellKey(sp) {
+    const base = sp.name_en || sp.name || '';
+    const rec = sp.recharge || 'long_rest';
+    return (base + '_' + rec).replace(/[^A-Za-z0-9]+/g, '_');
+}
+
+// Risorse "Slot magia innata": una per ogni incantesimo innato non a volonta'
+// e non trucchetto. Persistite in pg.risorse_classe._innate[key] = current.
+function _pgRaceInnateSlots(pg) {
+    const list = _pgRaceInnateSpells(pg);
+    const stored = (pg.risorse_classe && pg.risorse_classe._innate) || {};
+    const out = [];
+    list.forEach(sp => {
+        if (sp.recharge === 'at_will') return;
+        if ((sp.level || 0) === 0) return;
+        const key = _pgInnateSpellKey(sp);
+        const max = 1;
+        const current = stored[key] != null ? Math.min(max, Math.max(0, stored[key])) : max;
+        let rechargeLabel = '';
+        if (sp.recharge === 'long_rest') rechargeLabel = 'r. lungo';
+        else if (sp.recharge === 'short_rest') rechargeLabel = 'r. breve';
+        else if (sp.recharge === 'dawn') rechargeLabel = "all'alba";
+        out.push({
+            key,
+            name: sp.name,
+            name_en: sp.name_en,
+            level: sp.level,
+            level_cast: sp.level_cast || sp.level,
+            ability: sp.ability,
+            trait: sp.trait,
+            recharge: rechargeLabel,
+            max,
+            current,
+        });
+    });
+    return out;
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 
 function getBackgroundData(nome) {

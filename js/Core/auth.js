@@ -4,7 +4,7 @@ appDebug('[homebrew][build] auth.js BUILD 2026-04-23-I RPC get_uids_by_user_ids 
 // Setup Supabase Auth listeners
 function setupSupabaseAuth() {
     const supabase = getSupabaseClient();
-    
+
     if (!supabase) {
         console.warn('⚠️ Supabase non disponibile. L\'app funzionerà senza autenticazione.');
         return;
@@ -15,7 +15,7 @@ function setupSupabaseAuth() {
         let _authInitDone = false;
         supabase.auth.onAuthStateChange((event, session) => {
             appDebug('Auth state changed:', event, session?.user?.email || 'null');
-            
+
             if (session?.user) {
                 const alreadyLoggedSameUser = AppState.isLoggedIn && AppState.currentUser?.uid === session.user.id;
                 const prevName = AppState.currentUser?.displayName;
@@ -29,7 +29,7 @@ function setupSupabaseAuth() {
 
                 if (alreadyLoggedSameUser && _authInitDone && event === 'TOKEN_REFRESHED') return;
                 _authInitDone = true;
-                
+
                 initializeUserDocument(session.user).then(() => {
                     loadRazzeBackground();
                     loadHomebrewSottoclassi();
@@ -47,6 +47,7 @@ function setupSupabaseAuth() {
                         navigateToPage('combattimento');
                     } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                         navigateToPage('sessione');
+                        renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                         navigateToPage('dettagli');
                     } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
@@ -54,7 +55,7 @@ function setupSupabaseAuth() {
                     } else {
                         navigateToPage(AppState.currentPage || 'campagne');
                     }
-                    
+
                     startRollRequestsRealtime();
                     startSessionRealtime();
                     startAppEventsRealtime();
@@ -66,13 +67,18 @@ function setupSupabaseAuth() {
                 invalidateUserCache();
                 updateUIForLoggedOut();
                 appDebug('Utente non autenticato');
-                
+
                 // Ferma Realtime subscriptions
                 stopRollRequestsRealtime();
                 stopSessionRealtime();
                 stopAppEventsRealtime();
-                
+
                 // Pulisci i dati quando l'utente esce
+                if (AppState.currentPage === 'campagne') {
+                    renderCampagne([], false);
+                } else if (AppState.currentPage === 'amici') {
+                    renderAmici([], [], []);
+                }
             }
         });
     } catch (error) {
@@ -631,11 +637,11 @@ window.loadHomebrewSottoclassi = loadHomebrewSottoclassi;
 async function checkAuthState() {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-    
+
     try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        
+
         if (session?.user) {
             AppState.currentUser = {
                 uid: session.user.id,
@@ -648,13 +654,14 @@ async function checkAuthState() {
                 AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
             }
             updateUIForLoggedIn();
-            
+
             if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
                 navigateToPage('scheda');
             } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
                 navigateToPage('combattimento');
             } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                 navigateToPage('sessione');
+                renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 navigateToPage('dettagli');
             } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
@@ -662,7 +669,7 @@ async function checkAuthState() {
             } else {
                 navigateToPage(AppState.currentPage || 'campagne');
             }
-            
+
             startRollRequestsRealtime();
             startSessionRealtime();
             startAppEventsRealtime();
@@ -670,7 +677,12 @@ async function checkAuthState() {
         } else {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
-            
+
+            if (AppState.currentPage === 'campagne') {
+                renderCampagne([], false);
+            } else if (AppState.currentPage === 'amici') {
+                renderAmici([], [], []);
+            }
         }
     } catch (error) {
         console.error('❌ Errore nel controllo stato auth:', error);
@@ -686,22 +698,48 @@ function updateUIForLoggedIn() {
         headerUserName.textContent = dbName || AppState.currentUser?.displayName || '';
     }
     // Mostra i pulsanti quando l'utente è loggato
-    // Aggiorna i placeholder delle sezioni legacy.
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = '';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = '';
+    }
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = '';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = '';
+    }
+    // Aggiorna i placeholder per amici, laboratorio e personaggi (nessun dato ancora)
     updatePlaceholderMessages(true);
 }
 
 // Aggiorna i messaggi dei placeholder in base allo stato di login
 function updatePlaceholderMessages(isLoggedIn) {
+    const amiciPlaceholder = document.getElementById('amiciPlaceholder');
     const labPlaceholder = document.getElementById('laboratorioPlaceholder');
-    
+    const personaggiList = document.getElementById('personaggiList');
+
     if (isLoggedIn) {
+        if (amiciPlaceholder) {
+            amiciPlaceholder.innerHTML = '<p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p>';
+        }
         if (labPlaceholder) {
             labPlaceholder.style.display = 'none';
         }
+        if (personaggiList) {
+            personaggiList.innerHTML = '<div class="content-placeholder"><p>Non ci sono personaggi. Crea il tuo (ennesimo) alter ego!</p></div>';
+        }
     } else {
+        if (amiciPlaceholder) {
+            amiciPlaceholder.innerHTML = '<p>Accedi per vedere i tuoi amici</p>';
+        }
         if (labPlaceholder) {
             labPlaceholder.style.display = 'block';
             labPlaceholder.innerHTML = '<p>Accedi per creare i tuoi contenuti homebrew</p>';
+        }
+        if (personaggiList) {
+            personaggiList.innerHTML = '<div class="content-placeholder"><p>Accedi per vedere e creare i tuoi personaggi</p></div>';
         }
     }
 }
@@ -710,7 +748,21 @@ function updatePlaceholderMessages(isLoggedIn) {
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
     // Nascondi i pulsanti quando l'utente non è loggato
-    // Aggiorna i placeholder delle sezioni legacy.
+    if (elements.addCampagnaBtn) {
+        elements.addCampagnaBtn.style.display = 'none';
+    }
+    if (elements.addAmicoBtn) {
+        elements.addAmicoBtn.style.display = 'none';
+    }
+    if (elements.addHomebrewBtn) {
+        elements.addHomebrewBtn.style.display = 'none';
+    }
+    if (elements.addPersonaggioBtn) {
+        elements.addPersonaggioBtn.style.display = 'none';
+    }
+    // Show login message in campagne list
+    renderCampagne([], false);
+    // Aggiorna i placeholder per amici, laboratorio e personaggi
     updatePlaceholderMessages(false);
 }
 
@@ -719,7 +771,7 @@ function toggleLoginRegisterMode(isRegister) {
     AppState.isRegisterMode = isRegister;
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
-    
+
     if (isRegister) {
         elements.loginModalTitle.textContent = 'Registrati';
         elements.submitBtn.textContent = 'Registrati';
@@ -745,7 +797,7 @@ function toggleLoginRegisterMode(isRegister) {
             elements.nicknameInput.value = '';
         }
     }
-    
+
     hideError();
     emailInput.value = '';
     passwordInput.value = '';
@@ -766,7 +818,7 @@ function hideError() {
 async function handleLogin(e) {
     e.preventDefault();
     hideError();
-    
+
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
@@ -791,7 +843,7 @@ async function handleLogin(e) {
 
     // Verifica che Supabase sia disponibile
     const supabase = getSupabaseClient();
-    
+
     if (!supabase) {
         // Prova a ottenere il client direttamente se non è disponibile
         if (typeof window.supabaseClient !== 'undefined') {
@@ -819,7 +871,7 @@ async function handleLogin(e) {
         elements.submitBtn.textContent = AppState.isRegisterMode ? 'Registrazione...' : 'Accesso...';
 
         appDebug(AppState.isRegisterMode ? '📝 Registrazione utente...' : '🔐 Login utente...', email);
-        
+
         if (AppState.isRegisterMode) {
             // Register new user
             const nickname = document.getElementById('nickname')?.value.trim() || '';
@@ -833,11 +885,11 @@ async function handleLogin(e) {
                     }
                 }
             });
-            
+
             if (error) throw error;
-            
+
             appDebug('✅ Utente registrato con successo:', data.user?.id, data.user?.email);
-            
+
             // Non inizializziamo qui perché onAuthStateChange lo farà automaticamente
             // Questo evita doppie inizializzazioni e race conditions
             appDebug('✅ Registrazione completata, onAuthStateChange gestirà l\'inizializzazione');
@@ -848,9 +900,9 @@ async function handleLogin(e) {
                 email: email,
                 password: password
             });
-            
+
             if (error) throw error;
-            
+
             appDebug('✅ Utente autenticato con successo:', data.user?.id, data.user?.email);
             showNotification('Accesso effettuato!');
         }
@@ -859,14 +911,14 @@ async function handleLogin(e) {
     } catch (error) {
         console.error('❌ Auth error:', error);
         console.error('Error message:', error.message);
-        
+
         let errorMessage = 'Si è verificato un errore';
-        
+
         // Supabase error codes
         if (error.message) {
             if (error.message.includes('already registered') || error.message.includes('already exists')) {
-                errorMessage = AppState.isRegisterMode 
-                    ? 'Questa email è già registrata. Usa "Accedi" per entrare.' 
+                errorMessage = AppState.isRegisterMode
+                    ? 'Questa email è già registrata. Usa "Accedi" per entrare.'
                     : 'Email già in uso';
             } else if (error.message.includes('Invalid email')) {
                 errorMessage = 'Email non valida';
@@ -880,7 +932,7 @@ async function handleLogin(e) {
                 errorMessage = error.message || 'Errore durante l\'autenticazione';
             }
         }
-        
+
         showError(errorMessage);
     } finally {
         elements.submitBtn.disabled = false;
@@ -891,7 +943,7 @@ async function handleLogin(e) {
 // Google Login Handler
 async function handleGoogleLogin() {
     const supabase = getSupabaseClient();
-    
+
     if (!supabase) {
         showError('Autenticazione Google non disponibile. Controlla la configurazione Supabase.');
         return;
@@ -901,27 +953,27 @@ async function handleGoogleLogin() {
         hideError();
         elements.googleLoginBtn.disabled = true;
         elements.googleLoginBtn.textContent = 'Accesso in corso...';
-        
+
         // Usa l'URL completo corrente come redirect
         const redirectUrl = window.location.origin + window.location.pathname;
-        
+
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
                 redirectTo: redirectUrl
             }
         });
-        
+
         if (error) throw error;
-        
+
         // La redirect avverrà automaticamente, quindi non chiudiamo il modal qui
         // Il callback verrà gestito da onAuthStateChange
         appDebug('✅ Redirect a Google per autenticazione...');
-        
+
     } catch (error) {
         console.error('Google Auth error:', error);
         let errorMessage = 'Errore durante l\'accesso con Google';
-        
+
         if (error.message) {
             if (error.message.includes('popup_closed')) {
                 errorMessage = 'Popup chiusa. Riprova.';
@@ -931,7 +983,7 @@ async function handleGoogleLogin() {
                 errorMessage = error.message || 'Errore durante l\'accesso con Google';
             }
         }
-        
+
         showError(errorMessage);
     } finally {
         if (elements.googleLoginBtn) {
@@ -954,24 +1006,24 @@ async function handleGoogleLogin() {
 // D20 Roll Functions
 function rollD20() {
     if (!elements.d20Logo || !elements.d20RollNumber) return;
-    
+
     // Remove critical class if present
     elements.d20RollNumber.classList.remove('critical');
-    
+
     // Add spinning class
     elements.d20Logo.classList.add('spinning');
-    
+
     // Generate random number between 1 and 20
     const roll = Math.floor(Math.random() * 20) + 1;
-    
+
     // Remove spinning class after animation completes
     setTimeout(() => {
         elements.d20Logo.classList.remove('spinning');
-        
+
         // Show the number
         elements.d20RollNumber.textContent = roll;
         elements.d20RollNumber.classList.add('show');
-        
+
         // If critical roll (1 or 20), add flash effect
         if (roll === 1 || roll === 20) {
             elements.d20RollNumber.classList.add('critical');
@@ -997,14 +1049,22 @@ async function handleLogout() {
         }
         try {
             const supabase = getSupabaseClient();
-            
+
+            // Pulisci sessionStorage PRIMA del logout
+            sessionStorage.removeItem('currentCampagnaId');
             AppState.currentCampagnaId = null;
-            
+
             // Pulisci lo stato locale PRIMA
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
-            
+
             if (supabase) {
+                // Disconnetti da eventuali subscription
+                if (campagneChannel) {
+                    supabase.removeChannel(campagneChannel);
+                    campagneChannel = null;
+                }
+
                 // Esegui logout da Supabase (senza scope per pulire tutto)
                 const { error } = await supabase.auth.signOut();
                 if (error) {
@@ -1013,7 +1073,7 @@ async function handleLogout() {
             } else {
                     appDebug('✅ SignOut completato con successo');
                 }
-                
+
                 // Pulisci manualmente anche localStorage e sessionStorage per sicurezza
                 // Rimuovi tutte le chiavi di Supabase
                 Object.keys(localStorage).forEach(key => {
@@ -1027,30 +1087,31 @@ async function handleLogout() {
                     }
                 });
             }
-            
+
             // Aggiorna UI e chiudi modal
             updateUIForLoggedOut();
             closeUserModal();
             showNotification('Logout effettuato');
-            
+
             // Aspetta un po' per assicurarsi che il signOut sia completato
             // e poi forza un refresh della pagina per assicurarsi che tutto sia pulito
             await new Promise(resolve => setTimeout(resolve, 300));
-            
+
             // Pulisci anche AppState prima del reload
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             AppState.currentCampagnaId = null;
-            
+
             // Ricarica la pagina
             window.location.reload();
-            
+
         } catch (error) {
             console.error('Logout error:', error);
             // In caso di errore, pulisci comunque tutto
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
+            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             // Forza refresh anche in caso di errore
@@ -1069,6 +1130,7 @@ async function handleLogout() {
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
+            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             setTimeout(() => {

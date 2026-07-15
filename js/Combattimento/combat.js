@@ -3,10 +3,281 @@ const MONSTER_SIZES = ['Minuscola','Piccola','Media','Grande','Enorme','Mastodon
 const MONSTER_ALIGNMENTS = ['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Senza allineamento'];
 
 let _combatInitiativeOrder = [];
+let _combatMonsters = [];
+let _combatSelectedId = null;
+let _combatSelectedType = null; // 'player' or 'monster'
 
-window.setCombatInitiativeOrder = function(order) {
-    _combatInitiativeOrder = Array.isArray(order) ? order : [];
-};
+async function renderCombattimentoContent(campagnaId, sessioneId) {
+    const cardsCol = document.getElementById('combattimentoContent');
+    const initCol = document.getElementById('combatInitCol');
+    const roundInfo = document.getElementById('combatRoundInfo');
+    const nextBtn = document.getElementById('combatNextTurnBtn');
+    const toolbar = document.getElementById('combatToolbar');
+    if (!cardsCol) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase) { cardsCol.innerHTML = '<p>Errore: Supabase non disponibile</p>'; return; }
+
+    try {
+        const [sessioneResult, tiriResult, monstersResult, charData, isDM, currentUserId] = await Promise.all([
+            supabase.from('sessioni').select('combat_round, combat_turn_index').eq('id', sessioneId).single(),
+            supabase.rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId }),
+            supabase.from('mostri_combattimento').select('*').eq('sessione_id', sessioneId).order('iniziativa', { ascending: false, nullsFirst: false }),
+            getCampaignCharacterData(campagnaId),
+            isCurrentUserDM(campagnaId),
+            getCurrentInternalUserId()
+        ]);
+
+        const sessione = sessioneResult.data;
+        const combatRound = sessione?.combat_round || 1;
+        const combatTurnIdx = sessione?.combat_turn_index || 0;
+
+        let tiriIniziativa = tiriResult.data;
+        if (tiriResult.error || !tiriIniziativa) {
+            const fallback = await supabase.from('richieste_tiro_iniziativa')
+                .select(`*, utenti!richieste_tiro_iniziativa_giocatore_id_fkey(nome_utente, cid)`)
+                .eq('sessione_id', sessioneId).order('valore', { ascending: false });
+            tiriIniziativa = fallback.data;
+        }
+        const tiriCompleted = (tiriIniziativa || []).filter(t => t.stato === 'completed' && t.valore !== null);
+
+        _combatMonsters = monstersResult.data || [];
+
+        const pgNamesMap = charData.namesMap;
+        const pgConditionsMap = charData.conditionsMap;
+
+        // Build initiative order
+        // Tiebreak deterministico: a parità d'iniziativa l'ordine viene fissato
+        // dal momento in cui la creatura è entrata nel giro (created_at delle
+        // tiri_iniziativa per i player, created_at del mostro per i mostri).
+        // In questo modo, una volta deciso l'ordine, non cambia mai più anche
+        // quando vengono aggiunte nuove creature con lo stesso valore.
+        const _ts = (s) => { const t = s ? Date.parse(s) : NaN; return isNaN(t) ? 0 : t; };
+        const order = [];
+        tiriCompleted.forEach(t => {
+            const pgName = pgNamesMap[t.giocatore_id];
+            const cond = pgConditionsMap[t.giocatore_id];
+            order.push({
+                type: 'player', id: t.giocatore_id, pgId: cond?.id || null,
+                name: pgName || t.giocatore_nome || t.utenti?.nome_utente || '?',
+                init: t.valore,
+                tiebreak: _ts(t.created_at) || _ts(t.completed_at) || 0,
+                conditions: cond
+            });
+        });
+        _combatMonsters.forEach(m => {
+            order.push({
+                type: 'monster', id: m.id, name: m.nome,
+                init: m.iniziativa ?? 0,
+                tiebreak: _ts(m.created_at),
+                monster: m
+            });
+        });
+        order.sort((a, b) => {
+            if ((b.init || 0) !== (a.init || 0)) return (b.init || 0) - (a.init || 0);
+            // Stesso valore d'iniziativa: chi è stato aggiunto prima agisce prima.
+            if (a.tiebreak !== b.tiebreak) return a.tiebreak - b.tiebreak;
+            // Ulteriore fallback: id stringa, per evitare riordini casuali
+            // se due creature hanno timestamp identici.
+            return String(a.id).localeCompare(String(b.id));
+        });
+        _combatInitiativeOrder = order;
+
+        const turnIdx = Math.min(combatTurnIdx, Math.max(0, order.length - 1));
+
+        // Round/turn header
+        if (roundInfo) {
+            const currentName = order[turnIdx]?.name || 'In attesa...';
+            roundInfo.innerHTML = `<div class="combat-round-num">Round ${combatRound}</div><div class="combat-turn-name">${escapeHtml(currentName)}</div>`;
+        }
+        if (nextBtn) {
+            nextBtn.style.display = isDM && order.length > 0 ? '' : 'none';
+            nextBtn.onclick = () => combatNextTurn(campagnaId, sessioneId, order.length, combatRound, turnIdx);
+        }
+
+        // Helper: produce the click handler attribute for a given entry,
+        // applying access rules (player can only open their own sheet; non-DM
+        // cannot open monster sheets at all).
+        const buildClickHandler = (entry) => {
+            const isMonster = entry.type === 'monster';
+            if (isMonster) {
+                if (!isDM) return '';
+                if (_isPlaceholderMonster(entry.monster)) {
+                    return `onclick="combatOpenPlaceholderDialog('${entry.id}','${campagnaId}','${sessioneId}')"`;
+                }
+                return `onclick="combatOpenMonsterFullSheet('${entry.id}','${campagnaId}','${sessioneId}')"`;
+            }
+            const isOwner = entry.id === currentUserId;
+            if (!isDM && !isOwner) return '';
+            if (!entry.pgId) return '';
+            // Apri la scheda PG e centra automaticamente la tabella
+            // statistiche (PV / PV temp / CA) cosi' il DM/player vede subito
+            // i dati piu' rilevanti durante il combattimento.
+            return `onclick="openSchedaPersonaggio('${entry.pgId}',{scrollToStats:true})"`;
+        };
+
+        // Left icons column (square portraits, no initiative number).
+        // Per i player mostriamo l'immagine del personaggio se presente
+        // (immagine_url, normalizzata via _normalizeImageUrl per supportare
+        // gli URL di Google Drive); fallback alle iniziali del nome.
+        if (initCol) {
+            initCol.innerHTML = order.map((entry, idx) => {
+                const initials = entry.name.substring(0, 2).toUpperCase();
+                const isTurn = idx === turnIdx;
+                const click = buildClickHandler(entry);
+                const clickable = click ? 'is-clickable' : 'is-locked';
+                const initialsHtml = `<span class="combat-icon-initials">${escapeHtml(initials)}</span>`;
+                let portraitInner = initialsHtml;
+                if (entry.type === 'player' && entry.conditions?.immagine_url) {
+                    const rawUrl = entry.conditions.immagine_url;
+                    const url = (typeof window._normalizeImageUrl === 'function')
+                        ? window._normalizeImageUrl(rawUrl) : rawUrl;
+                    const safeUrl = String(url).replace(/"/g, '&quot;');
+                    const safeAlt = String(entry.name || '').replace(/"/g, '&quot;');
+                    portraitInner = `<img src="${safeUrl}" alt="${safeAlt}" class="combat-icon-img" referrerpolicy="no-referrer" loading="lazy" onerror="this.parentElement.classList.add('combat-icon-img-error');this.remove();" data-fallback-initials="${escapeHtml(initials)}">${initialsHtml}`;
+                }
+                return `<div class="combat-icon ${isTurn ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${clickable}" data-idx="${idx}" ${click}>
+                    ${portraitInner}
+                </div>`;
+            }).join('');
+        }
+
+        // Right cards column - always show all cards (no inline expansion)
+        if (order.length === 0) {
+            cardsCol.innerHTML = '<div class="content-placeholder"><p>In attesa dei tiri iniziativa...</p></div>';
+        } else {
+            cardsCol.innerHTML = order.map((entry, idx) => {
+                const isTurn = idx === turnIdx;
+                const isMonster = entry.type === 'monster';
+
+                let condBadges = '';
+                if (isMonster && entry.monster) {
+                    const active = ALL_CONDITIONS.filter(c => entry.monster[c.key]);
+                    if (active.length > 0) condBadges = active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('');
+                } else if (entry.conditions) {
+                    const active = ALL_CONDITIONS.filter(c => entry.conditions[c.key]);
+                    if (active.length > 0) condBadges = active.map(c => `<span class="condition-badge-sm">${c.label}</span>`).join('');
+                }
+
+                // Players can only see HP of fellow party members (not monsters).
+                let hpDisplay = '';
+                if (isMonster && isDM && entry.monster) {
+                    const mHp = entry.monster.pv_attuali ?? entry.monster.punti_vita_max;
+                    hpDisplay = `<span class="combat-card-hp">${mHp}/${entry.monster.punti_vita_max}</span>`;
+                } else if (!isMonster && entry.conditions) {
+                    const pHp = entry.conditions.pv_attuali != null ? entry.conditions.pv_attuali : entry.conditions.punti_vita_max;
+                    const pMax = entry.conditions.punti_vita_max || '?';
+                    hpDisplay = `<span class="combat-card-hp">${pHp}/${pMax}</span>`;
+                }
+
+                const click = buildClickHandler(entry);
+                const clickable = click ? 'is-clickable' : 'is-locked';
+
+                return `<div class="combat-card ${isTurn ? 'is-turn' : ''} ${isMonster ? 'monster-card' : ''} ${clickable}" ${click}>
+                    <span class="combat-card-init" title="Iniziativa">${entry.init}</span>
+                    <div class="combat-card-center">
+                        <span class="combat-card-name">${escapeHtml(entry.name)}</span>
+                        ${condBadges ? `<div class="combat-card-badges">${condBadges}</div>` : ''}
+                    </div>
+                    ${hpDisplay}
+                </div>`;
+            }).join('');
+        }
+
+        // Trova il personaggio del player corrente in questa campagna (per i timer
+        // personali). Per il DM resta null: la dialog timer chiede di scegliere
+        // il target tra i mostri o "globale".
+        let myPgId = null;
+        if (!isDM && currentUserId) {
+            for (const e of order) {
+                if (e.type === 'player' && e.id === currentUserId && e.pgId) { myPgId = e.pgId; break; }
+            }
+        }
+
+        // Toolbar: DM ha gli strumenti del master, i player hanno una toolbar
+        // ridotta con calcolatrice, timer (personale) e tira-dadi (placeholder).
+        if (toolbar) {
+            if (isDM) {
+                toolbar.style.display = 'flex';
+                toolbar.innerHTML = `
+                    <button class="combat-toolbar-btn" onclick="openMonsterCreationModal('${campagnaId}','${sessioneId}')" title="Aggiungi mostro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        <span>Mostro</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatDiceRoll()" title="Tira dadi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+                        <span>Dadi</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+                        <span>Calc</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatOpenTimerDialog('${campagnaId}','${sessioneId}','dm', null)" title="Timer combattimento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+                        <span>Timer</span>
+                    </button>
+                    <button class="combat-toolbar-btn danger" onclick="terminaCombattimento('${campagnaId}','${sessioneId}')" title="Termina combattimento">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span>Fine</span>
+                    </button>`;
+            } else {
+                toolbar.style.display = 'flex';
+                const timerOnclick = myPgId
+                    ? `combatOpenTimerDialog('${campagnaId}','${sessioneId}','player','${myPgId}')`
+                    : `showNotification('Nessun personaggio collegato al combattimento')`;
+                toolbar.innerHTML = `
+                    <button class="combat-toolbar-btn" onclick="combatDiceRoll()" title="Tira dadi (in arrivo)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+                        <span>Dadi</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="combatCalcOpen()" title="Calcolatrice">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+                        <span>Calc</span>
+                    </button>
+                    <button class="combat-toolbar-btn" onclick="${timerOnclick}" title="Timer personale">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+                        <span>Timer</span>
+                    </button>`;
+            }
+        }
+
+        // Render del pannello timer (visibile a tutti, ma con regole di filtro
+        // diverse per DM e player).
+        await renderCombatTimers(sessioneId, isDM, myPgId);
+
+        // Sincronizza lo scroll verticale tra la colonna delle icone (sx) e
+        // quella delle card (dx) in modo che le righe restino sempre
+        // allineate anche quando ci sono molte creature in iniziativa.
+        _attachCombatScrollSync();
+
+    } catch (error) {
+        console.error('Errore rendering combattimento:', error);
+        cardsCol.innerHTML = '<p>Errore nel caricamento del combattimento</p>';
+    }
+}
+
+// Allinea lo scroll delle due colonne del combat (icone a sx, card a dx)
+// in modo che le righe restino visivamente sincronizzate. Senza questa
+// sync, scrollando una colonna l'altra resta ferma e i due lati si
+// disallineano. Idempotente: riattacca i listener solo una volta.
+let _combatScrollSyncAttached = false;
+function _attachCombatScrollSync() {
+    if (_combatScrollSyncAttached) return;
+    const initCol = document.getElementById('combatInitCol');
+    const cardsCol = document.getElementById('combattimentoContent');
+    if (!initCol || !cardsCol) return;
+    let lock = false;
+    const sync = (src, dst) => {
+        if (lock) return;
+        lock = true;
+        dst.scrollTop = src.scrollTop;
+        // Sblocca al frame successivo per evitare loop reciproci.
+        requestAnimationFrame(() => { lock = false; });
+    };
+    initCol.addEventListener('scroll', () => sync(initCol, cardsCol), { passive: true });
+    cardsCol.addEventListener('scroll', () => sync(cardsCol, initCol), { passive: true });
+    _combatScrollSyncAttached = true;
+}
 
 async function getCurrentInternalUserId() {
     if (AppState.cachedUserData?.id) return AppState.cachedUserData.id;
@@ -51,6 +322,24 @@ window.combatNextTurn = async function(campagnaId, sessioneId, orderLen, round, 
     }
 
     await sendAppEventBroadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
+}
+
+window.combatSelectEntry = async function(type, id, campagnaId, sessioneId, isDM, isOwner) {
+    if (_combatSelectedId === id && _combatSelectedType === type) {
+        _combatSelectedId = null;
+        _combatSelectedType = null;
+    } else {
+        _combatSelectedId = id;
+        _combatSelectedType = type;
+    }
+    await renderCombattimentoContent(campagnaId, sessioneId);
+}
+
+window.combatCloseSheet = async function(campagnaId, sessioneId) {
+    _combatSelectedId = null;
+    _combatSelectedType = null;
+    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 // ===========================================================================
@@ -277,6 +566,7 @@ window.combatMonsterEditCa = async function(mId, campagnaId, sessioneId) {
     } else {
         combatOpenMonsterFullSheet(mId, campagnaId, sessioneId);
     }
+    renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Dialog rapida per i mostri "placeholder": stessa estetica della full
@@ -363,6 +653,7 @@ window.placeholderEditPvMax = async function(monsterId, campagnaId, sessioneId) 
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
     combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
+    renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Apre il modale condizioni per il placeholder. Le condizioni vengono
@@ -393,12 +684,303 @@ window.combatPlaceholderDelete = async function(monsterId, campagnaId, sessioneI
     if (error) { showNotification('Errore eliminazione: ' + error.message); return; }
     closeCombatPlaceholderModal();
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
+async function renderCombatPlayerSheet(userId, isDM, isOwner, campagnaId, sessioneId) {
+    const content = document.getElementById('combattimentoContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
 
+    const { data: pcList } = await supabase.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+    const pc = (pcList || []).find(p => p.player_user_id === userId);
+    if (!pc) { content.innerHTML = '<p>Personaggio non trovato</p>'; return; }
 
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pc.personaggio_id).single();
+    if (!pg) { content.innerHTML = '<p>Personaggio non trovato</p>'; return; }
 
+    const canEdit = isDM || isOwner;
+    const fMod = (v) => { const m = Math.floor(((v||10)-10)/2); return m >= 0 ? `+${m}` : `${m}`; };
+    const bonusComp = Math.floor(((pg.livello||1)-1)/4)+2;
+    const pvAttuali = pg.pv_attuali != null ? pg.pv_attuali : pg.punti_vita_max;
+    const saves = pg.tiri_salvezza || [];
 
+    const conditionsActive = ALL_CONDITIONS.filter(c => pg[c.key]);
+    const condBadges = conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('');
+
+    const hasSpellSlots = pg.slot_incantesimo && typeof pg.slot_incantesimo === 'object' && Object.keys(pg.slot_incantesimo).length > 0;
+
+    // Spell page content
+    let spellPageHtml = '';
+    if (hasSpellSlots) {
+        const classi = pg.classi || [];
+        const spellAbilities = [];
+        classi.forEach(c => {
+            const ab = CLASS_SPELL_ABILITY[c.nome];
+            if (ab && !spellAbilities.find(s => s.ability === ab)) {
+                const val = pg[ab] || 10;
+                const m = Math.floor((val - 10) / 2);
+                spellAbilities.push({ classe: c.nome, ability: ab, mod: m });
+            }
+        });
+        const spellStatsHtml = spellAbilities.map(sa => {
+            const atkBonus = sa.mod + bonusComp;
+            const dc = 8 + bonusComp + sa.mod;
+            return `<div class="scheda-box"><div class="scheda-box-val">${sa.mod >= 0 ? '+'+sa.mod : sa.mod}</div><div class="scheda-box-label">${sa.ability.substring(0,3).toUpperCase()}</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                    <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>`;
+        }).join('');
+
+        const slots = pg.slot_incantesimo;
+        const levels = Object.keys(slots).map(Number).sort((a, b) => a - b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const pips = [];
+            for (let i = 0; i < s.max; i++) {
+                pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+            }
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips.join('')}</div><span class="scheda-slot-count" id="cSlotCount_${lvl}">${s.current}/${s.max}</span></div>`;
+        }).join('');
+
+        spellPageHtml = `
+        <div id="combatSpellPage" class="combat-monster-scroll" style="display:none;">
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">${spellStatsHtml}</div>
+            <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>`;
+    }
+
+    content.innerHTML = `
+    <div class="combat-card-expanded">
+        <div class="combat-sheet-header">
+            <h3>${escapeHtml(pg.nome)}</h3>
+            <span class="combat-sheet-sub">${escapeHtml(pg.razza || '')} · Lv ${pg.livello || 1}</span>
+            <button class="combat-sheet-close" onclick="combatCloseSheet('${campagnaId}','${sessioneId}')">&times;</button>
+        </div>
+        ${hasSpellSlots ? `<div class="combat-sheet-tabs"><button class="combat-sheet-tab active" onclick="combatSheetTab(0)">Scheda</button><button class="combat-sheet-tab" onclick="combatSheetTab(1)">Incantesimi</button></div>` : ''}
+        <div id="combatStatsPage" class="combat-monster-scroll">
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${pg.classe_armatura || 10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${pg.iniziativa != null ? pg.iniziativa : fMod(pg.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${pg.velocita || 9}</div><div class="scheda-box-label">Velocità</div></div>
+            </div>
+            <div class="combat-hp-bar">
+                <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_attuali',${pvAttuali},${pg.punti_vita_max||10})"` : ''}>
+                    <span class="combat-hp-val ${canEdit ? 'editable' : ''}">${pvAttuali}</span>/<span>${pg.punti_vita_max||10}</span>
+                    <div class="scheda-hp-label">PV</div>
+                </div>
+                <div class="combat-hp-block" ${canEdit ? `onclick="schedaOpenHpCalc('${pg.id}','pv_temporanei',${pg.pv_temporanei||0},-1)"` : ''}>
+                    <span class="combat-hp-val ${canEdit ? 'editable' : ''}">${pg.pv_temporanei||0}</span>
+                    <div class="scheda-hp-label">PV Temp</div>
+                </div>
+            </div>
+            <div class="combat-abilities-grid">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const v = pg[a.key]||10;
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor((v-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${v}</span><span class="combat-ability-mod">${fMod(v)}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${condBadges || pg.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${pg.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${pg.esaustione}</span>` : ''}</div>` : ''}
+            ${canEdit ? `<button class="btn-secondary btn-small" style="margin-top:10px;" onclick="openConditionsModal('${pg.id}')">Condizioni</button>` : ''}
+        </div>
+        ${spellPageHtml}
+    </div>`;
+
+    // Wire slot pips if caster
+    if (hasSpellSlots && canEdit) {
+        content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+            pip.addEventListener('click', () => {
+                const lvl = parseInt(pip.dataset.lvl);
+                const idx = parseInt(pip.dataset.idx);
+                combatSlotToggle(pg.id, lvl, idx);
+            });
+        });
+    }
+}
+
+window.combatSheetTab = function(tabIdx) {
+    const statsPage = document.getElementById('combatStatsPage');
+    const spellPage = document.getElementById('combatSpellPage');
+    const tabs = document.querySelectorAll('.combat-sheet-tab');
+    tabs.forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+    if (statsPage) statsPage.style.display = tabIdx === 0 ? '' : 'none';
+    if (spellPage) spellPage.style.display = tabIdx === 1 ? '' : 'none';
+}
+
+function combatSlotToggle(pgId, level, index) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    supabase.from('personaggi').select('slot_incantesimo').eq('id', pgId).single().then(({ data: pg }) => {
+        if (!pg || !pg.slot_incantesimo) return;
+        const slot = pg.slot_incantesimo[level];
+        if (!slot) return;
+        slot.current = index < slot.current ? index : index + 1;
+        const content = document.getElementById('combattimentoContent');
+        if (content) {
+            content.querySelectorAll(`.scheda-slot-pip[data-lvl="${level}"]`).forEach((p, i) => p.classList.toggle('filled', i < slot.current));
+            const countEl = document.getElementById(`cSlotCount_${level}`);
+            if (countEl) countEl.textContent = `${slot.current}/${slot.max}`;
+        }
+        supabase.from('personaggi').update({ slot_incantesimo: pg.slot_incantesimo, updated_at: new Date().toISOString() }).eq('id', pgId).then(() => {});
+    });
+}
+
+async function renderCombatMonsterSheet(monsterId, isDM, campagnaId, sessioneId) {
+    const content = document.getElementById('combattimentoContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+
+    const { data: m } = await supabase.from('mostri_combattimento').select('*').eq('id', monsterId).single();
+    if (!m) { content.innerHTML = '<p>Mostro non trovato</p>'; return; }
+
+    const fMod = (v) => { const mod = Math.floor(((v||10)-10)/2); return mod >= 0 ? `+${mod}` : `${mod}`; };
+    const bonusComp = Math.max(2, Math.floor(((parseInt(m.grado_sfida)||0)-1)/4)+2);
+    const conditionsActive = ALL_CONDITIONS.filter(c => m[c.key]);
+    const condBadges = conditionsActive.map(c => `<span class="condition-badge active">${c.label}</span>`).join('');
+    const saves = m.tiri_salvezza || [];
+
+    const resistenzeHtml = (m.resistenze && m.resistenze.length > 0) ? m.resistenze.map(r => `<span class="scheda-tag">${escapeHtml(r)}</span>`).join('') : '';
+    const immunitaHtml = (m.immunita && m.immunita.length > 0) ? m.immunita.map(r => `<span class="scheda-tag" style="background:rgba(239,68,68,0.15);color:#ef4444;">${escapeHtml(r)}</span>`).join('') : '';
+
+    const attacks = m.attacchi || [];
+    const attacksHtml = attacks.length > 0 ? attacks.map((a, i) => {
+        const hasUsi = a.usi_max > 0;
+        const usiCur = a.usi_attuali ?? a.usi_max;
+        const usiPips = hasUsi ? `<span class="monster-action-uses">${Array.from({length: a.usi_max}, (_,j) =>
+            `<span class="monster-action-use-pip ${j < usiCur ? 'filled' : ''}" ${isDM ? `onclick="monsterToggleActionUse('${m.id}',${i},${j},'${campagnaId}','${sessioneId}')"` : ''}></span>`
+        ).join('')}</span>` : '';
+        return `<div class="monster-attack-row"><span class="monster-attack-name">${escapeHtml(a.nome)}</span><span class="monster-attack-hit">${escapeHtml(a.bonus || '')}</span><span class="monster-attack-dmg">${escapeHtml(a.danno || '')}</span>${usiPips}</div>`;
+    }).join('') : '';
+
+    const leggActions = m.azioni_leggendarie || [];
+    const leggActionsHtml = leggActions.length > 0 ? leggActions.map(a =>
+        `<div class="monster-legg-row"><span class="monster-legg-name">${escapeHtml(a.nome)}</span><span class="monster-legg-desc">${window.formatRichText(a.descrizione || '')}</span></div>`
+    ).join('') : '';
+
+    const resLeggMax = m.resistenze_leggendarie || 0;
+    const resLeggCur = m.res_legg_attuali ?? resLeggMax;
+    const azLeggMax = m.azioni_legg_max || 0;
+    const azLeggCur = m.azioni_legg_attuali ?? azLeggMax;
+
+    const hasSpells = m.slot_incantesimo && typeof m.slot_incantesimo === 'object' && Object.keys(m.slot_incantesimo).length > 0;
+
+    let spellPageHtml = '';
+    if (hasSpells) {
+        const carInc = m.caratteristica_incantatore;
+        const incVal = m[carInc] || 10;
+        const incMod = Math.floor((incVal - 10) / 2);
+        const atkBonus = incMod + bonusComp;
+        const dc = 8 + bonusComp + incMod;
+        const slots = m.slot_incantesimo;
+        const levels = Object.keys(slots).map(Number).sort((a,b) => a-b);
+        const slotsHtml = levels.map(lvl => {
+            const s = slots[lvl];
+            const pips = [];
+            for (let i = 0; i < s.max; i++) {
+                pips.push(`<span class="scheda-slot-pip ${i < s.current ? 'filled' : ''}" data-lvl="${lvl}" data-idx="${i}"></span>`);
+            }
+            return `<div class="scheda-slot-row"><span class="scheda-slot-level">Lv ${lvl}</span><div class="scheda-slot-pips">${pips.join('')}</div><span class="scheda-slot-count" id="mSlotCount_${lvl}">${s.current}/${s.max}</span></div>`;
+        }).join('');
+
+        spellPageHtml = `
+        <div id="monsterSpellPage" class="combat-monster-scroll" style="display:none;">
+            <div class="scheda-three-boxes" style="margin-bottom:10px;">
+                <div class="scheda-box"><div class="scheda-box-val">${incMod >= 0 ? '+'+incMod : incMod}</div><div class="scheda-box-label">${(carInc||'').substring(0,3).toUpperCase()}</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${atkBonus >= 0 ? '+'+atkBonus : atkBonus}</div><div class="scheda-box-label">Attacco</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${dc}</div><div class="scheda-box-label">CD</div></div>
+            </div>
+            <div class="scheda-slots-table">${slotsHtml}</div>
+        </div>`;
+    }
+
+    content.innerHTML = `
+    <div class="combat-card-expanded combat-monster-sheet">
+        <div class="combat-sheet-header">
+            <h3>${escapeHtml(m.nome)}</h3>
+            <span class="combat-sheet-sub">${escapeHtml(m.tipologia||'')} · ${escapeHtml(m.taglia||'Media')} · GS ${m.grado_sfida||0}</span>
+            <button class="combat-sheet-close" onclick="combatCloseSheet('${campagnaId}','${sessioneId}')">&times;</button>
+        </div>
+        ${hasSpells ? `<div class="combat-sheet-tabs"><button class="combat-sheet-tab active" onclick="monsterSheetTab(0)">Scheda</button><button class="combat-sheet-tab" onclick="monsterSheetTab(1)">Incantesimi</button></div>` : ''}
+        <div id="monsterStatsPage" class="combat-monster-scroll">
+            <div class="scheda-three-boxes">
+                <div class="scheda-box"><div class="scheda-box-val">${m.classe_armatura||10}</div><div class="scheda-box-label">CA</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.iniziativa != null ? m.iniziativa : fMod(m.destrezza)}</div><div class="scheda-box-label">Iniziativa</div></div>
+                <div class="scheda-box"><div class="scheda-box-val">${m.velocita||9}</div><div class="scheda-box-label">Velocità</div></div>
+            </div>
+            <div class="combat-hp-bar">
+                <div class="combat-hp-block" ${isDM ? `onclick="monsterHpCalc('${m.id}','pv_attuali',${m.pv_attuali??m.punti_vita_max},${m.punti_vita_max||10},'${campagnaId}','${sessioneId}')"` : ''}>
+                    <span class="combat-hp-val ${isDM ? 'editable' : ''}">${m.pv_attuali??m.punti_vita_max}</span>/<span>${m.punti_vita_max||10}</span>
+                    <div class="scheda-hp-label">PV</div>
+                </div>
+            </div>
+            ${resLeggMax > 0 ? `
+            <div class="combat-section-label">Resistenze Leggendarie</div>
+            <div class="monster-res-legg-counter" id="mResLeggCounter">
+                ${Array.from({length: resLeggMax}, (_,i) => `<span class="monster-res-legg-pip ${i < resLeggCur ? 'filled' : ''}" data-idx="${i}" ${isDM ? `onclick="monsterToggleResLegg('${m.id}',${i},'${campagnaId}','${sessioneId}')"` : ''}></span>`).join('')}
+                <span class="monster-res-legg-label">${resLeggCur}/${resLeggMax}</span>
+            </div>` : ''}
+            <div class="combat-abilities-grid">
+                ${SCHEDA_ABILITIES.map(a => {
+                    const isSave = saves.includes(a.key);
+                    const saveMod = Math.floor(((m[a.key]||10)-10)/2) + (isSave ? bonusComp : 0);
+                    const saveStr = saveMod >= 0 ? `+${saveMod}` : `${saveMod}`;
+                    return `<div class="combat-ability"><span class="combat-ability-label">${a.label}</span><span class="combat-ability-val">${m[a.key]||10}</span><span class="combat-ability-mod">${fMod(m[a.key])}</span><span class="combat-ability-save-mini ${isSave?'prof':''}">TS ${saveStr}</span></div>`;
+                }).join('')}
+            </div>
+            ${attacksHtml ? `<div class="combat-section-label">Azioni</div><div class="monster-attacks-list">${attacksHtml}</div>` : ''}
+            ${azLeggMax > 0 || leggActionsHtml ? `<div class="combat-section-label">Azioni Leggendarie</div>` : ''}
+            ${azLeggMax > 0 ? `<div class="monster-res-legg-counter" id="mAzLeggCounter">
+                ${Array.from({length: azLeggMax}, (_,i) => `<span class="monster-res-legg-pip ${i < azLeggCur ? 'filled' : ''}" data-idx="${i}" ${isDM ? `onclick="monsterToggleAzLegg('${m.id}',${i},'${campagnaId}','${sessioneId}')"` : ''}></span>`).join('')}
+                <span class="monster-res-legg-label">${azLeggCur}/${azLeggMax}</span>
+            </div>` : ''}
+            ${leggActionsHtml ? `<div class="monster-legg-list">${leggActionsHtml}</div>` : ''}
+            ${resistenzeHtml ? `<div class="combat-section-label">Resistenze</div><div class="scheda-tags">${resistenzeHtml}</div>` : ''}
+            ${immunitaHtml ? `<div class="combat-section-label">Immunità</div><div class="scheda-tags">${immunitaHtml}</div>` : ''}
+            ${condBadges || m.esaustione > 0 ? `<div class="combat-conditions">${condBadges} ${m.esaustione > 0 ? `<span class="condition-badge-sm exhaustion">Esaustione ${m.esaustione}</span>` : ''}</div>` : ''}
+            ${isDM ? `
+            <div class="combat-dm-actions">
+                <button class="btn-secondary btn-small combat-dm-btn-full" onclick="openMonsterConditionsModal('${m.id}','${campagnaId}','${sessioneId}')">Condizioni</button>
+                <div class="combat-dm-actions-row">
+                    <button class="btn-secondary btn-small" onclick="duplicateMonster('${m.id}','${campagnaId}','${sessioneId}')">Duplica</button>
+                    <button class="btn-danger btn-small" onclick="removeMonster('${m.id}','${campagnaId}','${sessioneId}')">Rimuovi</button>
+                </div>
+            </div>` : ''}
+        </div>
+        ${spellPageHtml}
+    </div>`;
+
+    if (hasSpells && isDM) {
+        content.querySelectorAll('.scheda-slot-pip').forEach(pip => {
+            pip.addEventListener('click', async () => {
+                const lvl = parseInt(pip.dataset.lvl);
+                const idx = parseInt(pip.dataset.idx);
+                const slots = m.slot_incantesimo;
+                const slot = slots[lvl];
+                if (!slot) return;
+                slot.current = idx < slot.current ? idx : idx + 1;
+                content.querySelectorAll(`.scheda-slot-pip[data-lvl="${lvl}"]`).forEach((p, i) => p.classList.toggle('filled', i < slot.current));
+                const countEl = document.getElementById(`mSlotCount_${lvl}`);
+                if (countEl) countEl.textContent = `${slot.current}/${slot.max}`;
+                await supabase.from('mostri_combattimento').update({ slot_incantesimo: slots }).eq('id', m.id);
+            });
+        });
+    }
+}
+
+window.monsterSheetTab = function(tab) {
+    const statsPage = document.getElementById('monsterStatsPage');
+    const spellPage = document.getElementById('monsterSpellPage');
+    if (statsPage) statsPage.style.display = tab === 0 ? '' : 'none';
+    if (spellPage) spellPage.style.display = tab === 1 ? '' : 'none';
+    const content = document.getElementById('combattimentoContent');
+    if (content) {
+        content.querySelectorAll('.combat-sheet-tab').forEach((btn, i) => btn.classList.toggle('active', i === tab));
+    }
+};
 
 window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
@@ -408,7 +990,7 @@ window.monsterToggleResLegg = async function(mId, idx, campagnaId, sessioneId) {
     const cur = m.res_legg_attuali ?? m.resistenze_leggendarie;
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ res_legg_attuali: newVal }).eq('id', mId);
-    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
@@ -419,9 +1001,22 @@ window.monsterToggleAzLegg = async function(mId, idx, campagnaId, sessioneId) {
     const cur = m.azioni_legg_attuali ?? m.azioni_legg_max;
     const newVal = idx < cur ? idx : idx + 1;
     await supabase.from('mostri_combattimento').update({ azioni_legg_attuali: newVal }).eq('id', mId);
-    await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
+window.monsterToggleActionUse = async function(mId, actionIdx, pipIdx, campagnaId, sessioneId) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: m } = await supabase.from('mostri_combattimento').select('attacchi').eq('id', mId).single();
+    if (!m || !m.attacchi || !m.attacchi[actionIdx]) return;
+    const action = m.attacchi[actionIdx];
+    const cur = action.usi_attuali ?? action.usi_max;
+    action.usi_attuali = pipIdx < cur ? pipIdx : pipIdx + 1;
+    const updated = [...m.attacchi];
+    updated[actionIdx] = action;
+    await supabase.from('mostri_combattimento').update({ attacchi: updated }).eq('id', mId);
+    await renderCombattimentoContent(campagnaId, sessioneId);
+};
 
 // Monster HP Calculator (reuses the same overlay UI)
 window.monsterHpCalc = function(mId, field, currentVal, maxVal, campagnaId, sessioneId) {
@@ -484,21 +1079,21 @@ window.removeMonster = async function(mId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
     await supabase.from('mostri_combattimento').delete().eq('id', mId);
+    _combatSelectedId = null;
+    _combatSelectedType = null;
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_removed', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
-    const [{ data: original }, { data: monsters }] = await Promise.all([
-        supabase.from('mostri_combattimento').select('*').eq('id', mId).single(),
-        supabase.from('mostri_combattimento').select('nome').eq('sessione_id', sessioneId)
-    ]);
+    const { data: original } = await supabase.from('mostri_combattimento').select('*').eq('id', mId).single();
     if (!original) { showNotification('Mostro non trovato'); return; }
 
     const baseName = original.nome.replace(/\s*#\d+$/, '');
-    const existing = (monsters || []).filter(m => {
+    const existing = _combatMonsters.filter(m => {
         const b = m.nome.replace(/\s*#\d+$/, '');
         return b === baseName;
     });
@@ -549,6 +1144,7 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
 
     showNotification(`${clone.nome} aggiunto!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // Combat toolbar placeholders
@@ -567,7 +1163,7 @@ window.combatCalcOpen = function() {
             <div class="hp-calc-title">Calcolatrice</div>
             <input type="text" class="hp-calc-input" id="combatCalcInput" value="" style="font-size:1.5rem;" readonly>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-                ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].map(b => 
+                ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].map(b =>
                     `<button class="hp-calc-btn ${b==='='?'heal':''}" style="padding:12px;font-size:1.1rem;" onclick="combatCalcPress('${b}')">${b}</button>`
                 ).join('')}
             </div>
@@ -635,6 +1231,7 @@ window.monsterConditionToggle = async function(mId, condKey, value, campagnaId, 
     const { error } = await supabase.from('mostri_combattimento').update(updates).eq('id', mId);
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    renderCombattimentoContent(campagnaId, sessioneId);
     if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
 };
 
@@ -645,6 +1242,7 @@ window.monsterExhaustionChange = async function(mId, raw, campagnaId, sessioneId
     const { error } = await supabase.from('mostri_combattimento').update({ esaustione: v }).eq('id', mId);
     if (error) { showNotification('Errore: ' + error.message); return; }
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_updated', sessioneId, campagnaId });
+    renderCombattimentoContent(campagnaId, sessioneId);
     if (typeof _monsterConditionsOnChange === 'function') _monsterConditionsOnChange();
 };
 
@@ -655,6 +1253,13 @@ window.closeMonsterConditionsModal = function() {
     _monsterConditionsOnChange = null;
     if (typeof cb === 'function') cb();
 };
+
+// Compat: vecchia firma "Salva" del modale condizioni (alcuni vecchi
+// onclick potrebbero ancora chiamarla). Ora salva e chiude.
+window.saveMonsterConditions = function(mId, campagnaId, sessioneId) {
+    closeMonsterConditionsModal();
+    renderCombattimentoContent(campagnaId, sessioneId);
+}
 
 // Monster creation modal
 window.openMonsterCreationModal = function(campagnaId, sessioneId) {
@@ -802,6 +1407,7 @@ window.monsterQuickAddHomebrew = async function(campagnaId, sessioneId) {
     closeMonsterModal();
     showNotification(`${monster.nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 // ===========================================================================
@@ -869,6 +1475,7 @@ window.monsterImportCombatHomebrew = async function(combatId, campagnaId, sessio
     closeMonsterModal();
     showNotification(`${added} mostr${added===1?'o':'i'} aggiunt${added===1?'o':'i'} al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 function _buildMonsterPayloadFromSnapshot(snap, campagnaId, sessioneId) {
@@ -1005,6 +1612,7 @@ window.monsterSavePlaceholder = async function(campagnaId, sessioneId) {
     closeMonsterModal();
     showNotification(`${nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 };
 
 const MONSTER_SIZE_DIE = { 'Minuscola': 4, 'Piccola': 6, 'Media': 8, 'Grande': 10, 'Enorme': 12, 'Mastodontica': 20 };
@@ -1546,6 +2154,7 @@ window.saveMonster = async function() {
     closeMonsterModal();
     showNotification(`${nome} aggiunto al combattimento!`);
     await sendAppEventBroadcast({ table: 'combattimento', action: 'monster_added', sessioneId, campagnaId });
+    await renderCombattimentoContent(campagnaId, sessioneId);
 }
 
 window.terminaCombattimento = async function(campagnaId, sessioneId) {
@@ -1581,6 +2190,7 @@ window.terminaCombattimento = async function(campagnaId, sessioneId) {
         showNotification('Combattimento terminato');
 
         navigateToPage('sessione');
+        await renderSessioneContent(campagnaId);
     } catch (error) {
         console.error('❌ Errore nella terminazione combattimento:', error);
         showNotification('Errore nella terminazione del combattimento: ' + (error.message || error));
@@ -1607,6 +2217,17 @@ window.rimuoviIniziativa = async function(iniziativaId, sessioneId) {
         await sendAppEventBroadcast({ table: 'iniziativa', action: 'delete', sessioneId, iniziativaId });
 
         showNotification('Iniziativa rimossa!');
+
+        // Ricarica la sessione
+        const { data: sessione } = await supabase
+            .from('sessioni')
+            .select('campagna_id')
+            .eq('id', sessioneId)
+            .single();
+
+        if (sessione) {
+            await renderSessioneContent(sessione.campagna_id);
+        }
     } catch (error) {
         console.error('❌ Errore nella rimozione iniziativa:', error);
         showNotification('Errore nella rimozione dell\'iniziativa: ' + (error.message || error));
@@ -1880,6 +2501,7 @@ window.combatSaveTimer = async function(campagnaId, sessioneId, mode, forcedPgId
 
         combatCloseTimerDialog();
         showNotification('Timer avviato');
+        await renderCombattimentoContent(campagnaId, sessioneId);
         try { await sendAppEventBroadcast({ table: 'combat_timers', action: 'insert', sessioneId, campagnaId }); } catch (_) {}
     } catch (e) {
         console.error('Errore salvataggio timer:', e);
@@ -1895,7 +2517,7 @@ window.combatRemoveTimer = async function(timerId) {
     await _combatExpireOrDeleteTimer(timerId, /*removeConditions*/ true, /*deleteRow*/ true);
     const cId = window.AppState?.currentCampagnaId;
     const sId = window.AppState?.currentSessioneId;
-    if (cId && sId) await sendAppEventBroadcast({ table: 'combat_timers', action: 'delete', sessioneId: sId, campagnaId: cId });
+    if (cId && sId) await renderCombattimentoContent(cId, sId);
 };
 
 // Esegue la "scadenza" o eliminazione di un timer:

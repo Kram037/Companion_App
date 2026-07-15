@@ -2,6 +2,71 @@
 // CHARACTER SHEET EQUIPMENT
 // ============================================================================
 
+function buildEquipSection(pg) {
+    const equip = pg.equipaggiamento || [];
+    const armiRows = equip.filter(e => e.tipo === 'arma').map((e, i) => {
+        const idx = equip.indexOf(e);
+        const bonus = e.bonus_colpire != null ? (e.bonus_colpire >= 0 ? `+${e.bonus_colpire}` : e.bonus_colpire) : '-';
+        const dmgBonus = e.bonus_danno || 0;
+        const dannoStr = e.danni ? `${e.danni}${dmgBonus !== 0 ? (dmgBonus > 0 ? '+' + dmgBonus : dmgBonus) : ''}` : '-';
+        return `<tr>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
+            <td class="text-center">${bonus}</td>
+            <td class="text-center">${dannoStr} ${e.tipo_danno ? escapeHtml(e.tipo_danno.slice(0,3)) + '.' : ''}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
+        </tr>`;
+    }).join('');
+    const armaturaItems = equip.filter(e => e.tipo === 'armatura' || e.tipo === 'scudo');
+    const armaturaRows = armaturaItems.map(e => {
+        const idx = equip.indexOf(e);
+        const totalCA = (e.ca_base || 0) + (e.magic_bonus || 0);
+        const magicStr = e.magic_bonus ? ` (+${e.magic_bonus})` : '';
+        return `<tr>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
+            <td class="text-center">${totalCA}${magicStr}</td>
+            <td class="text-center">${e.categoria || '-'}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
+        </tr>`;
+    }).join('');
+    const FOCUS_LABELS_SHORT = {
+        'arcano': 'Arcano',
+        'druidico': 'Druidico',
+        'sacro': 'Sacro',
+        'componenti': 'Componenti',
+        'altro': 'Altro',
+    };
+    const focusItems = equip.filter(e => e.tipo === 'focus');
+    const focusRows = focusItems.map(e => {
+        const idx = equip.indexOf(e);
+        const tipoLabel = FOCUS_LABELS_SHORT[e.categoria] || '-';
+        return `<tr>
+            <td class="equip-name-cell" onclick="schedaEditEquip('${pg.id}',${idx})">${formatEquipName(e)}</td>
+            <td class="text-center">${tipoLabel}</td>
+            <td class="text-center"><button class="scheda-custom-res-del" onclick="schedaRemoveEquip('${pg.id}',${idx})">✕</button></td>
+        </tr>`;
+    }).join('');
+    return `<div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Equipaggiamento
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenAddEquip('${pg.id}')" title="Aggiungi">&#9998;</button>
+        </div>
+        <div class="scheda-section-body">
+        ${armiRows ? `<table class="scheda-equip-table">
+            <thead><tr><th>Arma</th><th>Colpire</th><th>Danno</th><th></th></tr></thead>
+            <tbody>${armiRows}</tbody>
+        </table>` : ''}
+        ${armaturaRows ? `<table class="scheda-equip-table" style="margin-top:8px;">
+            <thead><tr><th>Armatura</th><th>CA</th><th>Tipo</th><th></th></tr></thead>
+            <tbody>${armaturaRows}</tbody>
+        </table>` : ''}
+        ${focusRows ? `<table class="scheda-equip-table" style="margin-top:8px;">
+            <thead><tr><th>Focus</th><th>Tipo</th><th></th></tr></thead>
+            <tbody>${focusRows}</tbody>
+        </table>` : ''}
+        ${!armiRows && !armaturaRows && !focusRows ? '<span class="scheda-empty">Nessun equipaggiamento</span>' : ''}
+        </div>
+    </div>`;
+}
+
 // Bonus extra inseriti manualmente dall'utente (oggetti che non sono armatura/scudo,
 // privilegi non auto-applicati, ecc.). Sempre normalizzato per evitare null-checks.
 //
@@ -140,6 +205,7 @@ window.schedaAddFocus = async function(pgId, nome) {
         categoria: focus.cat,
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${focus.nome} aggiunto`);
@@ -165,6 +231,7 @@ window.schedaAddFocusAltro = async function(pgId) {
         categoria: 'altro',
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${trimmed} aggiunto`);
@@ -198,6 +265,7 @@ window.schedaAddArma = async function(pgId, nome) {
         proprieta: arma.proprieta, bonus_colpire: profBonus + atkMod, bonus_danno: dmgMod
     });
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${arma.nome} aggiunta`);
@@ -221,6 +289,7 @@ window.schedaAddArmatura = async function(pgId, nome) {
     const newCA = calcCAFromEquip(pg);
     pg.classe_armatura = newCA;
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA });
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${arm.nome} equipaggiata — CA: ${newCA}`);
@@ -480,6 +549,7 @@ window._schedaApplyInvArmaEquip = async function(pgId, invIndex, dndArmaNome) {
     const updates = { equipaggiamento: pg.equipaggiamento };
     if (treasureUid) updates.inventario = pg.inventario;
     await schedaInstantSave(pgId, updates);
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${view.nome} equipaggiata`);
@@ -518,6 +588,7 @@ window._schedaApplyInvArmaturaEquip = async function(pgId, invIndex, dndArmNome)
     const updates = { equipaggiamento: pg.equipaggiamento, classe_armatura: newCA };
     if (treasureUid) updates.inventario = pg.inventario;
     await schedaInstantSave(pgId, updates);
+    renderSchedaPersonaggio(pgId);
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
     showNotification(`${view.nome} equipaggiata — CA: ${newCA}`);
@@ -536,6 +607,7 @@ window.schedaRemoveEquip = async function(pgId, index) {
         updates.classe_armatura = newCA;
     }
     await schedaInstantSave(pgId, updates);
+    renderSchedaPersonaggio(pgId);
     showNotification('Oggetto rimosso');
 }
 
@@ -625,6 +697,7 @@ window.schedaSaveEquipDesc = async function(pgId, index) {
     await schedaInstantSave(pgId, { equipaggiamento: pg.equipaggiamento });
     document.getElementById('editEquipModal')?.remove();
     document.body.style.overflow = '';
+    renderSchedaPersonaggio(pgId);
     showNotification('Descrizione aggiornata');
 }
 
@@ -786,6 +859,7 @@ window.schedaSaveCustomWeapon = async function(pgId, invIndex) {
     document.querySelectorAll('.hp-calc-overlay').forEach(o => o.remove());
     document.getElementById('equipModal')?.remove();
     document.body.style.overflow = '';
+    renderSchedaPersonaggio(pgId);
     showNotification(`${nome} aggiunta all'equipaggiamento`);
 };
 

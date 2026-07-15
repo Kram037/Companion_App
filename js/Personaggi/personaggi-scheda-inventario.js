@@ -26,8 +26,413 @@ function _formatGoldTotal(g) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-window.schedaOpenInventoryPage = function(pgId) {
-    _schedaRequestReactRefresh(pgId, 'inventario');
+// State + helpers per la lista oggetti dell'Inventario:
+//   - search testuale (nome / tipo / sotto-tipo / rarita')
+//   - filtri rarita' + tipologia (toggleable via icona imbuto)
+//   - drag & drop per riordinare gli oggetti (HTML5 + pointer events
+//     per supportare anche il touch). L'ordine viene salvato come
+//     ordine dell'array pg.inventario stesso (no campo separato).
+// ──────────────────────────────────────────────────────────────────────
+window._invListState = window._invListState || {
+    search: '',
+    filters: { rarita: '', tipo: '' },
+    filtersOpen: false,
+};
+
+function _invListItemView(o) {
+    return _invResolveLive(o);
+}
+
+function _invListItemRarity(view) {
+    return view._homebrew_rarita || view.rarita || '';
+}
+
+function _invListItemTipo(view) {
+    return view._homebrew_tipo || view.tipo || '';
+}
+
+function _invListMatches(view) {
+    const st = window._invListState || {};
+    const f = st.filters || {};
+    const raritaFilters = _invListFilterValues(f.rarita);
+    const tipoFilters = _invListFilterValues(f.tipo);
+    if (raritaFilters.length) {
+        const r = String(_invListItemRarity(view) || '').trim();
+        if (!raritaFilters.includes(r)) return false;
+    }
+    if (tipoFilters.length) {
+        const t = String(_invListItemTipo(view) || '').trim();
+        if (!tipoFilters.includes(t)) return false;
+    }
+    const q = (st.search || '').trim().toLowerCase();
+    if (q) {
+        const txt = [
+            _invDisplayName(view) || view.nome || '',
+            view.nome_en || '',
+            _invListItemTipo(view),
+            view._homebrew_sotto_tipo || view.sotto_tipo || '',
+            _invListItemRarity(view),
+        ].join(' ').toLowerCase();
+        if (!txt.includes(q)) return false;
+    }
+    return true;
+}
+
+function _invListBuildRowsHtml(pg, pgId) {
+    const oggetti = pg.inventario || [];
+    if (oggetti.length === 0) {
+        return '<span class="scheda-empty">Nessun oggetto</span>';
+    }
+    const visible = [];
+    oggetti.forEach((o, i) => {
+        const view = _invListItemView(o);
+        if (_invListMatches(view)) visible.push({ view, i });
+    });
+    if (visible.length === 0) {
+        return '<span class="scheda-empty">Nessun oggetto corrisponde ai filtri</span>';
+    }
+    return visible.map(({ view, i }) => {
+        const magicStr = view.magic_bonus
+            ? ` <span class="inv-magic-badge">+${view.magic_bonus}</span>` : '';
+        const hbBadge = view._homebrew_id
+            ? ' <span class="inv-hb-badge" title="Homebrew">HB</span>' : '';
+        let meta = '';
+        if (view._homebrew_id) {
+            meta = view._homebrew_meta || (typeof window.formatOggettoMeta === 'function'
+                ? window.formatOggettoMeta({
+                    tipo: view._homebrew_tipo,
+                    sotto_tipo: view._homebrew_sotto_tipo,
+                    rarita: view._homebrew_rarita,
+                    incantamento: view._homebrew_incantamento,
+                    richiede_sintonia: view._homebrew_richiede_sintonia,
+                    sintonia_dettaglio: view._homebrew_sintonia_dettaglio,
+                }) : '');
+        } else if (view.rarita) {
+            meta = (typeof window.formatOggettoMeta === 'function')
+                ? window.formatOggettoMeta(view) : '';
+        }
+        const rarClass = _invRarityClass(_invListItemRarity(view));
+        return `<div class="inv-item-row inv-item-card ${rarClass}" data-idx="${i}">
+            <div class="inv-item-main">
+                <div class="inv-item-name inv-item-name-clickable" onclick="invEditItem('${pgId}',${i})">${escapeHtml(_invDisplayName(view) || 'Oggetto')}${view.magico ? ' <span class="inv-magic-badge">✦</span>' : ''}${magicStr}${hbBadge}</div>
+                ${meta ? `<div class="inv-item-meta">${escapeHtml(meta)}</div>` : ''}
+            </div>
+            <div class="inv-item-qty-edit" title="Quantita'">
+                <span class="inv-item-qty-x">×</span>
+                <input type="number" class="inv-item-qty-input" min="1" step="1"
+                    value="${view.quantita || 1}"
+                    onclick="event.stopPropagation();this.select();"
+                    onchange="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onblur="invQtyInlineUpdate('${pgId}',${i},this.value)"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function _invListReRender(pgId) {
+    const pg = _schedaPgCache;
+    const cont = document.getElementById('invItemsList');
+    if (!pg || !cont) return;
+    cont.innerHTML = _invListBuildRowsHtml(pg, pgId);
+}
+
+function _invListOptionsFor(pg, field) {
+    const set = new Set();
+    (pg.inventario || []).forEach(o => {
+        const view = _invListItemView(o);
+        const v = field === 'rarita' ? _invListItemRarity(view) : _invListItemTipo(view);
+        const s = String(v || '').trim();
+        if (s) set.add(s);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'it'));
+}
+
+function _invListActiveFilterCount() {
+    const f = (window._invListState && window._invListState.filters) || {};
+    return _invListFilterValues(f.rarita).length + _invListFilterValues(f.tipo).length;
+}
+
+function _invListRenderFiltersBadge() {
+    const badge = document.getElementById('invListFiltersBadge');
+    if (!badge) return;
+    const n = _invListActiveFilterCount();
+    badge.textContent = n ? String(n) : '';
+    badge.style.display = n ? 'inline-flex' : 'none';
+    const btn = document.getElementById('invListFiltersBtn');
+    if (btn) btn.classList.toggle('active', n > 0);
+}
+
+function _invListRenderFiltersPanel(pgId) {
+    const panel = document.getElementById('invListFiltersPanel');
+    if (!panel) return;
+    const pg = _schedaPgCache;
+    if (!pg) { panel.innerHTML = ''; return; }
+    const f = window._invListState.filters || {};
+    const rarOpts = _invListOptionsFor(pg, 'rarita');
+    const tipOpts = _invListOptionsFor(pg, 'tipo');
+    panel.innerHTML = `
+        <div class="inv-list-filter-field">
+            <label>Rarità</label>
+            <select onchange="invListSetFilter('rarita', this.value, '${pgId}')">
+                <option value="">Tutte</option>
+                ${rarOpts.map(v => `<option value="${escapeHtml(v)}" ${f.rarita === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <div class="inv-list-filter-field">
+            <label>Tipologia</label>
+            <select onchange="invListSetFilter('tipo', this.value, '${pgId}')">
+                <option value="">Tutte</option>
+                ${tipOpts.map(v => `<option value="${escapeHtml(v)}" ${f.tipo === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
+            </select>
+        </div>
+        <button type="button" class="inv-list-filter-reset" onclick="invListResetFilters('${pgId}')">Pulisci</button>
+    `;
+}
+
+function _invListBuildFilterButton(field, label, emptyLabel, options, value, pgId) {
+    const selected = _invListFilterValues(value);
+    const normalized = [{ value: '', label: emptyLabel }, ...options.map(v => ({ value: String(v), label: v }))];
+    const selectable = normalized.filter(o => o.value !== '');
+    const isSingle = selectable.length === 2;
+    const encoded = encodeURIComponent(JSON.stringify(isSingle ? normalized : selectable)).replace(/'/g, '%27');
+    const selectedLabel = isSingle && selected.length
+        ? normalized.find(o => o.value === selected[0])?.label || selected[0]
+        : selected.length;
+    return `<button type="button" class="custom-select-trigger comp-filter-select" onclick="invListPickFilter('${field}','${encoded}','${safeAttr(label)}','${pgId}','${isSingle ? 'single' : 'multi'}')" data-value="${safeAttr(selected.join(','))}">
+        ${escapeHtml(label)}
+        ${selected.length ? `<small>${escapeHtml(selectedLabel)}</small>` : ''}
+    </button>`;
+}
+
+function _invListFiltersHtml(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg) return '';
+    const f = window._invListState.filters || {};
+    const rarOpts = _invListOptionsFor(pg, 'rarita');
+    const tipOpts = _invListOptionsFor(pg, 'tipo');
+    return [
+        _invListBuildFilterButton('rarita', 'Rarita', 'Tutte', rarOpts, f.rarita, pgId),
+        _invListBuildFilterButton('tipo', 'Tipologia', 'Tutte', tipOpts, f.tipo, pgId),
+    ].join('');
+}
+
+window.invListToggleFilters = function(pgId) {
+    invListOpenFiltersDialog(pgId);
+};
+
+window.invListOpenFiltersDialog = function(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay comp-filter-overlay inv-list-filter-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+        <div class="hp-calc-modal comp-filter-modal">
+            <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+            <h2 class="comp-filter-title">Filtri</h2>
+            <div class="comp-filter-panel">${_invListFiltersHtml(pgId)}</div>
+            <div class="comp-filter-actions">
+                <button type="button" class="btn-secondary" onclick="invListResetFilters('${pgId}')">Reset</button>
+                <button type="button" class="btn-primary" onclick="this.closest('.hp-calc-overlay').remove()">Applica</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+window.invListOnSearch = function(value, pgId) {
+    window._invListState.search = value || '';
+    _invListReRender(pgId);
+};
+
+window.invListSetFilter = function(field, value, pgId) {
+    window._invListState.filters = window._invListState.filters || {};
+    const values = _invListFilterValues(value);
+    window._invListState.filters[field] = values.length ? values : '';
+    _invListReRender(pgId);
+    _invListRenderFiltersBadge();
+};
+
+window.invListPickFilter = function(field, encodedOptions, title, pgId, mode = 'multi') {
+    const options = JSON.parse(decodeURIComponent(encodedOptions));
+    const current = _invListFilterValues(window._invListState.filters?.[field]);
+    if (mode === 'single') {
+        openCustomSelect(options, value => {
+            invListSetFilter(field, value, pgId);
+            const overlay = document.querySelector('.inv-list-filter-overlay');
+            if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
+        }, title || 'Filtro');
+        return;
+    }
+    openMultiSelect(options, current, values => {
+        invListSetFilter(field, values, pgId);
+        const overlay = document.querySelector('.inv-list-filter-overlay');
+        if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
+    }, title || 'Filtro');
+};
+
+window.invListResetFilters = function(pgId) {
+    window._invListState.filters = { rarita: '', tipo: '' };
+    const overlay = document.querySelector('.inv-list-filter-overlay');
+    if (overlay) overlay.querySelector('.comp-filter-panel').innerHTML = _invListFiltersHtml(pgId);
+    _invListReRender(pgId);
+    _invListRenderFiltersBadge();
+};
+
+function _invListFilterValues(value) {
+    if (Array.isArray(value)) return value.map(v => String(v || '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return [String(value).trim()].filter(Boolean);
+}
+
+// Drag & drop rimosso: gli oggetti dell'inventario ora restano fissi
+// nell'ordine in cui sono stati aggiunti.
+
+window.schedaOpenInventoryPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+    // Tracciamo la tab corrente cosi' il bottone "Vai a Statistiche" sa che
+    // deve prima navigare a Pagina 1 e poi scrollare. Senza questo flag il
+    // valore restava quello della tab precedente e il bottone non funzionava.
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'inventario';
+
+    const monete = pg.monete || {};
+    const coinCellHtml = (c) => {
+        const val = monete[c.key] || 0;
+        return `<div class="inv-coin-cell inv-coin-${c.key}">
+            <div class="inv-coin-abbr">${c.short}</div>
+            <input type="text" inputmode="none" readonly
+                class="inv-coin-input"
+                id="invCoin_${c.key}"
+                value="${val}"
+                data-coin="${c.key}"
+                data-pgid="${pgId}"
+                onclick="invOpenCoinKeypad(this)">
+            <div class="inv-coin-name">${c.label.split(' ')[0]}</div>
+        </div>`;
+    };
+    const totalGold = _calcCoinsTotalGold(monete);
+    const totalCellHtml = `<div class="inv-coin-cell inv-coin-total" id="invCoinTotalCell">
+        <div class="inv-coin-abbr">TOT</div>
+        <div class="inv-coin-input inv-coin-total-val" id="invCoinTotal">${_formatGoldTotal(totalGold)}</div>
+        <div class="inv-coin-name">in MO</div>
+    </div>`;
+    // Riga 1: MR / MA · Riga 2: ME / MO · Riga 3: MP / Totale
+    const coinsHtml = `<div class="inv-coins-grid inv-coins-grid-2x3">
+        ${coinCellHtml(COIN_TYPES[0])}${coinCellHtml(COIN_TYPES[1])}
+        ${coinCellHtml(COIN_TYPES[2])}${coinCellHtml(COIN_TYPES[3])}
+        ${coinCellHtml(COIN_TYPES[4])}${totalCellHtml}
+    </div>`;
+
+    // Le righe degli oggetti vengono generate da _invListBuildRowsHtml,
+    // cosi' search/filtri/drag&drop possono ri-renderizzare la lista
+    // senza ricaricare l'intera pagina.
+    const oggettiRowsHtml = _invListBuildRowsHtml(pg, pgId);
+
+    const sintonia = pg.sintonia || [];
+    const maxSintonia = 3;
+    const _attuneNameOf = (it) => {
+        if (!it) return '';
+        if (typeof it === 'string') return it;
+        // Strippa eventuale " +N" finale duplicato col magic_bonus.
+        return _invDisplayName(it) || it.nome || '';
+    };
+    const _attuneBonusOf = (it) => {
+        if (!it || typeof it === 'string') return 0;
+        return it.magic_bonus || 0;
+    };
+    let sintoniaHtml = '';
+    for (let i = 0; i < maxSintonia; i++) {
+        const item = sintonia[i] || null;
+        const itemName = _attuneNameOf(item);
+        const itemBonus = _attuneBonusOf(item);
+        const bonusStr = itemBonus ? ` +${itemBonus}` : '';
+        sintoniaHtml += `<div class="inv-attune-slot ${item ? 'filled' : 'empty'}" onclick="invEditAttune('${pgId}',${i})">
+            <span class="inv-attune-icon">◈</span>
+            <span class="inv-attune-name">${item ? escapeHtml(itemName) + bonusStr : 'Slot vuoto'}</span>
+        </div>`;
+    }
+
+    content.innerHTML = `
+    ${buildSchedaHeader(pg, 'Inventario')}
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">
+            <span>Monete</span>
+            <span class="inv-coins-title-total" id="invCoinsTitleTotal" title="Totale in monete d'oro">${_formatGoldTotal(totalGold)} <small>MO</small></span>
+        </div>
+        <div class="scheda-section-body">
+            ${coinsHtml}
+        </div>
+    </div>
+
+    <div class="scheda-section">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sintonia</div>
+        <div class="scheda-section-body">
+            <div class="inv-attune-grid">${sintoniaHtml}</div>
+        </div>
+    </div>
+
+    <div class="scheda-section inv-section-fixed">
+        <div class="scheda-section-title inv-section-title-fixed">
+            <span>Inventario</span>
+            <div class="inv-section-actions">
+                <button class="scheda-edit-btn" onclick="invAddItem('${pgId}')" title="Aggiungi oggetto">&#9998;</button>
+            </div>
+        </div>
+        <div class="filters-bar inv-list-toolbar">
+            <div class="filter-search-wrap">
+                <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="invListSearch" class="filter-search" placeholder="Cerca per nome o tipo..."
+                    value="${escapeHtml(window._invListState?.search || '')}"
+                    oninput="invListOnSearch(this.value,'${pgId}')">
+            </div>
+            <button type="button" id="invListFiltersBtn" class="comp-filter-btn" onclick="invListToggleFilters('${pgId}')" aria-label="Filtri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <span>Filtri</span>
+                <strong id="invListFiltersBadge" style="display:none;"></strong>
+            </button>
+        </div>
+        <div class="scheda-section-body">
+            <div id="invItemsList" class="inv-items-grid inv-items-grid-2col">${oggettiRowsHtml}</div>
+        </div>
+    </div>
+    `;
+
+    schedaSetActiveTab('inventario');
+    schedaWireTabBar(pgId);
+    _invListRenderFiltersBadge();
+};
+
+window.invCoinChange = async function(pgId, coinKey, delta) {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const monete = pg.monete ? { ...pg.monete } : {};
+    monete[coinKey] = Math.max(0, (monete[coinKey] || 0) + delta);
+    pg.monete = monete;
+    const el = document.getElementById('invCoin_' + coinKey);
+    if (el) el.textContent = monete[coinKey];
+    await supabase.from('personaggi').update({ monete }).eq('id', pgId);
 };
 
 window.invOpenCoinKeypad = function(inputEl) {
@@ -1181,6 +1586,15 @@ window.invEditItem = function(pgId, idx) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
+};
+
+window.invSelectMagicBonus = function(btn, bonus) {
+    const row = btn.parentElement;
+    if (!row) return;
+    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('invItemMagicBonus');
+    if (hidden) hidden.value = String(bonus);
 };
 
 window.invUpdateItem = async function(pgId, idx) {

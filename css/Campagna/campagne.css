@@ -169,30 +169,6 @@
 .campagna-card .info-item { gap: 4px; }
 .campagna-card .info-label { min-width: auto; }
 
-.react-campaign-main {
-    appearance: none;
-    background: none;
-    border: 0;
-    color: inherit;
-    cursor: pointer;
-    display: grid;
-    flex: 1;
-    gap: var(--spacing-xs) var(--spacing-sm);
-    grid-template-columns: 72px minmax(0, 1fr);
-    padding: var(--spacing-sm) 52px var(--spacing-sm) var(--spacing-sm);
-    text-align: left;
-}
-
-.react-campaign-main .campagna-icon {
-    grid-row: 1 / 3;
-}
-
-.react-campaign-main .campagna-info {
-    grid-column: 2;
-    margin: 0;
-    padding: 0;
-}
-
 .campagna-notes {
     margin-top: var(--spacing-sm);
     padding-top: var(--spacing-sm);
@@ -208,10 +184,6 @@
 .dettagli-content,
 .sessione-content {
     padding-bottom: 120px;
-}
-
-.danger-text {
-    color: #dc3545;
 }
 
 .dettagli-header {

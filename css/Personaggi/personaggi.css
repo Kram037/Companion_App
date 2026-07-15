@@ -61,23 +61,6 @@
     position: relative;
 }
 
-.react-character-main {
-    width: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-}
-
-.react-character-main .pg-card-header { display: flex; }
-.react-character-main .pg-card-name,
-.react-character-main .pg-card-subtitle { display: block; }
-.react-character-main .pg-card-campaigns { display: block; margin-top: var(--spacing-sm); }
-.react-character-actions { justify-content: flex-end; }
-
 .pg-card:hover {
     border-color: var(--accent-light);
     box-shadow: var(--shadow-md);
@@ -3065,67 +3048,6 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-}
-
-/* React character sheet */
-.react-character-sheet { padding-bottom: 26px; }
-.react-scheda-tab-bar { z-index: 1001; }
-.react-section-toggle,
-.react-inline-button,
-.react-dot-button,
-.react-inventory-main,
-.react-equipment-row,
-.react-spell-name,
-.react-prepare-toggle,
-.react-prepared-button {
-    color: inherit;
-    background: none;
-    border: 0;
-    font: inherit;
-}
-.react-section-toggle {
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-    color: var(--accent);
-    text-align: left;
-    text-transform: uppercase;
-    font-weight: 800;
-    cursor: pointer;
-}
-.react-section-actions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
-.react-character-sheet .scheda-section-title::after { display: none; }
-.react-character-sheet .scheda-section-title:has(.react-section-toggle)::after { display: block; }
-.react-character-sheet .scheda-section.collapsed .scheda-section-title:has(.react-section-toggle)::after { transform: rotate(-90deg); }
-.react-dot-button { padding: 2px 3px; cursor: pointer; }
-.react-inline-button { padding: 2px 5px; cursor: pointer; }
-.react-sheet-summary { margin-top: 10px; border-top: 1px solid var(--border); }
-.react-sheet-summary button { width: 100%; padding: 9px 0; display: grid; gap: 3px; color: var(--text-secondary); background: none; border: 0; text-align: left; cursor: pointer; }
-.react-sheet-summary span { font-size: 0.76rem; color: var(--text-light); }
-.react-sheet-action { margin-top: 8px; }
-.react-compact-list { display: grid; grid-template-columns: 96px 1fr; gap: 8px; padding: 5px 0; font-size: 0.82rem; }
-.react-compact-list strong { color: var(--text-secondary); }
-.react-equipment-list { display: grid; gap: 5px; }
-.react-equipment-row { display: grid; gap: 2px; width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: left; cursor: pointer; }
-.react-equipment-row span { color: var(--text-light); font-size: 0.72rem; }
-.react-inventory-main { display: grid; flex: 1; min-width: 0; padding: 0; text-align: left; cursor: pointer; }
-.react-spell-list { display: grid; gap: 5px; }
-.react-spell-row { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
-.react-spell-name { display: grid; flex: 1; gap: 2px; padding: 8px 10px; text-align: left; cursor: pointer; }
-.react-spell-name span { color: var(--text-light); font-size: 0.72rem; }
-.react-prepare-toggle { width: 40px; color: var(--text-muted); border-left: 1px solid var(--border); cursor: pointer; }
-.react-prepare-toggle.active { color: #fff; background: var(--accent); }
-.react-prepared-button { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 8px; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
-.react-character-sheet details > summary { list-style: none; }
-.react-character-sheet details > summary::-webkit-details-marker { display: none; }
-.react-character-sheet details[open] .priv-feat-arrow { transform: rotate(180deg); }
-.react-character-sheet .scheda-box,
-.react-character-sheet button.scheda-hp-cell { border: 0; color: inherit; font-family: inherit; }
-
-@media (max-width: 767px) {
-    .react-character-sheet .scheda-page-grid,
-    .react-character-sheet .scheda-spells-grid { display: block; }
-    .react-character-sheet .scheda-divider { display: block; }
 }
 
 .inv-list-filters-btn {

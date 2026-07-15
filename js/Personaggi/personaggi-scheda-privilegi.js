@@ -136,6 +136,131 @@ function _autoFeaturesForClass(clsEntry, pgClassLevel) {
     return { className: _localizedClassName(cls), features, subclassName, subFeatures };
 }
 
+/** Estrae nome/descrizione localizzati di un privilegio (auto o custom) in base alla lingua corrente. */
+function _privFeatField(f, key) {
+    if (!f) return '';
+    const lang = _spellLang();
+    if (key === 'name') {
+        if (lang === 'en') return f.name_en || f.name || '';
+        return f.name || f.name_en || '';
+    }
+    if (key === 'description') {
+        if (lang === 'en') return f.description_en || f.description || '';
+        return f.description || f.description_en || '';
+    }
+    return '';
+}
+
+function _privFeatureKey(source, nameEn) {
+    return `${source}:${nameEn}`;
+}
+
+function _renderPrivFeatureRow(f, opts = {}) {
+    const isHidden = !!opts.hidden;
+    const isCustom = !!opts.custom;
+    const name = _privFeatField(f, 'name');
+    const desc = _privFeatField(f, 'description').trim();
+    const hasDesc = desc.length > 0;
+    const lvlBadge = f.level
+        ? `<span class="priv-feat-level">Lv ${f.level}</span>`
+        : `<span class="priv-feat-level priv-feat-level-empty">—</span>`;
+    // Mostra il badge "EN" solo quando la lingua corrente e' italiano ma esiste solo la versione inglese.
+    const lang = _spellLang();
+    const showEnWarn = lang === 'it' && !f.translated && !isCustom && f.description_en && !f.description;
+    const langWarn = showEnWarn
+        ? `<span class="priv-feat-en-badge" title="Descrizione disponibile solo in inglese">EN</span>`
+        : '';
+    const editFn = opts.editFn || (isCustom
+        ? `privEditCustom('${escapeHtml(opts.tabName || '')}',${opts.index})`
+        : '');
+    // Per le righe custom: il click sull'header toggla il body (come per
+    // i privilegi auto). Se non c'e' descrizione, il click apre l'editor
+    // per evitare un'azione "morta". La matita affiancata apre sempre
+    // l'editor.
+    const isClickable = hasDesc || isCustom;
+    const headerClass = `priv-feat-header${isClickable ? ' priv-feat-clickable' : ''}${isHidden ? ' priv-feat-hidden' : ''}`;
+    const headerOnclick = hasDesc
+        ? `onclick="privToggleFeatureBody(this)"`
+        : (isCustom && editFn ? `onclick="${editFn}"` : '');
+    const arrowHtml = hasDesc ? '<span class="priv-feat-arrow">▾</span>' : '';
+    const editBtn = (isCustom && editFn)
+        ? `<button class="priv-feat-edit-btn" onclick="event.stopPropagation();${editFn}" title="Modifica">&#9998;</button>`
+        : '';
+    return `<div class="priv-feat-row${isHidden ? ' priv-feat-row-hidden' : ''}">
+        <div class="${headerClass}" ${headerOnclick}>
+            ${lvlBadge}
+            <span class="priv-feat-name">${escapeHtml(name)}${langWarn}</span>
+            ${arrowHtml}
+            ${editBtn}
+        </div>
+        ${hasDesc ? `<div class="priv-feat-body" style="display:none;">${_privDescToHtml(desc)}</div>` : ''}
+    </div>`;
+}
+
+function _privDescToHtml(desc) {
+    // Delegato al formatter unico dell'app: garantisce una sintassi
+    // coerente ovunque (**bold**, *bold*, _italic_, "- bullet").
+    const html = window.formatRichText(desc);
+    return html;
+}
+
+window.privToggleFeatureBody = function(headerEl) {
+    if (!headerEl) return;
+    const row = headerEl.closest('.priv-feat-row');
+    if (!row) return;
+    const body = row.querySelector('.priv-feat-body');
+    const arrow = headerEl.querySelector('.priv-feat-arrow');
+    if (!body) return;
+    const open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : '';
+    if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+};
+
+// ============================================================
+// Tabelle custom della pagina 1 (sotto Risorse)
+// Schema identico alla tabella "Risorse": ogni voce e' una risorsa
+// consumabile { nome, tipo: 'punti'|'dadi', max, current, dado? }.
+// Persistite in pg.privilegi.p1_tabs_order / p1_features.
+// ============================================================
+function _buildP1CustomTablesHtml(pg) {
+    const priv = _normalizePrivilegi(pg);
+    if (!priv.p1_tabs_order || priv.p1_tabs_order.length === 0) return '';
+    return priv.p1_tabs_order.map(tabName => {
+        const items = (priv.p1_features[tabName] || []).filter(r => r && typeof r === 'object' && r.nome != null);
+        const rowsHtml = items.length > 0
+            ? items.map((r, i) => {
+                const max = Number.isFinite(parseInt(r.max)) ? parseInt(r.max) : 1;
+                const current = (r.current != null) ? r.current : max;
+                const label = r.tipo === 'dadi' && r.dado
+                    ? `${escapeHtml(r.nome)} <small>(${escapeHtml(r.dado)})</small>`
+                    : escapeHtml(r.nome);
+                const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
+                return `<div class="scheda-hd-row">
+                    <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenP1TabRes('${pg.id}',${tabKey},${i})" title="Modifica / elimina">${label}</span>
+                    <div class="scheda-hd-avail">
+                        <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},-1,${max})">−</button>
+                        <span class="scheda-hd-val">${current}</span>
+                        <span class="scheda-hd-max">/ ${max}</span>
+                        <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},1,${max})">+</button>
+                    </div>
+                </div>`;
+            }).join('')
+            : '<span class="scheda-empty">Nessuna risorsa</span>';
+        const tabKey = JSON.stringify(tabName).replace(/"/g, '&quot;');
+        const sectionKey = 'p1tab:' + tabName;
+        const open = window._schedaOpenSections && window._schedaOpenSections.has(sectionKey);
+        return `<div class="scheda-section${open ? '' : ' collapsed'}" data-section-key="${escapeHtml(sectionKey)}">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenP1TabRes('${pg.id}',${tabKey})" title="Aggiungi risorsa">&#9998;</button>
+                <button class="scheda-edit-btn priv-tab-remove" onclick="event.stopPropagation();p1RemoveTab(${tabKey})" title="Rimuovi tabella">✕</button>
+            </div>
+            <div class="scheda-section-body">
+                ${items.length > 0 ? `<div class="scheda-hd-table">${rowsHtml}</div>` : rowsHtml}
+            </div>
+        </div>`;
+    }).join('');
+}
+
 async function _p1Save(pgId, priv) {
     const supabase = getSupabaseClient();
     if (!supabase) return false;
@@ -340,8 +465,330 @@ window.schedaP1TabResDelete = async function(pgId, tabName, index) {
     showNotification && showNotification('Risorsa rimossa');
 };
 
-window.schedaOpenPrivilegesPage = function(pgId) {
-    _schedaRequestReactRefresh(pgId, 'privilegi');
+window.schedaOpenPrivilegesPage = async function(pgId) {
+    const content = document.getElementById('schedaContent');
+    if (!content) return;
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    const { data: pg } = await supabase.from('personaggi').select('*').eq('id', pgId).single();
+    if (!pg) return;
+    _schedaPgCache = pg;
+
+    window._schedaCurrentPgId = pgId;
+    window._schedaCurrentTab = 'privilegi';
+
+    const priv = _normalizePrivilegi(pg);
+    const classi = pg.classi || [];
+
+    // ── Sezione Classe (per ogni classe del multiclass) ──
+    let classBlocks = '';
+    let subclassBlocks = '';
+    if (classi.length === 0) {
+        classBlocks = '<span class="scheda-empty">Nessuna classe selezionata</span>';
+    } else {
+        classi.forEach(c => {
+            const data = _autoFeaturesForClass(c, c.livello);
+            const classTitle = `${escapeHtml(data.className)} - Livello ${c.livello || 1}`;
+            const rows = data.features.length > 0
+                ? data.features.map(f => {
+                    const key = _privFeatureKey(f.source, f.name_en);
+                    return _renderPrivFeatureRow(f, { hidden: priv.hidden_auto.includes(key), featKey: key });
+                  }).join('')
+                : '<span class="scheda-empty">Nessun privilegio disponibile a questo livello</span>';
+            classBlocks += `<div class="priv-subblock">
+                <div class="priv-subblock-title">${classTitle}</div>
+                <div class="priv-feat-list-wrap">${rows}</div>
+            </div>`;
+
+            if (data.subclassName) {
+                const subRows = data.subFeatures.length > 0
+                    ? data.subFeatures.map(f => {
+                        const key = _privFeatureKey(f.source, f.name_en);
+                        return _renderPrivFeatureRow(f, { hidden: priv.hidden_auto.includes(key), featKey: key });
+                      }).join('')
+                    : '<span class="scheda-empty">Nessun privilegio di sottoclasse a questo livello</span>';
+                subclassBlocks += `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${escapeHtml(data.subclassName)} (${escapeHtml(data.className)})</div>
+                    <div class="priv-feat-list-wrap">${subRows}</div>
+                </div>`;
+            }
+        });
+    }
+
+    // ── Sezioni custom ──
+    // Le tabelle PREDEFINITE (Razza, Background) vengono renderizzate
+    // PRIMA di "Talenti", perche' fanno parte della base del personaggio.
+    // Le tabelle CREATE DALL'UTENTE invece vanno DOPO "Talenti", cosi' i
+    // privilegi automatici/standard restano in alto e l'utente personalizza
+    // in fondo.
+    let customDefaultSectionsHtml = '';  // Razza + Background (sopra a Talenti)
+    let customUserSectionsHtml = '';     // Tabelle utente (sotto a Talenti)
+    priv.custom_tabs_order.forEach(tabName => {
+        const items = priv.custom_features[tabName] || [];
+        let autoRows = '';
+        // Per la tabella "Razza" auto-popola con i tratti dal dataset locale
+        // (window.RACES_DATA), poi aggiunge le voci custom dell'utente.
+        if (tabName === 'Razza') {
+            const raceTraits = _pgRaceMergedTraits(pg);
+            if (raceTraits.length > 0) {
+                const merged = buildMergedRaceData(pg.razza, pg.sottorazza || null);
+                const subraceLabel = merged && merged.sottorazza
+                    ? ` <span class="priv-subblock-title-sub">(${escapeHtml(merged.sottorazza)})</span>`
+                    : '';
+                const headerLabel = `${escapeHtml(pg.razza || '')}${subraceLabel}`;
+                const traitRows = raceTraits.map(t => _renderPrivFeatureRow({
+                    name: t.name,
+                    name_en: t.name_en,
+                    description: t.description || '',
+                    translated: true,
+                }, {})).join('');
+                autoRows = `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${headerLabel}</div>
+                    <div class="priv-feat-list-wrap">${traitRows}</div>
+                </div>`;
+            }
+        }
+        // Per la tabella "Background" auto-popola il privilegio dal dataset
+        // locale (window.BACKGROUNDS_DATA). Mostra anche un riepilogo di
+        // skills/strumenti/lingue/equipaggiamento iniziale + oro come info.
+        if (tabName === 'Background' && pg.background) {
+            const bg = getBackgroundData(pg.background);
+            if (bg && bg._local) {
+                const featRows = bg.privilegio_nome
+                    ? _renderPrivFeatureRow({
+                        name: bg.privilegio_nome,
+                        description: bg.privilegio_descrizione || '',
+                        translated: true,
+                    }, {})
+                    : '';
+                const infoLines = [];
+                if (bg.competenze_abilita && bg.competenze_abilita.length) {
+                    const skillNames = bg.competenze_abilita.map(k => {
+                        const s = DND_SKILLS.find(x => x.key === k);
+                        return s ? s.nome : k;
+                    });
+                    infoLines.push(`<div class="bg-info-line"><strong>Abilita':</strong> ${escapeHtml(skillNames.join(', '))}</div>`);
+                }
+                if (bg.scelte_abilita_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Abilita' (a scelta):</strong> ${escapeHtml(bg.scelte_abilita_testo)}</div>`);
+                }
+                if (bg.competenze_strumenti && bg.competenze_strumenti.length) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Strumenti:</strong> ${escapeHtml(bg.competenze_strumenti.join(', '))}</div>`);
+                }
+                if (bg.scelte_strumenti_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Strumenti (a scelta):</strong> ${escapeHtml(bg.scelte_strumenti_testo)}</div>`);
+                }
+                if (bg.linguaggi_testo) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Linguaggi:</strong> ${escapeHtml(bg.linguaggi_testo)}</div>`);
+                } else if (bg.linguaggi_specifici && bg.linguaggi_specifici.length) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Linguaggi:</strong> ${escapeHtml(bg.linguaggi_specifici.join(', '))}</div>`);
+                }
+                if (bg.equipaggiamento_iniziale && bg.equipaggiamento_iniziale.length) {
+                    const eqHtml = bg.equipaggiamento_iniziale.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+                    infoLines.push(`<div class="bg-info-line"><strong>Equipaggiamento iniziale:</strong><ul class="bg-info-eq">${eqHtml}</ul></div>`);
+                }
+                if (bg.oro_iniziale) {
+                    infoLines.push(`<div class="bg-info-line"><strong>Oro iniziale:</strong> ${bg.oro_iniziale} mo</div>`);
+                }
+                const infoBlock = infoLines.length
+                    ? `<div class="bg-info-block">${infoLines.join('')}</div>`
+                    : '';
+                autoRows = `<div class="priv-subblock">
+                    <div class="priv-subblock-title">${escapeHtml(pg.background)} <span class="priv-subblock-title-sub">(${escapeHtml(bg.fonte || '')})</span></div>
+                    ${infoBlock}
+                    <div class="priv-feat-list-wrap">${featRows}</div>
+                </div>`;
+            }
+        }
+        const rows = items.length > 0
+            ? items.map((f, i) => _renderPrivFeatureRow(f, { custom: true, tabName, index: i })).join('')
+            : (autoRows ? '' : '<span class="scheda-empty">Nessun privilegio aggiunto</span>');
+        const isDefault = PRIV_DEFAULT_CUSTOM_TABS.includes(tabName);
+        // Le tabelle predefinite (Razza/Background) hanno solo "aggiungi
+        // privilegio". Le tabelle create dall'utente hanno la matita che
+        // apre un mini-editor con: rinomina + aggiungi privilegio + elimina.
+        const editBtn = isDefault
+            ? `<button class="scheda-edit-btn" onclick="event.stopPropagation();privAddCustom('${escapeHtml(tabName)}')" title="Aggiungi privilegio">&#9998;</button>`
+            : `<button class="scheda-edit-btn" onclick="event.stopPropagation();privOpenCustomTabEdit('${escapeHtml(tabName)}')" title="Modifica tabella">&#9998;</button>`;
+        const sectionHtml = `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">${escapeHtml(tabName)}
+                ${editBtn}
+            </div>
+            <div class="scheda-section-body">${autoRows}${rows}</div>
+        </div>`;
+        if (isDefault) customDefaultSectionsHtml += sectionHtml;
+        else customUserSectionsHtml += sectionHtml;
+    });
+
+    // Sezione Talenti: come tendine espandibili coerenti con le altre
+    // tabelle di Pagina 2 (header con nome, dropdown con descrizione).
+    const talentiData = _featsData();
+    // Indici secondari per matching robusto (per name_en, per slug, e
+    // ignorando apostrofi/accenti).
+    const _normFeat = s => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['\u2019\s]/g, '');
+    const featByEn = {};
+    const featBySlug = {};
+    const featByNorm = {};
+    Object.values(talentiData).forEach(f => {
+        if (f.name_en) featByEn[f.name_en] = f;
+        if (f.slug) featBySlug[f.slug] = f;
+        if (f.name) featByNorm[_normFeat(f.name)] = f;
+        if (f.name_en) featByNorm[_normFeat(f.name_en)] = f;
+    });
+    const talentiRows = (pg.talenti && pg.talenti.length > 0)
+        ? pg.talenti.map(t => {
+            const nome = typeof t === 'string' ? t : (t && t.name) || '';
+            const feat = talentiData[nome]
+                || featByEn[nome]
+                || featByNorm[_normFeat(nome)]
+                || (t && t.slug && featBySlug[t.slug])
+                || null;
+            const dispName = (feat && feat.name) || nome;
+            const desc = feat
+                ? (feat.description || feat.description_en || '')
+                : (typeof t === 'object' && t.description) || '(descrizione non disponibile)';
+            return _renderPrivFeatureRow({
+                name: dispName,
+                name_en: feat ? feat.name_en : '',
+                description: desc,
+                description_en: feat ? feat.description_en : '',
+                translated: feat ? !!feat.translated : true,
+                level: null,
+            }, {});
+        }).join('')
+        : '<span class="scheda-empty">Nessun talento</span>';
+    const talentiSectionHtml = `<div class="scheda-section collapsed">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Talenti
+            <small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${pg.talenti ? pg.talenti.length : 0})</small>
+            <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenTalentiEdit('${pg.id}')" title="Modifica">&#9998;</button>
+        </div>
+        <div class="scheda-section-body" id="schedaTalentiDisplay">
+            ${talentiRows}
+        </div>
+    </div>`;
+
+    // ─── Sezione Stili di Combattimento ───────────────────────────────
+    // Sempre visibile: anche se il PG non ha allowance, mostra un messaggio
+    // esplicativo. Cosi' il giocatore puo' sempre aprire il picker.
+    const fsAllowance = _pgFightingStylesAllowance(pg);
+    const fsKeys = Object.keys(fsAllowance);
+    let fightingStylesSectionHtml = '';
+    {
+        const stored = (pg.stile_combattimento && typeof pg.stile_combattimento === 'object')
+            ? pg.stile_combattimento : {};
+        let totalSelected = 0;
+        let totalMax = 0;
+        // Includi nel display solo gli slot rilevanti: o hanno max > 0,
+        // oppure hanno gia' degli stili selezionati. La slot
+        // 'Personalizzato' viene cosi' nascosta finche' l'utente non ne
+        // alza il massimo o ne assegna manualmente uno.
+        const visibleKeys = fsKeys.filter(cn => {
+            const entry = fsAllowance[cn];
+            const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
+            return (entry && entry.max > 0) || slugs.length > 0;
+        });
+        let blocks = '';
+        if (visibleKeys.length > 0) {
+            blocks = visibleKeys.map(cn => {
+                const entry = fsAllowance[cn];
+                const max = entry.max;
+                totalMax += max;
+                const slugs = Array.isArray(stored[cn]) ? stored[cn] : [];
+                totalSelected += slugs.length;
+                const rows = slugs.length > 0
+                    ? slugs.map(slug => {
+                        const fs = _fightingStyleById(slug);
+                        return _renderPrivFeatureRow({
+                            name: fs ? fs.name : slug,
+                            name_en: fs ? fs.name_en : '',
+                            description: fs ? fs.description : '',
+                            translated: true,
+                            level: null,
+                        }, {});
+                    }).join('')
+                    : '<span class="scheda-empty">Nessuno stile selezionato</span>';
+                return `<div class="priv-feat-row" style="background:transparent;border:none;padding:0;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin:6px 0 4px;">${escapeHtml(cn)} <small style="font-weight:500;text-transform:none;">(${slugs.length}/${max})</small></div>
+                    ${rows}
+                </div>`;
+            }).join('');
+        } else {
+            blocks = '<div class="scheda-empty" style="padding:6px 4px;">Nessuno stile di combattimento. Premi la matita per modificare il massimo o sceglierne uno.</div>';
+        }
+        const counterTxt = visibleKeys.length > 0 ? `<small style="color:var(--text-muted);font-weight:500;margin-left:4px;">(${totalSelected}/${totalMax})</small>` : '';
+        fightingStylesSectionHtml = `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Stili di Combattimento
+                ${counterTxt}
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenFightingStylesEdit('${pg.id}')" title="Scegli stili">&#9998;</button>
+            </div>
+            <div class="scheda-section-body" id="schedaFightingStylesDisplay">${blocks}</div>
+        </div>`;
+    }
+
+    // Sezione Invocazioni Occulte (solo per Warlock).
+    let invocationsSectionHtml = '';
+    const wlvl = _pgWarlockLevel(pg);
+    if (wlvl >= 2) {
+        const maxInv = _pgMaxInvocations(pg);
+        const selected = (pg.invocazioni || []).map(id => _invocationById(id)).filter(Boolean);
+        const itemsHtml = selected.length > 0
+            ? selected.map(inv => {
+                const desc = (inv.description || '').replace(/\s+/g, ' ').trim();
+                const prereq = _formatInvocationPrereqs(inv);
+                const prereqLine = prereq ? `<div class="priv-feat-prereq"><strong>Prerequisiti:</strong> ${escapeHtml(prereq)}</div>` : '';
+                return `<div class="priv-feat-row">
+                    <div class="priv-feat-header priv-feat-clickable" onclick="privToggleFeatureBody(this)">
+                        <span class="priv-feat-level">${escapeHtml(inv.source_short || '')}</span>
+                        <span class="priv-feat-name">${escapeHtml(inv.name)}</span>
+                        <span class="priv-feat-arrow">&#9662;</span>
+                    </div>
+                    <div class="priv-feat-body" style="display:none;">
+                        ${prereqLine}
+                        <div class="priv-feat-desc">${window.formatRichText(desc)}</div>
+                    </div>
+                </div>`;
+            }).join('')
+            : '<span class="scheda-empty">Nessuna supplica selezionata</span>';
+        invocationsSectionHtml = `<div class="scheda-section collapsed">
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Suppliche Occulte <small style="color:var(--text-muted);font-weight:500;">(${selected.length} / ${maxInv})</small>
+                <button class="scheda-edit-btn" onclick="event.stopPropagation();schedaOpenInvocationsEdit('${pg.id}')" title="Modifica suppliche">&#9998;</button>
+            </div>
+            <div class="scheda-section-body" id="schedaInvocationsDisplay">${itemsHtml}</div>
+        </div>`;
+    }
+
+    content.innerHTML = `
+    ${buildSchedaHeader(pg, 'Pagina 2 · Privilegi')}
+
+    <div class="scheda-section collapsed">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Classe</div>
+        <div class="scheda-section-body">${classBlocks}</div>
+    </div>
+
+    ${subclassBlocks ? `<div class="scheda-section collapsed">
+        <div class="scheda-section-title" onclick="schedaToggleSection(this)">Sottoclasse</div>
+        <div class="scheda-section-body">${subclassBlocks}</div>
+    </div>` : ''}
+
+    ${fightingStylesSectionHtml}
+
+    ${invocationsSectionHtml}
+
+    ${customDefaultSectionsHtml}
+
+    ${talentiSectionHtml}
+
+    ${customUserSectionsHtml}
+
+    <div class="priv-add-tab-wrap">
+        <button class="btn-secondary priv-add-tab-btn" onclick="privAddTab()">
+            <span class="priv-add-tab-plus">+</span> Nuova tabella
+        </button>
+    </div>
+    `;
+
+    schedaSetActiveTab('privilegi');
+    schedaWireTabBar(pgId);
 };
 
 async function _privSave(pgId, priv) {
@@ -367,6 +814,17 @@ async function _privSave(pgId, priv) {
         return false;
     }
 }
+
+window.privToggleAutoFeature = async function(featKey) {
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const priv = _normalizePrivilegi(pg);
+    const i = priv.hidden_auto.indexOf(featKey);
+    if (i >= 0) priv.hidden_auto.splice(i, 1);
+    else priv.hidden_auto.push(featKey);
+    await _privSave(pg.id, priv);
+    schedaOpenPrivilegesPage(pg.id);
+};
 
 window.privAddCustom = function(tabName) {
     const pg = _schedaPgCache;
@@ -727,6 +1185,28 @@ window.privConfirmEdit = async function(tabName, mode, index) {
     privCloseEdit();
     schedaOpenPrivilegesPage(pg.id);
 };
+
+function schedaSetActiveTab(tab) {
+    const mainTab = document.getElementById('schedaTabMain');
+    const spellTab = document.getElementById('schedaTabSpell');
+    const invTab = document.getElementById('schedaTabInventory');
+    const privTab = document.getElementById('schedaTabPrivileges');
+    if (mainTab) mainTab.classList.toggle('active', tab === 'scheda');
+    if (spellTab) spellTab.classList.toggle('active', tab === 'incantesimi');
+    if (invTab) invTab.classList.toggle('active', tab === 'inventario');
+    if (privTab) privTab.classList.toggle('active', tab === 'privilegi');
+}
+
+function schedaWireTabBar(pgId) {
+    const mainTab = document.getElementById('schedaTabMain');
+    const spellTab = document.getElementById('schedaTabSpell');
+    const invTab = document.getElementById('schedaTabInventory');
+    const privTab = document.getElementById('schedaTabPrivileges');
+    if (mainTab) mainTab.onclick = () => renderSchedaPersonaggio(pgId);
+    if (spellTab) spellTab.onclick = () => schedaOpenSpellPage(pgId);
+    if (invTab) invTab.onclick = () => schedaOpenInventoryPage(pgId);
+    if (privTab) privTab.onclick = () => schedaOpenPrivilegesPage(pgId);
+}
 
 function schedaSlotToggleInline(pgId, level, index) {
     const pg = _schedaPgCache;

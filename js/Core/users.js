@@ -131,6 +131,7 @@ async function findUserByUid(uid, forceRefresh = false) {
 
 function invalidateUserCache() {
     AppState.cachedUserData = null;
+    AppState.cachedCampagne = null;
 }
 
 async function loadUserData(userId) {

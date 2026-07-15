@@ -79,6 +79,13 @@ function schedaUpdateHpDisplays(pg) {
     if (pvTempEl) pvTempEl.textContent = pg.pv_temporanei || 0;
 }
 
+function schedaRefreshHpMaxPreview() {
+    const current = parseInt(_hpCalcState?.maxBase ?? document.getElementById('hpCalcCurrent')?.textContent) || 0;
+    const bonus = Math.max(0, parseInt(_hpCalcState?.maxTemp ?? document.getElementById('hpCalcTempBonus')?.textContent) || 0);
+    const el = document.getElementById('hpCalcEffectiveMax');
+    if (el) el.textContent = current + bonus;
+}
+
 function schedaGetPfHistory(pg) {
     const bm = (pg?.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
     const raw = bm._pf_storico;
@@ -87,6 +94,14 @@ function schedaGetPfHistory(pg) {
         ...raw,
         entries: Array.isArray(raw.entries) ? raw.entries : [],
     };
+}
+
+function schedaFormatPfHistoryRoll(entry) {
+    if (!entry) return '-';
+    if (entry.method === 'average') return `medio ${entry.roll}`;
+    if (entry.method === 'manual') return `manuale`;
+    if (entry.roll != null) return `1d${entry.die} = ${entry.roll}`;
+    return '-';
 }
 
 function schedaBuildPfVirtualRows(pg) {
@@ -368,6 +383,60 @@ function hpCalcGetAmount() {
         return 0;
     }
 }
+
+// Imposta il valore digitato come nuovo "Max Reale" del PG.
+// Salva sia bonus_manuali._pv_max_reale sia pg.punti_vita_max,
+// chiedendo prima conferma all'utente.
+window.schedaHpSetMaxReale = async function() {
+    if (!_hpCalcState) return;
+    if (_hpCalcState.field !== 'punti_vita_max') return;
+    const pg = _schedaPgCache;
+    if (!pg) return;
+    const buf = parseInt(_hpCalcState.inputBuffer) || 0;
+    if (buf <= 0) {
+        showNotification('Digita un valore valido nel tastierino prima di impostare il Max Reale');
+        return;
+    }
+    const oldReale = (typeof _getPvMaxReale === 'function') ? _getPvMaxReale(pg) : (parseInt(pg.punti_vita_max) || 0);
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Aggiornare il Max Reale?',
+        message: `Il Max Reale passera' da ${oldReale} a ${buf} PF. Anche il valore di PF massimi corrente verra' impostato a ${buf}.`,
+        confirmLabel: 'Conferma',
+    });
+    if (!ok) return;
+
+    const bm = (pg.bonus_manuali && typeof pg.bonus_manuali === 'object') ? { ...pg.bonus_manuali } : {};
+    bm._pv_max_reale = buf;
+    pg.bonus_manuali = bm;
+    pg.punti_vita_max = buf;
+    const effectiveMax = schedaGetPvMaxEffettivo(pg);
+    const clampedPv = Math.min(effectiveMax, Math.max(0, parseInt(pg.pv_attuali) || effectiveMax));
+    pg.pv_attuali = clampedPv;
+
+    _hpCalcState.currentVal = buf;
+    _hpCalcState.inputBuffer = '0';
+    const cur = document.getElementById('hpCalcCurrent');
+    if (cur) cur.textContent = buf;
+    const amt = document.getElementById('hpCalcAmountDisplay');
+    if (amt) amt.textContent = '0';
+    const realeEl = document.querySelector('#hpCalcOverlay .hp-calc-reale');
+    if (realeEl) realeEl.textContent = buf;
+    const pgDisplay = document.getElementById('schedaPvMax');
+    if (pgDisplay) pgDisplay.textContent = buf;
+    const pvAttualiDisplay = document.getElementById('schedaPvAttuali');
+    if (pvAttualiDisplay) pvAttualiDisplay.textContent = clampedPv;
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+        await supabase.from('personaggi').update({
+            punti_vita_max: buf,
+            pv_attuali: clampedPv,
+            bonus_manuali: pg.bonus_manuali,
+            updated_at: new Date().toISOString(),
+        }).eq('id', _hpCalcState.pgId);
+    }
+    showNotification('Max Reale aggiornato');
+};
 
 window.schedaHpSetDirect = async function() {
     if (!_hpCalcState) return;
@@ -663,7 +732,7 @@ window.schedaCloseHpCalc = async function() {
         if (typeof window.ensureRuntimeScript === 'function') {
             await window.ensureRuntimeScript('combattimento');
         }
-        window.dispatchEvent(new CustomEvent('companion:combat-refresh', { detail: { campagnaId, sessioneId } }));
+        await renderCombattimentoContent(campagnaId, sessioneId);
         // Se il calcolatore HP era stato aperto dalla full-sheet del mostro
         // in combattimento, ricarichiamo quella modale per riflettere i PV
         // aggiornati senza chiuderla.
@@ -846,6 +915,7 @@ window.schedaStatConfirm = async function() {
             }
         }
 
+        schedaRecalcAbility(field, clampedVal, pgId);
         await schedaInstantSave(pgId, updates);
         _recalcEquipFromStats(pgId);
     } else {

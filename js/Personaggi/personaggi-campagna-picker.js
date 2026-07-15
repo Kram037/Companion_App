@@ -84,6 +84,9 @@ window.selectPersonaggioCampagna = async function(campagnaId, personaggioId, use
         closeScegliPersonaggioModal();
         await sendAppEventBroadcast({ table: 'personaggi_campagna', action: 'upsert', campagnaId });
 
+        if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId === campagnaId) {
+            await loadCampagnaDetails(campagnaId);
+        }
     } catch (error) {
         console.error('Errore selezione personaggio:', error);
         showNotification('Errore: ' + (error.message || error));

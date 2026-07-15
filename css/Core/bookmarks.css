@@ -284,10 +284,9 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     display: none;
 }
 
-@media (min-width: 900px), (orientation: landscape) and (min-width: 760px) and (min-height: 540px) {
+@media (min-width: 900px) {
     :root {
         --desktop-sidebar-width: 228px;
-        --desktop-split-pane-width: calc((100vw - var(--desktop-sidebar-width)) / 2);
     }
 
     body {
@@ -364,9 +363,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     .desktop-sidebar-btn.active,
     .desktop-sidebar-btn.group-active,
     .desktop-sidebar-child:hover,
-    .desktop-sidebar-child.active,
-    .desktop-sidebar-grandchild:hover,
-    .desktop-sidebar-grandchild.active {
+    .desktop-sidebar-child.active {
         color: var(--fantasy-gold-strong, var(--accent));
         border-color: var(--fantasy-gold-line, var(--border));
         background:
@@ -427,34 +424,6 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         display: flex;
     }
 
-    .desktop-sidebar-subgroup {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .desktop-sidebar-subgroup-caret {
-        margin-left: auto;
-        transition: transform 0.18s ease;
-    }
-
-    .desktop-sidebar-subgroup.open .desktop-sidebar-subgroup-caret {
-        transform: rotate(180deg);
-    }
-
-    .desktop-sidebar-grandchildren {
-        display: none;
-        flex-direction: column;
-        gap: 1px;
-        margin-left: 10px;
-        padding-left: 7px;
-        border-left: 1px solid var(--border);
-    }
-
-    .desktop-sidebar-subgroup.open .desktop-sidebar-grandchildren {
-        display: flex;
-    }
-
     .desktop-sidebar-child {
         min-height: 27px;
         width: 100%;
@@ -471,43 +440,12 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
 
-    .desktop-sidebar-grandchild {
-        min-height: 25px;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 2px 5px;
-        border: 1px solid transparent;
-        border-radius: var(--radius-sm);
-        background: transparent;
-        color: var(--text-muted);
-        cursor: pointer;
-        text-align: left;
-    }
-
     .desktop-sidebar-item-icon {
         width: 17px;
         height: 17px;
-        display: block;
         flex: 0 0 17px;
         object-fit: contain;
-        filter: invert(55%) sepia(8%) saturate(330%) hue-rotate(345deg) brightness(90%) contrast(88%);
-    }
-
-    .desktop-sidebar-btn .desktop-sidebar-item-icon {
-        width: 21px;
-        height: 21px;
-        flex-basis: 21px;
-    }
-
-    .desktop-sidebar-btn:hover .desktop-sidebar-item-icon,
-    .desktop-sidebar-btn.group-active .desktop-sidebar-item-icon,
-    .desktop-sidebar-child:hover .desktop-sidebar-item-icon,
-    .desktop-sidebar-child.active .desktop-sidebar-item-icon,
-    .desktop-sidebar-grandchild:hover .desktop-sidebar-item-icon,
-    .desktop-sidebar-grandchild.active .desktop-sidebar-item-icon {
-        filter: invert(78%) sepia(47%) saturate(606%) hue-rotate(358deg) brightness(91%) contrast(89%) drop-shadow(0 0 6px rgba(198, 154, 74, 0.22));
+        filter: brightness(1.45) sepia(0.5) saturate(1.25) drop-shadow(0 0 6px rgba(198, 154, 74, 0.18));
     }
 
     .desktop-sidebar-child span {
@@ -517,15 +455,6 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         white-space: nowrap;
         font-size: 0.66rem;
         font-weight: 800;
-    }
-
-    .desktop-sidebar-grandchild span {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 0.62rem;
-        font-weight: 750;
     }
 
     .desktop-bookmark-tabs {
@@ -547,7 +476,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     body.desktop-split-active .desktop-bookmark-tabs {
-        width: var(--desktop-split-pane-width);
+        width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px));
     }
 
     .desktop-bookmark-tabs::-webkit-scrollbar {
@@ -565,18 +494,16 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         border: 1px solid var(--border);
         border-bottom-color: transparent;
         border-radius: 12px 12px 0 0;
-        padding: 4px 30px 4px 38px;
+        padding: 4px 30px 4px 12px;
         background: linear-gradient(180deg, var(--surface), rgba(255, 255, 255, 0.02));
         color: var(--text-secondary);
         display: grid;
         align-content: center;
         text-align: left;
         cursor: pointer;
-        user-select: none;
-        -webkit-user-drag: element;
         position: relative;
         flex: 0 0 auto;
-        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, min-width 0.18s ease;
     }
 
     .desktop-bookmark-add-tab {
@@ -635,6 +562,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     .desktop-bookmark-tab.active {
+        min-width: 214px;
         box-shadow: inset 0 2px 0 var(--fantasy-gold-strong, var(--accent));
     }
 
@@ -704,8 +632,8 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         top: var(--app-header-height);
         right: 0;
         bottom: 0;
-        width: var(--desktop-split-pane-width);
-        min-width: 0;
+        width: min(46vw, 720px);
+        min-width: 420px;
         z-index: 95;
         display: flex;
         flex-direction: column;
@@ -759,7 +687,7 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
     }
 
     body.desktop-split-active .main-content {
-        margin-right: var(--desktop-split-pane-width);
+        margin-right: min(46vw, 720px);
         padding-left: 0;
         padding-right: 0;
         scrollbar-width: none;
@@ -866,7 +794,7 @@ body.bookmark-split-instance .desktop-bookmark-tab {
     height: 34px;
     display: grid;
     align-content: center;
-    padding: 4px 30px 4px 38px;
+    padding: 4px 30px 4px 12px;
     border: 1px solid var(--border);
     border-bottom-color: transparent;
     border-radius: 12px 12px 0 0;
@@ -877,6 +805,7 @@ body.bookmark-split-instance .desktop-bookmark-tab {
 }
 
 body.bookmark-split-instance .desktop-bookmark-tab.active {
+    min-width: 176px;
     color: var(--text);
     border-color: var(--fantasy-gold-line, var(--accent-light));
     background:
@@ -959,7 +888,7 @@ body.bookmark-split-instance .campagna-card {
 }
 
 body.desktop-split-active .page.active .btn-fab {
-    right: calc(var(--desktop-split-pane-width) + 14px);
+    right: calc(min(46vw, 720px) + 14px);
 }
 
 body.desktop-split-active .scheda-page-grid,
@@ -975,13 +904,13 @@ body.bookmark-split-instance .scheda-page-grid > .scheda-divider {
 }
 
 body.desktop-split-active .scheda-tab-bar {
-    left: calc(var(--desktop-sidebar-width) + (var(--desktop-split-pane-width) / 2));
-    max-width: calc(var(--desktop-split-pane-width) - 28px);
+    left: calc(var(--desktop-sidebar-width) + ((100vw - var(--desktop-sidebar-width) - min(46vw, 720px)) / 2));
+    max-width: calc(100vw - var(--desktop-sidebar-width) - min(46vw, 720px) - 28px);
     bottom: 18px;
 }
 
 body.desktop-split-active .btn-scroll-stats {
-    right: calc(var(--desktop-split-pane-width) + 18px);
+    right: calc(min(46vw, 720px) + 18px);
     bottom: 18px;
 }
 
@@ -992,63 +921,4 @@ body.bookmark-split-instance .scheda-tab-bar {
 
 body.bookmark-split-instance .btn-scroll-stats {
     bottom: 18px;
-}
-
-.desktop-bookmark-tab-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    object-fit: contain;
-    pointer-events: none;
-}
-
-.desktop-bookmark-tab-icon svg {
-    width: 18px;
-    height: 18px;
-}
-
-.desktop-bookmark-tab-icon-mask {
-    background: currentColor;
-    -webkit-mask: var(--bookmark-tab-icon) center / contain no-repeat;
-    mask: var(--bookmark-tab-icon) center / contain no-repeat;
-}
-
-.desktop-bookmark-tab-icon-mask.icon-laboratorio {
-    --bookmark-tab-icon: url("../../images/Toolbar/Laboratorio.svg");
-}
-
-.desktop-bookmark-tab-icon-mask.icon-compendio {
-    --bookmark-tab-icon: url("../../images/Toolbar/Compendio-toolbar-20260521.svg");
-}
-
-.desktop-bookmark-tab.dragging {
-    opacity: 0.45;
-    cursor: grabbing;
-}
-
-.desktop-bookmark-tab.drop-before::before,
-.desktop-bookmark-tab.drop-after::after {
-    content: "";
-    position: absolute;
-    top: 3px;
-    bottom: 3px;
-    width: 2px;
-    border-radius: 2px;
-    background: var(--fantasy-gold-strong, var(--accent));
-    box-shadow: 0 0 6px rgba(198, 154, 74, 0.45);
-}
-
-.desktop-bookmark-tab.drop-before::before {
-    left: -2px;
-}
-
-.desktop-bookmark-tab.drop-after::after {
-    right: -2px;
 }

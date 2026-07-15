@@ -29,9 +29,9 @@ const RUNTIME_DATA_BUNDLES = {
 };
 
 const RUNTIME_SCRIPT_BUNDLES = {
-    combattimento: { src: 'js/Combattimento/combat.js', ready: 'setCombatInitiativeOrder' },
-    compendio: { src: 'js/Compendio/compendio.js', ready: 'getCompendioReactConfig' },
-    laboratorio: { src: 'js/Laboratorio/laboratorio.js', ready: 'getLaboratorioReactConfig', init: 'initLaboratorio' },
+    combattimento: { src: 'js/Combattimento/combat.js', ready: 'renderCombattimentoContent' },
+    compendio: { src: 'js/Compendio/compendio.js', ready: 'loadCompendio' },
+    laboratorio: { src: 'js/Laboratorio/laboratorio.js', ready: 'labBackToHub', init: 'initLaboratorio' },
 };
 
 const _runtimeDataPromises = new Map();
@@ -49,52 +49,40 @@ function _findRuntimeDataScript(src) {
     });
 }
 
-function _loadUtilityScript({ src, version, ready, datasetKey, label }) {
-    if (typeof window[ready] !== 'undefined') {
-        return Promise.resolve();
-    }
-
-    return new Promise((resolve, reject) => {
-        const finish = () => {
-            if (typeof window[ready] !== 'undefined') {
-                resolve();
-                return;
-            }
-            reject(new Error(`Modulo ${label} incompleto`));
-        };
-
-        const existing = _findRuntimeDataScript(src);
-        if (existing) {
-            existing.addEventListener('load', finish, { once: true });
-            existing.addEventListener('error', () => reject(new Error(`Caricamento ${label} fallito: ${src}`)), { once: true });
-            setTimeout(finish, 0);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = `${src}?v=${version}`;
-        script.async = true;
-        script.dataset[datasetKey] = 'true';
-        script.onload = finish;
-        script.onerror = () => reject(new Error(`Caricamento ${label} fallito: ${src}`));
-        document.head.appendChild(script);
-    }).catch(error => {
-        console.warn(`[${label}]`, error);
-    });
-}
-
 function ensureContentLocalization() {
     if (typeof window.localizeRuntimeDataBundle === 'function') {
         return Promise.resolve();
     }
     if (_contentLocalizationPromise) return _contentLocalizationPromise;
 
-    _contentLocalizationPromise = _loadUtilityScript({
-        src: 'js/Core/content-localization.js',
-        version: '20260712B',
-        ready: 'localizeRuntimeDataBundle',
-        datasetKey: 'contentLocalization',
-        label: 'content-localization',
+    _contentLocalizationPromise = new Promise((resolve, reject) => {
+        const src = 'js/Core/content-localization.js';
+        const finish = () => {
+            if (typeof window.localizeRuntimeDataBundle === 'function') {
+                resolve();
+                return;
+            }
+            reject(new Error('Modulo di localizzazione contenuti incompleto'));
+        };
+
+        const existing = _findRuntimeDataScript(src);
+        if (existing) {
+            existing.addEventListener('load', finish, { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Caricamento localizzazione fallito: ${src}`)), { once: true });
+            // Uno script gia' eseguito non emettera' un nuovo evento load.
+            setTimeout(finish, 0);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `${src}?v=20260712B`;
+        script.async = true;
+        script.dataset.contentLocalization = 'true';
+        script.onload = finish;
+        script.onerror = () => reject(new Error(`Caricamento localizzazione fallito: ${src}`));
+        document.head.appendChild(script);
+    }).catch(error => {
+        console.warn('[content-localization]', error);
     }).finally(() => {
         _contentLocalizationPromise = null;
     });
@@ -193,7 +181,7 @@ function ensureRuntimeScript(key) {
         const finish = () => {
             if (_runtimeScriptReady(bundle)) {
                 _initRuntimeScript(bundle);
-                ensureContentLocalization().then(() => resolve(), reject);
+                ensureContentLocalization().then(resolve, reject);
                 return;
             }
 
@@ -225,7 +213,8 @@ function ensureRuntimeScript(key) {
     return promise;
 }
 
-// Avvia presto la normalizzazione dei testi statici e dinamici.
+// Avvia presto la normalizzazione: corregge anche testi statici gia' presenti
+// nell'HTML e contenuti aggiunti successivamente da render legacy.
 ensureContentLocalization();
 
 window.RUNTIME_DATA_BUNDLES = RUNTIME_DATA_BUNDLES;

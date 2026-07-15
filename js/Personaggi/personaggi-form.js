@@ -194,6 +194,11 @@ async function handleSavePersonaggio(e) {
 
         const wasEditing = editingPersonaggioId;
         await closePersonaggioModal({ force: true });
+        if (wasEditing && AppState.currentPage === 'scheda') {
+            await renderSchedaPersonaggio(wasEditing);
+        } else {
+            await loadPersonaggi();
+        }
         await sendAppEventBroadcast({ table: 'personaggi', action: wasEditing ? 'update' : 'insert' });
     } catch (error) {
         console.error('Errore salvataggio personaggio:', error);
@@ -223,6 +228,7 @@ window.deletePersonaggio = async function(personaggioId) {
         if (AppState.currentPage === 'scheda') {
             navigateToPage('personaggi');
         }
+        await loadPersonaggi();
         await sendAppEventBroadcast({ table: 'personaggi', action: 'delete' });
     } catch (error) {
         console.error('Errore eliminazione personaggio:', error);
@@ -362,6 +368,13 @@ async function _pgOpenSubclassPickerForSavedPg(pgId, pg, classIdx) {
             showNotification(target.sottoclasse
                 ? `Sottoclasse di ${c.nome} aggiornata: ${target.sottoclasse}`
                 : `Sottoclasse di ${c.nome} rimossa`);
+            await loadPersonaggi();
+            // Se la scheda di questo PG e' aperta, ricarica.
+            if (AppState.currentPersonaggioId === pgId && AppState.currentPage === 'scheda') {
+                if (typeof renderSchedaPersonaggio === 'function') {
+                    await renderSchedaPersonaggio(pgId);
+                }
+            }
             try { await sendAppEventBroadcast({ table: 'personaggi', action: 'update', id: pgId }); } catch (_) {}
         } catch (e) {
             console.error('Errore aggiornamento sottoclasse:', e);

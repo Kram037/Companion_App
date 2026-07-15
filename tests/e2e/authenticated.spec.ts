@@ -35,7 +35,7 @@ test('authenticated campaign navigation', async ({ page }) => {
 
   if (sessionId) {
     await page.goto(`/campagne/${campaignId}/sessione/${sessionId}/combattimento`);
-    await expect(page.locator('.react-combat-page')).toBeVisible();
+    await expect(page.locator('#combattimentoPage')).toHaveClass(/active/);
   }
 });
 
@@ -44,7 +44,7 @@ test('a character accordion stays open during a realtime refetch', async ({ page
 
   await login(page, dmEmail!, dmPassword!);
   await page.goto(`/personaggi/${characterId}`);
-  await expect(page.locator('.react-character-sheet')).toBeVisible();
+  await expect(page.locator('#schedaPage')).toHaveClass(/active/);
   await page.getByRole('button', { name: 'Pagina 2' }).click();
 
   const feature = page.locator('details.priv-feat-row').first();
