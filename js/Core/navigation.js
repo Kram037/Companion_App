@@ -103,12 +103,10 @@ function updateScrollStatsBtn() {
 }
 
 // Navigation
-function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } = {}) {
+function navigateToPage(pageName, { pushHistory = true } = {}) {
     if (typeof captureActiveBookmark === 'function') {
         captureActiveBookmark({ silent: true });
     }
-
-    const previousPage = AppState.currentPage;
 
     // Update active page
     (elements.pages || document.querySelectorAll('.page')).forEach(page => {
@@ -158,14 +156,6 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         }));
     }
     
-    const desktopGroupTab = !skipPageLoad && previousPage !== pageName && typeof getDesktopDefaultGroupTab === 'function'
-        ? getDesktopDefaultGroupTab(pageName)
-        : '';
-
-    const pageLoadPromise = skipPageLoad
-        ? Promise.resolve()
-        : _runPageLoad(pageName, desktopGroupTab);
-
     updateReturnToSessionBtn();
     updateScrollStatsBtn();
     if (typeof scheduleActiveBookmarkCapture === 'function') {
@@ -174,8 +164,6 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
     if (typeof updateBookmarkChrome === 'function') {
         setTimeout(updateBookmarkChrome, 0);
     }
-
-    return pageLoadPromise;
 }
 
 function legacyPathFromNavigationState(state) {
@@ -203,64 +191,6 @@ function legacyAppBasePath() {
     return location.pathname.endsWith('/index.html')
         ? location.pathname.replace(/index\.html$/, '')
         : location.pathname.replace(/[^/]*$/, '');
-}
-
-function _pageRuntimeDataBundles(pageName) {
-    if (pageName === 'personaggioCreate' || pageName === 'scheda') {
-        const bundles = ['backgrounds', 'races', 'feats', 'fightingStyles', 'invocations', 'subclassSpells', 'classes', 'spells'];
-        if (pageName === 'scheda') bundles.push('magicItems', 'poisons');
-        return bundles;
-    }
-    if (pageName === 'laboratorio') {
-        return ['backgrounds', 'races', 'feats', 'fightingStyles', 'invocations', 'classes', 'spells', 'magicItems', 'poisons', 'equipment', 'monsters'];
-    }
-    return [];
-}
-
-async function _ensurePageRuntimeData(pageName) {
-    if (typeof window.ensureRuntimeData !== 'function') return;
-    const bundles = _pageRuntimeDataBundles(pageName);
-    if (!bundles.length) return;
-    const results = await Promise.allSettled(bundles.map(key => window.ensureRuntimeData(key)));
-    results.forEach((result, index) => {
-        if (result.status === 'rejected') {
-            console.warn(`[navigation] bundle dati non caricato (${bundles[index]}):`, result.reason);
-        }
-    });
-}
-
-async function _runPageLoad(pageName, desktopGroupTab = '') {
-    try {
-        if (window.CompanionReactPages?.has(pageName)) return;
-        await _ensurePageRuntimeData(pageName);
-        if (pageName === 'compendio') {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('compendio');
-            }
-            if (desktopGroupTab && typeof compendioOpenTab === 'function') {
-                compendioOpenTab(desktopGroupTab);
-            } else if (typeof compendioShowHub === 'function') {
-                compendioShowHub();
-            }
-        } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('laboratorio');
-            }
-            if (desktopGroupTab && typeof labOpenCategory === 'function') {
-                labOpenCategory(desktopGroupTab);
-            } else if (typeof labBackToHub === 'function') {
-                labBackToHub();
-            }
-        } else if (pageName === 'personaggioCreate') {
-            if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
-        } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('combattimento');
-            }
-        }
-    } catch (error) {
-        console.warn('[navigation] preload pagina fallito:', error);
-    }
 }
 
 // Modal Functions

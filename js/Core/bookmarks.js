@@ -1066,29 +1066,17 @@ function _bookmarkPostCurrentPaneState() {
 
 async function _openDesktopSidebarTarget(page, tab = '', section = '') {
     if (page === 'laboratorio') {
-        if (window.CompanionReactPages?.has('laboratorio')) {
-            const changingPage = AppState.currentPage !== 'laboratorio';
-            if (changingPage) window.__pendingLaboratorioTarget = { tab };
-            if (changingPage) await navigateToPage('laboratorio');
-            window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: tab || 'razze' } }));
-            if (!changingPage) delete window.__pendingLaboratorioTarget;
-            return;
-        }
-        if (AppState.currentPage !== 'laboratorio') await navigateToPage('laboratorio');
-        if (tab) window.labOpenCategory?.(tab);
-        scheduleActiveBookmarkCapture?.(0);
+        const changingPage = AppState.currentPage !== 'laboratorio';
+        if (changingPage) window.__pendingLaboratorioTarget = { tab };
+        if (changingPage) await navigateToPage('laboratorio');
+        window.dispatchEvent(new CustomEvent('companion:laboratory-navigate', { detail: { view: 'sub', tab: tab || 'razze' } }));
+        if (!changingPage) delete window.__pendingLaboratorioTarget;
         return;
     }
     if (page === 'compendio') {
-        if (window.CompanionReactPages?.has('compendio')) {
-            window.__pendingCompendioTarget = { tab, section };
-            if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
-            window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: tab || 'razze', section } }));
-            return;
-        }
+        window.__pendingCompendioTarget = { tab, section };
         if (AppState.currentPage !== 'compendio') await navigateToPage('compendio');
-        if (tab) window.compendioOpenTab?.(tab, section);
-        scheduleActiveBookmarkCapture?.(0);
+        window.dispatchEvent(new CustomEvent('companion:compendium-navigate', { detail: { view: 'sub', tab: tab || 'razze', section } }));
         return;
     }
     if (AppState.currentPage !== page) await navigateToPage(page);

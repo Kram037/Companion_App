@@ -5,12 +5,10 @@ import './app/react-page.css';
 
 declare global {
   interface Window {
-    CompanionReactPages?: Set<string>;
     CompanionRouterBridge?: { legacyNavigationFromLocation: typeof legacyNavigationFromLocation };
   }
 }
 
-window.CompanionReactPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento', 'personaggi', 'personaggioCreate', 'scheda', 'compendio', 'laboratorio', 'amici']);
 window.CompanionRouterBridge = { legacyNavigationFromLocation };
 initializeSupabaseClient();
 

@@ -176,7 +176,7 @@ async function init() {
     history.replaceState({ ...history.state, ...initialNavigation }, '', location.href);
 
     appDebug('Navigazione alla pagina iniziale...');
-    navigateToPage(initialPage, { pushHistory: false, skipPageLoad: isSplitPane });
+    navigateToPage(initialPage, { pushHistory: false });
     if (typeof restoreInitialDesktopBookmark === 'function') {
         restoreInitialDesktopBookmark();
     }

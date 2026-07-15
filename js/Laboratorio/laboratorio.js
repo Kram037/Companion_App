@@ -11,7 +11,7 @@ let _labTalentiStiliSubTab = 'talenti';
 let _labReactState = null;
 
 function _labReactOwnsPage() {
-    return window.CompanionReactPages?.has('laboratorio') && document.body.dataset.reactPage === 'laboratorio';
+    return document.body.dataset.reactPage === 'laboratorio';
 }
 
 function _labNotifyReactRefresh() {

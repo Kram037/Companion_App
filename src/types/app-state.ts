@@ -18,6 +18,6 @@ export interface LegacyAppState {
 declare global {
   interface Window {
     AppState?: Partial<LegacyAppState>;
-    navigateToPage?: (page: string, options?: { pushHistory?: boolean; skipPageLoad?: boolean }) => unknown;
+    navigateToPage?: (page: string, options?: { pushHistory?: boolean }) => unknown;
   }
 }

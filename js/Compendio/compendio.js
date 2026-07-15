@@ -109,7 +109,7 @@ let _compMonsterItemsSource = null;
 let _compReactState = null;
 
 function _compReactOwnsPage() {
-    return window.CompanionReactPages?.has('compendio') && document.body.dataset.reactPage === 'compendio';
+    return document.body.dataset.reactPage === 'compendio';
 }
 
 function _compNotifyReactRefresh() {
