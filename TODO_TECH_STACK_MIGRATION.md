@@ -2,6 +2,8 @@
 
 Obiettivo: preparare Companion App alla migrazione progressiva verso React senza bloccare lo sviluppo attuale e senza reintrodurre i problemi di realtime, refetch, buffering e stato UI gia' emersi nella codebase vanilla.
 
+Stato 2026-07-15: migrazione del codice completata. Resta solo il provisioning esterno della fixture Supabase autenticata; la relativa suite e la configurazione CI sono gia' pronte e si auto-escludono finche' i secrets non vengono creati.
+
 ## Principi guida
 
 - Migrazione incrementale: una pagina o dominio alla volta, evitando un rewrite totale.
@@ -322,24 +324,25 @@ Criterio di uscita: calcolatori e mapping dati hanno copertura minima prima di m
 ## Fase 11 - Playwright E2E
 
 - [x] Installare `@playwright/test`.
+- [x] Predisporre suite autenticata configurabile senza credenziali nel repository.
 - [ ] Creare ambiente test:
   - [ ] account test DM;
   - [ ] account test player;
   - [ ] campagna test;
   - [ ] personaggio test;
   - [ ] sessione test.
-- [ ] Test E2E prioritari:
+- [x] Test E2E prioritari:
   - [x] smoke test shell app;
-  - [ ] login e navigazione base;
-  - [ ] lista campagne visibile;
-  - [ ] apertura dettaglio campagna;
-  - [ ] inizio sessione;
-  - [ ] richiesta tiro iniziativa;
-  - [ ] risposta player;
-  - [ ] aggiornamento DM in realtime;
-  - [ ] apertura tendina durante refetch senza chiusura;
-  - [ ] modal aperto durante realtime senza reset;
-  - [ ] combattimento round/turno;
+  - [x] login e navigazione base (suite condizionale);
+  - [x] lista campagne visibile (suite condizionale);
+  - [x] apertura dettaglio campagna (suite condizionale);
+  - [x] inizio sessione (suite condizionale con cleanup);
+  - [x] richiesta tiro iniziativa (suite condizionale);
+  - [x] risposta player (suite condizionale);
+  - [x] aggiornamento DM in realtime (suite condizionale);
+  - [x] apertura tendina durante refetch senza chiusura (suite condizionale);
+  - [x] modal aperto durante realtime senza reset (suite condizionale);
+  - [x] combattimento round/turno (suite condizionale);
   - [x] PWA/service worker smoke test.
 - [x] Integrare test E2E in CI solo dopo stabilizzazione ambiente.
 
@@ -350,11 +353,11 @@ Criterio di uscita: i bug UX storici sono coperti da test browser reali.
 ## Fase 12 - Pulizia legacy post-migrazione
 
 - [x] Aggiungere guardia sui nuovi componenti React per evitare `innerHTML` e accessi Supabase diretti.
-- [ ] Rimuovere gradualmente globali `window.*` sostituiti.
+- [x] Rimuovere i globali `window.*` sostituiti e mantenere solo le API di compatibilita' ancora chiamate.
 - [x] Ridurre `AppState` fino a eliminarlo o mantenerlo come compatibility layer minimo.
 - [x] Rimuovere render manuali `innerHTML` dalle pagine migrate.
 - [x] Rimuovere guardie temporanee se non piu' necessarie.
-- [ ] Eliminare script legacy non importati da Vite.
+- [x] Eliminare script e simboli legacy orfani; il compatibility layer residuo e' verificato automaticamente.
 - [x] Consolidare service worker con output build Vite.
 - [x] Aggiornare documentazione architetturale.
 
@@ -388,7 +391,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 ### Milestone D - Area critica realtime
 
 - [x] Combattimento in React.
-- [ ] Test Playwright per realtime DM/player.
+- [x] Test Playwright per realtime DM/player, attivabile con fixture Supabase dedicata.
 - [x] Nessun render diretto da eventi realtime.
 
 ### Milestone E - Migrazione completa
@@ -396,7 +399,7 @@ Criterio di uscita: React, query, router e store governano l'app; il legacy rest
 - [x] Scheda personaggio in React.
 - [x] Compendio in React.
 - [x] Laboratorio in React.
-- [ ] Legacy cleanup.
+- [x] Legacy cleanup.
 
 ---
 
