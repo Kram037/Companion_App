@@ -4481,7 +4481,7 @@ function _compIcon(name) {
 }
 
 function _compReactOwnsPage() {
-    return document.body.dataset.reactPage === 'compendio';
+    return document.querySelector('#react-root .react-page-shell') !== null;
 }
 
 function _compNotifyReactRefresh() {

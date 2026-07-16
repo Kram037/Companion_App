@@ -4831,7 +4831,7 @@ window._labImportSave = async function() {
 };
 
 function _labReactOwnsPage() {
-    return document.body.dataset.reactPage === 'laboratorio';
+    return document.querySelector('#react-root .react-page-shell') !== null;
 }
 
 function _labNotifyReactRefresh() {

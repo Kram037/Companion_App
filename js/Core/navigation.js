@@ -247,6 +247,8 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
         } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
             loadCampagnaDetails(AppState.currentCampagnaId);
+        } else if (pageName === 'sessione' && AppState.currentCampagnaId) {
+            await renderSessioneContent(AppState.currentCampagnaId);
         } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('combattimento');

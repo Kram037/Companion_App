@@ -11,6 +11,23 @@ test('same-route legacy navigation still activates and loads the page', async ({
   await expect(page.locator('#campagnePage')).toHaveClass(/active/);
 });
 
+test('legacy session navigation invokes the session renderer', async ({ page }) => {
+  await page.goto('/campagne');
+
+  const renderedCampaignId = await page.evaluate(async () => {
+    let rendered = '';
+    window.renderSessioneContent = async campaignId => {
+      rendered = campaignId;
+    };
+    window.AppState.currentCampagnaId = 'campaign-test';
+
+    await window.navigateToPage?.('sessione', { pushHistory: false });
+    return rendered;
+  });
+
+  expect(renderedCampaignId).toBe('campaign-test');
+});
+
 test('legacy changes notify the React query bridge', async ({ page }) => {
   await page.goto('/campagne');
 
