@@ -3,7 +3,7 @@
 let supabaseReady = false;
 
 function canInitSupabaseClient() {
-    return typeof window.supabaseClient !== 'undefined' || (
+    return !!window.supabaseClient || (
         typeof window.supabaseCreateClient === 'function' &&
         !!window.CompanionConfig?.supabaseUrl &&
         !!window.CompanionConfig?.supabaseAnonKey
@@ -13,14 +13,14 @@ function canInitSupabaseClient() {
 // Initialize Supabase (runs after the SDK module loads)
 function initSupabase() {
     try {
-        if (typeof window.supabaseClient === 'undefined' && typeof window.supabaseCreateClient === 'function') {
+        if (!window.supabaseClient && typeof window.supabaseCreateClient === 'function') {
             const { supabaseUrl, supabaseAnonKey } = window.CompanionConfig || {};
             if (supabaseUrl && supabaseAnonKey) {
                 window.supabaseClient = window.supabaseCreateClient(supabaseUrl, supabaseAnonKey);
             }
         }
 
-        if (typeof window.supabaseClient === 'undefined') {
+        if (!window.supabaseClient) {
             console.error('Supabase client non disponibile. Verifica config e caricamento SDK.');
             return false;
         }
@@ -61,5 +61,6 @@ function waitForSupabase() {
 
 // Helper per ottenere il client Supabase
 function getSupabaseClient() {
+    if (!window.supabaseClient) initSupabase();
     return window.supabaseClient;
 }
