@@ -84,6 +84,7 @@ export function LegacyNavigationSync() {
   useEffect(() => {
     const navigation = legacyNavigationFromPath(pathname);
     if (!navigation) return;
+    document.body.dataset.reactPage = navigation.page ?? 'campagne';
 
     const current = window.AppState;
     const changed = current?.currentPage !== navigation.page

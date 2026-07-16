@@ -1,59 +1,31 @@
 import { expect, test } from '@playwright/test';
 
-test('compendium and laboratory React hubs render their navigation', async ({ page }) => {
+test('React routing leaves the legacy compendium and laboratory views intact', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto('/compendio');
-  const compendiumHub = page.locator('.react-compendium-hub');
-  await expect(compendiumHub).toBeVisible();
-  await expect(compendiumHub.locator('.page-header h1')).toHaveText('Compendio');
-  await expect(compendiumHub.locator('.comp-hub-card')).toHaveCount(8);
-
-  await compendiumHub.getByRole('button', { name: 'Razze' }).click();
-  await expect(page.locator('.react-compendium-page .page-header h1')).toHaveText('Razze');
-  await expect(page.locator('.react-compendium-content .comp-card').first()).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'compendio');
+  await expect(page.locator('#compendioPage')).toHaveClass(/active/);
+  await expect(page.locator('#compendioHub')).toBeVisible();
+  await expect(page.locator('#compendioHub .page-header h1')).toHaveText('Compendio');
 
   await page.goto('/laboratorio');
-  const laboratoryHub = page.locator('.react-laboratory-hub');
-  await expect(laboratoryHub).toBeVisible();
-  await expect(laboratoryHub.locator('.page-header h1')).toHaveText('Laboratorio');
-  await expect(laboratoryHub.locator('.lab-hub-card')).toHaveCount(8);
-
-  await laboratoryHub.getByRole('button', { name: 'Razze' }).click();
-  await expect(page.locator('.react-laboratory-page .page-header h1')).toHaveText('Razze');
-  await expect(page.locator('.react-laboratory-content')).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'laboratorio');
+  await expect(page.locator('#laboratorioPage')).toHaveClass(/active/);
+  await expect(page.locator('#labHub')).toBeVisible();
+  await expect(page.locator('#labHub .page-header h1')).toHaveText('Laboratorio');
 });
 
-test('React campaign and character actions keep the card theme visible', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+test('React never hides or replaces the legacy page DOM', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/campagne');
 
-  const styles = await page.evaluate(() => {
-    const campaignCard = document.createElement('article');
-    campaignCard.className = 'campagna-card';
-    const campaignAction = document.createElement('button');
-    campaignAction.className = 'react-campaign-main';
-    campaignCard.appendChild(campaignAction);
+  await expect(page.locator('#campagnePage')).toBeVisible();
+  await expect(page.locator('#react-root')).toBeEmpty();
+  await expect(page.locator('.react-page-shell')).toHaveCount(0);
 
-    const characterCard = document.createElement('article');
-    characterCard.className = 'pg-card';
-    const characterAction = document.createElement('button');
-    characterAction.className = 'react-character-main';
-    characterCard.appendChild(characterAction);
-
-    document.body.append(campaignCard, characterCard);
-    return {
-      campaignBackground: getComputedStyle(campaignAction).backgroundColor,
-      campaignDisplay: getComputedStyle(campaignAction).display,
-      characterBackground: getComputedStyle(characterAction).backgroundColor,
-      characterWidth: getComputedStyle(characterAction).width,
-      cardBackground: getComputedStyle(campaignCard).backgroundImage,
-    };
-  });
-
-  expect(styles.campaignBackground).toBe('rgba(0, 0, 0, 0)');
-  expect(styles.campaignDisplay).toBe('grid');
-  expect(styles.characterBackground).toBe('rgba(0, 0, 0, 0)');
-  expect(styles.characterWidth).not.toBe('auto');
-  expect(styles.cardBackground).not.toBe('none');
+  await page.locator('.toolbar-btn[data-page="personaggi"]').click();
+  await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
+  await expect(page.locator('#personaggiPage')).toBeVisible();
+  await expect(page.locator('#react-root')).toBeEmpty();
 });
