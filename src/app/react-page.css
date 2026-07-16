@@ -80,6 +80,13 @@ body[data-react-page="laboratorio"] .main-content {
   height: 24px;
 }
 
+@media (min-width: 900px) {
+  .react-compendium-hub,
+  .react-laboratory-hub {
+    height: calc(100svh - var(--main-content-padding) - var(--main-content-padding));
+  }
+}
+
 body[data-react-page="combattimento"] .react-page-shell {
   display: flex;
   height: 100%;

@@ -61,6 +61,23 @@
     position: relative;
 }
 
+.react-character-main {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.react-character-main .pg-card-header { display: flex; }
+.react-character-main .pg-card-name,
+.react-character-main .pg-card-subtitle { display: block; }
+.react-character-main .pg-card-campaigns { display: block; margin-top: var(--spacing-sm); }
+.react-character-actions { justify-content: flex-end; }
+
 .pg-card:hover {
     border-color: var(--accent-light);
     box-shadow: var(--shadow-md);

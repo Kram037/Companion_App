@@ -262,6 +262,10 @@ function _labScrollToTop() {
 }
 
 async function loadLabContent() {
+    if (_labReactOwnsPage()) {
+        _labNotifyReactRefresh();
+        return;
+    }
     const container = document.getElementById('labContent');
     if (!container) return;
 
@@ -632,6 +636,10 @@ function _labRenderHomebrewListWithFilters(container, cat, data, tab, options = 
 }
 
 function _labListReRenderList(tab) {
+    if (_labReactOwnsPage()) {
+        _labNotifyReactRefresh();
+        return;
+    }
     const data = window._labListAllData[tab] || [];
     const state = _labListGetState(tab);
     const filtered = _labListApplyFilters(tab, data, state);
@@ -4820,4 +4828,56 @@ window._labImportSave = async function() {
     if (typeof cat.cacheReload === 'function') {
         try { await cat.cacheReload(); } catch (_) { /* best-effort */ }
     }
+};
+
+function _labReactOwnsPage() {
+    return document.body.dataset.reactPage === 'laboratorio';
+}
+
+function _labNotifyReactRefresh() {
+    window.dispatchEvent(new CustomEvent('companion:laboratory-refresh'));
+}
+
+window.getLaboratorioReactConfig = function() {
+    return LAB_HUB_ORDER.map(key => ({
+        key,
+        label: LAB_CATEGORIES[key].labelPlural || LAB_CATEGORIES[key].label,
+        iconFile: LAB_CATEGORIES[key].iconFile,
+    }));
+};
+
+window.setLaboratorioReactState = function(state) {
+    if (!state) return;
+    _labCurrentTab = state.tab || 'razze';
+    if (state.tab === 'classi') _labClassiSubTab = state.subtab === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    if (state.tab === 'talenti') _labTalentiStiliSubTab = state.subtab === 'stili' ? 'stili' : 'talenti';
+    if (state.tab === 'nemici') _labNemiciSubTab = state.subtab === 'combattimenti' ? 'combattimenti' : 'nemici';
+};
+
+window.getLaboratorioReactList = function(tab, items, search) {
+    const rows = Array.isArray(items) ? items : [];
+    const state = _labListGetState(tab);
+    state.search = search || '';
+    window._labListAllData[tab] = rows;
+    return {
+        items: _labListApplyFilters(tab, rows, state),
+        activeFilters: _labListActiveFiltersCount(tab),
+        hasFilters: _labListGetFilterDefs(tab).length > 0,
+    };
+};
+
+window.getLaboratorioReactCardDetail = function(item, tab) {
+    return labGetCardDetail(item, tab);
+};
+
+window.openLaboratorioReactEditor = function(tab, activeTab, item) {
+    _labCurrentTab = tab || activeTab || 'razze';
+    if (_labCurrentTab === 'classi') _labClassiSubTab = activeTab === 'sottoclassi' ? 'sottoclassi' : 'classi';
+    if (_labCurrentTab === 'talenti') _labTalentiStiliSubTab = activeTab === 'stili' ? 'stili' : 'talenti';
+    if (_labCurrentTab === 'nemici') _labNemiciSubTab = activeTab === 'combattimenti' ? 'combattimenti' : 'nemici';
+    if (activeTab === 'nemici' && item?.id) {
+        window.labViewNemico?.(item.id);
+        return;
+    }
+    window.openHomebrewModal?.(item);
 };
