@@ -345,6 +345,7 @@ function startAppEventsRealtime() {
                 if (data.sourceUid && data.sourceUid === AppState.currentUser?.uid) {
                     return;
                 }
+                window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: data }));
 
                 if (data.table === 'richieste_tiro_iniziativa' && data.action === 'insert') {
                     setTimeout(async () => {
@@ -553,6 +554,8 @@ async function refreshCurrentPageData() {
  * Invia un broadcast globale per notificare cambiamenti app
  */
 async function sendAppEventBroadcast(change) {
+    window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
+
     const supabase = getSupabaseClient();
     if (!supabase) return;
 

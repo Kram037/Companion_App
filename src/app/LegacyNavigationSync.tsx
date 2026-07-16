@@ -43,7 +43,7 @@ function installNavigateToPageBridge() {
       const handled = window.CompanionRouterBridge?.navigateToLegacy?.(
         legacySnapshotFromCurrentState(pageName),
       );
-      if (handled) return Promise.resolve(true);
+      if (handled) return original(pageName, { ...options, pushHistory: false });
     }
 
     return original(pageName, options);

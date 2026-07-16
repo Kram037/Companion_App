@@ -36,13 +36,6 @@ export function CampaignDetailsPage() {
   const players = useQuery(campaignPlayersQuery(campagnaId));
   const characters = useQuery(campaignCharactersQuery(campagnaId));
   const user = useQuery(currentUserQuery());
-
-  const data = campaign.data;
-  if (campaign.isLoading) return <ReactPage name="dettagli"><Placeholder text="Caricamento dettagli..." /></ReactPage>;
-  if (!data) return <ReactPage name="dettagli"><Placeholder text="Campagna non trovata." /></ReactPage>;
-
-  const isDm = data.id_dm === user.data?.id;
-  const currentCharacter = characters.data?.find(character => character.player_user_id === user.data?.id);
   const startSession = useMutation({
     mutationFn: () => startCampaignSession(campagnaId),
     onSuccess: async started => {
@@ -58,6 +51,13 @@ export function CampaignDetailsPage() {
       navigate(buildAppPath('sessione', { campagnaId }));
     },
   });
+
+  const data = campaign.data;
+  if (campaign.isLoading) return <ReactPage name="dettagli"><Placeholder text="Caricamento dettagli..." /></ReactPage>;
+  if (!data) return <ReactPage name="dettagli"><Placeholder text="Campagna non trovata." /></ReactPage>;
+
+  const isDm = data.id_dm === user.data?.id;
+  const currentCharacter = characters.data?.find(character => character.player_user_id === user.data?.id);
 
   const openSession = () => session.data
     ? navigate(buildAppPath('sessione', { campagnaId }))
