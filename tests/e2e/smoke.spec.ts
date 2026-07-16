@@ -90,6 +90,12 @@ test('desktop compendium sidebar opens equipment sections directly', async ({ pa
   await expect(compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti:armi"]')).toBeHidden();
   await compendioSidebar.locator('.desktop-sidebar-child-toggle[data-tab="oggetti"]').click();
   await expect(compendioSidebar.locator('.desktop-sidebar-child[data-tab="oggetti:armi"]')).toBeVisible();
+  await page.evaluate(async () => {
+    await window.navigateToPage?.('compendio');
+    window.compendioOpenTab?.('oggetti');
+  });
+  await expect(page.locator('#compendioHub')).toBeHidden();
+  await expect(page.locator('#compendioSubTitle')).toHaveText('Armi, Armature e Scudi');
 });
 
 test('desktop character sheet toolbar is centered in the content area', async ({ page }) => {

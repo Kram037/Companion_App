@@ -120,6 +120,10 @@ function _compEquipmentSectionIcon(section) {
     return `<img class="comp-hub-icon-img" src="${src}" alt="" loading="lazy">`;
 }
 
+function _compUsesDesktopSidebar() {
+    return typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 900px)').matches;
+}
+
 window.compGetSidebarItems = function() {
     return Object.entries(COMP_TABS).flatMap(([key, tab]) => {
         if (key !== 'oggetti') {
@@ -539,7 +543,7 @@ window.compendioOpenTab = function(tab) {
     _compCurrentTab = tab;
     _compStateFor(tab).detail = null;
     if (tab === 'oggetti') {
-        _compStateFor(tab).equipmentSection = '';
+        _compStateFor(tab).equipmentSection = _compUsesDesktopSidebar() ? 'armi' : '';
     }
     const hub = document.getElementById('compendioHub');
     const sub = document.getElementById('compendioSubPage');
@@ -820,6 +824,9 @@ window.compRestoreBookmarkState = async function(saved) {
         if (sub) sub.style.display = '';
         const title = document.getElementById('compendioSubTitle');
         const state = _compStateFor(_compCurrentTab);
+        if (_compCurrentTab === 'oggetti' && !state.equipmentSection && _compUsesDesktopSidebar()) {
+            state.equipmentSection = 'armi';
+        }
         if (title) title.textContent = state.detail?.id
             ? (state.detail.title || COMP_TABS[_compCurrentTab]?.label || 'Compendio')
             : (state.equipmentSection
