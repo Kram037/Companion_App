@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test';
 test('React routing leaves the legacy compendium and laboratory views intact', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto('/compendio');
+  await page.goto('/index.html');
+  await expect(page).toHaveURL(/\/campagne$/);
+  await page.locator('.toolbar-btn[data-page="compendio"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-react-page', 'compendio');
   await expect(page.locator('#compendioPage')).toHaveClass(/active/);
   await expect(page.locator('#compendioHub')).toBeVisible();

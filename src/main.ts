@@ -14,6 +14,11 @@ declare global {
 window.CompanionRouterBridge = { legacyNavigationFromLocation };
 initializeSupabaseClient();
 
+const normalizedEntryPath = window.location.pathname.replace(/\/index\.html(?=\/|$)/, '') || '/';
+if (normalizedEntryPath !== window.location.pathname) {
+  window.history.replaceState(window.history.state, '', `${normalizedEntryPath}${window.location.search}${window.location.hash}`);
+}
+
 const reactRoot = document.getElementById('react-root');
 if (reactRoot) {
   mountReactBridge(reactRoot);
