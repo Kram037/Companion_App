@@ -17,12 +17,12 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 1 - Guardie nel check standard
 
-- [ ] Inserire `tools/check-index-bootstrap.mjs` nel target `check`.
-- [ ] Inserire `tools/check-react-boundaries.mjs` nel target `check`.
-- [ ] Decidere se `tools/check-legacy-symbols.mjs` deve essere bloccante o solo report.
-- [ ] Far fallire la build se Supabase torna caricato da CDN.
+- [x] Inserire `tools/check-index-bootstrap.mjs` nel target `check`.
+- [x] Inserire `tools/check-react-boundaries.mjs` nel target `check`.
+- [x] Tenere `tools/check-legacy-symbols.mjs` report-only nel check standard; la modalita manuale resta bloccante.
+- [x] Far fallire la build se Supabase torna caricato da CDN.
 - [ ] Far fallire la build se realtime legacy chiama render/load diretti.
-- [ ] Far fallire la build se nuove pagine React aggiungono dipendenze da `window.*` non autorizzate.
+- [x] Far fallire la build se nuove pagine React aggiungono dipendenze da `window.*` non autorizzate.
 
 ## Priorita 2 - Supabase client unico
 

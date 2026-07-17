@@ -25,10 +25,11 @@ for (const match of referencesText.matchAll(/[A-Za-z_$][\w$]*/g)) {
   references.set(match[0], (references.get(match[0]) || 0) + 1);
 }
 const unused = [...definitions].filter(name => (references.get(name) || 0) < 2);
+const reportOnly = process.argv.includes('--report');
 
 if (unused.length) {
-  console.error(`Simboli legacy senza chiamanti:\n${unused.sort().map(name => `- ${name}`).join('\n')}`);
-  process.exit(1);
+  console.warn(`Simboli legacy senza chiamanti${reportOnly ? ' (report)' : ''}:\n${unused.sort().map(name => `- ${name}`).join('\n')}`);
+  if (!reportOnly) process.exit(1);
+} else {
+  console.log(`Checked ${definitions.size} legacy symbols`);
 }
-
-console.log(`Checked ${definitions.size} legacy symbols`);
