@@ -21,6 +21,10 @@ function loadAppLang() {
     setAppLang(lang, false);
 }
 
+/**
+ * @param {string} lang
+ * @param {boolean} [save]
+ */
 function setAppLang(lang, save = true) {
     const normalized = lang === 'en' ? 'en' : 'it';
     if (save) {

@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true
+  },
+  "files": [
+    "types/legacy-core-check.d.ts",
+    "js/Core/config.js",
+    "js/Core/version.js",
+    "js/Core/supabase.js",
+    "js/Core/lang.js"
+  ],
+  "include": []
+}

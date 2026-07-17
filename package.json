@@ -19,6 +19,7 @@
     "e2e:install": "playwright install",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "typecheck:legacy": "tsc -p tsconfig.legacy-check.json",
     "vite:dev": "vite",
     "vite:build": "vite build",
     "audit": "npm audit"

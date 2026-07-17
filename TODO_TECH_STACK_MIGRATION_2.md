@@ -69,7 +69,7 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Ridurre `.passthrough()` negli schema Zod dove il dominio e' stabile; restano aperti solo personaggi, classi incorporate e homebrew eterogenei.
 - [x] Sostituire `select('*')` con colonne esplicite nelle API typed e bloccarne la reintroduzione nel check standard.
 - [x] Aggiungere fallback solo dove esiste una migrazione DB non ancora garantita.
-- [ ] Estendere `checkJs` a piccoli gruppi legacy solo quando il rumore e' gestibile.
+- [x] Estendere `checkJs` a piccoli gruppi legacy solo quando il rumore e' gestibile; il primo gruppo Core e' esplicitato in `tsconfig.legacy-check.json`.
 
 ## Priorita 8 - Pulizia legacy
 
