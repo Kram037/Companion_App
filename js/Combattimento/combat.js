@@ -819,7 +819,8 @@ window.duplicateMonster = async function(mId, campagnaId, sessioneId) {
 
 // Combat toolbar placeholders
 window.combatDiceRoll = function() {
-    showNotification('Funzione dadi in arrivo!');
+    if (typeof openDiceRoller === 'function') openDiceRoller();
+    else showNotification('Tira dadi non disponibile');
 }
 
 window.combatCalcOpen = function() {

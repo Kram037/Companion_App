@@ -156,6 +156,68 @@ test('desktop compendium sidebar opens equipment sections directly', async ({ pa
   await expect(page.locator('#compendioSubTitle')).toHaveText('Armi, Armature e Scudi');
 });
 
+test('desktop sidebar scroll is confined between chrome dividers', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 520 });
+  await page.goto('/');
+  await waitForStartup(page);
+
+  await page.locator('.desktop-sidebar-group-toggle[data-page="laboratorio"]').click();
+  await page.locator('.desktop-sidebar-group-toggle[data-page="compendio"]').click();
+
+  const metrics = await page.evaluate(() => {
+    const nav = document.querySelector<HTMLElement>('#desktopSidebarNav')!;
+    const list = document.querySelector<HTMLElement>('.desktop-sidebar-list')!;
+    const navRect = nav.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    return {
+      navOverflowY: getComputedStyle(nav).overflowY,
+      listOverflowY: getComputedStyle(list).overflowY,
+      listScrollHeight: list.scrollHeight,
+      listClientHeight: list.clientHeight,
+      topGap: listRect.top - navRect.top,
+      bottomGap: navRect.bottom - listRect.bottom,
+    };
+  });
+
+  expect(metrics.navOverflowY).toBe('hidden');
+  expect(metrics.listOverflowY).toBe('auto');
+  expect(metrics.listScrollHeight).toBeGreaterThan(metrics.listClientHeight);
+  expect(metrics.topGap).toBeGreaterThanOrEqual(80);
+  expect(metrics.bottomGap).toBeGreaterThanOrEqual(60);
+});
+
+test('desktop dice roller opens from the sidebar handle', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await waitForStartup(page);
+
+  await page.locator('#diceSidebarToggle').click();
+  await expect(page.locator('body')).toHaveClass(/dice-desktop-open/);
+  await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
+
+  await page.locator('[data-dice-add="6"]').click();
+  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(2);
+  await page.locator('[data-dice-roll]').click();
+  await expect.poll(() => page.locator('.dice-total strong').innerText().then(Number)).toBeGreaterThan(0);
+});
+
+test('mobile d20 pull opens the dice roller', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await waitForStartup(page);
+
+  const box = await page.locator('#d20Logo').boundingBox();
+  expect(box).not.toBeNull();
+  const x = box!.x + box!.width / 2;
+  const y = box!.y + box!.height / 2;
+  await page.locator('#d20Logo').dispatchEvent('pointerdown', { clientX: x, clientY: y, pointerType: 'touch' });
+  await page.locator('#d20Logo').dispatchEvent('pointermove', { clientX: x, clientY: y + 70, pointerType: 'touch' });
+  await page.locator('#d20Logo').dispatchEvent('pointerup', { clientX: x, clientY: y + 70, pointerType: 'touch' });
+
+  await expect(page.locator('body')).toHaveClass(/dice-mobile-open/);
+  await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
+});
+
 test('desktop character sheet toolbar is centered in the content area', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');

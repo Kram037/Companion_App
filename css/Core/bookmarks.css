@@ -325,18 +325,45 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         width: var(--desktop-sidebar-width);
         display: flex;
         flex-direction: column;
-        gap: 4px;
         padding: 84px 8px 68px;
         border-right: 1px solid var(--fantasy-chrome-border, var(--border));
         background:
             linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
             var(--surface);
         box-shadow: 12px 0 28px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+    }
+
+    .desktop-sidebar-nav::before,
+    .desktop-sidebar-nav::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        height: 1px;
+        pointer-events: none;
+        background: linear-gradient(90deg, transparent, var(--fantasy-gold-line, var(--border)), transparent);
+    }
+
+    .desktop-sidebar-nav::before {
+        top: 78px;
+    }
+
+    .desktop-sidebar-nav::after {
+        bottom: 60px;
+    }
+
+    .desktop-sidebar-list {
+        min-height: 0;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
         overflow-y: auto;
         scrollbar-width: none;
     }
 
-    .desktop-sidebar-nav::-webkit-scrollbar {
+    .desktop-sidebar-list::-webkit-scrollbar {
         display: none;
     }
 

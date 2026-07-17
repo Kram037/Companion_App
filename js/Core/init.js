@@ -702,7 +702,8 @@ function setupEventListeners() {
         elements.d20Logo.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            rollD20();
+            if (typeof openDiceRoller === 'function') openDiceRoller();
+            else rollD20();
         });
     }
 

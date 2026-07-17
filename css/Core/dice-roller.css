@@ -1,0 +1,352 @@
+.dice-roller-panel {
+    position: fixed;
+    z-index: 98;
+    display: block;
+    color: var(--text);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.22s ease, opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.dice-roller-shell {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+    background:
+        linear-gradient(180deg, var(--fantasy-chrome-start, var(--surface)), var(--fantasy-chrome-end, var(--surface))),
+        var(--surface);
+    border: 1px solid var(--fantasy-chrome-border, var(--border));
+    box-shadow: 14px 0 34px rgba(0, 0, 0, 0.18);
+}
+
+.dice-roller-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--fantasy-gold-line, var(--border));
+}
+
+.dice-roller-head h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.dice-close-btn,
+.dice-sidebar-toggle,
+.dice-clear-btn,
+.dice-roll-btn,
+.dice-type,
+.dice-face {
+    border: 1px solid var(--fantasy-gold-line, var(--border));
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dice-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.dice-stage {
+    min-height: 220px;
+    flex: 1 1 auto;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 16px 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(var(--accent-rgb), 0.06);
+    overflow-y: auto;
+}
+
+.dice-face {
+    width: 78px;
+    height: 78px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.85rem;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+    box-shadow: inset -12px -14px 0 rgba(0, 0, 0, 0.13), 0 12px 24px rgba(0, 0, 0, 0.18);
+    transition: transform 0.18s ease;
+}
+
+.dice-face:hover {
+    transform: translateY(-2px);
+}
+
+.dice-d4 { background: #159a4a; clip-path: polygon(50% 7%, 94% 86%, 6% 86%); }
+.dice-d6 { background: #26aebf; border-radius: 2px; }
+.dice-d8 { background: #7e35c8; clip-path: polygon(50% 0, 94% 50%, 50% 100%, 6% 50%); }
+.dice-d10 { background: #d72d86; clip-path: polygon(50% 0, 92% 30%, 74% 100%, 26% 100%, 8% 30%); }
+.dice-d12 { background: #c43a2e; clip-path: polygon(50% 0, 90% 18%, 100% 58%, 72% 100%, 28% 100%, 0 58%, 10% 18%); }
+.dice-d20 { background: #f47b20; clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); }
+
+.dice-total {
+    min-width: 92px;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+}
+
+.dice-total span {
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    font-weight: 900;
+}
+
+.dice-total strong {
+    color: var(--text);
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.dice-type-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dice-type {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 900;
+    box-shadow: inset -6px -7px 0 rgba(0, 0, 0, 0.14);
+}
+
+.dice-actions {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.dice-modifier {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid var(--fantasy-gold-line, var(--border));
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+}
+
+.dice-modifier span {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 900;
+}
+
+.dice-modifier input {
+    width: 58px;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 900;
+    text-align: right;
+}
+
+.dice-roll-btn,
+.dice-clear-btn {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 900;
+}
+
+.dice-roll-btn {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: #fff;
+}
+
+.dice-clear-btn {
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+
+.dice-roller-panel.is-rolling .dice-face {
+    animation: diceRollWobble 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes diceRollWobble {
+    from { transform: rotate(-5deg) scale(0.96); }
+    to { transform: rotate(5deg) scale(1.04); }
+}
+
+.dice-sidebar-toggle {
+    display: none;
+}
+
+@media (max-width: 899px) {
+    .dice-roller-panel {
+        left: 0;
+        right: 0;
+        top: var(--app-header-height);
+        bottom: 0;
+        z-index: 98;
+        transform: translateY(calc(-100% - var(--app-header-height)));
+    }
+
+    body.dice-mobile-open .dice-roller-panel {
+        pointer-events: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dice-roller-shell {
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .dice-stage {
+        min-height: 300px;
+    }
+}
+
+@media (min-width: 900px) {
+    .dice-roller-panel {
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--desktop-sidebar-width, 228px);
+        z-index: 95;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    body.dice-desktop-open .dice-roller-panel {
+        pointer-events: auto;
+    }
+
+    .desktop-sidebar-nav {
+        transition: transform 0.22s ease;
+    }
+
+    body.dice-desktop-open .desktop-sidebar-nav {
+        transform: translateX(-100%);
+    }
+
+    body.dice-desktop-open .header .logo-container {
+        transform: translateX(calc(-1 * var(--desktop-sidebar-width, 228px) - 50%));
+    }
+
+    body.dice-desktop-open .header .user-btn,
+    body.dice-desktop-open .header .settings-btn {
+        transform: translateX(calc(-1 * var(--desktop-sidebar-width, 228px)));
+    }
+
+    .header .logo-container,
+    .header .user-btn,
+    .header .settings-btn {
+        transition: transform 0.22s ease;
+    }
+
+    .dice-sidebar-toggle {
+        position: fixed;
+        left: calc(var(--desktop-sidebar-width, 228px) / 2 + 34px);
+        top: 24px;
+        z-index: 130;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+        background: var(--surface);
+        color: var(--fantasy-gold-strong, var(--accent));
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+        transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .dice-sidebar-toggle svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .dice-sidebar-toggle:hover {
+        transform: translateY(-1px);
+    }
+
+    body.dice-desktop-open .dice-sidebar-toggle {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .dice-roller-shell {
+        padding-top: 14px;
+    }
+
+    .dice-stage {
+        min-height: 210px;
+        gap: 12px;
+    }
+
+    .dice-face {
+        width: 66px;
+        height: 66px;
+        font-size: 1.55rem;
+    }
+
+    .dice-total strong {
+        font-size: 2.5rem;
+    }
+
+    .dice-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dice-modifier,
+    .dice-clear-btn {
+        grid-column: span 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dice-roller-panel,
+    .desktop-sidebar-nav,
+    .header .logo-container,
+    .header .user-btn,
+    .header .settings-btn {
+        transition: none;
+    }
+
+    .dice-roller-panel.is-rolling .dice-face {
+        animation: none;
+    }
+}

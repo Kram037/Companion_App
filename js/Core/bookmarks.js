@@ -979,7 +979,7 @@ function renderDesktopSidebar() {
     const sidebar = document.getElementById('desktopSidebarNav');
     if (!sidebar) return;
     const focusedPage = _desktopSidebarFocusedPage();
-    sidebar.innerHTML = _desktopNavItems().map(item => {
+    const itemsHtml = _desktopNavItems().map(item => {
         if (item.type !== 'group') {
             return `
                 <button type="button" class="desktop-sidebar-btn" data-page="${item.page}" aria-label="${item.label}">
@@ -1003,6 +1003,7 @@ function renderDesktopSidebar() {
             </div>
         `;
     }).join('');
+    sidebar.innerHTML = `<div class="desktop-sidebar-list">${itemsHtml}</div>`;
 }
 
 function _desktopSidebarChildHtml(page, child, focusedPage, activeChild) {
