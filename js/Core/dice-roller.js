@@ -69,10 +69,10 @@
                             <span>${die.value}</span>
                         </button>
                     `).join('')}
-                    <div class="dice-total">
-                        <span>Totale</span>
-                        <strong>${total()}</strong>
-                    </div>
+                </div>
+                <div class="dice-total">
+                    <span>Totale</span>
+                    <strong>${total()}</strong>
                 </div>
                 <div class="dice-type-row">
                     ${DICE_TYPES.map(sides => `
@@ -87,7 +87,6 @@
                         <input type="number" value="${state.modifier}" min="-99" max="99" step="1" data-dice-modifier>
                     </label>
                     <button type="button" class="dice-roll-btn" data-dice-roll>Roll</button>
-                    <button type="button" class="dice-clear-btn" data-dice-clear>Reset</button>
                 </div>
             </div>
         `);
@@ -109,7 +108,7 @@
         }
 
         const remove = event.target.closest('[data-dice-remove]');
-        if (remove && state.dice.length > 1) {
+        if (remove) {
             state.dice.splice(parseInt(remove.dataset.diceRemove, 10), 1);
             renderDiceRoller();
             return;
@@ -120,11 +119,6 @@
             return;
         }
 
-        if (event.target.closest('[data-dice-clear]')) {
-            state.dice = [{ sides: 20, value: rollDie(20) }];
-            state.modifier = 0;
-            renderDiceRoller();
-        }
     }
 
     function onPanelChange(event) {

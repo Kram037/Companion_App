@@ -195,24 +195,29 @@ test('desktop dice roller opens from the sidebar handle', async ({ page }) => {
   await expect(page.locator('body')).toHaveClass(/dice-desktop-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
 
+  await expect(page.locator('[data-dice-clear]')).toHaveCount(0);
+  await page.locator('#diceRollerPanel .dice-face').first().click();
+  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(0);
+  await expect(page.locator('.dice-total strong')).toHaveText('0');
+  await expect.poll(() => page.locator('.dice-type-row').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(3);
   await page.locator('[data-dice-add="6"]').click();
-  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(2);
+  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(1);
   await page.locator('[data-dice-roll]').click();
   await expect.poll(() => page.locator('.dice-total strong').innerText().then(Number)).toBeGreaterThan(0);
+  await expect.poll(() => page.locator('[data-dice-roll]').evaluate(el => {
+    const button = el.getBoundingClientRect();
+    const parent = el.parentElement!.getBoundingClientRect();
+    return Math.abs(button.width - parent.width);
+  })).toBeLessThan(2);
 });
 
-test('mobile d20 pull opens the dice roller', async ({ page }) => {
+test('mobile dice button opens the dice roller', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await waitForStartup(page);
 
-  const box = await page.locator('#d20Logo').boundingBox();
-  expect(box).not.toBeNull();
-  const x = box!.x + box!.width / 2;
-  const y = box!.y + box!.height / 2;
-  await page.locator('#d20Logo').dispatchEvent('pointerdown', { clientX: x, clientY: y, pointerType: 'touch' });
-  await page.locator('#d20Logo').dispatchEvent('pointermove', { clientX: x, clientY: y + 70, pointerType: 'touch' });
-  await page.locator('#d20Logo').dispatchEvent('pointerup', { clientX: x, clientY: y + 70, pointerType: 'touch' });
+  await expect(page.locator('#diceSidebarToggle')).toBeVisible();
+  await page.locator('#diceSidebarToggle').click();
 
   await expect(page.locator('body')).toHaveClass(/dice-mobile-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
