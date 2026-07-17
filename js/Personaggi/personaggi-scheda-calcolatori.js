@@ -79,13 +79,6 @@ function schedaUpdateHpDisplays(pg) {
     if (pvTempEl) pvTempEl.textContent = pg.pv_temporanei || 0;
 }
 
-function schedaRefreshHpMaxPreview() {
-    const current = parseInt(_hpCalcState?.maxBase ?? document.getElementById('hpCalcCurrent')?.textContent) || 0;
-    const bonus = Math.max(0, parseInt(_hpCalcState?.maxTemp ?? document.getElementById('hpCalcTempBonus')?.textContent) || 0);
-    const el = document.getElementById('hpCalcEffectiveMax');
-    if (el) el.textContent = current + bonus;
-}
-
 function schedaGetPfHistory(pg) {
     const bm = (pg?.bonus_manuali && typeof pg.bonus_manuali === 'object') ? pg.bonus_manuali : {};
     const raw = bm._pf_storico;
@@ -94,14 +87,6 @@ function schedaGetPfHistory(pg) {
         ...raw,
         entries: Array.isArray(raw.entries) ? raw.entries : [],
     };
-}
-
-function schedaFormatPfHistoryRoll(entry) {
-    if (!entry) return '-';
-    if (entry.method === 'average') return `medio ${entry.roll}`;
-    if (entry.method === 'manual') return `manuale`;
-    if (entry.roll != null) return `1d${entry.die} = ${entry.roll}`;
-    return '-';
 }
 
 function schedaBuildPfVirtualRows(pg) {

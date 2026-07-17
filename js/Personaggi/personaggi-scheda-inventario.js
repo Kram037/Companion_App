@@ -163,33 +163,6 @@ function _invListRenderFiltersBadge() {
     if (btn) btn.classList.toggle('active', n > 0);
 }
 
-function _invListRenderFiltersPanel(pgId) {
-    const panel = document.getElementById('invListFiltersPanel');
-    if (!panel) return;
-    const pg = _schedaPgCache;
-    if (!pg) { panel.innerHTML = ''; return; }
-    const f = window._invListState.filters || {};
-    const rarOpts = _invListOptionsFor(pg, 'rarita');
-    const tipOpts = _invListOptionsFor(pg, 'tipo');
-    panel.innerHTML = `
-        <div class="inv-list-filter-field">
-            <label>Rarità</label>
-            <select onchange="invListSetFilter('rarita', this.value, '${pgId}')">
-                <option value="">Tutte</option>
-                ${rarOpts.map(v => `<option value="${escapeHtml(v)}" ${f.rarita === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
-            </select>
-        </div>
-        <div class="inv-list-filter-field">
-            <label>Tipologia</label>
-            <select onchange="invListSetFilter('tipo', this.value, '${pgId}')">
-                <option value="">Tutte</option>
-                ${tipOpts.map(v => `<option value="${escapeHtml(v)}" ${f.tipo === v ? 'selected' : ''}>${escapeHtml(v)}</option>`).join('')}
-            </select>
-        </div>
-        <button type="button" class="inv-list-filter-reset" onclick="invListResetFilters('${pgId}')">Pulisci</button>
-    `;
-}
-
 function _invListBuildFilterButton(field, label, emptyLabel, options, value, pgId) {
     const selected = _invListFilterValues(value);
     const normalized = [{ value: '', label: emptyLabel }, ...options.map(v => ({ value: String(v), label: v }))];

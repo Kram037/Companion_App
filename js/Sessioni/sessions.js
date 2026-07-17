@@ -740,11 +740,6 @@ async function getCharacterNamesMap(campagnaId) {
     return namesMap;
 }
 
-async function getCharacterConditionsMap(campagnaId) {
-    const { conditionsMap } = await getCampaignCharacterData(campagnaId);
-    return conditionsMap;
-}
-
 window.aggiungiIniziativa = async function(sessioneId) {
     const nome = await showPrompt('Nome personaggio:', 'Aggiungi Iniziativa');
     if (!nome || nome.trim() === '') return;

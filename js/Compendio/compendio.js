@@ -4437,11 +4437,6 @@ function _compPrereqLabel(value) {
     return value || 'Nessuno';
 }
 
-function _compFeatureLevels(features) {
-    const levels = _compUnique((features || []).map(f => f.level != null ? String(f.level) : ''));
-    return levels.length ? `Livelli ${levels.join(', ')}` : '';
-}
-
 function _compSpellLevel(level) {
     const n = Number(level);
     if (_compLang() === 'en') return n === 0 ? 'Cantrip' : `Level ${n}`;

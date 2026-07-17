@@ -73,6 +73,7 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 8 - Pulizia legacy
 
+- [x] Primo batch: rimuovere polling sessioni duplicato e helper privati senza chiamanti (report da 39 a 29 simboli).
 - [ ] Risolvere o cancellare i simboli segnalati da `check-legacy-symbols`.
 - [ ] Rimuovere script legacy non piu caricati da `index.html`.
 - [ ] Tenere `LegacyFragment` solo per contenuti che non meritano ancora una conversione React.
