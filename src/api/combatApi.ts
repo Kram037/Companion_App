@@ -10,8 +10,11 @@ const CONDITION_KEYS = [
   'privo_di_sensi', 'prono', 'spaventato', 'stordito', 'trattenuto',
 ] as const;
 
-const COMBAT_MONSTER_COLUMNS = `id,sessione_id,nome,iniziativa,pv_attuali,punti_vita_max,created_at,${CONDITION_KEYS.join(',')}`;
+type CombatConditionKey = typeof CONDITION_KEYS[number];
+
+const COMBAT_MONSTER_COLUMNS = `id,sessione_id,nome,iniziativa,pv_attuali,punti_vita_max,created_at,resistenze_leggendarie,azioni_legg_max,${CONDITION_KEYS.join(',')}`;
 const INITIATIVE_ROLL_COLUMNS = 'id,giocatore_id,valore,stato,created_at';
+const COMBAT_TIMER_COLUMNS = 'id,target_kind,target_id,conditions,remaining_rounds';
 
 export async function fetchCombatMonsters(sessioneId: Id): Promise<MostroCombattimento[]> {
   const { data, error } = await getSupabaseClient()
@@ -31,6 +34,63 @@ export async function fetchCombatSnapshot(campagnaId: Id, sessioneId: Id): Promi
     fetchCombatCharacters(campagnaId),
   ]);
   return { sessione, tiri: rolls, mostri, personaggi };
+}
+
+export async function advanceCombatTurn(input: {
+  sessioneId: Id;
+  orderLength: number;
+  round: number;
+  turnIndex: number;
+  nextMonster?: MostroCombattimento | null;
+}): Promise<{ round: number; turnIndex: number; expiredTimers: number }> {
+  const { round: nextRound, turnIndex: nextTurnIndex } = nextCombatTurnState(input.orderLength, input.round, input.turnIndex);
+  if (input.orderLength <= 0) return { round: nextRound, turnIndex: nextTurnIndex, expiredTimers: 0 };
+  const client = getSupabaseClient();
+
+  if (input.nextMonster) {
+    const updates: Record<string, number> = {};
+    if ((input.nextMonster.resistenze_leggendarie ?? 0) > 0) updates.res_legg_attuali = input.nextMonster.resistenze_leggendarie ?? 0;
+    if ((input.nextMonster.azioni_legg_max ?? 0) > 0) updates.azioni_legg_attuali = input.nextMonster.azioni_legg_max ?? 0;
+    if (Object.keys(updates).length) {
+      const { error } = await client.from('mostri_combattimento').update(updates).eq('id', input.nextMonster.id);
+      throwIfSupabaseError(error);
+    }
+  }
+
+  const { error } = await client.from('sessioni')
+    .update({ combat_round: nextRound, combat_turn_index: nextTurnIndex })
+    .eq('id', input.sessioneId);
+  throwIfSupabaseError(error);
+
+  let expiredTimers = 0;
+  if (nextRound !== input.round) {
+    try {
+      expiredTimers = await tickCombatTimers(input.sessioneId);
+    } catch (error) {
+      console.warn('Errore tick timer:', error);
+    }
+  }
+  return { round: nextRound, turnIndex: nextTurnIndex, expiredTimers };
+}
+
+export function nextCombatTurnState(orderLength: number, round: number, turnIndex: number): { round: number; turnIndex: number } {
+  if (orderLength <= 0) return { round, turnIndex };
+  const nextTurnIndex = turnIndex + 1 >= orderLength ? 0 : turnIndex + 1;
+  return { round: nextTurnIndex === 0 ? round + 1 : round, turnIndex: nextTurnIndex };
+}
+
+export async function endCombat(sessioneId: Id): Promise<void> {
+  const client = getSupabaseClient();
+  const deleteRolls = await client.from('richieste_tiro_iniziativa').delete().eq('sessione_id', sessioneId);
+  throwIfSupabaseError(deleteRolls.error);
+
+  const deleteMonsters = await client.from('mostri_combattimento').delete().eq('sessione_id', sessioneId);
+  throwIfSupabaseError(deleteMonsters.error);
+
+  const resetSession = await client.from('sessioni')
+    .update({ combat_round: 1, combat_turn_index: 0 })
+    .eq('id', sessioneId);
+  throwIfSupabaseError(resetSession.error);
 }
 
 async function fetchInitiativeRolls(sessioneId: Id): Promise<InitiativeRoll[]> {
@@ -74,3 +134,49 @@ async function fetchCombatCharacters(campagnaId: Id): Promise<CombatCharacter[]>
   }));
 }
 
+async function tickCombatTimers(sessioneId: Id): Promise<number> {
+  const client = getSupabaseClient();
+  const { data, error } = await client.from('combat_timers')
+    .select(COMBAT_TIMER_COLUMNS)
+    .eq('sessione_id', sessioneId)
+    .eq('expired', false);
+  throwIfSupabaseError(error);
+
+  let expiredCount = 0;
+  for (const timer of (data ?? []) as Array<Record<string, unknown>>) {
+    const id = String(timer.id ?? '');
+    if (!id) continue;
+
+    const remaining = Number(timer.remaining_rounds ?? 0) - 1;
+    if (remaining > 0) {
+      const update = await client.from('combat_timers').update({ remaining_rounds: remaining }).eq('id', id);
+      throwIfSupabaseError(update.error);
+      continue;
+    }
+
+    const conditions = timerConditions(timer.conditions);
+    const targetId = timer.target_id ? String(timer.target_id) : '';
+    const targetKind = timer.target_kind ? String(timer.target_kind) : '';
+    if (targetId && conditions.length) {
+      const update = Object.fromEntries(conditions.map(condition => [condition, false]));
+      const table = targetKind === 'monster' ? 'mostri_combattimento' : targetKind === 'player' ? 'personaggi' : null;
+      if (table) {
+        const target = await client.from(table).update(update).eq('id', targetId);
+        throwIfSupabaseError(target.error);
+      }
+    }
+
+    const remove = await client.from('combat_timers').delete().eq('id', id);
+    throwIfSupabaseError(remove.error);
+    expiredCount += 1;
+  }
+  return expiredCount;
+}
+
+function timerConditions(value: unknown): CombatConditionKey[] {
+  return Array.isArray(value) ? value.filter(isCombatConditionKey) : [];
+}
+
+function isCombatConditionKey(value: unknown): value is CombatConditionKey {
+  return typeof value === 'string' && (CONDITION_KEYS as readonly string[]).includes(value);
+}

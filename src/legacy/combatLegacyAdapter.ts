@@ -2,14 +2,14 @@ type LegacyResult = void | Promise<void>;
 
 type CombatLegacyWindow = Window & {
   ensureRuntimeScript?: (key: string) => Promise<void>;
+  sendAppEventBroadcast?: (change: Record<string, unknown>) => Promise<void>;
+  showNotification?: (message: string) => void;
   setCombatInitiativeOrder?: (order: unknown[]) => void;
-  combatNextTurn?: (campagnaId: string, sessioneId: string, orderLength: number, round: number, turnIndex: number) => LegacyResult;
   combatOpenMonsterFullSheet?: (monsterId: string, campagnaId: string, sessioneId: string) => LegacyResult;
   openMonsterCreationModal?: (campagnaId: string, sessioneId: string) => LegacyResult;
   combatDiceRoll?: () => LegacyResult;
   combatCalcOpen?: () => LegacyResult;
   combatOpenTimerDialog?: (campagnaId: string, sessioneId: string, mode: 'dm' | 'player', personaggioId: string | null) => LegacyResult;
-  terminaCombattimento?: (campagnaId: string, sessioneId: string) => LegacyResult;
   renderCombatTimers?: (sessioneId: string, isDm: boolean, personaggioId: string | null) => LegacyResult;
 };
 
@@ -25,12 +25,11 @@ export const combatLegacyAdapter = {
   setNavigation(campagnaId: string, sessioneId: string) {
     window.setAppNavigationState?.({ page: 'combattimento', campagnaId, sessioneId }, 'react-combat');
   },
+  broadcast(change: Record<string, unknown>) { return legacy().sendAppEventBroadcast?.(change); },
+  notify(message: string) { legacy().showNotification?.(message); },
   setInitiativeOrder(order: unknown[]) { legacy().setCombatInitiativeOrder?.(order); },
   renderTimers(sessioneId: string, isDm: boolean, personaggioId: string | null) {
     return legacy().renderCombatTimers?.(sessioneId, isDm, personaggioId);
-  },
-  nextTurn(campagnaId: string, sessioneId: string, orderLength: number, round: number, turnIndex: number) {
-    return legacy().combatNextTurn?.(campagnaId, sessioneId, orderLength, round, turnIndex);
   },
   openMonster(monsterId: string, campagnaId: string, sessioneId: string) {
     return legacy().combatOpenMonsterFullSheet?.(monsterId, campagnaId, sessioneId);
@@ -41,5 +40,4 @@ export const combatLegacyAdapter = {
   openTimer(campagnaId: string, sessioneId: string, mode: 'dm' | 'player', personaggioId: string | null) {
     return legacy().combatOpenTimerDialog?.(campagnaId, sessioneId, mode, personaggioId);
   },
-  end(campagnaId: string, sessioneId: string) { return legacy().terminaCombattimento?.(campagnaId, sessioneId); },
 };

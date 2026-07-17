@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
+import { advanceCombatTurn, endCombat, nextCombatTurnState } from '../../api';
 import { ReactPage } from '../../app/ReactPage';
 import { combatLegacyAdapter } from '../../legacy/combatLegacyAdapter';
 import { queryKeys } from '../../query';
@@ -49,6 +50,41 @@ export function CombatPage() {
   const round = combat.data?.sessione?.combat_round ?? 1;
   const turnIndex = Math.min(combat.data?.sessione?.combat_turn_index ?? 0, Math.max(0, order.length - 1));
   const currentCharacter = combat.data?.personaggi.find(character => character.player_user_id === user.data?.id);
+  const nextTurn = useMutation({
+    mutationFn: async () => {
+      const nextIndex = nextCombatTurnState(order.length, round, turnIndex).turnIndex;
+      const nextEntry = order[nextIndex];
+      const result = await advanceCombatTurn({
+        sessioneId,
+        orderLength: order.length,
+        round,
+        turnIndex,
+        nextMonster: nextEntry?.type === 'monster' ? nextEntry.monster ?? null : null,
+      });
+      if (result.expiredTimers > 0) {
+        combatLegacyAdapter.notify(result.expiredTimers === 1 ? 'Un timer e\' scaduto' : `${result.expiredTimers} timer scaduti`);
+      }
+      await combatLegacyAdapter.broadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
+    },
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
+      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
+    },
+    onError: error => combatLegacyAdapter.notify(`Errore cambio turno: ${errorMessage(error)}`),
+  });
+  const stopCombat = useMutation({
+    mutationFn: async () => {
+      await endCombat(sessioneId);
+      await combatLegacyAdapter.broadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId, campagnaId });
+    },
+    onSuccess: () => {
+      combatLegacyAdapter.notify('Combattimento terminato');
+      client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
+      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
+      navigate(buildAppPath('sessione', { campagnaId }));
+    },
+    onError: error => combatLegacyAdapter.notify(`Errore nella terminazione del combattimento: ${errorMessage(error)}`),
+  });
 
   useEffect(() => {
     let live = true;
@@ -96,7 +132,7 @@ export function CombatPage() {
     <div className="combat-header">
       <button className="page-header-back combat-back" type="button" onClick={() => navigate(buildAppPath('sessione', { campagnaId }))} aria-label="Torna alla sessione"><Back /></button>
       <div className="combat-round-center"><div className="combat-round-num">Round {round}</div><div className="combat-turn-name">{order[turnIndex]?.name ?? 'In attesa...'}</div></div>
-      {isDm && order.length > 0 && <button className="combat-next-btn" type="button" disabled={!legacyReady} onClick={() => combatLegacyAdapter.nextTurn(campagnaId, sessioneId, order.length, round, turnIndex)} title="Prossimo turno"><Next /></button>}
+      {isDm && order.length > 0 && <button className="combat-next-btn" type="button" disabled={nextTurn.isPending} onClick={() => nextTurn.mutate()} title="Prossimo turno"><Next /></button>}
     </div>
     <div className="combat-timers-panel" id="combatTimersPanel" style={{ display: 'none' }} />
     <div className="combat-body">
@@ -112,17 +148,17 @@ export function CombatPage() {
         </button>)}
       </div>
     </div>
-    <CombatToolbar ready={legacyReady} isDm={isDm} campagnaId={campagnaId} sessioneId={sessioneId} personaggioId={currentCharacter?.id ?? null} />
+    <CombatToolbar ready={legacyReady} isDm={isDm} ending={stopCombat.isPending} campagnaId={campagnaId} sessioneId={sessioneId} personaggioId={currentCharacter?.id ?? null} onEnd={() => stopCombat.mutate()} />
   </div></ReactPage>;
 }
 
-function CombatToolbar({ ready, isDm, campagnaId, sessioneId, personaggioId }: { ready: boolean; isDm: boolean; campagnaId: string; sessioneId: string; personaggioId: string | null }) {
+function CombatToolbar({ ready, isDm, ending, campagnaId, sessioneId, personaggioId, onEnd }: { ready: boolean; isDm: boolean; ending: boolean; campagnaId: string; sessioneId: string; personaggioId: string | null; onEnd: () => void }) {
   return <div className="combat-toolbar">
     {isDm && <ToolbarButton label="Mostro" title="Aggiungi mostro" disabled={!ready} onClick={() => combatLegacyAdapter.addMonster(campagnaId, sessioneId)} icon={<Plus />} />}
     <ToolbarButton label="Dadi" title="Tira dadi" disabled={!ready} onClick={() => combatLegacyAdapter.rollDice()} icon={<Dice />} />
     <ToolbarButton label="Calc" title="Calcolatrice" disabled={!ready} onClick={() => combatLegacyAdapter.openCalculator()} icon={<Calculator />} />
     <ToolbarButton label="Timer" title="Timer combattimento" disabled={!ready || (!isDm && !personaggioId)} onClick={() => combatLegacyAdapter.openTimer(campagnaId, sessioneId, isDm ? 'dm' : 'player', personaggioId)} icon={<Clock />} />
-    {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={!ready} onClick={() => combatLegacyAdapter.end(campagnaId, sessioneId)} icon={<Close />} />}
+    {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={ending} onClick={onEnd} icon={<Close />} />}
   </div>;
 }
 
@@ -147,6 +183,7 @@ function monsterConditions(monster: MostroCombattimento) {
 
 function canOpen(entry: CombatEntry, isDm: boolean, userId?: string) { return entry.type === 'monster' ? isDm : Boolean(entry.pgId && (isDm || entry.playerUserId === userId)); }
 function normalizeImage(url: string) { return normalizeImageUrl(url) ?? url; }
+function errorMessage(error: unknown) { return error instanceof Error ? error.message : String(error); }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7 7-7-7 7-7" /></svg>; }
 function Next() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>; }

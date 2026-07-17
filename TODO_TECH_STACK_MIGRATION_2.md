@@ -52,6 +52,8 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Isolare i globali di combattimento in un adapter typed fuori dai componenti React.
 - [x] Attivare l'ownership incrementale e migrare `/amici` a React/API typed; il solo modale di aggiunta resta compat legacy.
 - [ ] Ridurre `CombatPage` a componenti React che chiamano API typed, non funzioni globali.
+  - [x] Spostare cambio turno e fine combattimento su API typed.
+  - [ ] Spostare modali mostro, dadi/calcolatrice e timer fuori da `window.*`.
 - [ ] Ridurre `CharacterSheetPage` a modello React/Zustand, lasciando legacy solo come fallback.
 - [ ] Spostare modali e action handler piu usati fuori da `window.*`.
 - [ ] Tenere una allowlist corta dei globali legacy ancora necessari.
