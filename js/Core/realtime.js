@@ -3,7 +3,16 @@
 // ============================================================
 
 let appEventsChannel = null;
-let appEventsRefreshTimeout = null;
+
+function publishAppDataChange(change) {
+    if (!change?.table || !change?.action) return;
+    window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
+}
+
+function publishIncomingAppChange(change) {
+    publishAppDataChange(change);
+    window.requestLegacyRealtimeRefresh?.(change);
+}
 
 /**
  * Avvia Realtime subscription per le nuove sessioni
@@ -120,15 +129,13 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
             { event: 'iniziativa_update' },
             async (payload) => {
                 appDebug('🔔 [REALTIME] Broadcast iniziativa:', payload);
-                const combattimentoPage = document.getElementById('combattimentoPage');
-                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
-                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
-                        if (typeof window.ensureRuntimeScript === 'function') {
-                            await window.ensureRuntimeScript('combattimento');
-                        }
-                        await renderCombattimentoContent(campagnaId, sessioneId);
-                    }
-                }
+                publishIncomingAppChange({
+                    table: 'combattimento',
+                    action: 'update',
+                    campagnaId,
+                    sessioneId,
+                    timestamp: payload?.payload?.ts || Date.now()
+                });
             }
         )
         .on(
@@ -141,19 +148,13 @@ function startCombattimentoRealtime(campagnaId, sessioneId) {
             },
             async (payload) => {
                 appDebug('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
-                // Verifica che siamo ancora nella pagina combattimento
-                const combattimentoPage = document.getElementById('combattimentoPage');
-                if (combattimentoPage && combattimentoPage.classList.contains('active')) {
-                    // Verifica che la sessione sia ancora quella corrente
-                    if (AppState.currentSessioneId === sessioneId && AppState.currentCampagnaId === campagnaId) {
-                        appDebug('✅ [REALTIME] Ricarico contenuto combattimento');
-                        // Ricarica il contenuto del combattimento
-                        if (typeof window.ensureRuntimeScript === 'function') {
-                            await window.ensureRuntimeScript('combattimento');
-                        }
-                        await renderCombattimentoContent(campagnaId, sessioneId);
-                    }
-                }
+                publishIncomingAppChange({
+                    table: 'richieste_tiro_iniziativa',
+                    action: String(payload.eventType || 'update').toLowerCase(),
+                    id: payload.new?.id || payload.old?.id || null,
+                    campagnaId,
+                    sessioneId
+                });
             }
         )
         .subscribe((status) => {
@@ -260,16 +261,13 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 appDebug('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
                 // Verifica che la sessione non abbia data_fine (sia attiva)
                 if (!payload.new.data_fine) {
-                    // Verifica che siamo ancora nella pagina dettagli
-                    const dettagliPage = document.getElementById('dettagliPage');
-                    if (dettagliPage && dettagliPage.classList.contains('active')) {
-                        // Verifica che la campagna sia ancora quella corrente
-                        if (AppState.currentCampagnaId === campagnaId) {
-                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per nuova sessione');
-                            // Ricarica i dettagli della campagna per aggiornare il bottone
-                            await loadCampagnaDetails(campagnaId);
-                        }
-                    }
+                    publishIncomingAppChange({
+                        table: 'sessioni',
+                        action: 'insert',
+                        id: payload.new?.id || null,
+                        campagnaId,
+                        sessioneId: payload.new?.id || null
+                    });
                 }
             }
         )
@@ -285,16 +283,13 @@ function startCampagnaDetailsRealtime(campagnaId) {
                 appDebug('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
                 // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
                 if (payload.new.data_fine) {
-                    // Verifica che siamo ancora nella pagina dettagli
-                    const dettagliPage = document.getElementById('dettagliPage');
-                    if (dettagliPage && dettagliPage.classList.contains('active')) {
-                        // Verifica che la campagna sia ancora quella corrente
-                        if (AppState.currentCampagnaId === campagnaId) {
-                            appDebug('✅ [REALTIME] Ricarico dettagli campagna per sessione terminata');
-                            // Ricarica i dettagli della campagna per aggiornare il bottone
-                            await loadCampagnaDetails(campagnaId);
-                        }
-                    }
+                    publishIncomingAppChange({
+                        table: 'sessioni',
+                        action: 'update',
+                        id: payload.new?.id || null,
+                        campagnaId,
+                        sessioneId: payload.new?.id || null
+                    });
                 }
             }
         )
@@ -342,10 +337,14 @@ function startAppEventsRealtime() {
             async (payload) => {
                 const data = payload?.payload;
                 if (!data) return;
-                if (data.sourceUid && data.sourceUid === AppState.currentUser?.uid) {
+                const clientId = window.CompanionRealtimeBridge?.clientId;
+                if (data.sourceClientId && clientId && data.sourceClientId === clientId) {
                     return;
                 }
-                window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: data }));
+                if (!data.sourceClientId && data.sourceUid && data.sourceUid === AppState.currentUser?.uid) {
+                    return;
+                }
+                publishAppDataChange(data);
 
                 if (data.table === 'richieste_tiro_iniziativa' && data.action === 'insert') {
                     setTimeout(async () => {
@@ -380,7 +379,6 @@ function startAppEventsRealtime() {
                     if (AppState.currentPage === 'combattimento' && data.campagnaId) {
                         showNotification('Il combattimento è terminato');
                         navigateToPage('sessione');
-                        renderSessioneContent(data.campagnaId);
                     }
                 }
 
@@ -426,7 +424,6 @@ function startAppEventsRealtime() {
                             stopSessioneTimer();
                             showNotification('La sessione è terminata');
                             navigateToPage('dettagli');
-                            loadCampagnaDetails(data.campagnaId);
                         }
                     }
                 }
@@ -437,7 +434,7 @@ function startAppEventsRealtime() {
                 ];
                 const needsRefresh = !skipRefreshTables.includes(data.table);
                 if (needsRefresh) {
-                    scheduleAppEventsRefresh();
+                    window.requestLegacyRealtimeRefresh?.(data);
                 }
             }
         )
@@ -467,103 +464,24 @@ function stopAppEventsRealtime() {
         appDebug('✅ Realtime subscription globale app fermata');
     }
 
-    if (appEventsRefreshTimeout) {
-        clearTimeout(appEventsRefreshTimeout);
-        appEventsRefreshTimeout = null;
-    }
-}
-
-let _appRefreshRunning = false;
-let _appRefreshQueued = false;
-
-function scheduleAppEventsRefresh() {
-    if (appEventsRefreshTimeout) {
-        clearTimeout(appEventsRefreshTimeout);
-    }
-    if (_appRefreshRunning) {
-        _appRefreshQueued = true;
-        return;
-    }
-    appEventsRefreshTimeout = setTimeout(() => {
-        refreshCurrentPageData();
-    }, 800);
-}
-
-async function refreshCurrentPageData() {
-    if (!AppState.isLoggedIn) return;
-    if (_appRefreshRunning) { _appRefreshQueued = true; return; }
-    _appRefreshRunning = true;
-    _appRefreshQueued = false;
-
-    if (_hpCalcState || (Date.now() - _hpCalcClosedAt < 2000)) { _appRefreshRunning = false; return; }
-
-    const page = AppState.currentPage;
-    try {
-        if (page === 'campagne' && AppState.currentUser?.uid) {
-            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
-        } else if (page === 'personaggi') {
-            await loadPersonaggi({ silent: true });
-        } else if (page === 'amici') {
-            await loadAmici({ silent: true });
-        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
-            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
-        } else if (page === 'sessione' && AppState.currentCampagnaId) {
-            if (window.currentTiroGenericoRichiestaId) {
-                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
-                if (sessione) {
-                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
-                }
-            } else {
-                await renderSessioneContent(AppState.currentCampagnaId);
-            }
-        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('combattimento');
-            }
-            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
-        } else if (page === 'scheda' && AppState.currentPersonaggioId) {
-            // Mantieni la tab attualmente visualizzata: senza questo
-            // controllo qualunque evento realtime (anche generato da un
-            // altro utente nella stessa campagna) riportava l'utente
-            // alla "Pagina 1" della scheda mentre stava navigando in
-            // Inventario / Incantesimi / Privilegi.
-            const tab = window._schedaCurrentTab;
-            const pgId = AppState.currentPersonaggioId;
-            if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') {
-                await schedaOpenInventoryPage(pgId);
-            } else if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
-                await schedaOpenSpellPage(pgId);
-            } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
-                await schedaOpenPrivilegesPage(pgId);
-            } else {
-                await renderSchedaPersonaggio(pgId);
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ Errore refresh pagina corrente:', error);
-    } finally {
-        _appRefreshRunning = false;
-        if (_appRefreshQueued) {
-            _appRefreshQueued = false;
-            scheduleAppEventsRefresh();
-        }
-    }
 }
 
 /**
  * Invia un broadcast globale per notificare cambiamenti app
  */
 async function sendAppEventBroadcast(change) {
-    window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
+    const timestamp = Date.now();
+    const payload = {
+        ...change,
+        eventId: window.crypto?.randomUUID?.() || `event-${timestamp}-${Math.random()}`,
+        sourceClientId: window.CompanionRealtimeBridge?.clientId || null,
+        sourceUid: AppState.currentUser?.uid || null,
+        timestamp
+    };
+    publishAppDataChange({ ...payload, sourceClientId: null });
 
     const supabase = getSupabaseClient();
     if (!supabase) return;
-
-    const payload = {
-        ...change,
-        sourceUid: AppState.currentUser?.uid || null,
-        ts: Date.now()
-    };
 
     if (appEventsChannel) {
         try {

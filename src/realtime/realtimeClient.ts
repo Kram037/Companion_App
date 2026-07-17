@@ -20,6 +20,7 @@ export interface RealtimeEventMeta {
   table: string;
   action: string;
   id?: string | number | null;
+  eventId?: string | null;
   sourceClientId?: string | null;
   timestamp?: number | string | null;
 }
@@ -41,11 +42,15 @@ export function setRealtimeNotifyHandler(handler: ((message: string) => void) | 
   notifyHandler = handler;
 }
 
-export function realtimeEventKey(event: RealtimeEventMeta): string {
-  return `${event.table}:${event.action}:${event.id ?? ''}`;
+export function realtimeEventKey(event: RealtimeDataChange): string {
+  if (event.eventId) return `event:${event.eventId}`;
+  const scope = [event.id, event.campagnaId, event.sessioneId, event.personaggioId, event.userId]
+    .filter(value => value != null && value !== '')
+    .join(':');
+  return `${event.table}:${event.action}:${scope}`;
 }
 
-export function shouldProcessRealtimeEvent(event: RealtimeEventMeta, now = Date.now()): boolean {
+export function shouldProcessRealtimeEvent(event: RealtimeDataChange, now = Date.now()): boolean {
   if (event.sourceClientId && event.sourceClientId === realtimeClientId) return false;
 
   const key = realtimeEventKey(event);
@@ -98,4 +103,10 @@ export function invalidateRealtimeEvent(event: RealtimeDataChange): void {
   for (const queryKey of realtimeQueryPrefixes(event)) {
     queryClient.invalidateQueries({ queryKey });
   }
+}
+
+export function processRealtimeEvent(event: RealtimeDataChange): boolean {
+  if (!event.table || !event.action || !shouldProcessRealtimeEvent(event)) return false;
+  invalidateRealtimeEvent(event);
+  return true;
 }

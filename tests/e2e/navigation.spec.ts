@@ -66,5 +66,5 @@ test('legacy changes notify the React query bridge', async ({ page }) => {
     void window.sendAppEventBroadcast?.({ table: 'campagne', action: 'update' });
   }));
 
-  expect(detail).toEqual({ table: 'campagne', action: 'update' });
+  expect(detail).toMatchObject({ table: 'campagne', action: 'update' });
 });

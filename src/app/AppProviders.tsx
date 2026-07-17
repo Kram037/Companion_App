@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { queryClient, queryKeys } from '../query';
-import { invalidateRealtimeEvent, type RealtimeDataChange } from '../realtime';
+import { processRealtimeEvent, type RealtimeDataChange } from '../realtime';
 import { subscribeToCurrentUser } from '../api/usersApi';
 
 interface AppProvidersProps {
@@ -15,7 +15,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   }), []);
 
   useEffect(() => {
-    const invalidate = (event: Event) => invalidateRealtimeEvent(
+    const invalidate = (event: Event) => processRealtimeEvent(
       (event as CustomEvent<RealtimeDataChange>).detail || { table: '', action: '' },
     );
     window.addEventListener('companion:data-changed', invalidate);

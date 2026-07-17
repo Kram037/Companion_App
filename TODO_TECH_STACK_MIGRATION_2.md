@@ -21,7 +21,7 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Inserire `tools/check-react-boundaries.mjs` nel target `check`.
 - [x] Tenere `tools/check-legacy-symbols.mjs` report-only nel check standard; la modalita manuale resta bloccante.
 - [x] Far fallire la build se Supabase torna caricato da CDN.
-- [ ] Far fallire la build se realtime legacy chiama render/load diretti.
+- [x] Far fallire la build se realtime legacy chiama render/load diretti.
 - [x] Far fallire la build se nuove pagine React aggiungono dipendenze da `window.*` non autorizzate.
 
 ## Priorita 2 - Supabase client unico
@@ -41,9 +41,9 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 4 - Realtime disciplinato
 
-- [ ] Sostituire in `js/Core/realtime.js` i render/load diretti con invalidazioni React Query.
-- [ ] Centralizzare deduplica eventi in `src/realtime/realtimeClient.ts`.
-- [ ] Verificare che realtime non chiuda modal, tendine o input attivi.
+- [x] Sostituire in `js/Core/realtime.js` i render/load diretti con invalidazioni React Query e un bridge legacy isolato.
+- [x] Centralizzare deduplica eventi in `src/realtime/realtimeClient.ts`.
+- [x] Verificare che realtime non chiuda modal, tendine o input attivi.
 - [ ] Coprire DM/player in due browser con Playwright quando la fixture Supabase e' pronta.
 
 ## Priorita 5 - Pagine React ancora dipendenti dal legacy

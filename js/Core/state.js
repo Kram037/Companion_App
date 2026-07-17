@@ -75,6 +75,7 @@ let elements = {};
     const deferredJobs = new Map();
     const runningJobs = new Map();
     const queuedJobs = new Map();
+    let legacyRealtimeRefreshTimeout = null;
 
     function activePageRoot() {
         return document.querySelector('.page.active') || document.body;
@@ -184,6 +185,60 @@ let elements = {};
     }
 
     window.isRealtimeUiRefreshBlocked = isUiRefreshBlocked;
+
+    async function refreshLegacyPageData() {
+        if (!AppState.isLoggedIn) return;
+        if (typeof _hpCalcState !== 'undefined' && _hpCalcState) return;
+        if (typeof _hpCalcClosedAt !== 'undefined' && Date.now() - _hpCalcClosedAt < 2000) return;
+
+        const page = AppState.currentPage;
+        if (page === 'campagne' && AppState.currentUser?.uid) {
+            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
+        } else if (page === 'personaggi') {
+            await loadPersonaggi({ silent: true });
+        } else if (page === 'amici') {
+            await loadAmici({ silent: true });
+        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
+            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
+        } else if (page === 'sessione' && AppState.currentCampagnaId) {
+            if (window.currentTiroGenericoRichiestaId) {
+                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
+                if (sessione) {
+                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
+                }
+            } else {
+                await renderSessioneContent(AppState.currentCampagnaId);
+            }
+        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+            if (typeof window.ensureRuntimeScript === 'function') {
+                await window.ensureRuntimeScript('combattimento');
+            }
+            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
+        } else if (page === 'scheda' && AppState.currentPersonaggioId) {
+            const tab = window._schedaCurrentTab;
+            const pgId = AppState.currentPersonaggioId;
+            if (tab === 'inventario' && typeof schedaOpenInventoryPage === 'function') {
+                await schedaOpenInventoryPage(pgId);
+            } else if (tab === 'incantesimi' && typeof schedaOpenSpellPage === 'function') {
+                await schedaOpenSpellPage(pgId);
+            } else if (tab === 'privilegi' && typeof schedaOpenPrivilegesPage === 'function') {
+                await schedaOpenPrivilegesPage(pgId);
+            } else {
+                await renderSchedaPersonaggio(pgId);
+            }
+        }
+    }
+
+    window.requestLegacyRealtimeRefresh = function() {
+        if (legacyRealtimeRefreshTimeout) clearTimeout(legacyRealtimeRefreshTimeout);
+        legacyRealtimeRefreshTimeout = setTimeout(() => {
+            legacyRealtimeRefreshTimeout = null;
+            runLatest('legacyRealtimeRefresh', refreshLegacyPageData, window, [], {
+                deferWhenBusy: true,
+                preserveUi: true
+            }).catch((error) => console.warn('[realtime-guard] refresh pagina fallito:', error));
+        }, 800);
+    };
 
     function compactArg(value) {
         if (value == null) return '';
@@ -310,7 +365,6 @@ let elements = {};
         patchOpenPageHelpers();
         patchEnsureRuntimeScript();
 
-        wrapWindowFunction('refreshCurrentPageData', { deferWhenBusy: true, preserveUi: true });
         wrapWindowFunction('loadCampagne', { deferWhenBusy: true, preserveUi: false });
         wrapWindowFunction('loadPersonaggi', { deferWhenBusy: true, preserveUi: false });
         wrapWindowFunction('loadAmici', { deferWhenBusy: true, preserveUi: false });

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyRealtimeAction,
+  processRealtimeEvent,
+  realtimeClientId,
   realtimeQueryPrefixes,
   realtimeEventKey,
   setRealtimeNotifyHandler,
@@ -11,6 +13,7 @@ import {
 describe('realtimeClient', () => {
   it('builds deterministic event keys', () => {
     expect(realtimeEventKey({ table: 'sessioni', action: 'update', id: 's1' })).toBe('sessioni:update:s1');
+    expect(realtimeEventKey({ table: 'sessioni', action: 'update', eventId: 'event-1' })).toBe('event:event-1');
   });
 
   it('deduplicates repeated events inside the dedupe window', () => {
@@ -19,6 +22,15 @@ describe('realtimeClient', () => {
     expect(shouldProcessRealtimeEvent(event, 10_000)).toBe(true);
     expect(shouldProcessRealtimeEvent(event, 10_500)).toBe(false);
     expect(shouldProcessRealtimeEvent(event, 13_500)).toBe(true);
+  });
+
+  it('ignores events echoed by the same browser client', () => {
+    expect(processRealtimeEvent({
+      table: 'sessioni',
+      action: 'update',
+      eventId: `own-${Date.now()}`,
+      sourceClientId: realtimeClientId,
+    })).toBe(false);
   });
 
   it('dispatches transient notifications through an injected handler', () => {

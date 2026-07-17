@@ -1,5 +1,6 @@
 import { mountReactBridge } from './app';
 import { initializeSupabaseClient } from './api/supabaseClient';
+import { realtimeClientId } from './realtime';
 import { legacyNavigationFromLocation, type LegacyNavigationSnapshot } from './router';
 
 declare global {
@@ -8,10 +9,12 @@ declare global {
       legacyNavigationFromLocation?: typeof legacyNavigationFromLocation;
       navigateToLegacy?: (snapshot: LegacyNavigationSnapshot) => boolean;
     };
+    CompanionRealtimeBridge?: { clientId: string };
   }
 }
 
 window.CompanionRouterBridge = { legacyNavigationFromLocation };
+window.CompanionRealtimeBridge = { clientId: realtimeClientId };
 initializeSupabaseClient();
 
 const normalizedEntryPath = window.location.pathname.replace(/\/index\.html(?=\/|$)/, '') || '/';

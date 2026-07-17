@@ -38,6 +38,25 @@ function collect(path) {
 
 for (const root of roots) collect(root);
 
+const realtimeLegacy = readFileSync('js/Core/realtime.js', 'utf8');
+const forbiddenRealtimeUiCalls = [
+  'loadAmici',
+  'loadCampagnaDetails',
+  'loadCampagne',
+  'loadPersonaggi',
+  'refreshCurrentPageData',
+  'renderCombattimentoContent',
+  'renderMicroScheda',
+  'renderSchedaPersonaggio',
+  'renderSessioneContent',
+];
+
+for (const name of forbiddenRealtimeUiCalls) {
+  if (new RegExp(`\\b${name}\\s*\\(`).test(realtimeLegacy)) {
+    errors.push(`js/Core/realtime.js: il trasporto realtime non deve chiamare ${name}`);
+  }
+}
+
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
   const rel = relative('.', file).replaceAll('\\', '/');
