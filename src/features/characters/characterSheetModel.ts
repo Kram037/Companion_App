@@ -110,6 +110,32 @@ export function modifier(score: number) { return Math.floor((score - 10) / 2); }
 export function signed(value: number) { return value >= 0 ? `+${value}` : String(value); }
 export function proficiency(level: number) { return Math.floor((Math.max(1, level) - 1) / 4) + 2; }
 
+export function factotumBonus(character: CharacterData) {
+  const classes = character.classi ?? [];
+  const bardLevel = classes
+    .filter(item => item.nome === 'Bardo' || item.nome === 'Bard')
+    .reduce((sum, item) => sum + (Number(item.livello) || 0), 0);
+  if (bardLevel < 2) return 0;
+  const totalLevel = classes.reduce((sum, item) => sum + (Number(item.livello) || 0), 0)
+    || Number(character.livello)
+    || 1;
+  return Math.floor(proficiency(totalLevel) / 2);
+}
+
+export function manualSaveBonus(character: CharacterData, ability: string) {
+  const raw = recordField(character, 'bonus_manuali').tiri_salvezza;
+  const saves = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+  return sumManualBonus(saves[ability]) + sumManualBonus(saves._all);
+}
+
+function sumManualBonus(value: unknown) {
+  const entries = Array.isArray(value) ? value : [value];
+  return entries.reduce<number>((sum, entry) => {
+    const raw = entry && typeof entry === 'object' ? (entry as Record<string, unknown>).valore : entry;
+    return sum + (Number.parseInt(String(raw ?? ''), 10) || 0);
+  }, 0);
+}
+
 export function classLine(character: CharacterData) {
   if (character.classi?.length) return character.classi.map(item => `${item.nome} ${item.livello || 1}`).join(' / ');
   return String(character.classe || '-');

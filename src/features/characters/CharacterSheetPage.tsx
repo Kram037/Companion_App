@@ -7,10 +7,11 @@ import { updateCharacterResistances } from '../../api';
 import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import { useCharacterSheetUiStore } from '../../store';
+import { normalizeImageUrl } from '../media/imageUrls';
 import { characterQuery } from './characterQueries';
 import {
-  ABILITIES, CONDITIONS, HIT_DICE, SKILLS, SPELL_ABILITIES, classLine, hpValues, inventoryMeta,
-  inventoryName, modifier, numberField, objectList, pageOneResourceTables, proficiency, raceLine, recordField, signed,
+  ABILITIES, CONDITIONS, HIT_DICE, SKILLS, SPELL_ABILITIES, classLine, factotumBonus, hpValues, inventoryMeta,
+  inventoryName, manualSaveBonus, modifier, numberField, objectList, pageOneResourceTables, proficiency, raceLine, recordField, signed,
   spellName, stringList, subclassAutoResistances, subclassLine, type CharacterData,
 } from './characterSheetModel';
 
@@ -91,9 +92,6 @@ declare global {
     privAddTab?: () => void;
     microOpenSlotConfig?: (id: string) => void;
     microSlotToggle?: (id: string, level: number, index: number) => void;
-    _normalizeImageUrl?: (url: string) => string;
-    _getFactotumBonus?: (character: CharacterData) => number;
-    _getSaveBonusFor?: (character: CharacterData, key: string) => number;
   }
 }
 
@@ -163,7 +161,7 @@ export function CharacterSheetPage() {
 
 function CharacterHeader({ character }: { character: CharacterData }) {
   const image = String(character.immagine_url || '');
-  const src = image ? window._normalizeImageUrl?.(image) ?? image : '';
+  const src = image ? normalizeImageUrl(image) ?? image : '';
   const initials = character.nome.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   const inspiration = numberField(character, 'ispirazione');
   return <div className="scheda-identity">
@@ -210,7 +208,7 @@ function Abilities({ character }: { character: CharacterData }) {
   return <Section id={`${character.id}:abilities`} title="Caratteristiche e Tiri Salvezza">
     <div className="scheda-abilities">{ABILITIES.map(ability => {
       const score = numberField(character, ability.key, 10);
-      const saveExtra = window._getSaveBonusFor?.(character, ability.key) ?? 0;
+      const saveExtra = manualSaveBonus(character, ability.key);
       const save = modifier(score) + (saves.includes(ability.key) ? prof : 0) + saveExtra;
       return <div className="scheda-ability" key={ability.key}>
         <div className="scheda-ability-label">{ability.label}</div>
@@ -229,7 +227,7 @@ function Skills({ character }: { character: CharacterData }) {
   const proficiencies = stringList(character, 'competenze_abilita');
   const expertise = stringList(character, 'maestrie_abilita');
   const prof = proficiency(character.livello || 1);
-  const factotum = window._getFactotumBonus?.(character) ?? 0;
+  const factotum = factotumBonus(character);
   const skillValue = (key: string, ability: string) => modifier(numberField(character, ability, 10)) + (proficiencies.includes(key) ? prof : 0) + (expertise.includes(key) ? prof : 0) + (!proficiencies.includes(key) && !expertise.includes(key) ? factotum : 0);
   const passive = 10 + skillValue('percezione', 'saggezza');
   return <Section id={`${character.id}:skills`} title="Abilita">

@@ -3,11 +3,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 
 import { ReactPage } from '../../app/ReactPage';
+import { combatLegacyAdapter } from '../../legacy/combatLegacyAdapter';
 import { queryKeys } from '../../query';
 import { buildAppPath } from '../../router';
 import type { CombatCharacter, MostroCombattimento } from '../../types/domain';
 import { currentUserQuery } from '../auth/currentUserQuery';
 import { campaignByIdQuery } from '../campaigns/campaignDetailQueries';
+import { normalizeImageUrl } from '../media/imageUrls';
 import { combatSnapshotQuery } from './combatQueries';
 import { sortInitiativeOrder } from './initiativeOrder';
 
@@ -25,22 +27,6 @@ type CombatEntry = {
   conditions: string[];
   monster?: MostroCombattimento;
 };
-
-declare global {
-  interface Window {
-    ensureRuntimeScript?: (key: string) => Promise<void>;
-    setCombatInitiativeOrder?: (order: CombatEntry[]) => void;
-    combatNextTurn?: (campagnaId: string, sessioneId: string, orderLength: number, round: number, turnIndex: number) => void;
-    combatOpenMonsterFullSheet?: (monsterId: string, campagnaId: string, sessioneId: string) => void;
-    openMonsterCreationModal?: (campagnaId: string, sessioneId: string) => void;
-    combatDiceRoll?: () => void;
-    combatCalcOpen?: () => void;
-    combatOpenTimerDialog?: (campagnaId: string, sessioneId: string, mode: 'dm' | 'player', personaggioId: string | null) => void;
-    terminaCombattimento?: (campagnaId: string, sessioneId: string) => void;
-    renderCombatTimers?: (sessioneId: string, isDm: boolean, personaggioId: string | null) => void;
-    _normalizeImageUrl?: (url: string) => string;
-  }
-}
 
 const CONDITION_LABELS: Record<string, string> = {
   concentrazione: 'Concentrazione', accecato: 'Accecato', affascinato: 'Affascinato', afferrato: 'Afferrato',
@@ -66,17 +52,12 @@ export function CombatPage() {
 
   useEffect(() => {
     let live = true;
-    window.ensureRuntimeScript?.('combattimento').then(() => { if (live) setLegacyReady(true); }).catch(console.error);
+    combatLegacyAdapter.prepare().then(ready => { if (live) setLegacyReady(ready); }).catch(console.error);
     return () => { live = false; };
   }, []);
 
   useEffect(() => {
-    const state = window.AppState as (typeof window.AppState & { currentPage?: string });
-    if (state) {
-      state.currentPage = 'combattimento';
-      state.currentCampagnaId = campagnaId;
-      state.currentSessioneId = sessioneId;
-    }
+    combatLegacyAdapter.setNavigation(campagnaId, sessioneId);
   }, [campagnaId, sessioneId]);
 
   useEffect(() => {
@@ -94,8 +75,8 @@ export function CombatPage() {
 
   useEffect(() => {
     if (!legacyReady) return;
-    window.setCombatInitiativeOrder?.(order);
-    window.renderCombatTimers?.(sessioneId, isDm, isDm ? null : currentCharacter?.id ?? null);
+    combatLegacyAdapter.setInitiativeOrder(order);
+    combatLegacyAdapter.renderTimers(sessioneId, isDm, isDm ? null : currentCharacter?.id ?? null);
   }, [currentCharacter?.id, isDm, legacyReady, order, sessioneId]);
 
   if (campaign.isLoading || combat.isLoading) return <ReactPage name="combattimento"><Placeholder text="Caricamento combattimento..." /></ReactPage>;
@@ -103,7 +84,7 @@ export function CombatPage() {
 
   const openEntry = (entry: CombatEntry) => {
     if (entry.type === 'monster') {
-      if (isDm) window.combatOpenMonsterFullSheet?.(entry.id, campagnaId, sessioneId);
+      if (isDm) combatLegacyAdapter.openMonster(entry.id, campagnaId, sessioneId);
       return;
     }
     if ((isDm || entry.playerUserId === user.data?.id) && entry.pgId) {
@@ -115,7 +96,7 @@ export function CombatPage() {
     <div className="combat-header">
       <button className="page-header-back combat-back" type="button" onClick={() => navigate(buildAppPath('sessione', { campagnaId }))} aria-label="Torna alla sessione"><Back /></button>
       <div className="combat-round-center"><div className="combat-round-num">Round {round}</div><div className="combat-turn-name">{order[turnIndex]?.name ?? 'In attesa...'}</div></div>
-      {isDm && order.length > 0 && <button className="combat-next-btn" type="button" disabled={!legacyReady} onClick={() => window.combatNextTurn?.(campagnaId, sessioneId, order.length, round, turnIndex)} title="Prossimo turno"><Next /></button>}
+      {isDm && order.length > 0 && <button className="combat-next-btn" type="button" disabled={!legacyReady} onClick={() => combatLegacyAdapter.nextTurn(campagnaId, sessioneId, order.length, round, turnIndex)} title="Prossimo turno"><Next /></button>}
     </div>
     <div className="combat-timers-panel" id="combatTimersPanel" style={{ display: 'none' }} />
     <div className="combat-body">
@@ -137,11 +118,11 @@ export function CombatPage() {
 
 function CombatToolbar({ ready, isDm, campagnaId, sessioneId, personaggioId }: { ready: boolean; isDm: boolean; campagnaId: string; sessioneId: string; personaggioId: string | null }) {
   return <div className="combat-toolbar">
-    {isDm && <ToolbarButton label="Mostro" title="Aggiungi mostro" disabled={!ready} onClick={() => window.openMonsterCreationModal?.(campagnaId, sessioneId)} icon={<Plus />} />}
-    <ToolbarButton label="Dadi" title="Tira dadi" disabled={!ready} onClick={() => window.combatDiceRoll?.()} icon={<Dice />} />
-    <ToolbarButton label="Calc" title="Calcolatrice" disabled={!ready} onClick={() => window.combatCalcOpen?.()} icon={<Calculator />} />
-    <ToolbarButton label="Timer" title="Timer combattimento" disabled={!ready || (!isDm && !personaggioId)} onClick={() => window.combatOpenTimerDialog?.(campagnaId, sessioneId, isDm ? 'dm' : 'player', personaggioId)} icon={<Clock />} />
-    {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={!ready} onClick={() => window.terminaCombattimento?.(campagnaId, sessioneId)} icon={<Close />} />}
+    {isDm && <ToolbarButton label="Mostro" title="Aggiungi mostro" disabled={!ready} onClick={() => combatLegacyAdapter.addMonster(campagnaId, sessioneId)} icon={<Plus />} />}
+    <ToolbarButton label="Dadi" title="Tira dadi" disabled={!ready} onClick={() => combatLegacyAdapter.rollDice()} icon={<Dice />} />
+    <ToolbarButton label="Calc" title="Calcolatrice" disabled={!ready} onClick={() => combatLegacyAdapter.openCalculator()} icon={<Calculator />} />
+    <ToolbarButton label="Timer" title="Timer combattimento" disabled={!ready || (!isDm && !personaggioId)} onClick={() => combatLegacyAdapter.openTimer(campagnaId, sessioneId, isDm ? 'dm' : 'player', personaggioId)} icon={<Clock />} />
+    {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={!ready} onClick={() => combatLegacyAdapter.end(campagnaId, sessioneId)} icon={<Close />} />}
   </div>;
 }
 
@@ -165,7 +146,7 @@ function monsterConditions(monster: MostroCombattimento) {
 }
 
 function canOpen(entry: CombatEntry, isDm: boolean, userId?: string) { return entry.type === 'monster' ? isDm : Boolean(entry.pgId && (isDm || entry.playerUserId === userId)); }
-function normalizeImage(url: string) { return window._normalizeImageUrl?.(url) ?? url; }
+function normalizeImage(url: string) { return normalizeImageUrl(url) ?? url; }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7 7-7-7 7-7" /></svg>; }
 function Next() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>; }

@@ -48,6 +48,8 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 5 - Pagine React ancora dipendenti dal legacy
 
+- [x] Estrarre in moduli TypeScript i calcoli puri condivisi da scheda e combattimento.
+- [x] Isolare i globali di combattimento in un adapter typed fuori dai componenti React.
 - [ ] Ridurre `CombatPage` a componenti React che chiamano API typed, non funzioni globali.
 - [ ] Ridurre `CharacterSheetPage` a modello React/Zustand, lasciando legacy solo come fallback.
 - [ ] Spostare modali e action handler piu usati fuori da `window.*`.

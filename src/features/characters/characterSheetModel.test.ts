@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classLine, hpValues, modifier, pageOneResourceTables, raceLine, subclassAutoResistances, subclassLine, type CharacterData } from './characterSheetModel';
+import { classLine, factotumBonus, hpValues, manualSaveBonus, modifier, pageOneResourceTables, raceLine, subclassAutoResistances, subclassLine, type CharacterData } from './characterSheetModel';
 
 const character = {
   id: 'pg-1', nome: 'Aldren', livello: 5, razza: 'Tiefling', sottorazza: 'Tiefling di Dispater',
@@ -42,5 +42,16 @@ describe('character sheet model', () => {
 
     expect(subclassAutoResistances(sorcerer)).toEqual(['psichico']);
     expect(subclassAutoResistances({ ...sorcerer, classi: [{ ...sorcerer.classi![0], livello: 5 }] })).toEqual([]);
+  });
+
+  it('computes legacy-compatible Factotum and manual save bonuses', () => {
+    const bard = {
+      ...character,
+      classi: [{ nome: 'Bardo', livello: 2 }, { nome: 'Guerriero', livello: 3 }],
+      bonus_manuali: { tiri_salvezza: { forza: [{ valore: 2 }, { valore: -1 }], _all: 1 } },
+    } as CharacterData;
+
+    expect(factotumBonus(bard)).toBe(1);
+    expect(manualSaveBonus(bard, 'forza')).toBe(2);
   });
 });

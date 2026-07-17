@@ -16,7 +16,6 @@ const legacyWindowAllowedFiles = new Set([
   'src/features/characters/CharacterCreationPage.tsx',
   'src/features/characters/CharacterSheetPage.tsx',
   'src/features/characters/CharactersPage.tsx',
-  'src/features/combat/CombatPage.tsx',
   'src/features/compendium/CompendiumPage.tsx',
   'src/features/compendium/compendiumQueries.ts',
   'src/features/friends/FriendsPage.tsx',
