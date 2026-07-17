@@ -77,9 +77,9 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Secondo batch: rimuovere alias storici e flussi UI gia' sostituiti (report da 29 a 3 simboli).
 - [x] Terzo batch: rimuovere la selezione inline e i renderer scheda combattimento sostituiti dalle full sheet correnti (report da 3 a 0 simboli).
 - [x] Risolvere o cancellare i simboli segnalati da `check-legacy-symbols`.
-- [ ] Rimuovere script legacy non piu caricati da `index.html`.
-- [ ] Tenere `LegacyFragment` solo per contenuti che non meritano ancora una conversione React.
-- [ ] Bloccare nuovi `innerHTML` fuori dai file legacy esplicitamente permessi.
+- [x] Verificare e bloccare script legacy non raggiungibili da `index.html` o dai loader lazy; l'audit non ha trovato file orfani.
+- [x] Tenere `LegacyFragment` solo per i contenuti HTML residui del Compendio e bloccarne nuovi usi.
+- [x] Bloccare nuovi `innerHTML` fuori dai file legacy esplicitamente permessi.
 
 ## Criterio di uscita
 

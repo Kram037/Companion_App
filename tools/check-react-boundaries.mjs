@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 
 const roots = ['src/app', 'src/components', 'src/features'];
 const files = [];
+const domFiles = [];
 const errors = [];
 const nativeWindowMembers = new Set([
   'addEventListener', 'clearInterval', 'clearTimeout', 'location', 'matchMedia',
@@ -21,6 +22,41 @@ const legacyWindowAllowedFiles = new Set([
   'src/features/friends/FriendsPage.tsx',
   'src/features/laboratory/LaboratoryPage.tsx',
 ]);
+const legacyFragmentAllowedFiles = new Set([
+  'src/components/LegacyFragment.tsx',
+  'src/features/compendium/CompendiumPage.tsx',
+]);
+const legacyInnerHtmlAllowedFiles = new Set([
+  'js/Campagna/campagne.js',
+  'js/Combattimento/combat.js',
+  'js/Compendio/compendio.js',
+  'js/Core/auth.js',
+  'js/Core/bookmarks.js',
+  'js/Core/init.js',
+  'js/Core/realtime.js',
+  'js/Core/utils.js',
+  'js/Laboratorio/laboratorio.js',
+  'js/Personaggi/personaggi-campagna-picker.js',
+  'js/Personaggi/personaggi-micro.js',
+  'js/Personaggi/personaggi-pf-max-modifiers.js',
+  'js/Personaggi/personaggi-razze-background.js',
+  'js/Personaggi/personaggi-scheda-abilita.js',
+  'js/Personaggi/personaggi-scheda-bonus.js',
+  'js/Personaggi/personaggi-scheda-calcolatori.js',
+  'js/Personaggi/personaggi-scheda-chrome.js',
+  'js/Personaggi/personaggi-scheda-editor.js',
+  'js/Personaggi/personaggi-scheda-equipaggiamento.js',
+  'js/Personaggi/personaggi-scheda-incantesimi.js',
+  'js/Personaggi/personaggi-scheda-inventario.js',
+  'js/Personaggi/personaggi-scheda-levelup-risorse.js',
+  'js/Personaggi/personaggi-scheda-linguaggi.js',
+  'js/Personaggi/personaggi-scheda-privilegi.js',
+  'js/Personaggi/personaggi-scheda-render.js',
+  'js/Personaggi/personaggi-talenti.js',
+  'js/Personaggi/personaggi-wizard-navigation.js',
+  'js/Sessioni/initiative.js',
+  'js/Sessioni/sessions.js',
+]);
 
 function collect(path) {
   try {
@@ -36,6 +72,17 @@ function collect(path) {
 }
 
 for (const root of roots) collect(root);
+
+function collectDomFiles(path) {
+  const stat = statSync(path);
+  if (stat.isDirectory()) {
+    for (const entry of readdirSync(path)) collectDomFiles(join(path, entry));
+  } else if (/\.(js|ts|tsx)$/.test(path)) {
+    domFiles.push(path);
+  }
+}
+
+for (const root of ['src', 'js']) collectDomFiles(root);
 
 const realtimeLegacy = readFileSync('js/Core/realtime.js', 'utf8');
 const forbiddenRealtimeUiCalls = [
@@ -60,8 +107,8 @@ for (const file of files) {
   const text = readFileSync(file, 'utf8');
   const rel = relative('.', file).replaceAll('\\', '/');
 
-  if (/\binnerHTML\b|dangerouslySetInnerHTML/.test(text)) {
-    errors.push(`${rel}: React UI non deve usare innerHTML/dangerouslySetInnerHTML`);
+  if (/\bLegacyFragment\b/.test(text) && !legacyFragmentAllowedFiles.has(rel)) {
+    errors.push(`${rel}: LegacyFragment e' autorizzato solo per i contenuti HTML residui del Compendio`);
   }
   if (/\bgetSupabaseClient\b|\bsupabase\s*\./.test(text)) {
     errors.push(`${rel}: React UI deve usare src/api, non Supabase diretto`);
@@ -72,6 +119,14 @@ for (const file of files) {
     .filter(name => !nativeWindowMembers.has(name));
   if (customWindowMembers.length && !legacyWindowAllowedFiles.has(rel)) {
     errors.push(`${rel}: nuovi globali legacy non autorizzati: ${[...new Set(customWindowMembers)].join(', ')}`);
+  }
+}
+
+for (const file of domFiles) {
+  const text = readFileSync(file, 'utf8');
+  const rel = relative('.', file).replaceAll('\\', '/');
+  if (/\binnerHTML\b|dangerouslySetInnerHTML/.test(text) && !legacyInnerHtmlAllowedFiles.has(rel)) {
+    errors.push(`${rel}: innerHTML/dangerouslySetInnerHTML non autorizzato`);
   }
 }
 
