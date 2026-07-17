@@ -89,8 +89,35 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 #variable_conflict use_column
+DECLARE
+    v_current_user_id VARCHAR(10);
+    v_id_dm VARCHAR(10);
+    v_giocatori VARCHAR(10)[];
 BEGIN
     IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
+    SELECT u.id INTO v_current_user_id
+    FROM utenti u
+    WHERE u.uid = auth.uid()::text;
+
+    IF v_current_user_id IS NULL THEN
+        RAISE EXCEPTION 'Utente non trovato';
+    END IF;
+
+    SELECT c.id_dm, COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[])
+    INTO v_id_dm, v_giocatori
+    FROM campagne c
+    WHERE c.id = p_campagna_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Campagna non trovata';
+    END IF;
+
+    IF v_current_user_id IS DISTINCT FROM p_user_id
+       AND v_current_user_id != v_id_dm
+       AND NOT (v_current_user_id = ANY(v_giocatori)) THEN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
@@ -128,6 +155,8 @@ AS $$
 #variable_conflict use_column
 DECLARE
     v_user_id VARCHAR(10);
+    v_id_dm VARCHAR(10);
+    v_giocatori VARCHAR(10)[];
 BEGIN
     IF auth.uid() IS NULL THEN
         RAISE EXCEPTION 'Non autorizzato';
@@ -136,6 +165,19 @@ BEGIN
     SELECT u.id INTO v_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'Utente non trovato';
+    END IF;
+
+    SELECT c.id_dm, COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[])
+    INTO v_id_dm, v_giocatori
+    FROM campagne c
+    WHERE c.id = p_campagna_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Campagna non trovata';
+    END IF;
+
+    IF v_user_id != v_id_dm AND NOT (v_user_id = ANY(v_giocatori)) THEN
+        RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
     RETURN QUERY
@@ -149,6 +191,10 @@ BEGIN
     WHERE pc.campagna_id = p_campagna_id;
 END;
 $$;
+
+REVOKE EXECUTE ON FUNCTION get_personaggi_utente() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION get_personaggi_utente() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;

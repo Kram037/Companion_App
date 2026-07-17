@@ -6,13 +6,14 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 0 - Sicurezza Supabase/RLS
 
-- [ ] Verificare tutte le funzioni `SECURITY DEFINER` in `backend/supabase/sql`.
-- [ ] Bloccare `update_dm_campagna` al solo DM corrente o a una policy amministrativa esplicita.
-- [ ] Vincolare `invia_invito_campagna` a `auth.uid() = p_inviante_id`.
-- [ ] Vincolare le RPC dei personaggi a proprietario, DM o membro autorizzato della campagna.
-- [ ] Sostituire policy `USING (true) WITH CHECK (true)` su `combat_timers` con scope per campagna/sessione.
-- [ ] Rivedere le policy homebrew pubbliche: distinguere privato, amici, campagna e pubblico.
-- [ ] Aggiungere una checklist SQL manuale per ogni migrazione RLS prima del deploy.
+- [x] Verificare tutte le funzioni `SECURITY DEFINER` in `backend/supabase/sql`.
+- [x] Bloccare `update_dm_campagna` al solo DM corrente o a una policy amministrativa esplicita.
+- [x] Vincolare `invia_invito_campagna` all'identita risolta da `auth.uid()`.
+- [x] Vincolare le RPC dei personaggi a proprietario, DM o membro autorizzato della campagna.
+- [x] Sostituire policy `USING (true) WITH CHECK (true)` su `combat_timers` con scope per campagna/sessione.
+- [x] Rivedere le policy homebrew pubbliche: distinguere privato, amici, campagna e pubblico.
+- [x] Aggiungere una checklist SQL manuale per ogni migrazione RLS prima del deploy.
+- [ ] Applicare e validare gli script RLS in staging e produzione seguendo `backend/supabase/RLS_DEPLOY_CHECKLIST.md`.
 
 ## Priorita 1 - Guardie nel check standard
 

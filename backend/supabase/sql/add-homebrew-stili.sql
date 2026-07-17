@@ -19,11 +19,11 @@ ALTER TABLE homebrew_stili ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS homebrew_stili_select ON homebrew_stili;
 DROP POLICY IF EXISTS homebrew_stili_select_all ON homebrew_stili;
-CREATE POLICY homebrew_stili_select_all
+CREATE POLICY homebrew_stili_select
     ON homebrew_stili
     FOR SELECT
     TO authenticated
-    USING (true);
+    USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS homebrew_stili_insert ON homebrew_stili;
 CREATE POLICY homebrew_stili_insert

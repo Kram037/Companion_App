@@ -36,8 +36,23 @@ DROP FUNCTION IF EXISTS rimuovi_giocatore_campagna(VARCHAR(10), VARCHAR(10)) CAS
 -- ============================================
 CREATE OR REPLACE FUNCTION get_current_user_id()
 RETURNS VARCHAR(10) AS $$
+DECLARE
+    v_current_user_id VARCHAR(10);
 BEGIN
-    RETURN (SELECT id FROM utenti WHERE uid = auth.uid()::text LIMIT 1);
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
+    SELECT u.id INTO v_current_user_id
+    FROM utenti u
+    WHERE u.uid = auth.uid()::text
+    LIMIT 1;
+
+    IF v_current_user_id IS NULL THEN
+        RAISE EXCEPTION 'Utente non trovato';
+    END IF;
+
+    RETURN v_current_user_id;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public;
 
@@ -122,6 +137,10 @@ RETURNS TABLE (
     cid INTEGER
 ) AS $$
 BEGIN
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
     RETURN QUERY
     SELECT u.id, u.nome_utente, u.cid
     FROM utenti u
@@ -216,8 +235,15 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
+    v_current_user_id VARCHAR(10);
     v_id_dm VARCHAR(10);
 BEGIN
+    v_current_user_id := get_current_user_id();
+
+    IF p_user_id IS DISTINCT FROM v_current_user_id THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
     SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id;
     IF v_id_dm IS NULL THEN
         RETURN FALSE;
@@ -393,8 +419,15 @@ SET search_path = public
 AS $$
 DECLARE
     v_invito_id VARCHAR(10);
+    v_current_user_id VARCHAR(10);
     v_id_dm VARCHAR(10);
 BEGIN
+    v_current_user_id := get_current_user_id();
+
+    IF v_current_user_id IS DISTINCT FROM p_inviante_id THEN
+        RAISE EXCEPTION 'Non autorizzato';
+    END IF;
+
     SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id;
     IF v_id_dm IS NULL OR v_id_dm != p_inviante_id THEN
         RAISE EXCEPTION 'Solo il DM può invitare giocatori';
@@ -493,6 +526,22 @@ $$;
 -- ============================================
 -- STEP 7: GRANT permissions
 -- ============================================
+REVOKE EXECUTE ON FUNCTION get_current_user_id() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_richieste_in_entrata() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_richieste_in_uscita() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_amici() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION search_user_by_name_and_cid(TEXT, INTEGER) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_dm_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_dms_campagne(VARCHAR(10)[]) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION check_dm_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_giocatori_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_inviti_ricevuti(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION invia_invito_campagna(VARCHAR(10), VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION accetta_invito_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION rifiuta_invito_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION rimuovi_giocatore_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_tiri_iniziativa(VARCHAR(10)) FROM PUBLIC;
+
 GRANT EXECUTE ON FUNCTION get_current_user_id() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_richieste_in_entrata() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_richieste_in_uscita() TO authenticated;

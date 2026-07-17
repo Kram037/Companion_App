@@ -48,12 +48,139 @@ CREATE INDEX IF NOT EXISTS idx_combat_timers_sessione
 CREATE INDEX IF NOT EXISTS idx_combat_timers_target
     ON combat_timers(target_kind, target_id);
 
--- RLS: per ora consentiamo accesso completo agli utenti autenticati
--- (la logica di "chi vede cosa" e' gestita lato app: il DM vede tutto,
--- il player vede solo i timer del proprio personaggio + i global).
+-- RLS: tutti i membri leggono i timer della propria campagna. Il DM gestisce
+-- tutto; un giocatore puo creare e gestire solo timer del proprio personaggio.
 ALTER TABLE combat_timers ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS combat_timers_all ON combat_timers;
-CREATE POLICY combat_timers_all ON combat_timers
-    FOR ALL TO authenticated
-    USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS combat_timers_select ON combat_timers;
+DROP POLICY IF EXISTS combat_timers_insert ON combat_timers;
+DROP POLICY IF EXISTS combat_timers_update ON combat_timers;
+DROP POLICY IF EXISTS combat_timers_delete ON combat_timers;
+
+CREATE POLICY combat_timers_select ON combat_timers
+    FOR SELECT TO authenticated
+    USING (
+        EXISTS (
+            SELECT 1
+            FROM sessioni s
+            JOIN campagne c ON c.id = s.campagna_id
+            JOIN utenti u ON u.uid::text = auth.uid()::text
+            WHERE s.id = combat_timers.sessione_id
+              AND s.campagna_id = combat_timers.campagna_id
+              AND (
+                  c.id_dm = u.id
+                  OR u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+              )
+        )
+    );
+
+CREATE POLICY combat_timers_insert ON combat_timers
+    FOR INSERT TO authenticated
+    WITH CHECK (
+        EXISTS (
+            SELECT 1
+            FROM sessioni s
+            JOIN campagne c ON c.id = s.campagna_id
+            JOIN utenti u ON u.uid::text = auth.uid()::text
+            WHERE s.id = combat_timers.sessione_id
+              AND s.campagna_id = combat_timers.campagna_id
+              AND combat_timers.created_by = u.id
+              AND (
+                  c.id_dm = u.id
+                  OR (
+                      u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                      AND combat_timers.created_by = u.id
+                      AND combat_timers.target_kind = 'player'
+                      AND EXISTS (
+                          SELECT 1
+                          FROM personaggi_campagna pc
+                          WHERE pc.campagna_id = c.id
+                            AND pc.user_id = u.id
+                            AND pc.personaggio_id = combat_timers.target_id
+                      )
+                  )
+              )
+        )
+    );
+
+CREATE POLICY combat_timers_update ON combat_timers
+    FOR UPDATE TO authenticated
+    USING (
+        EXISTS (
+            SELECT 1
+            FROM sessioni s
+            JOIN campagne c ON c.id = s.campagna_id
+            JOIN utenti u ON u.uid::text = auth.uid()::text
+            WHERE s.id = combat_timers.sessione_id
+              AND s.campagna_id = combat_timers.campagna_id
+              AND (
+                  c.id_dm = u.id
+                  OR (
+                      u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                      AND combat_timers.created_by = u.id
+                      AND combat_timers.target_kind = 'player'
+                      AND EXISTS (
+                          SELECT 1
+                          FROM personaggi_campagna pc
+                          WHERE pc.campagna_id = c.id
+                            AND pc.user_id = u.id
+                            AND pc.personaggio_id = combat_timers.target_id
+                      )
+                  )
+              )
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1
+            FROM sessioni s
+            JOIN campagne c ON c.id = s.campagna_id
+            JOIN utenti u ON u.uid::text = auth.uid()::text
+            WHERE s.id = combat_timers.sessione_id
+              AND s.campagna_id = combat_timers.campagna_id
+              AND (
+                  c.id_dm = u.id
+                  OR (
+                      u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                      AND combat_timers.created_by = u.id
+                      AND combat_timers.target_kind = 'player'
+                      AND EXISTS (
+                          SELECT 1
+                          FROM personaggi_campagna pc
+                          WHERE pc.campagna_id = c.id
+                            AND pc.user_id = u.id
+                            AND pc.personaggio_id = combat_timers.target_id
+                      )
+                  )
+              )
+        )
+    );
+
+CREATE POLICY combat_timers_delete ON combat_timers
+    FOR DELETE TO authenticated
+    USING (
+        EXISTS (
+            SELECT 1
+            FROM sessioni s
+            JOIN campagne c ON c.id = s.campagna_id
+            JOIN utenti u ON u.uid::text = auth.uid()::text
+            WHERE s.id = combat_timers.sessione_id
+              AND s.campagna_id = combat_timers.campagna_id
+              AND (
+                  c.id_dm = u.id
+                  OR (
+                      u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                      AND combat_timers.created_by = u.id
+                      AND combat_timers.target_kind = 'player'
+                      AND EXISTS (
+                          SELECT 1
+                          FROM personaggi_campagna pc
+                          WHERE pc.campagna_id = c.id
+                            AND pc.user_id = u.id
+                            AND pc.personaggio_id = combat_timers.target_id
+                      )
+                  )
+              )
+        )
+    );

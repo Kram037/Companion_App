@@ -19,11 +19,11 @@ ALTER TABLE homebrew_suppliche ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS homebrew_suppliche_select ON homebrew_suppliche;
 DROP POLICY IF EXISTS homebrew_suppliche_select_all ON homebrew_suppliche;
-CREATE POLICY homebrew_suppliche_select_all
+CREATE POLICY homebrew_suppliche_select
     ON homebrew_suppliche
     FOR SELECT
     TO authenticated
-    USING (true);
+    USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS homebrew_suppliche_insert ON homebrew_suppliche;
 CREATE POLICY homebrew_suppliche_insert

@@ -33,7 +33,7 @@
     "check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run typecheck && node tools/check-js.mjs && node tools/check-data-boundary.mjs"
+        "command": "npm run typecheck && node tools/check-js.mjs && node tools/check-data-boundary.mjs && node tools/check-supabase-security.mjs"
       }
     },
     "test": {
