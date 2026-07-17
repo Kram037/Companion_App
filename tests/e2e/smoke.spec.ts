@@ -117,6 +117,7 @@ test('desktop split panes divide the workspace in half', async ({ page }) => {
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
+  await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#diceSidebarToggle')).toHaveCount(0);
   await expect(page.locator('.desktop-bookmark-tab').first()).toHaveAttribute('draggable', 'true');
 
   await expect.poll(() => page.evaluate(() => {
@@ -186,12 +187,13 @@ test('desktop sidebar scroll is confined between chrome dividers', async ({ page
   expect(metrics.bottomGap).toBeGreaterThanOrEqual(60);
 });
 
-test('desktop dice roller opens from the sidebar handle', async ({ page }) => {
+test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await waitForStartup(page);
 
-  await page.locator('#diceSidebarToggle').click();
+  await expect(page.locator('#diceSidebarToggle')).toHaveCount(0);
+  await page.locator('#d20Logo').dispatchEvent('click');
   await expect(page.locator('body')).toHaveClass(/dice-desktop-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
 
@@ -211,16 +213,26 @@ test('desktop dice roller opens from the sidebar handle', async ({ page }) => {
   })).toBeLessThan(2);
 });
 
-test('mobile dice button opens the dice roller', async ({ page }) => {
+test('mobile d20 logo opens a fullscreen dice roller', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await waitForStartup(page);
 
-  await expect(page.locator('#diceSidebarToggle')).toBeVisible();
-  await page.locator('#diceSidebarToggle').click();
+  await expect(page.locator('#diceSidebarToggle')).toHaveCount(0);
+  await page.locator('#d20Logo').dispatchEvent('click');
 
   await expect(page.locator('body')).toHaveClass(/dice-mobile-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
+  await expect(page.locator('#diceRollerPanel .dice-roller-head')).toBeHidden();
+  await expect(page.locator('.bottom-toolbar')).toBeHidden();
+  await expect(page.locator('#campagnePage .btn-fab')).toBeHidden();
+  await expect(page.locator('.bookmarks-fab')).toBeHidden();
+  await expect.poll(() => page.locator('.dice-type-row').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(6);
+  await expect.poll(() => page.locator('#diceRollerPanel').evaluate(panel => {
+    const panelRect = panel.getBoundingClientRect();
+    const rollRect = document.querySelector('[data-dice-roll]')!.getBoundingClientRect();
+    return Math.max(panelRect.bottom, rollRect.bottom) - window.innerHeight;
+  })).toBeLessThanOrEqual(0);
 });
 
 test('desktop character sheet toolbar is centered in the content area', async ({ page }) => {

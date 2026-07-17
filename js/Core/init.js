@@ -702,7 +702,16 @@ function setupEventListeners() {
         elements.d20Logo.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (typeof openDiceRoller === 'function') openDiceRoller();
+            if (typeof toggleDiceRoller === 'function') toggleDiceRoller();
+            else if (typeof openDiceRoller === 'function') openDiceRoller();
+            else rollD20();
+        });
+        elements.d20Logo.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof toggleDiceRoller === 'function') toggleDiceRoller();
+            else if (typeof openDiceRoller === 'function') openDiceRoller();
             else rollD20();
         });
     }

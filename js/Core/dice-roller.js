@@ -2,10 +2,7 @@
     const DICE_TYPES = [4, 6, 8, 10, 12, 20];
     const state = {
         dice: [{ sides: 20, value: 1 }],
-        modifier: 0,
-        dragging: false,
-        startX: 0,
-        startY: 0
+        modifier: 0
     };
 
     function isDesktop() {
@@ -30,22 +27,6 @@
             panel.addEventListener('click', onPanelClick);
             panel.addEventListener('change', onPanelChange);
             document.body.appendChild(panel);
-        }
-
-        if (!document.getElementById('diceSidebarToggle')) {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.id = 'diceSidebarToggle';
-            button.className = 'dice-sidebar-toggle';
-            button.setAttribute('aria-label', 'Apri tira dadi');
-            button.title = 'Tira dadi';
-            setSafeHtml(button, '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>');
-            button.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                toggleDiceRoller();
-            });
-            document.body.appendChild(button);
         }
 
         state.dice.forEach(die => {
@@ -157,53 +138,6 @@
         }
     }
 
-    function bindMobileLogoDrag() {
-        const logo = document.getElementById('d20Logo');
-        if (!logo || logo.dataset.diceDragBound === '1') return;
-        logo.dataset.diceDragBound = '1';
-
-        const beginDrag = (clientX, clientY) => {
-            if (isDesktop()) return;
-            state.dragging = true;
-            state.startX = clientX;
-            state.startY = clientY;
-        };
-
-        const moveDrag = (clientX, clientY) => {
-            if (!state.dragging || isDesktop()) return;
-            const dx = Math.abs(clientX - state.startX);
-            const dy = clientY - state.startY;
-            if (dy > 46 && dx < 90) {
-                state.dragging = false;
-                openDiceRoller();
-            }
-        };
-
-        logo.addEventListener('pointerdown', (event) => {
-            beginDrag(event.clientX, event.clientY);
-        }, { passive: true });
-
-        logo.addEventListener('pointermove', (event) => {
-            moveDrag(event.clientX, event.clientY);
-        }, { passive: true });
-
-        logo.addEventListener('pointerup', () => { state.dragging = false; }, { passive: true });
-        logo.addEventListener('pointercancel', () => { state.dragging = false; }, { passive: true });
-
-        logo.addEventListener('touchstart', (event) => {
-            const touch = event.touches[0];
-            if (touch) beginDrag(touch.clientX, touch.clientY);
-        }, { passive: true });
-
-        logo.addEventListener('touchmove', (event) => {
-            const touch = event.touches[0];
-            if (touch) moveDrag(touch.clientX, touch.clientY);
-        }, { passive: true });
-
-        logo.addEventListener('touchend', () => { state.dragging = false; }, { passive: true });
-        logo.addEventListener('touchcancel', () => { state.dragging = false; }, { passive: true });
-    }
-
     window.openDiceRoller = openDiceRoller;
     window.closeDiceRoller = closeDiceRoller;
     window.toggleDiceRoller = toggleDiceRoller;
@@ -211,10 +145,8 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             ensureDiceRoller();
-            bindMobileLogoDrag();
         });
     } else {
         ensureDiceRoller();
-        bindMobileLogoDrag();
     }
 })();

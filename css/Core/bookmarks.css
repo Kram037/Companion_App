@@ -471,7 +471,8 @@ body.bookmarks-over-scheda-tabs .bookmarks-tabs-fab {
         height: 17px;
         flex: 0 0 17px;
         object-fit: contain;
-        filter: brightness(1.45) sepia(0.5) saturate(1.25) drop-shadow(0 0 6px rgba(198, 154, 74, 0.18));
+        opacity: 0.95;
+        filter: brightness(0) saturate(100%) invert(76%) sepia(42%) saturate(643%) hue-rotate(358deg) brightness(94%) contrast(91%) drop-shadow(0 0 6px rgba(198, 154, 74, 0.18));
     }
 
     .desktop-sidebar-child span {

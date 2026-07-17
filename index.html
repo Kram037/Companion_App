@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="css/Core/base.css?v=20260717A">
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
-    <link rel="stylesheet" href="css/Core/bookmarks.css?v=20260718A">
+    <link rel="stylesheet" href="css/Core/bookmarks.css?v=20260718B">
     <link rel="stylesheet" href="css/Campagna/campagne.css?v=20260517A">
     <link rel="stylesheet" href="css/Personaggi/personaggi.css?v=20260624A">
     <link rel="stylesheet" href="css/Sessioni/sessions.css?v=20260424G">
@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="css/Laboratorio/laboratorio.css?v=20260625C">
     <link rel="stylesheet" href="css/Compendio/compendio.css?v=20260625C">
     <link rel="stylesheet" href="css/Core/fantasy.css?v=20260715D">
-    <link rel="stylesheet" href="css/Core/dice-roller.css?v=20260718B">
+    <link rel="stylesheet" href="css/Core/dice-roller.css?v=20260718C">
 </head>
 <body>
     <div class="startup-screen" id="appStartup">
@@ -51,7 +51,7 @@
         </button>
 
         <div class="logo-container">
-            <div class="d20-logo" id="d20Logo">
+            <div class="d20-logo" id="d20Logo" role="button" tabindex="0" aria-label="Apri tira dadi">
                 <img src="images/icon d20.png" alt="D20 Logo" class="d20-icon">
                 <div class="d20-roll-number" id="d20RollNumber"></div>
             </div>
@@ -1072,8 +1072,8 @@
     <script src="js/Core/theme.js?v=1767900400"></script>
     <script src="js/Core/data-loader.js?v=20260715A"></script>
     <script src="js/Core/navigation.js?v=20260717C"></script>
-    <script src="js/Core/bookmarks.js?v=20260718A"></script>
-    <script src="js/Core/dice-roller.js?v=20260718B"></script>
+    <script src="js/Core/bookmarks.js?v=20260718B"></script>
+    <script src="js/Core/dice-roller.js?v=20260718C"></script>
     <script src="js/Core/auth.js?v=20260717C"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
@@ -1114,7 +1114,7 @@
     <script src="js/Sessioni/sessions.js?v=20260715A"></script>
     <script src="js/Core/realtime.js?v=20260717A"></script>
     <script src="js/Sessioni/initiative.js?v=20260425E"></script>
-    <script src="js/Core/init.js?v=20260717E"></script>
+    <script src="js/Core/init.js?v=20260718A"></script>
 
     <!-- Cache busting script for development -->
     <script>

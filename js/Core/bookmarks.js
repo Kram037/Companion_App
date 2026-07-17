@@ -10,6 +10,7 @@ let _bookmarkRestoreInProgress = false;
 let _bookmarkSplitLocalActiveId = '';
 let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '' };
+let _desktopPendingSidebarTarget = null;
 const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
 const DESKTOP_LAB_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
@@ -952,11 +953,19 @@ function _routeDesktopSidebarTarget(page, tab = '') {
         return;
     }
     _bookmarkSetFocusedPane('left');
+    _desktopPendingSidebarTarget = { page, tab };
+    updateDesktopSidebarActive();
     captureActiveBookmark({ silent: true });
-    _openDesktopSidebarTarget(page, tab);
+    _openDesktopSidebarTarget(page, tab).catch(error => {
+        console.warn('[bookmarks] navigazione sidebar fallita:', error);
+    }).finally(() => {
+        _desktopPendingSidebarTarget = null;
+        updateDesktopSidebarActive();
+    });
 }
 
 function _desktopActiveChild(page) {
+    if (_desktopPendingSidebarTarget?.page === page) return _desktopPendingSidebarTarget.tab || '';
     if (!_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right') {
         return _bookmarkRightPaneState.page === page ? (_bookmarkRightPaneState.tab || '') : '';
     }
@@ -970,6 +979,7 @@ function _desktopActiveChild(page) {
 }
 
 function _desktopSidebarFocusedPage() {
+    if (_desktopPendingSidebarTarget?.page) return _desktopPendingSidebarTarget.page;
     return !_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right'
         ? (_bookmarkRightPaneState.page || '')
         : AppState.currentPage;
