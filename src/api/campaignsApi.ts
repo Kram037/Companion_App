@@ -144,7 +144,7 @@ export async function fetchReceivedCampaignInvites(userTableId: Id): Promise<Cam
   const { data, error } = await getSupabaseClient()
     .rpc('get_inviti_ricevuti', { p_invitato_id: userTableId });
   throwIfSupabaseError(error);
-  return (data ?? []).map(row => mapReceivedCampaignInviteRow(row as Record<string, unknown>));
+  return (data ?? []).map((row: Record<string, unknown>) => mapReceivedCampaignInviteRow(row));
 }
 
 export async function updateCampaignInviteStatus(inviteId: Id, status: 'accepted' | 'rejected'): Promise<void> {

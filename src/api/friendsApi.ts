@@ -31,12 +31,12 @@ export async function fetchFriendsSnapshot(): Promise<FriendsSnapshot> {
   throwIfSupabaseError(outgoing.error);
 
   return {
-    friends: (friends.data ?? []).map(row => ({
+    friends: (friends.data ?? []).map((row: Record<string, unknown>) => ({
       id: String(row.amico_id),
       name: String(row.nome_utente || 'Utente'),
       cid: String(row.cid ?? ''),
     })),
-    incoming: (incoming.data ?? []).map(row => ({
+    incoming: (incoming.data ?? []).map((row: Record<string, unknown>) => ({
       id: String(row.richiesta_id),
       user: {
         id: String(row.richiedente_id),
@@ -44,7 +44,7 @@ export async function fetchFriendsSnapshot(): Promise<FriendsSnapshot> {
         cid: String(row.cid ?? ''),
       },
     })),
-    outgoing: (outgoing.data ?? []).map(row => ({
+    outgoing: (outgoing.data ?? []).map((row: Record<string, unknown>) => ({
       id: String(row.richiesta_id),
       user: {
         id: String(row.destinatario_id),

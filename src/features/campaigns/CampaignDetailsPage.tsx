@@ -42,7 +42,7 @@ export function CampaignDetailsPage() {
       client.setQueryData(queryKeys.session(campagnaId), started);
       client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
       window.setAppNavigationState?.({ campagnaId, sessioneId: started.id }, 'react-start-session');
-      window.AppState.activeSessionCampagnaId = campagnaId;
+      if (window.AppState) window.AppState.activeSessionCampagnaId = campagnaId;
       sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
       window.sendAppEventBroadcast?.({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: started.id });
       navigate(buildAppPath('sessione', { campagnaId }));

@@ -65,7 +65,7 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 7 - TypeScript, Zod e API
 
-- [ ] Portare `strict` a `true` per i nuovi moduli `src/`.
+- [x] Portare `strict` a `true` per tutti i moduli TypeScript in `src/`.
 - [ ] Ridurre `.passthrough()` negli schema Zod dove il dominio e' stabile.
 - [ ] Sostituire `select('*')` con colonne esplicite nelle API typed.
 - [ ] Aggiungere fallback solo dove esiste una migrazione DB non ancora garantita.
