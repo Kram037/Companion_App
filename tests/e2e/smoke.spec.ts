@@ -1,4 +1,8 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+async function waitForStartup(page: Page) {
+  await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
+}
 
 test('loads the legacy app shell', async ({ page }) => {
   await page.goto('/');
@@ -14,12 +18,15 @@ test('shows and closes the startup screen', async ({ page }) => {
 
   const startup = page.locator('#appStartup');
   await expect(startup).toBeVisible();
-  await expect(startup).toBeHidden({ timeout: 3000 });
+  await expect(startup).toBeHidden({ timeout: 8000 });
+  await expect(page.locator('#compendioHub .comp-hub-card')).toHaveCount(8);
+  await expect(page.locator('#labHub .lab-hub-card')).toHaveCount(8);
 });
 
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
+  await waitForStartup(page);
 
   await page.locator('.toolbar-btn[data-page="personaggi"]').click();
   await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
@@ -35,6 +42,7 @@ test('navigates through the main mobile toolbar', async ({ page }) => {
 
 test('opens the native PWA prompt from the install button', async ({ page }) => {
   await page.goto('/');
+  await waitForStartup(page);
   await page.evaluate(() => {
     const app = window as typeof window & { __installPrompted?: boolean };
     const event = new Event('beforeinstallprompt', { cancelable: true }) as Event & {
@@ -105,6 +113,7 @@ test('service worker installs and precaches the hashed Vite entrypoint', async (
 test('desktop split panes divide the workspace in half', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  await waitForStartup(page);
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
@@ -120,6 +129,7 @@ test('desktop split panes divide the workspace in half', async ({ page }) => {
 test('closing the only right split tab closes the split pane', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  await waitForStartup(page);
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
@@ -130,6 +140,7 @@ test('closing the only right split tab closes the split pane', async ({ page }) 
 test('desktop compendium sidebar opens equipment sections directly', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  await waitForStartup(page);
 
   await page.locator('.desktop-sidebar-group-toggle[data-page="compendio"]').click();
   const compendioSidebar = page.locator('.desktop-sidebar-group[data-page="compendio"]');
@@ -179,6 +190,7 @@ test('desktop character sheet toolbar is centered in the content area', async ({
 test('desktop split panes can use two columns on wide screens', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1000 });
   await page.goto('/');
+  await waitForStartup(page);
 
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();

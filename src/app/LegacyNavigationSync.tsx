@@ -54,6 +54,33 @@ function installNavigateToPageBridge() {
   return true;
 }
 
+function syncLegacyDomToPath(pathname: string) {
+  if (window.location.pathname !== pathname) return;
+  const navigation = legacyNavigationFromPath(pathname);
+  if (!navigation) return;
+  const page = navigation.page ?? 'campagne';
+  const current = window.AppState;
+  const targetPage = document.getElementById(`${page}Page`);
+  const isLegacyPageActive = targetPage?.classList.contains('active') ?? false;
+  const changed = current?.currentPage !== page
+    || (current?.currentCampagnaId ?? null) !== (navigation.campagnaId ?? null)
+    || (current?.currentSessioneId ?? null) !== (navigation.sessioneId ?? null)
+    || (current?.currentPersonaggioId ?? null) !== (navigation.personaggioId ?? null);
+
+  document.body.dataset.reactPage = page;
+
+  window.setAppNavigationState?.({
+    page,
+    campagnaId: navigation.campagnaId ?? null,
+    sessioneId: navigation.sessioneId ?? null,
+    personaggioId: navigation.personaggioId ?? null,
+  }, 'react-router');
+  if (window.navigateToPage && (changed || !isLegacyPageActive)) {
+    window.navigateToPage(page, { pushHistory: false });
+  }
+  else window.updateBookmarkChrome?.();
+}
+
 export function LegacyNavigationSync() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -84,25 +111,14 @@ export function LegacyNavigationSync() {
   }, []);
 
   useEffect(() => {
-    const navigation = legacyNavigationFromPath(pathname);
-    if (!navigation) return;
-    document.body.dataset.reactPage = navigation.page ?? 'campagne';
-
-    const current = window.AppState;
-    const changed = current?.currentPage !== navigation.page
-      || (current?.currentCampagnaId ?? null) !== (navigation.campagnaId ?? null)
-      || (current?.currentSessioneId ?? null) !== (navigation.sessioneId ?? null)
-      || (current?.currentPersonaggioId ?? null) !== (navigation.personaggioId ?? null);
-
-    window.setAppNavigationState?.({
-      page: navigation.page ?? 'campagne',
-      campagnaId: navigation.campagnaId ?? null,
-      sessioneId: navigation.sessioneId ?? null,
-      personaggioId: navigation.personaggioId ?? null,
-    }, 'react-router');
-    if (changed) window.navigateToPage?.(navigation.page ?? 'campagne', { pushHistory: false });
-    else window.updateBookmarkChrome?.();
+    syncLegacyDomToPath(pathname);
   }, [pathname]);
+
+  useEffect(() => {
+    const handlePopState = () => syncLegacyDomToPath(window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   return null;
 }

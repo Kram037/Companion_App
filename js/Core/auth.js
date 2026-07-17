@@ -15,6 +15,7 @@ function setupSupabaseAuth() {
         let _authInitDone = false;
         supabase.auth.onAuthStateChange((event, session) => {
             appDebug('Auth state changed:', event, session?.user?.email || 'null');
+            if (event === 'INITIAL_SESSION') return;
 
             if (session?.user) {
                 const alreadyLoggedSameUser = AppState.isLoggedIn && AppState.currentUser?.uid === session.user.id;
@@ -30,7 +31,7 @@ function setupSupabaseAuth() {
                 if (alreadyLoggedSameUser && _authInitDone && event === 'TOKEN_REFRESHED') return;
                 _authInitDone = true;
 
-                initializeUserDocument(session.user).then(() => {
+                initializeUserDocument(session.user).then(async () => {
                     loadRazzeBackground();
                     loadHomebrewSottoclassi();
                     loadHomebrewOggetti();
@@ -42,18 +43,18 @@ function setupSupabaseAuth() {
                         updateUIForLoggedIn();
                     }
                     if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
-                        navigateToPage('scheda');
+                        await navigateToPage('scheda');
                     } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-                        navigateToPage('combattimento');
+                        await navigateToPage('combattimento');
                     } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
-                        navigateToPage('sessione');
-                        renderSessioneContent(AppState.currentCampagnaId);
+                        await navigateToPage('sessione');
+                        await renderSessioneContent(AppState.currentCampagnaId);
                     } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
-                        navigateToPage('dettagli');
+                        await navigateToPage('dettagli');
                     } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
-                        navigateToPage('dettagli');
+                        await navigateToPage('dettagli');
                     } else {
-                        navigateToPage(AppState.currentPage || 'campagne');
+                        await navigateToPage(AppState.currentPage || 'campagne');
                     }
 
                     startRollRequestsRealtime();
@@ -656,18 +657,18 @@ async function checkAuthState() {
             updateUIForLoggedIn();
 
             if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
-                navigateToPage('scheda');
+                await navigateToPage('scheda');
             } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-                navigateToPage('combattimento');
+                await navigateToPage('combattimento');
             } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
-                navigateToPage('sessione');
-                renderSessioneContent(AppState.currentCampagnaId);
+                await navigateToPage('sessione');
+                await renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
-                navigateToPage('dettagli');
+                await navigateToPage('dettagli');
             } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
-                navigateToPage('dettagli');
+                await navigateToPage('dettagli');
             } else {
-                navigateToPage(AppState.currentPage || 'campagne');
+                await navigateToPage(AppState.currentPage || 'campagne');
             }
 
             startRollRequestsRealtime();

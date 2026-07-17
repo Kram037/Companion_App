@@ -23,6 +23,56 @@ function completeStartupScreen() {
     }, delay);
 }
 
+async function waitForStartupImages(selector) {
+    const urls = Array.from(document.querySelectorAll(`${selector} img`))
+        .map(img => img.currentSrc || img.src)
+        .filter(Boolean);
+    await Promise.allSettled(urls.map(url => new Promise(resolve => {
+        const image = new Image();
+        image.onload = image.onerror = resolve;
+        image.src = url;
+    })));
+}
+
+async function prepareStartupLandingPages() {
+    const jobs = [];
+    const canLoadRuntimeScript = typeof window.ensureRuntimeScript === 'function';
+
+    if (canLoadRuntimeScript) {
+        jobs.push(window.ensureRuntimeScript('compendio').then(async () => {
+            if (typeof loadCompendio === 'function') loadCompendio();
+            if (AppState.currentPage !== 'compendio' && typeof compendioShowHub === 'function') compendioShowHub();
+            await waitForStartupImages('#compendioHub');
+        }));
+        jobs.push(window.ensureRuntimeScript('laboratorio').then(async () => {
+            if (AppState.currentPage !== 'laboratorio' && typeof labBackToHub === 'function') labBackToHub();
+            await waitForStartupImages('#labHub');
+        }));
+    }
+
+    if (AppState.isLoggedIn && AppState.currentUser?.uid) {
+        if (typeof loadCampagne === 'function') {
+            jobs.push(loadCampagne(AppState.currentUser.uid, { skipRealtimeSetup: true, silent: true }));
+        }
+        if (typeof loadPersonaggi === 'function') {
+            jobs.push(loadPersonaggi({ silent: true }));
+        }
+    }
+
+    await Promise.allSettled(jobs);
+}
+
+async function prepareStartupAuth() {
+    const success = await waitForSupabase();
+    if (!success) {
+        console.warn('Supabase non disponibile, app continua senza autenticazione');
+        return;
+    }
+    appDebug('Supabase pronto, setup auth...');
+    setupSupabaseAuth();
+    await checkAuthState();
+}
+
 async function registerBaseServiceWorker() {
     const scriptHref = document.currentScript?.src || Array.from(document.scripts).find(script => {
         try {
@@ -221,21 +271,12 @@ async function init() {
     setupEventListeners();
 
     appDebug('Navigazione alla pagina iniziale...');
-    navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
+    const initialPageLoad = navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
     if (typeof restoreInitialDesktopBookmark === 'function') {
         restoreInitialDesktopBookmark();
     }
 
-    // Wait for Supabase to be ready (in background, non-blocking)
-    waitForSupabase().then((success) => {
-        if (success) {
-            appDebug('Supabase pronto, setup auth...');
-            setupSupabaseAuth();
-            checkAuthState();
-        } else {
-            console.warn('⚠️ Supabase non disponibile, app continua senza autenticazione');
-        }
-    }).catch((error) => {
+    const authReady = prepareStartupAuth().catch((error) => {
         console.error('❌ Errore nell\'attesa Supabase:', error);
     });
 
@@ -269,6 +310,9 @@ async function init() {
             }
         });
     }
+
+    await Promise.allSettled([initialPageLoad, authReady]);
+    await prepareStartupLandingPages();
 }
 
 // Setup Event Listeners

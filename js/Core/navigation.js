@@ -182,7 +182,7 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
     try {
         await _ensurePageRuntimeData(pageName);
         if (pageName === 'amici' && AppState.isLoggedIn) {
-            loadAmici();
+            await loadAmici();
         } else if (pageName === 'compendio') {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('compendio');
@@ -195,7 +195,7 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             }
         } else if (pageName === 'campagne') {
             if (AppState.isLoggedIn && AppState.currentUser) {
-                loadCampagne(AppState.currentUser.uid);
+                await loadCampagne(AppState.currentUser.uid);
             }
         } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
             if (typeof window.ensureRuntimeScript === 'function') {
@@ -207,11 +207,11 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
                 labBackToHub();
             }
         } else if (pageName === 'personaggi' && AppState.isLoggedIn) {
-            loadPersonaggi();
+            await loadPersonaggi();
         } else if (pageName === 'personaggioCreate') {
             if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
         } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
-            loadCampagnaDetails(AppState.currentCampagnaId);
+            await loadCampagnaDetails(AppState.currentCampagnaId);
         } else if (pageName === 'sessione' && AppState.currentCampagnaId) {
             await renderSessioneContent(AppState.currentCampagnaId);
         } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
@@ -223,7 +223,7 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
                 startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
             }
         } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
-            renderSchedaPersonaggio(AppState.currentPersonaggioId);
+            await renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }
     } catch (error) {
         console.warn('[navigation] preload pagina fallito:', error);
