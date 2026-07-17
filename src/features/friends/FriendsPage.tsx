@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { removeFriend, updateFriendRequest, type FriendProfile } from '../../api';
@@ -9,7 +10,6 @@ import { friendsQuery } from './friendsQueries';
 declare global {
   interface Window {
     openAddAmicoModal?: () => void;
-    openLoginModal?: () => void;
     sendAppEventBroadcast?: (change: Record<string, unknown>) => Promise<void>;
     showConfirm?: (message: string) => Promise<boolean>;
     showNotification?: (message: string) => void;
@@ -37,8 +37,8 @@ function FriendInfo({ friend }: { friend: FriendProfile }) {
 
 function CloseIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
+    <line x1="18" y1="6" x2="6" y2="18" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="6" y1="6" x2="18" y2="18" strokeLinecap="round" strokeLinejoin="round" />
   </svg>;
 }
 
@@ -49,6 +49,10 @@ export function FriendsPage() {
     ...friendsQuery(user.data?.id ?? ''),
     enabled: Boolean(user.data?.id),
   });
+
+  useEffect(() => {
+    if (friends.isError) window.showNotification?.('Errore nel caricamento degli amici. Riprova.');
+  }, [friends.isError]);
 
   const refresh = async (action: string, id: string) => {
     if (user.data) await queryClient.invalidateQueries({ queryKey: queryKeys.friends(user.data.id) });
@@ -61,7 +65,9 @@ export function FriendsPage() {
       window.showNotification?.(variables.status === 'accepted' ? 'Richiesta di amicizia accettata!' : 'Richiesta di amicizia rifiutata');
       void refresh('update', variables.id);
     },
-    onError: () => window.showNotification?.('Impossibile aggiornare la richiesta. Riprova.'),
+    onError: (_, variables) => window.showNotification?.(variables.status === 'accepted'
+      ? 'Errore nell\'accettazione della richiesta. Riprova.'
+      : 'Errore nel rifiuto della richiesta. Riprova.'),
   });
 
   const removeMutation = useMutation({
@@ -84,16 +90,16 @@ export function FriendsPage() {
 
       {!user.isLoading && !user.data && <div className="content-placeholder"><p>Accedi per vedere i tuoi amici</p></div>}
       {(user.isLoading || friends.isLoading) && <div className="content-placeholder"><div className="loading-spinner" /><p>Caricamento amici...</p></div>}
-      {friends.isError && <div className="content-placeholder"><p>Impossibile caricare gli amici. Riprova.</p></div>}
+      {friends.isError && <div className="content-placeholder"><p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p></div>}
 
-      {data && data.incoming.length > 0 && <section id="richiesteInEntrataSection">
-        <h3>Richieste in entrata</h3>
+      {data && data.incoming.length > 0 && <div style={{ marginTop: 'var(--spacing-lg)' }}>
+        <h3 style={{ margin: '1rem 0 0.5rem', fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Richieste in entrata</h3>
         <div className="amici-list">
           {data.incoming.map(request => <div className="amico-item" key={request.id}>
             <FriendInfo friend={request.user} />
             <div className="amico-actions">
               <button className="btn-icon-amico btn-accept" type="button" aria-label="Accetta richiesta" title="Accetta richiesta" onClick={() => requestMutation.mutate({ id: request.id, status: 'accepted' })}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
               </button>
               <button className="btn-icon-amico btn-reject" type="button" aria-label="Rifiuta richiesta" title="Rifiuta richiesta" onClick={() => requestMutation.mutate({ id: request.id, status: 'rejected' })}>
                 <CloseIcon />
@@ -101,7 +107,7 @@ export function FriendsPage() {
             </div>
           </div>)}
         </div>
-      </section>}
+      </div>}
 
       {data && data.friends.length > 0 && <div className="amici-list">
         {data.friends.map(friend => <div className="amico-item" key={friend.id}>
@@ -114,6 +120,6 @@ export function FriendsPage() {
 
       {isEmpty && <div className="content-placeholder"><p>Non hai amici. Tempo di unirsi a una gioiosa cooperazione!</p></div>}
     </div>
-    <button className="btn-fab" type="button" aria-label={user.data ? 'Aggiungi amico' : 'Accedi'} onClick={() => user.data ? window.openAddAmicoModal?.() : window.openLoginModal?.()}>+</button>
+    {user.data && <button className="btn-fab" type="button" aria-label="Aggiungi Amico" onClick={() => window.openAddAmicoModal?.()}>+</button>}
   </ReactPage>;
 }

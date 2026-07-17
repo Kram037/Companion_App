@@ -39,6 +39,18 @@ test('authenticated campaign navigation', async ({ page }) => {
   }
 });
 
+test('authenticated friends route uses the React page', async ({ page }) => {
+  test.skip(!dmEmail || !dmPassword, 'Richiede la fixture E2E Supabase documentata.');
+
+  await login(page, dmEmail!, dmPassword!);
+  await page.goto('/amici');
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'amici');
+  await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Amici');
+  await expect(page.locator('.react-page-shell .btn-fab')).toBeVisible();
+  await expect(page.locator('#amiciPage')).toBeHidden();
+});
+
 test('a character accordion stays open during a realtime refetch', async ({ page }) => {
   test.skip(!dmEmail || !dmPassword || !characterId, 'Richiede un personaggio nella fixture E2E Supabase.');
 

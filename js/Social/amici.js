@@ -215,6 +215,7 @@ async function handleInvitaAmico(e) {
 
         if (error) throw error;
 
+        await sendAppEventBroadcast({ table: 'richieste_amicizia', action: 'insert', id: data.id });
         showNotification(`Richiesta di amicizia inviata a ${searchedUser.nome_utente}!`);
         closeAddAmicoModal();
 
@@ -334,6 +335,7 @@ window.rimuoviAmico = async function(amicoId) {
  * Carica e visualizza gli amici e le richieste
  */
 async function loadAmici(options = {}) {
+    if (document.body.dataset.reactOwner === 'amici') return;
     if (!AppState.isLoggedIn || !AppState.currentUser) return;
     const { silent = false } = options;
 

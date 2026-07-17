@@ -27,20 +27,24 @@ Il progetto e in migrazione incrementale da JavaScript legacy a
 React/TypeScript. Non e un rewrite e i due livelli hanno responsabilita
 diverse.
 
-La UI approvata e ancora renderizzata dal runtime legacy:
+La UI approvata e ancora renderizzata prevalentemente dal runtime legacy:
 
 - `index.html` contiene la shell e i contenitori delle pagine;
 - `js/` gestisce rendering, interazioni e compatibilita del flusso corrente;
 - `css/` definisce l'aspetto grafico attuale;
 - `src/main.ts` inizializza Supabase e monta il bridge React;
 - `src/app/AppRouter.tsx` e `LegacyNavigationSync.tsx` sincronizzano URL e
-  navigazione legacy senza sostituire il DOM visibile;
+  navigazione; `/amici` e la prima route posseduta da React;
 - `src/api`, `src/schemas`, `src/query`, `src/store`, `src/realtime` e
   `src/features` costituiscono il livello typed e la base della migrazione.
 
 I componenti presenti in `src/features` non sono automaticamente la fonte
 della UI attiva. Prima di modificare un flusso bisogna verificare quale livello
 ne possiede realmente rendering, stato e navigazione.
+
+La route `/amici` usa React e le API typed per lista, caricamento e azioni. Il
+modale di aggiunta amico resta temporaneamente nel livello legacy per preservare
+lo stesso form e il tastierino numerico durante la migrazione incrementale.
 
 > **Vincolo UI:** l'aspetto corrente e la baseline obbligatoria. Leggere
 > [`UI_BASELINE_CHECKPOINT.md`](UI_BASELINE_CHECKPOINT.md) prima di qualsiasi

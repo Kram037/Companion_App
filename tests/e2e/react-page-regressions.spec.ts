@@ -33,7 +33,7 @@ test('React routing leaves the legacy compendium and laboratory views intact', a
   )).toBe(true);
 });
 
-test('React never hides or replaces the legacy page DOM', async ({ page }) => {
+test('React leaves unmigrated legacy page DOM intact', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/campagne');
 
@@ -44,5 +44,22 @@ test('React never hides or replaces the legacy page DOM', async ({ page }) => {
   await page.locator('.toolbar-btn[data-page="personaggi"]').click();
   await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
   await expect(page.locator('#personaggiPage')).toBeVisible();
+  await expect(page.locator('#react-root')).toBeEmpty();
+});
+
+test('React owns only the friends route', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/amici');
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'amici');
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'amici');
+  await expect(page.locator('#amiciPage')).toBeHidden();
+  await expect(page.locator('.react-page-shell')).toBeVisible();
+  await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Amici');
+  await expect(page.locator('.react-page-shell .content-placeholder')).toContainText('Accedi per vedere i tuoi amici');
+
+  await page.locator('.toolbar-btn[data-page="campagne"]').click();
+  await expect(page.locator('body')).not.toHaveAttribute('data-react-owner', /.+/);
+  await expect(page.locator('#campagnePage')).toBeVisible();
   await expect(page.locator('#react-root')).toBeEmpty();
 });
