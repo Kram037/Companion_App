@@ -19,7 +19,7 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 - [x] Inserire `tools/check-index-bootstrap.mjs` nel target `check`.
 - [x] Inserire `tools/check-react-boundaries.mjs` nel target `check`.
-- [x] Tenere `tools/check-legacy-symbols.mjs` report-only nel check standard; la modalita manuale resta bloccante.
+- [x] Rendere `tools/check-legacy-symbols.mjs` bloccante nel check standard dopo aver azzerato il report.
 - [x] Far fallire la build se Supabase torna caricato da CDN.
 - [x] Far fallire la build se realtime legacy chiama render/load diretti.
 - [x] Far fallire la build se nuove pagine React aggiungono dipendenze da `window.*` non autorizzate.
@@ -75,7 +75,8 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 - [x] Primo batch: rimuovere polling sessioni duplicato e helper privati senza chiamanti (report da 39 a 29 simboli).
 - [x] Secondo batch: rimuovere alias storici e flussi UI gia' sostituiti (report da 29 a 3 simboli).
-- [ ] Risolvere o cancellare i simboli segnalati da `check-legacy-symbols`.
+- [x] Terzo batch: rimuovere la selezione inline e i renderer scheda combattimento sostituiti dalle full sheet correnti (report da 3 a 0 simboli).
+- [x] Risolvere o cancellare i simboli segnalati da `check-legacy-symbols`.
 - [ ] Rimuovere script legacy non piu caricati da `index.html`.
 - [ ] Tenere `LegacyFragment` solo per contenuti che non meritano ancora una conversione React.
 - [ ] Bloccare nuovi `innerHTML` fuori dai file legacy esplicitamente permessi.
