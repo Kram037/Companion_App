@@ -211,8 +211,6 @@ window.labBackToHub = function() {
     _labScrollToTop();
 };
 
-window.laboratorioShowHub = window.labBackToHub;
-
 window.labOpenSettings = function() {
     labOpenCategory('impostazioni');
 };
@@ -660,10 +658,6 @@ function _labListRefreshBadge(tab) {
     badge.textContent = n || '';
     badge.style.display = n > 0 ? 'inline-flex' : 'none';
 }
-
-window.labListToggleFilters = function(tab) {
-    labListOpenFiltersDialog(tab);
-};
 
 window.labListOpenFiltersDialog = function(tab) {
     const overlay = document.createElement('div');
@@ -4651,27 +4645,6 @@ function _labImportUpdateAnalyzeState(root) {
     const analyzeBtn = target.querySelector('#labImportAnalyzeBtn');
     if (analyzeBtn) analyzeBtn.disabled = !(hasText || hasFile);
 }
-
-// Apre la dialog di importazione bulk per la categoria specificata
-// ('oggetti' o 'incantesimi'). Usa _LAB_IMPORT_CONFIGS per i contenuti.
-window.labOpenImportDialog = function(category) {
-    const cat = _LAB_IMPORT_CONFIGS[category];
-    if (!cat) {
-        console.warn('[lab-import] categoria non supportata:', category);
-        return;
-    }
-    const overlay = document.createElement('div');
-    overlay.className = 'hp-calc-overlay lab-import-overlay';
-    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
-    overlay.innerHTML = `
-        <div class="hp-calc-modal lab-import-modal">
-            ${_labImportContentHtml(cat, "this.closest('.hp-calc-overlay').remove()", true)}
-        </div>`;
-    document.body.appendChild(overlay);
-    overlay._parsed = [];
-    overlay._cat = cat;
-    _labWireImportControls(overlay);
-};
 
 window._labImportFileChanged = async function(ev) {
     const root = ev.target?.closest?.('.lab-import-overlay, .lab-import-host') || _labImportRoot();

@@ -1193,9 +1193,6 @@ window.spellFilterReset = function() {
     _spellFilterRerenderDialog();
 };
 
-// Alias storico
-window.schedaOpenCantripsPicker = function(pgId) { return window.schedaOpenSpellPicker(pgId, 0); };
-
 window.schedaSaveSpellsForLevel = async function(pgId, level) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
@@ -1248,6 +1245,3 @@ window.schedaSaveSpellsForLevel = async function(pgId, level) {
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenSpellPage(pgId);
 };
-
-// Alias storico
-window.schedaSaveCantrips = function(pgId) { return window.schedaSaveSpellsForLevel(pgId, 0); };

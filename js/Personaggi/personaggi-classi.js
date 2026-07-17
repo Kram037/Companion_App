@@ -27,14 +27,6 @@ window.pgRemoveClasse = function(index) {
     pgResetAutoHP();
 }
 
-window.pgUpdateClassLevel = function(index, value) {
-    const lv = Math.max(1, Math.min(20, parseInt(value) || 1));
-    pgSelectedClasses[index].livello = lv;
-    _pgEnsureSubclassAllowed(pgSelectedClasses[index]);
-    pgUpdateTotalLevel();
-    pgResetAutoHP();
-}
-
 function pgResetAutoHP() {
     const pvField = document.getElementById('pgPV');
     if (pvField) pvField.dataset.autoHp = 'true';

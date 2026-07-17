@@ -2143,13 +2143,6 @@ function _compObjectsPageHtml() {
     return `<div id="compEquipmentSectionContent">${_compEquipmentSectionHtml(state.equipmentSection, state)}</div>`;
 }
 
-window.compendioSetObjectsSubTab = function(tab) {
-    const state = _compStateFor('oggetti');
-    state.equipmentSection = tab === 'oggetti' ? 'oggetti' : 'armi';
-    compendioRenderTab();
-    _compScrollToTop();
-};
-
 window.compendioOpenEquipmentSection = function(section) {
     if (!COMP_EQUIPMENT_SECTIONS[section]) return;
     const state = _compStateFor('oggetti');
@@ -2157,12 +2150,6 @@ window.compendioOpenEquipmentSection = function(section) {
     state.detail = null;
     compendioRenderTab();
     _compScrollToTop();
-};
-
-window.compendioToggleGemTreasures = function() {
-    const state = _compStateFor('oggetti');
-    state.gemTreasureOpen = state.gemTreasureOpen === false;
-    _compRenderObjectsSectionContent();
 };
 
 window.compendioSetGemView = function(view) {
@@ -2833,10 +2820,6 @@ function _compRenderObjectsSectionContent() {
         badge.style.display = n ? 'inline-flex' : 'none';
     }
 }
-
-window.compendioSetObjectKind = function(kind) {
-    compendioOpenEquipmentSection(kind === 'veleni' ? 'veleni' : 'oggetti');
-};
 
 function _compObjectMatchesFilters(item, state) {
     const section = state.equipmentSection || (item.source === 'veleni' ? 'veleni' : 'oggetti');

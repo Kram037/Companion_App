@@ -395,19 +395,6 @@ window.schedaOpenInventoryPage = async function(pgId) {
     _invListRenderFiltersBadge();
 };
 
-window.invCoinChange = async function(pgId, coinKey, delta) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const pg = _schedaPgCache;
-    if (!pg) return;
-    const monete = pg.monete ? { ...pg.monete } : {};
-    monete[coinKey] = Math.max(0, (monete[coinKey] || 0) + delta);
-    pg.monete = monete;
-    const el = document.getElementById('invCoin_' + coinKey);
-    if (el) el.textContent = monete[coinKey];
-    await supabase.from('personaggi').update({ monete }).eq('id', pgId);
-};
-
 window.invOpenCoinKeypad = function(inputEl) {
     if (!inputEl) return;
     const coinKey = inputEl.dataset.coin;
@@ -1559,15 +1546,6 @@ window.invEditItem = function(pgId, idx) {
         </div>
     </div>`;
     document.body.appendChild(overlay);
-};
-
-window.invSelectMagicBonus = function(btn, bonus) {
-    const row = btn.parentElement;
-    if (!row) return;
-    row.querySelectorAll('.custom-res-dice-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const hidden = document.getElementById('invItemMagicBonus');
-    if (hidden) hidden.value = String(bonus);
 };
 
 window.invUpdateItem = async function(pgId, idx) {

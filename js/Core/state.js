@@ -184,8 +184,6 @@ let elements = {};
         return hasBlockingOverlay() || hasFocusedEditable() || !!window.currentRollRequest;
     }
 
-    window.isRealtimeUiRefreshBlocked = isUiRefreshBlocked;
-
     async function refreshLegacyPageData() {
         if (!AppState.isLoggedIn) return;
         if (typeof _hpCalcState !== 'undefined' && _hpCalcState) return;
@@ -311,7 +309,7 @@ let elements = {};
     function wrapWindowFunction(name, opts = {}) {
         const original = window[name];
         if (typeof original !== 'function' || original.__realtimeGuardWrapped) return false;
-        const wrapped = function realtimeGuardWrappedFunction(...args) {
+        const wrapped = function(...args) {
             return runLatest(name, original, this, args, opts);
         };
         wrapped.__realtimeGuardWrapped = true;

@@ -1171,7 +1171,6 @@ window.updateBookmarkChrome = updateBookmarkChrome;
 window.captureActiveBookmark = captureActiveBookmark;
 window.scheduleActiveBookmarkCapture = scheduleActiveBookmarkCapture;
 window.createBookmarkTab = createBookmarkTab;
-window.saveCurrentBookmark = createBookmarkTab;
 window.openBookmark = openBookmark;
 window.openBookmarkSplitPane = openBookmarkSplitPane;
 window.openActiveBookmarkSplitPane = openActiveBookmarkSplitPane;
