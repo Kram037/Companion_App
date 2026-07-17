@@ -26,10 +26,10 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 2 - Supabase client unico
 
-- [ ] Rimuovere il bootstrap Supabase da CDN in `index.html`.
-- [ ] Usare solo `src/api/supabaseClient.ts` come entry client.
-- [ ] Mantenere `window.supabaseClient` solo come compat layer temporaneo.
-- [ ] Documentare quando il compat layer potra essere cancellato.
+- [x] Rimuovere il bootstrap Supabase da CDN in `index.html`.
+- [x] Usare solo `src/api/supabaseClient.ts` come entry client.
+- [x] Mantenere `window.supabaseClient` solo come compat layer temporaneo.
+- [x] Documentare quando il compat layer potra essere cancellato.
 
 ## Priorita 3 - Navigazione e stato
 

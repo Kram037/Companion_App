@@ -1,25 +1,12 @@
-// Supabase - Database relazionale PostgreSQL
-// Il client e' creato in index.html usando window.CompanionConfig.
+// Adapter legacy. Il client viene creato esclusivamente da src/api/supabaseClient.ts.
 let supabaseReady = false;
 
 function canInitSupabaseClient() {
-    return !!window.supabaseClient || (
-        typeof window.supabaseCreateClient === 'function' &&
-        !!window.CompanionConfig?.supabaseUrl &&
-        !!window.CompanionConfig?.supabaseAnonKey
-    );
+    return !!window.supabaseClient;
 }
 
-// Initialize Supabase (runs after the SDK module loads)
 function initSupabase() {
     try {
-        if (!window.supabaseClient && typeof window.supabaseCreateClient === 'function') {
-            const { supabaseUrl, supabaseAnonKey } = window.CompanionConfig || {};
-            if (supabaseUrl && supabaseAnonKey) {
-                window.supabaseClient = window.supabaseCreateClient(supabaseUrl, supabaseAnonKey);
-            }
-        }
-
         if (!window.supabaseClient) {
             console.error('Supabase client non disponibile. Verifica config e caricamento SDK.');
             return false;
@@ -35,7 +22,6 @@ function initSupabase() {
     }
 }
 
-// Wait for DOM and Supabase to be ready
 function waitForSupabase() {
     return new Promise((resolve) => {
         if (canInitSupabaseClient()) {
@@ -59,8 +45,6 @@ function waitForSupabase() {
     });
 }
 
-// Helper per ottenere il client Supabase
 function getSupabaseClient() {
-    if (!window.supabaseClient) initSupabase();
     return window.supabaseClient;
 }

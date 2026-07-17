@@ -4,13 +4,11 @@ declare global {
   interface Window {
     CompanionConfig?: { supabaseUrl?: string; supabaseAnonKey?: string; debug?: boolean };
     supabaseClient?: SupabaseClient;
-    supabaseCreateClient?: typeof createClient;
   }
 }
 
 export function initializeSupabaseClient(): SupabaseClient | null {
   if (window.supabaseClient) return window.supabaseClient;
-  window.supabaseCreateClient = createClient;
   const { supabaseUrl, supabaseAnonKey, debug } = window.CompanionConfig ?? {};
   if (!supabaseUrl || !supabaseAnonKey) return null;
 

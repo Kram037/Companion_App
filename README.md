@@ -198,6 +198,9 @@ Regole:
 Supabase fornisce autenticazione, database PostgreSQL, RPC e realtime. I nuovi
 moduli devono accedere al client tramite `src/api/supabaseClient.ts`; la globale
 `window.supabaseClient` esiste solo come compatibilita temporanea con il legacy.
+La globale e `js/Core/supabase.js` potranno essere rimossi insieme solo quando
+nessun file runtime in `js/` chiamera piu `getSupabaseClient` e tutte le pagine
+attive useranno esclusivamente le API typed in `src/api`.
 
 Per ogni modifica SQL:
 
