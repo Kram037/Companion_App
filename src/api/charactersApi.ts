@@ -1,28 +1,69 @@
 import type { Id, Personaggio } from '../types/domain';
 import { characterSchema, parseArray, parseNullable } from '../schemas';
-import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
+import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
+
+const CHARACTER_BASE_COLUMNS = [
+  'id', 'user_id', 'nome', 'razza', 'classe', 'livello', 'forza', 'destrezza',
+  'costituzione', 'intelligenza', 'saggezza', 'carisma', 'esperienza',
+  'punti_vita_max', 'iniziativa', 'classe_armatura', 'percezione_passiva',
+  'velocita', 'created_at', 'updated_at',
+].join(',');
+
+const CHARACTER_LIST_COLUMNS = [
+  'id', 'user_id', 'nome', 'razza', 'classe', 'livello', 'esperienza',
+  'classi', 'background', 'tipo_scheda', 'sottorazza', 'updated_at',
+].join(',');
+
+const CHARACTER_DETAIL_COLUMNS = [
+  CHARACTER_BASE_COLUMNS,
+  'classi', 'tiri_salvezza', 'competenze_abilita', 'maestrie_abilita',
+  'resistenze', 'immunita', 'vulnerabilita', 'slot_incantesimo',
+  'risorse_classe', 'dadi_vita_disponibili', 'pv_attuali', 'pv_temporanei',
+  'background', 'concentrazione', 'accecato', 'affascinato', 'afferrato',
+  'assordato', 'avvelenato', 'incapacitato', 'invisibile', 'paralizzato',
+  'pietrificato', 'privo_di_sensi', 'prono', 'spaventato', 'stordito',
+  'trattenuto', 'esaustione', 'ispirazione', 'immagine_url', 'sottorazza',
+  'invocazioni', 'privilegi', 'stile_combattimento', 'bonus_manuali',
+  'linguaggi', 'competenze_strumenti', 'equipaggiamento', 'monete',
+  'inventario', 'sintonia', 'incantesimi_conosciuti', 'incantesimi_preparati',
+  'tipo_scheda', 'talenti',
+].join(',');
 
 export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio | null> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const result = await client
     .from('personaggi')
-    .select('*')
+    .select(CHARACTER_DETAIL_COLUMNS)
     .eq('id', personaggioId)
     .single();
-  throwIfSupabaseError(error);
-  return parseNullable(characterSchema, data);
+  if (!isMissingDatabaseColumn(result.error)) {
+    throwIfSupabaseError(result.error);
+    return parseNullable(characterSchema, result.data);
+  }
+
+  const fallback = await client
+    .from('personaggi')
+    .select(CHARACTER_BASE_COLUMNS)
+    .eq('id', personaggioId)
+    .single();
+  throwIfSupabaseError(fallback.error);
+  return parseNullable(characterSchema, fallback.data);
 }
 
 export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const result = await client
     .from('personaggi')
-    .select('*')
+    .select(CHARACTER_LIST_COLUMNS)
     .eq('user_id', userId)
     .order('nome');
-  throwIfSupabaseError(error);
-  const characters = parseArray(characterSchema, data);
+  const fallback = isMissingDatabaseColumn(result.error)
+    ? await client.from('personaggi').select(CHARACTER_BASE_COLUMNS).eq('user_id', userId).order('nome')
+    : result;
+  throwIfSupabaseError(fallback.error);
+  const characters = parseArray(characterSchema, fallback.data);
   if (!characters.length) return characters;
 
-  const client = getSupabaseClient();
   const { data: associations, error: associationError } = await client
     .from('personaggi_campagna')
     .select('personaggio_id,campagna_id')

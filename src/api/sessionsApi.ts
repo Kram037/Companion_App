@@ -1,27 +1,54 @@
 import type { Id, Sessione } from '../types/domain';
 import { parseData, parseNullable, sessionSchema } from '../schemas';
-import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
+import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
+
+const SESSION_COLUMNS = 'id,campagna_id,data_inizio,data_fine,created_at,combat_round,combat_turn_index';
+const SESSION_BASE_COLUMNS = 'id,campagna_id,data_inizio,data_fine,created_at';
 
 export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const result = await client
     .from('sessioni')
-    .select('*')
+    .select(SESSION_COLUMNS)
     .eq('id', sessioneId)
     .single();
-  throwIfSupabaseError(error);
-  return parseNullable(sessionSchema, data);
+  if (!isMissingDatabaseColumn(result.error)) {
+    throwIfSupabaseError(result.error);
+    return parseNullable(sessionSchema, result.data);
+  }
+
+  const fallback = await client
+    .from('sessioni')
+    .select(SESSION_BASE_COLUMNS)
+    .eq('id', sessioneId)
+    .single();
+  throwIfSupabaseError(fallback.error);
+  return parseNullable(sessionSchema, fallback.data);
 }
 
 export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sessione | null> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const result = await client
     .from('sessioni')
-    .select('*')
+    .select(SESSION_COLUMNS)
     .eq('campagna_id', campagnaId)
     .is('data_fine', null)
     .limit(1)
     .maybeSingle();
-  throwIfSupabaseError(error);
-  return parseNullable(sessionSchema, data);
+  if (!isMissingDatabaseColumn(result.error)) {
+    throwIfSupabaseError(result.error);
+    return parseNullable(sessionSchema, result.data);
+  }
+
+  const fallback = await client
+    .from('sessioni')
+    .select(SESSION_BASE_COLUMNS)
+    .eq('campagna_id', campagnaId)
+    .is('data_fine', null)
+    .limit(1)
+    .maybeSingle();
+  throwIfSupabaseError(fallback.error);
+  return parseNullable(sessionSchema, fallback.data);
 }
 
 export async function startCampaignSession(campagnaId: Id): Promise<Sessione> {
@@ -31,7 +58,7 @@ export async function startCampaignSession(campagnaId: Id): Promise<Sessione> {
   const { data, error } = await getSupabaseClient()
     .from('sessioni')
     .insert({ campagna_id: campagnaId, data_inizio: new Date().toISOString() })
-    .select('*')
+    .select(SESSION_BASE_COLUMNS)
     .single();
   throwIfSupabaseError(error);
   return parseData(sessionSchema, data);

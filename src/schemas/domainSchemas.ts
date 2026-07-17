@@ -28,7 +28,7 @@ export const userProfileSchema = z.object({
     enabled: z.boolean().default(true),
     amici_abilitati: z.array(z.string()).default([]),
   }).nullish(),
-}).passthrough();
+});
 
 export const campaignSchema = z.object({
   id: z.string(),
@@ -45,7 +45,7 @@ export const campaignSchema = z.object({
   note: z.array(z.string()).nullish(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
-}).passthrough();
+});
 
 export const campaignInviteSchema = z.object({
   id: z.string(),
@@ -64,7 +64,7 @@ export const campaignInviteSchema = z.object({
     nome_utente: z.string().nullish(),
     cid: cidSchema,
   }).nullish(),
-}).passthrough();
+});
 
 export const characterClassSchema = z.object({
   nome: z.string(),
@@ -101,7 +101,7 @@ export const sessionSchema = z.object({
   combat_turn_index: z.number().nullish(),
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
-}).passthrough();
+});
 
 export const rollRequestSchema = z.object({
   id: z.string(),
@@ -111,7 +111,7 @@ export const rollRequestSchema = z.object({
   tipo: z.string(),
   stato: z.string().nullish(),
   payload: jsonRecordSchema.nullish(),
-}).passthrough();
+});
 
 export const initiativeRollRequestSchema = rollRequestSchema;
 export const genericRollRequestSchema = rollRequestSchema;
@@ -129,7 +129,22 @@ export const combatMonsterSchema = z.object({
   resistenze_leggendarie: z.number().nullish(),
   azioni_legg_max: z.number().nullish(),
   dati: jsonRecordSchema.nullish(),
-}).passthrough();
+  concentrazione: z.boolean().nullish(),
+  accecato: z.boolean().nullish(),
+  affascinato: z.boolean().nullish(),
+  afferrato: z.boolean().nullish(),
+  assordato: z.boolean().nullish(),
+  avvelenato: z.boolean().nullish(),
+  incapacitato: z.boolean().nullish(),
+  invisibile: z.boolean().nullish(),
+  paralizzato: z.boolean().nullish(),
+  pietrificato: z.boolean().nullish(),
+  privo_di_sensi: z.boolean().nullish(),
+  prono: z.boolean().nullish(),
+  spaventato: z.boolean().nullish(),
+  stordito: z.boolean().nullish(),
+  trattenuto: z.boolean().nullish(),
+});
 
 export const homebrewItemSchema = z.object({
   id: z.string(),
@@ -149,7 +164,7 @@ export const runtimeDataBundleSchema = z.object({
   version: z.union([z.string(), z.number()]).nullish(),
   source: z.string().nullish(),
   data: jsonValueSchema,
-}).passthrough();
+});
 
 export type UserProfileFromSchema = z.infer<typeof userProfileSchema>;
 export type CampaignFromSchema = z.infer<typeof campaignSchema>;

@@ -26,3 +26,11 @@ export function getSupabaseClient(): SupabaseClient {
 export function throwIfSupabaseError(error: unknown): void {
   if (error) throw error;
 }
+
+export function isMissingDatabaseColumn(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const { code, message } = error as { code?: unknown; message?: unknown };
+  return code === '42703'
+    || code === 'PGRST204'
+    || /column .* does not exist|schema cache/i.test(String(message ?? ''));
+}

@@ -2,10 +2,12 @@ import type { Campagna, CampaignCharacter, CampaignInvite, CampaignPlayer, Id } 
 import { campaignInviteSchema, campaignSchema, parseArray, parseNullable } from '../schemas';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
+const CAMPAIGN_COLUMNS = 'id,nome_campagna,id_dm,icona_name,giocatori,data_creazione,numero_sessioni,tempo_di_gioco,note,updated_at';
+
 export async function fetchCampaignById(campagnaId: Id): Promise<Campagna | null> {
   const { data, error } = await getSupabaseClient()
     .from('campagne')
-    .select('*')
+    .select(CAMPAIGN_COLUMNS)
     .eq('id', campagnaId)
     .single();
   throwIfSupabaseError(error);
@@ -47,7 +49,7 @@ export async function fetchCampaignCharacters(campagnaId: Id): Promise<CampaignC
 export async function fetchCampaignsByDm(dmId: Id): Promise<Campagna[]> {
   const { data, error } = await getSupabaseClient()
     .from('campagne')
-    .select('*')
+    .select(CAMPAIGN_COLUMNS)
     .eq('id_dm', dmId)
     .order('data_creazione', { ascending: false });
   throwIfSupabaseError(error);
@@ -57,7 +59,7 @@ export async function fetchCampaignsByDm(dmId: Id): Promise<Campagna[]> {
 export async function fetchAcceptedCampaignsByPlayer(userTableId: Id): Promise<Campagna[]> {
   const { data, error } = await getSupabaseClient()
     .from('inviti_campagna')
-    .select('campagne:campagne!inviti_campagna_campagna_id_fkey(*)')
+    .select(`campagne:campagne!inviti_campagna_campagna_id_fkey(${CAMPAIGN_COLUMNS})`)
     .eq('invitato_id', userTableId)
     .eq('stato', 'accepted');
   throwIfSupabaseError(error);

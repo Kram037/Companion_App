@@ -1,6 +1,9 @@
 import type { HomebrewSettings, Id, UserProfile } from '../types/domain';
 import { parseNullable, userProfileSchema } from '../schemas';
-import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
+import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
+
+const USER_COLUMNS = 'id,uid,nome_utente,cid,email,campagne_preferite,homebrew_settings';
+const USER_BASE_COLUMNS = 'id,uid,nome_utente,cid,email';
 
 export async function fetchCurrentUser(): Promise<UserProfile | null> {
   let client;
@@ -26,23 +29,32 @@ export function subscribeToCurrentUser(callback: () => void): () => void {
 }
 
 export async function fetchUserById(userId: Id): Promise<UserProfile | null> {
-  const { data, error } = await getSupabaseClient()
-    .from('utenti')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  throwIfSupabaseError(error);
-  return parseNullable(userProfileSchema, data);
+  return fetchUserBy('id', userId);
 }
 
 export async function fetchUserByUid(uid: Id): Promise<UserProfile | null> {
-  const { data, error } = await getSupabaseClient()
+  return fetchUserBy('uid', uid);
+}
+
+async function fetchUserBy(column: 'id' | 'uid', value: Id): Promise<UserProfile | null> {
+  const client = getSupabaseClient();
+  const result = await client
     .from('utenti')
-    .select('*')
-    .eq('uid', uid)
+    .select(USER_COLUMNS)
+    .eq(column, value)
     .single();
-  throwIfSupabaseError(error);
-  return parseNullable(userProfileSchema, data);
+  if (!isMissingDatabaseColumn(result.error)) {
+    throwIfSupabaseError(result.error);
+    return parseNullable(userProfileSchema, result.data);
+  }
+
+  const fallback = await client
+    .from('utenti')
+    .select(USER_BASE_COLUMNS)
+    .eq(column, value)
+    .single();
+  throwIfSupabaseError(fallback.error);
+  return parseNullable(userProfileSchema, fallback.data);
 }
 
 export interface HomebrewFriend {

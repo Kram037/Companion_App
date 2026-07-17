@@ -4,25 +4,27 @@ import { campaignSchema, characterSchema, combatMonsterSchema, userProfileSchema
 import { parseData } from './parse';
 
 describe('domain schemas', () => {
-  it('keeps Supabase extra columns while validating campaigns', () => {
+  it('strips unknown columns from stable campaign rows', () => {
     const campaign = parseData(campaignSchema, {
       id: 'c1',
       nome_campagna: 'Alba Rossa',
       id_dm: 'dm1',
-      unknown_column: 'kept',
+      unknown_column: 'discarded',
     });
 
-    expect(campaign.unknown_column).toBe('kept');
+    expect(campaign).not.toHaveProperty('unknown_column');
   });
 
-  it('normalizes optional character fields from Supabase rows', () => {
+  it('keeps extension fields on the still-open character domain', () => {
     const character = parseData(characterSchema, {
       id: 'p1',
       nome: 'Nalia',
+      inventario: [{ nome: 'Corda' }],
     });
 
     expect(character.livello).toBe(1);
     expect(character.classi).toBeUndefined();
+    expect(character.inventario).toEqual([{ nome: 'Corda' }]);
   });
 
   it('normalizes the numeric CID returned by Supabase', () => {
