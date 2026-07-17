@@ -59,9 +59,9 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 - [x] Creare icone home screen quadrate con sfondo trasparente.
 - [x] Rimuovere `maskable` dal manifest per evitare sfondo launcher imposto.
-- [ ] Correggere `sw.js` aggiungendo il placeholder `BUILD_ASSET_URLS` o cambiando l'iniezione Vite.
-- [ ] Verificare che gli asset hashati Vite vengano precacheati.
-- [ ] Testare install/update PWA dopo build.
+- [x] Correggere `sw.js` aggiungendo il placeholder `BUILD_ASSET_URLS` e validarne l'iniezione Vite.
+- [x] Verificare che gli asset hashati Vite vengano precacheati.
+- [x] Testare install/update PWA dopo build.
 
 ## Priorita 7 - TypeScript, Zod e API
 

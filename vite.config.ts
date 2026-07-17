@@ -77,9 +77,17 @@ function injectServiceWorkerManifest(outDir: string) {
   }
 
   const swPath = join(outDir, 'sw.js');
-  const sw = readFileSync(swPath, 'utf8')
+  const placeholder = 'const BUILD_ASSET_URLS = [];';
+  const source = readFileSync(swPath, 'utf8');
+  if (!source.includes(placeholder)) {
+    throw new Error(`Service worker manifest placeholder missing: ${placeholder}`);
+  }
+  const sw = source
     .replace(/const CACHE_NAME = '[^']+';/, `const CACHE_NAME = 'companion-app-${hash.digest('hex').slice(0, 12)}';`)
-    .replace('const BUILD_ASSET_URLS = [];', `const BUILD_ASSET_URLS = ${JSON.stringify(sortedUrls, null, 4)};`);
+    .replace(placeholder, `const BUILD_ASSET_URLS = ${JSON.stringify(sortedUrls, null, 4)};`);
+  if (!/\.\/assets\/index-[^"']+\.js/.test(sw)) {
+    throw new Error('Service worker manifest does not contain the hashed Vite entrypoint.');
+  }
   writeFileSync(swPath, sw);
 }
 

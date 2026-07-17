@@ -1,4 +1,5 @@
-const CACHE_NAME = 'companion-app-v200';
+const CACHE_NAME = 'companion-app-v201';
+const BUILD_ASSET_URLS = [];
 
 const APP_SHELL_URLS = [
     './',
@@ -98,6 +99,10 @@ const RUNTIME_SCRIPT_URLS = [
     './js/Laboratorio/laboratorio.js'
 ];
 
+const PRECACHE_URLS = [...new Set([...APP_SHELL_URLS, ...BUILD_ASSET_URLS])];
+const PRECACHE_PATHS = new Set(PRECACHE_URLS.map(normalizeManagedPath));
+const BUILD_ASSET_PATHS = new Set(BUILD_ASSET_URLS.map(normalizeManagedPath));
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         precacheAppShell()
@@ -141,12 +146,20 @@ self.addEventListener('fetch', (event) => {
 
 function managedPath(url) {
     const path = url.pathname.replace(self.location.pathname.replace(/sw\.js$/, ''), './');
-    return path;
+    return normalizeManagedPath(path);
+}
+
+function normalizeManagedPath(path) {
+    try {
+        return decodeURIComponent(path);
+    } catch (_) {
+        return path;
+    }
 }
 
 function shouldNetworkFirst(url) {
     const path = managedPath(url);
-    if (!APP_SHELL_URLS.includes(path)) return false;
+    if (!PRECACHE_PATHS.has(path) || BUILD_ASSET_PATHS.has(path)) return false;
     return !/\.(?:png|jpe?g|svg|webp|gif|ico)$/i.test(path);
 }
 
@@ -154,7 +167,7 @@ function shouldCacheFirst(url) {
     const path = managedPath(url);
     if (DATA_URL_PREFIXES.some(prefix => path.startsWith(prefix))) return true;
     if (RUNTIME_SCRIPT_URLS.includes(path)) return true;
-    return APP_SHELL_URLS.includes(path);
+    return PRECACHE_PATHS.has(path);
 }
 
 async function cacheFirst(request) {
@@ -171,7 +184,7 @@ async function cacheFirst(request) {
 
 async function precacheAppShell() {
     const cache = await caches.open(CACHE_NAME);
-    await Promise.all(APP_SHELL_URLS.map(async (url) => {
+    await Promise.all(PRECACHE_URLS.map(async (url) => {
         const response = await fetch(url, { cache: 'no-store' });
         if (!response.ok) {
             throw new Error(`Precache fallita per ${url}`);

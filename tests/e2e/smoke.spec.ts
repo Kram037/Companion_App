@@ -55,6 +55,45 @@ test('manifest does not lock tablet orientation', async ({ request }) => {
   expect(manifest).not.toHaveProperty('orientation');
 });
 
+test('service worker installs and precaches the hashed Vite entrypoint', async ({ page, request }) => {
+  const swResponse = await request.get('/sw.js');
+  expect(swResponse.ok()).toBe(true);
+  const swSource = await swResponse.text();
+  const entrypoint = swSource.match(/\.\/assets\/index-[^"']+\.js/)?.[0];
+  const spacedAsset = swSource.match(/\.\/assets\/[^"'\n]* [^"'\n]*/)?.[0];
+  expect(entrypoint).toBeTruthy();
+  expect(spacedAsset).toBeTruthy();
+  expect(swSource).not.toContain('const BUILD_ASSET_URLS = [];');
+
+  await page.goto('/');
+  const serviceWorker = await page.evaluate(async (expectedUrl) => {
+    const registration = await navigator.serviceWorker.ready;
+    await registration.update();
+    const cacheName = (await caches.keys()).find(name => name.startsWith('companion-app-'));
+    if (!cacheName) return { active: false, cached: false };
+    const cache = await caches.open(cacheName);
+    const urls = (await cache.keys()).map(request => new URL(request.url).pathname);
+    return {
+      active: registration.active?.state === 'activated',
+      cached: urls.some(url => url.endsWith(expectedUrl.replace(/^\.\//, ''))),
+    };
+  }, entrypoint!);
+
+  expect(serviceWorker).toEqual({ active: true, cached: true });
+
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+  await page.context().setOffline(true);
+  try {
+    const availableOffline = await page.evaluate(
+      url => fetch(url).then(response => response.ok).catch(() => false),
+      `/${spacedAsset!.replace(/^\.\//, '')}`,
+    );
+    expect(availableOffline).toBe(true);
+  } finally {
+    await page.context().setOffline(false);
+  }
+});
+
 test('desktop split panes divide the workspace in half', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
