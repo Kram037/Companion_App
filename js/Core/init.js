@@ -12,6 +12,17 @@ function setupServiceWorkerReloadOnUpdate() {
     // automaticamente la pagina quando cambia il controller del service worker.
 }
 
+const startupScreenStartedAt = performance.now();
+function completeStartupScreen() {
+    const startup = document.getElementById('appStartup');
+    if (!startup) return;
+    const delay = Math.max(0, 650 - (performance.now() - startupScreenStartedAt));
+    setTimeout(() => {
+        startup.classList.add('is-complete');
+        setTimeout(() => startup.remove(), 250);
+    }, delay);
+}
+
 async function registerBaseServiceWorker() {
     const scriptHref = document.currentScript?.src || Array.from(document.scripts).find(script => {
         try {
@@ -958,7 +969,7 @@ function startApp() {
         init().catch(error => {
             console.error('❌ Errore durante l\'inizializzazione:', error);
             console.error('Stack:', error.stack);
-        });
+        }).finally(completeStartupScreen);
 
         appDebug('Inizializzazione avviata');
     } catch (error) {

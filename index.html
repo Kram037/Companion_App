@@ -19,7 +19,7 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="images/app-icon-180.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/app-icon-180.png">
-    <link rel="stylesheet" href="css/Core/base.css?v=20260715B">
+    <link rel="stylesheet" href="css/Core/base.css?v=20260717A">
     <link rel="stylesheet" href="css/Core/components.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/modals.css?v=20260519A">
     <link rel="stylesheet" href="css/Core/bookmarks.css?v=20260715D">
@@ -32,6 +32,13 @@
     <link rel="stylesheet" href="css/Core/fantasy.css?v=20260715D">
 </head>
 <body>
+    <div class="startup-screen" id="appStartup">
+        <img src="images/icon d20.png" alt="Companion App" class="startup-screen-logo">
+        <div class="startup-progress" role="progressbar" aria-label="Caricamento applicazione" aria-valuetext="Caricamento in corso">
+            <span></span>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <button class="header-btn user-btn" id="userBtn" aria-label="Utente">
@@ -1063,9 +1070,9 @@
     <script src="js/Core/lang.js?v=1771800000"></script>
     <script src="js/Core/theme.js?v=1767900400"></script>
     <script src="js/Core/data-loader.js?v=20260715A"></script>
-    <script src="js/Core/navigation.js?v=20260716A"></script>
+    <script src="js/Core/navigation.js?v=20260717B"></script>
     <script src="js/Core/bookmarks.js?v=20260715C"></script>
-    <script src="js/Core/auth.js?v=20260603A"></script>
+    <script src="js/Core/auth.js?v=20260717B"></script>
     <script src="js/Core/users.js?v=1767900400"></script>
     <script src="js/Social/amici.js?v=1767900400"></script>
     <script src="js/Campagna/campagne.js?v=20260517E"></script>
@@ -1105,7 +1112,7 @@
     <script src="js/Sessioni/sessions.js?v=20260715A"></script>
     <script src="js/Core/realtime.js?v=20260717A"></script>
     <script src="js/Sessioni/initiative.js?v=20260425E"></script>
-    <script src="js/Core/init.js?v=20260715B"></script>
+    <script src="js/Core/init.js?v=20260717D"></script>
 
     <!-- Cache busting script for development -->
     <script>

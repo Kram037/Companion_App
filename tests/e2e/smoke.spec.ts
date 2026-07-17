@@ -9,6 +9,14 @@ test('loads the legacy app shell', async ({ page }) => {
   await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
 });
 
+test('shows and closes the startup screen', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'commit' });
+
+  const startup = page.locator('#appStartup');
+  await expect(startup).toBeVisible();
+  await expect(startup).toBeHidden({ timeout: 3000 });
+});
+
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
