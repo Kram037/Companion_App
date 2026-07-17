@@ -1,24 +1,27 @@
 import { expect, test } from '@playwright/test';
 
-test('recreates the Supabase client from the shared legacy getter', async ({ page }) => {
+test('exposes the bundled Supabase singleton through the legacy getter', async ({ page }) => {
   await page.goto('/');
 
   await expect.poll(() => page.evaluate(() => {
     const app = window as typeof window & {
       getSupabaseClient?: () => unknown;
-      supabaseCreateClient?: unknown;
+      supabaseClient?: unknown;
     };
-    return typeof app.getSupabaseClient === 'function' && typeof app.supabaseCreateClient === 'function';
+    return typeof app.getSupabaseClient === 'function' && Boolean(app.supabaseClient);
   })).toBe(true);
 
-  const restored = await page.evaluate(() => {
+  const state = await page.evaluate(() => {
     const app = window as typeof window & {
       getSupabaseClient?: () => unknown;
       supabaseClient?: unknown;
+      supabaseCreateClient?: unknown;
     };
-    delete app.supabaseClient;
-    return Boolean(app.getSupabaseClient?.());
+    return {
+      sameInstance: app.getSupabaseClient?.() === app.supabaseClient,
+      hasLegacyFactory: typeof app.supabaseCreateClient === 'function',
+    };
   });
 
-  expect(restored).toBe(true);
+  expect(state).toEqual({ sameInstance: true, hasLegacyFactory: false });
 });

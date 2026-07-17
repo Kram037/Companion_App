@@ -463,8 +463,6 @@ async function showRollRequestModal(request) {
             const { data: sess } = await supabase.from('sessioni').select('campagna_id').eq('id', request.sessione_id).single();
             if (sess) {
                 campagnaId = sess.campagna_id;
-                AppState.currentCampagnaId = campagnaId;
-                sessionStorage.setItem('currentCampagnaId', campagnaId);
             }
         }
         if (supabase && userData && campagnaId) {

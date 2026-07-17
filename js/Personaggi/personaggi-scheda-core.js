@@ -4,8 +4,7 @@
 
 // --- Scheda Personaggio Page ---
 window.openSchedaPersonaggio = async function(personaggioId, opts) {
-    AppState.currentPersonaggioId = personaggioId;
-    sessionStorage.setItem('currentPersonaggioId', personaggioId);
+    window.setAppNavigationState({ personaggioId }, 'open-scheda');
     if (opts && opts.scrollToStats) {
         // Flag consumato dopo il render della Pagina 1 per centrare la tabella
         // delle statistiche (PV, PV temp, CA, ecc.). Usato quando si torna

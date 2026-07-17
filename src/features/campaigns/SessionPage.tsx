@@ -37,21 +37,15 @@ export function SessionPage() {
     onSuccess: async started => {
       client.setQueryData(queryKeys.session(campagnaId), started);
       client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
-      window.AppState.currentCampagnaId = campagnaId;
-      window.AppState.currentSessioneId = started.id;
+      window.setAppNavigationState?.({ campagnaId, sessioneId: started.id }, 'react-start-session');
       window.AppState.activeSessionCampagnaId = campagnaId;
-      sessionStorage.setItem('currentCampagnaId', campagnaId);
-      sessionStorage.setItem('currentSessioneId', started.id);
       sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
       window.sendAppEventBroadcast?.({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: started.id });
     },
   });
 
   useEffect(() => {
-    if (window.AppState) {
-      window.AppState.currentCampagnaId = campagnaId;
-      window.AppState.currentSessioneId = session.data?.id ?? null;
-    }
+    window.setAppNavigationState?.({ campagnaId, sessioneId: session.data?.id ?? null }, 'react-session');
   }, [campagnaId, session.data?.id]);
 
   useEffect(() => () => {

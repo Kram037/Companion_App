@@ -181,33 +181,6 @@ async function init() {
         initBookmarks();
     }
 
-    // Ripristina currentCampagnaId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedCampagnaId = sessionStorage.getItem('currentCampagnaId');
-    if (savedCampagnaId) {
-        AppState.currentCampagnaId = savedCampagnaId;
-        appDebug('Campagna salvata ripristinata dalla sessione:', savedCampagnaId);
-    }
-
-    // Ripristina currentSessioneId dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedSessioneId = sessionStorage.getItem('currentSessioneId');
-    if (savedSessioneId) {
-        AppState.currentSessioneId = savedSessioneId;
-        appDebug('Sessione salvata ripristinata dalla sessione:', savedSessioneId);
-    }
-
-    const savedPersonaggioId = sessionStorage.getItem('currentPersonaggioId');
-    if (savedPersonaggioId) {
-        AppState.currentPersonaggioId = savedPersonaggioId;
-        appDebug('Personaggio salvato ripristinato dalla sessione:', savedPersonaggioId);
-    }
-
-    // Ripristina currentPage dal sessionStorage se esiste (solo per la sessione corrente)
-    const savedPage = sessionStorage.getItem('currentPage');
-    if (savedPage) {
-        AppState.currentPage = savedPage;
-        appDebug('Pagina salvata ripristinata dalla sessione:', savedPage);
-    }
-
     const savedActiveSession = sessionStorage.getItem('activeSessionCampagnaId');
     if (savedActiveSession) {
         AppState.activeSessionCampagnaId = savedActiveSession;
@@ -215,10 +188,7 @@ async function init() {
 
     const routeState = window.CompanionRouterBridge?.legacyNavigationFromLocation?.(window.location.pathname);
     if (routeState?.page) {
-        AppState.currentPage = routeState.page;
-        AppState.currentCampagnaId = routeState.campagnaId || null;
-        AppState.currentSessioneId = routeState.sessioneId || null;
-        AppState.currentPersonaggioId = routeState.personaggioId || null;
+        window.setAppNavigationState(routeState, 'initial-url');
     }
 
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
@@ -238,39 +208,6 @@ async function init() {
     // Setup event listeners immediately (don't wait for Supabase)
     appDebug('Setup event listeners...');
     setupEventListeners();
-
-    // Browser back/forward navigation
-    window.addEventListener('popstate', async (event) => {
-        if (event.state && event.state.page) {
-            const st = event.state;
-            if (st.campagnaId) AppState.currentCampagnaId = st.campagnaId;
-            if (st.sessioneId) AppState.currentSessioneId = st.sessioneId;
-            if (st.personaggioId) AppState.currentPersonaggioId = st.personaggioId;
-
-            await navigateToPage(st.page, { pushHistory: false });
-
-            if (st.page === 'dettagli' && st.campagnaId) {
-                await loadCampagnaDetails(st.campagnaId);
-            } else if (st.page === 'sessione' && st.campagnaId) {
-                await renderSessioneContent(st.campagnaId);
-            } else if (st.page === 'scheda' && st.personaggioId) {
-                await renderSchedaPersonaggio(st.personaggioId);
-            }
-        } else {
-            // No state = initial page, go to campagne
-            AppState.currentCampagnaId = null;
-            AppState.currentSessioneId = null;
-            navigateToPage('campagne', { pushHistory: false });
-        }
-    });
-
-    // Replace current history entry with initial state
-    history.replaceState({
-        page: AppState.currentPage || 'campagne',
-        campagnaId: AppState.currentCampagnaId || null,
-        sessioneId: AppState.currentSessioneId || null,
-        personaggioId: AppState.currentPersonaggioId || null
-    }, '', null);
 
     appDebug('Navigazione alla pagina iniziale...');
     navigateToPage(AppState.currentPage || 'campagne', { pushHistory: false });
@@ -308,9 +245,11 @@ async function init() {
         navigator.serviceWorker.addEventListener('message', (event) => {
             if (event.data?.type === 'NOTIFICATION_CLICK') {
                 if (event.data.campagnaId) {
-                    AppState.currentCampagnaId = event.data.campagnaId;
+                    window.setAppNavigationState({
+                        campagnaId: event.data.campagnaId,
+                        sessioneId: event.data.sessioneId || null
+                    }, 'notification-click');
                     if (event.data.sessioneId) {
-                        AppState.currentSessioneId = event.data.sessioneId;
                         navigateToPage('sessione');
                     } else {
                         navigateToPage('dettagli');
@@ -749,9 +688,6 @@ function setupEventListeners() {
         elements.backToCampagneBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Reset currentCampagnaId per tornare alla lista
-            AppState.currentCampagnaId = null;
-            sessionStorage.removeItem('currentCampagnaId');
             navigateToPage('campagne');
         };
         appDebug('Event listener aggiunto a backToCampagneBtn');

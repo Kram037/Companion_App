@@ -41,11 +41,8 @@ export function CampaignDetailsPage() {
     onSuccess: async started => {
       client.setQueryData(queryKeys.session(campagnaId), started);
       client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
-      window.AppState.currentCampagnaId = campagnaId;
-      window.AppState.currentSessioneId = started.id;
+      window.setAppNavigationState?.({ campagnaId, sessioneId: started.id }, 'react-start-session');
       window.AppState.activeSessionCampagnaId = campagnaId;
-      sessionStorage.setItem('currentCampagnaId', campagnaId);
-      sessionStorage.setItem('currentSessioneId', started.id);
       sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
       window.sendAppEventBroadcast?.({ table: 'sessioni', action: 'insert', campagnaId, sessioneId: started.id });
       navigate(buildAppPath('sessione', { campagnaId }));

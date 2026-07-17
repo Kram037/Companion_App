@@ -28,6 +28,34 @@ const AppState = {
 // `if (window.AppState) ...` (sparsi nel codice) di funzionare correttamente.
 window.AppState = AppState;
 
+window.getAppNavigationState = function() {
+    return {
+        page: AppState.currentPage,
+        campagnaId: AppState.currentCampagnaId,
+        sessioneId: AppState.currentSessioneId,
+        personaggioId: AppState.currentPersonaggioId
+    };
+};
+
+window.setAppNavigationState = function(next = {}, source = 'legacy') {
+    if (Object.prototype.hasOwnProperty.call(next, 'page')) {
+        AppState.currentPage = next.page || 'campagne';
+    }
+    if (Object.prototype.hasOwnProperty.call(next, 'campagnaId')) {
+        AppState.currentCampagnaId = next.campagnaId || null;
+    }
+    if (Object.prototype.hasOwnProperty.call(next, 'sessioneId')) {
+        AppState.currentSessioneId = next.sessioneId || null;
+    }
+    if (Object.prototype.hasOwnProperty.call(next, 'personaggioId')) {
+        AppState.currentPersonaggioId = next.personaggioId || null;
+    }
+
+    const snapshot = window.getAppNavigationState();
+    if (typeof appDebug === 'function') appDebug(`[navigation:${source}]`, snapshot);
+    return snapshot;
+};
+
 // DOM Elements - will be initialized in init()
 let elements = {};
 
@@ -240,8 +268,7 @@ let elements = {};
     function patchOpenPageHelpers() {
         if (typeof window.openSchedaPersonaggio === 'function' && !window.openSchedaPersonaggio.__realtimeGuardNoDoubleRender) {
             const patchedOpenScheda = async function(personaggioId, opts) {
-                AppState.currentPersonaggioId = personaggioId;
-                sessionStorage.setItem('currentPersonaggioId', personaggioId);
+                window.setAppNavigationState({ personaggioId }, 'open-scheda');
                 if (opts && opts.scrollToStats) {
                     window._schedaPendingScrollToStats = true;
                 }
@@ -253,8 +280,7 @@ let elements = {};
 
         if (typeof window.openSessionePage === 'function' && !window.openSessionePage.__realtimeGuardNoDoubleRender) {
             const patchedOpenSessione = async function(campagnaId) {
-                AppState.currentCampagnaId = campagnaId;
-                sessionStorage.setItem('currentCampagnaId', campagnaId);
+                window.setAppNavigationState({ campagnaId }, 'open-sessione');
                 AppState.activeSessionCampagnaId = campagnaId;
                 sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
                 if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {

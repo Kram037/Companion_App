@@ -538,16 +538,11 @@ async function openBookmark(id) {
     _bookmarkSetActiveId(id);
 
     const st = item.state || {};
-    AppState.currentCampagnaId = st.campagnaId || null;
-    AppState.currentSessioneId = st.sessioneId || null;
-    AppState.currentPersonaggioId = st.personaggioId || null;
-
-    if (st.campagnaId) sessionStorage.setItem('currentCampagnaId', st.campagnaId);
-    else sessionStorage.removeItem('currentCampagnaId');
-    if (st.sessioneId) sessionStorage.setItem('currentSessioneId', st.sessioneId);
-    else sessionStorage.removeItem('currentSessioneId');
-    if (st.personaggioId) sessionStorage.setItem('currentPersonaggioId', st.personaggioId);
-    else sessionStorage.removeItem('currentPersonaggioId');
+    window.setAppNavigationState({
+        campagnaId: st.campagnaId || null,
+        sessioneId: st.sessioneId || null,
+        personaggioId: st.personaggioId || null
+    }, 'bookmark');
 
     const targetPage = st.page || item.page || 'campagne';
     const targetHook = _bookmarkNormalizeDesktopHook(targetPage, st.hook || {});

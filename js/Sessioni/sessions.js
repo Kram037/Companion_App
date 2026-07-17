@@ -88,10 +88,6 @@ async function checkStartupNotifications() {
                     const sess = activeSessions[0];
                     AppState.activeSessionCampagnaId = sess.campagna_id;
                     sessionStorage.setItem('activeSessionCampagnaId', sess.campagna_id);
-                    AppState.currentCampagnaId = sess.campagna_id;
-                    sessionStorage.setItem('currentCampagnaId', sess.campagna_id);
-                    AppState.currentSessioneId = sess.id;
-                    sessionStorage.setItem('currentSessioneId', sess.id);
                     updateReturnToSessionBtn();
                 }
             }
@@ -179,8 +175,7 @@ window.playerJoinSession = async function(campagnaId) {
  * Apre la pagina sessione
  */
 window.openSessionePage = async function(campagnaId) {
-    AppState.currentCampagnaId = campagnaId;
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
+    window.setAppNavigationState({ campagnaId }, 'open-sessione');
     AppState.activeSessionCampagnaId = campagnaId;
     sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
     if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {
@@ -775,10 +770,7 @@ window.aggiungiIniziativa = async function(sessioneId) {
 };
 
 window.openCombattimentoPage = async function(campagnaId, sessioneId) {
-    AppState.currentCampagnaId = campagnaId;
-    AppState.currentSessioneId = sessioneId;
-    sessionStorage.setItem('currentCampagnaId', campagnaId);
-    sessionStorage.setItem('currentSessioneId', sessioneId);
+    window.setAppNavigationState({ campagnaId, sessioneId }, 'open-combattimento');
     if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'combattimento', campagnaId, sessioneId })) {
         return;
     }

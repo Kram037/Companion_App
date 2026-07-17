@@ -24,11 +24,12 @@ type BridgedLegacyNavigateFunction = LegacyNavigateFunction & {
 };
 
 function legacySnapshotFromCurrentState(pageName: string): LegacyNavigationSnapshot {
+  const state = window.getAppNavigationState?.();
   return {
     page: pageName,
-    campagnaId: window.AppState?.currentCampagnaId ?? null,
-    sessioneId: window.AppState?.currentSessioneId ?? null,
-    personaggioId: window.AppState?.currentPersonaggioId ?? null,
+    campagnaId: state?.campagnaId ?? window.AppState?.currentCampagnaId ?? null,
+    sessioneId: state?.sessioneId ?? window.AppState?.currentSessioneId ?? null,
+    personaggioId: state?.personaggioId ?? window.AppState?.currentPersonaggioId ?? null,
   };
 }
 
@@ -61,11 +62,12 @@ export function LegacyNavigationSync() {
     window.CompanionRouterBridge = {
       ...window.CompanionRouterBridge,
       navigateToLegacy(snapshot) {
-        navigate(pathFromLegacyNavigation(snapshot));
+        const target = pathFromLegacyNavigation(snapshot);
+        if (pathname !== target) navigate(target);
         return true;
       },
     };
-  }, [navigate]);
+  }, [navigate, pathname]);
 
   useEffect(() => {
     if (installNavigateToPageBridge()) return;
@@ -92,11 +94,12 @@ export function LegacyNavigationSync() {
       || (current?.currentSessioneId ?? null) !== (navigation.sessioneId ?? null)
       || (current?.currentPersonaggioId ?? null) !== (navigation.personaggioId ?? null);
 
-    if (window.AppState) {
-      window.AppState.currentCampagnaId = navigation.campagnaId ?? null;
-      window.AppState.currentSessioneId = navigation.sessioneId ?? null;
-      window.AppState.currentPersonaggioId = navigation.personaggioId ?? null;
-    }
+    window.setAppNavigationState?.({
+      page: navigation.page ?? 'campagne',
+      campagnaId: navigation.campagnaId ?? null,
+      sessioneId: navigation.sessioneId ?? null,
+      personaggioId: navigation.personaggioId ?? null,
+    }, 'react-router');
     if (changed) window.navigateToPage?.(navigation.page ?? 'campagne', { pushHistory: false });
     else window.updateBookmarkChrome?.();
   }, [pathname]);

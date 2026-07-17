@@ -410,7 +410,7 @@ async function closePersonaggioModal({ force = false } = {}) {
 
     if (AppState.currentPage === 'personaggioCreate') {
         if (returnPage === 'scheda' && returnPersonaggioId) {
-            AppState.currentPersonaggioId = returnPersonaggioId;
+            window.setAppNavigationState({ personaggioId: returnPersonaggioId }, 'close-personaggio-editor');
         }
         navigateToPage(returnPage);
     }

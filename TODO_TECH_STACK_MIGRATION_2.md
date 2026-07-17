@@ -33,11 +33,11 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 ## Priorita 3 - Navigazione e stato
 
-- [ ] Scegliere React Router come fonte primaria di URL e pagina corrente.
-- [ ] Ridurre `js/Core/navigation.js` a bridge legacy senza `history.pushState(..., null)`.
-- [ ] Eliminare `sessionStorage currentPage/currentCampagnaId/currentSessioneId` dai flussi React.
-- [ ] Spostare `AppState.current*` dietro helper compatibili e tracciabili.
-- [ ] Aggiungere test smoke per deep link, refresh e back/forward browser.
+- [x] Scegliere React Router come fonte primaria di URL e pagina corrente.
+- [x] Ridurre `js/Core/navigation.js` a bridge legacy senza scritture dirette sulla history.
+- [x] Eliminare `sessionStorage currentPage/currentCampagnaId/currentSessioneId/currentPersonaggioId` dai flussi di navigazione.
+- [x] Spostare `AppState.current*` dietro helper compatibili e tracciabili.
+- [x] Aggiungere test smoke per deep link, refresh e back/forward browser.
 
 ## Priorita 4 - Realtime disciplinato
 

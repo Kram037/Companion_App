@@ -19,13 +19,41 @@ test('legacy session navigation invokes the session renderer', async ({ page }) 
     window.renderSessioneContent = async campaignId => {
       rendered = campaignId;
     };
-    window.AppState.currentCampagnaId = 'campaign-test';
+    window.setAppNavigationState?.({ campagnaId: 'campaign-test' }, 'e2e');
 
     await window.navigateToPage?.('sessione', { pushHistory: false });
     return rendered;
   });
 
   expect(renderedCampaignId).toBe('campaign-test');
+});
+
+test('URL drives deep links, refresh and browser history', async ({ page }) => {
+  await page.goto('/compendio');
+  await expect(page.locator('#compendioPage')).toHaveClass(/active/);
+
+  await page.reload();
+  await expect(page).toHaveURL(/\/compendio$/);
+  await expect(page.locator('#compendioPage')).toHaveClass(/active/);
+
+  await page.locator('.desktop-sidebar-btn[data-page="personaggi"]').click();
+  await expect(page).toHaveURL(/\/personaggi$/);
+  await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
+
+  await page.locator('.desktop-sidebar-btn[data-page="campagne"]').click();
+  await expect(page).toHaveURL(/\/campagne$/);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/personaggi$/);
+  await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/compendio$/);
+  await expect(page.locator('#compendioPage')).toHaveClass(/active/);
+
+  await page.goForward();
+  await expect(page).toHaveURL(/\/personaggi$/);
+  await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
 });
 
 test('legacy changes notify the React query bridge', async ({ page }) => {

@@ -19,6 +19,15 @@ export interface LegacyAppState {
 declare global {
   interface Window {
     AppState?: Partial<LegacyAppState>;
+    getAppNavigationState?: () => LegacyNavigationState;
+    setAppNavigationState?: (next: Partial<LegacyNavigationState>, source?: string) => LegacyNavigationState;
     navigateToPage?: (page: string, options?: { pushHistory?: boolean }) => unknown;
   }
+}
+
+export interface LegacyNavigationState {
+  page: string;
+  campagnaId: Id | null;
+  sessioneId: Id | null;
+  personaggioId: Id | null;
 }

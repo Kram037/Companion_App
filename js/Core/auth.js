@@ -1050,9 +1050,9 @@ async function handleLogout() {
         try {
             const supabase = getSupabaseClient();
 
-            // Pulisci sessionStorage PRIMA del logout
-            sessionStorage.removeItem('currentCampagnaId');
-            AppState.currentCampagnaId = null;
+            window.setAppNavigationState({
+                page: 'campagne', campagnaId: null, sessioneId: null, personaggioId: null
+            }, 'logout');
 
             // Pulisci lo stato locale PRIMA
             AppState.currentUser = null;
@@ -1100,7 +1100,6 @@ async function handleLogout() {
             // Pulisci anche AppState prima del reload
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
-            AppState.currentCampagnaId = null;
 
             // Ricarica la pagina
             window.location.reload();
@@ -1111,7 +1110,6 @@ async function handleLogout() {
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
-            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             // Forza refresh anche in caso di errore
@@ -1130,7 +1128,6 @@ async function handleLogout() {
             AppState.currentUser = null;
             AppState.isLoggedIn = false;
             updateUIForLoggedOut();
-            sessionStorage.removeItem('currentCampagnaId');
             closeUserModal();
             showNotification('Logout effettuato');
             setTimeout(() => {

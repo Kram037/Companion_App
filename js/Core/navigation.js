@@ -57,10 +57,7 @@ async function _returnToActiveSessionOrCombat() {
     }
     const inCombat = await _isCombatInProgress(sessione.id);
     if (inCombat) {
-        AppState.currentCampagnaId = campagnaId;
-        AppState.currentSessioneId = sessione.id;
-        sessionStorage.setItem('currentCampagnaId', campagnaId);
-        sessionStorage.setItem('currentSessioneId', sessione.id);
+        window.setAppNavigationState({ campagnaId, sessioneId: sessione.id }, 'return-to-combat');
         if (window.CompanionRouterBridge?.navigateToLegacy?.({
             page: 'combattimento',
             campagnaId,
@@ -104,8 +101,6 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         captureActiveBookmark({ silent: true });
     }
 
-    const previousPage = AppState.currentPage;
-
     // Update active page
     elements.pages.forEach(page => {
         page.classList.remove('active');
@@ -124,46 +119,16 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         }
     });
 
-    AppState.currentPage = pageName;
+    window.setAppNavigationState({ page: pageName }, 'legacy-render');
 
-    // Salva la pagina corrente nel sessionStorage
-    sessionStorage.setItem('currentPage', pageName);
-
-    // Salva currentCampagnaId e currentSessioneId solo per pagine che lo richiedono
-    if (pageName === 'dettagli' || pageName === 'sessione' || pageName === 'combattimento') {
-        if (AppState.currentCampagnaId) {
-            sessionStorage.setItem('currentCampagnaId', AppState.currentCampagnaId);
-        }
-        if (pageName === 'combattimento' && AppState.currentSessioneId) {
-            sessionStorage.setItem('currentSessioneId', AppState.currentSessioneId);
-        } else {
-            sessionStorage.removeItem('currentSessioneId');
-            AppState.currentSessioneId = null;
-        }
+    if (pageName === 'dettagli' || pageName === 'sessione') {
+        window.setAppNavigationState({ sessioneId: null, personaggioId: null }, 'legacy-render');
+    } else if (pageName === 'combattimento') {
+        window.setAppNavigationState({ personaggioId: null }, 'legacy-render');
     } else if (pageName === 'scheda') {
-        if (AppState.currentPersonaggioId) {
-            sessionStorage.setItem('currentPersonaggioId', AppState.currentPersonaggioId);
-        }
-    } else {
-        if (pageName === 'campagne' || pageName === 'amici' || pageName === 'compendio' || pageName === 'personaggi' || pageName === 'laboratorio') {
-            sessionStorage.removeItem('currentCampagnaId');
-            sessionStorage.removeItem('currentSessioneId');
-            sessionStorage.removeItem('currentPersonaggioId');
-            AppState.currentCampagnaId = null;
-            AppState.currentSessioneId = null;
-            AppState.currentPersonaggioId = null;
-        }
-    }
-
-    // Push to browser history so back/forward buttons work within the app
-    if (pushHistory && previousPage !== pageName) {
-        const stateObj = {
-            page: pageName,
-            campagnaId: AppState.currentCampagnaId || null,
-            sessioneId: AppState.currentSessioneId || null,
-            personaggioId: AppState.currentPersonaggioId || null
-        };
-        history.pushState(stateObj, '', null);
+        window.setAppNavigationState({ campagnaId: null, sessioneId: null }, 'legacy-render');
+    } else if (['campagne', 'amici', 'compendio', 'personaggi', 'laboratorio', 'personaggioCreate'].includes(pageName)) {
+        window.setAppNavigationState({ campagnaId: null, sessioneId: null, personaggioId: null }, 'legacy-render');
     }
 
     // Ferma Realtime subscription combattimento se si esce dalla pagina
