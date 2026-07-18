@@ -268,16 +268,16 @@
 @media (min-width: 900px) {
     .dice-roller-panel {
         left: 0;
-        top: 78px;
+        top: 74px;
         bottom: 60px;
         width: var(--desktop-sidebar-width, 228px);
         z-index: 97;
-        opacity: 1;
-        visibility: visible;
     }
 
     body.dice-desktop-open .dice-roller-panel {
         pointer-events: auto;
+        opacity: 1;
+        visibility: visible;
     }
 
     .desktop-sidebar-list {

@@ -193,6 +193,8 @@ test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await waitForStartup(page);
 
   await expect(page.locator('#diceSidebarToggle')).toHaveCount(0);
+  await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('#diceRollerPanel')).toBeHidden();
   await page.locator('#d20Logo').dispatchEvent('click');
   await expect(page.locator('body')).toHaveClass(/dice-desktop-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
@@ -229,6 +231,8 @@ test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await page.locator('#d20Logo').dispatchEvent('click');
   await expect(page.locator('body')).not.toHaveClass(/dice-desktop-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('#diceRollerPanel')).toBeHidden();
+  await expect.poll(() => page.locator('.desktop-sidebar-list').evaluate(el => getComputedStyle(el).opacity)).toBe('1');
 });
 
 test('mobile d20 logo opens a fullscreen dice roller', async ({ page }) => {
