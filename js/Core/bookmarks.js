@@ -1049,8 +1049,27 @@ function _desktopSidebarChildHtml(page, child, focusedPage, activeChild) {
 }
 
 function updateDesktopSidebarActive() {
-    renderDesktopSidebar();
     const focusedPage = _desktopSidebarFocusedPage();
+    document.querySelectorAll('.desktop-sidebar-group').forEach(group => {
+        const page = group.dataset.page || '';
+        const activeChild = _desktopActiveChild(page);
+        const open = _desktopGroupOpen(page);
+        group.classList.toggle('open', open);
+        group.querySelector('.desktop-sidebar-group-toggle')?.setAttribute('aria-expanded', open ? 'true' : 'false');
+        group.querySelectorAll('.desktop-sidebar-child-group').forEach(childGroup => {
+            const toggle = childGroup.querySelector('.desktop-sidebar-child-toggle');
+            const key = toggle?.dataset.tab || '';
+            childGroup.classList.toggle('open', _desktopNestedGroupOpen(page, key, activeChild));
+        });
+        group.querySelectorAll('.desktop-sidebar-child').forEach(child => {
+            const tab = child.dataset.tab || '';
+            const isToggle = child.classList.contains('desktop-sidebar-child-toggle');
+            const active = focusedPage === page && (isToggle
+                ? activeChild === tab || activeChild.startsWith(`${tab}:`)
+                : activeChild === tab);
+            child.classList.toggle('active', active);
+        });
+    });
     document.querySelectorAll('.desktop-sidebar-btn').forEach(btn => {
         const isGroup = btn.classList.contains('desktop-sidebar-group-toggle');
         btn.classList.toggle('active', btn.dataset.page === focusedPage && !isGroup);

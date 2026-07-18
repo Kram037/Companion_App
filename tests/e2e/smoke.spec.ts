@@ -194,10 +194,12 @@ test('desktop sidebar treats character sheets as personaggi in split view', asyn
 
   await page.evaluate(() => {
     document.body.classList.add('desktop-split-active');
+    document.querySelector('.desktop-sidebar-btn[data-page="campagne"] svg')?.setAttribute('data-render-probe', 'kept');
     window.postMessage({ type: 'companion-split-focus', page: 'scheda', tab: '' }, window.location.origin);
   });
 
   await expect(page.locator('.desktop-sidebar-btn[data-page="personaggi"]')).toHaveClass(/active/);
+  await expect(page.locator('.desktop-sidebar-btn[data-page="campagne"] svg')).toHaveAttribute('data-render-probe', 'kept');
 });
 
 test('desktop dice roller opens from the d20 logo', async ({ page }) => {
