@@ -271,7 +271,7 @@
         top: 78px;
         bottom: 60px;
         width: var(--desktop-sidebar-width, 228px);
-        z-index: 95;
+        z-index: 97;
         opacity: 1;
         visibility: visible;
     }
@@ -280,12 +280,14 @@
         pointer-events: auto;
     }
 
-    .desktop-sidebar-nav {
-        transition: transform 0.22s ease;
+    .desktop-sidebar-list {
+        transition: transform 0.22s ease, opacity 0.18s ease;
     }
 
-    body.dice-desktop-open .desktop-sidebar-nav {
-        transform: translateX(-100%);
+    body.dice-desktop-open .desktop-sidebar-list {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-110%);
     }
 
     .dice-roller-shell {
@@ -323,7 +325,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .dice-roller-panel,
-    .desktop-sidebar-nav {
+    .desktop-sidebar-list {
         transition: none;
     }
 

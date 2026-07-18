@@ -199,6 +199,8 @@ test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await expect(page.locator('#diceRollerPanel .dice-roller-head')).toHaveCount(0);
   await expect(page.locator('#userBtn')).toBeVisible();
   await expect(page.locator('#settingsBtn')).toBeVisible();
+  await expect.poll(() => page.locator('.desktop-sidebar-nav').evaluate(el => getComputedStyle(el).transform)).toBe('none');
+  await expect.poll(() => page.locator('.desktop-sidebar-list').evaluate(el => getComputedStyle(el).opacity)).toBe('0');
 
   await expect(page.locator('[data-dice-clear]')).toHaveCount(0);
   await page.locator('#diceRollerPanel .dice-face').first().click();
