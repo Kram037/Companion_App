@@ -85,3 +85,19 @@ test('legacy Supabase wait resolves when the bundled client becomes ready later'
 
   expect(resolved).toBe(true);
 });
+
+test('legacy Supabase still boots if React chunks fail', async ({ page }) => {
+  await page.route(/\/assets\/(?!index-[^/]+\.js$)[^/]+\.js$/, route => route.abort());
+  await page.goto('/');
+
+  await expect.poll(() => page.evaluate(() => {
+    const app = window as typeof window & {
+      getSupabaseClient?: () => unknown;
+      initializeSupabaseClient?: () => unknown;
+      supabaseClient?: unknown;
+    };
+    return typeof app.getSupabaseClient === 'function'
+      && typeof app.initializeSupabaseClient === 'function'
+      && Boolean(app.supabaseClient);
+  })).toBe(true);
+});
