@@ -34,6 +34,58 @@ test('legacy session navigation invokes the session renderer', async ({ page }) 
   expect(renderedCampaignId).toBe('campaign-test');
 });
 
+test('session buttons render immediately even when React bridge handles the URL', async ({ page }) => {
+  await page.goto('/campagne');
+  await waitForStartup(page);
+
+  const state = await page.evaluate(async () => {
+    let combatRendered = '';
+    let bridgedTo = '';
+    Object.defineProperty(window, 'renderCombattimentoContent', {
+      configurable: true,
+      writable: true,
+      value: async (campaignId, sessionId) => {
+        combatRendered = `${campaignId}:${sessionId}`;
+      },
+    });
+    window.ensureRuntimeScript = async () => {};
+    window.CompanionRouterBridge = {
+      ...window.CompanionRouterBridge,
+      navigateToLegacy(snapshot) {
+        bridgedTo = snapshot.page || '';
+        if (snapshot.page === 'sessione') {
+          window.history.pushState({}, '', `/campagne/${snapshot.campagnaId}/sessione`);
+        } else if (snapshot.page === 'combattimento') {
+          window.history.pushState({}, '', `/campagne/${snapshot.campagnaId}/sessione/${snapshot.sessioneId}/combattimento`);
+        }
+        return true;
+      },
+    };
+
+    await window.openSessionePage?.('campaign-test');
+    const sessionActive = document.getElementById('sessionePage')?.classList.contains('active') ?? false;
+    await window.openCombattimentoPage?.('campaign-test', 'session-test');
+
+    return {
+      bridgedTo,
+      sessionActive,
+      combatRendered,
+      page: window.AppState?.currentPage,
+      campagnaId: window.AppState?.currentCampagnaId,
+      sessioneId: window.AppState?.currentSessioneId,
+    };
+  });
+
+  expect(state).toEqual({
+    bridgedTo: 'combattimento',
+    sessionActive: true,
+    combatRendered: 'campaign-test:session-test',
+    page: 'combattimento',
+    campagnaId: 'campaign-test',
+    sessioneId: 'session-test',
+  });
+});
+
 test('URL drives deep links, refresh and browser history', async ({ page }) => {
   await page.goto('/compendio');
   await waitForStartup(page);

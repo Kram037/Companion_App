@@ -332,17 +332,7 @@ let elements = {};
         }
 
         if (typeof window.openSessionePage === 'function' && !window.openSessionePage.__realtimeGuardNoDoubleRender) {
-            const patchedOpenSessione = async function(campagnaId) {
-                window.setAppNavigationState({ campagnaId }, 'open-sessione');
-                AppState.activeSessionCampagnaId = campagnaId;
-                sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
-                if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {
-                    return;
-                }
-                return navigateToPage('sessione');
-            };
-            patchedOpenSessione.__realtimeGuardNoDoubleRender = true;
-            window.openSessionePage = patchedOpenSessione;
+            window.openSessionePage.__realtimeGuardNoDoubleRender = true;
         }
     }
 

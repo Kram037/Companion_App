@@ -53,3 +53,35 @@ test('legacy getter can recover the bundled Supabase singleton', async ({ page }
 
   expect(recovered).toBe(true);
 });
+
+test('legacy Supabase wait resolves when the bundled client becomes ready later', async ({ page }) => {
+  await page.goto('/');
+
+  const resolved = await page.evaluate(async () => {
+    const app = window as typeof window & {
+      initializeSupabaseClient?: () => unknown;
+      supabaseClient?: unknown;
+      waitForSupabase?: () => Promise<unknown>;
+    };
+    const realInit = app.initializeSupabaseClient;
+    const realClient = app.supabaseClient;
+    delete app.supabaseClient;
+    delete app.initializeSupabaseClient;
+
+    const wait = app.waitForSupabase?.();
+    window.setTimeout(() => {
+      app.initializeSupabaseClient = () => {
+        app.supabaseClient = { auth: {} };
+        return app.supabaseClient;
+      };
+      window.dispatchEvent(new Event('companion:supabase-ready'));
+    }, 50);
+
+    const result = Boolean(await wait);
+    app.initializeSupabaseClient = realInit;
+    app.supabaseClient = realClient;
+    return result;
+  });
+
+  expect(resolved).toBe(true);
+});

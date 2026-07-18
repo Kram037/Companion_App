@@ -178,11 +178,9 @@ window.openSessionePage = async function(campagnaId) {
     window.setAppNavigationState({ campagnaId }, 'open-sessione');
     AppState.activeSessionCampagnaId = campagnaId;
     sessionStorage.setItem('activeSessionCampagnaId', campagnaId);
-    if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId })) {
-        return;
-    }
-    navigateToPage('sessione');
-    await renderSessioneContent(campagnaId);
+    window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'sessione', campagnaId });
+    await navigateToPage('sessione', { pushHistory: false, skipPageLoad: true });
+    await (window.renderSessioneContent || renderSessioneContent)(campagnaId);
 };
 
 /**
@@ -742,8 +740,13 @@ async function getCharacterNamesMap(campagnaId) {
 
 window.openCombattimentoPage = async function(campagnaId, sessioneId) {
     window.setAppNavigationState({ campagnaId, sessioneId }, 'open-combattimento');
-    if (window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'combattimento', campagnaId, sessioneId })) {
-        return;
+    window.CompanionRouterBridge?.navigateToLegacy?.({ page: 'combattimento', campagnaId, sessioneId });
+    await navigateToPage('combattimento', { pushHistory: false, skipPageLoad: true });
+    if (typeof window.ensureRuntimeScript === 'function') {
+        await window.ensureRuntimeScript('combattimento');
     }
-    await navigateToPage('combattimento');
+    await (window.renderCombattimentoContent || renderCombattimentoContent)(campagnaId, sessioneId);
+    if (!window.combattimentoChannel) {
+        startCombattimentoRealtime(campagnaId, sessioneId);
+    }
 };

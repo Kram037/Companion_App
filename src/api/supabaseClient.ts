@@ -14,6 +14,7 @@ export function initializeSupabaseClient(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
   window.supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  window.dispatchEvent(new Event('companion:supabase-ready'));
   if (debug) console.log('Supabase caricato e inizializzato');
   return window.supabaseClient;
 }

@@ -36,22 +36,36 @@ function initSupabase() {
 
 function waitForSupabase() {
     return new Promise((resolve) => {
+        let completed = false;
+        /** @type {number | null} */
+        let interval = null;
+        /** @param {boolean} value */
+        const finish = (value) => {
+            if (completed) return;
+            completed = true;
+            if (interval) clearInterval(interval);
+            window.removeEventListener('companion:supabase-ready', check);
+            resolve(value);
+        };
+        const check = () => {
+            if (canInitSupabaseClient()) finish(initSupabase());
+        };
+
         if (canInitSupabaseClient()) {
-            resolve(initSupabase());
+            finish(initSupabase());
             return;
         }
 
         let attempts = 0;
-        const maxAttempts = 50;
-        const checkInterval = setInterval(() => {
+        const maxAttempts = 150;
+        window.addEventListener('companion:supabase-ready', check);
+        interval = setInterval(() => {
             attempts++;
             if (canInitSupabaseClient()) {
-                clearInterval(checkInterval);
-                resolve(initSupabase());
+                finish(initSupabase());
             } else if (attempts >= maxAttempts) {
-                clearInterval(checkInterval);
                 console.warn('Timeout attesa Supabase, continuo comunque...');
-                resolve(false);
+                finish(false);
             }
         }, 100);
     });

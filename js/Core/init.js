@@ -779,8 +779,7 @@ function setupEventListeners() {
             e.stopPropagation();
             const campagnaId = AppState.currentCampagnaId;
             if (campagnaId) {
-                navigateToPage('sessione');
-                await renderSessioneContent(campagnaId);
+                await openSessionePage(campagnaId);
             }
         };
         appDebug('Event listener aggiunto a backToSessioneBtn');

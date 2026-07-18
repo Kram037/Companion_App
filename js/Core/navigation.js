@@ -57,18 +57,12 @@ async function _returnToActiveSessionOrCombat() {
     }
     const inCombat = await _isCombatInProgress(sessione.id);
     if (inCombat) {
-        window.setAppNavigationState({ campagnaId, sessioneId: sessione.id }, 'return-to-combat');
-        if (window.CompanionRouterBridge?.navigateToLegacy?.({
-            page: 'combattimento',
-            campagnaId,
-            sessioneId: sessione.id
-        })) {
-            return true;
+        if (typeof openCombattimentoPage === 'function') {
+            await openCombattimentoPage(campagnaId, sessione.id);
         }
-        navigateToPage('combattimento');
     } else {
         if (typeof openSessionePage === 'function') {
-            openSessionePage(campagnaId);
+            await openSessionePage(campagnaId);
         }
     }
     return true;
