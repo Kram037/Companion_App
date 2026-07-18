@@ -12,6 +12,16 @@ let _bookmarkFocusedPane = 'left';
 let _bookmarkRightPaneState = { page: '', tab: '' };
 let _desktopPendingSidebarTarget = null;
 const _bookmarkIsSplitPaneInstance = new URLSearchParams(window.location.search).get('splitPane') === '1';
+const BOOKMARKS_APP_ROOT_URL = (() => {
+    const script = [...document.scripts].find(item => {
+        return new URL(item.src, window.location.href).pathname.endsWith('/js/Core/bookmarks.js');
+    });
+    const url = script?.src ? new URL(script.src, window.location.href) : new URL('/', window.location.href);
+    url.pathname = url.pathname.replace(/js\/Core\/bookmarks\.js$/, '');
+    url.search = '';
+    url.hash = '';
+    return url;
+})();
 const DESKTOP_LAB_CHILDREN = [
     { key: 'razze', label: 'Razze', iconFile: 'Razze' },
     { key: 'classi', label: 'Classi', iconFile: 'Classi' },
@@ -765,8 +775,9 @@ function _desktopNavItems() {
 function _desktopSidebarItemIcon(item) {
     if (item.icon) return item.icon;
     if (!item.iconFile) return '';
-    const src = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
-    return `<img class="desktop-sidebar-item-icon" src="${src}" alt="" loading="lazy">`;
+    const path = `images/Tabs/${String(item.iconFile).split('/').map(encodeURIComponent).join('/')}.svg`;
+    const src = new URL(path, BOOKMARKS_APP_ROOT_URL).toString();
+    return `<span class="desktop-sidebar-item-icon" aria-hidden="true" style="--desktop-sidebar-icon-url:url('${src}')"></span>`;
 }
 
 function _desktopGroupOpen(page) {

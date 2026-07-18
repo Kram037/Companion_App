@@ -200,6 +200,13 @@ test('desktop sidebar treats character sheets as personaggi in split view', asyn
 
   await expect(page.locator('.desktop-sidebar-btn[data-page="personaggi"]')).toHaveClass(/active/);
   await expect(page.locator('.desktop-sidebar-btn[data-page="campagne"] svg')).toHaveAttribute('data-render-probe', 'kept');
+
+  await page.locator('.desktop-sidebar-group-toggle[data-page="compendio"]').click();
+  const icon = page.locator('.desktop-sidebar-group[data-page="compendio"] .desktop-sidebar-child[data-tab="razze"] .desktop-sidebar-item-icon');
+  await expect(icon).toHaveCount(1);
+  expect(await icon.evaluate(el => el.tagName)).toBe('SPAN');
+  expect(await icon.evaluate(el => getComputedStyle(el).filter)).toBe('none');
+  await expect.poll(() => icon.evaluate(el => getComputedStyle(el).webkitMaskImage || getComputedStyle(el).maskImage)).toContain('Razze.svg');
 });
 
 test('desktop dice roller opens from the d20 logo', async ({ page }) => {
