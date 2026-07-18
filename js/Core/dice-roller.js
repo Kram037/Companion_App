@@ -40,10 +40,6 @@
         if (!panel) return;
         setSafeHtml(panel, `
             <div class="dice-roller-shell">
-                <div class="dice-roller-head">
-                    <h2>Tira dadi</h2>
-                    <button type="button" class="dice-close-btn" data-dice-close aria-label="Chiudi">x</button>
-                </div>
                 <div class="dice-stage" aria-live="polite">
                     ${state.dice.map((die, index) => `
                         <button type="button" class="dice-face dice-d${die.sides}" data-dice-remove="${index}" title="Rimuovi d${die.sides}">
@@ -74,12 +70,6 @@
     }
 
     function onPanelClick(event) {
-        const close = event.target.closest('[data-dice-close]');
-        if (close) {
-            closeDiceRoller();
-            return;
-        }
-
         const add = event.target.closest('[data-dice-add]');
         if (add) {
             const sides = parseInt(add.dataset.diceAdd, 10);
@@ -123,11 +113,15 @@
         document.body.classList.toggle('dice-desktop-open', isDesktop());
         document.body.classList.toggle('dice-mobile-open', !isDesktop());
         document.getElementById('diceRollerPanel')?.setAttribute('aria-hidden', 'false');
+        document.getElementById('d20Logo')?.setAttribute('aria-label', 'Chiudi tira dadi');
+        document.getElementById('d20Logo')?.setAttribute('aria-expanded', 'true');
     }
 
     function closeDiceRoller() {
         document.body.classList.remove('dice-desktop-open', 'dice-mobile-open');
         document.getElementById('diceRollerPanel')?.setAttribute('aria-hidden', 'true');
+        document.getElementById('d20Logo')?.setAttribute('aria-label', 'Apri tira dadi');
+        document.getElementById('d20Logo')?.setAttribute('aria-expanded', 'false');
     }
 
     function toggleDiceRoller() {

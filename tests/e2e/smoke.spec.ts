@@ -196,14 +196,27 @@ test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await page.locator('#d20Logo').dispatchEvent('click');
   await expect(page.locator('body')).toHaveClass(/dice-desktop-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
+  await expect(page.locator('#diceRollerPanel .dice-roller-head')).toHaveCount(0);
+  await expect(page.locator('#userBtn')).toBeVisible();
+  await expect(page.locator('#settingsBtn')).toBeVisible();
 
   await expect(page.locator('[data-dice-clear]')).toHaveCount(0);
   await page.locator('#diceRollerPanel .dice-face').first().click();
   await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(0);
   await expect(page.locator('.dice-total strong')).toHaveText('0');
   await expect.poll(() => page.locator('.dice-type-row').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(3);
+  await expect.poll(() => page.locator('.dice-type').first().evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return Math.abs(rect.width - rect.height);
+  })).toBeLessThan(1);
   await page.locator('[data-dice-add="6"]').click();
-  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(1);
+  await page.locator('[data-dice-add="8"]').click();
+  await page.locator('[data-dice-add="10"]').click();
+  await expect(page.locator('#diceRollerPanel .dice-face')).toHaveCount(3);
+  await expect.poll(() => page.locator('#diceRollerPanel .dice-face').evaluateAll(dice => {
+    const tops = dice.map(die => Math.round(die.getBoundingClientRect().top));
+    return new Set(tops).size;
+  })).toBe(1);
   await page.locator('[data-dice-roll]').click();
   await expect.poll(() => page.locator('.dice-total strong').innerText().then(Number)).toBeGreaterThan(0);
   await expect.poll(() => page.locator('[data-dice-roll]').evaluate(el => {
@@ -211,6 +224,9 @@ test('desktop dice roller opens from the d20 logo', async ({ page }) => {
     const parent = el.parentElement!.getBoundingClientRect();
     return Math.abs(button.width - parent.width);
   })).toBeLessThan(2);
+  await page.locator('#d20Logo').dispatchEvent('click');
+  await expect(page.locator('body')).not.toHaveClass(/dice-desktop-open/);
+  await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'true');
 });
 
 test('mobile d20 logo opens a fullscreen dice roller', async ({ page }) => {
@@ -223,11 +239,15 @@ test('mobile d20 logo opens a fullscreen dice roller', async ({ page }) => {
 
   await expect(page.locator('body')).toHaveClass(/dice-mobile-open/);
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
-  await expect(page.locator('#diceRollerPanel .dice-roller-head')).toBeHidden();
+  await expect(page.locator('#diceRollerPanel .dice-roller-head')).toHaveCount(0);
   await expect(page.locator('.bottom-toolbar')).toBeHidden();
   await expect(page.locator('#campagnePage .btn-fab')).toBeHidden();
   await expect(page.locator('.bookmarks-fab')).toBeHidden();
   await expect.poll(() => page.locator('.dice-type-row').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(6);
+  await expect.poll(() => page.locator('.dice-type').first().evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return Math.abs(rect.width - rect.height);
+  })).toBeLessThan(1);
   await expect.poll(() => page.locator('#diceRollerPanel').evaluate(panel => {
     const panelRect = panel.getBoundingClientRect();
     const rollRect = document.querySelector('[data-dice-roll]')!.getBoundingClientRect();
