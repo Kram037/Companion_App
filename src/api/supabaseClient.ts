@@ -36,4 +36,6 @@ export function isMissingDatabaseColumn(error: unknown): boolean {
     || /column .* does not exist|schema cache/i.test(String(message ?? ''));
 }
 
-window.initializeSupabaseClient = initializeSupabaseClient;
+if (typeof window !== 'undefined') {
+  window.initializeSupabaseClient = initializeSupabaseClient;
+}
