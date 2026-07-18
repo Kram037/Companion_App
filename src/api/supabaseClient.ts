@@ -4,6 +4,7 @@ declare global {
   interface Window {
     CompanionConfig?: { supabaseUrl?: string; supabaseAnonKey?: string; debug?: boolean };
     supabaseClient?: SupabaseClient;
+    initializeSupabaseClient?: () => SupabaseClient | null;
   }
 }
 
@@ -34,3 +35,5 @@ export function isMissingDatabaseColumn(error: unknown): boolean {
     || code === 'PGRST204'
     || /column .* does not exist|schema cache/i.test(String(message ?? ''));
 }
+
+window.initializeSupabaseClient = initializeSupabaseClient;

@@ -1,13 +1,25 @@
 // Adapter legacy. Il client viene creato esclusivamente da src/api/supabaseClient.ts.
 let supabaseReady = false;
 
+function ensureSupabaseClient() {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (typeof window.initializeSupabaseClient !== 'function') return null;
+
+    try {
+        return window.initializeSupabaseClient();
+    } catch (error) {
+        console.error('Errore inizializzazione Supabase:', error);
+        return null;
+    }
+}
+
 function canInitSupabaseClient() {
-    return !!window.supabaseClient;
+    return !!ensureSupabaseClient();
 }
 
 function initSupabase() {
     try {
-        if (!window.supabaseClient) {
+        if (!ensureSupabaseClient()) {
             console.error('Supabase client non disponibile. Verifica config e caricamento SDK.');
             return false;
         }
@@ -46,5 +58,5 @@ function waitForSupabase() {
 }
 
 function getSupabaseClient() {
-    return window.supabaseClient;
+    return ensureSupabaseClient();
 }

@@ -7,6 +7,7 @@ interface Window {
     debug?: boolean;
   };
   supabaseClient?: unknown;
+  initializeSupabaseClient?: () => unknown;
   getAppLang?: () => 'it' | 'en';
   setAppLang?: (lang: string, save?: boolean) => void;
   loadAppLang?: () => void;

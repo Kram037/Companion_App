@@ -843,27 +843,24 @@ async function handleLogin(e) {
     }
 
     // Verifica che Supabase sia disponibile
-    const supabase = getSupabaseClient();
+    let supabase = getSupabaseClient();
+    if (!supabase && typeof waitForSupabase === 'function') {
+        await waitForSupabase();
+        supabase = getSupabaseClient();
+    }
 
     if (!supabase) {
-        // Prova a ottenere il client direttamente se non è disponibile
-        if (typeof window.supabaseClient !== 'undefined') {
-            // Client disponibile, aggiorna supabaseReady
-            supabaseReady = true;
-        } else {
         showError('Autenticazione non disponibile. Ricarica la pagina.');
-            console.error('Supabase non disponibile:', {
-                supabaseReady,
-                supabase: !!supabase,
-                windowSupabaseClient: typeof window.supabaseClient
-            });
-            return;
-        }
-    } else {
-        // Client disponibile, assicurati che supabaseReady sia true
-        if (!supabaseReady) {
-            supabaseReady = true;
-        }
+        console.error('Supabase non disponibile:', {
+            supabaseReady,
+            windowSupabaseClient: typeof window.supabaseClient,
+            initializeSupabaseClient: typeof window.initializeSupabaseClient
+        });
+        return;
+    }
+
+    if (!supabaseReady) {
+        supabaseReady = true;
     }
 
     try {
@@ -943,7 +940,11 @@ async function handleLogin(e) {
 
 // Google Login Handler
 async function handleGoogleLogin() {
-    const supabase = getSupabaseClient();
+    let supabase = getSupabaseClient();
+    if (!supabase && typeof waitForSupabase === 'function') {
+        await waitForSupabase();
+        supabase = getSupabaseClient();
+    }
 
     if (!supabase) {
         showError('Autenticazione Google non disponibile. Controlla la configurazione Supabase.');
