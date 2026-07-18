@@ -784,6 +784,11 @@ function _desktopGroupStorageKey(page) {
     return `companion_sidebar_group_v2_${page}`;
 }
 
+function _desktopSidebarRootPage(page) {
+    if (page === 'scheda' || page === 'personaggioCreate') return 'personaggi';
+    return page || '';
+}
+
 function _desktopNestedGroupOpen(page, key, activeChild = '') {
     if (activeChild && (activeChild === key || activeChild.startsWith(`${key}:`))) return true;
     return localStorage.getItem(`${_desktopGroupStorageKey(page)}_${key}`) === 'open';
@@ -919,7 +924,7 @@ function _bookmarkPostCurrentPaneState() {
     if (!_bookmarkIsSplitPaneInstance) return;
     window.parent?.postMessage({
         type: 'companion-split-focus',
-        page: AppState.currentPage || '',
+        page: _desktopSidebarRootPage(AppState.currentPage || ''),
         tab: _desktopActiveChild(AppState.currentPage || ''),
     }, window.location.origin);
 }
@@ -979,10 +984,11 @@ function _desktopActiveChild(page) {
 }
 
 function _desktopSidebarFocusedPage() {
-    if (_desktopPendingSidebarTarget?.page) return _desktopPendingSidebarTarget.page;
-    return !_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right'
+    if (_desktopPendingSidebarTarget?.page) return _desktopSidebarRootPage(_desktopPendingSidebarTarget.page);
+    const page = !_bookmarkIsSplitPaneInstance && _bookmarkFocusedPane === 'right'
         ? (_bookmarkRightPaneState.page || '')
         : AppState.currentPage;
+    return _desktopSidebarRootPage(page);
 }
 
 function renderDesktopSidebar() {

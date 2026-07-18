@@ -187,6 +187,19 @@ test('desktop sidebar scroll is confined between chrome dividers', async ({ page
   expect(metrics.bottomGap).toBeGreaterThanOrEqual(60);
 });
 
+test('desktop sidebar treats character sheets as personaggi in split view', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await waitForStartup(page);
+
+  await page.evaluate(() => {
+    document.body.classList.add('desktop-split-active');
+    window.postMessage({ type: 'companion-split-focus', page: 'scheda', tab: '' }, window.location.origin);
+  });
+
+  await expect(page.locator('.desktop-sidebar-btn[data-page="personaggi"]')).toHaveClass(/active/);
+});
+
 test('desktop dice roller opens from the d20 logo', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
