@@ -4,4 +4,7 @@ Backlog rapido per fix puntuali da raccogliere e verificare durante la migrazion
 
 ## Da fare
 
-- [ ] Inserire qui i prossimi fix segnalati.
+- [ ] Migliorare automazione oggetti magici (bonus e modificatori).
+- [ ] Aggiungere selezione tipologia per oggetti magici con tipologia non definita.
+- [ ] Aggiungere animazione dadi.
+- [ ] Fixare microscheda.
