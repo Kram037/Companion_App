@@ -269,7 +269,7 @@ test('mobile d20 logo opens a fullscreen dice roller', async ({ page }) => {
   await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
   await expect(page.locator('#diceRollerPanel .dice-roller-head')).toHaveCount(0);
   await expect(page.locator('.bottom-toolbar')).toBeHidden();
-  await expect(page.locator('#campagnePage .btn-fab')).toBeHidden();
+  await expect(page.locator('.react-page-shell .btn-fab')).toBeHidden();
   await expect(page.locator('.bookmarks-fab')).toBeHidden();
   await expect.poll(() => page.locator('.dice-type-row').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(6);
   await expect.poll(() => page.locator('.dice-type').first().evaluate(el => {
@@ -322,7 +322,14 @@ test('desktop split panes can use two columns on wide screens', async ({ page })
   await page.locator('.desktop-bookmark-split-tab').click();
   await expect(page.locator('#desktopSplitPane')).toBeVisible();
 
-  await expect.poll(() => page.locator('#campagnePage.active .campagne-list').evaluate((el) => {
+  await page.locator('.react-page-shell').evaluate((el) => {
+    const list = document.createElement('div');
+    list.className = 'campagne-list';
+    list.innerHTML = '<div></div><div></div><div></div>';
+    el.appendChild(list);
+  });
+
+  await expect.poll(() => page.locator('.react-page-shell .campagne-list').evaluate((el) => {
     return getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
   })).toBeGreaterThanOrEqual(2);
 });

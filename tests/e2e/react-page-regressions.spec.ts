@@ -35,19 +35,36 @@ test('React routing leaves the legacy compendium and laboratory views intact', a
 
 test('React leaves unmigrated legacy page DOM intact', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/campagne');
+  await page.goto('/personaggi');
 
-  await expect(page.locator('#campagnePage')).toBeVisible();
+  await expect(page.locator('#personaggiPage')).toBeVisible();
   await expect(page.locator('#react-root')).toBeEmpty();
   await expect(page.locator('.react-page-shell')).toHaveCount(0);
 
+  await page.locator('.toolbar-btn[data-page="laboratorio"]').click();
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'laboratorio');
+  await expect(page.locator('#laboratorioPage')).toHaveClass(/active/);
+  await expect(page.locator('#react-root')).toBeEmpty();
+});
+
+test('React owns migrated campaign and friends routes', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/campagne');
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
+  await expect(page.locator('#campagnePage')).toBeHidden();
+  await expect(page.locator('.react-page-shell')).toBeVisible();
+  await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Campagne');
+
   await page.locator('.toolbar-btn[data-page="personaggi"]').click();
+  await expect(page.locator('body')).not.toHaveAttribute('data-react-owner', /.+/);
   await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
   await expect(page.locator('#personaggiPage')).toBeVisible();
   await expect(page.locator('#react-root')).toBeEmpty();
 });
 
-test('React owns only the friends route', async ({ page }) => {
+test('React can switch between migrated friends and campaign routes', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/amici');
 
@@ -59,7 +76,7 @@ test('React owns only the friends route', async ({ page }) => {
   await expect(page.locator('.react-page-shell .content-placeholder')).toContainText('Accedi per vedere i tuoi amici');
 
   await page.locator('.toolbar-btn[data-page="campagne"]').click();
-  await expect(page.locator('body')).not.toHaveAttribute('data-react-owner', /.+/);
-  await expect(page.locator('#campagnePage')).toBeVisible();
-  await expect(page.locator('#react-root')).toBeEmpty();
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
+  await expect(page.locator('#campagnePage')).toBeHidden();
+  await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Campagne');
 });
