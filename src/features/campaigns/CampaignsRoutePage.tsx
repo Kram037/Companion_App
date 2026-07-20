@@ -9,6 +9,7 @@ import { CampaignsListPage } from './CampaignsListPage';
 declare global {
   interface Window {
     deleteCampagna?: (id: string) => void;
+    openCampagnaDetails?: (id: string) => void;
     openCampagnaModal?: (id?: string | null) => void;
     openLoginModal?: () => void;
   }
@@ -28,7 +29,7 @@ export function CampaignsRoutePage() {
       onCreate={() => window.openCampagnaModal?.()}
       onDelete={id => window.deleteCampagna?.(id)}
       onEdit={id => window.openCampagnaModal?.(id)}
-      onOpen={id => navigate(buildAppPath('campagnaDetails', { campagnaId: id }))}
+      onOpen={id => window.openCampagnaDetails?.(id) ?? navigate(buildAppPath('campagnaDetails', { campagnaId: id }))}
     /> : !user.isLoading && <div className="page-content">
       <div className="page-top-stack"><div className="page-header"><h1>Campagne</h1></div></div>
       <div className="content-placeholder"><p>Accedi per vedere e creare le tue campagne</p></div>

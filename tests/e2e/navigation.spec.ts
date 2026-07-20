@@ -34,6 +34,39 @@ test('legacy session navigation invokes the session renderer', async ({ page }) 
   expect(renderedCampaignId).toBe('campaign-test');
 });
 
+test('legacy campaign detail opener keeps detail navigation under the React route bridge', async ({ page }) => {
+  await page.goto('/campagne');
+  await waitForStartup(page);
+
+  const state = await page.evaluate(async () => {
+    let rendered = '';
+    window.loadCampagnaDetails = async campaignId => {
+      rendered = campaignId;
+    };
+
+    window.openCampagnaDetails?.('campaign-test');
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    return {
+      rendered,
+      page: window.AppState?.currentPage,
+      campagnaId: window.AppState?.currentCampagnaId,
+      detailsActive: document.getElementById('dettagliPage')?.classList.contains('active') ?? false,
+      campaignsActive: document.getElementById('campagnePage')?.classList.contains('active') ?? false,
+      pathname: window.location.pathname,
+    };
+  });
+
+  expect(state).toEqual({
+    rendered: 'campaign-test',
+    page: 'dettagli',
+    campagnaId: 'campaign-test',
+    detailsActive: true,
+    campaignsActive: false,
+    pathname: '/campagne/campaign-test',
+  });
+});
+
 test('session buttons render immediately even when React bridge handles the URL', async ({ page }) => {
   await page.goto('/campagne');
   await waitForStartup(page);
