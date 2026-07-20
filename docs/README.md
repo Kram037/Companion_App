@@ -31,7 +31,7 @@ Indice dei documenti tecnici e operativi della Companion App.
 
 ## Backlog
 
-- [`backlog/TODO_PENDING_FIXES.md`](backlog/TODO_PENDING_FIXES.md): fix puntuali ancora aperti.
+- [`backlog/TODO.md`](backlog/TODO.md): fix puntuali ancora aperti.
 - [`backlog/RULES.md`](backlog/RULES.md): regole operative e note storiche residue.
 
 ## Audit
