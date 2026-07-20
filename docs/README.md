@@ -1,0 +1,39 @@
+# Documentazione
+
+Indice dei documenti tecnici e operativi della Companion App.
+
+## UI
+
+- [`ui/UI_BASELINE_CHECKPOINT.md`](ui/UI_BASELINE_CHECKPOINT.md): baseline grafica da preservare durante ogni migrazione.
+
+## Migrazione React
+
+- [`migration/REACT_PAGE_MIGRATION_GUIDE.md`](migration/REACT_PAGE_MIGRATION_GUIDE.md): procedura corretta per migrare una pagina senza cambiare design o routing.
+- [`migration/TODO_TECH_STACK_MIGRATION_2.md`](migration/TODO_TECH_STACK_MIGRATION_2.md): roadmap attiva della remediation `tech_migration_2`.
+- [`migration/TODO_TECH_STACK_MIGRATION.md`](migration/TODO_TECH_STACK_MIGRATION.md): roadmap storica della prima migrazione.
+- [`migration/tech-migration-qa.md`](migration/tech-migration-qa.md): checklist QA dei flussi critici.
+- [`migration/legacy-function-map.md`](migration/legacy-function-map.md): mappa dei renderer legacy sostituiti o confinati.
+
+## Architettura
+
+- [`architecture/tech-stack-architecture.md`](architecture/tech-stack-architecture.md): confini runtime, guardie e test.
+- [`architecture/realtime-rules.md`](architecture/realtime-rules.md): regole per eventi realtime e deduplica.
+
+## Supabase
+
+- [`supabase/GOOGLE_OAUTH_SETUP.md`](supabase/GOOGLE_OAUTH_SETUP.md): configurazione login Google.
+- [`supabase/SUPABASE_MIGRATION.md`](supabase/SUPABASE_MIGRATION.md): guida storica di migrazione a Supabase.
+- [`supabase/MIGRATION_TO_VARCHAR_IDS.md`](supabase/MIGRATION_TO_VARCHAR_IDS.md): note sulla migrazione degli ID.
+
+## PWA
+
+- [`pwa/CACHE_BUSTING.md`](pwa/CACHE_BUSTING.md): note storiche su cache busting e sviluppo.
+
+## Backlog
+
+- [`backlog/TODO_PENDING_FIXES.md`](backlog/TODO_PENDING_FIXES.md): fix puntuali ancora aperti.
+- [`backlog/RULES.md`](backlog/RULES.md): regole operative e note storiche residue.
+
+## Audit
+
+- [`audits/refactor-audit.md`](audits/refactor-audit.md): audit tecnico storico del refactor.

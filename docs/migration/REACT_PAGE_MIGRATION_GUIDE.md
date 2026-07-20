@@ -7,10 +7,11 @@ aspetto, routing o comportamento percepito dall'utente.
 
 La migrazione tecnica non deve cambiare il design.
 
-Prima di iniziare apri `UI_BASELINE_CHECKPOINT.md` e considera lo stato grafico
-attuale come vincolo. Se una card, un titolo, una search bar, una tab, un FAB o
-una sidebar cambiano dimensione, posizione, colore, spaziatura o icona, la
-migrazione non e' finita: e' una regressione.
+Prima di iniziare apri
+[`../ui/UI_BASELINE_CHECKPOINT.md`](../ui/UI_BASELINE_CHECKPOINT.md) e considera
+lo stato grafico attuale come vincolo. Se una card, un titolo, una search bar,
+una tab, un FAB o una sidebar cambiano dimensione, posizione, colore, spaziatura
+o icona, la migrazione non e' finita: e' una regressione.
 
 ## Procedura corretta
 
@@ -160,4 +161,3 @@ migrazione non e' finita: e' una regressione.
 - E2E lanciati in parallelo: falliscono in build per collisione su `dist`.
 - Fix CSS globale per correggere un problema React locale: rischia di cambiare
   tutta l'app.
-

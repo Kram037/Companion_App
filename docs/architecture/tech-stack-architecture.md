@@ -9,7 +9,7 @@
 - Build e deploy usano lo stesso output: `dist/apps/companion-app`.
 - Vite usa base `/` in locale e il prefisso del repository durante il deploy GitHub Pages, cosi' anche le route profonde caricano gli asset corretti.
 - Il markup e gli asset legacy restano inclusi da Vite finche' la relativa pagina non viene migrata.
-- Le route React sono caricate con `React.lazy`: il bootstrap iniziale non include il codice delle pagine non visitate.
+- React viene attivato per route incrementali; il resto resta servito dal runtime legacy tramite bridge.
 
 ## Confini
 
@@ -23,7 +23,10 @@
 
 ## Regola legacy
 
-Tutte le route sono renderizzate da React. `navigateToPage` mantiene sincronizzati i dialog e gli editor ancora condivisi con il runtime storico; il form del wizard personaggio viene montato nel contenitore React senza duplicarne lo stato. I globali rimasti sono API di compatibilita' intenzionali, non renderer di pagina.
+Una pagina migrata deve avere un solo owner React tramite `ReactPage`. Una pagina
+non migrata resta legacy e viene attivata da `navigateToPage` tramite
+`LegacyNavigationSync`. I globali rimasti sono API di compatibilita'
+intenzionali, non nuovi punti di rendering.
 
 ## Guardie
 

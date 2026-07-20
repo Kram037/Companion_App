@@ -34,7 +34,7 @@ La UI approvata e ancora renderizzata prevalentemente dal runtime legacy:
 - `css/` definisce l'aspetto grafico attuale;
 - `src/main.ts` inizializza Supabase e monta il bridge React;
 - `src/app/AppRouter.tsx` e `LegacyNavigationSync.tsx` sincronizzano URL e
-  navigazione; `/amici` e la prima route posseduta da React;
+  navigazione; le route migrate vengono possedute da React una alla volta;
 - `src/api`, `src/schemas`, `src/query`, `src/store`, `src/realtime` e
   `src/features` costituiscono il livello typed e la base della migrazione.
 
@@ -42,12 +42,12 @@ I componenti presenti in `src/features` non sono automaticamente la fonte
 della UI attiva. Prima di modificare un flusso bisogna verificare quale livello
 ne possiede realmente rendering, stato e navigazione.
 
-La route `/amici` usa React e le API typed per lista, caricamento e azioni. Il
-modale di aggiunta amico resta temporaneamente nel livello legacy per preservare
-lo stesso form e il tastierino numerico durante la migrazione incrementale.
+Le route `/campagne` e `/amici` usano React per le liste migrate. I dettagli e
+i modali non ancora migrati restano temporaneamente nel livello legacy per
+preservare flussi e design durante la migrazione incrementale.
 
 > **Vincolo UI:** l'aspetto corrente e la baseline obbligatoria. Leggere
-> [`UI_BASELINE_CHECKPOINT.md`](UI_BASELINE_CHECKPOINT.md) prima di qualsiasi
+> [`docs/ui/UI_BASELINE_CHECKPOINT.md`](docs/ui/UI_BASELINE_CHECKPOINT.md) prima di qualsiasi
 > modifica grafica o migrazione di pagina.
 
 ## Funzionalita principali
@@ -94,12 +94,19 @@ Companion_App/
 |-- images/                     # Icone e immagini statiche
 |-- tests/e2e/                  # Test Playwright dei flussi utente
 |-- tools/                      # Check architetturali e runner
-|-- docs/                       # Guide tecniche e documenti di migrazione
+|-- docs/                       # Guide, backlog, roadmap e documenti tecnici
+|   |-- architecture/           # Architettura, realtime e confini tecnici
+|   |-- audits/                 # Audit storici e analisi tecniche
+|   |-- backlog/                # TODO generali e fix puntuali
+|   |-- migration/              # Roadmap e procedure della migrazione React
+|   |-- pwa/                    # Note PWA, cache e service worker
+|   |-- supabase/               # Setup, migrazioni e OAuth Supabase
+|   `-- ui/                     # Baseline grafica e vincoli UI
 |-- manifest.json               # Configurazione PWA
 |-- sw.js                       # Service worker
 |-- vite.config.ts              # Build e copia degli asset legacy
 |-- project.json                # Target Nx
-`-- TODO_TECH_STACK_MIGRATION_2.md
+`-- README.md
 ```
 
 ## Route applicative
@@ -261,7 +268,7 @@ esistente. Non considerare sufficiente il solo caricamento nel browser desktop.
 ## Migrazione tecnologica
 
 La roadmap corrente e in
-[`TODO_TECH_STACK_MIGRATION_2.md`](TODO_TECH_STACK_MIGRATION_2.md). Le priorita
+[`docs/migration/TODO_TECH_STACK_MIGRATION_2.md`](docs/migration/TODO_TECH_STACK_MIGRATION_2.md). Le priorita
 sono sicurezza RLS, guardie automatiche, client Supabase unico, ownership della
 navigazione, realtime disciplinato, migrazione graduale delle pagine e pulizia
 dei globali legacy.
@@ -276,10 +283,12 @@ Una pagina puo essere considerata migrata solo quando:
 
 ## Documentazione utile
 
-- [`UI_BASELINE_CHECKPOINT.md`](UI_BASELINE_CHECKPOINT.md): contratto grafico.
-- [`TODO_TECH_STACK_MIGRATION_2.md`](TODO_TECH_STACK_MIGRATION_2.md): roadmap.
-- [`docs/realtime-rules.md`](docs/realtime-rules.md): regole degli eventi realtime.
-- [`docs/GOOGLE_OAUTH_SETUP.md`](docs/GOOGLE_OAUTH_SETUP.md): configurazione OAuth.
+- [`docs/README.md`](docs/README.md): indice della documentazione.
+- [`docs/ui/UI_BASELINE_CHECKPOINT.md`](docs/ui/UI_BASELINE_CHECKPOINT.md): contratto grafico.
+- [`docs/migration/TODO_TECH_STACK_MIGRATION_2.md`](docs/migration/TODO_TECH_STACK_MIGRATION_2.md): roadmap.
+- [`docs/migration/REACT_PAGE_MIGRATION_GUIDE.md`](docs/migration/REACT_PAGE_MIGRATION_GUIDE.md): procedura migrazione pagina React.
+- [`docs/architecture/realtime-rules.md`](docs/architecture/realtime-rules.md): regole degli eventi realtime.
+- [`docs/supabase/GOOGLE_OAUTH_SETUP.md`](docs/supabase/GOOGLE_OAUTH_SETUP.md): configurazione OAuth.
 - [`backend/supabase/sql`](backend/supabase/sql): migrazioni e policy database.
 
 Alcuni documenti in `docs/` descrivono fasi precedenti o l'architettura target:

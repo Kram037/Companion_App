@@ -8,3 +8,4 @@ Backlog rapido per fix puntuali da raccogliere e verificare durante la migrazion
 - [ ] Aggiungere selezione tipologia per oggetti magici con tipologia non definita.
 - [ ] Aggiungere animazione dadi.
 - [ ] Fixare microscheda.
+- [ ] Implementare simulazione e calcolo difficoltà dei combattimenti
