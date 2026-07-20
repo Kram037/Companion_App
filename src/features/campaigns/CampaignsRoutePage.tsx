@@ -20,20 +20,19 @@ export function CampaignsRoutePage() {
   const user = useQuery(currentUserQuery());
 
   return <ReactPage name="campagne">
-    {user.isLoading && <div className="page-content">
-      <div className="page-top-stack"><div className="page-header"><h1>Campagne</h1></div></div>
-      <div className="content-placeholder"><p>Caricamento...</p></div>
-    </div>}
-    {user.data ? <CampaignsListPage
-      currentUserId={user.data.id}
-      onCreate={() => window.openCampagnaModal?.()}
+    <CampaignsListPage
+      currentUserId={user.data?.id ?? null}
+      authLoading={user.isLoading}
+      onCreate={() => {
+        if (user.data) window.openCampagnaModal?.();
+        else window.openLoginModal?.();
+      }}
       onDelete={id => window.deleteCampagna?.(id)}
       onEdit={id => window.openCampagnaModal?.(id)}
-      onOpen={id => window.openCampagnaDetails?.(id) ?? navigate(buildAppPath('campagnaDetails', { campagnaId: id }))}
-    /> : !user.isLoading && <div className="page-content">
-      <div className="page-top-stack"><div className="page-header"><h1>Campagne</h1></div></div>
-      <div className="content-placeholder"><p>Accedi per vedere e creare le tue campagne</p></div>
-      <button className="btn-fab" type="button" onClick={() => window.openLoginModal?.()} aria-label="Accedi">+</button>
-    </div>}
+      onOpen={id => {
+        if (window.openCampagnaDetails) window.openCampagnaDetails(id);
+        else navigate(buildAppPath('campagnaDetails', { campagnaId: id }));
+      }}
+    />
   </ReactPage>;
 }

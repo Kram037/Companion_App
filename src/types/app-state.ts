@@ -14,6 +14,12 @@ export interface LegacyAppState {
   cachedBackground: JsonValue | null;
   cachedHomebrewSottoclassi: JsonValue | null;
   cachedHomebrewOggetti: JsonValue | null;
+  campagneFilters: {
+    searchText: string;
+    tipologia: string | string[];
+    dm: string | string[];
+    soloPreferiti: boolean;
+  };
 }
 
 declare global {
