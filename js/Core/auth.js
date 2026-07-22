@@ -853,7 +853,7 @@ async function handleLogin(e) {
     // Verifica che Supabase sia disponibile
     let supabase = getSupabaseClient();
     if (!supabase && typeof waitForSupabase === 'function') {
-        await waitForSupabase();
+        await waitForSupabase({ timeoutMs: 10000 });
         supabase = getSupabaseClient();
     }
 
@@ -950,7 +950,7 @@ async function handleLogin(e) {
 async function handleGoogleLogin() {
     let supabase = getSupabaseClient();
     if (!supabase && typeof waitForSupabase === 'function') {
-        await waitForSupabase();
+        await waitForSupabase({ timeoutMs: 10000 });
         supabase = getSupabaseClient();
     }
 

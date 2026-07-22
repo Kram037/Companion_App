@@ -86,6 +86,55 @@ test('legacy Supabase wait resolves when the bundled client becomes ready later'
   expect(resolved).toBe(true);
 });
 
+test('Google login waits for a delayed Supabase client before failing', async ({ page }) => {
+  await page.goto('/');
+
+  await expect.poll(() => page.evaluate(() => {
+    const app = window as typeof window & {
+      getSupabaseClient?: () => unknown;
+      initializeSupabaseClient?: () => unknown;
+    };
+    return typeof app.getSupabaseClient === 'function'
+      && typeof app.initializeSupabaseClient === 'function';
+  })).toBe(true);
+
+  await page.evaluate(() => {
+    const app = window as typeof window & {
+      googleOAuthCalls?: number;
+      initializeSupabaseClient?: () => unknown;
+      supabaseClient?: unknown;
+    };
+    delete app.supabaseClient;
+    delete app.initializeSupabaseClient;
+    app.googleOAuthCalls = 0;
+
+    window.setTimeout(() => {
+      app.initializeSupabaseClient = () => {
+        app.supabaseClient = {
+          auth: {
+            signInWithOAuth: async () => {
+              app.googleOAuthCalls = (app.googleOAuthCalls ?? 0) + 1;
+              return { data: {}, error: null };
+            },
+          },
+        };
+        return app.supabaseClient;
+      };
+      window.dispatchEvent(new Event('companion:supabase-ready'));
+    }, 2500);
+  });
+
+  await page.locator('#userBtn').click();
+  await page.locator('#googleLoginBtn').click();
+
+  await expect.poll(() => page.evaluate(() => {
+    return (window as typeof window & { googleOAuthCalls?: number }).googleOAuthCalls ?? 0;
+  }), { timeout: 6000 }).toBe(1);
+  await expect(page.locator('#errorMessage')).not.toHaveText(
+    'Autenticazione Google non disponibile. Controlla la configurazione Supabase.',
+  );
+});
+
 test('legacy Supabase still boots if React chunks fail', async ({ page }) => {
   await page.route(/\/assets\/(?!index-[^/]+\.js$)[^/]+\.js$/, route => route.abort());
   await page.goto('/');
