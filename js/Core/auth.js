@@ -13,7 +13,7 @@ function setupSupabaseAuth() {
     try {
         // Listen for auth state changes
         let _authInitDone = false;
-        supabase.auth.onAuthStateChange((event, session) => {
+        const handleAuthStateChange = async (event, session) => {
             appDebug('Auth state changed:', event, session?.user?.email || 'null');
             if (event === 'INITIAL_SESSION') return;
 
@@ -31,37 +31,36 @@ function setupSupabaseAuth() {
                 if (alreadyLoggedSameUser && _authInitDone && event === 'TOKEN_REFRESHED') return;
                 _authInitDone = true;
 
-                initializeUserDocument(session.user).then(async () => {
-                    loadRazzeBackground();
-                    loadHomebrewSottoclassi();
-                    loadHomebrewOggetti();
-                    loadHomebrewIncantesimi();
-                    loadHomebrewStili();
-                    loadHomebrewSuppliche();
-                    if (AppState.cachedUserData?.nome_utente) {
-                        AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
-                        updateUIForLoggedIn();
-                    }
-                    if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
-                        await navigateToPage('scheda');
-                    } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-                        await navigateToPage('combattimento');
-                    } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
-                        await navigateToPage('sessione');
-                        await renderSessioneContent(AppState.currentCampagnaId);
-                    } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
-                        await navigateToPage('dettagli');
-                    } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
-                        await navigateToPage('dettagli');
-                    } else {
-                        await navigateToPage(AppState.currentPage || 'campagne');
-                    }
+                await initializeUserDocument(session.user);
+                loadRazzeBackground();
+                loadHomebrewSottoclassi();
+                loadHomebrewOggetti();
+                loadHomebrewIncantesimi();
+                loadHomebrewStili();
+                loadHomebrewSuppliche();
+                if (AppState.cachedUserData?.nome_utente) {
+                    AppState.currentUser.displayName = AppState.cachedUserData.nome_utente;
+                    updateUIForLoggedIn();
+                }
+                if (AppState.currentPage === 'scheda' && AppState.currentPersonaggioId) {
+                    await navigateToPage('scheda');
+                } else if (AppState.currentPage === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
+                    await navigateToPage('combattimento');
+                } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
+                    await navigateToPage('sessione');
+                    await renderSessioneContent(AppState.currentCampagnaId);
+                } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
+                    await navigateToPage('dettagli');
+                } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
+                    await navigateToPage('dettagli');
+                } else {
+                    await navigateToPage(AppState.currentPage || 'campagne');
+                }
 
-                    startRollRequestsRealtime();
-                    startSessionRealtime();
-                    startAppEventsRealtime();
-                    checkStartupNotifications();
-                });
+                startRollRequestsRealtime();
+                startSessionRealtime();
+                startAppEventsRealtime();
+                checkStartupNotifications();
             } else {
                 AppState.currentUser = null;
                 AppState.isLoggedIn = false;
@@ -81,6 +80,15 @@ function setupSupabaseAuth() {
                     renderAmici([], [], []);
                 }
             }
+        };
+
+        supabase.auth.onAuthStateChange((event, session) => {
+            // Supabase mantiene un lock durante il callback: le sue API devono partire dopo il ritorno.
+            window.setTimeout(() => {
+                handleAuthStateChange(event, session).catch(error => {
+                    console.error('Errore gestione cambio stato auth:', error);
+                });
+            }, 0);
         });
     } catch (error) {
         console.error('❌ Errore nel setup Supabase Auth:', error);
@@ -845,7 +853,7 @@ async function handleLogin(e) {
     // Verifica che Supabase sia disponibile
     let supabase = getSupabaseClient();
     if (!supabase && typeof waitForSupabase === 'function') {
-        await waitForSupabase();
+        await waitForSupabase({ timeoutMs: 10000 });
         supabase = getSupabaseClient();
     }
 
@@ -942,7 +950,7 @@ async function handleLogin(e) {
 async function handleGoogleLogin() {
     let supabase = getSupabaseClient();
     if (!supabase && typeof waitForSupabase === 'function') {
-        await waitForSupabase();
+        await waitForSupabase({ timeoutMs: 10000 });
         supabase = getSupabaseClient();
     }
 

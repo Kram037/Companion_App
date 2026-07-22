@@ -311,8 +311,15 @@ async function init() {
         });
     }
 
-    await Promise.allSettled([initialPageLoad, authReady]);
-    await prepareStartupLandingPages();
+    await Promise.allSettled([initialPageLoad]);
+
+    // Auth e warm-up continuano in background: la shell deve restare utilizzabile
+    // anche durante un refresh sessione lento o con Supabase non raggiungibile.
+    window.setTimeout(() => {
+        authReady
+            .then(() => prepareStartupLandingPages())
+            .catch(error => console.warn('Warm-up iniziale non completato:', error));
+    }, 0);
 }
 
 // Setup Event Listeners

@@ -17,6 +17,11 @@ function canInitSupabaseClient() {
     return !!ensureSupabaseClient();
 }
 
+function hasInvalidSupabaseConfig() {
+    if (!window.CompanionConfig) return false;
+    return !window.CompanionConfig.supabaseUrl || !window.CompanionConfig.supabaseAnonKey;
+}
+
 function initSupabase() {
     try {
         if (!ensureSupabaseClient()) {
@@ -34,8 +39,13 @@ function initSupabase() {
     }
 }
 
-function waitForSupabase() {
+/**
+ * @param {{ timeoutMs?: number }} [options]
+ */
+function waitForSupabase(options = {}) {
     return new Promise((resolve) => {
+        const timeoutMs = Number.isFinite(options.timeoutMs) ? Number(options.timeoutMs) : 2000;
+        const intervalMs = 100;
         let completed = false;
         /** @type {number | null} */
         let interval = null;
@@ -49,15 +59,20 @@ function waitForSupabase() {
         };
         const check = () => {
             if (canInitSupabaseClient()) finish(initSupabase());
+            else if (hasInvalidSupabaseConfig()) finish(false);
         };
 
         if (canInitSupabaseClient()) {
             finish(initSupabase());
             return;
         }
+        if (hasInvalidSupabaseConfig()) {
+            finish(false);
+            return;
+        }
 
         let attempts = 0;
-        const maxAttempts = 150;
+        const maxAttempts = Math.ceil(timeoutMs / intervalMs);
         window.addEventListener('companion:supabase-ready', check);
         interval = setInterval(() => {
             attempts++;

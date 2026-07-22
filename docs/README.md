@@ -21,6 +21,7 @@ Indice dei documenti tecnici e operativi della Companion App.
 
 ## Supabase
 
+- [`supabase/SUPABASE_AUTH_DEPLOY_CHECKPOINT.md`](supabase/SUPABASE_AUTH_DEPLOY_CHECKPOINT.md): diagnosi e procedura di ripristino del login quando Pages pubblica sorgenti non compilati.
 - [`supabase/GOOGLE_OAUTH_SETUP.md`](supabase/GOOGLE_OAUTH_SETUP.md): configurazione login Google.
 - [`supabase/SUPABASE_MIGRATION.md`](supabase/SUPABASE_MIGRATION.md): guida storica di migrazione a Supabase.
 - [`supabase/MIGRATION_TO_VARCHAR_IDS.md`](supabase/MIGRATION_TO_VARCHAR_IDS.md): note sulla migrazione degli ID.

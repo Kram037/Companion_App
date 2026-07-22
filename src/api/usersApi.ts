@@ -24,8 +24,16 @@ export function subscribeToCurrentUser(callback: () => void): () => void {
   } catch {
     return () => undefined;
   }
-  const { data } = client.auth.onAuthStateChange(() => callback());
-  return () => data.subscription.unsubscribe();
+  let pendingCallback: ReturnType<typeof setTimeout> | undefined;
+  const { data } = client.auth.onAuthStateChange(() => {
+    // Querying Supabase inside its auth callback can deadlock the auth client.
+    clearTimeout(pendingCallback);
+    pendingCallback = setTimeout(callback, 0);
+  });
+  return () => {
+    clearTimeout(pendingCallback);
+    data.subscription.unsubscribe();
+  };
 }
 
 export async function fetchUserById(userId: Id): Promise<UserProfile | null> {
@@ -80,4 +88,3 @@ export async function updateUserHomebrewSettings(userId: Id, settings: HomebrewS
   }).eq('id', userId);
   throwIfSupabaseError(error);
 }
-

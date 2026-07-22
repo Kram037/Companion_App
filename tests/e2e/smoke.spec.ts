@@ -324,12 +324,13 @@ test('desktop split panes can use two columns on wide screens', async ({ page })
 
   await page.locator('.react-page-shell').evaluate((el) => {
     const list = document.createElement('div');
+    list.id = 'testWideCampagneList';
     list.className = 'campagne-list';
     list.innerHTML = '<div></div><div></div><div></div>';
     el.appendChild(list);
   });
 
-  await expect.poll(() => page.locator('.react-page-shell .campagne-list').evaluate((el) => {
+  await expect.poll(() => page.locator('#testWideCampagneList').evaluate((el) => {
     return getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length;
   })).toBeGreaterThanOrEqual(2);
 });
