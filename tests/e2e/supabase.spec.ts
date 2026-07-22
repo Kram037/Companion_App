@@ -101,3 +101,22 @@ test('legacy Supabase still boots if React chunks fail', async ({ page }) => {
       && Boolean(app.supabaseClient);
   })).toBe(true);
 });
+
+test('missing Supabase configuration does not block startup or login feedback', async ({ page }) => {
+  await page.route(/\/js\/Core\/config\.js/, route => route.fulfill({
+    contentType: 'application/javascript',
+    body: 'window.CompanionConfig = Object.freeze({});',
+  }));
+  await page.goto('/');
+
+  await expect(page.locator('#appStartup')).toBeHidden({ timeout: 3_000 });
+  await page.locator('#userBtn').click();
+  await page.locator('#email').fill('test@example.com');
+  await page.locator('#password').fill('not-a-real-password');
+  await page.locator('#submitBtn').click();
+
+  await expect(page.locator('#errorMessage')).toHaveText(
+    'Autenticazione non disponibile. Ricarica la pagina.',
+    { timeout: 3_000 },
+  );
+});

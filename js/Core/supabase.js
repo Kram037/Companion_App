@@ -57,7 +57,7 @@ function waitForSupabase() {
         }
 
         let attempts = 0;
-        const maxAttempts = 150;
+        const maxAttempts = 20;
         window.addEventListener('companion:supabase-ready', check);
         interval = setInterval(() => {
             attempts++;
