@@ -27,10 +27,10 @@ Il progetto e in migrazione incrementale da JavaScript legacy a
 React/TypeScript. Non e un rewrite e i due livelli hanno responsabilita
 diverse.
 
-La UI approvata e ancora renderizzata prevalentemente dal runtime legacy:
+La UI e' ibrida durante la migrazione incrementale:
 
-- `index.html` contiene la shell e i contenitori delle pagine;
-- `js/` gestisce rendering, interazioni e compatibilita del flusso corrente;
+- `index.html` contiene la shell e i contenitori delle pagine legacy residue;
+- `js/` gestisce le pagine e le dialog di compatibilita non ancora migrate;
 - `css/` definisce l'aspetto grafico attuale;
 - `src/main.ts` inizializza Supabase e monta il bridge React;
 - `src/app/AppRouter.tsx` e `LegacyNavigationSync.tsx` sincronizzano URL e
@@ -38,13 +38,11 @@ La UI approvata e ancora renderizzata prevalentemente dal runtime legacy:
 - `src/api`, `src/schemas`, `src/query`, `src/store`, `src/realtime` e
   `src/features` costituiscono il livello typed e la base della migrazione.
 
-I componenti presenti in `src/features` non sono automaticamente la fonte
-della UI attiva. Prima di modificare un flusso bisogna verificare quale livello
-ne possiede realmente rendering, stato e navigazione.
-
-Le route `/campagne` e `/amici` usano React per le liste migrate. I dettagli e
-i modali non ancora migrati restano temporaneamente nel livello legacy per
-preservare flussi e design durante la migrazione incrementale.
+React possiede `/campagne`, il dettaglio campagna, la sessione, il
+combattimento e `/amici`. Il dominio Campagna usa API TypeScript/Zod, TanStack
+Query e React Router; il vecchio renderer del combattimento e' stato rimosso.
+Le dialog condivise di modifica campagna, inviti e scelta personaggio restano
+temporaneamente legacy.
 
 > **Vincolo UI:** l'aspetto corrente e la baseline obbligatoria. Leggere
 > [`docs/ui/UI_BASELINE_CHECKPOINT.md`](docs/ui/UI_BASELINE_CHECKPOINT.md) prima di qualsiasi
@@ -84,7 +82,6 @@ Companion_App/
 |   |-- Campagna/               # Campagne e dettagli
 |   |-- Personaggi/             # Wizard e scheda personaggio
 |   |-- Sessioni/               # Sessioni e iniziativa
-|   |-- Combattimento/          # Runtime del combattimento
 |   |-- Compendio/              # Liste e dettagli del Compendio
 |   |-- Laboratorio/            # Editor homebrew
 |   `-- Social/                 # Amici e inviti
@@ -124,8 +121,8 @@ Companion_App/
 | `/laboratorio` | Laboratorio homebrew |
 | `/amici` | Amici |
 
-React Router mantiene gli URL profondi; il bridge traduce ogni route nello
-stato richiesto da `navigateToPage` e dal renderer legacy.
+React Router mantiene gli URL profondi; il bridge sincronizza soltanto lo stato
+necessario alle destinazioni e alle dialog legacy residue.
 
 ## Requisiti e avvio locale
 
@@ -142,6 +139,22 @@ La configurazione client di Supabase e letta da `js/Core/config.js`. La chiave
 `anon` e pubblica per definizione: la protezione dei dati dipende dalle policy
 Row Level Security. Non inserire mai nel client la service role key, segreti
 OAuth o credenziali di test.
+
+### Prerequisiti SQL per Campagna, sessione e combattimento
+
+La versione React del dominio Campagna usa le RPC e le policy definite in
+[`backend/supabase/sql/deploy-all-functions.sql`](backend/supabase/sql/deploy-all-functions.sql),
+[`backend/supabase/sql/harden-personaggi-campagna.sql`](backend/supabase/sql/harden-personaggi-campagna.sql)
+e
+[`backend/supabase/sql/atomic-campaign-runtime.sql`](backend/supabase/sql/atomic-campaign-runtime.sql).
+Applicare gli script nell'ordine della
+[`backend/supabase/RLS_DEPLOY_CHECKLIST.md`](backend/supabase/RLS_DEPLOY_CHECKLIST.md)
+**prima di distribuire il frontend migrato**.
+
+I preflight si interrompono se trovano associazioni personaggio-proprietario
+incoerenti o piu sessioni aperte nella stessa campagna: i dati vanno corretti
+manualmente e lo script va rieseguito. La presenza dei file nel repository non
+dimostra che siano gia stati applicati in staging o produzione.
 
 ## Comandi disponibili
 
@@ -221,9 +234,11 @@ Per ogni modifica SQL:
 4. evitare policy pubbliche `USING (true)` senza una decisione esplicita;
 5. testare separatamente i ruoli DM, giocatore e utente esterno.
 
-Gli eventi realtime devono produrre una sola azione osservabile: invalidazione
-mirata, patch della cache o notifica UI. Evitare render completi che chiudono
-modali, resettano input o fanno perdere lo stato locale.
+Gli eventi realtime sono hint non attendibili: invalidano le query mirate, poi
+il client rilegge il database. Navigazioni e notifiche dipendono sempre dallo
+stato autorizzato restituito da Supabase, mai dai campi del broadcast. Evitare
+render completi che chiudono modali, resettano input o fanno perdere lo stato
+locale.
 
 ## PWA e deploy
 

@@ -31,7 +31,7 @@ describe('filterCampaigns', () => {
   });
 
   it('counts active non-search filters for the badge', () => {
-    expect(countActiveCampaignFilters({ searchText: 'alba', tipologia: 'all', dm: 'all', soloPreferiti: false })).toBe(0);
-    expect(countActiveCampaignFilters({ tipologia: 'one-shot', dm: 'yes', soloPreferiti: true })).toBe(3);
+    expect(countActiveCampaignFilters({ searchText: 'alba', dm: 'all', soloPreferiti: false })).toBe(0);
+    expect(countActiveCampaignFilters({ dm: 'yes', soloPreferiti: true })).toBe(2);
   });
 });

@@ -4,6 +4,12 @@ Obiettivo: preparare Companion App alla migrazione progressiva verso React senza
 
 Stato 2026-07-15: migrazione del codice completata. Resta solo il provisioning esterno della fixture Supabase autenticata; la relativa suite e la configurazione CI sono gia' pronte e si auto-escludono finche' i secrets non vengono creati.
 
+Documento storico: per lo stato corrente e i gate di deploy del dominio
+Campagna usare
+[`TODO_TECH_STACK_MIGRATION_2.md`](TODO_TECH_STACK_MIGRATION_2.md). Le caselle
+qui registrano gli artefatti prodotti nella prima fase, non l'esito di una run
+di test sul worktree corrente.
+
 ## Principi guida
 
 - Migrazione incrementale: una pagina o dominio alla volta, evitando un rewrite totale.
@@ -149,9 +155,9 @@ Criterio di uscita: i dati critici sono validati prima di entrare nello stato Re
 - [x] Creare `queryClient` centralizzato.
 - [x] Definire query keys stabili:
   - [x] `['currentUser']`;
-  - [x] `['campaigns', userId]`;
-  - [x] `['campaign', campagnaId]`;
-  - [x] `['session', campagnaId]`;
+  - [x] `['campaigns', 'list', userId]`;
+  - [x] `['campaigns', 'detail', campagnaId]`;
+  - [x] `['campaigns', 'detail', campagnaId, 'session']`;
   - [x] `['combat', sessioneId]`;
   - [x] `['character', personaggioId]`;
   - [x] `['homebrew', userId]`;

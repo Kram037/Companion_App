@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
-import { queryClient, queryKeys } from '../query';
+import { queryClient } from '../query';
 import { processRealtimeEvent, type RealtimeDataChange } from '../realtime';
 import { subscribeToCurrentUser } from '../api/usersApi';
 
@@ -11,7 +11,7 @@ interface AppProvidersProps {
 
 export function AppProviders({ children }: AppProvidersProps) {
   useEffect(() => subscribeToCurrentUser(() => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.currentUser() });
+    queryClient.resetQueries();
   }), []);
 
   useEffect(() => {

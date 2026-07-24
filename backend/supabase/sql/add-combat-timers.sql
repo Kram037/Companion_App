@@ -48,8 +48,8 @@ CREATE INDEX IF NOT EXISTS idx_combat_timers_sessione
 CREATE INDEX IF NOT EXISTS idx_combat_timers_target
     ON combat_timers(target_kind, target_id);
 
--- RLS: tutti i membri leggono i timer della propria campagna. Il DM gestisce
--- tutto; un giocatore puo creare e gestire solo timer del proprio personaggio.
+-- RLS: il DM vede e gestisce tutto; un giocatore vede i timer globali e quelli
+-- del proprio personaggio, e puo gestire solo questi ultimi se li ha creati.
 ALTER TABLE combat_timers ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS combat_timers_all ON combat_timers;
@@ -68,9 +68,25 @@ CREATE POLICY combat_timers_select ON combat_timers
             JOIN utenti u ON u.uid::text = auth.uid()::text
             WHERE s.id = combat_timers.sessione_id
               AND s.campagna_id = combat_timers.campagna_id
+              AND s.data_fine IS NULL
               AND (
                   c.id_dm = u.id
-                  OR u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                  OR (
+                      u.id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+                      AND (
+                          combat_timers.target_kind = 'global'
+                          OR (
+                              combat_timers.target_kind = 'player'
+                              AND EXISTS (
+                                  SELECT 1
+                                  FROM personaggi_campagna pc
+                                  WHERE pc.campagna_id = c.id
+                                    AND pc.user_id = u.id
+                                    AND pc.personaggio_id = combat_timers.target_id
+                              )
+                          )
+                      )
+                  )
               )
         )
     );
@@ -85,6 +101,7 @@ CREATE POLICY combat_timers_insert ON combat_timers
             JOIN utenti u ON u.uid::text = auth.uid()::text
             WHERE s.id = combat_timers.sessione_id
               AND s.campagna_id = combat_timers.campagna_id
+              AND s.data_fine IS NULL
               AND combat_timers.created_by = u.id
               AND (
                   c.id_dm = u.id
@@ -114,6 +131,7 @@ CREATE POLICY combat_timers_update ON combat_timers
             JOIN utenti u ON u.uid::text = auth.uid()::text
             WHERE s.id = combat_timers.sessione_id
               AND s.campagna_id = combat_timers.campagna_id
+              AND s.data_fine IS NULL
               AND (
                   c.id_dm = u.id
                   OR (
@@ -139,6 +157,7 @@ CREATE POLICY combat_timers_update ON combat_timers
             JOIN utenti u ON u.uid::text = auth.uid()::text
             WHERE s.id = combat_timers.sessione_id
               AND s.campagna_id = combat_timers.campagna_id
+              AND s.data_fine IS NULL
               AND (
                   c.id_dm = u.id
                   OR (
@@ -167,6 +186,7 @@ CREATE POLICY combat_timers_delete ON combat_timers
             JOIN utenti u ON u.uid::text = auth.uid()::text
             WHERE s.id = combat_timers.sessione_id
               AND s.campagna_id = combat_timers.campagna_id
+              AND s.data_fine IS NULL
               AND (
                   c.id_dm = u.id
                   OR (

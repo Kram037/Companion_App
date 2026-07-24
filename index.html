@@ -77,46 +77,6 @@
 
     <!-- Main Content Area -->
     <main class="main-content" id="mainContent">
-        <!-- Campagne Page (Landing) -->
-        <section class="page active" id="campagnePage">
-            <div class="page-content">
-                <div class="page-top-stack">
-                    <div class="page-header">
-                        <h1>Campagne</h1>
-                    </div>
-                    <div class="comp-toolbar page-tools-row">
-                        <div class="comp-search-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <input type="text" id="campagneSearchInput" class="comp-search" placeholder="Cerca campagna...">
-                        </div>
-                        <button type="button" class="comp-filter-btn" id="campagneFiltersBtn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="4" y1="21" x2="4" y2="14"></line>
-                                <line x1="4" y1="10" x2="4" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12" y2="3"></line>
-                                <line x1="20" y1="21" x2="20" y2="16"></line>
-                                <line x1="20" y1="12" x2="20" y2="3"></line>
-                                <line x1="1" y1="14" x2="7" y2="14"></line>
-                                <line x1="9" y1="8" x2="15" y2="8"></line>
-                                <line x1="17" y1="16" x2="23" y2="16"></line>
-                            </svg>
-                            <span>Filtri</span>
-                        </button>
-                    </div>
-                </div>
-                <div id="campagneList" class="campagne-list">
-                    <div class="content-placeholder">
-                        <p>Accedi per vedere e creare le tue campagne</p>
-                    </div>
-                </div>
-            </div>
-            <button class="btn-fab" id="addCampagnaBtn" aria-label="Crea Campagna">+</button>
-        </section>
-
         <!-- Compendio Page -->
         <section class="page" id="compendioPage">
             <div class="page-content compendio-content">
@@ -273,73 +233,6 @@
             </div>
         </section>
 
-        <!-- Sessione Page -->
-        <section class="page" id="sessionePage">
-            <div class="page-content sessione-content">
-                <div class="page-top-stack">
-                    <div class="page-header page-header-with-back">
-                        <button class="page-header-back" id="backToDettagliBtn" aria-label="Torna ai dettagli">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </button>
-                        <h1 id="sessioneCampagnaTitle">Sessione</h1>
-                    </div>
-                </div>
-                <div id="sessioneContent">
-                    <!-- Il contenuto verrÃ  popolato dinamicamente -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Combattimento Page -->
-        <section class="page" id="combattimentoPage">
-            <div class="combat-header">
-                <button class="page-header-back combat-back" id="backToSessioneBtn" aria-label="Torna alla sessione">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                </button>
-                <div class="combat-round-center" id="combatRoundInfo">
-                    <div class="combat-round-num">Round 1</div>
-                    <div class="combat-turn-name">In attesa...</div>
-                </div>
-                <button class="combat-next-btn" id="combatNextTurnBtn" style="display:none;" title="Prossimo turno">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-            </div>
-            <div class="combat-timers-panel" id="combatTimersPanel" style="display:none;"></div>
-            <div class="combat-body">
-                <div class="combat-initiative-col" id="combatInitCol"></div>
-                <div class="combat-cards-col" id="combattimentoContent"></div>
-            </div>
-            <div class="combat-toolbar" id="combatToolbar" style="display:none;"></div>
-        </section>
-
-        <!-- Dettagli Campagna Page -->
-        <section class="page" id="dettagliPage">
-            <div class="page-content dettagli-content">
-                <div class="page-top-stack">
-                    <div class="page-header page-header-with-back">
-                        <button class="page-header-back" id="backToCampagneBtn" aria-label="Torna alle campagne">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </button>
-                        <h1 id="dettagliCampagnaTitle">Dettagli Campagna</h1>
-                    </div>
-                </div>
-                <div class="dettagli-header">
-                    <div class="dettagli-icon-container" id="dettagliIconContainer">
-                        <!-- L'icona verrÃ  popolata dinamicamente -->
-                    </div>
-                    <div class="dettagli-actions" id="dettagliActions">
-                        <!-- Le azioni rapide verranno popolate dinamicamente -->
-                    </div>
-                </div>
-                <div id="dettagliCampagnaContent">
-                    <!-- Il contenuto verrÃ  popolato dinamicamente -->
-                </div>
-            </div>
-        </section>
         <div id="react-root"></div>
     </main>
 
@@ -533,7 +426,7 @@
                 <div class="form-group">
                     <label id="rollRequestLabel" for="rollRequestInput">Risultato del tiro:</label>
                     <div class="roll-input-row">
-                        <input type="number" id="rollRequestInput" name="rollRequestInput" required min="1" max="999" placeholder="Inserisci il risultato" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
+                        <input type="number" id="rollRequestInput" name="rollRequestInput" required max="999" placeholder="Inserisci il risultato" inputmode="none" readonly onclick="pgOpenAbilityKeypad(this)">
                         <button type="button" class="btn-roll-d20" id="autoRollBtn" title="Tira d20 automaticamente">
                             <div class="roll-d20-wrapper">
                                 <img src="images/icon d20.png" alt="D20" class="roll-d20-img">
@@ -989,36 +882,6 @@
             <h2>Scegli Personaggio</h2>
             <div id="scegliPersonaggioList" class="scegli-pg-list">
                 <p>Caricamento personaggi...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Richiedi Tiro Modal -->
-    <div class="modal" id="richiediTiroModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeRichiediTiroModal">&times;</button>
-            <h2>Richiedi Tiro</h2>
-            <div class="richiedi-tiro-options">
-                <div class="form-group">
-                    <label>Tipo di tiro</label>
-                    <select id="tipoTiroSelect">
-                        <option value="salvezza">Tiro Salvezza</option>
-                        <option value="abilita">Tiro di AbilitÃ </option>
-                        <option value="caratteristica">Prova di Caratteristica</option>
-                    </select>
-                </div>
-                <div class="form-group" id="tiroTargetGroup">
-                    <label id="tiroTargetLabel">Caratteristica</label>
-                    <select id="tiroTargetSelect"></select>
-                </div>
-                <div class="form-group">
-                    <label>Giocatori</label>
-                    <div id="tiroPlayersList" class="tiro-players-list"></div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" id="cancelRichiediTiro">Annulla</button>
-                    <button type="button" class="btn-primary" id="confirmRichiediTiro">Richiedi</button>
-                </div>
             </div>
         </div>
     </div>

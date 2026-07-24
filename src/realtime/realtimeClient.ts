@@ -1,20 +1,5 @@
 import type { QueryKey } from '@tanstack/react-query';
-import { queryClient } from '../query';
-
-export const realtimeChannels = {
-  auth: 'auth-session',
-  campaigns: 'campaigns',
-  sessions: 'sessions',
-  combat: 'combat',
-  rollRequests: 'roll-requests',
-  notifications: 'notifications',
-} as const;
-
-export type RealtimeAction =
-  | { type: 'invalidate'; queryKey: QueryKey }
-  | { type: 'patch'; queryKey: QueryKey; updater: (current: unknown) => unknown }
-  | { type: 'notify'; message: string }
-  | { type: 'none' };
+import { queryClient, queryKeys } from '../query';
 
 export interface RealtimeEventMeta {
   table: string;
@@ -30,24 +15,18 @@ export interface RealtimeDataChange extends RealtimeEventMeta {
   sessioneId?: string | null;
   personaggioId?: string | null;
   userId?: string | null;
+  requestId?: string | null;
 }
 
 const DEDUPE_MS = 3000;
 const recentEvents = new Map<string, number>();
-let notifyHandler: ((message: string) => void) | null = null;
 
 export const realtimeClientId = globalThis.crypto?.randomUUID?.() ?? `client-${Date.now()}-${Math.random()}`;
 
-export function setRealtimeNotifyHandler(handler: ((message: string) => void) | null): void {
-  notifyHandler = handler;
-}
-
 export function realtimeEventKey(event: RealtimeDataChange): string {
-  if (event.eventId) return `event:${event.eventId}`;
-  const scope = [event.id, event.campagnaId, event.sessioneId, event.personaggioId, event.userId]
-    .filter(value => value != null && value !== '')
-    .join(':');
-  return `${event.table}:${event.action}:${scope}`;
+  const scope = [event.eventId, event.id, event.requestId, event.sessioneId, event.campagnaId, event.personaggioId, event.userId]
+    .find(value => value != null && value !== '');
+  return `${event.table}:${event.action}:${scope ?? ''}`;
 }
 
 export function shouldProcessRealtimeEvent(event: RealtimeDataChange, now = Date.now()): boolean {
@@ -64,37 +43,29 @@ export function shouldProcessRealtimeEvent(event: RealtimeDataChange, now = Date
   return true;
 }
 
-export function applyRealtimeAction(action: RealtimeAction): void {
-  if (action.type === 'invalidate') {
-    queryClient.invalidateQueries({ queryKey: action.queryKey });
-    return;
-  }
-  if (action.type === 'patch') {
-    queryClient.setQueryData(action.queryKey, action.updater);
-    return;
-  }
-  if (action.type === 'notify') {
-    notifyHandler?.(action.message);
-  }
-}
-
 export function realtimeQueryPrefixes(event: RealtimeDataChange): QueryKey[] {
   const table = event.table || '';
-  if (table.startsWith('homebrew_')) return [['homebrew']];
+  if (table.startsWith('homebrew_')) return [event.userId ? queryKeys.homebrew(event.userId) : ['homebrew']];
   if (['campagne', 'inviti_campagna', 'richieste_campagna'].includes(table)) {
-    return [['campaigns'], ['campaignInvites'], ['campaign']];
+    return event.campagnaId ? [['campaigns'], ['combat']] : [['campaigns']];
   }
   if (['personaggi', 'personaggi_campagna'].includes(table)) {
-    return [['characters'], ['character'], ['campaign']];
+    const personaggioId = event.personaggioId
+      ?? (table === 'personaggi' && event.id != null ? String(event.id) : null);
+    const prefixes: QueryKey[] = [['characters'], ['campaigns'], ['combat']];
+    if (personaggioId) prefixes.unshift(queryKeys.character(personaggioId));
+    return prefixes;
   }
   if (table === 'sessioni') {
-    return [['session'], ['campaign'], ['campaigns'], ['combat']];
+    const prefixes: QueryKey[] = [event.campagnaId ? queryKeys.campaign(event.campagnaId) : ['campaigns']];
+    if (event.sessioneId) prefixes.push(queryKeys.combat(event.sessioneId));
+    return prefixes;
   }
   if (['combattimento', 'mostri_combattimento', 'iniziativa', 'richieste_tiro_iniziativa', 'richieste_tiro_generico', 'combat_timers'].includes(table)) {
-    return [['combat'], ['session']];
+    return [event.sessioneId ? queryKeys.combat(event.sessioneId) : ['combat']];
   }
   if (['utenti', 'richieste_amicizia'].includes(table)) {
-    return [['currentUser'], ['friends'], ['campaigns'], ['homebrew']];
+    return [event.userId ? queryKeys.friends(event.userId) : ['friends']];
   }
   return [];
 }

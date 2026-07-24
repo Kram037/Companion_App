@@ -8,6 +8,7 @@ declare global {
     CompanionRouterBridge?: {
       legacyNavigationFromLocation?: (pathname: string) => LegacyNavigationSnapshot | null;
       navigateToLegacy?: (snapshot: LegacyNavigationSnapshot) => boolean;
+      ownsPage?: (pageName: string) => boolean;
     };
     updateBookmarkChrome?: () => void;
   }
@@ -44,7 +45,13 @@ function installNavigateToPageBridge() {
       const handled = window.CompanionRouterBridge?.navigateToLegacy?.(
         legacySnapshotFromCurrentState(pageName),
       );
-      if (handled) return original(pageName, { ...options, pushHistory: false });
+      if (handled) {
+        return original(pageName, {
+          ...options,
+          pushHistory: false,
+          skipPageLoad: options?.skipPageLoad || window.CompanionRouterBridge?.ownsPage?.(pageName),
+        });
+      }
     }
 
     return original(pageName, options);
@@ -76,7 +83,10 @@ function syncLegacyDomToPath(pathname: string) {
     personaggioId: navigation.personaggioId ?? null,
   }, 'react-router');
   if (window.navigateToPage && (changed || !isLegacyPageActive)) {
-    window.navigateToPage(page, { pushHistory: false });
+    window.navigateToPage(page, {
+      pushHistory: false,
+      skipPageLoad: window.CompanionRouterBridge?.ownsPage?.(page),
+    });
   }
   else window.updateBookmarkChrome?.();
 }

@@ -3,321 +3,13 @@
 // ============================================================
 
 let appEventsChannel = null;
+const notifiedSessionStarts = new Set();
+const handledFinishedSessions = new Set();
+const handledFinishedCombats = new Set();
 
 function publishAppDataChange(change) {
     if (!change?.table || !change?.action) return;
     window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
-}
-
-function publishIncomingAppChange(change) {
-    publishAppDataChange(change);
-    window.requestLegacyRealtimeRefresh?.(change);
-}
-
-/**
- * Avvia Realtime subscription per le nuove sessioni
- */
-function startSessionRealtime() {
-    const supabase = getSupabaseClient();
-    if (!supabase || !AppState.isLoggedIn || !AppState.currentUser) return;
-
-    // Ferma subscription esistente se presente
-    stopSessionRealtime();
-
-    // Ottieni l'ID utente dal database e carica le campagne
-    findUserByUid(AppState.currentUser.uid).then(async (userData) => {
-        if (!userData) {
-            console.warn('⚠️ UserData non trovato per Realtime sessioni');
-            return;
-        }
-
-        // Carica tutte le campagne dove l'utente è DM o giocatore
-        const { data: campagneDM } = await supabase
-            .from('campagne')
-            .select('id')
-            .eq('id_dm', userData.id);
-
-        const { data: tutteCampagne } = await supabase
-            .from('campagne')
-            .select('id, giocatori');
-
-        let campagnePlayer = [];
-        if (tutteCampagne) {
-            campagnePlayer = tutteCampagne
-                .filter(c => Array.isArray(c.giocatori) && c.giocatori.includes(userData.id))
-                .map(c => ({ id: c.id }));
-        }
-
-        const campagnaIds = [
-            ...(campagneDM || []).map(c => c.id),
-            ...(campagnePlayer || []).map(c => c.id)
-        ].filter((id, index, self) => self.indexOf(id) === index);
-
-        if (campagnaIds.length === 0) return;
-
-        // Subscription per nuove sessioni
-        // Nota: Supabase Realtime non supporta filtri complessi con OR, quindi
-        // ascoltiamo tutte le nuove sessioni e filtriamo lato client
-        const sessionChannel = supabase
-            .channel('new-sessions')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'sessioni'
-                },
-                async (payload) => {
-                    appDebug('🔔 Nuova sessione:', payload.new);
-                    // Filtra lato client: verifica che la sessione appartenga a una delle campagne dell'utente
-                    if (campagnaIds.includes(payload.new.campagna_id) && !payload.new.data_fine) {
-                        // Carica i dettagli della campagna
-                        const { data: campagna } = await supabase
-                            .from('campagne')
-                            .select('nome_campagna')
-                            .eq('id', payload.new.campagna_id)
-                            .single();
-
-                        if (campagna) {
-                            showInAppNotification({
-                                title: 'Sessione Attiva',
-                                message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
-                                campagnaId: payload.new.campagna_id,
-                                sessioneId: payload.new.id
-                            });
-                        }
-                    }
-                }
-            )
-            .subscribe();
-
-        window.sessionChannel = sessionChannel;
-        appDebug('✅ Realtime subscription per sessioni avviata');
-    }).catch(error => {
-        console.error('❌ Errore nell\'avvio Realtime sessioni:', error);
-    });
-}
-
-/**
- * Ferma Realtime subscription per le nuove sessioni
- */
-function stopSessionRealtime() {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    if (window.sessionChannel) {
-        supabase.removeChannel(window.sessionChannel);
-        window.sessionChannel = null;
-    }
-}
-
-/**
- * Avvia Realtime subscription per la pagina combattimento
- */
-function startCombattimentoRealtime(campagnaId, sessioneId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    // Ferma subscription esistente se presente
-    stopCombattimentoRealtime();
-
-    // Subscription per aggiornamenti ai tiri iniziativa
-    const combattimentoChannel = supabase
-        .channel(`combattimento-${sessioneId}`)
-        .on(
-            'broadcast',
-            { event: 'iniziativa_update' },
-            async (payload) => {
-                appDebug('🔔 [REALTIME] Broadcast iniziativa:', payload);
-                publishIncomingAppChange({
-                    table: 'combattimento',
-                    action: 'update',
-                    campagnaId,
-                    sessioneId,
-                    timestamp: payload?.payload?.ts || Date.now()
-                });
-            }
-        )
-        .on(
-            'postgres_changes',
-            {
-                event: '*', // INSERT, UPDATE, DELETE
-                schema: 'public',
-                table: 'richieste_tiro_iniziativa',
-                filter: `sessione_id=eq.${sessioneId}`
-            },
-            async (payload) => {
-                appDebug('🔔 [REALTIME] Aggiornamento tiro iniziativa:', payload);
-                publishIncomingAppChange({
-                    table: 'richieste_tiro_iniziativa',
-                    action: String(payload.eventType || 'update').toLowerCase(),
-                    id: payload.new?.id || payload.old?.id || null,
-                    campagnaId,
-                    sessioneId
-                });
-            }
-        )
-        .subscribe((status) => {
-            appDebug('📡 [REALTIME] Stato subscription combattimento:', status);
-            if (status === 'SUBSCRIBED') {
-                appDebug('✅ [REALTIME] Subscription combattimento attiva');
-            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                console.error('❌ [REALTIME] Errore subscription combattimento');
-            }
-        });
-
-    window.combattimentoChannel = combattimentoChannel;
-    appDebug('✅ Realtime subscription per combattimento avviata');
-}
-
-/**
- * Invia un broadcast per aggiornare il combattimento in tempo reale
- */
-async function sendCombattimentoUpdateBroadcast(sessioneId) {
-    const supabase = getSupabaseClient();
-    if (!supabase || !sessioneId) return;
-
-    // Se siamo già in combattimento, usa il canale esistente
-    if (window.combattimentoChannel && AppState.currentSessioneId === sessioneId) {
-        try {
-            await window.combattimentoChannel.send({
-                type: 'broadcast',
-                event: 'iniziativa_update',
-                payload: { sessioneId, ts: Date.now() }
-            });
-        } catch (error) {
-            console.warn('⚠️ Errore invio broadcast combattimento:', error);
-        }
-        return;
-    }
-
-    // Altrimenti crea un canale temporaneo per il broadcast
-    const tempChannel = supabase.channel(`combattimento-${sessioneId}`);
-    tempChannel.subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-            tempChannel.send({
-                type: 'broadcast',
-                event: 'iniziativa_update',
-                payload: { sessioneId, ts: Date.now() }
-            }).catch((error) => {
-                console.warn('⚠️ Errore invio broadcast combattimento:', error);
-            }).finally(() => {
-                setTimeout(() => {
-                    supabase.removeChannel(tempChannel);
-                }, 300);
-            });
-        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            supabase.removeChannel(tempChannel);
-        }
-    });
-}
-
-/**
- * Ferma Realtime subscription per la pagina combattimento
- */
-function stopCombattimentoRealtime() {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    if (window.combattimentoChannel) {
-        supabase.removeChannel(window.combattimentoChannel);
-        window.combattimentoChannel = null;
-    }
-}
-
-/**
- * Avvia Realtime subscription per aggiornare la pagina dettagli quando viene avviata una sessione
- */
-function startCampagnaDetailsRealtime(campagnaId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    // Ferma subscription esistente se presente
-    stopCampagnaDetailsRealtime();
-
-    // Verifica che siamo ancora nella pagina dettagli
-    const dettagliPage = document.getElementById('dettagliPage');
-    if (!dettagliPage || !dettagliPage.classList.contains('active')) {
-        return;
-    }
-
-    // Verifica che la campagna sia ancora quella corrente
-    if (AppState.currentCampagnaId !== campagnaId) {
-        return;
-    }
-
-    // Subscription per nuove sessioni per questa campagna
-    const campagnaDetailsChannel = supabase
-        .channel(`campagna-details-${campagnaId}`)
-        .on(
-            'postgres_changes',
-            {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'sessioni',
-                filter: `campagna_id=eq.${campagnaId}`
-            },
-            async (payload) => {
-                appDebug('🔔 [REALTIME] Nuova sessione avviata per campagna:', payload.new);
-                // Verifica che la sessione non abbia data_fine (sia attiva)
-                if (!payload.new.data_fine) {
-                    publishIncomingAppChange({
-                        table: 'sessioni',
-                        action: 'insert',
-                        id: payload.new?.id || null,
-                        campagnaId,
-                        sessioneId: payload.new?.id || null
-                    });
-                }
-            }
-        )
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'sessioni',
-                filter: `campagna_id=eq.${campagnaId}`
-            },
-            async (payload) => {
-                appDebug('🔔 [REALTIME] Sessione aggiornata per campagna:', payload.new);
-                // Se la sessione è stata terminata (data_fine impostata), ricarica i dettagli
-                if (payload.new.data_fine) {
-                    publishIncomingAppChange({
-                        table: 'sessioni',
-                        action: 'update',
-                        id: payload.new?.id || null,
-                        campagnaId,
-                        sessioneId: payload.new?.id || null
-                    });
-                }
-            }
-        )
-        .subscribe((status) => {
-            appDebug('📡 [REALTIME] Stato subscription dettagli campagna:', status);
-            if (status === 'SUBSCRIBED') {
-                appDebug('✅ [REALTIME] Subscription dettagli campagna attiva');
-            } else if (status === 'CHANNEL_ERROR') {
-                console.error('❌ [REALTIME] Errore subscription dettagli campagna');
-            }
-        });
-
-    window.campagnaDetailsChannel = campagnaDetailsChannel;
-    appDebug('✅ Realtime subscription per dettagli campagna avviata');
-}
-
-/**
- * Ferma Realtime subscription per la pagina dettagli campagna
- */
-function stopCampagnaDetailsRealtime() {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    if (window.campagnaDetailsChannel) {
-        supabase.removeChannel(window.campagnaDetailsChannel);
-        window.campagnaDetailsChannel = null;
-        appDebug('✅ Realtime subscription per dettagli campagna fermata');
-    }
 }
 
 /**
@@ -349,7 +41,10 @@ function startAppEventsRealtime() {
                 if (data.table === 'richieste_tiro_iniziativa' && data.action === 'insert') {
                     setTimeout(async () => {
                         const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
-                        if (pending && !window.currentRollRequest) {
+                        if (pending?.tipo === 'iniziativa') {
+                            handledFinishedCombats.delete(pending.sessione_id);
+                        }
+                        if (pending?.tipo === 'iniziativa' && !window.currentRollRequest) {
                             showRollRequestModal(pending);
                             sendBrowserNotification('Tiro di Iniziativa', 'Il DM ti ha richiesto un tiro di iniziativa!');
                             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -358,15 +53,10 @@ function startAppEventsRealtime() {
                 }
 
                 if (data.table === 'richieste_tiro_generico' && data.action === 'insert') {
-                    const label = data.tiroLabel || 'Tiro Richiesto';
-                    const tipoTiro = data.tipoTiro || null;
-                    const targetTiro = data.targetTiro || null;
                     setTimeout(async () => {
                         const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
-                        if (pending && !window.currentRollRequest) {
-                            pending.tiroLabel = label;
-                            pending.tipoTiro = tipoTiro;
-                            pending.targetTiro = targetTiro;
+                        if (pending?.tipo === 'generico' && !window.currentRollRequest) {
+                            const label = pending.tiroLabel || 'Tiro Richiesto';
                             showRollRequestModal(pending);
                             sendBrowserNotification(label, `Il DM ha richiesto: ${label}`);
                             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -375,19 +65,76 @@ function startAppEventsRealtime() {
                 }
 
                 if (data.table === 'richieste_tiro_iniziativa' && data.action === 'delete') {
-                    closeRollRequestModal();
-                    if (AppState.currentPage === 'combattimento' && data.campagnaId) {
+                    const current = window.currentRollRequest;
+                    if (current?.tipo === 'iniziativa' && current.sessione_id === data.sessioneId) {
+                        const { data: request, error } = await supabase
+                            .from('richieste_tiro_iniziativa')
+                            .select('id')
+                            .eq('id', current.id)
+                            .maybeSingle();
+                        if (!error && !request) closeRollRequestModal();
+                    }
+                    if (
+                        AppState.currentPage === 'combattimento'
+                        && AppState.currentCampagnaId === data.campagnaId
+                        && AppState.currentSessioneId === data.sessioneId
+                        && !handledFinishedCombats.has(data.sessioneId)
+                        && await combatRequestsAreGone(supabase, data.sessioneId)
+                    ) {
+                        handledFinishedCombats.add(data.sessioneId);
                         showNotification('Il combattimento è terminato');
                         navigateToPage('sessione');
                     }
                 }
 
-                if (data.table === 'richieste_tiro_generico' && data.action === 'delete') {
-                    closeRollRequestModal();
+                if (
+                    data.table === 'combattimento'
+                    && data.action === 'end'
+                    && AppState.currentPage === 'combattimento'
+                    && AppState.currentCampagnaId === data.campagnaId
+                    && AppState.currentSessioneId === data.sessioneId
+                    && !handledFinishedCombats.has(data.sessioneId)
+                    && await combatRequestsAreGone(supabase, data.sessioneId)
+                ) {
+                    handledFinishedCombats.add(data.sessioneId);
+                    showNotification('Il combattimento è terminato');
+                    navigateToPage('sessione');
                 }
 
-                if (data.table === 'sessioni' && data.action === 'insert' && data.campagnaId) {
+                if (data.table === 'richieste_tiro_generico' && data.action === 'delete') {
+                    const current = window.currentRollRequest;
+                    if (
+                        current?.tipo === 'generico'
+                        && current.sessione_id === data.sessioneId
+                        && current.richiesta_id === data.richiestaId
+                    ) {
+                        const { data: request, error } = await supabase
+                            .from('richieste_tiro_generico')
+                            .select('id')
+                            .eq('id', current.id)
+                            .maybeSingle();
+                        if (!error && !request) closeRollRequestModal();
+                    }
+                }
+
+                if (
+                    data.table === 'sessioni'
+                    && data.action === 'insert'
+                    && data.campagnaId
+                    && data.sessioneId
+                    && !notifiedSessionStarts.has(data.sessioneId)
+                ) {
                     try {
+                        const { data: sessione, error: sessionError } = await supabase
+                            .from('sessioni')
+                            .select('id, created_at')
+                            .eq('id', data.sessioneId)
+                            .eq('campagna_id', data.campagnaId)
+                            .is('data_fine', null)
+                            .maybeSingle();
+                        const startedAt = Date.parse(sessione?.created_at || '');
+                        if (sessionError || !sessione || !Number.isFinite(startedAt) || Math.abs(Date.now() - startedAt) > 60_000) return;
+
                         const userData = await findUserByUid(AppState.currentUser?.uid);
                         if (userData) {
                             const { data: campagna } = await supabase
@@ -399,6 +146,7 @@ function startAppEventsRealtime() {
                             if (campagna && campagna.id_dm !== userData.id) {
                                 const isPlayer = Array.isArray(campagna.giocatori) && campagna.giocatori.includes(userData.id);
                                 if (isPlayer) {
+                                    notifiedSessionStarts.add(data.sessioneId);
                                     showInAppNotification({
                                         title: 'Sessione Avviata!',
                                         message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
@@ -417,11 +165,39 @@ function startAppEventsRealtime() {
                     }
                 }
 
-                if (data.table === 'sessioni' && data.action === 'update' && data.campagnaId) {
-                    if (AppState.activeSessionCampagnaId === data.campagnaId) {
-                        clearActiveSession();
-                        if (AppState.currentPage === 'sessione') {
-                            stopSessioneTimer();
+                if (
+                    data.table === 'sessioni'
+                    && data.action === 'update'
+                    && data.campagnaId
+                    && data.sessioneId
+                    && !handledFinishedSessions.has(data.sessioneId)
+                ) {
+                    const { data: sessione, error } = await supabase
+                        .from('sessioni')
+                        .select('data_fine')
+                        .eq('id', data.sessioneId)
+                        .eq('campagna_id', data.campagnaId)
+                        .maybeSingle();
+                    if (!error && sessione?.data_fine) {
+                        handledFinishedSessions.add(data.sessioneId);
+                        if (window.currentRollRequest?.sessione_id === data.sessioneId) {
+                            closeRollRequestModal();
+                        }
+                        if (AppState.activeSessionCampagnaId === data.campagnaId) {
+                            const { data: activeSession, error: activeSessionError } = await supabase
+                                .from('sessioni')
+                                .select('id')
+                                .eq('campagna_id', data.campagnaId)
+                                .is('data_fine', null)
+                                .limit(1)
+                                .maybeSingle();
+                            if (!activeSessionError && !activeSession) clearActiveSession();
+                        }
+                        if (
+                            (AppState.currentPage === 'sessione' || AppState.currentPage === 'combattimento')
+                            && AppState.currentCampagnaId === data.campagnaId
+                            && AppState.currentSessioneId === data.sessioneId
+                        ) {
                             showNotification('La sessione è terminata');
                             navigateToPage('dettagli');
                         }
@@ -448,6 +224,15 @@ function startAppEventsRealtime() {
 
     appEventsChannel = channel;
     window.appEventsChannel = channel;
+}
+
+async function combatRequestsAreGone(supabase, sessioneId) {
+    if (!sessioneId) return false;
+    const { count, error } = await supabase
+        .from('richieste_tiro_iniziativa')
+        .select('id', { count: 'exact', head: true })
+        .eq('sessione_id', sessioneId);
+    return !error && count === 0;
 }
 
 /**

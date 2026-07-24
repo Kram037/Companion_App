@@ -3,10 +3,36 @@
 -- Esegui questo script UNA SOLA VOLTA nel SQL Editor di Supabase
 -- ============================================
 
+BEGIN;
+
+-- CREATE OR REPLACE non può cambiare il tipo restituito. Fallire prima di
+-- rimuovere altre RPC se un database storico conserva la vecchia firma UUID.
+DO $$
+DECLARE
+    v_return_type OID;
+BEGIN
+    SELECT p.prorettype
+    INTO v_return_type
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'get_current_user_id'
+      AND p.pronargs = 0
+      AND p.prokind = 'f';
+
+    IF v_return_type IS NOT NULL
+       AND v_return_type <> 'character varying'::REGTYPE THEN
+        RAISE EXCEPTION 'get_current_user_id() restituisce %, atteso character varying',
+            v_return_type::REGTYPE
+            USING HINT = 'Migrare esplicitamente le dipendenze della vecchia funzione prima di eseguire questo file.';
+    END IF;
+END;
+$$;
+
 -- STEP 1: DROP di tutte le funzioni esistenti (ignora se non esistono)
 
--- Friend functions (versione UUID - vecchia)
-DROP FUNCTION IF EXISTS get_current_user_id() CASCADE;
+-- get_current_user_id viene sostituita in-place: dropparla con CASCADE
+-- eliminerebbe anche le RPC atomiche che la usano.
 DROP FUNCTION IF EXISTS get_richieste_in_entrata() CASCADE;
 DROP FUNCTION IF EXISTS get_richieste_in_uscita() CASCADE;
 DROP FUNCTION IF EXISTS get_amici() CASCADE;
@@ -23,6 +49,8 @@ DROP FUNCTION IF EXISTS get_giocatori_campagna(VARCHAR(10)) CASCADE;
 
 -- Tiri iniziativa
 DROP FUNCTION IF EXISTS get_tiri_iniziativa(VARCHAR(10)) CASCADE;
+DROP FUNCTION IF EXISTS submit_initiative_roll(VARCHAR(10), INTEGER, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS submit_generic_roll(VARCHAR(10), INTEGER, INTEGER) CASCADE;
 
 -- Inviti
 DROP FUNCTION IF EXISTS get_inviti_ricevuti(VARCHAR(10)) CASCADE;
@@ -30,6 +58,9 @@ DROP FUNCTION IF EXISTS invia_invito_campagna(VARCHAR(10), VARCHAR(10), VARCHAR(
 DROP FUNCTION IF EXISTS accetta_invito_campagna(VARCHAR(10)) CASCADE;
 DROP FUNCTION IF EXISTS rifiuta_invito_campagna(VARCHAR(10)) CASCADE;
 DROP FUNCTION IF EXISTS rimuovi_giocatore_campagna(VARCHAR(10), VARCHAR(10)) CASCADE;
+DROP FUNCTION IF EXISTS create_invito_campagna(VARCHAR(10), VARCHAR(10)) CASCADE;
+DROP FUNCTION IF EXISTS update_invito_campagna_stato(VARCHAR(10), TEXT) CASCADE;
+DROP FUNCTION IF EXISTS dm_rimuovi_giocatore(VARCHAR(10), VARCHAR(10), VARCHAR(10)) CASCADE;
 
 -- ============================================
 -- STEP 2: Ricrea get_current_user_id
@@ -360,6 +391,92 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION submit_initiative_roll(
+    p_request_id VARCHAR(10),
+    p_valore INTEGER,
+    p_tiro_naturale INTEGER DEFAULT NULL
+)
+RETURNS VARCHAR(10)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_current_user_id VARCHAR(10);
+    v_sessione_id VARCHAR(10);
+BEGIN
+    v_current_user_id := get_current_user_id();
+
+    IF p_valore IS NULL OR (p_tiro_naturale IS NOT NULL AND p_tiro_naturale NOT BETWEEN 1 AND 20) THEN
+        RAISE EXCEPTION 'Risultato tiro non valido' USING ERRCODE = '22023';
+    END IF;
+
+    UPDATE richieste_tiro_iniziativa r
+    SET valore = p_valore,
+        tiro_naturale = p_tiro_naturale,
+        stato = 'completed',
+        "timestamp" = NOW()
+    FROM sessioni s
+    JOIN campagne c ON c.id = s.campagna_id
+    WHERE r.id = p_request_id
+      AND r.sessione_id = s.id
+      AND s.data_fine IS NULL
+      AND r.giocatore_id = v_current_user_id
+      AND v_current_user_id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+      AND r.stato = 'pending'
+    RETURNING r.sessione_id INTO v_sessione_id;
+
+    IF v_sessione_id IS NULL THEN
+        RAISE EXCEPTION 'Richiesta iniziativa non valida o non più pending' USING ERRCODE = '42501';
+    END IF;
+
+    RETURN v_sessione_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION submit_generic_roll(
+    p_request_id VARCHAR(10),
+    p_valore INTEGER,
+    p_tiro_naturale INTEGER DEFAULT NULL
+)
+RETURNS VARCHAR(10)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_current_user_id VARCHAR(10);
+    v_sessione_id VARCHAR(10);
+BEGIN
+    v_current_user_id := get_current_user_id();
+
+    IF p_valore IS NULL OR (p_tiro_naturale IS NOT NULL AND p_tiro_naturale NOT BETWEEN 1 AND 20) THEN
+        RAISE EXCEPTION 'Risultato tiro non valido' USING ERRCODE = '22023';
+    END IF;
+
+    UPDATE richieste_tiro_generico r
+    SET valore = p_valore,
+        tiro_naturale = p_tiro_naturale,
+        stato = 'completed',
+        "timestamp" = NOW()
+    FROM sessioni s
+    JOIN campagne c ON c.id = s.campagna_id
+    WHERE r.id = p_request_id
+      AND r.sessione_id = s.id
+      AND s.data_fine IS NULL
+      AND r.giocatore_id = v_current_user_id
+      AND v_current_user_id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+      AND r.stato = 'pending'
+    RETURNING r.sessione_id INTO v_sessione_id;
+
+    IF v_sessione_id IS NULL THEN
+        RAISE EXCEPTION 'Richiesta tiro non valida o non più pending' USING ERRCODE = '42501';
+    END IF;
+
+    RETURN v_sessione_id;
+END;
+$$;
+
 -- ============================================
 -- STEP 6: Inviti campagna
 -- ============================================
@@ -400,7 +517,8 @@ BEGIN
         u.nome_utente AS inviante_nome_utente,
         u.cid AS inviante_cid
     FROM inviti_campagna i
-    LEFT JOIN campagne c ON c.id = i.campagna_id
+    JOIN campagne c ON c.id = i.campagna_id
+                    AND c.id_dm = i.inviante_id
     LEFT JOIN utenti u ON u.id = i.inviante_id
     WHERE i.invitato_id = p_invitato_id AND i.stato = 'pending'
     ORDER BY i.created_at DESC;
@@ -428,14 +546,27 @@ BEGIN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id;
+    SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id FOR UPDATE;
     IF v_id_dm IS NULL OR v_id_dm != p_inviante_id THEN
         RAISE EXCEPTION 'Solo il DM può invitare giocatori';
     END IF;
 
     INSERT INTO inviti_campagna (campagna_id, inviante_id, invitato_id, stato)
     VALUES (p_campagna_id, p_inviante_id, p_invitato_id, 'pending')
+    ON CONFLICT (campagna_id, invitato_id) DO UPDATE
+    SET inviante_id = EXCLUDED.inviante_id,
+        stato = 'pending',
+        updated_at = NOW()
+    WHERE inviti_campagna.stato = 'rejected'
+       OR (
+           inviti_campagna.stato = 'pending'
+           AND inviti_campagna.inviante_id IS DISTINCT FROM EXCLUDED.inviante_id
+       )
     RETURNING id INTO v_invito_id;
+
+    IF v_invito_id IS NULL THEN
+        RAISE EXCEPTION 'Invito già esistente per questo utente e questa campagna';
+    END IF;
 
     RETURN v_invito_id;
 END;
@@ -452,16 +583,24 @@ DECLARE
     v_invitato_id VARCHAR(10);
     v_current_user_id VARCHAR(10);
 BEGIN
-    SELECT u.id INTO v_current_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
+    v_current_user_id := get_current_user_id();
 
-    SELECT campagna_id, invitato_id INTO v_campagna_id, v_invitato_id
-    FROM inviti_campagna WHERE id = p_invito_id AND stato = 'pending';
+    SELECT i.campagna_id, i.invitato_id INTO v_campagna_id, v_invitato_id
+    FROM inviti_campagna i
+    JOIN campagne c ON c.id = i.campagna_id AND c.id_dm = i.inviante_id
+    WHERE i.id = p_invito_id AND i.stato = 'pending'
+    FOR UPDATE OF c, i;
 
-    IF v_invitato_id IS NULL OR v_invitato_id != v_current_user_id THEN
+    IF v_invitato_id IS NULL OR v_invitato_id IS DISTINCT FROM v_current_user_id THEN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    UPDATE inviti_campagna SET stato = 'accepted', updated_at = NOW() WHERE id = p_invito_id;
+    UPDATE inviti_campagna
+    SET stato = 'accepted', updated_at = NOW()
+    WHERE id = p_invito_id AND stato = 'pending';
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Invito non più pending';
+    END IF;
 
     UPDATE campagne
     SET giocatori = array_append(COALESCE(giocatori, ARRAY[]::VARCHAR(10)[]), v_invitato_id)
@@ -480,16 +619,22 @@ DECLARE
     v_invitato_id VARCHAR(10);
     v_current_user_id VARCHAR(10);
 BEGIN
-    SELECT u.id INTO v_current_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
+    v_current_user_id := get_current_user_id();
 
     SELECT invitato_id INTO v_invitato_id
-    FROM inviti_campagna WHERE id = p_invito_id AND stato = 'pending';
+    FROM inviti_campagna WHERE id = p_invito_id AND stato = 'pending'
+    FOR UPDATE;
 
-    IF v_invitato_id IS NULL OR v_invitato_id != v_current_user_id THEN
+    IF v_invitato_id IS NULL OR v_invitato_id IS DISTINCT FROM v_current_user_id THEN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    UPDATE inviti_campagna SET stato = 'rejected', updated_at = NOW() WHERE id = p_invito_id;
+    UPDATE inviti_campagna
+    SET stato = 'rejected', updated_at = NOW()
+    WHERE id = p_invito_id AND stato = 'pending';
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Invito non più pending';
+    END IF;
 END;
 $$;
 
@@ -506,8 +651,8 @@ DECLARE
     v_id_dm VARCHAR(10);
     v_current_user_id VARCHAR(10);
 BEGIN
-    SELECT u.id INTO v_current_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
-    SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id;
+    v_current_user_id := get_current_user_id();
+    SELECT id_dm INTO v_id_dm FROM campagne WHERE id = p_campagna_id FOR UPDATE;
 
     IF v_id_dm IS NULL OR v_id_dm != v_current_user_id THEN
         RAISE EXCEPTION 'Solo il DM può rimuovere giocatori';
@@ -515,13 +660,57 @@ BEGIN
 
     UPDATE campagne
     SET giocatori = array_remove(COALESCE(giocatori, ARRAY[]::VARCHAR(10)[]), p_giocatore_id)
-    WHERE id = p_campagna_id;
+    WHERE id = p_campagna_id
+      AND id_dm = v_current_user_id
+      AND p_giocatore_id = ANY(COALESCE(giocatori, ARRAY[]::VARCHAR(10)[]));
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Giocatore non presente nella campagna';
+    END IF;
 
     UPDATE inviti_campagna
     SET stato = 'rejected', updated_at = NOW()
     WHERE campagna_id = p_campagna_id AND invitato_id = p_giocatore_id AND stato = 'accepted';
+
+    DELETE FROM combat_timers t
+    USING personaggi_campagna pc, sessioni s
+    WHERE pc.campagna_id = p_campagna_id
+      AND pc.user_id = p_giocatore_id
+      AND t.target_kind = 'player'
+      AND t.target_id = pc.personaggio_id
+      AND t.sessione_id = s.id
+      AND s.campagna_id = p_campagna_id
+      AND s.data_fine IS NULL;
+
+    DELETE FROM personaggi_campagna
+    WHERE campagna_id = p_campagna_id AND user_id = p_giocatore_id;
+
+    DELETE FROM richieste_tiro_iniziativa r
+    USING sessioni s
+    WHERE r.sessione_id = s.id
+      AND s.campagna_id = p_campagna_id
+      AND s.data_fine IS NULL
+      AND r.giocatore_id = p_giocatore_id;
+
+    DELETE FROM richieste_tiro_generico r
+    USING sessioni s
+    WHERE r.sessione_id = s.id
+      AND s.campagna_id = p_campagna_id
+      AND s.data_fine IS NULL
+      AND r.giocatore_id = p_giocatore_id;
 END;
 $$;
+
+DROP POLICY IF EXISTS "Utenti possono creare inviti per le proprie campagne" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono aggiornare inviti ricevuti" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono eliminare i propri inviti" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono creare inviti tramite funzione" ON inviti_campagna;
+DROP POLICY IF EXISTS "Utenti possono aggiornare inviti tramite funzione" ON inviti_campagna;
+REVOKE INSERT, UPDATE, DELETE ON TABLE inviti_campagna FROM PUBLIC, anon, authenticated;
+
+DROP POLICY IF EXISTS "Utenti possono aggiornare proprie richieste iniziativa"
+    ON richieste_tiro_iniziativa;
+DROP POLICY IF EXISTS "Utenti possono aggiornare proprie richieste tiro generico"
+    ON richieste_tiro_generico;
 
 -- ============================================
 -- STEP 7: GRANT permissions
@@ -541,6 +730,8 @@ REVOKE EXECUTE ON FUNCTION accetta_invito_campagna(VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION rifiuta_invito_campagna(VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION rimuovi_giocatore_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_tiri_iniziativa(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION submit_initiative_roll(VARCHAR(10), INTEGER, INTEGER) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION submit_generic_roll(VARCHAR(10), INTEGER, INTEGER) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION get_current_user_id() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_richieste_in_entrata() TO authenticated;
@@ -557,3 +748,7 @@ GRANT EXECUTE ON FUNCTION accetta_invito_campagna(VARCHAR(10)) TO authenticated;
 GRANT EXECUTE ON FUNCTION rifiuta_invito_campagna(VARCHAR(10)) TO authenticated;
 GRANT EXECUTE ON FUNCTION rimuovi_giocatore_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_tiri_iniziativa(VARCHAR(10)) TO authenticated;
+GRANT EXECUTE ON FUNCTION submit_initiative_roll(VARCHAR(10), INTEGER, INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION submit_generic_roll(VARCHAR(10), INTEGER, INTEGER) TO authenticated;
+
+COMMIT;

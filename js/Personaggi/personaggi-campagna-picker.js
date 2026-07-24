@@ -43,7 +43,7 @@ window.openScegliPersonaggioModal = async function(campagnaId) {
             const initials = (pg.nome || '?').substring(0, 2).toUpperCase();
             const isSelected = pg.id === currentPgId;
             return `
-            <div class="scegli-pg-item ${isSelected ? 'selected' : ''}" onclick="selectPersonaggioCampagna('${campagnaId}', '${pg.id}', '${userData.id}')">
+            <div class="scegli-pg-item ${isSelected ? 'selected' : ''}" onclick="selectPersonaggioCampagna('${campagnaId}', '${pg.id}')">
                 <div class="scegli-pg-item-avatar">${escapeHtml(initials)}</div>
                 <div class="scegli-pg-item-info">
                     <div class="scegli-pg-item-name">${escapeHtml(pg.nome)}${isSelected ? ' (attuale)' : ''}</div>
@@ -64,29 +64,21 @@ function closeScegliPersonaggioModal() {
     }
 }
 
-window.selectPersonaggioCampagna = async function(campagnaId, personaggioId, userId) {
+window.selectPersonaggioCampagna = async function(campagnaId, personaggioId) {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
     try {
-        const { error } = await supabase
-            .from('personaggi_campagna')
-            .upsert({
-                campagna_id: campagnaId,
-                user_id: userId,
-                personaggio_id: personaggioId,
-                created_at: new Date().toISOString()
-            }, { onConflict: 'campagna_id,user_id' });
+        const { error } = await supabase.rpc('select_personaggio_campagna', {
+            p_campagna_id: campagnaId,
+            p_personaggio_id: personaggioId
+        });
 
         if (error) throw error;
 
         showNotification('Personaggio selezionato!');
         closeScegliPersonaggioModal();
         await sendAppEventBroadcast({ table: 'personaggi_campagna', action: 'upsert', campagnaId });
-
-        if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId === campagnaId) {
-            await loadCampagnaDetails(campagnaId);
-        }
     } catch (error) {
         console.error('Errore selezione personaggio:', error);
         showNotification('Errore: ' + (error.message || error));

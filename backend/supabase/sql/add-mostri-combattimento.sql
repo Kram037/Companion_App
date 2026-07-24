@@ -48,23 +48,19 @@ DROP POLICY IF EXISTS "DM può gestire mostri combattimento" ON mostri_combattim
 CREATE POLICY "DM può gestire mostri combattimento" ON mostri_combattimento
 FOR ALL USING (
     EXISTS (
-        SELECT 1 FROM campagne c
+        SELECT 1 FROM sessioni s
+        JOIN campagne c ON c.id = s.campagna_id
         JOIN utenti u ON u.id = c.id_dm
-        WHERE c.id = mostri_combattimento.campagna_id
+        WHERE s.id = mostri_combattimento.sessione_id
+        AND s.campagna_id = mostri_combattimento.campagna_id
+        AND s.data_fine IS NULL
         AND u.uid = auth.uid()::text
     )
 );
 
 DROP POLICY IF EXISTS "Giocatori possono leggere mostri combattimento" ON mostri_combattimento;
-CREATE POLICY "Giocatori possono leggere mostri combattimento" ON mostri_combattimento
-FOR SELECT USING (
-    EXISTS (
-        SELECT 1 FROM personaggi_campagna pc
-        JOIN utenti u ON u.id = pc.user_id
-        WHERE pc.campagna_id = mostri_combattimento.campagna_id
-        AND u.uid = auth.uid()::text
-    )
-);
+-- I giocatori leggono solo l'ordine pubblico tramite get_combat_monsters_safe;
+-- una SELECT diretta esporrebbe statistiche e risorse riservate del DM.
 
 -- Add round/turn tracking to sessioni
 ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS combat_round INTEGER DEFAULT 1;

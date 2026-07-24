@@ -25,6 +25,9 @@ Indice dei documenti tecnici e operativi della Companion App.
 - [`supabase/GOOGLE_OAUTH_SETUP.md`](supabase/GOOGLE_OAUTH_SETUP.md): configurazione login Google.
 - [`supabase/SUPABASE_MIGRATION.md`](supabase/SUPABASE_MIGRATION.md): guida storica di migrazione a Supabase.
 - [`supabase/MIGRATION_TO_VARCHAR_IDS.md`](supabase/MIGRATION_TO_VARCHAR_IDS.md): note sulla migrazione degli ID.
+- [`../backend/supabase/sql/atomic-campaign-runtime.sql`](../backend/supabase/sql/atomic-campaign-runtime.sql): prerequisito database da applicare prima del frontend React di sessione e combattimento.
+- [`../backend/supabase/sql/harden-personaggi-campagna.sql`](../backend/supabase/sql/harden-personaggi-campagna.sql): ownership strutturale e RPC sicure per l'associazione personaggio-campagna.
+- [`../backend/supabase/RLS_DEPLOY_CHECKLIST.md`](../backend/supabase/RLS_DEPLOY_CHECKLIST.md): ordine e verifica operativa di tutti gli script SQL.
 
 ## PWA
 

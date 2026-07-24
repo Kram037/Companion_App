@@ -48,7 +48,6 @@ function setupSupabaseAuth() {
                     await navigateToPage('combattimento');
                 } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                     await navigateToPage('sessione');
-                    await renderSessioneContent(AppState.currentCampagnaId);
                 } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                     await navigateToPage('dettagli');
                 } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
@@ -58,7 +57,6 @@ function setupSupabaseAuth() {
                 }
 
                 startRollRequestsRealtime();
-                startSessionRealtime();
                 startAppEventsRealtime();
                 checkStartupNotifications();
             } else {
@@ -70,13 +68,10 @@ function setupSupabaseAuth() {
 
                 // Ferma Realtime subscriptions
                 stopRollRequestsRealtime();
-                stopSessionRealtime();
                 stopAppEventsRealtime();
 
                 // Pulisci i dati quando l'utente esce
-                if (AppState.currentPage === 'campagne') {
-                    renderCampagne([], false);
-                } else if (AppState.currentPage === 'amici') {
+                if (AppState.currentPage === 'amici') {
                     renderAmici([], [], []);
                 }
             }
@@ -670,7 +665,6 @@ async function checkAuthState() {
                 await navigateToPage('combattimento');
             } else if (AppState.currentPage === 'sessione' && AppState.currentCampagnaId) {
                 await navigateToPage('sessione');
-                await renderSessioneContent(AppState.currentCampagnaId);
             } else if (AppState.currentPage === 'dettagli' && AppState.currentCampagnaId) {
                 await navigateToPage('dettagli');
             } else if (AppState.currentCampagnaId && !['campagne','amici','compendio','personaggi','laboratorio','scheda'].includes(AppState.currentPage)) {
@@ -680,16 +674,13 @@ async function checkAuthState() {
             }
 
             startRollRequestsRealtime();
-            startSessionRealtime();
             startAppEventsRealtime();
             checkStartupNotifications();
         } else {
             updateUIForLoggedOut();
             stopAppEventsRealtime();
 
-            if (AppState.currentPage === 'campagne') {
-                renderCampagne([], false);
-            } else if (AppState.currentPage === 'amici') {
+            if (AppState.currentPage === 'amici') {
                 renderAmici([], [], []);
             }
         }
@@ -707,9 +698,6 @@ function updateUIForLoggedIn() {
         headerUserName.textContent = dbName || AppState.currentUser?.displayName || '';
     }
     // Mostra i pulsanti quando l'utente è loggato
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = '';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = '';
     }
@@ -757,9 +745,6 @@ function updatePlaceholderMessages(isLoggedIn) {
 function updateUIForLoggedOut() {
     document.body.classList.remove('user-logged-in');
     // Nascondi i pulsanti quando l'utente non è loggato
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = 'none';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
     }
@@ -769,8 +754,6 @@ function updateUIForLoggedOut() {
     if (elements.addPersonaggioBtn) {
         elements.addPersonaggioBtn.style.display = 'none';
     }
-    // Show login message in campagne list
-    renderCampagne([], false);
     // Aggiorna i placeholder per amici, laboratorio e personaggi
     updatePlaceholderMessages(false);
 }
@@ -1069,12 +1052,6 @@ async function handleLogout() {
             AppState.isLoggedIn = false;
 
             if (supabase) {
-                // Disconnetti da eventuali subscription
-                if (campagneChannel) {
-                    supabase.removeChannel(campagneChannel);
-                    campagneChannel = null;
-                }
-
                 // Esegui logout da Supabase (senza scope per pulire tutto)
                 const { error } = await supabase.auth.signOut();
                 if (error) {

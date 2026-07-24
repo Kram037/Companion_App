@@ -3,6 +3,10 @@ import { join } from 'node:path';
 
 const html = readFileSync('index.html', 'utf8');
 const legacySupabase = readFileSync('js/Core/supabase.js', 'utf8');
+const rollRequestRuntime = [
+  readFileSync('js/Core/init.js', 'utf8'),
+  readFileSync('js/Sessioni/initiative.js', 'utf8'),
+].join('\n');
 const runtimeLoaders = [
   readFileSync('js/Core/data-loader.js', 'utf8'),
   readFileSync('js/Core/state.js', 'utf8'),
@@ -15,10 +19,14 @@ if (/\bcreateClient\b|supabaseCreateClient/.test(legacySupabase)) {
   console.error('Il client Supabase deve essere creato solo da src/api/supabaseClient.ts');
   process.exit(1);
 }
+const rollInput = html.match(/<input[^>]+id=["']rollRequestInput["'][^>]*>/i)?.[0] ?? '';
+if (/\bmin\s*=/.test(rollInput) || /valore\s*<\s*1|rollRequestInput\.min\s*=/.test(rollRequestRuntime)) {
+  console.error('I risultati d20 con modificatore possono essere zero o negativi');
+  process.exit(1);
+}
 const scripts = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
   .map(match => match[1]);
 const lazyModules = [
-  'js/Combattimento/combat.js',
   'js/Compendio/compendio.js',
   'js/Laboratorio/laboratorio.js',
 ];

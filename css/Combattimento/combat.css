@@ -1,93 +1,17 @@
-/* Iniziativa */
-.sessione-iniziativa {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
-}
-
-.sessione-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0 0 var(--spacing-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.iniziativa-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.iniziativa-item {
-    display: grid;
-    grid-template-columns: 32px 1fr 50px auto;
-    align-items: center;
-    padding: 8px var(--spacing-md);
-    background: var(--background);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    gap: var(--spacing-md);
-    transition: var(--transition-fast);
-}
-
-.iniziativa-item:hover {
-    border-color: var(--accent-light);
-}
-
-.iniziativa-ordine {
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: white;
-    background: var(--accent);
-    width: 26px; height: 26px;
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.iniziativa-nome {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text);
-}
-
-.iniziativa-valore {
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-align: right;
-    font-size: 0.9rem;
-    font-variant-numeric: tabular-nums;
-}
-
-.no-iniziativa {
-    text-align: center;
-    color: var(--text-muted);
-    padding: var(--spacing-xl);
-    font-size: 0.88rem;
-}
-
 /* Combat Header */
 .combat-header { display: flex; align-items: center; padding: 10px 50px; min-height: 50px; justify-content: center; flex-shrink: 0; border-bottom: 1px solid var(--border); position: relative; }
-#combattimentoPage .combat-back.page-header-back { left: 10px; z-index: 10; }
+.react-combat-page .combat-back.page-header-back { left: 10px; z-index: 10; }
 .combat-round-center { text-align: center; flex: 1; }
 .combat-round-num { font-size: 0.82rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
 .combat-turn-name { font-size: 0.9rem; font-weight: 700; color: var(--accent); }
 .combat-next-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
 .combat-next-btn:hover { opacity: 0.85; }
 
-/* Combat Body: icon col + cards col.
-   Le due colonne devono restare allineate riga per riga. Per ottenere
-   un allineamento perfetto: stessa altezza riga (52px), stesso gap (6px)
-   e stesso padding-top (8px). Lo scroll viene sincronizzato via JS. */
+/* Un solo scroll mantiene icona e card nella stessa riga senza listener JS. */
 .combat-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
-.combat-initiative-col { width: 60px; min-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px 60px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); flex-shrink: 0; }
-.combat-cards-col { flex: 1; overflow-y: auto; padding: 8px 8px 60px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
-.combat-cards-col:has(.combat-card-expanded) { overflow: hidden; }
+.combat-order-list { flex: 1; overflow-y: auto; padding: 8px 8px 60px; min-height: 0; }
+.combat-order-row { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 6px; }
+.combat-order-row .combat-card { width: 100%; }
 
 /* Combat Icons (square portraits) - altezza fissa 52px per allinearsi
    pixel-perfect alle card a destra. */
@@ -96,7 +20,6 @@
 .combat-icon.is-locked { cursor: default; }
 .combat-icon.is-clickable:hover { border-color: var(--accent-light); }
 .combat-icon.active { border-color: var(--accent); background: var(--accent-subtle); }
-.combat-icon.dimmed { opacity: 0.35; }
 .combat-icon.monster { background: rgba(239,68,68,0.06); }
 .combat-icon.monster.active { border-color: #ef4444; background: rgba(239,68,68,0.12); }
 .combat-icon-initials { font-size: 0.95rem; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: 0.5px; }
@@ -148,45 +71,14 @@
 .combat-card-badges .condition-badge-sm { font-size: 0.55rem; padding: 1px 4px; white-space: nowrap; flex-shrink: 0; }
 .combat-card-hp { font-size: 0.82rem; font-weight: 800; color: var(--accent); flex-shrink: 0; white-space: nowrap; margin-left: auto; }
 
-/* Combat Card Expanded (sheet) */
-.combat-card-expanded {
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    animation: combatExpand 0.2s ease;
-    flex: 1;
-    min-height: 0;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-@keyframes combatExpand { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Combat Sheet (inline) */
-.combat-sheet-header { margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; }
-.combat-sheet-header h3 { font-size: 1rem; font-weight: 800; color: var(--text); margin: 0; }
-.combat-sheet-sub { font-size: 0.75rem; color: var(--text-muted); }
-.combat-sheet-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
-.combat-sheet-close:hover { color: var(--text); }
-.combat-hp-bar { display: flex; gap: 6px; margin-bottom: 10px; }
-.combat-hp-block { flex: 1; text-align: center; padding: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
-.combat-hp-val { font-size: 1.3rem; font-weight: 800; color: var(--text); }
-.combat-hp-val.editable { color: var(--accent); cursor: pointer; }
 .combat-abilities-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-bottom: 10px; }
 .combat-ability { text-align: center; padding: 4px 2px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .combat-ability-label { font-size: 0.55rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 .combat-ability-val { font-size: 0.8rem; font-weight: 700; color: var(--text); display: block; }
 .combat-ability-mod { font-size: 0.7rem; font-weight: 600; color: var(--accent); }
-.combat-conditions { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
 .combat-section-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 6px 0 3px; }
 .combat-ability-save-mini { font-size: 0.55rem; color: var(--text-muted); display: block; }
 .combat-ability-save-mini.prof { color: var(--accent); font-weight: 700; }
-.combat-sheet-tabs { display: flex; gap: 2px; margin-bottom: 10px; background: var(--bg); border-radius: var(--radius-sm); padding: 2px; }
-.combat-sheet-tab { flex: 1; padding: 6px 8px; font-size: 0.75rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
-.combat-sheet-tab.active { background: var(--accent); color: white; }
-.combat-dm-actions { display: flex; gap: 6px; margin-top: 10px; }
 
 /* Combat DM Toolbar (floating bottom) */
 .combat-toolbar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 4px; z-index: 50; box-shadow: var(--shadow-md); }
@@ -196,6 +88,26 @@
 .combat-toolbar-btn span { font-size: 0.5rem; font-weight: 700; text-transform: uppercase; }
 .combat-toolbar-btn.danger { color: #ef4444; }
 .combat-toolbar-btn.danger:hover { background: rgba(239,68,68,0.1); }
+
+.combat-dice-modal {
+    width: min(520px, calc(100vw - 32px));
+}
+.combat-dice-modal .dice-stage {
+    min-height: 180px;
+}
+.combat-dice-modal .dice-type-row {
+    grid-template-columns: repeat(6, 34px);
+}
+.combat-calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.hp-calc-modal output.hp-calc-input-display {
+    display: block;
+    box-sizing: border-box;
+}
 
 /* ===========================================================
    Combat Timers (panel + dialog)
@@ -277,7 +189,6 @@
     font-size: 0.72rem;
 }
 .combat-timer-target { font-weight: 600; }
-.combat-timer-conds { display: inline-flex; flex-wrap: wrap; gap: 3px; }
 .combat-timer-cond {
     background: rgba(220,38,38,0.12);
     color: var(--accent);
@@ -298,46 +209,6 @@
     flex-shrink: 0;
 }
 .combat-timer-remove:hover { background: rgba(220,38,38,0.12); color: var(--accent); }
-
-/* Dialog dei dettagli del timer (mostrata cliccando sulla chip) */
-.combat-timer-info-modal {
-    max-width: 380px;
-    width: 92%;
-}
-.combat-timer-info-body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 12px 0 6px;
-}
-.combat-timer-info-row {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 0.88rem;
-    color: var(--text);
-}
-.combat-timer-info-row strong {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    font-weight: 700;
-}
-.combat-timer-info-row.combat-timer-info-empty {
-    color: var(--text-muted);
-    font-style: italic;
-}
-.combat-timer-info-conds {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-.combat-timer-info-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 12px;
-}
 
 /* Dialog di creazione timer - layout compatto, fisso, niente overflow.
    La dialog non deve mai superare 90vh in altezza, cosi' resta sempre
@@ -475,18 +346,6 @@
     .combat-timer-chip { max-width: 100%; }
 }
 
-/* Monster skill check items */
-.pg-skill-check-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: 5px 8px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
-.pg-skill-check-item input[type="checkbox"] { accent-color: var(--accent); }
-.pg-skill-check-item small { opacity: 0.6; margin-left: 2px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .form-row .form-group { margin-bottom: 8px; }
 
@@ -497,25 +356,6 @@
     margin: 4px 0 0;
     font-style: italic;
 }
-
-/* Monster sheet scrollable */
-.combat-monster-sheet {
-    display: flex;
-    flex-direction: column;
-    max-height: calc(100% - 8px);
-    overflow: hidden;
-}
-.combat-monster-scroll {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    padding-bottom: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-}
-.combat-monster-scroll::-webkit-scrollbar { width: 4px; }
-.combat-monster-scroll::-webkit-scrollbar-track { background: transparent; }
-.combat-monster-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* Monster actions in sheet */
 .monster-attacks-list, .monster-legg-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
@@ -533,6 +373,7 @@
 .monster-attack-name { font-weight: 600; color: var(--text); flex: 1; min-width: 0; }
 .monster-attack-hit { color: var(--accent); font-weight: 600; }
 .monster-attack-dmg { color: var(--text-secondary); }
+.monster-attack-description { flex-basis: 100%; color: var(--text-secondary); font-size: 0.8rem; }
 .monster-action-uses { display: flex; gap: 3px; align-items: center; }
 .monster-action-use-pip {
     width: 14px; height: 14px; border-radius: 50%;
@@ -568,29 +409,8 @@
     transition: background 0.2s;
 }
 .monster-res-legg-pip.filled { background: var(--accent); }
+.monster-res-legg-pip:disabled { cursor: wait; opacity: 0.65; }
 .monster-res-legg-label { font-size: 0.8rem; color: var(--text-secondary); margin-left: 4px; }
-
-/* DM actions */
-.combat-dm-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-}
-.combat-dm-actions .btn-small {
-    font-size: 0.82rem;
-    padding: 8px 10px;
-    text-align: center;
-    border-radius: var(--radius, 6px);
-}
-.combat-dm-btn-full { width: 100%; }
-.combat-dm-actions-row {
-    display: flex;
-    gap: 6px;
-}
-.combat-dm-actions-row .btn-small { flex: 1; }
 
 /* Monster creation choice */
 .monster-choice-grid {
@@ -648,7 +468,7 @@
 
 @media (max-width: 480px) {
     .combat-header { padding-left: 50px; }
-    .combat-initiative-col { width: 46px; min-width: 46px; }
+    .combat-order-row { grid-template-columns: 44px minmax(0, 1fr); gap: 6px; }
     .combat-icon { width: 44px; height: 44px; }
     .combat-icon-initials { font-size: 0.85rem; }
     .combat-abilities-grid { grid-template-columns: repeat(3, 1fr); }
@@ -670,13 +490,14 @@
     font-size: 1.25rem;
 }
 .placeholder-boxes { margin-bottom: 14px; }
-
-.placeholder-cond-chips {
-    margin: 6px 0 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+.combat-monster-editor {
+    width: min(680px, 100%);
+    max-height: 92vh;
+    overflow-y: auto;
 }
+.combat-monster-section { margin-top: 12px; }
+.combat-monster-editor .combat-abilities-grid { margin: 12px 0; }
+.combat-monster-editor .pg-exhaustion-row input[type="number"] { width: 64px; }
 
 /* Toolbar di azioni unificata fra placeholder dialog e full sheet del
    mostro: Condizioni full-width sopra, [Duplica][Elimina] su una riga. */
@@ -684,26 +505,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-}
-.combat-monster-cond-btn {
-    width: 100%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 12px;
-    font-size: 0.92rem;
-}
-.combat-monster-cond-count {
-    background: var(--accent);
-    color: #fff;
-    border-radius: 999px;
-    padding: 1px 8px;
-    min-width: 22px;
-    text-align: center;
-    font-size: 0.78rem;
-    font-weight: 700;
-    line-height: 1.4;
 }
 .combat-monster-actions-row {
     display: grid;
@@ -748,19 +549,6 @@
     padding-top: 10px;
     border-top: 1px solid var(--border);
 }
-.monster-fullsheet-conditions {
-    margin-top: 6px;
-    margin-bottom: 4px;
-}
-
-/* Modale condizioni mostro: piu' largo della HP calc per mostrare bene
-   le checkbox a 2 colonne. */
-.monster-conditions-modal {
-    width: min(380px, calc(100vw - 32px));
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
 @media (max-width: 480px) {
     .placeholder-modal-content { padding: 18px 16px 14px; }
 }
@@ -777,19 +565,6 @@
     box-shadow: 0 0 0 2px rgba(196,85,85,0.18);
 }
 
-/* Quick-add da homebrew: info riassuntive del mostro selezionato. */
-.monster-quickadd-info {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 10px 14px;
-    margin-bottom: 12px;
-}
-.monster-quickadd-name {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--text);
-}
 .monster-quickadd-sub {
     font-size: 0.82rem;
     color: var(--text-secondary);

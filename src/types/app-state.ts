@@ -14,12 +14,6 @@ export interface LegacyAppState {
   cachedBackground: JsonValue | null;
   cachedHomebrewSottoclassi: JsonValue | null;
   cachedHomebrewOggetti: JsonValue | null;
-  campagneFilters: {
-    searchText: string;
-    tipologia: string | string[];
-    dm: string | string[];
-    soloPreferiti: boolean;
-  };
 }
 
 declare global {
@@ -27,7 +21,7 @@ declare global {
     AppState?: Partial<LegacyAppState>;
     getAppNavigationState?: () => LegacyNavigationState;
     setAppNavigationState?: (next: Partial<LegacyNavigationState>, source?: string) => LegacyNavigationState;
-    navigateToPage?: (page: string, options?: { pushHistory?: boolean }) => unknown;
+    navigateToPage?: (page: string, options?: { pushHistory?: boolean; skipPageLoad?: boolean }) => unknown;
   }
 }
 

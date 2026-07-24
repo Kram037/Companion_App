@@ -125,16 +125,6 @@ function navigateToPage(pageName, { pushHistory = true, skipPageLoad = false } =
         window.setAppNavigationState({ campagnaId: null, sessioneId: null, personaggioId: null }, 'legacy-render');
     }
 
-    // Ferma Realtime subscription combattimento se si esce dalla pagina
-    if (pageName !== 'combattimento') {
-        stopCombattimentoRealtime();
-    }
-
-    // Ferma Realtime subscription dettagli campagna se si esce dalla pagina
-    if (pageName !== 'dettagli') {
-        stopCampagnaDetailsRealtime();
-    }
-
     const desktopGroupTab = !skipPageLoad && typeof getDesktopDefaultGroupTab === 'function'
         ? getDesktopDefaultGroupTab(pageName)
         : '';
@@ -187,10 +177,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             } else if (typeof compendioShowHub === 'function') {
                 compendioShowHub();
             }
-        } else if (pageName === 'campagne') {
-            if (AppState.isLoggedIn && AppState.currentUser) {
-                await loadCampagne(AppState.currentUser.uid);
-            }
         } else if (pageName === 'laboratorio' && AppState.isLoggedIn) {
             if (typeof window.ensureRuntimeScript === 'function') {
                 await window.ensureRuntimeScript('laboratorio');
@@ -204,18 +190,6 @@ async function _runPageLoad(pageName, desktopGroupTab = '') {
             await loadPersonaggi();
         } else if (pageName === 'personaggioCreate') {
             if (typeof pgEnsureWizardPageMount === 'function') pgEnsureWizardPageMount();
-        } else if (pageName === 'dettagli' && AppState.currentCampagnaId) {
-            await loadCampagnaDetails(AppState.currentCampagnaId);
-        } else if (pageName === 'sessione' && AppState.currentCampagnaId) {
-            await renderSessioneContent(AppState.currentCampagnaId);
-        } else if (pageName === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('combattimento');
-            }
-            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
-            if (!window.combattimentoChannel) {
-                startCombattimentoRealtime(AppState.currentCampagnaId, AppState.currentSessioneId);
-            }
         } else if (pageName === 'scheda' && AppState.currentPersonaggioId) {
             await renderSchedaPersonaggio(AppState.currentPersonaggioId);
         }

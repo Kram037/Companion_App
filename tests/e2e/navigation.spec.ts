@@ -4,119 +4,51 @@ async function waitForStartup(page: Page) {
   await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
 }
 
-test('same-route legacy navigation still activates and loads the page', async ({ page }) => {
+test('campaign routes stay React-owned across legacy navigation, deep links and history', async ({ page }) => {
   await page.goto('/campagne');
   await waitForStartup(page);
 
-  await page.locator('#campagnePage').evaluate(element => element.classList.remove('active'));
-  await page.evaluate(async () => {
-    await window.navigateToPage?.('campagne');
-  });
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
+  await expect(page.locator('#campagnePage')).toHaveCount(0);
+  await expect(page.locator('#dettagliPage, #sessionePage, #combattimentoPage')).toHaveCount(0);
 
-  await expect(page.locator('#campagnePage')).toHaveClass(/active/);
-});
+  await page.evaluate(() => window.navigateToPage?.('campagne'));
 
-test('legacy session navigation invokes the session renderer', async ({ page }) => {
-  await page.goto('/campagne');
-  await waitForStartup(page);
+  await expect(page).toHaveURL(/\/campagne$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
 
-  const renderedCampaignId = await page.evaluate(async () => {
-    let rendered = '';
-    window.renderSessioneContent = async campaignId => {
-      rendered = campaignId;
-    };
+  await page.evaluate(() => {
     window.setAppNavigationState?.({ campagnaId: 'campaign-test' }, 'e2e');
-
-    await window.navigateToPage?.('sessione', { pushHistory: false });
-    return rendered;
+    return window.navigateToPage?.('dettagli');
   });
+  await expect(page).toHaveURL(/\/campagne\/campaign-test$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
 
-  expect(renderedCampaignId).toBe('campaign-test');
-});
+  await page.evaluate(() => window.openSessionePage?.('campaign-test'));
+  await expect(page).toHaveURL(/\/campagne\/campaign-test\/sessione$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
 
-test('legacy campaign detail opener keeps detail navigation under the React route bridge', async ({ page }) => {
-  await page.goto('/campagne');
+  await page.evaluate(() => window.openCombattimentoPage?.('campaign-test', 'session-test'));
+  await expect(page).toHaveURL(/\/campagne\/campaign-test\/sessione\/session-test\/combattimento$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
+  await expect(page.locator('#react-root > .react-page-shell')).toBeVisible();
+
+  await page.reload();
   await waitForStartup(page);
+  await expect(page).toHaveURL(/\/campagne\/campaign-test\/sessione\/session-test\/combattimento$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
 
-  const state = await page.evaluate(async () => {
-    let rendered = '';
-    window.loadCampagnaDetails = async campaignId => {
-      rendered = campaignId;
-    };
+  await page.goBack();
+  await expect(page).toHaveURL(/\/campagne\/campaign-test\/sessione$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
 
-    window.openCampagnaDetails?.('campaign-test');
-    await new Promise(resolve => setTimeout(resolve, 0));
+  await page.goBack();
+  await expect(page).toHaveURL(/\/campagne\/campaign-test$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
 
-    return {
-      rendered,
-      page: window.AppState?.currentPage,
-      campagnaId: window.AppState?.currentCampagnaId,
-      detailsActive: document.getElementById('dettagliPage')?.classList.contains('active') ?? false,
-      campaignsActive: document.getElementById('campagnePage')?.classList.contains('active') ?? false,
-      pathname: window.location.pathname,
-    };
-  });
-
-  expect(state).toEqual({
-    rendered: 'campaign-test',
-    page: 'dettagli',
-    campagnaId: 'campaign-test',
-    detailsActive: true,
-    campaignsActive: false,
-    pathname: '/campagne/campaign-test',
-  });
-});
-
-test('session buttons render immediately even when React bridge handles the URL', async ({ page }) => {
-  await page.goto('/campagne');
-  await waitForStartup(page);
-
-  const state = await page.evaluate(async () => {
-    let combatRendered = '';
-    let bridgedTo = '';
-    Object.defineProperty(window, 'renderCombattimentoContent', {
-      configurable: true,
-      writable: true,
-      value: async (campaignId, sessionId) => {
-        combatRendered = `${campaignId}:${sessionId}`;
-      },
-    });
-    window.ensureRuntimeScript = async () => {};
-    window.CompanionRouterBridge = {
-      ...window.CompanionRouterBridge,
-      navigateToLegacy(snapshot) {
-        bridgedTo = snapshot.page || '';
-        if (snapshot.page === 'sessione') {
-          window.history.pushState({}, '', `/campagne/${snapshot.campagnaId}/sessione`);
-        } else if (snapshot.page === 'combattimento') {
-          window.history.pushState({}, '', `/campagne/${snapshot.campagnaId}/sessione/${snapshot.sessioneId}/combattimento`);
-        }
-        return true;
-      },
-    };
-
-    await window.openSessionePage?.('campaign-test');
-    const sessionActive = document.getElementById('sessionePage')?.classList.contains('active') ?? false;
-    await window.openCombattimentoPage?.('campaign-test', 'session-test');
-
-    return {
-      bridgedTo,
-      sessionActive,
-      combatRendered,
-      page: window.AppState?.currentPage,
-      campagnaId: window.AppState?.currentCampagnaId,
-      sessioneId: window.AppState?.currentSessioneId,
-    };
-  });
-
-  expect(state).toEqual({
-    bridgedTo: 'combattimento',
-    sessionActive: true,
-    combatRendered: 'campaign-test:session-test',
-    page: 'combattimento',
-    campagnaId: 'campaign-test',
-    sessioneId: 'session-test',
-  });
+  await page.goBack();
+  await expect(page).toHaveURL(/\/campagne$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
 });
 
 test('URL drives deep links, refresh and browser history', async ({ page }) => {

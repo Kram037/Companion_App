@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router';
+import { Navigate, useNavigate, useParams } from 'react-router';
 
 import { advanceCombatTurn, endCombat, nextCombatTurnState } from '../../api';
+import {
+  fetchCombatTimers,
+  fetchCombatToolMonsters,
+  type CombatTimer,
+} from '../../api/combatToolsApi';
 import { ReactPage } from '../../app/ReactPage';
 import { combatLegacyAdapter } from '../../legacy/combatLegacyAdapter';
 import { queryKeys } from '../../query';
@@ -12,6 +17,8 @@ import { currentUserQuery } from '../auth/currentUserQuery';
 import { campaignByIdQuery } from '../campaigns/campaignDetailQueries';
 import { normalizeImageUrl } from '../media/imageUrls';
 import { combatSnapshotQuery } from './combatQueries';
+import { CombatTimersPanel, CombatTools } from './CombatTools';
+import { CombatUtilities } from './CombatUtilities';
 import { sortInitiativeOrder } from './initiativeOrder';
 
 type CombatEntry = {
@@ -43,13 +50,32 @@ export function CombatPage() {
   const campaign = useQuery(campaignByIdQuery(campagnaId));
   const combat = useQuery(combatSnapshotQuery(campagnaId, sessioneId));
   const user = useQuery(currentUserQuery());
-  const [legacyReady, setLegacyReady] = useState(false);
+  const [utility, setUtility] = useState<'dice' | 'calculator' | null>(null);
+  const [openMonsterId, setOpenMonsterId] = useState<string | null>(null);
 
   const isDm = campaign.data?.id_dm === user.data?.id;
-  const order = useMemo(() => buildCombatOrder(combat.data?.tiri ?? [], combat.data?.mostri ?? [], combat.data?.personaggi ?? []), [combat.data]);
-  const round = combat.data?.sessione?.combat_round ?? 1;
-  const turnIndex = Math.min(combat.data?.sessione?.combat_turn_index ?? 0, Math.max(0, order.length - 1));
   const currentCharacter = combat.data?.personaggi.find(character => character.player_user_id === user.data?.id);
+  const timers = useQuery({
+    queryKey: queryKeys.combatTimers(sessioneId),
+    queryFn: () => fetchCombatTimers(sessioneId),
+    enabled: Boolean(sessioneId),
+  });
+  const toolMonsters = useQuery({
+    queryKey: queryKeys.combatMonsters(sessioneId),
+    queryFn: () => fetchCombatToolMonsters(sessioneId),
+    enabled: Boolean(sessioneId && isDm),
+  });
+  const visibleTimers = useMemo(() => (timers.data ?? []).filter(timer => isDm
+    || timer.target_kind === 'global'
+    || (timer.target_kind === 'player' && timer.target_id === currentCharacter?.id)), [currentCharacter?.id, isDm, timers.data]);
+  const order = useMemo(() => buildCombatOrder(
+    combat.data?.tiri ?? [],
+    combat.data?.mostri ?? [],
+    combat.data?.personaggi ?? [],
+    visibleTimers,
+  ), [combat.data, visibleTimers]);
+  const round = combat.data?.sessione?.combat_round ?? 1;
+  const turnIndex = Math.max(0, Math.min(combat.data?.sessione?.combat_turn_index ?? 0, Math.max(0, order.length - 1)));
   const nextTurn = useMutation({
     mutationFn: async () => {
       const nextIndex = nextCombatTurnState(order.length, round, turnIndex).turnIndex;
@@ -61,70 +87,55 @@ export function CombatPage() {
         turnIndex,
         nextMonster: nextEntry?.type === 'monster' ? nextEntry.monster ?? null : null,
       });
-      if (result.expiredTimers > 0) {
-        combatLegacyAdapter.notify(result.expiredTimers === 1 ? 'Un timer e\' scaduto' : `${result.expiredTimers} timer scaduti`);
-      }
-      await combatLegacyAdapter.broadcast({ table: 'combattimento', action: 'next_turn', sessioneId, campagnaId });
+      return result;
     },
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
-      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
+    onSuccess: async result => {
+      if (!result.advanced) {
+        combatLegacyAdapter.notify('Il turno era già stato aggiornato: dati riallineati');
+        await client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
+        return;
+      }
+      if (result.expiredTimers > 0) combatLegacyAdapter.notify(result.expiredTimers === 1 ? 'Un timer è scaduto' : `${result.expiredTimers} timer scaduti`);
+      await combatLegacyAdapter.broadcast({
+        table: 'combattimento',
+        action: 'next_turn',
+        id: `${sessioneId}:${result.round}:${result.turnIndex}`,
+        sessioneId,
+        campagnaId,
+      });
     },
     onError: error => combatLegacyAdapter.notify(`Errore cambio turno: ${errorMessage(error)}`),
   });
   const stopCombat = useMutation({
-    mutationFn: async () => {
-      await endCombat(sessioneId);
-      await combatLegacyAdapter.broadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId, campagnaId });
-    },
-    onSuccess: () => {
+    mutationFn: () => endCombat(sessioneId),
+    onSuccess: async () => {
+      await combatLegacyAdapter.broadcast({ table: 'combattimento', action: 'end', id: sessioneId, sessioneId, campagnaId });
       combatLegacyAdapter.notify('Combattimento terminato');
-      client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
-      client.invalidateQueries({ queryKey: queryKeys.session(campagnaId) });
       navigate(buildAppPath('sessione', { campagnaId }));
     },
     onError: error => combatLegacyAdapter.notify(`Errore nella terminazione del combattimento: ${errorMessage(error)}`),
   });
 
   useEffect(() => {
-    let live = true;
-    combatLegacyAdapter.prepare().then(ready => { if (live) setLegacyReady(ready); }).catch(console.error);
-    return () => { live = false; };
-  }, []);
-
-  useEffect(() => {
     combatLegacyAdapter.setNavigation(campagnaId, sessioneId);
   }, [campagnaId, sessioneId]);
 
-  useEffect(() => {
-    const refresh = (event: Event) => {
-      const detail = (event as CustomEvent<{ campagnaId?: string; sessioneId?: string }>).detail;
-      if (detail?.campagnaId && detail.campagnaId !== campagnaId) return;
-      if (detail?.sessioneId && detail.sessioneId !== sessioneId) return;
-      client.invalidateQueries({ queryKey: queryKeys.combat(sessioneId) });
-    };
-    window.addEventListener('companion:combat-refresh', refresh);
-    return () => {
-      window.removeEventListener('companion:combat-refresh', refresh);
-    };
-  }, [campagnaId, client, sessioneId]);
+  const refreshCombat = useCallback(async () => {
+    await combatLegacyAdapter.broadcast({ table: 'combattimento', action: 'update', sessioneId, campagnaId });
+  }, [campagnaId, sessioneId]);
 
-  useEffect(() => {
-    if (!legacyReady) return;
-    combatLegacyAdapter.setInitiativeOrder(order);
-    combatLegacyAdapter.renderTimers(sessioneId, isDm, isDm ? null : currentCharacter?.id ?? null);
-  }, [currentCharacter?.id, isDm, legacyReady, order, sessioneId]);
-
-  if (campaign.isLoading || combat.isLoading) return <ReactPage name="combattimento"><Placeholder text="Caricamento combattimento..." /></ReactPage>;
+  if (campaign.isLoading || combat.isLoading || user.isLoading || timers.isLoading || (isDm && toolMonsters.isLoading)) return <ReactPage name="combattimento"><Placeholder text="Caricamento combattimento..." /></ReactPage>;
+  if (campaign.isError || combat.isError || user.isError || timers.isError || (isDm && toolMonsters.isError)) return <ReactPage name="combattimento"><Placeholder text="Impossibile caricare il combattimento." /></ReactPage>;
   if (!campaign.data || !combat.data?.sessione) return <ReactPage name="combattimento"><Placeholder text="Combattimento non trovato." /></ReactPage>;
+  if (!combat.data.tiri.length) return <Navigate replace to={buildAppPath('sessione', { campagnaId })} />;
 
   const openEntry = (entry: CombatEntry) => {
     if (entry.type === 'monster') {
-      if (isDm) combatLegacyAdapter.openMonster(entry.id, campagnaId, sessioneId);
+      if (isDm) setOpenMonsterId(entry.id);
       return;
     }
     if ((isDm || entry.playerUserId === user.data?.id) && entry.pgId) {
-      navigate(buildAppPath('personaggio', { personaggioId: entry.pgId }));
+      combatLegacyAdapter.openCharacter(entry.pgId);
     }
   };
 
@@ -134,45 +145,65 @@ export function CombatPage() {
       <div className="combat-round-center"><div className="combat-round-num">Round {round}</div><div className="combat-turn-name">{order[turnIndex]?.name ?? 'In attesa...'}</div></div>
       {isDm && order.length > 0 && <button className="combat-next-btn" type="button" disabled={nextTurn.isPending} onClick={() => nextTurn.mutate()} title="Prossimo turno"><Next /></button>}
     </div>
-    <div className="combat-timers-panel" id="combatTimersPanel" style={{ display: 'none' }} />
+    <CombatTimersPanel
+      timers={visibleTimers}
+      currentUserId={user.data?.id ?? ''}
+      isDm={isDm}
+      playerCharacterId={currentCharacter?.id ?? null}
+      onChanged={refreshCombat}
+      onNotify={message => combatLegacyAdapter.notify(message)}
+    />
     <div className="combat-body">
-      <div className="combat-initiative-col">{order.map((entry, index) => <button type="button" key={`${entry.type}-${entry.id}`} className={`combat-icon ${index === turnIndex ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)}>
-        {entry.imageUrl && <img src={normalizeImage(entry.imageUrl)} alt="" className="combat-icon-img" loading="lazy" referrerPolicy="no-referrer" onError={event => { event.currentTarget.style.display = 'none'; }} />}
-        <span className="combat-icon-initials">{entry.name.slice(0, 2).toUpperCase()}</span>
-      </button>)}</div>
-      <div className="combat-cards-col">
-        {!order.length ? <div className="content-placeholder"><p>In attesa dei tiri iniziativa...</p></div> : order.map((entry, index) => <button type="button" key={`${entry.type}-${entry.id}`} className={`combat-card ${index === turnIndex ? 'is-turn' : ''} ${entry.type === 'monster' ? 'monster-card' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)}>
-          <span className="combat-card-init" title="Iniziativa">{entry.init}</span>
-          <span className="combat-card-center"><span className="combat-card-name">{entry.name}</span>{entry.conditions.length > 0 && <span className="combat-card-badges">{entry.conditions.map(condition => <span className="condition-badge-sm" key={condition}>{CONDITION_LABELS[condition] ?? condition}</span>)}</span>}</span>
-          {(entry.type === 'player' || isDm) && entry.hpMax != null && <span className="combat-card-hp">{entry.hp ?? entry.hpMax}/{entry.hpMax}</span>}
-        </button>)}
+      <div className="combat-order-list">
+        {!order.length ? <div className="content-placeholder"><p>In attesa dei tiri iniziativa...</p></div> : order.map((entry, index) => <div className="combat-order-row" key={`${entry.type}-${entry.id}`}>
+          <button type="button" className={`combat-icon ${index === turnIndex ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)} aria-label={`Apri ${entry.name}`}>
+            {entry.imageUrl && <img src={normalizeImage(entry.imageUrl)} alt="" className="combat-icon-img" loading="lazy" referrerPolicy="no-referrer" onError={event => { event.currentTarget.style.display = 'none'; }} />}
+            <span className="combat-icon-initials">{entry.name.slice(0, 2).toUpperCase()}</span>
+          </button>
+          <button type="button" className={`combat-card ${index === turnIndex ? 'is-turn' : ''} ${entry.type === 'monster' ? 'monster-card' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)}>
+            <span className="combat-card-init" title="Iniziativa">{entry.init}</span>
+            <span className="combat-card-center"><span className="combat-card-name">{entry.name}</span>{entry.conditions.length > 0 && <span className="combat-card-badges">{entry.conditions.map(condition => <span className="condition-badge-sm" key={condition}>{CONDITION_LABELS[condition] ?? condition}</span>)}</span>}</span>
+            {(entry.type === 'player' || isDm) && entry.hpMax != null && <span className="combat-card-hp">{entry.hp ?? entry.hpMax}/{entry.hpMax}</span>}
+          </button>
+        </div>)}
       </div>
     </div>
-    <CombatToolbar ready={legacyReady} isDm={isDm} ending={stopCombat.isPending} campagnaId={campagnaId} sessioneId={sessioneId} personaggioId={currentCharacter?.id ?? null} onEnd={() => stopCombat.mutate()} />
+    <div className="combat-toolbar">
+      <CombatTools
+        campagnaId={campagnaId}
+        sessioneId={sessioneId}
+        currentUserId={user.data?.id ?? ''}
+        homebrewUserId={user.data?.uid ?? user.data?.id ?? ''}
+        isDm={isDm}
+        playerCharacterId={currentCharacter?.id ?? null}
+        monsters={toolMonsters.data ?? []}
+        openMonsterId={openMonsterId}
+        onMonsterOpened={() => setOpenMonsterId(null)}
+        onChanged={refreshCombat}
+        onOpenLaboratory={() => navigate(`${buildAppPath('laboratorio')}?tab=nemici&sub=nemici`)}
+        onNotify={message => combatLegacyAdapter.notify(message)}
+      />
+      <ToolbarButton label="Dadi" title="Tira dadi" onClick={() => setUtility('dice')} icon={<Dice />} />
+      <ToolbarButton label="Calc" title="Calcolatrice" onClick={() => setUtility('calculator')} icon={<Calculator />} />
+      {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={stopCombat.isPending} onClick={() => {
+        if (combatLegacyAdapter.confirm('Terminare il combattimento?')) stopCombat.mutate();
+      }} icon={<Close />} />}
+    </div>
+    <CombatUtilities mode={utility} onClose={() => setUtility(null)} />
   </div></ReactPage>;
-}
-
-function CombatToolbar({ ready, isDm, ending, campagnaId, sessioneId, personaggioId, onEnd }: { ready: boolean; isDm: boolean; ending: boolean; campagnaId: string; sessioneId: string; personaggioId: string | null; onEnd: () => void }) {
-  return <div className="combat-toolbar">
-    {isDm && <ToolbarButton label="Mostro" title="Aggiungi mostro" disabled={!ready} onClick={() => combatLegacyAdapter.addMonster(campagnaId, sessioneId)} icon={<Plus />} />}
-    <ToolbarButton label="Dadi" title="Tira dadi" disabled={!ready} onClick={() => combatLegacyAdapter.rollDice()} icon={<Dice />} />
-    <ToolbarButton label="Calc" title="Calcolatrice" disabled={!ready} onClick={() => combatLegacyAdapter.openCalculator()} icon={<Calculator />} />
-    <ToolbarButton label="Timer" title="Timer combattimento" disabled={!ready || (!isDm && !personaggioId)} onClick={() => combatLegacyAdapter.openTimer(campagnaId, sessioneId, isDm ? 'dm' : 'player', personaggioId)} icon={<Clock />} />
-    {isDm && <ToolbarButton label="Fine" title="Termina combattimento" className="danger" disabled={ending} onClick={onEnd} icon={<Close />} />}
-  </div>;
 }
 
 function ToolbarButton({ label, icon, className = '', ...props }: { label: string; icon: React.ReactNode; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return <button type="button" className={`combat-toolbar-btn ${className}`} {...props}>{icon}<span>{label}</span></button>;
 }
 
-export function buildCombatOrder(tiri: { giocatore_id: string; giocatore_nome?: string | null; valore?: number | null; stato?: string | null; created_at?: string | null; completed_at?: string | null }[], mostri: MostroCombattimento[], personaggi: CombatCharacter[]): CombatEntry[] {
+export function buildCombatOrder(tiri: { giocatore_id: string; giocatore_nome?: string | null; valore?: number | null; stato?: string | null; created_at?: string | null; completed_at?: string | null }[], mostri: MostroCombattimento[], personaggi: CombatCharacter[], timers: CombatTimer[] = []): CombatEntry[] {
   const characterByPlayer = new Map(personaggi.map(character => [character.player_user_id, character]));
   const players: CombatEntry[] = tiri.filter(roll => roll.stato === 'completed' && roll.valore != null).map(roll => {
     const character = characterByPlayer.get(roll.giocatore_id);
-    return { type: 'player', id: roll.giocatore_id, pgId: character?.id, playerUserId: roll.giocatore_id, name: character?.nome ?? roll.giocatore_nome ?? '?', init: roll.valore ?? 0, tiebreak: roll.created_at ?? roll.completed_at, imageUrl: character?.immagine_url, hp: character?.pv_attuali, hpMax: character?.punti_vita_max, conditions: character?.condizioni ?? [] };
+    return { type: 'player', id: roll.giocatore_id, pgId: character?.id, playerUserId: roll.giocatore_id, name: character?.nome ?? roll.giocatore_nome ?? '?', init: roll.valore ?? 0, tiebreak: roll.created_at ?? roll.completed_at, imageUrl: character?.immagine_url, hp: character?.pv_attuali, hpMax: character?.punti_vita_max, conditions: withTimerConditions(character?.condizioni ?? [], 'player', character?.id, timers) };
   });
-  const monsters: CombatEntry[] = mostri.map(monster => ({ type: 'monster', id: monster.id, name: monster.nome, init: monster.iniziativa ?? 0, tiebreak: monster.created_at, hp: monster.pv_attuali, hpMax: monster.punti_vita_max ?? monster.pv_max, conditions: monsterConditions(monster), monster }));
+  const monsters: CombatEntry[] = mostri.map(monster => ({ type: 'monster', id: monster.id, name: monster.nome, init: monster.iniziativa ?? 0, tiebreak: monster.created_at, hp: monster.pv_attuali, hpMax: monster.punti_vita_max ?? monster.pv_max, conditions: withTimerConditions(monsterConditions(monster), 'monster', monster.id, timers), monster }));
   return sortInitiativeOrder([...players, ...monsters]);
 }
 
@@ -181,14 +212,22 @@ function monsterConditions(monster: MostroCombattimento) {
   return Object.keys(CONDITION_LABELS).filter(key => Boolean(record[key]));
 }
 
+function withTimerConditions(current: string[], targetKind: 'player' | 'monster', targetId: string | undefined, timers: CombatTimer[]) {
+  const conditions = new Set(current);
+  if (targetId) {
+    timers
+      .filter(timer => timer.target_kind === targetKind && timer.target_id === targetId)
+      .forEach(timer => timer.conditions.forEach(condition => conditions.add(condition)));
+  }
+  return [...conditions];
+}
+
 function canOpen(entry: CombatEntry, isDm: boolean, userId?: string) { return entry.type === 'monster' ? isDm : Boolean(entry.pgId && (isDm || entry.playerUserId === userId)); }
 function normalizeImage(url: string) { return normalizeImageUrl(url) ?? url; }
 function errorMessage(error: unknown) { return error instanceof Error ? error.message : String(error); }
 function Placeholder({ text }: { text: string }) { return <div className="content-placeholder"><p>{text}</p></div>; }
 function Back() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7 7-7-7 7-7" /></svg>; }
 function Next() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>; }
-function Plus() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg>; }
 function Dice() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="4" /><circle cx="8" cy="8" r="1.5" fill="currentColor" /><circle cx="16" cy="16" r="1.5" fill="currentColor" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>; }
 function Calculator() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 10h2m4 0h2M8 14h2m4 0h2M8 18h8" /></svg>; }
-function Clock() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l3 2M9 2h6" /></svg>; }
 function Close() { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m18 6-12 12M6 6l12 12" /></svg>; }

@@ -1,14 +1,3 @@
-function formatTempoGioco(minuti) {
-    if (minuti < 60) {
-        return `00:${minuti.toString().padStart(2, '0')}`;
-    }
-    const ore = Math.floor(minuti / 60);
-    const min = minuti % 60;
-    // Se ore <= 99, usa formato hh:mm, altrimenti hhh:mm
-    const oreStr = ore.toString().padStart(ore > 99 ? 3 : 2, '0');
-    return `${oreStr}:${min.toString().padStart(2, '0')}`;
-}
-
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;

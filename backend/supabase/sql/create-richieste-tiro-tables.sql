@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS richieste_tiro_iniziativa (
     sessione_id VARCHAR(10) NOT NULL REFERENCES sessioni(id) ON DELETE CASCADE,
     giocatore_id VARCHAR(10) NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
     valore INTEGER,
+    tiro_naturale INTEGER,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     stato TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'completed'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -17,11 +18,17 @@ CREATE TABLE IF NOT EXISTS richieste_tiro_generico (
     richiesta_id VARCHAR(10) NOT NULL, -- Per raggruppare richieste dello stesso round
     giocatore_id VARCHAR(10) NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
     valore INTEGER,
+    tiro_naturale INTEGER,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     stato TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'completed'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(sessione_id, richiesta_id, giocatore_id)
 );
+
+ALTER TABLE richieste_tiro_iniziativa
+    ADD COLUMN IF NOT EXISTS tiro_naturale INTEGER;
+ALTER TABLE richieste_tiro_generico
+    ADD COLUMN IF NOT EXISTS tiro_naturale INTEGER;
 
 -- Indici per performance
 CREATE INDEX IF NOT EXISTS idx_richieste_tiro_iniziativa_sessione ON richieste_tiro_iniziativa(sessione_id);
@@ -53,10 +60,9 @@ CREATE POLICY "Utenti possono vedere richieste iniziativa sessioni accessibili"
         )
     );
 
--- Gli utenti possono aggiornare solo le proprie richieste (per inserire il valore del tiro)
-CREATE POLICY "Utenti possono aggiornare proprie richieste iniziativa"
-    ON richieste_tiro_iniziativa FOR UPDATE
-    USING (giocatore_id = (SELECT id FROM utenti WHERE uid = auth.uid()::text));
+-- I giocatori inviano il risultato tramite submit_initiative_roll.
+DROP POLICY IF EXISTS "Utenti possono aggiornare proprie richieste iniziativa"
+    ON richieste_tiro_iniziativa;
 
 -- Solo il DM può creare/eliminare richieste
 CREATE POLICY "Solo DM può gestire richieste iniziativa"
@@ -91,10 +97,9 @@ CREATE POLICY "Utenti possono vedere richieste tiro generico sessioni accessibil
         )
     );
 
--- Gli utenti possono aggiornare solo le proprie richieste (per inserire il valore del tiro)
-CREATE POLICY "Utenti possono aggiornare proprie richieste tiro generico"
-    ON richieste_tiro_generico FOR UPDATE
-    USING (giocatore_id = (SELECT id FROM utenti WHERE uid = auth.uid()::text));
+-- I giocatori inviano il risultato tramite submit_generic_roll.
+DROP POLICY IF EXISTS "Utenti possono aggiornare proprie richieste tiro generico"
+    ON richieste_tiro_generico;
 
 -- Solo il DM può creare/eliminare richieste
 CREATE POLICY "Solo DM può gestire richieste tiro generico"

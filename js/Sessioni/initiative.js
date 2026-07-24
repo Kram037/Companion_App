@@ -16,8 +16,8 @@ function closeRollRequestModal() {
 
 /**
  * Verifica se la sessione associata a una richiesta tiro e' ancora valida
- * (la sessione non e' terminata). Se la richiesta e' orfana (sessione conclusa),
- * la cancella dal DB cosi' non si ripresenta.
+ * (la sessione non e' terminata). Le richieste orfane vengono ignorate:
+ * la pulizia resta al DM, che possiede i permessi DELETE.
  *
  * Per le richieste di iniziativa controlla anche che ci sia un combattimento
  * "in corso" (almeno una riga in 'iniziativa' per la sessione, oppure sessione
@@ -46,24 +46,12 @@ async function _isRollRequestStillValid(req) {
             // la tabella iniziativa puo' avere 0 righe. Per non avere falsi positivi qui,
             // ci affidiamo solo al check su data_fine e su un flag esplicito (se in futuro
             // verra' aggiunto). La cancellazione massiva delle richieste a fine combattimento
-            // resta gestita lato DM in terminaCombattimento/finisciSessione.
+            // resta gestita lato DM quando termina combattimento o sessione.
         }
         return true;
     } catch (e) {
         console.warn('⚠️ Errore verifica validita\' richiesta tiro:', e);
         return true;
-    }
-}
-
-async function _deleteOrphanRollRequest(req) {
-    const supabase = getSupabaseClient();
-    if (!supabase || !req || !req.id) return;
-    const table = req.tipo === 'iniziativa' ? 'richieste_tiro_iniziativa' : 'richieste_tiro_generico';
-    try {
-        await supabase.from(table).delete().eq('id', req.id);
-        appDebug(`🧹 Richiesta tiro orfana cancellata (${table} id=${req.id})`);
-    } catch (e) {
-        console.warn('⚠️ Cleanup richiesta orfana fallito:', e);
     }
 }
 
@@ -107,8 +95,7 @@ async function checkPendingRollRequests(userId) {
                     appDebug('✅ Trovata richiesta iniziativa valida:', r.id);
                     return req;
                 } else {
-                    appDebug('🧹 Richiesta iniziativa orfana ignorata e cancellata:', r.id);
-                    await _deleteOrphanRollRequest(req);
+                    appDebug('🧹 Richiesta iniziativa orfana ignorata:', r.id);
                 }
             }
         }
@@ -130,13 +117,20 @@ async function checkPendingRollRequests(userId) {
 
         if (genericoRequests && genericoRequests.length > 0) {
             for (const r of genericoRequests) {
-                const req = { id: r.id, tipo: 'generico', sessione_id: r.sessione_id, richiesta_id: r.richiesta_id };
+                const req = {
+                    id: r.id,
+                    tipo: 'generico',
+                    sessione_id: r.sessione_id,
+                    richiesta_id: r.richiesta_id,
+                    tiroLabel: r.tiro_label || null,
+                    tipoTiro: r.tipo_tiro || null,
+                    targetTiro: r.target_tiro || null
+                };
                 if (await _isRollRequestStillValid(req)) {
                     appDebug('✅ Trovata richiesta generico valida:', r.id);
                     return req;
                 } else {
-                    appDebug('🧹 Richiesta generico orfana ignorata e cancellata:', r.id);
-                    await _deleteOrphanRollRequest(req);
+                    appDebug('🧹 Richiesta generico orfana ignorata:', r.id);
                 }
             }
         }
@@ -187,8 +181,7 @@ function startRollRequestsRealtime() {
                             sessione_id: payload.new.sessione_id
                         };
                         if (!(await _isRollRequestStillValid(request))) {
-                            appDebug('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro e cancello:', request);
-                            await _deleteOrphanRollRequest(request);
+                            appDebug('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro:', request);
                             return;
                         }
                         appDebug('✅ [REALTIME] Mostro modal per richiesta:', request);
@@ -223,11 +216,13 @@ function startRollRequestsRealtime() {
                             id: payload.new.id,
                             tipo: 'generico',
                             sessione_id: payload.new.sessione_id,
-                            richiesta_id: payload.new.richiesta_id
+                            richiesta_id: payload.new.richiesta_id,
+                            tiroLabel: payload.new.tiro_label || null,
+                            tipoTiro: payload.new.tipo_tiro || null,
+                            targetTiro: payload.new.target_tiro || null
                         };
                         if (!(await _isRollRequestStillValid(request))) {
-                            appDebug('🧹 [REALTIME] Richiesta generico orfana, ignoro e cancello:', request);
-                            await _deleteOrphanRollRequest(request);
+                            appDebug('🧹 [REALTIME] Richiesta generico orfana, ignoro:', request);
                             return;
                         }
                         appDebug('✅ [REALTIME] Mostro modal per richiesta:', request);
@@ -422,7 +417,7 @@ async function showRollRequestModal(request) {
     }
     if (elements.rollRequestInput) {
         elements.rollRequestInput.value = '';
-        elements.rollRequestInput.min = '1';
+        elements.rollRequestInput.removeAttribute('min');
         elements.rollRequestInput.max = '999';
     }
     const d20Text = document.getElementById('d20RollText');
@@ -448,526 +443,44 @@ window.submitRollRequest = async function(requestId, tipo, valore, tiroNaturale)
     const supabase = getSupabaseClient();
     if (!supabase) {
         showNotification('Errore: Supabase non disponibile');
-        return;
+        return false;
     }
 
     try {
-        const tableName = tipo === 'iniziativa'
+        const isIniziativa = tipo === 'iniziativa';
+        const tableName = isIniziativa
             ? 'richieste_tiro_iniziativa'
             : 'richieste_tiro_generico';
-
-        const updateData = {
-            valore: valore,
-            stato: 'completed',
-            timestamp: new Date().toISOString()
-        };
-        if (tiroNaturale != null) updateData.tiro_naturale = tiroNaturale;
-
-        const { error } = await supabase
-            .from(tableName)
-            .update(updateData)
-            .eq('id', requestId);
+        const { data: sessioneId, error } = await supabase.rpc(
+            isIniziativa ? 'submit_initiative_roll' : 'submit_generic_roll',
+            {
+                p_request_id: requestId,
+                p_valore: valore,
+                p_tiro_naturale: tiroNaturale ?? null
+            }
+        );
 
         if (error) throw error;
-        await sendAppEventBroadcast({ table: tableName, action: 'update', requestId });
+        await sendAppEventBroadcast({ table: tableName, action: 'update', requestId, sessioneId });
 
         showNotification('Tiro inviato!');
 
-        // Se è un tiro iniziativa, verifica se tutti hanno completato
-        if (tipo === 'iniziativa') {
-            const { data: richiesta } = await supabase
-                .from('richieste_tiro_iniziativa')
-                .select('sessione_id')
-                .eq('id', requestId)
+        // Il giocatore passa subito al combattimento dopo l'iniziativa.
+        if (isIniziativa && sessioneId) {
+            const { data: sessione } = await supabase
+                .from('sessioni')
+                .select('campagna_id')
+                .eq('id', sessioneId)
                 .single();
 
-            if (richiesta) {
-                // Porta subito il giocatore alla pagina combattimento
-                const { data: sessione } = await supabase
-                    .from('sessioni')
-                    .select('campagna_id')
-                    .eq('id', richiesta.sessione_id)
-                    .single();
-
-                if (sessione?.campagna_id) {
-                    await openCombattimentoPage(sessione.campagna_id, richiesta.sessione_id);
-                }
-
-                // Notifica subito il DM tramite broadcast realtime
-                await sendCombattimentoUpdateBroadcast(richiesta.sessione_id);
-
-                await checkAllIniziativaCompleted(richiesta.sessione_id);
-            }
-        }
-    } catch (error) {
-        console.error('❌ Errore nell\'invio tiro:', error);
-        showNotification('Errore nell\'invio del tiro: ' + (error.message || error));
-    }
-}
-
-/**
- * Verifica se tutti i giocatori hanno completato il tiro iniziativa
- */
-async function checkAllIniziativaCompleted(sessioneId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    try {
-        const { data: sessione } = await supabase
-            .from('sessioni')
-            .select('campagna_id')
-            .eq('id', sessioneId)
-            .single();
-
-        if (!sessione) return;
-
-        const { data: campagna } = await supabase
-            .from('campagne')
-            .select('giocatori, id_dm')
-            .eq('id', sessione.campagna_id)
-            .single();
-
-        if (!campagna) return;
-
-        // Lista solo i giocatori (DM esonerato)
-        const partecipanti = (campagna.giocatori || []).filter(Boolean);
-
-        // Controlla se tutte le richieste sono completed
-        const { data: richieste, error } = await supabase
-            .from('richieste_tiro_iniziativa')
-            .select('giocatore_id, stato')
-            .eq('sessione_id', sessioneId);
-
-        if (error) throw error;
-
-        const completedGiocatori = new Set(
-            (richieste || []).filter(r => r.stato === 'completed').map(r => r.giocatore_id)
-        );
-
-        // Se tutti i giocatori hanno completato, porta i giocatori alla pagina combattimento
-        const allCompleted = partecipanti.length > 0 && partecipanti.every(id => completedGiocatori.has(id));
-
-        if (allCompleted && partecipanti.length > 0) {
-            // Se l'utente corrente è nella sessione, portalo al combattimento
-            const userData = await findUserByUid(AppState.currentUser.uid);
-            if (userData && partecipanti.includes(userData.id)) {
-                // Usa openCombattimentoPage per impostare correttamente lo stato e avviare il polling
+            if (sessione?.campagna_id) {
                 await openCombattimentoPage(sessione.campagna_id, sessioneId);
             }
         }
+        return true;
     } catch (error) {
-        console.error('❌ Errore nel controllo completamento iniziativa:', error);
+        console.error('❌ Errore nell\'invio tiro:', error);
+        showNotification('Errore nell\'invio del tiro: ' + (error.message || error));
+        return false;
     }
 }
-
-/**
- * Richiede tiro iniziativa a tutti i giocatori
- */
-window.richiediTiroIniziativa = async function(sessioneId, campagnaId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-        showNotification('Errore: Supabase non disponibile');
-        return;
-    }
-
-    try {
-        // Verifica che l'utente sia il DM
-        const isDM = await isCurrentUserDM(campagnaId);
-        if (!isDM) {
-            showNotification('Solo il DM può richiedere tiri');
-            return;
-        }
-
-        // Carica la campagna per ottenere i giocatori
-        const { data: campagna, error: campagnaError } = await supabase
-            .from('campagne')
-            .select('giocatori, id_dm')
-            .eq('id', campagnaId)
-            .single();
-
-        if (campagnaError) throw campagnaError;
-
-        // Rimuovi eventuali richieste pending per questa sessione
-        const { error: deleteError } = await supabase
-            .from('richieste_tiro_iniziativa')
-            .delete()
-            .eq('sessione_id', sessioneId);
-        if (deleteError) throw deleteError;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'delete', sessioneId });
-
-        // Crea richieste solo per i giocatori (escludi il DM)
-        const partecipanti = (campagna.giocatori || []).filter(Boolean);
-
-        const richieste = partecipanti.map(giocatoreId => ({
-            sessione_id: sessioneId,
-            giocatore_id: giocatoreId,
-            stato: 'pending'
-        }));
-
-        const { error: insertError } = await supabase
-            .from('richieste_tiro_iniziativa')
-            .insert(richieste);
-
-        if (insertError) throw insertError;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_iniziativa', action: 'insert', sessioneId });
-
-        showNotification('Richieste tiro iniziativa inviate!');
-
-        // Apri pagina combattimento per il DM (imposta anche stato e realtime)
-        await openCombattimentoPage(campagnaId, sessioneId);
-    } catch (error) {
-        console.error('❌ Errore nella richiesta tiro iniziativa:', error);
-        showNotification('Errore nella richiesta tiro iniziativa: ' + (error.message || error));
-    }
-};
-
-/**
- * Apre il dialog per scegliere il tipo di tiro generico
- */
-const TIRO_CARATTERISTICHE = [
-    { value: 'forza', label: 'Forza' },
-    { value: 'destrezza', label: 'Destrezza' },
-    { value: 'costituzione', label: 'Costituzione' },
-    { value: 'intelligenza', label: 'Intelligenza' },
-    { value: 'saggezza', label: 'Saggezza' },
-    { value: 'carisma', label: 'Carisma' }
-];
-
-const TIRO_ABILITA = [
-    { value: 'acrobazia', label: 'Acrobazia' },
-    { value: 'addestrare_animali', label: 'Addestrare Animali' },
-    { value: 'arcano', label: 'Arcano' },
-    { value: 'atletica', label: 'Atletica' },
-    { value: 'furtivita', label: 'Furtività' },
-    { value: 'indagare', label: 'Indagare' },
-    { value: 'inganno', label: 'Inganno' },
-    { value: 'intimidire', label: 'Intimidire' },
-    { value: 'intrattenere', label: 'Intrattenere' },
-    { value: 'intuizione', label: 'Intuizione' },
-    { value: 'medicina', label: 'Medicina' },
-    { value: 'natura', label: 'Natura' },
-    { value: 'percezione', label: 'Percezione' },
-    { value: 'persuasione', label: 'Persuasione' },
-    { value: 'rapidita_di_mano', label: 'Rapidità di Mano' },
-    { value: 'religione', label: 'Religione' },
-    { value: 'sopravvivenza', label: 'Sopravvivenza' },
-    { value: 'storia', label: 'Storia' }
-];
-
-function updateTiroTargetOptions() {
-    const tipo = document.getElementById('tipoTiroSelect')?.value;
-    const targetSelect = document.getElementById('tiroTargetSelect');
-    const targetLabel = document.getElementById('tiroTargetLabel');
-    if (!targetSelect || !targetLabel) return;
-
-    let options = [];
-    if (tipo === 'salvezza' || tipo === 'caratteristica') {
-        options = TIRO_CARATTERISTICHE;
-        targetLabel.textContent = 'Caratteristica';
-    } else {
-        options = TIRO_ABILITA;
-        targetLabel.textContent = 'Abilità';
-    }
-    targetSelect.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
-}
-
-function getTiroLabel(tipo, target) {
-    const allOptions = [...TIRO_CARATTERISTICHE, ...TIRO_ABILITA];
-    const opt = allOptions.find(o => o.value === target);
-    const targetName = opt ? opt.label : target;
-    if (tipo === 'salvezza') return `Tiro salvezza su ${targetName}`;
-    if (tipo === 'abilita') return `Tiro di ${targetName}`;
-    return `Prova di ${targetName}`;
-}
-
-window.richiediTiroGenerico = async function(sessioneId, campagnaId) {
-    const modal = document.getElementById('richiediTiroModal');
-    if (!modal) return;
-
-    window._pendingTiroSessioneId = sessioneId;
-    window._pendingTiroCampagnaId = campagnaId;
-
-    updateTiroTargetOptions();
-
-    const playersList = document.getElementById('tiroPlayersList');
-    if (playersList) {
-        playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Caricamento...</p>';
-    }
-
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-
-    const supabase = getSupabaseClient();
-    if (!supabase || !playersList) return;
-
-    try {
-        const pgNamesMap = await getCharacterNamesMap(campagnaId);
-        const { data: giocatoriData } = await supabase.rpc('get_giocatori_campagna', {
-            campagna_id_param: campagnaId
-        });
-
-        if (!giocatoriData || giocatoriData.length === 0) {
-            playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Nessun giocatore</p>';
-            return;
-        }
-
-        playersList.innerHTML = giocatoriData.map(g => {
-            const displayName = pgNamesMap[g.id] || g.nome_utente || 'Giocatore';
-            return `
-                <div class="tiro-player-item">
-                    <input type="checkbox" id="tiroPlayer_${g.id}" value="${g.id}" checked>
-                    <label for="tiroPlayer_${g.id}">${escapeHtml(displayName)}</label>
-                </div>`;
-        }).join('');
-    } catch (e) {
-        console.warn('Errore caricamento giocatori per tiro:', e);
-        playersList.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Errore caricamento</p>';
-    }
-}
-
-function closeRichiediTiroModal() {
-    const modal = document.getElementById('richiediTiroModal');
-    if (modal) modal.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-async function executeRichiediTiro() {
-    const sessioneId = window._pendingTiroSessioneId;
-    const campagnaId = window._pendingTiroCampagnaId;
-    const tipo = document.getElementById('tipoTiroSelect')?.value;
-    const target = document.getElementById('tiroTargetSelect')?.value;
-    if (!sessioneId || !campagnaId || !tipo || !target) return;
-
-    const selectedCheckboxes = document.querySelectorAll('#tiroPlayersList input[type="checkbox"]:checked');
-    const selectedPlayerIds = Array.from(selectedCheckboxes).map(cb => cb.value);
-    if (selectedPlayerIds.length === 0) {
-        showNotification('Seleziona almeno un giocatore');
-        return;
-    }
-
-    const tiroLabel = getTiroLabel(tipo, target);
-    closeRichiediTiroModal();
-
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    try {
-        const isDM = await isCurrentUserDM(campagnaId);
-        if (!isDM) { showNotification('Solo il DM può richiedere tiri'); return; }
-
-        const richiestaId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-        const richieste = selectedPlayerIds.map(giocatoreId => ({
-            sessione_id: sessioneId,
-            richiesta_id: richiestaId,
-            giocatore_id: giocatoreId,
-            stato: 'pending'
-        }));
-
-        const { error: insertError } = await supabase
-            .from('richieste_tiro_generico')
-            .insert(richieste);
-        if (insertError) throw insertError;
-
-        await sendAppEventBroadcast({
-            table: 'richieste_tiro_generico',
-            action: 'insert',
-            sessioneId,
-            tiroLabel,
-            tipoTiro: tipo,
-            targetTiro: target
-        });
-        showNotification(`${tiroLabel} richiesto!`);
-
-        window.currentTiroGenericoRichiestaId = richiestaId;
-        window.currentTiroGenericoLabel = tiroLabel;
-
-        await updateTiroGenericoTable(sessioneId, richiestaId);
-        startTiroGenericoPolling(sessioneId);
-    } catch (error) {
-        console.error('❌ Errore nella richiesta tiro generico:', error);
-        showNotification('Errore: ' + (error.message || error));
-    }
-}
-
-/**
- * Avvia polling per aggiornare la tabella tiri generici
- */
-function startTiroGenericoPolling(sessioneId) {
-    if (window.tiroGenericoPollingInterval) {
-        clearInterval(window.tiroGenericoPollingInterval);
-    }
-
-    window.tiroGenericoPollingInterval = setInterval(async () => {
-        if (window.currentTiroGenericoRichiestaId) {
-            await updateTiroGenericoTable(sessioneId, window.currentTiroGenericoRichiestaId);
-        }
-    }, 2000); // Aggiorna ogni 2 secondi
-}
-
-/**
- * Ferma il polling per la tabella tiri generici
- */
-function stopTiroGenericoPolling() {
-    if (window.tiroGenericoPollingInterval) {
-        clearInterval(window.tiroGenericoPollingInterval);
-        window.tiroGenericoPollingInterval = null;
-    }
-}
-
-/**
- * Aggiorna la tabella tiri generici nella pagina sessione
- */
-async function updateTiroGenericoTable(sessioneId, richiestaId) {
-    const tableElement = document.getElementById('tiroGenericoTable');
-    if (!tableElement) return;
-
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-
-    try {
-        const { data: tiri, error } = await supabase
-            .from('richieste_tiro_generico')
-            .select('*')
-            .eq('sessione_id', sessioneId)
-            .eq('richiesta_id', richiestaId)
-            .order('valore', { ascending: false, nullsFirst: false });
-
-        if (error) throw error;
-
-        if (!tiri || tiri.length === 0) {
-            tableElement.style.display = 'none';
-            return;
-        }
-
-        const pgNamesMap = await getCharacterNamesMap(AppState.currentCampagnaId);
-
-        const giocatoreIds = [...new Set(tiri.map(t => t.giocatore_id).filter(Boolean))];
-        let utentiMap = {};
-        if (giocatoreIds.length > 0) {
-            try {
-                const { data: giocatoriData } = await supabase.rpc('get_giocatori_campagna', {
-                    campagna_id_param: AppState.currentCampagnaId
-                });
-                if (giocatoriData) {
-                    giocatoriData.forEach(g => { utentiMap[g.id] = g; });
-                }
-            } catch (e) {
-                console.warn('Fallback nomi giocatori:', e);
-            }
-        }
-
-        tableElement.style.display = 'block';
-        const tiroLabel = window.currentTiroGenericoLabel || 'Tiri Richiesti';
-
-        const tableHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
-                <h3 style="margin: 0;">${escapeHtml(tiroLabel)}</h3>
-                <button class="btn-secondary btn-small" onclick="chiudiTabellaTiri('${sessioneId}', '${richiestaId}')" style="width: auto; padding: var(--spacing-xs) var(--spacing-sm);">
-                    Chiudi
-                </button>
-            </div>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th style="text-align: left; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Giocatore</th>
-                        <th style="text-align: right; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Risultato</th>
-                        <th style="text-align: center; padding: var(--spacing-sm); border-bottom: 2px solid var(--border);">Stato</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tiri.map(tiro => {
-                        const pgName = pgNamesMap[tiro.giocatore_id];
-                        const utente = utentiMap[tiro.giocatore_id];
-                        const nome = pgName || utente?.nome_utente || 'Giocatore';
-                        const natRoll = tiro.tiro_naturale;
-                        const isNatCrit = natRoll === 1 || natRoll === 20;
-                        let risultatoHtml = '-';
-                        if (tiro.valore !== null) {
-                            if (isNatCrit) {
-                                const modDiff = tiro.valore - natRoll;
-                                const modStr = modDiff >= 0 ? `+${modDiff}` : `${modDiff}`;
-                                risultatoHtml = `<span style="color:#e74c3c;font-weight:700;">${natRoll}</span><span style="font-size:0.8em;opacity:0.7;margin-left:2px;">${modStr}</span> = ${tiro.valore}`;
-                            } else {
-                                risultatoHtml = `${tiro.valore}`;
-                            }
-                        }
-                        return `
-                        <tr>
-                            <td style="padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${escapeHtml(nome)}
-                            </td>
-                            <td style="text-align: right; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${risultatoHtml}
-                            </td>
-                            <td style="text-align: center; padding: var(--spacing-sm); border-bottom: 1px solid var(--border);">
-                                ${tiro.stato === 'completed' ? '✓' : '⏳'}
-                            </td>
-                        </tr>`;
-                    }).join('')}
-                </tbody>
-            </table>
-        `;
-
-        tableElement.innerHTML = tableHTML;
-    } catch (error) {
-        console.error('❌ Errore nell\'aggiornamento tabella tiri:', error);
-    }
-}
-
-/**
- * Chiude e cancella la tabella tiri generici
- */
-window.chiudiTabellaTiri = async function(sessioneId, richiestaId) {
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-        showNotification('Errore: Supabase non disponibile');
-        return;
-    }
-
-    try {
-        // Verifica che l'utente sia il DM
-        const { data: sessione } = await supabase
-            .from('sessioni')
-            .select('campagna_id')
-            .eq('id', sessioneId)
-            .single();
-
-        if (!sessione) return;
-
-        const isDM = await isCurrentUserDM(sessione.campagna_id);
-        if (!isDM) {
-            showNotification('Solo il DM può chiudere la tabella');
-            return;
-        }
-
-        // Cancella tutte le richieste per questa richiesta_id
-        const { error } = await supabase
-            .from('richieste_tiro_generico')
-            .delete()
-            .eq('sessione_id', sessioneId)
-            .eq('richiesta_id', richiestaId);
-
-        if (error) throw error;
-        await sendAppEventBroadcast({ table: 'richieste_tiro_generico', action: 'delete', sessioneId, richiestaId, campagnaId: AppState.currentCampagnaId });
-
-        // Nascondi la tabella
-        const tableElement = document.getElementById('tiroGenericoTable');
-        if (tableElement) {
-            tableElement.style.display = 'none';
-        }
-
-        if (window.currentTiroGenericoRichiestaId === richiestaId) {
-            window.currentTiroGenericoRichiestaId = null;
-            window.currentTiroGenericoLabel = null;
-        }
-        stopTiroGenericoPolling();
-
-        showNotification('Tabella tiri chiusa');
-    } catch (error) {
-        console.error('❌ Errore nella chiusura tabella tiri:', error);
-        showNotification('Errore nella chiusura tabella: ' + (error.message || error));
-    }
-};
-
-// terminaCombattimento and rimuoviIniziativa are defined in combat.js

@@ -141,6 +141,36 @@ export interface InitiativeRoll {
   completed_at?: ISODateString | null;
 }
 
+export type GenericRollKind = 'salvezza' | 'abilita' | 'caratteristica';
+
+export interface GenericRollMetadata {
+  tipoTiro: GenericRollKind;
+  targetTiro: string;
+  tiroLabel: string;
+}
+
+export interface GenericRollRequest {
+  id: Id;
+  sessione_id: Id;
+  richiesta_id: Id;
+  giocatore_id: Id;
+  valore?: number | null;
+  tiro_naturale?: number | null;
+  stato?: string | null;
+  created_at?: ISODateString | null;
+  tipo_tiro?: GenericRollKind | null;
+  target_tiro?: string | null;
+  tiro_label?: string | null;
+}
+
+export interface GenericRollGroup {
+  richiestaId: Id;
+  tipoTiro: GenericRollKind | null;
+  targetTiro: string | null;
+  tiroLabel: string | null;
+  risultati: GenericRollRequest[];
+}
+
 export interface CombatCharacter extends CampaignCharacter {
   immagine_url?: string | null;
   punti_vita_max?: number | null;

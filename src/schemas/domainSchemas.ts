@@ -116,6 +116,53 @@ export const rollRequestSchema = z.object({
 export const initiativeRollRequestSchema = rollRequestSchema;
 export const genericRollRequestSchema = rollRequestSchema;
 
+export const initiativeRollSchema = z.object({
+  id: z.string().nullish(),
+  giocatore_id: z.string(),
+  giocatore_nome: z.string().nullish(),
+  valore: z.coerce.number().nullish(),
+  stato: z.string().nullish(),
+  created_at: z.string().nullish(),
+  completed_at: z.string().nullish(),
+});
+
+export const genericRollKindSchema = z.enum(['salvezza', 'abilita', 'caratteristica']);
+export const genericRollGroupIdSchema = z.string().length(10);
+
+export const genericRollResultSchema = z.object({
+  id: z.string(),
+  sessione_id: z.string(),
+  richiesta_id: z.string(),
+  giocatore_id: z.string(),
+  valore: z.coerce.number().nullish(),
+  tiro_naturale: z.coerce.number().nullish(),
+  stato: z.string().nullish(),
+  created_at: z.string().nullish(),
+  tipo_tiro: genericRollKindSchema.nullish(),
+  target_tiro: z.string().nullish(),
+  tiro_label: z.string().nullish(),
+});
+
+export const campaignPlayerSchema = z.object({
+  id: z.string(),
+  nome_utente: z.string().nullish(),
+  cid: cidSchema,
+});
+
+export const campaignCharacterSchema = z.object({
+  personaggio_id: z.string(),
+  nome: z.string().nullish(),
+  player_user_id: z.string().nullish(),
+});
+
+export const combatCharacterRowSchema = z.object({
+  id: z.string(),
+  nome: z.string().default('?'),
+  immagine_url: z.string().nullish(),
+  punti_vita_max: z.coerce.number().nullish(),
+  pv_attuali: z.coerce.number().nullish(),
+}).passthrough();
+
 export const combatMonsterSchema = z.object({
   id: z.string(),
   sessione_id: z.string().nullish(),
@@ -144,6 +191,13 @@ export const combatMonsterSchema = z.object({
   spaventato: z.boolean().nullish(),
   stordito: z.boolean().nullish(),
   trattenuto: z.boolean().nullish(),
+});
+
+export const combatAdvanceResultSchema = z.object({
+  combat_round: z.number().int().positive(),
+  combat_turn_index: z.number().int().nonnegative(),
+  expired_timers: z.number().int().nonnegative(),
+  advanced: z.boolean(),
 });
 
 export const homebrewItemSchema = z.object({

@@ -650,34 +650,11 @@ window.schedaCloseXpCalc = function() {
 
 let _hpCalcClosedAt = 0;
 
-window.schedaCloseHpCalc = async function() {
+window.schedaCloseHpCalc = function() {
     const overlay = document.getElementById('hpCalcOverlay');
     if (overlay) overlay.remove();
-    const wasMonster = _hpCalcState?.isMonster;
-    const monsterId = _hpCalcState?.pgId;
-    const campagnaId = _hpCalcState?.campagnaId;
-    const sessioneId = _hpCalcState?.sessioneId;
     _hpCalcState = null;
     _hpCalcClosedAt = Date.now();
-    if (wasMonster && campagnaId && sessioneId) {
-        if (typeof window.ensureRuntimeScript === 'function') {
-            await window.ensureRuntimeScript('combattimento');
-        }
-        await renderCombattimentoContent(campagnaId, sessioneId);
-        // Se il calcolatore HP era stato aperto dalla full-sheet del mostro
-        // in combattimento, ricarichiamo quella modale per riflettere i PV
-        // aggiornati senza chiuderla.
-        const fullModal = document.getElementById('combatMonsterFullModal');
-        if (fullModal && fullModal.classList.contains('active') && monsterId && typeof combatOpenMonsterFullSheet === 'function') {
-            combatOpenMonsterFullSheet(monsterId, campagnaId, sessioneId);
-        }
-        // Stessa cosa per la dialog placeholder: re-render per aggiornare
-        // i numeri delle box PV / CA al volo.
-        const phModal = document.getElementById('combatPlaceholderModal');
-        if (phModal && phModal.classList.contains('active') && monsterId && typeof combatOpenPlaceholderDialog === 'function') {
-            combatOpenPlaceholderDialog(monsterId, campagnaId, sessioneId);
-        }
-    }
 }
 
 window.schedaOpenStatCalc = function(pgId, field) {

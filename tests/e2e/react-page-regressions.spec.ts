@@ -47,20 +47,21 @@ test('React leaves unmigrated legacy page DOM intact', async ({ page }) => {
   await expect(page.locator('#react-root')).toBeEmpty();
 });
 
-test('React owns migrated campaign and friends routes', async ({ page }) => {
+test('React owns migrated campaign routes without legacy shells', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/campagne');
 
   await expect(page.locator('body')).toHaveAttribute('data-react-page', 'campagne');
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
-  await expect(page.locator('#campagnePage')).toBeHidden();
+  await expect(page.locator('#campagnePage')).toHaveCount(0);
+  await expect(page.locator('#dettagliPage, #sessionePage, #combattimentoPage')).toHaveCount(0);
   await expect(page.locator('.react-page-shell')).toBeVisible();
   await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Campagne');
   await expect(page.locator('.react-page-shell .comp-search')).toHaveAttribute('placeholder', 'Cerca campagna...');
   await expect(page.locator('.react-page-shell .comp-filter-btn')).toContainText('Filtri');
   await page.locator('.react-page-shell .comp-filter-btn').click();
   await expect(page.locator('.campagne-filter-overlay .comp-filter-title')).toHaveText('Filtri');
-  await expect(page.locator('.campagne-filter-overlay .comp-filter-select')).toHaveText(['Tipo', 'Ruolo', 'Preferiti']);
+  await expect(page.locator('.campagne-filter-overlay .comp-filter-select')).toHaveText(['Ruolo', 'Preferiti']);
   await page.locator('.campagne-filter-overlay .modal-close').click();
 
   await page.locator('.toolbar-btn[data-page="personaggi"]').click();
@@ -83,6 +84,6 @@ test('React can switch between migrated friends and campaign routes', async ({ p
 
   await page.locator('.toolbar-btn[data-page="campagne"]').click();
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
-  await expect(page.locator('#campagnePage')).toBeHidden();
+  await expect(page.locator('#campagnePage')).toHaveCount(0);
   await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Campagne');
 });

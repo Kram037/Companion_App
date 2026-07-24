@@ -12,6 +12,7 @@ const nativeWindowMembers = new Set([
 const legacyWindowAllowedFiles = new Set([
   'src/app/LegacyNavigationSync.tsx',
   'src/features/campaigns/CampaignDetailsPage.tsx',
+  'src/features/campaigns/CampaignsListPage.tsx',
   'src/features/campaigns/CampaignsRoutePage.tsx',
   'src/features/campaigns/SessionPage.tsx',
   'src/features/characters/CharacterCreationPage.tsx',
@@ -28,7 +29,6 @@ const legacyFragmentAllowedFiles = new Set([
 ]);
 const legacyInnerHtmlAllowedFiles = new Set([
   'js/Campagna/campagne.js',
-  'js/Combattimento/combat.js',
   'js/Compendio/compendio.js',
   'js/Core/auth.js',
   'js/Core/bookmarks.js',
@@ -91,7 +91,6 @@ const forbiddenRealtimeUiCalls = [
   'loadCampagne',
   'loadPersonaggi',
   'refreshCurrentPageData',
-  'renderCombattimentoContent',
   'renderMicroScheda',
   'renderSchedaPersonaggio',
   'renderSessioneContent',

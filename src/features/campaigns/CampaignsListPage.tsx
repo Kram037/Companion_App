@@ -8,6 +8,12 @@ import type { Campagna, Id } from '../../types/domain';
 import { countActiveCampaignFilters, filterCampaigns } from './campaignFilters';
 import { receivedCampaignInvitesQuery, visibleCampaignsQuery } from './campaignQueries';
 
+declare global {
+  interface Window {
+    sendAppEventBroadcast?: (change: Record<string, unknown>) => Promise<void>;
+  }
+}
+
 interface Props {
   currentUserId: Id | null;
   authLoading?: boolean;
@@ -19,7 +25,6 @@ interface Props {
 
 type CampaignFiltersState = {
   searchText: string;
-  tipologia: 'all' | 'lunghe' | 'one-shot';
   dm: 'all' | 'yes' | 'no';
   soloPreferiti: boolean;
 };
@@ -31,16 +36,9 @@ type SelectOption<T extends string = string> = {
 
 const defaultFilters: CampaignFiltersState = {
   searchText: '',
-  tipologia: 'all',
   dm: 'all',
   soloPreferiti: false,
 };
-
-const typeOptions: Array<SelectOption<CampaignFiltersState['tipologia']>> = [
-  { value: 'all', label: 'Tutte' },
-  { value: 'lunghe', label: 'Lunghe' },
-  { value: 'one-shot', label: 'One-shot' },
-];
 
 const roleOptions: Array<SelectOption<CampaignFiltersState['dm']>> = [
   { value: 'all', label: 'Tutti' },
@@ -91,11 +89,9 @@ export function CampaignsListPage({ currentUserId, authLoading = false, onCreate
   });
 
   const inviteMutation = useMutation({
-    mutationFn: ({ id, status }: { id: Id; status: 'accepted' | 'rejected' }) => updateCampaignInviteStatus(id, status),
-    onSuccess: () => Promise.all([
-      client.invalidateQueries({ queryKey: queryKeys.campaignInvites(safeUserId) }),
-      client.invalidateQueries({ queryKey: campaignsKey }),
-    ]),
+    mutationFn: ({ id, status }: { id: Id; campagnaId: Id; status: 'accepted' | 'rejected' }) => updateCampaignInviteStatus(id, status),
+    onSuccess: (_, { id, campagnaId, status }) =>
+      window.sendAppEventBroadcast?.({ table: 'inviti_campagna', action: 'update', invitoId: id, campagnaId, status }),
   });
 
   const loading = authLoading || campaignsQuery.isLoading || invitesQuery.isLoading;
@@ -134,8 +130,8 @@ export function CampaignsListPage({ currentUserId, authLoading = false, onCreate
         <p><strong>Campagna: {invite.campagna?.nome_campagna ?? 'Campagna sconosciuta'}</strong></p>
         <p className="invito-from">DM: {invite.inviante?.nome_utente ?? 'DM sconosciuto'}{invite.inviante?.cid ? ` (CID: ${invite.inviante.cid})` : ''}</p>
         <div className="invito-actions">
-          <button className="btn-primary btn-small" type="button" data-campagne-action="accept-invite" data-invito-id={invite.id} disabled={inviteMutation.isPending} onClick={() => inviteMutation.mutate({ id: invite.id, status: 'accepted' })}>Accetta</button>
-          <button className="btn-secondary btn-small" type="button" data-campagne-action="reject-invite" data-invito-id={invite.id} disabled={inviteMutation.isPending} onClick={() => inviteMutation.mutate({ id: invite.id, status: 'rejected' })}>Rifiuta</button>
+          <button className="btn-primary btn-small" type="button" data-campagne-action="accept-invite" data-invito-id={invite.id} disabled={inviteMutation.isPending} onClick={() => inviteMutation.mutate({ id: invite.id, campagnaId: invite.campagna_id, status: 'accepted' })}>Accetta</button>
+          <button className="btn-secondary btn-small" type="button" data-campagne-action="reject-invite" data-invito-id={invite.id} disabled={inviteMutation.isPending} onClick={() => inviteMutation.mutate({ id: invite.id, campagnaId: invite.campagna_id, status: 'rejected' })}>Rifiuta</button>
         </div>
       </div>
     </div>)}
@@ -174,7 +170,7 @@ export function CampaignsListPage({ currentUserId, authLoading = false, onCreate
       filters={filters}
       onChange={updateFilters}
       onClose={() => setFiltersOpen(false)}
-      onReset={() => updateFilters({ tipologia: 'all', dm: 'all', soloPreferiti: false })}
+      onReset={() => updateFilters({ dm: 'all', soloPreferiti: false })}
     />}
   </div>;
 }
@@ -207,16 +203,6 @@ function CampaignFiltersDialog({
       <button className="modal-close" type="button" onClick={onClose} aria-label="Chiudi">&times;</button>
       <h2 className="comp-filter-title" id="campaignFiltersTitle">Filtri</h2>
       <div className="comp-filter-panel">
-        <FilterSelectButton
-          label="Tipo"
-          value={filters.tipologia === 'all' ? '' : filters.tipologia}
-          selectedLabel={selectedLabel(typeOptions, filters.tipologia, 'all')}
-          onClick={() => setSelectOpen({
-            title: 'Tipo',
-            options: typeOptions,
-            onSelect: value => onChange({ tipologia: normalizeOption(value, typeOptions, 'all') }),
-          })}
-        />
         <FilterSelectButton
           label="Ruolo"
           value={filters.dm === 'all' ? '' : filters.dm}
@@ -292,7 +278,6 @@ function normalizeCampaignFilters(value: unknown): CampaignFiltersState {
   const record = value as Record<string, unknown>;
   return {
     searchText: typeof record.searchText === 'string' ? record.searchText : '',
-    tipologia: normalizeOption(typeof record.tipologia === 'string' ? record.tipologia : 'all', typeOptions, 'all'),
     dm: normalizeOption(typeof record.dm === 'string' ? record.dm : 'all', roleOptions, 'all'),
     soloPreferiti: record.soloPreferiti === true,
   };
@@ -306,11 +291,12 @@ function SlidersIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>;
 }
 
-function CampaignIcon({ name }: { name?: string | null }) {
+export function CampaignIcon({ name, detail = false }: { name?: string | null; detail?: boolean }) {
+  const className = detail ? 'dettagli-icon-svg' : 'campagna-icon-svg';
   if (name === 'logo_leggenda') {
-    return <div className="campagna-icon-svg campagna-icon-image"><img src="images/Logo Leggenda.jpeg" alt="" decoding="async" /></div>;
+    return <div className={`${className} ${detail ? 'dettagli-icon-image' : 'campagna-icon-image'}`}><img src="images/Logo Leggenda.jpeg" alt="" decoding="async" /></div>;
   }
-  return <div className="campagna-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">{campaignIconPaths(name)}</svg></div>;
+  return <div className={className}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">{campaignIconPaths(name)}</svg></div>;
 }
 
 function campaignIconPaths(name?: string | null) {

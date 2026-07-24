@@ -7,12 +7,19 @@ declare global {
     CompanionRouterBridge?: {
       legacyNavigationFromLocation?: (pathname: string) => LegacyNavigationSnapshot | null;
       navigateToLegacy?: (snapshot: LegacyNavigationSnapshot) => boolean;
+      ownsPage?: (pageName: string) => boolean;
     };
     CompanionRealtimeBridge?: { clientId: string };
   }
 }
 
 initializeSupabaseClient();
+
+const reactOwnedPages = new Set(['campagne', 'dettagli', 'sessione', 'combattimento', 'amici']);
+window.CompanionRouterBridge = {
+  ...window.CompanionRouterBridge,
+  ownsPage: pageName => reactOwnedPages.has(pageName),
+};
 
 const normalizedEntryPath = window.location.pathname.replace(/\/index\.html(?=\/|$)/, '') || '/';
 if (normalizedEntryPath !== window.location.pathname) {

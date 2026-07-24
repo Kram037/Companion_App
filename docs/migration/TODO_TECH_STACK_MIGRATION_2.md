@@ -2,7 +2,15 @@
 
 Obiettivo: correggere le falle emerse dopo la prima migrazione React/TypeScript, senza aprire un secondo rewrite. Ogni step deve chiudere un rischio reale e lasciare `npm.cmd run check` e `npm.cmd run test` verdi.
 
-Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
+Stato 2026-07-24: dominio Campagna migrato su branch `react_migration`;
+deploy SQL e fixture E2E autenticata restano operazioni esterne.
+
+Gate di deploy: applicare gli script nell'ordine della
+[`../../backend/supabase/RLS_DEPLOY_CHECKLIST.md`](../../backend/supabase/RLS_DEPLOY_CHECKLIST.md),
+inclusi `harden-personaggi-campagna.sql` e `atomic-campaign-runtime.sql`, prima
+del frontend migrato. Le caselle completate qui descrivono il codice presente
+nel repository, non provano che la migrazione sia gia attiva su staging o
+produzione.
 
 ## Priorita 0 - Sicurezza Supabase/RLS
 
@@ -13,6 +21,17 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Sostituire policy `USING (true) WITH CHECK (true)` su `combat_timers` con scope per campagna/sessione.
 - [x] Rivedere le policy homebrew pubbliche: distinguere privato, amici, campagna e pubblico.
 - [x] Aggiungere una checklist SQL manuale per ogni migrazione RLS prima del deploy.
+- [x] Implementare nel repository avvio/fine sessione, richieste tiro e avanzamento turno atomici.
+- [x] Implementare nel repository la lettura mostri e timer con visibilita limitata per i player.
+- [x] Rendere strutturale l'ownership di `personaggi_campagna` e vietarne il DML diretto dal client.
+- [x] Sostituire la policy UPDATE completa del DM con una RPC limitata a condizioni ed esaustione.
+- [x] Spostare il submit dei tiri player su RPC autenticate e pending-only.
+- [x] Eliminare le RPC inviti obsolete e rendere non accettabili gli inviti del precedente DM.
+- [x] Revocare il DML diretto sugli inviti e rimuovere il trigger legacy che riscriveva i giocatori.
+- [x] Bloccare il trasferimento DM mentre esiste una sessione attiva.
+- [x] Pulire associazione, tiri e timer PG attivi quando il DM rimuove un giocatore.
+- [x] Impedire timer su sessioni concluse e gruppi di tiri generici sovrapposti.
+- [ ] Applicare `atomic-campaign-runtime.sql` e validare i ruoli con fixture autenticate.
 - [ ] Applicare e validare gli script RLS in staging e produzione seguendo `backend/supabase/RLS_DEPLOY_CHECKLIST.md`.
 
 ## Priorita 1 - Guardie nel check standard
@@ -43,6 +62,9 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 
 - [x] Sostituire in `js/Core/realtime.js` i render/load diretti con invalidazioni React Query e un bridge legacy isolato.
 - [x] Centralizzare deduplica eventi in `src/realtime/realtimeClient.ts`.
+- [x] Trattare i broadcast pubblici come hint e verificare il database prima di notifiche o navigazioni.
+- [x] Invalidare anche la cache combattimento quando cambiano membership o autorizzazioni.
+- [x] Azzerare le query al cambio autenticazione e non mostrare cache stale dopo errori RLS.
 - [x] Verificare che realtime non chiuda modal, tendine o input attivi.
 - [ ] Coprire DM/player in due browser con Playwright quando la fixture Supabase e' pronta.
 
@@ -51,9 +73,9 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Estrarre in moduli TypeScript i calcoli puri condivisi da scheda e combattimento.
 - [x] Isolare i globali di combattimento in un adapter typed fuori dai componenti React.
 - [x] Attivare l'ownership incrementale e migrare `/amici` a React/API typed; il solo modale di aggiunta resta compat legacy.
-- [ ] Ridurre `CombatPage` a componenti React che chiamano API typed, non funzioni globali.
+- [x] Ridurre `CombatPage` a componenti React che chiamano API typed, non funzioni globali.
   - [x] Spostare cambio turno e fine combattimento su API typed.
-  - [ ] Spostare modali mostro, dadi/calcolatrice e timer fuori da `window.*`.
+  - [x] Spostare modali mostro, dadi/calcolatrice e timer fuori da `window.*`.
 - [ ] Ridurre `CharacterSheetPage` a modello React/Zustand, lasciando legacy solo come fallback.
 - [ ] Spostare modali e action handler piu usati fuori da `window.*`.
 - [ ] Tenere una allowlist corta dei globali legacy ancora necessari.
@@ -83,11 +105,13 @@ Stato 2026-07-15: branch `tech_migration_2` creato da `tech_migration`.
 - [x] Verificare e bloccare script legacy non raggiungibili da `index.html` o dai loader lazy; l'audit non ha trovato file orfani.
 - [x] Tenere `LegacyFragment` solo per i contenuti HTML residui del Compendio e bloccarne nuovi usi.
 - [x] Bloccare nuovi `innerHTML` fuori dai file legacy esplicitamente permessi.
+- [x] Rimuovere renderer legacy di dettaglio, sessione e combattimento dopo il passaggio di ownership.
+- [x] Eliminare store Zustand e cache helper mai usati.
 
 ## Criterio di uscita
 
-- [ ] `npm.cmd run check` include tutte le guardie architetturali.
-- [ ] `npm.cmd run test` verde.
-- [ ] Build Vite verde.
-- [ ] Nessuna policy/RPC Supabase critica senza controllo `auth.uid()`.
-- [ ] PWA installabile con icona trasparente e service worker coerente con gli asset buildati.
+- [x] `npm.cmd run check` include tutte le guardie architetturali.
+- [x] `npm.cmd run test` verde.
+- [x] Build Vite verde.
+- [x] Nessuna policy/RPC Supabase critica senza controllo `auth.uid()`.
+- [x] PWA installabile con icona trasparente e service worker coerente con gli asset buildati.

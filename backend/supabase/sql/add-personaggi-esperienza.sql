@@ -115,10 +115,14 @@ BEGIN
         RAISE EXCEPTION 'Campagna non trovata';
     END IF;
 
-    IF v_current_user_id IS DISTINCT FROM p_user_id
-       AND v_current_user_id != v_id_dm
-       AND NOT (v_current_user_id = ANY(v_giocatori)) THEN
-        RAISE EXCEPTION 'Non autorizzato';
+    IF v_current_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(v_current_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Non autorizzato' USING ERRCODE = '42501';
+    END IF;
+
+    IF p_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(p_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Giocatore non appartenente alla campagna' USING ERRCODE = '42501';
     END IF;
 
     RETURN QUERY
@@ -127,7 +131,9 @@ BEGIN
            p.esperienza, p.punti_vita_max, p.iniziativa, p.classe_armatura, p.percezione_passiva,
            p.velocita
     FROM personaggi_campagna pc
-    JOIN personaggi p ON p.id = pc.personaggio_id
+    JOIN personaggi p
+      ON p.id = pc.personaggio_id
+     AND p.user_id = pc.user_id
     WHERE pc.campagna_id = p_campagna_id
     AND pc.user_id = p_user_id;
 END;
@@ -176,8 +182,9 @@ BEGIN
         RAISE EXCEPTION 'Campagna non trovata';
     END IF;
 
-    IF v_user_id != v_id_dm AND NOT (v_user_id = ANY(v_giocatori)) THEN
-        RAISE EXCEPTION 'Non autorizzato';
+    IF v_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(v_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Non autorizzato' USING ERRCODE = '42501';
     END IF;
 
     RETURN QUERY
@@ -186,9 +193,15 @@ BEGIN
            p.punti_vita_max, p.classe_armatura,
            u.nome_utente AS player_nome
     FROM personaggi_campagna pc
-    JOIN personaggi p ON p.id = pc.personaggio_id
+    JOIN personaggi p
+      ON p.id = pc.personaggio_id
+     AND p.user_id = pc.user_id
     JOIN utenti u ON u.id = pc.user_id
-    WHERE pc.campagna_id = p_campagna_id;
+    WHERE pc.campagna_id = p_campagna_id
+      AND (
+          pc.user_id = v_id_dm
+          OR pc.user_id = ANY(v_giocatori)
+      );
 END;
 $$;
 

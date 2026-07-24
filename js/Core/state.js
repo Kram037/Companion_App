@@ -7,20 +7,11 @@ const AppState = {
     currentCampagnaId: null,
     currentSessioneId: null,
     currentPersonaggioId: null,
-    currentCampagnaDetails: null,
-    campagnaGiocatori: [],
     cachedUserData: null,
-    cachedCampagne: null,
     cachedRazze: null,
     cachedBackground: null,
     cachedHomebrewSottoclassi: null,
-    cachedHomebrewOggetti: null,
-    campagneFilters: {
-        searchText: '',
-        tipologia: 'all',
-        dm: 'all',
-        soloPreferiti: false
-    }
+    cachedHomebrewOggetti: null
 };
 
 // CRITICAL: i `const` di top-level in script classici NON sono esposti su `window`
@@ -111,9 +102,7 @@ let elements = {};
             document.getElementById('mainContent'),
             root,
             root.querySelector('.page-content'),
-            document.getElementById('schedaContent'),
-            document.getElementById('sessioneContent'),
-            document.getElementById('combattimentoContent')
+            document.getElementById('schedaContent')
         ].forEach((el) => {
             if (el && !scrollTargets.some(item => item.el === el)) {
                 scrollTargets.push({ el, top: el.scrollTop, left: el.scrollLeft });
@@ -167,9 +156,7 @@ let elements = {};
             '.custom-select-overlay',
             '.multi-select-overlay',
             '#conditionsModal',
-            '#schedaTalentiModal',
-            '#combatMonsterFullModal.active',
-            '#combatPlaceholderModal.active'
+            '#schedaTalentiModal'
         ].join(','));
     }
 
@@ -190,28 +177,11 @@ let elements = {};
         if (typeof _hpCalcClosedAt !== 'undefined' && Date.now() - _hpCalcClosedAt < 2000) return;
 
         const page = AppState.currentPage;
-        if (page === 'campagne' && AppState.currentUser?.uid) {
-            await loadCampagne(AppState.currentUser.uid, { silent: true, skipRealtimeSetup: true });
-        } else if (page === 'personaggi') {
+        if (window.CompanionRouterBridge?.ownsPage?.(page)) return;
+        if (page === 'personaggi') {
             await loadPersonaggi({ silent: true });
         } else if (page === 'amici') {
             await loadAmici({ silent: true });
-        } else if (page === 'dettagli' && AppState.currentCampagnaId) {
-            await loadCampagnaDetails(AppState.currentCampagnaId, { silent: true });
-        } else if (page === 'sessione' && AppState.currentCampagnaId) {
-            if (window.currentTiroGenericoRichiestaId) {
-                const sessione = await getSessioneAttiva(AppState.currentCampagnaId);
-                if (sessione) {
-                    await updateTiroGenericoTable(sessione.id, window.currentTiroGenericoRichiestaId);
-                }
-            } else {
-                await renderSessioneContent(AppState.currentCampagnaId);
-            }
-        } else if (page === 'combattimento' && AppState.currentCampagnaId && AppState.currentSessioneId) {
-            if (typeof window.ensureRuntimeScript === 'function') {
-                await window.ensureRuntimeScript('combattimento');
-            }
-            await renderCombattimentoContent(AppState.currentCampagnaId, AppState.currentSessioneId);
         } else if (page === 'scheda' && AppState.currentPersonaggioId) {
             const tab = window._schedaCurrentTab;
             const pgId = AppState.currentPersonaggioId;
@@ -353,14 +323,10 @@ let elements = {};
         patchOpenPageHelpers();
         patchEnsureRuntimeScript();
 
-        wrapWindowFunction('loadCampagne', { deferWhenBusy: true, preserveUi: false });
         wrapWindowFunction('loadPersonaggi', { deferWhenBusy: true, preserveUi: false });
         wrapWindowFunction('loadAmici', { deferWhenBusy: true, preserveUi: false });
-        wrapWindowFunction('loadCampagnaDetails', { deferWhenBusy: true, preserveUi: true });
-        wrapWindowFunction('renderSessioneContent', { deferWhenBusy: true, preserveUi: true });
         wrapWindowFunction('renderSchedaPersonaggio', { deferWhenBusy: true, preserveUi: true });
         wrapWindowFunction('renderMicroScheda', { deferWhenBusy: true, preserveUi: true });
-        wrapWindowFunction('renderCombattimentoContent', { deferWhenBusy: true, preserveUi: true });
     }
 
     function installRealtimeUxGuards() {

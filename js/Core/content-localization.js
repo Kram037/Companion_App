@@ -461,7 +461,7 @@
 
     const STATBLOCK_CONTAINER_SELECTOR = [
         '.comp-monster-text', '.comp-summon-statblock-modal', '.comp-monster-card',
-        '.combat-monster-full-sheet', '#combatMonsterFullModal', '#combatPlaceholderModal',
+        '.combat-monster-full-sheet',
     ].join(',');
 
     function shouldSkipNode(node) {

@@ -27,15 +27,29 @@ test('authenticated campaign navigation', async ({ page }) => {
   await expect(page.locator('.campagna-card').first()).toBeVisible();
 
   await page.goto(`/campagne/${campaignId}`);
-  await expect(page.locator('.dettagli-content')).toBeVisible();
-  await expect(page.locator('.dettagli-content .page-header h1')).not.toBeEmpty();
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
+  await expect(page.locator('#campagnePage')).toHaveCount(0);
+  await expect(page.locator('#dettagliPage, #sessionePage, #combattimentoPage')).toHaveCount(0);
+  await expect(page.locator('#react-root .dettagli-content')).toBeVisible();
+  await expect(page.locator('#react-root .dettagli-content .page-header h1')).not.toBeEmpty();
+  await page.getByRole('button', { name: 'Torna alle campagne' }).click();
+  await expect(page).toHaveURL(/\/campagne$/);
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'campagne');
 
   await page.goto(`/campagne/${campaignId}/sessione`);
-  await expect(page.locator('.sessione-content')).toBeVisible();
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
+  await expect(page.locator('#react-root .sessione-content')).toBeVisible();
+  await page.getByRole('button', { name: 'Torna ai dettagli' }).click();
+  await expect(page).toHaveURL(new RegExp(`/campagne/${campaignId}$`));
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
 
   if (sessionId) {
     await page.goto(`/campagne/${campaignId}/sessione/${sessionId}/combattimento`);
-    await expect(page.locator('#combattimentoPage')).toHaveClass(/active/);
+    await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
+    await expect(page.locator('#react-root .react-combat-page')).toBeVisible();
+    await page.getByRole('button', { name: 'Torna alla sessione' }).click();
+    await expect(page).toHaveURL(new RegExp(`/campagne/${campaignId}/sessione$`));
+    await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
   }
 });
 
@@ -81,9 +95,11 @@ test('starts and ends a session without leaving fixture state behind', async ({ 
   await login(page, dmEmail!, dmPassword!);
   await page.goto(`/campagne/${emptyCampaignId}`);
   await page.getByRole('button', { name: 'Inizia Sessione' }).click();
-  await expect(page.locator('.sessione-content .timer-display')).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
+  await expect(page.locator('#react-root .sessione-content .timer-display')).toBeVisible({ timeout: 15_000 });
   await page.getByRole('button', { name: 'Fine Sessione' }).click();
-  await expect(page.locator('.dettagli-content')).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
+  await expect(page.locator('#react-root .dettagli-content')).toBeVisible({ timeout: 15_000 });
 });
 
 test('initiative and combat updates stay synchronized without resetting a modal', async ({ browser }) => {
@@ -103,9 +119,11 @@ test('initiative and combat updates stay synchronized without resetting a modal'
 
     const sessionPath = `/campagne/${campaignId}/sessione`;
     await Promise.all([dmPage.goto(sessionPath), playerPage.goto(sessionPath)]);
-    await expect(dmPage.getByRole('button', { name: 'Tirate iniziativa' })).toBeVisible();
+    await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
+    await expect(playerPage.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
+    await expect(dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' })).toBeVisible();
 
-    await dmPage.getByRole('button', { name: 'Tirate iniziativa' }).click();
+    await dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' }).click();
     await expect(playerPage.locator('#rollRequestModal')).toHaveClass(/active/, { timeout: 15_000 });
     await playerPage.locator('#autoRollBtn').click();
     await expect(playerPage.locator('#rollRequestInput')).not.toHaveValue('');
@@ -113,17 +131,23 @@ test('initiative and combat updates stay synchronized without resetting a modal'
 
     const combatPath = `/campagne/${campaignId}/sessione/${sessionId}/combattimento`;
     await Promise.all([dmPage.goto(combatPath), playerPage.goto(combatPath)]);
-    await expect(dmPage.locator('.combat-next-btn')).toBeVisible();
-    await expect(playerPage.locator('.combat-round-center')).toBeVisible();
+    await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
+    await expect(playerPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
+    await expect(dmPage.locator('#combattimentoPage')).toHaveCount(0);
+    await expect(playerPage.locator('#combattimentoPage')).toHaveCount(0);
+    const dmCombat = dmPage.locator('#react-root');
+    const playerCombat = playerPage.locator('#react-root');
+    await expect(dmCombat.locator('.combat-next-btn')).toBeVisible();
+    await expect(playerCombat.locator('.combat-round-center')).toBeVisible();
 
-    await playerPage.getByTitle('Calcolatrice').click();
+    await playerCombat.getByTitle('Calcolatrice').click();
     await expect(playerPage.locator('#hpCalcOverlay')).toBeVisible();
-    const previousTurn = await playerPage.locator('.combat-round-center').innerText();
+    const previousTurn = await playerCombat.locator('.combat-round-center').innerText();
 
-    await dmPage.locator('.combat-next-btn').click();
-    await expect(playerPage.locator('.combat-round-center')).not.toHaveText(previousTurn, { timeout: 15_000 });
+    await dmCombat.locator('.combat-next-btn').click();
+    await expect(playerCombat.locator('.combat-round-center')).not.toHaveText(previousTurn, { timeout: 15_000 });
     await expect(playerPage.locator('#hpCalcOverlay')).toBeVisible();
-    await expect(playerPage.locator('.combat-round-center')).toHaveText(await dmPage.locator('.combat-round-center').innerText());
+    await expect(playerCombat.locator('.combat-round-center')).toHaveText(await dmCombat.locator('.combat-round-center').innerText());
   } finally {
     await dmContext.close();
     await playerContext.close();

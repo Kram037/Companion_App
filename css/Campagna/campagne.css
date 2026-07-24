@@ -12,15 +12,6 @@
     min-height: 40px;
 }
 
-.campagne-filter-toggle {
-    margin-top: 10px;
-}
-
-.campagne-filter-toggle .filter-chip-toggle {
-    width: 100%;
-    justify-content: center;
-}
-
 .campagne-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -63,23 +54,6 @@
 }
 
 .campagna-card:hover::before { opacity: 1; }
-
-.campagna-card.session-attiva {
-    border-color: var(--accent-light);
-    box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-light);
-}
-
-.campagna-card.session-attiva::before { opacity: 1; }
-
-@keyframes shimmer {
-    0%, 100% { box-shadow: var(--shadow-md), 0 0 12px rgba(139,46,46,0.15); }
-    50%      { box-shadow: var(--shadow-lg), 0 0 20px rgba(139,46,46,0.25); }
-}
-
-@keyframes shimmer-border {
-    0%, 100% { opacity: 0.7; }
-    50%      { opacity: 1; }
-}
 
 .campagna-header {
     display: flex;
@@ -169,15 +143,6 @@
 .campagna-card .info-item { gap: 4px; }
 .campagna-card .info-label { min-width: auto; }
 
-.campagna-notes {
-    margin-top: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--border);
-    font-size: 0.85rem;
-    color: var(--text-light);
-    line-height: 1.4;
-}
-
 /* ============================================
    DETTAGLI CAMPAGNA
    ============================================ */
@@ -234,15 +199,6 @@
     display: block;
 }
 
-.dettagli-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text);
-    text-align: center;
-    margin: 0;
-    letter-spacing: -0.02em;
-}
-
 .dettagli-actions {
     display: flex;
     flex-direction: column;
@@ -270,6 +226,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.dettagli-actions svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .dettagli-actions .btn-small {
@@ -412,9 +374,6 @@
 
 .btn-icon-small:hover { background: var(--accent-dark); }
 .btn-icon-small svg { width: 14px; height: 14px; }
-.btn-icon-small.btn-remove { background: #EF4444; }
-.btn-icon-small.btn-remove:hover { background: #DC2626; }
-
 /* Stats */
 .dettagli-stats { margin-bottom: var(--spacing-xl); }
 
@@ -502,57 +461,12 @@
     margin-top: var(--spacing-sm);
 }
 
-/* Players section */
-.dettagli-giocatori-section { margin-top: var(--spacing-lg); }
-
-.dettagli-giocatori-section h3 {
-    margin: 0 0 var(--spacing-md);
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
-.giocatori-table {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-}
-
-.giocatore-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px var(--spacing-lg);
-    border-bottom: 1px solid var(--border-light);
-    gap: var(--spacing-md);
-    transition: var(--transition-fast);
-}
-
-.giocatore-row:last-child { border-bottom: none; }
-.giocatore-row:hover { background: var(--accent-subtle); }
-
 .giocatore-info {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
     flex: 1;
 }
-
-.giocatore-avatar-small {
-    width: 32px; height: 32px;
-    border-radius: var(--radius-full);
-    background: var(--accent-subtle);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    flex-shrink: 0;
-}
-
-.giocatore-avatar-small svg { width: 16px; height: 16px; }
 
 .giocatore-nome {
     margin: 0;

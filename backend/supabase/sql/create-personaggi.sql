@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS personaggi (
     percezione_passiva INTEGER DEFAULT 10,
     velocita DECIMAL(5,1) DEFAULT 9.0,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(id, user_id)
 );
 
 -- Tabella associativa personaggio-campagna
@@ -29,7 +30,11 @@ CREATE TABLE IF NOT EXISTS personaggi_campagna (
     user_id VARCHAR(10) NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
     personaggio_id VARCHAR(10) NOT NULL REFERENCES personaggi(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(campagna_id, user_id)
+    UNIQUE(campagna_id, user_id),
+    CONSTRAINT personaggi_campagna_character_owner_fkey
+        FOREIGN KEY (personaggio_id, user_id)
+        REFERENCES personaggi(id, user_id)
+        ON DELETE CASCADE
 );
 
 -- Indici
@@ -59,9 +64,15 @@ CREATE POLICY "Membri campagna vedono personaggi campagna"
             SELECT 1 FROM personaggi_campagna pc
             JOIN campagne c ON c.id = pc.campagna_id
             WHERE pc.personaggio_id = personaggi.id
+            AND pc.user_id = personaggi.user_id
+            AND (
+                pc.user_id = c.id_dm
+                OR pc.user_id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+            )
             AND (
                 c.id_dm = (SELECT id FROM utenti WHERE uid = auth.uid()::text)
-                OR (SELECT id FROM utenti WHERE uid = auth.uid()::text) = ANY(c.giocatori)
+                OR (SELECT id FROM utenti WHERE uid = auth.uid()::text)
+                    = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
             )
         )
     );
@@ -74,16 +85,22 @@ CREATE POLICY "Membri vedono associazioni personaggi"
             SELECT 1 FROM campagne c
             WHERE c.id = personaggi_campagna.campagna_id
             AND (
+                personaggi_campagna.user_id = c.id_dm
+                OR personaggi_campagna.user_id
+                    = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+            )
+            AND (
                 c.id_dm = (SELECT id FROM utenti WHERE uid = auth.uid()::text)
-                OR (SELECT id FROM utenti WHERE uid = auth.uid()::text) = ANY(c.giocatori)
+                OR (SELECT id FROM utenti WHERE uid = auth.uid()::text)
+                    = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
             )
         )
     );
 
--- Solo il proprietario può gestire la propria associazione
-CREATE POLICY "Utenti gestiscono proprie associazioni"
-    ON personaggi_campagna FOR ALL
-    USING (user_id = (SELECT id FROM utenti WHERE uid = auth.uid()::text));
+-- Le associazioni si scrivono solo tramite select_personaggio_campagna.
+DROP POLICY IF EXISTS "Utenti gestiscono proprie associazioni" ON personaggi_campagna;
+REVOKE INSERT, UPDATE, DELETE ON TABLE personaggi_campagna FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE personaggi_campagna TO authenticated;
 
 -- RPC per ottenere i personaggi di un utente
 DROP FUNCTION IF EXISTS get_personaggi_utente();
@@ -135,6 +152,63 @@ BEGIN
     FROM personaggi p
     WHERE p.user_id = v_user_id
     ORDER BY p.updated_at DESC;
+END;
+$$;
+
+-- RPC canonica: utente e ownership derivano dalla sessione autenticata.
+CREATE OR REPLACE FUNCTION select_personaggio_campagna(
+    p_campagna_id VARCHAR(10),
+    p_personaggio_id VARCHAR(10)
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_current_user_id VARCHAR(10);
+BEGIN
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Non autorizzato' USING ERRCODE = '42501';
+    END IF;
+
+    SELECT u.id
+    INTO v_current_user_id
+    FROM utenti u
+    WHERE u.uid = auth.uid()::text;
+
+    IF v_current_user_id IS NULL THEN
+        RAISE EXCEPTION 'Utente non trovato' USING ERRCODE = '42501';
+    END IF;
+
+    PERFORM 1
+    FROM campagne c
+    WHERE c.id = p_campagna_id
+      AND (
+          c.id_dm = v_current_user_id
+          OR v_current_user_id = ANY(COALESCE(c.giocatori, ARRAY[]::VARCHAR(10)[]))
+      )
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Campagna non disponibile' USING ERRCODE = '42501';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM personaggi p
+        WHERE p.id = p_personaggio_id
+          AND p.user_id = v_current_user_id
+    ) THEN
+        RAISE EXCEPTION 'Personaggio non disponibile' USING ERRCODE = '42501';
+    END IF;
+
+    INSERT INTO personaggi_campagna(campagna_id, user_id, personaggio_id, created_at)
+    VALUES (p_campagna_id, v_current_user_id, p_personaggio_id, NOW())
+    ON CONFLICT (campagna_id, user_id)
+    DO UPDATE SET
+        personaggio_id = EXCLUDED.personaggio_id,
+        created_at = NOW();
 END;
 $$;
 
@@ -191,10 +265,14 @@ BEGIN
         RAISE EXCEPTION 'Campagna non trovata';
     END IF;
 
-    IF v_current_user_id IS DISTINCT FROM p_user_id
-       AND v_current_user_id != v_id_dm
-       AND NOT (v_current_user_id = ANY(v_giocatori)) THEN
-        RAISE EXCEPTION 'Non autorizzato';
+    IF v_current_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(v_current_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Non autorizzato' USING ERRCODE = '42501';
+    END IF;
+
+    IF p_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(p_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Giocatore non appartenente alla campagna' USING ERRCODE = '42501';
     END IF;
 
     RETURN QUERY
@@ -203,7 +281,9 @@ BEGIN
            p.esperienza, p.punti_vita_max, p.iniziativa, p.classe_armatura, p.percezione_passiva,
            p.velocita
     FROM personaggi_campagna pc
-    JOIN personaggi p ON p.id = pc.personaggio_id
+    JOIN personaggi p
+      ON p.id = pc.personaggio_id
+     AND p.user_id = pc.user_id
     WHERE pc.campagna_id = p_campagna_id
     AND pc.user_id = p_user_id;
 END;
@@ -253,8 +333,9 @@ BEGIN
         RAISE EXCEPTION 'Campagna non trovata';
     END IF;
 
-    IF v_user_id != v_id_dm AND NOT (v_user_id = ANY(v_giocatori)) THEN
-        RAISE EXCEPTION 'Non autorizzato';
+    IF v_user_id IS DISTINCT FROM v_id_dm
+       AND NOT COALESCE(v_user_id = ANY(v_giocatori), FALSE) THEN
+        RAISE EXCEPTION 'Non autorizzato' USING ERRCODE = '42501';
     END IF;
 
     RETURN QUERY
@@ -263,17 +344,25 @@ BEGIN
            p.punti_vita_max, p.classe_armatura,
            u.nome_utente AS player_nome
     FROM personaggi_campagna pc
-    JOIN personaggi p ON p.id = pc.personaggio_id
+    JOIN personaggi p
+      ON p.id = pc.personaggio_id
+     AND p.user_id = pc.user_id
     JOIN utenti u ON u.id = pc.user_id
-    WHERE pc.campagna_id = p_campagna_id;
+    WHERE pc.campagna_id = p_campagna_id
+      AND (
+          pc.user_id = v_id_dm
+          OR pc.user_id = ANY(v_giocatori)
+      );
 END;
 $$;
 
 -- Grants
 REVOKE EXECUTE ON FUNCTION get_personaggi_utente() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION get_personaggi_utente() TO authenticated;
+GRANT EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) TO authenticated;

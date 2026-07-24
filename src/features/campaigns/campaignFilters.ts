@@ -2,7 +2,6 @@ import type { Campagna, Id } from '../../types/domain';
 
 export interface CampaignListFilters {
   searchText?: string;
-  tipologia?: string | string[];
   dm?: string | string[];
   soloPreferiti?: boolean;
   currentUserId?: Id;
@@ -10,16 +9,10 @@ export interface CampaignListFilters {
 
 export function filterCampaigns(campaigns: readonly Campagna[], filters: CampaignListFilters = {}) {
   const search = filters.searchText?.trim().toLowerCase() ?? '';
-  const tipologie = campaignFilterValues(filters.tipologia).filter(value => value !== 'all');
   const ruoli = campaignFilterValues(filters.dm).filter(value => value !== 'all');
 
   return campaigns
     .filter(campaign => !search || campaign.nome_campagna.toLowerCase().includes(search))
-    .filter(campaign => {
-      if (!tipologie.length) return true;
-      const tipologia = (campaign as Campagna & { tipologia?: string | null }).tipologia;
-      return !tipologia || tipologie.includes(tipologia);
-    })
     .filter(campaign => {
       if (ruoli.length !== 1 || !filters.currentUserId) return true;
       if (ruoli[0] === 'yes') return campaign.id_dm === filters.currentUserId;
@@ -38,8 +31,7 @@ export function filterCampaigns(campaigns: readonly Campagna[], filters: Campaig
 }
 
 export function countActiveCampaignFilters(filters: CampaignListFilters = {}) {
-  return campaignFilterValues(filters.tipologia).filter(value => value !== 'all').length
-    + campaignFilterValues(filters.dm).filter(value => value !== 'all').length
+  return campaignFilterValues(filters.dm).filter(value => value !== 'all').length
     + (filters.soloPreferiti ? 1 : 0);
 }
 

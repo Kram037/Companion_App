@@ -51,9 +51,6 @@ async function prepareStartupLandingPages() {
     }
 
     if (AppState.isLoggedIn && AppState.currentUser?.uid) {
-        if (typeof loadCampagne === 'function') {
-            jobs.push(loadCampagne(AppState.currentUser.uid, { skipRealtimeSetup: true, silent: true }));
-        }
         if (typeof loadPersonaggi === 'function') {
             jobs.push(loadPersonaggi({ silent: true }));
         }
@@ -122,12 +119,6 @@ async function init() {
         userName: document.getElementById('userName'),
         userEmail: document.getElementById('userEmail'),
         userCID: document.getElementById('userCID'),
-        backToCampagneBtn: document.getElementById('backToCampagneBtn'),
-        backToDettagliBtn: document.getElementById('backToDettagliBtn'),
-        backToSessioneBtn: document.getElementById('backToSessioneBtn'),
-        dettagliCampagnaTitle: document.getElementById('dettagliCampagnaTitle'),
-        dettagliCampagnaContent: document.getElementById('dettagliCampagnaContent'),
-        dettagliIconContainer: document.getElementById('dettagliIconContainer'),
         editUserNameBtn: document.getElementById('editUserNameBtn'),
         editUserNameForm: document.getElementById('editUserNameForm'),
         editUserNameInput: document.getElementById('editUserNameInput'),
@@ -137,8 +128,6 @@ async function init() {
         themeDark: document.getElementById('themeDark'),
         langIt: document.getElementById('langIt'),
         langEn: document.getElementById('langEn'),
-        campagneList: document.getElementById('campagneList'),
-        addCampagnaBtn: document.getElementById('addCampagnaBtn'),
         addAmicoBtn: document.getElementById('addAmicoBtn'),
         openAmiciFromUserBtn: document.getElementById('openAmiciFromUserBtn'),
         addHomebrewBtn: document.getElementById('addHomebrewBtn'),
@@ -253,9 +242,6 @@ async function init() {
     }
 
     // Nascondi i pulsanti di default (saranno mostrati quando l'utente fa login)
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.style.display = 'none';
-    }
     if (elements.addAmicoBtn) {
         elements.addAmicoBtn.style.display = 'none';
     }
@@ -498,25 +484,6 @@ function setupEventListeners() {
         appDebug('Event listener aggiunto a googleLoginBtn');
     }
 
-    if (elements.addCampagnaBtn) {
-        elements.addCampagnaBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            openCampagnaModal();
-        };
-    }
-
-    // Filtri campagne
-    setupCampagneFilters();
-    if (typeof setupCampagneEventDelegation === 'function') {
-        setupCampagneEventDelegation();
-    }
-    if (typeof setupCampagnaDetailsActionsDelegation === 'function') {
-        setupCampagnaDetailsActionsDelegation();
-    }
-    if (typeof setupCampagnaDetailsContentDelegation === 'function') {
-        setupCampagnaDetailsContentDelegation();
-    }
     if (typeof setupGiocatoriCampagnaDelegation === 'function') {
         setupGiocatoriCampagnaDelegation();
     }
@@ -663,22 +630,6 @@ function setupEventListeners() {
     // ritorno avviene cliccando il back-button rosso flottante, che si
     // illumina (classe glow-return-session) quando esiste una sessione attiva.
 
-    const richiediTiroModal = document.getElementById('richiediTiroModal');
-    const closeRichiediTiroBtn = document.getElementById('closeRichiediTiroModal');
-    const cancelRichiediTiroBtn = document.getElementById('cancelRichiediTiro');
-    const confirmRichiediTiroBtn = document.getElementById('confirmRichiediTiro');
-    const tipoTiroSelect = document.getElementById('tipoTiroSelect');
-
-    if (closeRichiediTiroBtn) closeRichiediTiroBtn.onclick = closeRichiediTiroModal;
-    if (cancelRichiediTiroBtn) cancelRichiediTiroBtn.onclick = closeRichiediTiroModal;
-    if (confirmRichiediTiroBtn) confirmRichiediTiroBtn.onclick = executeRichiediTiro;
-    if (tipoTiroSelect) tipoTiroSelect.addEventListener('change', updateTiroTargetOptions);
-    if (richiediTiroModal) {
-        richiediTiroModal.addEventListener('click', (e) => {
-            if (e.target === richiediTiroModal) closeRichiediTiroModal();
-        });
-    }
-
     if (elements.closeCampagnaModal) {
         elements.closeCampagnaModal.onclick = function(e) {
             e.preventDefault();
@@ -753,43 +704,6 @@ function setupEventListeners() {
                 closeIconSelectorModal();
             }
         });
-    }
-
-    // Back to campagne button
-    if (elements.backToCampagneBtn) {
-        elements.backToCampagneBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            navigateToPage('campagne');
-        };
-        appDebug('Event listener aggiunto a backToCampagneBtn');
-    }
-
-    // Back to dettagli button (from sessione page)
-    if (elements.backToDettagliBtn) {
-        elements.backToDettagliBtn.onclick = async function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const campagnaId = AppState.currentCampagnaId;
-            if (campagnaId) {
-                navigateToPage('dettagli');
-                await loadCampagnaDetails(campagnaId);
-            }
-        };
-        appDebug('Event listener aggiunto a backToDettagliBtn');
-    }
-
-    // Back to sessione button (from combattimento page)
-    if (elements.backToSessioneBtn) {
-        elements.backToSessioneBtn.onclick = async function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const campagnaId = AppState.currentCampagnaId;
-            if (campagnaId) {
-                await openSessionePage(campagnaId);
-            }
-        };
-        appDebug('Event listener aggiunto a backToSessioneBtn');
     }
 
     // Edit user name button
@@ -908,16 +822,25 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             if (window.currentRollRequest) {
-                const valore = parseInt(elements.rollRequestInput.value);
-                if (isNaN(valore) || valore < 1) {
-                    showNotification('Inserisci un numero valido (minimo 1)');
+                const rawValue = elements.rollRequestInput.value.trim();
+                const valore = Number(rawValue);
+                if (!rawValue || !Number.isInteger(valore)) {
+                    showNotification('Inserisci un numero intero valido');
                     return;
                 }
                 const natRoll = elements.rollRequestInput.dataset.natRoll
                     ? parseInt(elements.rollRequestInput.dataset.natRoll)
                     : null;
-                await submitRollRequest(window.currentRollRequest.id, window.currentRollRequest.tipo, valore, natRoll);
+                const submitted = await submitRollRequest(
+                    window.currentRollRequest.id,
+                    window.currentRollRequest.tipo,
+                    valore,
+                    natRoll
+                );
+                if (!submitted) return;
                 closeRollRequestModal();
+                const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
+                if (pending && !window.currentRollRequest) showRollRequestModal(pending);
             }
         });
     }

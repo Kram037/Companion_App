@@ -1,6 +1,13 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { fetchActiveSessionByCampaign, fetchCampaignById, fetchCampaignCharacters, fetchCampaignPlayers, fetchHasInitiativeRequest } from '../../api';
+import {
+  fetchActiveSessionByCampaign,
+  fetchCampaignById,
+  fetchCampaignCharacters,
+  fetchCampaignPlayers,
+  fetchHasInitiativeRequest,
+  fetchLatestGenericRollGroup,
+} from '../../api';
 import { queryKeys, queryTimings } from '../../query';
 import type { Id } from '../../types/domain';
 
@@ -40,6 +47,15 @@ export function initiativeRequestsQuery(sessioneId: Id) {
   return queryOptions({
     queryKey: queryKeys.initiativeRequests(sessioneId),
     queryFn: () => fetchHasInitiativeRequest(sessioneId),
+    enabled: Boolean(sessioneId),
+    ...queryTimings.combat,
+  });
+}
+
+export function latestGenericRollGroupQuery(sessioneId: Id) {
+  return queryOptions({
+    queryKey: queryKeys.genericRollRequests(sessioneId),
+    queryFn: () => fetchLatestGenericRollGroup(sessioneId),
     enabled: Boolean(sessioneId),
     ...queryTimings.combat,
   });

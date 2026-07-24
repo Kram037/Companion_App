@@ -9,7 +9,6 @@ import { CampaignsListPage } from './CampaignsListPage';
 declare global {
   interface Window {
     deleteCampagna?: (id: string) => void;
-    openCampagnaDetails?: (id: string) => void;
     openCampagnaModal?: (id?: string | null) => void;
     openLoginModal?: () => void;
   }
@@ -29,10 +28,7 @@ export function CampaignsRoutePage() {
       }}
       onDelete={id => window.deleteCampagna?.(id)}
       onEdit={id => window.openCampagnaModal?.(id)}
-      onOpen={id => {
-        if (window.openCampagnaDetails) window.openCampagnaDetails(id);
-        else navigate(buildAppPath('campagnaDetails', { campagnaId: id }));
-      }}
+      onOpen={id => navigate(buildAppPath('campagnaDetails', { campagnaId: id }))}
     />
   </ReactPage>;
 }
