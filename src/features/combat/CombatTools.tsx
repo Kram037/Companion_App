@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   activeCombatConditions,
@@ -736,13 +737,13 @@ function Modal({
   const closeFromBackdrop = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) onClose();
   };
-  return <div className="modal active" role="dialog" aria-modal="true" aria-label={title} onMouseDown={closeFromBackdrop}>
+  return createPortal(<div className="modal active" role="dialog" aria-modal="true" aria-label={title} onMouseDown={closeFromBackdrop}>
     <div className={`modal-content ${className}`}>
       <button className="modal-close" type="button" onClick={onClose} aria-label="Chiudi">×</button>
       <h2 className="placeholder-title">{title}</h2>
       {children}
     </div>
-  </div>;
+  </div>, document.body);
 }
 
 function ToolButton({ label, icon, ...props }: { label: string; icon: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
