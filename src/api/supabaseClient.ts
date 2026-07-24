@@ -26,7 +26,12 @@ export function getSupabaseClient(): SupabaseClient {
 }
 
 export function throwIfSupabaseError(error: unknown): void {
-  if (error) throw error;
+  if (!error) return;
+  if (error instanceof Error) throw error;
+  if (typeof error === 'object' && 'message' in error) {
+    throw new Error(String((error as { message: unknown }).message), { cause: error });
+  }
+  throw new Error(String(error));
 }
 
 export function isMissingDatabaseColumn(error: unknown): boolean {
