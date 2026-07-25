@@ -47,6 +47,17 @@ test('authenticated campaign navigation', async ({ page }) => {
     await page.goto(`/campagne/${campaignId}/sessione/${sessionId}/combattimento`);
     await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
     await expect(page.locator('#react-root .react-combat-page')).toBeVisible();
+    await page.getByTitle('Gestisci mostri').click();
+    await page.getByRole('dialog', { name: 'Mostri' }).getByRole('button', { name: 'Aggiungi' }).click();
+    await page.getByRole('button', { name: /Dal Compendio/ }).click();
+    const compendium = page.getByRole('dialog', { name: 'Mostri del compendio' });
+    await compendium.getByRole('searchbox', { name: 'Cerca mostro nel compendio' }).fill('Awakened Shrub');
+    await compendium.locator('[data-source-id="awakened-shrub-mm-41"]').click();
+    const quickAdd = page.getByRole('dialog', { name: 'Awakened Shrub' });
+    await expect(quickAdd.locator('#combat-homebrew-initiative')).toBeVisible();
+    await expect(quickAdd.getByRole('button', { name: 'Aggiungi' })).toBeVisible();
+    await quickAdd.getByRole('button', { name: 'Chiudi' }).click();
+    await page.getByRole('dialog', { name: 'Mostri del compendio' }).getByRole('button', { name: 'Chiudi' }).click();
     await page.getByRole('button', { name: 'Torna alla sessione' }).click();
     await expect(page).toHaveURL(new RegExp(`/campagne/${campaignId}/sessione$`));
     await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');

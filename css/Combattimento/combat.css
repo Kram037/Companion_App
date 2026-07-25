@@ -448,6 +448,7 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 }
+.combat-monster-search { margin-bottom: 8px; padding-left: 12px; }
 .monster-hb-item {
     display: flex;
     align-items: center;
@@ -495,6 +496,7 @@
     max-height: 92vh;
     overflow-y: auto;
 }
+.combat-monster-editor > form { overflow-y: auto; }
 .combat-monster-section { margin-top: 12px; }
 .combat-monster-editor .combat-abilities-grid { margin: 12px 0; }
 .combat-monster-editor .pg-exhaustion-row input[type="number"] { width: 64px; }

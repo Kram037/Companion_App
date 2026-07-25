@@ -39,6 +39,54 @@ describe('combat tools validation', () => {
     expect(payload.attacchi).toEqual([{ nome: 'Morso' }]);
   });
 
+  it('normalizes a compendium monster into a combat monster', () => {
+    const payload = combatMonsterPayload({
+      nome: 'Arbusto Risvegliato',
+      tipo: 'Pianta',
+      taglia: 'Piccolo',
+      classe_armatura: '9',
+      punti_ferita: '10 (3d6)',
+      velocita: '6 m',
+      caratteristiche: {
+        forza: { score: 3 },
+        destrezza: { score: 8 },
+        costituzione: { score: 11 },
+        intelligenza: { score: 10 },
+        saggezza: { score: 10 },
+        carisma: { score: 6 },
+      },
+      tiri_salvezza_testo: 'DES +1, SAG +2',
+      abilita_testo: 'Percezione +0 plus PB x 2',
+      immunita_danni: ['fuoco'],
+      tratti: '**Legendary Resistenza (3/Giorno).** Testo.',
+      azioni: '**Ramo.** Attacco con arma.\n\n**Spinta.** Il bersaglio cade prono.\n\nIngrandire. Aumenta di una taglia.',
+      azioni_leggendarie: 'Può effettuare 3 azioni leggendarie.\n\n**Coda.** Effettua un attacco.',
+    }, 'campaign', 'session', 12);
+
+    expect(payload).toMatchObject({
+      forza: 3,
+      destrezza: 8,
+      punti_vita_max: 10,
+      pv_attuali: 10,
+      dadi_vita_num: 3,
+      dado_vita: 6,
+      classe_armatura: 9,
+      velocita: 6,
+      tiri_salvezza: ['destrezza', 'saggezza'],
+      competenze_abilita: ['Percezione'],
+      immunita: ['fuoco'],
+      resistenze_leggendarie: 3,
+      azioni_legg_max: 3,
+      is_placeholder: false,
+    });
+    expect(payload.attacchi).toEqual([
+      { nome: 'Ramo', descrizione: 'Attacco con arma.' },
+      { nome: 'Spinta', descrizione: 'Il bersaglio cade prono.' },
+      { nome: 'Ingrandire', descrizione: 'Aumenta di una taglia.' },
+    ]);
+    expect(payload.azioni_leggendarie).toEqual([{ nome: 'Coda', descrizione: 'Effettua un attacco.' }]);
+  });
+
   it('rejects invalid mutations before accessing Supabase', async () => {
     await expect(createPlaceholderMonster({
       campagnaId: 'campaign',

@@ -9,6 +9,7 @@ import {
   createPlaceholderMonster,
   duplicateCombatMonster,
   fetchCombatMonsterSources,
+  fetchCompendiumMonsterSources,
   importCombatEncounter,
   removeCombatMonster,
   removeCombatTimer,
@@ -71,10 +72,11 @@ export function CombatTools({
   onOpenLaboratory,
   onNotify,
 }: CombatToolsProps) {
-  const [dialog, setDialog] = useState<'monsters' | 'add-monster' | 'create-monster' | 'homebrew' | 'encounters' | 'create-timer' | null>(null);
+  const [dialog, setDialog] = useState<'monsters' | 'add-monster' | 'create-monster' | 'homebrew' | 'compendium' | 'encounters' | 'create-timer' | null>(null);
   const [selectedMonsterId, setSelectedMonsterId] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<HomebrewItem | null>(null);
   const [sources, setSources] = useState<CombatMonsterSources | null>(null);
+  const [compendiumMonsters, setCompendiumMonsters] = useState<HomebrewItem[] | null>(null);
   const [confirmingMonster, setConfirmingMonster] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -126,6 +128,20 @@ export function CombatTools({
     }
   };
 
+  const openCompendium = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      setCompendiumMonsters(compendiumMonsters ?? await fetchCompendiumMonsterSources());
+      setDialog('compendium');
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return <>
     {isDm && <ToolButton label="Mostro" title="Gestisci mostri" onClick={() => setDialog('monsters')} icon={<PlusIcon />} />}
     <ToolButton
@@ -166,6 +182,11 @@ export function CombatTools({
           <span className="monster-choice-label">Da Homebrew</span>
           <span className="monster-choice-desc">Importa dal Laboratorio</span>
         </button>
+        <button className="monster-choice-card" type="button" disabled={busy} onClick={() => void openCompendium()}>
+          <span className="monster-choice-icon" aria-hidden="true">📚</span>
+          <span className="monster-choice-label">Dal Compendio</span>
+          <span className="monster-choice-desc">Importa dal bestiario</span>
+        </button>
         <button className="monster-choice-card" type="button" disabled={busy} onClick={() => void openSources('encounters')}>
           <span className="monster-choice-icon" aria-hidden="true">⚔</span>
           <span className="monster-choice-label">Da Combattimento</span>
@@ -195,6 +216,29 @@ export function CombatTools({
     />}
 
     {dialog === 'homebrew' && selectedSource && <HomebrewQuickAdd
+      source={selectedSource}
+      busy={busy}
+      error={error}
+      onCancel={() => setSelectedSource(null)}
+      onSubmit={initiative => void run(
+        () => createCombatMonsterFromSource({ campagnaId, sessioneId, source: selectedSource, initiative }),
+        `${selectedSource.nome} aggiunto al combattimento`,
+        closeAll,
+      )}
+    />}
+
+    {dialog === 'compendium' && !selectedSource && <SourceList
+      title="Mostri del compendio"
+      items={compendiumMonsters ?? []}
+      empty="Nessun mostro trovato."
+      subtitle={compendiumMonsterSubtitle}
+      searchText={compendiumMonsterSearchText}
+      onBack={() => setDialog('add-monster')}
+      onSelect={setSelectedSource}
+      onClose={closeAll}
+    />}
+
+    {dialog === 'compendium' && selectedSource && <HomebrewQuickAdd
       source={selectedSource}
       busy={busy}
       error={error}
@@ -367,6 +411,7 @@ function SourceList({
   items,
   empty,
   subtitle,
+  searchText,
   busy = false,
   error = '',
   onBack,
@@ -377,22 +422,37 @@ function SourceList({
   items: HomebrewItem[];
   empty: string;
   subtitle: (item: HomebrewItem) => string;
+  searchText?: (item: HomebrewItem) => string;
   busy?: boolean;
   error?: string;
   onBack: () => void;
   onSelect: (item: HomebrewItem) => void;
   onClose: () => void;
 }) {
+  const [search, setSearch] = useState('');
+  const query = normalizeSourceSearch(search);
+  const visibleItems = query && searchText
+    ? items.filter(item => normalizeSourceSearch(searchText(item)).includes(query))
+    : items;
   return <Modal title={title} onClose={onClose}>
+    {searchText && <input
+      className="filter-search combat-monster-search"
+      type="search"
+      value={search}
+      onChange={event => setSearch(event.target.value)}
+      placeholder="Cerca mostro..."
+      aria-label="Cerca mostro nel compendio"
+      autoFocus
+    />}
     <div className="monster-hb-list">
-      {items.map(item => <button className="monster-hb-item" type="button" disabled={busy} key={item.id} onClick={() => onSelect(item)}>
+      {visibleItems.map(item => <button className="monster-hb-item" data-source-id={item.id} type="button" disabled={busy} key={item.id} onClick={() => onSelect(item)}>
         <span className="monster-hb-info">
           <span className="monster-hb-name">{item.nome}</span>
           <span className="monster-hb-sub">{subtitle(item)}</span>
         </span>
         <span className="monster-hb-arrow" aria-hidden="true">›</span>
       </button>)}
-      {!items.length && <div className="content-placeholder"><p>{empty}</p></div>}
+      {!visibleItems.length && <div className="content-placeholder"><p>{empty}</p></div>}
     </div>
     <InlineError>{error}</InlineError>
     <div className="form-actions"><button className="btn-secondary" type="button" disabled={busy} onClick={onBack}>Indietro</button></div>
@@ -843,7 +903,19 @@ function sourceText(source: Record<string, unknown>, key: string, fallback: stri
 }
 
 function monsterSourceSubtitle(source: HomebrewItem) {
-  return `${sourceText(source, 'tipo', 'Mostro')} · GS ${sourceText(source, 'grado_sfida', '0')} · PV ${sourceText(source, 'punti_vita_max', '?')}`;
+  return `${sourceText(source, 'tipo', 'Mostro')} · GS ${sourceText(source, 'grado_sfida', '0')} · PV ${sourceText(source, 'punti_vita_max', sourceText(source, 'punti_ferita', '?'))}`;
+}
+
+function compendiumMonsterSubtitle(source: HomebrewItem) {
+  return `${sourceText(source, 'tipo', 'Mostro')} · GS ${sourceText(source, 'grado_sfida', '0')} · ${sourceText(source, 'fonte_breve', sourceText(source, 'fonte', 'Compendio'))}`;
+}
+
+function compendiumMonsterSearchText(source: HomebrewItem) {
+  return ['nome', 'nome_en', 'tipo', 'grado_sfida', 'fonte', 'fonte_breve'].map(key => sourceText(source, key, '')).join(' ');
+}
+
+function normalizeSourceSearch(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('it').trim();
 }
 
 function encounterMonsterCount(source: HomebrewItem) {

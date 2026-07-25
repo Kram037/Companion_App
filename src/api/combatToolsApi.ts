@@ -5,6 +5,13 @@ import type { HomebrewItem } from '../types/domain';
 import { fetchHomebrewByUser } from './homebrewApi';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
+declare global {
+  interface Window {
+    ensureRuntimeData?: (key: string) => Promise<unknown>;
+    COMP_MONSTERS_DATA?: unknown;
+  }
+}
+
 export const COMBAT_CONDITIONS = [
   'concentrazione', 'accecato', 'affascinato', 'afferrato', 'assordato',
   'avvelenato', 'incapacitato', 'invisibile', 'paralizzato', 'pietrificato',
@@ -12,6 +19,10 @@ export const COMBAT_CONDITIONS = [
 ] as const;
 
 const idSchema = z.string().trim().min(1);
+const compendiumMonsterSchema = z.object({
+  id: idSchema,
+  nome: z.string().trim().min(1),
+}).passthrough();
 const conditionSchema = z.enum(COMBAT_CONDITIONS);
 const nullableNumber = z.number().nullish();
 const initiativeSchema = z.number().int().min(-100).max(100);
@@ -189,6 +200,12 @@ export async function fetchCombatMonsterSources(userId: string): Promise<CombatM
   return { monsters, encounters };
 }
 
+export async function fetchCompendiumMonsterSources(): Promise<HomebrewItem[]> {
+  if (typeof window.ensureRuntimeData !== 'function') throw new Error('Catalogo mostri non disponibile');
+  await window.ensureRuntimeData('monsters');
+  return parseArray(compendiumMonsterSchema, window.COMP_MONSTERS_DATA);
+}
+
 export async function createCombatMonsterFromSource(input: {
   campagnaId: string;
   sessioneId: string;
@@ -356,11 +373,12 @@ export function combatMonsterPayload(
   sessioneId: string,
   initiative?: number,
 ): Record<string, unknown> {
-  const dexterity = numberValue(source.destrezza, 10);
+  const hitDice = parseHitDice(source.punti_ferita);
+  const dexterity = abilityScore(source, 'destrezza');
   const initiativeModifier = numberValue(source.mod_iniziativa, Math.floor((dexterity - 10) / 2));
-  const hpMax = numberValue(source.punti_vita_max, 10);
-  const legendaryResistances = numberValue(source.resistenze_leggendarie, 0);
-  const legendaryActions = numberValue(source.azioni_legg_max, 0);
+  const hpMax = numberValue(source.punti_vita_max ?? source.punti_ferita, 10);
+  const legendaryResistances = numberValue(source.resistenze_leggendarie, textResourceCount(source.tratti, /(?:legendary resist(?:ance|enza)|resistenza leggendaria)/i));
+  const legendaryActions = numberValue(source.azioni_legg_max, textResourceCount(source.azioni_leggendarie, /(?:legendary actions|azioni leggendarie)/i));
   const validInitiative = initiativeSchema.optional().parse(initiative);
   return {
     sessione_id: idSchema.parse(sessioneId),
@@ -370,26 +388,26 @@ export function combatMonsterPayload(
     taglia: stringValue(source.taglia, 'Media'),
     allineamento: stringValue(source.allineamento, 'Neutrale'),
     grado_sfida: stringValue(source.grado_sfida, '0'),
-    forza: numberValue(source.forza, 10),
+    forza: abilityScore(source, 'forza'),
     destrezza: dexterity,
-    costituzione: numberValue(source.costituzione, 10),
-    intelligenza: numberValue(source.intelligenza, 10),
-    saggezza: numberValue(source.saggezza, 10),
-    carisma: numberValue(source.carisma, 10),
+    costituzione: abilityScore(source, 'costituzione'),
+    intelligenza: abilityScore(source, 'intelligenza'),
+    saggezza: abilityScore(source, 'saggezza'),
+    carisma: abilityScore(source, 'carisma'),
     punti_vita_max: hpMax,
     pv_attuali: hpMax,
-    dadi_vita_num: numberValue(source.dadi_vita_num, 1),
-    dado_vita: numberValue(source.dado_vita, hitDieForSize(source.taglia)),
+    dadi_vita_num: numberValue(source.dadi_vita_num, hitDice?.count ?? 1),
+    dado_vita: numberValue(source.dado_vita, hitDice?.die ?? hitDieForSize(source.taglia)),
     classe_armatura: numberValue(source.classe_armatura, 10),
     velocita: numberValue(source.velocita, 9),
     iniziativa: validInitiative ?? Math.floor(Math.random() * 20) + 1 + initiativeModifier,
-    tiri_salvezza: jsonArray(source.tiri_salvezza),
-    competenze_abilita: jsonArray(source.competenze_abilita),
+    tiri_salvezza: sourceList(source.tiri_salvezza, saveAbilities(source.tiri_salvezza_testo)),
+    competenze_abilita: sourceList(source.competenze_abilita, skillNames(source.abilita_testo)),
     maestrie_abilita: jsonArray(source.maestrie_abilita),
     resistenze: jsonArray(source.resistenze),
-    immunita: jsonArray(source.immunita),
-    attacchi: jsonArray(source.attacchi),
-    azioni_leggendarie: jsonArray(source.azioni_leggendarie),
+    immunita: sourceList(source.immunita, jsonArray(source.immunita_danni)),
+    attacchi: sourceActions(source.attacchi, source.azioni, true),
+    azioni_leggendarie: sourceActions(source.azioni_leggendarie),
     resistenze_leggendarie: legendaryResistances,
     res_legg_attuali: legendaryResistances,
     azioni_legg_max: legendaryActions,
@@ -430,6 +448,55 @@ function nullableString(value: unknown): string | null {
 function numberValue(value: unknown, fallback: number): number {
   const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function abilityScore(source: Record<string, unknown>, ability: string) {
+  const characteristics = recordValue(source.caratteristiche);
+  const nested = recordValue(characteristics?.[ability]);
+  return numberValue(source[ability] ?? nested?.score, 10);
+}
+
+function parseHitDice(value: unknown) {
+  const match = String(value ?? '').match(/\((\d+)d(\d+)/i);
+  return match ? { count: Number(match[1]), die: Number(match[2]) } : null;
+}
+
+function sourceList(value: unknown, fallback: unknown[]) {
+  const items = jsonArray(value);
+  return items.length ? items : fallback;
+}
+
+function saveAbilities(value: unknown) {
+  const text = String(value ?? '').toLocaleLowerCase('it');
+  return Object.entries({
+    for: 'forza', des: 'destrezza', cos: 'costituzione',
+    int: 'intelligenza', sag: 'saggezza', car: 'carisma',
+  }).flatMap(([short, ability]) => new RegExp(`\\b${short}\\s*[+-]\\d+`, 'i').test(text) ? [ability] : []);
+}
+
+function skillNames(value: unknown) {
+  return String(value ?? '').split(',').map(entry => entry.replace(/\s+[+-]\s*\d+.*$/, '').trim()).filter(Boolean);
+}
+
+function sourceActions(primary: unknown, fallback?: unknown, includePlain = false) {
+  const items = jsonArray(primary);
+  if (items.length) return items;
+  return String(fallback ?? primary ?? '').split(/\n\s*\n/).flatMap(section => {
+    const text = section.trim();
+    const match = text.match(/^\*\*(.+?)\.?\*\*\s*(.*)$/s);
+    if (match) return [{ nome: match[1].replace(/\.$/, '').trim(), descrizione: match[2].trim() }];
+    if (!includePlain || !text) return [];
+    // ponytail: plain statblocks use the first sentence as title; replace when the catalog exposes structured actions.
+    const split = text.indexOf('. ');
+    return [{ nome: split > 0 ? text.slice(0, split) : 'Azione', descrizione: split > 0 ? text.slice(split + 2) : text }];
+  });
+}
+
+function textResourceCount(value: unknown, label: RegExp) {
+  const text = String(value ?? '');
+  if (!label.test(text)) return 0;
+  const count = text.match(/\((\d+)\s*\/[^)]*\)/)?.[1] ?? text.match(/(\d+)\s+(?:legendary actions|azioni leggendarie)/i)?.[1];
+  return count ? Number(count) : 0;
 }
 
 function jsonArray(value: unknown) {
