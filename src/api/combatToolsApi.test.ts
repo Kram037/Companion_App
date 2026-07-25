@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   combatMonsterPayload,
+  combatMonsterPayloads,
+  createCombatMonsters,
   createCombatTimer,
   createPlaceholderMonster,
   nextCombatMonsterCopyName,
@@ -87,6 +89,21 @@ describe('combat tools validation', () => {
     expect(payload.azioni_leggendarie).toEqual([{ nome: 'Coda', descrizione: 'Effettua un attacco.' }]);
   });
 
+  it('shares one automatic initiative only inside a monster group', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValueOnce(0.5);
+    const source = { nome: 'Goblin', destrezza: 10 };
+    const payloads = combatMonsterPayloads([
+      { source, initiativeGroup: 'goblin' },
+      { source, initiativeGroup: 'goblin' },
+      { source },
+      { source, initiative: 18 },
+    ], 'campaign', 'session');
+
+    expect(payloads.map(payload => payload.iniziativa)).toEqual([1, 1, 11, 18]);
+    expect(random).toHaveBeenCalledTimes(2);
+    random.mockRestore();
+  });
+
   it('rejects invalid mutations before accessing Supabase', async () => {
     await expect(createPlaceholderMonster({
       campagnaId: 'campaign',
@@ -95,6 +112,12 @@ describe('combat tools validation', () => {
       hpMax: 10,
       armorClass: 10,
     })).rejects.toThrow();
+
+    await expect(createCombatMonsters({
+      campagnaId: 'campaign',
+      sessioneId: 'session',
+      drafts: Array.from({ length: 501 }, () => ({ source: { nome: 'Goblin' } })),
+    })).rejects.toThrow(/massimo 500/i);
 
     await expect(updateCombatMonster('monster', {
       hp: 11,

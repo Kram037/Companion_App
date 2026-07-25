@@ -412,31 +412,78 @@
 .monster-res-legg-pip:disabled { cursor: wait; opacity: 0.65; }
 .monster-res-legg-label { font-size: 0.8rem; color: var(--text-secondary); margin-left: 4px; }
 
-/* Monster creation choice */
-.monster-choice-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 8px;
+/* Monster picker */
+.combat-picker-source-modal { max-width: 520px; }
+.combat-picker-modal { width: 96%; max-width: 760px; }
+.combat-picker-body {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
 }
-.monster-choice-card {
+.combat-picker-source-tabs { flex-shrink: 0; }
+.combat-picker-source-tab {
+    min-height: 68px;
+    flex-direction: column;
+}
+.combat-picker-source-tab .lab-subtab-icon-img { width: 30px; height: 30px; }
+.combat-picker-placeholder-tab { flex: 0 0 48px; padding-inline: 8px; }
+.combat-picker-placeholder-tab svg { width: 24px; height: 24px; }
+.combat-picker-hint { margin: 4px 0 0; text-align: center; }
+.combat-picker-modal .comp-toolbar { flex-shrink: 0; }
+.combat-picker-scroll { padding-bottom: 60px; }
+.combat-picker-list.comp-list { display: flex; }
+.combat-picker-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: default;
+}
+.combat-picker-card.is-selected { border-color: var(--accent); background: var(--surface-hover); }
+.combat-picker-checkbox {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+.combat-picker-card-content { flex: 1; min-width: 0; }
+.combat-picker-stepper { flex-shrink: 0; }
+.combat-picker-confirm {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+}
+.combat-picker-confirm svg { width: 24px; height: 24px; }
+.combat-picker-confirm:disabled { cursor: wait; opacity: 0.65; }
+.combat-initiative-modal { max-width: 520px; }
+.combat-initiative-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 20px 12px;
-    border: 2px solid var(--border);
-    border-radius: var(--radius-lg, 12px);
-    background: var(--card-bg);
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s;
-    text-align: center;
+    gap: 8px;
+    margin-top: 10px;
 }
-.monster-choice-card:active { transform: scale(0.97); }
-.monster-choice-card:hover { border-color: var(--primary); }
-.monster-choice-icon { font-size: 1.8rem; }
-.monster-choice-label { font-weight: 700; font-size: 0.95rem; color: var(--text); }
-.monster-choice-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.3; }
+.combat-initiative-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 88px;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+}
+.combat-initiative-row span {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.combat-initiative-row input { width: 100%; }
 
 /* Homebrew monster list */
 .monster-hb-list {
@@ -448,7 +495,6 @@
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 }
-.combat-monster-search { margin-bottom: 8px; padding-left: 12px; }
 .monster-hb-item {
     display: flex;
     align-items: center;

@@ -180,7 +180,6 @@ export function CombatPage() {
         openMonsterId={openMonsterId}
         onMonsterOpened={() => setOpenMonsterId(null)}
         onChanged={refreshCombat}
-        onOpenLaboratory={() => navigate(`${buildAppPath('laboratorio')}?tab=nemici&sub=nemici`)}
         onNotify={message => combatLegacyAdapter.notify(message)}
       />
       <ToolbarButton label="Dadi" title="Tira dadi" onClick={() => setUtility('dice')} icon={<Dice />} />

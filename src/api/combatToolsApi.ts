@@ -26,6 +26,7 @@ const compendiumMonsterSchema = z.object({
 const conditionSchema = z.enum(COMBAT_CONDITIONS);
 const nullableNumber = z.number().nullish();
 const initiativeSchema = z.number().int().min(-100).max(100);
+const MAX_MONSTERS_PER_BATCH = 500;
 
 const combatToolMonsterSchema = z.object({
   id: idSchema,
@@ -160,6 +161,11 @@ export type CombatMonsterSources = {
   monsters: HomebrewItem[];
   encounters: HomebrewItem[];
 };
+export type CombatMonsterDraft = {
+  source: Record<string, unknown>;
+  initiative?: number;
+  initiativeGroup?: string;
+};
 
 export async function fetchCombatToolMonsters(sessioneId: string): Promise<CombatToolMonster[]> {
   const { data, error } = await getSupabaseClient()
@@ -206,36 +212,14 @@ export async function fetchCompendiumMonsterSources(): Promise<HomebrewItem[]> {
   return parseArray(compendiumMonsterSchema, window.COMP_MONSTERS_DATA);
 }
 
-export async function createCombatMonsterFromSource(input: {
+export async function createCombatMonsters(input: {
   campagnaId: string;
   sessioneId: string;
-  source: HomebrewItem;
-  initiative?: number;
-}): Promise<CombatToolMonster> {
-  const { data, error } = await getSupabaseClient()
-    .from('mostri_combattimento')
-    .insert(combatMonsterPayload(input.source, input.campagnaId, input.sessioneId, input.initiative))
-    .select(MONSTER_COLUMNS)
-    .single();
-  throwIfSupabaseError(error);
-  return parseData(combatToolMonsterSchema, data);
-}
-
-export async function importCombatEncounter(input: {
-  campagnaId: string;
-  sessioneId: string;
-  source: HomebrewItem;
+  drafts: CombatMonsterDraft[];
 }): Promise<CombatToolMonster[]> {
-  const entries = Array.isArray(input.source.mostri) ? input.source.mostri : [];
-  const payloads = entries
-    .map(entry => {
-      const record = recordValue(entry);
-      return recordValue(record?.snapshot) ?? record;
-    })
-    .filter((entry): entry is Record<string, unknown> => Boolean(entry))
-    .map(entry => combatMonsterPayload(entry, input.campagnaId, input.sessioneId));
-  if (!payloads.length) throw new Error('Questo combattimento non contiene mostri');
-
+  if (!input.drafts.length) throw new Error('Seleziona almeno un mostro');
+  if (input.drafts.length > MAX_MONSTERS_PER_BATCH) throw new Error(`Puoi aggiungere al massimo ${MAX_MONSTERS_PER_BATCH} mostri alla volta`);
+  const payloads = combatMonsterPayloads(input.drafts, input.campagnaId, input.sessioneId);
   const { data, error } = await getSupabaseClient()
     .from('mostri_combattimento')
     .insert(payloads)
@@ -418,6 +402,22 @@ export function combatMonsterPayload(
     esaustione: 0,
     ...Object.fromEntries(COMBAT_CONDITIONS.map(condition => [condition, false])),
   };
+}
+
+export function combatMonsterPayloads(
+  drafts: CombatMonsterDraft[],
+  campagnaId: string,
+  sessioneId: string,
+): Record<string, unknown>[] {
+  const groupInitiatives = new Map<string, number>();
+  return drafts.map(draft => {
+    const shared = draft.initiativeGroup ? groupInitiatives.get(draft.initiativeGroup) : undefined;
+    const payload = combatMonsterPayload(draft.source, campagnaId, sessioneId, shared ?? draft.initiative);
+    if (draft.initiativeGroup && shared == null) {
+      groupInitiatives.set(draft.initiativeGroup, Number(payload.iniziativa));
+    }
+    return payload;
+  });
 }
 
 async function updateMonster(monsterId: string, changes: Record<string, unknown>): Promise<CombatToolMonster> {

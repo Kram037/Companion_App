@@ -4,22 +4,23 @@ import { createPortal } from 'react-dom';
 import {
   activeCombatConditions,
   COMBAT_CONDITIONS,
+  createCombatMonsters,
   createCombatTimer,
-  createCombatMonsterFromSource,
   createPlaceholderMonster,
   duplicateCombatMonster,
   fetchCombatMonsterSources,
   fetchCompendiumMonsterSources,
-  importCombatEncounter,
   removeCombatMonster,
   removeCombatTimer,
   updateCombatMonster,
   updateCombatMonsterCounter,
   type CombatCondition,
+  type CombatMonsterDraft,
   type CombatMonsterSources,
   type CombatTimer,
   type CombatToolMonster,
 } from '../../api/combatToolsApi';
+import { SearchToolbar } from '../../components/SearchToolbar';
 import type { HomebrewItem } from '../../types/domain';
 
 const CONDITION_LABELS: Record<CombatCondition, string> = {
@@ -39,9 +40,25 @@ const CONDITION_LABELS: Record<CombatCondition, string> = {
   stordito: 'Stordito',
   trattenuto: 'Trattenuto',
 };
+const ASSET_BASE = import.meta.env.BASE_URL;
 
 type ChangeCallback = () => void | Promise<void>;
 type NotifyCallback = (message: string) => void;
+type PickerSource = 'laboratory' | 'compendium';
+type PickerKind = 'monsters' | 'encounters';
+type PickerSelection = {
+  key: string;
+  origin: PickerSource;
+  kind: PickerKind;
+  source: HomebrewItem;
+  quantity: number;
+};
+type PickerMonsterDraft = {
+  key: string;
+  groupKey: string;
+  label: string;
+  source: Record<string, unknown>;
+};
 
 export type CombatToolsProps = {
   campagnaId: string;
@@ -54,7 +71,6 @@ export type CombatToolsProps = {
   openMonsterId?: string | null;
   onMonsterOpened?: () => void;
   onChanged: ChangeCallback;
-  onOpenLaboratory?: () => void;
   onNotify?: NotifyCallback;
 };
 
@@ -69,22 +85,24 @@ export function CombatTools({
   openMonsterId,
   onMonsterOpened,
   onChanged,
-  onOpenLaboratory,
   onNotify,
 }: CombatToolsProps) {
-  const [dialog, setDialog] = useState<'monsters' | 'add-monster' | 'create-monster' | 'homebrew' | 'compendium' | 'encounters' | 'create-timer' | null>(null);
+  const [dialog, setDialog] = useState<'picker' | 'initiative' | 'create-monster' | 'create-timer' | null>(null);
   const [selectedMonsterId, setSelectedMonsterId] = useState<string | null>(null);
-  const [selectedSource, setSelectedSource] = useState<HomebrewItem | null>(null);
   const [sources, setSources] = useState<CombatMonsterSources | null>(null);
   const [compendiumMonsters, setCompendiumMonsters] = useState<HomebrewItem[] | null>(null);
+  const [pickerSource, setPickerSource] = useState<PickerSource | null>(null);
+  const [pickerKind, setPickerKind] = useState<PickerKind>('monsters');
+  const [selection, setSelection] = useState<Record<string, PickerSelection>>({});
   const [confirmingMonster, setConfirmingMonster] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const selectedMonster = monsters.find(monster => monster.id === selectedMonsterId) ?? null;
+  const pickerDrafts = expandPickerSelection(Object.values(selection));
 
   useEffect(() => {
     if (!openMonsterId) return;
-    setDialog('monsters');
+    setDialog(null);
     setSelectedMonsterId(openMonsterId);
     onMonsterOpened?.();
   }, [onMonsterOpened, openMonsterId]);
@@ -109,18 +127,32 @@ export function CombatTools({
     if (busy) return;
     setDialog(null);
     setSelectedMonsterId(null);
-    setSelectedSource(null);
+    setPickerSource(null);
+    setPickerKind('monsters');
+    setSelection({});
     setConfirmingMonster(false);
     setError('');
   };
 
-  const openSources = async (nextDialog: 'homebrew' | 'encounters') => {
-    if (busy || !homebrewUserId) return;
-    setBusy(true);
+  const openPickerSource = async (nextSource: PickerSource) => {
+    if (busy) return;
+    const loaded = nextSource === 'laboratory' ? Boolean(sources) : Boolean(compendiumMonsters);
+    if (nextSource === pickerSource && loaded) return;
+    setPickerSource(nextSource);
+    setPickerKind('monsters');
     setError('');
+    if (loaded) return;
+    if (nextSource === 'laboratory' && !homebrewUserId) {
+      setError('Catalogo del Laboratorio non disponibile');
+      return;
+    }
+    setBusy(true);
     try {
-      setSources(sources ?? await fetchCombatMonsterSources(homebrewUserId));
-      setDialog(nextDialog);
+      if (nextSource === 'laboratory') {
+        setSources(await fetchCombatMonsterSources(homebrewUserId));
+      } else {
+        setCompendiumMonsters(await fetchCompendiumMonsterSources());
+      }
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
@@ -128,22 +160,24 @@ export function CombatTools({
     }
   };
 
-  const openCompendium = async () => {
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    try {
-      setCompendiumMonsters(compendiumMonsters ?? await fetchCompendiumMonsterSources());
-      setDialog('compendium');
-    } catch (caught) {
-      setError(errorMessage(caught));
-    } finally {
-      setBusy(false);
-    }
+  const updatePickerQuantity = (origin: PickerSource, kind: PickerKind, source: HomebrewItem, quantity: number) => {
+    const key = pickerSelectionKey(origin, kind, source.id);
+    setSelection(current => {
+      const next = { ...current };
+      if (quantity <= 0) delete next[key];
+      else next[key] = { key, origin, kind, source, quantity: Math.min(quantity, 99) };
+      return next;
+    });
   };
 
   return <>
-    {isDm && <ToolButton label="Mostro" title="Gestisci mostri" onClick={() => setDialog('monsters')} icon={<PlusIcon />} />}
+    {isDm && <ToolButton label="Mostro" title="Gestisci mostri" onClick={() => {
+      setDialog('picker');
+      setPickerSource(null);
+      setPickerKind('monsters');
+      setSelection({});
+      setError('');
+    }} icon={<PlusIcon />} />}
     <ToolButton
       label="Timer"
       title="Nuovo timer"
@@ -152,128 +186,52 @@ export function CombatTools({
       icon={<ClockIcon />}
     />
 
-    {dialog === 'monsters' && !selectedMonster && <Modal title="Mostri" onClose={closeAll}>
-      <div className="monster-hb-list">
-        {monsters.map(monster => <button className="monster-hb-item" type="button" key={monster.id} onClick={() => setSelectedMonsterId(monster.id)}>
-          <span className="monster-hb-info">
-            <span className="monster-hb-name">{monster.nome}</span>
-            <span className="monster-hb-sub">PV {monster.pv_attuali ?? monster.punti_vita_max ?? 0}/{monster.punti_vita_max ?? 0} · CA {monster.classe_armatura ?? 10}</span>
-          </span>
-          <span className="monster-hb-arrow" aria-hidden="true">›</span>
-        </button>)}
-        {!monsters.length && <div className="content-placeholder"><p>Nessun mostro nel combattimento.</p></div>}
-      </div>
-      <div className="form-actions">
-        <button className="btn-secondary" type="button" onClick={closeAll}>Chiudi</button>
-        <button className="btn-primary" type="button" onClick={() => setDialog('add-monster')}>Aggiungi</button>
-      </div>
-      <InlineError>{error}</InlineError>
-    </Modal>}
-
-    {dialog === 'add-monster' && <Modal title="Aggiungi mostro" onClose={closeAll}>
-      <div className="monster-choice-grid">
-        <button className="monster-choice-card" type="button" onClick={() => setDialog('create-monster')}>
-          <span className="monster-choice-icon" aria-hidden="true">👤</span>
-          <span className="monster-choice-label">Placeholder</span>
-          <span className="monster-choice-desc">Solo nome, PV e CA</span>
-        </button>
-        <button className="monster-choice-card" type="button" disabled={busy} onClick={() => void openSources('homebrew')}>
-          <span className="monster-choice-icon" aria-hidden="true">📖</span>
-          <span className="monster-choice-label">Da Homebrew</span>
-          <span className="monster-choice-desc">Importa dal Laboratorio</span>
-        </button>
-        <button className="monster-choice-card" type="button" disabled={busy} onClick={() => void openCompendium()}>
-          <span className="monster-choice-icon" aria-hidden="true">📚</span>
-          <span className="monster-choice-label">Dal Compendio</span>
-          <span className="monster-choice-desc">Importa dal bestiario</span>
-        </button>
-        <button className="monster-choice-card" type="button" disabled={busy} onClick={() => void openSources('encounters')}>
-          <span className="monster-choice-icon" aria-hidden="true">⚔</span>
-          <span className="monster-choice-label">Da Combattimento</span>
-          <span className="monster-choice-desc">Importa un incontro pronto</span>
-        </button>
-        {onOpenLaboratory && <button className="monster-choice-card" type="button" onClick={() => {
-          closeAll();
-          onOpenLaboratory();
-        }}>
-          <span className="monster-choice-icon" aria-hidden="true">✏️</span>
-          <span className="monster-choice-label">Crea nuovo</span>
-          <span className="monster-choice-desc">Apri il Laboratorio</span>
-        </button>}
-      </div>
-      <InlineError>{error}</InlineError>
-      <div className="form-actions"><button className="btn-secondary" type="button" onClick={() => setDialog('monsters')}>Indietro</button></div>
-    </Modal>}
-
-    {dialog === 'homebrew' && !selectedSource && <SourceList
-      title="Nemici homebrew"
-      items={sources?.monsters ?? []}
-      empty="Nessun nemico homebrew trovato."
-      subtitle={monsterSourceSubtitle}
-      onBack={() => setDialog('add-monster')}
-      onSelect={setSelectedSource}
-      onClose={closeAll}
-    />}
-
-    {dialog === 'homebrew' && selectedSource && <HomebrewQuickAdd
-      source={selectedSource}
+    {dialog === 'picker' && <MonsterPicker
+      source={pickerSource}
+      kind={pickerKind}
+      sources={sources}
+      compendiumMonsters={compendiumMonsters}
+      selection={selection}
       busy={busy}
       error={error}
-      onCancel={() => setSelectedSource(null)}
-      onSubmit={initiative => void run(
-        () => createCombatMonsterFromSource({ campagnaId, sessioneId, source: selectedSource, initiative }),
-        `${selectedSource.nome} aggiunto al combattimento`,
-        closeAll,
-      )}
-    />}
-
-    {dialog === 'compendium' && !selectedSource && <SourceList
-      title="Mostri del compendio"
-      items={compendiumMonsters ?? []}
-      empty="Nessun mostro trovato."
-      subtitle={compendiumMonsterSubtitle}
-      searchText={compendiumMonsterSearchText}
-      onBack={() => setDialog('add-monster')}
-      onSelect={setSelectedSource}
-      onClose={closeAll}
-    />}
-
-    {dialog === 'compendium' && selectedSource && <HomebrewQuickAdd
-      source={selectedSource}
-      busy={busy}
-      error={error}
-      onCancel={() => setSelectedSource(null)}
-      onSubmit={initiative => void run(
-        () => createCombatMonsterFromSource({ campagnaId, sessioneId, source: selectedSource, initiative }),
-        `${selectedSource.nome} aggiunto al combattimento`,
-        closeAll,
-      )}
-    />}
-
-    {dialog === 'encounters' && <SourceList
-      title="Combattimenti homebrew"
-      items={sources?.encounters ?? []}
-      empty="Nessun combattimento homebrew trovato."
-      subtitle={encounterSourceSubtitle}
-      busy={busy}
-      error={error}
-      onBack={() => setDialog('add-monster')}
-      onSelect={source => void run(
-        () => importCombatEncounter({ campagnaId, sessioneId, source }),
-        `${encounterMonsterCount(source)} mostri aggiunti al combattimento`,
-        closeAll,
-      )}
+      onSource={source => void openPickerSource(source)}
+      onKind={setPickerKind}
+      onQuantity={updatePickerQuantity}
+      onPlaceholder={() => {
+        setDialog('create-monster');
+        setError('');
+      }}
+      onConfirm={() => setDialog('initiative')}
       onClose={closeAll}
     />}
 
     {dialog === 'create-monster' && <PlaceholderForm
       busy={busy}
       error={error}
-      onCancel={() => setDialog('monsters')}
+      onCancel={() => {
+        setDialog('picker');
+        setError('');
+      }}
       onSubmit={input => run(
         () => createPlaceholderMonster({ campagnaId, sessioneId, ...input }),
         'Mostro aggiunto',
-        () => setDialog('monsters'),
+        closeAll,
+      )}
+    />}
+
+    {dialog === 'initiative' && pickerDrafts.length > 0 && <InitiativeForm
+      drafts={pickerDrafts}
+      busy={busy}
+      error={error}
+      onBack={() => {
+        setDialog('picker');
+        setError('');
+      }}
+      onClose={closeAll}
+      onSubmit={drafts => void run(
+        () => createCombatMonsters({ campagnaId, sessioneId, drafts }),
+        `${drafts.length} ${drafts.length === 1 ? 'mostro aggiunto' : 'mostri aggiunti'} al combattimento`,
+        closeAll,
       )}
     />}
 
@@ -406,88 +364,205 @@ export function CombatTimersPanel({
   </div>;
 }
 
-function SourceList({
-  title,
-  items,
-  empty,
-  subtitle,
-  searchText,
-  busy = false,
-  error = '',
-  onBack,
-  onSelect,
+function MonsterPicker({
+  source,
+  kind,
+  sources,
+  compendiumMonsters,
+  selection,
+  busy,
+  error,
+  onSource,
+  onKind,
+  onQuantity,
+  onPlaceholder,
+  onConfirm,
   onClose,
 }: {
-  title: string;
-  items: HomebrewItem[];
-  empty: string;
-  subtitle: (item: HomebrewItem) => string;
-  searchText?: (item: HomebrewItem) => string;
-  busy?: boolean;
-  error?: string;
-  onBack: () => void;
-  onSelect: (item: HomebrewItem) => void;
+  source: PickerSource | null;
+  kind: PickerKind;
+  sources: CombatMonsterSources | null;
+  compendiumMonsters: HomebrewItem[] | null;
+  selection: Record<string, PickerSelection>;
+  busy: boolean;
+  error: string;
+  onSource: (source: PickerSource) => void;
+  onKind: (kind: PickerKind) => void;
+  onQuantity: (origin: PickerSource, kind: PickerKind, source: HomebrewItem, quantity: number) => void;
+  onPlaceholder: () => void;
+  onConfirm: () => void;
   onClose: () => void;
 }) {
   const [search, setSearch] = useState('');
+  useEffect(() => setSearch(''), [kind, source]);
+
+  const items = source === 'laboratory'
+    ? (kind === 'monsters' ? sources?.monsters : sources?.encounters)
+    : source === 'compendium' && kind === 'monsters'
+      ? compendiumMonsters
+      : [];
   const query = normalizeSourceSearch(search);
-  const visibleItems = query && searchText
-    ? items.filter(item => normalizeSourceSearch(searchText(item)).includes(query))
-    : items;
-  return <Modal title={title} onClose={onClose}>
-    {searchText && <input
-      className="filter-search combat-monster-search"
-      type="search"
-      value={search}
-      onChange={event => setSearch(event.target.value)}
-      placeholder="Cerca mostro..."
-      aria-label="Cerca mostro nel compendio"
-      autoFocus
-    />}
-    <div className="monster-hb-list">
-      {visibleItems.map(item => <button className="monster-hb-item" data-source-id={item.id} type="button" disabled={busy} key={item.id} onClick={() => onSelect(item)}>
-        <span className="monster-hb-info">
-          <span className="monster-hb-name">{item.nome}</span>
-          <span className="monster-hb-sub">{subtitle(item)}</span>
-        </span>
-        <span className="monster-hb-arrow" aria-hidden="true">›</span>
-      </button>)}
-      {!visibleItems.length && <div className="content-placeholder"><p>{empty}</p></div>}
+  const visibleItems = (items ?? []).filter(item => !query || normalizeSourceSearch(pickerSearchText(item, kind)).includes(query));
+  const selectedCount = expandPickerSelection(Object.values(selection)).length;
+  const loaded = source === 'laboratory' ? Boolean(sources) : source === 'compendium' ? Boolean(compendiumMonsters) : true;
+
+  return <Modal
+    title="Aggiungi mostri"
+    className={source ? 'modal-content-lg combat-picker-modal' : 'placeholder-modal-content combat-picker-source-modal'}
+    onClose={onClose}
+  >
+    <div className="combat-picker-body">
+      <div className="lab-subtabs combat-picker-source-tabs" role="tablist" aria-label="Origine mostri">
+        <button className={`lab-subtab combat-picker-source-tab ${source === 'laboratory' ? 'active' : ''}`} type="button" role="tab" aria-selected={source === 'laboratory'} disabled={busy} onClick={() => onSource('laboratory')}>
+          <img className="lab-subtab-icon-img" src={`${ASSET_BASE}images/Toolbar/Laboratorio.svg`} alt="" />
+          <span>Laboratorio</span>
+        </button>
+        <button className={`lab-subtab combat-picker-source-tab ${source === 'compendium' ? 'active' : ''}`} type="button" role="tab" aria-selected={source === 'compendium'} disabled={busy} onClick={() => onSource('compendium')}>
+          <img className="lab-subtab-icon-img" src={`${ASSET_BASE}images/Toolbar/Compendio-toolbar-20260521.svg`} alt="" />
+          <span>Compendio</span>
+        </button>
+        <button className="lab-subtab combat-picker-placeholder-tab" type="button" aria-label="Placeholder" title="Crea placeholder" disabled={busy} onClick={onPlaceholder}>
+          <PlaceholderIcon />
+        </button>
+      </div>
+
+      {!source && <p className="monster-quickadd-sub combat-picker-hint">Scegli da dove aggiungere i mostri.</p>}
+      {source && <>
+        <div className="lab-subtabs comp-inner-tabs" role="tablist" aria-label="Tipo contenuto">
+          <button className={`lab-subtab ${kind === 'monsters' ? 'active' : ''}`} type="button" role="tab" aria-selected={kind === 'monsters'} onClick={() => onKind('monsters')}>Mostri</button>
+          <button className={`lab-subtab ${kind === 'encounters' ? 'active' : ''}`} type="button" role="tab" aria-selected={kind === 'encounters'} onClick={() => onKind('encounters')}>Combattimenti</button>
+        </div>
+        {kind === 'encounters' && source === 'compendium'
+          ? <div className="content-placeholder"><p>I combattimenti del Compendio saranno disponibili in un prossimo aggiornamento.</p></div>
+          : <>
+            <SearchToolbar value={search} onChange={setSearch} placeholder={kind === 'monsters' ? 'Cerca mostro...' : 'Cerca combattimento...'} ariaLabel={kind === 'monsters' ? 'Cerca mostro' : 'Cerca combattimento'} />
+            <div className="wizard-page-scroll combat-picker-scroll">
+              {!loaded && busy ? <div className="content-placeholder"><p>Caricamento...</p></div> : <div className={source === 'laboratory' ? 'lab-list combat-picker-list' : 'comp-list combat-picker-list'}>
+                {visibleItems.map(item => {
+                  const key = pickerSelectionKey(source, kind, item.id);
+                  return <PickerCard
+                    origin={source}
+                    kind={kind}
+                    source={item}
+                    quantity={selection[key]?.quantity ?? 0}
+                    busy={busy}
+                    onQuantity={quantity => onQuantity(source, kind, item, quantity)}
+                    key={key}
+                  />;
+                })}
+                {loaded && !visibleItems.length && <div className="content-placeholder"><p>Nessun elemento trovato.</p></div>}
+              </div>}
+            </div>
+          </>}
+      </>}
+      <InlineError>{error}</InlineError>
+      {selectedCount > 0 && <button className="btn-fab combat-picker-confirm" type="button" disabled={busy} onClick={onConfirm} aria-label="Conferma selezione" title={`Conferma ${selectedCount} mostri`}>
+        <CheckIcon />
+      </button>}
     </div>
-    <InlineError>{error}</InlineError>
-    <div className="form-actions"><button className="btn-secondary" type="button" disabled={busy} onClick={onBack}>Indietro</button></div>
   </Modal>;
 }
 
-function HomebrewQuickAdd({
+function PickerCard({
+  origin,
+  kind,
   source,
+  quantity,
+  busy,
+  onQuantity,
+}: {
+  origin: PickerSource;
+  kind: PickerKind;
+  source: HomebrewItem;
+  quantity: number;
+  busy: boolean;
+  onQuantity: (quantity: number) => void;
+}) {
+  const encounterCount = kind === 'encounters' ? encounterMonsterCount(source) : 1;
+  const selectable = encounterCount > 0;
+  const className = origin === 'laboratory'
+    ? `lab-card combat-picker-card ${quantity ? 'is-selected' : ''}`
+    : `comp-card comp-monster-card combat-picker-card ${quantity ? 'is-selected' : ''}`;
+
+  return <article className={className} data-source-id={source.id}>
+    <input
+      className="combat-picker-checkbox"
+      type="checkbox"
+      checked={quantity > 0}
+      disabled={busy || !selectable}
+      onChange={() => onQuantity(quantity > 0 ? 0 : 1)}
+      aria-label={`Seleziona ${source.nome}`}
+    />
+    {origin === 'laboratory' && <div className="lab-card-icon"><img className="lab-card-icon-img" src={`${ASSET_BASE}images/Tabs/Mostri%20e%20Combattimenti.svg`} alt="" /></div>}
+    {origin === 'laboratory'
+      ? <div className="lab-card-info combat-picker-card-content">
+        <p className="lab-card-name">{source.nome}</p>
+        <p className="lab-card-detail">{kind === 'monsters' ? monsterSourceSubtitle(source) : encounterSourceSubtitle(source)}</p>
+      </div>
+      : <div className="combat-picker-card-content">
+        <div className="comp-card-main"><h2 className="comp-card-title">{source.nome}</h2><span className="comp-monster-gs">GS {sourceText(source, 'grado_sfida', '-')}</span></div>
+        <div className="comp-monster-card-meta"><span>{sourceText(source, 'tipo', 'Mostro')}</span><span>{sourceText(source, 'allineamento_breve', sourceText(source, 'fonte_breve', 'Compendio'))}</span></div>
+      </div>}
+    <QuantityStepper name={source.nome} value={quantity} disabled={busy || !selectable} onChange={onQuantity} />
+  </article>;
+}
+
+function QuantityStepper({ name, value, disabled, onChange }: { name: string; value: number; disabled: boolean; onChange: (value: number) => void }) {
+  return <div className="lab-sub-count-stepper combat-picker-stepper">
+    <button className="lab-sub-count-btn" type="button" disabled={disabled || value === 0} onClick={() => onChange(value - 1)} aria-label={`Riduci quantità ${name}`}>−</button>
+    <output className="lab-sub-count-val" aria-label={`Quantità ${name}`}>{value}</output>
+    <button className="lab-sub-count-btn" type="button" disabled={disabled || value >= 99} onClick={() => onChange(value + 1)} aria-label={`Aumenta quantità ${name}`}>+</button>
+  </div>;
+}
+
+function InitiativeForm({
+  drafts,
   busy,
   error,
-  onCancel,
+  onBack,
+  onClose,
   onSubmit,
 }: {
-  source: HomebrewItem;
+  drafts: PickerMonsterDraft[];
   busy: boolean;
   error: string;
-  onCancel: () => void;
-  onSubmit: (initiative?: number) => void;
+  onBack: () => void;
+  onClose: () => void;
+  onSubmit: (drafts: CombatMonsterDraft[]) => void;
 }) {
+  const [mode, setMode] = useState<'individual' | 'group'>('individual');
+  const rows = initiativeRows(drafts, mode);
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const raw = String(new FormData(event.currentTarget).get('initiative') ?? '').trim();
-    onSubmit(raw ? Number(raw) : undefined);
+    const data = new FormData(event.currentTarget);
+    onSubmit(drafts.map(draft => {
+      const field = mode === 'group' ? draft.groupKey : draft.key;
+      const raw = String(data.get(field) ?? '').trim();
+      return {
+        source: draft.source,
+        initiative: raw ? Number(raw) : undefined,
+        initiativeGroup: mode === 'group' ? draft.groupKey : undefined,
+      };
+    }));
   };
-  return <Modal title={source.nome} onClose={onCancel}>
+
+  return <Modal title="Iniziativa mostri" className="modal-content-lg combat-initiative-modal" onClose={onClose}>
     <form onSubmit={submit}>
-      <p className="monster-quickadd-sub">{monsterSourceSubtitle(source)}</p>
-      <div className="form-group">
-        <label htmlFor="combat-homebrew-initiative">Iniziativa (vuota = tiro automatico)</label>
-        <input id="combat-homebrew-initiative" name="initiative" type="number" min="-100" max="100" autoFocus />
+      <div className="lab-subtabs comp-inner-tabs" role="tablist" aria-label="Modalità iniziativa">
+        <button className={`lab-subtab ${mode === 'individual' ? 'active' : ''}`} type="button" role="tab" aria-selected={mode === 'individual'} onClick={() => setMode('individual')}>Tiri singoli</button>
+        <button className={`lab-subtab ${mode === 'group' ? 'active' : ''}`} type="button" role="tab" aria-selected={mode === 'group'} onClick={() => setMode('group')}>Tiro di gruppo</button>
+      </div>
+      <p className="monster-quickadd-sub">Inserisci i risultati totali. I campi vuoti saranno tirati automaticamente.</p>
+      <div className="wizard-page-scroll combat-initiative-list">
+        {rows.map((row, index) => <label className="combat-initiative-row" key={row.key}>
+          <span>{row.label}{row.count > 1 ? ` × ${row.count}` : ''}</span>
+          <input name={row.key} type="number" min="-100" max="100" placeholder="Auto" aria-label={`Iniziativa ${row.label}`} autoFocus={index === 0} />
+        </label>)}
       </div>
       <InlineError>{error}</InlineError>
       <div className="form-actions">
-        <button className="btn-secondary" type="button" disabled={busy} onClick={onCancel}>Indietro</button>
-        <button className="btn-primary" type="submit" disabled={busy}>Aggiungi</button>
+        <button className="btn-secondary" type="button" disabled={busy} onClick={onBack}>Indietro</button>
+        <button className="btn-primary" type="submit" disabled={busy}>Aggiungi {drafts.length}</button>
       </div>
     </form>
   </Modal>;
@@ -906,10 +981,6 @@ function monsterSourceSubtitle(source: HomebrewItem) {
   return `${sourceText(source, 'tipo', 'Mostro')} · GS ${sourceText(source, 'grado_sfida', '0')} · PV ${sourceText(source, 'punti_vita_max', sourceText(source, 'punti_ferita', '?'))}`;
 }
 
-function compendiumMonsterSubtitle(source: HomebrewItem) {
-  return `${sourceText(source, 'tipo', 'Mostro')} · GS ${sourceText(source, 'grado_sfida', '0')} · ${sourceText(source, 'fonte_breve', sourceText(source, 'fonte', 'Compendio'))}`;
-}
-
 function compendiumMonsterSearchText(source: HomebrewItem) {
   return ['nome', 'nome_en', 'tipo', 'grado_sfida', 'fonte', 'fonte_breve'].map(key => sourceText(source, key, '')).join(' ');
 }
@@ -918,13 +989,68 @@ function normalizeSourceSearch(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('it').trim();
 }
 
+function pickerSelectionKey(origin: PickerSource, kind: PickerKind, id: string) {
+  return `${origin}:${kind}:${id}`;
+}
+
+function pickerSearchText(source: HomebrewItem, kind: PickerKind) {
+  if (kind === 'monsters') return compendiumMonsterSearchText(source);
+  return `${source.nome} ${encounterMonsterEntries(source).map(entry => sourceText(entry.source, 'nome', '')).join(' ')}`;
+}
+
+function expandPickerSelection(selections: PickerSelection[]): PickerMonsterDraft[] {
+  return selections.flatMap(selection => {
+    if (selection.kind === 'monsters') {
+      return Array.from({ length: selection.quantity }, (_, index) => ({
+        key: `${selection.key}:${index}`,
+        groupKey: `${selection.origin}:${selection.source.id}`,
+        label: selection.source.nome,
+        source: selection.source,
+      }));
+    }
+    const entries = encounterMonsterEntries(selection.source);
+    return Array.from({ length: selection.quantity }, (_, repetition) => entries.map((entry, index) => ({
+      key: `${selection.key}:${repetition}:${index}`,
+      groupKey: `${selection.origin}:${entry.sourceId}`,
+      label: sourceText(entry.source, 'nome', 'Mostro'),
+      source: entry.source,
+    }))).flat();
+  });
+}
+
+function initiativeRows(drafts: PickerMonsterDraft[], mode: 'individual' | 'group') {
+  if (mode === 'individual') {
+    return drafts.map((draft, index) => ({ key: draft.key, label: `${index + 1}. ${draft.label}`, count: 1 }));
+  }
+  const groups = new Map<string, { key: string; label: string; count: number }>();
+  for (const draft of drafts) {
+    const row = groups.get(draft.groupKey);
+    if (row) row.count += 1;
+    else groups.set(draft.groupKey, { key: draft.groupKey, label: draft.label, count: 1 });
+  }
+  return [...groups.values()];
+}
+
+function encounterMonsterEntries(source: HomebrewItem) {
+  const values = Array.isArray(source.mostri) ? source.mostri : [];
+  return values.flatMap((value, index) => {
+    const record = objectValue(value);
+    const snapshot = objectValue(record?.snapshot) ?? record;
+    if (!snapshot || !sourceText(snapshot, 'nome', '').trim()) return [];
+    const fallback = sourceText(snapshot, 'id', `${source.id}:${index}`);
+    return [{ source: snapshot, sourceId: record ? sourceText(record, 'source_id', fallback) : fallback }];
+  });
+}
+
 function encounterMonsterCount(source: HomebrewItem) {
-  return Array.isArray(source.mostri) ? source.mostri.length : 0;
+  return encounterMonsterEntries(source).length;
 }
 
 function encounterSourceSubtitle(source: HomebrewItem) {
-  const count = encounterMonsterCount(source);
-  return `${count} ${count === 1 ? 'mostro' : 'mostri'}`;
+  const entries = encounterMonsterEntries(source);
+  if (!entries.length) return 'Nessun mostro';
+  const names = entries.slice(0, 3).map(entry => sourceText(entry.source, 'nome', 'Mostro')).join(', ');
+  return `${entries.length} ${entries.length === 1 ? 'mostro' : 'mostri'} · ${names}${entries.length > 3 ? ` +${entries.length - 3}` : ''}`;
 }
 
 function PlusIcon() {
@@ -933,4 +1059,12 @@ function PlusIcon() {
 
 function ClockIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l3 2M9 2h6" /></svg>;
+}
+
+function CheckIcon() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>;
+}
+
+function PlaceholderIcon() {
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M5 21a7 7 0 0 1 14 0M19 5v6M16 8h6" /></svg>;
 }
