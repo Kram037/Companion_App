@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { legacyNavigationFromPath, pathFromLegacyNavigation, type LegacyNavigationSnapshot } from '../router';
+import { legacyNavigationFromLocation, pathFromLegacyNavigation, type LegacyNavigationSnapshot } from '../router';
 
 declare global {
   interface Window {
@@ -62,8 +62,7 @@ function installNavigateToPageBridge() {
 }
 
 function syncLegacyDomToPath(pathname: string) {
-  if (window.location.pathname !== pathname) return;
-  const navigation = legacyNavigationFromPath(pathname);
+  const navigation = legacyNavigationFromLocation(pathname);
   if (!navigation) return;
   const page = navigation.page ?? 'campagne';
   const current = window.AppState;

@@ -81,6 +81,14 @@ test('URL drives deep links, refresh and browser history', async ({ page }) => {
   await expect(page.locator('#personaggiPage')).toHaveClass(/active/);
 });
 
+test('deployed basename keeps legacy campaign state synchronized', async ({ page }) => {
+  await page.goto('/Companion_App/campagne/campaign-test');
+  await waitForStartup(page);
+
+  await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');
+  await expect.poll(() => page.evaluate(() => window.AppState?.currentCampagnaId)).toBe('campaign-test');
+});
+
 test('legacy changes notify the React query bridge', async ({ page }) => {
   await page.goto('/campagne');
   await waitForStartup(page);
