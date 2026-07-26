@@ -12,6 +12,64 @@ function publishAppDataChange(change) {
     window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
 }
 
+async function handleSessionStarted(campagnaId, sessioneId) {
+    if (!campagnaId || !sessioneId || notifiedSessionStarts.has(sessioneId)) return;
+
+    const supabase = getSupabaseClient();
+    if (!supabase || !AppState.isLoggedIn) return;
+    notifiedSessionStarts.add(sessioneId);
+
+    try {
+        const { data: sessione, error: sessionError } = await supabase
+            .from('sessioni')
+            .select('id, created_at')
+            .eq('id', sessioneId)
+            .eq('campagna_id', campagnaId)
+            .is('data_fine', null)
+            .maybeSingle();
+        const startedAt = Date.parse(sessione?.created_at || '');
+        if (sessionError || !sessione || !Number.isFinite(startedAt) || Math.abs(Date.now() - startedAt) > 60_000) {
+            notifiedSessionStarts.delete(sessioneId);
+            return;
+        }
+
+        const userData = await findUserByUid(AppState.currentUser?.uid);
+        if (!userData) {
+            notifiedSessionStarts.delete(sessioneId);
+            return;
+        }
+
+        const { data: campagna } = await supabase
+            .from('campagne')
+            .select('nome_campagna, id_dm, giocatori')
+            .eq('id', campagnaId)
+            .single();
+        if (!campagna) {
+            notifiedSessionStarts.delete(sessioneId);
+            return;
+        }
+        if (campagna.id_dm === userData.id) return;
+        if (!Array.isArray(campagna.giocatori) || !campagna.giocatori.includes(userData.id)) {
+            notifiedSessionStarts.delete(sessioneId);
+            return;
+        }
+
+        showInAppNotification({
+            title: 'Sessione Avviata!',
+            message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
+            campagnaId,
+            sessioneId
+        });
+        sendBrowserNotification(
+            'Sessione Avviata',
+            `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`
+        );
+    } catch (error) {
+        notifiedSessionStarts.delete(sessioneId);
+        console.warn('Errore notifica sessione:', error);
+    }
+}
+
 /**
  * Avvia Realtime subscription globale per eventi app
  */
@@ -131,47 +189,8 @@ function startAppEventsRealtime() {
                     && data.action === 'insert'
                     && data.campagnaId
                     && data.sessioneId
-                    && !notifiedSessionStarts.has(data.sessioneId)
                 ) {
-                    try {
-                        const { data: sessione, error: sessionError } = await supabase
-                            .from('sessioni')
-                            .select('id, created_at')
-                            .eq('id', data.sessioneId)
-                            .eq('campagna_id', data.campagnaId)
-                            .is('data_fine', null)
-                            .maybeSingle();
-                        const startedAt = Date.parse(sessione?.created_at || '');
-                        if (sessionError || !sessione || !Number.isFinite(startedAt) || Math.abs(Date.now() - startedAt) > 60_000) return;
-
-                        const userData = await findUserByUid(AppState.currentUser?.uid);
-                        if (userData) {
-                            const { data: campagna } = await supabase
-                                .from('campagne')
-                                .select('nome_campagna, id_dm, giocatori')
-                                .eq('id', data.campagnaId)
-                                .single();
-
-                            if (campagna && campagna.id_dm !== userData.id) {
-                                const isPlayer = Array.isArray(campagna.giocatori) && campagna.giocatori.includes(userData.id);
-                                if (isPlayer) {
-                                    notifiedSessionStarts.add(data.sessioneId);
-                                    showInAppNotification({
-                                        title: 'Sessione Avviata!',
-                                        message: `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`,
-                                        campagnaId: data.campagnaId,
-                                        sessioneId: data.sessioneId
-                                    });
-                                    sendBrowserNotification(
-                                        'Sessione Avviata',
-                                        `La campagna "${campagna.nome_campagna}" ha iniziato una nuova sessione`
-                                    );
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('Errore notifica sessione:', e);
-                    }
+                    await handleSessionStarted(data.campagnaId, data.sessioneId);
                 }
 
                 if (
@@ -221,6 +240,21 @@ function startAppEventsRealtime() {
                 if (needsRefresh) {
                     window.requestLegacyRealtimeRefresh?.(data);
                 }
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'sessioni' },
+            (payload) => {
+                const row = payload?.new;
+                if (!row?.id || !row?.campagna_id) return;
+                publishAppDataChange({
+                    table: 'sessioni',
+                    action: 'insert',
+                    campagnaId: row.campagna_id,
+                    sessioneId: row.id
+                });
+                handleSessionStarted(row.campagna_id, row.id);
             }
         )
         .on(

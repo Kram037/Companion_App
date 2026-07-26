@@ -55,3 +55,38 @@ test('a newer roll request replaces only a stale request of the same kind', asyn
 
   expect(result).toEqual([true, false, false]);
 });
+
+test('a session insert is verified once before notifying the player', async ({ page }) => {
+  await page.goto('/campagne');
+  await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
+
+  const result = await page.evaluate(async () => {
+    const app = window as typeof window & Record<string, any>;
+    let table = '';
+    const rows = {
+      sessioni: { id: 's1', created_at: new Date().toISOString() },
+      campagne: { nome_campagna: 'Test', id_dm: 'dm1', giocatori: ['p1'] },
+    };
+    const query = {
+      select() { return this; },
+      eq() { return this; },
+      is() { return this; },
+      async maybeSingle() { return { data: rows.sessioni, error: null }; },
+      async single() { return { data: rows.campagne, error: null }; },
+    };
+    const shown: string[] = [];
+
+    app.AppState.isLoggedIn = true;
+    app.AppState.currentUser = { uid: 'player-uid' };
+    app.getSupabaseClient = () => ({ from(name: string) { table = name; return query; } });
+    app.findUserByUid = async () => ({ id: 'p1' });
+    app.showInAppNotification = ({ sessioneId }: { sessioneId: string }) => shown.push(sessioneId);
+    app.sendBrowserNotification = () => {};
+
+    await app.handleSessionStarted('c1', 's1');
+    await app.handleSessionStarted('c1', 's1');
+    return { shown, table };
+  });
+
+  expect(result).toEqual({ shown: ['s1'], table: 'campagne' });
+});

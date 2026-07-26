@@ -32,6 +32,7 @@ Tutte le funzioni hanno `SET search_path = public`, revocano `EXECUTE` a
 
 - [ ] `backend/supabase/sql/add-tiro-naturale.sql`
 - [ ] `backend/supabase/sql/deploy-all-functions.sql`
+- [ ] `backend/supabase/sql/repair-campaign-membership.sql`
 - [ ] `backend/supabase/sql/update-dm-campagna.sql`
 - [ ] `backend/supabase/sql/add-get-amici-with-uid.sql`
 - [ ] `backend/supabase/sql/add-personaggi-esperienza.sql`

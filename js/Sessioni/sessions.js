@@ -48,24 +48,27 @@ async function checkStartupNotifications() {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         }
 
-        if (!AppState.activeSessionCampagnaId) {
-            const myCampagnaIds = [
-                ...(dmCampagneResult.data || []).map(c => c.id),
-                ...(playerCampagneResult.data || []).map(c => c.campagna_id)
-            ];
-            if (myCampagnaIds.length > 0) {
-                const { data: activeSessions } = await supabase
-                    .from('sessioni')
-                    .select('id, campagna_id')
-                    .in('campagna_id', myCampagnaIds)
-                    .is('data_fine', null)
-                    .limit(1);
+        const myCampagnaIds = [
+            ...(dmCampagneResult.data || []).map(c => c.id),
+            ...(playerCampagneResult.data || []).map(c => c.campagna_id)
+        ];
+        if (myCampagnaIds.length > 0) {
+            const { data: activeSessions } = await supabase
+                .from('sessioni')
+                .select('id, campagna_id')
+                .in('campagna_id', myCampagnaIds)
+                .is('data_fine', null)
+                .limit(1);
 
-                if (activeSessions && activeSessions.length > 0) {
-                    const sess = activeSessions[0];
+            if (activeSessions && activeSessions.length > 0) {
+                const sess = activeSessions[0];
+                if (!AppState.activeSessionCampagnaId) {
                     AppState.activeSessionCampagnaId = sess.campagna_id;
                     sessionStorage.setItem('activeSessionCampagnaId', sess.campagna_id);
                     updateReturnToSessionBtn();
+                }
+                if (typeof handleSessionStarted === 'function') {
+                    await handleSessionStarted(sess.campagna_id, sess.id);
                 }
             }
         }
