@@ -1,0 +1,68 @@
+name: Publish react_migration static build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-react-migration-static.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-react-migration-static
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout react_migration
+        uses: actions/checkout@v4
+        with:
+          ref: react_migration
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_BASE: /Companion_App/
+
+      - name: Verify compiled output
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/apps/companion-app/index.html
+          if grep -q '/src/main.ts' dist/apps/companion-app/index.html; then
+            echo 'Build non compilata: index.html contiene ancora /src/main.ts' >&2
+            exit 1
+          fi
+
+      - name: Publish to pages-react-migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          publish_dir="$RUNNER_TEMP/companion-pages"
+          rm -rf "$publish_dir"
+          mkdir -p "$publish_dir"
+          cp -a dist/apps/companion-app/. "$publish_dir/"
+          touch "$publish_dir/.nojekyll"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan pages-react-migration
+          git rm -rf .
+          cp -a "$publish_dir/." .
+          git add -A
+          git commit -m "Deploy compiled react_migration ${GITHUB_SHA}"
+          git push --force origin pages-react-migration
