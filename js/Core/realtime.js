@@ -12,6 +12,18 @@ function publishAppDataChange(change) {
     window.dispatchEvent(new CustomEvent('companion:data-changed', { detail: change }));
 }
 
+function publishPostgresDataChange(table, action, row) {
+    if (!row?.id) return;
+    publishAppDataChange({
+        table,
+        action,
+        id: row.id,
+        requestId: row.richiesta_id || (table.startsWith('richieste_tiro_') ? row.id : null),
+        campagnaId: row.campagna_id || null,
+        sessioneId: row.sessione_id || (table === 'sessioni' ? row.id : null)
+    });
+}
+
 async function handleSessionStarted(campagnaId, sessioneId) {
     if (!campagnaId || !sessioneId || notifiedSessionStarts.has(sessioneId)) return;
 
@@ -75,9 +87,9 @@ async function handleSessionStarted(campagnaId, sessioneId) {
  */
 function startAppEventsRealtime() {
     const supabase = getSupabaseClient();
-    if (!supabase || !AppState.isLoggedIn) return;
+    if (!supabase || !AppState.isLoggedIn) return null;
 
-    if (appEventsChannel) return;
+    if (appEventsChannel) return appEventsChannel;
 
     const channel = supabase
         .channel('app-events')
@@ -248,33 +260,30 @@ function startAppEventsRealtime() {
             (payload) => {
                 const row = payload?.new;
                 if (!row?.id || !row?.campagna_id) return;
-                publishAppDataChange({
-                    table: 'sessioni',
-                    action: 'insert',
-                    campagnaId: row.campagna_id,
-                    sessioneId: row.id
-                });
+                publishPostgresDataChange('sessioni', 'insert', row);
                 handleSessionStarted(row.campagna_id, row.id);
             }
         )
         .on(
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'richieste_tiro_iniziativa' },
-            (payload) => {
-                const row = payload?.new;
-                if (!row?.id || !row?.sessione_id) return;
-                publishAppDataChange({
-                    table: 'richieste_tiro_iniziativa',
-                    action: 'update',
-                    id: row.id,
-                    requestId: row.id,
-                    sessioneId: row.sessione_id
-                });
-            }
+            (payload) => publishPostgresDataChange('richieste_tiro_iniziativa', 'update', payload?.new)
+        )
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'richieste_tiro_generico' },
+            (payload) => publishPostgresDataChange('richieste_tiro_generico', 'update', payload?.new)
         )
         .subscribe((status, error) => {
             if (status === 'SUBSCRIBED') {
                 appDebug('✅ Realtime subscription globale app attiva');
+                publishAppDataChange({
+                    table: 'sessioni',
+                    action: 'sync',
+                    eventId: window.crypto?.randomUUID?.() || `sync-${Date.now()}`,
+                    campagnaId: AppState.currentCampagnaId || null,
+                    sessioneId: AppState.currentSessioneId || null
+                });
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 console.error('❌ Realtime subscription globale app in errore', error);
             } else if (status === 'CLOSED' && appEventsChannel === channel) {
@@ -285,6 +294,7 @@ function startAppEventsRealtime() {
 
     appEventsChannel = channel;
     window.appEventsChannel = channel;
+    return channel;
 }
 
 async function combatRequestsAreGone(supabase, sessioneId) {
@@ -331,40 +341,14 @@ async function sendAppEventBroadcast(change) {
     };
     publishAppDataChange({ ...payload, sourceClientId: null });
 
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
+    const channel = appEventsChannel || startAppEventsRealtime();
+    if (!channel) return;
 
-    if (appEventsChannel) {
-        try {
-            await appEventsChannel.send({
-                type: 'broadcast',
-                event: 'app_change',
-                payload
-            });
-        } catch (error) {
-            console.warn('⚠️ Errore broadcast app (channel):', error);
-        }
-        return;
+    try {
+        await channel.httpSend('app_change', payload);
+    } catch (error) {
+        console.warn('⚠️ Errore broadcast app:', error);
     }
-
-    const tempChannel = supabase.channel('app-events');
-    tempChannel.subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-            tempChannel.send({
-                type: 'broadcast',
-                event: 'app_change',
-                payload
-            }).catch((error) => {
-                console.warn('⚠️ Errore broadcast app (temp):', error);
-            }).finally(() => {
-                setTimeout(() => {
-                    supabase.removeChannel(tempChannel);
-                }, 300);
-            });
-        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            supabase.removeChannel(tempChannel);
-        }
-    });
 }
 
 /**

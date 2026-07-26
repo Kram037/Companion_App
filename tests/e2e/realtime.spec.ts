@@ -94,7 +94,7 @@ test('a session insert is verified once before notifying the player', async ({ p
   expect(result).toEqual({ shown: ['s1', 's1'], table: 'campagne', beforeStop: 1 });
 });
 
-test('app realtime keeps transiently failed channels for the native reconnect', async ({ page }) => {
+test('the first broadcast configures the shared realtime channel before sending', async ({ page }) => {
   await page.goto('/campagne');
   await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
 
@@ -102,54 +102,98 @@ test('app realtime keeps transiently failed channels for the native reconnect', 
     const app = window as typeof window & Record<string, any>;
     let joins = 0;
     let removals = 0;
+    let channelLookups = 0;
+    let httpSends = 0;
+    let subscribed = false;
     let updateStatus: (status: string, error?: Error) => void;
-    let updateInitiative: ((payload: Record<string, any>) => void) | undefined;
-    let receivedChange: Record<string, any> | undefined;
+    let receiveBroadcast: ((payload: Record<string, any>) => void) | undefined;
+    const postgresCallbacks: Record<string, (payload: Record<string, any>) => void> = {};
+    const operations: string[] = [];
+    const receivedChanges: string[] = [];
     const channel = {
       on(type: string, filter: Record<string, string>, callback: (payload: Record<string, any>) => void) {
-        if (type === 'postgres_changes' && filter.table === 'richieste_tiro_iniziativa') {
-          updateInitiative = callback;
+        if (subscribed && type === 'postgres_changes') {
+          throw new Error('cannot add postgres_changes callbacks after subscribe()');
         }
+        operations.push(type === 'broadcast'
+          ? `on:broadcast:${filter.event}`
+          : `on:${type}:${filter.table}:${filter.event}`);
+        if (type === 'broadcast') receiveBroadcast = callback;
+        if (type === 'postgres_changes') postgresCallbacks[`${filter.table}:${filter.event}`] = callback;
         return this;
       },
       subscribe(callback: (status: string, error?: Error) => void) {
         joins += 1;
+        subscribed = true;
         updateStatus = callback;
+        operations.push('subscribe');
         return this;
+      },
+      async httpSend(event: string) {
+        httpSends += 1;
+        operations.push(`http:${event}`);
+        return { success: true };
       },
     };
 
     app.AppState.isLoggedIn = true;
+    app.AppState.currentCampagnaId = null;
+    app.AppState.currentSessioneId = null;
     app.getSupabaseClient = () => ({
-      channel: () => channel,
+      channel: () => {
+        channelLookups += 1;
+        return channel;
+      },
       async removeChannel() {
         removals += 1;
+        subscribed = false;
+        operations.push('remove');
         updateStatus('CLOSED');
       },
     });
     window.addEventListener('companion:data-changed', (event) => {
-      receivedChange = (event as CustomEvent).detail;
-    }, { once: true });
+      const change = (event as CustomEvent<Record<string, any>>).detail;
+      receivedChanges.push(`${change.table}:${change.action}:${change.sessioneId ?? ''}:${change.requestId ?? ''}`);
+    });
 
-    app.startAppEventsRealtime();
+    await app.sendAppEventBroadcast({ table: 'utenti', action: 'update', userId: 'u1' });
     app.startAppEventsRealtime();
     updateStatus!('CHANNEL_ERROR');
     app.startAppEventsRealtime();
     updateStatus!('SUBSCRIBED');
-    updateInitiative!({ new: { id: 'r1', sessione_id: 's1' } });
+    receiveBroadcast!({ payload: {
+      table: 'combattimento',
+      action: 'update',
+      eventId: 'remote-combat-1',
+      sourceClientId: 'other-client',
+      sessioneId: 's1',
+    } });
+    postgresCallbacks['richieste_tiro_iniziativa:UPDATE']({ new: { id: 'r1', sessione_id: 's1' } });
+    postgresCallbacks['richieste_tiro_generico:UPDATE']({ new: { id: 'r2', richiesta_id: 'g1', sessione_id: 's1' } });
     await app.stopAppEventsRealtime();
-    return { joins, removals, receivedChange };
+    return { joins, removals, channelLookups, httpSends, operations, receivedChanges };
   });
 
   expect(result).toEqual({
     joins: 1,
     removals: 1,
-    receivedChange: {
-      table: 'richieste_tiro_iniziativa',
-      action: 'update',
-      id: 'r1',
-      requestId: 'r1',
-      sessioneId: 's1',
-    },
+    channelLookups: 1,
+    httpSends: 1,
+    operations: [
+      'on:broadcast:app_change',
+      'on:postgres_changes:sessioni:INSERT',
+      'on:postgres_changes:richieste_tiro_iniziativa:UPDATE',
+      'on:postgres_changes:richieste_tiro_generico:UPDATE',
+      'subscribe',
+      'http:app_change',
+      'remove',
+    ],
+    receivedChanges: [
+      'utenti:update::',
+      'sessioni:sync::',
+      'combattimento:update:s1:',
+      'richieste_tiro_iniziativa:update:s1:r1',
+      'richieste_tiro_generico:update:s1:g1',
+    ],
   });
 });

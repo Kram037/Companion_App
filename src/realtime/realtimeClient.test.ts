@@ -62,6 +62,12 @@ describe('realtimeClient', () => {
     expect(realtimeQueryPrefixes({ table: 'mostri_combattimento', action: 'update', sessioneId: 's1' })).toEqual([
       ['combat', 's1'],
     ]);
+    expect(realtimeQueryPrefixes({ table: 'combat_timers', action: 'insert', sessioneId: 's1' })).toEqual([
+      ['combat', 's1'],
+    ]);
+    expect(realtimeQueryPrefixes({ table: 'combattimento', action: 'update', sessioneId: 's1' })).toEqual([
+      ['combat', 's1'],
+    ]);
     expect(realtimeQueryPrefixes({ table: 'homebrew_oggetti', action: 'insert' })).toEqual([['homebrew']]);
     expect(realtimeQueryPrefixes({ table: 'richieste_amicizia', action: 'update' })).toEqual([['friends']]);
     expect(realtimeQueryPrefixes({ table: 'unknown', action: 'update' })).toEqual([]);
