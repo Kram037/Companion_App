@@ -77,7 +77,7 @@ function startAppEventsRealtime() {
     const supabase = getSupabaseClient();
     if (!supabase || !AppState.isLoggedIn) return;
 
-    stopAppEventsRealtime();
+    if (appEventsChannel) return;
 
     const channel = supabase
         .channel('app-events')
@@ -296,7 +296,7 @@ async function combatRequestsAreGone(supabase, sessioneId) {
 /**
  * Ferma Realtime subscription globale per eventi app
  */
-function stopAppEventsRealtime() {
+async function stopAppEventsRealtime() {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
@@ -305,9 +305,10 @@ function stopAppEventsRealtime() {
     handledFinishedCombats.clear();
 
     if (appEventsChannel) {
-        supabase.removeChannel(appEventsChannel);
+        const channel = appEventsChannel;
         appEventsChannel = null;
         window.appEventsChannel = null;
+        await supabase.removeChannel(channel);
         appDebug('✅ Realtime subscription globale app fermata');
     }
 

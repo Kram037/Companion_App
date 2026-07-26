@@ -68,7 +68,7 @@ function setupSupabaseAuth() {
 
                 // Ferma Realtime subscriptions
                 stopRollRequestsRealtime();
-                stopAppEventsRealtime();
+                await stopAppEventsRealtime();
 
                 // Pulisci i dati quando l'utente esce
                 if (AppState.currentPage === 'amici') {
@@ -678,7 +678,7 @@ async function checkAuthState() {
             checkStartupNotifications();
         } else {
             updateUIForLoggedOut();
-            stopAppEventsRealtime();
+            await stopAppEventsRealtime();
 
             if (AppState.currentPage === 'amici') {
                 renderAmici([], [], []);

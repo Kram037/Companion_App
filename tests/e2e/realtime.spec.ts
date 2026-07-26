@@ -86,10 +86,38 @@ test('a session insert is verified once before notifying the player', async ({ p
     await app.handleSessionStarted('c1', 's1');
     await app.handleSessionStarted('c1', 's1');
     const beforeStop = shown.length;
-    app.stopAppEventsRealtime();
+    await app.stopAppEventsRealtime();
     await app.handleSessionStarted('c1', 's1');
     return { shown, table, beforeStop };
   });
 
   expect(result).toEqual({ shown: ['s1', 's1'], table: 'campagne', beforeStop: 1 });
+});
+
+test('starting app realtime twice reuses the active channel', async ({ page }) => {
+  await page.goto('/campagne');
+  await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
+
+  const result = await page.evaluate(async () => {
+    const app = window as typeof window & Record<string, any>;
+    let joins = 0;
+    let removals = 0;
+    const channel = {
+      on() { return this; },
+      subscribe() { joins += 1; return this; },
+    };
+
+    app.AppState.isLoggedIn = true;
+    app.getSupabaseClient = () => ({
+      channel: () => channel,
+      async removeChannel() { removals += 1; },
+    });
+
+    app.startAppEventsRealtime();
+    app.startAppEventsRealtime();
+    await app.stopAppEventsRealtime();
+    return { joins, removals };
+  });
+
+  expect(result).toEqual({ joins: 1, removals: 1 });
 });
