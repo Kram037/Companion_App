@@ -300,6 +300,10 @@ function stopAppEventsRealtime() {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
+    notifiedSessionStarts.clear();
+    handledFinishedSessions.clear();
+    handledFinishedCombats.clear();
+
     if (appEventsChannel) {
         supabase.removeChannel(appEventsChannel);
         appEventsChannel = null;

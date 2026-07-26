@@ -196,6 +196,7 @@ function startRollRequestsRealtime() {
                             return;
                         }
                         appDebug('✅ [REALTIME] Mostro modal per richiesta:', request);
+                        if (!shouldShowRollRequest(request)) return;
                         showRollRequestModal(request);
                         sendBrowserNotification('Tiro di Iniziativa', 'Il DM ti ha richiesto un tiro di iniziativa!');
                         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);

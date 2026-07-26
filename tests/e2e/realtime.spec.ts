@@ -85,8 +85,11 @@ test('a session insert is verified once before notifying the player', async ({ p
 
     await app.handleSessionStarted('c1', 's1');
     await app.handleSessionStarted('c1', 's1');
-    return { shown, table };
+    const beforeStop = shown.length;
+    app.stopAppEventsRealtime();
+    await app.handleSessionStarted('c1', 's1');
+    return { shown, table, beforeStop };
   });
 
-  expect(result).toEqual({ shown: ['s1'], table: 'campagne' });
+  expect(result).toEqual({ shown: ['s1', 's1'], table: 'campagne', beforeStop: 1 });
 });
