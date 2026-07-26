@@ -1,5 +1,6 @@
 # Companion App
 
+
 Companion App e una Progressive Web App per supportare campagne e sessioni di
 Dungeons & Dragons. Riunisce gestione della campagna, personaggi, sessioni,
 combattimenti, contenuti di riferimento e homebrew in un'unica interfaccia
