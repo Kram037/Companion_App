@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main, tech_migration, tech_migration_2, react_migration]
+    branches: [react_migration]
   workflow_dispatch:
 
 permissions:
@@ -46,9 +46,6 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/apps/companion-app
-      # The repository still has the legacy branch deployment enabled. Let it
-      # finish first so this Vite artifact remains the active Pages release.
-      - run: sleep 30
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
