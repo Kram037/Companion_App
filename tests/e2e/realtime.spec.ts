@@ -102,9 +102,14 @@ test('starting app realtime twice reuses the active channel', async ({ page }) =
     const app = window as typeof window & Record<string, any>;
     let joins = 0;
     let removals = 0;
+    let updateStatus: (status: string) => Promise<void>;
     const channel = {
       on() { return this; },
-      subscribe() { joins += 1; return this; },
+      subscribe(callback: (status: string) => Promise<void>) {
+        joins += 1;
+        updateStatus = callback;
+        return this;
+      },
     };
 
     app.AppState.isLoggedIn = true;
@@ -115,9 +120,11 @@ test('starting app realtime twice reuses the active channel', async ({ page }) =
 
     app.startAppEventsRealtime();
     app.startAppEventsRealtime();
+    await updateStatus!('CHANNEL_ERROR');
+    app.startAppEventsRealtime();
     await app.stopAppEventsRealtime();
     return { joins, removals };
   });
 
-  expect(result).toEqual({ joins: 1, removals: 1 });
+  expect(result).toEqual({ joins: 2, removals: 2 });
 });

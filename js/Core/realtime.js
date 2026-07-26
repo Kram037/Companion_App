@@ -272,11 +272,17 @@ function startAppEventsRealtime() {
                 });
             }
         )
-        .subscribe((status) => {
+        .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
                 appDebug('✅ Realtime subscription globale app attiva');
-            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            } else if (
+                appEventsChannel === channel
+                && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')
+            ) {
                 console.error('❌ Realtime subscription globale app in errore');
+                appEventsChannel = null;
+                window.appEventsChannel = null;
+                await supabase.removeChannel(channel);
             }
         });
 
