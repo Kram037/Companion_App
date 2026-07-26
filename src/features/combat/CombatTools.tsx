@@ -67,6 +67,7 @@ export type CombatToolsProps = {
   homebrewUserId: string;
   isDm: boolean;
   playerCharacterId: string | null;
+  playerCharacterName: string | null;
   monsters: CombatToolMonster[];
   openMonsterId?: string | null;
   onMonsterOpened?: () => void;
@@ -81,6 +82,7 @@ export function CombatTools({
   homebrewUserId,
   isDm,
   playerCharacterId,
+  playerCharacterName,
   monsters,
   openMonsterId,
   onMonsterOpened,
@@ -275,6 +277,7 @@ export function CombatTools({
       monsters={monsters}
       isDm={isDm}
       playerCharacterId={playerCharacterId}
+      playerCharacterName={playerCharacterName}
       busy={busy}
       error={error}
       onCancel={closeAll}
@@ -292,6 +295,7 @@ export type CombatTimersPanelProps = {
   currentUserId: string;
   isDm: boolean;
   playerCharacterId: string | null;
+  playerCharacterName: string | null;
   onChanged: ChangeCallback;
   onNotify?: NotifyCallback;
 };
@@ -301,16 +305,19 @@ export function CombatTimersPanel({
   currentUserId,
   isDm,
   playerCharacterId,
+  playerCharacterName,
   onChanged,
   onNotify,
 }: CombatTimersPanelProps) {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [openedId, setOpenedId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const visible = timers.filter(timer => isDm
     || timer.target_kind === 'global'
     || (timer.target_kind === 'player' && timer.target_id === playerCharacterId));
   const confirmingTimer = visible.find(timer => timer.id === confirmingId);
+  const openedTimer = visible.find(timer => timer.id === openedId);
 
   if (!visible.length) return null;
 
@@ -335,15 +342,18 @@ export function CombatTimersPanel({
       {visible.map(timer => {
         const canRemove = isDm
           || (timer.created_by === currentUserId && timer.target_kind === 'player' && timer.target_id === playerCharacterId);
+        const targetLabel = timerTargetLabel(timer, playerCharacterId, playerCharacterName);
         return <div className={`combat-timer-chip ${timer.remaining_rounds <= 1 ? 'is-low' : ''}`} key={timer.id}>
-          <span className="combat-timer-rounds">{timer.remaining_rounds}</span>
-          <span className="combat-timer-info">
-            <span className="combat-timer-name">{timer.nome}</span>
-            <span className="combat-timer-meta">
-              <span className="combat-timer-target">{timer.target_name || (timer.target_kind === 'global' ? 'Globale' : 'Target')}</span>
-              {timer.conditions.map(condition => <span className="combat-timer-cond" key={condition}>{CONDITION_LABELS[condition]}</span>)}
+          <button className="combat-timer-open" type="button" onClick={() => setOpenedId(timer.id)} aria-label={`Dettagli timer ${timer.nome}`}>
+            <span className="combat-timer-rounds">{timer.remaining_rounds}</span>
+            <span className="combat-timer-info">
+              <span className="combat-timer-name">{timer.nome}</span>
+              <span className="combat-timer-meta">
+                <span className="combat-timer-target">{targetLabel}</span>
+                {timer.conditions.map(condition => <span className="combat-timer-cond" key={condition}>{CONDITION_LABELS[condition]}</span>)}
+              </span>
             </span>
-          </span>
+          </button>
           {canRemove && <button
             className="combat-timer-remove"
             type="button"
@@ -355,6 +365,11 @@ export function CombatTimersPanel({
       })}
     </div>
     <InlineError>{error}</InlineError>
+    {openedTimer && <TimerDetails
+      timer={openedTimer}
+      targetLabel={timerTargetLabel(openedTimer, playerCharacterId, playerCharacterName)}
+      onClose={() => setOpenedId(null)}
+    />}
     {confirmingTimer && <ConfirmDelete
       message={`Rimuovere il timer "${confirmingTimer.nome}"?`}
       busy={Boolean(removingId)}
@@ -782,6 +797,7 @@ function TimerForm({
   monsters,
   isDm,
   playerCharacterId,
+  playerCharacterName,
   busy,
   error,
   onCancel,
@@ -790,6 +806,7 @@ function TimerForm({
   monsters: CombatToolMonster[];
   isDm: boolean;
   playerCharacterId: string | null;
+  playerCharacterName: string | null;
   busy: boolean;
   error: string;
   onCancel: () => void;
@@ -813,7 +830,7 @@ function TimerForm({
       nome: String(data.get('nome') ?? ''),
       targetKind,
       targetId: targetKind === 'global' ? null : monster?.id ?? playerCharacterId,
-      targetName: monster?.nome ?? null,
+      targetName: monster?.nome ?? (targetKind === 'player' ? playerCharacterName : null),
       conditions: targetKind === 'global' ? [] : readConditions(data),
       rounds: Number(data.get('rounds')),
     });
@@ -844,6 +861,22 @@ function TimerForm({
         <button className="btn-primary btn-small" type="submit" disabled={busy}>Avvia</button>
       </div>
     </form>
+  </Modal>;
+}
+
+function TimerDetails({ timer, targetLabel, onClose }: {
+  timer: CombatTimer;
+  targetLabel: string;
+  onClose: () => void;
+}) {
+  return <Modal title={timer.nome} className="combat-timer-modal" onClose={onClose}>
+    <dl className="combat-timer-details">
+      <div><dt>Target</dt><dd>{targetLabel}</dd></div>
+      <div><dt>Tipo</dt><dd>{timer.target_kind === 'global' ? 'Globale' : timer.target_kind === 'player' ? 'Personaggio' : 'Mostro'}</dd></div>
+      <div><dt>Durata</dt><dd>{timer.duration_rounds} round</dd></div>
+      <div><dt>Rimanenti</dt><dd>{timer.remaining_rounds} round</dd></div>
+      <div><dt>Condizioni</dt><dd>{timer.conditions.length ? timer.conditions.map(condition => CONDITION_LABELS[condition]).join(', ') : 'Nessuna'}</dd></div>
+    </dl>
   </Modal>;
 }
 
@@ -912,6 +945,13 @@ function ConfirmDelete({
 function readConditions(data: FormData): CombatCondition[] {
   const values = new Set(data.getAll('conditions').map(String));
   return COMBAT_CONDITIONS.filter(condition => values.has(condition));
+}
+
+export function timerTargetLabel(timer: CombatTimer, playerCharacterId: string | null, playerCharacterName: string | null) {
+  if (timer.target_name) return timer.target_name;
+  if (timer.target_kind === 'global') return 'Globale';
+  if (timer.target_kind === 'player' && timer.target_id === playerCharacterId && playerCharacterName) return playerCharacterName;
+  return 'Target sconosciuto';
 }
 
 function stringArray(value: unknown): string[] {

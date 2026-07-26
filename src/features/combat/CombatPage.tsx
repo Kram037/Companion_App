@@ -150,6 +150,7 @@ export function CombatPage() {
       currentUserId={user.data?.id ?? ''}
       isDm={isDm}
       playerCharacterId={currentCharacter?.id ?? null}
+      playerCharacterName={currentCharacter?.nome ?? null}
       onChanged={refreshCombat}
       onNotify={message => combatLegacyAdapter.notify(message)}
     />
@@ -176,6 +177,7 @@ export function CombatPage() {
         homebrewUserId={user.data?.uid ?? user.data?.id ?? ''}
         isDm={isDm}
         playerCharacterId={currentCharacter?.id ?? null}
+        playerCharacterName={currentCharacter?.nome ?? null}
         monsters={toolMonsters.data ?? []}
         openMonsterId={openMonsterId}
         onMonsterOpened={() => setOpenMonsterId(null)}
