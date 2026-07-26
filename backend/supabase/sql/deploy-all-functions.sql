@@ -202,7 +202,7 @@ BEGIN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    SELECT id INTO v_current_user_id FROM utenti WHERE uid = auth.uid()::text;
+    SELECT u.id INTO v_current_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
     IF v_current_user_id IS NULL THEN
         RAISE EXCEPTION 'Utente non trovato';
     END IF;
@@ -305,7 +305,7 @@ BEGIN
         RAISE EXCEPTION 'Non autorizzato';
     END IF;
 
-    SELECT id INTO v_current_user_id FROM utenti WHERE uid = auth.uid()::text;
+    SELECT u.id INTO v_current_user_id FROM utenti u WHERE u.uid = auth.uid()::text;
     IF v_current_user_id IS NULL THEN
         RAISE EXCEPTION 'Utente non trovato';
     END IF;

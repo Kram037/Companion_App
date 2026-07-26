@@ -80,6 +80,9 @@ if (!campaignFunctions.includes("v_return_type <> 'character varying'::REGTYPE")
 if (/DROP\s+FUNCTION\s+IF\s+EXISTS\s+get_current_user_id\(\)\s+CASCADE/i.test(campaignFunctions)) {
   errors.push('deploy-all-functions.sql: get_current_user_id non deve eliminare le RPC dipendenti');
 }
+if (campaignFunctions.includes('SELECT id INTO v_current_user_id FROM utenti')) {
+  errors.push('deploy-all-functions.sql: id utente ambiguo nelle RPC con output id');
+}
 const playerRemoval = campaignFunctions
   .split('CREATE OR REPLACE FUNCTION rimuovi_giocatore_campagna', 2)[1]
   ?.split('DROP POLICY IF EXISTS', 1)[0] ?? '';
