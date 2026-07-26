@@ -94,7 +94,7 @@ test('a session insert is verified once before notifying the player', async ({ p
   expect(result).toEqual({ shown: ['s1', 's1'], table: 'campagne', beforeStop: 1 });
 });
 
-test('starting app realtime twice reuses the active channel', async ({ page }) => {
+test('app realtime keeps transiently failed channels for the native reconnect', async ({ page }) => {
   await page.goto('/campagne');
   await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
 
@@ -102,10 +102,17 @@ test('starting app realtime twice reuses the active channel', async ({ page }) =
     const app = window as typeof window & Record<string, any>;
     let joins = 0;
     let removals = 0;
-    let updateStatus: (status: string) => Promise<void>;
+    let updateStatus: (status: string, error?: Error) => void;
+    let updateInitiative: ((payload: Record<string, any>) => void) | undefined;
+    let receivedChange: Record<string, any> | undefined;
     const channel = {
-      on() { return this; },
-      subscribe(callback: (status: string) => Promise<void>) {
+      on(type: string, filter: Record<string, string>, callback: (payload: Record<string, any>) => void) {
+        if (type === 'postgres_changes' && filter.table === 'richieste_tiro_iniziativa') {
+          updateInitiative = callback;
+        }
+        return this;
+      },
+      subscribe(callback: (status: string, error?: Error) => void) {
         joins += 1;
         updateStatus = callback;
         return this;
@@ -115,16 +122,34 @@ test('starting app realtime twice reuses the active channel', async ({ page }) =
     app.AppState.isLoggedIn = true;
     app.getSupabaseClient = () => ({
       channel: () => channel,
-      async removeChannel() { removals += 1; },
+      async removeChannel() {
+        removals += 1;
+        updateStatus('CLOSED');
+      },
     });
+    window.addEventListener('companion:data-changed', (event) => {
+      receivedChange = (event as CustomEvent).detail;
+    }, { once: true });
 
     app.startAppEventsRealtime();
     app.startAppEventsRealtime();
-    await updateStatus!('CHANNEL_ERROR');
+    updateStatus!('CHANNEL_ERROR');
     app.startAppEventsRealtime();
+    updateStatus!('SUBSCRIBED');
+    updateInitiative!({ new: { id: 'r1', sessione_id: 's1' } });
     await app.stopAppEventsRealtime();
-    return { joins, removals };
+    return { joins, removals, receivedChange };
   });
 
-  expect(result).toEqual({ joins: 2, removals: 2 });
+  expect(result).toEqual({
+    joins: 1,
+    removals: 1,
+    receivedChange: {
+      table: 'richieste_tiro_iniziativa',
+      action: 'update',
+      id: 'r1',
+      requestId: 'r1',
+      sessioneId: 's1',
+    },
+  });
 });

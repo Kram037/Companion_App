@@ -272,17 +272,14 @@ function startAppEventsRealtime() {
                 });
             }
         )
-        .subscribe(async (status) => {
+        .subscribe((status, error) => {
             if (status === 'SUBSCRIBED') {
                 appDebug('✅ Realtime subscription globale app attiva');
-            } else if (
-                appEventsChannel === channel
-                && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')
-            ) {
-                console.error('❌ Realtime subscription globale app in errore');
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.error('❌ Realtime subscription globale app in errore', error);
+            } else if (status === 'CLOSED' && appEventsChannel === channel) {
                 appEventsChannel = null;
                 window.appEventsChannel = null;
-                await supabase.removeChannel(channel);
             }
         });
 
