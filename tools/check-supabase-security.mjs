@@ -48,6 +48,7 @@ const requiredGuards = [
   ['atomic-campaign-runtime.sql', 'FOR UPDATE OF s, c'],
   ['atomic-campaign-runtime.sql', "Chiudi la richiesta tiro corrente prima di crearne un''altra"],
   ['atomic-campaign-runtime.sql', 'm.campagna_id = v_campagna_id'],
+  ['enable-realtime.sql', 'pg_publication_tables'],
   ['harden-personaggi-campagna.sql', 'CREATE OR REPLACE FUNCTION select_personaggio_campagna'],
   ['harden-personaggi-campagna.sql', 'CREATE OR REPLACE FUNCTION update_campaign_character_conditions'],
   ['harden-personaggi-campagna.sql', 'FOREIGN KEY (personaggio_id, user_id)'],
@@ -94,6 +95,12 @@ if ((timerPolicies.match(/s\.data_fine\s+IS\s+NULL/gi)?.length ?? 0) < 5) {
 const atomicRuntime = readFileSync(join(sqlDir, 'atomic-campaign-runtime.sql'), 'utf8');
 if ((atomicRuntime.match(/FOR\s+UPDATE\s+OF\s+s,\s*c/gi)?.length ?? 0) < 5) {
   errors.push('atomic-campaign-runtime.sql: le mutation devono serializzare sessione e campagna');
+}
+const initiativeRequest = atomicRuntime
+  .split('CREATE OR REPLACE FUNCTION request_initiative_rolls', 2)[1]
+  ?.split('CREATE OR REPLACE FUNCTION request_generic_rolls', 1)[0] ?? '';
+if (!initiativeRequest.includes('UNNEST(v_campaign_players)')) {
+  errors.push('atomic-campaign-runtime.sql: iniziativa non usa la membership letta dal database');
 }
 
 const hardenedCharacters = readFileSync(join(sqlDir, 'harden-personaggi-campagna.sql'), 'utf8');

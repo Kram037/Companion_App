@@ -40,6 +40,7 @@ Tutte le funzioni hanno `SET search_path = public`, revocano `EXECUTE` a
 - [ ] `backend/supabase/sql/add-combat-timers.sql`
 - [ ] `backend/supabase/sql/harden-homebrew-rls.sql`
 - [ ] `backend/supabase/sql/atomic-campaign-runtime.sql`
+- [ ] `backend/supabase/sql/enable-realtime.sql`
 
 Eseguire ogni file in una transazione e interrompere il deploy al primo errore.
 `relax-homebrew-rls.sql` e' solo un fallback owner-only e non sostituisce

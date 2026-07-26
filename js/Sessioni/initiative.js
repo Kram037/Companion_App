@@ -142,6 +142,16 @@ async function checkPendingRollRequests(userId) {
     }
 }
 
+function shouldShowRollRequest(request) {
+    const current = window.currentRollRequest;
+    return !current || (current.tipo === request.tipo && current.id !== request.id);
+}
+
+async function syncPendingRollRequest() {
+    const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
+    if (pending && shouldShowRollRequest(pending)) showRollRequestModal(pending);
+}
+
 /**
  * Avvia Realtime subscription per le richieste tiro
  */
@@ -174,12 +184,13 @@ function startRollRequestsRealtime() {
                 },
                 async (payload) => {
                     appDebug('🔔 [REALTIME] Nuova richiesta tiro iniziativa ricevuta:', payload.new);
-                    if (payload.new.stato === 'pending' && !window.currentRollRequest) {
+                    if (payload.new.stato === 'pending') {
                         const request = {
                             id: payload.new.id,
                             tipo: 'iniziativa',
                             sessione_id: payload.new.sessione_id
                         };
+                        if (!shouldShowRollRequest(request)) return;
                         if (!(await _isRollRequestStillValid(request))) {
                             appDebug('🧹 [REALTIME] Richiesta iniziativa orfana, ignoro:', request);
                             return;
@@ -193,6 +204,7 @@ function startRollRequestsRealtime() {
                 appDebug('📡 [REALTIME] Stato subscription iniziativa:', status);
                 if (status === 'SUBSCRIBED') {
                     appDebug('✅ [REALTIME] Subscription iniziativa attiva');
+                    syncPendingRollRequest();
                 } else if (status === 'CHANNEL_ERROR') {
                     console.error('❌ [REALTIME] Errore subscription iniziativa');
                 }
@@ -211,7 +223,7 @@ function startRollRequestsRealtime() {
                 },
                 async (payload) => {
                     appDebug('🔔 [REALTIME] Nuova richiesta tiro generico ricevuta:', payload.new);
-                    if (payload.new.stato === 'pending' && !window.currentRollRequest) {
+                    if (payload.new.stato === 'pending') {
                         const request = {
                             id: payload.new.id,
                             tipo: 'generico',
@@ -221,6 +233,7 @@ function startRollRequestsRealtime() {
                             tipoTiro: payload.new.tipo_tiro || null,
                             targetTiro: payload.new.target_tiro || null
                         };
+                        if (!shouldShowRollRequest(request)) return;
                         if (!(await _isRollRequestStillValid(request))) {
                             appDebug('🧹 [REALTIME] Richiesta generico orfana, ignoro:', request);
                             return;
@@ -234,6 +247,7 @@ function startRollRequestsRealtime() {
                 appDebug('📡 [REALTIME] Stato subscription generico:', status);
                 if (status === 'SUBSCRIBED') {
                     appDebug('✅ [REALTIME] Subscription generico attiva');
+                    syncPendingRollRequest();
                 } else if (status === 'CHANNEL_ERROR') {
                     console.error('❌ [REALTIME] Errore subscription generico');
                 }

@@ -159,7 +159,10 @@ test('initiative and combat updates stay synchronized without resetting a modal'
     await expect(playerPage.locator('#rollRequestModal')).toHaveClass(/active/, { timeout: 15_000 });
     await playerPage.locator('#autoRollBtn').click();
     await expect(playerPage.locator('#rollRequestInput')).not.toHaveValue('');
+    const submittedInitiative = await playerPage.locator('#rollRequestInput').inputValue();
     await playerPage.locator('#submitRollRequestBtn').click();
+    await expect(playerPage.locator('#rollRequestModal')).not.toHaveClass(/active/);
+    await expect.poll(() => dmPage.locator('.combat-card-init').allTextContents()).toContain(submittedInitiative);
 
     const combatPath = `/campagne/${campaignId}/sessione/${sessionId}/combattimento`;
     await Promise.all([dmPage.goto(combatPath), playerPage.goto(combatPath)]);

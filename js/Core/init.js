@@ -822,6 +822,7 @@ function setupEventListeners() {
             e.preventDefault();
             e.stopPropagation();
             if (window.currentRollRequest) {
+                if (elements.submitRollRequestBtn?.disabled) return;
                 const rawValue = elements.rollRequestInput.value.trim();
                 const valore = Number(rawValue);
                 if (!rawValue || !Number.isInteger(valore)) {
@@ -831,12 +832,14 @@ function setupEventListeners() {
                 const natRoll = elements.rollRequestInput.dataset.natRoll
                     ? parseInt(elements.rollRequestInput.dataset.natRoll)
                     : null;
+                if (elements.submitRollRequestBtn) elements.submitRollRequestBtn.disabled = true;
                 const submitted = await submitRollRequest(
                     window.currentRollRequest.id,
                     window.currentRollRequest.tipo,
                     valore,
                     natRoll
                 );
+                if (elements.submitRollRequestBtn) elements.submitRollRequestBtn.disabled = false;
                 if (!submitted) return;
                 closeRollRequestModal();
                 const pending = await checkPendingRollRequests(AppState.currentUser?.uid);

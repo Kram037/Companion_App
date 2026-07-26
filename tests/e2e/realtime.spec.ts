@@ -35,3 +35,23 @@ test('React-owned campaign refresh never invokes the legacy renderer', async ({ 
   await page.waitForTimeout(1_200);
   expect(await page.evaluate(() => typeof (window as typeof window & { loadCampagne?: unknown }).loadCampagne)).toBe('undefined');
 });
+
+test('a newer roll request replaces only a stale request of the same kind', async ({ page }) => {
+  await page.goto('/campagne');
+  await expect(page.locator('#appStartup')).toBeHidden({ timeout: 8000 });
+
+  const result = await page.evaluate(() => {
+    const app = window as typeof window & {
+      currentRollRequest?: { id: string; tipo: string } | null;
+      shouldShowRollRequest?: (request: { id: string; tipo: string }) => boolean;
+    };
+    app.currentRollRequest = { id: 'old', tipo: 'iniziativa' };
+    return [
+      app.shouldShowRollRequest?.({ id: 'new', tipo: 'iniziativa' }),
+      app.shouldShowRollRequest?.({ id: 'old', tipo: 'iniziativa' }),
+      app.shouldShowRollRequest?.({ id: 'generic', tipo: 'generico' }),
+    ];
+  });
+
+  expect(result).toEqual([true, false, false]);
+});

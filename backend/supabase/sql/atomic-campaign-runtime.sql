@@ -131,6 +131,8 @@ BEGIN
 END;
 $$;
 
+-- p_player_ids resta nella firma per i client già pubblicati; la membership
+-- autorevole viene sempre letta dalla campagna sotto lock.
 CREATE OR REPLACE FUNCTION request_initiative_rolls(
     p_sessione_id VARCHAR(10),
     p_player_ids VARCHAR(10)[]
@@ -157,22 +159,11 @@ BEGIN
         RAISE EXCEPTION 'Solo il DM può richiedere l''iniziativa' USING ERRCODE = '42501';
     END IF;
 
-    IF EXISTS (
-        SELECT 1
-        FROM UNNEST(COALESCE(p_player_ids, ARRAY[]::VARCHAR(10)[])) AS requested(player_id)
-        WHERE requested.player_id IS NULL
-           OR NOT COALESCE(requested.player_id = ANY(v_campaign_players), FALSE)
-    ) THEN
-        RAISE EXCEPTION 'Uno o più giocatori non appartengono alla campagna' USING ERRCODE = '22023';
-    END IF;
-
     DELETE FROM richieste_tiro_iniziativa WHERE sessione_id = p_sessione_id;
     INSERT INTO richieste_tiro_iniziativa(sessione_id, giocatore_id, stato)
-    SELECT p_sessione_id, players.player_id, 'pending'
-    FROM (
-        SELECT DISTINCT requested.player_id
-        FROM UNNEST(COALESCE(p_player_ids, ARRAY[]::VARCHAR(10)[])) AS requested(player_id)
-    ) AS players;
+    SELECT DISTINCT p_sessione_id, players.player_id, 'pending'
+    FROM UNNEST(v_campaign_players) AS players(player_id)
+    WHERE players.player_id IS NOT NULL;
     GET DIAGNOSTICS v_count = ROW_COUNT;
     RETURN v_count;
 END;

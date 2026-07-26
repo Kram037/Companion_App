@@ -44,7 +44,7 @@ function startAppEventsRealtime() {
                         if (pending?.tipo === 'iniziativa') {
                             handledFinishedCombats.delete(pending.sessione_id);
                         }
-                        if (pending?.tipo === 'iniziativa' && !window.currentRollRequest) {
+                        if (pending?.tipo === 'iniziativa' && shouldShowRollRequest(pending)) {
                             showRollRequestModal(pending);
                             sendBrowserNotification('Tiro di Iniziativa', 'Il DM ti ha richiesto un tiro di iniziativa!');
                             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -55,7 +55,7 @@ function startAppEventsRealtime() {
                 if (data.table === 'richieste_tiro_generico' && data.action === 'insert') {
                     setTimeout(async () => {
                         const pending = await checkPendingRollRequests(AppState.currentUser?.uid);
-                        if (pending?.tipo === 'generico' && !window.currentRollRequest) {
+                        if (pending?.tipo === 'generico' && shouldShowRollRequest(pending)) {
                             const label = pending.tiroLabel || 'Tiro Richiesto';
                             showRollRequestModal(pending);
                             sendBrowserNotification(label, `Il DM ha richiesto: ${label}`);
@@ -85,6 +85,15 @@ function startAppEventsRealtime() {
                         showNotification('Il combattimento è terminato');
                         navigateToPage('sessione');
                     }
+                }
+
+                if (
+                    data.table === 'combattimento'
+                    && data.action === 'end'
+                    && window.currentRollRequest?.tipo === 'iniziativa'
+                    && window.currentRollRequest.sessione_id === data.sessioneId
+                ) {
+                    closeRollRequestModal();
                 }
 
                 if (
@@ -212,6 +221,21 @@ function startAppEventsRealtime() {
                 if (needsRefresh) {
                     window.requestLegacyRealtimeRefresh?.(data);
                 }
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'richieste_tiro_iniziativa' },
+            (payload) => {
+                const row = payload?.new;
+                if (!row?.id || !row?.sessione_id) return;
+                publishAppDataChange({
+                    table: 'richieste_tiro_iniziativa',
+                    action: 'update',
+                    id: row.id,
+                    requestId: row.id,
+                    sessioneId: row.sessione_id
+                });
             }
         )
         .subscribe((status) => {

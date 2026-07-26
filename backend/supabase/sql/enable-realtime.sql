@@ -1,16 +1,37 @@
--- Abilita Realtime per le tabelle necessarie
--- IMPORTANTE: Questo script deve essere eseguito nel SQL Editor di Supabase
--- per abilitare Realtime su tutte le tabelle utilizzate dall'app
+-- Abilita Realtime senza fallire quando una tabella è già pubblicata.
+DO $$
+DECLARE
+    v_table TEXT;
+BEGIN
+    FOREACH v_table IN ARRAY ARRAY[
+        'richieste_tiro_iniziativa',
+        'richieste_tiro_generico',
+        'sessioni'
+    ]
+    LOOP
+        IF NOT EXISTS (
+            SELECT 1
+            FROM pg_publication_tables
+            WHERE pubname = 'supabase_realtime'
+              AND schemaname = 'public'
+              AND tablename = v_table
+        ) THEN
+            EXECUTE FORMAT(
+                'ALTER PUBLICATION supabase_realtime ADD TABLE public.%I',
+                v_table
+            );
+        END IF;
+    END LOOP;
+END;
+$$;
 
--- Abilita Realtime per richieste_tiro_iniziativa
-ALTER PUBLICATION supabase_realtime ADD TABLE richieste_tiro_iniziativa;
-
--- Abilita Realtime per richieste_tiro_generico
-ALTER PUBLICATION supabase_realtime ADD TABLE richieste_tiro_generico;
-
--- Abilita Realtime per sessioni
-ALTER PUBLICATION supabase_realtime ADD TABLE sessioni;
-
--- Verifica che Realtime sia abilitato (opzionale - per debug)
--- SELECT * FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
-
+SELECT tablename
+FROM pg_publication_tables
+WHERE pubname = 'supabase_realtime'
+  AND schemaname = 'public'
+  AND tablename IN (
+      'richieste_tiro_iniziativa',
+      'richieste_tiro_generico',
+      'sessioni'
+  )
+ORDER BY tablename;
