@@ -12,6 +12,7 @@ import {
   fetchCompendiumMonsterSources,
   removeCombatMonster,
   removeCombatTimer,
+  updateCombatTimer,
   updateCombatMonster,
   updateCombatMonsterCounter,
   type CombatCondition,
@@ -295,7 +296,7 @@ export type CombatTimersPanelProps = {
   currentUserId: string;
   isDm: boolean;
   playerCharacterId: string | null;
-  playerCharacterName: string | null;
+  targetNames: Readonly<Record<string, string>>;
   onChanged: ChangeCallback;
   onNotify?: NotifyCallback;
 };
@@ -305,11 +306,11 @@ export function CombatTimersPanel({
   currentUserId,
   isDm,
   playerCharacterId,
-  playerCharacterName,
+  targetNames,
   onChanged,
   onNotify,
 }: CombatTimersPanelProps) {
-  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [openedId, setOpenedId] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -318,33 +319,36 @@ export function CombatTimersPanel({
     || (timer.target_kind === 'player' && timer.target_id === playerCharacterId));
   const confirmingTimer = visible.find(timer => timer.id === confirmingId);
   const openedTimer = visible.find(timer => timer.id === openedId);
+  const canManage = (timer: CombatTimer) => isDm
+    || (timer.created_by === currentUserId && timer.target_kind === 'player' && timer.target_id === playerCharacterId);
 
   if (!visible.length) return null;
 
-  const remove = async (timer: CombatTimer) => {
-    if (removingId) return;
-    setRemovingId(timer.id);
+  const run = async (timer: CombatTimer, action: () => Promise<unknown>, success: string, close: () => void) => {
+    if (busyId) return;
+    setBusyId(timer.id);
     setError('');
     try {
-      await removeCombatTimer(timer.id);
+      await action();
       await onChanged();
-      onNotify?.('Timer rimosso');
-      setConfirmingId(null);
+      onNotify?.(success);
+      close();
     } catch (caught) {
       setError(errorMessage(caught));
     } finally {
-      setRemovingId(null);
+      setBusyId(null);
     }
   };
 
   return <div className="combat-timers-panel">
     <div className="combat-timers-list">
       {visible.map(timer => {
-        const canRemove = isDm
-          || (timer.created_by === currentUserId && timer.target_kind === 'player' && timer.target_id === playerCharacterId);
-        const targetLabel = timerTargetLabel(timer, playerCharacterId, playerCharacterName);
+        const targetLabel = timerTargetLabel(timer, targetNames);
         return <div className={`combat-timer-chip ${timer.remaining_rounds <= 1 ? 'is-low' : ''}`} key={timer.id}>
-          <button className="combat-timer-open" type="button" onClick={() => setOpenedId(timer.id)} aria-label={`Dettagli timer ${timer.nome}`}>
+          <button className="combat-timer-open" type="button" onClick={() => {
+            setError('');
+            setOpenedId(timer.id);
+          }} aria-label={`Dettagli timer ${timer.nome}`}>
             <span className="combat-timer-rounds">{timer.remaining_rounds}</span>
             <span className="combat-timer-info">
               <span className="combat-timer-name">{timer.nome}</span>
@@ -354,10 +358,10 @@ export function CombatTimersPanel({
               </span>
             </span>
           </button>
-          {canRemove && <button
+          {canManage(timer) && <button
             className="combat-timer-remove"
             type="button"
-            disabled={removingId === timer.id}
+            disabled={busyId === timer.id}
             onClick={() => setConfirmingId(timer.id)}
             aria-label={`Rimuovi timer ${timer.nome}`}
           >×</button>}
@@ -367,14 +371,32 @@ export function CombatTimersPanel({
     <InlineError>{error}</InlineError>
     {openedTimer && <TimerDetails
       timer={openedTimer}
-      targetLabel={timerTargetLabel(openedTimer, playerCharacterId, playerCharacterName)}
-      onClose={() => setOpenedId(null)}
+      owner={timerTargetLabel(openedTimer, targetNames)}
+      canEdit={canManage(openedTimer)}
+      busy={busyId === openedTimer.id}
+      error={error}
+      onClose={() => {
+        if (busyId) return;
+        setError('');
+        setOpenedId(null);
+      }}
+      onSubmit={input => void run(
+        openedTimer,
+        () => updateCombatTimer(openedTimer.id, input),
+        'Timer aggiornato',
+        () => setOpenedId(null),
+      )}
     />}
     {confirmingTimer && <ConfirmDelete
       message={`Rimuovere il timer "${confirmingTimer.nome}"?`}
-      busy={Boolean(removingId)}
+      busy={Boolean(busyId)}
       onCancel={() => setConfirmingId(null)}
-      onConfirm={() => void remove(confirmingTimer)}
+      onConfirm={() => void run(
+        confirmingTimer,
+        () => removeCombatTimer(confirmingTimer.id),
+        'Timer rimosso',
+        () => setConfirmingId(null),
+      )}
     />}
   </div>;
 }
@@ -864,19 +886,50 @@ function TimerForm({
   </Modal>;
 }
 
-function TimerDetails({ timer, targetLabel, onClose }: {
+function TimerDetails({ timer, owner, canEdit, busy, error, onClose, onSubmit }: {
   timer: CombatTimer;
-  targetLabel: string;
+  owner: string;
+  canEdit: boolean;
+  busy: boolean;
+  error: string;
   onClose: () => void;
+  onSubmit: (input: { remainingRounds: number; conditions: CombatCondition[] }) => void;
 }) {
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    onSubmit({
+      remainingRounds: Number(data.get('remainingRounds')),
+      conditions: readConditions(data),
+    });
+  };
+
   return <Modal title={timer.nome} className="combat-timer-modal" onClose={onClose}>
-    <dl className="combat-timer-details">
-      <div><dt>Target</dt><dd>{targetLabel}</dd></div>
-      <div><dt>Tipo</dt><dd>{timer.target_kind === 'global' ? 'Globale' : timer.target_kind === 'player' ? 'Personaggio' : 'Mostro'}</dd></div>
-      <div><dt>Durata</dt><dd>{timer.duration_rounds} round</dd></div>
-      <div><dt>Rimanenti</dt><dd>{timer.remaining_rounds} round</dd></div>
-      <div><dt>Condizioni</dt><dd>{timer.conditions.length ? timer.conditions.map(condition => CONDITION_LABELS[condition]).join(', ') : 'Nessuna'}</dd></div>
-    </dl>
+    <p className="combat-timer-owner">{owner}</p>
+    <form className="combat-timer-form" onSubmit={submit}>
+      <dl className="combat-timer-details">
+        <div>
+          <dt>Durata rimanente</dt>
+          <dd className="combat-timer-field">{canEdit
+            ? <div className="combat-timer-duration-row"><input name="remainingRounds" type="number" min="1" max="9999" defaultValue={timer.remaining_rounds} required /><span className="combat-timer-duration-suffix">round</span></div>
+            : `${timer.remaining_rounds} round`}</dd>
+        </div>
+        <div>
+          <dt>Condizioni</dt>
+          <dd>{canEdit && timer.target_kind !== 'global'
+            ? <div className="combat-timer-conditions">{COMBAT_CONDITIONS.map(condition => <label className="combat-timer-cond-chip" key={condition}>
+              <input name="conditions" value={condition} type="checkbox" defaultChecked={timer.conditions.includes(condition)} />
+              <span>{CONDITION_LABELS[condition]}</span>
+            </label>)}</div>
+            : timer.conditions.length ? timer.conditions.map(condition => CONDITION_LABELS[condition]).join(', ') : 'Nessuna'}</dd>
+        </div>
+      </dl>
+      <InlineError>{error}</InlineError>
+      {canEdit && <div className="combat-timer-actions">
+        <button className="btn-secondary btn-small" type="button" disabled={busy} onClick={onClose}>Annulla</button>
+        <button className="btn-primary btn-small" type="submit" disabled={busy}>Salva</button>
+      </div>}
+    </form>
   </Modal>;
 }
 
@@ -947,11 +1000,10 @@ function readConditions(data: FormData): CombatCondition[] {
   return COMBAT_CONDITIONS.filter(condition => values.has(condition));
 }
 
-export function timerTargetLabel(timer: CombatTimer, playerCharacterId: string | null, playerCharacterName: string | null) {
+export function timerTargetLabel(timer: CombatTimer, targetNames: Readonly<Record<string, string>>) {
   if (timer.target_name) return timer.target_name;
   if (timer.target_kind === 'global') return 'Globale';
-  if (timer.target_kind === 'player' && timer.target_id === playerCharacterId && playerCharacterName) return playerCharacterName;
-  return 'Target sconosciuto';
+  return timer.target_id ? targetNames[`${timer.target_kind}:${timer.target_id}`] ?? 'Target sconosciuto' : 'Target sconosciuto';
 }
 
 function stringArray(value: unknown): string[] {

@@ -55,6 +55,10 @@ export function CombatPage() {
 
   const isDm = campaign.data?.id_dm === user.data?.id;
   const currentCharacter = combat.data?.personaggi.find(character => character.player_user_id === user.data?.id);
+  const timerTargetNames = useMemo(() => Object.fromEntries([
+    ...(combat.data?.personaggi ?? []).map(character => [`player:${character.id}`, character.nome]),
+    ...(combat.data?.mostri ?? []).map(monster => [`monster:${monster.id}`, monster.nome]),
+  ]), [combat.data?.mostri, combat.data?.personaggi]);
   const timers = useQuery({
     queryKey: queryKeys.combatTimers(sessioneId),
     queryFn: () => fetchCombatTimers(sessioneId),
@@ -150,7 +154,7 @@ export function CombatPage() {
       currentUserId={user.data?.id ?? ''}
       isDm={isDm}
       playerCharacterId={currentCharacter?.id ?? null}
-      playerCharacterName={currentCharacter?.nome ?? null}
+      targetNames={timerTargetNames}
       onChanged={refreshCombat}
       onNotify={message => combatLegacyAdapter.notify(message)}
     />

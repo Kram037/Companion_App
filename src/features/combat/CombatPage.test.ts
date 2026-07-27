@@ -44,6 +44,6 @@ describe('combat timer target', () => {
       duration_rounds: 3,
       remaining_rounds: 2,
       expired: false,
-    }, 'character-1', 'Aria')).toBe('Aria');
+    }, { 'player:character-1': 'Aria' })).toBe('Aria');
   });
 });

@@ -359,6 +359,11 @@
     flex-shrink: 0;
 }
 .combat-timer-actions .btn-small { margin-top: 0; }
+.combat-timer-owner {
+    margin: -8px 0 4px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
 .combat-timer-details {
     display: grid;
     gap: 0;
@@ -380,6 +385,12 @@
     margin: 0;
     color: var(--text);
     overflow-wrap: anywhere;
+}
+.combat-timer-details .combat-timer-duration-row {
+    grid-template-columns: minmax(70px, 120px) auto;
+}
+.combat-timer-details .combat-timer-conditions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 480px) {

@@ -125,6 +125,10 @@ const timerInputSchema = z.object({
     context.addIssue({ code: 'custom', message: 'Il target e obbligatorio', path: ['targetId'] });
   }
 });
+const timerUpdateSchema = z.object({
+  remainingRounds: z.number().int().min(1).max(9_999),
+  conditions: z.array(conditionSchema),
+});
 
 const MONSTER_COLUMNS = [
   'id', 'sessione_id', 'campagna_id', 'nome', 'iniziativa', 'pv_attuali',
@@ -156,6 +160,7 @@ export type CombatToolMonster = z.infer<typeof combatToolMonsterSchema>;
 export type CombatTimer = z.infer<typeof combatTimerSchema>;
 export type CreatePlaceholderMonsterInput = z.input<typeof placeholderInputSchema>;
 export type CreateCombatTimerInput = z.input<typeof timerInputSchema>;
+export type UpdateCombatTimerInput = z.input<typeof timerUpdateSchema>;
 export type UpdateCombatMonsterInput = z.input<typeof monsterUpdateSchema>;
 export type CombatMonsterSources = {
   monsters: HomebrewItem[];
@@ -321,6 +326,21 @@ export async function createCombatTimer(input: CreateCombatTimerInput): Promise<
       duration_rounds: value.rounds,
       remaining_rounds: value.rounds,
     })
+    .select(TIMER_COLUMNS)
+    .single();
+  throwIfSupabaseError(error);
+  return parseData(combatTimerSchema, data);
+}
+
+export async function updateCombatTimer(timerId: string, input: UpdateCombatTimerInput): Promise<CombatTimer> {
+  const value = timerUpdateSchema.parse(input);
+  const { data, error } = await getSupabaseClient()
+    .from('combat_timers')
+    .update({
+      remaining_rounds: value.remainingRounds,
+      conditions: value.conditions,
+    })
+    .eq('id', idSchema.parse(timerId))
     .select(TIMER_COLUMNS)
     .single();
   throwIfSupabaseError(error);

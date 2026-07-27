@@ -7,6 +7,7 @@ import {
   createCombatTimer,
   createPlaceholderMonster,
   nextCombatMonsterCopyName,
+  updateCombatTimer,
   updateCombatMonster,
 } from './combatToolsApi';
 
@@ -137,5 +138,10 @@ describe('combat tools validation', () => {
       conditions: ['avvelenato'],
       rounds: 3,
     })).rejects.toThrow(/target/i);
+
+    await expect(updateCombatTimer('timer', {
+      remainingRounds: 0,
+      conditions: [],
+    })).rejects.toThrow();
   });
 });
