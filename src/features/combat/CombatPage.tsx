@@ -164,11 +164,11 @@ export function CombatPage() {
           <button type="button" className={`combat-icon ${index === turnIndex ? 'active' : ''} ${entry.type === 'monster' ? 'monster' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)} aria-label={`Apri ${entry.name}`}>
             {entry.imageUrl && <img src={normalizeImage(entry.imageUrl)} alt="" className="combat-icon-img" loading="lazy" referrerPolicy="no-referrer" onError={event => { event.currentTarget.style.display = 'none'; }} />}
             <span className="combat-icon-initials">{entry.name.slice(0, 2).toUpperCase()}</span>
+            <span className="combat-icon-init" title="Iniziativa">{entry.init}</span>
           </button>
           <button type="button" className={`combat-card ${index === turnIndex ? 'is-turn' : ''} ${entry.type === 'monster' ? 'monster-card' : ''} ${canOpen(entry, isDm, user.data?.id) ? 'is-clickable' : 'is-locked'}`} onClick={() => openEntry(entry)} disabled={!canOpen(entry, isDm, user.data?.id)}>
-            <span className="combat-card-init" title="Iniziativa">{entry.init}</span>
-            <span className="combat-card-center"><span className="combat-card-name">{entry.name}</span>{entry.conditions.length > 0 && <span className="combat-card-badges">{entry.conditions.map(condition => <span className="condition-badge-sm" key={condition}>{CONDITION_LABELS[condition] ?? condition}</span>)}</span>}</span>
-            {(entry.type === 'player' || isDm) && entry.hpMax != null && <span className="combat-card-hp">{entry.hp ?? entry.hpMax}/{entry.hpMax}</span>}
+            <span className="combat-card-meta"><span className="combat-card-name">{entry.name}</span>{(entry.type === 'player' || isDm) && entry.hpMax != null && <span className="combat-card-hp">{entry.hp ?? entry.hpMax}/{entry.hpMax}</span>}</span>
+            <span className="combat-card-badges">{entry.conditions.map(condition => <span className="condition-badge-sm" key={condition}>{CONDITION_LABELS[condition] ?? condition}</span>)}</span>
           </button>
         </div>)}
       </div>
