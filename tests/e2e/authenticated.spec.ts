@@ -65,6 +65,7 @@ test('staging RLS rejects anonymous and cross-user access', async () => {
     external.auth.signInWithPassword({ email: externalEmail!, password: externalPassword! }),
   ]);
   expect(logins.map(result => result.error)).toEqual([null, null, null]);
+  await new Promise(resolve => setTimeout(resolve, 1_000));
 
   const [dmIdResult, playerIdResult] = await Promise.all([
     dm.rpc('get_current_user_id'),
@@ -151,9 +152,9 @@ test('authenticated campaign navigation', async ({ page }) => {
     await picker.getByRole('searchbox', { name: 'Cerca mostro' }).fill('Awakened Shrub');
     const monster = picker.locator('[data-source-id="awakened-shrub-mm-41"]');
     await monster.getByRole('checkbox', { name: 'Seleziona Awakened Shrub' }).check();
-    await expect(monster.getByLabel('Quantità Awakened Shrub')).toHaveText('1');
+    await expect(monster.getByRole('status', { name: 'Quantità Awakened Shrub' })).toHaveText('1');
     await monster.getByRole('button', { name: 'Aumenta quantità Awakened Shrub' }).click();
-    await expect(monster.getByLabel('Quantità Awakened Shrub')).toHaveText('2');
+    await expect(monster.getByRole('status', { name: 'Quantità Awakened Shrub' })).toHaveText('2');
     await monster.getByRole('button', { name: 'Riduci quantità Awakened Shrub' }).click();
     const confirmSelection = picker.getByRole('button', { name: 'Conferma selezione' });
     await expect(confirmSelection).toBeInViewport();
@@ -210,13 +211,22 @@ test('initiative and combat updates stay synchronized without resetting a modal'
 
   try {
     await login(dmPage, dmEmail!, dmPassword!);
-    await login(playerPage, playerEmail!, playerPassword!);
 
     const sessionPath = `/campagne/${campaignId}/sessione`;
+    const combatPath = `/campagne/${campaignId}/sessione/${sessionId}/combattimento`;
+    await dmPage.goto(combatPath);
+    dmPage.once('dialog', dialog => dialog.accept());
+    await dmPage.getByTitle('Termina combattimento').click();
+    await expect(dmPage).toHaveURL(new RegExp(`${sessionPath}$`));
+
+    await login(playerPage, playerEmail!, playerPassword!);
     await Promise.all([dmPage.goto(sessionPath), playerPage.goto(sessionPath)]);
     await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
     await expect(playerPage.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
     await expect(dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' })).toBeVisible();
+    await expect.poll(() => playerPage.evaluate(() =>
+      (window as typeof window & { rollRequestsChannels?: { iniziativa?: { state?: string } } })
+        .rollRequestsChannels?.iniziativa?.state)).toBe('joined');
 
     await dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' }).click();
     await expect(playerPage.locator('#rollRequestModal')).toHaveClass(/active/, { timeout: 15_000 });
@@ -227,7 +237,6 @@ test('initiative and combat updates stay synchronized without resetting a modal'
     await expect(playerPage.locator('#rollRequestModal')).not.toHaveClass(/active/);
     await expect.poll(() => dmPage.locator('.combat-card-init').allTextContents()).toContain(submittedInitiative);
 
-    const combatPath = `/campagne/${campaignId}/sessione/${sessionId}/combattimento`;
     await Promise.all([dmPage.goto(combatPath), playerPage.goto(combatPath)]);
     await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
     await expect(playerPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
