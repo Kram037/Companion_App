@@ -10,6 +10,7 @@ export function combatSnapshotQuery(campagnaId: Id, sessioneId: Id) {
     queryFn: () => fetchCombatSnapshot(campagnaId, sessioneId),
     enabled: Boolean(campagnaId && sessioneId),
     refetchInterval: query => query.state.data?.tiri.some(roll => roll.stato === 'pending') ? 1_000 : false,
+    refetchIntervalInBackground: true,
     ...queryTimings.combat,
   });
 }
