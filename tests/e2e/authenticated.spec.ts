@@ -65,7 +65,7 @@ test('staging RLS rejects anonymous and cross-user access', async () => {
     external.auth.signInWithPassword({ email: externalEmail!, password: externalPassword! }),
   ]);
   expect(logins.map(result => result.error)).toEqual([null, null, null]);
-  await new Promise(resolve => setTimeout(resolve, 1_000));
+  await new Promise(resolve => setTimeout(resolve, 3_000));
 
   const [dmIdResult, playerIdResult] = await Promise.all([
     dm.rpc('get_current_user_id'),
