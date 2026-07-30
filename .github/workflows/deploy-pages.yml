@@ -15,7 +15,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  visual:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - run: npm run e2e -- --grep=@visual
+      - name: Playwright artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-windows
+          path: test-results
+          if-no-files-found: ignore
+
   deploy:
+    needs: visual
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,8 +50,9 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e
+      - run: npm run e2e -- --grep-invert=@visual
         env:
+          E2E_REQUIRE_AUTH: '1'
           E2E_DM_EMAIL: ${{ secrets.E2E_DM_EMAIL }}
           E2E_DM_PASSWORD: ${{ secrets.E2E_DM_PASSWORD }}
           E2E_PLAYER_EMAIL: ${{ secrets.E2E_PLAYER_EMAIL }}
@@ -41,6 +62,13 @@ jobs:
           E2E_CHARACTER_ID: ${{ secrets.E2E_CHARACTER_ID }}
           E2E_EMPTY_CAMPAIGN_ID: ${{ secrets.E2E_EMPTY_CAMPAIGN_ID }}
           E2E_MUTATION_TESTS: ${{ secrets.E2E_MUTATION_TESTS }}
+      - name: Playwright artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-ubuntu
+          path: test-results
+          if-no-files-found: ignore
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

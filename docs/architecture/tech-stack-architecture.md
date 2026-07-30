@@ -64,7 +64,8 @@ al livello React/typed.
 - `npm run test`: Vitest su logica typed.
 - `npm run e2e -- --list`: verifica discovery Playwright sulla build production.
 - `npm run e2e`: genera la build, avvia il preview e chiude il server al termine; richiede browser installati con `npm run e2e:install`.
-- GitHub Pages esegue check, unit test e Playwright prima del deploy.
+- `npm run e2e -- --grep=@visual`: confronta le baseline Windows di pagine, modali, dice roller e split view.
+- GitHub Pages esegue check, unit test, suite pubblica/autenticata su Ubuntu e baseline visuali su Windows prima del deploy.
 
 ### Fixture E2E autenticata
 
@@ -75,4 +76,8 @@ I test pubblici non richiedono credenziali. `tests/e2e/authenticated.spec.ts` ab
 - `E2E_CAMPAIGN_ID`, `E2E_SESSION_ID`, `E2E_CHARACTER_ID`;
 - `E2E_EMPTY_CAMPAIGN_ID`, riferita a una seconda campagna del DM senza sessioni attive.
 
-La campagna principale deve contenere entrambi gli account, un personaggio del player e una sessione attiva. Il test realtime crea richieste di iniziativa e avanza il turno; il test sessione usa la campagna vuota e termina la sessione che crea. Entrambi vanno eseguiti solo su fixture dedicate impostando `E2E_MUTATION_TESTS=1`. Gli stessi nomi sono gia' collegati ai GitHub Actions secrets; in loro assenza i test autenticati vengono saltati.
+La campagna principale deve contenere entrambi gli account, un personaggio del player e una sessione attiva. Il test realtime crea richieste di iniziativa e avanza il turno; il test sessione usa la campagna vuota e termina la sessione che crea. Entrambi vanno eseguiti solo su fixture dedicate impostando `E2E_MUTATION_TESTS=1`.
+
+In locale i test autenticati restano facoltativi. Il gate di rilascio imposta
+`E2E_REQUIRE_AUTH=1`: secret mancanti, fixture incompleta o mutation test
+disabilitati fanno fallire la suite invece di produrre skip.

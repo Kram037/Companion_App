@@ -10,6 +10,27 @@ const characterId = process.env.E2E_CHARACTER_ID;
 const emptyCampaignId = process.env.E2E_EMPTY_CAMPAIGN_ID;
 const runMutations = process.env.E2E_MUTATION_TESTS === '1';
 
+test.beforeAll(() => {
+  if (process.env.E2E_REQUIRE_AUTH !== '1') return;
+
+  const fixture = {
+    E2E_DM_EMAIL: dmEmail,
+    E2E_DM_PASSWORD: dmPassword,
+    E2E_PLAYER_EMAIL: playerEmail,
+    E2E_PLAYER_PASSWORD: playerPassword,
+    E2E_CAMPAIGN_ID: campaignId,
+    E2E_SESSION_ID: sessionId,
+    E2E_CHARACTER_ID: characterId,
+    E2E_EMPTY_CAMPAIGN_ID: emptyCampaignId,
+  };
+  const missing = Object.entries(fixture)
+    .filter(([, value]) => !value)
+    .map(([name]) => name);
+
+  expect(missing, 'La suite di rilascio richiede la fixture E2E Supabase completa.').toEqual([]);
+  expect(runMutations, 'La suite di rilascio richiede E2E_MUTATION_TESTS=1.').toBe(true);
+});
+
 async function login(page: Page, email: string, password: string) {
   await page.goto('/campagne');
   await page.locator('#userBtn').click();
