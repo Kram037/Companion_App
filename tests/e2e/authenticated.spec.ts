@@ -227,15 +227,19 @@ test('initiative and combat updates stay synchronized without resetting a modal'
     await expect.poll(() => playerPage.evaluate(() =>
       (window as typeof window & { rollRequestsChannels?: { iniziativa?: { state?: string } } })
         .rollRequestsChannels?.iniziativa?.state)).toBe('joined');
+    await expect.poll(() => dmPage.evaluate(() =>
+      (window as typeof window & { appEventsChannel?: { state?: string } })
+        .appEventsChannel?.state)).toBe('joined');
 
     await dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' }).click();
     await expect(playerPage.locator('#rollRequestModal')).toHaveClass(/active/, { timeout: 15_000 });
+    await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
     await playerPage.locator('#autoRollBtn').click();
     await expect(playerPage.locator('#rollRequestInput')).not.toHaveValue('');
     const submittedInitiative = await playerPage.locator('#rollRequestInput').inputValue();
     await playerPage.locator('#submitRollRequestBtn').click();
     await expect(playerPage.locator('#rollRequestModal')).not.toHaveClass(/active/);
-    await expect.poll(() => dmPage.locator('.combat-card-init').allTextContents()).toContain(submittedInitiative);
+    await expect.poll(() => dmPage.locator('.combat-card-init').allTextContents(), { timeout: 15_000 }).toContain(submittedInitiative);
 
     await Promise.all([dmPage.goto(combatPath), playerPage.goto(combatPath)]);
     await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
