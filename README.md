@@ -207,6 +207,8 @@ Creare e confermare i tre account Auth nel progetto E2E, quindi applicare
 esclusivamente account e campagne fixture, mai dati reali degli utenti.
 Il gate di rilascio usa `E2E_REQUIRE_AUTH=1`: fixture incompleta o test
 mutativi disabilitati fanno fallire la suite invece di produrre skip.
+In GitHub Actions solo le tre password sono secret; URL, chiave pubblicabile,
+email sintetiche e ID deterministici sono dichiarati nel workflow.
 
 ## Dati del Compendio
 

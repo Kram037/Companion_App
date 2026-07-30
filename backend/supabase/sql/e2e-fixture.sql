@@ -9,13 +9,13 @@ DECLARE
     external_uid TEXT;
 BEGIN
     SELECT id::TEXT INTO dm_uid FROM auth.users
-    WHERE email = 'companion.e2e.dm.v2+smekahfvjbfyyoknucqe@example.com';
+    WHERE email = 'companion.e2e.dm.ci+smekahfvjbfyyoknucqe@example.com';
 
     SELECT id::TEXT INTO player_uid FROM auth.users
-    WHERE email = 'companion.e2e.player.v2+smekahfvjbfyyoknucqe@example.com';
+    WHERE email = 'companion.e2e.player.ci+smekahfvjbfyyoknucqe@example.com';
 
     SELECT id::TEXT INTO external_uid FROM auth.users
-    WHERE email = 'companion.e2e.external.v2+smekahfvjbfyyoknucqe@example.com';
+    WHERE email = 'companion.e2e.external.ci+smekahfvjbfyyoknucqe@example.com';
 
     IF dm_uid IS NULL OR player_uid IS NULL OR external_uid IS NULL THEN
         RAISE EXCEPTION 'Create the three confirmed CompanionApp E2E Auth users first';
@@ -23,9 +23,9 @@ BEGIN
 
     INSERT INTO utenti (id, uid, cid, nome_utente, email)
     VALUES
-        ('e2edm00001', dm_uid, 910001, 'E2E Dungeon Master', 'companion.e2e.dm.v2+smekahfvjbfyyoknucqe@example.com'),
-        ('e2epl00001', player_uid, 910002, 'E2E Player', 'companion.e2e.player.v2+smekahfvjbfyyoknucqe@example.com'),
-        ('e2eex00001', external_uid, 910003, 'E2E External', 'companion.e2e.external.v2+smekahfvjbfyyoknucqe@example.com')
+        ('e2edm00001', dm_uid, 910001, 'E2E Dungeon Master', 'companion.e2e.dm.ci+smekahfvjbfyyoknucqe@example.com'),
+        ('e2epl00001', player_uid, 910002, 'E2E Player', 'companion.e2e.player.ci+smekahfvjbfyyoknucqe@example.com'),
+        ('e2eex00001', external_uid, 910003, 'E2E External', 'companion.e2e.external.ci+smekahfvjbfyyoknucqe@example.com')
     ON CONFLICT (id) DO UPDATE SET
         uid = EXCLUDED.uid,
         cid = EXCLUDED.cid,
