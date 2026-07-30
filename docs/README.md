@@ -12,7 +12,7 @@ Indice dei documenti tecnici e operativi della Companion App.
 - [`migration/TODO_TECH_STACK_MIGRATION_2.md`](migration/TODO_TECH_STACK_MIGRATION_2.md): roadmap attiva della remediation `tech_migration_2`.
 - [`migration/TODO_TECH_STACK_MIGRATION.md`](migration/TODO_TECH_STACK_MIGRATION.md): roadmap storica della prima migrazione.
 - [`migration/tech-migration-qa.md`](migration/tech-migration-qa.md): checklist QA dei flussi critici.
-- [`migration/legacy-function-map.md`](migration/legacy-function-map.md): mappa dei renderer legacy sostituiti o confinati.
+- [`migration/legacy-function-map.md`](migration/legacy-function-map.md): inventario verificato di ownership, bridge, dati e destinazione React.
 
 ## Architettura
 
