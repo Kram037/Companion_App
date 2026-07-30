@@ -264,7 +264,7 @@ test('initiative and combat updates stay synchronized without resetting a modal'
     await dmCombat.locator('.combat-next-btn').click();
     await expect(playerCombat.locator('.combat-round-center')).not.toHaveText(previousTurn, { timeout: 15_000 });
     await expect(playerPage.locator('#hpCalcOverlay')).toBeVisible();
-    await expect(playerCombat.locator('.combat-round-center')).toHaveText(await dmCombat.locator('.combat-round-center').innerText());
+    await expect.poll(async () => await playerCombat.locator('.combat-round-center').innerText() === await dmCombat.locator('.combat-round-center').innerText()).toBe(true);
   } finally {
     await dmContext.close();
     await playerContext.close();
