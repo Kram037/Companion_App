@@ -128,7 +128,7 @@ export function CombatPage() {
     await combatLegacyAdapter.broadcast({ table: 'combattimento', action: 'update', sessioneId, campagnaId });
   }, [campagnaId, sessioneId]);
 
-  if (campaign.isLoading || combat.isLoading || (combat.isFetching && !combat.data?.tiri.length) || user.isLoading || timers.isLoading || (isDm && toolMonsters.isLoading)) return <ReactPage name="combattimento"><Placeholder text="Caricamento combattimento..." /></ReactPage>;
+  if (campaign.isLoading || combat.isLoading || user.isLoading || timers.isLoading || (isDm && toolMonsters.isLoading)) return <ReactPage name="combattimento"><Placeholder text="Caricamento combattimento..." /></ReactPage>;
   if (campaign.isError || combat.isError || user.isError || timers.isError || (isDm && toolMonsters.isError)) return <ReactPage name="combattimento"><Placeholder text="Impossibile caricare il combattimento." /></ReactPage>;
   if (!campaign.data || !combat.data?.sessione) return <ReactPage name="combattimento"><Placeholder text="Combattimento non trovato." /></ReactPage>;
   if (!combat.data.tiri.length) return <Navigate replace to={buildAppPath('sessione', { campagnaId })} />;

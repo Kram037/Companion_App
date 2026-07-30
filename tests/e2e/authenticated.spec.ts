@@ -45,6 +45,11 @@ async function login(page: Page, email: string, password: string) {
   await expect(page.locator('body')).toHaveClass(/user-logged-in/, { timeout: 15_000 });
 }
 
+async function waitForJwtClock(client: ReturnType<typeof createClient>) {
+  await expect.poll(async () => (await client.rpc('get_current_user_id')).error?.code, { timeout: 10_000 })
+    .not.toBe('PGRST303');
+}
+
 test('staging RLS rejects anonymous and cross-user access', async () => {
   test.skip(
     !supabaseUrl || !supabaseAnonKey || !dmEmail || !dmPassword
@@ -65,7 +70,7 @@ test('staging RLS rejects anonymous and cross-user access', async () => {
     external.auth.signInWithPassword({ email: externalEmail!, password: externalPassword! }),
   ]);
   expect(logins.map(result => result.error)).toEqual([null, null, null]);
-  await new Promise(resolve => setTimeout(resolve, 3_000));
+  await Promise.all([dm, player, external].map(waitForJwtClock));
 
   const [dmIdResult, playerIdResult] = await Promise.all([
     dm.rpc('get_current_user_id'),
@@ -234,6 +239,7 @@ test('initiative and combat updates stay synchronized without resetting a modal'
     await dmPage.locator('#react-root').getByRole('button', { name: 'Tirate iniziativa' }).click();
     await expect(playerPage.locator('#rollRequestModal')).toHaveClass(/active/, { timeout: 15_000 });
     await expect(dmPage.locator('body')).toHaveAttribute('data-react-owner', 'combattimento');
+    await expect(dmPage.locator('#react-root .react-combat-page')).toBeVisible();
     await playerPage.locator('#autoRollBtn').click();
     await expect(playerPage.locator('#rollRequestInput')).not.toHaveValue('');
     const submittedInitiative = await playerPage.locator('#rollRequestInput').inputValue();

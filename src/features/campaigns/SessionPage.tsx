@@ -134,6 +134,7 @@ export function SessionPage() {
         return;
       }
       window.showNotification?.('Richieste tiro iniziativa inviate!');
+      client.removeQueries({ queryKey: queryKeys.combat(sessioneId), exact: true });
       navigate(buildAppPath('combattimento', { campagnaId, sessioneId }));
     },
     onError: error => window.showNotification?.(`Errore nella richiesta tiro iniziativa: ${errorMessage(error)}`),
