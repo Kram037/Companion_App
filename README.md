@@ -141,6 +141,15 @@ La configurazione client di Supabase e letta da `js/Core/config.js`. La chiave
 Row Level Security. Non inserire mai nel client la service role key, segreti
 OAuth o credenziali di test.
 
+| Ambiente | Configurazione |
+| --- | --- |
+| Locale | Usa la configurazione pubblica di `js/Core/config.js`; per test isolati impostare `window.CompanionConfigOverride` prima del bootstrap. |
+| Staging/E2E | Il workflow e i test Playwright usano il progetto Supabase E2E dedicato tramite variabili `E2E_*`; solo le password degli account sintetici sono GitHub secrets. |
+| Produzione | URL e chiave pubblicabile sono in `js/Core/config.js`; RLS e autorizzazioni nel database restano il confine di sicurezza. |
+
+Non eseguire test mutativi locali contro la configurazione di produzione
+predefinita: usare sempre l'override E2E e le fixture dedicate.
+
 ### Prerequisiti SQL per Campagna, sessione e combattimento
 
 La versione React del dominio Campagna usa le RPC e le policy definite in
@@ -257,9 +266,8 @@ adatta la base URL al repository GitHub Pages. `manifest.json` e `sw.js`
 gestiscono installazione e cache.
 
 Il workflow `.github/workflows/deploy-pages.yml` esegue check, test, Playwright
-e build prima del deploy. I push su `main`, `tech_migration` e
-`tech_migration_2` pubblicano nello stesso ambiente Pages: l'ultimo workflow
-completato diventa la versione online.
+e build prima del deploy. Durante la migrazione viene eseguito sui push a
+`react_migration`; l'ultimo workflow completato diventa la versione online.
 
 Quando si modificano manifest, service worker, script lazy o asset PWA bisogna
 verificare sia una nuova installazione sia l'aggiornamento di un'installazione
