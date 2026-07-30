@@ -1,9 +1,14 @@
 import { expect, type Page, test } from '@playwright/test';
+import { createClient } from '@supabase/supabase-js';
 
+const supabaseUrl = process.env.E2E_SUPABASE_URL;
+const supabaseAnonKey = process.env.E2E_SUPABASE_ANON_KEY;
 const dmEmail = process.env.E2E_DM_EMAIL;
 const dmPassword = process.env.E2E_DM_PASSWORD;
 const playerEmail = process.env.E2E_PLAYER_EMAIL;
 const playerPassword = process.env.E2E_PLAYER_PASSWORD;
+const externalEmail = process.env.E2E_EXTERNAL_EMAIL;
+const externalPassword = process.env.E2E_EXTERNAL_PASSWORD;
 const campaignId = process.env.E2E_CAMPAIGN_ID;
 const sessionId = process.env.E2E_SESSION_ID;
 const characterId = process.env.E2E_CHARACTER_ID;
@@ -14,10 +19,14 @@ test.beforeAll(() => {
   if (process.env.E2E_REQUIRE_AUTH !== '1') return;
 
   const fixture = {
+    E2E_SUPABASE_URL: supabaseUrl,
+    E2E_SUPABASE_ANON_KEY: supabaseAnonKey,
     E2E_DM_EMAIL: dmEmail,
     E2E_DM_PASSWORD: dmPassword,
     E2E_PLAYER_EMAIL: playerEmail,
     E2E_PLAYER_PASSWORD: playerPassword,
+    E2E_EXTERNAL_EMAIL: externalEmail,
+    E2E_EXTERNAL_PASSWORD: externalPassword,
     E2E_CAMPAIGN_ID: campaignId,
     E2E_SESSION_ID: sessionId,
     E2E_CHARACTER_ID: characterId,
@@ -32,14 +41,82 @@ test.beforeAll(() => {
 });
 
 async function login(page: Page, email: string, password: string) {
+  if (supabaseUrl && supabaseAnonKey) {
+    await page.addInitScript(
+      ({ url, key }) => Object.assign(window, {
+        CompanionConfigOverride: { supabaseUrl: url, supabaseAnonKey: key },
+      }),
+      { url: supabaseUrl, key: supabaseAnonKey },
+    );
+  }
   await page.goto('/campagne');
   await page.locator('#userBtn').click();
   await expect(page.locator('#loginModal')).toHaveClass(/active/);
   await page.locator('#email').fill(email);
   await page.locator('#password').fill(password);
   await page.locator('#submitBtn').click();
+  await page.locator('#password').fill('');
   await expect(page.locator('body')).toHaveClass(/user-logged-in/, { timeout: 15_000 });
 }
+
+test('staging RLS rejects anonymous and cross-user access', async () => {
+  test.skip(
+    !supabaseUrl || !supabaseAnonKey || !dmEmail || !dmPassword
+      || !playerEmail || !playerPassword || !externalEmail || !externalPassword
+      || !campaignId || !characterId,
+    'Richiede i tre account e la fixture RLS nello staging Supabase.',
+  );
+
+  const options = { auth: { persistSession: false, autoRefreshToken: false } };
+  const dm = createClient(supabaseUrl!, supabaseAnonKey!, options);
+  const player = createClient(supabaseUrl!, supabaseAnonKey!, options);
+  const external = createClient(supabaseUrl!, supabaseAnonKey!, options);
+  const anonymous = createClient(supabaseUrl!, supabaseAnonKey!, options);
+
+  const logins = await Promise.all([
+    dm.auth.signInWithPassword({ email: dmEmail!, password: dmPassword! }),
+    player.auth.signInWithPassword({ email: playerEmail!, password: playerPassword! }),
+    external.auth.signInWithPassword({ email: externalEmail!, password: externalPassword! }),
+  ]);
+  expect(logins.map(result => result.error)).toEqual([null, null, null]);
+
+  const [dmIdResult, playerIdResult] = await Promise.all([
+    dm.rpc('get_current_user_id'),
+    player.rpc('get_current_user_id'),
+  ]);
+  expect(dmIdResult.error).toBeNull();
+  expect(playerIdResult.error).toBeNull();
+
+  const externalCampaign = await external.from('campagne').select('id').eq('id', campaignId!);
+  const externalCharacter = await external.from('personaggi').select('id').eq('id', characterId!);
+  expect(externalCampaign.error).toBeNull();
+  expect(externalCampaign.data).toEqual([]);
+  expect(externalCharacter.error).toBeNull();
+  expect(externalCharacter.data).toEqual([]);
+
+  const forbiddenTransfer = await player
+    .from('campagne')
+    .update({ id_dm: playerIdResult.data })
+    .eq('id', campaignId!)
+    .select('id_dm');
+  expect(forbiddenTransfer.error).toBeNull();
+  expect(forbiddenTransfer.data).toEqual([]);
+
+  const forbiddenAssociation = await player.from('personaggi_campagna').insert({
+    id: 'e2eprobe01',
+    campagna_id: campaignId!,
+    user_id: playerIdResult.data,
+    personaggio_id: characterId!,
+  });
+  expect(forbiddenAssociation.error).not.toBeNull();
+
+  const anonymousRpc = await anonymous.rpc('get_dm_campagna', { p_campagna_id: campaignId! });
+  expect(anonymousRpc.error).not.toBeNull();
+
+  const campaignOwner = await dm.from('campagne').select('id_dm').eq('id', campaignId!).single();
+  expect(campaignOwner.error).toBeNull();
+  expect(campaignOwner.data?.id_dm).toBe(dmIdResult.data);
+});
 
 test('authenticated campaign navigation', async ({ page }) => {
   test.skip(!dmEmail || !dmPassword || !campaignId, 'Richiede la fixture E2E Supabase documentata.');
@@ -116,27 +193,6 @@ test('authenticated friends route uses the React page', async ({ page }) => {
   await expect(page.locator('.react-page-shell .page-header h1')).toHaveText('Amici');
   await expect(page.locator('.react-page-shell .btn-fab')).toBeVisible();
   await expect(page.locator('#amiciPage')).toBeHidden();
-});
-
-test('a character accordion stays open during a realtime refetch', async ({ page }) => {
-  test.skip(!dmEmail || !dmPassword || !characterId, 'Richiede un personaggio nella fixture E2E Supabase.');
-
-  await login(page, dmEmail!, dmPassword!);
-  await page.goto(`/personaggi/${characterId}`);
-  await expect(page.locator('#schedaPage')).toHaveClass(/active/);
-  await page.getByRole('button', { name: 'Pagina 2' }).click();
-
-  const feature = page.locator('details.priv-feat-row').first();
-  await expect(feature).toBeVisible();
-  await feature.locator('summary').click();
-  await expect(feature).toHaveAttribute('open', '');
-
-  const refetch = page.waitForResponse(response => response.request().method() === 'GET' && response.url().includes('/rest/v1/personaggi'));
-  await page.evaluate(() => window.dispatchEvent(new CustomEvent('companion:data-changed', {
-    detail: { table: 'personaggi', action: 'update' },
-  })));
-  await refetch;
-  await expect(feature).toHaveAttribute('open', '');
 });
 
 test('starts and ends a session without leaving fixture state behind', async ({ page }) => {

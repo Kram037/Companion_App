@@ -62,6 +62,8 @@ const requiredGuards = [
   ['update-dm-campagna.sql', 'DROP TRIGGER IF EXISTS sync_giocatori_on_invito_change'],
   ['update-dm-campagna.sql', 'Termina la sessione attiva prima di trasferire la campagna'],
   ['harden-homebrew-rls.sql', "'private', 'friends', 'campaign', 'public'"],
+  ['revoke-anon-security-definer.sql', 'REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon'],
+  ['revoke-anon-security-definer.sql', "'REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC, anon'"],
 ];
 
 for (const [file, guard] of requiredGuards) {

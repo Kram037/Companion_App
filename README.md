@@ -187,10 +187,14 @@ I test pubblici non richiedono credenziali. I test Supabase autenticati vengono
 abilitati solo quando sono presenti le variabili dedicate:
 
 ```text
+E2E_SUPABASE_URL
+E2E_SUPABASE_ANON_KEY
 E2E_DM_EMAIL
 E2E_DM_PASSWORD
 E2E_PLAYER_EMAIL
 E2E_PLAYER_PASSWORD
+E2E_EXTERNAL_EMAIL
+E2E_EXTERNAL_PASSWORD
 E2E_CAMPAIGN_ID
 E2E_SESSION_ID
 E2E_CHARACTER_ID
@@ -198,8 +202,9 @@ E2E_EMPTY_CAMPAIGN_ID
 E2E_MUTATION_TESTS=1
 ```
 
-I test mutativi devono usare esclusivamente account e campagne fixture. Non
-eseguirli su dati reali degli utenti.
+Creare e confermare i tre account Auth nel progetto E2E, quindi applicare
+`backend/supabase/sql/e2e-fixture.sql`. I test mutativi devono usare
+esclusivamente account e campagne fixture, mai dati reali degli utenti.
 
 ## Dati del Compendio
 
