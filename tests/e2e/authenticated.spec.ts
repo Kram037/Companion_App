@@ -18,25 +18,11 @@ const runMutations = process.env.E2E_MUTATION_TESTS === '1';
 test.beforeAll(() => {
   if (process.env.E2E_REQUIRE_AUTH !== '1') return;
 
-  const fixture = {
-    E2E_SUPABASE_URL: supabaseUrl,
-    E2E_SUPABASE_ANON_KEY: supabaseAnonKey,
-    E2E_DM_EMAIL: dmEmail,
-    E2E_DM_PASSWORD: dmPassword,
-    E2E_PLAYER_EMAIL: playerEmail,
-    E2E_PLAYER_PASSWORD: playerPassword,
-    E2E_EXTERNAL_EMAIL: externalEmail,
-    E2E_EXTERNAL_PASSWORD: externalPassword,
-    E2E_CAMPAIGN_ID: campaignId,
-    E2E_SESSION_ID: sessionId,
-    E2E_CHARACTER_ID: characterId,
-    E2E_EMPTY_CAMPAIGN_ID: emptyCampaignId,
-  };
-  const missing = Object.entries(fixture)
-    .filter(([, value]) => !value)
-    .map(([name]) => name);
-
-  expect(missing, 'La suite di rilascio richiede la fixture E2E Supabase completa.').toEqual([]);
+  const hasCompleteFixture = [
+    supabaseUrl, supabaseAnonKey, dmEmail, dmPassword, playerEmail, playerPassword,
+    externalEmail, externalPassword, campaignId, sessionId, characterId, emptyCampaignId,
+  ].every(Boolean);
+  expect(hasCompleteFixture, 'La suite di rilascio richiede la fixture E2E Supabase completa.').toBe(true);
   expect(runMutations, 'La suite di rilascio richiede E2E_MUTATION_TESTS=1.').toBe(true);
 });
 

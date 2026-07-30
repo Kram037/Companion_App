@@ -205,6 +205,8 @@ E2E_MUTATION_TESTS=1
 Creare e confermare i tre account Auth nel progetto E2E, quindi applicare
 `backend/supabase/sql/e2e-fixture.sql`. I test mutativi devono usare
 esclusivamente account e campagne fixture, mai dati reali degli utenti.
+Il gate di rilascio usa `E2E_REQUIRE_AUTH=1`: fixture incompleta o test
+mutativi disabilitati fanno fallire la suite invece di produrre skip.
 
 ## Dati del Compendio
 

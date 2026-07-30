@@ -6,6 +6,7 @@ const viewports = [
   { name: 'tablet', width: 768, height: 1024 },
   { name: 'desktop', width: 1440, height: 900 },
 ] as const;
+const screenshotOptions = { animations: 'disabled', caret: 'hide' } as const;
 
 test.use({
   colorScheme: 'light',
@@ -36,11 +37,10 @@ test.describe('@visual baseline', () => {
       test(`${route} ${viewport.name}`, async ({ page }) => {
         await page.setViewportSize(viewport);
         await openStablePage(page, route);
-        await expect(page).toHaveScreenshot(`${route}-${viewport.name}.png`, {
-          animations: 'disabled',
-          caret: 'hide',
-          fullPage: true,
-        });
+        await expect(page).toHaveScreenshot(
+          `${route}-${viewport.name}.png`,
+          { ...screenshotOptions, fullPage: true },
+        );
       });
     }
   }
@@ -51,10 +51,7 @@ test.describe('@visual baseline', () => {
       await openStablePage(page);
       await page.locator('#userBtn').click();
       await expect(page.locator('#loginModal')).toHaveClass(/active/);
-      await expect(page).toHaveScreenshot(`login-modal-${viewport.name}.png`, {
-        animations: 'disabled',
-        caret: 'hide',
-      });
+      await expect(page).toHaveScreenshot(`login-modal-${viewport.name}.png`, screenshotOptions);
     });
 
     test(`dice roller ${viewport.name}`, async ({ page }) => {
@@ -62,10 +59,7 @@ test.describe('@visual baseline', () => {
       await openStablePage(page);
       await page.locator('#d20Logo').dispatchEvent('click');
       await expect(page.locator('#diceRollerPanel')).toHaveAttribute('aria-hidden', 'false');
-      await expect(page).toHaveScreenshot(`dice-roller-${viewport.name}.png`, {
-        animations: 'disabled',
-        caret: 'hide',
-      });
+      await expect(page).toHaveScreenshot(`dice-roller-${viewport.name}.png`, screenshotOptions);
     });
   }
 
@@ -75,9 +69,6 @@ test.describe('@visual baseline', () => {
     await page.locator('.desktop-bookmark-split-tab').click();
     await expect(page.locator('#desktopSplitPane')).toBeVisible();
     await expect(page.frameLocator('#desktopSplitPaneFrame').locator('#appStartup')).toBeHidden({ timeout: 8000 });
-    await expect(page).toHaveScreenshot('split-view-desktop-wide.png', {
-      animations: 'disabled',
-      caret: 'hide',
-    });
+    await expect(page).toHaveScreenshot('split-view-desktop-wide.png', screenshotOptions);
   });
 });
