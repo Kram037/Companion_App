@@ -1,5 +1,7 @@
 import type { HomebrewSettings, Id, UserProfile } from '../types/domain';
 import { parseNullable, userProfileSchema } from '../schemas';
+import { dbRpc, dbTables } from './databaseContract';
+import { parseFriendProfileRows } from './friendsApi';
 import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
 
 const USER_COLUMNS = 'id,uid,nome_utente,cid,email,campagne_preferite,homebrew_settings';
@@ -47,7 +49,7 @@ export async function fetchUserByUid(uid: Id): Promise<UserProfile | null> {
 async function fetchUserBy(column: 'id' | 'uid', value: Id): Promise<UserProfile | null> {
   const client = getSupabaseClient();
   const result = await client
-    .from('utenti')
+    .from(dbTables.users)
     .select(USER_COLUMNS)
     .eq(column, value)
     .single();
@@ -57,7 +59,7 @@ async function fetchUserBy(column: 'id' | 'uid', value: Id): Promise<UserProfile
   }
 
   const fallback = await client
-    .from('utenti')
+    .from(dbTables.users)
     .select(USER_BASE_COLUMNS)
     .eq(column, value)
     .single();
@@ -72,17 +74,17 @@ export interface HomebrewFriend {
 }
 
 export async function fetchHomebrewFriends(): Promise<HomebrewFriend[]> {
-  const { data, error } = await getSupabaseClient().rpc('get_amici');
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.getFriends);
   throwIfSupabaseError(error);
-  return (Array.isArray(data) ? data : []).map(row => ({
-    id: String(row.amico_id || row.uid || row.id || ''),
-    nome: String(row.nome_utente || row.username || 'Amico'),
-    cid: row.cid == null ? null : String(row.cid),
-  })).filter(friend => friend.id);
+  return parseFriendProfileRows(data).map(friend => ({
+    id: friend.id,
+    nome: friend.name,
+    cid: friend.cid || null,
+  }));
 }
 
 export async function updateUserHomebrewSettings(userId: Id, settings: HomebrewSettings): Promise<void> {
-  const { error } = await getSupabaseClient().from('utenti').update({
+  const { error } = await getSupabaseClient().from(dbTables.users).update({
     homebrew_settings: settings,
     updated_at: new Date().toISOString(),
   }).eq('id', userId);

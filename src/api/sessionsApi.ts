@@ -7,6 +7,7 @@ import {
   parseNullable,
   sessionSchema,
 } from '../schemas';
+import { dbRpc, dbTables } from './databaseContract';
 import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
 
 const SESSION_COLUMNS = 'id,campagna_id,data_inizio,data_fine,created_at,combat_round,combat_turn_index';
@@ -16,7 +17,7 @@ const GENERIC_ROLL_COLUMNS = 'id,sessione_id,richiesta_id,giocatore_id,valore,ti
 export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null> {
   const client = getSupabaseClient();
   const result = await client
-    .from('sessioni')
+    .from(dbTables.sessions)
     .select(SESSION_COLUMNS)
     .eq('id', sessioneId)
     .single();
@@ -26,7 +27,7 @@ export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null>
   }
 
   const fallback = await client
-    .from('sessioni')
+    .from(dbTables.sessions)
     .select(SESSION_BASE_COLUMNS)
     .eq('id', sessioneId)
     .single();
@@ -37,7 +38,7 @@ export async function fetchSessionById(sessioneId: Id): Promise<Sessione | null>
 export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sessione | null> {
   const client = getSupabaseClient();
   const result = await client
-    .from('sessioni')
+    .from(dbTables.sessions)
     .select(SESSION_COLUMNS)
     .eq('campagna_id', campagnaId)
     .is('data_fine', null)
@@ -49,7 +50,7 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
   }
 
   const fallback = await client
-    .from('sessioni')
+    .from(dbTables.sessions)
     .select(SESSION_BASE_COLUMNS)
     .eq('campagna_id', campagnaId)
     .is('data_fine', null)
@@ -60,7 +61,7 @@ export async function fetchActiveSessionByCampaign(campagnaId: Id): Promise<Sess
 }
 
 export async function startCampaignSession(campagnaId: Id): Promise<Sessione> {
-  const { data, error } = await getSupabaseClient().rpc('start_campaign_session', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.startCampaignSession, {
     p_campagna_id: campagnaId,
   });
   throwIfSupabaseError(error);
@@ -69,7 +70,7 @@ export async function startCampaignSession(campagnaId: Id): Promise<Sessione> {
 
 export async function fetchHasInitiativeRequest(sessioneId: Id): Promise<boolean> {
   const { count, error } = await getSupabaseClient()
-    .from('richieste_tiro_iniziativa')
+    .from(dbTables.initiativeRequests)
     .select('id', { count: 'exact', head: true })
     .eq('sessione_id', sessioneId);
   throwIfSupabaseError(error);
@@ -77,14 +78,14 @@ export async function fetchHasInitiativeRequest(sessioneId: Id): Promise<boolean
 }
 
 export async function endCampaignSession(sessioneId: Id): Promise<void> {
-  const { error } = await getSupabaseClient().rpc('finish_campaign_session', {
+  const { error } = await getSupabaseClient().rpc(dbRpc.finishCampaignSession, {
     p_sessione_id: sessioneId,
   });
   throwIfSupabaseError(error);
 }
 
 export async function requestInitiativeRolls(sessioneId: Id, playerIds: Id[]): Promise<number> {
-  const { data, error } = await getSupabaseClient().rpc('request_initiative_rolls', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.requestInitiativeRolls, {
     p_sessione_id: sessioneId,
     p_player_ids: playerIds,
   });
@@ -100,7 +101,7 @@ export async function requestGenericRolls(
   metadata: GenericRollMetadata,
 ): Promise<Id> {
   if (!playerIds.length) throw new Error('Seleziona almeno un giocatore');
-  const { data, error } = await getSupabaseClient().rpc('request_generic_rolls', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.requestGenericRolls, {
     p_sessione_id: sessioneId,
     p_player_ids: playerIds,
     p_tipo_tiro: metadata.tipoTiro,
@@ -114,7 +115,7 @@ export async function requestGenericRolls(
 export async function fetchLatestGenericRollGroup(sessioneId: Id): Promise<GenericRollGroup | null> {
   const client = getSupabaseClient();
   const latestResult = await client
-    .from('richieste_tiro_generico')
+    .from(dbTables.genericRollRequests)
     .select(GENERIC_ROLL_COLUMNS)
     .eq('sessione_id', sessioneId)
     .order('created_at', { ascending: false })
@@ -125,7 +126,7 @@ export async function fetchLatestGenericRollGroup(sessioneId: Id): Promise<Gener
   if (!latest) return null;
 
   const { data, error } = await client
-    .from('richieste_tiro_generico')
+    .from(dbTables.genericRollRequests)
     .select(GENERIC_ROLL_COLUMNS)
     .eq('sessione_id', sessioneId)
     .eq('richiesta_id', latest.richiesta_id)
@@ -142,7 +143,7 @@ export async function fetchLatestGenericRollGroup(sessioneId: Id): Promise<Gener
 
 export async function deleteGenericRollGroup(sessioneId: Id, richiestaId: Id): Promise<void> {
   const { error } = await getSupabaseClient()
-    .from('richieste_tiro_generico')
+    .from(dbTables.genericRollRequests)
     .delete()
     .eq('sessione_id', sessioneId)
     .eq('richiesta_id', richiestaId);

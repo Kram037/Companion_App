@@ -1,5 +1,6 @@
 import type { CombatCharacter, CombatSnapshot, Id, InitiativeRoll, MostroCombattimento } from '../types/domain';
 import { campaignCharacterSchema, combatAdvanceResultSchema, combatCharacterRowSchema, combatMonsterSchema, initiativeRollSchema, parseArray, parseData } from '../schemas';
+import { dbRpc, dbTables } from './databaseContract';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 import { fetchSessionById } from './sessionsApi';
@@ -12,7 +13,7 @@ const CONDITION_KEYS = [
 
 export async function fetchCombatMonsters(sessioneId: Id): Promise<MostroCombattimento[]> {
   const { data, error } = await getSupabaseClient()
-    .rpc('get_combat_monsters_safe', { p_sessione_id: sessioneId });
+    .rpc(dbRpc.getCombatMonsters, { p_sessione_id: sessioneId });
   throwIfSupabaseError(error);
   return parseArray(combatMonsterSchema, data);
 }
@@ -39,7 +40,7 @@ export async function advanceCombatTurn(input: {
 }): Promise<{ round: number; turnIndex: number; expiredTimers: number; advanced: boolean }> {
   const { round: nextRound, turnIndex: nextTurnIndex } = nextCombatTurnState(input.orderLength, input.round, input.turnIndex);
   if (input.orderLength <= 0) return { round: nextRound, turnIndex: nextTurnIndex, expiredTimers: 0, advanced: false };
-  const { data, error } = await getSupabaseClient().rpc('advance_combat_turn', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.advanceCombatTurn, {
     p_sessione_id: input.sessioneId,
     p_order_length: input.orderLength,
     p_expected_round: input.round,
@@ -63,24 +64,24 @@ export function nextCombatTurnState(orderLength: number, round: number, turnInde
 }
 
 export async function endCombat(sessioneId: Id): Promise<void> {
-  const { error } = await getSupabaseClient().rpc('finish_combat', { p_sessione_id: sessioneId });
+  const { error } = await getSupabaseClient().rpc(dbRpc.finishCombat, { p_sessione_id: sessioneId });
   throwIfSupabaseError(error);
 }
 
 async function fetchInitiativeRolls(sessioneId: Id): Promise<InitiativeRoll[]> {
-  const { data, error } = await getSupabaseClient().rpc('get_tiri_iniziativa', { p_sessione_id: sessioneId });
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.getInitiativeRolls, { p_sessione_id: sessioneId });
   throwIfSupabaseError(error);
   return parseArray(initiativeRollSchema, data);
 }
 
 async function fetchCombatCharacters(campagnaId: Id): Promise<CombatCharacter[]> {
   const client = getSupabaseClient();
-  const { data: links, error: linksError } = await client.rpc('get_personaggi_in_campagna', { p_campagna_id: campagnaId });
+  const { data: links, error: linksError } = await client.rpc(dbRpc.getCampaignCharacters, { p_campagna_id: campagnaId });
   throwIfSupabaseError(linksError);
   const parsedLinks = parseArray(campaignCharacterSchema, links);
   const ids = parsedLinks.map(row => row.personaggio_id);
   if (!ids.length) return [];
-  const { data, error } = await client.from('personaggi')
+  const { data, error } = await client.from(dbTables.characters)
     .select(`id,nome,immagine_url,punti_vita_max,pv_attuali,${CONDITION_KEYS.join(',')}`)
     .in('id', ids);
   throwIfSupabaseError(error);

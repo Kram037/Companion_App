@@ -14,7 +14,8 @@
 
 ## Confini
 
-- `src/api`: unico punto per Supabase nei nuovi moduli.
+- `src/api`: unico punto per Supabase nei nuovi moduli; `databaseContract.ts`
+  cataloga tabelle/RPC e `DataAccessError` normalizza gli errori tecnici.
 - `src/schemas`: validazione runtime Zod.
 - `src/query`: TanStack Query, query keys gerarchiche e cache server.
 - `src/realtime`: deduplica eventi e invalidazioni mirate.
@@ -56,6 +57,8 @@ al livello React/typed.
 - `tools/check-data-boundary.mjs`: controlla i data bundle runtime.
 - `tools/check-index-bootstrap.mjs`: impedisce il ritorno dei data bundle pesanti nel bootstrap iniziale.
 - `tools/check-react-boundaries.mjs`: blocca `innerHTML` e Supabase diretto nei nuovi componenti React.
+- `tools/check-api-boundaries.mjs`: blocca accessi Supabase fuori da `src/api`,
+  colonne implicite e nomi DB dispersi fuori dal catalogo typed.
 - `tools/check-legacy-symbols.mjs`: blocca funzioni e API globali legacy senza chiamanti.
 
 ## Test

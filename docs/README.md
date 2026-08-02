@@ -41,3 +41,5 @@ Indice dei documenti tecnici e operativi della Companion App.
 ## Audit
 
 - [`audits/refactor-audit.md`](audits/refactor-audit.md): audit tecnico storico del refactor.
+- [`audits/react-foundations-audit.md`](audits/react-foundations-audit.md): audit gap-only di React, TypeScript, Vite e Nx (scheda 05).
+- [`audits/data-access-audit.md`](audits/data-access-audit.md): mappa e audit dei contratti in `src/api` (scheda 06).

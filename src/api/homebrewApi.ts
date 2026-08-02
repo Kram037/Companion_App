@@ -1,18 +1,9 @@
 import type { HomebrewItem, Id } from '../types/domain';
 import { homebrewItemSchema, parseArray } from '../schemas';
+import type { HomebrewTable } from './databaseContract';
 import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
 
-export type HomebrewTable =
-  | 'homebrew_background'
-  | 'homebrew_classi'
-  | 'homebrew_combattimenti'
-  | 'homebrew_incantesimi'
-  | 'homebrew_nemici'
-  | 'homebrew_oggetti'
-  | 'homebrew_razze'
-  | 'homebrew_stili'
-  | 'homebrew_suppliche'
-  | 'homebrew_talenti';
+export type { HomebrewTable } from './databaseContract';
 
 const HOME_BREW_COMMON_COLUMNS = 'id,user_id,nome,created_at,updated_at';
 const HOME_BREW_STABLE_COLUMNS: Record<HomebrewTable, string> = {

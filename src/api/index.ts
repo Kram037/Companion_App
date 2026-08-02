@@ -1,6 +1,7 @@
 export * from './campaignsApi';
 export * from './charactersApi';
 export * from './combatApi';
+export * from './databaseContract';
 export * from './friendsApi';
 export * from './homebrewApi';
 export * from './runtimeDataApi';

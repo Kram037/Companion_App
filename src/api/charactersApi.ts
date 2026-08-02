@@ -1,5 +1,8 @@
+import { z } from 'zod';
+
 import type { Id, Personaggio } from '../types/domain';
-import { characterSchema, parseArray, parseNullable } from '../schemas';
+import { characterSchema, parseArray, parseData, parseNullable } from '../schemas';
+import { dbTables } from './databaseContract';
 import { getSupabaseClient, isMissingDatabaseColumn, throwIfSupabaseError } from './supabaseClient';
 
 const CHARACTER_BASE_COLUMNS = [
@@ -29,10 +32,22 @@ const CHARACTER_DETAIL_COLUMNS = [
   'tipo_scheda', 'talenti',
 ].join(',');
 
+const characterCampaignLinkSchema = z.object({
+  personaggio_id: z.string(),
+  campagna_id: z.string(),
+});
+const campaignNameSchema = z.object({
+  id: z.string(),
+  nome_campagna: z.string(),
+});
+const characterResistancesSchema = z.object({
+  resistenze: z.array(z.string()).nullish(),
+});
+
 export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio | null> {
   const client = getSupabaseClient();
   const result = await client
-    .from('personaggi')
+    .from(dbTables.characters)
     .select(CHARACTER_DETAIL_COLUMNS)
     .eq('id', personaggioId)
     .single();
@@ -42,7 +57,7 @@ export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio
   }
 
   const fallback = await client
-    .from('personaggi')
+    .from(dbTables.characters)
     .select(CHARACTER_BASE_COLUMNS)
     .eq('id', personaggioId)
     .single();
@@ -53,31 +68,32 @@ export async function fetchCharacterById(personaggioId: Id): Promise<Personaggio
 export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> {
   const client = getSupabaseClient();
   const result = await client
-    .from('personaggi')
+    .from(dbTables.characters)
     .select(CHARACTER_LIST_COLUMNS)
     .eq('user_id', userId)
     .order('nome');
   const fallback = isMissingDatabaseColumn(result.error)
-    ? await client.from('personaggi').select(CHARACTER_BASE_COLUMNS).eq('user_id', userId).order('nome')
+    ? await client.from(dbTables.characters).select(CHARACTER_BASE_COLUMNS).eq('user_id', userId).order('nome')
     : result;
   throwIfSupabaseError(fallback.error);
   const characters = parseArray(characterSchema, fallback.data);
   if (!characters.length) return characters;
 
   const { data: associations, error: associationError } = await client
-    .from('personaggi_campagna')
+    .from(dbTables.campaignCharacters)
     .select('personaggio_id,campagna_id')
     .in('personaggio_id', characters.map(character => character.id));
   throwIfSupabaseError(associationError);
-  const campaignIds = [...new Set((associations ?? []).map((row: Record<string, unknown>) => String(row.campagna_id)))];
+  const parsedAssociations = parseArray(characterCampaignLinkSchema, associations);
+  const campaignIds = [...new Set(parsedAssociations.map(row => row.campagna_id))];
   if (!campaignIds.length) return characters.map(character => ({ ...character, campagne: [] }));
-  const { data: campaigns, error: campaignsError } = await client.from('campagne').select('id,nome_campagna').in('id', campaignIds);
+  const { data: campaigns, error: campaignsError } = await client.from(dbTables.campaigns).select('id,nome_campagna').in('id', campaignIds);
   throwIfSupabaseError(campaignsError);
-  const nameById = new Map<string, string>((campaigns ?? []).map((row: Record<string, unknown>) => [String(row.id), String(row.nome_campagna)]));
+  const nameById = new Map<string, string>(parseArray(campaignNameSchema, campaigns).map(row => [row.id, row.nome_campagna]));
   const namesByCharacter = new Map<string, string[]>();
-  (associations ?? []).forEach((row: Record<string, unknown>) => {
-    const characterId = String(row.personaggio_id);
-    const name = nameById.get(String(row.campagna_id));
+  parsedAssociations.forEach(row => {
+    const characterId = row.personaggio_id;
+    const name = nameById.get(row.campagna_id);
     if (name) namesByCharacter.set(characterId, [...(namesByCharacter.get(characterId) ?? []), name]);
   });
   return characters.map(character => ({ ...character, campagne: namesByCharacter.get(character.id) ?? [] }));
@@ -85,12 +101,12 @@ export async function fetchCharactersByUser(userId: Id): Promise<Personaggio[]> 
 
 export async function updateCharacterResistances(personaggioId: Id, resistenze: string[]): Promise<string[]> {
   const { data, error } = await getSupabaseClient()
-    .from('personaggi')
+    .from(dbTables.characters)
     .update({ resistenze, updated_at: new Date().toISOString() })
     .eq('id', personaggioId)
     .select('resistenze')
     .single();
   throwIfSupabaseError(error);
-  return Array.isArray(data?.resistenze) ? data.resistenze.map(String) : resistenze;
+  return parseData(characterResistancesSchema, data).resistenze ?? resistenze;
 }
 

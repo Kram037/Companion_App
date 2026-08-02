@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { jsonValueSchema, parseArray, parseData } from '../schemas';
 import type { HomebrewItem } from '../types/domain';
+import { dbTables } from './databaseContract';
 import { fetchHomebrewByUser } from './homebrewApi';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
@@ -174,7 +175,7 @@ export type CombatMonsterDraft = {
 
 export async function fetchCombatToolMonsters(sessioneId: string): Promise<CombatToolMonster[]> {
   const { data, error } = await getSupabaseClient()
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .select(MONSTER_CLONE_COLUMNS)
     .eq('sessione_id', idSchema.parse(sessioneId))
     .order('iniziativa', { ascending: false, nullsFirst: false });
@@ -185,7 +186,7 @@ export async function fetchCombatToolMonsters(sessioneId: string): Promise<Comba
 export async function createPlaceholderMonster(input: CreatePlaceholderMonsterInput): Promise<CombatToolMonster> {
   const value = placeholderInputSchema.parse(input);
   const { data, error } = await getSupabaseClient()
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .insert({
       campagna_id: value.campagnaId,
       sessione_id: value.sessioneId,
@@ -226,7 +227,7 @@ export async function createCombatMonsters(input: {
   if (input.drafts.length > MAX_MONSTERS_PER_BATCH) throw new Error(`Puoi aggiungere al massimo ${MAX_MONSTERS_PER_BATCH} mostri alla volta`);
   const payloads = combatMonsterPayloads(input.drafts, input.campagnaId, input.sessioneId);
   const { data, error } = await getSupabaseClient()
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .insert(payloads)
     .select(MONSTER_COLUMNS);
   throwIfSupabaseError(error);
@@ -262,7 +263,7 @@ export async function duplicateCombatMonster(monsterId: string, sessioneId: stri
   const validMonsterId = idSchema.parse(monsterId);
   const validSessionId = idSchema.parse(sessioneId);
   const [{ data: sourceData, error: sourceError }, monsters] = await Promise.all([
-    client.from('mostri_combattimento').select(MONSTER_CLONE_COLUMNS).eq('id', validMonsterId).single(),
+    client.from(dbTables.combatMonsters).select(MONSTER_CLONE_COLUMNS).eq('id', validMonsterId).single(),
     fetchCombatToolMonsters(validSessionId),
   ]);
   throwIfSupabaseError(sourceError);
@@ -282,7 +283,7 @@ export async function duplicateCombatMonster(monsterId: string, sessioneId: stri
   for (const condition of COMBAT_CONDITIONS) clone[condition] = false;
 
   const { data, error } = await client
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .insert(clone)
     .select(MONSTER_COLUMNS)
     .single();
@@ -292,7 +293,7 @@ export async function duplicateCombatMonster(monsterId: string, sessioneId: stri
 
 export async function removeCombatMonster(monsterId: string): Promise<void> {
   const { error } = await getSupabaseClient()
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .delete()
     .eq('id', idSchema.parse(monsterId));
   throwIfSupabaseError(error);
@@ -300,7 +301,7 @@ export async function removeCombatMonster(monsterId: string): Promise<void> {
 
 export async function fetchCombatTimers(sessioneId: string): Promise<CombatTimer[]> {
   const { data, error } = await getSupabaseClient()
-    .from('combat_timers')
+    .from(dbTables.combatTimers)
     .select(TIMER_COLUMNS)
     .eq('sessione_id', idSchema.parse(sessioneId))
     .eq('expired', false)
@@ -313,7 +314,7 @@ export async function createCombatTimer(input: CreateCombatTimerInput): Promise<
   const value = timerInputSchema.parse(input);
   const targetId = value.targetKind === 'global' ? null : value.targetId;
   const { data, error } = await getSupabaseClient()
-    .from('combat_timers')
+    .from(dbTables.combatTimers)
     .insert({
       campagna_id: value.campagnaId,
       sessione_id: value.sessioneId,
@@ -335,7 +336,7 @@ export async function createCombatTimer(input: CreateCombatTimerInput): Promise<
 export async function updateCombatTimer(timerId: string, input: UpdateCombatTimerInput): Promise<CombatTimer> {
   const value = timerUpdateSchema.parse(input);
   const { data, error } = await getSupabaseClient()
-    .from('combat_timers')
+    .from(dbTables.combatTimers)
     .update({
       remaining_rounds: value.remainingRounds,
       conditions: value.conditions,
@@ -349,7 +350,7 @@ export async function updateCombatTimer(timerId: string, input: UpdateCombatTime
 
 export async function removeCombatTimer(timerId: string): Promise<void> {
   const { error } = await getSupabaseClient()
-    .from('combat_timers')
+    .from(dbTables.combatTimers)
     .delete()
     .eq('id', idSchema.parse(timerId));
   throwIfSupabaseError(error);
@@ -442,7 +443,7 @@ export function combatMonsterPayloads(
 
 async function updateMonster(monsterId: string, changes: Record<string, unknown>): Promise<CombatToolMonster> {
   const { data, error } = await getSupabaseClient()
-    .from('mostri_combattimento')
+    .from(dbTables.combatMonsters)
     .update(changes)
     .eq('id', idSchema.parse(monsterId))
     .select(MONSTER_COLUMNS)

@@ -1,25 +1,36 @@
+import { z } from 'zod';
+
 import type { Campagna, CampaignCharacter, CampaignInvite, CampaignPlayer, Id } from '../types/domain';
-import { campaignCharacterSchema, campaignInviteSchema, campaignPlayerSchema, campaignSchema, parseArray, parseNullable } from '../schemas';
+import { campaignCharacterSchema, campaignInviteSchema, campaignPlayerSchema, campaignSchema, parseArray, parseData, parseNullable } from '../schemas';
+import { dbRpc, dbTables } from './databaseContract';
 import { getSupabaseClient, throwIfSupabaseError } from './supabaseClient';
 
 const CAMPAIGN_COLUMNS = 'id,nome_campagna,id_dm,icona_name,giocatori,data_creazione,numero_sessioni,tempo_di_gioco,note,updated_at';
+const campaignDmSchema = z.object({
+  id: z.string(),
+  nome_utente: z.string().nullish(),
+  cid: z.union([z.string(), z.number().transform(String)]).nullish(),
+});
+const campaignFavoritesSchema = z.object({
+  campagne_preferite: z.array(z.string()).nullish(),
+});
 
 export async function fetchCampaignById(campagnaId: Id): Promise<Campagna | null> {
   const [campaignResult, dmResult] = await Promise.all([
-    getSupabaseClient().from('campagne').select(CAMPAIGN_COLUMNS).eq('id', campagnaId).single(),
-    getSupabaseClient().rpc('get_dm_campagna', { p_campagna_id: campagnaId }),
+    getSupabaseClient().from(dbTables.campaigns).select(CAMPAIGN_COLUMNS).eq('id', campagnaId).single(),
+    getSupabaseClient().rpc(dbRpc.getCampaignDm, { p_campagna_id: campagnaId }),
   ]);
   const { data, error } = campaignResult;
   throwIfSupabaseError(error);
   throwIfSupabaseError(dmResult.error);
   const campaign = parseNullable(campaignSchema, data);
   if (!campaign) return null;
-  const dm = Array.isArray(dmResult.data) ? dmResult.data[0] : null;
-  return { ...campaign, dm_nome: dm?.nome_utente ? String(dm.nome_utente) : null };
+  const dm = parseArray(campaignDmSchema, dmResult.data)[0] ?? null;
+  return { ...campaign, dm_nome: dm?.nome_utente ?? null };
 }
 
 export async function fetchCampaignPlayers(campagnaId: Id): Promise<CampaignPlayer[]> {
-  const { data, error } = await getSupabaseClient().rpc('get_giocatori_campagna', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.getCampaignPlayers, {
     campagna_id_param: campagnaId,
   });
   throwIfSupabaseError(error);
@@ -27,7 +38,7 @@ export async function fetchCampaignPlayers(campagnaId: Id): Promise<CampaignPlay
 }
 
 export async function fetchCampaignCharacters(campagnaId: Id): Promise<CampaignCharacter[]> {
-  const { data, error } = await getSupabaseClient().rpc('get_personaggi_in_campagna', {
+  const { data, error } = await getSupabaseClient().rpc(dbRpc.getCampaignCharacters, {
     p_campagna_id: campagnaId,
   });
   throwIfSupabaseError(error);
@@ -40,22 +51,22 @@ export async function fetchCampaignCharacters(campagnaId: Id): Promise<CampaignC
 
 export async function fetchVisibleCampaigns(userTableId: Id): Promise<Campagna[]> {
   const [visible, user] = await Promise.all([
-    getSupabaseClient().from('campagne').select(CAMPAIGN_COLUMNS).order('data_creazione', { ascending: false }),
-    getSupabaseClient().from('utenti').select('campagne_preferite').eq('id', userTableId).single(),
+    getSupabaseClient().from(dbTables.campaigns).select(CAMPAIGN_COLUMNS).order('data_creazione', { ascending: false }),
+    getSupabaseClient().from(dbTables.users).select('campagne_preferite').eq('id', userTableId).single(),
   ]);
   throwIfSupabaseError(visible.error);
   throwIfSupabaseError(user.error);
   const campaigns = parseArray(campaignSchema, visible.data);
   const dmIds = [...new Set(campaigns.map(campaign => campaign.id_dm))];
   const { data: dms, error: dmsError } = dmIds.length
-    ? await getSupabaseClient().rpc('get_dms_campagne', { p_dm_ids: dmIds })
+    ? await getSupabaseClient().rpc(dbRpc.getCampaignDms, { p_dm_ids: dmIds })
     : { data: [], error: null };
   throwIfSupabaseError(dmsError);
 
-  const favoriteIds = new Set<Id>(user.data?.campagne_preferite ?? []);
-  const dmNames = new Map<Id, string>((dms ?? []).map((dm: Record<string, unknown>) => [
-    String(dm.id),
-    String(dm.nome_utente ?? ''),
+  const favoriteIds = new Set<Id>(parseData(campaignFavoritesSchema, user.data).campagne_preferite ?? []);
+  const dmNames = new Map<Id, string>(parseArray(campaignDmSchema, dms).map(dm => [
+    dm.id,
+    dm.nome_utente ?? '',
   ]));
   return campaigns.map(campaign => ({
     ...campaign,
@@ -70,19 +81,19 @@ export async function fetchVisibleCampaigns(userTableId: Id): Promise<Campagna[]
 export async function toggleCampaignFavorite(userTableId: Id, campaignId: Id): Promise<Id[]> {
   const client = getSupabaseClient();
   const { data, error } = await client
-    .from('utenti')
+    .from(dbTables.users)
     .select('campagne_preferite')
     .eq('id', userTableId)
     .single();
   throwIfSupabaseError(error);
 
-  const favorites = new Set<Id>(data?.campagne_preferite ?? []);
+  const favorites = new Set<Id>(parseData(campaignFavoritesSchema, data).campagne_preferite ?? []);
   if (favorites.has(campaignId)) favorites.delete(campaignId);
   else favorites.add(campaignId);
 
   const next = [...favorites];
   const { error: updateError } = await client
-    .from('utenti')
+    .from(dbTables.users)
     .update({ campagne_preferite: next })
     .eq('id', userTableId);
   throwIfSupabaseError(updateError);
@@ -112,14 +123,14 @@ export function mapReceivedCampaignInviteRow(row: Record<string, unknown>): Camp
 
 export async function fetchReceivedCampaignInvites(userTableId: Id): Promise<CampaignInvite[]> {
   const { data, error } = await getSupabaseClient()
-    .rpc('get_inviti_ricevuti', { p_invitato_id: userTableId });
+    .rpc(dbRpc.getReceivedCampaignInvites, { p_invitato_id: userTableId });
   throwIfSupabaseError(error);
   return (data ?? []).map((row: Record<string, unknown>) => mapReceivedCampaignInviteRow(row));
 }
 
 export async function updateCampaignInviteStatus(inviteId: Id, status: 'accepted' | 'rejected'): Promise<void> {
   const { error } = await getSupabaseClient()
-    .rpc(status === 'accepted' ? 'accetta_invito_campagna' : 'rifiuta_invito_campagna', {
+    .rpc(status === 'accepted' ? dbRpc.acceptCampaignInvite : dbRpc.rejectCampaignInvite, {
       p_invito_id: inviteId,
     });
   throwIfSupabaseError(error);
