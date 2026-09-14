@@ -129,7 +129,12 @@ test('authenticated campaign navigation', async ({ page }) => {
   await page.goto(`/campagne/${campaignId}/sessione`);
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
   await expect(page.locator('#react-root .sessione-content')).toBeVisible();
-  await expect(page.locator('#react-root .session-pg-card-inspiration').first()).toHaveText(/^★ \d+$/);
+  const inspirationCounters = page.locator('#react-root .session-pg-card-inspiration');
+  await expect(inspirationCounters.first()).toHaveText(/^★ \d+$/);
+  const expectedTotal = (await inspirationCounters.allTextContents()).reduce((sum, value) => sum + Number(value.replace('★', '').trim()), 0);
+  await page.getByRole('button', { name: 'Mostra ispirazioni totali' }).click();
+  await expect(inspirationCounters).toHaveCount(0);
+  await expect(page.locator('#react-root .session-pg-inspiration-total')).toHaveText(`★ ${expectedTotal}`);
   await page.getByRole('button', { name: 'Torna ai dettagli' }).click();
   await expect(page).toHaveURL(new RegExp(`/campagne/${campaignId}$`));
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');

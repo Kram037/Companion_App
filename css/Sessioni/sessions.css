@@ -347,13 +347,48 @@
 
 /* Card personaggi (sessione + dettaglio campagna) */
 .session-pg-cards { margin-bottom: var(--spacing-lg); }
+.session-pg-cards-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
 .session-pg-cards-title {
     font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
-    margin-bottom: 8px;
+    margin-bottom: 0;
+}
+.session-pg-inspiration-toggle {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: gold;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.session-pg-inspiration-toggle[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+}
+.session-pg-inspiration-toggle:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+.session-pg-inspiration-total {
+    width: max-content;
+    margin: 0 auto 8px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: gold;
+    font-size: 0.9rem;
+    font-weight: 800;
 }
 .session-pg-cards-grid {
     display: grid;

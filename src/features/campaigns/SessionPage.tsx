@@ -88,6 +88,7 @@ export function SessionPage() {
   const [rollKind, setRollKind] = useState<GenericRollKind>('salvezza');
   const [rollTarget, setRollTarget] = useState('forza');
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
+  const [showTotalInspiration, setShowTotalInspiration] = useState(false);
 
   const startSession = useMutation({
     mutationFn: () => startCampaignSession(campagnaId),
@@ -197,6 +198,7 @@ export function SessionPage() {
   const activeSession = session.data;
   const genericGroup = genericRolls.data;
   const sessionNumber = (data.numero_sessioni ?? 0) + 1;
+  const totalInspiration = campaignInspirationTotal(characters.data ?? []);
   const rollPlayers = (players.data ?? []).map(player => ({
     id: player.id,
     name: playerName(player.id, players.data ?? [], characters.data ?? []),
@@ -238,11 +240,15 @@ export function SessionPage() {
       />}
 
       <div className="session-pg-cards">
-        <div className="session-pg-cards-title">Personaggi</div>
+        <div className="session-pg-cards-header">
+          <div className="session-pg-cards-title">Personaggi</div>
+          <button className="session-pg-inspiration-toggle" type="button" disabled={!characters.data?.length} aria-pressed={showTotalInspiration} aria-label={showTotalInspiration ? 'Mostra ispirazioni per personaggio' : 'Mostra ispirazioni totali'} onClick={() => setShowTotalInspiration(current => !current)}>★</button>
+        </div>
+        {showTotalInspiration && !!characters.data?.length && <div className="session-pg-inspiration-total" aria-label={`Ispirazioni totali: ${totalInspiration}`}>★ {totalInspiration}</div>}
         {!characters.data?.length ? <div className="campagna-pg-empty">Nessun personaggio in questa campagna.</div> : <div className="session-pg-cards-grid">
           {characters.data.map(character => <button className="session-pg-card" type="button" key={character.id} onClick={() => window.openSchedaPersonaggio?.(character.id)} title={character.nome}>
             <span className="session-pg-card-initials">{character.nome.slice(0, 2).toUpperCase()}</span>
-            <span className="session-pg-card-copy"><span className="session-pg-card-inspiration" aria-label={`Ispirazioni: ${character.ispirazione ?? 0}`}>★ {character.ispirazione ?? 0}</span><span className="session-pg-card-name">{character.nome}</span></span>
+            <span className="session-pg-card-copy">{!showTotalInspiration && <span className="session-pg-card-inspiration" aria-label={`Ispirazioni: ${character.ispirazione ?? 0}`}>★ {character.ispirazione ?? 0}</span>}<span className="session-pg-card-name">{character.nome}</span></span>
           </button>)}
         </div>}
       </div>
@@ -271,6 +277,10 @@ export function SessionPage() {
       />}
     </>}
   </div></ReactPage>;
+}
+
+export function campaignInspirationTotal(characters: Pick<CampaignCharacter, 'ispirazione'>[]) {
+  return characters.reduce((total, character) => total + Math.max(0, character.ispirazione ?? 0), 0);
 }
 
 function RollRequestModal({
