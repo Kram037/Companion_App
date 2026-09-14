@@ -2,18 +2,6 @@
 // CHARACTER SHEET ABILITY AND SKILL ACTIONS
 // ============================================================================
 
-window.schedaToggleProficiencyEdit = function(button, containerId, label) {
-    const editing = button.getAttribute('aria-pressed') !== 'true';
-    button.setAttribute('aria-pressed', String(editing));
-    button.classList.toggle('active', editing);
-    button.textContent = editing ? '✓' : '✎';
-    button.title = editing ? `Termina modifica ${label}` : `Modifica ${label}`;
-    button.setAttribute('aria-label', button.title);
-    document.getElementById(containerId)?.querySelectorAll('.scheda-proficiency-toggle').forEach(toggle => {
-        toggle.disabled = !editing;
-    });
-}
-
 window.schedaToggleSave = async function(pgId, abilityKey) {
     const pg = _schedaPgCache;
     if (!pg) return;

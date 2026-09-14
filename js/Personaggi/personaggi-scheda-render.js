@@ -102,7 +102,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <div class="scheda-ability-input clickable" id="sAbil_${a.key}" data-field="${a.key}" data-pgid="${pg.id}" onclick="schedaOpenAbilityCalc('${pg.id}','${a.key}')">${val}</div>
                 <div class="scheda-ability-mod" id="sMod_${a.key}">${m}</div>
                 <div class="scheda-ability-save ${isSaveProf ? 'proficient' : ''}" data-save="${a.key}" data-pgid="${pg.id}">
-                    <button type="button" class="scheda-save-dot scheda-proficiency-toggle" disabled aria-label="Competenza nel tiro salvezza su ${a.full}" aria-pressed="${isSaveProf}" onclick="schedaToggleSave('${pg.id}','${a.key}')">${isSaveProf ? '●' : '○'}</button>
+                    <button type="button" class="scheda-save-dot" aria-label="Competenza nel tiro salvezza su ${a.full}" aria-pressed="${isSaveProf}" onclick="schedaToggleSave('${pg.id}','${a.key}')">${isSaveProf ? '●' : '○'}</button>
                     <span class="scheda-save-clickable" onclick="schedaOpenSaveBonus('${pg.id}','${a.key}')" title="Modifica bonus extra ai TS">
                         <span class="scheda-save-label">TS</span>
                         <span class="scheda-save-val" id="sSave_${a.key}">${saveStr}${saveMark}</span>
@@ -132,8 +132,8 @@ async function renderSchedaPersonaggio(personaggioId) {
             const totalStr = total >= 0 ? `+${total}` : `${total}`;
             return `
             <div class="scheda-skill">
-                <button type="button" class="scheda-skill-dot scheda-proficiency-toggle ${isProf ? 'active' : ''}" disabled aria-label="Competenza in ${sk.label}" aria-pressed="${isProf}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}')">●</button>
-                <button type="button" class="scheda-skill-dot expert scheda-proficiency-toggle ${isExpert ? 'active' : ''}" disabled aria-label="Maestria in ${sk.label}" aria-pressed="${isExpert}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}')">★</button>
+                <button type="button" class="scheda-skill-dot ${isProf ? 'active' : ''}" aria-label="Competenza in ${sk.label}" aria-pressed="${isProf}" onclick="schedaToggleSkillProf('${pg.id}','${sk.key}')">●</button>
+                <button type="button" class="scheda-skill-dot expert ${isExpert ? 'active' : ''}" aria-label="Maestria in ${sk.label}" aria-pressed="${isExpert}" onclick="schedaToggleSkillExpert('${pg.id}','${sk.key}')">★</button>
                 <span class="scheda-skill-mod" id="sSkill_${sk.key}">${totalStr}</span>
                 <span class="scheda-skill-name">${sk.label} <small>(${sk.ability.substring(0, 3).toUpperCase()})</small></span>
             </div>`;
@@ -360,18 +360,14 @@ async function renderSchedaPersonaggio(personaggioId) {
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza
-                <button type="button" class="scheda-edit-btn" aria-pressed="false" aria-label="Modifica competenze tiri salvezza" onclick="event.stopPropagation();schedaToggleProficiencyEdit(this,'schedaAbilitiesList','competenze tiri salvezza')" title="Modifica competenze tiri salvezza">✎</button>
-            </div>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Caratteristiche e Tiri Salvezza</div>
             <div class="scheda-section-body">
                 <div class="scheda-abilities" id="schedaAbilitiesList">${abilitiesHtml}</div>
             </div>
         </div>
 
         <div class="scheda-section">
-            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Abilità
-                <button type="button" class="scheda-edit-btn" aria-pressed="false" aria-label="Modifica competenze abilita" onclick="event.stopPropagation();schedaToggleProficiencyEdit(this,'schedaSkillsList','competenze abilita')" title="Modifica competenze abilita">✎</button>
-            </div>
+            <div class="scheda-section-title" onclick="schedaToggleSection(this)">Abilità</div>
             <div class="scheda-section-body">
                 <div class="scheda-skills" id="schedaSkillsList">${skillsHtml}</div>
                 <div class="scheda-perc-passiva">
