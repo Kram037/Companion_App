@@ -627,9 +627,10 @@ function _labRenderHomebrewListWithFilters(container, cat, data, tab, options = 
     const filtered = _labListApplyFilters(tab, data, state);
     _labRenderStickyTools(tab, data);
     const renderer = window._labListRenderers[tab];
+    const listClass = tab === 'oggetti' ? 'lab-list comp-list' : 'lab-list';
     const listHtml = filtered.length === 0
         ? renderer.emptyHtml
-        : `<div class="lab-list">${filtered.map(renderer.render).join('')}</div>`;
+        : `<div class="${listClass}">${filtered.map(renderer.render).join('')}</div>`;
     container.innerHTML = `<div id="labListContainer">${listHtml}</div>`;
 }
 
@@ -645,9 +646,10 @@ function _labListReRenderList(tab) {
     if (!wrap) return;
     const renderer = window._labListRenderers[tab] || {};
     const render = renderer.render || ((item) => labRenderCard(item, LAB_CATEGORIES[tab]));
+    const listClass = tab === 'oggetti' ? 'lab-list comp-list' : 'lab-list';
     wrap.innerHTML = filtered.length === 0
         ? (renderer.emptyHtml || '<div class="lab-empty">Nessun risultato per i filtri impostati</div>')
-        : `<div class="lab-list">${filtered.map(render).join('')}</div>`;
+        : `<div class="${listClass}">${filtered.map(render).join('')}</div>`;
     _labListRefreshBadge(tab);
 }
 
@@ -936,6 +938,23 @@ window.labNemiciSetSubTab = function(sub) {
 function labRenderCard(item, cat, tabOverride) {
     const tab = tabOverride || _labActiveTab();
     const detail = labGetCardDetail(item, tab);
+    if (tab === 'oggetti') {
+        const rarClass = typeof _invRarityClass === 'function' ? _invRarityClass(item.rarita) : '';
+        const source = item.nascosto_catalogo ? '🔒 Nascosto' : (item.rarita || 'Comune');
+        return `
+        <article class="comp-card comp-inventory-card ${rarClass}" data-id="${item.id}" onclick="labEditItem('${item.id}')">
+            <div class="comp-card-main">
+                <h2 class="comp-card-title">${escapeHtml(item.nome)}</h2>
+                <div class="lab-card-actions">
+                    <span class="comp-card-source">${escapeHtml(source)}</span>
+                    <button class="lab-delete" onclick="event.stopPropagation();labDeleteItem('${item.id}')" title="Elimina">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+            </div>
+            ${detail ? `<div class="comp-card-meta comp-inventory-meta">${escapeHtml(detail)}</div>` : ''}
+        </article>`;
+    }
     // Tutta la card e' cliccabile: per i nemici apre la scheda di
     // dettaglio (viewer dedicato), per tutto il resto apre direttamente
     // il dialog di modifica con lo stato attuale gia' caricato.
@@ -3237,6 +3256,14 @@ function labFieldsOggetti(data) {
     </div>
 
     <div class="form-group">
+        <label class="lab-sub-toggle">
+            <input type="checkbox" id="hbNascostoCatalogo" ${data?.nascosto_catalogo ? 'checked' : ''}>
+            <span>Nascondi dal catalogo homebrew</span>
+        </label>
+        <div class="lab-help">Resterà visibile a te nel Laboratorio, ma non agli altri utenti.</div>
+    </div>
+
+    <div class="form-group">
         <label for="hbDescrizione">Descrizione</label>
         ${window.renderTextareaFullscreen({
             id: 'hbDescrizione',
@@ -3711,6 +3738,7 @@ async function handleSaveHomebrew(e) {
             record.tipo = document.getElementById('hbTipoOgg')?.value || null;
             record.rarita = document.getElementById('hbRarita')?.value || 'Comune';
             record.sotto_tipo = document.getElementById('hbSottoTipo')?.value?.trim() || null;
+            record.nascosto_catalogo = !!document.getElementById('hbNascostoCatalogo')?.checked;
             record.richiede_sintonia = document.getElementById('hbSintonia')?.value === '1';
             record.sintonia_dettaglio = record.richiede_sintonia
                 ? (document.getElementById('hbSintoniaDet')?.value?.trim() || null)

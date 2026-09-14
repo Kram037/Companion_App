@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS homebrew_oggetti (
     tipo TEXT DEFAULT NULL,
     rarita TEXT DEFAULT 'Comune',
     proprieta TEXT DEFAULT NULL,
+    nascosto_catalogo BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

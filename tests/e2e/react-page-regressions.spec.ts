@@ -33,6 +33,36 @@ test('React routing leaves the legacy compendium and laboratory views intact', a
   )).toBe(true);
 });
 
+test('Laboratory equipment uses compendium cards and exposes the hidden-catalog flag', async ({ page }) => {
+  await page.goto('/laboratorio');
+  await page.evaluate(async () => {
+    await window.ensureRuntimeScript?.('laboratorio');
+    const labWindow = window as typeof window & {
+      labRenderCard: (item: Record<string, unknown>, category: Record<string, unknown>, tab: string) => string;
+      labFieldsOggetti: (item: Record<string, unknown>) => string;
+    };
+    const fixture = {
+      id: 'oggetto-test',
+      nome: 'Lama Velata',
+      tipo: 'Arma',
+      rarita: 'Raro',
+      incantamento: 1,
+      nascosto_catalogo: true,
+    };
+    const host = document.createElement('div');
+    host.id = 'labEquipmentRegressionFixture';
+    host.innerHTML = `${labWindow.labRenderCard(fixture, {}, 'oggetti')}${labWindow.labFieldsOggetti(fixture)}`;
+    document.body.appendChild(host);
+  });
+
+  const card = page.locator('#labEquipmentRegressionFixture .comp-card.comp-inventory-card');
+  await expect(card).toHaveClass(/rarita-raro/);
+  await expect(card.locator('.comp-card-title')).toHaveText('Lama Velata');
+  await expect(card.locator('.comp-card-meta')).toContainText('Arma');
+  await expect(card.locator('.comp-card-source')).toContainText('Nascosto');
+  await expect(page.locator('#hbNascostoCatalogo')).toBeChecked();
+});
+
 test('React leaves unmigrated legacy page DOM intact', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/personaggi');

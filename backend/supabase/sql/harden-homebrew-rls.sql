@@ -68,6 +68,12 @@ BEGIN
             'ALTER TABLE %I ADD COLUMN IF NOT EXISTS campaign_id VARCHAR(10)',
             tbl
         );
+        IF tbl = 'homebrew_oggetti' THEN
+            EXECUTE format(
+                'ALTER TABLE %I ADD COLUMN IF NOT EXISTS nascosto_catalogo BOOLEAN NOT NULL DEFAULT FALSE',
+                tbl
+            );
+        END IF;
 
         constraint_name := tbl || '_visibility_check';
         IF NOT EXISTS (
@@ -96,10 +102,17 @@ BEGIN
         EXECUTE format('DROP POLICY IF EXISTS %I ON %I', tbl || '_update', tbl);
         EXECUTE format('DROP POLICY IF EXISTS %I ON %I', tbl || '_delete', tbl);
 
-        EXECUTE format(
-            'CREATE POLICY %I ON %I FOR SELECT TO authenticated USING (can_read_homebrew(user_id, visibility, campaign_id))',
-            tbl || '_select', tbl
-        );
+        IF tbl = 'homebrew_oggetti' THEN
+            EXECUTE format(
+                'CREATE POLICY %I ON %I FOR SELECT TO authenticated USING (can_read_homebrew(user_id, visibility, campaign_id) AND ((SELECT auth.uid()) = user_id OR NOT nascosto_catalogo))',
+                tbl || '_select', tbl
+            );
+        ELSE
+            EXECUTE format(
+                'CREATE POLICY %I ON %I FOR SELECT TO authenticated USING (can_read_homebrew(user_id, visibility, campaign_id))',
+                tbl || '_select', tbl
+            );
+        END IF;
         EXECUTE format(
             'CREATE POLICY %I ON %I FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND ((visibility = %L AND campaign_id IS NOT NULL) OR (visibility <> %L AND campaign_id IS NULL)))',
             tbl || '_insert', tbl, 'campaign', 'campaign'

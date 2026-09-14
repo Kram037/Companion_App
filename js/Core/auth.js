@@ -193,7 +193,7 @@ window._resolveHomebrewFriendUids = _resolveHomebrewFriendUids;
 //  • utente corrente (sempre);
 //  • amici esplicitamente abilitati (se master enabled).
 // Cache: AppState.cachedHomebrewOggetti
-//   = [{ id, nome, tipo, rarita, descrizione, proprieta, incantamento,
+//   = [{ id, nome, tipo, rarita, descrizione, proprieta, incantamento, nascosto_catalogo,
 //        _author_uid, _author_name, _is_own }]
 // ─────────────────────────────────────────────────────────────────────────
 async function loadHomebrewOggetti() {
@@ -220,15 +220,17 @@ async function loadHomebrewOggetti() {
                 return [];
             }
             const ownName = userData?.nome_utente || 'Tuo';
-            const list = (data || []).map(r => {
-                const isOwn = r.user_id === ownUid;
-                return {
-                    ...r,
-                    _author_uid: r.user_id,
-                    _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
-                    _is_own: isOwn,
-                };
-            });
+            const list = (data || [])
+                .filter(r => r.user_id === ownUid || !r.nascosto_catalogo)
+                .map(r => {
+                    const isOwn = r.user_id === ownUid;
+                    return {
+                        ...r,
+                        _author_uid: r.user_id,
+                        _author_name: isOwn ? ownName : (friendInfoByUid[r.user_id]?.nome_utente || 'Amico'),
+                        _is_own: isOwn,
+                    };
+                });
             AppState.cachedHomebrewOggetti = list;
             try {
                 appDebug('[homebrew] oggetti caricati:', {
