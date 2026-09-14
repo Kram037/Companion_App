@@ -755,8 +755,9 @@
 .scheda-ability-mod { font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: center; }
 .scheda-ability-save { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; padding: 2px 4px; border-radius: var(--radius-sm); -webkit-tap-highlight-color: transparent; user-select: none; }
 .scheda-ability-save.proficient { color: var(--accent); font-weight: 600; }
-.scheda-save-dot { font-size: 1rem; cursor: pointer; padding: 2px 3px; border-radius: 3px; transition: background 0.15s; }
-@media (hover: hover) { .scheda-save-dot:hover { background: var(--surface-hover); } }
+.scheda-save-dot { border: 0; background: transparent; color: inherit; font: inherit; font-size: 1rem; cursor: pointer; padding: 2px 3px; border-radius: 3px; transition: background 0.15s; }
+.scheda-save-dot:disabled, .scheda-skill-dot:disabled { cursor: default; pointer-events: none; }
+@media (hover: hover) { .scheda-save-dot:not(:disabled):hover { background: var(--surface-hover); } }
 .scheda-save-clickable { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; padding: 2px 5px; border-radius: var(--radius-sm); transition: background 0.15s; }
 @media (hover: hover) { .scheda-save-clickable:hover { background: var(--surface-hover); } }
 .scheda-save-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
@@ -1106,10 +1107,10 @@
 /* Skills */
 .scheda-skills { display: flex; flex-direction: column; gap: 2px; }
 .scheda-skill { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-secondary); padding: 3px 0; }
-.scheda-skill-dot { font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none !important; }
+.scheda-skill-dot { border: 0; background: transparent; padding: 0; font-family: inherit; font-size: 1rem; flex-shrink: 0; cursor: pointer; color: var(--text-muted); transition: color 0.15s; width: 20px; text-align: center; line-height: 1; -webkit-tap-highlight-color: transparent; user-select: none; outline: none !important; }
 .scheda-skill-dot:focus, .scheda-skill-dot:active, .scheda-skill-dot:focus-visible { outline: none !important; box-shadow: none !important; }
 .scheda-skill-dot.active { color: var(--accent); }
-@media (hover: hover) { .scheda-skill-dot:not(.active):hover { color: var(--accent); opacity: 0.5; } }
+@media (hover: hover) { .scheda-skill-dot:not(.active):not(:disabled):hover { color: var(--accent); opacity: 0.5; } }
 .scheda-skill-dot.expert { font-size: 1.05rem; }
 .scheda-skill-dot.expert.active { color: goldenrod; }
 .scheda-skill-mod { min-width: 24px; font-weight: 600; text-align: right; color: var(--text); }
@@ -1165,6 +1166,7 @@
     color: #fff;
     transform: scale(1.06);
 }
+.scheda-edit-btn.active { background: var(--accent); color: #fff; }
 .scheda-edit-btn:active { transform: scale(0.96); }
 
 /* ============================================================

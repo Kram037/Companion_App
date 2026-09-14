@@ -2,6 +2,18 @@
 // CHARACTER SHEET ABILITY AND SKILL ACTIONS
 // ============================================================================
 
+window.schedaToggleProficiencyEdit = function(button, containerId, label) {
+    const editing = button.getAttribute('aria-pressed') !== 'true';
+    button.setAttribute('aria-pressed', String(editing));
+    button.classList.toggle('active', editing);
+    button.textContent = editing ? '✓' : '✎';
+    button.title = editing ? `Termina modifica ${label}` : `Modifica ${label}`;
+    button.setAttribute('aria-label', button.title);
+    document.getElementById(containerId)?.querySelectorAll('.scheda-proficiency-toggle').forEach(toggle => {
+        toggle.disabled = !editing;
+    });
+}
+
 window.schedaToggleSave = async function(pgId, abilityKey) {
     const pg = _schedaPgCache;
     if (!pg) return;
@@ -22,7 +34,9 @@ window.schedaToggleSave = async function(pgId, abilityKey) {
     const saveEl = document.querySelector(`.scheda-ability-save[data-save="${abilityKey}"]`);
     if (saveEl) {
         saveEl.classList.toggle('proficient', isProf);
-        saveEl.querySelector('.scheda-save-dot').textContent = isProf ? '●' : '○';
+        const dot = saveEl.querySelector('.scheda-save-dot');
+        dot.textContent = isProf ? '●' : '○';
+        dot.setAttribute('aria-pressed', String(isProf));
         saveEl.querySelector('.scheda-save-val').innerHTML = `${saveStr}${saveMark}`;
     }
     schedaInstantSave(pgId, { tiri_salvezza: saves });
@@ -81,8 +95,14 @@ function schedaRefreshSkill(pg, skillKey) {
     const row = el?.closest('.scheda-skill');
     if (row) {
         const dots = row.querySelectorAll('.scheda-skill-dot');
-        if (dots[0]) dots[0].classList.toggle('active', isProf);
-        if (dots[1]) dots[1].classList.toggle('active', isExpert);
+        if (dots[0]) {
+            dots[0].classList.toggle('active', isProf);
+            dots[0].setAttribute('aria-pressed', String(isProf));
+        }
+        if (dots[1]) {
+            dots[1].classList.toggle('active', isExpert);
+            dots[1].setAttribute('aria-pressed', String(isExpert));
+        }
     }
 
     if (skillKey === 'percezione') {

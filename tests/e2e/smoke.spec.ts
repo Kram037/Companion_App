@@ -23,6 +23,24 @@ test('shows and closes the startup screen', async ({ page }) => {
   await expect(page.locator('#labHub .lab-hub-card')).toHaveCount(8);
 });
 
+test('requires edit mode before changing proficiencies', async ({ page }) => {
+  await page.goto('/');
+  await waitForStartup(page);
+  await page.evaluate(() => {
+    const fixture = document.createElement('div');
+    fixture.innerHTML = '<button id="edit-proficiencies" aria-pressed="false"></button><div id="proficiencies"><button id="proficiency" class="scheda-proficiency-toggle" disabled></button></div>';
+    document.body.append(fixture);
+  });
+
+  const edit = page.locator('#edit-proficiencies');
+  const proficiency = page.locator('#proficiency');
+  await expect(proficiency).toBeDisabled();
+  await edit.evaluate(button => (window as typeof window & { schedaToggleProficiencyEdit: (button: Element, containerId: string, label: string) => void }).schedaToggleProficiencyEdit(button, 'proficiencies', 'competenze'));
+  await expect(proficiency).toBeEnabled();
+  await edit.evaluate(button => (window as typeof window & { schedaToggleProficiencyEdit: (button: Element, containerId: string, label: string) => void }).schedaToggleProficiencyEdit(button, 'proficiencies', 'competenze'));
+  await expect(proficiency).toBeDisabled();
+});
+
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
