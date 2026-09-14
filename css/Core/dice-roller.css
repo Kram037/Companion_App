@@ -260,7 +260,8 @@
     body.dice-mobile-open .bookmarks-tabs-fab,
     body.dice-mobile-open .btn-fab,
     body.dice-mobile-open #globalSessionReturnBtn,
-    body.dice-mobile-open #btnScrollStats {
+    body.dice-mobile-open #btnScrollStats,
+    body.dice-mobile-open #btnLongRest {
         display: none !important;
     }
 }

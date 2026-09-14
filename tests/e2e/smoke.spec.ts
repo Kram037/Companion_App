@@ -105,6 +105,37 @@ test('generic magic armor keeps the selected base armor', async ({ page }) => {
   expect(result.legacyName).toBe('Armatura Completa di Mithral');
 });
 
+test('magic armor picker closes as soon as a base armor is selected', async ({ page }) => {
+  await page.goto('/');
+  await waitForStartup(page);
+  await page.evaluate(() => {
+    (window as any)._invOpenCatalogArmorDialog('paladin-1', { id: 'mithral-armor', nome: 'Armatura di Mithral' }, [
+      { nome: 'Mezza Armatura', cat: 'media', ca_base: 15 },
+    ]);
+    (window as any)._invAddCatalogArmorVariant = () => Promise.resolve();
+  });
+
+  await page.locator('.generic-magic-type-row').click();
+  await expect(page.locator('.generic-magic-modal')).toHaveCount(0);
+});
+
+test('long rest floats above the combat shortcut on character sheets', async ({ page }) => {
+    await page.goto('/');
+    await waitForStartup(page);
+  await page.evaluate(() => {
+    (window as any).AppState.currentPage = 'scheda';
+    (window as any).AppState.currentPersonaggioId = 'paladin-1';
+    (window as any).updateScrollStatsBtn();
+  });
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
+    await page.setViewportSize(viewport);
+    const rest = await page.locator('#btnLongRest').boundingBox();
+    const combat = await page.locator('#btnScrollStats').boundingBox();
+    expect(rest!.y + rest!.height).toBeLessThanOrEqual(combat!.y);
+  }
+});
+
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

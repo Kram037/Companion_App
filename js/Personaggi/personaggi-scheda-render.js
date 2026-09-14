@@ -414,7 +414,6 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PF Temp</div>
                 </div>
             </div>
-                <button type="button" class="btn-primary scheda-long-rest-btn" onclick="schedaLongRest('${pg.id}')">☾ Riposo Lungo</button>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Difese</span>

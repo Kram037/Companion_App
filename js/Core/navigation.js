@@ -79,13 +79,17 @@ document.addEventListener('click', function(e) {
 
 function updateScrollStatsBtn() {
     const btn = document.getElementById('btnScrollStats');
-    if (!btn) return;
+    const restBtn = document.getElementById('btnLongRest');
     const show = AppState.currentPage === 'scheda';
-    btn.style.display = show ? 'inline-flex' : 'none';
-    if (show && typeof window.schedaScrollToStats === 'function') {
-        btn.onclick = window.schedaScrollToStats;
-    } else {
-        btn.onclick = null;
+    if (btn) {
+        btn.style.display = show ? 'inline-flex' : 'none';
+        btn.onclick = show && typeof window.schedaScrollToStats === 'function'
+            ? window.schedaScrollToStats : null;
+    }
+    if (restBtn) {
+        restBtn.style.display = show ? 'inline-flex' : 'none';
+        restBtn.onclick = show && AppState.currentPersonaggioId
+            ? () => window.schedaLongRest?.(AppState.currentPersonaggioId) : null;
     }
 }
 

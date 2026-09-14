@@ -1073,7 +1073,7 @@ function _invOpenCatalogArmorDialog(pgId, item, candidates) {
     overlay.className = 'hp-calc-overlay';
     overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
     const rows = candidates.map(armor => `<button type="button" class="generic-magic-type-row"
-        onclick="_invAddCatalogArmorVariant('${pgId}','${escapeHtml(String(item.id)).replace(/'/g, "\\'")}','${escapeHtml(armor.nome).replace(/'/g, "\\'")}')">
+        onclick="this.closest('.hp-calc-overlay').remove();_invAddCatalogArmorVariant('${pgId}','${escapeHtml(String(item.id)).replace(/'/g, "\\'")}','${escapeHtml(armor.nome).replace(/'/g, "\\'")}')">
         <span class="generic-magic-type-name">${escapeHtml(armor.nome)}</span>
         <span class="generic-magic-type-sub">CA ${armor.ca_base} · ${escapeHtml(armor.cat)}</span>
     </button>`).join('');
@@ -1125,7 +1125,6 @@ async function _invSaveCatalogItem(pgId, it, armor) {
     inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
-    document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
 }
 

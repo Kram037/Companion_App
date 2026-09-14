@@ -425,8 +425,6 @@ async function renderMicroScheda(personaggioId) {
             <div class="scheda-hp-label">PF Temp</div>
         </div>
         </div>
-    <button type="button" class="btn-primary scheda-long-rest-btn" onclick="schedaLongRest('${pg.id}')">☾ Riposo Lungo</button>
-
     <div class="scheda-section">
         <div class="scheda-section-title">Dadi Vita</div>
         ${hitDiceHtml || '<span class="scheda-empty">-</span>'}
