@@ -530,6 +530,9 @@ body.global-return-active .back-button-floating { display: none !important; }
     .global-session-return-btn {
         bottom: calc(var(--app-bottom-toolbar-height) + env(safe-area-inset-bottom, 0px) + 62px);
     }
+    body.bookmarks-over-scheda-tabs .global-session-return-btn {
+        bottom: calc(var(--app-bottom-toolbar-height) + env(safe-area-inset-bottom, 0px) + 98px);
+    }
 }
 
 /* ============================================

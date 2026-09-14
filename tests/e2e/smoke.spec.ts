@@ -41,6 +41,21 @@ test('requires edit mode before changing proficiencies', async ({ page }) => {
   await expect(proficiency).toBeDisabled();
 });
 
+test('keeps the session return button above bookmarks on character sheets', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await waitForStartup(page);
+  await page.evaluate(() => {
+    document.body.classList.add('bookmarks-over-scheda-tabs');
+    document.getElementById('globalSessionReturnBtn')!.style.display = 'inline-flex';
+    document.getElementById('bookmarksFab')!.style.display = 'flex';
+  });
+
+  const sessionReturn = await page.locator('#globalSessionReturnBtn').boundingBox();
+  const bookmark = await page.locator('#bookmarksFab').boundingBox();
+  expect(sessionReturn!.y + sessionReturn!.height).toBeLessThanOrEqual(bookmark!.y);
+});
+
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
