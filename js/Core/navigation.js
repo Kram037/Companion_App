@@ -89,7 +89,7 @@ function updateScrollStatsBtn() {
     if (restBtn) {
         restBtn.style.display = show ? 'inline-flex' : 'none';
         restBtn.onclick = show && AppState.currentPersonaggioId
-            ? () => window.schedaLongRest?.(AppState.currentPersonaggioId) : null;
+            ? () => window.schedaOpenRestDialog?.(AppState.currentPersonaggioId) : null;
     }
 }
 

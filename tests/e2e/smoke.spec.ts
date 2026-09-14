@@ -44,8 +44,8 @@ test('long rest restores resources without clearing conditions', async ({ page }
 
   const updates = await page.evaluate(() => (window as any)._schedaBuildLongRestUpdates({
     id: 'paladin-1',
-    livello: 10,
-    classi: [{ nome: 'Paladino', livello: 10 }],
+    livello: 12,
+    classi: [{ nome: 'Paladino', livello: 9 }, { nome: 'Mago', livello: 3 }],
     punti_vita_max: 84,
     pv_attuali: 12,
     esaustione: 2,
@@ -64,8 +64,9 @@ test('long rest restores resources without clearing conditions', async ({ page }
   expect(updates.pv_attuali).toBe(84);
   expect(updates.esaustione).toBe(1);
   expect(updates.slot_incantesimo['1']).toMatchObject({ max: 4, current: 4, used: 0 });
-  expect(updates.dadi_vita_disponibili.Paladino).toBe(10);
-  expect(updates.risorse_classe.Paladino_res).toBe(50);
+  expect(updates.dadi_vita_disponibili.Paladino).toBe(6);
+  expect(updates.dadi_vita_disponibili.Mago).toBe(3);
+  expect(updates.risorse_classe.Paladino_res).toBe(45);
   expect(updates.risorse_classe._custom[0].current).toBe(7);
   expect(updates.privilegi.p1_features.Pozioni[0].current).toBe(3);
   expect(updates).not.toHaveProperty('avvelenato');
@@ -134,6 +135,22 @@ test('long rest floats above the combat shortcut on character sheets', async ({ 
     const combat = await page.locator('#btnScrollStats').boundingBox();
     expect(rest!.y + rest!.height).toBeLessThanOrEqual(combat!.y);
   }
+});
+
+test('rest button offers long and short rest before continuing', async ({ page }) => {
+  await page.goto('/');
+  await waitForStartup(page);
+  await page.evaluate(() => {
+    (window as any).AppState.currentPage = 'scheda';
+    (window as any).AppState.currentPersonaggioId = 'paladin-1';
+    (window as any).schedaLongRest = (id: string) => { (window as any).__longRestId = id; };
+    (window as any).updateScrollStatsBtn();
+  });
+
+  await page.locator('#btnLongRest').click();
+  await expect(page.locator('[data-rest="short"]')).toContainText('Work in progress');
+  await page.locator('[data-rest="long"]').click();
+  await expect.poll(() => page.evaluate(() => (window as any).__longRestId)).toBe('paladin-1');
 });
 
 test('navigates through the main mobile toolbar', async ({ page }) => {

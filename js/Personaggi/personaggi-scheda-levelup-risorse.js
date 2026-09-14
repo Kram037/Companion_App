@@ -559,7 +559,12 @@ window._schedaBuildLongRestUpdates = function(pg) {
     });
 
     const hitDice = {};
-    (pg.classi || []).forEach(c => { hitDice[c.nome] = Number(c.livello) || 1; });
+    (pg.classi || []).forEach(c => {
+        const max = Number(c.livello) || 1;
+        const stored = pg.dadi_vita_disponibili?.[c.nome];
+        const current = stored == null ? max : Math.max(0, Number(stored) || 0);
+        hitDice[c.nome] = Math.min(max, current + Math.floor(max / 2));
+    });
     const maxHp = (typeof schedaGetPvMaxEffettivo === 'function')
         ? schedaGetPvMaxEffettivo(pg)
         : Math.max(1, (Number(pg.punti_vita_max) || 10) + (Number(pg.bonus_manuali?._pv_max_temporaneo) || 0));
@@ -586,12 +591,42 @@ window._schedaBuildLongRestUpdates = function(pg) {
     return updates;
 };
 
+window.schedaOpenRestDialog = function(pgId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal">
+        <button class="modal-close" aria-label="Chiudi">&times;</button>
+        <h3 class="generic-magic-title">Riposo</h3>
+        <p class="generic-magic-sub">Scegli il tipo di riposo</p>
+        <div class="generic-magic-type-list">
+            <button type="button" class="generic-magic-type-row" data-rest="long">
+                <span class="generic-magic-type-name">☾ Riposo Lungo</span>
+            </button>
+            <button type="button" class="generic-magic-type-row" data-rest="short">
+                <span class="generic-magic-type-name">Riposo Breve</span>
+                <span class="generic-magic-type-sub">Work in progress</span>
+            </button>
+        </div>
+    </div>`;
+    overlay.querySelector('.modal-close').onclick = () => overlay.remove();
+    overlay.querySelector('[data-rest="long"]').onclick = () => {
+        overlay.remove();
+        window.schedaLongRest(pgId);
+    };
+    overlay.querySelector('[data-rest="short"]').onclick = () => {
+        overlay.remove();
+        if (typeof showNotification === 'function') showNotification('Riposo breve: work in progress');
+    };
+    document.body.appendChild(overlay);
+};
+
 window.schedaLongRest = async function(pgId) {
     const pg = _schedaPgCache;
     if (!pg || pg.id !== pgId) return;
     const ok = await _schedaShowConfirmDialog({
         title: 'Riposo Lungo',
-        message: 'Ripristinare punti vita, slot, dadi vita e tutte le risorse? Le condizioni resteranno attive e l\'esaustione scendera di 1.',
+        message: 'Ripristinare punti vita, slot e risorse, e recuperare meta dei dadi vita? Le condizioni resteranno attive e l\'esaustione scendera di 1.',
         confirmLabel: 'Riposa',
         cancelLabel: 'Annulla',
     });
