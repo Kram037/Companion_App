@@ -301,7 +301,7 @@ async function renderMicroScheda(personaggioId) {
                     <span class="scheda-hd-total">${res.nome} <small>(${c.nome})</small></span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
-                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                        <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sCRes_${key}" onclick="schedaSetResourceValue('${pg.id}','class','${key}',${maxVal})" aria-label="Imposta ${escapeHtml(res.nome)}">${current}</button>
                         <span class="scheda-hd-max">/ ${maxVal}</span>
                         <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
                     </div>
@@ -315,7 +315,7 @@ async function renderMicroScheda(personaggioId) {
             <span class="scheda-hd-total">${escapeHtml(rr.name)}${sub}</span>
             <div class="scheda-hd-avail">
                 <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},-1,${rr.max})">−</button>
-                <span class="scheda-hd-val" id="sRRes_${rr.key}">${rr.current}</span>
+                <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sRRes_${rr.key}" onclick="schedaSetResourceValue('${pg.id}','race','${rr.key}',${rr.max})" aria-label="Imposta ${escapeHtml(rr.name)}">${rr.current}</button>
                 <span class="scheda-hd-max">/ ${rr.max}</span>
                 <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},1,${rr.max})">+</button>
             </div>
@@ -329,7 +329,7 @@ async function renderMicroScheda(personaggioId) {
             <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica / elimina">${label}</span>
             <div class="scheda-hd-avail">
                 <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
-                <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
+                <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sCusRes_${i}" onclick="schedaSetResourceValue('${pg.id}','custom','${i}',${cr.max})" aria-label="Imposta ${escapeHtml(cr.nome)}">${current}</button>
                 <span class="scheda-hd-max">/ ${cr.max}</span>
                 <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},1,${cr.max})">+</button>
             </div>
@@ -424,7 +424,8 @@ async function renderMicroScheda(personaggioId) {
             <div class="scheda-hp-display" id="schedaPvTemp">${pvTemp}</div>
             <div class="scheda-hp-label">PF Temp</div>
         </div>
-    </div>
+        </div>
+    <button type="button" class="btn-primary scheda-long-rest-btn" onclick="schedaLongRest('${pg.id}')">☾ Riposo Lungo</button>
 
     <div class="scheda-section">
         <div class="scheda-section-title">Dadi Vita</div>

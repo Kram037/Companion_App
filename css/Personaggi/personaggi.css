@@ -1129,8 +1129,11 @@
 .scheda-hd-total small { color: var(--text-light); font-weight: 400; }
 .scheda-hd-avail { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .scheda-hd-val { font-size: 1rem; font-weight: 800; color: var(--accent); min-width: 24px; text-align: center; }
+.scheda-hd-val-editable { min-height: 28px; padding: 2px 7px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; line-height: 1; }
+.scheda-hd-val-editable:hover, .scheda-hd-val-editable:focus-visible { border-color: var(--accent); background: var(--surface-hover); outline: none; }
 .scheda-hd-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; padding: 0; line-height: 1; }
 .scheda-hd-btn:hover { border-color: var(--accent); background: var(--surface-hover); }
+.scheda-long-rest-btn { width: 100%; margin: 10px 0 4px; }
 
 /* Tags & Conditions */
 .scheda-tags { display: flex; flex-wrap: wrap; gap: 4px; }

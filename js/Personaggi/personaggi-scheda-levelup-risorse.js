@@ -477,6 +477,133 @@ window.schedaHdChange = function(pgId, className, current, delta, max) {
     schedaInstantSave(pgId, { dadi_vita_disponibili: dadi });
 }
 
+// Apre il tastierino sul valore corrente: utile per risorse capienti
+// (es. Imposizione delle Mani) senza dover premere +/- decine di volte.
+window.schedaSetResourceValue = async function(pgId, kind, key, max) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const resources = pg.risorse_classe || {};
+    let current = max;
+    if (kind === 'class') current = resources[key] ?? max;
+    else if (kind === 'subclass') current = resources._subclass?.[key] ?? max;
+    else if (kind === 'race') current = resources._race?.[key] ?? max;
+    else if (kind === 'invocation') current = resources._invocations?.[key] ?? max;
+    else if (kind === 'custom') current = resources._custom?.[Number(key)]?.current ?? max;
+    else return;
+
+    current = Math.max(0, Math.min(max, Number(current) || 0));
+    const next = await _schedaShowNumpadDialog({
+        title: 'Imposta risorsa',
+        initial: current,
+        min: 0,
+        max,
+    });
+    if (next == null || next === current) return;
+    const delta = next - current;
+    if (kind === 'class') schedaClassResChange(pgId, key, current, delta, max);
+    else if (kind === 'subclass') schedaSubclassResChange(pgId, key, current, delta, max);
+    else if (kind === 'race') schedaRaceResChange(pgId, key, current, delta, max);
+    else if (kind === 'invocation') schedaInvocationSlotChange(pgId, key, current, delta, max);
+    else schedaCustomResChange(pgId, Number(key), current, delta, max);
+};
+
+// Produce un unico aggiornamento atomico per il riposo lungo. Le condizioni
+// non compaiono volutamente nell'oggetto restituito; l'esaustione e' l'unica
+// eccezione e scende di un livello.
+window._schedaBuildLongRestUpdates = function(pg) {
+    const sourceResources = (pg.risorse_classe && typeof pg.risorse_classe === 'object') ? pg.risorse_classe : {};
+    const resources = {
+        ...sourceResources,
+        _subclass: { ...(sourceResources._subclass || {}) },
+        _race: { ...(sourceResources._race || {}) },
+        _innate: { ...(sourceResources._innate || {}) },
+        _invocations: { ...(sourceResources._invocations || {}) },
+        _portent: { ...(sourceResources._portent || {}) },
+        _custom: Array.isArray(sourceResources._custom)
+            ? sourceResources._custom.map(r => ({ ...r, current: Math.max(0, Number(r.max) || 0) }))
+            : [],
+    };
+    const overrides = sourceResources._overrides || {};
+
+    (pg.classi || []).forEach(c => {
+        (CLASS_RESOURCES[c.nome] || []).forEach((res, index) => {
+            const level = Number(c.livello) || 1;
+            if (level < res.fromLevel) return;
+            let max = res.hpPool ? level * 5
+                : res.usaMod ? Math.max(1, calcMod(pg[res.usaMod] || 10))
+                    : res.perLivello?.[Math.min(level, 20)] || 0;
+            const key = index === 0 ? `${c.nome}_res` : `${c.nome}_res_${index}`;
+            if (Number(overrides[key]?.max) > 0) max = Number(overrides[key].max);
+            if (max > 0) resources[key] = max;
+        });
+    });
+
+    _pgSubclassResources(pg).forEach(resource => {
+        resources._subclass[resource.key] = resource.max;
+        if (resource.tipo === 'portent') {
+            resources._portent[resource.key] = Array.from(
+                { length: resource.max },
+                () => 1 + Math.floor(Math.random() * 20)
+            );
+        }
+    });
+    _pgRaceResources(pg).forEach(resource => { resources._race[resource.key] = resource.max; });
+    _pgRaceInnateSlots(pg).forEach(resource => { resources._innate[resource.key] = resource.max; });
+    _pgInvocationSlots(pg).forEach(resource => { resources._invocations[resource.key] = resource.max; });
+
+    const slots = {};
+    Object.entries(pg.slot_incantesimo || {}).forEach(([level, raw]) => {
+        if (!raw || typeof raw !== 'object') return;
+        const max = Math.max(0, Number(raw.max) || 0);
+        slots[level] = { ...raw, max, current: max, used: 0 };
+    });
+
+    const hitDice = {};
+    (pg.classi || []).forEach(c => { hitDice[c.nome] = Number(c.livello) || 1; });
+    const maxHp = (typeof schedaGetPvMaxEffettivo === 'function')
+        ? schedaGetPvMaxEffettivo(pg)
+        : Math.max(1, (Number(pg.punti_vita_max) || 10) + (Number(pg.bonus_manuali?._pv_max_temporaneo) || 0));
+    const updates = {
+        pv_attuali: maxHp,
+        slot_incantesimo: slots,
+        dadi_vita_disponibili: hitDice,
+        risorse_classe: resources,
+        esaustione: Math.max(0, (Number(pg.esaustione) || 0) - 1),
+    };
+
+    const privileges = (pg.privilegi && typeof pg.privilegi === 'object') ? pg.privilegi : null;
+    if (privileges?.p1_features && typeof privileges.p1_features === 'object') {
+        const p1Features = {};
+        Object.entries(privileges.p1_features).forEach(([name, items]) => {
+            p1Features[name] = Array.isArray(items)
+                ? items.map(item => item && typeof item === 'object'
+                    ? { ...item, current: Math.max(0, Number(item.max) || 0) }
+                    : item)
+                : items;
+        });
+        updates.privilegi = { ...privileges, p1_features: p1Features };
+    }
+    return updates;
+};
+
+window.schedaLongRest = async function(pgId) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const ok = await _schedaShowConfirmDialog({
+        title: 'Riposo Lungo',
+        message: 'Ripristinare punti vita, slot, dadi vita e tutte le risorse? Le condizioni resteranno attive e l\'esaustione scendera di 1.',
+        confirmLabel: 'Riposa',
+        cancelLabel: 'Annulla',
+    });
+    if (!ok) return;
+    const updates = window._schedaBuildLongRestUpdates(pg);
+    Object.assign(pg, updates);
+    await schedaInstantSave(pgId, updates);
+    showNotification && showNotification('Riposo lungo completato');
+    if (pg.tipo_scheda === 'micro') await renderMicroScheda(pgId);
+    else await renderSchedaPersonaggio(pgId);
+};
+
 window.schedaClassResChange = function(pgId, key, current, delta, max) {
     const newVal = Math.max(0, max != null ? Math.min(max, current + delta) : current + delta);
     if (newVal === current) return;

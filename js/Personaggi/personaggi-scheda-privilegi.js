@@ -239,7 +239,7 @@ function _buildP1CustomTablesHtml(pg) {
                     <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenP1TabRes('${pg.id}',${tabKey},${i})" title="Modifica / elimina">${label}</span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},-1,${max})">−</button>
-                        <span class="scheda-hd-val">${current}</span>
+                        <button type="button" class="scheda-hd-val scheda-hd-val-editable" onclick="schedaSetP1ResourceValue('${pg.id}',${tabKey},${i},${max})" aria-label="Imposta ${escapeHtml(r.nome)}">${current}</button>
                         <span class="scheda-hd-max">/ ${max}</span>
                         <button class="scheda-hd-btn" onclick="schedaP1TabResChange('${pg.id}',${tabKey},${i},${current},1,${max})">+</button>
                     </div>
@@ -345,6 +345,17 @@ window.schedaP1TabResChange = async function(pgId, tabName, index, current, delt
         } catch (e) { console.warn('[p1 custom res] save failed', e); }
     }
     openSchedaPersonaggio(pgId);
+};
+
+window.schedaSetP1ResourceValue = async function(pgId, tabName, index, max) {
+    const pg = _schedaPgCache;
+    if (!pg || pg.id !== pgId) return;
+    const item = _normalizePrivilegi(pg).p1_features[tabName]?.[index];
+    if (!item) return;
+    const current = Math.max(0, Math.min(max, Number(item.current ?? max) || 0));
+    const next = await _schedaShowNumpadDialog({ title: 'Imposta risorsa', initial: current, min: 0, max });
+    if (next == null || next === current) return;
+    await schedaP1TabResChange(pgId, tabName, index, current, next - current, max);
 };
 
 // Apre la dialog "Aggiungi/Modifica risorsa" per una tabella custom di pagina 1.

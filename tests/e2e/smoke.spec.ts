@@ -38,6 +38,73 @@ test('keeps the session return button above bookmarks on character sheets', asyn
   expect(sessionReturn!.y + sessionReturn!.height).toBeLessThanOrEqual(bookmark!.y);
 });
 
+test('long rest restores resources without clearing conditions', async ({ page }) => {
+  await page.goto('/');
+  await waitForStartup(page);
+
+  const updates = await page.evaluate(() => (window as any)._schedaBuildLongRestUpdates({
+    id: 'paladin-1',
+    livello: 10,
+    classi: [{ nome: 'Paladino', livello: 10 }],
+    punti_vita_max: 84,
+    pv_attuali: 12,
+    esaustione: 2,
+    avvelenato: true,
+    slot_incantesimo: { 1: { max: 4, current: 1, used: 3 } },
+    dadi_vita_disponibili: { Paladino: 2 },
+    risorse_classe: {
+      Paladino_res: 3,
+      _custom: [{ nome: 'Cariche', max: 7, current: 1 }],
+    },
+    privilegi: {
+      p1_features: { Pozioni: [{ nome: 'Pozioni', max: 3, current: 0 }] },
+    },
+  }));
+
+  expect(updates.pv_attuali).toBe(84);
+  expect(updates.esaustione).toBe(1);
+  expect(updates.slot_incantesimo['1']).toMatchObject({ max: 4, current: 4, used: 0 });
+  expect(updates.dadi_vita_disponibili.Paladino).toBe(10);
+  expect(updates.risorse_classe.Paladino_res).toBe(50);
+  expect(updates.risorse_classe._custom[0].current).toBe(7);
+  expect(updates.privilegi.p1_features.Pozioni[0].current).toBe(3);
+  expect(updates).not.toHaveProperty('avvelenato');
+});
+
+test('generic magic armor keeps the selected base armor', async ({ page }) => {
+  await page.goto('/');
+  await waitForStartup(page);
+
+  const result = await page.evaluate(() => {
+    const armors = [
+      { nome: 'Pelle', cat: 'media' },
+      { nome: 'Mezza Armatura', cat: 'media' },
+      { nome: 'Armatura Completa', cat: 'pesante' },
+      { nome: 'Cuoio', cat: 'leggera' },
+    ];
+    const candidates = (window as any)._schedaMatchDndCandidates(
+      armors,
+      'media o pesante (esclusa di pelle)',
+      { armatura: true },
+    );
+    return {
+      candidates: candidates.map((item: { nome: string }) => item.nome),
+      name: (window as any)._invCatalogArmorVariantName(
+        { nome: 'Armatura di Mithral' },
+        'Armatura Completa',
+      ),
+      legacyName: (window as any)._schedaBuildEquipDisplayName(
+        'Armatura di Mithral',
+        'Armatura Completa',
+      ),
+    };
+  });
+
+  expect(result.candidates).toEqual(['Mezza Armatura', 'Armatura Completa']);
+  expect(result.name).toBe('Armatura Completa di Mithral');
+  expect(result.legacyName).toBe('Armatura Completa di Mithral');
+});
+
 test('navigates through the main mobile toolbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

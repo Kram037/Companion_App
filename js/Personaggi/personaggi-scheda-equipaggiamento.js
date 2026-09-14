@@ -332,9 +332,22 @@ function _schedaMatchDndCandidates(dataset, subRaw, opts = {}) {
     // 1) match esatto sul nome
     const exact = dataset.filter(x => (x.nome || '').toLowerCase() === sub);
     if (exact.length) return exact;
-    // 2) "qualsiasi X" o "X qualsiasi" -> match per parola chiave
+    // 2) per le armature, le categorie prevalgono sui token del nome.
+    // "media o pesante (esclusa di pelle)" non deve quindi risolversi
+    // erroneamente nella sola Armatura di Pelle.
+    if (opts.armatura) {
+        const cats = ['leggera','media','pesante'].filter(c => sub.includes(c));
+        if (cats.length) {
+            let matches = dataset.filter(x => cats.includes(x.cat) && x.cat !== 'scudo');
+            if (/esclus[oa]\s+(?:di\s+)?pelle/.test(sub)) {
+                matches = matches.filter(x => (x.nome || '').toLowerCase() !== 'pelle');
+            }
+            return matches;
+        }
+    }
+    // 3) "qualsiasi X" o "X qualsiasi" -> match per parola chiave
     const cleaned = sub.replace(/\b(qualsiasi|qualunque|ogni|tutte le|tutti gli)\b/g, '').trim();
-    // 3) per le armi: "spada", "ascia", "martello", ...
+    // 4) per le armi o armature specifiche: "spada", "ascia", "cuoio", ...
     if (cleaned) {
         const tokens = cleaned.split(/[\s,()\/]+/).filter(t => t && t.length >= 3);
         if (tokens.length) {
@@ -343,13 +356,6 @@ function _schedaMatchDndCandidates(dataset, subRaw, opts = {}) {
                 return tokens.some(t => n.includes(t));
             });
             if (matches.length) return matches;
-        }
-    }
-    // 4) per le armature: matcha per categoria (leggera/media/pesante)
-    if (opts.armatura) {
-        const cats = ['leggera','media','pesante'].filter(c => sub.includes(c));
-        if (cats.length) {
-            return dataset.filter(x => cats.includes(x.cat) && x.cat !== 'scudo');
         }
     }
     return [];
@@ -501,6 +507,13 @@ function _schedaBuildEquipDisplayName(invName, baseName) {
     if (!stripped) return baseName || 'Oggetto';
     if (!lowBase || lowName === lowBase || lowName.includes(lowBase)) {
         return stripped;
+    }
+    // Le armature magiche generiche sono una variante di una base D&D:
+    // "Armatura di Mithral" + "Armatura Completa" diventa
+    // "Armatura Completa di Mithral", anche per gli item gia' salvati.
+    if (/^armatura\b/i.test(stripped)) {
+        const suffix = stripped.replace(/^armatura\s*/i, '').trim();
+        if (suffix) return `${baseName} ${suffix}`;
     }
     return `${stripped} (${baseName})`;
 }

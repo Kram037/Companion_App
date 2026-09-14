@@ -1059,16 +1059,60 @@ window.invAddFromCatalog = async function(pgId, catId) {
     const cat = Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
     const it = cat.find(o => String(o.id) === String(catId));
     if (!it) return;
+    if ((it.tipo || '').toLowerCase() === 'armatura' && typeof DND_ARMATURE !== 'undefined') {
+        const armors = DND_ARMATURE.filter(a => a.cat !== 'scudo');
+        let candidates = _schedaMatchDndCandidates(armors, it.sotto_tipo || '', { armatura: true });
+        if (!candidates.length && /armatura|qualsiasi|qualunque/i.test(it.sotto_tipo || '')) candidates = armors;
+        if (candidates.length > 1) return _invOpenCatalogArmorDialog(pgId, it, candidates);
+    }
+    return _invSaveCatalogItem(pgId, it);
+};
+
+function _invOpenCatalogArmorDialog(pgId, item, candidates) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hp-calc-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const rows = candidates.map(armor => `<button type="button" class="generic-magic-type-row"
+        onclick="_invAddCatalogArmorVariant('${pgId}','${escapeHtml(String(item.id)).replace(/'/g, "\\'")}','${escapeHtml(armor.nome).replace(/'/g, "\\'")}')">
+        <span class="generic-magic-type-name">${escapeHtml(armor.nome)}</span>
+        <span class="generic-magic-type-sub">CA ${armor.ca_base} · ${escapeHtml(armor.cat)}</span>
+    </button>`).join('');
+    overlay.innerHTML = `<div class="hp-calc-modal generic-magic-modal generic-magic-modal-wide">
+        <button class="modal-close" onclick="this.closest('.hp-calc-overlay').remove()">&times;</button>
+        <h3 class="generic-magic-title">${escapeHtml(item.nome || 'Armatura')}</h3>
+        <p class="generic-magic-sub">Scegli l'armatura di base</p>
+        <div class="generic-magic-type-list">${rows}</div>
+        <div class="dialog-actions" style="margin-top:12px;justify-content:flex-end;">
+            <button class="btn-secondary" onclick="this.closest('.hp-calc-overlay').remove()">Annulla</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+window._invAddCatalogArmorVariant = function(pgId, catId, armorName) {
+    const cat = Array.isArray(window.OGGETTI_MAGICI_DATA) ? window.OGGETTI_MAGICI_DATA : [];
+    const item = cat.find(o => String(o.id) === String(catId));
+    const armor = (typeof DND_ARMATURE !== 'undefined') ? DND_ARMATURE.find(a => a.nome === armorName) : null;
+    if (!item || !armor) return;
+    return _invSaveCatalogItem(pgId, item, armor);
+};
+
+function _invCatalogArmorVariantName(item, armorName) {
+    const suffix = String(item.nome || '').replace(/^Armatura\s*/i, '').trim();
+    return suffix ? `${armorName} ${suffix}` : armorName;
+}
+
+async function _invSaveCatalogItem(pgId, it, armor) {
     const supabase = getSupabaseClient();
     const pg = _schedaPgCache;
     if (!supabase || !pg) return;
     const inventario = pg.inventario ? [...pg.inventario] : [];
     const entry = {
-        nome: it.nome || it.nome_en || 'Oggetto',
+        nome: armor ? _invCatalogArmorVariantName(it, armor.nome) : (it.nome || it.nome_en || 'Oggetto'),
         descrizione: it.descrizione || it.descrizione_en || '',
         quantita: 1,
         tipo: it.tipo || '',
-        sotto_tipo: it.sotto_tipo || '',
+        sotto_tipo: armor ? armor.nome : (it.sotto_tipo || ''),
         rarita: it.rarita || '',
         richiede_sintonia: !!it.richiede_sintonia,
         sintonia_dettaglio: it.sintonia_dettaglio || '',
@@ -1076,13 +1120,14 @@ window.invAddFromCatalog = async function(pgId, catId) {
         magico: (it.rarita && it.rarita !== 'Comune') || (parseInt(it.incantamento) > 0),
         _catalog_id: it.id,
     };
+    if (armor) entry.armatura_base = armor.nome;
     if (parseInt(it.incantamento) > 0) entry.magic_bonus = parseInt(it.incantamento);
     inventario.push(entry);
     pg.inventario = inventario;
     await supabase.from('personaggi').update({ inventario }).eq('id', pgId);
     document.querySelector('.hp-calc-overlay')?.remove();
     schedaOpenInventoryPage(pgId);
-};
+}
 
 // ──────────────────────────────────────────────────────────────────────
 // Voci "generiche" del catalogo: Arma/Armatura/Scudo +N.

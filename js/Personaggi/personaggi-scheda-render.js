@@ -191,7 +191,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenEditClassRes('${pg.id}','${key}','${escapeHtml(res.nome).replace(/'/g, '&#39;')}',${maxVal})" title="Modifica">${escapeHtml(dispNome)} <small>(${escapeHtml(c.nome)})</small></span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},-1,${maxVal})">−</button>
-                        <span class="scheda-hd-val" id="sCRes_${key}">${current}</span>
+                        <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sCRes_${key}" onclick="schedaSetResourceValue('${pg.id}','class','${key}',${maxVal})" aria-label="Imposta ${escapeHtml(dispNome)}">${current}</button>
                         <span class="scheda-hd-max">/ ${maxVal}</span>
                         <button class="scheda-hd-btn" onclick="schedaClassResChange('${pg.id}','${key}',${current},1,${maxVal})">+</button>
                     </div>
@@ -237,7 +237,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                     <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenEditClassRes('${pg.id}','${sr.key}','${escapeHtml(sr.nome).replace(/'/g, '&#39;')}',${Math.max(0, 2 * wizardLvl + intMod)})" title="Modifica">${escapeHtml(dispNome)}${sub}</span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${wardCur},-1,${wardMax})">−</button>
-                        <span class="scheda-hd-val" id="sSubRes_${sr.key}">${wardCur}</span>
+                        <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sSubRes_${sr.key}" onclick="schedaSetResourceValue('${pg.id}','subclass','${sr.key}',${wardMax})" aria-label="Imposta ${escapeHtml(dispNome)}">${wardCur}</button>
                         <span class="scheda-hd-max">/ ${wardMax}</span>
                         <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${wardCur},1,${wardMax})">+</button>
                     </div>
@@ -248,7 +248,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                     <span class="scheda-hd-total scheda-hd-total-clickable" ${editBtn}>${escapeHtml(dispNome)}${dieBadge}${sub}</span>
                     <div class="scheda-hd-avail">
                         <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${current},-1,${maxVal})">−</button>
-                        <span class="scheda-hd-val" id="sSubRes_${sr.key}">${current}</span>
+                        <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sSubRes_${sr.key}" onclick="schedaSetResourceValue('${pg.id}','subclass','${sr.key}',${maxVal})" aria-label="Imposta ${escapeHtml(dispNome)}">${current}</button>
                         <span class="scheda-hd-max">/ ${maxVal}</span>
                         <button class="scheda-hd-btn" onclick="schedaSubclassResChange('${pg.id}','${sr.key}',${current},1,${maxVal})">+</button>
                     </div>
@@ -262,7 +262,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <span class="scheda-hd-total">${escapeHtml(rr.name)}${sub}</span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},-1,${rr.max})">−</button>
-                    <span class="scheda-hd-val" id="sRRes_${rr.key}">${rr.current}</span>
+                    <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sRRes_${rr.key}" onclick="schedaSetResourceValue('${pg.id}','race','${rr.key}',${rr.max})" aria-label="Imposta ${escapeHtml(rr.name)}">${rr.current}</button>
                     <span class="scheda-hd-max">/ ${rr.max}</span>
                     <button class="scheda-hd-btn" onclick="schedaRaceResChange('${pg.id}','${rr.key}',${rr.current},1,${rr.max})">+</button>
                 </div>
@@ -277,7 +277,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <span class="scheda-hd-total">${escapeHtml(is.name)} <small>(supplica, ${escapeHtml(is.recharge)})</small></span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},-1,${is.max})">−</button>
-                    <span class="scheda-hd-val" id="sInvRes_${is.key}">${is.current}</span>
+                    <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sInvRes_${is.key}" onclick="schedaSetResourceValue('${pg.id}','invocation','${is.key}',${is.max})" aria-label="Imposta ${escapeHtml(is.name)}">${is.current}</button>
                     <span class="scheda-hd-max">/ ${is.max}</span>
                     <button class="scheda-hd-btn" onclick="schedaInvocationSlotChange('${pg.id}','${is.key}',${is.current},1,${is.max})">+</button>
                 </div>
@@ -291,7 +291,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                 <span class="scheda-hd-total scheda-hd-total-clickable" onclick="schedaOpenAddCustomRes('${pg.id}',${i})" title="Modifica / elimina">${label}</span>
                 <div class="scheda-hd-avail">
                     <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},-1,${cr.max})">−</button>
-                    <span class="scheda-hd-val" id="sCusRes_${i}">${current}</span>
+                    <button type="button" class="scheda-hd-val scheda-hd-val-editable" id="sCusRes_${i}" onclick="schedaSetResourceValue('${pg.id}','custom','${i}',${cr.max})" aria-label="Imposta ${escapeHtml(cr.nome)}">${current}</button>
                     <span class="scheda-hd-max">/ ${cr.max}</span>
                     <button class="scheda-hd-btn" onclick="schedaCustomResChange('${pg.id}',${i},${current},1,${cr.max})">+</button>
                 </div>
@@ -414,6 +414,7 @@ async function renderSchedaPersonaggio(personaggioId) {
                         <div class="scheda-hp-label">PF Temp</div>
                 </div>
             </div>
+                <button type="button" class="btn-primary scheda-long-rest-btn" onclick="schedaLongRest('${pg.id}')">☾ Riposo Lungo</button>
                 <div class="scheda-subsection collapsed">
                     <div class="scheda-subsection-title" onclick="schedaToggleSubsection(this)">
                         <span>Difese</span>
