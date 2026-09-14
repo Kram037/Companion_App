@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS personaggi (
     classe_armatura INTEGER DEFAULT 10,
     percezione_passiva INTEGER DEFAULT 10,
     velocita DECIMAL(5,1) DEFAULT 9.0,
+    ispirazione INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(id, user_id)
@@ -303,7 +304,8 @@ RETURNS TABLE (
     iniziativa INTEGER,
     punti_vita_max INTEGER,
     classe_armatura INTEGER,
-    player_nome TEXT
+    player_nome TEXT,
+    ispirazione INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -342,7 +344,7 @@ BEGIN
     SELECT pc.personaggio_id, pc.user_id AS player_user_id,
            p.nome, p.razza, p.classe, p.livello, p.esperienza, p.iniziativa,
            p.punti_vita_max, p.classe_armatura,
-           u.nome_utente AS player_nome
+           u.nome_utente AS player_nome, COALESCE(p.ispirazione, 0)
     FROM personaggi_campagna pc
     JOIN personaggi p
       ON p.id = pc.personaggio_id
@@ -361,6 +363,7 @@ REVOKE EXECUTE ON FUNCTION get_personaggi_utente() FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM anon;
 
 GRANT EXECUTE ON FUNCTION get_personaggi_utente() TO authenticated;
 GRANT EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;

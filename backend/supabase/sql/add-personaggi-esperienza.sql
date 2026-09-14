@@ -1,5 +1,6 @@
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS esperienza INTEGER DEFAULT 0;
 ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS bonus_manuali JSONB DEFAULT '{}';
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS ispirazione INTEGER DEFAULT 0;
 
 UPDATE personaggi
 SET esperienza = 0
@@ -152,7 +153,8 @@ RETURNS TABLE (
     iniziativa INTEGER,
     punti_vita_max INTEGER,
     classe_armatura INTEGER,
-    player_nome TEXT
+    player_nome TEXT,
+    ispirazione INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -191,7 +193,7 @@ BEGIN
     SELECT pc.personaggio_id, pc.user_id AS player_user_id,
            p.nome, p.razza, p.classe, p.livello, p.esperienza, p.iniziativa,
            p.punti_vita_max, p.classe_armatura,
-           u.nome_utente AS player_nome
+           u.nome_utente AS player_nome, COALESCE(p.ispirazione, 0)
     FROM personaggi_campagna pc
     JOIN personaggi p
       ON p.id = pc.personaggio_id
@@ -208,6 +210,7 @@ $$;
 REVOKE EXECUTE ON FUNCTION get_personaggi_utente() FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM anon;
 
 GRANT EXECUTE ON FUNCTION get_personaggi_utente() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;

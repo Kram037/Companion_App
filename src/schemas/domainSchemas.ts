@@ -153,6 +153,7 @@ export const campaignCharacterSchema = z.object({
   personaggio_id: z.string(),
   nome: z.string().nullish(),
   player_user_id: z.string().nullish(),
+  ispirazione: z.coerce.number().nullish(),
 });
 
 export const combatCharacterRowSchema = z.object({

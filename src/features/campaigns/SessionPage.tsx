@@ -241,7 +241,8 @@ export function SessionPage() {
         <div className="session-pg-cards-title">Personaggi</div>
         {!characters.data?.length ? <div className="campagna-pg-empty">Nessun personaggio in questa campagna.</div> : <div className="session-pg-cards-grid">
           {characters.data.map(character => <button className="session-pg-card" type="button" key={character.id} onClick={() => window.openSchedaPersonaggio?.(character.id)} title={character.nome}>
-            <span className="session-pg-card-initials">{character.nome.slice(0, 2).toUpperCase()}</span><span className="session-pg-card-name">{character.nome}</span>
+            <span className="session-pg-card-initials">{character.nome.slice(0, 2).toUpperCase()}</span>
+            <span className="session-pg-card-copy"><span className="session-pg-card-inspiration" aria-label={`Ispirazioni: ${character.ispirazione ?? 0}`}>★ {character.ispirazione ?? 0}</span><span className="session-pg-card-name">{character.nome}</span></span>
           </button>)}
         </div>}
       </div>

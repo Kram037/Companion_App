@@ -104,6 +104,7 @@ export interface CampaignCharacter {
   id: Id;
   nome: string;
   player_user_id?: Id | null;
+  ispirazione?: number | null;
 }
 
 export interface RichiestaTiro {

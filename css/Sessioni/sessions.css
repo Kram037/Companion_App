@@ -393,6 +393,17 @@
     justify-content: center;
     flex-shrink: 0;
 }
+.session-pg-card-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.session-pg-card-inspiration {
+    color: gold;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+}
 .session-pg-card-name {
     overflow: hidden;
     text-overflow: ellipsis;

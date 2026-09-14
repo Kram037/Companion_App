@@ -2,6 +2,8 @@
 
 BEGIN;
 
+ALTER TABLE personaggi ADD COLUMN IF NOT EXISTS ispirazione INTEGER DEFAULT 0;
+
 DO $$
 DECLARE
     v_invalid_links TEXT;
@@ -246,7 +248,8 @@ RETURNS TABLE (
     iniziativa INTEGER,
     punti_vita_max INTEGER,
     classe_armatura INTEGER,
-    player_nome TEXT
+    player_nome TEXT,
+    ispirazione INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -289,7 +292,7 @@ BEGIN
     SELECT pc.personaggio_id, pc.user_id,
            p.nome, p.razza, p.classe, p.livello, p.esperienza, p.iniziativa,
            p.punti_vita_max, p.classe_armatura,
-           u.nome_utente
+           u.nome_utente, COALESCE(p.ispirazione, 0)
     FROM personaggi_campagna pc
     JOIN personaggi p
       ON p.id = pc.personaggio_id
@@ -397,6 +400,7 @@ $$;
 REVOKE EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggio_campagna(VARCHAR(10), VARCHAR(10)) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION get_personaggi_in_campagna(VARCHAR(10)) FROM anon;
 REVOKE EXECUTE ON FUNCTION update_campaign_character_conditions(VARCHAR(10), VARCHAR(10), JSONB) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION select_personaggio_campagna(VARCHAR(10), VARCHAR(10)) TO authenticated;

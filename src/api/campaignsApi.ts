@@ -46,6 +46,7 @@ export async function fetchCampaignCharacters(campagnaId: Id): Promise<CampaignC
     id: row.personaggio_id,
     nome: row.nome ?? '?',
     player_user_id: row.player_user_id,
+    ispirazione: row.ispirazione ?? 0,
   }));
 }
 

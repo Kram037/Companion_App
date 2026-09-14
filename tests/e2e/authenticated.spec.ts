@@ -129,6 +129,7 @@ test('authenticated campaign navigation', async ({ page }) => {
   await page.goto(`/campagne/${campaignId}/sessione`);
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'sessione');
   await expect(page.locator('#react-root .sessione-content')).toBeVisible();
+  await expect(page.locator('#react-root .session-pg-card-inspiration').first()).toHaveText(/^★ \d+$/);
   await page.getByRole('button', { name: 'Torna ai dettagli' }).click();
   await expect(page).toHaveURL(new RegExp(`/campagne/${campaignId}$`));
   await expect(page.locator('body')).toHaveAttribute('data-react-owner', 'dettagli');

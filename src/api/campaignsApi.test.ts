@@ -9,7 +9,7 @@ vi.mock('./supabaseClient', () => ({
   throwIfSupabaseError: vi.fn(),
 }));
 
-import { toggleCampaignFavorite, updateCampaignInviteStatus } from './campaignsApi';
+import { fetchCampaignCharacters, toggleCampaignFavorite, updateCampaignInviteStatus } from './campaignsApi';
 
 describe('campaignsApi mutations', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -41,5 +41,17 @@ describe('campaignsApi mutations', () => {
 
     expect(rpc).toHaveBeenNthCalledWith(1, 'accetta_invito_campagna', { p_invito_id: 'i1' });
     expect(rpc).toHaveBeenNthCalledWith(2, 'rifiuta_invito_campagna', { p_invito_id: 'i2' });
+  });
+
+  it('maps cumulative inspiration returned for campaign characters', async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      data: [{ personaggio_id: 'p1', player_user_id: 'u1', nome: 'Alda', ispirazione: 4 }],
+      error: null,
+    });
+    mocks.getSupabaseClient.mockReturnValue({ rpc });
+
+    await expect(fetchCampaignCharacters('c1')).resolves.toEqual([
+      { id: 'p1', player_user_id: 'u1', nome: 'Alda', ispirazione: 4 },
+    ]);
   });
 });

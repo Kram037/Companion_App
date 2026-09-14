@@ -893,7 +893,7 @@ window.schedaToggleConcentrazione = async function(pgId, el) {
 };
 
 /* ── Ispirazione (contatore semplice, illimitato, >= 0) ── */
-window.schedaIspChange = function(pgId, delta) {
+window.schedaIspChange = async function(pgId, delta) {
     const pg = _schedaPgCache;
     if (!pg) return;
     const current = parseInt(pg.ispirazione || 0) || 0;
@@ -902,5 +902,6 @@ window.schedaIspChange = function(pgId, delta) {
     pg.ispirazione = newVal;
     const el = document.getElementById('sIsp');
     if (el) el.textContent = newVal;
-    schedaInstantSave(pgId, { ispirazione: newVal });
+    await schedaInstantSave(pgId, { ispirazione: newVal });
+    try { await sendAppEventBroadcast({ table: 'personaggi', action: 'update', id: pgId }); } catch (_) {}
 };
